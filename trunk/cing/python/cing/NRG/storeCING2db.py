@@ -25,12 +25,8 @@ from cing.main import getStopMessage
 from sqlalchemy.sql.expression import and_
 from sqlalchemy.sql.expression import select
 
-if True: # default: True
-    db_name = PDBJ_DB_NAME
-    user_name = PDBJ_DB_USER_NAME
-else:
-    db_name = CASD_DB_NAME
-    user_name = CASD_DB_USER_NAME
+db_name = PDBJ_DB_NAME
+user_name = PDBJ_DB_USER_NAME
 
 def doStoreCING2db( entry_code, archive_id, project = None):
     """Cwd should be where the project is located.
@@ -45,7 +41,7 @@ def doStoreCING2db( entry_code, archive_id, project = None):
     pdb_id = None
     casd_id = None
     schema = PDB_DB_NAME
-    if archive_id == ARCHIVE_NRG_ID or archive_id == ARCHIVE_PDB_ID:
+    if archive_id == ARCHIVE_NRG_ID or archive_id == ARCHIVE_DEV_NRG_ID or archive_id == ARCHIVE_PDB_ID:
         pdb_id = entry_code
         if pdb_id == None:
             NTerror("Expected pdb_id argument")
@@ -55,6 +51,9 @@ def doStoreCING2db( entry_code, archive_id, project = None):
             return True
         if archive_id == ARCHIVE_NRG_ID:
             schema = NRG_DB_NAME
+        elif archive_id == ARCHIVE_DEV_NRG_ID:
+            schema = DEV_NRG_DB_NAME
+
     elif archive_id == ARCHIVE_CASD_ID or archive_id == ARCHIVE_CASP_ID:
         casd_id = entry_code
         if casd_id == None:
@@ -515,6 +514,7 @@ def doStoreCING2db( entry_code, archive_id, project = None):
             if True:
                 for atom in residue.allAtoms():
                     a_name = atom.name
+                    a_spin_type = getDeepByKeysOrAttributes( atom, DB_STR, SPINTYPE_STR )
                     # WI
 #                    a_wi_ba2lst = atom.getDeepAvgByKeys(WHATIF_STR, BA2CHK_STR, VALUE_LIST_STR) # should have worked
 #                    a_wi_bh2chk = atom.getDeepAvgByKeys(WHATIF_STR, BH2CHK_STR, VALUE_LIST_STR) # should have worked
@@ -526,8 +526,17 @@ def doStoreCING2db( entry_code, archive_id, project = None):
                     a_wi_pl2chk = atom.getDeepAvgByKeys(WHATIF_STR, PL2CHK_STR, VALUE_LIST_STR)
                     a_wi_wgtchk = atom.getDeepAvgByKeys(WHATIF_STR, WGTCHK_STR, VALUE_LIST_STR)
 
+                    a_cs = None
+                    a_cs_err = None
+                    a_cs_ssa = None
+                    a_first_resonance = getDeepByKeysOrAttributes(atom, RESONANCES_STR, 0)
+                    if a_first_resonance != None:
+                        a_cs = getDeepWithNone(a_first_resonance, VALUE_STR)
+                        if a_cs != None:
+                            a_cs_err = getDeepWithNone(a_first_resonance, ERROR_STR)
+                            a_cs_ssa = truthToInt( atom.isStereoAssigned() )
                     # Store only atoms for which there is useful info.
-                    useFullColumns = [
+                    useFulColumns = [
 #                        a_wi_ba2lst,
 #                        a_wi_bh2chk,
                         a_wi_chichk,
@@ -536,23 +545,28 @@ def doStoreCING2db( entry_code, archive_id, project = None):
                         a_wi_mischk,
                         a_wi_mo2chk,
                         a_wi_pl2chk,
-                        a_wi_wgtchk
+                        a_wi_wgtchk,
+                        a_cs,
+                        a_cs_err,
+                        a_cs_ssa
                     ]
-                    hasUsefullColumn = False
-                    for column in useFullColumns:
+                    hasUsefulColumn = False
+                    for _i,column in enumerate(useFulColumns):
                         if column != None:
-                            hasUsefullColumn = True
-                    if not hasUsefullColumn:
+#                            NTdebug("Found useful column: %s %s" % ( i, column))
+                            hasUsefulColumn = True
+                    if not hasUsefulColumn:
                         continue
                     a_rog = atom.rogScore.rogInt()
-                    atomInfoList = [entry_id,chain_id,residue_id,a_name,a_wi_chichk,a_wi_dunchk,a_wi_hndchk, a_wi_mischk, a_wi_mo2chk, a_wi_pl2chk, a_wi_wgtchk,a_rog]
-                    NTdebug("Inserting atom: " + str(atomInfoList))
+                    atomInfoList = [entry_id,chain_id,residue_id,a_name,a_wi_chichk,a_wi_dunchk,a_wi_hndchk, a_wi_mischk, a_wi_mo2chk, a_wi_pl2chk, a_wi_wgtchk, a_cs,a_cs_err,a_cs_ssa,a_rog]
+#                    NTdebug("Inserting atom: " + str(atomInfoList))
                     try:
                         result = execute(catom.insert().values(
                             entry_id=entry_id,
                             chain_id=chain_id,
                             residue_id=residue_id,
                             name=a_name,
+                            spin_type=a_spin_type,
     #                        wi_ba2lst=a_wi_ba2lst,
     #                        wi_bh2chk=a_wi_bh2chk,
                             wi_chichk=a_wi_chichk,
@@ -562,6 +576,9 @@ def doStoreCING2db( entry_code, archive_id, project = None):
                             wi_mo2chk=a_wi_mo2chk,
                             wi_pl2chk=a_wi_pl2chk,
                             wi_wgtchk=a_wi_wgtchk,
+                            cs = a_cs,
+                            cs_err = a_cs_err,
+                            cs_ssa = a_cs_ssa,
                             rog=a_rog
                             )
                         )

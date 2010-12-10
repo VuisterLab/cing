@@ -14,15 +14,14 @@ import unittest
 
 class AllChecks(TestCase):
 
-    "Enable again when issue 193 with NMR-STAR format has been alleviated; "
     def testWattos(self):
         "Testing wattos reading and working on a star file that first gets created by Wim's FC."
 
         # failing entries: 1ai0, 1kr8 (same for 2hgh)
-        entryList = "1kr8".split()
-#        entryList = "1brv".split()
+#        entryList = "1kr8".split()
+        entryList = "1brv".split()
 #        entryList = "basp2".split()
-#        entryList = "taf3".split()
+#        entryList = "1bus".split()
 #        entryList = "1a4d".split()
 #        entryList = "2k0e_all".split()
 #        entryList = "1a4d 1a24 1afp 1ai0 1brv 1bus 1cjg 1hue 1ieh 1iv6 1kr8 2hgh 2k0e SRYBDNA Parvulustat".split()

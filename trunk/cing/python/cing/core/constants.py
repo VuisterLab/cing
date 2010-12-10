@@ -111,12 +111,16 @@ DIHEDRAL_BY_RESIDUE_STR = 'DihedralByResidue'
 SUMMARY_STR = 'summary'
 
 DATA_STR = 'data' # mostly for NRG.
+DB_STR = 'db'
+SPINTYPE_STR = 'spinType'
 
 DR_STR = 'distanceRestraints' # used as in residue.distanceRestraints
 AC_STR = 'dihedralRestraints' # used as in residue.dihedralRestraints
 VIOL1_STR = 'violCount1'
 VIOL3_STR = 'violCount3'
 VIOL5_STR = 'violCount5'
+
+RESONANCES_STR = 'resonances'
 
 # SQL stuff
 PDB_ID_STR      = 'pdb_id'
@@ -184,6 +188,7 @@ RMSD_STR = 'rmsd'
 RANGES_STR = 'ranges'
 RESNUM_STR = 'resNum'
 VALUE_STR = "value"
+ERROR_STR = "error"
 BACKBONE_AVERAGE_STR = 'backboneAverage'
 HEAVY_ATOM_AVERAGE_STR = 'heavyAtomsAverage'
 QSHIFT_STR = 'Qshift'

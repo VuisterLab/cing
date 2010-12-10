@@ -45,3 +45,25 @@ On the restraint side:
 2hgh CYANA with AMBER RDCs
 1d3z XPLOR RDCs
 2cka XPLOR with bounds 0, 5.5, 5.5, None for lower, upper, target, and error.
+
+Our own lab (See VuisterLab.numbers file):
+1e91
+1gm1
+1h95
+1hks
+1hkt,4046
+1mo7,5577
+1mo8,5576
+1ozi,5762
+1p9j,5801
+1pd7,5808
+1qjt,4491
+1vj6,5131
+1y7n,6113
+2fws,7009
+2fwu,7008
+2f05
+2jsx,15381
+2kls
+2klt
+3phy

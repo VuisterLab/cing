@@ -16,7 +16,8 @@ from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.Libs.disk import copy
 from cing.Libs.disk import rmdir
 from cing.Libs.forkoff import do_cmd
-from cing.NRG import ARCHIVE_NRG_ID
+from cing.NRG import * #@UnusedWildImport
+from cing.NRG.settings import * #@UnusedWildImport
 from cing.NRG.storeCING2db import doStoreCING2db
 from cing.core.classes import Project
 from cing.core.constants import * #@UnusedWildImport
@@ -261,8 +262,11 @@ def main(entryId, *extraArgList):
         # Does require:
         #from cing.PluginCode.sqlAlchemy import csqlAlchemy
         # and should never crash  run.
+        archive_id = ARCHIVE_DEV_NRG_ID
+        if isProduction:
+            archive_id = ARCHIVE_NRG_ID
         try:
-            if doStoreCING2db( entryId, ARCHIVE_NRG_ID, project=project):
+            if doStoreCING2db( entryId, archive_id, project=project):
                 NTerror("Failed to store CING project's data to DB but continuing.")
         except:
             NTtracebackError()

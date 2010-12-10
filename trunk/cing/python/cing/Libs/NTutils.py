@@ -1277,7 +1277,7 @@ class NTdict(dict):
             popitem() returns None upon empty dictionary
 
         Reserved attributes:
-            attribute '__CLASS__'                         is reserved to store a class identifier; usefull for subtyping
+            attribute '__CLASS__'                         is reserved to store a class identifier; useful for subtyping
             attribute '__OBJECTID__'                      is reserved to store an unique object id
             attribute '__FORMAT__'                        is reserved to store format for method format()
             attribute '__HIDDEN__'                        is reserved to store the hidden attributes
@@ -4086,7 +4086,7 @@ def limitToRange(v, low, hi):
     return v
 
 def NTmax(*args):
-    """Usefull as mat plot lib overrides buildin"""
+    """Useful as mat plot lib overrides buildin"""
     result = args[0]
     for a in args:
         if a > result:
@@ -4095,7 +4095,7 @@ def NTmax(*args):
 
 #
 def NTmin(*args):
-    """Usefull as mat plot lib overrides buildin"""
+    """Useful as mat plot lib overrides buildin"""
     result = args[0]
     for a in args:
         if a < result:
@@ -4404,6 +4404,12 @@ def getDeepByKeys(c, *keyList):
     return getDeepByKeys(value, *reducedKeyList)
 #end def
 
+
+def getDeepWithNone(c, *keyList):
+    value = getDeepByKeysOrAttributes(c, *keyList)
+    if isNaN(value):
+        return None
+    return value
 
 def getDeepByKeysOrAttributes(c, *keyList):
     """Return arbitrary deep element or None if key is absent at some point.
@@ -4924,7 +4930,7 @@ def _setOutStreamList(stream, outputStreamContainerList):
 
 
 
-"""Switch away from output; might be usefull to silence verbose part of code or external program"""
+"""Switch away from output; might be useful to silence verbose part of code or external program"""
 def switchOutput( showOutput, doStdOut=True, doStdErr=False):
     if showOutput:
         if doStdOut:
@@ -5127,4 +5133,10 @@ def stringMeansBooleanTrue(inputStr):
     return False
 # end def
 
-
+def truthToInt(i):
+    if i == None:
+        return None
+    if i:
+        return 1
+    return 0
+# end def
