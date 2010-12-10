@@ -1300,7 +1300,7 @@ class nrgCing(Lister):
         inputDir = 'file://' + self.results_dir + '/' + self.inputDir
         outputDir = self.results_dir
         storeCING2db = "1" # DEFAULT: 1 All arguments need to be strings.
-        extraArgList = (inputDir, outputDir, '.', '.', `ARCHIVE_TYPE_BY_CH23`, `PROJECT_TYPE_CCPN`, storeCING2db)
+        extraArgList = (inputDir, outputDir, '.', '.', `ARCHIVE_TYPE_BY_CH23`, `PROJECT_TYPE_CCPN`, storeCING2db, CV_RANGES_STR)
 
         if doScriptOnEntryList(pythonScriptFileName,
                             entryListFileName,

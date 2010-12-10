@@ -89,9 +89,8 @@ def main(entryId, *extraArgList):
     restraintsConvention = extraArgList[3]
     archiveType = extraArgList[4]
     projectType = extraArgList[5]
-    storeCING2db = False
-    if len(extraArgList) >= expectedNumberOfArguments:
-        storeCING2db = stringMeansBooleanTrue( extraArgList[6] )
+    storeCING2db = stringMeansBooleanTrue( getDeepByKeysOrAttributes(extraArgList, 6))
+    ranges = getDeepByKeysOrAttributes(extraArgList, 7)
 
     if archiveType == ARCHIVE_TYPE_FLAT:
         pass
@@ -112,6 +111,7 @@ def main(entryId, *extraArgList):
     NTdebug("projectType:          %s" % projectType)
     NTdebug("modelCount:           %s" % modelCount)
     NTdebug("storeCING2db:         %s" % storeCING2db)
+    NTdebug("ranges:               %s" % ranges)
     # presume the directory still needs to be created.
     cingEntryDir = entryId + ".cing"
 
@@ -250,6 +250,9 @@ def main(entryId, *extraArgList):
 #        project.molecule.name = entryId # insufficient since all data is already initialized to disk.
 #        project.updateProject()
 #        project.molecule.rename( entryId )
+
+    if ranges != None:
+        project.molecule.setRanges(ranges)
 
     project.save()
     if project.validate(htmlOnly=htmlOnly, doProcheck=doProcheck, doWhatif=doWhatif,

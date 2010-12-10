@@ -795,7 +795,7 @@ class Ccpn:
            NB CING data model has no CS list entity but rather stores the info at the atom & resonances level.
         """
 
-        NTdebug("Now in _getCcpnShiftList")
+#        NTdebug("Now in _getCcpnShiftList")
         shiftMapping = self._getShiftAtomNameMapping(ccpnShiftList, ccpnMolSystem)
         if not len(shiftMapping):
             NTmessage("Skipping empty CS list.")
@@ -1110,7 +1110,7 @@ class Ccpn:
            http://www.ccpn.ac.uk/ccpn/data-model/python-api-v2-examples/assignment
         """
 
-        NTdebug("Now in _getShiftAtomNameMapping for ccpnShiftList (%r)" % ccpnShiftList)
+#        NTdebug("Now in _getShiftAtomNameMapping for ccpnShiftList (%r)" % ccpnShiftList)
         ccpnResonanceList = []
         ccpnResonanceToShiftMap = {}
         ccpnShiftMappingResult = {}
@@ -1147,7 +1147,7 @@ class Ccpn:
             ccpnShift = ccpnResonanceToShiftMap[ccpnResonance]
             ccpnShiftMappingResult[ccpnShift] = [ccpnResidue, tuple(atomList) ]
         matchCount = len(ccpnShiftMappingResult)
-        NTdebug("_getShiftAtomNameMapping found %d elements in mapping." % matchCount)
+#        NTdebug("_getShiftAtomNameMapping found %d elements in mapping." % matchCount)
         if matchCount == 0:
             NTwarning("All resonances in this list are unassigned")
         return ccpnShiftMappingResult
