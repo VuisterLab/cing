@@ -308,7 +308,7 @@ CREATE INDEX atom_001 ON casdcing.cingatom (residue_id);
 CREATE INDEX atom_002 ON casdcing.cingatom (chain_id);
 CREATE INDEX atom_003 ON casdcing.cingatom (entry_id);
 CREATE INDEX atom_004 ON casdcing.cingatom (name);
-CREATE INDEX atom_005 ON casdcing.cingatom (isotope);
+CREATE INDEX atom_005 ON casdcing.cingatom (spin_type);
 CREATE INDEX atom_se1 ON casdcing.cingatom (sel_1);
 CREATE INDEX atom_se2 ON casdcing.cingatom (sel_2);
 CREATE INDEX atom_se3 ON casdcing.cingatom (sel_3);

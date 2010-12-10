@@ -63,7 +63,7 @@ commonResidueList = commonAAList + commonNAList
 common20AADict = NTlist2dict(common20AAList)
 
 terminalAtomDict = NTdict()
-terminalAtomDict.appendFromList( "H1 H2 H3 H' H''".split())
+terminalAtomDict.appendFromList( "H1 H2 H3 H' H'' HOP2 HOP3".split())
 
 def chothiaClassInt(chothiaClass):
     """Integer value for fast lookup in db. Return None if class parameter is None"""
@@ -2400,7 +2400,7 @@ Return an Molecule instance or None on error
                     inSelection = resHashSelection.has_key(res)
 #                    NTdebug("In toPDB inSelection %s for residue: %s" % (inSelection,res))
                     if useRanges and (not inSelection) and (not useRangesForLoweringOccupancy):
-                        NTdebug("In toPDB skipping residue: %s" % res)
+#                        NTdebug("In toPDB skipping residue: %s" % res)
                         continue
                     for atm in res.allAtoms():
                         atm.setdefault('pdbSkipRecord',False)
@@ -2416,7 +2416,7 @@ Return an Molecule instance or None on error
                             if useRanges and (not inSelection) and atm.isBackbone() and (
                                 atm.name == 'CA' or atm.name == "P" ):
                                 record.occupancy = 0.49 # special meaning in Whatif for ignoring the residue in Structure Z-scores.
-                                NTdebug("In toPDB lowering occ. to below half for atom: %s" % atm)
+#                                NTdebug("In toPDB lowering occ. to below half for atom: %s" % atm)
                         pdbFile.append( record )
                         atmCount += 1
                         lastAtm = atm

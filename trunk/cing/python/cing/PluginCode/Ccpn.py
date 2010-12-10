@@ -1128,7 +1128,7 @@ class Ccpn:
 
         for ccpnResonance in ccpnResonanceList:
             if not ccpnResonance.resonanceSet: # i.e atom assigned
-                NTdebug("Skipping unassigned CCPN resonance %s" % ccpnResonance)
+#                NTdebug("Skipping unassigned CCPN resonance %s" % ccpnResonance)
                 continue
             ccpnAtomSetList = list(ccpnResonance.resonanceSet.atomSets)
             ccpnResidue = ccpnAtomSetList[0].findFirstAtom().residue
