@@ -1024,7 +1024,7 @@ class nrgCing(Lister):
     # end def
 
     def prepareEntry(self, entry_code,
-                     doInteractive=1,
+                     doInteractive=0,
                      convertMmCifCoor=1,
                      convertMrRestraints=0,
                      convertStarCS=1
@@ -1538,11 +1538,13 @@ Additional modes I see:
             convertMmCifCoor = 0
             convertMrRestraints = 1
             convertStarCS = 1
+            doInteractive=isProduction
             if len(argListOther) > 0:
                 convertMmCifCoor = int(argListOther[0])
                 if len(argListOther) > 1:
                     convertMrRestraints = int(argListOther[1])
-            if m.prepareEntry(entry_code, convertMmCifCoor=convertMmCifCoor, convertMrRestraints=convertMrRestraints, convertStarCS=convertStarCS):
+            if m.prepareEntry(entry_code, doInteractive=doInteractive,
+                convertMmCifCoor=convertMmCifCoor, convertMrRestraints=convertMrRestraints, convertStarCS=convertStarCS):
                 NTerror("Failed to prepareEntry")
         elif destination == 'runCingEntry':
             m.entry_list_todo = [ entry_code ]

@@ -61,6 +61,7 @@ cd /Volumes/tera4/CASD-NMR-CING/dataPrep
 
 # DEVelopmental
 set results_base = $D/devNRG-CING
+mkdir $results_base
 cd $results_base
 mkdir recoordSync input list log index nrgPlus pgsql plot prep vCing data cmbi8
 
