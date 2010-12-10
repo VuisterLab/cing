@@ -11,7 +11,7 @@
 -- * psql --quiet pdbmlplus pdbj < $CINGROOT/scripts/sql/createDB-CING_psql.sql
 --
 -- Or edit and execute:
--- python -u $CINGROOT/python/cing/NRG/runSqlForSchema.py nrgcing    $CINGROOT/python/cing/NRG/sql/createDB-CING_psql.sql    $D/NRG-CING/pgsql
+-- python -u $CINGROOT/python/cing/NRG/runSqlForSchema.py devnrgcing    $CINGROOT/python/cing/NRG/sql/createDB-CING_psql.sql    .
 
 -- Should be autocommiting by default but I saw it didn't once.
 SET AUTOCOMMIT=1;
@@ -278,6 +278,7 @@ CREATE TABLE casdcing.cingatom
     chain_id                       INT              NOT NULL,
     entry_id                       INT              NOT NULL,
     name                           VARCHAR(255)     DEFAULT NULL,
+    spin_type                      VARCHAR(255)     DEFAULT NULL,
     sel_1                     BOOLEAN DEFAULT NULL,
     sel_2                     BOOLEAN DEFAULT NULL,
     sel_3                     BOOLEAN DEFAULT NULL,
@@ -294,6 +295,10 @@ CREATE TABLE casdcing.cingatom
     wi_pl2chk                      FLOAT DEFAULT NULL,
     wi_wgtchk                      FLOAT DEFAULT NULL,
 --   cing
+    cs                             FLOAT DEFAULT NULL,
+    cs_err                         FLOAT DEFAULT NULL,
+    cs_ssa                         INT DEFAULT NULL,
+
     rog                            INT DEFAULT NULL,
     FOREIGN KEY (residue_id)        REFERENCES casdcing.cingresidue (residue_id) ON DELETE CASCADE,
     FOREIGN KEY (chain_id)          REFERENCES casdcing.cingchain (chain_id) ON DELETE CASCADE,
@@ -303,6 +308,7 @@ CREATE INDEX atom_001 ON casdcing.cingatom (residue_id);
 CREATE INDEX atom_002 ON casdcing.cingatom (chain_id);
 CREATE INDEX atom_003 ON casdcing.cingatom (entry_id);
 CREATE INDEX atom_004 ON casdcing.cingatom (name);
+CREATE INDEX atom_005 ON casdcing.cingatom (isotope);
 CREATE INDEX atom_se1 ON casdcing.cingatom (sel_1);
 CREATE INDEX atom_se2 ON casdcing.cingatom (sel_2);
 CREATE INDEX atom_se3 ON casdcing.cingatom (sel_3);

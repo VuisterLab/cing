@@ -53,7 +53,7 @@ def interpn_linear(z, targetcoords, bincoords=None):
 
 def rebin(a, newshape):
         '''Rebin an array to a new shape, without interpolation.
-        This can be usefull if the array type is not a vector space.
+        This can be useful if the array type is not a vector space.
         '''
         assert a.ndim == len(newshape)
 

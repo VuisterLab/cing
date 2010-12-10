@@ -838,23 +838,7 @@ def main():
         # Validate
         #------------------------------------------------------------------------------------
         if options.validate or options.validateFastest or options.validateCingOnly or options.validateImageLess:
-#            modelCount=9999
-            htmlOnly = True # default is False but enable it for faster runs without some actual data.
-            doWhatif = True # disables whatif actual run
-            doProcheck = True
-            doWattos = True
-            doTalos = True
-            if options.validateFastest or options.validateCingOnly:
-                doWhatif = False
-                doProcheck = False
-                doWattos = False
-                doTalos = False
-#            if options.validateFastest:
-#                modelCount=2
-            if options.validateFastest or options.validateImageLess:
-                htmlOnly = True
-            project.validate(htmlOnly = htmlOnly, doProcheck = doProcheck, doWhatif = doWhatif, doWattos=doWattos,
-                              doTalos=doTalos)
+            project.validate(validateFastest = options.validateFastest, validateCingOnly = options.validateCingOnly, validateImageLess = options.validateImageLess)
         #end if
     # end if noProject
 

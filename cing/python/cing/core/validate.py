@@ -89,9 +89,19 @@ def runCingChecks( project, toFile=True, ranges=None ):
 
 "Need this here so the code can be tested. I.e. returns a meaningful status if needed."
 def validate( project, ranges=None, parseOnly=False, htmlOnly=False,
-        doProcheck = True, doWhatif=True, doWattos=True, doTalos=True, doSuperpose = True ):
+        doProcheck = True, doWhatif=True, doWattos=True, doTalos=True, doSuperpose = True,
+        validateFastest = False, validateCingOnly = False, validateImageLess = False ):
     if ranges == None:
         ranges = project.molecule.ranges
+
+    if validateFastest or validateCingOnly:
+        doWhatif = False
+        doProcheck = False
+        doWattos = False
+        doTalos = False
+    if validateFastest or validateImageLess:
+        htmlOnly = True
+
 #    NTdebug('Starting validate#validate with toFile True')
     if getDeepByKeysOrAttributes(plugins, SHIFTX_STR, IS_INSTALLED_STR):
         project.runShiftx(parseOnly=parseOnly)
@@ -1182,11 +1192,23 @@ def moleculeValidateAssignments( molecule  ):
     # if there are none at all assigned of that type.
     # Just initialize the ones that are checked below; not 1H or P etc.; GV added 1H anyway
     assignmentCountMap = molecule.getAssignmentCountMap()
+    notAssignmentCountMap = molecule.getAssignmentCountMap(isAssigned=False)
     hasAssignment = {}
-    for key in assignmentCountMap.keys():
-        hasAssignment[key] = assignmentCountMap[key] > 0
-
-#    NTdebug("Molecule.validateAssignments: Found assignments for the following spin types: %s" % hasAssignment.keys())
+    FRACTION_REQUIRED = 0.75
+    msg = ''
+    keyList = '1H 13C 15N 31P'.split()
+    for key in keyList:
+        a = assignmentCountMap[key]
+        n = notAssignmentCountMap[key]
+        t = a + n
+        if not t:
+            continue
+        f = (1. * a) / t
+        hasAssignment[key] = f > FRACTION_REQUIRED
+#        NTdebug("key, a, n, t, f, hasAssignment: %s" % str([key, a, n, t, f, hasAssignment]))
+        msg += '   %s %s/%s/%.2f' % ( key, a, t, f)
+    NTmessage("Found assigned/overall/fraction for spins: " + msg)
+    NTmessage("Only spins with fraction >= %.2f will be flagged when missing: %s" % ( FRACTION_REQUIRED, str(hasAssignment)))
 
     for atm in molecule.allAtoms():
         atm.rogScore.reset()
@@ -1303,33 +1325,37 @@ def moleculeValidateAssignments( molecule  ):
                 # check stereo methyl protons
                 if atm.isMethylProton():
                     heavy = atm.heavyAtom()
-                    if heavy and heavy.isAssigned():
-                        if atm.isStereoAssigned() and not heavy.isStereoAssigned():
-                            string = sprintf('%s: %s not stereo assigned', INVALID_STEREO_ASSIGNMENT, heavy )
-                            result.append( atm )
-                            atm.validateAssignment.append(string)
-                        #end if
-                        if not atm.isStereoAssigned() and heavy.isStereoAssigned():
-                            string = sprintf('%s: %s is stereo assigned', INVALID_STEREO_ASSIGNMENT, heavy )
-                            result.append( atm )
-                            atm.validateAssignment.append(string)
+                    if atm.name.endswith('1'): # JFD: don't do both.
+                        if heavy and heavy.isAssigned():
+                            if atm.isStereoAssigned() and not heavy.isStereoAssigned():
+                                string = sprintf('%s: %s not stereo assigned', INVALID_STEREO_ASSIGNMENT, heavy )
+                                result.append( atm )
+                                atm.validateAssignment.append(string)
+                            #end if
+                            if not atm.isStereoAssigned() and heavy.isStereoAssigned():
+                                string = sprintf('%s: %s is stereo assigned', INVALID_STEREO_ASSIGNMENT, heavy )
+                                result.append( atm )
+                                atm.validateAssignment.append(string)
+                            #end if
                         #end if
                     #end if
                 #end if
 
-                # check stereo methyl carbon
-                if atm.isMethyl() and atm.isCarbon():
-                    pseudo = atm.attachedProtons(includePseudo=True).last()
-                    if pseudo and pseudo.isAssigned():
-                        if atm.isStereoAssigned() and not pseudo.isStereoAssigned():
-                            string = sprintf('%s: %s not stereo assigned', INVALID_STEREO_ASSIGNMENT, pseudo )
-                            result.append( atm )
-                            atm.validateAssignment.append(string)
-                        #end if
-                        if not atm.isStereoAssigned() and pseudo.isStereoAssigned():
-                            string = sprintf('%s: %s is stereo assigned', INVALID_STEREO_ASSIGNMENT, pseudo )
-                            result.append( atm )
-                            atm.validateAssignment.append(string)
+                if False: # JFD removed this message to avoid cluttering reports
+                    # check stereo methyl carbon
+                    if atm.isMethyl() and atm.isCarbon():
+                        pseudo = atm.attachedProtons(includePseudo=True).last()
+                        if pseudo and pseudo.isAssigned():
+                            if atm.isStereoAssigned() and not pseudo.isStereoAssigned():
+                                string = sprintf('%s: %s not stereo assigned', INVALID_STEREO_ASSIGNMENT, pseudo )
+                                result.append( atm )
+                                atm.validateAssignment.append(string)
+                            #end if
+                            if not atm.isStereoAssigned() and pseudo.isStereoAssigned():
+                                string = sprintf('%s: %s is stereo assigned', INVALID_STEREO_ASSIGNMENT, pseudo )
+                                result.append( atm )
+                                atm.validateAssignment.append(string)
+                            #end if
                         #end if
                     #end if
                 #end if

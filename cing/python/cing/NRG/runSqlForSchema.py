@@ -1,7 +1,7 @@
 """
 Execute like:
 python -u $CINGROOT/python/cing/NRG/runSqlForSchema.py nrgcing    $CINGROOT/python/cing/NRG/sql/dumpNRG-CING_psql.sql   $D/NRG-CING/pgsql
-python -u $CINGROOT/python/cing/NRG/runSqlForSchema.py nrgcing    $CINGROOT/python/cing/NRG/sql/createDB-CING_psql.sql  $D/NRG-CING/pgsql
+python -u $CINGROOT/python/cing/NRG/runSqlForSchema.py devnrgcing    $CINGROOT/python/cing/NRG/sql/createDB-CING_psql.sql  .
 python -u $CINGROOT/python/cing/NRG/runSqlForSchema.py nrgcing    $CINGROOT/python/cing/NRG/sql/loadDB-CING_psql.sql    $D/NRG-CING/pgsql
 python -u $CINGROOT/python/cing/NRG/runSqlForSchema.py nrgcing    $CINGROOT/python/cing/NRG/sql/loadBmrbPdbMatch.sql    $CINGROOT/data/NRG/bmrbPdbMatch
 """
@@ -9,13 +9,9 @@ python -u $CINGROOT/python/cing/NRG/runSqlForSchema.py nrgcing    $CINGROOT/pyth
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.NRG import * #@UnusedWildImport
 
-schemaIdOrg = CASD_DB_NAME
-if True: # default: True
-    db_name = PDBJ_DB_NAME
-    user_name = PDBJ_DB_USER_NAME
-else:
-    db_name = CASD_DB_NAME
-    user_name = CASD_DB_USER_NAME
+schemaIdOrg = CASD_DB_NAME # this should match the input SQL.
+db_name = PDBJ_DB_NAME
+user_name = PDBJ_DB_USER_NAME
 
 
 def runSqlForSchema(sqlFile, schemaId = CASD_DB_NAME, rootPath=None):

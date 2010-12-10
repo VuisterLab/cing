@@ -792,25 +792,40 @@ class Ccpn:
            Inputs: CCPN MolSystem.MolSystem, CCPN Nmr.ShiftList
            Output: True or None for error.
 
-           NB CING data model has no CS list entity but rather stores the info at the atom level.
+           NB CING data model has no CS list entity but rather stores the info at the atom & resonances level.
         """
 
-#        NTdebug("Now in _getCcpnShiftList")
+        NTdebug("Now in _getCcpnShiftList")
         shiftMapping = self._getShiftAtomNameMapping(ccpnShiftList, ccpnMolSystem)
         if not len(shiftMapping):
             NTmessage("Skipping empty CS list.")
             return True
-        self.molecule.newResonances()
+        if not self.molecule.hasResonances():
+            self.molecule.newResonances() # do only once per import now. TODO: enable multiple resonances per atom per CCPN project.
 
         knownTroubleResidues = {} # To avoid repeating the same messages over
         atomsTouched = {} # Use a hash to prevent double counting.
 
         # Called KeyList because of name class with ccpnShiftList
-        ccpnShiftKeyList = shiftMapping.keys()
-        for ccpnShift in ccpnShiftKeyList:
+#        ccpnShiftKeyList = shiftMapping.keys()
+        resonanceSetDoneMap = {}
+        for ccpnShift in ccpnShiftList.sortedMeasurements():
             shiftValue = ccpnShift.value
             shiftError = ccpnShift.error
-            ccpnResidue, ccpnAtoms = shiftMapping[ccpnShift]
+            ccpnResonance = ccpnShift.getResonance()
+            ccpnResonanceSet = ccpnResonance.resonanceSet
+            if not resonanceSetDoneMap.has_key( ccpnResonanceSet ):
+                resonanceSetDoneMap[ccpnResonanceSet ] = -1
+            resonanceSetDoneMap[ ccpnResonanceSet ] += 1
+            resonanceSetDoneCount = resonanceSetDoneMap[ ccpnResonanceSet ]
+            if resonanceSetDoneCount > 1:
+#                NTdebug("Ignoring ccpnShift %s because count is %s which is over the 0/1 expected" % (ccpnShift, resonanceSetDoneCount))
+                continue
+            if not shiftMapping.has_key( ccpnShift ) :
+#                NTdebug("Skipping shift outside molecular system or without atoms.")
+                continue
+            ccpnResidue, _ccpnAtoms = shiftMapping[ccpnShift]
+#            NTdebug("Looking %s with %s and %s" % ( ccpnShift, ccpnResonanceSet, resonanceSetDoneCount ))
 
             if knownTroubleResidues.get(ccpnResidue):
                 NTdebug("Skipping known trouble residue: %s" % ccpnResidue )
@@ -822,33 +837,54 @@ class Ccpn:
                 knownTroubleResidues[ccpnResidue] = True
                 continue
 
-            for ccpnAtom in ccpnAtoms:
-                try:
-                    atom = ccpnAtom.cing
-                    a = atom
-                    # Since we don't show methyls in the assignment list any more; they appear lost; this fixes issue 192.
-                    if atom.isMethylProton() and atom.pseudoAtom():
-                        a = atom.pseudoAtom()
+            ccpnAtomSetList = ccpnResonanceSet.sortedAtomSets()
+            isStereo = len(ccpnAtomSetList) == 1
+            if resonanceSetDoneCount >= len(ccpnAtomSetList):
+#                NTdebug("Ignoring ccpnShift %s because resonanceSetDoneCount is %s which is over length of ccpnAtomSetList %s" % (ccpnShift, len(ccpnAtomSetList)))
+                continue
+            ccpnAtomSet = ccpnAtomSetList[resonanceSetDoneCount]
+#            for ccpnAtom in ccpnAtoms:
+            ccpnAtom = list(ccpnAtomSet.atoms)[0] # Picking only the first hydrogen of say a methyl group. What sorting is used?
+#            NTdebug("Looking at first ccpnAtom %s out of ccpnAtomSet %s" % ( ccpnAtom, ccpnAtomSet))
+            try:
+                a = ccpnAtom.cing
+#                NTdebug("Looking at atom %s" % a)
+                # Since we don't show methyls in the assignment list any more; they appear lost; this fixes issue 192.
+                if a.isMethylProton() and a.pseudoAtom():
+                    a = a.pseudoAtom() #
 
-                    index = len(a.resonances) - 1
-                    lastAtomResonance = a.resonances[index]
-                    lastAtomResonance.value = shiftValue
-                    lastAtomResonance.error = shiftError
-                    # TODO: set setStereoAssigned
-
-                    # Make mutual linkages between CCPN and Cing objects
-                    lastAtomResonance.ccpn = ccpnShift
-                    ccpnShift.cing = lastAtomResonance
-                    atomsTouched[a] = None
-                except:
-                    msg = "_getCcpnShiftList: %s, shift CCPN atom %s skipped"
-                    NTwarning(msg, ccpnResidue.cing, ccpnAtom.name)
-            # end for.over ccpnAtoms.
+                index = len(a.resonances) - 1
+#                NTdebug("Looking at atom %s resonanceSetDoneCount: %s isStereo %s" % (a, resonanceSetDoneCount, isStereo))
+                lastAtomResonance = a.resonances[index] # last existing resonance of atom.
+                lastAtomResonance.value = shiftValue
+                lastAtomResonance.error = shiftError
+                if a.isProChiral(): # only mark those that need marking.
+                    if isStereo:
+                        otherAtom = a.getSterospecificallyRelatedPartner()
+#                        NTdebug("For stereo looking at otherAtom: %s" % ( otherAtom))
+                        if otherAtom != None:
+                            shiftValueOther = otherAtom.resonances[index].value
+                            if math.fabs( shiftValueOther -  shiftValue ) < 0.01:
+                                isStereo = False
+                                otherAtom.setStereoAssigned(False)
+#                        else:
+#                            NTdebug("Failed to getSterospecificallyRelatedPartner from %s" % a)
+                    a.setStereoAssigned(isStereo)
+                # end if prochiral
+                # Make mutual linkages between CCPN and Cing objects
+                lastAtomResonance.ccpn = ccpnShift
+                ccpnShift.cing = lastAtomResonance
+                atomsTouched[a] = None
+            except:
+                msg = "_getCcpnShiftList: %s, shift CCPN atom %s skipped"
+                NTwarning(msg, ccpnResidue.cing, ccpnAtom.name)
+            # end try
         # end for.over shifts.
 
         NTmessage("==> CCPN ShiftList '%s' imported from CCPN Nmr project '%s'",
                          ccpnShiftList.name, ccpnShiftList.parent.name)
-        NTmessage("==> CING (pseudo-)atom with resonances updated numbering %s" % len(atomsTouched.keys()))
+        NTmessage("==> Count of (pseudo-)atom with resonances updated %s" % len(atomsTouched.keys()))
+        NTmessage("==> Count of resonanceSetDone %s" % len(resonanceSetDoneMap.keys()))
 
         return True
 
@@ -1069,18 +1105,22 @@ class Ccpn:
            Inputs: CCPN Nmr.ShiftList, CCPN MoleSystem.MolSystem
            Output: Dict of CCPN Nmr.Shift:[CCPN MolSystem.Residue, Tuple of CCPN MolSystem.Atoms] which may be empty
                    if the input is empty.
+
+           Details about this part of the CCPN API use at:
+           http://www.ccpn.ac.uk/ccpn/data-model/python-api-v2-examples/assignment
         """
 
-#        NTdebug("Now in _getShiftAtomNameMapping for ccpnShiftList (%r)" % ccpnShiftList)
+        NTdebug("Now in _getShiftAtomNameMapping for ccpnShiftList (%r)" % ccpnShiftList)
         ccpnResonanceList = []
         ccpnResonanceToShiftMap = {}
         ccpnShiftMappingResult = {}
 
-        if not len(ccpnShiftList.measurements):
+        measurementList = ccpnShiftList.sortedMeasurements()
+        if not len(measurementList):
             NTwarning("Ccpn Shift List has no members; it is empty")
             return ccpnShiftMappingResult
 
-        for ccpnShift in ccpnShiftList.measurements:
+        for ccpnShift in measurementList:
             ccpnResonance = ccpnShift.resonance
             ccpnResonanceList.append(ccpnResonance)
             ccpnResonanceToShiftMap[ccpnResonance] = ccpnShift
@@ -1088,26 +1128,26 @@ class Ccpn:
 
         for ccpnResonance in ccpnResonanceList:
             if not ccpnResonance.resonanceSet: # i.e atom assigned
-#                NTdebug("Skipping unassigned CCPN resonance %s" % ccpnResonance)
+                NTdebug("Skipping unassigned CCPN resonance %s" % ccpnResonance)
                 continue
             ccpnAtomSetList = list(ccpnResonance.resonanceSet.atomSets)
             ccpnResidue = ccpnAtomSetList[0].findFirstAtom().residue
             if ccpnResidue.chain.molSystem is not ccpnMolSystem:
-#                NTdebug("Skipping resonance %s because CCPN residue falls outside the expected CCPN molSystem" % ccpnResonance)
+                NTdebug("Skipping resonance %s because CCPN residue falls outside the expected CCPN molSystem" % ccpnResonance)
                 continue
             atomList = []
             if not ccpnAtomSetList:
-#                NTdebug("Skipping resonance %s because empty ccpnAtomSetList was created" % ccpnResonance)
+                NTdebug("Skipping resonance %s because empty ccpnAtomSetList was created" % ccpnResonance)
                 continue
             for ccpnAtomSet in ccpnAtomSetList:
 #                NTdebug("Working on ccpnAtomSet: %r" % ccpnAtomSet)
                 for ccpnAtom in ccpnAtomSet.atoms:
-#                    NTdebug("Working on ccpnAtom: %r" % ccpnAtom)
+#                    NTdebug("Working on %s %s %r" % (ccpnResonance, ccpnAtomSet, ccpnAtom))
                     atomList.append(ccpnAtom)
             ccpnShift = ccpnResonanceToShiftMap[ccpnResonance]
             ccpnShiftMappingResult[ccpnShift] = [ccpnResidue, tuple(atomList) ]
         matchCount = len(ccpnShiftMappingResult)
-#        NTdebug("_getShiftAtomNameMapping found %d elements in mapping." % matchCount)
+        NTdebug("_getShiftAtomNameMapping found %d elements in mapping." % matchCount)
         if matchCount == 0:
             NTwarning("All resonances in this list are unassigned")
         return ccpnShiftMappingResult
@@ -2316,10 +2356,10 @@ def saveCcpn(project, ccpnFolder, ccpnTgzFile = None):
 
     switchOutput(False)
     status = ccpnProject.saveModified() # TODO: can't change from original ccpnFolder
+    switchOutput(True)
     if status:
         NTerror("Failed ccpnProject.saveModified in " + saveCcpn.func_name)
         return None
-    switchOutput(True)
 
     NTmessage("Saved ccpn project to folder: %s" % ccpnFolder)
 

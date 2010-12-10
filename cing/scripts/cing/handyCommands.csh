@@ -2,7 +2,7 @@ set list = ( AR3436A AtT13 CGR26A CtR69A ET109Aox ET109Ared HR5537A NeR103A PGR1
 set baseDir = ~/CASD-NMR-CING
 
 foreach x ( $list )
-	echo $x
+    echo $x
     set ch23 = ( `echo $x | cut -c2-3` )
     mkdir $baseDir/data/$x
     tar -czf $baseDir/data/$x/$x.tgz $x
@@ -59,3 +59,18 @@ cd /Volumes/tera4/CASD-NMR-CING/dataPrep
 \rm -rf */*/Author/*
 ( cd /Volumes/jd/CASD-NMR-CING/data && tar -cpBf - */*/Author/* ) | ( tar -xpvf - )
 
+# DEVelopmental
+set results_base = $D/devNRG-CING
+cd $results_base
+mkdir recoordSync input list log index nrgPlus pgsql plot prep vCing data cmbi8
+
+set list = ( 1brv 1cjg 1d3z 1hue 1ieh 1iv6 2rop 2jmx 2kz0 2kib )
+set x = 1brv
+foreach x ( $list )
+    cp -r $D/NRG-CING/recoordSync/$x $results_base/recoordSync
+end
+psql pdbmlplus pdbj
+ create user devnrgcing1;
+select count(*) from nrgcing.cingentry;
+
+python -u $CINGROOT/python/cing/NRG/runSqlForSchema.py devnrgcing $CINGROOT/python/cing/NRG/sql/createDB-CING_psql.sql    .

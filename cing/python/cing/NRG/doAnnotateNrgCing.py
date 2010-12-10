@@ -8,8 +8,10 @@ from cing import header
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.Libs.disk import mkdirs
 from cing.Libs.forkoff import do_cmd
+from cing.NRG.PDBEntryLists import getBmrbLinks
 from cing.NRG.nrgCing import nrgCing
-from cing.NRG.nrgCingPresetDict import presetDict
+from cing.NRG.settings import bmrbDir
+from cing.NRG.shiftPresetDict import presetDict
 from cing.Scripts.FC.convertStar2Ccpn import importStarChemicalShifts
 from cing.Scripts.FC.utils import swapCheck
 from cing.core.classes import Project
@@ -24,13 +26,12 @@ import tarfile
 
 
 n = nrgCing()
-if True:
-    n.getBmrbLinks()
-    
+if False:
+    getBmrbLinks()
+
 dataDir = n.data_dir
 results_dir = n.results_dir
 nrgPlusDir = os.path.join(results_dir, 'nrgPlus')
-bmrbDir = os.path.join('/Users/jd/wattosTestingPlatform/bmrb/ftp.bmrb.wisc.edu/pub/bmrb/entry_directories')
 
 def annotateEntry(entry_code, bmrb_id, *extraArgList):
     'Return True on error'
@@ -91,7 +92,8 @@ def annotateEntry(entry_code, bmrb_id, *extraArgList):
     NTdebug("Looking at %s" % entry_code)
 #                continue # TODO disable premature stop.
 
-    inputStarDir = os.path.join(bmrbDir, 'bmr'+bmrb_id)
+    bmrb_code = 'bmr'+bmrb_id
+    inputStarDir = os.path.join(bmrbDir, bmrb_code)
     if not os.path.exists(inputStarDir):
         NTerror("Input star dir not found: %s" % inputStarDir)
         return True
@@ -107,7 +109,7 @@ def annotateEntry(entry_code, bmrb_id, *extraArgList):
         mkdirs(outputNijmegenDir)
     os.chdir(outputNijmegenDir)
 
-    presets = getDeepByKeysOrDefault(presetDict, {}, entry_code)
+    presets = getDeepByKeysOrDefault(presetDict, {}, bmrb_code)
     if presets:
       NTmessage("In annotateLoop using preset values...")
       NTdebug(str(presets))

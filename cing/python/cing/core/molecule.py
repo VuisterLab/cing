@@ -62,6 +62,9 @@ commonResidueList = commonAAList + commonNAList
 
 common20AADict = NTlist2dict(common20AAList)
 
+terminalAtomDict = NTdict()
+terminalAtomDict.appendFromList( "H1 H2 H3 H' H''".split())
+
 def chothiaClassInt(chothiaClass):
     """Integer value for fast lookup in db. Return None if class parameter is None"""
     return mapChothia_class2Int[ chothiaClass ]
@@ -108,21 +111,39 @@ def chothiaClass(resList):
 
     return None
 
-def getAssignmentCountMapForResList(resList):
+def getAssignmentCountMapForResList(resList, isAssigned=True):
     """Returns dictionary by isotope and overall keys with boolean values."""
-    assignmentCountMap = {'1H': 0, '13C': 0, '15N': 0, 'overall': 0}
+#    keyList = '1H 13C 15N 31P'.split()
+#    keyListIncludingOverall = keyList + ['overall']
+    assignmentCountMap = {'1H': 0, '13C': 0, '15N': 0, '31P':0, 'overall': 0}
     atmList = NTlist()
     for res in resList:
         atmList.addList( res.allAtoms() )
     for atm in atmList:
-#        NTdebug("atm, isAssigned: %s %s" % (atm, atm.isAssigned()))
-        if atm.isAssigned():
-            # spintype is not available for pseudos etc. perhaps
-            spinType = getDeepByKeys(atm, 'db', 'spinType')
-#            NTdebug("spinType: %s" % spinType)
-            if spinType:
-                assignmentCountMap[spinType] += 1
-                assignmentCountMap['overall'] += 1
+        spinType = getDeepByKeys(atm, 'db', 'spinType')
+        if not spinType:
+            continue
+        if atm.isMethylProton() and not atm.isPseudoAtom():
+#            NTdebug("Skipping isMethylProton and not atm.isPseudoAtom() %s" % atm)
+            continue
+        if atm.isPseudoAtom() and not atm.isMethyl():
+#            NTdebug("Skipping atm.isPseudoAtom() and not atm.isMethyl() %s" % atm)
+            continue
+        if atm.isTerminal():
+#            NTdebug("Skipping isTerminal %s" % atm)
+            continue
+        if not assignmentCountMap.has_key(spinType):
+#            NTdebug("Failed to find spinType in assignmentCountMap: %s" % spinType)
+            continue
+#        if isAssigned:
+#            NTdebug("atm, isAssigned: %s %s %s" % (atm, atm.isAssigned(), spinType))
+        # spintype is not available for pseudos etc. perhaps
+        atmIsAssigned = atm.isAssigned()
+        if ((atmIsAssigned and isAssigned) or
+             (not atmIsAssigned and not isAssigned)):
+            assignmentCountMap[spinType] += 1
+            assignmentCountMap['overall'] += 1
+
     return assignmentCountMap
 
 def allResiduesWithCoordinates(resList):
@@ -144,8 +165,8 @@ class ResidueList():
         return chothiaClass(self.allResidues())
     def chothiaClassInt(self):
         return chothiaClassInt(chothiaClass(self.allResidues()))
-    def getAssignmentCountMap(self):
-        return getAssignmentCountMapForResList(self.allResidues())
+    def getAssignmentCountMap(self, isAssigned=True):
+        return getAssignmentCountMapForResList(self.allResidues(), isAssigned=isAssigned)
     def allResiduesWithCoordinates(self):
         return allResiduesWithCoordinates(self.allResidues())
 
@@ -1913,6 +1934,14 @@ Return an Molecule instance or None on error
                 return True
         return None # is actually the default of course.
 
+    def hasResonances(self):
+        """Return True if at least one atom has at least one resonance"""
+        for res in self.allResidues(): # faster to split this in 2 loops.
+            for atm in res.allAtoms():
+                if atm.resonances:
+                    return True
+        return None # is actually the default of course.
+
     def hasDNA(self):
         for res in self.allResidues():
             if res.hasProperties('DNA'):
@@ -2385,7 +2414,7 @@ Return an Molecule instance or None on error
                             continue
                         if useRangesForLoweringOccupancy:
                             if useRanges and (not inSelection) and atm.isBackbone() and (
-                                atm.name == 'CA' or atm.name == "C1'"):
+                                atm.name == 'CA' or atm.name == "P" ):
                                 record.occupancy = 0.49 # special meaning in Whatif for ignoring the residue in Structure Z-scores.
                                 NTdebug("In toPDB lowering occ. to below half for atom: %s" % atm)
                         pdbFile.append( record )
@@ -3956,7 +3985,6 @@ Atom class: Defines object for storing atom properties
     LVdict = dict( CD1 = 'CD2', CD2 = 'CD1', QD1 = 'QD2', QD2 = 'QD1', MD1 = 'MD2', MD2 = 'MD1',
                    CG1 = 'CG2', CG2 = 'CG1', QG1 = 'QG2', QG2 = 'QG1', MG1 = 'MG2', MG2 = 'MG1'
                  )
-
     def __init__( self, resName, atomName, convention=INTERNAL, **kwds ):
 
         NTtree.__init__(self, name=atomName, __CLASS__='Atom', **kwds )
@@ -4216,10 +4244,10 @@ coordinates: %s"""  , dots, self, dots
 
     def isAssigned( self ):
         """return true if atom current resonance has a valid assignment"""
-        if (self.resonances() != None):
-            return not isNaN(self.resonances().value)
-        #end if
-        return False
+        lastResonance = self.resonances()
+        if lastResonance == None:
+            return False
+        return not isNaN(lastResonance.value)
     #end def
 
     def shift( self ):
@@ -4245,20 +4273,24 @@ coordinates: %s"""  , dots, self, dots
     #end def
 
 
-    def setStereoAssigned( self ):
+    def setStereoAssigned( self, ssa = True ):
         """
-        Return stereoAssigned flag to True
+        Return stereoAssigned flag to True or if ssa == False set it to False.
         """
         if not self.isProChiral():
             NTerror('Atom.setStereoAssigned: %s is not prochiral', self)
-        self.stereoAssigned = True
+        self.stereoAssigned = ssa
     #end def
 
 
     def isStereoAssigned( self ):
         """
-        Return True if stereoAssigned flag present and True
+        Return True if stereoAssigned flag present and True.
+
+        For non prochirals this property is not set.
         """
+        if not self.isProChiral():
+            return False
         return self.stereoAssigned
     #end def
 
@@ -4382,6 +4414,13 @@ coordinates: %s"""  , dots, self, dots
         Return True if it is a backbone atom.
         """
         return self.db.hasProperties('backbone')
+    #end def
+
+    def isTerminal( self ):
+        """
+        Return True for Amino acid H1, H2, H3 etc.
+        """
+        return terminalAtomDict.has_key( self.name )
     #end def
 
     def isSidechain( self ):

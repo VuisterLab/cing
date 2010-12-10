@@ -230,6 +230,7 @@ Project: Top level Cing project class
 
         self.valSets = NTdict()
         self.readValidationSettings(fn = None)
+        self.nosave = False
 
         self.saveXML('version',
                       'name', 'created',
@@ -594,7 +595,9 @@ Project: Top level Cing project class
         """
         global projects
         #self.export()
-        if save: self.save()
+
+        if save and not self.nosave:
+            self.save()
         # remove the tmpdir
         tmpdir = self.path(directories.tmp)
         # have to use cing.verbosity to work?
@@ -965,9 +968,11 @@ Project: Top level Cing project class
         return criticize(self, toFile = toFile)
 
     def validate(self, ranges = None, parseOnly = False, htmlOnly = False, doProcheck = True, doWhatif = True,
-                 doWattos = True, doTalos = True):
+                 doWattos = True, doTalos = True,
+                 validateFastest = False, validateCingOnly = False, validateImageLess = False):
         return validate(self, ranges = ranges, parseOnly = parseOnly, htmlOnly = htmlOnly, doProcheck = doProcheck, doWhatif = doWhatif,
-                        doWattos = doWattos, doTalos = doTalos)
+                        doWattos = doWattos, doTalos = doTalos,
+                        validateFastest = validateFastest, validateCingOnly = validateCingOnly, validateImageLess = validateImageLess)
 
     def runCingChecks(self, toFile=True, ranges = None):
         return runCingChecks(self, toFile=toFile, ranges = ranges)

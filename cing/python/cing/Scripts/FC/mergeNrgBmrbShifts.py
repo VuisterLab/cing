@@ -1,14 +1,26 @@
+"""
+Use akin linkNmrStarData.py, so e.g.:
+
+python -u $CINGROOT/python/cing/Scripts/FC/mergeNrgBmrbShifts.py 1ieh -bmrbCodes bmr4969 -raise -force
+
+Input from:
+Output to:
+"""
+
+from cing import cingDirTmp
 from cing.Libs.NTutils import * #@UnusedWildImport
+from cing.Libs.forkoff import do_cmd
+from cing.NRG.doAnnotateNrgCing import bmrbDir
+from cing.NRG.settings import dir_S
 from cing.NRG.shiftPresetDict import presetDict
-from memops.general.Io import loadProject, saveProject
-from pdbe.adatah.Bmrb    import bmrbArchiveDataDir #@UnresolvedImport
-from pdbe.adatah.Constants import archivesCcpnDataDir
+from cing.core.classes import Project
+from memops.general.Io import saveProject
 from pdbe.adatah.Generic import DataHandler
 from pdbe.adatah.NmrRestrGrid import nmrGridDataDir #@UnusedImport
 from pdbe.adatah.NmrStar import NmrStarHandler
 from pdbe.adatah.Util import runConversionJobs #@UnusedImport
-from recoord2.pdbe.Constants import projectDirectory as loadDir #@UnresolvedImport
-
+#from recoord2.pdbe.Constants import projectDirectory as loadDir
+#from pdbe.adatah.Bmrb    import bmrbArchiveDataDir #@UnresolvedImport
 
 #####################################
 # Generic dataHandling code/classes #
@@ -16,26 +28,39 @@ from recoord2.pdbe.Constants import projectDirectory as loadDir #@UnresolvedImpo
 
 class MergeNrgBmrbShifts(DataHandler, NmrStarHandler):
 
-    baseName = 'nrgBmrbMerge'
+    baseName = 'nrgBmrbMerge' # default for ccpn top directory
 
     # List of formats used
     formatList = ['NmrStar']
     bmrbFileFormat = "%s.str"
     # These can be reset if necessary... not part of main class
-    loadDir = loadDir
-    projectDirectory = os.path.join(archivesCcpnDataDir, 'nrgBmrbMerge')
+#    loadDir = cingDirTmp
+#    projectDirectory = os.path.join(archivesCcpnDataDir, 'nrgBmrbMerge')
+    projectDirectory = cingDirTmp
     presetDict = presetDict
 
     def setBaseName(self):
-        self.baseName = self.baseName
+        self.baseName = self.idCode
 
     def loadProject(self):
-        self.ccpnProject = loadProject(os.path.join(self.loadDir, self.idCode, 'linkNmrStarData'))
+        modelCount = 1
+        ccpnFile = os.path.join("%s_input.tgz" % self.idCode)
+        project = Project.open(self.idCode, status = 'new')
+        # Can read tgz files.
+        if project.initCcpn(ccpnFolder = ccpnFile, modelCount=modelCount) == None:
+            NTerror("Failed to read: %s" % ccpnFile)
+            return True
+#        self.ccpnProject = loadCcpnTgzProject(os.path.join(self.loadDir, self.idCode, 'linkNmrStarData'))
+        self.ccpnProject = project.ccpn
 
     def runSpecific(self):
         """ Returns True on error """
+        entryCodeChar2and3 = self.idCode[1:3]
+        projectDirectory = os.path.join(dir_S, entryCodeChar2and3, self.idCode)
+        os.chdir(projectDirectory)
         curDir = os.getcwd() #@UnusedVariable
-        ccpnDir = self.baseName #@UnusedVariable
+        NTdebug("curDir: %s" % curDir)
+#        ccpnDir = self.baseName #@UnusedVariable
 
         # Read the existing CCPN project, set up format object dict
         self.loadProject()
@@ -56,24 +81,45 @@ class MergeNrgBmrbShifts(DataHandler, NmrStarHandler):
         # Read the BMRB NMR-STAR files (only chem shift data)
         for bmrbCode in self.bmrbCodes:
           self.initShiftPresets(bmrbCode)
-          bmrbNmrStarFile = os.path.join(bmrbArchiveDataDir, self.bmrbFileFormat % bmrbCode)
-          self.readNmrStarFile(bmrbNmrStarFile, components=['measurements'])
+#          bmrbNmrStarFile = os.path.join(bmrbArchiveDataDir, self.bmrbFileFormat % bmrbCode)
+          inputStarDir = os.path.join(bmrbDir, bmrbCode)
+          if not os.path.exists(inputStarDir):
+            NTerror("Input star dir not found: %s" % inputStarDir)
+            return True
+          bmrbFile = os.path.join(inputStarDir, '%s_21.str'%bmrbCode)
+          if not os.path.exists(bmrbFile):
+            NTerror("Input bmrbFile not found: %s" % bmrbFile)
+            return True
+
+          self.readNmrStarFile(bmrbFile, components=['measurements'])
           # Try to autoset mapping...
-          self.setBmrbNmrStarMapping(bmrbNmrStarFile)
+          self.setBmrbNmrStarMapping(bmrbFile)
           # Run linkResonances, using custom keywds set above
           self.runLinkResonances(resonanceType='nmr')
         # Save project in new location
-        saveProject(self.ccpnProject, removeExisting=True, newPath=os.path.join(self.entryDir, self.baseName), newProjectName=self.baseName)
+        newPath = self.baseName
+        NTmessage('Saving to new path: %s in cwd: %s' % (newPath, os.getcwd()))
+        saveProject(self.ccpnProject, removeExisting=True, newPath=newPath, newProjectName=self.baseName)
+        ccpnTgzFile = "%s.tgz" % self.idCode
+        cmd = "tar -czf %s %s" % (ccpnTgzFile, newPath)
+        if do_cmd(cmd):
+            NTerror("Failed tar")
+            return None
+        NTmessage("Saved ccpn project to tgz: %s" % ccpnTgzFile)
 
     def initShiftPresets(self, bmrbCode):
-        if self.presetDict.has_key(bmrbCode):
-          sys.__stdout__.write("  Using shift preset values...\n")
-          self.presets = self.presetDict[bmrbCode]
-          # Print out comment if available
-          if self.presetDict[bmrbCode].has_key('comment'):
-            commentLines = self.presetDict[bmrbCode]['comment'].split("\n")
-            for commentLine in commentLines:
-              sys.__stdout__.write("    > %s\n" % commentLine)
+        if not self.presetDict.has_key(bmrbCode):
+            return
+        sys.__stdout__.write("  Using shift preset values...\n")
+        self.presets = self.presetDict[bmrbCode]
+        # Print out comment if available
+        if 1:
+            sys.__stdout__.write("    > %s\n" % self.presets)
+        else: # Just comments
+            if self.presets.has_key('comment'):
+              commentLines = self.presets['comment'].split("\n")
+              for commentLine in commentLines:
+                sys.__stdout__.write("    > %s\n" % commentLine)
 
     def handleSpecificArguments(self, sysArgs):
         self.bmrbCodes = []
@@ -87,4 +133,5 @@ class MergeNrgBmrbShifts(DataHandler, NmrStarHandler):
           raise self.DataHandlerError, "Need to pass in at least one BMRB code with -bmrbCodes flag for this script to work!"
 
 if __name__ == "__main__":
+    cing.verbosity = cing.verbosityDebug
     MergeNrgBmrbShifts(sys.argv)
