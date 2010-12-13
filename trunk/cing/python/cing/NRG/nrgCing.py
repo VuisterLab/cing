@@ -31,10 +31,10 @@ from cing.Libs.disk import mkdirs
 from cing.Libs.disk import rmdir
 from cing.Libs.helper import detectCPUs
 from cing.Libs.html import GOOGLE_ANALYTICS_TEMPLATE
-from cing.NRG import ARCHIVE_NRG_ID
+from cing.NRG import * #@UnusedWildImport
+from cing.NRG.nrgCingRdb import nrgCingRdb #@Reimport # why doesn't pydev see this class import is different than the module?
 from cing.NRG.PDBEntryLists import * #@UnusedWildImport
 from cing.NRG.WhyNot import * #@UnusedWildImport
-from cing.NRG.nrgCingRdb import nrgCingRdb
 from cing.NRG.settings import * #@UnusedWildImport
 from cing.Scripts.doScriptOnEntryList import doScriptOnEntryList
 from cing.Scripts.vCing.vCing import VALIDATE_ENTRY_NRG_STR
@@ -130,7 +130,7 @@ class nrgCing(Lister):
         self.bmrb_link_template = 'http://www.bmrb.wisc.edu/cgi-bin/explore.cgi?bmrbId=%b'
         self.pdb_link_template = 'http://www.rcsb.org/pdb/explore/explore.do?structureId=%s'
 #        self.cing_link_template = self.results_url + '/data/%t/%s/%s.cing/%s/HTML/index.html'
-        self.cing_link_template = './data/%t/%s/%s.cing/%s/HTML/index.html'
+        self.cing_link_template = '../data/%t/%s/%s.cing/%s/HTML/index.html'
 
         os.chdir(self.results_dir)
 
@@ -491,9 +491,11 @@ class nrgCing(Lister):
         # end for subDir
 
         host = 'localhost'
+        schema=DEV_NRG_DB_SCHEMA
         if self.isProduction:
             host = 'nmr'
-        m = nrgCingRdb(host=host)
+            schema=NRG_DB_SCHEMA
+        m = nrgCingRdb(host=host, schema=schema)
         self.entry_list_store_in_db = m.getPdbIdList()
         if not self.entry_list_store_in_db:
             NTerror("Failed to get any entry from NRG-CING RDB")
@@ -1198,7 +1200,35 @@ class nrgCing(Lister):
 
             log_file = "%s_starCS2Ccpn.log" % entry_code
             if 1: # Default: 0
-                self.matches_many2one = { '1brv':4020 , '1cjg':4813 , '1d3z':6457 , '1hue':4047 , '1ieh':4969 ,'1iv6':5317 , '2rop':11041, '2jmx':15072, '2kz0':16995, '2kib':20074 }
+                self.matches_many2one = {
+'1b4y': 4400 ,
+'1brv': 4020 ,
+'1bus': 53   ,
+'1c2n': 1646 ,
+'1cjg': 4813 ,
+'1d3z': 6457 ,
+'1hkt': 4046 ,
+'1hue': 4047 ,
+'1ieh': 4969 ,
+'1iv6': 5317 ,
+'2fws': 7009 ,
+'2jmx': 15072,
+'2kib': 20074,
+'2kz0': 16995,
+'2rop': 11041,
+'1hkt': 4046 ,
+'1mo7': 5577 ,
+'1mo8': 5576 ,
+'1ozi': 5762 ,
+'1p9j': 5801 ,
+'1pd7': 5808 ,
+'1qjt': 4491 ,
+'1vj6': 5131 ,
+'1y7n': 6113 ,
+'2fws': 7009 ,
+'2fwu': 7008 ,
+'2jsx': 15381
+ }
             if not self.matches_many2one.has_key(entry_code):
                 NTerror("No BMRB entry for PDB entry: %s" % entry_code)
                 return True
@@ -1380,13 +1410,14 @@ class nrgCing(Lister):
                 NTerror("In prepare failed prepareEntry")
                 return True
         if False: # DEFAULT: False
+            self.searchPdbEntries()
 #            self.entry_list_todo = "134d 135d 136d 177d 1crq 1crr 1ezc 1ezd 1gnc 1kld 1l0r 1lcc 1lcd 1msh 1qch 1r4e 1sah 1saj 1vve 2axx 2ezq 2ezr 2ezs 2i7z 2ku2 2neo 2ofg".split()
 #            self.entry_list_todo = "1crq 1crr 1ezc 1ezd 1kld 1sah 1saj 1vve 2axx 2ezq 2ezr 2ezs".split()
-            self.entry_list_todo = "1brv 1cjg 1d3z 1hue 1ieh 1iv6 2rop 2jmx 2kz0 2kib".split()
+            self.entry_list_todo = "1b4y 1brv 1bus 1c2n 1cjg 1d3z 1hkt 1hue 1ieh 1iv6 1mo7 1mo8 1otz 1ozi 1p9j 1pd7 1qjt 1v0e 1vj6 1y7n 2f05 2fws 2fwu 2jmx 2jsx 2k0e 2kib 2kz0 2rop".split()
 #            self.entry_list_todo = "2rop 2jmx 2kz0 2kib".split()
-            self.entry_list_nmr = deepcopy(self.entry_list_todo)
+#            self.entry_list_nmr = deepcopy(self.entry_list_todo)
 #            self.entry_list_nrg_docr = []
-            self.entry_list_nrg_docr = deepcopy(self.entry_list_todo)
+#            self.entry_list_nrg_docr = deepcopy(self.entry_list_todo)
 
 
 #        self.entry_list_nmr = readLinesFromFile(os.path.join(self.results_dir, 'entry_list_nmr.csv'))
@@ -1501,7 +1532,6 @@ Additional modes I see:
         prepare            Only moves the entries through prep stages.
     """
     cing.verbosity = verbosityDebug
-    isProduction = 1       # DEFAULT: 1.
     max_entries_todo = 40  # DEFAULT: 40
     useTopos = 0           # DEFAULT: 0
 

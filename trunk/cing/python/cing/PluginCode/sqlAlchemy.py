@@ -108,7 +108,8 @@ class cgenericSql(NTdict):
             return True
 
         self.dBversion = self.session.execute(func.version()).fetchone()[0]
-        NTmessage("Now connected on %s to %s database %s by %s" % (self.host, self.db, self.dBversion, self.user))
+#        NTmessage("Now connected on host %s to database %s schema %s by user %s" % (self.host, self.db, self.schema, self.user))
+        NTmessage("Connection cgenericSql: %20s %10s %10s %10s" % (self.host, self.db, self.schema, self.user))
         if self.db_type == DB_TYPE_MYSQL:
             dBversionTuple = self.dBversion.split('.')
             dBversionFloat = float(dBversionTuple[0] + '.' + dBversionTuple[1])

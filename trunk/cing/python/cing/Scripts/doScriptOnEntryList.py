@@ -20,19 +20,19 @@ def mkSubDirStructure(startDir, entryCodeList, pythonScriptFileNameRoot):
         entryCodeChar2and3 = entry_code[1:3]
         dataDir = os.path.join( startDir, DATA_STR )
         if not os.path.exists(dataDir):
-            NTmessage("Creating dir: " + dataDir)
+#            NTmessage("Creating dir: " + dataDir)
             os.mkdir(dataDir)
         subDir = os.path.join( dataDir, entryCodeChar2and3 )
         if not os.path.exists(subDir):
-            NTmessage("Creating dir: " + subDir)
+#            NTmessage("Creating dir: " + subDir)
             os.mkdir(subDir)
         entryDir = os.path.join( subDir, entry_code )
         if not os.path.exists(entryDir):
-            NTmessage("Creating dir: " + entryDir)
+#            NTmessage("Creating dir: " + entryDir)
             os.mkdir(entryDir)
         logDir = os.path.join( entryDir, 'log_'+pythonScriptFileNameRoot )
         if not os.path.exists(logDir):
-            NTmessage("Creating dir: " + logDir)
+#            NTmessage("Creating dir: " + logDir)
             os.mkdir(logDir)
 
 def doScriptOnEntryList(pythonScriptFileName,
