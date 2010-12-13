@@ -63,12 +63,15 @@ cd /Volumes/tera4/CASD-NMR-CING/dataPrep
 set results_base = $D/devNRG-CING
 mkdir $results_base
 cd $results_base
-mkdir recoordSync input list log index nrgPlus pgsql plot prep vCing data cmbi8
+mkdir -p recoordSync input list log index nrgPlus pgsql plot prep vCing data cmbi8/comments
+
 
 set list = ( 1brv 1cjg 1d3z 1hue 1ieh 1iv6 2rop 2jmx 2kz0 2kib )
+set list = ( 1b4y 1brv 1bus 1c2n 1cjg 1d3z 1hkt 1hue 1ieh 1iv6 1mo7 1mo8 1otz 1ozi 1p9j 1pd7 1qjt 1v0e 1vj6 1y7n 2f05 2fws 2fwu 2jmx 2jsx 2k0e 2kib 2kz0 2rop )
+
 set x = 1brv
 foreach x ( $list )
-    cp -r $D/NRG-CING/recoordSync/$x $results_base/recoordSync
+    \cp -rf $D/NRG-CING/recoordSync/$x $results_base/recoordSync
 end
 psql pdbmlplus pdbj
  create user devnrgcing1;

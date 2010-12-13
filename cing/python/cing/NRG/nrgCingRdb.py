@@ -58,11 +58,12 @@ if False:
 
 class nrgCingRdb():
     def __init__(self,host=HOST, user=PDBJ_DB_USER_NAME, db=PDBJ_DB_NAME, schema=NRG_DB_SCHEMA):
+        self.schema = schema
         if True: # block the NRG-CING stuff away from other schema
             self.csql = csqlAlchemy(host=host, user=user, db=db, schema=schema)
             self.csql.connect()
             self.execute = self.csql.conn.execute
-            if True: # DEFAULT True but disable for quicker testing.
+            if False: # DEFAULT True but disable for quicker testing.
                 self.createDepTables()
             self.csql.autoload()
             #csql.close()
@@ -126,6 +127,7 @@ class nrgCingRdb():
 
 
     def getPdbIdList(self, fromNrg=True):
+        "Return None on error."
         table = self.centry
         columnName = PDB_ID_STR
 
@@ -141,9 +143,13 @@ class nrgCingRdb():
             NTtracebackError()
             return
 
+        if pdbIdTable == None:
+            NTerror("Failed retrieval from NRG-CING rdb from table %s and column %s" % (table, columnName))
+            return None
+
         if not pdbIdTable:
-            NTerror("Failed to retrieve entries from NRG-CING rdb from table %s and column %s" % (table, columnName))
-            return
+            NTwarning("Failed to retrieve any entries from NRG-CING rdb from table %s and column %s" % (table, columnName))
+            return []
 
         pdbIdDateResultDict = NTdict() # hash by entry id
         pdbIdDateResultDict.appendFromTable(pdbIdTable, 0, 0)
@@ -154,30 +160,33 @@ class nrgCingRdb():
 
     def createDepTables(self):
         NTmessage("creating temporary tables")
-        stmt1 = 'drop table if exists nrgcing.cingsummary cascade'
+
+
+        stmt1 = 'drop table if exists %s.cingsummary cascade' % self.schema
         # The full molecular weight > 3.5 kDa,; not just the polymers
         stmt2 = """
-CREATE table nrgcing.cingsummary AS
+CREATE table %s.cingsummary AS
 SELECT s.pdbid AS pdb_id, SUM(p2.val * p3.val) AS weight
 FROM pdbj.brief_summary s
 JOIN pdbj."E://entity" e ON e.docid = s.docid
 JOIN "//entity/pdbx_number_of_molecules" p2    ON p2.docid = e.docid AND p2.pos BETWEEN e.pstart AND e.pend
 JOIN "//entity/formula_weight" p3              ON p3.docid = e.docid AND p3.pos BETWEEN e.pstart AND e.pend
 GROUP BY s.pdbid;
-"""
-        stmt3 = 'drop table if exists nrgcing.entry_list_selection cascade;'
+""" % self.schema
+        stmt3 = 'drop table if exists %s.entry_list_selection cascade;' % self.schema
         # The full molecular weight; not just the polymers
         stmt4 = """
-CREATE table nrgcing.entry_list_selection AS
+CREATE table %s.entry_list_selection AS
 SELECT e.pdb_id
-FROM nrgcing.CINGENTRY E,  pdbj.brief_summary s, nrgcing.cingsummary cingsummary
+FROM %s.CINGENTRY E,  pdbj.brief_summary s, %s.cingsummary cingsummary
 WHERE e.pdb_id = S.pdbid
 AND e.pdb_id = cingsummary.pdb_id
 AND E.MODEL_COUNT > 9
 and cingsummary.weight > 3500.0 -- about 30 residues
 AND '{2}' <@ S.chain_type; -- contains at least one protein chain.
-"""
+""" % tuple( [self.schema] *3 )
         for stmt in [ stmt1, stmt2, stmt3, stmt4]:
+            NTdebug("Executing: %s" % stmt)
             result = self.execute(stmt)
             printResult(result)
 
@@ -808,7 +817,7 @@ def bin_by(y, x, nbins=None, ymin=None, ymax=None):
 
 if __name__ == '__main__':
     cing.verbosity = verbosityDebug
-    m = nrgCingRdb(host='localhost')
+    m = nrgCingRdb(host='localhost', schema=DEV_NRG_DB_SCHEMA)
 
     if False:
         m.createPlots(doTrending = False)
@@ -821,7 +830,7 @@ if __name__ == '__main__':
     if True:
         pdbIdList = m.getPdbIdList()
 
-    if False:
+    if True:
         m.showCounts()
 
     NTmessage("done with nrgCingRdb")
