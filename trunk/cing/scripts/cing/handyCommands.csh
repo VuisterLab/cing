@@ -67,7 +67,7 @@ mkdir -p recoordSync input list log index nrgPlus pgsql plot prep vCing data cmb
 
 
 set list = ( 1brv 1cjg 1d3z 1hue 1ieh 1iv6 2rop 2jmx 2kz0 2kib )
-set list = ( 1b4y 1brv 1bus 1c2n 1cjg 1d3z 1hkt 1hue 1ieh 1iv6 1mo7 1mo8 1otz 1ozi 1p9j 1pd7 1qjt 1v0e 1vj6 1y7n 2f05 2fws 2fwu 2jmx 2jsx 2k0e 2kib 2kz0 2rop )
+set list = ( 1b4y 1brv 1bus 1c2n 1cjg 1d3z 1hkt 1hue 1ieh 1iv6 1mo7 1mo8 1ozi 1p9j 1pd7 1qjt 1vj6 1y7n 2f05 2fws 2fwu 2jmx 2jsx 2k0e 2kib 2kz0 2rop )
 
 set x = 1brv
 foreach x ( $list )
@@ -78,3 +78,6 @@ psql pdbmlplus pdbj
 select count(*) from nrgcing.cingentry;
 
 python -u $CINGROOT/python/cing/NRG/runSqlForSchema.py devnrgcing $CINGROOT/python/cing/NRG/sql/createDB-CING_psql.sql    .
+
+find . -name "*_21.str" | xargs grep -H "chemical shifts'" > ~/BMRB_CS_counts.txt
+

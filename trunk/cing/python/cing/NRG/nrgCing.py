@@ -32,15 +32,16 @@ from cing.Libs.disk import rmdir
 from cing.Libs.helper import detectCPUs
 from cing.Libs.html import GOOGLE_ANALYTICS_TEMPLATE
 from cing.NRG import * #@UnusedWildImport
-from cing.NRG.nrgCingRdb import nrgCingRdb #@Reimport # why doesn't pydev see this class import is different than the module?
 from cing.NRG.PDBEntryLists import * #@UnusedWildImport
 from cing.NRG.WhyNot import * #@UnusedWildImport
+from cing.NRG.nrgCingRdb import nrgCingRdb #@Reimport # why doesn't pydev see this class import is different than the module?
 from cing.NRG.settings import * #@UnusedWildImport
 from cing.Scripts.doScriptOnEntryList import doScriptOnEntryList
 from cing.Scripts.vCing.vCing import VALIDATE_ENTRY_NRG_STR
 from cing.Scripts.vCing.vCing import vCing
 from cing.Scripts.validateEntry import ARCHIVE_TYPE_BY_CH23
 from cing.Scripts.validateEntry import PROJECT_TYPE_CCPN
+from cing.core.classes import Project
 from cing.main import getStartMessage
 from cing.main import getStopMessage
 from shutil import copyfile
@@ -189,6 +190,8 @@ class nrgCing(Lister):
         self.ENTRY_DELETED_COUNT_MAX = 2
         self.MAX_ERROR_COUNT_CING_LOG = 200
         self.MAX_ERROR_COUNT_FC_LOG = 99999 # 104d had 16. 108d had 460
+        self.FRACTION_CS_CONVERSION_REQUIRED = 0.95
+
         self.wattosVerbosity = cing.verbosity
         self.wattosMemory = '4g'
         if not self.isProduction:
@@ -269,40 +272,40 @@ class nrgCing(Lister):
 
     def addInputModificationTimesFromMmCif(self):
         NTmessage("Looking at mmCIF input file modification times.")
-        for entryId in self.entry_list_nmr:
-            entryCodeChar2and3 = entryId[1:3]
-            fileName = os.path.join(CIFZ2, entryCodeChar2and3, '%s.cif.gz' % entryId)
+        for entry_code in self.entry_list_nmr:
+            entryCodeChar2and3 = entry_code[1:3]
+            fileName = os.path.join(CIFZ2, entryCodeChar2and3, '%s.cif.gz' % entry_code)
 #            NTdebug("Looking at: " + fileName)
             if not os.path.exists(fileName):
                 if self.isProduction:
                     NTmessage("Failed to find: " + fileName)
                 continue
-            self.inputModifiedDict[ entryId ] = os.path.getmtime(fileName)
+            self.inputModifiedDict[ entry_code ] = os.path.getmtime(fileName)
         # end for
     # end def
 
     def addInputModificationTimesFromNrg(self):
         NTmessage("Looking at NRG input file modification times.")
-        for entryId in self.entry_list_nrg_docr:
+        for entry_code in self.entry_list_nrg_docr:
             inputDir = os.path.join(self.results_dir, self.recoordSyncDir)
-            fileName = os.path.join(inputDir, entryId, '%s.tgz' % entryId)
+            fileName = os.path.join(inputDir, entry_code, '%s.tgz' % entry_code)
             if not os.path.exists(fileName):
                 if self.isProduction:
                     NTdebug("Failed to find: " + fileName)
                 continue
             nrgMod = os.path.getmtime(fileName)
 #            NTdebug("For %s found: %s" % ( fileName, nrgMod))
-            prevMod = getDeepByKeysOrAttributes(self.inputModifiedDict, entryId)
+            prevMod = getDeepByKeysOrAttributes(self.inputModifiedDict, entry_code)
 
             if prevMod:
                if nrgMod > prevMod:
-                   self.inputModifiedDict[ entryId ] = nrgMod # nrg more recent
+                   self.inputModifiedDict[ entry_code ] = nrgMod # nrg more recent
                else:
                    pass
             else:
-               self.inputModifiedDict[ entryId ] = nrgMod # nrg more recent
+               self.inputModifiedDict[ entry_code ] = nrgMod # nrg more recent
                if self.isProduction:
-                   NTwarning("Found no mmCIF file for %s" % entryId)
+                   NTwarning("Found no mmCIF file for %s" % entry_code)
             # end else
         # end for
     # end def
@@ -689,35 +692,35 @@ class nrgCing(Lister):
 
         whyNot = WhyNot()
         # Loop for speeding up the checks. Most are not nmr.
-        for entryId in self.entry_list_pdb:
-            whyNotEntry = WhyNotEntry(entryId)
-            whyNot[entryId] = whyNotEntry
+        for entry_code in self.entry_list_pdb:
+            whyNotEntry = WhyNotEntry(entry_code)
+            whyNot[entry_code] = whyNotEntry
             whyNotEntry.comment = NOT_NMR_ENTRY
             whyNotEntry.exists = False
 
-        for entryId in self.entry_list_nmr:
-            whyNotEntry = whyNot[entryId]
+        for entry_code in self.entry_list_nmr:
+            whyNotEntry = whyNot[entry_code]
             whyNotEntry.exists = True
-            if entryId not in self.entry_list_nrg:
+            if entry_code not in self.entry_list_nrg:
                 whyNotEntry.comment = NO_EXPERIMENTAL_DATA
                 whyNotEntry.exists = False
                 continue
-            if entryId not in self.entry_list_nrg_docr:
+            if entry_code not in self.entry_list_nrg_docr:
                 whyNotEntry.comment = FAILED_TO_BE_CONVERTED_NRG
                 whyNotEntry.exists = False
                 continue
-            if entryId not in self.entry_list_tried:
+            if entry_code not in self.entry_list_tried:
                 whyNotEntry.comment = TO_BE_VALIDATED_BY_CING
                 whyNotEntry.exists = False
                 continue
-            if entryId not in self.entry_list_done:
+            if entry_code not in self.entry_list_done:
                 whyNotEntry.comment = FAILED_TO_BE_VALIDATED_CING
                 whyNotEntry.exists = False
                 continue
 
 #            whyNotEntry.comment = PRESENT_IN_CING
             # Entries that are present in the database do not need a comment
-            del(whyNot[entryId])
+            del(whyNot[entry_code])
         # end loop over entries
         whyNotStr = '%s' % whyNot
 #        NTdebug("whyNotStr truncated to 1000 chars: [" + whyNotStr[0:1000] + "]")
@@ -728,13 +731,13 @@ class nrgCing(Lister):
 #        NTdebug("Copying to: " + why_not_db_comments_file)
         shutil.copy("NRG-CING.txt", why_not_db_comments_file)
         if self.writeTheManyFiles:
-            for entryId in self.entry_list_done:
+            for entry_code in self.entry_list_done:
                 # For many files like: /usr/data/raw/nmr-cing/           d3/1d3z/1d3z.exist
-                char23 = entryId[1:3]
-                subDir = os.path.join(self.why_not_db_raw_dir, char23, entryId)
+                char23 = entry_code[1:3]
+                subDir = os.path.join(self.why_not_db_raw_dir, char23, entry_code)
                 if not os.path.exists(subDir):
                     os.makedirs(subDir)
-                fileName = os.path.join(subDir, entryId + ".exist")
+                fileName = os.path.join(subDir, entry_code + ".exist")
                 if not os.path.exists(fileName):
     #                NTdebug("Creating: " + fileName)
                     fp = open(fileName, 'w')
@@ -1191,6 +1194,7 @@ class nrgCing(Lister):
                 return True
             fn = "%s.tgz" % entry_code
             inputCcpnFile = os.path.join(inputDir, fn)
+            outputCcpnFile = fn
             if not os.path.exists( inputCcpnFile):
                 NTerror("Failed to find input: %s" % inputCcpnFile)
                 return True
@@ -1242,7 +1246,7 @@ class nrgCing(Lister):
             if not os.path.exists(inputStarFile):
                 NTerror("inputStarFile not found: %s" % inputStarFile)
                 return True
-            outputCcpnFile = fn
+
             fcScript = os.path.join(cingDirScripts, 'FC', 'mergeNrgBmrbShifts.py')
 
             # Will save a copy to disk as well.
@@ -1269,6 +1273,40 @@ class nrgCing(Lister):
             if not os.path.exists(outputCcpnFile):
                 NTerror("%s found no output ccpn file %s" % (entry_code, outputCcpnFile))
                 return True
+            if True: # Test completion of conversions.
+                conversionCsSucces = True
+                nucleiList = '1H 13C 15N'.split()
+                bmrbCountMap = getBmrbCsCounts()
+                entryMap = getDeepByKeysOrAttributes( bmrbCountMap, bmrb_entry_code )
+                NTdebug("entryMap %r" % entryMap)
+                project = Project.open(entry_code, status = 'new')
+                project.initCcpn(ccpnFolder = outputCcpnFile)
+                assignmentCountMap = project.molecule.getAssignmentCountMap()
+                for nucleusId in nucleiList:
+                    d_count = getDeepByKeysOrAttributes( entryMap, nucleusId )
+                    p_count = getDeepByKeysOrAttributes( assignmentCountMap, nucleusId )
+                    NTdebug("nucleus: %s db: %s project: %s" % ( nucleusId, d_count, p_count ) )
+                    if p_count == None:
+                        NTerror("Failed to find nucleus: %s CS count in project" % nucleusId)
+                        continue
+                    if d_count == None:
+                        NTmessage("Failed to find nucleus: %s CS count in db" % nucleusId)
+                        continue
+                    if d_count == 0:
+                        NTerror("Found zero nucleii: %s CS in db" % nucleusId)
+                        conversionCsSucces = False
+                        continue
+                    f = (1. * p_count) / d_count
+                    if f < self.FRACTION_CS_CONVERSION_REQUIRED:
+                        NTerror("Found less than %.2f but %.2f for nucleus %s (p/db: %s/%s)" % (self.FRACTION_CS_CONVERSION_REQUIRED, f, nucleusId, p_count, d_count))
+                        conversionCsSucces = False
+                # end for
+                del project
+                if not conversionCsSucces:
+                    NTerror("Conversion considered a failure.")
+                    return True
+            # end CS count check.
+
             if 0: # DEFAULT 1 tmp files are removed when all is successful.
                 cingDir = "%s.cing" % entry_code
                 tmpFileList = [inputLocalCcpnFile, entry_code, cingDir]
@@ -1409,11 +1447,11 @@ class nrgCing(Lister):
             if self.prepareEntry(entry_code, convertMmCifCoor=0, convertMrRestraints=1, convertStarCS=0):
                 NTerror("In prepare failed prepareEntry")
                 return True
-        if False: # DEFAULT: False
+        if True: # DEFAULT: False
             self.searchPdbEntries()
 #            self.entry_list_todo = "134d 135d 136d 177d 1crq 1crr 1ezc 1ezd 1gnc 1kld 1l0r 1lcc 1lcd 1msh 1qch 1r4e 1sah 1saj 1vve 2axx 2ezq 2ezr 2ezs 2i7z 2ku2 2neo 2ofg".split()
 #            self.entry_list_todo = "1crq 1crr 1ezc 1ezd 1kld 1sah 1saj 1vve 2axx 2ezq 2ezr 2ezs".split()
-            self.entry_list_todo = "1b4y 1brv 1bus 1c2n 1cjg 1d3z 1hkt 1hue 1ieh 1iv6 1mo7 1mo8 1otz 1ozi 1p9j 1pd7 1qjt 1v0e 1vj6 1y7n 2f05 2fws 2fwu 2jmx 2jsx 2k0e 2kib 2kz0 2rop".split()
+            self.entry_list_todo = "1b4y 1brv 1bus 1c2n 1cjg 1d3z 1hkt 1hue 1ieh 1iv6 1mo7 1mo8 1ozi 1p9j 1pd7 1qjt 1vj6 1y7n 2f05 2fws 2fwu 2jmx 2jsx 2k0e 2kib 2kz0 2rop".split()
 #            self.entry_list_todo = "2rop 2jmx 2kz0 2kib".split()
 #            self.entry_list_nmr = deepcopy(self.entry_list_todo)
 #            self.entry_list_nrg_docr = []

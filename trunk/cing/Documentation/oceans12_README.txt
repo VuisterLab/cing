@@ -70,7 +70,7 @@ Our own lab (See VuisterLab.numbers file):
 
 All with BMRB entry:
 
-1b4y 1brv 1bus 1c2n 1cjg 1d3z 1hkt 1hue 1ieh 1iv6 1mo7 1mo8 1otz 1ozi 1p9j 1pd7 1qjt 1v0e 1vj6 1y7n 2f05 2fws 2fwu 2jmx 2jsx 2k0e 2kib 2kz0 2rop
+1b4y 1brv 1bus 1c2n 1cjg 1d3z 1hkt 1hue 1ieh 1iv6 1mo7 1mo8 1ozi 1p9j 1pd7 1qjt 1vj6 1y7n 2f05 2fws 2fwu 2jmx 2jsx 2k0e 2kib 2kz0 2rop
 
 1b4y
 1brv
@@ -84,12 +84,10 @@ All with BMRB entry:
 1iv6
 1mo7
 1mo8
-1otz
 1ozi
 1p9j
 1pd7
 1qjt
-1v0e
 1vj6
 1y7n
 2f05

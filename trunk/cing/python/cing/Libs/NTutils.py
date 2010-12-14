@@ -1363,13 +1363,27 @@ class NTdict(dict):
 
     def isEquivalent(self, other):
         if other == None:
+#            NTdebug("other == None")
             return False
-        if not isinstance(other, NTdict): # eg when comparing with tuple.
+        # NTdict and regular dictionaries can be considered equivalent for this.
+        if not isinstance(other, dict): # eg when comparing with tuple.
+#            NTdebug("not isinstance(other, dict)")
             return False
         for key in self:
+#            NTdebug("key %s" % key)
             if not (other.has_key(key) or hasattr(other, key)):
+#                NTdebug("No key %s" % key)
                 return False
-            if self[key] != other[key]:
+            valueKeySelf = self[key]
+            valueKeyOther = other[key]
+            if isinstance(valueKeySelf, NTdict):
+#                NTdebug("Comparing NTdict of selfKey")
+                return valueKeySelf.isEquivalent( valueKeyOther )
+            if isinstance(valueKeyOther, NTdict):
+#                NTdebug("Comparing NTdict of otherKey")
+                return valueKeyOther.isEquivalent( valueKeySelf )
+            if valueKeySelf != valueKeyOther:
+#                NTdebug("Comparing identity showing mismatch between self %r and other %r keys" % (valueKeySelf, valueKeyOther))
                 return False
         return True
 
@@ -1570,6 +1584,38 @@ class NTdict(dict):
         for row in myTable:
             self[ row[idxColumnKey] ] = row[idxColumnValue]
 #        m = len(self)
+#        NTdebug("NTdict grew from %d to %d items" % ( n, m))
+
+    def appendFromTableGeneric(self, myTable=None, *idxColumnKeyList):
+        '''
+        Creates a nested dictionary with at each level the next column.
+        See unit test examples.
+        '''
+        n = len(self) #@UnusedVariable
+        nTable = len(myTable)
+        if nTable == 0:
+            NTwarning("Empty table not appended.")
+            return
+        firstRow = myTable[0]
+        cTable = len(firstRow)
+        if cTable == 0:
+            NTwarning("Empty table (no columns) not appended.")
+            return
+
+        if len(idxColumnKeyList) == 0: # do all.
+            idxColumnKeyList = range(cTable)
+
+        for row in myTable:
+#            NTdebug("Looking at row %s" % str(row))
+            keyList = [ row[idx] for idx in idxColumnKeyList]
+#            NTdebug("Found keyList %s" % str(keyList))
+            if len(keyList) > 1:
+                value = row[ idxColumnKeyList[-1] ]
+                truncatedKeyList = keyList[:-1]
+                setDeepByKeys(self, value, *truncatedKeyList)
+            else:
+                setDeepByKeys(self, None, *keyList)
+        m = len(self) #@UnusedVariable
 #        NTdebug("NTdict grew from %d to %d items" % ( n, m))
 
     def appendFromList(self, myList): # simply hash
@@ -4448,7 +4494,7 @@ def getDeepByKeysOrAttributes(c, *keyList):
     if isinstance(c, dict):
         if c.has_key(key):
             value = c[key]
-        elif hasattr(c, key):
+        elif isinstance(key, str) and hasattr(c, key): # attributes need to be strings.
             value = getattr(c, key)
         else:
             return None

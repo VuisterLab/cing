@@ -3,6 +3,7 @@ Author: Jurgen F. Doreleijers, BMRB, June 2006
 
 python -u $CINGROOT/python/cing/NRG/PDBEntryLists.py
 """
+from cing import cingDirData
 from cing import cingPythonDir
 from cing import cingRoot
 from cing.Libs.DBMS import DBMS
@@ -207,3 +208,19 @@ def getPdbEntriesOca(onlyNmr = False):
             result.append(pdbCode)
   result.sort()
   return result
+
+def getBmrbCsCounts():
+    dbms = DBMS()
+    bmrbCountTableName = 'BMRB_CS_counts'
+    dbms.readCsvRelationList([bmrbCountTableName], os.path.join(cingDirData, 'NRG'))
+    bmrbCountTable = dbms.tables[ bmrbCountTableName ]
+    bmrbCountTable.convertColumn(0) # default is integer data type converting the read strings
+    bmrbCountTable.convertColumn(2)
+    bmrbCountTableProper = bmrbCountTable.toTable()
+#        NTdebug("Found table: %r" % bmrbCountTableProper)
+    bmrbCountMap = NTdict()
+#        idxColumnKeyList = [0, 1, 2]
+    idxColumnKeyList = []
+    bmrbCountMap.appendFromTableGeneric(bmrbCountTableProper, *idxColumnKeyList)
+
+    return bmrbCountMap

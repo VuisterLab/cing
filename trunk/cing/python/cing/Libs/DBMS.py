@@ -87,6 +87,16 @@ class Relation():
             return None
         return self.attr[label]
 
+    def convertColumn(self, idx, func=int):
+        """Returns None on error or column converted otherwise"""
+
+        column = self.getColumnByIdx(idx)
+        if column == None:
+            return None
+        for idx,v in enumerate(column):
+            column[idx] = apply(func,(v,))
+        return column
+
     def readCsvFile(self, file_name, containsHeaderRow, dtd_file_name=None):
         """
      *If containsHeaderRow is false then the default labels will be used.
@@ -365,7 +375,26 @@ class Relation():
                 file_str.write(',')
         return file_str.getvalue()
 
-    def getValueString( self, row, column):
+    def toTable(self):
+        """
+        """
+#        return [self.attr[label] for label in self.columnOrder ] Too easy.
+        result = []
+        sizeColumns = self.sizeColumns()
+        sizeRows = self.sizeRows()
+        if sizeColumns == 0:
+            return result
+        if sizeRows == 0:
+            return result
+        for r in range(sizeRows):
+            row = []
+            result.append(row)
+            for c in range(sizeColumns):
+                value = self.getValue(r, c)
+                row.append(value)
+        return result
+
+    def getValue( self, row, column):
         """
         Returns None on error.
         Returns module variable NULL_STRING for None values. Modify if needed.
@@ -373,17 +402,24 @@ class Relation():
         label = self.getColumnLabel(column);
 #        // Sanity checks
         if label == False:
-            NTerror("Failed to Relation.getValueString for column idx %s. Existing column labels:" % (
+            NTerror("Failed to Relation.getValue for column idx %s. Existing column labels:" % (
                 column, str(self.columnOrder)))
             return None
         column = self.getColumnByIdx(column)
         sizeRows = self.sizeRows()
         if row < 0 or row >= self.sizeRows():
-            NTerror("Failed to Relation.getValueString for row idx %s is not in range of (0,%s) for column %s." % (
+            NTerror("Failed to Relation.getValue for row idx %s is not in range of (0,%s) for column %s." % (
                 row, label, sizeRows))
             return None
 
-        value = column[row]
+        return column[row]
+
+    def getValueString( self, row, column):
+        """
+        Returns None on error.
+        Returns module variable NULL_STRING for None values. Modify if needed.
+        """
+        value = self.getValue( row, column)
         if value == None:
             return NULL_STRING
         return str(value)
