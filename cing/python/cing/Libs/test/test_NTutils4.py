@@ -9,7 +9,7 @@ import unittest
 
 class AllChecks(TestCase):
 
-    def tttestSwitchOutput(self):
+    def testSwitchOutput(self):
         x1 = "Message to debug"
         x2 = "Message to debug 2 should not show up."
         x3 = "Message to debug 3"
@@ -134,6 +134,36 @@ b
         keyList = [ 'a.b.', 'c' ] # extra dot should mess this up.
         valueOut = getDeepByKeysOrAttributes(d,*keyList)
         self.assertFalse(valueOut) # None will evaluate to False as well.
+
+    def testGetDeepByKeysOrAttributes2(self):
+
+        inputTable = [['a'],['b']]
+        expected = NTdict( a=None, b=None )
+        result = NTdict()
+#        idxColumnKeyList = [0]
+        idxColumnKeyList = [] # indicates all.
+        result.appendFromTableGeneric(inputTable, *idxColumnKeyList)
+        NTdebug("Created: %r" % result)
+        self.assertTrue( expected.isEquivalent(result ))
+
+        inputTable = [['a','foo'],['b','bar']]
+        expected = NTdict( a='foo', b='bar' )
+        result = NTdict()
+#        idxColumnKeyList = [0, 1]
+        result.appendFromTableGeneric(inputTable, *idxColumnKeyList)
+        NTdebug("Created: %r" % result)
+        self.assertTrue( expected.isEquivalent(result ))
+
+#        # Finally 3D
+        inputTable = [['a','foo', 'abba'],['b','bar', 'waterloo']]
+        expected = { 'a':{ 'foo':'abba'}, 'b':{ 'bar':'waterloo'}}
+        result = NTdict()
+#        idxColumnKeyList = [0, 1,2]
+        result.appendFromTableGeneric(inputTable, *idxColumnKeyList)
+        NTdebug("Created: %r" % result)
+        self.assertTrue( result.isEquivalent(expected ))
+##        self.failUnlessRaises( AttributeError, expected.isEquivalent(result )) Dont care why this fails....
+
 
 if __name__ == "__main__":
     cing.verbosity = cing.verbosityDebug

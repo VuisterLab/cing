@@ -63,7 +63,7 @@ class nrgCingRdb():
             self.csql = csqlAlchemy(host=host, user=user, db=db, schema=schema)
             self.csql.connect()
             self.execute = self.csql.conn.execute
-            if False: # DEFAULT True but disable for quicker testing.
+            if True: # DEFAULT True but disable for quicker testing.
                 self.createDepTables()
             self.csql.autoload()
             #csql.close()
@@ -186,7 +186,7 @@ and cingsummary.weight > 3500.0 -- about 30 residues
 AND '{2}' <@ S.chain_type; -- contains at least one protein chain.
 """ % tuple( [self.schema] *3 )
         for stmt in [ stmt1, stmt2, stmt3, stmt4]:
-            NTdebug("Executing: %s" % stmt)
+#            NTdebug("Executing: %s" % stmt)
             result = self.execute(stmt)
             printResult(result)
 
