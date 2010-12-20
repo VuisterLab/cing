@@ -12,45 +12,45 @@ E.g. for NeR103ACheshire it is: -8 = Gln1 - Gln9
 
 Sort the entry codes alphabetically
 """
-presetDictByPdbId = { # not used.
-
-'1hue': {
-  'readShifts': {
-   'keywds': {
-     'forceChainMappings': [['A', 'HUBst', 1, 0]],
-      },
-    },
-  },
-'2jmx': {
-  'readShifts': {
-   'keywds': {
-     'forceChainMappings': [['A', 'OSCP N-terminal 1-120', 1, 0]],
-      },
-    },
-  },
-'1iv6': {
-  'readShifts': {
-   'keywds': {
-     'forceChainMappings': [['C', 'TRF1', 1, -1]],
-      },
-    },
-  },
-
-'2kib': {
-  'readShifts': {
-   'keywds': {
-     'forceChainMappings': [['A', 'subunit A1 peptide 1', 1, 2]],
-      },
-    },
-  },
-
-
-}
+#presetDictByPdbId = { # not used.
+#
+#'1hue': {
+#  'readShifts': {
+#   'keywds': {
+#     'forceChainMappings': [['A', 'HUBst', 1, 0]],
+#      },
+#    },
+#  },
+#'2jmx': {
+#  'readShifts': {
+#   'keywds': {
+#     'forceChainMappings': [['A', 'OSCP N-terminal 1-120', 1, 0]],
+#      },
+#    },
+#  },
+#'1iv6': {
+#  'readShifts': {
+#   'keywds': {
+#     'forceChainMappings': [['C', 'TRF1', 1, -1]],
+#      },
+#    },
+#  },
+#
+#'2kib': {
+#  'readShifts': {
+#   'keywds': {
+#     'forceChainMappings': [['A', 'subunit A1 peptide 1', 1, 2]],
+#      },
+#    },
+#  },
+#
+#
+#}
 
 
 presetDict = {
 
-'bmr4813': {
+'disabled_bmr4813': {
 #  'duplicateResonances': {
 #     'A': ['A', 'B'],
 #     'C': ['C', 'D'],
@@ -58,8 +58,10 @@ presetDict = {
   'linkResonances': {
    'keywds': {
      'forceChainMappings': [
-       ['A', 'LAC OPERATOR C', 1, 0], ['B', 'LAC OPERATOR D', 1, 0],
-       ['C', 'LAC REPRESSOR HP62 A', 3, 0], ['D', 'LAC REPRESSOR HP62 B', 3, 0]
+       ['A', 'LAC OPERATOR C', 1, 0],
+       ['B', 'LAC OPERATOR D', 1, 0],
+       ['C', 'LAC REPRESSOR HP62 A', 1, 0],  # protein headpiece 62
+       ['D', 'LAC REPRESSOR HP62 B', 1, 0]
        ],
       },
     },
@@ -86,7 +88,23 @@ presetDict = {
     },
   },
 
-
+#add one for:
+#1vj6
+#
+#*** Setting chain mapping automatically to: [['A', 'PDZ2', 9, 0], ['B', 'PDZ2', 1, 19]] ***
+#
+#      WARNING: Mismatches in sequence mapping between CCPN chain 'B' and BMRB chain 'PDZ2':
+#          - 2.Arg  <-> 21.Thr
+#          - 3.His  <-> 22.Asp
+#          - 4.Ser  <-> 23.Gly
+#          - 5.Gly  <-> 24.Ser
+#          - 6.Ser  <-> 25.Leu
+#          - 7.Tyr  <-> 26.Gly
+#          - 8.Leu  <-> 27.Ile
+#          - 9.Val  <-> 28.Ser
+#          - 10.Thr  <-> 29.Val
+#          - 11.Ser  <-> 30.Thr
+#          - 12.Val  <-> 31.Gly
 
 }
 

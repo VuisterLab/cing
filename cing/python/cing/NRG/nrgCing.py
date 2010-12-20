@@ -33,6 +33,7 @@ from cing.Libs.helper import detectCPUs
 from cing.Libs.html import GOOGLE_ANALYTICS_TEMPLATE
 from cing.NRG import * #@UnusedWildImport
 from cing.NRG.PDBEntryLists import * #@UnusedWildImport
+from cing.NRG.PDBEntryLists import getBmrbCsCountsFromFile
 from cing.NRG.WhyNot import * #@UnusedWildImport
 from cing.NRG.nrgCingRdb import nrgCingRdb #@Reimport # why doesn't pydev see this class import is different than the module?
 from cing.NRG.settings import * #@UnusedWildImport
@@ -1236,13 +1237,16 @@ class nrgCing(Lister):
             if not self.matches_many2one.has_key(entry_code):
                 NTerror("No BMRB entry for PDB entry: %s" % entry_code)
                 return True
-            bmrb_entry_code = self.matches_many2one[entry_code]
-            bmrbCode = 'bmr%s' % bmrb_entry_code
-            inputStarDir = os.path.join(bmrbDir, bmrbCode)
+            bmrb_id = self.matches_many2one[entry_code]
+            bmrb_code = 'bmr%s' % bmrb_id
+
+
+            digits12 ="%02d" % ( bmrb_id % 100 )
+            inputStarDir = os.path.join(bmrbDir, digits12)
             if not os.path.exists(inputStarDir):
                 NTerror("Input star dir not found: %s" % inputStarDir)
                 return True
-            inputStarFile = os.path.join(inputStarDir, '%s_21.str'%bmrbCode)
+            inputStarFile = os.path.join(inputStarDir, '%s.str'%bmrb_code)
             if not os.path.exists(inputStarFile):
                 NTerror("inputStarFile not found: %s" % inputStarFile)
                 return True
@@ -1252,7 +1256,7 @@ class nrgCing(Lister):
             # Will save a copy to disk as well.
             convertProgram = ExecuteProgram("python -u %s" % fcScript, redirectOutputToFile=log_file,)
 #            NTmessage("==> Running Wim Vranken's FormatConverter from script %s" % fcScript)
-            exitCode = convertProgram("%s -bmrbCodes %s -raise -force -noGui" % (entry_code, bmrbCode))
+            exitCode = convertProgram("%s -bmrbCodes %s -raise -force -noGui" % (entry_code, bmrb_code))
             if exitCode:
                 NTerror("Failed convertProgram with exit code: %s" % str(exitCode))
                 return True
@@ -1277,7 +1281,8 @@ class nrgCing(Lister):
                 conversionCsSucces = True
                 nucleiList = '1H 13C 15N'.split()
                 bmrbCountMap = getBmrbCsCounts()
-                entryMap = getDeepByKeysOrAttributes( bmrbCountMap, bmrb_entry_code )
+                bmrbCountMap = getBmrbCsCountsFromFile(inputStarFile)
+                entryMap = getDeepByKeysOrAttributes( bmrbCountMap, bmrb_id )
                 NTdebug("entryMap %r" % entryMap)
                 project = Project.open(entry_code, status = 'new')
                 project.initCcpn(ccpnFolder = outputCcpnFile)
@@ -1286,24 +1291,21 @@ class nrgCing(Lister):
                     d_count = getDeepByKeysOrAttributes( entryMap, nucleusId )
                     p_count = getDeepByKeysOrAttributes( assignmentCountMap, nucleusId )
                     NTdebug("nucleus: %s db: %s project: %s" % ( nucleusId, d_count, p_count ) )
+                    if d_count == None or d_count == 0:
+                        NTmessage("No nucleus: %s in db" % nucleusId)
+                        continue
                     if p_count == None:
-                        NTerror("Failed to find nucleus: %s CS count in project" % nucleusId)
-                        continue
-                    if d_count == None:
-                        NTmessage("Failed to find nucleus: %s CS count in db" % nucleusId)
-                        continue
-                    if d_count == 0:
-                        NTerror("Found zero nucleii: %s CS in db" % nucleusId)
                         conversionCsSucces = False
+                        NTerror("No nucleus: %s in project" % nucleusId)
                         continue
                     f = (1. * p_count) / d_count
                     if f < self.FRACTION_CS_CONVERSION_REQUIRED:
-                        NTerror("Found less than %.2f but %.2f for nucleus %s (p/db: %s/%s)" % (self.FRACTION_CS_CONVERSION_REQUIRED, f, nucleusId, p_count, d_count))
+                        NTwarning("Found less than %.2f but %.2f for nucleus %s (p/db: %s/%s)" % (self.FRACTION_CS_CONVERSION_REQUIRED, f, nucleusId, p_count, d_count))
                         conversionCsSucces = False
                 # end for
                 del project
                 if not conversionCsSucces:
-                    NTerror("Conversion considered a failure.")
+                    NTwarning("Conversion considered a failure.")
                     return True
             # end CS count check.
 
@@ -1451,7 +1453,7 @@ class nrgCing(Lister):
             self.searchPdbEntries()
 #            self.entry_list_todo = "134d 135d 136d 177d 1crq 1crr 1ezc 1ezd 1gnc 1kld 1l0r 1lcc 1lcd 1msh 1qch 1r4e 1sah 1saj 1vve 2axx 2ezq 2ezr 2ezs 2i7z 2ku2 2neo 2ofg".split()
 #            self.entry_list_todo = "1crq 1crr 1ezc 1ezd 1kld 1sah 1saj 1vve 2axx 2ezq 2ezr 2ezs".split()
-            self.entry_list_todo = "1b4y 1brv 1bus 1c2n 1cjg 1d3z 1hkt 1hue 1ieh 1iv6 1mo7 1mo8 1ozi 1p9j 1pd7 1qjt 1vj6 1y7n 2f05 2fws 2fwu 2jmx 2jsx 2k0e 2kib 2kz0 2rop".split()
+            self.entry_list_todo = "1b4y 1brv 1bus 1c2n 1cjg 1d3z 1hkt 1hue 1ieh 1iv6 1mo7 1mo8 1ozi 1p9j 1pd7 1qjt 1vj6 1y7n 2fws 2fwu 2jmx 2jsx 2kib 2kz0 2rop".split()
 #            self.entry_list_todo = "2rop 2jmx 2kz0 2kib".split()
 #            self.entry_list_nmr = deepcopy(self.entry_list_todo)
 #            self.entry_list_nrg_docr = []
@@ -1510,7 +1512,7 @@ class nrgCing(Lister):
                                 entryListFileName,
                                 self.results_dir,
                                 processes_max=self.processes_max,
-                                max_time_to_wait=600,
+                                max_time_to_wait=6000,
                                 extraArgList=extraArgList, # list of strings
                                 START_ENTRY_ID=0, # DEFAULT: 0.
                                 MAX_ENTRIES_TODO=self.max_entries_todo,

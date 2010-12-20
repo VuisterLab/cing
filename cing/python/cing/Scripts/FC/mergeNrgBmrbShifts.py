@@ -45,9 +45,9 @@ class MergeNrgBmrbShifts(DataHandler, NmrStarHandler):
     def loadProject(self):
         modelCount = 1
         ccpnFile = os.path.join("%s_input.tgz" % self.idCode)
-        project = Project.open(self.idCode, status = 'new')
+        project = Project.open(self.idCode, status='new')
         # Can read tgz files.
-        if project.initCcpn(ccpnFolder = ccpnFile, modelCount=modelCount) == None:
+        if project.initCcpn(ccpnFolder=ccpnFile, modelCount=modelCount) == None:
             NTerror("Failed to read: %s" % ccpnFile)
             return True
 #        self.ccpnProject = loadCcpnTgzProject(os.path.join(self.loadDir, self.idCode, 'linkNmrStarData'))
@@ -82,19 +82,23 @@ class MergeNrgBmrbShifts(DataHandler, NmrStarHandler):
         for bmrbCode in self.bmrbCodes:
           self.initShiftPresets(bmrbCode)
 #          bmrbNmrStarFile = os.path.join(bmrbArchiveDataDir, self.bmrbFileFormat % bmrbCode)
-          inputStarDir = os.path.join(bmrbDir, bmrbCode)
+          bmrb_id = int(bmrbCode[3:])
+          digits12 = "%02d" % (bmrb_id % 100)
+          inputStarDir = os.path.join(bmrbDir, digits12)
           if not os.path.exists(inputStarDir):
-            NTerror("Input star dir not found: %s" % inputStarDir)
-            return True
-          bmrbFile = os.path.join(inputStarDir, '%s_21.str'%bmrbCode)
-          if not os.path.exists(bmrbFile):
-            NTerror("Input bmrbFile not found: %s" % bmrbFile)
-            return True
-
-          self.readNmrStarFile(bmrbFile, components=['measurements'])
+                NTerror("Input star dir not found: %s" % inputStarDir)
+                return True
+          inputStarFile = os.path.join(inputStarDir, '%s.str' % bmrbCode)
+          if not os.path.exists(inputStarFile):
+                NTerror("inputStarFile not found: %s" % inputStarFile)
+                return True
+          NTdebug("Start readNmrStarFile")
+          self.readNmrStarFile(inputStarFile, components=['measurements'])
           # Try to autoset mapping...
-          self.setBmrbNmrStarMapping(bmrbFile)
+          NTdebug("Start setBmrbNmrStarMapping")
+          self.setBmrbNmrStarMapping(inputStarFile)
           # Run linkResonances, using custom keywds set above
+          NTdebug("Start runLinkResonances")
           self.runLinkResonances(resonanceType='nmr')
         # Save project in new location
         newPath = self.baseName
@@ -132,6 +136,8 @@ class MergeNrgBmrbShifts(DataHandler, NmrStarHandler):
         if not self.bmrbCodes:
           raise self.DataHandlerError, "Need to pass in at least one BMRB code with -bmrbCodes flag for this script to work!"
 
+
 if __name__ == "__main__":
     cing.verbosity = cing.verbosityDebug
     MergeNrgBmrbShifts(sys.argv)
+
