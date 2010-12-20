@@ -93,13 +93,15 @@ def annotateEntry(entry_code, bmrb_id, *extraArgList):
 #                continue # TODO disable premature stop.
 
     bmrb_code = 'bmr'+bmrb_id
-    inputStarDir = os.path.join(bmrbDir, bmrb_code)
+
+    digits12 ="%02d" % ( bmrb_id % 100 )
+    inputStarDir = os.path.join(bmrbDir, digits12)
     if not os.path.exists(inputStarDir):
         NTerror("Input star dir not found: %s" % inputStarDir)
         return True
-    bmrbFile = os.path.join(inputStarDir, 'bmr%s_21.str'%bmrb_id)
-    if not os.path.exists(bmrbFile):
-        NTerror("Input bmrbFile not found: %s" % bmrbFile)
+    inputStarFile = os.path.join(inputStarDir, '%s.str'%bmrb_code)
+    if not os.path.exists(inputStarFile):
+        NTerror("inputStarFile not found: %s" % inputStarFile)
         return True
 
     dataDividedXDir = os.path.join(nrgPlusDir, ch23)

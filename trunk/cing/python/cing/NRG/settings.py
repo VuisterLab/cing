@@ -46,7 +46,8 @@ dir_F           = os.path.join(dir_prep, 'F')
 dir_vCing       = os.path.join(dir_prep, 'vCing')
 
 bmrbbase_dir    = os.path.join(platform_dir,'bmrb')
-bmrbDir         = os.path.join(bmrbbase_dir,'ftp.bmrb.wisc.edu/pub/bmrb/entry_directories')
+#bmrbDir         = os.path.join(bmrbbase_dir,'ftp.bmrb.wisc.edu/pub/bmrb/entry_directories')
+bmrbDir         = os.path.join(bmrbbase_dir,'2.1.1')
 
 # Postgres install but are they needed?
 #PGBIN           = '/usr/local/pgsql/bin'

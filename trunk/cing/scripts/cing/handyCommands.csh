@@ -69,10 +69,20 @@ mkdir -p recoordSync input list log index nrgPlus pgsql plot prep vCing data cmb
 set list = ( 1brv 1cjg 1d3z 1hue 1ieh 1iv6 2rop 2jmx 2kz0 2kib )
 set list = ( 1b4y 1brv 1bus 1c2n 1cjg 1d3z 1hkt 1hue 1ieh 1iv6 1mo7 1mo8 1ozi 1p9j 1pd7 1qjt 1vj6 1y7n 2f05 2fws 2fwu 2jmx 2jsx 2k0e 2kib 2kz0 2rop )
 
+set bDir = /Volumes/Toby/Backups.backupdb/Stella/Latest/Stella
+set eDir = /Users/jd/wattosTestingPlatform/bmrb/ftp.bmrb.wisc.edu/pub/bmrb/entry_directories
+
 set x = 1brv
 foreach x ( $list )
-    \cp -rf $D/NRG-CING/recoordSync/$x $results_base/recoordSync
+    \cp -rf $bDir/$D/NRG-CING/recoordSync/$x $results_base/recoordSync
 end
+
+set blist = ( 53 1646 4020 4046 4046 4047 4400 4491 4813 4969 5131 5317 5576 5577 5762 5801 5808 6113 6457 7008 7009 7009 11041 15072 15381 16995 20074 )
+set y = 4020
+foreach y ( $blist )
+    \cp -rf $bDir/$eDir/bmr$y $eDir
+end
+
 psql pdbmlplus pdbj
  create user devnrgcing1;
 select count(*) from nrgcing.cingentry;
@@ -81,3 +91,5 @@ python -u $CINGROOT/python/cing/NRG/runSqlForSchema.py devnrgcing $CINGROOT/pyth
 
 find . -name "*_21.str" | xargs grep -H "chemical shifts'" > ~/BMRB_CS_counts.txt
 
+find $D/devNRG-CING/data -name "*.log" | xargs grep "DEBUG: nucleus: 1"
+find $D/devNRG-CING/data -name "*.log" | xargs grep "ERROR: "

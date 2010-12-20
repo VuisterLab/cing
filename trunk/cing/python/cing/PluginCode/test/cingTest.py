@@ -3,7 +3,7 @@ Unit test execute as:
 python $CINGROOT/python/cing/PluginCode/test/cingTest.py
 """
 from cing.PluginCode.xplor import createProjectFromXplorMemory
-import protocol
+import protocol #@UnresolvedImport
 
 pdb='''
 REMARK FILENAME="g_xray_withprotons.pdbfit"

@@ -1,8 +1,9 @@
 """
-Author: Jurgen F. Doreleijers, BMRB, June 2006
+Author: Jurgen F. Doreleijers
 
 python -u $CINGROOT/python/cing/NRG/PDBEntryLists.py
 """
+from ccp.format.nmrStar.projectIO import NmrStarProjectFile
 from cing import cingDirData
 from cing import cingPythonDir
 from cing import cingRoot
@@ -115,7 +116,7 @@ def writeEntryListToFile(fileName, entryList):
         return True
     writeTextToFile(fileName, csvText)
 
-def readEntryListFromFile(fileName, headerCount = 0):
+def readEntryListFromFile(fileName, headerCount=0):
     """
     Throws exception on failure or None on error
     Will only use first column's values
@@ -136,7 +137,7 @@ def readEntryListFromFile(fileName, headerCount = 0):
         result = result[headerCount:]
     return result
 
-def getPdbEntries(onlyNmr = False, mustHaveExperimentalNmrData = False, onlySolidState = False):
+def getPdbEntries(onlyNmr=False, mustHaveExperimentalNmrData=False, onlySolidState=False):
     """Includes solution and solid state NMR if onlyNMR is chosen
     """
 #    if True: # Default False; used for not bothering sites.
@@ -175,7 +176,7 @@ def getPdbEntries(onlyNmr = False, mustHaveExperimentalNmrData = False, onlySoli
     return result
 
 
-def getPdbEntriesOca(onlyNmr = False):
+def getPdbEntriesOca(onlyNmr=False):
   """Not really used anymore"""
   result = []
   urlLocation = ocaUrl + "?dat=dep&ex=any&m=du"
@@ -224,3 +225,43 @@ def getBmrbCsCounts():
     bmrbCountMap.appendFromTableGeneric(bmrbCountTableProper, *idxColumnKeyList)
 
     return bmrbCountMap
+
+# end def
+
+class AssignmentCountMap(NTdict):
+    def __init__(self):
+#        d = {'1H': 0, '13C': 0, '15N': 0, '31P':0, 'overall': 0}
+        d = {'H': 0 }
+        self.__init__(**d)
+
+#TODO: test code here. Fails still...
+#assignmentCountMap = AssignmentCountMap()
+#print "assignmentCountMap: %s" % assignmentCountMap
+
+def getBmrbCsCountsFromFile(inputStarFile):
+    """Return None on error or a map on success"""
+    assignmentCountMap = AssignmentCountMap()
+    nmrStarFile = NmrStarProjectFile(inputStarFile)
+    nmrStarFile.read(verbose=0)
+
+    fileType, measurementType = ('chemShiftFiles', 'chemShifts')
+
+    for valuesFile in getattr(nmrStarFile, fileType):
+        NTdebug("getBmrbCsCountsFromFile valuesFile: %s" % valuesFile)
+        valueList = getattr(valuesFile, measurementType)
+        NTdebug("getBmrbCsCountsFromFile size valueList: %s" % len(valueList))
+        for value in valueList:
+            # value is a ccp.format.nmrStar.chemShiftsIO.NmrStarChemShift instance
+            NTdebug("in NmrStar.NmrStarHandler.readNmrStarFile value: %s" % value)
+            csAtomType = value.atomType
+            if not hasattr( assignmentCountMap, csAtomType ):
+                NTdebug("Skipping CS for atom type undesired: %s" % value)
+                continue
+            assignmentCountMap[ csAtomType] += 1
+            assignmentCountMap[ 'overall' ] += 1
+        # end for
+    # end for
+    return assignmentCountMap
+# end def
+
+#def showAssignmentCountMap
