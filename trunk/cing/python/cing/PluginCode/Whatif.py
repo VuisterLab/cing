@@ -155,6 +155,19 @@ SETWIF 1012 0
 $pdb_file
 xxx
 
+# Read again for separate options.
+getmol
+$pdb_file
+
+# dolog # Fails as of yet with wsvacc due to a bug in WI
+# wsvacc_$modelNumberString.log
+# # Returns for each atom in the input file its solvent accessibility in A**2. Waters are neglected by this service.
+# 0
+
+%wsvacc
+
+# nolog
+
 $mv check.db check_$modelNumberString.db
 
 # Initialize the soup
@@ -1062,9 +1075,6 @@ def runWhatif( project, ranges=None, parseOnly=False ):
             NTerror("runWhatif: Failed whatif checks with exit code: " + `whatifExitCode`)
             return True
 
-        if False:
-            removeTempFiles(whatifDir)
-
         whatifStatus.completed = True
 #        NTdebug("Setting what if status completed to %s" % whatifStatus.completed)
     else:
@@ -1163,7 +1173,8 @@ def runWhatif( project, ranges=None, parseOnly=False ):
     whatifStatus.keysformat()
 
     # Clean up junk.
-    removeTempFiles( whatifDir )
+    if 1: # DEFAULT 1
+        removeTempFiles( whatifDir )
 #end def
 
 

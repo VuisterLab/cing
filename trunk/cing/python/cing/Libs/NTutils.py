@@ -1429,7 +1429,15 @@ class NTdict(dict):
         return str(self.__class__)[7:-2].split('.')[-1:][0]
     #end def
 
-    def __repr__(self):
+    def __repr__(self, showEmptyElements = True):
+        """Show all but empty items if desired"""
+        if not showEmptyElements:
+            c = NTdict()
+            for key in self.keys():
+                if self[key] != 0:
+                    c[key] = self[key]
+            return c.__repr__(showEmptyElements = True) # default but shown for clarity.
+
 #        return dict.__repr__( self )
 #        return '<%s-object (%d)>' % (self.__CLASS__,self.__OBJECTID__ )
         global NTdictDepth, NTdictMaxDepth, NTdictCycles

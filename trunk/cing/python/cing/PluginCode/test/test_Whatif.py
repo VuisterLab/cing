@@ -67,7 +67,7 @@ class AllChecks(TestCase):
                 if not os.path.exists(ccpnFile):
                     self.fail("Neither %s or the .tgz exist" % ccpnFile)
 
-            self.assertTrue(project.initCcpn(ccpnFolder = ccpnFile, modelCount=999))
+            self.assertTrue(project.initCcpn(ccpnFolder = ccpnFile, modelCount=2))
             self.assertFalse(runWhatif(project, ranges=ranges, parseOnly=False))
         else:
             project = Project.open( entryId, status='old' )
