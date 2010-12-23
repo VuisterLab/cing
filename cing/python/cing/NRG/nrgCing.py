@@ -33,10 +33,10 @@ from cing.Libs.helper import detectCPUs
 from cing.Libs.html import GOOGLE_ANALYTICS_TEMPLATE
 from cing.NRG import * #@UnusedWildImport
 from cing.NRG.PDBEntryLists import * #@UnusedWildImport
-from cing.NRG.PDBEntryLists import getBmrbCsCountsFromFile
 from cing.NRG.WhyNot import * #@UnusedWildImport
 from cing.NRG.nrgCingRdb import nrgCingRdb #@Reimport # why doesn't pydev see this class import is different than the module?
 from cing.NRG.settings import * #@UnusedWildImport
+from cing.Scripts.FC.utils import getBmrbCsCountsFromFile
 from cing.Scripts.doScriptOnEntryList import doScriptOnEntryList
 from cing.Scripts.vCing.vCing import VALIDATE_ENTRY_NRG_STR
 from cing.Scripts.vCing.vCing import vCing
@@ -1279,15 +1279,15 @@ class nrgCing(Lister):
                 return True
             if True: # Test completion of conversions.
                 conversionCsSucces = True
-                nucleiList = '1H 13C 15N'.split()
-                bmrbCountMap = getBmrbCsCounts()
+                nucleiToCheckList = '1H 13C 15N'.split()
+#                bmrbCountMap = getBmrbCsCounts()
                 bmrbCountMap = getBmrbCsCountsFromFile(inputStarFile)
                 entryMap = getDeepByKeysOrAttributes( bmrbCountMap, bmrb_id )
                 NTdebug("entryMap %r" % entryMap)
                 project = Project.open(entry_code, status = 'new')
                 project.initCcpn(ccpnFolder = outputCcpnFile)
                 assignmentCountMap = project.molecule.getAssignmentCountMap()
-                for nucleusId in nucleiList:
+                for nucleusId in nucleiToCheckList:
                     d_count = getDeepByKeysOrAttributes( entryMap, nucleusId )
                     p_count = getDeepByKeysOrAttributes( assignmentCountMap, nucleusId )
                     NTdebug("nucleus: %s db: %s project: %s" % ( nucleusId, d_count, p_count ) )

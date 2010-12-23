@@ -1,12 +1,15 @@
 """Utilities for working with CCPN/FC"""
 
+from ccp.format.nmrStar.projectIO import NmrStarProjectFile
 from ccpnmr.format.converters.PseudoPdbFormat import PseudoPdbFormat
 from ccpnmr.format.process.stereoAssignmentSwap import StereoAssignmentSwapCheck
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.Libs.pdb import defaultPrintChainCode
 from cing.Scripts.FC.constants import * #@UnusedWildImport
 from cing.Scripts.utils import printSequenceFromPdbFile
+from cing.core.molecule import AssignmentCountMap
 from glob import glob
+from cing.PluginCode.BMRB import bmrbAtomType2spinTypeCingMap
 
 def reportDifference(ccpnProject, fn):
     printSequenceFromCcpnProject(ccpnProject)
@@ -107,3 +110,41 @@ def swapCheck(nmrConstraintStore,structureEnsemble,numSwapCheckRuns):
 
     print
     print
+
+
+def getBmrbCsCountsFromFile(inputStarFile):
+    """Return None on error or a map on success"""
+    assignmentCountMap = AssignmentCountMap()
+
+    nmrStarFile = NmrStarProjectFile(inputStarFile)
+    nmrStarFile.read(verbose=0)
+
+    fileType, measurementType = ('chemShiftFiles', 'chemShifts')
+
+    reportedSpinType = []
+    for valuesFile in getattr(nmrStarFile, fileType):
+        NTdebug("getBmrbCsCountsFromFile valuesFile: %s" % valuesFile)
+        valueList = getattr(valuesFile, measurementType)
+        NTdebug("getBmrbCsCountsFromFile size valueList: %s" % len(valueList))
+        for value in valueList:
+            # value is a ccp.format.nmrStar.chemShiftsIO.NmrStarChemShift instance
+#            NTdebug("in NmrStar.NmrStarHandler.readNmrStarFile value: %s" % value)
+            csAtomType = getDeepByKeysOrAttributes( bmrbAtomType2spinTypeCingMap, value.atomType )
+#            resTypeBMRB = getDeepByKeysOrAttributes(  value, 'resLabel'' )
+#            atomName = getDeepByKeysOrAttributes(  value, 'atomName' )
+            if not csAtomType:
+                if csAtomType not in reportedSpinType:
+                    NTdebug("Skipping CS for less common atom type: %s" %  value.atomType )
+                    reportedSpinType.append(csAtomType)
+                continue
+            if not hasattr( assignmentCountMap, csAtomType ):
+                if csAtomType not in reportedSpinType:
+                    NTdebug("Skipping CS for atom type unfit for CS: %s" % value)
+                    reportedSpinType.append(csAtomType)
+                continue
+            assignmentCountMap[ csAtomType] += 1
+        # end for
+    # end for
+    NTdebug(str(assignmentCountMap))
+    return assignmentCountMap
+# end def

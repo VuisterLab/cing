@@ -112,10 +112,19 @@ def chothiaClass(resList):
     return None
 
 def getAssignmentCountMapForResList(resList, isAssigned=True):
-    """Returns dictionary by isotope and overall keys with boolean values."""
-#    keyList = '1H 13C 15N 31P'.split()
-#    keyListIncludingOverall = keyList + ['overall']
-    assignmentCountMap = {'1H': 0, '13C': 0, '15N': 0, '31P':0, 'overall': 0}
+    """
+    Returns dictionary by isotope and overall keys with boolean values.
+    Only spinTypes listed in AssignmentCountMap are filled.
+
+    Method is designed to correspond to BMRB counting method:
+    - Methylene protons are counted separately even when degenerate.
+
+    In contrast to BMRB version 3 files here:
+    - Methyl protons are only counted once.
+    """
+
+    assignmentCountMap = AssignmentCountMap()
+
     atmList = NTlist()
     for res in resList:
         atmList.addList( res.allAtoms() )
@@ -123,6 +132,11 @@ def getAssignmentCountMapForResList(resList, isAssigned=True):
         spinType = getDeepByKeys(atm, 'db', 'spinType')
         if not spinType:
             continue
+        if not assignmentCountMap.has_key(spinType):
+            NTdebug("Skipping spinType: %s" % spinType)
+            continue
+
+        # Only count the methyl pseudo atom e.g. Ala MB
         if atm.isMethylProton() and not atm.isPseudoAtom():
 #            NTdebug("Skipping isMethylProton and not atm.isPseudoAtom() %s" % atm)
             continue
@@ -139,11 +153,15 @@ def getAssignmentCountMapForResList(resList, isAssigned=True):
 #            NTdebug("atm, isAssigned: %s %s %s" % (atm, atm.isAssigned(), spinType))
         # spintype is not available for pseudos etc. perhaps
         atmIsAssigned = atm.isAssigned()
-        if ((atmIsAssigned and isAssigned) or
+        if not ((atmIsAssigned and isAssigned) or
              (not atmIsAssigned and not isAssigned)):
-            assignmentCountMap[spinType] += 1
-            assignmentCountMap['overall'] += 1
-
+            NTdebug("%s skipped because of final check" % atm)
+            continue
+        assignmentCountMap[spinType] += 1
+    # end for
+    # Twice as fast to to do at end.
+    assignmentCountMap['overall'] = sum( [ assignmentCountMap[key] for key in assignmentCountMap.keys()])
+    NTdebug("Found %r" % assignmentCountMap)
     return assignmentCountMap
 
 def allResiduesWithCoordinates(resList):
@@ -5095,6 +5113,16 @@ class Resonance( NTvalue  ):
 #Resonance.XMLhandler = XMLResonanceHandler()
 
 
+class AssignmentCountMap(NTdict):
+    def __init__(self, *args, **kwds):
+        d = {'1H': 0, '13C': 0, '15N': 0, '31P':0}
+#        d = {'H': 0 }
+        NTdict.__init__(self, __CLASS__='AssignmentCountMap')
+        self.update(d)
+    def __str__(self):
+        'Default is to have no zero elements. Using trick with different method name to prevent recursion.'
+        return self.__repr__(showEmptyElements=0)
+#end class
 
 #==============================================================================
 def translateTopology( residue, topDefList ):

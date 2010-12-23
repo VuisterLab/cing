@@ -54,7 +54,7 @@ class CingSummary( NTdict ):
                                       'WHATIF: rama %(WI_ramachandran)-15s bb %(WI_bbNormality)-15s rotamer %(WI_rotamer)-15s '
 
                     )
-        if hasattr(plugins, WHATIF_STR) and plugins[ WHATIF_STR ].isInstalled:
+        if getDeepByKeysOrAttributes( plugins, WHATIF_STR, IS_INSTALLED_STR):
 #            from cing.PluginCode.Whatif import Whatif # JFD: This breaks the plugin concept somewhat.
             # Add all Whatif summary check Id's
             # The below causes an exception when called on a system that has no Whatif.

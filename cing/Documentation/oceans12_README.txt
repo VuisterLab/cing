@@ -46,6 +46,10 @@ On the restraint side:
 1d3z XPLOR RDCs
 2cka XPLOR with bounds 0, 5.5, 5.5, None for lower, upper, target, and error.
 
+CS interest
+**********************
+1nk2 4141
+
 Our own lab (See VuisterLab.numbers file):
 1e91
 1gm1
@@ -63,9 +67,30 @@ Our own lab (See VuisterLab.numbers file):
 2fws,7009
 2fwu,7008
 2f05
-2jsx,15381
+2jsx,15381 NapD a Tat signal peptide-binding chaperone
 2kls
 2klt
 3phy
+
+With BMRB 3 file:
+4046
+4047
+4491
+4969
+5131
+5317
+5576
+5577
+5762
+5801
+5808
+6113
+7008
+7009
+11041
+15072
+15381
+16995
+20074
 
 All with BMRB entry: see nrgCing.py in prepare()

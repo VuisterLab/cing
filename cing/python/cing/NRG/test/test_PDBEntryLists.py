@@ -12,10 +12,10 @@ import unittest
 
 class AllChecks(TestCase):
 
-    def test_PDBEntryLists(self):
+    def _test_PDBEntryLists(self):
 
         if not cing.internetConnected:
-            NTdebug("Skipping checks for there is not internet connection detected")
+            NTdebug("Skipping checks for there is no internet connection detected")
             return
 
         self.failIf(os.chdir(cingDirTmp), msg =
@@ -75,6 +75,7 @@ class AllChecks(TestCase):
             bmrb_id = matches_many2one[inputPdbId]
 #            self.assertEqual(pdb_id,inputPdbId)
             self.assertEqual(bmrb_id, '4020')
+
 
 if __name__ == "__main__":
     cing.verbosity = verbosityDebug

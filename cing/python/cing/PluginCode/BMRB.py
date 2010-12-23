@@ -10,6 +10,8 @@ from cing.core.molecule import Chain
 from cing.core.molecule import Molecule
 #from cing.Libs.fpconst import NaN
 
+bmrbAtomType2spinTypeCingMap = { 'H': '1H', 'C': '13C', 'N': '15N', 'P': '31P' }
+bmrbResType2CingMap = { 'H': '1H', 'C': '13C', 'N': '15N', 'P': '31P' }
 
 class NMRrestraintsGrid:
     def __init__(self):

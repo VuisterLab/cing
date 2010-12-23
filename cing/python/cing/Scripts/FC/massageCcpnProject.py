@@ -15,6 +15,7 @@ from cing import cingDirTmp
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.Libs.disk import mkdirs
 from cing.NRG import CASD_NMR_BASE_NAME
+from cing.NRG.settings import baseDir
 from cing.core.classes import Project
 from glob import glob
 from memops.general.Io import loadProject
@@ -73,8 +74,6 @@ def replaceCoordinates():
     removeOriginalStructureEnsemble = True
     addStructureEnsemble = True # From all *.pdb files in inputDir.
 
-#    inputDir = os.path.join(cingDirTestsData, "ccpn")
-    baseDir = '/Users/jd/CASD-NMR-CING'
     dataOrgDir = os.path.join(baseDir,DATA_STR)
     dataDividedDir = os.path.join(baseDir,DATA_STR)
     #        _scriptName = sys.argv[0]
