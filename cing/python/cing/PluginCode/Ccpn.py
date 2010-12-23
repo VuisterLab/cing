@@ -884,7 +884,7 @@ class Ccpn:
         NTmessage("==> CCPN ShiftList '%s' imported from CCPN Nmr project '%s'",
                          ccpnShiftList.name, ccpnShiftList.parent.name)
         NTmessage("==> Count of (pseudo-)atom with resonances updated %s" % len(atomsTouched.keys()))
-        NTmessage("==> Count of resonanceSetDone %s" % len(resonanceSetDoneMap.keys()))
+        NTmessage("==> Count of resonanceSetDone %s (will be same or lower than the above count" % len(resonanceSetDoneMap.keys()))
 
         return True
 

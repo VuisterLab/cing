@@ -111,7 +111,7 @@ def chothiaClass(resList):
 
     return None
 
-def getAssignmentCountMapForResList(resList, isAssigned=True):
+def getAssignmentCountMapForResList(resList, isAssigned = True):
     """
     Returns dictionary by isotope and overall keys with boolean values.
     Only spinTypes listed in AssignmentCountMap are filled.
@@ -121,6 +121,9 @@ def getAssignmentCountMapForResList(resList, isAssigned=True):
 
     In contrast to BMRB version 3 files here:
     - Methyl protons are only counted once.
+
+    If isAssigned is not set then the unassigned spins will be counted.
+    Together with the assigned spins they should constitute all assignable spins.
     """
 
     assignmentCountMap = AssignmentCountMap()
@@ -129,13 +132,16 @@ def getAssignmentCountMapForResList(resList, isAssigned=True):
     for res in resList:
         atmList.addList( res.allAtoms() )
     for atm in atmList:
-        spinType = getDeepByKeys(atm, 'db', 'spinType')
+        atmIsAssigned = atm.isAssigned()
+        # spintype is not available for pseudos etc. perhaps
+        spinType = getDeepByKeys(atm, DB_STR, SPINTYPE_STR)
+#        NTdebug("atm, spinType, atmIsAssigned, isAssigned: %s %s %s %s" % (atm, spinType, atmIsAssigned, isAssigned))
         if not spinType:
+#            NTdebug("Failed to find spinType for atom: %s" % atm)
             continue
         if not assignmentCountMap.has_key(spinType):
-            NTdebug("Skipping spinType: %s" % spinType)
+#            NTdebug("Failed to find spinType in assignmentCountMap: %s for atm %s" % (spinType, atm))
             continue
-
         # Only count the methyl pseudo atom e.g. Ala MB
         if atm.isMethylProton() and not atm.isPseudoAtom():
 #            NTdebug("Skipping isMethylProton and not atm.isPseudoAtom() %s" % atm)
@@ -143,25 +149,23 @@ def getAssignmentCountMapForResList(resList, isAssigned=True):
         if atm.isPseudoAtom() and not atm.isMethyl():
 #            NTdebug("Skipping atm.isPseudoAtom() and not atm.isMethyl() %s" % atm)
             continue
+        # Get rid of counts for terminii which usually are absent.
         if atm.isTerminal():
 #            NTdebug("Skipping isTerminal %s" % atm)
             continue
-        if not assignmentCountMap.has_key(spinType):
-#            NTdebug("Failed to find spinType in assignmentCountMap: %s" % spinType)
-            continue
-#        if isAssigned:
-#            NTdebug("atm, isAssigned: %s %s %s" % (atm, atm.isAssigned(), spinType))
-        # spintype is not available for pseudos etc. perhaps
-        atmIsAssigned = atm.isAssigned()
-        if not ((atmIsAssigned and isAssigned) or
-             (not atmIsAssigned and not isAssigned)):
-            NTdebug("%s skipped because of final check" % atm)
-            continue
+
+        if isAssigned:
+            if not atmIsAssigned:
+#                NTdebug("%s skipped because requesting assigned and this atom was not for : " % atm)
+                continue
+        else:
+            if atmIsAssigned:
+#                NTdebug("%s skipped because requesting -unassigned- and this atoms was for: " % atm)
+                continue
+#        NTmessage("Including atm: %s " % atm)
         assignmentCountMap[spinType] += 1
     # end for
-    # Twice as fast to to do at end.
-    assignmentCountMap['overall'] = sum( [ assignmentCountMap[key] for key in assignmentCountMap.keys()])
-    NTdebug("Found %r" % assignmentCountMap)
+    NTdebug("For isAssigned: %s found %s" % (isAssigned, assignmentCountMap))
     return assignmentCountMap
 
 def allResiduesWithCoordinates(resList):
@@ -183,7 +187,7 @@ class ResidueList():
         return chothiaClass(self.allResidues())
     def chothiaClassInt(self):
         return chothiaClassInt(chothiaClass(self.allResidues()))
-    def getAssignmentCountMap(self, isAssigned=True):
+    def getAssignmentCountMap(self,isAssigned=True):
         return getAssignmentCountMapForResList(self.allResidues(), isAssigned=isAssigned)
     def allResiduesWithCoordinates(self):
         return allResiduesWithCoordinates(self.allResidues())
@@ -2124,7 +2128,7 @@ Return an Molecule instance or None on error
                 NTwarning("No residues left in rangesByCv; max cvList of any residue: %s" % max_cv)
             return EMPTY_RANGES_STR
         if max_cv < 0.2:
-            NTwarning("No residues with cv above 0.2 which is weird. Max cv is: %s" % max_cv)
+            NTdebug("No residues with cv above 0.2 which is weird. Max cv is: %s" % max_cv)
         if debugRoutine:
             NTdebug("In rangesByCv; max cvList of any residue: %s" % max_cv)
 
@@ -5115,13 +5119,17 @@ class Resonance( NTvalue  ):
 
 class AssignmentCountMap(NTdict):
     def __init__(self, *args, **kwds):
-        d = {'1H': 0, '13C': 0, '15N': 0, '31P':0}
-#        d = {'H': 0 }
+        d = {'1H': 0, '13C': 0, '15N': 0,  '31P':0}
+        # skipping: O & S that are not observed in BMRB
+        # Observed were F in bmr16409, & Cd in bmr4363. None in BMRB and PDB for these 2 nucleii so leave out of code for now.
+#        '19F':0, '113Cd': 0
         NTdict.__init__(self, __CLASS__='AssignmentCountMap')
         self.update(d)
     def __str__(self):
         'Default is to have no zero elements. Using trick with different method name to prevent recursion.'
         return self.__repr__(showEmptyElements=0)
+    def overallCount(self):
+        return sum([self[key] for key in self.keys()])
 #end class
 
 #==============================================================================

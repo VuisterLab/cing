@@ -1053,7 +1053,7 @@ class nrgCing(Lister):
         NTmessage("convertMrRestraints    Start from DOCR                                   %s" % convertMrRestraints)
         NTmessage("convertStarCS          Adds STAR CS to Ccpn with XXXX                    %s" % convertStarCS)
 #        NTmessage("filterCcpnAll          Filter CS and restraints with XXXX                -> F/XXXX_F_FC.xml         %s" % filterCcpnAll)
-        NTmessage("Doing                                                                %4s" % entry_code)
+        NTmessage("Doing                                                                 %4s" % entry_code)
 #        NTdebug("copyToInputDir          Copies the input to the collecting directory                                 %s" % copyToInputDir)
 
 
@@ -1213,17 +1213,13 @@ class nrgCing(Lister):
 '1cjg': 4813 ,
 '1d3z': 6457 ,
 '1hkt': 4046 ,
+'1hkt': 4046 ,
 '1hue': 4047 ,
 '1ieh': 4969 ,
 '1iv6': 5317 ,
-'2fws': 7009 ,
-'2jmx': 15072,
-'2kib': 20074,
-'2kz0': 16995,
-'2rop': 11041,
-'1hkt': 4046 ,
 '1mo7': 5577 ,
 '1mo8': 5576 ,
+'1nk2': 4141 ,
 '1ozi': 5762 ,
 '1p9j': 5801 ,
 '1pd7': 5808 ,
@@ -1231,8 +1227,13 @@ class nrgCing(Lister):
 '1vj6': 5131 ,
 '1y7n': 6113 ,
 '2fws': 7009 ,
+'2fws': 7009 ,
 '2fwu': 7008 ,
-'2jsx': 15381
+'2jmx': 15072,
+'2jsx': 15381,
+'2kib': 20074,
+'2kz0': 16995,
+'2rop': 11041,
  }
             if not self.matches_many2one.has_key(entry_code):
                 NTerror("No BMRB entry for PDB entry: %s" % entry_code)
@@ -1279,37 +1280,43 @@ class nrgCing(Lister):
                 return True
             if True: # Test completion of conversions.
                 conversionCsSucces = True
-                nucleiToCheckList = '1H 13C 15N'.split()
+                nucleiToCheckList = '1H 13C 15N 31P'.split()
 #                bmrbCountMap = getBmrbCsCounts()
-                bmrbCountMap = getBmrbCsCountsFromFile(inputStarFile)
-                entryMap = getDeepByKeysOrAttributes( bmrbCountMap, bmrb_id )
+#                entryMap = getDeepByKeysOrAttributes( bmrbCountMap, bmrb_id )
+                entryMap = getBmrbCsCountsFromFile(inputStarFile)
                 NTdebug("entryMap %r" % entryMap)
                 project = Project.open(entry_code, status = 'new')
                 project.initCcpn(ccpnFolder = outputCcpnFile)
                 assignmentCountMap = project.molecule.getAssignmentCountMap()
+                input_count_total = 0
+                project_count_total = 0
                 for nucleusId in nucleiToCheckList:
-                    d_count = getDeepByKeysOrAttributes( entryMap, nucleusId )
-                    p_count = getDeepByKeysOrAttributes( assignmentCountMap, nucleusId )
-                    NTdebug("nucleus: %s db: %s project: %s" % ( nucleusId, d_count, p_count ) )
-                    if d_count == None or d_count == 0:
-                        NTmessage("No nucleus: %s in db" % nucleusId)
+                    input_count = getDeepByKeysOrAttributes( entryMap, nucleusId )
+                    project_count = getDeepByKeysOrAttributes( assignmentCountMap, nucleusId )
+                    NTdebug("nucleus: %s input: %s project: %s" % ( nucleusId, input_count, project_count ) )
+                    if input_count == None or input_count == 0:
+#                        NTmessage("No nucleus: %s in input" % nucleusId)
                         continue
-                    if p_count == None:
-                        conversionCsSucces = False
+                    if project_count == None:
                         NTerror("No nucleus: %s in project" % nucleusId)
                         continue
-                    f = (1. * p_count) / d_count
-                    if f < self.FRACTION_CS_CONVERSION_REQUIRED:
-                        NTwarning("Found less than %.2f but %.2f for nucleus %s (p/db: %s/%s)" % (self.FRACTION_CS_CONVERSION_REQUIRED, f, nucleusId, p_count, d_count))
-                        conversionCsSucces = False
+                    input_count_total += input_count
+                    project_count_total += project_count
                 # end for
+                if input_count_total == 0:
+                    f = 0.0
+                else:
+                    f = (1. * project_count_total) / input_count_total
+                resultTuple = (self.FRACTION_CS_CONVERSION_REQUIRED, f, project_count, input_count)
+                if f < self.FRACTION_CS_CONVERSION_REQUIRED:
+                    NTwarning("Found fraction less than %.2f but %.2f overall (input/project: %s/%s)" % resultTuple)
+                    conversionCsSucces = False
+                else:
+                    NTwarning("Found fraction of at least %.2f at %.2f overall (input/project: %s/%s)" % resultTuple)
                 del project
-                if not conversionCsSucces:
-                    NTwarning("Conversion considered a failure.")
-                    return True
             # end CS count check.
 
-            if 0: # DEFAULT 1 tmp files are removed when all is successful.
+            if 1: # DEFAULT 1 tmp files are removed when all is successful.
                 cingDir = "%s.cing" % entry_code
                 tmpFileList = [inputLocalCcpnFile, entry_code, cingDir]
                 for file in tmpFileList:
@@ -1318,7 +1325,8 @@ class nrgCing(Lister):
                             shutil.rmtree(file)
                         else:
                             os.unlink(file)
-            finalPhaseId = PHASE_S
+            if conversionCsSucces: # Only use CS if criteria on conversion were met.
+                finalPhaseId = PHASE_S
 
         if copyToInputDir:
             if not finalPhaseId:
@@ -1347,7 +1355,7 @@ class nrgCing(Lister):
         else:
             NTwarning("Did not copy input %s" % finalInputTgz)
         # end else
-        if 0: # DEFAULT: 0
+        if 1: # DEFAULT: 0
             self.entry_list_todo = [ entry_code ]
             self.runCing()
         NTmessage("Done with %s" % entry_code)
