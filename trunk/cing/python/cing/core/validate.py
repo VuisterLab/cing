@@ -1194,9 +1194,13 @@ def moleculeValidateAssignments( molecule  ):
     assignmentCountMap = molecule.getAssignmentCountMap()
     notAssignmentCountMap = molecule.getAssignmentCountMap(isAssigned=False)
     hasAssignment = {}
-    FRACTION_REQUIRED = 0.75
+    FRACTION_REQUIRED = 0.85 # was 0.75 but let's only report real exceptions.
     msg = ''
-    keyList = '1H 13C 15N 31P'.split()
+    if not assignmentCountMap:
+        NTerror("Failed in moleculeValidateAssignments to get even an empty assignmentCountMap; skipping")
+        return None
+
+    keyList = assignmentCountMap.keys()
     for key in keyList:
         a = assignmentCountMap[key]
         n = notAssignmentCountMap[key]

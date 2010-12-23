@@ -48,7 +48,7 @@ On the restraint side:
 
 CS interest
 **********************
-1nk2 4141
+1nk2 4141 Has all types of CS spin types.
 
 Our own lab (See VuisterLab.numbers file):
 1e91
