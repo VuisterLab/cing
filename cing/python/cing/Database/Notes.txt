@@ -681,4 +681,7 @@ Added QH pseudo-atom to HOH residue
 - 29 Jul 2009:
 Changed to sml description of residues.
 
+- 2 Jan 2011
+Updated INTERNAL_1 directory using mkINTERNAL_1.py script
+Changed to INTERNAL_1 definitions
 
