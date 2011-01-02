@@ -30,13 +30,13 @@ import time
 
 programName     = 'CING'
 # Version number is a float. Watch out, version 0.100 will be older than 0.99; nope, version 0.100 is long behind us !! (GWV)
-cingVersion     = 0.90
+cingVersion     = 0.95
 cingRevision    = getSvnRevision()
 
 
 
 __version__     = cingVersion # for pydoc
-__date__        = '21 April 2010'
+__date__        = '24 December 2010'
 __copyright_years__ = '2004-' + __date__.split()[-1] # Never have to update this again...
 
 authorList      = [  ('Geerten W. Vuister',          'g.vuister@science.ru.nl'),

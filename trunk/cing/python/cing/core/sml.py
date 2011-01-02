@@ -14,6 +14,8 @@ from cing.core.database import AtomDef
 from cing.core.database import DihedralDef
 from cing.core.database import MolDef
 from cing.core.database import ResidueDef
+from cing.core.database import isNterminalAtom
+from cing.core.database import isCterminalAtom
 from cing.core.molecule import Atom
 from cing.core.molecule import Chain
 from cing.core.molecule import Coordinate #@UnusedImport
@@ -24,7 +26,7 @@ from cing.core.molecule import Resonance
 
 SMLstarthandlers = {}
 SMLendhandlers   = {}
-SMLversion       = 0.23
+SMLversion       = 0.24
 # version history:
 #  0.1: initial version
 #  0.2: NTlist and NTdict SML handlers; recursion in dict-like handlers
@@ -32,6 +34,7 @@ SMLversion       = 0.23
 #  0.22: SML Molecule, Chain, Residue, Atom handlers
 #  0.221: Atom saves shiftx
 #  0.23: Molecule saves Nterminal, Cterminal in _sequence list
+#  0.24: ResidueDef initial string changes
 
 SMLsaveFormat  = 'INTERNAL_0'
 SMLfileVersion = None
@@ -550,7 +553,7 @@ class SMLResidueHandler( SMLhandler ):
         nameTuple = eval(' '.join(line[2:]))
         res = molecule.decodeNameTuple(nameTuple)
         if res == None:
-            NTerror('SMLResidueHandler.handle: invalid nameTuple %s, ==> skipped Residue', nameTuple)
+            NTwarning('SMLResidueHandler.handle: line %d, skipping nameTuple %s', fp.NR, str(nameTuple))
             self.jumpToEndTag(fp)
             return None
         #end if
@@ -597,18 +600,31 @@ class SMLAtomHandler( SMLhandler ):
 
         nameTuple = eval(' '.join(line[2:]))
         atm = molecule.decodeNameTuple(nameTuple)
-        if atm == None: # TODO: check this code it doesn't work well yet considering error messages from test_ccpn.py unit tests.
-            NTdebug('SMLAtomHandler.handle: line %d, invalid nameTuple %s', fp.NR, str(nameTuple))
-#            // Code from CCPN
-            atomName = nameTuple[3]
-            nameTuple = ( nameTuple[0],nameTuple[1], nameTuple[2], None)
-            NTdebug('Trying to create non-standard atom %s in (non-standard) residue %s' % ( atomName, str(nameTuple)))
-            res = molecule.decodeNameTuple(nameTuple)
+        if atm == None: # TODO: check this code.
+            # Could not find anything: to maintain compatibility of all Jurgen's old stuff; try to add it on the fly.
+            NTdebug('SMLAtomHandler.handle: line %d, could not properly decode nameTuple %s', fp.NR, str(nameTuple))
+            resTuple = list(nameTuple)
+            resTuple[3] = None
+            resTuple = tuple(resTuple)
+            res = molecule.decodeNameTuple(resTuple)
             if not res:
-                NTcodeerror('No residue found in SMLAtomHandler for tuple %s. Skipping creating non-standard atoms' % str(nameTuple))
+                NTwarning('SMLAtomHandler.handle: line %d, could not get residue, skipping nameTuple %s', fp.NR, str(nameTuple))
                 self.jumpToEndTag(fp)
                 return None
-            atm = res.addAtom(atomName)
+
+            # GWV: skip non-relevant N- and C-terminal atoms
+            aDef = res.db.getAtomDefByName(nameTuple[3], convention=nameTuple[6])
+            if aDef:
+                if (   (not res.Nterminal and isNterminalAtom(aDef))
+                    or (res.Nterminal and aDef.translate(INTERNAL_0) == 'HN')
+                    or (not res.Cterminal and isCterminalAtom(aDef))
+                   ):
+                    NTdebug('SMLAtomHandler.handle: line %d, skipping terminal atom: %s', fp.NR, str(nameTuple))
+                    self.jumpToEndTag(fp)
+                    return None
+            #end if
+
+            atm = res.addAtom(nameTuple[3], convention=nameTuple[6])
             if not atm:
                 NTdebug('Failed to add atom in SMLAtomHandler to residue for tuple %s' % str(nameTuple))
                 self.jumpToEndTag(fp)
@@ -1058,6 +1074,7 @@ class SMLCoplanarListHandler( SMLhandler ):
         return
     #end def
 #end class
+
 class SMLMolDefHandler( SMLhandler ):
     """Just a container to MolDef SMl
     """
@@ -1079,18 +1096,27 @@ class SMLResidueDefHandler( SMLhandler ):
             self.jumpToEndTag(fp)
             return None
         #end if
-        if len(line) < 5:
-            NTerror('SMLResidueDefHandler.handle: file "%s" line %d, incomplete ResidueDef syntax "%s"', fp.name, fp.NR, line)
-            self.jumpToEndTag(fp)
-            return None
-        #end if
-        if line[4] != INTERNAL:
-            NTerror('SMLResidueDefHandler.handle: file "%s" line %d, convention "%s" differs from current (%s)', fp.name, fp.NR, line[4], INTERNAL)
-            self.jumpToEndTag(fp)
-            return None
-        #end if
+        if SMLfileVersion < 0.24:
+            if len(line) < 5:
+                NTerror('SMLResidueDefHandler.handle: file "%s" line %d, incomplete ResidueDef syntax "%s"', fp.name, fp.NR, line)
+                self.jumpToEndTag(fp)
+                return None
+            #end if
+#            if line[4] != INTERNAL:
+#                NTerror('SMLResidueDefHandler.handle: file "%s" line %d, convention "%s" differs from current (%s)', fp.name, fp.NR, line[4], INTERNAL)
+#                self.jumpToEndTag(fp)
+#                return None
+#            #end if
+            resDef = molDef.appendResidueDef(line[2], shortName=line[3])
+        else:
+            if len(line) < 4:
+                NTerror('SMLResidueDefHandler.handle: file "%s" line %d, incomplete ResidueDef syntax "%s"', fp.name, fp.NR, line)
+                self.jumpToEndTag(fp)
+                return None
+            #end if
+            resDef = molDef.appendResidueDef(line[2])
+        #endif
 
-        resDef = molDef.appendResidueDef(line[2], line[3])
         if not resDef:
             NTerror('SMLResidueDefHandler.handle: file "%s" line %d, error initiating ResidueDef instance "%s"', fp.name, fp.NR, line[2])
             self.jumpToEndTag(fp)
@@ -1108,12 +1134,12 @@ class SMLResidueDefHandler( SMLhandler ):
         """Store resDef in SML format
         """
         fprintf( stream, '\n#=======================================================================\n')
-        fprintf( stream,   '#%s \t%-8s %-8s\n', ' '*len(self.startTag), 'internal', 'short')
-        fprintf( stream,   '%s  \t%-8s %-8s %-8s\n', self.startTag, resDef.translate(convention), resDef.shortName, convention)
+        fprintf( stream,   '#%s \t%-8s %-8s\n', ' '*len(self.startTag), 'name', 'convention')
+        fprintf( stream,   '%s  \t%-8s %-8s\n', self.startTag, resDef.translate(convention), convention)
         fprintf( stream,   '#=======================================================================\n')
 
         # saving different residue attributes
-        for attr in ['comment','nameDict']:
+        for attr in ['commonName','shortName','comment','nameDict']:
             fprintf( stream, "\t%-10s = %r\n", attr, resDef[attr] )
         #end for
 

@@ -1,11 +1,13 @@
-<SML> 0.23
+<SML> 0.24
 
 #=======================================================================
-#             	internal short   
-<ResidueDef>  	LLM5     LLM5     INTERNAL_1
+#             	name     convention
+<ResidueDef>  	LLM5     INTERNAL_1
 #=======================================================================
+	commonName = 'LLM5'
+	shortName  = 'LLM5'
 	comment    = 'Cyana pseudo residue'
-	nameDict   = {'BMRBd': None, 'IUPAC': None, 'AQUA': None, 'INTERNAL_0': 'LLM5', 'INTERNAL_1': 'LLM5', 'CYANA': 'LLM5', 'CYANA2': 'LLM5', 'PDB': None, 'XPLOR': None}
+	nameDict   = {'INTERNAL_0': 'LLM5', 'BMRBd': None, 'CYANA': 'LLM5', 'CYANA2': 'LLM5', 'INTERNAL_1': 'LLM5', 'IUPAC': None, 'AQUA': None, 'PDB': None, 'XPLOR': None}
 	properties = ['cyanaPseudoResidue']
 
 	dihedrals  = <NTlist>
@@ -24,13 +26,13 @@
 		topology   = []
 		real       = []
 		pseudo     = None
-		nameDict   = {'BMRBd': None, 'IUPAC': None, 'AQUA': None, 'INTERNAL_0': 'Q3', 'INTERNAL_1': 'Q3', 'CYANA': 'Q3', 'CYANA2': 'Q3', 'PDB': None, 'XPLOR': None}
+		nameDict   = {'INTERNAL_0': 'Q3', 'BMRBd': None, 'CYANA': 'Q3', 'CYANA2': 'Q3', 'INTERNAL_1': 'Q3', 'IUPAC': None, 'AQUA': None, 'PDB': None, 'XPLOR': None}
 		aliases    = []
 		type       = 'PSEUD'
 		spinType   = '1H'
 		shift      = None
 		hetatm     = False
-		properties = ['isProton', 'proton', 'isNotCarbon', 'notcarbon', 'isNotNitrogen', 'notnitrogen', 'isNotSulfur', 'isNotSulphur', 'notsulfur', 'notsulphur', 'isSidechain', 'sidechain', 'isNotAromatic', 'notaromatic', 'isNotMethyl', 'notmethyl', 'isNotMethylProton', 'notmethylproton', 'isNotPseudoAtom', 'notpseudoatom', 'hasNoPseudoAtom', 'hasnopseudoatom']
+		properties = ['isProton', 'proton', 'isNotCarbon', 'notcarbon', 'isNotNitrogen', 'notnitrogen', 'isNotSulfur', 'isNotSulphur', 'notsulfur', 'notsulphur', 'isSidechain', 'sidechain', 'isNotAromatic', 'notaromatic', 'isNotMethyl', 'notmethyl', 'isNotMethylProton', 'notmethylproton', 'isPseudoAtom', 'pseudoatom', 'hasNoPseudoAtom', 'hasnopseudoatom', 'isNotMethylene', 'notmethylene', 'isNotMethyleneProton', 'notmethyleneproton', 'isNotPseudoAtom', 'notpseudoatom']
 	</AtomDef>
 	#---------------------------------------------------------------
 	<AtomDef> Q3'     
@@ -38,13 +40,13 @@
 		topology   = []
 		real       = []
 		pseudo     = None
-		nameDict   = {'BMRBd': None, 'IUPAC': None, 'AQUA': None, 'INTERNAL_0': "Q3'", 'INTERNAL_1': "Q3'", 'CYANA': "Q3'", 'CYANA2': "Q3'", 'PDB': None, 'XPLOR': None}
+		nameDict   = {'INTERNAL_0': "Q3'", 'BMRBd': None, 'CYANA': "Q3'", 'CYANA2': "Q3'", 'INTERNAL_1': "Q3'", 'IUPAC': None, 'AQUA': None, 'PDB': None, 'XPLOR': None}
 		aliases    = []
 		type       = 'PSEUD'
 		spinType   = '1H'
 		shift      = None
 		hetatm     = False
-		properties = ['isProton', 'proton', 'isNotCarbon', 'notcarbon', 'isNotNitrogen', 'notnitrogen', 'isNotSulfur', 'isNotSulphur', 'notsulfur', 'notsulphur', 'isSidechain', 'sidechain', 'isNotAromatic', 'notaromatic', 'isNotMethyl', 'notmethyl', 'isNotMethylProton', 'notmethylproton', 'isNotPseudoAtom', 'notpseudoatom', 'hasNoPseudoAtom', 'hasnopseudoatom']
+		properties = ['isProton', 'proton', 'isNotCarbon', 'notcarbon', 'isNotNitrogen', 'notnitrogen', 'isNotSulfur', 'isNotSulphur', 'notsulfur', 'notsulphur', 'isSidechain', 'sidechain', 'isNotAromatic', 'notaromatic', 'isNotMethyl', 'notmethyl', 'isNotMethylProton', 'notmethylproton', 'isPseudoAtom', 'pseudoatom', 'hasNoPseudoAtom', 'hasnopseudoatom', 'isNotMethylene', 'notmethylene', 'isNotMethyleneProton', 'notmethyleneproton', 'isNotPseudoAtom', 'notpseudoatom']
 	</AtomDef>
 	#---------------------------------------------------------------
 	<AtomDef> Q1      
@@ -52,13 +54,13 @@
 		topology   = []
 		real       = []
 		pseudo     = None
-		nameDict   = {'BMRBd': None, 'IUPAC': None, 'AQUA': None, 'INTERNAL_0': 'Q1', 'INTERNAL_1': 'Q1', 'CYANA': 'Q1', 'CYANA2': 'Q1', 'PDB': None, 'XPLOR': None}
+		nameDict   = {'INTERNAL_0': 'Q1', 'BMRBd': None, 'CYANA': 'Q1', 'CYANA2': 'Q1', 'INTERNAL_1': 'Q1', 'IUPAC': None, 'AQUA': None, 'PDB': None, 'XPLOR': None}
 		aliases    = []
 		type       = 'PSEUD'
 		spinType   = '1H'
 		shift      = None
 		hetatm     = False
-		properties = ['isProton', 'proton', 'isNotCarbon', 'notcarbon', 'isNotNitrogen', 'notnitrogen', 'isNotSulfur', 'isNotSulphur', 'notsulfur', 'notsulphur', 'isSidechain', 'sidechain', 'isNotAromatic', 'notaromatic', 'isNotMethyl', 'notmethyl', 'isNotMethylProton', 'notmethylproton', 'isNotPseudoAtom', 'notpseudoatom', 'hasNoPseudoAtom', 'hasnopseudoatom']
+		properties = ['isProton', 'proton', 'isNotCarbon', 'notcarbon', 'isNotNitrogen', 'notnitrogen', 'isNotSulfur', 'isNotSulphur', 'notsulfur', 'notsulphur', 'isSidechain', 'sidechain', 'isNotAromatic', 'notaromatic', 'isNotMethyl', 'notmethyl', 'isNotMethylProton', 'notmethylproton', 'isPseudoAtom', 'pseudoatom', 'hasNoPseudoAtom', 'hasnopseudoatom', 'isNotMethylene', 'notmethylene', 'isNotMethyleneProton', 'notmethyleneproton', 'isNotPseudoAtom', 'notpseudoatom']
 	</AtomDef>
 	#---------------------------------------------------------------
 	<AtomDef> Q1'     
@@ -66,13 +68,13 @@
 		topology   = []
 		real       = []
 		pseudo     = None
-		nameDict   = {'BMRBd': None, 'IUPAC': None, 'AQUA': None, 'INTERNAL_0': "Q1'", 'INTERNAL_1': "Q1'", 'CYANA': "Q1'", 'CYANA2': "Q1'", 'PDB': None, 'XPLOR': None}
+		nameDict   = {'INTERNAL_0': "Q1'", 'BMRBd': None, 'CYANA': "Q1'", 'CYANA2': "Q1'", 'INTERNAL_1': "Q1'", 'IUPAC': None, 'AQUA': None, 'PDB': None, 'XPLOR': None}
 		aliases    = []
 		type       = 'PSEUD'
 		spinType   = '1H'
 		shift      = None
 		hetatm     = False
-		properties = ['isProton', 'proton', 'isNotCarbon', 'notcarbon', 'isNotNitrogen', 'notnitrogen', 'isNotSulfur', 'isNotSulphur', 'notsulfur', 'notsulphur', 'isSidechain', 'sidechain', 'isNotAromatic', 'notaromatic', 'isNotMethyl', 'notmethyl', 'isNotMethylProton', 'notmethylproton', 'isNotPseudoAtom', 'notpseudoatom', 'hasNoPseudoAtom', 'hasnopseudoatom']
+		properties = ['isProton', 'proton', 'isNotCarbon', 'notcarbon', 'isNotNitrogen', 'notnitrogen', 'isNotSulfur', 'isNotSulphur', 'notsulfur', 'notsulphur', 'isSidechain', 'sidechain', 'isNotAromatic', 'notaromatic', 'isNotMethyl', 'notmethyl', 'isNotMethylProton', 'notmethylproton', 'isPseudoAtom', 'pseudoatom', 'hasNoPseudoAtom', 'hasnopseudoatom', 'isNotMethylene', 'notmethylene', 'isNotMethyleneProton', 'notmethyleneproton', 'isNotPseudoAtom', 'notpseudoatom']
 	</AtomDef>
 	#---------------------------------------------------------------
 	<AtomDef> Q2      
@@ -80,13 +82,13 @@
 		topology   = []
 		real       = []
 		pseudo     = None
-		nameDict   = {'BMRBd': None, 'IUPAC': None, 'AQUA': None, 'INTERNAL_0': 'Q2', 'INTERNAL_1': 'Q2', 'CYANA': 'Q2', 'CYANA2': 'Q2', 'PDB': None, 'XPLOR': None}
+		nameDict   = {'INTERNAL_0': 'Q2', 'BMRBd': None, 'CYANA': 'Q2', 'CYANA2': 'Q2', 'INTERNAL_1': 'Q2', 'IUPAC': None, 'AQUA': None, 'PDB': None, 'XPLOR': None}
 		aliases    = []
 		type       = 'PSEUD'
 		spinType   = '1H'
 		shift      = None
 		hetatm     = False
-		properties = ['isProton', 'proton', 'isNotCarbon', 'notcarbon', 'isNotNitrogen', 'notnitrogen', 'isNotSulfur', 'isNotSulphur', 'notsulfur', 'notsulphur', 'isSidechain', 'sidechain', 'isNotAromatic', 'notaromatic', 'isNotMethyl', 'notmethyl', 'isNotMethylProton', 'notmethylproton', 'isNotPseudoAtom', 'notpseudoatom', 'hasNoPseudoAtom', 'hasnopseudoatom']
+		properties = ['isProton', 'proton', 'isNotCarbon', 'notcarbon', 'isNotNitrogen', 'notnitrogen', 'isNotSulfur', 'isNotSulphur', 'notsulfur', 'notsulphur', 'isSidechain', 'sidechain', 'isNotAromatic', 'notaromatic', 'isNotMethyl', 'notmethyl', 'isNotMethylProton', 'notmethylproton', 'isPseudoAtom', 'pseudoatom', 'hasNoPseudoAtom', 'hasnopseudoatom', 'isNotMethylene', 'notmethylene', 'isNotMethyleneProton', 'notmethyleneproton', 'isNotPseudoAtom', 'notpseudoatom']
 	</AtomDef>
 	#---------------------------------------------------------------
 	<AtomDef> Q2'     
@@ -94,13 +96,13 @@
 		topology   = []
 		real       = []
 		pseudo     = None
-		nameDict   = {'BMRBd': None, 'IUPAC': None, 'AQUA': None, 'INTERNAL_0': "Q2'", 'INTERNAL_1': "Q2'", 'CYANA': "Q2'", 'CYANA2': "Q2'", 'PDB': None, 'XPLOR': None}
+		nameDict   = {'INTERNAL_0': "Q2'", 'BMRBd': None, 'CYANA': "Q2'", 'CYANA2': "Q2'", 'INTERNAL_1': "Q2'", 'IUPAC': None, 'AQUA': None, 'PDB': None, 'XPLOR': None}
 		aliases    = []
 		type       = 'PSEUD'
 		spinType   = '1H'
 		shift      = None
 		hetatm     = False
-		properties = ['isProton', 'proton', 'isNotCarbon', 'notcarbon', 'isNotNitrogen', 'notnitrogen', 'isNotSulfur', 'isNotSulphur', 'notsulfur', 'notsulphur', 'isSidechain', 'sidechain', 'isNotAromatic', 'notaromatic', 'isNotMethyl', 'notmethyl', 'isNotMethylProton', 'notmethylproton', 'isNotPseudoAtom', 'notpseudoatom', 'hasNoPseudoAtom', 'hasnopseudoatom']
+		properties = ['isProton', 'proton', 'isNotCarbon', 'notcarbon', 'isNotNitrogen', 'notnitrogen', 'isNotSulfur', 'isNotSulphur', 'notsulfur', 'notsulphur', 'isSidechain', 'sidechain', 'isNotAromatic', 'notaromatic', 'isNotMethyl', 'notmethyl', 'isNotMethylProton', 'notmethylproton', 'isPseudoAtom', 'pseudoatom', 'hasNoPseudoAtom', 'hasnopseudoatom', 'isNotMethylene', 'notmethylene', 'isNotMethyleneProton', 'notmethyleneproton', 'isNotPseudoAtom', 'notpseudoatom']
 	</AtomDef>
 	</NTlist>
 </ResidueDef>

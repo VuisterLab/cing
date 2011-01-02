@@ -1154,81 +1154,83 @@ class NTset(NTlist):
 
 #end class
 
-#class odict(dict):
-#    """ Ordered dictionary.
-#        Adapted from http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/107747
-#    """
-#    def __init__(self, *args):
-#        self._keys = []
-#        dict.__init__(self)
-#        self.append( *args )
-#
-#    def __delitem__(self, key):
-#        dict.__delitem__(self, key)
-#        self._keys.remove(key)
-#
-#    def __setitem__(self, key, item):
-#        dict.__setitem__(self, key, item)
-#        if key not in self._keys: self._keys.append(key)
-#
-#    def clear(self):
-#        dict.clear(self)
-#        self._keys = []
-#
-#    def copy(self):
-#
-#        newInstance = odict()
-#        newInstance.update(self)
-#        return newInstance
-#
-## methods iterkeys(), values(), itervalues(), items() and iteritems()
-## now all decend from method keys().
-#    def keys(self):
-#        return self._keys
-#
-#    def iterkeys( self ):
-#        for key in self.keys():
-#            yield key
-#
-#    def values( self ):
-#        return map( self.get, self.keys() )
-#
-#    def itervalues( self ):
-#        for value in self.values():
-#           yield value
-#
-#    def items( self ):
-#        return zip( self.keys(), self.values() )
-#
-#    def iteritems( self ):
-#        for item in self.items():
-#            yield item
-#
-#    def popitem(self):
-#        try:
-#            key = self._keys[-1]
-#        except IndexError:
-#            raise KeyError('dictionary is empty')
-#
-#        val = self[key]
-#        del self[key]
-#
-#        return (key, val)
-#
-#    def setdefault(self, key, failobj = None):
-#        if key not in self._keys:
-#            self._keys.append(key)
-#        return dict.setdefault(self, key, failobj)
-#
-#    def update(self, dict):
-#        dict.update(self, dict)
-#        for key in dict.keys():
-#            if key not in self._keys:
-#                self._keys.append(key)
-#
-#    def append( self, *items):
-#        for key, value in items:
-#           self.__setitem__( key, value )
+class odict(dict):
+    """ Ordered dictionary.
+        Adapted from http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/107747
+    """
+    def __init__(self, *args):
+        self._keys = []
+        dict.__init__(self)
+        self.append( *args )
+
+    def __delitem__(self, key):
+        dict.__delitem__(self, key)
+        self._keys.remove(key)
+
+    def __setitem__(self, key, item):
+        if not dict.has_key(self, key):
+            self._keys.append(key)
+        dict.__setitem__(self, key, item)
+
+    def clear(self):
+        dict.clear(self)
+        self._keys = []
+
+    def copy(self):
+
+        newInstance = odict()
+        newInstance.update(self)
+        return newInstance
+
+# methods iterkeys(), values(), itervalues(), items() and iteritems()
+# now all decend from method keys().
+    def keys(self):
+        return self._keys
+
+    def iterkeys( self ):
+        for key in self.keys():
+            yield key
+
+    def values( self ):
+        return map( self.get, self.keys() )
+
+    def itervalues( self ):
+        for value in self.values():
+           yield value
+
+    def items( self ):
+        return zip( self.keys(), self.values() )
+
+    def iteritems( self ):
+        for item in self.items():
+            yield item
+
+    def popitem(self):
+        try:
+            key = self._keys[-1]
+        except IndexError:
+            raise KeyError('dictionary is empty')
+
+        val = self[key]
+        del self[key]
+
+        return (key, val)
+
+    def setdefault(self, key, failobj = None):
+        if key not in self._keys:
+            self._keys.append(key)
+        return dict.setdefault(self, key, failobj)
+
+    def update(self, dict):
+        dict.update(self, dict)
+        for key in dict.keys():
+            if key not in self._keys:
+                self._keys.append(key)
+
+    def append( self, *items):
+        for key, value in items:
+           self.__setitem__( key, value )
+#end def
 
 
 NTdictObjectId = 0
