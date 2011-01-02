@@ -156,12 +156,12 @@ class MolDef( NTtree ):
 #        self.saveXML('name')
     #end def
 
-    def appendResidueDef( self, name, shortName, **kwds ):
+    def appendResidueDef( self, name, **kwds ):
         """
-        Append a new ResidueDef instance name, shortName
+        Append a new ResidueDef instance name
         Return instance or None on error
         """
-        resDef = ResidueDef( name, shortName, **kwds )
+        resDef = ResidueDef( name, **kwds )
         if self.has_key(name):
             oldResDef = self[name]
             if not oldResDef.canBeModified:
@@ -188,11 +188,7 @@ class MolDef( NTtree ):
             sys.exit(1)
         #end if
         restoreFromSML( rootPath, self, convention=convention )
-        # set the flag to disallow modifications
-        for rdef in self:
-            rdef.canBeModified = False
-            for adef in rdef:
-                adef.canBeModified = False
+        self.postProcess()
         return NTdb
     #end def
 
@@ -331,42 +327,31 @@ class MolDef( NTtree ):
         Call postProcessing routines of all ResidueDefs and atomDefs
         """
 #        NTdebug("==> Creating translation dictionaries ... ")
-        for res in self:
-            res.postProcess()
-            for atm in res:
+        for rdef in self:
+            rdef.postProcess()
+            for atm in rdef:
                 atm.postProcess()
             #end for
-            for d in res.dihedrals:
+            for d in rdef.dihedrals:
                 d.postProcess()
             #end for
         #end for
-
-#        for res in self:
-#            # loose definitions
-#            self.residueDict.setdefault( LOOSE, {} )
-#            for n in [res.shortName, res.name, res.name.capitalize(), res.name.lower()]:
-#                self.residueDict[LOOSE][n] = res
-#            #end for
-#            #different convention definitions
-#            for convR, nameR in res.nameDict.iteritems():
-#                self.residueDict.setdefault( convR, {} )
-#                if (nameR != None):
-#                    self.residueDict[convR][nameR] = res
-#                #end if
-#            # end for
-#            for atm in res:
-#                for convA, nameA in atm.nameDict.iteritems():
-#                    res.atomDict.setdefault( convA, {} )
-#                    if (nameA != None):
-#                        # XPLOR definitions have possibly multiple entries
-#                        # separated by ','
-#                        for n in nameA.split(','):
-#                            res.atomDict[convA][n] = atm
-#                        #end for
-#                    #end if
-#                #end for
-#            #end for
-#        #end for
+        # set the flag to (dis)allow modifications
+        for rdef in self:
+            # allow additions to protein/nucleic defs
+            if rdef.hasProperties('protein') or rdef.hasProperties('nucleic'):
+                rdef.canBeModified = True
+                rdef.shouldBeSaved = False
+                for adef in rdef:
+                    adef.canBeModified = True
+            # disallow modifications to all other; ie. cyana pseudo residues, H2O, metals ions, etc.
+            else:
+                rdef.canBeModified = False
+                rdef.shouldBeSaved = False
+                for adef in rdef:
+                    adef.canBeModified = False
+            #end if
+        #end for
     #end def
 
     def exportDef( self, stream = sys.stdout, convention=INTERNAL ):
@@ -379,31 +364,38 @@ class MolDef( NTtree ):
 #end class
 
 class ResidueDef( NTtree ):
-    def __init__( self, name, shortName, **kwds ):
+    def __init__( self, name, **kwds ):
         NTtree.__init__(   self,
                            __CLASS__   = 'ResidueDef',
                            convention  = INTERNAL,
-                           name        = name,
-                           shortName   = shortName,
-                           canBeModified = True,
+                           name        = name,        # used to refer to this residueDef: should be unique
+                           commonName  = name,        # used to name residue; default later changed to IUPAC if exists
+                           shortName   = '_',
+                           canBeModified = True,      # ResidueDef can be modified; i.e. AtomDefs added;
+                                                      # set to False on import for  non-protein and non-nucleic CING definitions
+                           shouldBeSaved = True,      # ResidueDef requires saving with project; set to False on import for default CING definitions
                            comment     = None,
                            nameDict    = {INTERNAL_0:name, INTERNAL_1:name},
-                           atomDict    = {}, # contains definition of atoms, sorted by convention, dynamically created on initialization
+                           atomDict    = {},          # contains definition of atoms, sorted by convention, dynamically created on initialization
                            dihedrals   = NTlist(),
-                           properties  = [] # list of properties for residue
+                           properties  = []           # list of properties for residue
                        )
-        self.atoms = self._children
+        if self.nameDict.has_key(IUPAC):
+            self.commonName = self.nameDict[IUPAC]
+        # update the defaults with any arguments to the initialization
         self.update( kwds )
 
+        #NB atoms is a derived attribute (from _children), no need to save it explicitly
+        self.atoms = self._children
+
         self.__FORMAT__ = '=== ResidueDef %(name)s (%(convention)r) ===\n' +\
+                          'commonName: %(commonName)s\n' +\
                           'shortName:  %(shortName)s\n' +\
                           'comment:    %(comment)s\n' +\
                           'atoms:      %(atoms)s\n' +\
                           'dihedrals:  %(dihedrals)s\n' +\
                           'properties: %(properties)s'
 #        NTdebug("XXXXXXXX Adding %r" % self)
-
-        #NB atoms is a derived attribute (from _children), no need to save it explicitly
     #end def
 
     def appendAtomDef( self, name, **kwds ):
@@ -418,6 +410,7 @@ class ResidueDef( NTtree ):
         #end if
 
         atmDef = AtomDef( name, **kwds )
+        #print '>>',self, name, atmDef
         if self.has_key(name):
             oldAtmDef = self[name]
             if not oldAtmDef.canBeModified:
@@ -428,8 +421,10 @@ class ResidueDef( NTtree ):
             self.replaceChild( oldAtmDef, atmDef )
         else:
             self._addChild( atmDef )
+        self.atoms = self._children #GWV: fixes a bug, but do not know why!
         atmDef.residueDef = self
         atmDef.postProcess()
+        #print '..', self.atoms
         return atmDef
     #end def
 
@@ -563,8 +558,8 @@ class ResidueDef( NTtree ):
         Any post-reading actions
         """
         # Add name and shortName; Remove the duplicates;
-        props2 =  [self.name, self.shortName]
-        for prop in self.properties:
+        props2 =  []
+        for prop in [self.name, self.shortName, self.commonName]+ self.properties:
             if not prop in props2:
                 props2.append(prop)
             #end if
@@ -574,7 +569,7 @@ class ResidueDef( NTtree ):
         # Set the entry residueDict of molDef to self
         residueDict = self.molDef.residueDict
         residueDict.setdefault( LOOSE, {} )
-        for n in [self.shortName, self.name, self.name.capitalize(), self.name.lower()]:
+        for n in [self.shortName, self.name, self.name.capitalize(), self.name.lower(), self.commonName, self.commonName.capitalize(), self.commonName.lower()]:
             residueDict[LOOSE][n] = self
         #end for
         #different convention definitions
@@ -629,6 +624,20 @@ class ResidueDef( NTtree ):
 # Note it does not include the carbonyl anymore. Just like molmol doesn't.
 backBoneProteinAtomDict = { 'C':1,'N'  :1,'H'  :1,'HN' :1,'H1' :1,'H2':1,'H3':1,'CA':1,'HA':1,'HA1':1,'HA2':1,'HA3':1 }
 backBoneNucleicAtomDict = { 'P':1,"O3'":1,"C3'":1,"C4'":1,"C5'":1,"O5'":1 } # skipping 'backbone protons'
+
+NterminalAtomDict = NTdict()
+NterminalAtomDict.appendFromList( "H1 H2 H3 H' H'' HOP2 HOP3".split())
+
+def isNterminalAtom( atmDef ):
+    "Return True if atom belongs to N-terminal category"
+    return NterminalAtomDict.has_key(atmDef.name)
+
+CterminalAtomDict = NTdict()
+CterminalAtomDict.appendFromList( "OXT".split())
+
+def isCterminalAtom( atmDef ):
+    "Return True if atom belongs to C-terminal category"
+    return CterminalAtomDict.has_key(atmDef.name)
 
 def isAromatic( atmDef ):
     """Return true if it is an atom belonging to an aromatic ring
@@ -688,7 +697,7 @@ def isMethyl( atmDef ):
         #end for
         return (count == 3) # Methyls have three protons!
     elif isProton(atmDef):
-        # should be attched to a heavy atomo
+        # should be attached to a heavy atom
         if len(atmDef.topology) == 0: return False #bloody CYANA pseudo atomsof some residues like CA2P do not have a topology
         heavy = atmDef.residueDef[atmDef.topology[0][1]]
         return isMethyl( heavy )
@@ -702,6 +711,35 @@ def isMethylProton( atmDef ):
     Return True if atm is a methyl proton
     """
     return isProton(atmDef) and isMethyl(atmDef)
+#end def
+
+def isMethylene( atmDef ):
+    """
+    Return True atm is a methylene (either carbon or proton)
+    """
+    if isCarbon(atmDef):
+        count = 0
+        for dummy,p in atmDef.topology:
+            if p in atmDef.residueDef and isProton( atmDef.residueDef[p] ):
+                count += 1
+            #end if
+        #end for
+        return (count == 2) # Methylene's have two protons!
+    elif isProton(atmDef):
+        # should be attached to a heavy atom
+        if len(atmDef.topology) == 0: return False #bloody CYANA pseudo atomsof some residues like CA2P do not have a topology
+        heavy = atmDef.residueDef[atmDef.topology[0][1]]
+        return isMethylene( heavy )
+    else:
+        return False
+    #end if
+#end def
+
+def isMethyleneProton( atmDef ):
+    """
+    Return True if atm is a methylene proton
+    """
+    return isProton(atmDef) and isMethylene(atmDef)
 #end def
 
 def isProton( atmDef ):
@@ -771,7 +809,7 @@ class AtomDef( NTtree ):
                          )
         self.update( kwds )
 
-        self.__FORMAT__ = '=== AtomDef %(residueDef)s.%(name)s (%(convention)r) ===\n' +\
+        self.__FORMAT__ = '=== %(name)s (%(convention)r) ===\n' +\
                           'topology:   %(topology)s\n' +\
                           'pseudo:     %(pseudo)s\n' +\
                           'real:       %(real)s\n' +\
@@ -851,7 +889,7 @@ class AtomDef( NTtree ):
     def patchProperties(self):
         """Patch the properties list
         """
-        props = NTlist( self.name, self.residueDef.name, self.residueDef.shortName, self.spinType, *self.properties)
+        props = NTlist( self.name, self.residueDef.name, self.residueDef.commonName, self.residueDef.shortName, self.spinType, *self.properties)
 
         # Append these defs so we will always have them. If they were already present, they will be removed again below.
         if isProton(self):
@@ -893,6 +931,16 @@ class AtomDef( NTtree ):
             props.append('isMethylProton','methylproton')
         else:
             props.append('isNotMethylProton','notmethylproton')
+        #end if
+        if isMethylene(self):
+            props.append('isMethylene','methylene')
+        else:
+            props.append('isNotMethylene','notmethylene')
+        #end if
+        if isMethyleneProton(self):
+            props.append('isMethyleneProton','methyleneproton')
+        else:
+            props.append('isNotMethyleneProton','notmethyleneproton')
         #end if
         if isPseudoAtom(self):
             props.append('isPseudoAtom','pseudoatom')
@@ -937,7 +985,6 @@ class AtomDef( NTtree ):
             self.residueDef[aname] = self
             atomDict[INTERNAL][aname] = self
         #end for
-
     #end def
 
     def exportDef( self, stream = sys.stdout, convention=INTERNAL ):

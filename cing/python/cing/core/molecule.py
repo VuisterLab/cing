@@ -20,7 +20,8 @@ from cing.core.ROGscore import ROGscore
 from cing.core.classes2 import RestraintList
 from cing.core.constants import * #@UnusedWildImport
 from cing.core.database import AtomDef
-from database import NTdb
+from cing.core.database import NterminalAtomDict as terminalAtomDict
+import database
 from math import acos
 from numpy import * #@UnusedWildImport
 from numpy import linalg as LA
@@ -36,7 +37,8 @@ _DEFAULT_CHAIN_ID = 'A' # Use Chain.defaultChainId which is public.
 
 # version <= 0.91: old sequence.dat defs
 # version 0.92: xml-sequence storage, xml-stereo storage
-# Superseeded by SML routines
+# Superseded by SML routines >0.93
+# 0.94 storage of molecule specific database stuff
 NTmolParameters = NTdict(
     version        = 0.92,
     contentFile    = 'content.xml',
@@ -62,8 +64,9 @@ commonResidueList = commonAAList + commonNAList
 
 common20AADict = NTlist2dict(common20AAList)
 
-terminalAtomDict = NTdict()
-terminalAtomDict.appendFromList( "H1 H2 H3 H' H'' HOP2 HOP3".split())
+# GWV: moved to database.py
+#terminalAtomDict = NTdict()
+#terminalAtomDict.appendFromList( "H1 H2 H3 H' H'' HOP2 HOP3".split())
 
 def chothiaClassInt(chothiaClass):
     """Integer value for fast lookup in db. Return None if class parameter is None"""
@@ -268,7 +271,7 @@ class Molecule( NTtree, ResidueList ):
         self.content.saveAllXML()
         self.content.keysformat()
 
-        self.project = None # JFD: don't know where it gets set but it exists.
+        self.project = None # JFD: don't know where it gets set but it exists. GWV; when initializing molecules from a project
         self.rmsd = None
 
         self.selectedResidues = None # this is a python array
@@ -1162,12 +1165,30 @@ class Molecule( NTtree, ResidueList ):
     #end def
 
     def save( self, path = None)   :
-        """Create a SML file
+        """Create a directory with SML file
            Save sequence, resonances, stereo assignments and coordinates.
            Return self or None on error
         """
         if not path: path = self.objectPath
-        if self.SMLhandler.toFile(self, path) != self:
+        if not path:
+            NTerror('Molecule.save: undefined path')
+        if os.path.exists(path):
+            removedir(path)
+        os.makedirs(path)
+
+        # save special db entries
+        dbpath = os.path.join(path,'Database')
+        os.makedirs(dbpath)
+        dblist = NTlist()
+        for res in self.allResidues():
+            if res.db.shouldBeSaved and res.db not in dblist:
+                dblist.append(res.db)
+        #end for
+        #print dblist
+        database.saveToSML( dblist, dbpath )
+
+        fpath = os.path.join(path,'molecule.sml')
+        if self.SMLhandler.toFile(self, fpath) != self:
             NTerror('Molecule.save: failed creating "%s"', path)
             return None
         #end if
@@ -1180,6 +1201,41 @@ class Molecule( NTtree, ResidueList ):
         """Static method to restore molecule from SML file path
            returns Molecule instance or None on error
         """
+        if (not os.path.exists( path )):
+            NTerror('Molecule.open: path "%s" not found\n', path)
+            return None
+        #end if
+
+        dbpath = os.path.join( path, 'Database')
+        database.restoreFromSML( dbpath, database.NTdb )
+
+        fpath = os.path.join(path,'molecule.sml')
+        if (not os.path.exists( fpath )):
+            NTerror('Molecule.open: smlFile "%s" not found\n', fpath)
+            return None
+        #end if
+
+        mol = Molecule.SMLhandler.fromFile(fpath)
+        if not mol:
+            NTerror('Molecule.open: open from "%s" failed', path)
+            return None
+        #end if
+
+        mol._check()
+        mol.updateAll()
+
+        NTdetail('%s', mol.format())
+
+        return mol
+    #end def
+    open = staticmethod(open)
+
+    def _open094( path )   :
+        """Static method to restore molecule from SML file path: 0.75< version <= 0.90
+           returns Molecule instance or None on error
+        """
+        #print '*** Opening using Molecule._open094'
+
         if (not os.path.exists( path )):
             NTerror('Molecule.open: smlFile "%s" not found\n', path)
             return None
@@ -1198,7 +1254,7 @@ class Molecule( NTtree, ResidueList ):
 
         return mol
     #end def
-    open = staticmethod(open)
+    _open094 = staticmethod(_open094)
 
     def _open075( path )   :
         """Static method to restore molecule from directory path
@@ -1808,11 +1864,11 @@ class Molecule( NTtree, ResidueList ):
     def initialize( name, path = None, convention=LOOSE, **kwds   ):
 
         """
-Static method to initialize a Molecule from a file
+Static method to initialize a Molecule from path
 Return an Molecule instance or None on error
 
-       fromFile:  File ==  <resName1 [resNum1] [chainId1]
-                            resName2 [resNum2] [chainId2]
+       fromFile:  File ==  <resName1 [resNum1] [chainId1] [Nterminal|Cterminal]
+                            resName2 [resNum2] [chainId2] [Nterminal|Cterminal]
                             ...
                            >
         """
@@ -1847,9 +1903,21 @@ Return an Molecule instance or None on error
                 chainId = Chain.defaultChainId # recommended to use your own instead of CING making one up.
                 if f.NF >= 3:
                     chainId = f.dollar[3]
-                chainId = molecule.ensureValidChainId( chainId )
+                chainId = molecule.ensureValidChainIdForThisMolecule( chainId )
 
-                molecule._addResidue( chainId, resName, resNum, convention )
+                if f.NF >= 4 and f.dollar[4] == 'Nterminal':
+                    Nterminal = True
+                else:
+                    Nterminal = False
+
+                if f.NF >= 4 and f.dollar[4] == 'Cterminal':
+                    Cterminal = True
+                else:
+                    Cterminal = False
+
+                molecule._addResidue( chainId, resName, resNum, convention, Nterminal=Nterminal, Cterminal=Cterminal )
+            #end if
+        #end for
         NTmessage("%s", molecule.format())
         return molecule
     #end def
@@ -3145,28 +3213,23 @@ Residue class: Defines residue properties
     def _nameResidue( self, resName, resNum, convention = INTERNAL ):
         """Internal routine to set all the naming right and database references right
         """
-        # find the database entry in NTdb (which is of type MolDef)
-        db = NTdb.getResidueDefByName( resName, convention )
+        # find the database entry in database.NTdb (which is of type MolDef)
+        db = database.NTdb.getResidueDefByName( resName, convention )
         if not db:
-#            NTwarning('Residue._nameResidue: residue "%s" not defined in database by convention [%s]. Adding non-standard one now.' %( resName, convention))
-            self.db = NTdb.appendResidueDef( name=resName, shortName = '_',
-                                             nameDict = {INTERNAL:resName, convention:resName}
-                                           )
-            x = NTdb.getResidueDefByName( resName, convention )
-            if not x:
-                NTcodeerror("Residue._nameResidue: Added residue but failed to find it again")
+            NTdebug('Residue._nameResidue: residue "%s" not defined in database by convention [%s]. Adding non-standard one now.' %( resName, convention))
+            database.NTdb.appendResidueDef( name=resName, shortName = '_', commonName = resName,
+                                            nameDict = {INTERNAL_0:resName, INTERNAL_1:resName, INTERNAL:resName, convention:resName},
+                                            comment = 'Non-standard residue'
+                                          )
+            db = database.NTdb.getResidueDefByName( resName, convention ) # checking if things went ok1
+            if not db:
+                NTcodeerror("Residue._nameResidue: Added residue '%s' but failed to find it again", resName)
         #end if
         self.resNum   = resNum
-        if not db:
-            self.name      = resName + str(resNum)
-            self.resName   = resName
-            self.shortName = '_' + str(resNum)
-#            self.db        = None # JFD adds: It's erased again? Must be a bug.
-        else:
-            self.db        = db
-            self.name      = db.translate(INTERNAL) + str(resNum)
-            self.resName   = db.translate(INTERNAL)
-            self.shortName = db.shortName + str(resNum)
+        self.db        = db
+        self.name      = db.commonName + str(resNum)
+        self.shortName = db.shortName + str(resNum)
+        self.resName   = db.translate(INTERNAL)
         #end if
         # add the two names to the dictionary
         self.names     = [self.shortName, self.name]
@@ -3181,7 +3244,7 @@ Residue class: Defines residue properties
             NTerror( 'ERROR Residue.renumber: residue  number "%s" already present\n', newResNum )
             return None
         #end if
-        newName = self.resName + str(newResNum)
+        newName = self.db.commonName + str(newResNum)
         if newName in self._parent:
             NTerror( 'ERROR Residue.renumber: residue "%s" already present\n', newName )
             return None
@@ -3222,8 +3285,8 @@ Residue class: Defines residue properties
         Return (self,newResidue) tuple or None on error
         """
         # find the database entry
-        if resName not in NTdb:
-            #self.db = NTdb[self.resName]
+        if resName not in database.NTdb:
+            #self.db = database.NTdb[self.resName]
             NTerror('Residue.mutate: residue "%s" not defined in database', resName )
             return None
         #end if
@@ -3324,7 +3387,16 @@ Residue class: Defines residue properties
         # Use database to add atoms
         if self.db:
             for atm in self.db:
-                self.addAtom( atm.name )
+                # GWV: skip non-relevant N- and C-terminal atoms
+                if not self.Nterminal and database.isNterminalAtom(atm):
+                    pass
+                elif self.Nterminal and atm.translate(INTERNAL_0) == 'HN':
+                    pass
+                elif not self.Cterminal and database.isCterminalAtom(atm):
+                    pass
+                else:
+                    self.addAtom( atm.name )
+                #end if
             #end for
         #end if
     #end def
@@ -4025,15 +4097,40 @@ Atom class: Defines object for storing atom properties
         self.atomIndex = AtomIndex
         AtomIndex += 1
 
-        db = NTdb.getAtomDefByName( resName, atomName, convention = convention )
+        db = database.NTdb.getAtomDefByName( resName, atomName, convention = convention )
         if db:
             self.name = db.translate(INTERNAL)
             self.db = db
         else:
-#            NTerror('Atom.__init__: atom "%s" not defined for residue %s in database' % (atomName, resName ))
-#            NTdebug('Atom.__init__: (%-4s,%-4s) not valid for convention "%s". Creating non-standard definition.',
-#                       resName, atomName, convention   )
-            self.db = AtomDef(atomName) # TODO: check if absense of residue defs within here cause problems.
+            # see if we can add to the definition database
+            patches = NTdict()
+
+            patches.nameDict = {INTERNAL_0:atomName, INTERNAL_1:atomName, convention:atomName}
+
+            if atomName[0:1] in ['H','Q', 'M']:
+                patches.spinType = '1H'
+            elif atomName[0:1] == 'N':
+                patches.spinType = '15N'
+            elif atomName[0:1] == 'C':
+                patches.spinType = '13C'
+            elif atomName[0:1] == 'P':
+                patches.spinType = '31P'
+            elif atomName[0:1] == 'S':
+                patches.spinType = '32S'
+            #end if
+
+            rdef = database.NTdb.getResidueDefByName( resName, convention = convention )
+            db = None
+            if rdef and rdef.canBeModified:
+                #print '****', rdef, atomName
+                NTdebug("Atom.__init__: adding non-standard '%s' to database %s", atomName, rdef)
+                db=rdef.appendAtomDef( atomName, **patches )
+            #end if
+            #print '***', db
+            if db:
+                self.db = db
+            else:
+                self.db = AtomDef( atomName, **patches ) # TODO: check if absense of residue defs within here cause problems.
         #end if
     #end def
 
@@ -4464,6 +4561,20 @@ coordinates: %s"""  , dots, self, dots
         Return True if atm is a methyl proton
         """
         return self.db.hasProperties('methylproton')
+    #end def
+
+    def isMethylene( self ):
+        """
+        Return True atm is a methylene (either carbon or proton)
+        """
+        return self.db.hasProperties('methylene')
+    #end def
+
+    def isMethyleneProton( self ):
+        """
+        Return True if atm is a methylene proton
+        """
+        return self.db.hasProperties('methyleneproton')
     #end def
 
     def isMethylProtonButNotPseudo( self ):

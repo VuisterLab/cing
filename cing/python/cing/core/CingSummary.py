@@ -72,59 +72,60 @@ class CingSummary( NTdict ):
         """
 
         self.name = project.name
+        if project.molecule != None:
+            # Residue counts (total, protein, nucleic)
+            self.totalResidueCount   = len( project.molecule.allResidues() )
+            proteinResidues = project.molecule.residuesWithProperties('protein' )
+            self.proteinResidueCount = len( proteinResidues )
+            nucleicResidues = project.molecule.residuesWithProperties('nucleic' )
+            self.nucleicResidueCount = len( nucleicResidues )
 
-        # Residue counts (total, protein, nucleic)
-        self.totalResidueCount   = len( project.molecule.allResidues() )
-        proteinResidues = project.molecule.residuesWithProperties('protein' )
-        self.proteinResidueCount = len( proteinResidues )
-        nucleicResidues = project.molecule.residuesWithProperties('nucleic' )
-        self.nucleicResidueCount = len( nucleicResidues )
+            # rmsds
+            if project.molecule and project.molecule.has_key('rmsd'):
+                rmsdObject = project.molecule.rmsd
+                self.rmsdToMean_backboneAverage = getDeepByKeysOrAttributes(rmsdObject,'backboneAverage')
+                self.rmsdToMean_heavyAtomsAverage = getDeepByKeysOrAttributes(rmsdObject,'heavyAtomsAverage')
+            #end if
 
-        # rmsds
-        if project.molecule and project.molecule.has_key('rmsd'):
-            rmsdObject = project.molecule.rmsd
-            self.rmsdToMean_backboneAverage = getDeepByKeysOrAttributes(rmsdObject,'backboneAverage')
-            self.rmsdToMean_heavyAtomsAverage = getDeepByKeysOrAttributes(rmsdObject,'heavyAtomsAverage')
-        #end if
+            # ROG scores
+            rog = NTlist( 0, 0, 0 ) # Counts for red, orange, green.
+            for residue in project.molecule.allResidues():
+                if residue.rogScore.isRed():
+                    rog[0] += 1
+                elif residue.rogScore.isOrange():
+                    rog[1] += 1
+                else:
+                    rog[2] += 1
+                self.CING_residueROG.append( (residue._Cname(-1), residue.rogScore) )
+            #end for
+            total = reduce(lambda x, y: x+y+0.0, rog) # total expressed as a float because of 0.0
+            for i, _x in enumerate(rog): rog[i] = rog[i]*100.0/total
+            self.CING_red    = round(rog[0],1)
+            self.CING_orange = round(rog[1],1)
+            self.CING_green  = round(rog[2],1)
 
-        # ROG scores
-        rog = NTlist( 0, 0, 0 ) # Counts for red, orange, green.
-        for residue in project.molecule.allResidues():
-            if residue.rogScore.isRed():
-                rog[0] += 1
-            elif residue.rogScore.isOrange():
-                rog[1] += 1
-            else:
-                rog[2] += 1
-            self.CING_residueROG.append( (residue._Cname(-1), residue.rogScore) )
-        #end for
-        total = reduce(lambda x, y: x+y+0.0, rog) # total expressed as a float because of 0.0
-        for i, _x in enumerate(rog): rog[i] = rog[i]*100.0/total
-        self.CING_red    = round(rog[0],1)
-        self.CING_orange = round(rog[1],1)
-        self.CING_green  = round(rog[2],1)
+            # Procheck (core, allowed,  generous, disallowed) (%), average g_factor
+            pcSummary = getDeepByKeysOrAttributes(project.molecule, PROCHECK_STR, SUMMARY_STR)
+            if (self.proteinResidueCount > 0 and pcSummary):
+    #            NTdebug("Going to add procheck results to summary.")
+    #            NTmessage("E.g.: project.molecule.procheck.summary.core: [%8.3f]" % project.molecule.procheck.summary.core)
+                self.PC_core       = pcSummary.core
+                self.PC_allowed    = pcSummary.allowed
+                self.PC_generous   = pcSummary.generous
+                self.PC_disallowed = pcSummary.disallowed
+                self.PC_gf  = proteinResidues.zap('procheck','gf').average2(fmt='%6.3f +/- %5.3f')
+    #        else:
+    #            NTmessage("Skipping adding procheck results since no results available or no protein residues or...")
+            #end if
 
-        # Procheck (core, allowed,  generous, disallowed) (%), average g_factor
-        pcSummary = getDeepByKeysOrAttributes(project.molecule, PROCHECK_STR, SUMMARY_STR)
-        if (self.proteinResidueCount > 0 and pcSummary):
-#            NTdebug("Going to add procheck results to summary.")
-#            NTmessage("E.g.: project.molecule.procheck.summary.core: [%8.3f]" % project.molecule.procheck.summary.core)
-            self.PC_core       = pcSummary.core
-            self.PC_allowed    = pcSummary.allowed
-            self.PC_generous   = pcSummary.generous
-            self.PC_disallowed = pcSummary.disallowed
-            self.PC_gf  = proteinResidues.zap('procheck','gf').average2(fmt='%6.3f +/- %5.3f')
-#        else:
-#            NTmessage("Skipping adding procheck results since no results available or no protein residues or...")
-        #end if
-
-        # Whatif
-        if hasattr(plugins, WHATIF_STR) and plugins[ WHATIF_STR ].isInstalled:
-            if self.proteinResidueCount > 0 and project.whatifStatus.completed and project.whatifStatus.parsed:
-                for checkId in summaryCheckIdList:
-                    if project.molecule[WHATIF_STR].has_key(checkId):
-                        key = 'WI_' + cingCheckId(checkId)
-                        self[key] = project.molecule[WHATIF_STR][checkId].average(fmt='%6.3f +/- %5.3f')
+            # Whatif
+            if hasattr(plugins, WHATIF_STR) and plugins[ WHATIF_STR ].isInstalled:
+                if self.proteinResidueCount > 0 and project.whatifStatus.completed and project.whatifStatus.parsed:
+                    for checkId in summaryCheckIdList:
+                        if project.molecule[WHATIF_STR].has_key(checkId):
+                            key = 'WI_' + cingCheckId(checkId)
+                            self[key] = project.molecule[WHATIF_STR][checkId].average(fmt='%6.3f +/- %5.3f')
+                #end if
             #end if
         #end if
 

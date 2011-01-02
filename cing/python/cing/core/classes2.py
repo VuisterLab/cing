@@ -14,7 +14,7 @@ class RestraintList(NTlist):
     # use the same spelling through out.
     def __init__(self, name, status = 'keep'):
         NTlist.__init__(self)
-        self.__CLASS__ = None
+        self.__CLASS__ = 'RestraintList'
         self.name = name        # Name of the list
         self.status = status    # Status of the list; 'keep' indicates storage required
         self.currentId = 0      # Id for each element of list

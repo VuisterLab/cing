@@ -19,6 +19,7 @@ directories = NTdict(
     restraints = 'Data/Restraints',
     ccpn       = 'Data/CCPN',
     sources    = 'Data/Sources',
+    database   = 'Data/Database',
     export     = 'Export',
     xeasy      = 'Export/Xeasy',
     xeasy2     = 'Export/Xeasy2',

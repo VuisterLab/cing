@@ -11,6 +11,7 @@ from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.Libs.cython.superpose import NTcVector #@UnresolvedImport @UnusedImport
 from cing.Libs.cython.superpose import Rm6dist #@UnresolvedImport
 from cing.Libs.disk import copydir
+from cing.Libs.disk import remove
 from cing.Libs.html import DihedralByProjectList
 from cing.Libs.html import addPreTagLines
 from cing.Libs.html import generateHtml
@@ -181,7 +182,7 @@ Project: Top level Cing project class
         self.molecules = ProjectList(project = self,
                                          classDef = Molecule,
                                          nameListKey = 'moleculeNames',
-                                         basePath = directories.molecules + '/%s.molecule'
+                                         basePath = directories.molecules + '/%s'
                                        )
         self.peaks = ProjectList(project = self,
                                          classDef = PeakList,
@@ -562,6 +563,19 @@ Project: Top level Cing project class
                 pr.restore()
                 # Save to consolidate
                 pr.save()
+
+            # changed for allowing to store special database entries.
+            elif round(pr.version*1000) < 950: # i.e. versions 0.94 and lower
+                for molName in pr.moleculeNames:
+                    path = pr.molecules.path(molName)
+                    mol = Molecule._open094(path+'.molecule')
+                    mol.save(path)
+                    remove(path+'.molecule')
+                #end for
+                # restore
+                pr.restore()
+                # Save to consolidate
+                pr.save()
             #end if
 
             # Optionally restore the content
@@ -798,10 +812,11 @@ Project: Top level Cing project class
 
     def restoreMolecule(self, name):
         """Restore molecule 'name'
-        Return Molecle instance or None on error
+        Return Molecule instance or None on error
         """
         path = self.molecules.path(name)
         mol = Molecule.open(path)
+
         if mol:
             mol.status = 'keep'
             self.appendMolecule(mol)
