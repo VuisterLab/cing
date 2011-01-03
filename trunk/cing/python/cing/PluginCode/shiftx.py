@@ -307,7 +307,7 @@ def restoreShiftx( project, tmp=None ):
     root = project.moleculePath( 'shiftx' )
 
     if project.molecule == None:
-        #NTmessage('restoreShiftx: no molecule defined')
+        NTdebug('restoreShiftx: no molecule defined')
         return None
     #end if
 

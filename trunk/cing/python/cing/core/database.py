@@ -625,19 +625,34 @@ class ResidueDef( NTtree ):
 backBoneProteinAtomDict = { 'C':1,'N'  :1,'H'  :1,'HN' :1,'H1' :1,'H2':1,'H3':1,'CA':1,'HA':1,'HA1':1,'HA2':1,'HA3':1 }
 backBoneNucleicAtomDict = { 'P':1,"O3'":1,"C3'":1,"C4'":1,"C5'":1,"O5'":1 } # skipping 'backbone protons'
 
-NterminalAtomDict = NTdict()
-NterminalAtomDict.appendFromList( "H1 H2 H3 H' H'' HOP2 HOP3".split())
+NterminalProteinAtomDict = NTdict()
+NterminalProteinAtomDict.appendFromList( "H1 H2 H3 H' H''".split()) # watch out; H1 does occur in nucleic acid bases.
+
+NterminalNucleicAtomDict = NTdict()
+NterminalNucleicAtomDict.appendFromList( "HOP2 HOP3".split())
 
 def isNterminalAtom( atmDef ):
     "Return True if atom belongs to N-terminal category"
-    return NterminalAtomDict.has_key(atmDef.name)
+    if atmDef.residueDef.hasProperties('protein'):
+        d = NterminalProteinAtomDict
+    elif atmDef.residueDef.hasProperties('nucleic'):
+        d = NterminalNucleicAtomDict
+    else:
+        return False
+    return d.has_key( atmDef.name )
 
+# No need to specify by polymer type yet.
 CterminalAtomDict = NTdict()
 CterminalAtomDict.appendFromList( "OXT".split())
 
 def isCterminalAtom( atmDef ):
     "Return True if atom belongs to C-terminal category"
     return CterminalAtomDict.has_key(atmDef.name)
+
+def isTerminal( atmDef ):
+    if isNterminalAtom( atmDef ):
+        return True
+    return isCterminalAtom( atmDef )
 
 def isAromatic( atmDef ):
     """Return true if it is an atom belonging to an aromatic ring
@@ -659,30 +674,24 @@ def isAromatic( atmDef ):
 
 def isBackbone( atmDef ):
     """
-    Return True if it is a backbone atom.
-    Patch for now, based upon explicit enumeration
+    Return True if it is not a sidechain atom, False otherwise
     """
-    if atmDef.residueDef.hasProperties('protein') and \
-       backBoneProteinAtomDict.has_key( atmDef.name ):
-            return True
-    if atmDef.residueDef.hasProperties('nucleic') and \
-       backBoneNucleicAtomDict.has_key( atmDef.name ):
-            return True
-    return False
+    if atmDef.residueDef.hasProperties('protein'):
+        d = backBoneProteinAtomDict
+    elif atmDef.residueDef.hasProperties('nucleic'):
+        d = backBoneNucleicAtomDict
+    else:
+        return False
+    return d.has_key( atmDef.name )
+#end def
 
 def isSidechain( atmDef ):
     """
-    Return True if it is a sidechain atom,
+    Return True if it is not a backbone atom,
     i.e. not isBackbone, but is protein or nucleic acid; e.g. HOH is not sidechain!
     """
-    if atmDef.residueDef.hasProperties('protein') and \
-       not backBoneProteinAtomDict.has_key( atmDef.name ):
-            return True
-    if atmDef.residueDef.hasProperties('nucleic') and \
-       not backBoneNucleicAtomDict.has_key( atmDef.name ):
-            return True
-    return False
-#    return not isBackbone( atmDef )
+    return not isBackbone( atmDef )
+#end def
 
 def isMethyl( atmDef ):
     """
@@ -735,11 +744,28 @@ def isMethylene( atmDef ):
     #end if
 #end def
 
+def isIsopropylOrGuanidinium( atmDef ):
+    """Return True if atom is a Leu or Val isopropyl or Arg guanidinium pseudo"""
+    n = len(atmDef.real)
+    if (n == 4) or (n == 6):
+        return True
+    return False
+#end def
+
 def isMethyleneProton( atmDef ):
     """
     Return True if atm is a methylene proton
     """
     return isProton(atmDef) and isMethylene(atmDef)
+#end def
+
+def isMethylProtonButNotPseudo( atmDef ):
+    """
+    Return True if atm is a methylene proton but not a pseudo
+    """
+    if not atmDef.hasProperties('methylproton'):
+        return False
+    return not isPseudoAtom(atmDef)
 #end def
 
 def isProton( atmDef ):
@@ -760,6 +786,12 @@ def isNitrogen( atmDef ):
     return (atmDef.spinType == '15N')
 #end def
 
+def isOxygen( atmDef ):
+    """Return Tue if atm is 16O
+    """
+    return (atmDef.spinType == '16O')
+#end def
+
 def isSulfur( atmDef ):
     """Return Tue if atm is 32S
     """
@@ -768,7 +800,7 @@ def isSulfur( atmDef ):
 
 def isPseudoAtom( atmDef ):
     """Return True if atom is pseudoAtom"""
-    return ( len(atmDef.real) > 0 )
+    return ( len(atmDef.real) > 0 or atmDef.hasProperties('isPseudoAtom') ) # additional check: eq. CYANA Pseudoatoms of Calcium
 #end def
 
 def hasPseudoAtom( atmDef ):

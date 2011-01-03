@@ -602,7 +602,7 @@ class SMLAtomHandler( SMLhandler ):
         atm = molecule.decodeNameTuple(nameTuple)
         if atm == None: # TODO: check this code.
             # Could not find anything: to maintain compatibility of all Jurgen's old stuff; try to add it on the fly.
-            NTdebug('SMLAtomHandler.handle: line %d, could not properly decode nameTuple %s', fp.NR, str(nameTuple))
+#            NTdebug('SMLAtomHandler.handle: line %d, could not properly decode nameTuple %s', fp.NR, str(nameTuple))
             resTuple = list(nameTuple)
             resTuple[3] = None
             resTuple = tuple(resTuple)
@@ -619,14 +619,14 @@ class SMLAtomHandler( SMLhandler ):
                     or (res.Nterminal and aDef.translate(INTERNAL_0) == 'HN')
                     or (not res.Cterminal and isCterminalAtom(aDef))
                    ):
-                    NTdebug('SMLAtomHandler.handle: line %d, skipping terminal atom: %s', fp.NR, str(nameTuple))
+#                    NTdebug('SMLAtomHandler.handle: line %d, skipping terminal atom: %s', fp.NR, str(nameTuple))
                     self.jumpToEndTag(fp)
                     return None
             #end if
 
             atm = res.addAtom(nameTuple[3], convention=nameTuple[6])
             if not atm:
-                NTdebug('Failed to add atom in SMLAtomHandler to residue for tuple %s' % str(nameTuple))
+                NTwarning('Failed to add atom in SMLAtomHandler to residue for tuple %s' % str(nameTuple))
                 self.jumpToEndTag(fp)
                 return None
             #end if

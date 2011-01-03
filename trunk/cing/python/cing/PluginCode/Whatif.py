@@ -164,8 +164,10 @@ $pdb_file
 # # Returns for each atom in the input file its solvent accessibility in A**2. Waters are neglected by this service.
 # 0
 
+# Get's written to OUTPUT.TXT but that's undocumented so I rather not use it...
 %wsvacc
 
+$mv OUTPUT.TXT wsvacc_$modelNumberString.log
 # nolog
 
 $mv check.db check_$modelNumberString.db
@@ -177,8 +179,14 @@ $mv check.db check_$modelNumberString.db
 """
 
     scriptQuit = """
-fullstop y
+
+$sleep 10
+
+end y
 """
+#was:
+#fullstop y
+
 # Run whatif with the script
 
 
@@ -1186,7 +1194,7 @@ def removeTempFiles( whatifDir ):
         # do NOT remove pdbout.txt.
         # Now pdbout.txt is no longer parsed, it may be removed I guess unless we want it again for fixing an issue
         # on this but then we need all not just the last model.
-        removeListLocal = [scriptFileName, "DSSPOUT", "TOPOLOGY.FIL", "PDBFILE.PDB", "PDBFILE", "pdbout.tex", 'fort.79']
+        removeListLocal = [scriptFileName, "DSSPOUT", "TOPOLOGY.FIL", "PDBFILE.PDB", "PDBFILE", "pdbout.tex", 'fort.79', 'DONE']
         removeList = []
         for fn in removeListLocal:
             removeList.append( os.path.join(whatifDir, fn) )
