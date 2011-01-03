@@ -93,9 +93,11 @@ class AllChecks(TestCase):
 #        project.validate(parseOnly=False, htmlOnly=True, doProcheck=False, doWhatif=False, doWattos=False, doTalos=False) # needed?
 
         self.assertFalse( project.molecule.setRanges(ranges) )
+        from cing.PluginCode.dssp import runDssp # Triggers checks. @UnusedImport
+
         project.runDssp()
         if actuallyRunWhatif:
-            from cing.PluginCode.Whatif import runWhatif
+            from cing.PluginCode.Whatif import runWhatif # Triggers checks.
             self.assertFalse(runWhatif(project))
         else:
             rangeList = project.molecule.getFixedRangeList(

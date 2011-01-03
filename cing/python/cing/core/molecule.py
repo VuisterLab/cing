@@ -20,7 +20,6 @@ from cing.core.ROGscore import ROGscore
 from cing.core.classes2 import RestraintList
 from cing.core.constants import * #@UnusedWildImport
 from cing.core.database import AtomDef
-from cing.core.database import NterminalAtomDict as terminalAtomDict
 import database
 from math import acos
 from numpy import * #@UnusedWildImport
@@ -2076,6 +2075,7 @@ Return an Molecule instance or None on error
                 #end if
             #end for
         #end for
+#        NTdebug("Atom list to be fitted:\n%s" % fitted)
         return fitted
     #end def
 
@@ -4123,7 +4123,7 @@ Atom class: Defines object for storing atom properties
             db = None
             if rdef and rdef.canBeModified:
                 #print '****', rdef, atomName
-                NTdebug("Atom.__init__: adding non-standard '%s' to database %s", atomName, rdef)
+#                NTdebug("Atom.__init__: adding non-standard '%s' to database %s", atomName, rdef)
                 db=rdef.appendAtomDef( atomName, **patches )
             #end if
             #print '***', db
@@ -4525,104 +4525,98 @@ coordinates: %s"""  , dots, self, dots
     def isAromatic( self ):
         """Return true if it is an atom belonging to an aromatic ring
         """
-        return self.db.hasProperties('aromatic')
+        return database.isAromatic(self.db)
     #end def
 
     def isBackbone( self ):
         """
         Return True if it is a backbone atom.
         """
-        return self.db.hasProperties('backbone')
+        return database.isBackbone(self.db)
     #end def
 
     def isTerminal( self ):
         """
         Return True for Amino acid H1, H2, H3 etc.
         """
-        return terminalAtomDict.has_key( self.name )
+        return database.isTerminal(self.db)
     #end def
 
     def isSidechain( self ):
         """
         Return True if it is a sidechain atom,
         """
-        return self.db.hasProperties('sidechain')
+        return database.isSidechain(self.db)
     #end def
 
     def isMethyl( self ):
         """
         Return True atm is a methyl (either carbon or proton)
         """
-        return self.db.hasProperties('methyl')
+        return database.isMethyl(self.db)
     #end def
 
     def isMethylProton( self ):
         """
         Return True if atm is a methyl proton
         """
-        return self.db.hasProperties('methylproton')
+        return database.isMethylProton(self.db)
     #end def
 
     def isMethylene( self ):
         """
         Return True atm is a methylene (either carbon or proton)
         """
-        return self.db.hasProperties('methylene')
+        return database.isMethylene(self.db)
     #end def
 
     def isMethyleneProton( self ):
         """
         Return True if atm is a methylene proton
         """
-        return self.db.hasProperties('methyleneproton')
+        return database.isMethyleneProton(self.db)
     #end def
 
     def isMethylProtonButNotPseudo( self ):
         """
         Return True if atm is a methyl proton but not a pseudo atom.
         """
-        if not self.db.hasProperties('methylproton'):
-            return False
-        return not self.isPseudoAtom()
+        return database.isMethylProtonButNotPseudo(self.db)
     #end def
 
     def isIsopropylOrGuanidinium( self ):
         """Return True if atom is a Leu or Val isopropyl or Arg guanidinium pseudo"""
-        n = len(self.db.real)
-        if (n == 4) or (n == 6):
-            return True
-        return False
+        return database.isIsopropylOrGuanidinium(self.db)
     #end def
-
 
     def isProton( self ):
         """Return Tue if atm is 1H
         """
-        return (self.db.spinType == '1H')
+        return database.isProton(self.db)
     #end def
 
     def isCarbon( self ):
         """Return Tue if atm is 13C
         """
-        return (self.db.spinType == '13C')
+        return database.isCarbon(self.db)
     #end def
 
     def isNitrogen( self ):
         """Return Tue if atm is 15N
         """
-        return (self.db.spinType == '15N')
+        return database.isNitrogen(self.db)
     #end def
 
     def isSulfur( self ):
         """Return Tue if atm is 32S
         """
-        return (self.db.spinType == '32S')
+        return database.isSulfur(self.db)
     #end def
 
     def isOxygen( self ):
         """Return Tue if atm is 16O
         """
-        return (self.db.spinType == '16O')
+        return database.isOxygen(self.db)
     #end def
 
     def hasProperties(self, *properties):
@@ -4694,7 +4688,7 @@ coordinates: %s"""  , dots, self, dots
 
     def isPseudoAtom( self ):
         """Return True if atom is pseudoAtom"""
-        return ( len(self.db.real) > 0 or self.hasProperties('isPseudoAtom') ) # additional check: eq. CYANA Pseudoatoms of Calcium
+        return database.isPseudoAtom(self.db)
     #end def
 
     def hasPseudoAtom( self ):

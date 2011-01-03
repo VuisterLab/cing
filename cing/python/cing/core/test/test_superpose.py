@@ -56,7 +56,6 @@ class AllChecks(TestCase):
         # and CING only 3.
 
 if __name__ == "__main__":
-    cing.verbosity = verbosityNothing
     cing.verbosity = verbosityDebug
     unittest.main()
 
