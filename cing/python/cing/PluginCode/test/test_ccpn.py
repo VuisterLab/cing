@@ -22,7 +22,6 @@ import unittest
 class AllChecks(TestCase):
 
     entryList = "1brv_cs_pk_2mdl".split() # DEFAULT because it contains many data types and is small/fast to run.
-#    entryList = "2i7z".split() # huge entry causing cing to have python memory problems.
 # Set for creating ccpn projects from cyana pdbs.
 #    entryList = "1a4d 1ai0 1brv_1model 1hkt_1model 1i1s 1ka3 1tgq_1model 1tkv 1y4o_1model 2hgh_1model 2hm9 H2_2Ca_53".split()
     def testInitFromAndSaveToCcpn(self):

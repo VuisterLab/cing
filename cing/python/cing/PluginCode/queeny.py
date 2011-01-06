@@ -1,17 +1,18 @@
 """
-Basic QUEEN inplementation for restraint information calculation
+Basic QUEEN implementation for restraint information calculation
 
 project.runQueeny() executes the queeny routine.
-Atoms obtain attribute 'information' (defined in Queeny.informationKey) with information value
-Residues obtain attribute 'information' (defined in Queeny.informationKey) with information value,
-averaged over a three residue window
+Atoms obtain attribute 'information' (defined in QUEENY_INFORMATION_STR) with information value.
+Residues obtain attribute 'information' with information value that is averaged over a three residue window
 
 """
 
 from cing.Libs.NTutils import * #@UnusedWildImport
+from cing.Libs.cython.superpose import Rm6dist
+from cing.PluginCode.required.reqQueeny import * #@UnusedWildImport
 from cing.core.sml import SML2obj
 from cing.core.sml import obj2SML
-import math
+
 
 class dmElement():
     "Distance Matrix element for Queeny"
@@ -59,9 +60,6 @@ class Queeny( odict ):
     Class to run a queen-like analysis
 
     """
-    uncertainty1Key = 'uncertainty1'  # Key used for residue's and atom's uncertainty after topology triangulation
-    uncertainty2Key = 'uncertainty2'  # Key used for residue's and atom's uncertainty after restraint triangulation
-    informationKey  = 'information'   # Key used for residue's and atom's information, calculated from uncertainty1 and uncertainty2
 
     def __init__(self, project ):
         odict.__init__( self )
@@ -104,13 +102,13 @@ class Queeny( odict ):
         # do the topology
         self.initTopology()
         self.triangulateAll( cutoff=cutoff, maxDepth = 4 )
-        self.setUncertainty(Queeny.uncertainty1Key)
+        self.setUncertainty(QUEENY_UNCERTAINTY1_STR)
         # do the restraints
         self.initRestraints()
         self.triangulateAll( cutoff=cutoff, maxDepth = 3 )
-        self.setUncertainty(Queeny.uncertainty2Key)
+        self.setUncertainty(QUEENY_UNCERTAINTY2_STR)
         # calculate the information content for each atom, residue
-        self.setInformation(Queeny.uncertainty1Key, Queeny.uncertainty2Key, Queeny.informationKey)
+        self.setInformation(QUEENY_UNCERTAINTY1_STR, QUEENY_UNCERTAINTY2_STR, QUEENY_INFORMATION_STR)
     #end def
 
     def initDmElement(self, atm1, atm2, lower=None, upper=None):
@@ -232,10 +230,9 @@ class Queeny( odict ):
         returns None on error or list with relative contributions for each pair on success.
         """
 
-        from cing.Libs.cython.superpose import Rm6dist #@UnresolvedImport
 
 #        NTdebug('Queeny._calculateAverage: %s')
-        error = False    # Indicates if an error was encountered when analyzing restraint
+        error = False    # Indicates if an error was encountered when analyzing restraint @UnusedVariable
 
         modelCount = dr.getModelCount()
         if not modelCount:
@@ -584,9 +581,9 @@ def runQueeny( project, tmp=None ):
         return True
 
     project.status.queeny = queenyDefaults()
-    project.status.queeny.molecule = project.molecule.nameTuple()
-
     queenyDefs = project.status.queeny # temp variable for shorter typing
+    queenyDefs.molecule = project.molecule.nameTuple()
+
 
     path = project.validationPath( queenyDefs.directory )
     if not path:
@@ -632,12 +629,12 @@ def saveQueeny( project, tmp=None ):
 
     l = NTlist()
     for res in project.molecule.allResidues():
-        if res.has_key(Queeny.informationKey):
-            l.append( (res.nameTuple(), res[Queeny.informationKey])
+        if res.has_key(QUEENY_INFORMATION_STR):
+            l.append( (res.nameTuple(), res[QUEENY_INFORMATION_STR])
                     )
         for atm in res:
-            if atm.has_key(Queeny.informationKey):
-                l.append( (atm.nameTuple(), atm[Queeny.informationKey])
+            if atm.has_key(QUEENY_INFORMATION_STR):
+                l.append( (atm.nameTuple(), atm[QUEENY_INFORMATION_STR])
                           )
         #end for
     #end for
@@ -661,9 +658,9 @@ def restoreQueeny( project, tmp=None ):
     if project.molecule == None:
         return False # Gracefully returns
     for res in project.molecule.allResidues():
-        res[Queeny.informationKey] = 0.0
+        res[QUEENY_INFORMATION_STR] = 0.0
     for atm in project.molecule.allAtoms():
-        atm[Queeny.informationKey] = 0.0
+        atm[QUEENY_INFORMATION_STR] = 0.0
 
     project.status.setdefault('queeny',queenyDefaults())
     project.status.keysformat()
@@ -692,7 +689,7 @@ def restoreQueeny( project, tmp=None ):
         if not obj:
             NTerror('restoreQueeny: error decoding "%s"', nameTuple)
         else:
-            obj[Queeny.informationKey] = info
+            obj[QUEENY_INFORMATION_STR] = info
     #end for
     return False
 #end def
@@ -702,12 +699,3 @@ def restoreQueeny( project, tmp=None ):
 methods  = [(runQueeny,None)]
 saves    = [(saveQueeny, None)]
 restores = [(restoreQueeny, None)]
-
-
-#-----------------------------------------------------------------------------
-# Testing from here-on
-#-----------------------------------------------------------------------------
-#
-if __name__ == '__main__':
-    pass
-

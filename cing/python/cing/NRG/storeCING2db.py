@@ -15,6 +15,7 @@ from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.NRG import * #@UnusedWildImport
 from cing.PluginCode.required.reqDssp import * #@UnusedWildImport
 from cing.PluginCode.required.reqProcheck import * #@UnusedWildImport
+from cing.PluginCode.required.reqQueeny import * #@UnusedWildImport
 from cing.PluginCode.required.reqWattos import * #@UnusedWildImport
 from cing.PluginCode.required.reqWhatif import * #@UnusedWildImport
 from cing.PluginCode.sqlAlchemy import csqlAlchemy
@@ -158,14 +159,12 @@ def doStoreCING2db( entry_code, archive_id, project = None):
     p_dih_c3_viol = getDeepByKeysOrAttributes(rL,VIOLCOUNT3_STR)
     p_dih_c5_viol = getDeepByKeysOrAttributes(rL,VIOLCOUNT5_STR)
 
-
-    # TODO: test
-    assignmentCountMap = project.molecule.getAssignmentCountMap()
-    p_cs_count = assignmentCountMap['overall']
-    p_cs1H_count = assignmentCountMap['1H']
-    p_cs13C_count = assignmentCountMap['13C']
-    p_cs15N_count = assignmentCountMap['15N']
-
+    p_assignmentCountMap = project.molecule.getAssignmentCountMap()
+    p_cs_count = p_assignmentCountMap.overallCount()
+    p_cs1H_count = p_assignmentCountMap['1H']
+    p_cs13C_count = p_assignmentCountMap['13C']
+    p_cs15N_count = p_assignmentCountMap['15N']
+    p_cs31P_count = p_assignmentCountMap['31P']
     # WI
     p_wi_bbcchk = molecule.getDeepAvgByKeys(WHATIF_STR, BBCCHK_STR, VALUE_LIST_STR)
     p_wi_bmpchk = molecule.getDeepAvgByKeys(WHATIF_STR, BMPCHK_STR, VALUE_LIST_STR) # not used
@@ -221,6 +220,7 @@ def doStoreCING2db( entry_code, archive_id, project = None):
         cs1h_count=p_cs1H_count,
         cs13c_count=p_cs13C_count,
         cs15n_count=p_cs15N_count,
+        cs31p_count=p_cs31P_count,
 
         dis_max_all = p_dis_max_all,
         dis_rms_all = p_dis_rms_all,
@@ -342,11 +342,12 @@ def doStoreCING2db( entry_code, archive_id, project = None):
 
 #            NTdebug("r_distance_count r_dihedral_count r_rdc_count %d %d %d" % (r_distance_count, r_dihedral_count, r_rdc_count))
             # TODO: test with cs present
-            assignmentCountMap = getAssignmentCountMapForResList([residue])
-            r_cs_count = assignmentCountMap['overall']
-            r_cs1H_count = assignmentCountMap['1H']
-            r_cs13C_count = assignmentCountMap['13C']
-            r_cs15N_count = assignmentCountMap['15N']
+            r_assignmentCountMap = getAssignmentCountMapForResList([residue])
+            r_cs_count = r_assignmentCountMap.overallCount()
+            r_cs1H_count = r_assignmentCountMap['1H']
+            r_cs13C_count = r_assignmentCountMap['13C']
+            r_cs15N_count = r_assignmentCountMap['15N']
+            r_cs31P_count = r_assignmentCountMap['31P']
 
             rL = residue.distanceRestraints
             # None may exist.
@@ -394,6 +395,11 @@ def doStoreCING2db( entry_code, archive_id, project = None):
             r_noe_compl_obs = residue.getDeepByKeys(WATTOS_STR, OBS_COUNT_STR, VALUE_LIST_STR)
             r_noe_compl_exp = residue.getDeepByKeys(WATTOS_STR, EXP_COUNT_STR, VALUE_LIST_STR)
             r_noe_compl_mat = residue.getDeepByKeys(WATTOS_STR, MAT_COUNT_STR, VALUE_LIST_STR)
+
+            # Queen
+            r_queen_information = residue.getDeepByKeys(QUEENY_INFORMATION_STR)
+            r_queen_uncertainty1 = residue.getDeepByKeys(QUEENY_UNCERTAINTY1_STR)
+            r_queen_uncertainty2 = residue.getDeepByKeys(QUEENY_UNCERTAINTY2_STR)
 
             # Talos+
             r_qcs_all = residue.getDeepAvgByKeys(QSHIFT_STR, ALL_ATOMS_STR, VALUE_LIST_STR)
@@ -453,6 +459,10 @@ def doStoreCING2db( entry_code, archive_id, project = None):
                 noe_compl_exp=r_noe_compl_exp,
                 noe_compl_mat=r_noe_compl_mat,
 
+                queen_information = r_queen_information,
+                queen_uncertainty1 = r_queen_uncertainty1,
+                queen_uncertainty2 = r_queen_uncertainty2,
+
                 distance_count  = r_distance_count,
                 dihedral_count  = r_dihedral_count,
                 rdc_count       = r_rdc_count,
@@ -460,6 +470,7 @@ def doStoreCING2db( entry_code, archive_id, project = None):
                 cs1h_count      = r_cs1H_count,
                 cs13c_count     = r_cs13C_count,
                 cs15n_count     = r_cs15N_count,
+                cs31p_count     = r_cs31P_count,
 
                 dis_max_all = r_dis_max_all,
                 dis_rms_all = r_dis_rms_all,
