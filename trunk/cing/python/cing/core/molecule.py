@@ -22,7 +22,7 @@ from cing.core.constants import * #@UnusedWildImport
 from cing.core.database import AtomDef
 import database
 from math import acos
-from numpy import * #@UnusedWildImport
+from numpy import * #@UnusedWildImport overwrites such common functions as sum, max etc.
 from numpy import linalg as LA
 from operator import attrgetter
 from parameters   import plotParameters
@@ -167,7 +167,7 @@ def getAssignmentCountMapForResList(resList, isAssigned = True):
 #        NTmessage("Including atm: %s " % atm)
         assignmentCountMap[spinType] += 1
     # end for
-    NTdebug("For isAssigned: %s found %s" % (isAssigned, assignmentCountMap))
+#    NTdebug("For isAssigned: %s found %s" % (isAssigned, assignmentCountMap))
     return assignmentCountMap
 
 def allResiduesWithCoordinates(resList):
@@ -5224,7 +5224,7 @@ class Resonance( NTvalue  ):
 
 class AssignmentCountMap(NTdict):
     def __init__(self, *args, **kwds):
-        d = {'1H': 0, '13C': 0, '15N': 0,  '31P':0}
+        d = {'1H': 0, '13C': 0, '15N': 0,  '31P':0} # sync these defs with RDB
         # skipping: O & S that are not observed in BMRB
         # Observed were F in bmr16409, & Cd in bmr4363. None in BMRB and PDB for these 2 nucleii so leave out of code for now.
 #        '19F':0, '113Cd': 0
@@ -5234,7 +5234,10 @@ class AssignmentCountMap(NTdict):
         'Default is to have no zero elements. Using trick with different method name to prevent recursion.'
         return self.__repr__(showEmptyElements=0)
     def overallCount(self):
-        return sum([self[key] for key in self.keys()])
+        r = sum([self[key] for key in self.keys()]) # numpy.int64 type because sum is from numpy.
+        r = int(r)
+#        NTdebug("type of overall count %s: %s" % ( r, r.__class__))
+        return r
 #end class
 
 #==============================================================================
@@ -5248,10 +5251,12 @@ def translateTopology( residue, topDefList ):
     for resdiffIndex,atomName in topDefList:
         # optimized
         res = residue.sibling( resdiffIndex )
-        if res == None or not res.has_key( atomName ):
-            result.append( None )
-            continue
-        result.append( res[atomName] )
+#        if res == None or not res.has_key( atomName ):
+#            result.append( None )
+#            continue
+#        result.append( res[atomName] )
+        # simplified:
+        result.append( getDeepByKeysOrAttributes( res, atomName) )
     return result
 #end def
 

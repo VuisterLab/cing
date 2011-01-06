@@ -68,9 +68,10 @@ CREATE TABLE casdcing.cingentry
     rdc_count                      INT DEFAULT NULL,
     peak_count                     INT DEFAULT NULL, -- (30)
     cs_count                       INT DEFAULT NULL,
-    cs1H_count                     INT DEFAULT NULL,
-    cs13C_count                    INT DEFAULT NULL,
-    cs15N_count                    INT DEFAULT NULL,
+    cs1h_count                     INT DEFAULT NULL,
+    cs13c_count                    INT DEFAULT NULL,
+    cs15n_count                    INT DEFAULT NULL,
+    cs31p_count                    INT DEFAULT NULL,
 --   whatif (averages over the ensemble of selected models)
     wi_angchk                      FLOAT DEFAULT NULL,
     wi_bbcchk                      FLOAT DEFAULT NULL,
@@ -206,6 +207,12 @@ CREATE TABLE casdcing.cingresidue
     noe_compl_obs                  INT DEFAULT NULL,
     noe_compl_exp                  INT DEFAULT NULL,
     noe_compl_mat                  INT DEFAULT NULL,
+
+--   queen
+    queen_information      FLOAT DEFAULT NULL,
+    queen_uncertainty1     FLOAT DEFAULT NULL,
+    queen_uncertainty2     FLOAT DEFAULT NULL,
+
 --   cing
     rog                            INT DEFAULT NULL,
     omega_dev_av_all               FLOAT DEFAULT NULL,
@@ -229,9 +236,10 @@ CREATE TABLE casdcing.cingresidue
     rdc_count                      INT DEFAULT NULL,
     peak_count                     INT DEFAULT NULL,
     cs_count                       INT DEFAULT NULL,
-    cs1H_count                     INT DEFAULT NULL,
-    cs13C_count                    INT DEFAULT NULL,
-    cs15N_count                    INT DEFAULT NULL,
+    cs1h_count                     INT DEFAULT NULL,
+    cs13c_count                    INT DEFAULT NULL,
+    cs15n_count                    INT DEFAULT NULL,
+    cs31p_count                    INT DEFAULT NULL,
 
     qcs_all                        FLOAT DEFAULT NULL,
     qcs_bb                         FLOAT DEFAULT NULL,
