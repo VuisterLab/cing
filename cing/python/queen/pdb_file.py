@@ -188,102 +188,102 @@ class FortranLine:
     """
 
     def __init__(self, line, format, length = 80):
-	if type(line) == type(''):
-	    self.text = line
-	    self.data = None
-	else:
-	    self.text = None
-	    self.data = line
-	if type(format) == type(''):
-	    self.format = FortranFormat(format)
-	else:
-	    self.format = format
-	self.length = length
-	if self.text is None:
-	    self._output()
-	if self.data is None:
-	    self._input()
+        if type(line) == type(''):
+            self.text = line
+            self.data = None
+        else:
+            self.text = None
+            self.data = line
+        if type(format) == type(''):
+            self.format = FortranFormat(format)
+        else:
+            self.format = format
+        self.length = length
+        if self.text is None:
+            self._output()
+        if self.data is None:
+            self._input()
 
     def __len__(self):
-	return len(self.data)
+        return len(self.data)
 
     def __getitem__(self, i):
-	return self.data[i]
+        return self.data[i]
 
     def __getslice__(self, i, j):
-	return self.data[i:j]
+        return self.data[i:j]
 
     def __str__(self):
-	return self.text
+        return self.text
 
     def isBlank(self):
-	return len(string.strip(self.text)) == 0
+        return len(string.strip(self.text)) == 0
 
     def _input(self):
-	text = self.text
-	if len(text) < self.length: text = text + (self.length-len(text))*' '
-	self.data = []
-	for field in self.format:
-	    l = field[1]
-	    s = text[:l]
-	    text = text[l:]
-	    type = field[0]
-	    value = None
-	    if type == 'A':
-		value = s
-	    elif type == 'I':
-		s = string.strip(s)
-		if len(s) == 0:
-		    value = 0
-		else:
-		    value = string.atoi(s)
-	    elif type == 'D' or type == 'E' or type == 'F' or type == 'G':
-		s = string.lower(string.strip(s))
-		n = string.find(s, 'd')
-		if n >= 0:
-		    s = s[:n] + 'e' + s[n+1:]
-		if len(s) == 0:
-		    value = 0.
-		else:
-		    value = string.atof(s)
-	    if value is not None:
-		self.data.append(value)
+        text = self.text
+        if len(text) < self.length: text = text + (self.length-len(text))*' '
+        self.data = []
+        for field in self.format:
+            l = field[1]
+            s = text[:l]
+            text = text[l:]
+            type = field[0]
+            value = None
+            if type == 'A':
+                value = s
+            elif type == 'I':
+                s = string.strip(s)
+                if len(s) == 0:
+                    value = 0
+                else:
+                    value = string.atoi(s)
+            elif type == 'D' or type == 'E' or type == 'F' or type == 'G':
+                s = string.lower(string.strip(s))
+                n = string.find(s, 'd')
+                if n >= 0:
+                    s = s[:n] + 'e' + s[n+1:]
+                if len(s) == 0:
+                    value = 0.
+                else:
+                    value = string.atof(s)
+            if value is not None:
+                self.data.append(value)
 
     def _output(self):
-	data = self.data
-	self.text = ''
-	for field in self.format:
-	    type = field[0]
-	    if type == "'":
-		self.text = self.text + field[1]
-	    elif type == 'X':
-		self.text = self.text + field[1]*' '
-	    else: # fields that use input data
-		length = field[1]
-		if len(field) > 2: fraction = field[2]
-		value = data[0]
-		data = data[1:]
-		if type == 'A':
-		    self.text = self.text + (value+length*' ')[:length]
-		else: # numeric fields
+        data = self.data
+        self.text = ''
+        for field in self.format:
+            type = field[0]
+            if type == "'":
+                self.text = self.text + field[1]
+            elif type == 'X':
+                self.text = self.text + field[1]*' '
+            else: # fields that use input data
+                length = field[1]
+                if len(field) > 2: fraction = field[2]
+                value = data[0]
+                data = data[1:]
+                if type == 'A':
+                    self.text = self.text + (value+length*' ')[:length]
+                else: # numeric fields
                     if value is None:
                         s = ''
-		    elif type == 'I':
-			s = `value`
-		    elif type == 'D':
-			s = ('%'+`length`+'.'+`fraction`+'e') % value
-			n = string.find(s, 'e')
-			s = s[:n] + 'D' + s[n+1:]
-		    elif type == 'E':
-			s = ('%'+`length`+'.'+`fraction`+'e') % value
-		    elif type == 'F':
-			s = ('%'+`length`+'.'+`fraction`+'f') % value
-		    elif type == 'G':
-			s = ('%'+`length`+'.'+`fraction`+'g') % value
-		    else:
-			raise ValueError, 'Not yet implemented'
-		    s = string.upper(s)
-		    self.text = self.text + ((length*' ')+s)[-length:]
+                    elif type == 'I':
+                        s = `value`
+                    elif type == 'D':
+                        s = ('%'+`length`+'.'+`fraction`+'e') % value
+                        n = string.find(s, 'e')
+                        s = s[:n] + 'D' + s[n+1:]
+                    elif type == 'E':
+                        s = ('%'+`length`+'.'+`fraction`+'e') % value
+                    elif type == 'F':
+                        s = ('%'+`length`+'.'+`fraction`+'f') % value
+                    elif type == 'G':
+                        s = ('%'+`length`+'.'+`fraction`+'g') % value
+                    else:
+                        raise ValueError, 'Not yet implemented'
+                    s = string.upper(s)
+                    self.text = self.text + ((length*' ')+s)[-length:]
         self.text = string.rstrip(self.text)
 
 #
@@ -300,65 +300,65 @@ class FortranFormat:
     """
 
     def __init__(self, format, nested = 0):
-	fields = []
-	format = string.strip(format)
-	while format and format[0] != ')':
-	    n = 0
-	    while format[0] in string.digits:
-		n = 10*n + string.atoi(format[0])
-		format = format[1:]
-	    if n == 0: n = 1
-	    type = string.upper(format[0])
-	    if type == "'":
-		eof = string.find(format, "'", 1)
-		text = format[1:eof]
-		format = format[eof+1:]
-	    else:
-		format = string.strip(format[1:])
-	    if type == '(':
-		subformat = FortranFormat(format, 1)
-		fields = fields + n*subformat.fields
-		format = subformat.rest
-		eof = string.find(format, ',')
-		if eof >= 0:
-		    format = format[eof+1:]
-	    else:
-		eof = string.find(format, ',')
-		if eof >= 0:
-		    field = format[:eof]
-		    format = format[eof+1:]
-		else:
-		    eof = string.find(format, ')')
-		    if eof >= 0:
-			field = format[:eof]
-			format = format[eof+1:]
-		    else:
-			field = format
-			format = ''
-		if type == "'":
-		    field = (type, text)
-		else:
-		    dot = string.find(field, '.')
-		    if dot > 0:
-			length = string.atoi(field[:dot])
-			fraction = string.atoi(field[dot+1:])
-			field = (type, length, fraction)
-		    else:
-			if field:
-			    length = string.atoi(field)
-			else:
-			    length = 1
-			field = (type, length)
-		fields = fields + n*[field]
-	self.fields = fields
-	if nested:
-	    self.rest = format
+        fields = []
+        format = string.strip(format)
+        while format and format[0] != ')':
+            n = 0
+            while format[0] in string.digits:
+                n = 10*n + string.atoi(format[0])
+                format = format[1:]
+            if n == 0: n = 1
+            type = string.upper(format[0])
+            if type == "'":
+                eof = string.find(format, "'", 1)
+                text = format[1:eof]
+                format = format[eof+1:]
+            else:
+                format = string.strip(format[1:])
+            if type == '(':
+                subformat = FortranFormat(format, 1)
+                fields = fields + n*subformat.fields
+                format = subformat.rest
+                eof = string.find(format, ',')
+                if eof >= 0:
+                    format = format[eof+1:]
+            else:
+                eof = string.find(format, ',')
+                if eof >= 0:
+                    field = format[:eof]
+                    format = format[eof+1:]
+                else:
+                    eof = string.find(format, ')')
+                    if eof >= 0:
+                        field = format[:eof]
+                        format = format[eof+1:]
+                    else:
+                        field = format
+                        format = ''
+                if type == "'":
+                    field = (type, text)
+                else:
+                    dot = string.find(field, '.')
+                    if dot > 0:
+                        length = string.atoi(field[:dot])
+                        fraction = string.atoi(field[dot+1:])
+                        field = (type, length, fraction)
+                    else:
+                        if field:
+                            length = string.atoi(field)
+                        else:
+                            length = 1
+                        field = (type, length)
+                fields = fields + n*[field]
+        self.fields = fields
+        if nested:
+            self.rest = format
 
     def __len__(self):
-	return len(self.fields)
+        return len(self.fields)
 
     def __getitem__(self, i):
-	return self.fields[i]
+        return self.fields[i]
 
 #
 # A convenient base class...
@@ -477,7 +477,7 @@ def issamealtloc(a,b):
     if ('A' in b or '1' in b): return(1)
     return(0)
   if (a in b): return(1)
-  for i in range(2):
+  for i in range(2): #@UnusedVariable
     if ((a=="A" and b=="1") or (a=="B" and b=="2") or (a=="C" and b=="3") or
         (a=="D" and b=="4") or (a=="E" and b=="5") or (a=="F" and b=="6") or
         (a=="G" and b=="7") or (a=="H" and b=="8") or (a=="I" and b=="9")):
@@ -501,8 +501,8 @@ class PDBFile:
     """
 
     def __init__(self, filename, mode = 'r', subformat = None):
-	self.file = open(filename, mode)
-	self.output = string.lower(mode[0]) == 'w'
+        self.file = open(filename, mode)
+        self.output = string.lower(mode[0]) == 'w'
         self.export_filter = None
         if subformat is not None:
              export = export_filters.get(subformat, None)
@@ -539,58 +539,58 @@ class PDBFile:
         record types, the second tuple element is a string containing
         the remaining part of the record.
         """
-	while 1:
-	    line = self.file.readline()
-	    # UNTIL THE RCSB HAS TIME TO CORRECT 1HC8
-	    if (string.strip(line)=="ATOM    252  N   ARG A   37      70.647  91.305  23.399  1.00 80.75           N"):
-	      line="ATOM    252  N   ARG A  37      70.647  91.305  23.399  1.00 80.75           N"
-	    if (string.strip(line)=="HETATM14371  O   HOH B1188   32.660  40.759  61.083  0.50 12.14           O"):
-	      line="HETATM14371  O   HOH B1188      32.660  40.759  61.083  0.50 12.14           O"
-	    if not line: return ('END','')
-	    if line[-1] == '\n': line = line[:-1]
-	    line = string.strip(line)
-	    if line: break
-	line = string.ljust(line, 80)
-	type = string.strip(line[:6])
-	if type == 'ATOM' or type == 'HETATM':
-	    # EK: CHECK IF STRING.ATOI IN SCIENTIFIC PYTHON MIGHT CRASH
-	    for i in range(22,26):
-	      if (line[i]!=' ' and line[i] not in string.digits and i==25):
-	        line=line[:22]+' '+line[22:26]+line[27:]
-	        break
-	    line = FortranLine(line, atom_format)
-	    data = {'serial_number': line[1],
-		    'name': line[2],
-		    'alternate': string.strip(line[3]),
-		    'residue_name': string.strip(line[4]),
-		    'chain_id': string.strip(line[5]),
-		    'residue_number': line[6],
+        while 1:
+            line = self.file.readline()
+            # UNTIL THE RCSB HAS TIME TO CORRECT 1HC8
+            if (string.strip(line)=="ATOM    252  N   ARG A   37      70.647  91.305  23.399  1.00 80.75           N"):
+              line="ATOM    252  N   ARG A  37      70.647  91.305  23.399  1.00 80.75           N"
+            if (string.strip(line)=="HETATM14371  O   HOH B1188   32.660  40.759  61.083  0.50 12.14           O"):
+              line="HETATM14371  O   HOH B1188      32.660  40.759  61.083  0.50 12.14           O"
+            if not line: return ('END','')
+            if line[-1] == '\n': line = line[:-1]
+            line = string.strip(line)
+            if line: break
+        line = string.ljust(line, 80)
+        type = string.strip(line[:6])
+        if type == 'ATOM' or type == 'HETATM':
+            # EK: CHECK IF STRING.ATOI IN SCIENTIFIC PYTHON MIGHT CRASH
+            for i in range(22,26):
+              if (line[i]!=' ' and line[i] not in string.digits and i==25):
+                line=line[:22]+' '+line[22:26]+line[27:]
+                break
+            line = FortranLine(line, atom_format)
+            data = {'serial_number': line[1],
+                    'name': line[2],
+                    'alternate': string.strip(line[3]),
+                    'residue_name': string.strip(line[4]),
+                    'chain_id': string.strip(line[5]),
+                    'residue_number': line[6],
         'insertion_code': string.strip(line[7]),
         'position': line[8:11],
-		    'occupancy': line[11],
-		    'temperature_factor': line[12],
-		    'segment_id': string.strip(line[13]),
-		    'element': string.strip(line[14]),
-		    'charge': string.strip(line[15])}
-	    # EK: A NEW CHAIN FOUND ?
-	    if (data['chain_id']!=self.lastchain):
-	      self.lastchain=data['chain_id']
+                    'occupancy': line[11],
+                    'temperature_factor': line[12],
+                    'segment_id': string.strip(line[13]),
+                    'element': string.strip(line[14]),
+                    'charge': string.strip(line[15])}
+            # EK: A NEW CHAIN FOUND ?
+            if (data['chain_id']!=self.lastchain):
+              self.lastchain=data['chain_id']
               # EK: RESET NUMBER OF LAST RESIDUE AND ALTERNATE LOC. RENAMING
               self.lastresno=-1
-	      self.altrename="~"
-	    # EK: A RESIDUE WITH HIGHER NUMBER FOUND?
-	    if (data['residue_number']>self.lastresno):
-	      # EK: A RESIDUE WITH HIGHER NUMBER HAS BEEN FOUND
-	      self.lastresno=data['residue_number']
-	      # EK: RENAME ALTERNATE LOCATION INDICATOR TO 'A'
-	      if (data['alternate']>'A' or
-	          (data['alternate']>'1' and data['alternate']<='9')):
-	        self.altrename=data['alternate']
-	      else:
-	        self.altrename="~"
-	    # EK: RENAME IF NEEDED
-	    if (data['alternate']==self.altrename): data['alternate']='A'
-	    return type, data
+              self.altrename="~"
+            # EK: A RESIDUE WITH HIGHER NUMBER FOUND?
+            if (data['residue_number']>self.lastresno):
+              # EK: A RESIDUE WITH HIGHER NUMBER HAS BEEN FOUND
+              self.lastresno=data['residue_number']
+              # EK: RENAME ALTERNATE LOCATION INDICATOR TO 'A'
+              if (data['alternate']>'A' or
+                  (data['alternate']>'1' and data['alternate']<='9')):
+                self.altrename=data['alternate']
+              else:
+                self.altrename="~"
+            # EK: RENAME IF NEEDED
+            if (data['alternate']==self.altrename): data['alternate']='A'
+            return type, data
         elif type == 'ANISOU':
             # EK: SCRIPT CAN CRASH IF ANISOU CONTAINS JUST A "-" (see 1DXD.PDB)
             i=30
@@ -601,20 +601,20 @@ class PDBFile:
                 line=line[:i]+"0"+line[i+1:]
               i=i+1
             line = FortranLine(line, anisou_format)
-	    data = {'serial_number': line[1],
-		    'name': line[2],
-		    'alternate': string.strip(line[3]),
-		    'residue_name': string.strip(line[4]),
-		    'chain_id': string.strip(line[5]),
-		    'residue_number': line[6],
+            data = {'serial_number': line[1],
+                    'name': line[2],
+                    'alternate': string.strip(line[3]),
+                    'residue_name': string.strip(line[4]),
+                    'chain_id': string.strip(line[5]),
+                    'residue_number': line[6],
                     'insertion_code': string.strip(line[7]),
                     'u': [[1e-4*line[8], 1e-4*line[11], 1e-4*line[12]],
                           [1e-4*line[11], 1e-4*line[9] , 1e-4*line[13]],
                           [1e-4*line[12], 1e-4*line[13], 1e-4*line[10]]],
-		    'segment_id': string.strip(line[14]),
-		    'element': string.strip(line[15]),
-		    'charge': string.strip(line[16])}
-	    return type, data
+                    'segment_id': string.strip(line[14]),
+                    'element': string.strip(line[15]),
+                    'charge': string.strip(line[16])}
+            return type, data
         elif type == 'TER':
             line = FortranLine(line, ter_format)
             data = {'serial_number': line[1],
@@ -622,27 +622,27 @@ class PDBFile:
                     'chain_id': string.strip(line[3]),
                     'residue_number': line[4],
                     'insertion_code': string.strip(line[5])}
-	    return type, data
-	elif type == 'CONECT':
+            return type, data
+        elif type == 'CONECT':
             line = FortranLine(line, conect_format)
-	    data = {'serial_number': line[1],
-		    'bonded': filter(lambda i: i > 0, line[2:6]),
-		    'hydrogen_bonded': filter(lambda i: i > 0, line[6:10]),
-		    'salt_bridged': filter(lambda i: i > 0, line[10:12])}
-	    return type, data
+            data = {'serial_number': line[1],
+                    'bonded': filter(lambda i: i > 0, line[2:6]),
+                    'hydrogen_bonded': filter(lambda i: i > 0, line[6:10]),
+                    'salt_bridged': filter(lambda i: i > 0, line[10:12])}
+            return type, data
         elif type == 'MODEL':
             line = FortranLine(line, model_format)
             data = {'serial_number': line[1]}
-	    return type, data
+            return type, data
         elif type == 'HEADER':
             line = FortranLine(line, header_format)
             data = {'compound': line[1],
                     'date': line[2],
                     'pdb_code': line[3]}
-	    return type, data
-	elif type =="CRYST1":
-		line=FortranLine(line,cryst1_format)
-		data={"a":line[1],
+            return type, data
+        elif type =="CRYST1":
+                line=FortranLine(line,cryst1_format)
+                data={"a":line[1],
           "b":line[2],
           "c":line[3],
           "alpha":line[4],
@@ -650,35 +650,35 @@ class PDBFile:
           "gamma":line[6],
           "spacegroup":line[7],
           "chains":line[8]}
-		return type,data
-	elif type[0:5]=="SCALE" and type[5] in ['1','2','3']:
-		line=FortranLine(line,scale_format)
-		data={"s1":line[1],
+                return type,data
+        elif type[0:5]=="SCALE" and type[5] in ['1','2','3']:
+                line=FortranLine(line,scale_format)
+                data={"s1":line[1],
           "s2":line[2],
           "s3":line[3],
           "u":line[4]}
-		return type,data
-	elif type[0:6]=="REMARK" and line[6:10]==" 200":
-		if (line[12:23]=="TEMPERATURE"):
-		  try: temp=float(string.split(line)[-1])
-		  except: temp=None
-		  if (string.find(line,"CELSIUS")!=-1): temp=temp+273.15
-		  return "TEMP",temp
-		if (line[12:23]=="TEMPERATURE"):
-		  try: temp=float(string.split(line)[-1])
-		  except: temp=None
-		  if (string.find(line,"CELSIUS")!=-1): temp=temp+273.15
-		  return "TEMP",temp
-		if (line[12:14]=="PH"):
-		  try: ph=float(string.split(line)[-1])
-		  except: ph=None
-		  return "PH",ph
-		return type, line[6:]
-	elif type[0:6]=="REMARK" and line[6:10]==" 350":
-		return("BIOMT",line[10:])
-	elif type[0:6]=="SEQRES":
-		return("SEQRES",[line[11],string.split(line[19:70])])
-	else: return type, line[6:]
+                return type,data
+        elif type[0:6]=="REMARK" and line[6:10]==" 200":
+                if (line[12:23]=="TEMPERATURE"):
+                  try: temp=float(string.split(line)[-1])
+                  except: temp=None
+                  if (string.find(line,"CELSIUS")!=-1): temp=temp+273.15
+                  return "TEMP",temp
+                if (line[12:23]=="TEMPERATURE"):
+                  try: temp=float(string.split(line)[-1])
+                  except: temp=None
+                  if (string.find(line,"CELSIUS")!=-1): temp=temp+273.15
+                  return "TEMP",temp
+                if (line[12:14]=="PH"):
+                  try: ph=float(string.split(line)[-1])
+                  except: ph=None
+                  return "PH",ph
+                return type, line[6:]
+        elif type[0:6]=="REMARK" and line[6:10]==" 350":
+                return("BIOMT",line[10:])
+        elif type[0:6]=="SEQRES":
+                return("SEQRES",[line[11],string.split(line[19:70])])
+        else: return type, line[6:]
 
     def writeLine(self, type, data):
         """Writes a line using record type and data dictionary in the
@@ -763,12 +763,12 @@ class PDBFile:
         Each line of the text is prefixed with 'REMARK' and written
         to the file.
         """
-	while text:
-	    eol = string.find(text,'\n')
-	    if eol == -1:
-		eol = len(text)
-	    self.file.write('REMARK %s \n' % text[:eol])
-	    text = text[eol+1:]
+        while text:
+            eol = string.find(text,'\n')
+            if eol == -1:
+                eol = len(text)
+            self.file.write('REMARK %s \n' % text[:eol])
+            text = text[eol+1:]
 
     def writeAtom(self, name, position, occupancy=0.0, temperature_factor=0.0,
                   element=''):
@@ -777,11 +777,11 @@ class PDBFile:
         chain information is taken from the last calls to the methods
         nextResidue() and nextChain().
         """
-	if self.het_flag:
-	    type = 'HETATM'
-	else:
-	    type = 'ATOM'
-	name = string.upper(name)
+        if self.het_flag:
+            type = 'HETATM'
+        else:
+            type = 'ATOM'
+        name = string.upper(name)
         if element != '' and len(element) == 1 and name and name[0] == element:
             name = ' ' + name
         self.data['name'] = name
@@ -882,9 +882,9 @@ class Atom:
     The properties can be obtained or modified using
     indexing, as for Python dictionaries.
     """
-    
+
     def __init__(self, name, position, **properties):
-	self.position = position
+        self.position = position
         self.properties = properties
         if self.properties.get('element', '') == '':
            if name[0] == ' ' or name[0] in string.digits:
@@ -910,13 +910,13 @@ class Atom:
         self.properties[item] = value
 
     def __str__(self):
-	return self.__class__.__name__ + ' ' + self.name + \
+        return self.__class__.__name__ + ' ' + self.name + \
                ' at ' + str(self.position)
     __repr__ = __str__
 
     def type(self):
         "Returns the six-letter record type, ATOM or HETATM."
-	return 'ATOM  '
+        return 'ATOM  '
 
     def save(self, file):
         """Writes an atom record to |file| (a PDBFile object or a
@@ -944,8 +944,8 @@ class HetAtom(Atom):
     """
 
     def type(self):
-	return 'HETATM'
-    
+        return 'HETATM'
+
 
 class Group:
 
@@ -1148,7 +1148,7 @@ class NucleotideResidue(Residue):
     def __init__(self, name, atoms = None, number = None):
         self.pdbname = name
         name = name[:-1] + 'D' + name[-1]
-	Residue.__init__(self, name, atoms, number)
+        Residue.__init__(self, name, atoms, number)
         for a in atoms:
             if a.name == 'O2*': # Ribose
                 self.name = self.name[:-2] + 'R' + self.name[-1]
@@ -1255,7 +1255,7 @@ class Chain:
     def deleteHydrogens(self):
         "Removes all hydrogen atoms."
         for r in self.residues:
-	    r.deleteHydrogens()
+            r.deleteHydrogens()
 
     def save(self, file):
         """Writes the chain to |file| (a PDBFile object or a
@@ -1287,7 +1287,7 @@ class PeptideChain(Chain):
     """
 
     def __getslice__(self, i1, i2):
-	return self.__class__(self.residues[i1:i2])
+        return self.__class__(self.residues[i1:i2])
 
     def isTerminated(self):
         "Returns 1 if the last residue is in C-terminal configuration."
@@ -1328,7 +1328,7 @@ class NucleotideChain(Chain):
     """
 
     def __getslice__(self, i1, i2):
-	return self.__class__(self.residues[i1:i2])
+        return self.__class__(self.residues[i1:i2])
 
     def isTerminated(self):
         return 0
@@ -1692,7 +1692,7 @@ class Structure:
     chain=None
     new_chain=0
     read=(self.model==0)
-    speedup=0
+    speedup=0 #@UnusedVariable
     # SN: THE MODEL CURRENTLY UNDER INVESTIGATION
     currentmodel = 0
     self.cryst1=None

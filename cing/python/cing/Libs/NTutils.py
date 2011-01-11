@@ -5106,7 +5106,7 @@ def getKeyWithLargestCount(count):
 def grep(fileName, txt, resultList = None, doQuiet=False, caseSensitive=True):
     """
     Exit status is 0 if selected lines are found and 1 if none are found.
-    Exit status is 2 is returned if an error occurred, unless the -q or --quiet or --silent option is used and a selected line is found.
+    Exit status 2 is returned if an error occurred, unless the -q or --quiet or --silent option is used and a selected line is found.
     Instead of printing, a resultList will be filled if provided.
     """
     if not os.path.exists(fileName):
@@ -5116,10 +5116,15 @@ def grep(fileName, txt, resultList = None, doQuiet=False, caseSensitive=True):
 
     matchedLine = False
     for line in open(fileName):
+        if len(line):
+            line = line[:-1] # must be at least 1 char long
+        else:
+            NTcodeerror("Fix code in grep")
         lineMod = line
         if not caseSensitive:
             lineMod = line.lower()
         if txt in lineMod:
+#            NTdebug("Matched line in grep: %s" % lineMod)
             if doQuiet:
                 # important for not scanning whole file.
                 return 0

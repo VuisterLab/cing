@@ -119,7 +119,7 @@ QUEEN comes with a testsuite to check your installation. Before proceeding
 any further we suggest you run it to make your sure your basic installation
 is correct. The script is located in the main installation directory.
 
-  ./cing.py --test    (NB changed in 1.2 version)
+  queen --test    (NB changed in 1.2 version)
 
 ## Running QUEEN ##
 ###################
@@ -129,13 +129,13 @@ QUEEN consists of four programs:
   ./ccpndatamodel.py - for importing data from the CPPN datamodel.
   ./generate.py      - for generating projects and input files
   ./restraints.py    - for checking restraint files
-  ./queen.py         - running QUEEN
+  queen         - running QUEEN
 
-For each program help is availabe by running it with the -h option.
+For each program help is available by running it with the -h option.
 
 QUEEN stores all the data it uses for one project in a project
 directory tree. Using the default configuration file this tree
-lookes like this:
+looks like this:
 
   ./projectname/data
   ./projectname/data/sequence    - sequence, psf and template files
@@ -154,7 +154,7 @@ Setting a QUEEN project consists of one step:
  1. Creating the project directory tree from a existing CING project.
     A new QUEEN run is initialized by the following command:
 
-    ./queen.py --project projectname --initCing  (NB new in 1.2 version)
+    queen --project projectname --initCing  (NB new in 1.2 version)
 
 The restraints are taken from the CING project and automatically converted
 suitable for the QUEEN run. They are grouped in the dataset 'all'.
@@ -171,7 +171,7 @@ Setting a QUEEN project consists of several steps:
 
 1. A new project is created by the following command:
 
-  ./queen.py --project projectname --init  (NB new in 1.2 version)
+  queen --project projectname --init  (NB new in 1.2 version)
 
 This creates a new directory 'projectname' in the QUEEN project directory,
 which was defined as Q_PROJECT in 'queen.conf'.
@@ -185,7 +185,7 @@ be found at http://www.cmbi.kun.nl/software/queen/.
 2. If you have a PDB file available of your structure, you can take
 the easy route:
 
-  ./queen.py --project projectname --pdb2all yourprotein.pdb (NB changed in version 1.2)
+  queen --project projectname --pdb2all yourprotein.pdb (NB changed in version 1.2)
 
 This will generate a sequence file, a PSF file and a template PDB file at
 the following locations:
@@ -194,7 +194,7 @@ the following locations:
   /theprojectdir/data/sequence/protein.psf
   /theprojectdir/data/sequence/protein.pdb
 
-If you do not have a PDB file availabe, you first have to generate
+If you do not have a PDB file available, you first have to generate
 a sequence file. The format for the sequence file is as follows:
 
   > A
@@ -211,16 +211,16 @@ a sequence file. The format for the sequence file is as follows:
 
 Where 'A' and 'B' are chain names, which should be replaced by a space if no
 chain name is present. The sequence should be given in three-letter
-aminoacid codes, with one amino-acid per line. With the sequence file, you
+amino acid codes, with one amino-acid per line. With the sequence file, you
 can generate a PSF file.
 
-  ./queen.py --project projectname --seq2psf yoursequencefile.seq
+  queen --project projectname --seq2psf yoursequencefile.seq
   (NB changed in version 1.2)
 
 This PSF (which can be found at /theprojectdir/data/sequence/protein.psf
 can then be converted to a template PDB file.
 
-  ./queen.py --project projectname --psf2tem /theprojectdir/data/sequence/protein.psf
+  queen --project projectname --psf2tem /theprojectdir/data/sequence/protein.psf
   (NB changed in version 1.2)
 
 The template PDB file can then be found at: /theprojectdir/data/sequence/protein.pdb.
@@ -268,7 +268,7 @@ to be located in the /yourprojectdir/projectname/data/restraints/ directory.
 The TYPE field can be either DIST or DIHE for distance and dihedral restraints,
 respectively. Every block has to be ended with a '//' delimiter!
 
-A new feature since QUEEN 1.1 is the possiblity to include restraints as
+A new feature since QUEEN 1.1 is the possibility to include restraints as
 back ground information. This done by adding the 'INFO' statement to the
 dataset description file. For example:
 
@@ -291,16 +291,16 @@ medium-range restraints.
 
 # Running QUEEN #
 
-With everything in place you should now be able to run QUEEN, using queen.py.
+With everything in place you should now be able to run QUEEN, using queenM.py.
 To quickly test your data, run the check option:
 
-  ./queen.py --project projectname --dataset yourdataset --check
+  queen --project projectname --dataset yourdataset --check
 
 If this runs without QUEEN reporting errors, it's likely that all others options
 will also run without any further problems. If you receive warnings or errors when
 checking your dataset, the iterative check option (--icheck) can help you to
 identify problematic restraints. For information on the other things QUEEN can do
-for you, run queen.py -h.
+for you, run queenM.py -h.
 
 # Iave calculations #
 
@@ -326,12 +326,12 @@ To use this dataset you must use the --example flag in stead of the --project op
 You can then run all the QUEEN options with 'noe' or 'all' as the dataset.
 For example, to check the 'all' dataset:
 
-  ./queen.py --example --check --dataset all  (NB changed in version 1.2)
+  queen --example --check --dataset all  (NB changed in version 1.2)
 
 Or, to calculate the unique restraint information of the restraints in the
 'noe' dataset:
 
-  ./queen.py --example --Iuni --dataset noe  (NB changed in version 1.2)
+  queen --example --Iuni --dataset noe  (NB changed in version 1.2)
 
 
 ## Miscellaneous ##
@@ -339,7 +339,7 @@ Or, to calculate the unique restraint information of the restraints in the
 
 # Running QUEEN in parallel #
 
-The main program (queen.py) can also be run in parallel for the 'Iset', 'Iave' and
+The main program (queenM.py) can also be run in parallel for the 'Iset', 'Iave' and
 'Iuni' options. As especially the 'Iave' option can be rather time consuming, it
 is recommendable to run this option in parallel on a Linux cluster.
 This done by providing the '-m' flag, for using the MPI protocol.
@@ -351,12 +351,12 @@ http://sourceforge.net/projects/numpy.
 For example, to calculate the unique restraint information on a dual processor
 machine:
 
-  mpirun -np 2 ./queen.py -m --Iuni projectname yourdataset
+  mpirun -np 2 queen -m --Iuni projectname yourdataset
 
 To run QUEEN parallel on 10 CPUs on a Linux cluster in order to calculate the
 average restraint information, submit to following command to your queueing system:
 
-  mpirun -np 10 /pathtoqueen/queen.py -m --Iave projectname yourdataset
+  mpirun -np 10 /pathtoqueen/queenM.py -m --Iave projectname yourdataset
 
 NOTE: only the 'Iset', 'Iave' and 'Iuni' options will run in parallel, for all
 others options, it will just execute the same code many times!

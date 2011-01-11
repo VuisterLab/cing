@@ -27,7 +27,7 @@ class dmElement():
         self.atm2 = atm2
         self.upper  = dmElement.upperDefault
         self.lower  = dmElement.lowerDefault
-        self.upperChange = 0.0
+        self.upperChange = 0.0 # change after using last iteration of setLU()
         self.uncertainty = dmElement.uncertaintyDefault
         self.flagged = False
     #end def
@@ -131,24 +131,25 @@ class Queeny( odict ):
     def initTopology(self):
         NTdebug('Queeny.initTopology: initializing topology')
         for atm in self.molecule.allAtoms():
-            for n in atm.topology():
+            for atmN in atm.topology():
 
-                if not self.has_key((atm.atomIndex,n.atomIndex)):
+                if self.has_key((atm.atomIndex,atmN.atomIndex)):
+                    continue
 
-                    dme = dmElement(atm, n)
-                    self[(atm.atomIndex,n.atomIndex)] = dme
+                dme = dmElement(atm, atmN)
+                self[(atm.atomIndex,atmN.atomIndex)] = dme
 
-                    # approximate values
-                    if (atm.isProton() and n.isCarbon()) or (n.isProton() and atm.isCarbon()):
-                        dme.setLU( 0.0, 1.08)
-                    elif atm.isCarbon() and n.isCarbon():
-                        dme.setLU( 0.0, 1.52) # alphatic C-C
-                    elif (atm.isNitrogen() and n.isCarbon()) or (n.isNitrogen() and atm.isCarbon()):
-                        dme.setLU( 0.0, 1.33) #N-C'; (N-CA) = 1.45
-                    elif (atm.isNitrogen() and n.isProton()) or (n.isNitrogen() and atm.isProton()):
-                        dme.setLU( 0.0, 0.98)
-                    else:
-                        dme.setLU( 0.0, 1.0)
+                # approximate values
+                if (atm.isProton() and atmN.isCarbon()) or (atmN.isProton() and atm.isCarbon()):
+                    dme.setLU( 0.0, 1.08)
+                elif atm.isCarbon() and atmN.isCarbon():
+                    dme.setLU( 0.0, 1.52) # alphatic C-C
+                elif (atm.isNitrogen() and atmN.isCarbon()) or (atmN.isNitrogen() and atm.isCarbon()):
+                    dme.setLU( 0.0, 1.33) #N-C'; (N-CA) = 1.45
+                elif (atm.isNitrogen() and atmN.isProton()) or (atmN.isNitrogen() and atm.isProton()):
+                    dme.setLU( 0.0, 0.98)
+                else:
+                    dme.setLU( 0.0, 1.0)
                 #end if
             #end for
         #end for
@@ -327,7 +328,7 @@ class Queeny( odict ):
                         lower = dmElement.lowerDefault
                     self.initDmElement(atm1, atm2, lower, upper)
                 else:
-                    # ambigious restraints
+                    # ambiguous restraints
                     Rm6distances = self._calculateAverage( dr )
                     if Rm6distances == None:
                         NTwarning('Queeny.initRestraints: failure to analyze %s', dr)
@@ -401,7 +402,7 @@ class Queeny( odict ):
     #end def
 
     def setNeighbors(self, keyIndex):
-        """Set the neighbors form dme, starting at keyIndex"""
+        """Set the neighbors from dme, starting at keyIndex"""
         nkeys = len(self)
         while keyIndex < nkeys:
             dme = self(keyIndex)
@@ -422,7 +423,7 @@ class Queeny( odict ):
 
         while depth < maxDepth and count>0:
 
-            self.sortedKeys()
+            self.sortKeys()
             self.initFlagged()
 
             nkeys = len(self._keys)
@@ -442,21 +443,21 @@ class Queeny( odict ):
                     NTdebug('Queeny.triangulateAll: depth: %d nkeys %4d  key %4d  len %6d  count %4d %7.3f  BREAK',
                             depth, nkeys, key, len(self), count, dme12.upperChange)
                     break
+                #end if
 
                 atm1  = dme12.atm1
                 atm2  = dme12.atm2
 
-                for n1,dme in atm1.neighbors.iteritems(): # duplicate, because gets added onto original
-                    self.triangulate(n1, atm1, atm2, dme, dme12)
-                for n2,dme in atm2.neighbors.iteritems():
-                    self.triangulate(atm1, atm2, n2, dme12, dme)
+                for atmN1,dme in atm1.neighbors.iteritems(): # duplicate, because gets added onto original
+                    self.triangulate(atmN1, atm1, atm2, dme, dme12)
+                for atmN2,dme in atm2.neighbors.iteritems():
+                    self.triangulate(atm1, atm2, atmN2, dme12, dme)
                 dme12.upperChange=0.0
                 dme12.flagged=True
                 count += 1
-                #end if
                 key += 1
             #end while
-            self.setNeighbors(nkeys) # Update neighborlists for newly added elements (starting at nkeys)
+            self.setNeighbors(nkeys) # Update neighbor lists for newly added elements (starting at nkeys)
 
             NTdebug('Queeny.triangulateAll: depth: %d nkeys %4d  key %4d  len %6d  count %4d', depth, nkeys, key, len(self), count)
             depth += 1
@@ -498,9 +499,9 @@ class Queeny( odict ):
                 #end if
             #end for
         #end for
-        fl = 1.0/float(l-1)
+        fls = float(l-1)
         for atm in atms:
-            atm[key] *= fl
+            atm[key] /= fls
 
         # residues
         for res in self.molecule.allResidues():
@@ -531,18 +532,19 @@ class Queeny( odict ):
             else:
                 res[informationKey] = 0.0
         #end for
-        # average
-        for chain in self.molecule.allChains():
-            for res in chain.allResidues()[1:-1]:
-                res.information = (res.sibling(-1).information+res.information+res.sibling(1).information)*0.333
-            #end for
-        #end for
+#        # average
+#        for chain in self.molecule.allChains():
+#            for res in chain.allResidues()[1:-1]:
+#                res.information = (res.sibling(-1).information+res.information+res.sibling(1).information)*0.333
+#            #end for
+#        #end for
     #end def
 
     def zap(self, byItem):
         return NTzap(self.values(), byItem)
 
-    def sortedKeys(self):
+    def sortKeys(self):
+        'Sorts the dme list by upperChange'
         a = zip(self._keys,NTzap(self.values(),'upperChange'))
         NTsort(a, 1, inplace=True)
         a.reverse()
