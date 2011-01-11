@@ -114,12 +114,14 @@ def doSetup( config, project, basePath, options ):
     NTmessage(   '==> Exporting %s to %s for refinement\n', project, basePath )
 
     for drl in project.distances:
+        drl.renameToXplorCompatible()
         xplor.noeRestraints.append( refineNoeParameters( drl.name ) )
         fname = xplor.joinPath( xplor.directories.tables, drl.name +'.tbl' )
         drl.export2xplor( fname )
     #end for
 
     for drl in project.dihedrals:
+        drl.renameToXplorCompatible()
         xplor.dihedralRestraints.append( refineDihedralParameters( drl.name ) )
         fname = xplor.joinPath( xplor.directories.tables, drl.name +'.tbl' )
         drl.export2xplor( fname )

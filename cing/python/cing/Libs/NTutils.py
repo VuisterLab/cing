@@ -1325,6 +1325,9 @@ class NTdict(dict):
 #        return
 #        if hasattr(self, attr):
         if not self.has_key(attr):
+            # Happens at H2_2Ca_64_100.cing TODO: fix.
+#            print 'CODE ERROR "%s" not found.' % attr
+#            return ""
             raise AttributeError( '"%s" not found.' % attr )
         return self[attr]
     #end def
@@ -1492,8 +1495,12 @@ class NTdict(dict):
         if (format == None):
             # use the default format if None
             format ='<%(__CLASS__)s-object (%(__OBJECTID__)d)>'
-
-        return format % self
+        try:
+            result = format % self
+        except: # Happens at H2_2Ca_64_100.cing
+            NTtracebackError()
+            return ""
+        return result
     #end def
 
     def keysformat(self, dots='-'*20):
@@ -4402,7 +4409,6 @@ def addDeepByKeys(d, value, *keyList):
 
 def getDeepByKeysOrDefault(c, default, *keyList):
     """NEW: store default if returned; remember silence is key.
-    TODO: JFD to run tests on this change in api!
     """
     result = getDeepByKeys(c, *keyList)
     if result == None:

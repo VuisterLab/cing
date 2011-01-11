@@ -1,12 +1,19 @@
-#Refinement setup
+# Refinement setup
 
-set x = LdCof_jfd_ref4
-set stage = r4
-set ranges = '6-23,26-57,63-141'
+set x = 1brv
+set stage = rT
+set ranges = 171-188
+
 
 -----------------------------------------------------------------------------------------------------------------------------------------
    Import into cing
 -----------------------------------------------------------------------------------------------------------------------------------------
+
+# From CCPN:
+cing -v 9 --name $x --initCcpn $x.tgz --ipython
+
+
+
 Usage: cyana2cing.py [options] cyanaDirectory Use -h or --help for full options.
 
 Options:
@@ -38,7 +45,7 @@ Options:
 cyana2cing -v 9 --pdbFile $x --peakFiles $x"n15",$x"c13" --uplFiles $x --acoFiles $x --seqFile $x --protFile $x -o $x
 
 -----------------------------------------------------------------------------------------------------------------------------------------
-  setup for refine
+  setup for refine using XPLOR-NIH
 -----------------------------------------------------------------------------------------------------------------------------------------
 
 Usage: refine.py [options]
@@ -68,6 +75,7 @@ Options:
                         verbosity: [0(nothing)-9(debug)] no/less messages to
                         stdout/stderr (default: 3)
 
+
 refine --project $x --name $stage --setup --overwrite --superpose $ranges
 
 ==> Generated setup under "./$x.cing/Refine/$stage"
@@ -91,19 +99,20 @@ assi (resid 646 and name O)         (resid 900 and name * and not segid WAT1)   
 assi (resid 649 and name OG)        (resid 900 and name * and not segid WAT1)          2.900     0.900     0.000
 
 # Then create the psf etc.
-refine --project $x --name $stage --superpose $ranges --psf --ipython
+refine --project $x --name $stage --superpose $ranges --psf
 
 -----------------------------------------------------------------------------------------------------------------------------------------
   PSF file
 -----------------------------------------------------------------------------------------------------------------------------------------
-Manually copy the appropriate .psf file to the $x.cing/Refine/$stage/PSF subdirectory
+Manually copy the appropriate .psf file to the $x.cing/Refine/$stage/PSF subdirectory if not there yet.
+
 Be sure to have the right name in parameter.py for the psfFile field
 PERHAPS: edit the generatePSF.inp to include better topology description:
 patch DISN
-	reference=1=( resid 173 )  reference=2=( resid 186 )
+    reference=1=( resid 173 )  reference=2=( resid 186 )
 end
 patch DISN
-	reference=1=( resid 176 )  reference=2=( resid 182 )
+    reference=1=( resid 176 )  reference=2=( resid 182 )
 end
 and run again:
 $x.cing/Refine/$stage/Jobs/generatePSF.csh
@@ -115,7 +124,7 @@ refine --project $x --name $stage --analyze --overwrite --ipython
 
 Examine at least one log file in the Jobs directory for errors.
 JFD: - fixed bug with too long file name: @@1brv_cs_pk_2mdl.cing/Refine/refine1/Tables/dihedral_constraint_list.tbl
-		The same for the other files. Easiest fix is to rename the lists to be no more than 10 chars.
+        The same for the other files. Easiest fix is to rename the lists to be no more than 10 chars.
 
 -------------------------------1----------------------------------------------------------------------------------------------------------
   Refine

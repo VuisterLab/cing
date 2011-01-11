@@ -37,8 +37,29 @@ class RestraintList(NTlist):
         return self.__str__()
     #end def
     def rename(self, newName):
+        NTdebug("Renaming %s to %s" % ( self, newName))
         return self.projectList.rename(self.name, newName)
     #end def
+    def renameToXplorCompatible(self):
+        l = len(self.name)
+        if l < MAX_SIZE_XPLOR_RESTRAINT_LIST_NAME:
+             NTdebug("Kept the original xplor compatible drl name: %s" % self.name)
+             return
+        prefix = 'pl'
+        if self.__CLASS__ == DRL_LEVEL:
+            prefix = DRL_STR
+        elif self.__CLASS__ == ACL_LEVEL:
+            prefix = ACL_STR
+        elif self.__CLASS__ == RDCL_LEVEL:
+            prefix = RDCL_STR
+        prefix += '_'
+        newName = self.projectList.getNextValidName(prefix = prefix)
+        if newName == None:
+            NTerror("Failed renameToXplorCompatible for %s" % self)
+            return
+        self.rename(newName)
+    #end def
+
     def append(self, restraint):
         restraint.id = self.currentId
         restraint.parent = self # being able to go from restraint to restraint list is important.
