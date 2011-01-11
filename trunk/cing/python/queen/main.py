@@ -1,8 +1,133 @@
-#@PydevCodeAnalysisIgnore
-from queen.queen import nmvconf
-from subprocess import PIPE
-from subprocess import Popen
-import string,os,sys,math,socket,time,shutil,copy,types,random,glob,fnmatch,nmv,pdb_file
+#!/usr/bin/env python
+"""
+QUEEN   : QUantitative Evaluation of Experimental Nmr restraints
+
+Author  : Sander Nabuurs & Geerten Vuister
+
+E-mail  : s.nabuurs@cmbi.ru.nl or g.vuister@science.ru.nl
+
+Homepage and servers: http://nmr.cmbi.ru.nl/QUEEN
+
+
+When using QUEEN please cite:
+
+  Sander B. Nabuurs, Chris A.E.M. Spronk, Elmar Krieger, Hans Maassen,
+  Gert Vriend and Geerten W. Vuister (2003). Quantitative evaluation of
+  experimental NMR restraints. J. Am. Chem. Soc. 125 (39), 12026-12034.
+
+No warranty implied or expressed. All rights reserved.
+
+
+"""
+from cing.Libs.NTutils import * #@UnusedWildImport
+from cing.core.classes import Project
+from cing.core.parameters import directories
+from queen import nmvconf
+from queen.q_utils import nmv_checkpython
+import nmv
+import queen.pdb_file as pdb_file # watch out yasara has one too.
+import string,socket,shutil,copy,types,random
+
+cing.verbosity = cing.verbosityDebug
+
+eflag = nmv.cvar.eflag #@UndefinedVariable
+
+programName         = 'QUEEN'
+queenVersion        = 1.2
+
+__version__         = queenVersion # for pydoc
+__date__            = '9 April 2009'
+__copyright_years__ = '2004-' + __date__.split()[-1] # Never have to update this again...
+
+authorList          = [  ('Geerten W. Vuister',          'g.vuister@science.ru.nl'),
+                         ('Sander Nabuurs',              's.nabuurs@cmbi.ru.nl'),
+                      ]
+__author__          = '' # for pydoc
+for _a in authorList:
+    __author__ = __author__ + _a[0] + ' (' + _a[1] + ')    '
+
+__copyright__       = "Copyright (c) Protein Biophysics (IMM)/CMBI, Radboud University Nijmegen, The Netherlands"
+__credits__         = """More info at http://nmr.cmbi.ru.nl/QUEEN
+
+""" + __copyright__ # TODO: misusing credits for pydoc
+
+versionStr = "%s" % queenVersion
+
+header = """
+======================================================================================================
+| QUEEN: QUantitative Evaluation of Experimental Nmr restraints      Version %-10s   %-10s |
+|                                                                                                    |
+| %-98s |
+======================================================================================================
+""" % (versionStr, __copyright_years__, __copyright__)
+
+def initFromCING( queenProject, cingProject ):
+    """Initialize the QUEEN data structure from a CING project instance.
+       Export and check the restraints.
+       Generate the templates.
+    """
+    if not cingProject:
+        NTerror('initFromCING: Please supply a valid CING project argument.')
+        exit(1)
+    #end if
+
+    if not cingProject.contentIsRestored:
+        cingProject.restore()
+
+    nmvconf = queenProject.nmvconf #@UnusedVariable
+
+    # Create the queen directory structure
+    removedir( queenProject.projectpath )
+    queenProject.createproject()
+
+    # export restraints and WRITE DATASET DESCRIPTION FILE
+    setfile = nmv_adjust(queenProject.dataset, 'all')
+    fp = open(setfile,'w')
+    for drl in cingProject.distances:
+        tableName = nmv_adjust(queenProject.table,drl.name.replace(' ','_'))
+        drl.export2xplor( tableName )
+        restraints,doubles,selfrefs = rfile_check( tableName, type='DIST' )
+        print "- %5i valid restraints."%restraints
+        print "- %5i double restraints."%doubles
+        print "- %5i self referencing restraints."%selfrefs
+
+        # write entry in set file
+        fprintf( fp, "NAME = %s\nTYPE = %s\nFILE = %s\n//\n",
+                     "Distance restraints " + drl.name,
+                     "DIST",
+                     drl.name.replace(' ','_')
+               )
+    # end for
+    for drl in cingProject.dihedrals:
+        tableName = nmv_adjust(queenProject.table,drl.name.replace(' ','_'))
+        drl.export2xplor( tableName )
+        restraints,doubles,selfrefs = rfile_check( tableName, type='DIST' )
+        print "- %5i valid restraints."%restraints
+        print "- %5i double restraints."%doubles
+        print "- %5i self referencing restraints."%selfrefs
+
+        fprintf( fp, "NAME = %s\nTYPE = %s\nFILE = %s\n//\n",
+                     "Dihedral restraints " + drl.name,
+                     "DIHED",
+                     drl.name.replace(' ','_')
+               )
+    # end for
+    fp.close()
+    NTmessage('==> Dataset file: %s', setfile)
+
+    # Generate templates by writing pdbfile and calling qn_pdb2all
+    if not cingProject.molecule:
+        NTerror('initFromCING: no molecule defined, skipping template generation')
+        return
+    #end if
+    NTmessage('==> Generating templates ...')
+    pdbfile = os.path.join(queenProject.pdb, cingProject.molecule.name.replace(' ','_')+'.pdb')
+    #print '>', pdbfile
+    cingProject.molecule.toPDBfile( pdbfile, model=0 ) # save first model to pdbfile
+    qn_pdb2all( queenProject, pdbfile, xplorflag=0)
+#end def
+
+
 
 #  ======================================================================
 #    P R O G R E S S   I N D I C A T O R   C L A S S
@@ -32,11 +157,11 @@ class progress_indicator:
       numchars = int(self.lengthofbar*(float(numincrements)/self.totalincrements))
       # PROGRESS STRING
       progstr = ""
-      for i in range(numchars):
+      for _i in range(numchars):
         progstr += "="
       # EMPTY SPACE STRING
       numspaces = self.lengthofbar-numchars
-      for i in range(numspaces):
+      for _i in range(numspaces):
         progstr += " "
       # COMBINE STRING
       progstr = "[%s] (%i/%i)"%(progstr,numincrements,
@@ -168,7 +293,7 @@ def pdb_getdisulfides(pdbfile):
   # READ THE PDBFILE
   content = open(pdbfile,'r').readlines()
   # GO THROUGH THE CONTENT
-  found, no_models = 0,0
+#  found, no_models = 0,0
   list = []
   for line in content:
     sline = string.split(line)
@@ -240,7 +365,7 @@ def pdb_models(pdbfile):
   content = file.readlines()
   file.close()
   # GO THROUGH THE CONTENT
-  found, no_models = 0,0
+  found, no_models = 0,0 #@UnusedVariable
   for line in content:
     sline = string.split(line)
     if sline[0]=='MODEL':
@@ -334,7 +459,7 @@ def avg_list(list,sdflag=1):
 def avg_listsd(list):
   # IF WE HAVE MORE THAN ONE VALUE
   if len(list)>1:
-    sum,sumsq,sumsdsq=0.0,0.0,0.0
+    sum,sumsq,sumsdsq=0.0,0.0,0.0 #@UnusedVariable
     n = 0
     for element in list:
         sum = sum + element[0]
@@ -420,45 +545,6 @@ def coord_fluct(list):
   elif len(list)==1: return 0.0
   # IN CASE OF EMPTY LIST
   else: return 0.0
-
-#  ======================================================================
-#    D I C T I O N A R Y   F U N C T I O N   G R O U P
-#  ======================================================================
-
-# READ DICTIONARY
-# ===========================
-# READ A DICTIONARY FROM DISC
-def dct_read(filename):
-  try: dctfile = open(filename,"r")
-  except: error("Dictionary %s could not be read" % filename)
-  dct = {}
-  for line in dctfile.readlines():
-    line=string.strip(line)
-    # CHECK IF CURRENT LINE IS A COMMENT (STARTS WITH '#')
-    l=len(line);
-    if (l):
-      if (line[0]!='#'):
-        # IF LINE IS NOT A COMMENT:
-        #   CHECK IF DICTIONARY KEY AND ENTRY ARE REALLY PRESENT
-        i=string.find(line,"=")
-        if (i==-1):  error("No equals sign found in %s at %s" % (filename,line))
-        if (i==0):   error("No data found before equals sign in %s at %s" % (filename,line))
-        if (i==l-1): error("No data found behind equals sign in %s at %s" % (filename,line))
-        # ADD TO DICTIONARY
-        dct[string.strip(line[:i])] = string.strip(line[i+1:])
-  return(dct)
-
-# WRITE DICTIONARY
-# ==========================
-# WRITE A DICTIONARY TO DISC
-def dct_write(dct,filename):
-  try: dctfile = open(filename,"w")
-  except: error("Dictionary %s could not be written" % filename)
-  # PRINT ENTRIES
-  for key in dct.keys():
-    # PRINT KEY AND VALUE
-    dctfile.write("%s = %s\n" % (key,dct[key]))
-  dctfile.close()
 
 #  ======================================================================
 #    X P L O R   F U N C T I O N   G R O U P
@@ -924,51 +1010,6 @@ def xplor_hbuild(inpdb,outpdb,psf,
 #    Q U E E N   F U N C T I O N   G R O U P
 #  ======================================================================
 
-# CREATE PROJECT
-# ==============
-# CREATE QUEEN PROJECT DIRECTORY FROM QUEEN CONF FILE
-def qn_createproject(nmvconf,projectname=None,projectpath=None):
-  # CHECK IF PROJECTPATH EXISTS
-  #print '>',nmvconf
-  if not projectpath:
-    projectpath = nmvconf["Q_PROJECT"]
-  if os.path.exists(projectpath):
-    if not projectname:
-        qpath = projectpath
-    else:
-        qpath = os.path.join(projectpath,projectname)
-    #print '>',qpath
-
-    if os.path.exists(qpath):
-      error("Project already exists")
-    else:
-      print( "==> Creating QUEEN project directory tree at %s", qpath )
-      # CREATE THE PROJECT DIR
-      os.makedirs(qpath)
-      # CREATE THE NECESSARY SUBDIRS
-      for key in nmvconf.keys():
-        if key[:2]=='Q_' and key not in ['Q_PEP','Q_TOP','Q_PAR']:
-          subpath = os.path.dirname(nmvconf[key])
-          # TAKE ONLY THE RELATIVE PATHS
-          if len(subpath)>0 and subpath[0]!='/':
-            # BUILD THE FULL PATH
-            fullpath = os.path.join(qpath,subpath)
-            # CREATE THE SUBDIRS
-            try:
-              os.mkdir(fullpath)
-            except OSError:
-              # WE PROBABLY HAVE TO GO DEEPER THAN ONE DIR
-              if fullpath[0]=='/': basepath = '/'
-              else: basepath=''
-              fullpath = fullpath.split('/')
-              # CONSTRUCT THE FULL PATH ONE BY ONE
-              for element in fullpath:
-                basepath = os.path.join(basepath,element)
-                if not os.path.exists(basepath):
-                  os.mkdir(basepath)
-  else:
-    error("Project path does not exist")
-
 # READ SEQUENCE
 # =============
 # READ SEQUENCE FILE
@@ -1142,7 +1183,7 @@ def qn_seq2psf( queenProject, seqfile):
 
     top = os.path.join(nmvconf["Q_PATH"],nmvconf["Q_TOP"])
     pep = os.path.join(nmvconf["Q_PATH"],nmvconf["Q_PEP"])
-    par = os.path.join(nmvconf["Q_PATH"],nmvconf["Q_PAR"])
+    par = os.path.join(nmvconf["Q_PATH"],nmvconf["Q_PAR"]) #@UnusedVariable
     xpl = nmvconf["XPLOR"]
 
     patches = {}
@@ -1170,8 +1211,8 @@ def qn_psf2tem( queenProject, psffile ):
     #end if
 
     nmvconf     = queenProject.nmvconf
-    top = os.path.join(nmvconf["Q_PATH"],nmvconf["Q_TOP"])
-    pep = os.path.join(nmvconf["Q_PATH"],nmvconf["Q_PEP"])
+    top = os.path.join(nmvconf["Q_PATH"],nmvconf["Q_TOP"]) #@UnusedVariable
+    pep = os.path.join(nmvconf["Q_PATH"],nmvconf["Q_PEP"]) #@UnusedVariable
     par = os.path.join(nmvconf["Q_PATH"],nmvconf["Q_PAR"])
     xpl = nmvconf["XPLOR"]
 
@@ -1233,7 +1274,7 @@ def qn_test(nmvconf):
     # TEST WITH THE EXAMPLE
     print "  Temporarily switching Q_PROJECT to the example/ directory..."
     nmvconf["Q_PROJECT"]=nmvconf["Q_PATH"]
-    project,dataset = 'example','all'
+    project,dataset = 'example','all' #@UnusedVariable
     # SETUP QUEEN
     print "  Initializing QUEEN...",
     queen = qn_setup(nmvconf,project,0,1)
@@ -1272,7 +1313,7 @@ def qn_setup(nmvconf,project,myid=0,numproc=1):
   queen.numproc    = numproc
   queen.myid       = myid
   if numproc>1:
-    import pypar
+    import pypar #@UnusedImport @UnresolvedImport
   # RETURN QUEEN INSTANCE
   return queen
 
@@ -1399,14 +1440,14 @@ def qn_sortinffile(infile,outfile):
 # ===================
 # CHECK VALIDITY OF EXPERIMENTAL DATA
 def qn_checkdata(queen,xplr,dataset,iterate=0,errorfunc=error):
-  project = queen.project
+  project = queen.project #@UnusedVariable
   # READ DATA
   data = qn_readdata(queen,nmv_adjust(queen.dataset,dataset))
   # COMBINE ALL DATA, WE ALSO CHECK THE BACKGROUND INFORMATION!
   restraints = data["data"] + data["bckg"]
   # INITIALIZE QUEEN CLASS FOR FULL AND INITIAL UNCERTAINTY
   if not iterate:
-    unc = queen.uncertainty(xplr,restraints)
+    unc = queen.uncertainty(xplr,restraints) #@UnusedVariable
     if not queen.errorflag:
       print "Dataset '%s' runs through QUEEN without problems.\n"%dataset
     else:
@@ -1419,7 +1460,7 @@ your dataset.\n"""
     for r in restraints:
       testlist.append(r)
       print "Adding restraint:\n%s"%r.format()
-      score = queen.uncertainty(xplr,testlist)
+      score = queen.uncertainty(xplr,testlist) #@UnusedVariable
       if queen.errorflag:
         errorfunc("Restraint seems to be problematic. Please check.")
     if not queen.errorflag:
@@ -1435,10 +1476,10 @@ your dataset.\n"""
 # RESTRAINT FILES IN A PROVIDED DATASET
 def qn_setinformation(queen,xplr,dataset):
   print "Calculating set information content."
-  if queen.numproc > 1: import pypar
+  if queen.numproc > 1: import pypar #@UnresolvedImport
   # STARTING TIME
   starttime = time.time()
-  project = queen.project
+  project = queen.project #@UnusedVariable
   # READ DATAFILE
   datasets = qn_readdatafile(nmv_adjust(queen.dataset,dataset))
   # SET THE OUTPUT FILE
@@ -1577,7 +1618,7 @@ def qn_setinformation(queen,xplr,dataset):
 # THIS SCRIPT GENERATE A PLOT WHICH DISPLAYS THE DECREASE IN UNCERTAINTY
 # AS EXPERIMENTAL DATA IS ADDED TO THE SYSTEM.
 def qn_plotuncertainty(queen,xplr,dataset):
-  project = queen.project
+  project = queen.project #@UnusedVariable
   # READ DATAFILE
   datasets = qn_readdatafile(nmv_adjust(queen.dataset,dataset))
   # READ DATASETS
@@ -1604,7 +1645,7 @@ def qn_plotuncertainty(queen,xplr,dataset):
   for filedict in datasets:
     # GET THE RESTRAINTS
     restraintlist = data["sets"][filedict["FILE"]]
-    rtype = filedict["TYPE"]
+    rtype = filedict["TYPE"] #@UnusedVariable
     # CYCLE THE RESTRAINTS
     for i in range(len(restraintlist)):
       rlist = copy.copy(data['bckg'])
@@ -1624,7 +1665,7 @@ def qn_plotuncertainty(queen,xplr,dataset):
 # THIS SCRIPT GENERATES A DISTANCE MATRIX
 # REPRESENTING Hstructure|0
 def qn_hstructure0(queen,xplr):
-  project = queen.project
+  project = queen.project #@UnusedVariable
   # SET THE OUTPUT FILE
   mtxfile = os.path.join(queen.outputpath,'Hstructure0.mtx')
   # GET MATRIX
@@ -1675,7 +1716,7 @@ def qn_infuniperres(iunifile,restraintlist,pdbfile,pdbformat='xplor'):
 # OF THE DATASET
 def qn_infuni(queen,xplr,dataset):
   print "Calculating unique restraint information."
-  if queen.numproc > 1: import pypar
+  if queen.numproc > 1: import pypar #@UnresolvedImport
   # STARTING TIME
   starttime = time.time()
   # READ DATAFILE
@@ -1760,7 +1801,7 @@ def qn_infuni(queen,xplr,dataset):
 # INDIVIDUAL RESTRAINTS IN AN NMR DATASET
 def qn_infave(queen,xplr,dataset,convcutoff=0.01):
   print "Calculating average restraint information."
-  if queen.numproc > 1: import pypar
+  if queen.numproc > 1: import pypar #@UnresolvedImport
   # STARTING TIME
   starttime = time.time()
   # READ DATAFILE
@@ -1786,7 +1827,7 @@ def qn_infave(queen,xplr,dataset,convcutoff=0.01):
     con_dict[str(r)]=1
   # DETERMINE THE AVERAGE INFORMATION
   done,cycles,total,comparisons = 0,queen.numproc,0,0
-  ttotal = 0
+  ttotal = 0 #@UnusedVariable
   loglist = []
   # MAXIMUM NUMBER OF CYCLES
   cyclescutoff = 1000
@@ -1873,10 +1914,10 @@ def qn_infave(queen,xplr,dataset,convcutoff=0.01):
           # PLOT DICT
           plotdict[str(r)]=plotdict.get(str(r),[])+[cavg]
           # CALCULATE SOME PERCENTAGES FOR HUMAN EVALUATION....
-          if aavg[0]!=0.0: paavg = int((aavg[1]/aavg[0])*100)
-          else: paavg = 0.0
-          if cavg[0]!=0.0: pcavg = int((cavg[1]/cavg[0])*100)
-          else: pcavg = 0.0
+          if aavg[0]!=0.0: paavg = int((aavg[1]/aavg[0])*100) #@UnusedVariable
+          else: paavg = 0.0 #@UnusedVariable
+          if cavg[0]!=0.0: pcavg = int((cavg[1]/cavg[0])*100) #@UnusedVariable
+          else: pcavg = 0.0 #@UnusedVariable
           # IF A RESTRAINT CONVERGES
           if converged:
             # SET CONVERGENCE FLAG
@@ -1956,7 +1997,7 @@ def qn_infave(queen,xplr,dataset,convcutoff=0.01):
 # POSSIBLY LESS ACCURATE...) WAY
 def qn_infave_fast(queen,xplr,dataset,ncycles=25):
   print "Calculating average restraint information."
-  if queen.numproc > 1: import pypar
+  if queen.numproc > 1: import pypar #@UnresolvedImport
   # STARTING TIME
   starttime = time.time()
   # READ DATAFILE
@@ -1981,10 +2022,10 @@ def qn_infave_fast(queen,xplr,dataset,ncycles=25):
   for r in data["bckg"]:
     con_dict[str(r)]=1
   # DETERMINE THE AVERAGE INFORMATION
-  done,cycles,total,comparisons = 0,0,0,0
+  done,cycles,total,comparisons = 0,0,0,0 #@UnusedVariable
   loglist = []
   # PLOTDICT
-  plotdict = {}
+  plotdict = {} #@UnusedVariable
   while cycles < ncycles:
     if queen.myid==0:
       print "Starting cycles: %i to %i of %i"%(cycles+1,cycles+queen.numproc,ncycles)
@@ -2039,7 +2080,7 @@ def qn_infave_fast(queen,xplr,dataset,ncycles=25):
         for r in rlist:
           # CALC GENERAL AVERAGES
           ravg = avg_list(inf_dict[str(r)])
-          aavg = avg_list(avg_dict[str(r)])
+          aavg = avg_list(avg_dict[str(r)]) #@UnusedVariable
           # GET THE OLDPOSITION
           oldpos = restraintlist.index(r)
           # ADD TO THE LOGFILE LIST
@@ -2181,7 +2222,7 @@ def qn_sorttbl(queen,xplr,dataset):
   outputtbl = os.path.join(queen.outputpath,'Iave_%s.tbl'%dataset)
   print "Output can be found in:\n%s"%outputtbl
   avg_r = restraint_file(outputtbl,'w')
-  udict,adict,cdict={},{},{}
+  udict,adict,cdict={},{},{} #@UnusedVariable
   sumdict = {}
   # READ AND CLEAN FILES
   comments = ['#','@','&']
@@ -2244,7 +2285,7 @@ def qn_sorttbl(queen,xplr,dataset):
 # =========================
 # SORT DATASET SUCH THAT THE MOST INFORMATIVE RESTRAINTS COME FIRST
 def qn_infsort(queen,xplr,dataset):
-  if queen.numproc > 1: import pypar
+  if queen.numproc > 1: import pypar #@UnresolvedImport
   if queen.myid==0:
     print "Calculating information sorted dataset"
   # READ DATAFILE
@@ -2403,7 +2444,7 @@ def qn_nrdataset(queen,xplr,dataset):
     unc_bg = unc_re
   # WRITE THE NON-REDUNDANT RESTRAINT FILES
   endtime = time.time()
-  hours,minutes,seconds = log_passedtime(starttime,endtime)
+  hours,minutes,seconds = log_passedtime(starttime,endtime) #@UnusedVariable
   for key in rdict.keys():
     for r in rdict[key]:
       outputtbl = os.path.join(queen.outputpath,'nr_%s.tbl'%(memdict[str(r)]))
@@ -2432,14 +2473,6 @@ def qn_nrdataset(queen,xplr,dataset):
 def nmv_adjust(nmvconfkey,value):
   return string.replace(nmvconfkey,'????',value)
 
-# CHECK PYTHON VERSION
-# ====================
-# CHECK PYTHON VERSION
-def nmv_checkpython():
-  version = float(sys.version[0])
-  if version < 2.0:
-    error('Python version 2.0 or higher required')
-  return float(sys.version.split()[0][:3])
 #  ======================================================================
 #    N M R   F U N C T I O N   G R O U P
 #  ======================================================================
@@ -2743,7 +2776,7 @@ def r_adjust(restraintlist,pdb,averaging='SUM',precision=None):
   adjusted = []
   # CYCLE THE RESTRAINTS
   for r in restraintlist:
-    orig = r.upperb
+    orig = r.upperb #@UnusedVariable
     coordlist = []
     # CYCLE THE TWO PARTNERS IN THE RESTRAINT
     for i in range(2):
@@ -3357,7 +3390,7 @@ class xplor_script:
     self.errorfunc=errorfunc
     self.logfiles = logfiles
     self.clear()
-
+    NTdebug("Writting to scriptpath: %s\n and log path %s" % (self.scriptpath, self.logpath))
   # RAISE AN ERROR
   # ==============
   # CALLS THE ERRORFUNCTION PROVIDED BY THE USER WITH THE GIVEN STRING
@@ -3382,44 +3415,45 @@ class xplor_script:
   # SUBMIT SCRIPT
   # =============
   def submit(self):
-    if (not self.error):
+      if self.error:
+        NTerror("Found error when starting xplor submit")
+        return
       # CLOSE THE SCRIPT
       self.write("stop")
       self.script.close()
-      # RUN XPLOR WITH THE SCRIPT
-#      log = os.popen("%s < %s"%(self.xplor,self.scriptpath))
+      NTdebug("RUN XPLOR WITH THE SCRIPT")
+    #      log = os.popen("%s < %s"%(self.xplor,self.scriptpath))
+      # TODO: rewrite so that it always writes to disk.
       cmd = "%s < %s"%(self.xplor,self.scriptpath)
       log = Popen(cmd, shell=True, stdout=PIPE).stdout
 
-      # CHECK FOR ERRORS
+      NTdebug("CHECK FOR ERRORS in %s" % self.logpath)
       xplorlog = log.read()
-      skiperrors = string.count(xplorlog,"POWELL-ERR")
-      errors = string.count(xplorlog,"ERR")
-      warnings = string.count(xplorlog,"WRN")
-      # TAKE CARE OF ERRORS
-      if errors-skiperrors:
-        file = open(self.logpath,'w')
-        file.write(xplorlog)
-        self.raiseerror("%s generated %i errors.\nLogfile: %s"%(self.progstr,errors-skiperrors,self.logpath))
-      # TAKE CARE OF WARNINGS
-      if warnings:
-        file = open(self.logpath,'w')
-        file.write(xplorlog)
-        print "%s generated %i warnings. Please investigate!\nLogfile: %s"%(self.progstr,warnings,self.logpath)
       exitstatus = log.close()
+      writeTextToFile(self.logpath, xplorlog)
+
+      skiperrors = string.count(xplorlog,"POWELL-ERR")
+      resultList = []
+      if not grep(self.logpath, "ERR", resultList = resultList):
+          NTerror("Found errors in xplor log.")
+      errors = len(resultList)
+#      errors = string.count(xplorlog,"ERR") #@UnusedVariable
+      warnings = string.count(xplorlog,"WRN")
+      NTdebug("TAKE CARE OF ERRORS")
+      if errors-skiperrors:
+          NTerror("Found errors in XPLOR log: %s" % resultList)
+          self.raiseerror("%s generated %i errors.\nLogfile: %s"%(self.progstr,errors-skiperrors,self.logpath))
+          return
+      NTdebug("TAKE CARE OF WARNINGS")
+      if warnings:
+        print "%s generated %i warnings. Please investigate!\nLogfile: %s"%(self.progstr,warnings,self.logpath)
       if (exitstatus): self.raiseerror("XPLOR returned error %d"%exitstatus)
       if self.logfiles=='delete':
         os.remove(self.scriptpath)
       elif self.logfiles=='keep':
         print "%s executed without serious problems."%self.progstr
-        print "Log can be found in: %s"%self.logpath
-        print "Script can be found in: %s"%self.scriptpath
-        file = open(self.logpath,'w')
-        file.write(xplorlog)
-      elif self.logfiles=='silent':
-        file = open(self.logpath,'w')
-        file.write(xplorlog)
-    return
+      NTdebug("Done in submit")
+      return
 
 #  ======================================================================
 #    N M R _ R E S T R A I N T   C L A S S
@@ -4069,10 +4103,10 @@ class queenbase:
   """
   def __init__(self, nmvconf, project, path=None, numproc=1, myid=0 ):
 
-    if not path:
-        self.path        = nmvconf["Q_PROJECT"]
-    else:
-        self.path        = path
+#    if not path:
+#        self.path        = nmvconf["Q_PROJECT"]
+#    else:
+    self.path        = path
     #end if
     self.project         = project
     self.nmvconf         = nmvconf
@@ -4151,22 +4185,23 @@ class queenbase:
     os.remove(self.dmtx)
 
   def calcmtx(self,xplr,restraints,averaging='sum'):
+    NTdebug("Now in calcmtx using xplr")
     self.dmtx = os.path.join(self.logpath,'d_%i.mtx'%os.getpid())
-    # INITIALIZE XPLOR
+    NTdebug("INITIALIZE XPLOR")
     xplrs = xplor_script(xplr.path,self.logpath)
-    # BUILD SCRIPT
+    NTdebug("BUILD SCRIPT")
     xplrs.write("structure\n @%s\nend"%xplr.psf)
     xplrs.write("evaluate ($par_nonbonded=PROLSQ)")
     xplrs.write("parameter\n @%s\nend"%xplr.parameter)
     # ECHO CAN BE HANDY FOR DEBUGGING, BUT LET'S
     # LEAVE IT OFF FOR NOW
     xplrs.write("set echo on message on end")
-    # FORMAT THE RESTRAINT FILE
+    NTdebug("FORMAT THE RESTRAINT FILE")
     if type(restraints)==types.DictType:
       xplrs.write(xplor_formatdict(restraints,averaging))
     elif type(restraints)==types.ListType:
       xplrs.write(xplor_formatlist(restraints,averaging))
-    # READ TEMPLATE FOR PSEUDOATOM CORRECTIONS
+    NTdebug("READ TEMPLATE FOR PSEUDOATOM CORRECTIONS")
     xplrs.write("coord disp=refe @%s"%xplr.template)
     # SET FLAGE
     xplrs.write("flags")
@@ -4178,24 +4213,26 @@ class queenbase:
     xplrs.write("  shortest-path-algorithm=auto")
     xplrs.write("  writebounds=%s"%self.dmtx)
     xplrs.write("end")
+    NTdebug("Submitting xplor script")
     xplrs.submit()
 
   def calcunc(self):
-    # READ MATRIX USING NMV MODULE
+    NTdebug("READ MATRIX USING NMV MODULE")
     nmv.xplor_read(self.dmtx)
-    # CALCULATE UNCERTAINTY USING NMV MODULE
+    NTdebug("CALCULATE UNCERTAINTY USING NMV MODULE")
     unc = nmv.total_uncertainty()
-    self.errorflag = nmv.cvar.eflag
+    self.errorflag = eflag
+    NTdebug("Returning unc")
     return unc
 
   def uncertainty(self,xplr,restraints):
-    # CALCULATE MATRIX
+    NTdebug("CALCULATE MATRIX")
     self.calcmtx(xplr,restraints)
-    # CALCULATE UNCERTAINTY
+    NTdebug("CALCULATE UNCERTAINTY")
     unc = self.calcunc()
-    # CLEAR MEMORY
+    NTdebug("CLEAR MEMORY")
     self.clear()
-    # RETURN UNCERTAINTY
+    NTdebug("RETURN UNCERTAINTY")
     return unc
 
   def rmsde(self,xplr,restraints):
@@ -4203,7 +4240,7 @@ class queenbase:
     self.calcmtx(xplr,restraints)
     # CALCULATE UNCERTAINTY
     nmv.xplor_read(self.dmtx)
-    unc = nmv.total_rmsde()
+    unc = nmv.total_rmsde() #@UndefinedVariable
     # CLEAR MEMORY
     self.clear()
     # RETURN UNCERTAINTY
@@ -4217,7 +4254,7 @@ class queenbase:
     unc = []
     for atomnumber in atomnumbers:
       unc.append(nmv.atom_uncertainty(atomnumber-1))
-    self.errorflag = nmv.cvar.eflag
+    self.errorflag = eflag
     # CLEAR MEMORY
     self.clear()
     # RETURN UNCERTAINTY
@@ -4231,6 +4268,88 @@ class queenbase:
     # CLEAR MEMORY
     self.clear()
   #end def
+#end class
+
+class CingBasedQueen( queenbase ):
+    """Class to initialize the QUEEN data structure from a CING project instance.
+       Method to export and check the restraints and generate the templates.
+    """
+
+    def __init__(self, nmvconf, cingProjectName, numproc, myid ):
+
+        cingProject = Project.open( cingProjectName, status='old', restore=False)
+        if cingProject == None:
+            NTerror('CingBasedQueen: Opening project "%s"\n', cingProjectName )
+            exit(1)
+        #end if
+
+        self.cingProject = cingProject
+
+        # patch the nmrconf file to point to CING project
+        nmvconf["Q_PROJECT"] = os.path.abspath(cingProject.path())
+
+        # patch the project to point to cingProject/Queen directory
+        queenbase.__init__( self, nmvconf, project = directories.queen, numproc=numproc, myid=myid)
+    #end def
+
+    def exportFromCING(self):
+        """Export and check the restraints.
+           Generate the templates.
+        """
+        if not self.cingProject:
+            NTerror('CingBasedQueen.exportFromCING: Please supply a valid CING project argument.')
+            exit(1)
+        #end if
+
+        if not self.cingProject.contentIsRestored:
+            self.cingProject.restore()
+
+        # export restraints and WRITE DATASET DESCRIPTION FILE
+        setfile = nmv_adjust(self.dataset, 'all')
+        fp = open(setfile,'w')
+        for drl in self.cingProject.distances:
+            tableName = nmv_adjust(self.table,drl.name.replace(' ','_'))
+            drl.export2xplor( tableName )
+            restraints,doubles,selfrefs = rfile_check( tableName, type='DIST' )
+            print "- %5i valid restraints."%restraints
+            print "- %5i double restraints."%doubles
+            print "- %5i self referencing restraints."%selfrefs
+
+            # write entry in set file
+            fprintf( fp, "NAME = %s\nTYPE = %s\nFILE = %s\n//\n",
+                         "Distance restraints " + drl.name,
+                         "DIST",
+                         drl.name.replace(' ','_')
+                   )
+        # end for
+        for drl in self.cingProject.dihedrals:
+            tableName = nmv_adjust(self.table,drl.name.replace(' ','_'))
+            drl.export2xplor( tableName )
+            restraints,doubles,selfrefs = rfile_check( tableName, type='DIST' )
+            print "- %5i valid restraints."%restraints
+            print "- %5i double restraints."%doubles
+            print "- %5i self referencing restraints."%selfrefs
+
+            fprintf( fp, "NAME = %s\nTYPE = %s\nFILE = %s\n//\n",
+                         "Dihedral restraints " + drl.name,
+                         "DIHED",
+                         drl.name.replace(' ','_')
+                   )
+        # end for
+        fp.close()
+        NTmessage('==> Dataset file: %s', setfile)
+
+        # Generate templates by writing pdbfile and calling qn_pdb2all
+        if not self.cingProject.molecule:
+            NTerror('CingBasedQueen.exportFromCING: no molecule defined, skipping template generation')
+            return
+        #end if
+        NTmessage('==> Generating templates ...')
+        pdbfile = os.path.join(self.pdb, self.cingProject.molecule.name.replace(' ','_')+'.pdb')
+        #print '>', pdbfile
+        self.cingProject.molecule.toPDB( pdbfile, model=0 ) # save first model to pdbfile
+        qn_pdb2all( self, pdbfile, xplorflag=0)
+    #end def
 #end class
 
 
@@ -4249,3 +4368,274 @@ class ExampleQueen( queenbase ):
     #end def
 #end class
 
+
+
+if __name__ == '__main__':
+
+    # CHECK PYTHON VERSION
+    version = nmv_checkpython()
+
+    # OPTION PARSER
+    usage = "usage: %prog [options]"
+    parser = optparse.OptionParser(usage=usage,version=versionStr)
+
+    parser.add_option("--project", dest="projectName", default=None,
+                       help="name of the project (required, except in case of --example, --test, --pydoc)",
+                       metavar="PROJECTNAME"
+                     )
+    parser.add_option("--cing",action="store_true",dest='cing', default=False,
+                      help="defines PROJECTNAME to be a CING project")
+
+    parser.add_option("--init",action="store_true",dest='init', default=None,
+                      help="initialize QUEEN project PROJECTNAME")
+
+    parser.add_option("--initCing",action="store_true",dest='initCing', default=False,
+                      help="initialize from CING project PROJECTNAME (equivalent to --cing --init)")
+
+    parser.add_option("--overwrite",action="store_true",dest='overwrite', default=False,
+                      help="flag to overwrite existing project directory")
+
+    parser.add_option("--pdb2seq",dest="pdb2seq",default=None,
+                      help="generate sequence file from PDBFILE",
+                      metavar="PDBFILE"
+                     )
+    parser.add_option("--seq2psf",dest="seq2psf",default=None,
+                      help="generate psf file from SEQUENCEFILE",
+                      metavar="SEQUENCEFILE"
+                     )
+    parser.add_option("--psf2tem",dest="psf2tem",default=None,
+                      help="generate template file from PSFFILE",
+                      metavar="PSFFILE"
+                     )
+    parser.add_option("--pdb2all",dest="pdb2all",default=None,
+                      help="generate sequence, psf and template from PDBFILE",
+                      metavar="PDBFILE"
+                     )
+    parser.add_option("--xplor",action="store_true",dest="xplor",
+                      default=0,help="xplor PDBFILE flag")
+
+
+    parser.add_option("--dataset",dest='dataset', default=None,
+                      help="defines dataset (required for subsequent options)",
+                      metavar="DATASET"
+                     )
+
+    parser.add_option("--check",action="store_true",dest='check',
+                      help="check validity of DATASET")
+    parser.add_option("--icheck",action="store_true",dest='icheck',
+                      help="iteratively check validity of DATASET")
+    parser.add_option("--Iset",action="store_true",dest="iset",
+                      help="calculate DATASET information")
+    parser.add_option("--Iuni",action="store_true",dest="iuni",
+                      help="calculate DATASET unique information")
+    parser.add_option("--Iave",action="store_true",dest="iave",
+                      help="calculate DATASET average information")
+    parser.add_option("--Iavef",action="store_true",dest="iavef",
+                      help="calculate DATASET average restraint information\
+                      (faster, but less accurate algorithm)")
+    parser.add_option("--Isort",action="store_true",dest="sort",
+                      help="sort DATASET by information")
+    parser.add_option("--plot",action="store_true",dest="plot",
+                      help="plot DATASET Iave versus Iuni")
+    parser.add_option("--mpi",action="store_true",dest="mpi",
+                      default=0,help="mpi flag")
+
+
+    parser.add_option("--example",action="store_true",dest='example', default=False,
+                      help="use example QUEEN project")
+    parser.add_option("--test",action="store_true",dest='test', default=False,
+                      help="test QUEEN installation")
+    parser.add_option("--pydoc",
+                        action="store_true",
+                        dest="pydoc",
+                        help="start pydoc server and browse documentation"
+                      )
+    (options,args) = parser.parse_args()
+
+    #------------------------------------------------------------------------------
+    # MPI and other stuff
+    #------------------------------------------------------------------------------
+    # CHECK IF WE NEED TO IMPORT PYPAR
+    if options.mpi:
+        import pypar #@UnresolvedImport
+        numproc = pypar.size()
+        myid = pypar.rank()
+        sys.stdout.flush()
+    else:
+        numproc,myid = 1,0
+
+    # PRINT WARNING FOR Iave CALCULATIONS not done on cluster
+    if (options.iave or options.iavef) and numproc == 1:
+        print "WARNING: You are running an Iave calculation on 1 processor."
+        print "         This can be very time consuming, we suggest to run"
+        print "         these calculations on a (Linux) cluster or multi-processor CPU.\n"
+    #end if
+
+    # SHOW TEXT HEADER
+    if myid==0: print header
+
+
+    #------------------------------------------------------------------------------
+    # testing installation
+    #------------------------------------------------------------------------------
+    if options.test:
+        qn_test(nmvconf)
+        sys.exit(0)
+    #end if
+
+    #------------------------------------------------------------------------------
+    # pydoc documentation
+    #------------------------------------------------------------------------------
+    if options.pydoc:
+        import webbrowser
+        print '==> Serving documentation at http://localhost:9998'
+        print '    Type <control-c> to quit'
+        webbrowser.open('http://localhost:9998/queen.html')
+        pydoc.serve(port=9998)
+        sys.exit(0)
+    #end if
+
+
+    #------------------------------------------------------------------------------
+    # Initialize queenbase instances and optionally use the CING API
+    #------------------------------------------------------------------------------
+
+    # Check if we need CING IMPORTS and patch the nmvconf file
+    cingProject = None
+    queen = None
+
+    if options.cing or options.initCing:
+        # check the projectName
+        if not options.projectName:
+            error("Please supply the --project argument; type queen --help for more help")
+            exit(1)
+        #end if
+#        try:
+#            from cing import *
+#            from cing.core.parameters import directories
+#            from cing.Libs.NTutils import removedir
+#            from initFromCING import initFromCING
+#        except ImportError:
+#            error("You do not seem to have the CING API installed")
+#            exit(1)
+#
+#        cingProject = Project.open( options.projectName, status='old', restore=False)
+#        if cingProject == None:
+#            NTerror('initFromCING: Opening project "%s"\n', options.projectName )
+#            exit(1)
+#        #end if
+#
+#        # patch the nmrconf file to point to CING project and CING source code
+#        nmvconf["Q_PROJECT"] = os.path.abspath(cingProject.path())
+#
+#        # patch the project to point to cingProject/Queen directory
+#        queen = qn_setup(nmvconf, directories.queen, myid, numproc)
+        xplr  = qn_setupxplor(nmvconf,directories.queen)
+        queen = CingBasedQueen( nmvconf, options.projectName, numproc=numproc, myid=myid )
+        print '==> Data in CING project directory %s' % (queen.projectpath)
+    # default
+    else:
+        # check the projectName
+        if not options.projectName:
+            error("Please supply the --project argument; type queen --help for more help")
+            exit(1)
+        #end if
+#        NTwarning("JFD assumes nmrconf = nmvconf")
+        nmrconf = nmvconf
+        queen = qn_setup(nmrconf, options.projectName, myid, numproc)
+        xplr  = qn_setupxplor(nmvconf,options.projectName)
+        print '==> Data in QUEEN project directory %s' % (queen.projectpath)
+    #end if
+
+    if numproc==1:
+        print "==> Starting QUEEN ..."
+    else:
+        print "==> Starting QUEEN on processor %i of %i ..." %(myid+1,numproc)
+
+
+    #------------------------------------------------------------------------------
+    # Inits (< version 1.1 in generate.py)
+    #------------------------------------------------------------------------------
+
+    # create regular QUEEN project
+    if options.init and not options.cing:
+        queen.createproject(options.overwrite)
+        exit(0)
+    #end if
+
+    # create QUEEN project using CING data structures
+    if options.initCing or (options.init and options.cing):
+        queen.createproject(options.overwrite)
+        queen.exportFromCING()
+        #initFromCING( queen, cingProject)
+        exit(0)
+    #end if
+
+    #------------------------------------------------------------------------------
+    # Generation of template files (< version 1.1 in generate.py)
+    #------------------------------------------------------------------------------
+    # GV wonders why not passing the xplor option directly?
+    if options.xplor: xplorflag = 1
+    else: xplorflag = 0
+
+    if options.pdb2seq:
+        qn_pdb2seq(options.pdb2seq, queen.seqfile, xplorflag)
+        exit(0)
+    #end if
+    if options.seq2psf:
+        qn_seq2psf( queen, options.seq2psf )
+        exit(0)
+    #end if
+    if options.psf2tem:
+        qn_psf2tem( queen, options.psf2tem )
+        exit(0)
+    #end if
+    if options.pdb2all:
+        qn_pdb2all( queen, options.pdb2all, xplorflag )
+        exit(0)
+    #end if
+
+    #------------------------------------------------------------------------------
+    # Dataset actions
+    #------------------------------------------------------------------------------
+
+    # check of dataset option
+    if not options.dataset:
+        error("Please supply the --dataset argument; type queen --help for more help")
+        exit(1)
+    else:
+        dataset = options.dataset
+    #end if
+
+
+    # TAKE THE SELECTED OPTION
+    if options.check:
+      # CHECK VALIDITY OF DATASET
+      qn_checkdata(queen,xplr,dataset)
+    if options.icheck:
+      # ITERATIVELY CHECK VALIDITY OF RESTRAINTS
+      qn_checkdata(queen,xplr,dataset,iterate=1)
+    if options.iset:
+      # CALCULATE SET INFORMATION
+      qn_setinformation(queen,xplr,dataset)
+    elif options.iuni:
+      # CALCULATE Iuni
+      qn_infuni(queen,xplr,dataset)
+    elif options.iave:
+      # CALCULATE Iave
+      convcutoff = float(nmvconf["IAVE_CUTOFF"])
+      qn_infave(queen,xplr,dataset,convcutoff=convcutoff)
+    elif options.iavef:
+      # CALCULATE Iavef
+      ncycles = int(nmvconf["IAVEF_NCYCLES"])
+      qn_infave_fast(queen,xplr,dataset,ncycles=ncycles)
+    elif options.sort:
+      # SORT RESTRAINTS WITH MOST INFORMATIVE FIRST
+      qn_infsort(queen,xplr,dataset)
+    elif options.plot:
+      # PLOT Iave VS Iuni
+      qn_avevsuni(queen,xplr,dataset)
+      # WRITE SORTED RESTRAINTTABLE
+      qn_sorttbl(queen,xplr,dataset)
+    #end if
+#end main

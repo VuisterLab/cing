@@ -1,16 +1,6 @@
 #!/usr/bin/env python
-#@PydevCodeAnalysisIgnore
-
-# ADD QUEEN SOURCE TO SYSTEM PATH
-import sys,os
-
-sys.path += [os.path.join(sys.path[0],'src/py'),
-             os.path.join(sys.path[0],'src/c'),
-             os.path.join(sys.path[0],'src/3rd-party')]
-
-# DO IMPORTS
-import optparse
-from qn import *
+from cing.Libs.NTutils import * #@UnusedWildImport
+from queen.main import * #@UnusedWildImport
 
 # THE TEXT HEADER
 def txt_header():
@@ -28,9 +18,6 @@ def txt_header():
 
 # CHECK PYTHON VERSION
 version = nmv_checkpython()
-
-# READ THE QUEEN CONFIGURATION FILE
-nmvconf = dct_read(os.path.join(sys.path[0],'queen.conf'))
 
 # OPTION PARSER
 usage = "usage: %prog [option] restraintfile"
@@ -60,7 +47,7 @@ if options.dihedral: type="DIHE"
 else: type="DIST"
 # GROUP RESTRAINTS
 if options.group:
-  if type!="DIST": error("Only distance restraints can be grouped")
+  if type!="DIST": NTerror("Only distance restraints can be grouped")
   else:
     groupout = rfile_group(args[0])
     filelist = groupout[0]
@@ -88,8 +75,8 @@ if options.visualize:
   # CHECK FOR YASARA
   if os.path.exists(nmvconf["YASARA"]):
     # CHECK IF A PDB FILE IS PROVIDED
-    if not options.pdbfile: error("Please provide a PDB file (-p PDBFILE option)")
+    if not options.pdbfile: NTerror("Please provide a PDB file (-p PDBFILE option)")
     tbl = args[0]
     rfile_visualize(tbl,options.pdbfile,nmvconf["YASARA"],options.number)
   else:
-    error("YASARA not found! Adjust YASARA path in queen.conf")
+    NTerror("YASARA not found! Adjust YASARA path in queen.conf")

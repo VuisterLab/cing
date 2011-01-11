@@ -104,6 +104,7 @@ else
 
 # Use -u to ensure messaging streams for stdout/stderr don't mingle (too much).
 alias cing%(equals)s'python -u $CINGROOT/python/cing/main.py'
+alias queen%(equals)s'python -u $CINGROOT/python/queen/main.py'
 alias cyana2cing%(equals)s'python -u $CINGROOT/python/cyana2cing/cyana2cing.py'
 alias refine%(equals)s'python -u $CINGROOT/python/Refine/refine.py'
 alias cython%(equals)s'$CYTHON/bin/cython'
