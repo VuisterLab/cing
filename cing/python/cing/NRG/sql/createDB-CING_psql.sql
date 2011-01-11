@@ -211,7 +211,7 @@ CREATE TABLE casdcing.cingresidue
 --   queen
     queen_information      FLOAT DEFAULT NULL,
     queen_uncertainty1     FLOAT DEFAULT NULL,
-    queen_uncertainty2     FLOAT DEFAULT NULL,
+    queen_uncertainty2     FLOAT DEFAULT NULL, -- column 39
 
 --   cing
     rog                            INT DEFAULT NULL,
