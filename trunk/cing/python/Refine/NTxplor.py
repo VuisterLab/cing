@@ -455,9 +455,9 @@ evaluate ( $rms.noe = $result )
 # ACCEPTANCE CRITERIA POSSIBLE. THIS IS A WORKAROUND
 # XPLOR CANNOT DO IT DIRECTLY
             for noe in self.noeRestraints:
-                maxlength = 20 - len('viol.noe.')
-                if len(noe.name) > maxlength:
-                    NTerror("NOE list name is over 11 chars and xplor wouldn't be able to handle it: [%s]" % noe.name)
+#                maxlength = 20 - len('viol.noe.')
+                if len(noe.name) > MAX_SIZE_XPLOR_RESTRAINT_LIST_NAME:
+                    NTerror("NOE list name is over %s chars and xplor wouldn't be able to handle it: [%s]" % (MAX_SIZE_XPLOR_RESTRAINT_LIST_NAME, noe.name))
                     return False
                 noe.setdefault( 'averaging', 'sum' )
                 noe.setdefault( 'scale',      50 )
@@ -486,9 +486,9 @@ evaluate ( $viol.noe.total = $violations + $viol.noe.total )
 """
 # DO ALL THE CDIH CLASSES SEPARATELY:
         for dihed in self.dihedralRestraints:
-            maxlength = 20 - len('viol.cdih.')
-            if len(dihed.name) > maxlength:
-                NTerror("Dihedral angle list name is over 10 chars and xplor wouldn't be able to handle it: [%s]" % dihed.name)
+#            maxlength = 20 - len('viol.cdih.')
+            if len(dihed.name) > MAX_SIZE_XPLOR_RESTRAINT_LIST_NAME:
+                NTerror("Dihedral angle list name is over %s chars and xplor wouldn't be able to handle it: [%s]" % (MAX_SIZE_XPLOR_RESTRAINT_LIST_NAME, dihed.name))
                 return False
             code = code + """
 restraints dihedral reset

@@ -1163,6 +1163,15 @@ class ProjectList(NTlist):
         return l
     #end def
 
+    def getNextValidName(self, prefix = 'projectList_'):
+        i = 1
+        while i < 1000:
+            posName = prefix + '%03d' % i
+            if not posName in self.names():
+                return posName
+            i += 1
+        NTerror("Failed to return ProjectList.getNextValidName")
+
     def delete(self, name):
         """
         Delete listitem name from the project

@@ -99,12 +99,15 @@ ANY_ENTITY_LEVEL = 'ANY_ENTITY'
 
 DR_LEVEL       = 'DistanceRestraint'
 DRL_LEVEL      = 'DistanceRestraintList'
+DRL_STR      = 'DRL'
 HBR_LEVEL = 'HBondRestraint' # Alternative for hydrogen bond restraints where in CCPN another name is used.
 HBRL_LEVEL = 'HBondRestraintList'
 AC_LEVEL = 'DihedralRestraint'
 ACL_LEVEL = 'DihedralRestraintList'
+ACL_STR      = 'ACL'
 RDC_LEVEL = 'RDCRestraint'
 RDCL_LEVEL = 'RDCRestraintList'
+RDCL_STR      = 'RDCL'
 COPLANAR_LEVEL = 'Coplanar'
 COPLANARL_LEVEL = 'CoplanarList'
 DIHEDRAL_BY_PROJECT_LEVEL = 'DihedralByProject'
@@ -249,5 +252,8 @@ QshiftMaxValue = 0.05
 QshiftReverseColorScheme = False
 
 DS_STORE_STR = ".DS_Store" # A mac OSX file that should be ignored by CING.
+
+MAX_SIZE_XPLOR_RESTRAINT_LIST_NAME = 10
+#maxlength = 20 - len('viol.noe.')
 
 VAL_SETS_CFG_DEFAULT_FILENAME = 'valSets.cfg'

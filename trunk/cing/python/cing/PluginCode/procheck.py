@@ -113,6 +113,10 @@ ramachandran
   generous:   %(generous)4.1f%%
   disallowed: %(disallowed)4.1f%%"""
                        )
+        self.core      = None
+        self.allowed   = None
+        self.generous  = None
+        self.disallowed= None
 
         self._parseText()
     #end def
@@ -127,6 +131,8 @@ ramachandran
                 break
             #end if
         #end for
+        if self.core == None or self.allowed == None or self.generous == None or self.disallowed == None:
+            NTerror("IN ProcheckSummaryResult Failed to parse Text as expected for self.text:\n%s" % self.text)
     #end def
 #end class
 
@@ -505,6 +511,7 @@ B   7 U   999.900 999.900 999.900 999.900 999.900 999.900   0.000   1.932 999.90
         Return True on error.
 
         """
+#        NTdebug("Starting pc parseResult")
         modelCount = self.molecule.modelCount
 #        NTdebug("==> Parsing procheck results")
 
