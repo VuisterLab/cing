@@ -126,10 +126,14 @@ def doStoreCING2db( entry_code, archive_id, project = None):
         if result.rowcount > 1:
             NTerror("Removed more than the expected ONE entry; this could be serious.")
             return True
-    else:
-        NTdebug("No original entry present yet.")
+#    else:
+#        NTdebug("No original entry present yet.")
 
     ranges = getDeepByKeysOrAttributes(molecule,RANGES_STR)
+    p_rmsd_backbone = getDeepByKeysOrAttributes(molecule, RMSD_STR, BACKBONE_AVERAGE_STR)
+    p_rmsd_sidechain = getDeepByKeysOrAttributes(molecule, RMSD_STR, HEAVY_ATOM_AVERAGE_STR)
+    p_cv_backbone = getDeepByKeysOrAttributes(molecule, CV_BACKBONE_STR)
+    p_cv_sidechain = getDeepByKeysOrAttributes(molecule, CV_SIDECHAIN_STR)
 
     chainList = molecule.allChains()
     is_multimeric = len(chainList) > 1
@@ -210,6 +214,12 @@ def doStoreCING2db( entry_code, archive_id, project = None):
         is_multimeric=is_multimeric,
         chothia_class=chothia_class,
         ranges=ranges,
+#        omega_dev_av_all = p_omega_dev_av_all,
+        cv_backbone      = p_cv_backbone     ,
+        cv_sidechain     = p_cv_sidechain    ,
+        rmsd_backbone    = p_rmsd_backbone   ,
+        rmsd_sidechain   = p_rmsd_sidechain  ,
+
         res_count=molecule.residueCount,
         model_count=molecule.modelCount,
         distance_count=p_distance_count,
@@ -413,6 +423,8 @@ def doStoreCING2db( entry_code, archive_id, project = None):
             r_chk_janin = residue.getDeepAvgByKeys(CHK_STR, CHI1CHI2_CHK_STR, VALUE_LIST_STR)
             r_chk_d1d2 = residue.getDeepAvgByKeys(CHK_STR, D1D2_CHK_STR, VALUE_LIST_STR)
 #            r_omega_dev_av_all = residue.getDeepAvgByKeys(CHK_STR, XXX_CHK_STR, VALUE_LIST_STR)
+            r_rmsd_backbone    = residue.getDeepByKeys(RMSD_STR, BACKBONE_STR)
+            r_rmsd_sidechain   = residue.getDeepByKeys(RMSD_STR, HEAVY_ATOMS_STR)
             r_cv_backbone = residue.getDeepByKeys(CV_BACKBONE_STR)
             r_cv_sidechain = residue.getDeepByKeys(CV_SIDECHAIN_STR)
 
@@ -489,6 +501,8 @@ def doStoreCING2db( entry_code, archive_id, project = None):
                 dih_c5_viol = r_dih_c5_viol,
 
 #                omega_dev_av_all= r_omega_dev_av_all,
+                rmsd_backbone    = r_rmsd_backbone,
+                rmsd_sidechain   = r_rmsd_sidechain,
                 cv_backbone     = r_cv_backbone,
                 cv_sidechain    = r_cv_sidechain,
 

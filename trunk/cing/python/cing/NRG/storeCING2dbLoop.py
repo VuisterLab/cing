@@ -13,7 +13,7 @@ def storeCING2dbLoop(archive_id, entryList=None, expectPdbEntryList = True):
     if archive_id == ARCHIVE_CASD_ID:
         startDir = os.path.join(dDir,'CASD-NMR-CING')
         expectPdbEntryList = False
-    if archive_id == ARCHIVE_CASP_ID:
+    elif archive_id == ARCHIVE_CASP_ID:
         startDir = os.path.join(dDir,'CASP-NMR-CING')
         expectPdbEntryList = False
     elif archive_id == ARCHIVE_NRG_ID:
@@ -48,7 +48,7 @@ def storeCING2dbLoop(archive_id, entryList=None, expectPdbEntryList = True):
                         delay_between_submitting_jobs = 1,
                         max_time_to_wait = 60 * 6,
                         START_ENTRY_ID = 0,
-                        MAX_ENTRIES_TODO = 2,
+                        MAX_ENTRIES_TODO = 1,
                         expectPdbEntryList = expectPdbEntryList,
                         extraArgList = extraArgList)
 
@@ -60,14 +60,14 @@ if __name__ == '__main__':
 #    entryList = '1a4d 1a24 1afp 1ai0 1b4y 1brv 1bus 1cjg 1d3z 1hkt 1hue 1ieh 1iv6 1jwe 1kr8 2hgh 2k0e'.split()
     entryList = []
 
-    if True:
+    if 0:
         archive_id = ARCHIVE_CASP_ID
         entryList = 'T0538TS001 T0538Org'.split()
-    if False:
+    elif 1:
         archive_id = ARCHIVE_CASD_ID
-        entryList = None # will use all entries in startDir, 'list', 'entry_list_all.csv'
-        entryList = 'CGR26AParis CGR26AUtrecht2 VpR247Seattle2'.split()
-    if False:
+#        entryList = None # will use all entries in startDir, 'list', 'entry_list_all.csv'
+        entryList = 'CGR26APiscataway CGR26AUtrecht2 VpR247Seattle2'.split()
+    elif 0:
         archive_id = ARCHIVE_PDB_ID
 #        entryList = '1brv'.split()
         entryList = "3kff 3a4r 3a34 3i40 2xdy 3mcd 3ild 1brv 1hkt".split()

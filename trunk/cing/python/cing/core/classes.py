@@ -308,7 +308,7 @@ Project: Top level Cing project class
 
     def getCingSummaryDict(self):
         """Get a CING summary dict from self
-        Return summayDict or None on error
+        Return summaryDict or None on error
         """
         self.summaryDict.getSummaryFromProject(self)
         return self.summaryDict
