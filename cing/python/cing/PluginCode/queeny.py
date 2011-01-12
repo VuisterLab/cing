@@ -682,7 +682,7 @@ def restoreQueeny( project, tmp=None ):
         return True
 
    # Restore the data
-    NTmessage('==> Restoring queeny results from "%s"', smlFile)
+    NTmessage('==> Restoring queeny results')
     l=SML2obj( smlFile, project.molecule)
     if l==None:
         return True

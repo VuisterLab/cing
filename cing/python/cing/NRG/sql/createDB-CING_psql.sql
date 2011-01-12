@@ -12,6 +12,7 @@
 --
 -- Or edit and execute:
 -- python -u $CINGROOT/python/cing/NRG/runSqlForSchema.py devnrgcing    $CINGROOT/python/cing/NRG/sql/createDB-CING_psql.sql    .
+-- python -u $CINGROOT/python/cing/NRG/runSqlForSchema.py casdcing    $CINGROOT/python/cing/NRG/sql/createDB-CING_psql.sql    .
 
 -- Should be autocommiting by default but I saw it didn't once.
 SET AUTOCOMMIT=1;
@@ -41,7 +42,7 @@ CREATE TABLE casdcing.cingentry
     sel_5                     BOOLEAN DEFAULT NULL,
     bmrb_id                        INT,
     casd_id                        VARCHAR(255) UNIQUE,
-    pdb_id                         VARCHAR(255),
+    pdb_id                         VARCHAR(255), -- (10)
     is_solid                       BOOLEAN DEFAULT NULL, -- ssnmr
     is_paramagnetic                BOOLEAN DEFAULT NULL, -- paramagnetic.
     is_membrane                    BOOLEAN DEFAULT NULL, -- membrane
@@ -51,34 +52,38 @@ CREATE TABLE casdcing.cingentry
     dna_count                      INT DEFAULT NULL,
     rna_count                      INT DEFAULT NULL,
     dna_rna_hybrid_count           INT DEFAULT NULL,
-    is_minimized                   BOOLEAN DEFAULT NULL, -- (optimized) minimized structure only known for 1340 entries in PDB overall on Jan 2010.
+    is_minimized                   BOOLEAN DEFAULT NULL, -- (20) (optimized) minimized structure only known for 1340 entries in PDB overall on Jan 2010.
     software_collection            VARCHAR(255) DEFAULT NULL, -- _pdbx_nmr_software.name etc. only 8,000 items estimated 1,000 entries available
     software_processing            VARCHAR(255) DEFAULT NULL,
     software_analysis              VARCHAR(255) DEFAULT NULL,
     software_struct_solution       VARCHAR(255) DEFAULT NULL,
-    software_refinement            VARCHAR(255) DEFAULT NULL, -- (20)
+    software_refinement            VARCHAR(255) DEFAULT NULL,
     in_recoord                     BOOLEAN DEFAULT NULL,
     in_casd                        BOOLEAN DEFAULT NULL,
     in_dress                       BOOLEAN DEFAULT NULL,
     ranges                         VARCHAR(512) DEFAULT NULL,
-    res_count                      INT DEFAULT NULL,     -- number of residues
-    model_count                    INT DEFAULT NULL,     -- (Z)
+    res_count                      INT DEFAULT NULL,     -- (30) number of residues
+    model_count                    INT DEFAULT NULL,
     distance_count                 INT DEFAULT NULL,
     dihedral_count                 INT DEFAULT NULL,
     rdc_count                      INT DEFAULT NULL,
-    peak_count                     INT DEFAULT NULL, -- (30)
+    peak_count                     INT DEFAULT NULL,
     cs_count                       INT DEFAULT NULL,
     cs1h_count                     INT DEFAULT NULL,
     cs13c_count                    INT DEFAULT NULL,
     cs15n_count                    INT DEFAULT NULL,
     cs31p_count                    INT DEFAULT NULL,
---   whatif (averages over the ensemble of selected models)
-    wi_angchk                      FLOAT DEFAULT NULL,
+    omega_dev_av_all               FLOAT DEFAULT NULL, --   cing
+    cv_backbone                    FLOAT DEFAULT NULL,
+    cv_sidechain                   FLOAT DEFAULT NULL,
+    rmsd_backbone                  FLOAT DEFAULT NULL,
+    rmsd_sidechain                 FLOAT DEFAULT NULL,
+    wi_angchk                      FLOAT DEFAULT NULL, --   whatif (averages over the ensemble of selected models)
     wi_bbcchk                      FLOAT DEFAULT NULL,
     wi_bmpchk                      FLOAT DEFAULT NULL,
     wi_bndchk                      FLOAT DEFAULT NULL,
     wi_c12chk                      FLOAT DEFAULT NULL,
-    wi_chichk                      FLOAT DEFAULT NULL, -- (40)
+    wi_chichk                      FLOAT DEFAULT NULL, 
     wi_flpchk                      FLOAT DEFAULT NULL,
     wi_hndchk                      FLOAT DEFAULT NULL,
     wi_inochk                      FLOAT DEFAULT NULL,
@@ -88,41 +93,36 @@ CREATE TABLE casdcing.cingentry
     wi_pl3chk                      FLOAT DEFAULT NULL,
     wi_plnchk                      FLOAT DEFAULT NULL,
     wi_quachk                      FLOAT DEFAULT NULL,
-    wi_ramchk                      FLOAT DEFAULT NULL, -- (50)
+    wi_ramchk                      FLOAT DEFAULT NULL, 
     wi_rotchk                      FLOAT DEFAULT NULL,
---   procheck_nmr
-    pc_gf                           FLOAT DEFAULT NULL,-- (AZ)
-    pc_gf_phipsi                    FLOAT DEFAULT NULL,-- (BA)
+    pc_gf                           FLOAT DEFAULT NULL, --   procheck_nmr
+    pc_gf_phipsi                    FLOAT DEFAULT NULL,
     pc_gf_chi12                     FLOAT DEFAULT NULL,
     pc_gf_chi1                      FLOAT DEFAULT NULL,
     pc_rama_core                    FLOAT DEFAULT NULL,
     pc_rama_allow                   FLOAT DEFAULT NULL,
     pc_rama_gener                   FLOAT DEFAULT NULL,
     pc_rama_disall                  FLOAT DEFAULT NULL,
---   wattos (there are other parameters at residue level but not filled in now).
-    noe_compl4                     FLOAT DEFAULT NULL, -- (60) -- (BH)
+    noe_compl4                     FLOAT DEFAULT NULL, -- wattos (there are other parameters at residue level but not filled in now).
     noe_compl_obs                  INT DEFAULT NULL,
     noe_compl_exp                  INT DEFAULT NULL,
     noe_compl_mat                  INT DEFAULT NULL,
-
     dis_max_all                    FLOAT DEFAULT NULL,
     dis_rms_all                    FLOAT DEFAULT NULL,
     dis_av_all                     FLOAT DEFAULT NULL,
     dis_av_viol                    FLOAT DEFAULT NULL,
-    dis_c1_viol                    INT DEFAULT NULL, -- (65) -- (AZ)
+    dis_c1_viol                    INT DEFAULT NULL,
     dis_c3_viol                    INT DEFAULT NULL,
     dis_c5_viol                    INT DEFAULT NULL,
-
     dih_max_all                    FLOAT DEFAULT NULL,
     dih_rms_all                    FLOAT DEFAULT NULL,
-    dih_av_all                     FLOAT DEFAULT NULL, -- (70)
+    dih_av_all                     FLOAT DEFAULT NULL,
     dih_av_viol                    FLOAT DEFAULT NULL,
     dih_c1_viol                    INT DEFAULT NULL,
     dih_c3_viol                    INT DEFAULT NULL,
     dih_c5_viol                    INT DEFAULT NULL,
-
+    rog                            INT DEFAULT NULL
 --    pdbx_SG_project_XXXinitial_of_center  VARCHAR(25) DEFAULT NULL, -- pdbx_SG_project_Initial_of_center E.g. RSGI; NULL means not from any SG.
-    rog                            INT DEFAULT NULL -- (B)
 );
 
 CREATE INDEX entry_001 ON casdcing.cingentry (bmrb_id);
@@ -218,6 +218,8 @@ CREATE TABLE casdcing.cingresidue
     omega_dev_av_all               FLOAT DEFAULT NULL,
     cv_backbone                    FLOAT DEFAULT NULL,
     cv_sidechain                   FLOAT DEFAULT NULL,
+    rmsd_backbone                  FLOAT DEFAULT NULL,
+    rmsd_sidechain                 FLOAT DEFAULT NULL,
 
     phi_avg                    FLOAT DEFAULT NULL,
     phi_cv                     FLOAT DEFAULT NULL,

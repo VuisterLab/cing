@@ -1518,7 +1518,7 @@ def restoreTalosPlus( project, tmp=None ):
         return True
 
    # Restore the data
-    NTmessage('==> Restoring talos+ results from "%s"', smlFile)
+    NTmessage('==> Restoring talos+ results')
     l=SML2obj( smlFile, project.molecule)
     if l==None:
         return True

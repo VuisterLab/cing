@@ -272,6 +272,9 @@ class Molecule( NTtree, ResidueList ):
 
         self.project = None # JFD: don't know where it gets set but it exists. GWV; when initializing molecules from a project
         self.rmsd = None
+        # cv's
+        self.cv_backbone = None # filled by self.setCvBackboneSidechain. Needs to be matched by cing.core.constants#CV_BACKBONE_STR
+        self.cv_sidechain = None
 
         self.selectedResidues = None # this is a python array
 
@@ -1634,6 +1637,12 @@ class Molecule( NTtree, ResidueList ):
             #end for
             res.setCvBackboneSidechain() # will automatically skip non-amino acids.
         #end for
+
+        for cvType in [ CV_BACKBONE_STR, CV_SIDECHAIN_STR ]:
+            cvList = residueList.zap(cvType)
+            av = cvList.average()
+#            NTdebug("Set %s to average %s" % ( cvType, av))
+            self[cvType] = av[0]
     #end def
 
     def updateMean( self):
@@ -2821,11 +2830,11 @@ class RmsdResult( NTdict ):
     def __init__(self, modelList, ranges, comment='' ):
         NTdict.__init__( self,
                          __CLASS__       = 'RmsdResult',
-                         backbone        = NTfill(0.0, len(modelList)),
+                         backbone        = NTfill(0.0, len(modelList)), # needs to match BACKBONE_STR
                          backboneCount   = 0,
                          backboneAverage = NTvalue( NaN, NaN, fmt='%4.2f +- %4.2f', fmt2='%4.2f' ),
 
-                         heavyAtoms      = NTfill(0.0, len(modelList)),
+                         heavyAtoms      = NTfill(0.0, len(modelList)), # needs to match HEAVY_ATOMS_STR
                          heavyAtomsCount = 0,
                          heavyAtomsAverage = NTvalue( NaN, NaN, fmt='%4.2f +- %4.2f', fmt2='%4.2f'  ),
 

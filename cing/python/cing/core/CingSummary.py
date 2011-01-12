@@ -86,8 +86,8 @@ class CingSummary( NTdict ):
         # rmsds
         if project.molecule and project.molecule.has_key('rmsd'):
             rmsdObject = project.molecule.rmsd
-            self.rmsdToMean_backboneAverage = getDeepByKeysOrAttributes(rmsdObject,'backboneAverage')
-            self.rmsdToMean_heavyAtomsAverage = getDeepByKeysOrAttributes(rmsdObject,'heavyAtomsAverage')
+            self.rmsdToMean_backboneAverage = getDeepByKeysOrAttributes(rmsdObject,BACKBONE_AVERAGE_STR)
+            self.rmsdToMean_heavyAtomsAverage = getDeepByKeysOrAttributes(rmsdObject,HEAVY_ATOM_AVERAGE_STR)
         #end if
 
         # ROG scores

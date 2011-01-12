@@ -656,7 +656,7 @@ RMS Z-scores, should be close to 1.0:
 
         """
 
-        NTdetail("==> Processing the WHATIF results into CING data model")
+#        NTdetail("==> Processing the WHATIF results into CING data model")
         # Assemble the atom, residue and molecule specific checks
         # set the formats of each check easy printing
 #        self.molecule.setAllChildrenByKey( WHATIF_STR, None)
