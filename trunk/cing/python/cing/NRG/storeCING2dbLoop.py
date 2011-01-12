@@ -66,7 +66,8 @@ if __name__ == '__main__':
     elif 1:
         archive_id = ARCHIVE_CASD_ID
 #        entryList = None # will use all entries in startDir, 'list', 'entry_list_all.csv'
-        entryList = 'CGR26APiscataway CGR26AUtrecht2 VpR247Seattle2'.split()
+#        entryList = 'CGR26APiscataway CGR26AUtrecht2 VpR247Seattle2'.split()
+        entryList = 'AR3436APiscataway2 AtT13Piscataway CGR26APiscataway CtR69APiscataway ET109AoxPiscataway2 ET109AredPiscataway2 HR5537APiscataway2 NeR103APiscataway PGR122APiscataway VpR247Piscataway2'.split()
     elif 0:
         archive_id = ARCHIVE_PDB_ID
 #        entryList = '1brv'.split()

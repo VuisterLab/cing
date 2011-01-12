@@ -14,6 +14,7 @@ from cing.PluginCode.matplib import NTplot
 from cing.PluginCode.matplib import NTplotSet
 from cing.PluginCode.required.reqDssp import * #@UnusedWildImport
 from cing.PluginCode.required.reqProcheck import * #@UnusedWildImport
+from cing.PluginCode.required.reqQueeny import * #@UnusedWildImport
 from cing.PluginCode.required.reqWattos import * #@UnusedWildImport
 from cing.PluginCode.required.reqWhatif import * #@UnusedWildImport
 from cing.PluginCode.sqlAlchemy import cgenericSql
@@ -43,12 +44,7 @@ ONLY_NON_ZERO = 'onlyNonZero'
 'Filter out entities that have a zero float/int value'
 PDBJ_ENTRY_ID_STR = 'pdbid'
 DEPOSITION_DATE_STR = 'deposition_date'
-#db_name = PDBJ_DB_NAME
-#user_name = PDBJ_DB_USER_NAME
-#schema = NRG_DB_SCHEMA
-#schemaJ = PDBJ_DB_SCHEMA
-#HOST = 'nmr'
-HOST = 'localhost'
+EMPTY_PROGID = ""
 
 if False:
     from matplotlib import use #@UnusedImport
@@ -57,13 +53,13 @@ if False:
 
 
 class nrgCingRdb():
-    def __init__(self,host=HOST, user=PDBJ_DB_USER_NAME, db=PDBJ_DB_NAME, schema=NRG_DB_SCHEMA):
+    def __init__(self,host='localhost', user=PDBJ_DB_USER_NAME, db=PDBJ_DB_NAME, schema=NRG_DB_SCHEMA):
         self.schema = schema
         if True: # block the NRG-CING stuff away from other schema
             self.csql = csqlAlchemy(host=host, user=user, db=db, schema=schema)
             self.csql.connect()
             self.execute = self.csql.conn.execute
-            if True: # DEFAULT True but disable for quicker testing.
+            if 0: # DEFAULT True but disable for quicker testing.
                 self.createDepTables()
             self.csql.autoload()
             #csql.close()
@@ -343,6 +339,7 @@ AND '{2}' <@ S.chain_type; -- contains at least one protein chain.
 
         if doTrending:
             os.chdir(dir_plotTrending)
+
         try:
             djaflsjlfjalskdjf #@UndefinedVariable
             from localPlotList import plotList
@@ -350,7 +347,8 @@ AND '{2}' <@ S.chain_type; -- contains at least one protein chain.
 #            NTtracebackError()
             plotList = [
 #            [ PROJECT_LEVEL, CING_STR, DISTANCE_COUNT_STR,dict4 ],
-            [ PROJECT_LEVEL, WHATIF_STR, RAMCHK_STR, {ONLY_SELECTION:1} ],
+#            [ PROJECT_LEVEL, WHATIF_STR, RAMCHK_STR, {ONLY_SELECTION:1} ],
+            [ RES_LEVEL, CING_STR, RDB_QUEENY_INFORMATION_STR, {ONLY_NON_ZERO:1} ],
             ]
 
 
@@ -361,7 +359,6 @@ AND '{2}' <@ S.chain_type; -- contains at least one protein chain.
             chk_id_unique = '.'.join([level,progId,chk_id])
             NTdebug("Starting with: %s" % chk_id_unique)
             floatValueLoL = m.getFloatLoLFromDb(level, progId, chk_id, **plotDict)
-
             if False: # DEFAULT False. Block used for checking procedures.
                 mu = 100.
                 sigma = sqrt(5)
@@ -483,7 +480,7 @@ AND '{2}' <@ S.chain_type; -- contains at least one protein chain.
 #                    NTdebug("Creating the non-standard x-range.")
                     bins_input = numpy.linspace(xmin,xmax,num_bins,endpoint=True)
 
-                n, bins, _patches = hist(floatValueLoL, bins_input, normed=normed, facecolor='green', alpha=0.75)
+                n, bins, _patches = hist(floatNTlist, bins_input, normed=normed, facecolor='green', alpha=0.75)
                 # Draw a line to fit.
                 if normed:
                     y = mlab.normpdf( bins, av, sd) # would loose the y-axis count by a varying scale factor. Not desirable.
@@ -530,7 +527,7 @@ AND '{2}' <@ S.chain_type; -- contains at least one protein chain.
 
             xlabel(chk_id_unique)
             title(titleStr)
-            for fmt in ['png', 'eps']:
+            for fmt in ['png' ]:
                 fn = "plotHist_%s.%s" % (chk_id_unique, fmt)
                 NTdebug("Writing " + fn)
                 savefig(fn)
@@ -817,9 +814,13 @@ def bin_by(y, x, nbins=None, ymin=None, ymax=None):
 
 if __name__ == '__main__':
     cing.verbosity = verbosityDebug
-    m = nrgCingRdb(host='localhost', schema=DEV_NRG_DB_SCHEMA)
 
-    if False:
+#    schema = DEV_NRG_DB_SCHEMA
+    schema = CASD_DB_NAME
+
+    m = nrgCingRdb( schema=schema )
+
+    if 1:
         m.createPlots(doTrending = False)
     if False:
 #        m.plotQualityVsColor()
@@ -827,10 +828,10 @@ if __name__ == '__main__':
         m.getAndPlotColorVsColor(doPlot = True)
     if False:
         m.createScatterPlotGreenVersusRed()
-    if True:
+    if 0:
         pdbIdList = m.getPdbIdList()
 
-    if True:
+    if 0:
         m.showCounts()
 
     NTmessage("done with nrgCingRdb")

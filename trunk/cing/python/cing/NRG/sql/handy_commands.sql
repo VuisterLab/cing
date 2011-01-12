@@ -154,3 +154,10 @@ SELECT e.pdb_id
 
 
 
+SELECT E.name,  R.name, R.number, queen_information
+FROM casdcing.CINGENTRY E, "casdcing"."cingresidue" R
+where E.entry_id = R.entry_id
+AND E.name = 'AR3436APiscataway2'
+order by E.name, R.number
+
+

@@ -13,6 +13,7 @@ from cing.PluginCode.required.reqQueeny import * #@UnusedWildImport
 from cing.core.sml import SML2obj
 from cing.core.sml import obj2SML
 
+storedPropList = [QUEENY_UNCERTAINTY1_STR, QUEENY_UNCERTAINTY2_STR, QUEENY_INFORMATION_STR ]
 
 class dmElement():
     "Distance Matrix element for Queeny"
@@ -614,7 +615,7 @@ def saveQueeny( project, tmp=None ):
         NTmessage("saveQueeny: No project defined")
         return True
 
-    if 'queeny' not in project.status:
+    if QUEENY_STR not in project.status:
 #        NTdebug("saveQueeny: No talos+ was run")
         return False # just no data, not an error
 
@@ -631,13 +632,12 @@ def saveQueeny( project, tmp=None ):
 
     l = NTlist()
     for res in project.molecule.allResidues():
-        if res.has_key(QUEENY_INFORMATION_STR):
-            l.append( (res.nameTuple(), res[QUEENY_INFORMATION_STR])
-                    )
-        for atm in res:
-            if atm.has_key(QUEENY_INFORMATION_STR):
-                l.append( (atm.nameTuple(), atm[QUEENY_INFORMATION_STR])
-                          )
+        for storedProp in storedPropList:
+            if res.has_key(storedProp):
+                l.append( (res.nameTuple(), storedProp, res[storedProp]))
+            for atm in res:
+                if atm.has_key(storedProp):
+                    l.append( (atm.nameTuple(), storedProp, atm[storedProp]))
         #end for
     #end for
     smlFile = os.path.join(path, queenyDefs.smlFile )
@@ -659,12 +659,13 @@ def restoreQueeny( project, tmp=None ):
 
     if project.molecule == None:
         return False # Gracefully returns
-    for res in project.molecule.allResidues():
-        res[QUEENY_INFORMATION_STR] = 0.0
-    for atm in project.molecule.allAtoms():
-        atm[QUEENY_INFORMATION_STR] = 0.0
+    for storedProp in storedPropList:
+        for res in project.molecule.allResidues():
+            res[storedProp] = 0.0
+        for atm in project.molecule.allAtoms():
+            atm[storedProp] = 0.0
 
-    project.status.setdefault('queeny',queenyDefaults())
+    project.status.setdefault(QUEENY_STR,queenyDefaults())
     project.status.keysformat()
 
     if not project.status.queeny.completed:
@@ -686,13 +687,23 @@ def restoreQueeny( project, tmp=None ):
     l=SML2obj( smlFile, project.molecule)
     if l==None:
         return True
-    for nameTuple,info in l:
-        obj = project.molecule.decodeNameTuple(nameTuple)
-        if not obj:
-            NTerror('restoreQueeny: error decoding "%s"', nameTuple)
-        else:
-            obj[QUEENY_INFORMATION_STR] = info
-    #end for
+
+    try:
+        for tupleInfo in l:
+            if len(tupleInfo) == 3: # Version with multiple data items
+                nameTuple,storedProp,info = tupleInfo
+            else: # Old version with multiple data items
+                nameTuple,info = tupleInfo
+                storedProp = QUEENY_INFORMATION_STR
+            obj = project.molecule.decodeNameTuple(nameTuple)
+            if not obj:
+                NTerror('restoreQueeny: error decoding "%s"', nameTuple)
+            else:
+                obj[storedProp] = info
+    except:
+        NTtracebackError()
+        NTerror("Failed to restore Queeny results.")
+        return True
     return False
 #end def
 #-----------------------------------------------------------------------------

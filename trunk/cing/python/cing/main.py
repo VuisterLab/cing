@@ -43,7 +43,7 @@ Options:
   --molecule=MOLECULENAME
                         Restore Molecule MOLECULENAME as active molecule
   --script=SCRIPTFILE   Run script from SCRIPTFILE
-  --ipython             Start ipython interpreter
+  -i --ipython          Start ipython interpreter
   --validate            Validate.
   --validateFastest     Fastest possible checks by CING only and without imagery.
                         Implies --validateCingOnly and --validateImageLess.
@@ -508,7 +508,7 @@ def getParser():
                       help="Run script from SCRIPTFILE",
                       metavar="SCRIPTFILE"
                      )
-    parser.add_option("--ipython",
+    parser.add_option('-i', "--ipython",
                       action="store_true",
                       dest="ipython",
                       help="Start ipython interpreter"

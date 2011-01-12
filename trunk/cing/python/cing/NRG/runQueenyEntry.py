@@ -11,4 +11,6 @@ project = Project.open(pname, status = 'old')
 
 
 project.runQueeny()
+project.save()
+
 doStoreCING2db( project.name, ARCHIVE_CASD_ID, project=project)
