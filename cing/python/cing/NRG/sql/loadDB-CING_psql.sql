@@ -1,5 +1,6 @@
 -- * Run by command like:
 -- python -u $CINGROOT/python/cing/NRG/runSqlForSchema.py nrgcing    $CINGROOT/python/cing/NRG/sql/loadDB-CING_psql.sql    $D/NRG-CING/pgsql
+-- python -u $CINGROOT/python/cing/NRG/runSqlForSchema.py casdcing   $CINGROOT/python/cing/NRG/sql/loadDB-CING_psql.sql    ~/CASD-NMR-CING/pgsql
 
 delete from casdcing.cingentry;
 
