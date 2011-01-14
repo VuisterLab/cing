@@ -423,8 +423,8 @@ def doStoreCING2db( entry_code, archive_id, project = None):
             r_chk_janin = residue.getDeepAvgByKeys(CHK_STR, CHI1CHI2_CHK_STR, VALUE_LIST_STR)
             r_chk_d1d2 = residue.getDeepAvgByKeys(CHK_STR, D1D2_CHK_STR, VALUE_LIST_STR)
 #            r_omega_dev_av_all = residue.getDeepAvgByKeys(CHK_STR, XXX_CHK_STR, VALUE_LIST_STR)
-            r_rmsd_backbone    = residue.getDeepByKeys(RMSD_STR, BACKBONE_STR)
-            r_rmsd_sidechain   = residue.getDeepByKeys(RMSD_STR, HEAVY_ATOMS_STR)
+            r_rmsd_backbone    = residue.getDeepAvgByKeys(RMSD_STR, BACKBONE_STR)
+            r_rmsd_sidechain   = residue.getDeepAvgByKeys(RMSD_STR, HEAVY_ATOMS_STR)
             r_cv_backbone = residue.getDeepByKeys(CV_BACKBONE_STR)
             r_cv_sidechain = residue.getDeepByKeys(CV_SIDECHAIN_STR)
 

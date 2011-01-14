@@ -1597,9 +1597,28 @@ class NTdict(dict):
         return deeper.setDeepByKeys(value, *reducedKeyList)
 
     def appendFromTable(self, myTable, idxColumnKey=0, idxColumnValue=0):
+        """
+        Maps from table column to table column or row idx if target column idx is -1.
+        Return True on error.
+        """
 #        n = len(self)
-        for row in myTable:
-            self[ row[idxColumnKey] ] = row[idxColumnValue]
+        sizeRowsTable = len(myTable)
+        if not sizeRowsTable:
+            NTerror("Found no row in appendFromTable")
+            return True
+        sizeColumnsTable = len(myTable[0])
+        if not sizeColumnsTable:
+            NTwarning("Found no column in appendFromTable")
+            return
+#        NTdebug("Found %d rows and %d columns in appendFromTable" % (sizeRowsTable, sizeColumnsTable))
+        # coded for speed:
+        if idxColumnValue == -1:
+            for row_idx, row in enumerate(myTable):
+#                NTdebug("row_idx, row: %s %s" % (row_idx, row))
+                self[ row[idxColumnKey] ] = row_idx
+        else:
+            for row in myTable:
+                self[ row[idxColumnKey] ] = row[idxColumnValue]
 #        m = len(self)
 #        NTdebug("NTdict grew from %d to %d items" % ( n, m))
 

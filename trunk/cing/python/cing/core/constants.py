@@ -129,6 +129,7 @@ VIOL5_STR = 'violCount5'
 RESONANCES_STR = 'resonances'
 
 # SQL stuff
+NAME_STR        = 'name'
 PDB_ID_STR      = 'pdb_id'
 ENTRY_ID_STR    = 'entry_id'
 CHAIN_ID_STR    = 'chain_id'
@@ -202,6 +203,15 @@ ALL_ATOMS_STR = 'allAtoms'
 BACKBONE_STR = 'backbone'
 HEAVY_ATOMS_STR = 'heavyAtoms'
 PROTONS_STR = 'protons'
+
+# for RDB only:
+RMSD_BACKBONE_STR = 'rmsd_backbone'
+RMSD_SIDECHAIN_STR = 'rmsd_sidechain'
+SEL1_STR = 'sel_1'
+SEL2_STR = 'sel_2'
+SEL3_STR = 'sel_3'
+SEL4_STR = 'sel_4'
+SEL5_STR = 'sel_5'
 
 DIS_MAX_ALL_STR = 'dis_max_all'
 DIS_RMS_ALL_STR = 'dis_rms_all'
