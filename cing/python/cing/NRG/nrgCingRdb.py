@@ -22,7 +22,6 @@ from cing.PluginCode.sqlAlchemy import csqlAlchemy
 from cing.PluginCode.sqlAlchemy import printResult
 from matplotlib import is_interactive
 from pylab import * #@UnusedWildImport # imports plt too now.
-from random import gauss
 from scipy import * #@UnusedWildImport
 from scipy import optimize
 from sqlalchemy.schema import Table #@UnusedImport
@@ -45,6 +44,9 @@ ONLY_NON_ZERO = 'onlyNonZero'
 PDBJ_ENTRY_ID_STR = 'pdbid'
 DEPOSITION_DATE_STR = 'deposition_date'
 EMPTY_PROGID = ""
+SYMBOL_BY_ENTRY = 'symbolByEntry'
+IS_TRUE = 'isTrue'
+IS_FALSE = 'isFalse'
 
 if False:
     from matplotlib import use #@UnusedImport
@@ -196,6 +198,60 @@ AND '{2}' <@ S.chain_type; -- contains at least one protein chain.
             table = m.a1
         return table
 
+    def level2level_id(self, level):
+        if level == ATOM_LEVEL:
+            return ATOM_ID_STR
+        if level == RES_LEVEL:
+            return RESIDUE_ID_STR
+        if level == CHAIN_LEVEL:
+            return CHAIN_ID_STR
+        if level == PROJECT_LEVEL:
+            return ENTRY_ID_STR
+        NTexit("Bad level: %s" % level)
+
+    def getLevelNumber(self, level):
+        if level == ATOM_LEVEL:
+            return 0
+        if level == RES_LEVEL:
+            return 1
+        if level == CHAIN_LEVEL:
+            return 2
+        if level == PROJECT_LEVEL:
+            return 3
+        NTexit("In getLevelNumber bad level: %s" % level)
+
+
+    def getTitleFromStats(self, av, sd, n, minValue, maxValue):
+        return "av/sd/n %.3f %.3f %d min/max %.3f %.3f" % (av, sd, n, minValue, maxValue )
+
+    def getTitleFromDict(self, plotDict):
+        titleStr = ''
+        if getDeepByKeysOrAttributes( plotDict, DIVIDE_BY_RESIDUE_COUNT):
+            titleStr += ' perRes'
+#            if getDeepByKeysOrAttributes( plotDict, ONLY_PROTEIN): # TODO: here
+#                titleStr += ' onlyAA'
+        if getDeepByKeysOrAttributes( plotDict, ONLY_SELECTION):
+            titleStr += ' onlySel'
+        if getDeepByKeysOrAttributes( plotDict, SYMBOL_BY_ENTRY):
+            titleStr += ' byEntry'
+        if getDeepByKeysOrAttributes( plotDict, ONLY_NON_ZERO):
+            titleStr += ' only!zero'
+        filterForTruth = getDeepByKeysOrAttributes( plotDict, IS_TRUE) or getDeepByKeysOrAttributes( plotDict, IS_FALSE)
+        if filterForTruth:
+            trueAttribute = getDeepByKeysOrAttributes( plotDict, IS_TRUE)
+            if trueAttribute != None:
+                titleStr += ' T:' + trueAttribute
+            falseAttribute = getDeepByKeysOrAttributes( plotDict, IS_FALSE)
+            if falseAttribute != None:
+                titleStr += ' F:' + falseAttribute
+
+        if getDeepByKeysOrAttributes( plotDict, USE_MIN_VALUE_STR) and \
+           getDeepByKeysOrAttributes( plotDict, USE_MAX_VALUE_STR):
+            xmin = getDeepByKeysOrAttributes( plotDict, USE_MIN_VALUE_STR)
+            xmax = getDeepByKeysOrAttributes( plotDict, USE_MAX_VALUE_STR)
+            titleStr += ' [%.3f,%.3f]' % (xmin,xmax)
+        return titleStr
+
     def getFloatLoLFromDb(self, level, progId, chk_id, **plotDict):
         '''Returns a LoL with the
         first element being a tuple with elements (entry_id, chain_id, res_num, atom_num) and
@@ -206,15 +262,17 @@ AND '{2}' <@ S.chain_type; -- contains at least one protein chain.
         columnName = getDbColumnName( level, progId, chk_id )
     #    NTdebug("Found column: %s for level, progId, chk_id: %s" % (columnName,str([level, progId, chk_id])))
         table = self.getDbTable(level)
+        level_number = self.getLevelNumber(level)
 
         doDivideByResidueCount = getDeepByKeysOrAttributes( plotDict, DIVIDE_BY_RESIDUE_COUNT)
         _filterForProtein = getDeepByKeysOrAttributes( plotDict, ONLY_PROTEIN)
         filterForSelection = getDeepByKeysOrAttributes( plotDict, ONLY_SELECTION)
         filterZero = getDeepByKeysOrAttributes( plotDict, ONLY_NON_ZERO)
         doTrending = getDeepByKeysOrAttributes( plotDict, DO_TRENDING)
+        filterForTruth = getDeepByKeysOrAttributes( plotDict, IS_TRUE) or getDeepByKeysOrAttributes( plotDict, IS_FALSE)
 
         if doTrending: # optimalization is to ignore the 'pure' X-ray,
-            # First get the entry pdb_id info
+            # First get the entry entry_name info
             try:
                 s = select([m.bs.c[PDBJ_ENTRY_ID_STR], m.bs.c[DEPOSITION_DATE_STR]])
         #        NTdebug("SQL: %s" % s)
@@ -222,32 +280,61 @@ AND '{2}' <@ S.chain_type; -- contains at least one protein chain.
             except:
                 NTtracebackError()
                 return
-            pdbIdDateResultDict = NTdict() # hash by entry id
+            pdbIdDateResultDict = NTdict() # hash by entry filterId
             pdbIdDateResultDict.appendFromTable(pdbIdDateResultTable, 0, 1)
         # end trending.
 
-        # First get the entry pdb_id info
+        if filterForTruth:
+            truth = True
+            columnNameForTruth = getDeepByKeysOrAttributes( plotDict, IS_TRUE)
+            if columnNameForTruth == None:
+                columnNameForTruth = getDeepByKeysOrAttributes( plotDict, IS_FALSE)
+                truth = False
+            try:
+                level_id = self.level2level_id(level)
+                s = select([table.c[level_id],]).where(table.c[columnNameForTruth]==truth)
+#                NTdebug("SQL:\n%s\n" % s)
+                truthResultTable = m.execute(s).fetchall()
+            except:
+                NTtracebackError()
+                return
+            truthResultDict = NTdict() # hash by entry filterId
+            truthResultDict.appendFromTable(truthResultTable)
+
+
+        # First get the entry name info
         try:
-            s = select([m.e1.c[ENTRY_ID_STR], m.e1.c[PDB_ID_STR]])
+            s = select([m.e1.c[ENTRY_ID_STR], m.e1.c[NAME_STR]])
     #        NTdebug("SQL: %s" % s)
-            entryIdPdbIdResultTable = m.execute(s).fetchall()
+            entryNameResultTable = m.execute(s).fetchall()
         except:
             NTtracebackError()
             return
-        entryIdPdbIdResultDict = NTdict() # hash by entry id
-        entryIdPdbIdResultDict.appendFromTable(entryIdPdbIdResultTable, 0, 1)
-        pdbIdEntryIdResultDict = NTdict() # hash by pdb id
-        pdbIdEntryIdResultDict.appendFromTable(entryIdPdbIdResultTable, 1, 0)
+        entryIdEntryNameResultDict = NTdict() # hash by entry filterId
+        entryIdEntryNameResultDict.appendFromTable(entryNameResultTable, 0, 1)
+        entryNameEntryIdResultDict = NTdict() # hash by entry name
+        entryNameEntryIdResultDict.appendFromTable(entryNameResultTable, 1, 0)
 
+
+        # Get actual value of interest together with attributes to filter on.
         try:
             # Filter and limit after select for speed in most cases.
             # I wonder if sqlalchemy could relay the burden of filtering out the None's to the db.
-            # It would save some io.
-            s = select([table.c[ENTRY_ID_STR], table.c[columnName]]).where(table.c[columnName]!=None)
+
+            # Stupid trick but it will do.
+            if level == ATOM_LEVEL:
+                s = select([table.c[ENTRY_ID_STR], table.c[CHAIN_ID_STR], table.c[RESIDUE_ID_STR], table.c[ATOM_ID_STR], table.c[columnName]])
+            elif level == RES_LEVEL:
+                s = select([table.c[ENTRY_ID_STR], table.c[CHAIN_ID_STR], table.c[RESIDUE_ID_STR], table.c[columnName]])
+            elif level == CHAIN_LEVEL:
+                s = select([table.c[ENTRY_ID_STR], table.c[CHAIN_ID_STR], table.c[columnName]])
+            elif level == MOLECULE_LEVEL:
+                s = select([table.c[ENTRY_ID_STR], table.c[columnName]])
+            s = s.where(table.c[columnName]!=None)
             if filterZero:
                 s = s.where(table.c[columnName]!=0.0)
 #                s = s.where(table.c[columnName]!=0) # don't use this because truncation will be tried.
-            NTdebug("SQL: %s" % s)
+#            NTdebug("SQL:\n%s\n" % s)
             checkResultTable = m.execute(s).fetchall()
         except:
             NTtracebackError()
@@ -286,37 +373,53 @@ AND '{2}' <@ S.chain_type; -- contains at least one protein chain.
     #    NTdebug("checkResultTable: %s" % str(checkResultTable))
         result = []
         for i,element in enumerate(checkResultTable):
+#            entry_id, chain_id, res_id, atom_id, v = element
 
+            chain_id, res_id, atom_id = (-1,-1,-1)
             entry_id = element[0]
-            v = float(element[1])
-            pdb_id = entryIdPdbIdResultDict[entry_id]
+            v = element[4-level_number]
+            v = float(v)
+            if level_number < 3:
+                chain_id = element[1]
+                if level_number < 2:
+                    res_id = element[2]
+                    if level_number < 1:
+                        atom_id = element[3]
+
+            entry_name = entryIdEntryNameResultDict[entry_id]
             if v == None:
-                NTdebug("Unexpected None found at pdb_id %s" % pdb_id)
+                NTdebug("Unexpected None found at entry_name %s" % entry_name)
                 continue
             if isNaN(v): # this -DOES- happen; e.g. PROJECT.Whatif.BNDCHK
-#                NTdebug("Unexpected nan instead of None found at pdb_id %s" % pdb_id)
+#                NTdebug("Unexpected nan instead of None found at entry_name %s" % entry_name)
                 continue
+            if filterForTruth:
+                idList = [atom_id, res_id, chain_id, entry_id] # shorter code longer execution time...
+                filterId = idList[level_number]
+                if not truthResultDict.has_key(filterId):
+                    continue
+
             if doDivideByResidueCount:
                 resCount = resCountDict[entry_id]
                 if isNaN(resCount) or resCount == None or resCount == 0:
-                    NTerror("Found null for resCount for pdb_id %s" % pdb_id)
+                    NTerror("Found null for resCount for entry_name %s" % entry_name)
                     continue
                 v /= resCount
             if filterForSelection:
-                if not pdbidSelectionDict.has_key(pdb_id):
+                if not pdbidSelectionDict.has_key(entry_name):
                     continue
             if filterZero:
                 # Works when v is integer or float
                 if v == 0.0:
-                    NTdebug("Unexpected zero value for %s %s" % (entry_id, pdb_id))
+                    NTdebug("Unexpected zero value for %s %s" % (entry_id, entry_name))
                     continue
-#            resultIdTuple = ( pdb_id, chain_id, res_num, atom_id)
-            resultIdTuple = ( pdb_id, )
-            resultRecord = [ resultIdTuple, v ]
+#            resultIdTuple = ( entry_name, chain_id, res_id, atom_id )
+#            resultIdTuple = ( entry_name, )
+            resultRecord = [ entry_name, chain_id, res_id, atom_id, v ]
             if doTrending:
-                dateObject = getDeepByKeysOrAttributes( pdbIdDateResultDict, pdb_id)
+                dateObject = getDeepByKeysOrAttributes( pdbIdDateResultDict, entry_name)
                 if dateObject == None: # obsoleted entries
-#                    NTmessage("Skipping obsoleted entry: %s" % pdb_id)
+#                    NTmessage("Skipping obsoleted entry: %s" % entry_name)
                     continue
                 # end if date
                 resultRecord.append( dateObject )
@@ -328,6 +431,194 @@ AND '{2}' <@ S.chain_type; -- contains at least one protein chain.
         return result
 
 
+    def createScatterPlots(self):
+        ''' The code below can use settings in the form of a dictionary that influences the
+        plotting.
+
+        '''
+        m = self
+        try:
+            djaflsjlfjalskdjf #@UndefinedVariable
+            from localPlotList import plotList
+        except:
+#            NTtracebackError()
+            d5 = {IS_TRUE: SEL1_STR, USE_MIN_VALUE_STR: 0.0}
+#            d5 = {ONLY_NON_ZERO:1 }
+            plotList = [
+#            [ PROJECT_LEVEL, CING_STR, DISTANCE_COUNT_STR,dict4 ],
+#            [ PROJECT_LEVEL, WHATIF_STR, RAMCHK_STR, {ONLY_SELECTION:1} ],
+            [ RES_LEVEL, ( ( CING_STR,   RDB_QUEENY_INFORMATION_STR,    d5),
+                           ( WHATIF_STR, RAMCHK_STR,                    d5) ),
+                           {SYMBOL_BY_ENTRY:1} ],
+            [ RES_LEVEL, ( ( CING_STR,   RDB_QUEENY_INFORMATION_STR,    d5),
+                           ( PROCHECK_STR, gf_STR,                    d5) ),
+                           {SYMBOL_BY_ENTRY:1} ],
+            [ RES_LEVEL, ( ( CING_STR,   RDB_QUEENY_INFORMATION_STR,    d5),
+                           ( WHATIF_STR, BBCCHK_STR,                    d5) ),
+                           {SYMBOL_BY_ENTRY:1} ],
+            [ RES_LEVEL, ( ( CING_STR, RDB_QUEENY_INFORMATION_STR,    d5),
+                           ( CING_STR, CV_SIDECHAIN_STR,              d5) ),
+                           {SYMBOL_BY_ENTRY:1} ],
+            [ RES_LEVEL, ( ( CING_STR, RDB_QUEENY_INFORMATION_STR,    d5),
+                           ( CING_STR, CV_BACKBONE_STR,               d5) ),
+                           {SYMBOL_BY_ENTRY:1} ],
+            [ RES_LEVEL, ( ( CING_STR, RDB_QUEENY_INFORMATION_STR,    d5),
+                           ( CING_STR, RMSD_BACKBONE_STR,             d5) ),
+                           {SYMBOL_BY_ENTRY:1} ],
+            [ RES_LEVEL, ( ( CING_STR, RDB_QUEENY_INFORMATION_STR,    d5),
+                           ( CING_STR, RMSD_SIDECHAIN_STR,             d5) ),
+                           {SYMBOL_BY_ENTRY:1} ],
+            ]
+
+        for p in plotList:
+            level, pTuple, plotDict = p
+            floatValueLoLoL = []
+            progIdList = [0,0]
+            chk_idList = [0,0]
+            dicList = [0,0]
+            chk_id_unique = level + "-"
+            level_number = self.getLevelNumber(level)
+            NTdebug("level_number %d" % level_number)
+            labelList = []
+            for dim in range(2):
+                progIdList[dim], chk_idList[dim], dicList[dim] = pTuple[dim]
+                floatValueLoL = m.getFloatLoLFromDb(level, progIdList[dim], chk_idList[dim], **dicList[dim])
+                floatValueLoLoL.append( floatValueLoL )
+                if dim:
+                    chk_id_unique += '-'
+                chk_id = '.'.join([progIdList[dim], chk_idList[dim]])
+                chk_id_unique += chk_id
+                labelList.append( chk_id )
+                NTdebug("Starting with: %s found number of records: %s" % (chk_id, len(floatValueLoL)))
+
+            for dim, floatValueLoL in enumerate(floatValueLoLoL):
+                if len(floatValueLoL) == 0:
+                    NTmessage("Got empty float LoL for %s from db for: %s skipping plot" % (dim, chk_id_unique))
+                    continue
+                if not floatValueLoL:
+                    NTerror("Encountered and error while getting float LoL %s from db for: %s skipping plot" % (dim, chk_id_unique))
+                    continue
+            # Link the 2 dims by id via a map from dim x to dim y.
+            dim_yDict = NTdict() # hash by entry filterId. E.g. for residue level this will map from res_id to row_idx in floatValueLoL
+#            level_number zero is for atom and 3 for entry.
+            level_pos = 3-level_number
+#            NTdebug("level_pos %d" % level_pos)
+#            NTdebug("dim_yDict: %r" % dim_yDict)
+            floatValueLoL_x = floatValueLoLoL[0]
+            floatValueLoL_y = floatValueLoLoL[1]
+            dim_yDict.appendFromTable(floatValueLoL_y, level_pos, -1)
+            floatValueLoL_x_size = len(floatValueLoL_x)
+            for row_idx in range(floatValueLoL_x_size-1,-1,-1): # reversed makes it easier to delete elements.
+                floatValueL_x = floatValueLoL_x[row_idx]
+#                NTdebug("floatValueL_x: %s" % str(floatValueL_x))
+                level_idx = floatValueL_x[level_pos]
+#                NTdebug("Checking row_idx %s and level_idx %s " % (row_idx, level_idx))
+                if not dim_yDict.has_key(level_idx):
+#                    NTdebug("Removing row_idx %s" % row_idx)
+                    del floatValueLoL_x[row_idx]
+#                else:
+#                    rowY_idx = dim_yDict.get(level_idx)
+#                    NTdebug("Found matching row of y %s" % str(floatValueLoL_y[rowY_idx]))
+#            dim_xDict = {} # map from valid x row
+            floatValueLoL2 = [[],[]]
+            for row_idx in range(len(floatValueLoL_x)):
+                floatValueL_x = floatValueLoL_x[row_idx]
+                level_idx = floatValueL_x[level_pos]
+#                dim_xDict[ row_idx ] = dim_yDict.get(level_idx)
+#                resultRecord = [ entry_name, chain_id, res_id, atom_id, v ]
+                floatValueLoL2[0].append(floatValueL_x[-1])
+                floatValueLoL2[1].append(floatValueLoL_y[dim_yDict.get(level_idx)][-1])
+            avList = [None,None]
+            sdList = [None,None]
+            nList = [None,None]
+            minValueList = [None,None]
+            maxValueList = [None,None]
+            minList = [None,None]
+            maxList = [None,None]
+
+            titleStr = ''
+            for dim in range(2):
+                floatValueL = floatValueLoL2[dim]
+                floatNTlist = NTlist()
+                for row_idx in range(len(floatValueL)):
+                    floatNTlist.append(floatValueL[row_idx])
+                avList[dim], sdList[dim], nList[dim] = floatNTlist.average()
+                minValueList[dim] = floatNTlist.min()
+                maxValueList[dim] = floatNTlist.max()
+                if 1: # DEFAULT: True. Disable when testing.
+                    if minValueList[dim]  == maxValueList[dim]:
+                        NTwarning("Skipping plot were the min = max value (%s) for dim: %s." % ( minValueList[dim], dim))
+                        continue
+                if dim:
+                    titleStr += '\n'
+                titleStr += "Dim: %s" % dim
+                titleStr += ' ' + self.getTitleFromStats( avList[dim], sdList[dim], nList[dim], minValueList[dim], maxValueList[dim] )
+                if dicList[dim]:
+                    titleStr += ' ' + self.getTitleFromDict(dicList[dim])
+                minList[dim] = getDeepByKeysOrAttributes( dicList[dim], USE_MIN_VALUE_STR)
+                maxList[dim] = getDeepByKeysOrAttributes( dicList[dim], USE_MAX_VALUE_STR)
+                NTdebug("dim: %s lim: %s %s" % (dim, minList[dim], maxList[dim]))
+            if plotDict:
+                titleStr += '\n' + self.getTitleFromDict(plotDict)
+            # end for
+
+            clf()
+            doSymbolByEntry = getDeepByKeysOrAttributes( plotDict, SYMBOL_BY_ENTRY)
+            if not doSymbolByEntry:
+                scatter(x=floatValueLoL2[0], y=floatValueLoL2[1], s=10, c='b', marker='o', cmap=None, norm=None, vmin=None, vmax=None, alpha=None, linewidths=None, faceted=False )
+            else:
+                floatValueLoLoL = []
+                entry_name_map = {}
+                colorList = 'b k y g r b k y g r b k y g r'.split()
+                markerList = 's o ^ > v < d p h 8 + x'.split()
+                NTdebug("Using colorList: %s" % str(colorList))
+                NTdebug("Using markerList: %s" % str(markerList))
+                for row_idx in range(len(floatValueLoL_x)):
+                    floatValueL_x = floatValueLoL_x[row_idx]
+                    entry_name = floatValueL_x[0]
+                    entry_name = entry_name.replace('Piscataway2','')
+                    entry_name = entry_name.replace('Piscataway','')
+                    if not entry_name_map.has_key(entry_name):
+                         entry_name_map[ entry_name ] = len( entry_name_map.keys())
+                         floatValueLoLoL.append(([],[]))
+                    entryIdx = entry_name_map.get( entry_name )
+                    floatValueLoL = floatValueLoLoL[entryIdx]
+                    level_idx = floatValueL_x[level_pos]
+    #                dim_xDict[ row_idx ] = dim_yDict.get(level_idx)
+    #                resultRecord = [ entry_name, chain_id, res_id, atom_id, v ]
+                    floatValueLoL[0].append(floatValueL_x[-1])
+                    floatValueLoL[1].append(floatValueLoL_y[dim_yDict.get(level_idx)][-1])
+                # end for
+                entry_name_list = entry_name_map.keys()
+                NTdebug("Using entry_name_list: %s" % str(entry_name_list))
+                NTdebug("Using len entry_name_list: %s" % len(entry_name_list))
+                entry_name_list.sort()
+                for entryIdx in range( len(entry_name_list) ):
+                    floatValueLoL = floatValueLoLoL[entryIdx]
+                    scatter(x=floatValueLoL[0], y=floatValueLoL[1], s=10, c=colorList[entryIdx], edgecolors=colorList[entryIdx],
+                            marker=markerList[entryIdx], label=entry_name_list[entryIdx] )
+                    plot()
+                legend()
+            # end if
+            if minList[0] != None:
+                xlim(xmin=minList[0])
+
+            xlabel(labelList[0])
+            ylabel(labelList[1])
+            # end else normed
+            grid(True)
+            # end else trending
+            NTdebug("Title:\n%s" % titleStr)
+            title(titleStr, fontsize='small')
+            for fmt in ['png' ]:
+                fn = "plotHist_%s.%s" % (chk_id_unique, fmt)
+                NTdebug("Writing " + fn)
+                savefig(fn)
+#~
+        # end for plot
+    # end def
+
+
     def createPlots(self, doTrending = False):
         ''' The code below can use settings in the form of a dictionary that influences the
         plotting.
@@ -337,8 +628,8 @@ AND '{2}' <@ S.chain_type; -- contains at least one protein chain.
         # NB The level of project is equivalent to the entry level in the database.
         # Sorted by project, program.
 
-        if doTrending:
-            os.chdir(dir_plotTrending)
+#        if doTrending:
+#            os.chdir(dir_plotTrending)
 
         try:
             djaflsjlfjalskdjf #@UndefinedVariable
@@ -348,7 +639,20 @@ AND '{2}' <@ S.chain_type; -- contains at least one protein chain.
             plotList = [
 #            [ PROJECT_LEVEL, CING_STR, DISTANCE_COUNT_STR,dict4 ],
 #            [ PROJECT_LEVEL, WHATIF_STR, RAMCHK_STR, {ONLY_SELECTION:1} ],
-            [ RES_LEVEL, CING_STR, RDB_QUEENY_INFORMATION_STR, {ONLY_NON_ZERO:1} ],
+#            [ RES_LEVEL, CING_STR, RDB_QUEENY_INFORMATION_STR,  {IS_FALSE: SEL1_STR} ],
+#            [ RES_LEVEL, CING_STR, RDB_QUEENY_UNCERTAINTY1_STR, {IS_FALSE: SEL1_STR} ],
+#            [ RES_LEVEL, CING_STR, RDB_QUEENY_UNCERTAINTY2_STR, {IS_FALSE: SEL1_STR} ],
+            [ RES_LEVEL, CING_STR, RDB_QUEENY_INFORMATION_STR,  {IS_TRUE: SEL1_STR} ],
+#            [ RES_LEVEL, CING_STR, RDB_QUEENY_UNCERTAINTY1_STR, {IS_TRUE: SEL1_STR} ],
+#            [ RES_LEVEL, CING_STR, RDB_QUEENY_UNCERTAINTY2_STR, {IS_TRUE: SEL1_STR} ],
+#            [ RES_LEVEL, CING_STR, RMSD_BACKBONE_STR, {IS_TRUE: SEL1_STR} ],
+#            [ RES_LEVEL, CING_STR, RMSD_SIDECHAIN_STR, {IS_TRUE: SEL1_STR} ],
+#            [ RES_LEVEL, CING_STR, RMSD_BACKBONE_STR, {IS_FALSE: SEL1_STR} ],
+#            [ RES_LEVEL, CING_STR, RMSD_SIDECHAIN_STR, {IS_FALSE: SEL1_STR} ],
+#            [ RES_LEVEL, CING_STR, CV_BACKBONE_STR, {IS_TRUE: SEL1_STR} ],
+#            [ RES_LEVEL, CING_STR, CV_SIDECHAIN_STR, {IS_TRUE: SEL1_STR} ],
+#            [ RES_LEVEL, CING_STR, CV_BACKBONE_STR, {IS_FALSE: SEL1_STR} ],
+#            [ RES_LEVEL, CING_STR, CV_SIDECHAIN_STR, {IS_FALSE: SEL1_STR} ],
             ]
 
 
@@ -359,11 +663,7 @@ AND '{2}' <@ S.chain_type; -- contains at least one protein chain.
             chk_id_unique = '.'.join([level,progId,chk_id])
             NTdebug("Starting with: %s" % chk_id_unique)
             floatValueLoL = m.getFloatLoLFromDb(level, progId, chk_id, **plotDict)
-            if False: # DEFAULT False. Block used for checking procedures.
-                mu = 100.
-                sigma = sqrt(5)
-                floatValueLoL = [[None, gauss(mu, sigma)] for i in range(100000)]
-
+#            resultRecord = [ entry_name, chain_id, res_id, atom_id, v ]
             if len(floatValueLoL) == 0:
                 NTmessage("Got empty float LoL from db for: %s skipping plot" % chk_id_unique)
                 continue
@@ -373,7 +673,7 @@ AND '{2}' <@ S.chain_type; -- contains at least one protein chain.
 
             floatNTlist = NTlist()
             for i in range(len(floatValueLoL)):
-                floatNTlist.append(floatValueLoL[i][1])
+                floatNTlist.append(floatValueLoL[i][4])
             av, sd, n = floatNTlist.average()
             minValue = floatNTlist.min()
             maxValue = floatNTlist.max()
@@ -384,29 +684,15 @@ AND '{2}' <@ S.chain_type; -- contains at least one protein chain.
                     NTwarning("Skipping plot were the min = max value.")
                     continue
 
-            titleStr = "av/sd/n %.3f %.3f %d min/max %.3f %.3f" % (av, sd, n, minValue, maxValue )
+            titleStr = self.getTitleFromStats( av, sd, n, minValue, maxValue )
             if plotDict:
                 titleStr += '\n'
-            if getDeepByKeysOrAttributes( plotDict, DIVIDE_BY_RESIDUE_COUNT):
-                titleStr += ' perRes'
-#            if getDeepByKeysOrAttributes( plotDict, ONLY_PROTEIN): # TODO: here
-#                titleStr += ' onlyAA'
-            if getDeepByKeysOrAttributes( plotDict, ONLY_SELECTION):
-                titleStr += ' onlySel'
-            if getDeepByKeysOrAttributes( plotDict, ONLY_NON_ZERO):
-                titleStr += ' only!zero'
-
-
-            xmin = None
-            xmax = None
-            if getDeepByKeysOrAttributes( plotDict, USE_MIN_VALUE_STR) and \
-               getDeepByKeysOrAttributes( plotDict, USE_MAX_VALUE_STR):
-                xmin = getDeepByKeysOrAttributes( plotDict, USE_MIN_VALUE_STR)
-                xmax = getDeepByKeysOrAttributes( plotDict, USE_MAX_VALUE_STR)
-                titleStr += ' [%.3f,%.3f]' % (xmin,xmax)
-
+            titleStr += self.getTitleFromDict( plotDict )
             NTmessage("Plotting level/program/check: %10s %10s %15s with options: %s %s" % (level,progId,chk_id,titleStr,plotDict))
             clf()
+
+            xmin = getDeepByKeysOrAttributes( plotDict, USE_MIN_VALUE_STR)
+            xmax = getDeepByKeysOrAttributes( plotDict, USE_MAX_VALUE_STR)
 
             if doTrending:
                 num_points_line = 100
@@ -414,7 +700,7 @@ AND '{2}' <@ S.chain_type; -- contains at least one protein chain.
                 x = NTlist()
                 xDate = NTlist()
                 for i in range(len(floatNTlist)):
-                    dateObject = floatValueLoL[i][2]
+                    dateObject = floatValueLoL[i][5]
                     x.append(date2num(dateObject))
                     xDate.append(dateObject)
                 # end list creation.
@@ -519,7 +805,8 @@ AND '{2}' <@ S.chain_type; -- contains at least one protein chain.
                     else:
                         NTdebug("Plotting analytically parameterized function.")
                         q = p0
-                    plot(t, fitfunc(q, t), "r--", linewidth=1) # Plot of the data and the fit
+                    if 0:
+                        plot(t, fitfunc(q, t), "r--", linewidth=1) # Plot of the data and the fit
                     ylabel('Frequency')
                 # end else normed
                 grid(True)
@@ -531,7 +818,6 @@ AND '{2}' <@ S.chain_type; -- contains at least one protein chain.
                 fn = "plotHist_%s.%s" % (chk_id_unique, fmt)
                 NTdebug("Writing " + fn)
                 savefig(fn)
-#~
         # end for plot
     # end def
 
@@ -820,8 +1106,10 @@ if __name__ == '__main__':
 
     m = nrgCingRdb( schema=schema )
 
-    if 1:
+    if 0:
         m.createPlots(doTrending = False)
+    if 1:
+        m.createScatterPlots()
     if False:
 #        m.plotQualityVsColor()
 #        m.plotQualityPcVsColor()

@@ -154,10 +154,21 @@ SELECT e.pdb_id
 
 
 
-SELECT E.name,  R.name, R.number, queen_information
+SELECT E.name,  R.name, R.number, queen_information, queen_uncertainty1, queen_uncertainty2
+
+SELECT E.name,  avg( r.queen_information ), count(*), e.res_count
 FROM casdcing.CINGENTRY E, "casdcing"."cingresidue" R
 where E.entry_id = R.entry_id
-AND E.name = 'AR3436APiscataway2'
-order by E.name, R.number
+and queen_information IS NOT NULL AND queen_information != 0.0
+group by e.name, e.res_count
+order by E.name;
+
+
+SELECT E.name,  R.residue_id, R.name, R.number,R.rmsd_backbone, R.rmsd_sidechain
+FROM casdcing.CINGENTRY E, "casdcing"."cingresidue" R
+where E.entry_id = R.entry_id
+AND E.name = 'CGR26APiscataway'
+order by E.name, R.number;
+
 
 

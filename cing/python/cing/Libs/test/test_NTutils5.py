@@ -84,6 +84,8 @@ class AllChecks(TestCase):
 
     def testAppendFromTable(self):
         myTable = [ (1,'a'), (2, 'b') ]
+        # First column is (1,'a')
+        # First row is a header row (1,2)
         myDict = NTdict()
 #        myDictExpected = NTdict(1='a')        not allowed to have an integer as the key in this specification.
         myDictExpected = NTdict()
