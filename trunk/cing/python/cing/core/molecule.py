@@ -1626,6 +1626,7 @@ class Molecule( NTtree, ResidueList ):
 
     def updateDihedrals( self, residueList = None)   :
         """Calculate the dihedral angles for all residues
+        Return True on error.
         """
 #        NTdebug('Calculating dihedral angles')
         if residueList == None:
@@ -1637,6 +1638,12 @@ class Molecule( NTtree, ResidueList ):
             #end for
             res.setCvBackboneSidechain() # will automatically skip non-amino acids.
         #end for
+
+        if not isinstance(residueList, list):
+            NTcodeerror("In updateDihedrals the residueList is not of a class list")
+            return True
+        if not isinstance(residueList, NTlist):
+            residueList = NTlist( *residueList )
 
         for cvType in [ CV_BACKBONE_STR, CV_SIDECHAIN_STR ]:
             cvList = residueList.zap(cvType)
@@ -2204,8 +2211,8 @@ Return an Molecule instance or None on error
             if debugRoutine:
                 NTwarning("No residues left in rangesByCv; max cvList of any residue: %s" % max_cv)
             return EMPTY_RANGES_STR
-        if max_cv < 0.2:
-            NTdebug("No residues with cv above 0.2 which is weird. Max cv is: %s" % max_cv)
+#        if max_cv < 0.2:
+#            NTdebug("No residues with cv above 0.2 which is weird. Max cv is: %s" % max_cv)
         if debugRoutine:
             NTdebug("In rangesByCv; max cvList of any residue: %s" % max_cv)
 

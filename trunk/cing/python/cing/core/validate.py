@@ -89,7 +89,7 @@ def runCingChecks( project, toFile=True, ranges=None ):
 
 "Need this here so the code can be tested. I.e. returns a meaningful status if needed."
 def validate( project, ranges=None, parseOnly=False, htmlOnly=False,
-        doProcheck = True, doWhatif=True, doWattos=True, doTalos=True, doSuperpose = True,
+        doProcheck = True, doWhatif=True, doWattos=True, doTalos=True, doQueeny=True, doSuperpose = True,
         validateFastest = False, validateCingOnly = False, validateImageLess = False ):
     if ranges == None:
         ranges = project.molecule.ranges
@@ -99,6 +99,7 @@ def validate( project, ranges=None, parseOnly=False, htmlOnly=False,
         doProcheck = False
         doWattos = False
         doTalos = False
+        doQueeny = False
     if validateFastest or validateImageLess:
         htmlOnly = True
 
@@ -113,6 +114,8 @@ def validate( project, ranges=None, parseOnly=False, htmlOnly=False,
         project.runProcheck(ranges=ranges, parseOnly=parseOnly)
     if doWattos and getDeepByKeysOrAttributes(plugins, WATTOS_STR, IS_INSTALLED_STR):
         project.runWattos(parseOnly=parseOnly)
+    if doQueeny:
+        project.runQueeny()
     if doTalos and getDeepByKeysOrAttributes(plugins, NIH_STR, IS_INSTALLED_STR):
         project.runTalosPlus(parseOnly=parseOnly)
     if doSuperpose:

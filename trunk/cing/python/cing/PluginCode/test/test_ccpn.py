@@ -21,13 +21,13 @@ import unittest
 
 class AllChecks(TestCase):
 
-    entryList = "1brv_cs_pk_2mdl".split() # DEFAULT because it contains many data types and is small/fast to run.
-# Set for creating ccpn projects from cyana pdbs.
-#    entryList = "1a4d 1ai0 1brv_1model 1hkt_1model 1i1s 1ka3 1tgq_1model 1tkv 1y4o_1model 2hgh_1model 2hm9 H2_2Ca_53".split()
+#    entryList = "1brv_cs_pk_2mdl".split() # DEFAULT because it contains many data types and is small/fast to run.
+#    entryList = "1bus".split() # DEFAULT because it contains many data types and is small/fast to run.
+    entryList = "1a4d 1ai0 1brv_cs_pk_2mdl 1bus 2hgh".split()
     def testInitFromAndSaveToCcpn(self):
 
 #        if you have a local copy you can use it; make sure to adjust the path setting below.
-        fastestTest = True
+        fastestTest = 1        # Not passed to the validate routine in order to customize checks for speed.
 
         modelCount=99
         redoFromCingProject = False
@@ -35,6 +35,7 @@ class AllChecks(TestCase):
         doWhatif = True # disables whatif actual run
         doProcheck = True
         doWattos = True
+        doQueeny = True
         doTalos = True
         useNrgArchive = False
         ranges = 'cv'
@@ -51,6 +52,7 @@ class AllChecks(TestCase):
             doWhatif = False
             doProcheck = False
             doWattos = False
+            doQueeny = True
             doTalos = False
             doRestoreCheck = False
             doStoreCheck = False
@@ -135,9 +137,11 @@ class AllChecks(TestCase):
             if True:
                 self.assertFalse(project.validate(htmlOnly = htmlOnly,
                                               ranges=ranges,
+#                                              fastestTest=fastestTest, # disabled
                                               doProcheck = doProcheck,
                                               doWhatif = doWhatif,
                                               doWattos=doWattos,
+                                              doQueeny = doQueeny,
                                               doTalos=doTalos
                                                ))
                 if doWattos:
