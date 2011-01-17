@@ -130,7 +130,7 @@ class Queeny( odict ):
     #end def
 
     def initTopology(self):
-        NTdebug('Queeny.initTopology: initializing topology')
+#        NTdebug('Queeny.initTopology: initializing topology')
         for atm in self.molecule.allAtoms():
             for atmN in atm.topology():
 
@@ -308,7 +308,7 @@ class Queeny( odict ):
         Only distances for now
         """
 
-        NTdebug('Queeny.initRestraints: adding restraints (# elements = %d)', len(self))
+        NTmessage('Queeny.initRestraints: adding restraints (# elements = %d)', len(self))
 
         for dme in self.itervalues():
             dme.upperChange = 0.0
@@ -418,7 +418,7 @@ class Queeny( odict ):
 
     def triangulateAll(self, cutoff=0.1, maxDepth=4):
 
-        NTdebug('Queeny.triangulateAll: starting')
+#        NTdebug('Queeny.triangulateAll: starting')
         count = 1
         depth = 0
 
@@ -441,8 +441,8 @@ class Queeny( odict ):
 
 
                 if dme12.upperChange < cutoff:
-                    NTdebug('Queeny.triangulateAll: depth: %d nkeys %4d  key %4d  len %6d  count %4d %7.3f  BREAK',
-                            depth, nkeys, key, len(self), count, dme12.upperChange)
+#                    NTdebug('Queeny.triangulateAll: depth: %d nkeys %4d  key %4d  len %6d  count %4d %7.3f  BREAK',
+#                            depth, nkeys, key, len(self), count, dme12.upperChange)
                     break
                 #end if
 
@@ -460,7 +460,7 @@ class Queeny( odict ):
             #end while
             self.setNeighbors(nkeys) # Update neighbor lists for newly added elements (starting at nkeys)
 
-            NTdebug('Queeny.triangulateAll: depth: %d nkeys %4d  key %4d  len %6d  count %4d', depth, nkeys, key, len(self), count)
+#            NTdebug('Queeny.triangulateAll: depth: %d nkeys %4d  key %4d  len %6d  count %4d', depth, nkeys, key, len(self), count)
             depth += 1
         #end while
     #end def
@@ -470,7 +470,7 @@ class Queeny( odict ):
         - each atom[key] of molecule
         - each residue[key] of molecule
         """
-        NTdebug('Queeny.setUncertainty: starting')
+#        NTdebug('Queeny.setUncertainty: starting')
 
         for dme in self.itervalues():
             if dme.upper > dme.lower:
@@ -520,7 +520,7 @@ class Queeny( odict ):
         - each residue of molecule
         using key1 and key2
         """
-        NTdebug('Queeny.setInformation: starting')
+#        NTdebug('Queeny.setInformation: starting')
         for atm in self.molecule.allAtoms():
             if atm.has_key(key1) and atm.has_key(key2):
                 atm[informationKey] = atm[key1]-atm[key2]
@@ -571,6 +571,7 @@ def runQueeny( project, tmp=None ):
     Returns True on error.
     Returns False when all is fine.
     """
+    NTmessage("==> Calculating restraint information by Queeny")
     if project == None:
         NTerror("runQueeny: No project defined")
         return True

@@ -82,10 +82,13 @@ class AllChecks(TestCase):
 #                        self.assertAlmostEqual(expected,information,3)
             if doStoreCheck:
 #                # Does require:
-                from cing.PluginCode.sqlAlchemy import csqlAlchemy #@UnusedImport
-                pdbEntryId = entryId[0:4]
-                if doStoreCING2db( pdbEntryId, ARCHIVE_DEV_NRG_ID, project=project):
-                    NTerror("Failed to store CING project's data to DB but continuing.")
+                try:
+                    from cing.PluginCode.sqlAlchemy import csqlAlchemy #@UnusedImport
+                    pdbEntryId = entryId[0:4]
+                    if doStoreCING2db( pdbEntryId, ARCHIVE_DEV_NRG_ID, project=project):
+                        NTerror("Failed to store CING project's data to DB but continuing.")
+                except:
+                    NTwarning("Failed to doStoreCING2db from test_queeny.py")
         # end for
     # end def test
 
