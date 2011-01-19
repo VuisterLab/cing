@@ -14,7 +14,7 @@ Once the file is uploaded to iCing, the iCing and CCPN Analysis interfaces allow
     {{{curl -i -F Action=Purge -F UserId=YOUR_USER_ID_HERE -F AccessKey=YOUR_ACCESS_ID_HERE https://nmr.cmbi.ru.nl/icing/serv/iCingServlet}}}
   # Repeat bullet 3 to see if your data really got removed. Make sure you clean your browser's cache. 
 
-*UserId lookup table*
+*`UserId` lookup table*
 || *Interace* || *`UserId`* ||
 || iCing || ano ||
 || CCPN Analysis || ccpnAp || 
