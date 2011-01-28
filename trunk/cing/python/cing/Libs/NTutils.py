@@ -3880,6 +3880,18 @@ def NTpath(path):
     return dirname, f[0], f[1]
 #end def
 
+def getFileName(path):
+    """Return a basename.extension from path"
+    May be empty:
+CING 11> os.path.split('/a/')
+Out[11]: ('/a', '')
+
+CING 12> os.path.split('/a')
+Out[12]: ('/', 'a')
+    """
+    d = os.path.split(path)
+    return d[1]
+
 def NTmkdir(path):
 
     """ creates missing directories for the given path and
@@ -4909,6 +4921,17 @@ def writeTextToFile(fileName, txt):
     try:
         fp = open(fileName, 'w')
         fprintf(fp, txt)
+        fp.close()
+    except:
+        NTtracebackError()
+        return True
+
+def writeDataToFile(fileName, data):
+    """Returns True on error"""
+#    NTdebug("Writing to %s text (first 20 chars) [%s]" % ( fileName, txt[:20]))
+    try:
+        fp = open(fileName, 'wb')
+        fp.write(data)
         fp.close()
     except:
         NTtracebackError()

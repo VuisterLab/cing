@@ -22,133 +22,161 @@ Accepted from manual list 1 for a total of 3339 matches
 Accepted unique 3339 PDB and 2993 BMRB entries
 Will write 3339 nrows and 2 ncols to newMany2OneTable.csv
 """
-from cing import cingRoot
-from cing.Libs.DBMS import DBMS
 from cing.Libs.DBMS import Relation
 from cing.Libs.NTutils import * #@UnusedWildImport
-from cing.NRG import nrgCing
-from cing.NRG.PDBEntryLists import getPdbEntries
+from cing.NRG.PDBEntryLists import * #@UnusedWildImport
+from cing.NRG.nrgCing import nrgCing
 from glob import glob
 
-cing.verbosity = cing.verbosityDebug
-n = nrgCing()
-csvFileDir = os.path.join(cingRoot, n.matchBmrbPdbDataDir)
-os.chdir(csvFileDir)
-relationNames = glob("*.csv")
-relationNames = [ relationName[:-4] for relationName in relationNames]
-dbms = DBMS()
-dbms.readCsvRelationList(relationNames, csvFileDir)
-if False: # done once.
+if __name__ == '__main__':
+    cing.verbosity = cing.verbosityDebug
+    n = nrgCing()
+    csvFileDir = os.path.join(cingRoot, matchBmrbPdbDataDir)
+    NTmessage("Reading csv files in %s" % csvFileDir)
+    os.chdir(csvFileDir)
+    relationNames = glob("*.csv")
+    relationNames = [ relationName[:-4] for relationName in relationNames]
     dbms = DBMS()
-    pdbList = getPdbEntries(onlyNmr = True)
-    pdbNmrTable = Relation('pdbNmr', dbms, columnList=['pdb_id'])
-    pdbIdColumn = pdbNmrTable.getColumnByIdx(0)
-    pdbIdColumn += pdbList
-    pdbNmrTable.writeCsvFile('pdbNmrTable.csv')
-if False:
-    newMany2OneTable =dbms.tables['newMany2OneTable']
+    dbms.readCsvRelationList(relationNames, csvFileDir)
+    if 1: # Only do once a week.
+        dbms2 = DBMS()
+        pdbList = getPdbEntries(onlyNmr = True)
+        pdbNmrTable = Relation('pdbNmr', dbms2, columnList=['pdb_id'])
+        pdbIdColumn = pdbNmrTable.getColumnByIdx(0)
+        pdbIdColumn += pdbList
+        pdbNmrTable.writeCsvFile('pdbNmrTable.csv')
+    if 0: # Only do once a week.
+        bmrbIdList = getBmrbEntries()
+        bmrbSttIdList = [ str(bmrbId) for bmrbId in bmrbIdList ]
+        writeTextToFile('bmrb.csv', 'bmrb_id\n' + '\n'.join(bmrbSttIdList))
+    if False:
+        newMany2OneTable =dbms.tables['newMany2OneTable']
 
-newMany2OneTable = Relation('newMany2OneTable', dbms, columnList=['pdb_id', 'bmrb_id'])
-bmrbIdNewMany2OneList = newMany2OneTable.getColumn('bmrb_id')
-pdbIdNewMany2OneList = newMany2OneTable.getColumn('pdb_id')
+    newMany2OneTable = Relation('newMany2OneTable', dbms, columnList=['pdb_id', 'bmrb_id'])
+    bmrbIdNewMany2OneList = newMany2OneTable.getColumn('bmrb_id')
+    pdbIdNewMany2OneList = newMany2OneTable.getColumn('pdb_id')
 
-tableScore_many2one = dbms.tables['score_many2one']
-bmrbIdOldMany2OneList = tableScore_many2one.getColumn('bmrb_id')
-pdbIdOldMany2OneList = tableScore_many2one.getColumn('pdb_id')
+    tableScore_many2one = dbms.tables['score_many2one']
+    bmrbIdOldMany2OneList = tableScore_many2one.getColumn('bmrb_id')
+    pdbIdOldMany2OneList = tableScore_many2one.getColumn('pdb_id')
 
-# Not that this table is a one 2 many unlike what I need.
-tableAdit = dbms.tables['adit_nmr_matched_pdb_bmrb_entry_ids']
-bmrbIdAditList = tableAdit.getColumn('bmrb_id')
-pdbIdAditList = tableAdit.getColumn('pdb_id')
-pdbIdAditNmrHash = list2dict( pdbIdAditList )
+    # Not that this table is a one 2 many unlike what I need.
+    tableAdit = dbms.tables['adit_nmr_matched_pdb_bmrb_entry_ids']
+    bmrbIdAditList = tableAdit.getColumn('bmrb_id')
+    pdbIdAditList = tableAdit.getColumn('pdb_id')
+    pdbIdAditNmrHash = list2dict( pdbIdAditList )
 
-tableManual = dbms.tables['manualMatches']
-bmrbIdManualList = tableManual.getColumn('bmrb_id')
-pdbIdManualList = tableManual.getColumn('pdb_id')
-pdbIdManualNmrHash = list2dict( pdbIdManualList )
-
-tablePdbNmrTable = dbms.tables['pdbNmrTable']
-pdbIdPdbNmrList = tablePdbNmrTable.getColumn('pdb_id')
-pdbIdPdbNmrHash = list2dict( pdbIdPdbNmrList )
-
-bmrbTable = dbms.tables['bmrb']
-bmrbIdList = bmrbTable.getColumn('bmrb_id')
-bmrbIdHash = list2dict( bmrbIdList )
-
-pdbIdListAbsent =[]
-bmrbIdListAbsent =[]
-for idx, pdb_id in enumerate(pdbIdOldMany2OneList):
-    bmrb_id = bmrbIdOldMany2OneList[idx]
-    if not pdbIdPdbNmrHash.has_key(pdb_id):
-        pdbIdListAbsent.append(pdb_id)
-        continue
-    if not bmrbIdHash.has_key(bmrb_id):
-        bmrbIdListAbsent.append(bmrb_id)
-        continue
-    bmrbIdNewMany2OneList.append(bmrb_id)
-    pdbIdNewMany2OneList.append(pdb_id)
-
-l1 = len(pdbIdNewMany2OneList)
-NTmessage("Skipped: %s obsolete PDB entries from score_many2one %s" % (len(pdbIdListAbsent),str(pdbIdListAbsent)))
-NTmessage("Skipped: %s obsolete BMRB entries from score_many2one %s" % (len(bmrbIdListAbsent),str(bmrbIdListAbsent)))
-NTmessage("Accepted from old list %s matches" % l1)
-
-pdbIdListDouble = []
-pdbIdListObsolete = []
-bmrbIdListObsolete = []
-for idx, pdb_id in enumerate(pdbIdAditList):
-    bmrb_id = bmrbIdAditList[idx]
-    if pdbIdAditNmrHash[pdb_id] > 1:
-        if pdb_id not in pdbIdListDouble:
-            pdbIdListDouble.append(pdb_id)
-        continue
-    if not pdbIdPdbNmrHash.has_key(pdb_id):
-        pdbIdListObsolete.append(pdb_id)
-        continue
-    if not bmrbIdHash.has_key(bmrb_id):
-        bmrbIdListObsolete.append(bmrb_id)
-        continue
-    if pdb_id in pdbIdNewMany2OneList:
-        continue
-#    if bmrb_id in bmrbIdNewMany2OneList: allow this.
-#        continue
-    bmrbIdNewMany2OneList.append(bmrb_id)
-    pdbIdNewMany2OneList.append(pdb_id)
+    # New table from Dmitri
+    tableAdit2 = dbms.tables['BMRB_PDB_match']
+    bmrbIdAdit2List = tableAdit2.getColumn('BMRB_ID')
+    pdbIdAdit2List = tableAdit2.getColumn('PDB_ID')
+    pdbIdAdit2NmrHash = list2dict( pdbIdAdit2List )
 
 
-ltotal1 = len(pdbIdNewMany2OneList)
-l2 = ltotal1 - l1
+    tableManual = dbms.tables['manualMatches']
+    bmrbIdManualList = tableManual.getColumn('bmrb_id')
+    pdbIdManualList = tableManual.getColumn('pdb_id')
+    pdbIdManualNmrHash = list2dict( pdbIdManualList )
 
-for idx, pdb_id in enumerate(pdbIdManualList):
-    bmrb_id = bmrbIdManualList[idx]
-    if not pdbIdPdbNmrHash.has_key(pdb_id):
-        NTerror("Failed to find %s in PDB; update the manual list." % pdb_id)
-        continue
-    if not bmrbIdHash.has_key(bmrb_id):
-        NTerror("Failed to find %s in BMRB; update the manual list." % bmrb_id)
-        continue
-    if pdb_id in pdbIdNewMany2OneList:
-        NTdebug("Already found %s in PDB; consider updating the manual list." % pdb_id)
-        continue
-#    if bmrb_id in bmrbIdNewMany2OneList: allow this.
-#        continue
-    bmrbIdNewMany2OneList.append(bmrb_id)
-    pdbIdNewMany2OneList.append(pdb_id)
+    tablePdbNmrTable = dbms.tables['pdbNmrTable']
+    pdbIdPdbNmrList = tablePdbNmrTable.getColumn('pdb_id')
+    pdbIdPdbNmrHash = list2dict( pdbIdPdbNmrList )
 
-ltotal2 = len(pdbIdNewMany2OneList)
-l3 = ltotal2 - ltotal1
+    bmrbTable = dbms.tables['bmrb']
+    bmrbIdList = bmrbTable.getColumn('bmrb_id')
+    bmrbIdHash = list2dict( bmrbIdList )
 
-pdbIdNewHash = list2dict( pdbIdNewMany2OneList )
-bmrbIdNewHash = list2dict( bmrbIdNewMany2OneList )
-uniquePdbCount = len(pdbIdNewHash)
-uniqueBmrbCount = len(bmrbIdNewHash)
+    pdbIdListAbsent =[]
+    bmrbIdListAbsent =[]
+    for idx, pdb_id in enumerate(pdbIdOldMany2OneList):
+        bmrb_id = bmrbIdOldMany2OneList[idx]
+        if not pdbIdPdbNmrHash.has_key(pdb_id):
+            pdbIdListAbsent.append(pdb_id)
+            continue
+        if not bmrbIdHash.has_key(bmrb_id):
+            bmrbIdListAbsent.append(bmrb_id)
+            continue
+        bmrbIdNewMany2OneList.append(bmrb_id)
+        pdbIdNewMany2OneList.append(pdb_id)
 
-NTmessage("Skipped: %s double entries from pdbIdAditList %s" % (len(pdbIdListDouble),str(pdbIdListDouble)))
-NTmessage("Skipped: %s obsolete PDB entries from adit %s" % (len(pdbIdListObsolete),str(pdbIdListObsolete)))
-NTmessage("Skipped: %s obsolete BMRB entries from adit %s" % (len(bmrbIdListObsolete),str(bmrbIdListObsolete)))
-NTmessage("Accepted from adit list   %s for a total of %s matches" %( l2, ltotal1))
-NTmessage("Accepted from manual list %s for a total of %s matches" %( l3, ltotal2))
-NTmessage("Accepted unique %d PDB and %d BMRB entries" %( uniquePdbCount, uniqueBmrbCount))
+    l1 = len(pdbIdNewMany2OneList)
+    NTmessage("Skipped: %s obsolete PDB entries from score_many2one %s" % (len(pdbIdListAbsent),str(pdbIdListAbsent)))
+    NTmessage("Skipped: %s obsolete BMRB entries from score_many2one %s" % (len(bmrbIdListAbsent),str(bmrbIdListAbsent)))
+    NTmessage("Accepted from old list %s matches" % l1)
 
-newMany2OneTable.writeCsvFile()
+
+
+    # Do both adit lists
+    pdbIdLoLDouble = [[],[]]
+    pdbIdLoLObsolete = [[],[]]
+    bmrbIdLoLObsolete =[[],[]]
+    ltotal1 = [ -1, -1]
+    l2 = [ -1, -1]
+    nadit = 2
+    for aditIdx, pdbIdAditXList in enumerate( [pdbIdAditList, pdbIdAdit2List] ):
+        bmrbIdAditXList = (bmrbIdAditList, bmrbIdAdit2List )[aditIdx]
+        pdbIdAditXNmrHash = (pdbIdAditNmrHash, pdbIdAdit2NmrHash )[aditIdx]
+        pdbIdListDouble = pdbIdLoLDouble[aditIdx]
+        pdbIdListObsolete = pdbIdLoLObsolete[aditIdx]
+        bmrbIdListObsolete = bmrbIdLoLObsolete[aditIdx]
+        for idx, pdb_id in enumerate(pdbIdAditXList):
+            bmrb_id = bmrbIdAditXList[idx]
+            if pdbIdAditXNmrHash[pdb_id] > 1:
+                if pdb_id not in pdbIdListDouble:
+                    pdbIdListDouble.append(pdb_id)
+                continue
+            if not pdbIdPdbNmrHash.has_key(pdb_id):
+                pdbIdListObsolete.append(pdb_id)
+                continue
+            if not bmrbIdHash.has_key(bmrb_id):
+                bmrbIdListObsolete.append(bmrb_id)
+                continue
+            if pdb_id in pdbIdNewMany2OneList:
+                continue
+        #    if bmrb_id in bmrbIdNewMany2OneList: allow this.
+        #        continue
+            bmrbIdNewMany2OneList.append(bmrb_id)
+            pdbIdNewMany2OneList.append(pdb_id)
+        ltotal1[aditIdx] = len(pdbIdNewMany2OneList)
+        if aditIdx == 0:
+            l2[aditIdx] = ltotal1[aditIdx] - l1
+        else:
+            l2[aditIdx] = ltotal1[aditIdx] - ltotal1[aditIdx-1]
+
+
+    for idx, pdb_id in enumerate(pdbIdManualList):
+        bmrb_id = bmrbIdManualList[idx]
+        if not pdbIdPdbNmrHash.has_key(pdb_id):
+            NTerror("Failed to find %s in PDB; update the manual list." % pdb_id)
+            continue
+        if not bmrbIdHash.has_key(bmrb_id):
+            NTerror("Failed to find %s in BMRB; update the manual list." % bmrb_id)
+            continue
+        if pdb_id in pdbIdNewMany2OneList:
+            NTdebug("Already found %s in PDB; consider updating the manual list." % pdb_id)
+            continue
+    #    if bmrb_id in bmrbIdNewMany2OneList: allow this.
+    #        continue
+        bmrbIdNewMany2OneList.append(bmrb_id)
+        pdbIdNewMany2OneList.append(pdb_id)
+
+    ltotal2 = len(pdbIdNewMany2OneList)
+    l3 = ltotal2 - ltotal1[nadit-1]
+
+    pdbIdNewHash = list2dict( pdbIdNewMany2OneList )
+    bmrbIdNewHash = list2dict( bmrbIdNewMany2OneList )
+    uniquePdbCount = len(pdbIdNewHash)
+    uniqueBmrbCount = len(bmrbIdNewHash)
+
+    NTmessage("Skipped: %s double entries from pdbIdAditList %s" % (len(pdbIdListDouble),str(pdbIdListDouble)))
+    for aditIdx in range(nadit):
+        pdbIdLoLObsolete[aditIdx].sort()
+        bmrbIdLoLObsolete[aditIdx].sort()
+        NTmessage("Skipped: %s obsolete  PDB entries from adit%s %s" % (len( pdbIdLoLObsolete[aditIdx]), aditIdx,  str(pdbIdLoLObsolete[aditIdx])))
+        NTmessage("Skipped: %s obsolete BMRB entries from adit%s %s" % (len(bmrbIdLoLObsolete[aditIdx]), aditIdx, str(bmrbIdLoLObsolete[aditIdx])))
+        NTmessage("Accepted from adit%s %s for a total of %s matches" %(aditIdx, l2[aditIdx], ltotal1[aditIdx]))
+    NTmessage("Accepted from manual list %s for a total of %s matches" %( l3, ltotal2))
+    NTmessage("Accepted unique %d PDB and %d BMRB entries" %( uniquePdbCount, uniqueBmrbCount))
+
+    newMany2OneTable.writeCsvFile()
 

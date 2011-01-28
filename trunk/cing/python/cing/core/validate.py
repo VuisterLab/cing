@@ -1576,7 +1576,7 @@ def validateDihedralCombinations(project):
                     NTdebug("Failed to get the D1D2 hist for %s; skipping. Perhaps a non-protein residue was a neighbor?" % residue)
                     continue
                 if len(myHistList) != 3:
-                    NTerror("Expected exactly one but found %s histogram for %s with ssType %s; skipping" % (len(myHistList),residue, ssType))
+                    NTdebug("Expected exactly one but found %s histogram for %s with ssType %s; skipping" % (len(myHistList),residue, ssType))
                     continue
 #                myHist = myHistList[0]
             else:

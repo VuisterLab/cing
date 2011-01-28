@@ -123,9 +123,9 @@ def getBmrbCsCountsFromFile(inputStarFile):
 
     reportedSpinType = []
     for valuesFile in getattr(nmrStarFile, fileType):
-        NTdebug("getBmrbCsCountsFromFile valuesFile: %s" % valuesFile)
+#        NTdebug("getBmrbCsCountsFromFile valuesFile: %s" % valuesFile)
         valueList = getattr(valuesFile, measurementType)
-        NTdebug("getBmrbCsCountsFromFile size valueList: %s" % len(valueList))
+#        NTdebug("getBmrbCsCountsFromFile size valueList: %s" % len(valueList))
         for value in valueList:
             # value is a ccp.format.nmrStar.chemShiftsIO.NmrStarChemShift instance
 #            NTdebug("in NmrStar.NmrStarHandler.readNmrStarFile value: %s" % value)
@@ -134,17 +134,17 @@ def getBmrbCsCountsFromFile(inputStarFile):
 #            atomName = getDeepByKeysOrAttributes(  value, 'atomName' )
             if not csAtomType:
                 if csAtomType not in reportedSpinType:
-                    NTdebug("Skipping CS for less common atom type: %s" %  value.atomType )
+#                    NTdebug("Skipping CS for less common atom type: %s" %  value.atomType )
                     reportedSpinType.append(csAtomType)
                 continue
             if not hasattr( assignmentCountMap, csAtomType ):
                 if csAtomType not in reportedSpinType:
-                    NTdebug("Skipping CS for atom type unfit for CS: %s" % value)
+#                    NTdebug("Skipping CS for atom type unfit for CS: %s" % value)
                     reportedSpinType.append(csAtomType)
                 continue
             assignmentCountMap[ csAtomType] += 1
         # end for
     # end for
-    NTdebug(str(assignmentCountMap))
+    NTmessage("Read: %s" % str(assignmentCountMap))
     return assignmentCountMap
 # end def
