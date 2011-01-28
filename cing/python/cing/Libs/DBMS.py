@@ -431,13 +431,31 @@ class DBMS():
 
     def readCsvRelationList(self, relationNames, csvFileDir='.',
             csvDtdFileDir=None, checkConsistency=False, showChecks=False, containsHeaderRow=True):
+        'return True on error'
         csvFilesRead = len(relationNames)
         for i in range(csvFilesRead):
-            relation = Relation(relationNames[i], self)
-#            NTmessage("Reading relation : " + relation.name)
-            csvFileDir = os.path.abspath(csvFileDir)
-            csv_fileName = os.path.join(csvFileDir, relation.name + ".csv")
-            if relation.readCsvFile(csv_fileName, containsHeaderRow):
-                NTerror("Failed to read csv file: " + csv_fileName)
+            if self.readCsvRelation( relationNames[i], csvFileDir=csvFileDir, csvDtdFileDir=csvDtdFileDir, checkConsistency=checkConsistency, showChecks=showChecks, containsHeaderRow=containsHeaderRow):
+                NTerror("Failed to read relation: " + relationNames[i])
                 return True
+
+    def readCsvRelation(self, relationName, csvFileDir='.',
+            csvDtdFileDir=None, checkConsistency=False, showChecks=False, containsHeaderRow=True):
+        'return True on error'
+        relation = Relation(relationName, self)
+        NTmessage("Reading relation : " + relation.name)
+        csvFileDir = os.path.abspath(csvFileDir)
+        csv_fileName = os.path.join(csvFileDir, relation.name + ".csv")
+        if relation.readCsvFile(csv_fileName, containsHeaderRow):
+            NTerror("Failed to read csv file: " + csv_fileName)
+            return True
+
+# Convenience method
+def getRelationFromCsvFile( csvPath, containsHeaderRow=True):
+    'return True on error'
+    dbms = DBMS()
+    (directory, relationName, _extension) = NTpath(csvPath)
+    if dbms.readCsvRelation( relationName, csvFileDir=directory, containsHeaderRow=containsHeaderRow):
+        NTerror("Failed to getRelationFromCsvFile")
+        return True
+    return dbms.tables[relationName]
 

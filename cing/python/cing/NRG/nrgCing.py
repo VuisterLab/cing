@@ -1204,8 +1204,8 @@ class nrgCing(Lister):
 
 
             log_file = "%s_starCS2Ccpn.log" % entry_code
-            if 1: # Default: 0
-                self.matches_many2one = {
+            if not self.matches_many2one: # Default: 0 just for testing when retrieval of the mathes is bypassed.
+                    self.matches_many2one = {
 '1b4y': 4400 ,
 '1brv': 4020 ,
 '1bus': 53   ,
@@ -1293,7 +1293,7 @@ class nrgCing(Lister):
                 for nucleusId in nucleiToCheckList:
                     input_count = getDeepByKeysOrAttributes( entryMap, nucleusId )
                     project_count = getDeepByKeysOrAttributes( assignmentCountMap, nucleusId )
-                    NTdebug("nucleus: %s input: %s project: %s" % ( nucleusId, input_count, project_count ) )
+#                    NTdebug("nucleus: %s input: %s project: %s" % ( nucleusId, input_count, project_count ) )
                     if input_count == None or input_count == 0:
 #                        NTmessage("No nucleus: %s in input" % nucleusId)
                         continue
@@ -1308,11 +1308,12 @@ class nrgCing(Lister):
                 else:
                     f = (1. * project_count_total) / input_count_total
                 resultTuple = (self.FRACTION_CS_CONVERSION_REQUIRED, f, project_count, input_count)
+
                 if f < self.FRACTION_CS_CONVERSION_REQUIRED:
                     NTwarning("Found fraction less than %.2f but %.2f overall (input/project: %s/%s)" % resultTuple)
                     conversionCsSucces = False
                 else:
-                    NTwarning("Found fraction of at least %.2f at %.2f overall (input/project: %s/%s)" % resultTuple)
+                    NTmessage("Found fraction of at least %.2f at %.2f overall (input/project: %s/%s)" % resultTuple)
                 del project
             # end CS count check.
 
@@ -1370,7 +1371,7 @@ class nrgCing(Lister):
         NTmessage("Starting runCing")
 #        return True
 
-        NTmessage("Not using topos")
+        NTdebug("Not using topos")
         entryListFileName = "entry_list_todo.csv"
         writeTextToFile(entryListFileName, toCsv(self.entry_list_todo))
 

@@ -11,7 +11,7 @@ import unittest
 
 class AllChecks(TestCase):
 
-    def tttestiCingRobot(self):
+    def testiCingRobot(self):
         self.failIf(os.chdir(cingDirTmp), msg =
             "Failed to change to directory for temporary test files: " + cingDirTmp)
 #        url = 'http://restraintsgrid.bmrb.wisc.edu/servlet_data/NRG_ccpn_tmp'
@@ -21,9 +21,9 @@ class AllChecks(TestCase):
         ## queries possible; do one at a time going down the list.
         ## After the run is started the status will let you know if the run is finished
         ## The log will show what the server is doing at any one time.
-        doSave  = 1 # Upload to iCing and show derived urls
+        doSave  = 0 # Upload to iCing and show derived urls
         doRun   = 0 # Start the run in Nijmegen
-        doStatus= 0 # Find out if the run finished
+        doStatus= 1 # Find out if the run finished
         doLog   = 0 # Get the next piece of log file (may be empty)
         doPname = 0 # Get the project name back. This is the entryId below.
         doPurge = 0 # Remove data from server again.
@@ -31,8 +31,8 @@ class AllChecks(TestCase):
         # User id should be a short id (<without any special chars.)
     #    user_id = os.getenv("USER", "UnknownUser")
         user_id = "iCingRobot"
-    #    access_key = "123456"
-        access_key = getRandomKey() # Use a different one in a production setup.
+        access_key = "123456"
+#        access_key = getRandomKey() # Use a different one in a production setup.
 
         entryId = '1brv' # 68K, smallest for quick testing.
     #    entryId = 'gb1' # only included in xplor variant as single model.

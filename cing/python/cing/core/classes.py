@@ -477,9 +477,9 @@ Project: Top level Cing project class
                 if not os.path.exists(possibleProjectDir):
                     NTerror('Project.open: Failed to find project in .tgz file. Unable to open Project "%s"', name)
                     return None
-            else:
-                if not os.path.exists(possibleTgz):
-                    NTdebug("No " + possibleTgz + " found.")
+#            else:
+#                if not os.path.exists(possibleTgz):
+#                    NTdebug("No " + possibleTgz + " found.")
 #                    NTdebug("Skipping .tgz because there's already a .cing")
 #                else:
 

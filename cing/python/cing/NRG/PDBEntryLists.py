@@ -8,6 +8,7 @@ from cing import cingDirData
 from cing import cingPythonDir
 from cing import cingRoot
 from cing.Libs.DBMS import DBMS
+from cing.Libs.DBMS import getRelationFromCsvFile
 from cing.Libs.NTutils import * #@UnusedWildImport
 import urllib
 import urllib2
@@ -18,6 +19,7 @@ urlDB2 = "http://restraintsgrid.bmrb.wisc.edu/servlet_data/viavia/mr_mysql_backu
 
 #ocaUrl = "http://oca.ebi.ac.uk/oca-bin/ocaids"
 ocaUrl = "http://www.ebi.ac.uk/msd-srv/oca/oca-bin/ocaids"
+bmrbUrl ="http://www.bmrb.wisc.edu/ftp/pub/bmrb/relational_tables/nmr-star2.1/depsindb.csv.gz"
 
 testingLocally = False
 if testingLocally:
@@ -37,8 +39,8 @@ def getEntryListFromCsvFile(urlLocation):
   dataLines = data.split("\n")
   for dataLine in dataLines:
     if dataLine:
-        (pdbCode,) = dataLine.split()
-        result.append(pdbCode)
+        (entryCode,) = dataLine.split()
+        result.append(entryCode)
   return result
 
 def getBmrbLinks():
@@ -137,6 +139,23 @@ def readEntryListFromFile(fileName, headerCount=0):
         result = result[headerCount:]
     return result
 
+
+def getBmrbEntries():
+    """Includes solution and solid state NMR if onlyNMR is chosen
+    """
+    r1 = urllib.urlopen(bmrbUrl)
+    data = r1.read()
+    fileNameGz = getFileName(bmrbUrl)
+    writeDataToFile(fileNameGz, data)
+    fileName = fileNameGz[:-3] # remove .gz
+    gunzip(fileNameGz, outputFileName=fileName, removeOriginal=True)
+    bmrbDepRelation = getRelationFromCsvFile( fileName, containsHeaderRow=0 )
+    bmrbDateList = bmrbDepRelation.getColumnByIdx(0)
+    bmrbIdList = [ int(bmrbData[5:]) for bmrbData in bmrbDateList ]
+    NTdebug("Read %s entries in bmrbDateList" % len(bmrbIdList))
+    bmrbIdList.sort()
+    return bmrbIdList
+
 def getPdbEntries(onlyNmr=False, mustHaveExperimentalNmrData=False, onlySolidState=False):
     """Includes solution and solid state NMR if onlyNMR is chosen
     """
@@ -227,3 +246,6 @@ def getBmrbCsCounts():
     return bmrbCountMap
 
 # end def
+if __name__ == '__main__':
+    cing.verbosity = cing.verbosityDebug
+    getBmrbEntries()
