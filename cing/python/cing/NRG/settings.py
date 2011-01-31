@@ -16,12 +16,6 @@ isProduction = 1 # DEFAULT: 1 override for development in localConstants.py
 
 UJ              = '/Users/wim'
 WS              = os.path.join(UJ,'workspace')
-platform_dir    = os.path.join(UJ,'wattosTestingPlatform')  # For BMRB, and PDB and mmCIF formatted entries data. @UnusedVariable
-pdbbase_dir     = os.path.join(platform_dir,'pdb')          # For PDB and mmCIF formatted entries data. @UnusedVariable
-baseDir         = os.path.join(UJ,'CASD-NMR-CING') #@UnusedVariable
-baseCaspDir     = os.path.join(UJ, 'CASP-NMR-CING') #@UnusedVariable
-nrg_project     = 'nmrrestrntsgrid'
-nrg_dir         = os.path.join(WS,nrg_project)              # For NRG project code.
 dDir            = '/Library/WebServer/Documents'            # Web dir.
 
 try:
@@ -29,6 +23,13 @@ try:
     NTdebug("Loaded NRG localConstants.py.")
 except:
     NTdebug("Consider creating a localConstants.py file with a different 'user' location.")
+
+platform_dir    = os.path.join(UJ,'wattosTestingPlatform')  # For BMRB, and PDB and mmCIF formatted entries data. @UnusedVariable
+pdbbase_dir     = os.path.join(platform_dir,'pdb')          # For PDB and mmCIF formatted entries data. @UnusedVariable
+baseDir         = os.path.join(UJ,'CASD-NMR-CING') #@UnusedVariable
+baseCaspDir     = os.path.join(UJ, 'CASP-NMR-CING') #@UnusedVariable
+nrg_project     = 'nmrrestrntsgrid'
+nrg_dir         = os.path.join(WS,nrg_project)              # For NRG project code.
 
 scripts_dir     = os.path.join(nrg_dir,'scripts')
 wcf_dir         = os.path.join(scripts_dir,'wcf') #@UnusedVariable

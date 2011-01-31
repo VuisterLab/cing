@@ -377,7 +377,9 @@ Sum                %s
         for element in other:
 #            NTdebug("difference: Trying element: %s" % element)
             if hashedSelf.has_key(element):
-                idx = self.index(element)
+                idx = result.index(element)
+                if idx < 0:
+                    NTcodeerror("Skipping element [%s] in other because after all it was not in result" % element)
                 del result[idx]
         return result
 

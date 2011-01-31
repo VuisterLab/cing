@@ -389,8 +389,8 @@ class nrgCing(Lister):
             # end if
             if nr_error > 0:
                 self.entry_list_prep_failed.append(entry_code)
-                NTmessage("Found %s/%s timeTaken/entryCrashed and %d/%d/%d/%d error,warning,message, and debug lines." % (timeTaken, entryCrashed, nr_error, nr_warning, nr_message, nr_debug) )
-                NTmessage("%s Found %s errors in prep phase X please check: %s" % (entry_code, nr_error, logLastFile))
+                NTmessage("For %s found %s/%s timeTaken/entryCrashed and %d/%d/%d/%d error,warning,message, and debug lines. Please check: %s" % (entry_code, timeTaken, entryCrashed, nr_error, nr_warning, nr_message, nr_debug, logLastFile) )
+#                NTmessage("%s Found %s errors in prep phase X please check: %s" % (entry_code, nr_error, logLastFile))
                 continue
             # end if
             self.entry_list_prep_done.append(entry_code)
@@ -442,8 +442,8 @@ class nrgCing(Lister):
                     continue # don't mark it as stopped anymore.
                 # end if
                 if nr_error > self.MAX_ERROR_COUNT_CING_LOG:
-                    NTmessage("Found %s/%s timeTaken/entryCrashed and %d/%d/%d/%d error,warning,message, and debug lines." % (timeTaken, entryCrashed, nr_error, nr_warning, nr_message, nr_debug) )
-                    NTmessage("Found %s which is over %s please check: %s" % (nr_error, self.MAX_ERROR_COUNT_CING_LOG, entry_code))
+                    NTmessage("For %s found %s/%s timeTaken/entryCrashed and %d/%d/%d/%d error,warning,message, and debug lines." % (entry_code, timeTaken, entryCrashed, nr_error, nr_warning, nr_message, nr_debug) )
+#                    NTmessage("Found %s which is over %s please check: %s" % (nr_error, self.MAX_ERROR_COUNT_CING_LOG, entry_code))
 
                 if timeTaken:
                     self.timeTakenDict[entry_code] = timeTaken
@@ -523,19 +523,19 @@ class nrgCing(Lister):
                 continue
             timeTaken, entryCrashed, nr_error, nr_warning, nr_message, nr_debug = analysisResultTuple
             if entryCrashed:
-                NTmessage("For CING store log file: %s assumed crashed." % logLastFile)
+                NTmessage("For CING store log file: %s assumed crashed on basis of analyzeCingLog." % logLastFile)
                 self.entry_list_store_crashed.append(entry_code)
                 continue # don't mark it as stopped anymore.
             # end if
             if not entry_dict_store_in_db.has_key(entry_code):
-                NTmessage("Failed to find [%s] in db." % entry_code)
+                NTmessage("%s not in db." % entry_code)
                 self.entry_list_store_not_in_db.append(entry_code)
                 continue # don't mark it as stopped anymore.
             # end if
             if nr_error > self.MAX_ERROR_COUNT_CING_LOG:
                 self.entry_list_store_failed.append(entry_code)
-                NTmessage("Found %s/%s timeTaken/entryCrashed and %d/%d/%d/%d error,warning,message, and debug lines." % (timeTaken, entryCrashed, nr_error, nr_warning, nr_message, nr_debug) )
-                NTmessage("%s Found %s errors in storing please check: %s" % (entry_code, nr_error, logLastFile))
+                NTmessage("For %s found %s/%s timeTaken/entryCrashed and %d/%d/%d/%d error,warning,message, and debug lines. Please check: %s" % (entry_code, timeTaken, entryCrashed, nr_error, nr_warning, nr_message, nr_debug, logLastFile) )
+#                NTmessage("%s Found %s errors in storing please check: %s" % (entry_code, nr_error, logLastFile))
                 continue
             # end if
             self.entry_list_store_done.append(entry_code)
@@ -1604,7 +1604,7 @@ Additional modes I see:
     if len(sys.argv) > startArgListOther:
         argListOther = sys.argv[startArgListOther:]
     NTmessage('\nGoing to destination: %s with(out) on entry_code %s with extra arguments %s' % (destination, entry_code, str(argListOther)))
-    NTmessage('isProduction:                                                %s' % (isProduction))
+#    NTmessage('isProduction:                                                %s' % (isProduction))
 
     try:
         if destination == 'updateWeekly':
