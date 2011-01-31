@@ -1747,7 +1747,13 @@ class NTdict(dict):
 #            NTdebug("x returned by getConsensus() in getDeepAvgByKeys %s" % x)
             return x
 
-        r = result.average()
+        try:
+            r = result.average()
+        except:
+            NTerror("Rare case throws an error on bad ")
+            NTtracebackError()
+            r = None
+
         if r == None:
 #            NTdebug("None returned by average() in getDeepAvgByKeys")
             return None
@@ -2678,7 +2684,7 @@ def NTaverage2(theList, byIndex=None, fmt='%f +- %f' ):
 
 def NTaverage(theList, byIndex=None ):
     """Calculate average of theList
-       Assumes numeric list, None elements are ignored
+       Assumes numeric list (might throw exception otherwise), None elements are ignored
        byIndex allows for list of tuples r other elements
 
        returns
