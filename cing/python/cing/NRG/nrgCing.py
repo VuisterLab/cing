@@ -1458,7 +1458,7 @@ class nrgCing(Lister):
             if self.prepareEntry(entry_code, convertMmCifCoor=0, convertMrRestraints=1, convertStarCS=0):
                 NTerror("In prepare failed prepareEntry")
                 return True
-        if True: # DEFAULT: False
+        if False: # DEFAULT: False
             self.searchPdbEntries()
 #            self.entry_list_todo = "134d 135d 136d 177d 1crq 1crr 1ezc 1ezd 1gnc 1kld 1l0r 1lcc 1lcd 1msh 1qch 1r4e 1sah 1saj 1vve 2axx 2ezq 2ezr 2ezs 2i7z 2ku2 2neo 2ofg".split()
 #            self.entry_list_todo = "1crq 1crr 1ezc 1ezd 1kld 1sah 1saj 1vve 2axx 2ezq 2ezr 2ezs".split()
@@ -1541,6 +1541,7 @@ class nrgCing(Lister):
 
 #        self.searchPdbEntries()
 #        self.getEntryInfo()
+
 
         if False: # DEFAULT: False
             self.entry_list_done = '2hyn 2kj3 2ku1'.split()

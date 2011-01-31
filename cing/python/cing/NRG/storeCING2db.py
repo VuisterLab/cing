@@ -546,8 +546,8 @@ def doStoreCING2db( entry_code, archive_id, project = None):
                     a_wi_chichk = atom.getDeepAvgByKeys(WHATIF_STR, CHICHK_STR, VALUE_LIST_STR)
                     a_wi_dunchk = atom.getDeepAvgByKeys(WHATIF_STR, DUNCHK_STR, VALUE_LIST_STR)
                     a_wi_hndchk = atom.getDeepAvgByKeys(WHATIF_STR, HNDCHK_STR, VALUE_LIST_STR)
-                    a_wi_mischk = atom.getDeepAvgByKeys(WHATIF_STR, MISCHK_STR, VALUE_LIST_STR)
-                    a_wi_mo2chk = atom.getDeepAvgByKeys(WHATIF_STR, MO2CHK_STR, VALUE_LIST_STR)
+#                    a_wi_mischk = atom.getDeepAvgByKeys(WHATIF_STR, MISCHK_STR, VALUE_LIST_STR)
+#                    a_wi_mo2chk = atom.getDeepAvgByKeys(WHATIF_STR, MO2CHK_STR, VALUE_LIST_STR)
                     a_wi_pl2chk = atom.getDeepAvgByKeys(WHATIF_STR, PL2CHK_STR, VALUE_LIST_STR)
                     a_wi_wgtchk = atom.getDeepAvgByKeys(WHATIF_STR, WGTCHK_STR, VALUE_LIST_STR)
 
@@ -567,8 +567,8 @@ def doStoreCING2db( entry_code, archive_id, project = None):
                         a_wi_chichk,
                         a_wi_dunchk,
                         a_wi_hndchk,
-                        a_wi_mischk,
-                        a_wi_mo2chk,
+#                        a_wi_mischk,
+#                        a_wi_mo2chk,
                         a_wi_pl2chk,
                         a_wi_wgtchk,
                         a_cs,
@@ -583,7 +583,7 @@ def doStoreCING2db( entry_code, archive_id, project = None):
                     if not hasUsefulColumn:
                         continue
                     a_rog = atom.rogScore.rogInt()
-                    atomInfoList = [entry_id,chain_id,residue_id,a_name,a_wi_chichk,a_wi_dunchk,a_wi_hndchk, a_wi_mischk, a_wi_mo2chk, a_wi_pl2chk, a_wi_wgtchk, a_cs,a_cs_err,a_cs_ssa,a_rog]
+                    atomInfoList = [entry_id,chain_id,residue_id,a_name,a_wi_chichk,a_wi_dunchk,a_wi_hndchk, a_wi_pl2chk, a_wi_wgtchk, a_cs,a_cs_err,a_cs_ssa,a_rog]
 #                    NTdebug("Inserting atom: " + str(atomInfoList))
                     try:
                         result = execute(catom.insert().values(
@@ -597,8 +597,8 @@ def doStoreCING2db( entry_code, archive_id, project = None):
                             wi_chichk=a_wi_chichk,
                             wi_dunchk=a_wi_dunchk,
                             wi_hndchk=a_wi_hndchk,
-                            wi_mischk=a_wi_mischk,
-                            wi_mo2chk=a_wi_mo2chk,
+#                            wi_mischk=a_wi_mischk,
+#                            wi_mo2chk=a_wi_mo2chk,
                             wi_pl2chk=a_wi_pl2chk,
                             wi_wgtchk=a_wi_wgtchk,
                             cs = a_cs,

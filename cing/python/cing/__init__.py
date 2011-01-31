@@ -36,7 +36,7 @@ cingRevision    = getSvnRevision()
 
 
 __version__     = cingVersion # for pydoc
-__date__        = '24 December 2010'
+__date__        = '31 January 2011'
 __copyright_years__ = '2004-' + __date__.split()[-1] # Never have to update this again...
 
 authorList      = [  ('Geerten W. Vuister',          'g.vuister@science.ru.nl'),
