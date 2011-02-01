@@ -98,10 +98,11 @@ n
 y
 y
 
-SelectResiduesByRangesExp
-RANGES
-y
-y
+# TODO: Disabled until old residue numbering can be used.
+#SelectResiduesByRangesExp
+#RANGES
+#y
+#y
 
 # Redundancy tolerance (5% suggested)
 # Should impossible target distance be reset to null (y suggested)

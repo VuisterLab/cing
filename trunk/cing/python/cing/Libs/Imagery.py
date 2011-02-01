@@ -144,6 +144,9 @@ def convert2Web(path, outputDir=None, doFull=True, doPrint=True, doMontage=False
     doPinUp = True
 
     if isinstance(path, list):
+        if path == None or len(path) == 0:
+            NTerror("Failed to find valid input path list")
+            return True
         for p in path:
             if not os.path.exists(p):
                 NTerror("Failed to find input path: " + p)
