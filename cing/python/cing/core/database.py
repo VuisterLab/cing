@@ -632,7 +632,13 @@ NterminalNucleicAtomDict = NTdict()
 NterminalNucleicAtomDict.appendFromList( "HOP2 HOP3".split())
 
 def isNterminalAtom( atmDef ):
-    "Return True if atom belongs to N-terminal category"
+    """
+    Return True if atom belongs to N-terminal category.
+    Needs to be called by valid atmDef or 0 will be returned.
+    """
+    if atmDef == None or atmDef.residueDef == None: # Fixes 2ksi
+        NTdebug("isNterminalAtom called without atom/residue definition.")
+        return 0
     if atmDef.residueDef.hasProperties('protein'):
         d = NterminalProteinAtomDict
     elif atmDef.residueDef.hasProperties('nucleic'):

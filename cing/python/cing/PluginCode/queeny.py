@@ -157,6 +157,8 @@ class Queeny( odict ):
         for atm in self.molecule.atomsWithProperties('isMethyl','isCarbon'):
             #patch methyls
             protons = atm.attachedProtons()
+            if protons == None or len(protons) == 0: # fixes 2ca7
+                continue
             pseudo = protons[0].pseudoAtom()
             self.initDmElement(protons[0],protons[1], 0.0, 1.764)
             self.initDmElement(protons[0],protons[2], 0.0, 1.764)
@@ -168,6 +170,8 @@ class Queeny( odict ):
         for atm in self.molecule.atomsWithProperties('isMethylene','isCarbon'):
             #patch methylenes
             protons = atm.attachedProtons()
+            if protons == None or len(protons) == 0: # fixes ??
+                continue
             pseudo = protons[0].pseudoAtom()
             self.initDmElement(protons[0],protons[1], 0.0, 1.764)
             self.initDmElement(protons[0],pseudo, 0.0, 0.882) # geometric centre: 0.5*1.764
@@ -182,6 +186,8 @@ class Queeny( odict ):
             HE2 = res.getAtom('HE2',INTERNAL_0)
             QE  = res.getAtom('QE',INTERNAL_0)
 
+            if None in [ HD1, HD2, QD, HE1, HE2, QE]:
+                continue
             self.initDmElement(HD1,HE1, 0.0, 2.46)
             self.initDmElement(HD2,HE2, 0.0, 2.46)
 
@@ -201,6 +207,9 @@ class Queeny( odict ):
             HE2 = res.getAtom('HE2',INTERNAL_0)
             QE  = res.getAtom('QE',INTERNAL_0)
             HZ  = res.getAtom('HZ',INTERNAL_0)
+
+            if None in [ HD1, HD2, QD, HE1, HE2, QE, HZ]:
+                continue
 
             self.initDmElement(HD1,HE1, 0.0, 2.46)
             self.initDmElement(HD2,HE2, 0.0, 2.46)
@@ -510,7 +519,9 @@ class Queeny( odict ):
         for atm in atms:
             atm.residue[key] += atm[key]
         for res in self.molecule.allResidues():
-            res[key] /= len(res.atoms)
+            resAtomCount = len(res.atoms)
+            if resAtomCount:
+                res[key] /= resAtomCount
 
     #end def
 
@@ -566,6 +577,14 @@ def queenyDefaults():
 
 
 def runQueeny( project, tmp=None ):
+    try: # Fixes 2l4g
+        return _runQueeny( project, tmp=tmp )
+    except:
+        NTerror("Queeny failed as per below.")
+        NTtracebackError()
+        return True
+
+def _runQueeny( project, tmp=None ):
     """Perform a queeny analysis and save the results.
 
     Returns True on error.
