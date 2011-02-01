@@ -2157,6 +2157,8 @@ Return an Molecule instance or None on error
 
         Second the excludeFragmentSize parameter (DEFAULT: 4) will remove a
         short fragment (equal to or shorter than excludeFragmentSize).
+
+        If the result is an empty selection then invert and return all.
         """
         debugRoutine = False
 
@@ -2208,9 +2210,8 @@ Return an Molecule instance or None on error
                     residueList.append(r)
             # end for
         if not residueList:
-            if debugRoutine:
-                NTwarning("No residues left in rangesByCv; max cvList of any residue: %s" % max_cv)
-            return EMPTY_RANGES_STR
+            NTwarning("No residues left in rangesByCv; max cvList of any residue: %s. Return all residues." % max_cv)
+            return ALL_RANGES_STR
 #        if max_cv < 0.2:
 #            NTdebug("No residues with cv above 0.2 which is weird. Max cv is: %s" % max_cv)
         if debugRoutine:
@@ -2282,8 +2283,8 @@ Return an Molecule instance or None on error
                 rangeListNew.append(rangeStr)
             # end for
             if not rangeListNew:
-                NTwarning("No residues left in rangesByCv for ranges: [%s] in rangesByCv after sub selecting for excludeFragmentSize" % ranges)
-                return EMPTY_RANGES_STR
+                NTwarning("No residues left in rangesByCv for ranges: [%s] in rangesByCv after sub selecting for excludeFragmentSize. Returning all residues." % ranges)
+                return ALL_RANGES_STR
             ranges = ','.join(rangeListNew)
             if debugRoutine:
                 NTdebug("Finishing excludeFragmentSize with ranges: %s" % ranges)

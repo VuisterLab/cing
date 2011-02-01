@@ -76,7 +76,7 @@ class nrgCing(Lister):
                  updateIndices=True,
                  isProduction=True
                 ):
-        self.assumeAllAreDone = 0 # DEFAULT: 1 when assumed all are done.
+        self.assumeAllAreDone = 1 # DEFAULT: 1 when assumed all are done.
         self.writeWhyNot = writeWhyNot
         "Write the info for the WhyNot database"
         self.writeTheManyFiles = writeTheManyFiles
@@ -447,8 +447,8 @@ class nrgCing(Lister):
 
                 if timeTaken:
                     self.timeTakenDict[entry_code] = timeTaken
-                else:
-                    NTmessage("Unexpected [%s] for time taken in CING log for file: %s" % (timeTaken, logLastFile))
+#                else:
+#                    NTmessage("Unexpected [%s] for time taken in CING log for file: %s" % (timeTaken, logLastFile))
 
                 timeStampLastValidation = getTimeStampFromFileName(logLastFile)
                 if not timeStampLastValidation:
@@ -466,7 +466,7 @@ class nrgCing(Lister):
 
                 if not self.timeTakenDict.has_key(entry_code):
                     # was stopped by time out or by user or by system (any other type of stop but stack trace)
-                    NTmessage("%s Since CING end message was not found assumed to have stopped" % entry_code)
+                    NTmessage("%s Since CING end message was not found in %s assumed to have stopped" % (entry_code, logLastFile))
                     self.entry_list_stopped.append(entry_code)
                     continue
 
@@ -483,7 +483,7 @@ class nrgCing(Lister):
                     self.entry_list_stopped.append(entry_code)
                     continue
 
-                if isProduction: # DEFAULT: True but disabled for testing.
+                if self.isProduction: # DEFAULT: True but disabled for testing.
                     molGifFile = os.path.join(cingDirEntry, entry_code, "HTML/mol.gif")
                     if not os.path.exists(molGifFile):
                         NTmessage("%s Since mol.gif file %s was not found assumed to have stopped" % (entry_code, projectHtmlFile))
@@ -580,6 +580,8 @@ class nrgCing(Lister):
         if not self.entry_list_done:
             NTwarning("Failed to find entries that CING did.")
 
+#        NTmessage("Writing the entry lists already; will likely be overwritten next.")
+        self.doWriteEntryLoL()
     # end def
 
     def searchPdbEntries(self):
@@ -643,10 +645,10 @@ class nrgCing(Lister):
         NTmessage("Found %5d NRG DOCR entries. (A)" % len(self.entry_list_nrg_docr))
 
 
-
-
     def doWriteEntryLoL(self):
-        """Write the entry list of each list to file"""
+
+        NTmessage("Writing the entry list of each list to file")
+
         writeTextToFile("entry_list_pdb.csv", toCsv(self.entry_list_pdb))
         writeTextToFile("entry_list_nmr.csv", toCsv(self.entry_list_nmr))
         writeTextToFile("entry_list_nmr_exp.csv", toCsv(self.entry_list_nmr_exp))
@@ -1204,7 +1206,7 @@ class nrgCing(Lister):
 
 
             log_file = "%s_starCS2Ccpn.log" % entry_code
-            if not self.matches_many2one: # Default: 0 just for testing when retrieval of the mathes is bypassed.
+            if not self.matches_many2one: # Default: 0 just for testing when retrieval of the matches is bypassed.
                     self.matches_many2one = {
 '1b4y': 4400 ,
 '1brv': 4020 ,
@@ -1356,7 +1358,7 @@ class nrgCing(Lister):
         else:
             NTwarning("Did not copy input %s" % finalInputTgz)
         # end else
-        if 1: # DEFAULT: 0
+        if 0: # DEFAULT: 0
             self.entry_list_todo = [ entry_code ]
             self.runCing()
         NTmessage("Done with %s" % entry_code)
@@ -1371,7 +1373,7 @@ class nrgCing(Lister):
         NTmessage("Starting runCing")
 #        return True
 
-        NTdebug("Not using topos")
+#        NTdebug("Not using topos")
         entryListFileName = "entry_list_todo.csv"
         writeTextToFile(entryListFileName, toCsv(self.entry_list_todo))
 
@@ -1388,7 +1390,7 @@ class nrgCing(Lister):
                             delay_between_submitting_jobs=5, # why is this so long? because of time outs at tang?
                             max_time_to_wait=self.max_time_to_wait,
                             # <Molecule "2p80" (C:20,R:1162,A:24552,M:20)>
-                            START_ENTRY_ID=0, # default.
+                            START_ENTRY_ID=0, # default: 0
                             MAX_ENTRIES_TODO=self.max_entries_todo,
                             extraArgList=extraArgList):
             NTerror("Failed to doScriptOnEntryList")
@@ -1464,6 +1466,8 @@ class nrgCing(Lister):
 #            self.entry_list_todo = "1crq 1crr 1ezc 1ezd 1kld 1sah 1saj 1vve 2axx 2ezq 2ezr 2ezs".split()
             self.entry_list_todo = "1b4y 1brv 1bus 1c2n 1cjg 1d3z 1hkt 1hue 1ieh 1iv6 1mo7 1mo8 1ozi 1p9j 1pd7 1qjt 1vj6 1y7n 2fws 2fwu 2jmx 2jsx 2kib 2kz0 2rop".split()
 #            self.entry_list_todo = "2rop 2jmx 2kz0 2kib".split()
+            self.entry_list_todo = readLinesFromFile('/Library/WebServer/Documents/NRG-CING/list_backup/entry_list_prep_crashed.csv')
+
 #            self.entry_list_nmr = deepcopy(self.entry_list_todo)
 #            self.entry_list_nrg_docr = []
 #            self.entry_list_nrg_docr = deepcopy(self.entry_list_todo)
@@ -1490,8 +1494,9 @@ class nrgCing(Lister):
             if not (convertMmCifCoor or convertMrRestraints):
                 NTerror("not (convertMmCifCoor or convertMrRestraints) in prepare. Skipping entry: %s" % entry_code)
                 continue
-            if self.matches_many2one.has_key(entry_code):
-                convertStarCS = 1
+            if 1: # Default 1
+                if self.matches_many2one.has_key(entry_code):
+                    convertStarCS = 1
 
             argList = [convertMmCifCoor, convertMrRestraints, convertStarCS]
             argStringList = [ str(x) for x in argList ]
@@ -1617,7 +1622,7 @@ Additional modes I see:
         elif destination == 'prepareEntry':
             convertMmCifCoor = 0
             convertMrRestraints = 1
-            convertStarCS = 1
+            convertStarCS = 0
             doInteractive=isProduction
             if len(argListOther) > 0:
                 convertMmCifCoor = int(argListOther[0])
@@ -1627,7 +1632,9 @@ Additional modes I see:
                 convertMmCifCoor=convertMmCifCoor, convertMrRestraints=convertMrRestraints, convertStarCS=convertStarCS):
                 NTerror("Failed to prepareEntry")
         elif destination == 'runCingEntry':
-            m.entry_list_todo = [ entry_code ]
+#            m.entry_list_todo = [ entry_code ]
+            m.entry_list_todo = readLinesFromFile('/Library/WebServer/Documents/NRG-CING/list_backup/t.csv')
+#            m.entry_list_todo = [ entry_code ] xxxx
             if m.runCing():
                 NTerror("Failed to runCingEntry")
         elif destination == 'postProcessAfterVc':
@@ -1642,6 +1649,11 @@ Additional modes I see:
         elif destination == 'storeCING2db':
             if m.storeCING2db():
                 NTerror("Failed to storeCING2db")
+        elif destination == 'getEntryInfo':
+            if m.searchPdbEntries():
+                NTerror("Failed to searchPdbEntries")
+            if m.getEntryInfo():
+                NTerror("Failed to getEntryInfo")
         else:
             NTerror("Unknown destination: %s" % destination)
         # end if
