@@ -52,7 +52,10 @@ class AllChecks(TestCase):
 #        atomPairs.append((r2.HN, r2.MG1))
 #        atomPairs.append((r2.HN, r2.MG2))
         distanceRestraint = DistanceRestraint(atomPairs, 0.0, 5.0)
-        self.distanceRestraintList.append(distanceRestraint)
+        if distanceRestraint.isValid:
+            self.distanceRestraintList.append(distanceRestraint)
+        else:
+            NTerror('Failed to initialize DR with %s' % atomPairs)
 #        NTdebug("dr before: %s" % formatall(distanceRestraint))
 
         # Takes 4 simplification iterations.

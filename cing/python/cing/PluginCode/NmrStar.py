@@ -78,7 +78,7 @@ class NmrStar():
         logFileName += "_convertCcpn2Nmrstar.log"
         convertProgram = ExecuteProgram("python -u %s" % scriptFileName,
                 rootPath = outputDir, redirectOutputToFile = logFileName)
-        NTmessage("Running Wim Vranken's FormatConverter from script %s" % scriptFileName )
+        NTmessage("==> Running Wim Vranken's FormatConverter from script %s" % scriptFileName )
         exitCode = convertProgram("%s %s %s" % (projectName, inputDir, fileName))
         if exitCode:
             NTerror("Failed convertProgram with exit code: " + `exitCode`)

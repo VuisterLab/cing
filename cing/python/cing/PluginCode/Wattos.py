@@ -98,11 +98,10 @@ n
 y
 y
 
-# TODO: Disabled until old residue numbering can be used.
-#SelectResiduesByRangesExp
-#RANGES
-#y
-#y
+SelectResiduesByRangesExp
+RANGES
+y
+y
 
 # Redundancy tolerance (5% suggested)
 # Should impossible target distance be reset to null (y suggested)
@@ -286,6 +285,14 @@ Quit
     #end def
 
 def runWattos(project, ranges=None, tmp = None, parseOnly=False):
+    try:
+        return _runWattos(project, ranges=ranges, tmp = tmp, parseOnly=parseOnly)
+    except:
+        NTerror("Failed runWattos by throwable below.")
+        NTtracebackError()
+        return True
+
+def _runWattos(project, ranges=None, tmp = None, parseOnly=False):
     """
         Run and import the wattos results per model.
         All models in the ensemble of the molecule will be checked.
@@ -322,7 +329,7 @@ def runWattos(project, ranges=None, tmp = None, parseOnly=False):
     if ranges == None:
         ranges = mol.ranges
     wattos = Wattos(rootPath = path, molecule = mol, ranges = ranges)
-    del ranges # only use whatif.ranges now.
+    del ranges # only use wattos.ranges now.
     useRanges = mol.useRanges(wattos.ranges)
     if mol == None:
         NTerror('runWattos: no mol defined')
@@ -372,7 +379,12 @@ def runWattos(project, ranges=None, tmp = None, parseOnly=False):
         rangesTxt = wattos.ranges
         if not useRanges: # Wattos can't handle a None this way.
             rangesTxt = ALL_RANGES_STR
-        scriptComplete = scriptComplete.replace("RANGES", rangesTxt)
+        rangesTxtWattos = project.molecule.rangesToMmCifRanges(rangesTxt)
+        if rangesTxtWattos == None:
+            rangesTxtWattos = ALL_RANGES_STR
+        if rangesTxt != rangesTxtWattos:
+            NTmessage("==> Translating ranges %s to mmCIF numbering scheme: %s" % (rangesTxt, rangesTxtWattos ))
+        scriptComplete = scriptComplete.replace("RANGES", rangesTxtWattos)
         # Let's ask the user to be nice and not kill us
         # estimate to do **0.5 residues per minutes as with entry 1bus on dual core intel Mac.
         timeRunEstimatedInSeconds = 0.025 * mol.modelCount * len(mol.allResidues())
@@ -404,6 +416,9 @@ def runWattos(project, ranges=None, tmp = None, parseOnly=False):
             return None
         wattosStatus.completed = True
     # endif not parseOnly
+
+    if not project.hasDistanceRestraints():
+        return wattos
 
     fullname = os.path.join(wattosDir, wattos.COMPLETENESS_CHECK_FILE_NAME)
     if not os.path.exists(fullname):

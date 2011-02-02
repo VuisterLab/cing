@@ -34,6 +34,13 @@ pc_rama_LIST_STR = [ pc_rama_core_STR, pc_rama_allow_STR, pc_rama_gener_STR, pc_
 MAX_PROCHECK_NMR_MODELS = 60
 #MAX_PROCHECK_NMR_MODELS = 2
 
+#C MXRES  - Maximum number of residues allowed for the protein structure
+#C          being plotted
+#was 20,000 in tplot.inc, set to 200,000
+#5,000 to 50,000 in mplot.inc etc.
+MAX_PROCHECK_TOTAL_RESIDUES = 50000
+#MAX_PROCHECK_TOTAL_RESIDUES = 100
+
 PCgFactorMinValue = - 3.0
 PCgFactorMaxValue = 1.0
 PCgFactorReverseColorScheme = True

@@ -22,11 +22,7 @@ from cing.Libs.AwkLike import AwkLike
 from cing.Libs.AwkLike import AwkLikeS
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.Libs.disk import copy
-from cing.PluginCode.required.reqProcheck import MAX_PROCHECK_NMR_MODELS
-from cing.PluginCode.required.reqProcheck import PROCHECK_STR
-from cing.PluginCode.required.reqProcheck import SECSTRUCT_STR
-from cing.PluginCode.required.reqProcheck import gf_LIST_STR
-from cing.PluginCode.required.reqProcheck import to3StateUpper
+from cing.PluginCode.required.reqProcheck import * #@UnusedWildImport
 from cing.core.constants import * #@UnusedWildImport
 from cing.core.parameters import cingPaths
 from cing.setup import PLEASE_ADD_EXECUTABLE_HERE
@@ -338,6 +334,23 @@ B   7 U   999.900 999.900 999.900 999.900 999.900 999.900   0.000   1.932 999.90
         return result
     # end def
 
+    def getMaxModelCount(self):
+        max_models = min( self.molecule.modelCount, MAX_PROCHECK_NMR_MODELS)
+        resCount = len( self.molecule.allResidues() )
+        resCountTotal = max_models * resCount
+        if resCountTotal >= MAX_PROCHECK_TOTAL_RESIDUES:
+            max_models_org = max_models
+            max_models =  MAX_PROCHECK_TOTAL_RESIDUES / resCount
+            NTdebug("Reducing number of models from %s to %s to limit residue count to less than %s" % (max_models_org, max_models, MAX_PROCHECK_TOTAL_RESIDUES))
+        if max_models < 1:
+            NTerror("Molecule is to large for procheck to even run on a single model")
+            return True
+        if max_models > self.molecule.modelCount:
+            NTcodeerror("Was trying to run more models than available; reseting to just a one.")
+            max_models = 1
+        return max_models
+    # end def
+
     def run(self, ranges=None, export = True, createPlots=True, runAqua=True):
         """
         Run procheck analysis.
@@ -402,9 +415,11 @@ B   7 U   999.900 999.900 999.900 999.900 999.900 999.900   0.000   1.932 999.90
             NTerror("Procheck.run: Failed to copy (by exception) from " +pcNmrParameterFile+" to: " + pcNmrParameterFileDestination)
             return True
 
+        max_models = self.getMaxModelCount()
+
         path = os.path.join(self.rootPath, self.molecule.name + '.pdb')
         if export:
-            self.molecule.toPDB(path, convention=AQUA, max_models = MAX_PROCHECK_NMR_MODELS)
+            self.molecule.toPDB(path, convention=AQUA, max_models = max_models)
 #            self.molecule.toPDBfile(path, convention=AQUA) #GV removed because not implemented in toPDBfile; 12 Jan 09 Try-again
             # Can't use IUPAC here because aqua doesn't understand difference between
             # G and DG.(oxy/deoxy).
@@ -512,12 +527,14 @@ B   7 U   999.900 999.900 999.900 999.900 999.900 999.900   0.000   1.932 999.90
 
         """
 #        NTdebug("Starting pc parseResult")
-        modelCount = self.molecule.modelCount
+#        modelCount = self.molecule.modelCount
+        modelCount = self.getMaxModelCount()
+
 #        NTdebug("==> Parsing procheck results")
 
-        if modelCount > MAX_PROCHECK_NMR_MODELS:
-            NTwarning("Limiting number of models analyzed from %d to %d" % (modelCount, MAX_PROCHECK_NMR_MODELS))
-            modelCount = MAX_PROCHECK_NMR_MODELS
+#        if modelCount > MAX_PROCHECK_NMR_MODELS:
+#            NTwarning("Limiting number of models analyzed from %d to %d" % (modelCount, MAX_PROCHECK_NMR_MODELS))
+#            modelCount = MAX_PROCHECK_NMR_MODELS
 
         # reset the procheck dictionary of each residue
         for res in self.molecule.allResidues():

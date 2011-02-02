@@ -68,7 +68,7 @@ class nrgCing(Lister):
                  useTopos=False,
                  getTodoList=True,
                  max_entries_todo=1,
-                 max_time_to_wait=86400, # one day. 2p80 took the longest: 5.2 hours. But <Molecule "2ku1" (C:7,R:1659,A:36876,M:30)> is taking longer
+                 max_time_to_wait=86400, # one day. 2p80 took the longest: 5.2 hours. But <Molecule "2ku1" (C:7,R:1659,A:36876,M:30)> is taking longer. 2ku2 is taking over 12 hrs now.
                  processes_max=None,
                  prepareInput=False,
                  writeWhyNot=True,
@@ -512,7 +512,7 @@ class nrgCing(Lister):
             logDir = os.path.join(self.results_dir, DATA_STR, entryCodeChar2and3, entry_code, LOG_STORE_CING2DB )
             logLastFile = globLast(logDir + '/*.log')#            NTdebug("logLastFile: %s" % logLastFile)
             if not logLastFile:
-                if self.isProduction and 0: # DEFAULT: 1 when assumed all are done.
+                if self.isProduction and 0: # DEFAULT: 0 or 1 when assumed all are done by store instead of validate. This is not always the case!
                     NTmessage("Failed to find any store log file in directory: %s" % logDir)
                 continue
             self.entry_list_store_tried.append(entry_code)
@@ -1548,8 +1548,9 @@ class nrgCing(Lister):
 #        self.getEntryInfo()
 
 
-        if False: # DEFAULT: False
-            self.entry_list_done = '2hyn 2kj3 2ku1'.split()
+        if 0: # DEFAULT: False
+#            self.entry_list_done = '2hyn 2kj3 2ku1'.split()
+            self.entry_list_todo = readLinesFromFile('/Library/WebServer/Documents/NRG-CING/list_backup/entry_list_t.csv')
 
         if False: # DEFAULT: False
             self.entry_list_todo = "134d 135d 136d 177d 1crq 1crr 1ezc 1ezd 1gnc 1kld 1l0r 1lcc 1lcd 1msh 1qch 1r4e 1sah 1saj 1vve 2axx 2ezq 2ezr 2ezs 2i7z 2ku2 2neo 2ofg".split()
@@ -1561,8 +1562,8 @@ class nrgCing(Lister):
         # parameters for doScriptOnEntryList
         cingDirNRG = os.path.join(cingPythonDir, 'cing', 'NRG' )
         pythonScriptFileName = os.path.join(cingDirNRG, 'storeCING2db.py')
-        entryListFileName = os.path.join( self.results_dir, 'entry_list_done.csv')
-        writeEntryListToFile(entryListFileName, self.entry_list_done)
+        entryListFileName = os.path.join( self.results_dir, 'entry_list_todo.csv')
+        writeEntryListToFile(entryListFileName, self.entry_list_todo)
         extraArgList = (ARCHIVE_NRG_ID,) # note that for length one tuples the comma is required.
 
         doScriptOnEntryList(pythonScriptFileName,

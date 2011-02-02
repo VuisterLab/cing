@@ -22,7 +22,10 @@ import unittest
 class AllChecks(TestCase):
 
     entryList = "1brv_cs_pk_2mdl".split() # DEFAULT because it contains many data types and is small/fast to run.
-#    entryList = "1bus".split() # DEFAULT because it contains many data types and is small/fast to run.
+#    entryList = "1c2n".split()
+#    entryList = "1brv".split()
+#    entryList = "2hgh".split()
+#    entryList = "1bus".split()
 #    entryList = "1a4d 1ai0 1brv_cs_pk_2mdl 1bus 2hgh".split()
     def testInitFromAndSaveToCcpn(self):
 
@@ -52,7 +55,7 @@ class AllChecks(TestCase):
             doWhatif = False
             doProcheck = False
             doWattos = False
-            doQueeny = True
+            doQueeny = False
             doTalos = False
             doRestoreCheck = False
             doStoreCheck = False
@@ -65,8 +68,10 @@ class AllChecks(TestCase):
 
         self.failIf(os.chdir(cingDirTmp), msg =
             "Failed to change to directory for temporary test files: " + cingDirTmp)
-        for entryId in AllChecks.entryList:
+        for i,entryId in enumerate(AllChecks.entryList):
 
+            if i:
+                NTmessage('\n\n')
             if redoFromCingProject:
                 project = Project.open(entryId, status = 'old')
             else:
@@ -120,19 +125,20 @@ class AllChecks(TestCase):
                 self.assertTrue(project.save())
 
             if False:
-                ranges = "171-173"
-                residueOfInterest = range(171,174)
-                for residue in project.molecule.A.allResidues():
-                    if residue.resNum not in residueOfInterest:
-    #                    NTmessage("Removing residue of no interest")
-                        project.molecule.A.removeResidue(residue)
+                ranges = "173-183"
+#                residueOfInterest = range(171,174)
+#                for residue in project.molecule.A.allResidues():
+#                    if residue.resNum not in residueOfInterest:
+#    #                    NTmessage("Removing residue of no interest")
+#                        project.molecule.A.removeResidue(residue)
             if False:
                 ccpnProject = project.ccpn
                 printSequenceFromCcpnProject(ccpnProject)
 
             if True:
                 self.assertFalse(project.molecule.setRanges(ranges))
-#                NTdebug('ranges: %s' % str(project.molecule.ranges))
+                NTdebug('ranges: %s' % str(project.molecule.ranges))
+                project.molecule.rangesToMmCifRanges(ranges)
 
             if True:
                 self.assertFalse(project.validate(htmlOnly = htmlOnly,

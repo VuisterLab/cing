@@ -42,7 +42,7 @@ On the restraint side:
 1iv6 EMBOSS
 1jwe CYANA RDCs (Interest of WV)
 1kr8 Amber with RDCs. Has missing atoms.
-2hgh CYANA with AMBER RDCs
+2hgh CYANA with unparsed RDCs
 1d3z XPLOR RDCs
 2cka XPLOR with bounds 0, 5.5, 5.5, None for lower, upper, target, and error.
 

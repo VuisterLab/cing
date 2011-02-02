@@ -142,7 +142,7 @@ def runShiftx( project, parseOnly=False, model=None   ):
         #end for
     #end for
     if skippedResidues:
-        NTmessage('runShiftx: non-protein residues %s will be skipped.',  skippedResidues)
+        NTmessage('runShiftx: %s non-protein residues will be skipped.' %  len(skippedResidues))
 
     if model!=None:
         models = NTlist( model )
