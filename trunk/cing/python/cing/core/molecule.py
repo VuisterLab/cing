@@ -658,6 +658,67 @@ class Molecule( NTtree, ResidueList ):
         return result
     #end def
 
+    def _getResidueHash2LoL(self):
+        """
+        Return hash on residues that has a value of indices of chain idx and residue idx in same order as _getResidueLoL
+        For decoding usage with Wattos routines
+        """
+        result = NTdict()
+        for c,ch in enumerate(self.allChains()):
+            for r,res in enumerate(ch.allResidues()):
+                result[ res ] = ( c, r )
+        return result
+    #end def
+
+    def rangesToMmCifRanges(self, ranges=None):
+        """
+        Return a new ranges string with residue numbering akin mmCIF/NMR-STAR i.e. residue numbering starting at 1
+        and chain ids unchanged.
+
+        E.g. 1brv's A.173-189 becomes A.3-19
+
+        Return None on error.
+        """
+        if ranges == None:
+            ranges = self.ranges
+
+        rangesNew = ''
+        residueList2StartStopList = self.ranges2StartStopList(ranges)
+        if residueList2StartStopList == None:
+            NTerror("Failed ranges2StartStopList for ranges: %s" % ranges)
+            return None
+
+#        residueLoL = self._getResidueLoL()
+        residueHash2LoL = self._getResidueHash2LoL()
+#        residuePair = [ None, None]
+        residueNewNumberPair = [ None, None]
+        pairCount = len(residueList2StartStopList) / 2
+        for p in range(pairCount):
+            for r in range(2):
+                i = 2 * p + r
+                residue = residueList2StartStopList[i]
+                residueNewTuple = getDeepByKeysOrAttributes( residueHash2LoL, residue)
+                if residueNewTuple == None:
+                    NTerror("Failed to find residue in residueHash2LoL.")
+                    return None
+                residueNewNumberPair[r] = str(residueNewTuple[1] + 1) # Plus one 'cause indices start at zero and mmCIF starts at one.
+                NTdebug("Mapping %s %s to residueNewNumberPair %s" % (r,residue,residueNewNumberPair[r]))
+                if residueNewNumberPair[r] < 1:
+                    NTerror("In %s tried to map to mmCIF invalid residue number: %s" % ( getCallerName(), residueNewNumberPair[r] ))
+                    return None
+            # end for
+            if p:
+                rangesNew += ','
+            rangesNew += residue.chain.name + '.'
+            if residueNewNumberPair[0] != residueNewNumberPair[1]:
+                rangesNew += '-'.join(residueNewNumberPair)
+            else:
+                rangesNew += residueNewNumberPair[0]
+        # end for
+        NTdebug("Mapped ranges %s to %s" % (ranges,rangesNew))
+        return rangesNew
+
+
     def _getAtomDictWithchain(self, convention=INTERNAL):
         """
         Return a dict instance with (chainId, resNum, atomName), Atom mappings.
@@ -711,7 +772,7 @@ class Molecule( NTtree, ResidueList ):
             return True
         rangesReset = self.residueList2Ranges(residueList)
         if rangesReset != ranges:
-            NTmessage("Ranges reset from: %s to %s" % ( ranges, rangesReset ))
+            NTmessage("==> Ranges reset from: %s to %s" % ( ranges, rangesReset ))
             self.ranges = rangesReset
 
     def setResiduesFromRanges(self, ranges=None, autoLimit=LIMIT_RANGES):
@@ -854,6 +915,10 @@ class Molecule( NTtree, ResidueList ):
             # end if
         # end for
         rangeResidueList.append(selectedResidues[-1])
+
+        if len(rangeResidueList) % 2:
+            NTcodeerror("Expected to have an even number of residues in the start stop list but found %s residues."  % len(rangeResidueList) )
+            return None
 #        NTdebug( 'rangeResidueList (just the inclusive boundaries): %s' % rangeResidueList)
         return rangeResidueList
 
@@ -3233,7 +3298,7 @@ Residue class: Defines residue properties
         # find the database entry in database.NTdb (which is of type MolDef)
         db = database.NTdb.getResidueDefByName( resName, convention )
         if not db:
-            NTdebug('Residue._nameResidue: residue "%s" not defined in database by convention [%s]. Adding non-standard one now.' %( resName, convention))
+#            NTdebug('Residue._nameResidue: residue "%s" not defined in database by convention [%s]. Adding non-standard one now.' %( resName, convention))
             database.NTdb.appendResidueDef( name=resName, shortName = '_', commonName = resName,
                                             nameDict = {INTERNAL_0:resName, INTERNAL_1:resName, INTERNAL:resName, convention:resName},
                                             comment = 'Non-standard residue'
@@ -3506,6 +3571,20 @@ Residue class: Defines residue properties
         #end if
         return None
     #end def
+
+    def getMinDistanceCalpha(self, other):
+        """
+        Returns the minimum distance between the C alphas in the ensemble of models.
+        Meant to be a fast quiet routine.
+        Returns None if no C alpha atoms or coordinates are present.
+        """
+        caSelf = getDeepByKeysOrAttributes(self, "CA")
+        if not caSelf:
+            return None
+        caOther = getDeepByKeysOrAttributes(other, "CA")
+        if not caOther:
+            return None
+        return caSelf.getMinDistance(caOther)
 
     def getAtoms( self, atomNames, convention = INTERNAL ):
         """
@@ -4271,6 +4350,19 @@ coordinates: %s"""  , dots, self, dots
         return (av,sd,minv,maxv)
     #end def
 
+    def getMinDistance(self, other):
+        """
+        Returns the minimum distance in the ensemble of models.
+        Meant to be a fast quiet routine.
+        Returns None if no atoms or coordinates are present.
+        """
+        result = self.distance(other)
+        if result == None:
+            return None
+        (_av,_sd,minv,_maxv) = result
+        return minv
+
+
     def calculateMeanCoordinate( self ):
         """
         Calculate mean of coordinates of self
@@ -4492,7 +4584,7 @@ coordinates: %s"""  , dots, self, dots
 #            NTwarning("This routine wasn't meant to be used for atoms that are part of a group of more than 2; please improve code") # happens in AtT13Paris for I guess isopropyl groups or alike.
             return None
         if len(realAtomList) < 2:
-            NTwarning("This routine wasn't meant to be used when the pseudo atom has no (or not all) real atoms present.")
+#            NTdebug("This routine wasn't meant to be used when the pseudo atom has no (or not all) real atoms present.")
             return None
 
         if self == realAtomList[0]:

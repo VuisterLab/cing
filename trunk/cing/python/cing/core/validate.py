@@ -57,6 +57,9 @@ from cing.core.parameters import plugins
 from numpy.lib.index_tricks import ogrid
 from numpy.lib.twodim_base import histogram2d
 
+CUTOFF_SALTBRIDGE_BY_Calpha = 20.0 # DEFAULT: 20
+
+
 def runCingChecks( project, toFile=True, ranges=None ):
     """This set of routines needs to be run after a project is restored."""
 
@@ -791,7 +794,7 @@ def checkForSaltbridges( project, cutoff = 0.5, toFile=False)   :
         return result
     #end if
 
-    if toFile:
+    if toFile: # This output could easily be cached before write at once.
         #project.mkdir(project.directories.analysis, project.molecule.name)
         fname = project.path(project.molecule.name, project.moleculeDirectories.analysis,'saltbridges.txt')
         fp = open( fname, 'w' )
@@ -812,38 +815,63 @@ def checkForSaltbridges( project, cutoff = 0.5, toFile=False)   :
                 project.molecule.residuesWithProperties('K') + \
                 project.molecule.residuesWithProperties('H')
 
+#    NTdebug("residues1 count: %s" % (len(residues1)))
+#    NTdebug("residues2 count: %s" % (len(residues2)))
     # initialize
     for res in project.molecule.allResidues():
         res.saltbridges = NTlist()
     #end for
 
+    pairCountDistant = 0
+    pairCountSkipped = 0
+    pairCountBelowCutoff = 0
     s = None
     for res1 in residues1:
         for res2 in residues2:
-            #print '>>', res1, res2
-            s = validateSaltbridge(res1,res2)
-            if not (s and s.result): # no s.result for entry 1f96 issue 197
-                continue
-            if float(s.types[4][1])/float(len(s.result)) > cutoff:    # fraction 'not observed' > then cutoff (default 0.5), skip
+#            NTdebug('>> %s %s' % ( res1, res2 ))
+
+            # Quick optimalization based on distances
+            # Arg CA to NH1 maxes out at 7.3 so let's take 8 twice plus max distance of a valid saltbridge4 Ang.
+            residuePairDistance = res1.getMinDistanceCalpha( res2 )
+            if residuePairDistance > CUTOFF_SALTBRIDGE_BY_Calpha:
+#                NTdebug("Ignoring distant pair: %s %s - %s" % ( residuePairDistance, res1, res2 ))
+                pairCountDistant += 1
                 continue
 
+            s = validateSaltbridge(res1,res2)
+            if not (s and s.result): # no s.result for entry 1f96 issue 197
+                pairCountSkipped += 1
+                continue
+            if float(s.types[4][1])/float(len(s.result)) > cutoff:    # fraction 'not observed' > then cutoff (default 0.5), skip
+                pairCountBelowCutoff += 1
+                continue
             if toFile:
                 fprintf(fp, '%s\n', s.format() )
-#               NTdebug(    '%s\n', s.format() )
+#            NTdebug(    '%s\n', s.format() )
             res1.saltbridges.append( s )
             res2.saltbridges.append( s )
             result.append( s )
         #end for
     #end for
-
+    lresult = len(result)
+    lresidues1 = len(residues1)
+    lresidues2 = len(residues2)
+    pairCountConsidered = lresidues1*lresidues2
+    msg = "==> CheckForSaltbridges distant: %s skipped: %s below cutoff %s present %s total considered %s" % (
+        pairCountDistant, pairCountSkipped, pairCountBelowCutoff, lresult, pairCountConsidered )
+    sumPairs = pairCountDistant + pairCountSkipped + pairCountBelowCutoff + lresult
+    if sumPairs != pairCountConsidered:
+        NTcodeerror("Failed sum check in checkForSaltbridges")
+    NTmessage(msg)
     if s and toFile:
+        fprintf( fp, '%s\n', msg )
         fprintf( fp, '%s\n', s.comment )
         #NTdebug(     '%s\n', s.comment )
     #end if
 
     if toFile:
         fp.close()
-    sys.stdout.flush()
+#    sys.stdout.flush()
     #end if
 #    NTdebug("Ending checkForSaltbridges")
 
@@ -862,13 +890,24 @@ def validateSaltbridge( residue1, residue2 ):
     Arbitrarily set the criteria for ion-pair r,theta to be within 2 sd of average,
     else set type to none.
 
-    Returns summary NTdict or None on error
+    Returns summary NTdict or None on error.
+
+
     """
 #    NTdebug('validateSaltBridge: %s %s', residue1, residue2)
 
     # Definitions of the centroids according to the paper
     # TODO: fix problem as in 1bzb most likely due to uncommon residues within getting recognized as regular ones.
     # Recode to use fullnames including variants.(Store in Database?)
+
+    if residue1 == None:
+        NTerror('validateSaltbridge: undefined residue1')
+        return None
+    #end if
+    if residue2 == None:
+        NTerror('validateSaltbridge: undefined residue2')
+        return None
+    #end if
 
     centroids = NTdict(
         E = ['OE1','OE2'],
@@ -884,15 +923,6 @@ def validateSaltbridge( residue1, residue2 ):
         K = ['NZ'],
         R = ['NE','NH1','NH2']
     )
-
-    if residue1 == None:
-        NTerror('validateSaltbridge: undefined residue1')
-        return None
-    #end if
-    if residue2 == None:
-        NTerror('validateSaltbridge: undefined residue2')
-        return None
-    #end if
 
     modelCount = residue1.chain.molecule.modelCount
     if modelCount == 0:
@@ -911,6 +941,7 @@ def validateSaltbridge( residue1, residue2 ):
         return None
     #end if
 
+    # Check if all atoms are present
     for residue in [residue1, residue2]:
         for atmName in centroids[residue.db.shortName]:
             atm = None
@@ -1573,7 +1604,7 @@ def validateDihedralCombinations(project):
                 # depending on doOnlyOverall it will actually return an array of myHist.
                 myHistList = residue.getTripletHistogramList( doOnlyOverall = False, ssTypeRequested = ssType, doNormalize=doNormalize  )
                 if myHistList == None:
-                    NTdebug("Failed to get the D1D2 hist for %s; skipping. Perhaps a non-protein residue was a neighbor?" % residue)
+#                    NTdebug("Failed to get the D1D2 hist for %s; skipping. Perhaps a non-protein residue was a neighbor?" % residue)
                     continue
                 if len(myHistList) != 3:
                     NTdebug("Expected exactly one but found %s histogram for %s with ssType %s; skipping" % (len(myHistList),residue, ssType))

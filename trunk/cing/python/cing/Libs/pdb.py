@@ -327,7 +327,7 @@ class pdbParser:
         if unmatchedAtomByResDict:
             msg = "pdbParser.map2molecule: Strange! ERROR mapping atom for:\n"
             msg += unmatchedAtomByResDictToString(unmatchedAtomByResDict)
-            NTcodeerror(msg)
+            NTwarning(msg)
     #end def
 
     def importCoordinates(self, nmodels = None, update = True):

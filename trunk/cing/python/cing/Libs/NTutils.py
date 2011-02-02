@@ -5259,3 +5259,7 @@ def truthToInt(i):
         return 1
     return 0
 # end def
+
+def getCallerName():
+    return inspect.stack()[1][3]
+

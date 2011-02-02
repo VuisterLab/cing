@@ -656,6 +656,10 @@ def isCterminalAtom( atmDef ):
     return CterminalAtomDict.has_key(atmDef.name)
 
 def isTerminal( atmDef ):
+    if atmDef == None or atmDef.residueDef == None:
+        NTdebug("%s called without atom/residue definition." % getCallerName())
+        return 0
+
     if isNterminalAtom( atmDef ):
         return True
     return isCterminalAtom( atmDef )
@@ -664,6 +668,10 @@ def isAromatic( atmDef ):
     """Return true if it is an atom belonging to an aromatic ring
        Patched for now, have to store it in database
     """
+    if atmDef == None or atmDef.residueDef == None:
+        NTdebug("%s called without atom/residue definition." % getCallerName())
+        return 0
+
     if not atmDef.residueDef.hasProperties('aromatic'): return False
 
     if (isCarbon(atmDef) and atmDef.shift != None and atmDef.shift.average > 100.0):
@@ -682,6 +690,9 @@ def isBackbone( atmDef ):
     """
     Return True if it is not a sidechain atom, False otherwise
     """
+    if atmDef == None or atmDef.residueDef == None: # Fixes 2ksi
+        NTdebug("%s called without atom/residue definition." % getCallerName())
+        return 0
     if atmDef.residueDef.hasProperties('protein'):
         d = backBoneProteinAtomDict
     elif atmDef.residueDef.hasProperties('nucleic'):
@@ -696,6 +707,10 @@ def isSidechain( atmDef ):
     Return True if it is not a backbone atom,
     i.e. not isBackbone, but is protein or nucleic acid; e.g. HOH is not sidechain!
     """
+    if atmDef == None or atmDef.residueDef == None:
+        NTdebug("%s called without atom/residue definition." % getCallerName())
+        return 0
+
     return not isBackbone( atmDef )
 #end def
 
@@ -703,6 +718,9 @@ def isMethyl( atmDef ):
     """
     Return True atm is a methyl (either carbon or proton)
     """
+    if atmDef == None or atmDef.residueDef == None:
+        NTdebug("%s called without atom/residue definition." % getCallerName())
+        return 0
     if isCarbon(atmDef):
         count = 0
         for dummy,p in atmDef.topology:
@@ -732,6 +750,10 @@ def isMethylene( atmDef ):
     """
     Return True atm is a methylene (either carbon or proton)
     """
+    if atmDef == None or atmDef.residueDef == None:
+        NTdebug("%s called without atom/residue definition." % getCallerName())
+        return 0
+
     if isCarbon(atmDef):
         count = 0
         for dummy,p in atmDef.topology:

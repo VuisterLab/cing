@@ -713,7 +713,7 @@ class Ccpn:
                                     break
                                 ccpnCoord = ccpnCoordAtom.findFirstCoord(model = ccpnModel)
                                 if not ccpnCoord: # as in entry 1agg GLU1.H2 and 3.
-                                    NTwarning("Skipping coordinate for CING failed to find coordinate for model %d for atom %s" % (i, atom))
+#                                    NTwarning("Skipping coordinate for CING failed to find coordinate for model %d for atom %s" % (i, atom)) # happens for 2xfm  <Atom A.VAL280.HG11> and many others.
                                     continue
                                 atom.addCoordinate(ccpnCoord.x, ccpnCoord.y, ccpnCoord.z, ccpnCoord.bFactor, ocuppancy = ccpnCoord.occupancy)
                             # end for
@@ -1352,7 +1352,9 @@ class Ccpn:
                 # end if
 
                 distanceRestraint = DistanceRestraint(atomPairList, lower, upper)
-                if not distanceRestraint: # happened for entry 1f8h
+#                NTdebug('distanceRestraint.isValid: %s' % distanceRestraint.isValid)
+
+                if not (distanceRestraint and distanceRestraint.isValid): # happened for entry 1f8h and 2xfm
                     # restraints that will not be imported
                     msgHoL.appendMessage("%s failed to be instantiated as CING DistanceRestraint" % (ccpnDistanceConstraint))
                     continue
@@ -1417,10 +1419,16 @@ class Ccpn:
                 lower, upper = result
                 atoms = self._getConstraintAtomList(ccpnDihedralConstraint)
                 if not atoms:
-                    NTdetail("Ccpn dihedral restraint '%s' without atoms will be skipped" % ccpnDihedralConstraint)
+                    msgHoL.appendMessage("Ccpn dihedral restraint '%s' without atoms will be skipped" % ccpnDihedralConstraint)
                     continue
 
                 dihedralRestraint = DihedralRestraint(atoms, lower, upper)
+                if not (dihedralRestraint and dihedralRestraint.isValid): # happened for entry 1f8h and 2xfm
+                    # restraints that will not be imported
+                    msgHoL.appendMessage("%s failed to be instantiated as CING DihedralRestraint" % (ccpnDihedralConstraint))
+                    continue
+                # end if
+
                 dihedralRestraintList.append(dihedralRestraint)
 
                 dihedralRestraint.ccpn = ccpnDihedralConstraint
@@ -2262,7 +2270,8 @@ def getRestraintBoundList(constraint, restraintTypeIdx, msgHoL):
 #        NTdebug("Simplest case first for speed reasons.")
     else:
         if constraint.targetValue == None:
-            msgHoL.appendDebug("One or both of the two bounds are None but no target available to derive them. Lower/upper: [%s,%s]" % (lower, upper))
+            pass
+#            msgHoL.appendDebug("One or both of the two bounds are None but no target available to derive them. Lower/upper: [%s,%s]" % (lower, upper))
         else:
             # When there is a target value and no lower or upper we will use a error of zero by default which makes
             # the range of their error zero in case the error was not defined. This is a reasonable assumption according

@@ -17,8 +17,8 @@ class AllChecks(TestCase):
         runAqua = True
         showProcheckResults = False
         #entryId = "1ai0" # Most complex molecular system in any PDB NMR entry
-#        entryId = "1brv"
-        entryId = "1brv_1model" # Small much studied PDB NMR entry
+        entryId = "1bus"
+#        entryId = "1brv_1model" # Small much studied PDB NMR entry
 #        entryId = "1YWUcdGMP" # Example entry from external user, Martin Allan
         ranges = None
         pdbConvention = IUPAC

@@ -883,6 +883,12 @@ Project: Top level Cing project class
         """
         return self.distances + self.dihedrals + self.rdcs
 
+    def hasDistanceRestraints(self):
+        for drList in self.distances:
+            if len(drList):
+                return True
+        return False
+
     def header(self, dots = '---------'):
         """Subclass header to generate using __CLASS__, name and dots.
         """
@@ -2241,7 +2247,10 @@ def getAtomsFromAtomPairs(atomPairs):
     return result
 
 class Restraint(NTdict):
-    "Super class for DistanceRestraint etc."
+    """
+    Super class for DistanceRestraint etc.
+    On initialization the atom pairs will be tested for validity and reported in self.isValid
+    """
     def __init__(self, lower, upper, **kwds):
 
         NTdict.__init__(self, lower = lower,
@@ -2257,6 +2266,7 @@ class Restraint(NTdict):
         self.violMax = 0.0      # Maximum violation
         self.violAv = 0.0      # Average violation
         self.violSd = 0.0      # Sd of violations
+        self.isValid = True
         self.rogScore = ROGscore()
     #end def
     def __str__(self):
@@ -2314,7 +2324,7 @@ class Restraint(NTdict):
 class DistanceRestraint(Restraint):
     """DistanceRestraint class:
        atomPairs: list of (atom_1,atom_2) tuples,
-       lower and upper bounds
+       lower and upper bounds.
     """
     STATUS_SIMPLIFIED = 'simplified'
     STATUS_NOT_SIMPLIFIED = 'not simplified'
@@ -2342,7 +2352,10 @@ class DistanceRestraint(Restraint):
         self.error = False    # Indicates if an error was encountered when analyzing restraint
 
         for pair in atomPairs:
-            self.appendPair(pair)
+            if self.appendPair(pair):
+#                NTdebug('resetting self.isValid')
+                self.isValid = False
+                return
         #end for
     #end def
 
@@ -2547,7 +2560,7 @@ class DistanceRestraint(Restraint):
 #                    NTdebug('    no pseudo for this atom %s' % atomItoMerge)
                     pseudoOfAtom = atomItoMerge.getPseudoOfPseudoAtom()
                     if not pseudoOfAtom:
-                        NTerror('    no pseudo of pseudoatom %s' % atomItoMerge)
+#                        NTerror('    no pseudo of pseudoatom %s' % atomItoMerge) # happens in 1y0j for <Atom A.VAL205.CG1>
                         continue
 
 #                NTdebug( "    New pop atom: %s" % pseudoOfAtom)
@@ -2568,6 +2581,7 @@ class DistanceRestraint(Restraint):
 
         check if atom1 already present, keep order
         otherwise: keep atom with lower residue index first
+        Return True on error.
         """
         # GV says; order needs to stay: is being used for easier
         # (manual) analysis.
@@ -2575,25 +2589,25 @@ class DistanceRestraint(Restraint):
 
         if pair[0] == None or pair[1] == None:
             NTerror('DistanceRestraint.appendPair: invalid pair %s', str(pair))
-            return
+            return True
         #end if
 
-        missesId = False
+#        missesId = False
         for atom in pair:
             if not hasattr(atom, 'id'): # happens for 1f8h and LdCof (imported from CYANA data).
-                NTwarning('DistanceRestraint.appendPair: invalid pair %s for atom: %s' % (str(pair), str(atom)))
-                missesId = True
-#                return
+#                NTwarning('DistanceRestraint.appendPair: invalid pair %s for atom missing id: %s' % (str(pair), str(atom)))
+#                missesId = True
+                return True
         #end if
 
-        if missesId:
+#        if missesId:
+#            self.atomPairs.append((pair[0], pair[1]))
+#        else:
+        # gv 24 Jul: just use atoms id, they are unique and ordered
+        if pair[0].id < pair[1].id:
             self.atomPairs.append((pair[0], pair[1]))
         else:
-            # gv 24 Jul: just use atoms id, they are unique and ordered
-            if pair[0].id < pair[1].id:
-                self.atomPairs.append((pair[0], pair[1]))
-            else:
-                self.atomPairs.append((pair[1], pair[0]))
+            self.atomPairs.append((pair[1], pair[0]))
     #end def
 
     def classify(self):
@@ -3117,6 +3131,8 @@ class DihedralRestraint(Restraint):
         self.setdefault('discontinuous', False)
         self.__CLASS__ = AC_LEVEL
         self.atoms = NTlist(*atoms)
+        if None in self.atoms:
+            self.isValid = False
     #end def
 
     def isValidForAquaExport(self):
