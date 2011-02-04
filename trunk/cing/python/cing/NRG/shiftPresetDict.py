@@ -1,5 +1,4 @@
-# See NRG presetDict.py
-# vi $CINGROOT/python/cing/NRG/nrgCingPresetDict.py
+# See $WS/recoord/python/recoord2/presetDict.py
 
 help = """
 
@@ -50,7 +49,10 @@ Sort the entry codes alphabetically
 
 presetDict = {
 
-'disabled_bmr4813': {
+'bmr4813': {
+  'comment': """
+    *** Setting chain mapping automatically to: [['C', 'LAC REPRESSOR HP62 A', 3, 0], ['D', 'LAC REPRESSOR HP62 A', 3, 0]] ***
+  """,
 #  'duplicateResonances': {
 #     'A': ['A', 'B'],
 #     'C': ['C', 'D'],
@@ -58,10 +60,10 @@ presetDict = {
   'linkResonances': {
    'keywds': {
      'forceChainMappings': [
-       ['A', 'LAC OPERATOR C', 1, 0],
-       ['B', 'LAC OPERATOR D', 1, 0],
+       ['A', 'LAC OPERATOR C', 1, 0], # dna
+#       ['B', 'LAC OPERATOR D', 1, 0], # absent
        ['C', 'LAC REPRESSOR HP62 A', 1, 0],  # protein headpiece 62
-       ['D', 'LAC REPRESSOR HP62 B', 1, 0]
+#       ['D', 'LAC REPRESSOR HP62 B', 1, 0] # absent
        ],
       },
     },

@@ -884,7 +884,7 @@ class Ccpn:
         NTmessage("==> CCPN ShiftList '%s' imported from CCPN Nmr project '%s'",
                          ccpnShiftList.name, ccpnShiftList.parent.name)
         NTmessage("==> Count of (pseudo-)atom with resonances updated %s" % len(atomsTouched.keys()))
-        NTmessage("==> Count of resonanceSetDone %s (will be same or lower than the above count" % len(resonanceSetDoneMap.keys()))
+        NTmessage("==> Count of resonanceSetDone %s (<= above count)" % len(resonanceSetDoneMap.keys()))
 
         return True
 
@@ -1110,7 +1110,7 @@ class Ccpn:
            http://www.ccpn.ac.uk/ccpn/data-model/python-api-v2-examples/assignment
         """
 
-#        NTdebug("Now in _getShiftAtomNameMapping for ccpnShiftList (%r)" % ccpnShiftList)
+        NTdebug("Now in _getShiftAtomNameMapping for ccpnShiftList (%r)" % ccpnShiftList)
         ccpnResonanceList = []
         ccpnResonanceToShiftMap = {}
         ccpnShiftMappingResult = {}
@@ -1149,7 +1149,7 @@ class Ccpn:
         matchCount = len(ccpnShiftMappingResult)
 #        NTdebug("_getShiftAtomNameMapping found %d elements in mapping." % matchCount)
         if matchCount == 0:
-            NTwarning("All resonances in this list are unassigned")
+            NTwarning("All resonances in this list %r are unassigned" % ccpnShiftList)
         return ccpnShiftMappingResult
 
 
