@@ -1166,12 +1166,13 @@ def bin_by(y, x, nbins=None, ymin=None, ymax=None):
 if __name__ == '__main__':
     cing.verbosity = verbosityDebug
 
-#    schema = DEV_NRG_DB_SCHEMA
-    schema = CASD_DB_NAME
+    schema = DEV_NRG_DB_SCHEMA
+    if isProduction:
+            schema = NRG_DB_SCHEMA
 
     m = nrgCingRdb( schema=schema )
 
-    if 1:
+    if 0:
         m.createPlots(doTrending = False)
     if 0:
         m.createScatterPlots()

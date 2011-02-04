@@ -137,7 +137,6 @@ class nrgCing(Lister):
 '1cjg': 4813 ,
 '1d3z': 6457 ,
 '1hkt': 4046 ,
-'1hkt': 4046 ,
 '1hue': 4047 ,
 '1ieh': 4969 ,
 '1iv6': 5317 ,
@@ -150,7 +149,6 @@ class nrgCing(Lister):
 '1qjt': 4491 ,
 '1vj6': 5131 ,
 '1y7n': 6113 ,
-'2fws': 7009 ,
 '2fws': 7009 ,
 '2fwu': 7008 ,
 '2jmx': 15072,
@@ -265,7 +263,7 @@ class nrgCing(Lister):
             return True
 
         if self.new_hits_entry_list:
-            self.entry_list_todo.addList(self.new_hits_entry_list)
+            self.entry_list_todo = NTlist(*self.new_hits_entry_list)
         elif self.getTodoList:
             # Get todo list and some others.
             if self.getEntryInfo():
@@ -576,14 +574,13 @@ class nrgCing(Lister):
         self.entry_list_done.difference(self.entry_list_updated)
         # Consider the entries updated as not done.
 
-        timeTakenList = NTlist() # local variable.
-        timeTakenList.addList(self.timeTakenDict.values())
+        timeTakenList = NTlist(*self.timeTakenDict.values())
         NTmessage("Time taken by CING by statistics\n%s" % timeTakenList.statsFloat())
 
         if not self.entry_list_tried:
             NTerror("Failed to find entries that CING tried.")
 
-        self.entry_list_todo.addList(self.entry_list_nmr)
+        self.entry_list_todo = NTlist(*self.entry_list_nmr)
         self.entry_list_todo = self.entry_list_todo.difference(self.entry_list_done)
 
         NTmessage("Found %4d entries by NMR (A)." % len(self.entry_list_nmr))
@@ -634,30 +631,30 @@ class nrgCing(Lister):
 
         ## following statement is equivalent to a unix command like:
         NTmessage("Looking for entries from the PDB and NRG databases.")
-        if True: # DEFAULT ON Use switch to debug.
-            self.entry_list_pdb.addList(getPdbEntries())
-            if not self.entry_list_pdb:
-                NTerror("No PDB entries found")
-                return True
-            self.entry_list_nmr.addList(getPdbEntries(onlyNmr=True))
-            if not self.entry_list_nmr:
-                NTerror("No NMR entries found")
-                return True
-        else:
-            self.entry_list_pdb += '1crn 1bus 1brv 1a4d'.split()
-            self.entry_list_nmr += '1bus 1brv'.split()
-            self.entry_list_nrg_docr += '1brv'.split()
+        self.entry_list_pdb = NTlist()
+        self.entry_list_pdb.addList(getPdbEntries())
+        if not self.entry_list_pdb:
+            NTerror("No PDB entries found")
+            return True
+        self.entry_list_nmr = NTlist()
+        self.entry_list_nmr.addList(getPdbEntries(onlyNmr=True))
+        if not self.entry_list_nmr:
+            NTerror("No NMR entries found")
+            return True
 
 
         NTmessage("Found %5d PDB entries." % len(self.entry_list_pdb))
         NTmessage("Found %5d NMR entries." % len(self.entry_list_nmr))
 
+
+        self.entry_list_nmr_exp = NTlist()
         self.entry_list_nmr_exp.addList(getPdbEntries(onlyNmr=True, mustHaveExperimentalNmrData=True))
         if not self.entry_list_nmr_exp:
             NTerror("No NMR with experimental data entries found")
             return True
         NTmessage("Found %5d NMR with experimental data entries." % len(self.entry_list_nmr_exp))
 
+        self.entry_list_nrg = NTlist()
         self.entry_list_nrg.addList(getBmrbNmrGridEntries())
         if not self.entry_list_nrg:
             NTerror("No NRG entries found")
@@ -666,6 +663,7 @@ class nrgCing(Lister):
 
         if 1: # DEFAULT 1
             ## The list of all entry_codes for which tgz files have been found
+            self.entry_list_nrg_docr = NTlist()
             self.entry_list_nrg_docr.addList(getBmrbNmrGridEntriesDOCRDone())
             if not self.entry_list_nrg_docr:
                 NTerror("No NRG DOCR entries found")
@@ -1312,7 +1310,7 @@ class nrgCing(Lister):
                     f = 0.0
                 else:
                     f = (1. * cing_count_total) / star_count_total
-                resultTuple = (self.FRACTION_CS_CONVERSION_REQUIRED, f, cing_count_total, star_count_total)
+                resultTuple = (self.FRACTION_CS_CONVERSION_REQUIRED, f, star_count_total, cing_count_total )
 
                 if f < self.FRACTION_CS_CONVERSION_REQUIRED:
                     NTwarning("Found fraction less than   cutoff %.2f but %.2f overall (STAR/CING: %s/%s)" % resultTuple)
@@ -1361,7 +1359,7 @@ class nrgCing(Lister):
         else:
             NTwarning("Did not copy input %s" % finalInputTgz)
         # end else
-        if 1: # DEFAULT: 0
+        if 0: # DEFAULT: 0
             self.entry_list_todo = [ entry_code ]
             self.runCing()
         NTmessage("Done with %s" % entry_code)
@@ -1458,13 +1456,16 @@ class nrgCing(Lister):
 
         NTmessage("Starting prepare using self.entry_list_todo")
 
-        if 0: # DEFAULT: False
-#            self.searchPdbEntries()
-            self.entry_list_todo = "1brv".split()
-#            self.entry_list_todo = "1b4y 1brv 1bus 1c2n 1cjg 1d3z 1hkt 1hue 1ieh 1iv6 1mo7 1mo8 1ozi 1p9j 1pd7 1qjt 1vj6 1y7n 2fws 2fwu 2jmx 2jsx 2kib 2kz0 2rop".split()
+        if 1: # DEFAULT: False
+#            self.entry_list_todo = "1b4y 1brv 1bus 1c2n 1cjg 1d3z 1hkt 1hue 1ieh 1iv6 1mo7 1mo8 1nk2 1ozi 1p9j 1pd7 1qjt 1vj6 1y7n 2fws 2fwu 2jmx 2jsx 2kib 2kz0 2rop".split()
+            self.entry_list_todo = "1mo8".split()
+            self.entry_list_todo = NTlist( *self.entry_list_todo )
 #            self.entry_list_todo = readLinesFromFile('/Library/WebServer/Documents/NRG-CING/list_backup/entry_list_prep_crashed.csv')
             self.entry_list_nmr = deepcopy(self.entry_list_todo)
             self.entry_list_nrg_docr = deepcopy(self.entry_list_todo)
+            if 1: # use actual info instead of 2 lists above.
+                self.searchPdbEntries()
+
 
 
 #        self.entry_list_nmr = readLinesFromFile(os.path.join(self.results_dir, 'entry_list_nmr.csv'))

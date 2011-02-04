@@ -11,7 +11,7 @@ PDB  BMRB  Notes
 1a4d       small dsRNA one to start off with
 1a24       reduced DsbA from E.coli 189 residues alpha/beta (mixed), 20 models
 1afp       beta barrel of 50 some AA
-1ai0   n/a R6 insulin complex with H2O
+1ai0       R6 insulin complex with H2O
 1b4y  4400 DNA triple helix for testing x3dna code
 1brv  4020 smallest protein by JFD (1996). VAL H1 is only present in the second model and on.
 1bus    53 has ligand PCA.
