@@ -317,7 +317,7 @@ class Queeny( odict ):
         Only distances for now
         """
 
-        NTmessage('Queeny.initRestraints: adding restraints (# elements = %d)', len(self))
+        NTmessage('==> Queeny adding restraints (# elements = %d)', len(self))
 
         for dme in self.itervalues():
             dme.upperChange = 0.0
@@ -369,7 +369,7 @@ class Queeny( odict ):
             #end for
         #end for
 
-        NTdebug('Queeny.initRestraints: %d restraints added (# elements = %d)', count, len(self))
+#        NTdebug('Queeny.initRestraints: %d restraints added (# elements = %d)', count, len(self))
 
         self.setNeighbors(nkeys) # update the neighbors for newly added
         #print '>>',len(self)
@@ -662,7 +662,7 @@ def saveQueeny( project, tmp=None ):
     #end for
     smlFile = os.path.join(path, queenyDefs.smlFile )
     obj2SML( l, smlFile)
-    NTdetail('==> Saved queeny results to "%s"', smlFile)
+#    NTdebug('==> Saved queeny results to "%s"', smlFile)
     return False
 #end def
 

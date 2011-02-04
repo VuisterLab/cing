@@ -145,6 +145,6 @@ def getBmrbCsCountsFromFile(inputStarFile):
             assignmentCountMap[ csAtomType] += 1
         # end for
     # end for
-    NTmessage("Read: %s" % str(assignmentCountMap))
+#    NTdebug("Read: %s" % str(assignmentCountMap))
     return assignmentCountMap
 # end def

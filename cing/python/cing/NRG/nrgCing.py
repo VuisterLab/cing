@@ -76,7 +76,7 @@ class nrgCing(Lister):
                  updateIndices=True,
                  isProduction=True
                 ):
-        self.assumeAllAreDone = 1 # DEFAULT: 1 when assumed all are done.
+        self.assumeAllAreDone = 0 # DEFAULT: 0 when assumed all are done. Disables some messaging in case not all are done.
         self.writeWhyNot = writeWhyNot
         "Write the info for the WhyNot database"
         self.writeTheManyFiles = writeTheManyFiles
@@ -122,12 +122,43 @@ class nrgCing(Lister):
         self.url_directer = '../direct.php' # relative to index directory.
         self.url_redirecter = '../redirect.php'
 #        self.url_csv_file_link_base = 'http://www.bmrb.wisc.edu/servlet_data/viavia/bmrb_pdb_match'
-        ## Dictionary with matches pdb to bmrb
-        self.matches_many2one = {}
         ## Dictionary with matches bmrb to pdb
         self.matches_one2many = {}
         ## Dictionary with matches bmrb to pdb
         self.matches_one2many_inv = {}
+
+        ## Dictionary with matches pdb to bmrb
+        # will be overwritten except when testing
+        self.matches_many2one = {
+'1b4y': 4400 ,
+'1brv': 4020 ,
+'1bus': 53   ,
+'1c2n': 1646 ,
+'1cjg': 4813 ,
+'1d3z': 6457 ,
+'1hkt': 4046 ,
+'1hkt': 4046 ,
+'1hue': 4047 ,
+'1ieh': 4969 ,
+'1iv6': 5317 ,
+'1mo7': 5577 ,
+'1mo8': 5576 ,
+'1nk2': 4141 ,
+'1ozi': 5762 ,
+'1p9j': 5801 ,
+'1pd7': 5808 ,
+'1qjt': 4491 ,
+'1vj6': 5131 ,
+'1y7n': 6113 ,
+'2fws': 7009 ,
+'2fws': 7009 ,
+'2fwu': 7008 ,
+'2jmx': 15072,
+'2jsx': 15381,
+'2kib': 20074,
+'2kz0': 16995,
+'2rop': 11041,
+ }
         ## Replace %b in the below for the real link.
         self.bmrb_link_template = 'http://www.bmrb.wisc.edu/cgi-bin/explore.cgi?bmrbId=%b'
         self.pdb_link_template = 'http://www.rcsb.org/pdb/explore/explore.do?structureId=%s'
@@ -191,7 +222,7 @@ class nrgCing(Lister):
         self.ENTRY_DELETED_COUNT_MAX = 2
         self.MAX_ERROR_COUNT_CING_LOG = 200
         self.MAX_ERROR_COUNT_FC_LOG = 99999 # 104d had 16. 108d had 460
-        self.FRACTION_CS_CONVERSION_REQUIRED = 0.95
+        self.FRACTION_CS_CONVERSION_REQUIRED = 0.05 # DEFAULT: 0.95
 
         self.wattosVerbosity = cing.verbosity
         self.wattosMemory = '4g'
@@ -1206,37 +1237,7 @@ class nrgCing(Lister):
 
 
             log_file = "%s_starCS2Ccpn.log" % entry_code
-            if not self.matches_many2one: # Default: 0 just for testing when retrieval of the matches is bypassed.
-                    self.matches_many2one = {
-'1b4y': 4400 ,
-'1brv': 4020 ,
-'1bus': 53   ,
-'1c2n': 1646 ,
-'1cjg': 4813 ,
-'1d3z': 6457 ,
-'1hkt': 4046 ,
-'1hkt': 4046 ,
-'1hue': 4047 ,
-'1ieh': 4969 ,
-'1iv6': 5317 ,
-'1mo7': 5577 ,
-'1mo8': 5576 ,
-'1nk2': 4141 ,
-'1ozi': 5762 ,
-'1p9j': 5801 ,
-'1pd7': 5808 ,
-'1qjt': 4491 ,
-'1vj6': 5131 ,
-'1y7n': 6113 ,
-'2fws': 7009 ,
-'2fws': 7009 ,
-'2fwu': 7008 ,
-'2jmx': 15072,
-'2jsx': 15381,
-'2kib': 20074,
-'2kz0': 16995,
-'2rop': 11041,
- }
+
             if not self.matches_many2one.has_key(entry_code):
                 NTerror("No BMRB entry for PDB entry: %s" % entry_code)
                 return True
@@ -1257,7 +1258,7 @@ class nrgCing(Lister):
             fcScript = os.path.join(cingDirScripts, 'FC', 'mergeNrgBmrbShifts.py')
 
             # Will save a copy to disk as well.
-            convertProgram = ExecuteProgram("python -u %s" % fcScript, redirectOutputToFile=log_file,)
+            convertProgram = ExecuteProgram("python -u %s" % fcScript, redirectOutputToFile=log_file)
 #            NTmessage("==> Running Wim Vranken's FormatConverter from script %s" % fcScript)
             exitCode = convertProgram("%s -bmrbCodes %s -raise -force -noGui" % (entry_code, bmrb_code))
             if exitCode:
@@ -1280,42 +1281,44 @@ class nrgCing(Lister):
             if not os.path.exists(outputCcpnFile):
                 NTerror("%s found no output ccpn file %s" % (entry_code, outputCcpnFile))
                 return True
-            if True: # Test completion of conversions.
+            if True:
+                NTmessage("Testing completeness of FC merge by comparing input STAR with output CING counts" )
                 conversionCsSucces = True
                 nucleiToCheckList = '1H 13C 15N 31P'.split()
 #                bmrbCountMap = getBmrbCsCounts()
-#                entryMap = getDeepByKeysOrAttributes( bmrbCountMap, bmrb_id )
-                entryMap = getBmrbCsCountsFromFile(inputStarFile)
-                NTdebug("entryMap %r" % entryMap)
+#                bmrbCsMap = getDeepByKeysOrAttributes( bmrbCountMap, bmrb_id )
+                bmrbCsMap = getBmrbCsCountsFromFile(inputStarFile)
+                NTmessage("BMRB %r" % bmrbCsMap)
+
                 project = Project.open(entry_code, status = 'new')
                 project.initCcpn(ccpnFolder = outputCcpnFile)
                 assignmentCountMap = project.molecule.getAssignmentCountMap()
-                input_count_total = 0
-                project_count_total = 0
+                star_count_total = 0
+                cing_count_total = 0
                 for nucleusId in nucleiToCheckList:
-                    input_count = getDeepByKeysOrAttributes( entryMap, nucleusId )
-                    project_count = getDeepByKeysOrAttributes( assignmentCountMap, nucleusId )
-#                    NTdebug("nucleus: %s input: %s project: %s" % ( nucleusId, input_count, project_count ) )
-                    if input_count == None or input_count == 0:
+                    star_count = getDeepByKeysOrAttributes( bmrbCsMap, nucleusId )
+                    cing_count = getDeepByKeysOrAttributes( assignmentCountMap, nucleusId )
+#                    NTdebug("nucleus: %s input: %s project: %s" % ( nucleusId, star_count, cing_count ) )
+                    if star_count == None or star_count == 0:
 #                        NTmessage("No nucleus: %s in input" % nucleusId)
                         continue
-                    if project_count == None:
+                    if cing_count == None:
                         NTerror("No nucleus: %s in project" % nucleusId)
                         continue
-                    input_count_total += input_count
-                    project_count_total += project_count
+                    star_count_total += star_count
+                    cing_count_total += cing_count
                 # end for
-                if input_count_total == 0:
+                if star_count_total == 0:
                     f = 0.0
                 else:
-                    f = (1. * project_count_total) / input_count_total
-                resultTuple = (self.FRACTION_CS_CONVERSION_REQUIRED, f, project_count, input_count)
+                    f = (1. * cing_count_total) / star_count_total
+                resultTuple = (self.FRACTION_CS_CONVERSION_REQUIRED, f, cing_count_total, star_count_total)
 
                 if f < self.FRACTION_CS_CONVERSION_REQUIRED:
-                    NTwarning("Found fraction less than %.2f but %.2f overall (input/project: %s/%s)" % resultTuple)
+                    NTwarning("Found fraction less than   cutoff %.2f but %.2f overall (STAR/CING: %s/%s)" % resultTuple)
                     conversionCsSucces = False
                 else:
-                    NTmessage("Found fraction of at least %.2f at %.2f overall (input/project: %s/%s)" % resultTuple)
+                    NTmessage("Found fraction of at least cutoff %.2f at %.2f  overall (STAR/CING: %s/%s)" % resultTuple)
                 del project
             # end CS count check.
 
@@ -1358,7 +1361,7 @@ class nrgCing(Lister):
         else:
             NTwarning("Did not copy input %s" % finalInputTgz)
         # end else
-        if 0: # DEFAULT: 0
+        if 1: # DEFAULT: 0
             self.entry_list_todo = [ entry_code ]
             self.runCing()
         NTmessage("Done with %s" % entry_code)
@@ -1455,22 +1458,13 @@ class nrgCing(Lister):
 
         NTmessage("Starting prepare using self.entry_list_todo")
 
-        if False: # DEFAULT: False
-            entry_code = '1brv'
-            if self.prepareEntry(entry_code, convertMmCifCoor=0, convertMrRestraints=1, convertStarCS=0):
-                NTerror("In prepare failed prepareEntry")
-                return True
-        if False: # DEFAULT: False
-            self.searchPdbEntries()
-#            self.entry_list_todo = "134d 135d 136d 177d 1crq 1crr 1ezc 1ezd 1gnc 1kld 1l0r 1lcc 1lcd 1msh 1qch 1r4e 1sah 1saj 1vve 2axx 2ezq 2ezr 2ezs 2i7z 2ku2 2neo 2ofg".split()
-#            self.entry_list_todo = "1crq 1crr 1ezc 1ezd 1kld 1sah 1saj 1vve 2axx 2ezq 2ezr 2ezs".split()
-            self.entry_list_todo = "1b4y 1brv 1bus 1c2n 1cjg 1d3z 1hkt 1hue 1ieh 1iv6 1mo7 1mo8 1ozi 1p9j 1pd7 1qjt 1vj6 1y7n 2fws 2fwu 2jmx 2jsx 2kib 2kz0 2rop".split()
-#            self.entry_list_todo = "2rop 2jmx 2kz0 2kib".split()
-            self.entry_list_todo = readLinesFromFile('/Library/WebServer/Documents/NRG-CING/list_backup/entry_list_prep_crashed.csv')
-
-#            self.entry_list_nmr = deepcopy(self.entry_list_todo)
-#            self.entry_list_nrg_docr = []
-#            self.entry_list_nrg_docr = deepcopy(self.entry_list_todo)
+        if 0: # DEFAULT: False
+#            self.searchPdbEntries()
+            self.entry_list_todo = "1brv".split()
+#            self.entry_list_todo = "1b4y 1brv 1bus 1c2n 1cjg 1d3z 1hkt 1hue 1ieh 1iv6 1mo7 1mo8 1ozi 1p9j 1pd7 1qjt 1vj6 1y7n 2fws 2fwu 2jmx 2jsx 2kib 2kz0 2rop".split()
+#            self.entry_list_todo = readLinesFromFile('/Library/WebServer/Documents/NRG-CING/list_backup/entry_list_prep_crashed.csv')
+            self.entry_list_nmr = deepcopy(self.entry_list_todo)
+            self.entry_list_nrg_docr = deepcopy(self.entry_list_todo)
 
 
 #        self.entry_list_nmr = readLinesFromFile(os.path.join(self.results_dir, 'entry_list_nmr.csv'))
@@ -1494,9 +1488,8 @@ class nrgCing(Lister):
             if not (convertMmCifCoor or convertMrRestraints):
                 NTerror("not (convertMmCifCoor or convertMrRestraints) in prepare. Skipping entry: %s" % entry_code)
                 continue
-            if 1: # Default 1
-                if self.matches_many2one.has_key(entry_code):
-                    convertStarCS = 1
+            if self.matches_many2one.has_key(entry_code):
+                convertStarCS = 1
 
             argList = [convertMmCifCoor, convertMrRestraints, convertStarCS]
             argStringList = [ str(x) for x in argList ]
@@ -1549,13 +1542,9 @@ class nrgCing(Lister):
 
 
         if 0: # DEFAULT: False
-#            self.entry_list_done = '2hyn 2kj3 2ku1'.split()
-            self.entry_list_todo = readLinesFromFile('/Library/WebServer/Documents/NRG-CING/list_backup/entry_list_t.csv')
-
-        if False: # DEFAULT: False
-            self.entry_list_todo = "134d 135d 136d 177d 1crq 1crr 1ezc 1ezd 1gnc 1kld 1l0r 1lcc 1lcd 1msh 1qch 1r4e 1sah 1saj 1vve 2axx 2ezq 2ezr 2ezs 2i7z 2ku2 2neo 2ofg".split()
-            self.entry_list_nmr = deepcopy(self.entry_list_todo)
-            self.entry_list_nrg_docr = []
+            self.entry_list_todo = '1brv'.split()
+#            self.entry_list_todo = readLinesFromFile('/Library/WebServer/Documents/NRG-CING/list_backup/entry_list_t.csv')
+#            self.entry_list_todo = "134d 135d 136d 177d 1crq 1crr 1ezc 1ezd 1gnc 1kld 1l0r 1lcc 1lcd 1msh 1qch 1r4e 1sah 1saj 1vve 2axx 2ezq 2ezr 2ezs 2i7z 2ku2 2neo 2ofg".split()
 
         NTmessage("Found entries in NRG-CING todo: %d" % len(self.entry_list_todo))
 
@@ -1564,7 +1553,10 @@ class nrgCing(Lister):
         pythonScriptFileName = os.path.join(cingDirNRG, 'storeCING2db.py')
         entryListFileName = os.path.join( self.results_dir, 'entry_list_todo.csv')
         writeEntryListToFile(entryListFileName, self.entry_list_todo)
-        extraArgList = (ARCHIVE_NRG_ID,) # note that for length one tuples the comma is required.
+        archive_id=ARCHIVE_DEV_NRG_ID
+        if self.isProduction:
+            archive_id=ARCHIVE_NRG_ID
+        extraArgList = (archive_id,) # note that for length one tuples the comma is required.
 
         doScriptOnEntryList(pythonScriptFileName,
                             entryListFileName,
@@ -1623,14 +1615,13 @@ Additional modes I see:
         elif destination == 'prepareEntry':
             convertMmCifCoor = 0
             convertMrRestraints = 1
-            convertStarCS = 0
+            convertStarCS = 1
             doInteractive=isProduction
             if len(argListOther) > 0:
                 convertMmCifCoor = int(argListOther[0])
                 if len(argListOther) > 1:
                     convertMrRestraints = int(argListOther[1])
-            if m.prepareEntry(entry_code, doInteractive=doInteractive,
-                convertMmCifCoor=convertMmCifCoor, convertMrRestraints=convertMrRestraints, convertStarCS=convertStarCS):
+            if m.prepareEntry(entry_code, doInteractive=doInteractive, convertMmCifCoor=convertMmCifCoor, convertMrRestraints=convertMrRestraints, convertStarCS=convertStarCS):
                 NTerror("Failed to prepareEntry")
         elif destination == 'runCingEntry':
 #            m.entry_list_todo = [ entry_code ]
@@ -1648,6 +1639,10 @@ Additional modes I see:
             if m.createToposTokens():
                 NTerror("Failed to createToposTokens")
         elif destination == 'storeCING2db':
+            if m.storeCING2db():
+                NTerror("Failed to storeCING2db")
+        elif destination == 'storeCING2dbEntry':
+            m.entry_list_todo = [ entry_code ]
             if m.storeCING2db():
                 NTerror("Failed to storeCING2db")
         elif destination == 'getEntryInfo':

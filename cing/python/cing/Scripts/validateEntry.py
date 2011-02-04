@@ -53,6 +53,7 @@ def main(entryId, *extraArgList):
     doWhatif = True # disables whatif actual run
     doProcheck = True
     doWattos = True
+    doQueeny = True
     doTalos = True
     tgzCing = True # default: True # Create a tgz for the cing project. In case of a CING project input it will be overwritten.
 #    modelCount=2
@@ -63,6 +64,7 @@ def main(entryId, *extraArgList):
         doWhatif = False
         doProcheck = False
         doWattos = False
+        doQueeny = False
         doTalos = False
     FORCE_REDO = True
     FORCE_RETRIEVE_INPUT = True
@@ -256,7 +258,7 @@ def main(entryId, *extraArgList):
 
     project.save()
     if project.validate(htmlOnly=htmlOnly, doProcheck=doProcheck, doWhatif=doWhatif,
-            doWattos=doWattos, doTalos=doTalos):
+            doWattos=doWattos, doQueeny = doQueeny, doTalos=doTalos):
         NTerror("Failed to validate project read")
         return True
     project.save()
@@ -310,8 +312,8 @@ def retrieveTgzFromUrl(entryId, url, archiveType=ARCHIVE_TYPE_FLAT, formatFileNa
 ##        entryCodeChar2and3 = entryId[1:3]
 #        pathInsert = '/%s/%s' % (entryCodeChar2and3, entryId)
 
-    if url.startswith('file:/'):
-        pathSource = url.replace('file:/', '')
+    if url.startswith('file://'):
+        pathSource = url.replace('file://', '')
         fullPathSource = "%s%s/%s" % (pathSource, pathInsert, fileNameTgz)
         NTmessage("copying file: %s to: %s" % (fullPathSource, fileNameTgz))
         if not os.path.exists(fullPathSource):

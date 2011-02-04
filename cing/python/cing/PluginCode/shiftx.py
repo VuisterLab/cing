@@ -115,7 +115,7 @@ def runShiftx( project, parseOnly=False, model=None   ):
         return None
     #end if
     if not project.molecule.hasAminoAcid():
-        NTmessage('runShiftx: not a single amino acid in the molecule so skipping this step.')
+        NTmessage('==> Skipping runShiftx because no amino acids are present.')
         return project
 
     NTmessage('==> Running shiftx' )
@@ -142,7 +142,7 @@ def runShiftx( project, parseOnly=False, model=None   ):
         #end for
     #end for
     if skippedResidues:
-        NTmessage('runShiftx: %s non-protein residues will be skipped.' %  len(skippedResidues))
+        NTmessage('==> runShiftx: %s non-protein residues will be skipped.' %  len(skippedResidues))
 
     if model!=None:
         models = NTlist( model )

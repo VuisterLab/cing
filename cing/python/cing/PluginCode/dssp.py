@@ -60,7 +60,7 @@ class Dssp:
             return None
         if export:
             if not self.project.molecule.hasAminoAcid():
-                NTmessage('Dssp.run: skipping because no amino acid in this molecule')
+                NTmessage('==> Skipping Dssp because no amino acids are present.')
                 return
 
             for res in self.project.molecule.allResidues():
