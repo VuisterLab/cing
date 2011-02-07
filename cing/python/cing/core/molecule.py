@@ -702,7 +702,7 @@ class Molecule( NTtree, ResidueList ):
                     NTerror("Failed to find residue in residueHash2LoL.")
                     return None
                 residueNewNumberPair[r] = str(residueNewTuple[1] + 1) # Plus one 'cause indices start at zero and mmCIF starts at one.
-                NTdebug("Mapping %s %s to residueNewNumberPair %s" % (r,residue,residueNewNumberPair[r]))
+#                NTdebug("Mapping %s %s to residueNewNumberPair %s" % (r,residue,residueNewNumberPair[r]))
                 if residueNewNumberPair[r] < 1:
                     NTerror("In %s tried to map to mmCIF invalid residue number: %s" % ( getCallerName(), residueNewNumberPair[r] ))
                     return None
@@ -715,7 +715,7 @@ class Molecule( NTtree, ResidueList ):
             else:
                 rangesNew += residueNewNumberPair[0]
         # end for
-        NTdebug("Mapped ranges %s to %s" % (ranges,rangesNew))
+#        NTdebug("Mapped ranges %s to %s" % (ranges,rangesNew))
         return rangesNew
 
 
@@ -3569,6 +3569,12 @@ Residue class: Defines residue properties
         if aDef and self.has_key(aDef.name):
             return self[aDef.name]
         #end if
+
+        # For when the atom defs were not store with CING project as with entry 2ksi.B.PLM200
+        # TODO: GWV to review.
+        if self.has_key(atomName):
+            return self[atomName]
+
         return None
     #end def
 

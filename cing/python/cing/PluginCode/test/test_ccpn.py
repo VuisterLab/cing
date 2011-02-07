@@ -49,13 +49,13 @@ class AllChecks(TestCase):
         doRestoreCheck = False
         doStoreCheck = False # DEFAULT: False Requires sqlAlchemy
         if fastestTest:
-            modelCount=2
+#            modelCount=2 # DEFAULT 2
             redoFromCingProject = False
             htmlOnly = True
             doWhatif = False
             doProcheck = False
             doWattos = False
-            doQueeny = False
+#            doQueeny = False
             doTalos = False
             doRestoreCheck = False
             doStoreCheck = False
@@ -137,7 +137,7 @@ class AllChecks(TestCase):
 
             if True:
                 self.assertFalse(project.molecule.setRanges(ranges))
-                NTdebug('ranges: %s' % str(project.molecule.ranges))
+#                NTdebug('In test_ccpn.py: ranges: %s' % str(project.molecule.ranges))
                 project.molecule.rangesToMmCifRanges(ranges)
 
             if True:
