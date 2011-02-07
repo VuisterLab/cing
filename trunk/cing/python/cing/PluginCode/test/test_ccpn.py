@@ -49,13 +49,13 @@ class AllChecks(TestCase):
         doRestoreCheck = False
         doStoreCheck = False # DEFAULT: False Requires sqlAlchemy
         if fastestTest:
-#            modelCount=2 # DEFAULT 2
+            modelCount=1 # DEFAULT 2
             redoFromCingProject = False
             htmlOnly = True
             doWhatif = False
             doProcheck = False
             doWattos = False
-#            doQueeny = False
+            doQueeny = False
             doTalos = False
             doRestoreCheck = False
             doStoreCheck = False

@@ -1242,13 +1242,13 @@ class nrgCing(Lister):
             bmrb_id = self.matches_many2one[entry_code]
             bmrb_code = 'bmr%s' % bmrb_id
 
-
-            digits12 ="%02d" % ( bmrb_id % 100 )
-            inputStarDir = os.path.join(bmrbDir, digits12)
+#            digits12 ="%02d" % ( bmrb_id % 100 )
+#            inputStarDir = os.path.join(bmrbDir, digits12)
+            inputStarDir = os.path.join(bmrbDir, bmrb_code)
             if not os.path.exists(inputStarDir):
                 NTerror("Input star dir not found: %s" % inputStarDir)
                 return True
-            inputStarFile = os.path.join(inputStarDir, '%s.str'%bmrb_code)
+            inputStarFile = os.path.join(inputStarDir, '%s_21.str'%bmrb_code)
             if not os.path.exists(inputStarFile):
                 NTerror("inputStarFile not found: %s" % inputStarFile)
                 return True

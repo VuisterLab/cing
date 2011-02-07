@@ -60,5 +60,6 @@ dir_vCing       = os.path.join(dir_prep, 'vCing')
 
 bmrbbase_dir    = os.path.join(platform_dir,'bmrb')
 #bmrbDir         = os.path.join(bmrbbase_dir,'ftp.bmrb.wisc.edu/pub/bmrb/entry_directories')
-bmrbDir         = os.path.join(bmrbbase_dir,'2.1.1') # Switching to 3 later.
+bmrbDir         = os.path.join(bmrbbase_dir,'rsync') # Switching to 3 later.
+#bmrbDir         = os.path.join(bmrbbase_dir,'2.1.1') # Switching to 3 later.
 #bmrbDir         = os.path.join(bmrbbase_dir,'3.0.8.34')

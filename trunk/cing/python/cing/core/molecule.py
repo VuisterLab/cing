@@ -3572,8 +3572,8 @@ Residue class: Defines residue properties
 
         # For when the atom defs were not store with CING project as with entry 2ksi.B.PLM200
         # TODO: GWV to review.
-        if self.has_key(atomName):
-            return self[atomName]
+#        if self.has_key(atomName):
+#            return self[atomName]
 
         return None
     #end def
