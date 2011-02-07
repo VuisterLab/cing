@@ -32,7 +32,7 @@ class MergeNrgBmrbShifts(DataHandler, NmrStarHandler):
 
     # List of formats used
     formatList = ['NmrStar']
-    bmrbFileFormat = "%s.str"
+    bmrbFileFormat = "%s_21.str" # Used indirectly as well perhaps.
     # These can be reset if necessary... not part of main class
 #    loadDir = cingDirTmp
 #    projectDirectory = os.path.join(archivesCcpnDataDir, 'nrgBmrbMerge')
@@ -83,13 +83,14 @@ class MergeNrgBmrbShifts(DataHandler, NmrStarHandler):
         bmrbCode = self.bmrbCodes[0]
         self.initShiftPresets(bmrbCode)
     #          bmrbNmrStarFile = os.path.join(bmrbArchiveDataDir, self.bmrbFileFormat % bmrbCode)
-        bmrb_id = int(bmrbCode[3:])
-        digits12 = "%02d" % (bmrb_id % 100)
-        inputStarDir = os.path.join(bmrbDir, digits12)
+#        bmrb_id = int(bmrbCode[3:])
+#        digits12 = "%02d" % (bmrb_id % 100)
+#        inputStarDir = os.path.join(bmrbDir, digits12)
+        inputStarDir = os.path.join(bmrbDir, bmrbCode)
         if not os.path.exists(inputStarDir):
             NTerror("Input star dir not found: %s" % inputStarDir)
             return True
-        inputStarFile = os.path.join(inputStarDir, '%s.str' % bmrbCode)
+        inputStarFile = os.path.join(inputStarDir, self.bmrbFileFormat % bmrbCode)
         if not os.path.exists(inputStarFile):
             NTerror("inputStarFile not found: %s" % inputStarFile)
             return True
