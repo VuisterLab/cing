@@ -637,7 +637,7 @@ def isNterminalAtom( atmDef ):
     Needs to be called by valid atmDef or 0 will be returned.
     """
     if atmDef == None or atmDef.residueDef == None: # Fixes 2ksi
-        NTdebug("isNterminalAtom called without atom/residue definition.")
+        NTdebug("%s called without atom/residue definition." % getCallerName())
         return 0
     if atmDef.residueDef.hasProperties('protein'):
         d = NterminalProteinAtomDict
@@ -657,7 +657,7 @@ def isCterminalAtom( atmDef ):
 
 def isTerminal( atmDef ):
     if atmDef == None or atmDef.residueDef == None:
-        NTdebug("%s called without atom/residue definition." % getCallerName())
+#        NTdebug("%s called without atom/residue definition." % getCallerName())
         return 0
 
     if isNterminalAtom( atmDef ):
@@ -691,7 +691,7 @@ def isBackbone( atmDef ):
     Return True if it is not a sidechain atom, False otherwise
     """
     if atmDef == None or atmDef.residueDef == None: # Fixes 2ksi
-        NTdebug("%s called without atom/residue definition." % getCallerName())
+#        NTdebug("%s called without atom/residue definition." % getCallerName())
         return 0
     if atmDef.residueDef.hasProperties('protein'):
         d = backBoneProteinAtomDict
@@ -708,7 +708,7 @@ def isSidechain( atmDef ):
     i.e. not isBackbone, but is protein or nucleic acid; e.g. HOH is not sidechain!
     """
     if atmDef == None or atmDef.residueDef == None:
-        NTdebug("%s called without atom/residue definition." % getCallerName())
+#        NTdebug("%s called without atom/residue definition." % getCallerName())
         return 0
 
     return not isBackbone( atmDef )
@@ -719,7 +719,7 @@ def isMethyl( atmDef ):
     Return True atm is a methyl (either carbon or proton)
     """
     if atmDef == None or atmDef.residueDef == None:
-        NTdebug("%s called without atom/residue definition." % getCallerName())
+#        NTdebug("%s called without atom/residue definition." % getCallerName())
         return 0
     if isCarbon(atmDef):
         count = 0
