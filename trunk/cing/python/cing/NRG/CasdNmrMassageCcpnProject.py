@@ -26,7 +26,7 @@ __author__ = "Wim Vranken <wim@ebi.ac.uk> Jurgen Doreleijers <jurgenfd@gmail.com
 
 #    inputDir = os.path.join(cingDirTestsData, "ccpn")
 try:
-    from localConstants import baseDir
+    from localConstants import baseDir #@UnresolvedImport
 except:
     #baseDir = '/Users/jd/CASD-NMR-CING'
     baseDir = '/Volumes/UserHome/geerten/Data/CASD-NMR-CING'
