@@ -4,7 +4,7 @@ indices that live on top of them. For weekly and for more mass updates.
 
 Execute like:
 
-python -u $CINGROOT/python/cing/NRG/nrgCing.py [entry_code] [updateWeekly prepare prepareEntry runCingEntry storeCING2db createToposTokens ]
+python -u $CINGROOT/python/cing/NRG/nrgCing.py [entry_code] [updateWeekly prepare prepareEntry runCingEntry storeCING2db createToposTokens getEntryInfo ]
 
 As a cron job this will:
     - create a todo list
@@ -23,6 +23,7 @@ Sum                4971048.908
 from cing import cingDirScripts
 from cing import cingPythonCingDir
 from cing import header
+from cing.Libs import disk
 from cing.Libs.NTgenUtils import analyzeCingLog
 from cing.Libs.NTgenUtils import analyzeFcLog
 from cing.Libs.NTutils import * #@UnusedWildImport
@@ -129,34 +130,39 @@ class nrgCing(Lister):
 
         ## Dictionary with matches pdb to bmrb
         # will be overwritten except when testing
-        self.matches_many2one = {
-'1b4y': 4400 ,
-'1brv': 4020 ,
-'1bus': 53   ,
-'1c2n': 1646 ,
-'1cjg': 4813 ,
-'1d3z': 6457 ,
-'1hkt': 4046 ,
-'1hue': 4047 ,
-'1ieh': 4969 ,
-'1iv6': 5317 ,
-'1mo7': 5577 ,
-'1mo8': 5576 ,
-'1nk2': 4141 ,
-'1ozi': 5762 ,
-'1p9j': 5801 ,
-'1pd7': 5808 ,
-'1qjt': 4491 ,
-'1vj6': 5131 ,
-'1y7n': 6113 ,
-'2fws': 7009 ,
-'2fwu': 7008 ,
-'2jmx': 15072,
-'2jsx': 15381,
-'2kib': 20074,
-'2kz0': 16995,
-'2rop': 11041,
- }
+#        self.matches_many2one = {
+#'1b4y': 4400 ,
+#'1brv': 4020 ,
+#'1bus': 53   ,
+#'1c2n': 1646 ,
+#'1cjg': 4813 ,
+#'1d3z': 6457 ,
+#'1hkt': 4046 ,
+#'1hue': 4047 ,
+#'1ieh': 4969 ,
+#'1iv6': 5317 ,
+#'1mo7': 5577 ,
+#'1mo8': 5576 ,
+#'1nk2': 4141 ,
+#'1ozi': 5762 ,
+#'1p9j': 5801 ,
+#'1pd7': 5808 ,
+#'1qjt': 4491 ,
+#'1vj6': 5131 ,
+#'1y7n': 6113 ,
+#'2fws': 7009 ,
+#'2fwu': 7008 ,
+#'2jmx': 15072,
+#'2jsx': 15381,
+#'2kib': 20074,
+#'2kz0': 16995,
+#'2rop': 11041,
+# }
+        # Retrieve the linkages between BMRB and PDB entries.
+        self.matches_many2one = getBmrbLinks()
+        if not self.matches_many2one:
+            NTerror("Failed to get BMRB-PDB links")
+
         ## Replace %b in the below for the real link.
         self.bmrb_link_template = 'http://www.bmrb.wisc.edu/cgi-bin/explore.cgi?bmrbId=%b'
         self.pdb_link_template = 'http://www.rcsb.org/pdb/explore/explore.do?structureId=%s'
@@ -250,12 +256,6 @@ class nrgCing(Lister):
             self.new_hits_entry_list = self.new_hits_entry_list[100:110]
 
         NTmessage("In updateWeekly starting with:\n%r" % self)
-
-        # Retrieve the linkages between BMRB and PDB entries.
-        self.matches_many2one = getBmrbLinks()
-        if not self.matches_many2one:
-            NTerror("Failed to get BMRB-PDB links")
-            return True
 
         # Get the PDB info to see which entries can/should be done.
         if self.searchPdbEntries():
@@ -416,7 +416,7 @@ class nrgCing(Lister):
                 self.entry_list_prep_crashed.append(entry_code)
                 continue # don't mark it as stopped anymore.
             # end if
-            if nr_error > 0:
+            if nr_error > self.MAX_ERROR_COUNT_CING_LOG:
                 self.entry_list_prep_failed.append(entry_code)
                 NTmessage("For %s found %s/%s timeTaken/entryCrashed and %d/%d/%d/%d error,warning,message, and debug lines. Please check: %s" % (entry_code, timeTaken, entryCrashed, nr_error, nr_warning, nr_message, nr_debug, logLastFile) )
 #                NTmessage("%s Found %s errors in prep phase X please check: %s" % (entry_code, nr_error, logLastFile))
@@ -1354,7 +1354,8 @@ class nrgCing(Lister):
             fullDst = os.path.join(dst, fn)
             if os.path.exists(fullDst):
                 os.remove(fullDst)
-            os.link(finalInputTgz, fullDst) # Will use less resources but will be expanded when copied between resources.
+#            os.link(finalInputTgz, fullDst) # Will use less resources but will be expanded when copied between resources.
+            disk.copy(finalInputTgz, fullDst)
 #            NTdebug("Copied input %s to: %s" % (finalInputTgz, dst))
         else:
             NTwarning("Did not copy input %s" % finalInputTgz)
@@ -1458,7 +1459,8 @@ class nrgCing(Lister):
 
         if 1: # DEFAULT: False
 #            self.entry_list_todo = "1b4y 1brv 1bus 1c2n 1cjg 1d3z 1hkt 1hue 1ieh 1iv6 1mo7 1mo8 1nk2 1ozi 1p9j 1pd7 1qjt 1vj6 1y7n 2fws 2fwu 2jmx 2jsx 2kib 2kz0 2rop".split()
-            self.entry_list_todo = "1mo8".split()
+            self.entry_list_todo = readLinesFromFile('/Users/jd/NRG/lists/entry_list_prep_failed.csv')
+#            self.entry_list_todo = "1mo8".split()
             self.entry_list_todo = NTlist( *self.entry_list_todo )
 #            self.entry_list_todo = readLinesFromFile('/Library/WebServer/Documents/NRG-CING/list_backup/entry_list_prep_crashed.csv')
             self.entry_list_nmr = deepcopy(self.entry_list_todo)
@@ -1622,6 +1624,8 @@ Additional modes I see:
                 convertMmCifCoor = int(argListOther[0])
                 if len(argListOther) > 1:
                     convertMrRestraints = int(argListOther[1])
+                    if len(argListOther) > 2:
+                        convertStarCS = int(argListOther[2])
             if m.prepareEntry(entry_code, doInteractive=doInteractive, convertMmCifCoor=convertMmCifCoor, convertMrRestraints=convertMrRestraints, convertStarCS=convertStarCS):
                 NTerror("Failed to prepareEntry")
         elif destination == 'runCingEntry':

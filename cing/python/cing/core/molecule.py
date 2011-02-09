@@ -3060,13 +3060,13 @@ Chain class: defines chain properties and methods
 
     def addResidue( self, resName, resNum, convention=INTERNAL, Nterminal=False, Cterminal=False, FiveTerminal=False, ThreeTerminal=False, **kwds ):
         if self.has_key(resNum):
-            NTerror( 'Chain.addResidue: residue number "%s" already present in %s', resNum, self )
+            NTwarning( 'Chain.addResidue: residue number "%s" already present in %s perhaps there is a insertion code? Skipping residue', resNum, self )
             NTwarning("See also issue: %s%d" % (issueListUrl, 226))
             return None
         #end if
         res = Residue( resName=resName, resNum=resNum, convention=convention, Nterminal=Nterminal, Cterminal=Cterminal, **kwds )
         if res.name in self:
-            NTerror( 'Chain.addResidue: residue "%s" already present in %s', res.name, self.name )
+            NTwarning( 'Chain.addResidue: residue "%s" already present in %s; skipping residue', res.name, self.name )
             return None
         #end if
         self._addChild( res )

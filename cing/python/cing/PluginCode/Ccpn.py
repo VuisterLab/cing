@@ -644,7 +644,7 @@ class Ccpn:
                     continue
                 residue = chain.addResidue(resNameCing, resNumber, convention = matchingConvention, Nterminal = Nterminal, Cterminal = Cterminal)
                 if not residue:
-                    NTcodeerror("Failed to add residue: [" + resNameCing + ']')
+                    NTwarning("Failed to add residue: [" + resNameCing + ']')
                     continue
 
                 # Make mutual linkages between Ccpn and Cing objects
