@@ -65,7 +65,7 @@ Our own lab (See VuisterLab.numbers file):
 1vj6,5131
 1y7n,6113
 2fws,7009
-2fwu,7008
+2fwu,7008 Entry called H2_2Ca internally with project H2_2Ca_64_100.cing from GWV
 2f05
 2jsx,15381 NapD a Tat signal peptide-binding chaperone
 2kls

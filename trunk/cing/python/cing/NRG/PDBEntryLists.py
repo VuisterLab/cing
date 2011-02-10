@@ -53,7 +53,7 @@ def getBmrbLinks():
     mTable = dbms.tables[matchBmrbPdbTable]
 #    NTmessage("mTable:\n%s" % mTable.__str__(show_rows=False))
     matches_many2one = mTable.getHash(useSingleValueOfColumn=1) # hashes by first column to the next by default already.
-    NTmessage("Found %s matches from PDB to BMRB" % len(matches_many2one))
+#    NTmessage("Found %s matches from PDB to BMRB" % len(matches_many2one))
     return matches_many2one
 
 def getBmrbNmrGridEntries():

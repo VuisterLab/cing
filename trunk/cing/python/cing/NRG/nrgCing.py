@@ -4,7 +4,7 @@ indices that live on top of them. For weekly and for more mass updates.
 
 Execute like:
 
-python -u $CINGROOT/python/cing/NRG/nrgCing.py [entry_code] [updateWeekly prepare prepareEntry runCingEntry storeCING2db createToposTokens getEntryInfo ]
+python -u $CINGROOT/python/cing/NRG/nrgCing.py [entry_code] [updateWeekly prepare prepareEntry runCing runCingEntry storeCING2db createToposTokens getEntryInfo ]
 
 As a cron job this will:
     - create a todo list
@@ -350,7 +350,7 @@ class nrgCing(Lister):
 #        self.addInputModificationTimesFromBmrb() # TODO:
 
 
-    def getEntryInfo(self):
+    def getEntryInfo(self, reportCsConversion = 0):
         """Returns True for error.
 
         This routine sets self.entry_list_todo
@@ -363,6 +363,9 @@ class nrgCing(Lister):
 
         NTmessage("Get the entries tried, todo, crashed, and stopped in NRG-CING from file system.")
 
+        if self.searchPdbEntries():
+            NTerror("Failed to searchPdbEntries")
+            return True
 
         self.entry_list_prep_tried = NTlist()
         self.entry_list_prep_crashed = NTlist()
@@ -422,6 +425,14 @@ class nrgCing(Lister):
 #                NTmessage("%s Found %s errors in prep phase X please check: %s" % (entry_code, nr_error, logLastFile))
                 continue
             # end if
+            if reportCsConversion:
+                resultList = NTlist()
+                grep(logLastFile, 'Found fraction', resultList)
+                if not resultList:
+                    self.entry_list_prep_failed.append(entry_code)
+                    NTerror("%s Failed to get fraction" % entry_code)
+                    continue
+                NTmessage("%s %s" % (entry_code, resultList[0]))
             self.entry_list_prep_done.append(entry_code)
         # end for
 
@@ -1312,11 +1323,12 @@ class nrgCing(Lister):
                     f = (1. * cing_count_total) / star_count_total
                 resultTuple = (self.FRACTION_CS_CONVERSION_REQUIRED, f, star_count_total, cing_count_total )
 
+                # Use same number of field to facilitate computer readability.
                 if f < self.FRACTION_CS_CONVERSION_REQUIRED:
-                    NTwarning("Found fraction less than   cutoff %.2f but %.2f overall (STAR/CING: %s/%s)" % resultTuple)
+                    NTmessage("Found fraction less than the cutoff %.2f but %.2f overall (STAR/CING: %s/%s)" % resultTuple)
                     conversionCsSucces = False
                 else:
-                    NTmessage("Found fraction of at least cutoff %.2f at %.2f  overall (STAR/CING: %s/%s)" % resultTuple)
+                    NTmessage("Found fraction of at least   cutoff %.2f at %.2f  overall (STAR/CING: %s/%s)" % resultTuple)
                 del project
             # end CS count check.
 
@@ -1375,6 +1387,17 @@ class nrgCing(Lister):
         NTmessage("Starting runCing")
 #        return True
 
+        if 1:
+            NTmessage("Setting different list todo in runCing")
+            self.entry_list_todo = readLinesFromFile('/Users/jd/NRG/lists/bmrbPdbEntryList.csv')
+#            self.entry_list_todo = "1mo8".split()
+            self.entry_list_todo = NTlist( *self.entry_list_todo )
+
+            if self.searchPdbEntries():
+                NTerror("Failed to searchPdbEntries")
+                return True
+
+
 #        NTdebug("Not using topos")
         entryListFileName = "entry_list_todo.csv"
         writeTextToFile(entryListFileName, toCsv(self.entry_list_todo))
@@ -1427,7 +1450,13 @@ class nrgCing(Lister):
         """Return True on error.
         TODO: embed.
         """
-        extraArgListStr = "http://nmr.cmbi.umcn.nl/NRG-CING/prep/C jd@nmr.cmbi.umcn.nl:/Library/WebServer/Documents/NRG-CING . . BY_CH23_BY_ENTRY CCPN"
+        # Tune this to:
+#            expectedArgumentList = [ 'inputDir', 'outputDir', 'pdbConvention', 'restraintsConvention', 'archiveType', 'projectType' ]
+
+        extraArgListStr = "http://nmr.cmbi.umcn.nl/NRG-CING/input jd@nmr.cmbi.umcn.nl:/Library/WebServer/Documents/NRG-CING . . %s %s" % (
+                    ARCHIVE_TYPE_BY_CH23,
+                    PROJECT_TYPE_CCPN
+                     )
 
         NTmessage("Starting createToposTokens with extra params: [%s]" % extraArgListStr)
         self.entry_list_nmr = readLinesFromFile(os.path.join(self.results_dir, 'entry_list_nmr.csv'))
@@ -1435,6 +1464,11 @@ class nrgCing(Lister):
         self.entry_list_todo = NTlist()
         self.entry_list_todo.addList(self.entry_list_nmr)
         self.entry_list_todo = self.entry_list_todo.difference(self.entry_list_done)
+        if 1: # DEFAULT: False
+            self.entry_list_todo = readLinesFromFile('/Users/jd/NRG/lists/bmrbPdbEntryList_perm011_2713entries.csv')
+#            self.entry_list_todo = "1brv".split()
+            self.entry_list_todo = NTlist( *self.entry_list_todo )
+
 
         NTmessage("Found entries in NMR          : %d" % len(self.entry_list_nmr))
         NTmessage("Found entries in NRG-CING done: %d" % len(self.entry_list_done))
@@ -1457,10 +1491,10 @@ class nrgCing(Lister):
 
         NTmessage("Starting prepare using self.entry_list_todo")
 
-        if 1: # DEFAULT: False
+        if 0: # DEFAULT: False
 #            self.entry_list_todo = "1b4y 1brv 1bus 1c2n 1cjg 1d3z 1hkt 1hue 1ieh 1iv6 1mo7 1mo8 1nk2 1ozi 1p9j 1pd7 1qjt 1vj6 1y7n 2fws 2fwu 2jmx 2jsx 2kib 2kz0 2rop".split()
-            self.entry_list_todo = readLinesFromFile('/Users/jd/NRG/lists/entry_list_prep_failed.csv')
-#            self.entry_list_todo = "1mo8".split()
+            self.entry_list_todo = readLinesFromFile('/Users/jd/NRG/lists/bmrbPdbEntryList.csv')
+            self.entry_list_todo = "1brv".split()
             self.entry_list_todo = NTlist( *self.entry_list_todo )
 #            self.entry_list_todo = readLinesFromFile('/Library/WebServer/Documents/NRG-CING/list_backup/entry_list_prep_crashed.csv')
             self.entry_list_nmr = deepcopy(self.entry_list_todo)
@@ -1583,7 +1617,7 @@ Additional modes I see:
         prepare            Only moves the entries through prep stages.
     """
     cing.verbosity = verbosityDebug
-    max_entries_todo = 40  # DEFAULT: 40
+    max_entries_todo = 400000  # DEFAULT: 40
     useTopos = 0           # DEFAULT: 0
 
     NTmessage(header)
@@ -1628,10 +1662,11 @@ Additional modes I see:
                         convertStarCS = int(argListOther[2])
             if m.prepareEntry(entry_code, doInteractive=doInteractive, convertMmCifCoor=convertMmCifCoor, convertMrRestraints=convertMrRestraints, convertStarCS=convertStarCS):
                 NTerror("Failed to prepareEntry")
+        elif destination == 'runCing':
+            if m.runCing():
+                NTerror("Failed to runCing")
         elif destination == 'runCingEntry':
-#            m.entry_list_todo = [ entry_code ]
-            m.entry_list_todo = readLinesFromFile('/Library/WebServer/Documents/NRG-CING/list_backup/t.csv')
-#            m.entry_list_todo = [ entry_code ] xxxx
+            m.entry_list_todo = [ entry_code ]
             if m.runCing():
                 NTerror("Failed to runCingEntry")
         elif destination == 'postProcessAfterVc':
@@ -1651,9 +1686,7 @@ Additional modes I see:
             if m.storeCING2db():
                 NTerror("Failed to storeCING2db")
         elif destination == 'getEntryInfo':
-            if m.searchPdbEntries():
-                NTerror("Failed to searchPdbEntries")
-            if m.getEntryInfo():
+            if m.getEntryInfo(reportCsConversion = 0): # DEFAULT: 0
                 NTerror("Failed to getEntryInfo")
         else:
             NTerror("Unknown destination: %s" % destination)

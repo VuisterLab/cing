@@ -4629,10 +4629,10 @@ coordinates: %s"""  , dots, self, dots
             return None
         topology = self.topology()
         if topology == None:
-            NTerror("Failed to get topology for heavy atom routine: %s" % self)
+            NTwarning("Failed to get topology for heavy atom routine: %s" % self)
             return None
         if len(topology) < 1:
-            NTerror("Failed to get any atom in topology for heavy atom routine: %s" % self)
+            NTwarning("Failed to get any atom in topology for heavy atom routine: %s" % self)
             return None
         return self.topology()[0]
     #end def

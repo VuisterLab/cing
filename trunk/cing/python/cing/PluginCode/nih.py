@@ -1075,6 +1075,9 @@ DATA ATOMNAMES HA CA CB C N HN
         return True
     molecule = project.molecule
     residues = molecule.residuesWithProperties('protein')
+    if not residues:
+        NTerror('exportShifts2TalosPlus: no amino acid defined')
+        return True
 
     table = nmrPipeTable()
     table.remarks.append( sprintf('shifts from %s', molecule.name ) )
@@ -1163,6 +1166,9 @@ def _importTableFile( tabFile, molecule ):
 
     # residues for which we will analyze; same as used in export2talosPlus
     residues = molecule.residuesWithProperties('protein')
+    if not residues:
+        NTerror('_importTableFile: no amino acid defined')
+        return None
 
     table = nmrPipeTable()
     table.readFile(tabFile)
@@ -1356,13 +1362,17 @@ def runTalosPlus(project, tmp=None, parseOnly=False):
     #tmp: to be entered in setup
 #    cingPaths.talosPlus = 'talos+'
     if project.molecule == None:
-        NTerror("RunTalosPlus: No molecule defined")
+        NTmessage("RunTalosPlus: No molecule defined")
         return True
+    residues = project.molecule.residuesWithProperties('protein')
+    if not residues:
+        NTmessage('RunTalosPlus: no amino acid defined')
+        return False
 
     if project.molecule.resonanceCount == 0:
         NTmessage("==> RunTalosPlus: No resonances defined so no sense in running.")
         # JFD: This doesn't catch all cases.
-        return True
+        return False
 
     if not parseOnly:
         if cingPaths.talos == None or cingPaths.talos == 'PLEASE_ADD_EXECUTABLE_HERE':

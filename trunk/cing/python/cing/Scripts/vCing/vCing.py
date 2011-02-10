@@ -86,6 +86,7 @@ class vCing(Lister):
         log2Dir = os.path.join(self.MASTER_TARGET_DIR, self.MASTER_TARGET_LOG2)
         resultDir = os.path.join(self.MASTER_TARGET_DIR, self.MASTER_TARGET_RESULT)
         for d in (logDir, log2Dir, resultDir, cingDirTmp):
+            NTdebug("Creating %s" % d)
             mkdirs(d)
 
         # now manually fill pool with something like this:
@@ -100,6 +101,7 @@ class vCing(Lister):
         log2Dir = os.path.join(self.MASTER_TARGET_DIR, self.MASTER_TARGET_LOG2)
         resultDir = os.path.join(self.MASTER_TARGET_DIR, self.MASTER_TARGET_RESULT)
         for d in (logDir, log2Dir, resultDir, cingDirTmp):
+            NTdebug("Removing and recreating %s" % d)
             rmdir(d)
             mkdirs(d)
 

@@ -3448,7 +3448,7 @@ class DihedralRestraintList(RestraintList):
 #        NTdebug('DihedralRestraintList.analyze: %s', self)
 
         if not len(self):
-            NTerror('DihedralRestraintList.analyze: "%s" empty list', self.name)
+            NTwarning('DihedralRestraintList.analyze: "%s" empty list', self.name)
             return errorResult
         #end if
 
