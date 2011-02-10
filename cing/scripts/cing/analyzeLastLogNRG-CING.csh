@@ -106,3 +106,9 @@ foreach x ( $list )
     mkdir $ch23/$x/log_validateEntry >& /dev/null
     mv $ch23/$x/*.log $ch23/$x/log_validateEntry >& /dev/null
 end
+
+# Get CS conversion results
+python -u $CINGROOT/python/cing/NRG/nrgCing.py getEntryInfo > & log/getEntryInfo_2011-02-09.log &
+grep fraction log/getEntryInfo_2011-02-09.log | grep -v Failed | sed -e 's/\// /g' -e 's/[)]/ /g' | gawk 'BEGIN{print "pdb_id,f,STAR,CING"}{printf "\"%s\",%s,%s,%s\n", $1, $10, $14, $15}' | sort -nr > cs_conversion_results.csv
+scp -P 39676 localhost-nmr://Library/WebServer/Documents/devNRG-CING/cs_conversion_results.csv ~/workspace/nrgcing
+# process with Numbers

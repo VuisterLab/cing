@@ -11,7 +11,7 @@ Retrieves from http://nmr.cmbi.ru.nl/NRG-CING/prep/C/br/1brv/1brv.tgz
 Scps to                 :     jd@localhost:/tmp/data/br/1brv/1brv.cing.tgz
 
 For topos replace the first command by validateEntryNrg:
-validateEntryNrg 1brv http://nmr.cmbi.umcn.nl/NRG-CING/prep/C jd@nmr.cmbi.umcn.nl:/Library/WebServer/Documents/NRG-CING . . BY_CH23_BY_ENTRY CCPN
+validateEntryNrg 1brv http://nmr.cmbi.umcn.nl/NRG-CING/input jd@nmr.cmbi.umcn.nl:/Library/WebServer/Documents/NRG-CING . . BY_CH23_BY_ENTRY CCPN
 """
 
 from cing import cingDirTmp
@@ -85,7 +85,7 @@ def main(entryId, *extraArgList):
     outputDir = os.path.join(extraArgList[1], DATA_STR, entryCodeChar2and3, entryId)
     pdbConvention = extraArgList[2] #@UnusedVariable
     restraintsConvention = extraArgList[3]
-    archiveType = extraArgList[4]
+    archiveType = extraArgList[4] # Only used for deriving the input location not the output.
     projectType = extraArgList[5]
 
     if archiveType == ARCHIVE_TYPE_FLAT:

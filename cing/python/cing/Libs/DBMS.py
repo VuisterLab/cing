@@ -439,10 +439,11 @@ class DBMS():
                 return True
 
     def readCsvRelation(self, relationName, csvFileDir='.',
-            csvDtdFileDir=None, checkConsistency=False, showChecks=False, containsHeaderRow=True):
+            csvDtdFileDir=None, checkConsistency=False, showChecks=False, containsHeaderRow=True, showMessages=0):
         'return True on error'
         relation = Relation(relationName, self)
-        NTmessage("Reading relation : " + relation.name)
+        if showMessages:
+            NTmessage("Reading relation : " + relation.name)
         csvFileDir = os.path.abspath(csvFileDir)
         csv_fileName = os.path.join(csvFileDir, relation.name + ".csv")
         if relation.readCsvFile(csv_fileName, containsHeaderRow):

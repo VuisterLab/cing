@@ -83,7 +83,7 @@ CREATE TABLE casdcing.cingentry
     wi_bmpchk                      FLOAT DEFAULT NULL,
     wi_bndchk                      FLOAT DEFAULT NULL,
     wi_c12chk                      FLOAT DEFAULT NULL,
-    wi_chichk                      FLOAT DEFAULT NULL, 
+    wi_chichk                      FLOAT DEFAULT NULL,
     wi_flpchk                      FLOAT DEFAULT NULL,
     wi_hndchk                      FLOAT DEFAULT NULL,
     wi_inochk                      FLOAT DEFAULT NULL,
@@ -93,7 +93,7 @@ CREATE TABLE casdcing.cingentry
     wi_pl3chk                      FLOAT DEFAULT NULL,
     wi_plnchk                      FLOAT DEFAULT NULL,
     wi_quachk                      FLOAT DEFAULT NULL,
-    wi_ramchk                      FLOAT DEFAULT NULL, 
+    wi_ramchk                      FLOAT DEFAULT NULL,
     wi_rotchk                      FLOAT DEFAULT NULL,
     pc_gf                           FLOAT DEFAULT NULL, --   procheck_nmr
     pc_gf_phipsi                    FLOAT DEFAULT NULL,
@@ -307,7 +307,7 @@ CREATE TABLE casdcing.cingatom
 --   cing
     cs                             FLOAT DEFAULT NULL,
     cs_err                         FLOAT DEFAULT NULL,
-    cs_ssa                         INT DEFAULT NULL,
+    cs_ssa                         INT DEFAULT NULL, -- atom.stereoAssigned flag in CING data model.
 
     rog                            INT DEFAULT NULL,
     FOREIGN KEY (residue_id)        REFERENCES casdcing.cingresidue (residue_id) ON DELETE CASCADE,

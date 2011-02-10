@@ -684,7 +684,7 @@ evaluate ( $temperature = """ + str(self.temp) + """ )
 
 set seed """ + str(self.seed()) + """ end
 
-! We loop untill we have an accepted structure, maximum trials=1
+! We loop until we have an accepted structure, maximum trials=1
 evaluate ($end_count = 1)
 evaluate ($count = 0)
 

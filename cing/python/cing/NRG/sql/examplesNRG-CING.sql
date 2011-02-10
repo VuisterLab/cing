@@ -118,7 +118,26 @@ e.model_count <= 10 AND
 e.pc_gf > -99
 order by e.pdb_id;
 
-SELECT count( FROM "nrgcing"."cingentry";
+SELECT count(*) FROM "devnrgcing"."cingentry";
+SELECT e.pdb_id as pdb, c.name as c, r.number as num, a.name, a.cs
+
+SELECT count(*) /2 as leu_ssa_cds
+FROM
+"devnrgcing"."cingentry" e,
+"devnrgcing"."cingresidue" r,
+"devnrgcing"."cingchain" c,
+"devnrgcing"."cingatom" a
+ where
+r.entry_id = e.entry_id AND
+c.entry_id = e.entry_id AND
+a.residue_id = r.residue_id AND
+e.res_count >= 30 AND -- Includes not too small peptides
+e.model_count > 1 AND -- Dismiss entries without true ensemble
+r.name = 'LEU' AND
+a.cs_ssa = 1 AND -- only ssa according to BMRB (stereoAssigned flag in CING)
+a.name LIKE 'CD%';
+order by e.pdb_id, c.name, r.number, a.name;
+
 
 -- Can't be done in one blow.
 ALTER TABLE nrgcing.cingatom ALTER COLUMN wi_mo2chk TYPE VARCHAR(255);
