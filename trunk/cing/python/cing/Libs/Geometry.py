@@ -60,6 +60,7 @@ def to_0_2pi( a ):
     return a
 
 def to_0_360( a ):
+    "Reduces to range [0,360> So exclusive 360 itself!"
     while a >= 360.:
         a -= 360.
     while a < 0.:

@@ -92,6 +92,7 @@ def runCingChecks( project, toFile=True, ranges=None ):
 
 "Need this here so the code can be tested. I.e. returns a meaningful status if needed."
 def validate( project, ranges=None, parseOnly=False, htmlOnly=False,
+        doShiftx = True,
         doProcheck = True, doWhatif=True, doWattos=True, doTalos=True, doQueeny=True, doSuperpose = True,
         validateFastest = False, validateCingOnly = False, validateImageLess = False ):
     if ranges == None:
@@ -103,11 +104,13 @@ def validate( project, ranges=None, parseOnly=False, htmlOnly=False,
         doWattos = False
         doTalos = False
         doQueeny = False
+        if validateFastest:
+            doShiftx = False
     if validateFastest or validateImageLess:
         htmlOnly = True
 
 #    NTdebug('Starting validate#validate with toFile True')
-    if getDeepByKeysOrAttributes(plugins, SHIFTX_STR, IS_INSTALLED_STR):
+    if doShiftx and getDeepByKeysOrAttributes(plugins, SHIFTX_STR, IS_INSTALLED_STR):
         project.runShiftx(parseOnly=parseOnly)
     if getDeepByKeysOrAttributes(plugins, DSSP_STR, IS_INSTALLED_STR):
         project.runDssp(parseOnly=parseOnly)
@@ -1257,6 +1260,10 @@ def moleculeValidateAssignments( molecule  ):
         if res.hasProperties('PRO') or res.hasProperties('cPRO'):
             if res.validateChemicalShiftProPeptide(result):
                 NTerror("Failed to _validateChemicalShiftProPeptide for %s" % res)
+        if res.hasProperties('LEU'):
+            if res.validateChemicalShiftLeu(result):
+                NTerror("Failed to validateChemicalShiftLeu for %s" % res)
+
         for atm in res.allAtoms():
             if atm.isAssigned():
                 shift = atm.shift()

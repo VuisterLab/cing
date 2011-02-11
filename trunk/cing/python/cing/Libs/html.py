@@ -2921,6 +2921,8 @@ class AtomsHTMLfile( HTMLfile ):
         valueStr   = val2Str(value, '%6.2f', useNanString=False )
         if valueStr==NaNstring:
             error=None
+        if error < 0.001: # Error are often missing and we don't want to bother users with the zeros.
+            error = None
         errorStr   = val2Str(error, '%6.2f', useNanString=False )
 
         chain   = atom.residue.chain

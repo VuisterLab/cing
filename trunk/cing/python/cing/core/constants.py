@@ -183,6 +183,10 @@ DIHEDRAL_NAME_Cb4C = 'Cb4C'
 GLY_HA3_NAME_CING = 'HA2'
 range0_360 = [0.,360.]
 
+DIHEDRAL_60_STR = 'DIHEDRAL_60' # gauche + Leu chi2
+DIHEDRAL_180_STR = 'DIHEDRAL_180' # trans
+DIHEDRAL_300_STR = 'DIHEDRAL_300' # gauche -
+
 VALUE_LIST_STR   = "valueList" # Originally in reqWhatif.py
 # Used for keying of residue entity (and potentially others) with CING's own Z-score values.
 CHK_STR = 'CHK'
