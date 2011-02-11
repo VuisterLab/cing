@@ -5,6 +5,7 @@ from ConfigParser import ConfigParser
 from cing import cingPythonCingDir
 from cing import cingRoot
 from cing import cingVersion
+from cing import header
 from cing import issueListUrl
 from cing.Libs.Geometry import violationAngle
 from cing.Libs.NTutils import * #@UnusedWildImport
@@ -12,6 +13,8 @@ from cing.Libs.cython.superpose import NTcVector #@UnresolvedImport @UnusedImpor
 from cing.Libs.cython.superpose import Rm6dist #@UnresolvedImport
 from cing.Libs.disk import copydir
 from cing.Libs.disk import remove
+from cing.Libs.helper import getStartMessage
+from cing.Libs.helper import getStopMessage
 from cing.Libs.html import DihedralByProjectList
 from cing.Libs.html import addPreTagLines
 from cing.Libs.html import generateHtml
@@ -50,6 +53,7 @@ from cing.core.validate import validateDihedralCombinations
 from cing.core.validate import validateDihedrals
 from cing.core.validate import validateModels
 from cing.core.validate import validateRestraints
+from glob import glob
 from shutil import rmtree
 import tarfile
 __version__ = cing.__version__
@@ -371,7 +375,7 @@ Project: Top level Cing project class
             return None
         if subdir == None:
             return self.path(self.molecule.name)
-
+#        NTdebug("moleculePath: subdir, moleculeDirectories[subdir] %s %s" % (subdir, moleculeDirectories[subdir]))
         return self.path(self.molecule.name, moleculeDirectories[subdir], *args)
     #end def
 
@@ -597,6 +601,8 @@ Project: Top level Cing project class
             pr.mkdir(dir)
         #end for
 
+        pr.addLog()
+
         projects.append(pr)
         return pr
     #end def
@@ -618,6 +624,8 @@ Project: Top level Cing project class
         #print '>>', cing.verbosity, cing.verbosityDebug
         if os.path.exists(tmpdir) and cing.verbosity != cing.verbosityDebug:
             removedir(tmpdir)
+
+        self.closeLog()
 
         projects.remove(self)
         return None
@@ -855,6 +863,48 @@ Project: Top level Cing project class
 
     def addHistory(self, line, timeStamp = True):
         self.history(line, timeStamp)
+    #end def
+
+    def removeOlderLogs(self):
+        """
+        Remove all but last; because we're still writting to it.
+        Match code to html#_generateLogsHtml
+        """
+        logsPattern = self.path(directories.logs, '*.txt')
+        logFileList = glob(logsPattern)
+        if not logFileList:
+            NTmessage("No log files found")
+            return
+        logFileList.sort()
+        for logFile in logFileList[:-1]:
+            NTdebug("Removing older log file %s" % logFile)
+            os.unlink(logFile)
+    #end def
+
+    def addLog(self):
+#        htmlHeader = """<html><head><title>CING: Common Interface for Structure Validation</title></head><body><PRE>\n"""
+        # Get first available new log file name like:
+        # 2jsx.cing/2jsx/Cing/Logs/2jsx_2011-02-10_20-09-31.html
+        date_stamp = getDateTimeStampForFileName()
+        fn = "%s_%s.txt" % (self.name, date_stamp )
+        logFilePath = self.path(directories.logs, fn)
+        stream2 = open(logFilePath, 'w')
+#        NTdebug("Opening %s" % logFilePath )
+        addStreamNTmessageList(stream2)
+        fprintf(stream2,header+'\n')
+        fprintf(stream2,getStartMessage()+'\n')
+#        NTdebug("Opened %s (should now show up in log too)" % logFilePath )
+    #end def
+
+    def closeLog(self):
+#        NTdebug("Closing log" )
+        if NTdebug.stream2 == None:
+            NTdebug("Strange in project.removeLog stream2 was already closed.")
+            return
+        stream2 = NTdebug.stream2
+        fprintf(stream2, getStopMessage(cing.starttime)+'\n')
+        removeStreamNTmessageList()
+#        NTdebug("Closed stream2 (should now NOT show up in log too)" )
     #end def
 
 #    def newPeakList( self, name, status='keep'):

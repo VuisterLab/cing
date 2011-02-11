@@ -1,7 +1,6 @@
 """
 Adds x3dna method to analyze DNA structures. The x3dna program is included as binaries for Mac OSX in the bin directory.
 """
-from cing import OS_TYPE_MAC
 from cing import osType
 from cing.Libs.NTplot import * #@UnusedWildImport
 from cing.Libs.NTutils import * #@UnusedWildImport

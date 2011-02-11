@@ -22,6 +22,11 @@ __author__     = cing.__author__
 __copyright__  = cing.__copyright__
 __credits__    = cing.__credits__
 
+OS_TYPE_MAC = 'darwin'
+OS_TYPE_LINUX = 'linux'
+OS_TYPE_WINDOWS = 'windows' # unsupported.
+OS_TYPE_UNKNOWN = 'unknown'
+
 AQUA       = 'AQUA' # not uptodate with BMRB DG/G difference.
 IUPAC      = 'IUPAC'
 SPARKY     =  IUPAC

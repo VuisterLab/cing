@@ -15,17 +15,16 @@ from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.Libs.find import find2 # Important to differ from NTutil's otherwise from string import find
 from cing.PluginCode.required.reqMatplib import MATPLIB_STR
 from cing.PluginCode.required.reqMolgrap import MOLGRAP_STR
-from cing.PluginCode.required.reqNih import NUMBER_OF_SD_TALOS
-from cing.PluginCode.required.reqNih import TALOSPLUS_CLASS_STR
-from cing.PluginCode.required.reqNih import TALOSPLUS_STR
-from cing.PluginCode.required.reqWattos import WATTOS_STR
-from cing.PluginCode.required.reqWattos import wattosPlotList
+from cing.PluginCode.required.reqNih import * #@UnusedWildImport
+from cing.PluginCode.required.reqWattos import * #@UnusedWildImport
 from cing.PluginCode.required.reqWhatif import * #@UnusedWildImport
 from cing.PluginCode.required.reqX3dna import X3DNA_STR
 from cing.core.parameters import cingPaths
+from cing.core.parameters import directories
 from cing.core.parameters import htmlDirectories
 from cing.core.parameters import moleculeDirectories
 from cing.core.parameters import plugins
+from glob import glob1
 import cPickle
 import shutil
 
@@ -1701,6 +1700,37 @@ class ProjectHTMLfile( HTMLfile ):
         return html
     #end def
 
+    def _generateLogsHtml( self ):
+        """
+        Match code to classes#addLog etc.
+        """
+        fileName = self.project.htmlPath( 'logs.html' )
+        html = HTMLfile( fileName, title = 'Project logs', project=self.project )
+        html.htmlLocation = (fileName, HTMLfile.top) # Fake an object location; see below
+
+        html.header('h1', 'Logs project ' + self.project.name )
+        html.insertHtmlLink(html.header, html, self.project, text='Home' )
+
+        html.main('h3', 'Logs')
+#        html.main('ul', closeTag=False)
+        logsDir = self.project.path(directories.logs)
+        logFileList = glob1(logsDir, '*.txt')
+        if logFileList:
+            logFileList.sort()
+            logFileList.reverse() # Important to have latest on top because they might get long. Use p.removeOlderLogs() then.
+        l = len(logFileList)
+        for i, logFile in enumerate(logFileList):
+            idx = l - i
+            # Create a link to the actual HTML log file.
+            html.main('p', str(idx), closeTag=0)
+            html.main('a', logFile, href="../../Logs/%s" % logFile)
+            html.main('P', openTag=0)
+        #end for
+#        html.main('ul', openTag=False)
+        html.render()
+        return html
+    #end def
+
     def generateHtml( self, htmlOnly = False ):
         """Generate all html for the project page.
         """
@@ -1738,6 +1768,11 @@ class ProjectHTMLfile( HTMLfile ):
             del(self.history)
         self.history = self._generateHistoryHtml()
         self.insertHtmlLinkInTag( 'li', self.main, self.project, self.history, text='History')
+
+        if hasattr(self, 'logs'):
+            del(self.logs)
+        self.logs = self._generateLogsHtml()
+        self.insertHtmlLinkInTag( 'li', self.main, self.project, self.logs, text='Logs')
         self.main('ul', openTag=False)
 
         # Molecule page and assignment links

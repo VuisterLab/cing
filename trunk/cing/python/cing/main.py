@@ -123,8 +123,6 @@ format(peaks)
     formatall( project.molecule.A.VAL171.C )
 """
 #==============================================================================
-from cing import OS_TYPE_LINUX
-from cing import OS_TYPE_MAC
 from cing import __author__ #@UnusedImport
 from cing import __copyright__ #@UnusedImport
 from cing import __credits__ #@UnusedImport
@@ -137,16 +135,14 @@ from cing import cingVersion
 from cing import header
 from cing import starttime
 from cing.Libs.NTutils import * #@UnusedWildImport
-from cing.Libs.helper import detectCPUs
+from cing.Libs.helper import * #@UnusedWildImport
 from cing.core.classes import Project
 from cing.core.molecule import Molecule
 from cing.core.parameters import cingPaths
 from cing.core.parameters import osType
 from cing.core.parameters import plugins
 import commands
-import platform
 import unittest
-
 
 #------------------------------------------------------------------------------------
 # Support routines
@@ -209,41 +205,6 @@ Default verbosity: %d
      cing.cingRoot, cing.cingDirTmp,
      cing.verbosityDefault
     )
-
-def getStartMessage():
-    """
-    Copy catted from xplor
-    user = "jd"
-    on   = "Stella.local (darwin/32bit/2cores/2.6.6)
-    at   = "(3676) 29-Oct-08 15:36:22
-    """
-    user = os.getenv("USER", "Unknown user")
-    machine = os.getenv("HOST", "Unknown host") #only works with (t)csh shell
-    ncpus = detectCPUs()
-#    ostype = os.getenv("OSTYPE", "Unknown os") #only works with (t)csh shell
-    on = "%s (%s/%s/%scores/%s)" % (machine, osType, platform.architecture()[0], ncpus, sys.version.split()[0])
-    at = time.asctime()
-    pid = os.getpid()
-    at = '(%d) ' %  pid + at
-#    atForFileName = "%s" % at
-#    atForFileName = re.sub('[ :]', '_', atForFileName)
-    return "User: %-10s on: %-42s at: %32s" % (user, on, at)
-#(3737) Thu Oct 21 11:19:30 2010
-#Stella.local (darwin/32bit/2cores/2.6.6)
-
-def getStopMessage():
-    """From Wattos
-#    Wattos started at: October 29, 2008 4:04:44 PM CET
-#    Wattos stopped at: October 29, 2008 4:04:49 PM CET
-#    Wattos took (#ms): 4915"""
-    at = time.asctime(time.localtime(starttime))
-    now = time.asctime()
-
-#    memory TODO print "in use and allocated"
-    msg = "CING started at : %s\n" % at
-    msg += "CING stopped at : %s\n" % now
-    msg += "CING took       : %-.3f s\n\n" % (time.time() - starttime)
-    return msg
 
 def verbosity(value):
     """Set CING verbosity
@@ -749,6 +710,7 @@ def main():
         #end if
         if not options.noProject and not project.molecule:
             NTdebug("No project.molecule, doing a hard system exit")
+            project.close()
             sys.exit(2)
 
         #------------------------------------------------------------------------------------
@@ -890,4 +852,4 @@ if __name__ == '__main__':
     try:
         main()
     finally:
-        NTmessage(getStopMessage())
+        NTmessage(getStopMessage(starttime))
