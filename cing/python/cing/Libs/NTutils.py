@@ -3735,6 +3735,7 @@ class PrintWrap:
         self.useDate        = useDate
         self.useProcessId   = useProcessId
         self.doubleToStandardStreams = doubleToStandardStreams
+        self.stream2   = None
 
         if self.verbose > verbosityError:
             self.stream = sys.stdout
@@ -3763,7 +3764,11 @@ class PrintWrap:
             format = processId + format
         if not self.noEOL:
             format += '\n'
-        fprintf(self.stream, format, *args)
+        finalMsg = sprintf(format, *args) # cache for speed.
+        fprintf(self.stream, finalMsg)
+        if self.stream2 != None:
+#            if self.stream2.writable(): # stupid slowing down check because JFD can't seem to get it closed proper.
+            fprintf(self.stream2, finalMsg)
         if self.prefix.find('EXCEPTION')>=0:
             pass
 #            fprintf( self.stream, "Exception below:\n" )
@@ -3773,8 +3778,35 @@ class PrintWrap:
             self.flush()
     def flush(self):
         self.stream.flush()
+        if self.stream2 != None:
+            try:
+                self.stream2.flush()
+            except:
+                NTdebug("Failed to flush stream2")
+
     def setVerbosity(self, verbose):
         self.verbose=verbose
+
+    def addStream(self, stream):
+        if self.stream2 != None:
+#            self.stream2.flush()
+#            print "DDD: Flushed 2nd stream and closing before adding new one."
+            try:
+                self.stream2.close()
+            except:
+                NTdebug("Failed to close stream2")
+#        print "DDD: Adding 2nd stream to %s." % self
+        self.stream2 = stream
+
+    def removeStream(self):
+        if self.stream2 == None:
+#            print "DDD: Strange 2nd stream was already closed in %s." % self
+            return
+#        self.stream2.flush()
+#        print "DDD: Flushed 2nd stream and closing."
+#        self.stream2.close()
+        self.stream2 = None
+# end class
 
 ERROR_ID = "ERROR"
 WARNING_ID = "WARNING"
@@ -4973,7 +5005,6 @@ NTdetail  = PrintWrap(verbose=verbosityDetail)
 NTdebug   = PrintWrap(verbose=verbosityDebug, prefix = prefixDebug)
 NTmessageNoEOL = PrintWrap(verbose=verbosityOutput, noEOL=True)
 
-
 kwds = {'useDate':True, 'useProcessId':True, 'doubleToStandardStreams': True}
 NTnothingT              = PrintWrap(verbose=verbosityNothing                            , **kwds)
 NTerrorT                = PrintWrap(verbose=verbosityError, prefix = prefixError        , **kwds)
@@ -4984,6 +5015,19 @@ NTmessageT              = PrintWrap(verbose=verbosityOutput                     
 NTdetailT               = PrintWrap(verbose=verbosityDetail                             , **kwds)
 NTdebugT                = PrintWrap(verbose=verbosityDebug, prefix = prefixDebug        , **kwds)
 NTmessageNoEOLT         = PrintWrap(verbose=verbosityOutput, noEOL=True                 , **kwds)
+
+NTmessageList = (
+  NTnothing,  NTerror ,  NTcodeerror ,  NTexception ,  NTwarning ,  NTmessage ,  NTdetail ,  NTdebug,  NTmessageNoEOL,
+  NTnothingT, NTerrorT , NTcodeerrorT , NTexceptionT , NTwarningT , NTmessageT , NTdetailT , NTdebugT, NTmessageNoEOLT
+)
+def addStreamNTmessageList(stream):
+    for NTm in NTmessageList:
+#        print "EEE: starting addStream to %s" % NTm
+        NTm.addStream(stream)
+def removeStreamNTmessageList():
+    for NTm in NTmessageList:
+#        print "EEE: starting removeStream to %s" % NTm
+        NTm.removeStream()
 
 def teeToFile(logFile):
     '''Starts to tee the different verbosity messages to a possibly existing file

@@ -22,11 +22,7 @@ setup.py                Run to set up environment variables and check installati
 valSets.cfg             Validation settings. Might be moved around.
 
 """
-from cing.Libs.helper import getSvnRevision
-from cing.Libs.helper import isInternetConnected
-import os
-import sys
-import time
+from cing.Libs.helper import *
 
 programName     = 'CING'
 # Version number is a float. Watch out, version 0.100 will be older than 0.99; nope, version 0.100 is long behind us !! (GWV)
@@ -84,31 +80,7 @@ NaNstring = "." # default if not set in localConstants. @UnusedVariable
 # When specified differently it should also be reflected in some dictionaries
 # so better not.
 
-OS_TYPE_MAC = 'darwin'
-OS_TYPE_LINUX = 'linux'
-OS_TYPE_WINDOWS = 'windows' # unsupported.
-OS_TYPE_UNKNOWN = 'unknown'
 
-def getOsType():
-    """Return the type of OS, mapped to either darwin, linux, or windows from sys.platform"""
-
-    # Known platforms to JFD.
-    _platformMap = {
-        'darwin': 'Darwin',
-        'win32': 'Microsoft Windows',
-        'linux2': 'Linux', # Ubuntu 10.9 on 64 bit and others
-        'sunos5': 'Solaris',
-        'freebsd6': 'FreeBSD 6.0'
-    }
-    if sys.platform.startswith('darwin'):
-        return OS_TYPE_MAC
-    if sys.platform.startswith('linux'):
-        return OS_TYPE_LINUX
-    if sys.platform.startswith('sunos'): # Probably needs it's own type in future.
-        return OS_TYPE_LINUX
-    if sys.platform.startswith('win'):
-        return OS_TYPE_WINDOWS
-    return OS_TYPE_UNKNOWN
 osType = getOsType()
 
 

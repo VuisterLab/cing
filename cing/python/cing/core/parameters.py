@@ -1,7 +1,5 @@
-from cing import OS_TYPE_LINUX
 from cing import osType
 from cing.Libs.NTutils import * #@UnusedWildImport
-from cing import OS_TYPE_MAC
 import platform
 
 #-----------------------------------------------------------------------------
@@ -20,6 +18,7 @@ directories = NTdict(
     ccpn       = 'Data/CCPN',
     sources    = 'Data/Sources',
     database   = 'Data/Database',
+    logs       = 'Logs',
     export     = 'Export',
     xeasy      = 'Export/Xeasy',
     xeasy2     = 'Export/Xeasy2',

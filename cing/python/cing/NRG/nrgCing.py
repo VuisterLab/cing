@@ -1389,8 +1389,8 @@ class nrgCing(Lister):
 
         if 1:
             NTmessage("Setting different list todo in runCing")
-            self.entry_list_todo = readLinesFromFile('/Users/jd/NRG/lists/bmrbPdbEntryList.csv')
-#            self.entry_list_todo = "1mo8".split()
+#            self.entry_list_todo = readLinesFromFile('/Users/jd/NRG/lists/bmrbPdbEntryList.csv')
+            self.entry_list_todo = "1brv 1hkt 1mo7 1mo8 1ozi 1p9j 1pd7 1qjt 1vj6 1y7n 2fws 2fwu 2jsx".split()
             self.entry_list_todo = NTlist( *self.entry_list_todo )
 
             if self.searchPdbEntries():
@@ -1493,8 +1493,6 @@ class nrgCing(Lister):
         NTmessage("Starting prepare using self.entry_list_todo")
 
         if 1: # DEFAULT: False
-#            self.entry_list_todo = "1b4y 1brv 1bus 1c2n 1cjg 1d3z 1hkt 1hue 1ieh 1iv6 1mo7 1mo8 1nk2 1ozi 1p9j 1pd7 1qjt 1vj6 1y7n 2fws 2fwu 2jmx 2jsx 2kib 2kz0 2rop".split()
-#            self.entry_list_todo = readLinesFromFile('/Users/jd/NRG/lists/bmrbPdbEntryList.csv')
             self.entry_list_todo = "1brv 1hkt 1mo7 1mo8 1ozi 1p9j 1pd7 1qjt 1vj6 1y7n 2fws 2fwu 2jsx".split()
             self.entry_list_todo = NTlist( *self.entry_list_todo )
 #            self.entry_list_todo = readLinesFromFile('/Library/WebServer/Documents/NRG-CING/list_backup/entry_list_prep_crashed.csv')
@@ -1503,14 +1501,6 @@ class nrgCing(Lister):
             if 1: # use actual info instead of 2 lists above.
                 self.searchPdbEntries()
 
-
-
-#        self.entry_list_nmr = readLinesFromFile(os.path.join(self.results_dir, 'entry_list_nmr.csv'))
-#        self.entry_list_done = readLinesFromFile(os.path.join(self.results_dir, 'entry_list_done.csv'))
-#        self.entry_list_todo = NTlist()
-#        self.entry_list_todo.addList(self.entry_list_nmr)
-#        self.entry_list_todo = self.entry_list_todo.difference(self.entry_list_done)
-##        self.entry_list_todo = "2znf".split()
         permutationArgumentList = NTdict() # per permutation hold the entry list.
 
         for entry_code in self.entry_list_todo:
