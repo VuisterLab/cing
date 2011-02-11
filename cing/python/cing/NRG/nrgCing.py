@@ -1465,7 +1465,8 @@ class nrgCing(Lister):
         self.entry_list_todo.addList(self.entry_list_nmr)
         self.entry_list_todo = self.entry_list_todo.difference(self.entry_list_done)
         if 1: # DEFAULT: False
-            self.entry_list_todo = readLinesFromFile('/Users/jd/NRG/lists/bmrbPdbEntryList_perm011_2713entries.csv')
+#            self.entry_list_todo = readLinesFromFile('/Users/jd/NRG/lists/bmrbPdbEntryList_perm011_2713entries.csv')
+            self.entry_list_todo = readLinesFromFile('/Users/jd/NRG/lists/bmrbPdbEntryList.csv')
 #            self.entry_list_todo = "1brv".split()
             self.entry_list_todo = NTlist( *self.entry_list_todo )
 
@@ -1491,10 +1492,10 @@ class nrgCing(Lister):
 
         NTmessage("Starting prepare using self.entry_list_todo")
 
-        if 0: # DEFAULT: False
+        if 1: # DEFAULT: False
 #            self.entry_list_todo = "1b4y 1brv 1bus 1c2n 1cjg 1d3z 1hkt 1hue 1ieh 1iv6 1mo7 1mo8 1nk2 1ozi 1p9j 1pd7 1qjt 1vj6 1y7n 2fws 2fwu 2jmx 2jsx 2kib 2kz0 2rop".split()
-            self.entry_list_todo = readLinesFromFile('/Users/jd/NRG/lists/bmrbPdbEntryList.csv')
-            self.entry_list_todo = "1brv".split()
+#            self.entry_list_todo = readLinesFromFile('/Users/jd/NRG/lists/bmrbPdbEntryList.csv')
+            self.entry_list_todo = "1brv 1hkt 1mo7 1mo8 1ozi 1p9j 1pd7 1qjt 1vj6 1y7n 2fws 2fwu 2jsx".split()
             self.entry_list_todo = NTlist( *self.entry_list_todo )
 #            self.entry_list_todo = readLinesFromFile('/Library/WebServer/Documents/NRG-CING/list_backup/entry_list_prep_crashed.csv')
             self.entry_list_nmr = deepcopy(self.entry_list_todo)
@@ -1543,7 +1544,8 @@ class nrgCing(Lister):
             permutationKeyForFileName = permutationKey.replace(' ', '')
             extraArgList = permutationKey.split()
             convertMmCifCoor, convertMrRestraints, convertStarCS = extraArgList
-            NTmessage("Keys: %s split to: %s %s %s with number of entries %d" % (permutationKey, convertMmCifCoor, convertMrRestraints, convertStarCS, len(permutationArgumentList[permutationKey])))
+            NTmessage("Keys: %s split to: %s %s %s with number of entries %d" % (
+                    permutationKey, convertMmCifCoor, convertMrRestraints, convertStarCS, len(permutationArgumentList[permutationKey])))
 
 #            NTdebug("Quitting for now.")
 #            continue
@@ -1653,7 +1655,7 @@ Additional modes I see:
             convertMmCifCoor = 0
             convertMrRestraints = 1
             convertStarCS = 1
-            doInteractive=isProduction
+            doInteractive=not isProduction
             if len(argListOther) > 0:
                 convertMmCifCoor = int(argListOther[0])
                 if len(argListOther) > 1:

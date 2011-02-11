@@ -1,6 +1,7 @@
 from cing import issueListUrl
 from cing.Libs import PyMMLib
 from cing.Libs.AwkLike import AwkLikeS
+from cing.Libs.Geometry import to_0_360
 from cing.Libs.NTplot import ssIdxToType
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.Libs.PyMMLib import ATOM
@@ -20,12 +21,12 @@ from cing.core.ROGscore import ROGscore
 from cing.core.classes2 import RestraintList
 from cing.core.constants import * #@UnusedWildImport
 from cing.core.database import AtomDef
-import database
 from math import acos
 from numpy import * #@UnusedWildImport overwrites such common functions as sum, max etc.
 from numpy import linalg as LA
 from operator import attrgetter
 from parameters   import plotParameters
+import database
 import numpy
 
 #==============================================================================
@@ -3843,6 +3844,119 @@ Residue class: Defines residue properties
         #end if
     #end def
 
+    def validateChemicalShiftLeu( self, resultList ):
+        """Returns True on error.
+        Append to result list if validation found a problem.
+
+        Uses the data in:
+        Frans Mulder's Leucine side-chain conformations and dynamics in proteins from 13D NMR chemical shifts. ChemBioChem (2009)
+
+        DELTA delta(13C) = 13CD1-13CD2 = -5 + 10*Pt (Eq.2)
+
+        With Pt is the portion trans (180) for chi2 and assumed Pt = 1 - Pg.
+        With Pg being gauche+ (60) for chi2
+
+        The cutoff for assuming the CS difference indicates multiple rotameric state is set to -4 < csd < 4 which corresponds to
+        0.1 < Pt < 0.9.
+
+        The cutoff for assuming the chi2 dihedral is sampling multiple rotameric states is set to having a cv over 0.2.
+
+        In case there is only one model the one state will be used for comparison.
+
+        If the csd < 0.01 then the resonances were assumed to overlap and no critiques are attempted.
+
+        TODO:
+            -
+        """
+
+        CUTOFF_LOL_CSD_LEU_CD = [[ -4, 4 ], [ -3, 3 ]] # ERROR/WARNING LIMITS
+        cvCutOffList = [ 0.2, 0.2 ]
+        if not self.hasProperties('LEU'):
+            NTerror("Can not validateChemicalShiftLeu for non Leu: %s" % self)
+            return True
+        # Allready generalize for VAL application TODO:
+        atomC1 = self.CD1
+        atomC2 = self.CD2
+        c1Shift = atomC1.shift()
+        c2Shift = atomC2.shift()
+        chi = getDeepByKeysOrAttributes( self, CHI2_STR )
+        if chi == None:
+            NTdebug("Skipping %s for missing dihedral" % self)
+
+        if isNaN( c1Shift ) or isNaN( c2Shift ):
+            NTdebug("CS unavailabe for both Cs for %s" % self)
+            return
+
+        shiftDifference = c1Shift - c2Shift
+        if math.fabs(shiftDifference) < 0.01:
+            NTdebug("shiftDifference zero so assuming they were not ssa" % self)
+            return
+
+        if not atomC1.isStereoAssigned():
+            NTdebug("%s is not ssa" % atomC1)
+            return
+
+#        shiftDifference = -5. + 10.*Pt
+        Pt = (shiftDifference + 5.)/10.
+        PtLimited = limitToRange(Pt, 0., 1.)
+        if Pt != PtLimited:
+            NTwarning("CS difference for C in %s exceed expected range of [-5,5] being at %s" % (self, shiftDifference))
+            Pt = PtLimited
+
+#        for i,color in enumerate( [ COLOR_RED, COLOR_ORANGE ]):
+        for i,color in enumerate( [ COLOR_RED ]):
+            str = None
+            rangeListCd = CUTOFF_LOL_CSD_LEU_CD[i]
+            # Determine CS indication
+            csIndicatesAveraging = rangeListCd[0] < shiftDifference < rangeListCd[1]
+            csIndicatesSingleConformer = None
+            if not csIndicatesAveraging:
+                if shiftDifference < rangeListCd[0]:
+                    csIndicatesSingleConformer = DIHEDRAL_60_STR
+                else:
+                    csIndicatesSingleConformer = DIHEDRAL_180_STR
+
+            # Determin CV indication
+            cvIndicatesAveraging = chi.cv >= cvCutOffList[ i ]
+            dihedralIndicatesSingleConformer = chi.getRotamerState()
+            if dihedralIndicatesSingleConformer == None:
+                NTerror("Failed to get rotameric state of %s" % self)
+                return True
+            NTdebug("res shiftDifference, csIndicatesAveraging, csIndicatesSingleConformer, cvIndicatesAveraging, dihedralIndicatesSingleConformer: %10s %8.3f %s %s %s %s" % (
+                   self, shiftDifference, csIndicatesAveraging, csIndicatesSingleConformer, cvIndicatesAveraging, dihedralIndicatesSingleConformer ))
+
+            if dihedralIndicatesSingleConformer == DIHEDRAL_300_STR:
+                str = 'Conformer %s chi impossible regardless of csd value [%.3f]' % (dihedralIndicatesSingleConformer, shiftDifference)
+                # will be flagged by other software as well so eliminate here?
+            else:
+                if cvIndicatesAveraging:
+                    if csIndicatesAveraging:
+                        pass
+                    else:
+                        str = 'csd [%.3f]: single conformer but cv [%.3f]' % (shiftDifference, chi.cv)
+                    # end if
+                else:
+                    if csIndicatesAveraging:
+                        str = 'csd [%.3f]: averaging but cv [%.3f]' % (shiftDifference, chi.cv)
+                    else:
+                        # cs and dihedral agree on single conformer. Now do they match?
+                        if csIndicatesSingleConformer == dihedralIndicatesSingleConformer:
+                            continue
+                        str = 'csd [%.3f]: %s but found %s' % ( csIndicatesSingleConformer, dihedralIndicatesSingleConformer)
+                    # end if
+                # end if
+            # end if
+            if not str:
+                continue
+            NTdebug("critque: %s %s" % ( color, str))
+            resultList.append( atomC1 ) # Just do this once.
+#            atomC1.validateAssignment.append(str)
+            atomC1.rogScore.setMaxColor( color, comment = str )
+            if i == 0: # skip orange if red was already established
+                return
+        # end for
+#    # end def
+
     def validateChemicalShiftProPeptide( self, resultList ):
         """Returns True on error.
         Append to result list if validation found a problem.
@@ -3967,6 +4081,22 @@ class Dihedral( NTlist ):
             return True
         return False
     #end def
+
+    def getRotamerState(self):
+        """
+        Return None on error or
+        DIHEDRAL_60_STR etc.
+        Lowerbound is inclusive. E.g. 0 and 360 become DIHEDRAL_60_STR
+        """
+        if self.cav == None:
+            return None
+        cav = to_0_360( self.cav )
+        if cav < 120.:
+            return DIHEDRAL_60_STR # zero inclusive
+        if cav < 240.:
+            return DIHEDRAL_180_STR
+        return DIHEDRAL_300_STR # 240 inclusive. 360 never occurs here.
+
 
     def __str__(self):
         if self.residue:

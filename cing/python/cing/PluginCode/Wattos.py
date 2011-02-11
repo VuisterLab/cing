@@ -537,8 +537,8 @@ def restoreWattos( project, tmp=None ):
     if project.wattosStatus.completed:
         NTmessage('==> Restoring Wattos results')
         project.runWattos(parseOnly=True)
-    else:
-        NTdebug("In restoreWattos: project.wattosStatus.completed: %s" % project.wattosStatus.completed)
+#    else:
+#        NTdebug("In restoreWattos: project.wattosStatus.completed: %s" % project.wattosStatus.completed)
 #end def
 
 # register the functions
