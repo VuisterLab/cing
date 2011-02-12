@@ -644,4 +644,4 @@ if __name__ == "__main__":
         if status:
             NTerror("Failed script: storeCING2db.py")
     finally:
-        NTmessage(getStopMessage())
+        NTmessage(getStopMessage(cing.starttime))

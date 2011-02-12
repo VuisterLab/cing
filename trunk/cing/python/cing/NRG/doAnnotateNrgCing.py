@@ -214,7 +214,7 @@ def runAbunch():
             NTtracebackError()
             status = True
         finally:
-            NTmessage(getStopMessage())
+            NTmessage(getStopMessage(cing.starttime))
             if status:
                 NTerror("Failed to annotateEntry for arguments: %s" % str( sys.argv))
 
@@ -227,7 +227,7 @@ if __name__ == "__main__":
 #        NTtracebackError()
 #        status = True
 #    finally:
-#        NTmessage(getStopMessage())
+#        NTmessage(getStopMessage(cing.starttime))
 #        if status:
 #            NTerror("Failed to annotateEntry for arguments: %s" % str( sys.argv))
 #            sys.exit(1)

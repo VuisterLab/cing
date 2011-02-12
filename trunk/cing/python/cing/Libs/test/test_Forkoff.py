@@ -78,5 +78,5 @@ if __name__ == "__main__":
     try:
         unittest.main()
     finally:
-        NTmessage(getStopMessage())
+        NTmessage(getStopMessage(cing.starttime))
 
