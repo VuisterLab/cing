@@ -1686,5 +1686,5 @@ Additional modes I see:
     except:
         NTtracebackError()
     finally:
-        NTmessage(getStopMessage())
+        NTmessage(getStopMessage(cing.starttime))
 

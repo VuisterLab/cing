@@ -296,4 +296,4 @@ if __name__ == "__main__":
     try:
         status = main(*sys.argv[1:])
     finally:
-        NTmessage(getStopMessage())
+        NTmessage(getStopMessage(cing.starttime))

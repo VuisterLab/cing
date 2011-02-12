@@ -429,4 +429,4 @@ if __name__ == "__main__":
             NTerror("Unknown destination: %s" % destination)
         # end if
     finally:
-        NTmessage(getStopMessage())
+        NTmessage(getStopMessage(cing.starttime))
