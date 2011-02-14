@@ -3916,7 +3916,11 @@ Residue class: Defines residue properties
                 else:
                     csIndicatesSingleConformer = DIHEDRAL_180_STR
 
-            # Determin CV indication
+            # Determine CV indication
+            if getDeepByKeysOrAttributes(chi, CV_STR) == None:
+                NTerror("Failed to get chi cv of %s" % self)
+                return True
+
             cvIndicatesAveraging = chi.cv >= cvCutOffList[ i ]
             dihedralIndicatesSingleConformer = chi.getRotamerState()
             if dihedralIndicatesSingleConformer == None:
@@ -3942,7 +3946,7 @@ Residue class: Defines residue properties
                         # cs and dihedral agree on single conformer. Now do they match?
                         if csIndicatesSingleConformer == dihedralIndicatesSingleConformer:
                             continue
-                        str = 'csd [%.3f]: %s but found %s' % ( csIndicatesSingleConformer, dihedralIndicatesSingleConformer)
+                        str = 'csd [%.3f]: %s but found %s' % ( shiftDifference, dihedralIndicatesSingleConformer)
                     # end if
                 # end if
             # end if
