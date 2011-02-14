@@ -3764,7 +3764,13 @@ class PrintWrap:
             format = processId + format
         if not self.noEOL:
             format += '\n'
-        finalMsg = sprintf(format, *args) # cache for speed.
+        # cache for speed.
+        if args == None:
+            finalMsg = format
+        elif len(args) == 0:
+            finalMsg = format
+        else:
+            finalMsg = sprintf(format, *args)
         fprintf(self.stream, finalMsg)
         if self.stream2 != None:
 #            if self.stream2.writable(): # stupid slowing down check because JFD can't seem to get it closed proper.
@@ -5060,6 +5066,9 @@ def teeToFile(logFile):
 
 def NTtracebackError():
     traceBackString = format_exc()
+    print 'DEBUG: NTtracebackError: [%s]' % traceBackString
+    if traceBackString == None:
+        traceBackString = 'No traceback error string available.'
     NTerror(traceBackString)
 
 _outOutputStreamContainerList = [ NTmessageNoEOL, NTdebug, NTdetail, NTmessage, NTwarning ]

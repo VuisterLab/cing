@@ -363,9 +363,13 @@ class nrgCing(Lister):
 
         NTmessage("Get the entries tried, todo, crashed, and stopped in NRG-CING from file system.")
 
-        if self.searchPdbEntries():
-            NTerror("Failed to searchPdbEntries")
-            return True
+        if 0: # DEFAULT 0 this is done by updateWeekly already.
+            NTmessage("Going to do non-default searchPdbEntries in getEntryInfo")
+            if self.searchPdbEntries():
+                NTerror("Failed to searchPdbEntries")
+                return True
+            # end if
+        # end if
 
         self.entry_list_prep_tried = NTlist()
         self.entry_list_prep_crashed = NTlist()
@@ -1387,8 +1391,8 @@ class nrgCing(Lister):
         NTmessage("Starting runCing")
 #        return True
 
-        if 1:
-            NTmessage("Setting different list todo in runCing")
+        if 0: # DEFAULT
+            NTmessage("Going to use non-default entry_list_todo in runCing")
 #            self.entry_list_todo = readLinesFromFile('/Users/jd/NRG/lists/bmrbPdbEntryList.csv')
             self.entry_list_todo = "1brv 1hkt 1mo7 1mo8 1ozi 1p9j 1pd7 1qjt 1vj6 1y7n 2fws 2fwu 2jsx".split()
             self.entry_list_todo = NTlist( *self.entry_list_todo )
@@ -1434,6 +1438,10 @@ class nrgCing(Lister):
         self.entry_list_todo = NTlist()
         self.entry_list_todo.addList(self.entry_list_nmr)
         self.entry_list_todo = self.entry_list_todo.difference(self.entry_list_done)
+        if 0:
+            NTmessage("Going to use non-default entry_list_todo in postProcessAfterVc")
+            self.entry_list_todo = readLinesFromFile('/Users/jd/NRG/lists/bmrbPdbEntryList.csv')
+            self.entry_list_todo = NTlist( *self.entry_list_todo )
 
         NTmessage("Found entries in NMR          : %d" % len(self.entry_list_nmr))
         NTmessage("Found entries in NRG-CING done: %d" % len(self.entry_list_done))
@@ -1492,10 +1500,11 @@ class nrgCing(Lister):
 
         NTmessage("Starting prepare using self.entry_list_todo")
 
-        if 1: # DEFAULT: False
-            self.entry_list_todo = "1brv 1hkt 1mo7 1mo8 1ozi 1p9j 1pd7 1qjt 1vj6 1y7n 2fws 2fwu 2jsx".split()
+        if 0: # DEFAULT: False
+            NTmessage("Going to use non-default entry_list_todo in prepare")
+#            self.entry_list_todo = "1brv 1hkt 1mo7 1mo8 1ozi 1p9j 1pd7 1qjt 1vj6 1y7n 2fws 2fwu 2jsx".split()
+            self.entry_list_todo = readLinesFromFile('/Users/jd/NRG/lists/bmrbPdbEntryList.csv')
             self.entry_list_todo = NTlist( *self.entry_list_todo )
-#            self.entry_list_todo = readLinesFromFile('/Library/WebServer/Documents/NRG-CING/list_backup/entry_list_prep_crashed.csv')
             self.entry_list_nmr = deepcopy(self.entry_list_todo)
             self.entry_list_nrg_docr = deepcopy(self.entry_list_todo)
             if 1: # use actual info instead of 2 lists above.
@@ -1571,9 +1580,10 @@ class nrgCing(Lister):
 
 
         if 0: # DEFAULT: False
-            self.entry_list_todo = '1brv'.split()
-#            self.entry_list_todo = readLinesFromFile('/Library/WebServer/Documents/NRG-CING/list_backup/entry_list_t.csv')
-#            self.entry_list_todo = "134d 135d 136d 177d 1crq 1crr 1ezc 1ezd 1gnc 1kld 1l0r 1lcc 1lcd 1msh 1qch 1r4e 1sah 1saj 1vve 2axx 2ezq 2ezr 2ezs 2i7z 2ku2 2neo 2ofg".split()
+            NTmessage("Going to use non-default entry_list_todo in storeCING2db")
+#            self.entry_list_todo = '1brv'.split()
+            self.entry_list_todo = readLinesFromFile('/Users/jd/NRG/lists/bmrbPdbEntryList.csv')
+            self.entry_list_todo = NTlist( *self.entry_list_todo )
 
         NTmessage("Found entries in NRG-CING todo: %d" % len(self.entry_list_todo))
 
@@ -1609,7 +1619,7 @@ Additional modes I see:
         prepare            Only moves the entries through prep stages.
     """
     cing.verbosity = verbosityDebug
-    max_entries_todo = 400000  # DEFAULT: 40
+    max_entries_todo = 40  # DEFAULT: 40
     useTopos = 0           # DEFAULT: 0
 
     NTmessage(header)
