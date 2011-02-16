@@ -118,6 +118,8 @@ e.model_count <= 10 AND
 e.pc_gf > -99
 order by e.pdb_id;
 
+
+-- find the cs differences for the Leu Cdeltas
 SELECT count(*) FROM "devnrgcing"."cingentry";
 SELECT e.pdb_id as pdb, c.name as c, r.number as num, a.name, a.cs
 
@@ -137,6 +139,9 @@ r.name = 'LEU' AND
 a.cs_ssa = 1 AND -- only ssa according to BMRB (stereoAssigned flag in CING)
 a.name LIKE 'CD%';
 order by e.pdb_id, c.name, r.number, a.name;
+
+
+
 
 
 -- Can't be done in one blow.

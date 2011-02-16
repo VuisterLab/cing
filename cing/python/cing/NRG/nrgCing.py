@@ -300,6 +300,35 @@ class nrgCing(Lister):
             return True
     # end def run
 
+    def reportHeadAndTailEntriesByDuration(self, timeTakenDict):
+        timeTakenList = NTlist(*timeTakenDict.values())
+        if len(timeTakenList) < 1:
+            NTmessage("No entries in reportHeadAndTailEntriesByDuration")
+            return
+        n = 10 # Number of entries to list
+        m = n/2 # on either side
+        if len(timeTakenList) < n:
+            NTmessage("All entries in order by time taken: %s" % str(timeTakenDict.keys()))
+            return
+
+        entryLoL = []
+        timeTakenList.sort()
+        timeTakenDictInv = timeTakenDict.invert()
+        for i in range(2):
+            entryList = []
+            entryLoL.append(entryList)
+            if i == 0:
+                timeTakenList = timeTakenList[:m]
+            else:
+                timeTakenList = timeTakenList[-m:]
+            for timeTaken in timeTakenList:
+                entryList.append(timeTakenDictInv[timeTaken])
+            # end for
+        # end for
+        NTmessage("%s slowest and fastest: %s and %s" % (m, str(entryLoL[0]), str(entryLoL[1])))
+    # end def
+
+
     def addInputModificationTimesFromMmCif(self):
         NTmessage("Looking at mmCIF input file modification times.")
         for entry_code in self.entry_list_nmr:
@@ -395,7 +424,7 @@ class nrgCing(Lister):
             return True
 
         # TODO: loop this over different prep stages.
-        NTmessage("Scanning the prep logs.")
+        NTmessage("Scanning the prepare logs.")
         for entry_code in self.entry_list_nmr:
             entryCodeChar2and3 = entry_code[1:3]
             logDir = os.path.join(self.results_dir, DATA_STR, entryCodeChar2and3, entry_code, LOG_NRG_CING )
@@ -437,8 +466,14 @@ class nrgCing(Lister):
                     NTerror("%s Failed to get fraction" % entry_code)
                     continue
                 NTmessage("%s %s" % (entry_code, resultList[0]))
+            if timeTaken:
+                self.timeTakenDict[entry_code] = timeTaken
             self.entry_list_prep_done.append(entry_code)
         # end for
+        timeTakenList = NTlist(*self.timeTakenDict.values())
+        NTmessage("Time taken by prepare statistics\n%s" % timeTakenList.statsFloat())
+        self.reportHeadAndTailEntriesByDuration(self.timeTakenDict)
+        self.timeTakenDict = NTdict()
 
         NTmessage("Starting to scan CING report/log.")
         subDirList = os.listdir(DATA_STR)
@@ -537,6 +572,11 @@ class nrgCing(Lister):
                 self.entry_list_done.append(entry_code)
             # end for entryDir
         # end for subDir
+        timeTakenList = NTlist(*self.timeTakenDict.values())
+        NTmessage("Time taken by validation statistics\n%s" % timeTakenList.statsFloat())
+        self.reportHeadAndTailEntriesByDuration(self.timeTakenDict)
+        self.timeTakenDict = NTdict()
+
 
         host = 'localhost'
         schema=DEV_NRG_DB_SCHEMA
@@ -590,7 +630,8 @@ class nrgCing(Lister):
         # Consider the entries updated as not done.
 
         timeTakenList = NTlist(*self.timeTakenDict.values())
-        NTmessage("Time taken by CING by statistics\n%s" % timeTakenList.statsFloat())
+        NTmessage("Time taken by storeCING2db statistics\n%s" % timeTakenList.statsFloat())
+        self.reportHeadAndTailEntriesByDuration(self.timeTakenDict)
 
         if not self.entry_list_tried:
             NTerror("Failed to find entries that CING tried.")
@@ -1582,7 +1623,7 @@ class nrgCing(Lister):
         if 0: # DEFAULT: False
             NTmessage("Going to use non-default entry_list_todo in storeCING2db")
 #            self.entry_list_todo = '1brv'.split()
-            self.entry_list_todo = readLinesFromFile('/Users/jd/NRG/lists/bmrbPdbEntryList.csv')
+            self.entry_list_todo = readLinesFromFile('/Users/jd/NRG/lists/entry_list_vuisterlab.csv')
             self.entry_list_todo = NTlist( *self.entry_list_todo )
 
         NTmessage("Found entries in NRG-CING todo: %d" % len(self.entry_list_todo))

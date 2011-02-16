@@ -18,7 +18,7 @@ import tarfile
 
 
 if True: # for easy blocking of data, preventing the code to be resorted with imports above.
-    from cing.PluginCode.required.reqCcpn import CCPN_STR
+    from cing.PluginCode.required.reqCcpn import * #@UnusedWildImport
     switchOutput(False)
     try:
         import ccpnmr #@UnusedImport
@@ -111,13 +111,6 @@ class Ccpn:
     CCPN_CING_RUN = 'cingRun'
     CCPN_CING_ATR = 'cing'
     CING_CCPN_ATR = 'ccpn'
-
-    "Don't report on the next atoms"
-    # Add these to CING lib later. For now, it's just clobbering the output to report on them.
-    CCPN_ATOM_LIST_TO_IGNORE_REPORTING = []
-    hideMissingAtomsJfdKnowsAbout = True # default should be False
-    if hideMissingAtomsJfdKnowsAbout:
-        CCPN_ATOM_LIST_TO_IGNORE_REPORTING = "H1 H2 H3 OXT ZN O' HO3' HO5' HOP2 HOP3 OP3".split(' ')
 
     def __init__(self, project, ccpnFolder, convention = IUPAC, patchAtomNames = True,
                  skipWaters = False, allowNonStandardResidue = True):
@@ -684,7 +677,7 @@ class Ccpn:
                         atmList = unmatchedAtomByResDict[ccpnResName3Letter][0]
                         resNumList = unmatchedAtomByResDict[ccpnResName3Letter][1]
 
-                        if (atomName not in atmList) and (atomName not in self.CCPN_ATOM_LIST_TO_IGNORE_REPORTING):
+                        if (atomName not in atmList) and (atomName not in ATOM_LIST_TO_IGNORE_REPORTING):
                             atmList.append(atomName)
                         if res.resNum not in resNumList:
                             resNumList.append(res.resNum)
@@ -2019,7 +2012,7 @@ Note that this doesn't happen with other pseudos. Perhaps CCPN does not have the
                     atom = self.molecule.decodeNameTuple(nameTuple)
 
                     if not atom:
-                        if ccpnAtomName not in self.CCPN_ATOM_LIST_TO_IGNORE_REPORTING:
+                        if ccpnAtomName not in ATOM_LIST_TO_IGNORE_REPORTING:
                             if not unmatchedAtomByResDict.has_key(resName):
                                 unmatchedAtomByResDict[ resName ] = ([], [])
                             atmList = unmatchedAtomByResDict[resName][0]
@@ -2109,7 +2102,7 @@ Note that this doesn't happen with other pseudos. Perhaps CCPN does not have the
                     for atom in residue.allAtoms():
                         if not atom.coordinates:
                             if not atom.isPseudoAtom():
-                                if atom.name not in self.CCPN_ATOM_LIST_TO_IGNORE_REPORTING:
+                                if atom.name not in ATOM_LIST_TO_IGNORE_REPORTING:
                                     NTwarning("Skipping %s because no coordinates were found", atom)
     #                        NTwarning('atom: '+atom.format())
                             continue

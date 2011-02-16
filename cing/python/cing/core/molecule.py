@@ -3946,7 +3946,7 @@ Residue class: Defines residue properties
                         # cs and dihedral agree on single conformer. Now do they match?
                         if csIndicatesSingleConformer == dihedralIndicatesSingleConformer:
                             continue
-                        str = 'csd [%.3f]: %s but found %s' % ( shiftDifference, dihedralIndicatesSingleConformer)
+                        str = 'csd [%.3f]: %s but found %s' % ( shiftDifference, csIndicatesSingleConformer, dihedralIndicatesSingleConformer)
                     # end if
                 # end if
             # end if
@@ -3966,7 +3966,8 @@ Residue class: Defines residue properties
         Append to result list if validation found a problem.
 
         Uses the data in:
-        Schubert et al. A software tool for the prediction of Xaa-Pro peptide bond conformation in proteins based on 13C chemical shift statistics. J Biomol NMR (2002) vol. 24 (2) pp. 149-54
+        Schubert et al. A software tool for the prediction of Xaa-Pro peptide bond conformation in proteins based on 13C chemical shift statistics.
+        J Biomol NMR (2002) vol. 24 (2) pp. 149-54
         From their text:
         100% certainty  trans    [0.0,  4.8]
                         cis      [9.15,14.4]

@@ -275,4 +275,11 @@ DS_STORE_STR = ".DS_Store" # A mac OSX file that should be ignored by CING.
 MAX_SIZE_XPLOR_RESTRAINT_LIST_NAME = 10
 #maxlength = 20 - len('viol.noe.')
 
+"Don't report on the next atoms"
+# Add these to CING lib later. For now, it's just clobbering the output to report on them.
+ATOM_LIST_TO_IGNORE_REPORTING = []
+hideMissingAtomsJfdKnowsAbout = True # default should be False
+if hideMissingAtomsJfdKnowsAbout:
+    ATOM_LIST_TO_IGNORE_REPORTING = "H1 H2 H3 OXT ZN O' HO3' HO5' HOP2 HOP3 OP3".split(' ')
+
 VAL_SETS_CFG_DEFAULT_FILENAME = 'valSets.cfg'
