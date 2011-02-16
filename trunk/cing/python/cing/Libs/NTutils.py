@@ -1568,6 +1568,14 @@ class NTdict(dict):
         #end for
         return newInstance
 
+    def invert(self):
+        'Swaps key and value.'
+        result = NTdict()
+        for key in self.keys():
+            value = self[key]
+            result[value] = key
+        return result
+
     def __call__(self, **kwds):
         self.update(kwds)
         return self
@@ -5066,7 +5074,7 @@ def teeToFile(logFile):
 
 def NTtracebackError():
     traceBackString = format_exc()
-    print 'DEBUG: NTtracebackError: [%s]' % traceBackString
+#    print 'DEBUG: NTtracebackError: [%s]' % traceBackString
     if traceBackString == None:
         traceBackString = 'No traceback error string available.'
     NTerror(traceBackString)

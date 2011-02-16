@@ -717,7 +717,9 @@ def restoreQueeny( project, tmp=None ):
                 storedProp = QUEENY_INFORMATION_STR
             obj = project.molecule.decodeNameTuple(nameTuple)
             if not obj:
-                NTerror('restoreQueeny: error decoding "%s"', nameTuple)
+                atomName = nameTuple[3]
+                if not (atomName in ATOM_LIST_TO_IGNORE_REPORTING):
+                    NTerror('restoreQueeny: error decoding "%s"', nameTuple) # Was reporting terminal atoms eg. in "('1buq', 'A', 39, 'H2', None, None, 'INTERNAL_1')"
             else:
                 obj[storedProp] = info
     except:
