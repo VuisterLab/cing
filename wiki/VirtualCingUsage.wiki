@@ -1,4 +1,4 @@
-#Virtual CING manual
+#summary Virtual CING Usage
 
 Use case creating validation reports for NRG-CING at Sara's cloud with results back to nmr.cmbi.umcn.nl (master)
 
