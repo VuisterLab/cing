@@ -1,4 +1,8 @@
-"""Utilities for working with CCPN/FC"""
+"""Utilities for working with CCPN/FC
+Located in
+
+python $CINGROOT/python/cing/Scripts/FC/utils.py
+"""
 
 from ccp.format.nmrStar.projectIO import NmrStarProjectFile
 from ccpnmr.format.converters.PseudoPdbFormat import PseudoPdbFormat

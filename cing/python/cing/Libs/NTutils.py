@@ -40,6 +40,7 @@ locale.setlocale(locale.LC_ALL, "")
 CONSENSUS_STR = 'consensus'
 
 class Lister:
+    MAX_LINE_SIZE_VALUE = 80 # who wants to see long lines of gibberish
     """Example from 'Learning Python from O'Reilly publisher'"""
     def __repr__(self):
         return ("<Instance of %s, address %s:\n%s>" %
@@ -53,7 +54,10 @@ class Lister:
             if attr[:2] == "__":
                 result = result + "\tname %s=<built-in>\n" % attr
             else:
-                result = result + "\tname %s=%s\n" % (attr, self.__dict__[attr])
+                valueStr = '%s' % self.__dict__[attr]
+                if len(valueStr) > self.MAX_LINE_SIZE_VALUE:
+                    valueStr = valueStr[:self.MAX_LINE_SIZE_VALUE]
+                result = result + "\tname %s=%s\n" % (attr, valueStr)
         return result
     #end def
 #end class

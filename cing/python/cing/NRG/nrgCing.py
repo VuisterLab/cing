@@ -215,6 +215,7 @@ class nrgCing(Lister):
         self.entry_list_store_done = NTlist()
 
         self.entry_list_tried = NTlist()      # .cing directory and .log file present so it was tried to start but might not have finished
+        self.entry_list_untried = NTlist()      # all NMR entries except those in the tried list
         self.entry_list_crashed = NTlist()    # has a stack trace
         self.entry_list_stopped = NTlist()    # was stopped by time out or by user or by system (any other type of stop but stack trace)
         self.entry_list_done = NTlist()       # finished to completion of the cing run.
@@ -224,7 +225,7 @@ class nrgCing(Lister):
         self.inputModifiedDict = NTdict()     # This is the most recent of mmCIF, NRG, BMRB CS.
         self.entry_list_obsolete = NTlist()
         self.ENTRY_DELETED_COUNT_MAX = 2
-        self.MAX_ERROR_COUNT_CING_LOG = 200
+        self.MAX_ERROR_COUNT_CING_LOG = 1000
         self.MAX_ERROR_COUNT_FC_LOG = 99999 # 104d had 16. 108d had 460
         self.FRACTION_CS_CONVERSION_REQUIRED = 0.05 # DEFAULT: 0.95
 
@@ -413,6 +414,7 @@ class nrgCing(Lister):
 
         self.entry_list_obsolete = NTlist()
         self.entry_list_tried = NTlist()
+        self.entry_list_untried = NTlist()
         self.entry_list_crashed = NTlist()
         self.entry_list_stopped = NTlist() # mutely exclusive from entry_list_crashed
         self.entry_list_done = NTlist()
@@ -423,8 +425,8 @@ class nrgCing(Lister):
             NTerror("Failed to getInputModificationTimes aborting")
             return True
 
-        # TODO: loop this over different prep stages.
         NTmessage("Scanning the prepare logs.")
+        self.timeTakenDict = NTdict()
         for entry_code in self.entry_list_nmr:
             entryCodeChar2and3 = entry_code[1:3]
             logDir = os.path.join(self.results_dir, DATA_STR, entryCodeChar2and3, entry_code, LOG_NRG_CING )
@@ -473,9 +475,9 @@ class nrgCing(Lister):
         timeTakenList = NTlist(*self.timeTakenDict.values())
         NTmessage("Time taken by prepare statistics\n%s" % timeTakenList.statsFloat())
         self.reportHeadAndTailEntriesByDuration(self.timeTakenDict)
-        self.timeTakenDict = NTdict()
 
         NTmessage("Starting to scan CING report/log.")
+        self.timeTakenDict = NTdict()
         subDirList = os.listdir(DATA_STR)
         for subDir in subDirList:
             if len(subDir) != 2:
@@ -575,7 +577,6 @@ class nrgCing(Lister):
         timeTakenList = NTlist(*self.timeTakenDict.values())
         NTmessage("Time taken by validation statistics\n%s" % timeTakenList.statsFloat())
         self.reportHeadAndTailEntriesByDuration(self.timeTakenDict)
-        self.timeTakenDict = NTdict()
 
 
         host = 'localhost'
@@ -591,6 +592,7 @@ class nrgCing(Lister):
         entry_dict_store_in_db = list2dict(self.entry_list_store_in_db)
 
         NTmessage("Scanning the store logs of entries done.")
+        self.timeTakenDict = NTdict()
         for entry_code in self.entry_list_done:
             entryCodeChar2and3 = entry_code[1:3]
             logDir = os.path.join(self.results_dir, DATA_STR, entryCodeChar2and3, entry_code, LOG_STORE_CING2DB )
@@ -642,6 +644,8 @@ class nrgCing(Lister):
 
         self.entry_list_todo = NTlist(*self.entry_list_nmr)
         self.entry_list_todo = self.entry_list_todo.difference(self.entry_list_done)
+        self.entry_list_untried = NTlist(*self.entry_list_nmr)
+        self.entry_list_untried = self.entry_list_untried.difference(self.entry_list_tried)
 
         NTmessage("Found %4d entries by NMR (A)." % len(self.entry_list_nmr))
 
@@ -651,6 +655,7 @@ class nrgCing(Lister):
         NTmessage("Found %4d entries that CING prep done." % len(self.entry_list_prep_done))
 
         NTmessage("Found %4d entries that CING tried (T)." % len(self.entry_list_tried))
+        NTmessage("Found %4d entries that CING did not try." % len(self.entry_list_untried))
         NTmessage("Found %4d entries that CING crashed (C)." % len(self.entry_list_crashed))
         NTmessage("Found %4d entries that CING stopped (S)." % len(self.entry_list_stopped))
         NTmessage("Found %4d entries that CING should update (U)." % len(self.entry_list_updated))
@@ -751,6 +756,7 @@ class nrgCing(Lister):
         writeTextToFile("entry_list_prep_done.csv", toCsv(self.entry_list_prep_done))
 
         writeTextToFile("entry_list_tried.csv", toCsv(self.entry_list_tried))
+        writeTextToFile("entry_list_untried.csv", toCsv(self.entry_list_untried))
         writeTextToFile("entry_list_done.csv", toCsv(self.entry_list_done))
         writeTextToFile("entry_list_todo.csv", toCsv(self.entry_list_todo))
         writeTextToFile("entry_list_crashed.csv", toCsv(self.entry_list_crashed))
@@ -1123,9 +1129,9 @@ class nrgCing(Lister):
     def prepareEntry(self, entry_code,
                      doInteractive=0,
                      convertMmCifCoor=1,
-                     convertMrRestraints=0,
-                     convertStarCS=1
-#                     filterCcpnAll=0
+                     convertMrRestraints=1,
+                     convertStarCS=1,
+                     filterCcpnAll=0
                      ):
         "Return True on error."
 
@@ -1142,8 +1148,8 @@ class nrgCing(Lister):
         NTmessage("interactive            interactive run is fast use zero for production   %s" % doInteractive)
         NTmessage("convertMmCifCoor       Start from mmCIF                                  %s" % convertMmCifCoor)
         NTmessage("convertMrRestraints    Start from DOCR                                   %s" % convertMrRestraints)
-        NTmessage("convertStarCS          Adds STAR CS to Ccpn with XXXX                    %s" % convertStarCS)
-#        NTmessage("filterCcpnAll          Filter CS and restraints with XXXX                -> F/XXXX_F_FC.xml         %s" % filterCcpnAll)
+        NTmessage("convertStarCS          Adds STAR CS to Ccpn with FC                      %s" % convertStarCS)
+        NTmessage("filterCcpnAll          Filter CS and restraints with FC                  %s" % filterCcpnAll)
         NTmessage("Doing                                                                 %4s" % entry_code)
 #        NTdebug("copyToInputDir          Copies the input to the collecting directory                                 %s" % copyToInputDir)
 
@@ -1392,6 +1398,140 @@ class nrgCing(Lister):
                             os.unlink(file)
             if conversionCsSucces: # Only use CS if criteria on conversion were met.
                 finalPhaseId = PHASE_S
+            # end if
+        # end if CS
+
+        if filterCcpnAll:
+            NTmessage("  filter CS")
+
+            S_sub_entry_dir = os.path.join(dir_S, entryCodeChar2and3)
+            S_entry_dir = os.path.join(S_sub_entry_dir, entry_code)
+
+            if not os.path.exists(S_entry_dir):
+                mkdirs(dir_S)
+            if not os.path.exists(S_sub_entry_dir):
+                mkdirs(S_sub_entry_dir)
+            os.chdir(S_sub_entry_dir)
+            if os.path.exists(entry_code):
+                rmtree(entry_code)
+            # end if
+            if not os.path.exists(entry_code):
+                os.mkdir(entry_code)
+            os.chdir(entry_code)
+
+            inputDir = getDeepByKeysOrAttributes(inputDirByPhase, finalPhaseId)
+            if not inputDir:
+                NTerror("Failed to get prep stage dir for phase: [%s]" % finalPhaseId)
+                return True
+            fn = "%s.tgz" % entry_code
+            inputCcpnFile = os.path.join(inputDir, fn)
+            outputCcpnFile = fn
+            if not os.path.exists( inputCcpnFile):
+                NTerror("Failed to find input: %s" % inputCcpnFile)
+                return True
+            inputLocalCcpnFile = "%s_input.tgz" % entry_code
+            shutil.copy( inputCcpnFile, inputLocalCcpnFile )
+
+
+            log_file = "%s_starCS2Ccpn.log" % entry_code
+
+            if not self.matches_many2one.has_key(entry_code):
+                NTerror("No BMRB entry for PDB entry: %s" % entry_code)
+                return True
+            bmrb_id = self.matches_many2one[entry_code]
+            bmrb_code = 'bmr%s' % bmrb_id
+
+#            digits12 ="%02d" % ( bmrb_id % 100 )
+#            inputStarDir = os.path.join(bmrbDir, digits12)
+            inputStarDir = os.path.join(bmrbDir, bmrb_code)
+            if not os.path.exists(inputStarDir):
+                NTerror("Input star dir not found: %s" % inputStarDir)
+                return True
+            inputStarFile = os.path.join(inputStarDir, '%s_21.str'%bmrb_code)
+            if not os.path.exists(inputStarFile):
+                NTerror("inputStarFile not found: %s" % inputStarFile)
+                return True
+
+            fcScript = os.path.join(cingDirScripts, 'FC', 'mergeNrgBmrbShifts.py')
+
+            # Will save a copy to disk as well.
+            convertProgram = ExecuteProgram("python -u %s" % fcScript, redirectOutputToFile=log_file)
+#            NTmessage("==> Running Wim Vranken's FormatConverter from script %s" % fcScript)
+            exitCode = convertProgram("%s -bmrbCodes %s -raise -force -noGui" % (entry_code, bmrb_code))
+            if exitCode:
+                NTerror("Failed convertProgram with exit code: %s" % str(exitCode))
+                return True
+            analysisResultTuple = analyzeFcLog(log_file)
+            if not analysisResultTuple:
+                NTerror("Failed to analyze log file: %s" % log_file)
+                return True
+            timeTaken, entryCrashed, nr_error, nr_warning, nr_message, nr_debug = analysisResultTuple
+            if entryCrashed or (nr_error > self.MAX_ERROR_COUNT_FC_LOG):
+                NTmessage("Found %s/%s timeTaken/entryCrashed and %d/%d/%d/%d error,warning,message, and debug lines." % (timeTaken, entryCrashed, nr_error, nr_warning, nr_message, nr_debug) )
+                NTmessage("Found %s errors in prep phase S please check: %s" % (nr_error, entry_code))
+                resultList = []
+                status = grep(log_file, 'ERROR', resultList=resultList, doQuiet=True, caseSensitive=False)
+                if status == 0:
+                    NTerror("%s found errors in log file; aborting." % entry_code)
+                    NTmessage('\n'.join(resultList))
+                return True
+            if not os.path.exists(outputCcpnFile):
+                NTerror("%s found no output ccpn file %s" % (entry_code, outputCcpnFile))
+                return True
+            if True:
+                NTmessage("Testing completeness of FC merge by comparing input STAR with output CING counts" )
+                conversionCsSucces = True
+                nucleiToCheckList = '1H 13C 15N 31P'.split()
+#                bmrbCountMap = getBmrbCsCounts()
+#                bmrbCsMap = getDeepByKeysOrAttributes( bmrbCountMap, bmrb_id )
+                bmrbCsMap = getBmrbCsCountsFromFile(inputStarFile)
+                NTmessage("BMRB %r" % bmrbCsMap)
+
+                project = Project.open(entry_code, status = 'new')
+                project.initCcpn(ccpnFolder = outputCcpnFile)
+                assignmentCountMap = project.molecule.getAssignmentCountMap()
+                star_count_total = 0
+                cing_count_total = 0
+                for nucleusId in nucleiToCheckList:
+                    star_count = getDeepByKeysOrAttributes( bmrbCsMap, nucleusId )
+                    cing_count = getDeepByKeysOrAttributes( assignmentCountMap, nucleusId )
+#                    NTdebug("nucleus: %s input: %s project: %s" % ( nucleusId, star_count, cing_count ) )
+                    if star_count == None or star_count == 0:
+#                        NTmessage("No nucleus: %s in input" % nucleusId)
+                        continue
+                    if cing_count == None:
+                        NTerror("No nucleus: %s in project" % nucleusId)
+                        continue
+                    star_count_total += star_count
+                    cing_count_total += cing_count
+                # end for
+                if star_count_total == 0:
+                    f = 0.0
+                else:
+                    f = (1. * cing_count_total) / star_count_total
+                resultTuple = (self.FRACTION_CS_CONVERSION_REQUIRED, f, star_count_total, cing_count_total )
+
+                # Use same number of field to facilitate computer readability.
+                if f < self.FRACTION_CS_CONVERSION_REQUIRED:
+                    NTmessage("Found fraction less than the cutoff %.2f but %.2f overall (STAR/CING: %s/%s)" % resultTuple)
+                    conversionCsSucces = False
+                else:
+                    NTmessage("Found fraction of at least   cutoff %.2f at %.2f  overall (STAR/CING: %s/%s)" % resultTuple)
+                del project
+            # end CS count check.
+
+            if 1: # DEFAULT 1 tmp files are removed when all is successful.
+                cingDir = "%s.cing" % entry_code
+                tmpFileList = [inputLocalCcpnFile, entry_code, cingDir]
+                for file in tmpFileList:
+                    if os.path.exists( file ):
+                        if os.path.isdir(file):
+                            shutil.rmtree(file)
+                        else:
+                            os.unlink(file)
+            if conversionCsSucces: # Only use CS if criteria on conversion were met.
+                finalPhaseId = PHASE_S
+
 
         if copyToInputDir:
             if not finalPhaseId:
@@ -1700,6 +1840,7 @@ Additional modes I see:
             convertMmCifCoor = 0
             convertMrRestraints = 1
             convertStarCS = 1
+            filterCcpnAll = 0
             doInteractive=not isProduction
             if len(argListOther) > 0:
                 convertMmCifCoor = int(argListOther[0])
@@ -1707,7 +1848,9 @@ Additional modes I see:
                     convertMrRestraints = int(argListOther[1])
                     if len(argListOther) > 2:
                         convertStarCS = int(argListOther[2])
-            if m.prepareEntry(entry_code, doInteractive=doInteractive, convertMmCifCoor=convertMmCifCoor, convertMrRestraints=convertMrRestraints, convertStarCS=convertStarCS):
+                        if len(argListOther) > 3:
+                            filterCcpnAll = int(argListOther[3])
+            if m.prepareEntry(entry_code, doInteractive=doInteractive, convertMmCifCoor=convertMmCifCoor, convertMrRestraints=convertMrRestraints, convertStarCS=convertStarCS, filterCcpnAll=filterCcpnAll):
                 NTerror("Failed to prepareEntry")
         elif destination == 'runCing':
             if m.runCing():
