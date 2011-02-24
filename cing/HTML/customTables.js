@@ -18,7 +18,7 @@ jQuery(document).ready(function() {
                       { "sType": "html" }, 						// resn
                       { "sType": "html" }, 						// atom name
                       { "sType": "html" }, 						// atom type
-                      { "sClass": "center"}, 					// stereo
+                      { "sClass": "center"}, 					// stereo (s) now
 
                       { "sType": "numeric", "sClass": "right"}, // obs
                       { "sType": "numeric", "sClass": "right"}, // error
