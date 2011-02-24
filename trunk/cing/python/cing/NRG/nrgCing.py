@@ -308,7 +308,7 @@ class nrgCing(Lister):
         n = 10 # Number of entries to list
         m = n/2 # on either side
         if len(timeTakenList) < n:
-            NTmessage("All entries in order by time taken: %s" % str(timeTakenDict.keys()))
+#            NTdebug("All entries in random order: %s" % str(timeTakenDict.keys())) # useless
             return
 
         entryLoL = []
@@ -318,14 +318,14 @@ class nrgCing(Lister):
             entryList = []
             entryLoL.append(entryList)
             if i == 0:
-                timeTakenList = timeTakenList[:m]
+                timeTakenListSlice = timeTakenList[:m]
             else:
-                timeTakenList = timeTakenList[-m:]
-            for timeTaken in timeTakenList:
+                timeTakenListSlice = timeTakenList[-m:]
+            for timeTaken in timeTakenListSlice:
                 entryList.append(timeTakenDictInv[timeTaken])
             # end for
         # end for
-        NTmessage("%s slowest and fastest: %s and %s" % (m, str(entryLoL[0]), str(entryLoL[1])))
+        NTmessage("%s fastest %s and slowest %s" % (m, str(entryLoL[0]), str(entryLoL[1])))
     # end def
 
 
@@ -622,6 +622,10 @@ class nrgCing(Lister):
 #                NTmessage("%s Found %s errors in storing please check: %s" % (entry_code, nr_error, logLastFile))
                 continue
             # end if
+            if timeTaken:
+                self.timeTakenDict[entry_code] = timeTaken
+#            else:
+#                NTmessage("Unexpected [%s] for time taken in CING log for file: %s" % (timeTaken, logLastFile))
             self.entry_list_store_done.append(entry_code)
         # end for
 

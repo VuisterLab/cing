@@ -49,9 +49,8 @@ Sort the entry codes alphabetically
 
 presetDict = {
 
-'bmr4813': {
+'bmr4813disabled': {
   'comment': """
-    *** Setting chain mapping automatically to: [['C', 'LAC REPRESSOR HP62 A', 3, 0], ['D', 'LAC REPRESSOR HP62 A', 3, 0]] ***
   """,
 #  'duplicateResonances': {
 #     'A': ['A', 'B'],
@@ -61,9 +60,9 @@ presetDict = {
    'keywds': {
      'forceChainMappings': [
        ['A', 'LAC OPERATOR C', 1, 0], # dna
-#       ['B', 'LAC OPERATOR D', 1, 0], # absent
-       ['C', 'LAC REPRESSOR HP62 A', 1, 0],  # protein headpiece 62
-#       ['D', 'LAC REPRESSOR HP62 B', 1, 0] # absent
+       ['B', 'LAC OPERATOR C', 1, 0], # absent
+       ['C', 'LAC REPRESSOR HP62 A', 3, 0],  # protein according to Wim
+       ['D', 'LAC REPRESSOR HP62 A', 3, 0],
        ],
       },
     },

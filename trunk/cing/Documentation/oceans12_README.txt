@@ -28,9 +28,9 @@ PDB  BMRB  Notes
 2jmx 15072 All beta from Neuhaus (2007).
 2k0e       Largest (NMR) in total 35 Mb cif file; 160 models with each 148 residues
 2kib 20074 Fibril
+2knr       Interest of Wim. SG project with distance restraints.
 2kz0 16995 alpha/beta BolA protein from the Seattle Structural Genomics Center
 2rop 11041 separated 2 domains (2008)
-
 
 On the restraint side:
 **********************
@@ -71,26 +71,5 @@ Our own lab (See VuisterLab.numbers file):
 2kls
 2klt
 3phy
-
-With BMRB 3 file:
-4046
-4047
-4491
-4969
-5131
-5317
-5576
-5577
-5762
-5801
-5808
-6113
-7008
-7009
-11041
-15072
-15381
-16995
-20074
 
 All with BMRB entry: see nrgCing.py in prepare()
