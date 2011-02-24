@@ -54,7 +54,5 @@ class AllChecks(TestCase):
                 self.assertFalse(shutil.rmtree(entryId))
 
 if __name__ == "__main__":
-    cing.verbosity = verbosityNothing
-    cing.verbosity = verbosityError
     cing.verbosity = verbosityDebug
     unittest.main()

@@ -178,7 +178,7 @@ class X3dna(NTdict):
               output files in rootPath:
                 - find_pair
 
-        Return None on error.
+        Return None on error and True on success.
         """
         if not self.molecule:
             NTerror('X3dna: no molecule defined')
