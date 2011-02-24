@@ -3031,7 +3031,7 @@ class AtomsHTMLfile( HTMLfile ):
                             ('resn', {'title':'Residue type (links to specific residue) of atom'} ),
                             ('atom', {'title':'Name of atom'} ),
                             ('iso',  {'title':'NMR isotope.'} ),
-                            ('stereo' , {'title':'S indicates the atom is stereospecifically assigned.'}),
+                            ('s' , {'title':'S indicates the atom is stereospecifically assigned.'}),
 
                             ('obs.',    {'title':'Observed chemical shift.'}),
                             ('error' ,  {'title':'Error estimate of observed chemical shift.'}),
