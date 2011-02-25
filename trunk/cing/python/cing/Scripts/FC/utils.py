@@ -1,19 +1,30 @@
 """Utilities for working with CCPN/FC
-Located in
 
-python $CINGROOT/python/cing/Scripts/FC/utils.py
+Run example:
+
+cd $D/NRG-CING/prep/F/br/1brv ; python $CINGROOT/python/cing/Scripts/FC/utils.py 1brv fcProcessEntry \
+    $D/NRG-CING/prep/S/br/1brv/1brv.tgz 1brv_assign.tgz swapCheck
 """
 
 from ccp.format.nmrStar.projectIO import NmrStarProjectFile
 from ccpnmr.format.converters.PseudoPdbFormat import PseudoPdbFormat
-from ccpnmr.format.process.stereoAssignmentSwap import StereoAssignmentSwapCheck
+from ccpnmr.format.process.stereoAssignmentSwap import StereoAssignmentCleanup
+from cing import header
 from cing.Libs.NTutils import * #@UnusedWildImport
+from cing.Libs.forkoff import do_cmd
+from cing.Libs.helper import getStartMessage
+from cing.Libs.helper import getStopMessage
 from cing.Libs.pdb import defaultPrintChainCode
+from cing.PluginCode.BMRB import bmrbAtomType2spinTypeCingMap
 from cing.Scripts.FC.constants import * #@UnusedWildImport
 from cing.Scripts.utils import printSequenceFromPdbFile
 from cing.core.molecule import AssignmentCountMap
 from glob import glob
-from cing.PluginCode.BMRB import bmrbAtomType2spinTypeCingMap
+from memops.general.Io import loadProject
+from memops.general.Io import saveProject
+from shutil import rmtree
+import Tkinter
+import tarfile
 
 def reportDifference(ccpnProject, fn):
     printSequenceFromCcpnProject(ccpnProject)
@@ -87,7 +98,7 @@ def importPseudoPdb(ccpnProject, inputDir, guiRoot, allowPopups=1, minimalPrompt
         NTerror("Failed to formatPseudoPdb.readCoordinates")
         return True # returns True on error
 
-def swapCheck(nmrConstraintStore,structureEnsemble,numSwapCheckRuns):
+def swapCheck(nmrConstraintStore,structureEnsemble,numSwapCheckRuns=1):
 
     """
     Input:
@@ -95,25 +106,112 @@ def swapCheck(nmrConstraintStore,structureEnsemble,numSwapCheckRuns):
     nmrConstraintStore
     structureEnsemble
 
-    numSwapCheckRuns: number of times this swap check is performed. 2 should be enough
+    numSwapCheckRuns: number of times this swap check is performed. 1 should be enough
 
     """
 
-    print "\n### Checking stereo swaps and deassignment ###"
+    NTmessage("\n### Checking stereo swaps and deassignment ###")
 
-    swapCheck = StereoAssignmentSwapCheck(nmrConstraintStore,structureEnsemble,verbose = True)
+#    swapCheck = StereoAssignmentSwapCheck(nmrConstraintStore,structureEnsemble,verbose = True)
+    swapCheck = StereoAssignmentCleanup(nmrConstraintStore,structureEnsemble,verbose = True)
 
 #    violationCodes = {'xl': {'violation': 1.0, 'fraction': 0.00001},
 #                      'l': {'violation': 0.5, 'fraction': 0.5}}
     # Use more restrictive cutoffs than the above defaults.
-    violationCodes = {'xl': {'violation': 0.5, 'fraction': 0.00001},
-                      'l': {'violation': 0.3, 'fraction': 0.5}}
+    violationCodes = {'xl': {'violation': 1.0, 'fraction': 0.00001},
+                       'l': {'violation': 0.5, 'fraction': 0.5}}
 
     for _swapCheckRun in range(0,numSwapCheckRuns):
       swapCheck.checkSwapsAndClean(violationCodes = violationCodes)
 
-    print
-    print
+    NTmessage("\n")
+# end def
+
+def fcProcessEntry( entry_code, ccpnTgzFile, outputCcpnTgzFile, functionToRun='swapCheck'):
+    """
+    E.g.
+
+    entry_code          1brv
+    ccpnTgzFile         /NRG-CING/prep/S/br/1brv/1brv.tgz Full path
+    outputCcpnTgzFile   1brv_assign.tgz but inside the project will still be keyed and named 1brv.
+
+    Return True on error
+    Can be extended later on to run a different function.
+    Will run in cwd.
+    """
+
+    # Adjust the parameters below
+    isInteractive = False
+    doSwapCheck = True
+    doSaveProject = True
+    doExport = True
+
+    minimalPrompts = True
+    verbose = True
+    allowPopups = False
+
+    if isInteractive:
+        allowPopups = True
+        minimalPrompts = False
+
+    print 'entry_code                                                                                    ', entry_code
+#    print 'bmrb_id                                                                                       ', bmrb_id
+    print 'allowPopups                                                                                   ', allowPopups
+    print 'isInteractive                                                                                 ', isInteractive
+    print 'minimalPrompts                                                                                ', minimalPrompts
+    print 'verbose                                                                                       ', verbose
+    print 'doSwapCheck                                                                                   ', doSwapCheck
+    print 'doSaveProject                                                                                 ', doSaveProject
+    print 'doExport                                                                                      ', doExport
+
+    guiRoot = None
+    if allowPopups:
+        guiRoot = Tkinter.Tk()
+
+    if not os.path.exists(ccpnTgzFile):
+        NTerror("Input file not found: %s" % ccpnTgzFile)
+        return True
+    NTdebug("Looking at %s" % entry_code)
+
+    if os.path.exists(entry_code):
+        NTmessage("Removing previous directory: %s" % entry_code)
+        rmtree(entry_code)
+    do_cmd("tar -xzf " + ccpnTgzFile) # will unpack to cwd.
+    if os.path.exists('linkNmrStarData'):
+        NTmessage("Renaming standard directory linkNmrStarData to entry: %s" % entry_code)
+        os.rename('linkNmrStarData', entry_code)
+
+    ccpnProject = loadProject(entry_code)
+    if not ccpnProject:
+        NTerror("Failed to read project: %s" % entry_code)
+        return True
+
+    if doSwapCheck:
+#        constraintsHandler = ConstraintsHandler()
+        nmrConstraintStore = ccpnProject.findFirstNmrConstraintStore()
+        structureEnsemble = ccpnProject.findFirstStructureEnsemble()
+        if nmrConstraintStore:
+            if structureEnsemble:
+                swapCheck(nmrConstraintStore, structureEnsemble)
+            else:
+                NTmessage("Failed to find structureEnsemble; skipping swapCheck")
+        else:
+            NTmessage("Failed to find nmrConstraintStore; skipping swapCheck")
+#        constraintsHandler.swapCheck(nmrConstraintStore, structureEnsemble, numSwapCheckRuns)
+    # end if doSwapCheck
+
+    if doSaveProject:
+        NTmessage('Saving to new path')
+        saveProject(ccpnProject, newPath=entry_code, removeExisting=True)
+    if doExport:
+        if os.path.exists(outputCcpnTgzFile):
+            NTmessage("Overwriting: " + outputCcpnTgzFile)
+        myTar = tarfile.open(outputCcpnTgzFile, mode='w:gz') # overwrites
+        myTar.add(entry_code)
+        myTar.close()
+    if guiRoot:
+        guiRoot.destroy()
+# end def
 
 
 def getBmrbCsCountsFromFile(inputStarFile):
@@ -152,3 +250,41 @@ def getBmrbCsCountsFromFile(inputStarFile):
 #    NTdebug("Read: %s" % str(assignmentCountMap))
     return assignmentCountMap
 # end def
+
+if __name__ == '__main__':
+    cing.verbosity = verbosityDebug
+
+    NTmessage(header)
+    NTmessage(getStartMessage())
+
+    destination = sys.argv[1]
+    hasPdbId = False
+    entry_code = '.'
+    if is_pdb_code(destination): # needs to be first argument if this main is to be used by doScriptOnEntryList.
+        entry_code = destination
+        hasPdbId = True
+        destination = sys.argv[2]
+    # end if
+
+    startArgListOther = 2
+    if hasPdbId:
+        startArgListOther = 3
+    argListOther = []
+    if len(sys.argv) > startArgListOther:
+        argListOther = sys.argv[startArgListOther:]
+    NTmessage('\nGoing to destination: %s with(out) on entry_code %s with extra arguments %s' % (destination, entry_code, str(argListOther)))
+
+    try:
+        if destination == 'fcProcessEntry':
+            ccpnTgzFile = argListOther[0]
+            outputCcpnTgzFile = argListOther[1]
+            functionToRun = argListOther[2]
+            if fcProcessEntry( entry_code, ccpnTgzFile, outputCcpnTgzFile, functionToRun ):
+                NTerror("Failed to fcProcessEntry")
+        else:
+            NTerror("Unknown destination: %s" % destination)
+    except:
+        NTtracebackError()
+    finally:
+        NTmessage(getStopMessage(cing.starttime))
+

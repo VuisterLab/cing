@@ -56,7 +56,8 @@ import string
 PHASE_C = 'C'
 PHASE_R = 'R'
 PHASE_S = 'S'
-PHASE_F = 'F'
+PHASE_FA = 'FA'
+PHASE_FV = 'FV'
 
 LOG_NRG_CING = 'log_nrgCing'
 LOG_STORE_CING2DB = 'log_storeCING2db'
@@ -186,12 +187,13 @@ class nrgCing(Lister):
         # Stages are cumulative in that e.g. R always includes all from C. This simplifies this setup hopefully.
                       # id #name         #code
 
-        self.phaseIdList = [PHASE_C, PHASE_R, PHASE_S, PHASE_F]
+        self.phaseIdList = [PHASE_C, PHASE_R, PHASE_S, PHASE_FA, PHASE_FV ]
         self.phaseDataList = [
                      [ 'Coordinate', 'C'],
                      [ 'Restraint', 'R'],
                      [ 'Shift', 'S'],
-                     [ 'Filter', 'F'],
+                     [ 'Filter assign', 'FA'],
+                     [ 'Filter vasco', 'FV'],
                       ]
         self.recoordSyncDir = 'recoordSync'
         self.bmrbDir = bmrbDir
@@ -504,11 +506,6 @@ class nrgCing(Lister):
                             entry_code, self.ENTRY_DELETED_COUNT_MAX))
                 # end if
 
-                cingDirEntry = os.path.join(entrySubDir, entry_code + ".cing")
-                if not os.path.exists(cingDirEntry):
-#                    NTdebug("Skipping entry because no(t yet a) directory: %s" % cingDirEntry)
-                    continue
-
                 # Look for last log file
                 logLastFile = globLast(entrySubDir + '/log_validateEntry/*.log')
                 if not logLastFile:
@@ -549,6 +546,11 @@ class nrgCing(Lister):
                     # was stopped by time out or by user or by system (any other type of stop but stack trace)
                     NTmessage("%s Since CING end message was not found in %s assumed to have stopped" % (entry_code, logLastFile))
                     self.entry_list_stopped.append(entry_code)
+                    continue
+
+                cingDirEntry = os.path.join(entrySubDir, entry_code + ".cing")
+                if not os.path.exists(cingDirEntry):
+                    NTmessage("%s Entry stopped because no(t yet a) directory: %s" % (entry_code, cingDirEntry))
                     continue
 
                 # Look for end statement from CING which shows it wasn't killed before it finished.
@@ -655,7 +657,7 @@ class nrgCing(Lister):
         NTmessage("Found %4d entries that CING prep done." % len(self.entry_list_prep_done))
 
         NTmessage("Found %4d entries that CING tried (T)." % len(self.entry_list_tried))
-        NTmessage("Found %4d entries that CING did not try." % len(self.entry_list_untried))
+        NTmessage("Found %4d entries that CING did not try (A-T)." % len(self.entry_list_untried))
         NTmessage("Found %4d entries that CING crashed (C)." % len(self.entry_list_crashed))
         NTmessage("Found %4d entries that CING stopped (S)." % len(self.entry_list_stopped))
         NTmessage("Found %4d entries that CING should update (U)." % len(self.entry_list_updated))
@@ -1142,7 +1144,9 @@ class nrgCing(Lister):
         inputDirByPhase = {
                            PHASE_C: os.path.join(dir_C, entryCodeChar2and3, entry_code),
                            PHASE_S: os.path.join(dir_S, entryCodeChar2and3, entry_code),
-                           PHASE_R: os.path.join(self.results_dir, self.recoordSyncDir, entry_code)
+                           PHASE_R: os.path.join(self.results_dir, self.recoordSyncDir, entry_code),
+                           PHASE_FA: os.path.join(dir_F, entryCodeChar2and3, entry_code),
+                           PHASE_FV: os.path.join(dir_F, entryCodeChar2and3, entry_code),
                            }
 
         NTmessage("interactive            interactive run is fast use zero for production   %s" % doInteractive)
@@ -1402,16 +1406,16 @@ class nrgCing(Lister):
         # end if CS
 
         if filterCcpnAll:
-            NTmessage("  filter CS")
+            NTmessage("  filter")
 
-            S_sub_entry_dir = os.path.join(dir_S, entryCodeChar2and3)
-            S_entry_dir = os.path.join(S_sub_entry_dir, entry_code)
+            F_sub_entry_dir = os.path.join(dir_F, entryCodeChar2and3)
+            F_entry_dir = os.path.join(F_sub_entry_dir, entry_code)
 
-            if not os.path.exists(S_entry_dir):
-                mkdirs(dir_S)
-            if not os.path.exists(S_sub_entry_dir):
-                mkdirs(S_sub_entry_dir)
-            os.chdir(S_sub_entry_dir)
+            if not os.path.exists(F_entry_dir):
+                mkdirs(dir_F)
+            if not os.path.exists(F_sub_entry_dir):
+                mkdirs(F_sub_entry_dir)
+            os.chdir(F_sub_entry_dir)
             if os.path.exists(entry_code):
                 rmtree(entry_code)
             # end if
@@ -1425,113 +1429,47 @@ class nrgCing(Lister):
                 return True
             fn = "%s.tgz" % entry_code
             inputCcpnFile = os.path.join(inputDir, fn)
-            outputCcpnFile = fn
             if not os.path.exists( inputCcpnFile):
                 NTerror("Failed to find input: %s" % inputCcpnFile)
                 return True
-            inputLocalCcpnFile = "%s_input.tgz" % entry_code
-            shutil.copy( inputCcpnFile, inputLocalCcpnFile )
+
+            if convertMrRestraints: # Makes no sense to do when there are no restraints at all.
+                NTmessage("         -1- assign")
 
 
-            log_file = "%s_starCS2Ccpn.log" % entry_code
+                log_file = "%s_FC_assign.log" % entry_code
+                fcScript = os.path.join(cingDirScripts, 'FC', 'utils.py')
+                outputCcpnFile = "%s_assign.tgz" % entry_code
 
-            if not self.matches_many2one.has_key(entry_code):
-                NTerror("No BMRB entry for PDB entry: %s" % entry_code)
-                return True
-            bmrb_id = self.matches_many2one[entry_code]
-            bmrb_code = 'bmr%s' % bmrb_id
-
-#            digits12 ="%02d" % ( bmrb_id % 100 )
-#            inputStarDir = os.path.join(bmrbDir, digits12)
-            inputStarDir = os.path.join(bmrbDir, bmrb_code)
-            if not os.path.exists(inputStarDir):
-                NTerror("Input star dir not found: %s" % inputStarDir)
-                return True
-            inputStarFile = os.path.join(inputStarDir, '%s_21.str'%bmrb_code)
-            if not os.path.exists(inputStarFile):
-                NTerror("inputStarFile not found: %s" % inputStarFile)
-                return True
-
-            fcScript = os.path.join(cingDirScripts, 'FC', 'mergeNrgBmrbShifts.py')
-
-            # Will save a copy to disk as well.
-            convertProgram = ExecuteProgram("python -u %s" % fcScript, redirectOutputToFile=log_file)
-#            NTmessage("==> Running Wim Vranken's FormatConverter from script %s" % fcScript)
-            exitCode = convertProgram("%s -bmrbCodes %s -raise -force -noGui" % (entry_code, bmrb_code))
-            if exitCode:
-                NTerror("Failed convertProgram with exit code: %s" % str(exitCode))
-                return True
-            analysisResultTuple = analyzeFcLog(log_file)
-            if not analysisResultTuple:
-                NTerror("Failed to analyze log file: %s" % log_file)
-                return True
-            timeTaken, entryCrashed, nr_error, nr_warning, nr_message, nr_debug = analysisResultTuple
-            if entryCrashed or (nr_error > self.MAX_ERROR_COUNT_FC_LOG):
-                NTmessage("Found %s/%s timeTaken/entryCrashed and %d/%d/%d/%d error,warning,message, and debug lines." % (timeTaken, entryCrashed, nr_error, nr_warning, nr_message, nr_debug) )
-                NTmessage("Found %s errors in prep phase S please check: %s" % (nr_error, entry_code))
-                resultList = []
-                status = grep(log_file, 'ERROR', resultList=resultList, doQuiet=True, caseSensitive=False)
-                if status == 0:
-                    NTerror("%s found errors in log file; aborting." % entry_code)
-                    NTmessage('\n'.join(resultList))
-                return True
-            if not os.path.exists(outputCcpnFile):
-                NTerror("%s found no output ccpn file %s" % (entry_code, outputCcpnFile))
-                return True
-            if True:
-                NTmessage("Testing completeness of FC merge by comparing input STAR with output CING counts" )
-                conversionCsSucces = True
-                nucleiToCheckList = '1H 13C 15N 31P'.split()
-#                bmrbCountMap = getBmrbCsCounts()
-#                bmrbCsMap = getDeepByKeysOrAttributes( bmrbCountMap, bmrb_id )
-                bmrbCsMap = getBmrbCsCountsFromFile(inputStarFile)
-                NTmessage("BMRB %r" % bmrbCsMap)
-
-                project = Project.open(entry_code, status = 'new')
-                project.initCcpn(ccpnFolder = outputCcpnFile)
-                assignmentCountMap = project.molecule.getAssignmentCountMap()
-                star_count_total = 0
-                cing_count_total = 0
-                for nucleusId in nucleiToCheckList:
-                    star_count = getDeepByKeysOrAttributes( bmrbCsMap, nucleusId )
-                    cing_count = getDeepByKeysOrAttributes( assignmentCountMap, nucleusId )
-#                    NTdebug("nucleus: %s input: %s project: %s" % ( nucleusId, star_count, cing_count ) )
-                    if star_count == None or star_count == 0:
-#                        NTmessage("No nucleus: %s in input" % nucleusId)
-                        continue
-                    if cing_count == None:
-                        NTerror("No nucleus: %s in project" % nucleusId)
-                        continue
-                    star_count_total += star_count
-                    cing_count_total += cing_count
-                # end for
-                if star_count_total == 0:
-                    f = 0.0
-                else:
-                    f = (1. * cing_count_total) / star_count_total
-                resultTuple = (self.FRACTION_CS_CONVERSION_REQUIRED, f, star_count_total, cing_count_total )
-
-                # Use same number of field to facilitate computer readability.
-                if f < self.FRACTION_CS_CONVERSION_REQUIRED:
-                    NTmessage("Found fraction less than the cutoff %.2f but %.2f overall (STAR/CING: %s/%s)" % resultTuple)
-                    conversionCsSucces = False
-                else:
-                    NTmessage("Found fraction of at least   cutoff %.2f at %.2f  overall (STAR/CING: %s/%s)" % resultTuple)
-                del project
-            # end CS count check.
-
-            if 1: # DEFAULT 1 tmp files are removed when all is successful.
-                cingDir = "%s.cing" % entry_code
-                tmpFileList = [inputLocalCcpnFile, entry_code, cingDir]
-                for file in tmpFileList:
-                    if os.path.exists( file ):
-                        if os.path.isdir(file):
-                            shutil.rmtree(file)
-                        else:
-                            os.unlink(file)
-            if conversionCsSucces: # Only use CS if criteria on conversion were met.
-                finalPhaseId = PHASE_S
-
+                # Will save a copy to disk as well.
+                convertProgram = ExecuteProgram("python -u %s" % fcScript, redirectOutputToFile=log_file)
+#                NTmessage("==> Running Wim Vranken's FormatConverter from script %s" % fcScript)
+                exitCode = convertProgram("%s fcProcessEntry %s %s swapCheck" % (entry_code, inputCcpnFile, outputCcpnFile))
+                if exitCode:
+                    NTerror("Failed convertProgram with exit code: %s" % str(exitCode))
+                    return True
+                analysisResultTuple = analyzeCingLog(log_file)
+                if not analysisResultTuple:
+                    NTerror("Failed to analyze log file: %s" % log_file)
+                    return True
+                timeTaken, entryCrashed, nr_error, nr_warning, nr_message, nr_debug = analysisResultTuple
+                if entryCrashed or (nr_error > self.MAX_ERROR_COUNT_FC_LOG):
+                    NTmessage("Found %s/%s timeTaken/entryCrashed and %d/%d/%d/%d error,warning,message, and debug lines." % (timeTaken, entryCrashed, nr_error, nr_warning, nr_message, nr_debug) )
+                    NTmessage("Found %s errors in prep phase F -1- assign please check: %s" % (nr_error, entry_code))
+                    resultList = []
+                    status = grep(log_file, 'ERROR', resultList=resultList, doQuiet=True, caseSensitive=False)
+                    if status == 0:
+                        NTerror("%s found errors in log file; aborting." % entry_code)
+                        NTmessage('\n'.join(resultList))
+                    return True
+                if not os.path.exists(outputCcpnFile):
+                    NTerror("%s found no output ccpn file %s" % (entry_code, outputCcpnFile))
+                    return True
+                filterAssignSucces = 1 # Check further or leave like this.
+                if filterAssignSucces: # Only use filtering if successful
+                    finalPhaseId = PHASE_FA
+            if convertStarCS:
+                pass # TODO add Vasco here.
 
         if copyToInputDir:
             if not finalPhaseId:
@@ -1545,6 +1483,11 @@ class nrgCing(Lister):
                 NTerror("Failed to get prep stage dir: [%s]" % finalInputDir)
                 return True
             fn = "%s.tgz" % entry_code
+            fnDst = fn
+            if finalPhaseId == PHASE_FA:
+                fn = "%s_assign.tgz" % entry_code
+            elif finalPhaseId == PHASE_FV:
+                fn = "%s_vasco.tgz" % entry_code
             finalInputTgz = os.path.join(finalInputDir, fn)
             if not os.path.exists(finalInputTgz):
                 NTerror("final input tgz missing: %s" % finalInputTgz)
@@ -1552,7 +1495,7 @@ class nrgCing(Lister):
             dst = os.path.join(self.results_dir, self.inputDir, entryCodeChar2and3)
             if not os.path.exists(dst):
                 os.mkdir(dst)
-            fullDst = os.path.join(dst, fn)
+            fullDst = os.path.join(dst, fnDst)
             if os.path.exists(fullDst):
                 os.remove(fullDst)
 #            os.link(finalInputTgz, fullDst) # Will use less resources but will be expanded when copied between resources.
@@ -1837,9 +1780,9 @@ Additional modes I see:
             if m.prepare():
                 NTerror("Failed to prepare")
         elif destination == 'prepareEntry':
-            convertMmCifCoor = 0
-            convertMrRestraints = 1
-            convertStarCS = 1
+            convertMmCifCoor = 1 # always present so nicest fall back.
+            convertMrRestraints = 0
+            convertStarCS = 0
             filterCcpnAll = 0
             doInteractive=not isProduction
             if len(argListOther) > 0:
