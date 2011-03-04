@@ -3,18 +3,8 @@
 from cing.Libs.NTutils import * #@UnusedWildImport
 import mimetools
 import mimetypes
-import random
 import urllib2
 
-def getRandomKey(size=6):
-    """Get a random alphanumeric string of a given size"""
-    ALPHANUMERIC = [chr(x) for x in range(48, 58) + range(65, 91) + range(97, 123)]
-    #random.shuffle(ALPHANUMERIC)
-
-    n = len(ALPHANUMERIC) - 1
-    random.seed(time.time()*time.time())
-
-    return ''.join([ALPHANUMERIC[random.randint(0, n)] for x in range(size)])
 
 #########################################################################################
 # Initial code from http://www.voidspace.org.uk/python/cgi.shtml#upload                                                #

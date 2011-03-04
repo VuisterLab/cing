@@ -53,11 +53,12 @@ import csv
 import shutil
 import string
 
-PHASE_C = 'C'
-PHASE_R = 'R'
-PHASE_S = 'S'
-PHASE_FA = 'FA'
-PHASE_FV = 'FV'
+PHASE_C = 'C'   # coordinates
+PHASE_R = 'R'   # restraints
+PHASE_S = 'S'   # Chemical shifts
+PHASE_FA = 'FA' # SSA swap/deassign
+PHASE_FV = 'FV' # Vasco
+#PHASE_FT = 'FT' # Filtering top violations
 
 LOG_NRG_CING = 'log_nrgCing'
 LOG_STORE_CING2DB = 'log_storeCING2db'
@@ -189,11 +190,11 @@ class nrgCing(Lister):
 
         self.phaseIdList = [PHASE_C, PHASE_R, PHASE_S, PHASE_FA, PHASE_FV ]
         self.phaseDataList = [
-                     [ 'Coordinate', 'C'],
-                     [ 'Restraint', 'R'],
-                     [ 'Shift', 'S'],
-                     [ 'Filter assign', 'FA'],
-                     [ 'Filter vasco', 'FV'],
+                     [ 'Coordinate',    PHASE_C],
+                     [ 'Restraint',     PHASE_R],
+                     [ 'Shift',         PHASE_S],
+                     [ 'Filter assign', PHASE_FA],
+                     [ 'Filter vasco',  PHASE_FV],
                       ]
         self.recoordSyncDir = 'recoordSync'
         self.bmrbDir = bmrbDir
@@ -1139,6 +1140,7 @@ class nrgCing(Lister):
 
         entryCodeChar2and3 = entry_code[1:3]
         copyToInputDir = 1 # DEFAULT: 1
+#        filterTopViolations = 1 # DEFAULT: 1
         finalPhaseId = None # id to use for final move to input dir.
         # Absolute paths with still be appending a entryCodeChar2and3
         inputDirByPhase = {
@@ -1154,6 +1156,7 @@ class nrgCing(Lister):
         NTmessage("convertMrRestraints    Start from DOCR                                   %s" % convertMrRestraints)
         NTmessage("convertStarCS          Adds STAR CS to Ccpn with FC                      %s" % convertStarCS)
         NTmessage("filterCcpnAll          Filter CS and restraints with FC                  %s" % filterCcpnAll)
+#        NTmessage("filterTopViolations    Filter top violations if present                  %s" % filterTopViolations)
         NTmessage("Doing                                                                 %4s" % entry_code)
 #        NTdebug("copyToInputDir          Copies the input to the collecting directory                                 %s" % copyToInputDir)
 
@@ -1435,8 +1438,7 @@ class nrgCing(Lister):
 
             if convertMrRestraints: # Makes no sense to do when there are no restraints at all.
                 NTmessage("         -1- assign")
-
-
+                filterAssignSucces = 1
                 log_file = "%s_FC_assign.log" % entry_code
                 fcScript = os.path.join(cingDirScripts, 'FC', 'utils.py')
                 outputCcpnFile = "%s_assign.tgz" % entry_code
@@ -1461,15 +1463,46 @@ class nrgCing(Lister):
                     if status == 0:
                         NTerror("%s found errors in log file; aborting." % entry_code)
                         NTmessage('\n'.join(resultList))
-                    return True
+                    filterAssignSucces = 0
                 if not os.path.exists(outputCcpnFile):
                     NTerror("%s found no output ccpn file %s" % (entry_code, outputCcpnFile))
-                    return True
-                filterAssignSucces = 1 # Check further or leave like this.
-                if filterAssignSucces: # Only use filtering if successful
+                    filterAssignSucces = 0
+                if filterAssignSucces: # Only use filtering if successful but do continue if failed just skip this.
                     finalPhaseId = PHASE_FA
-            if convertStarCS:
-                pass # TODO add Vasco here.
+#            if convertStarCS: # Only usefull when there are CS imported.
+            if 0:
+                NTmessage("         -2- vasco")
+                filterVascoSucces = 1
+                log_file = "%s_vasco.log" % entry_code
+                fcScript = os.path.join(cingDirScripts, 'FC', 'utils.py')
+                outputCcpnFile = "%s_vasco.tgz" % entry_code
+
+                # Will save a copy to disk as well.
+                convertProgram = ExecuteProgram("python -u %s" % fcScript, redirectOutputToFile=log_file)
+#                NTmessage("==> Running Wim Vranken's FormatConverter from script %s" % fcScript)
+                exitCode = convertProgram("%s fcProcessEntry %s %s swapCheck" % (entry_code, inputCcpnFile, outputCcpnFile))
+                if exitCode:
+                    NTerror("Failed convertProgram with exit code: %s" % str(exitCode))
+                    return True
+                analysisResultTuple = analyzeCingLog(log_file)
+                if not analysisResultTuple:
+                    NTerror("Failed to analyze log file: %s" % log_file)
+                    return True
+                timeTaken, entryCrashed, nr_error, nr_warning, nr_message, nr_debug = analysisResultTuple
+                if entryCrashed or (nr_error > self.MAX_ERROR_COUNT_FC_LOG):
+                    NTmessage("Found %s/%s timeTaken/entryCrashed and %d/%d/%d/%d error,warning,message, and debug lines." % (timeTaken, entryCrashed, nr_error, nr_warning, nr_message, nr_debug) )
+                    NTmessage("Found %s errors in prep phase F -1- assign please check: %s" % (nr_error, entry_code))
+                    resultList = []
+                    status = grep(log_file, 'ERROR', resultList=resultList, doQuiet=True, caseSensitive=False)
+                    if status == 0:
+                        NTerror("%s found errors in log file; aborting." % entry_code)
+                        NTmessage('\n'.join(resultList))
+                    filterVascoSucces = 0
+                if not os.path.exists(outputCcpnFile):
+                    NTerror("%s found no output ccpn file %s" % (entry_code, outputCcpnFile))
+                    filterVascoSucces = 0
+                if filterVascoSucces: # Only use filtering if successful but do continue if failed just skip this.
+                    finalPhaseId = PHASE_FV
 
         if copyToInputDir:
             if not finalPhaseId:
@@ -1537,8 +1570,15 @@ class nrgCing(Lister):
         pythonScriptFileName = os.path.join(cingDirScripts, 'validateEntry.py')
         inputDir = 'file://' + self.results_dir + '/' + self.inputDir
         outputDir = self.results_dir
-        storeCING2db = "1" # DEFAULT: 1 All arguments need to be strings.
-        extraArgList = (inputDir, outputDir, '.', '.', `ARCHIVE_TYPE_BY_CH23`, `PROJECT_TYPE_CCPN`, storeCING2db, CV_RANGES_STR)
+        storeCING2db = "1" # DEFAULT: '1' All arguments need to be strings.
+        filterTopViolations = '1' # DEFAULT: '1'
+        # Tune this to:
+#            verbosity         inputDir             outputDir
+#            pdbConvention     restraintsConvention archiveType         projectType
+#            storeCING2db      ranges               filterTopViolations
+        extraArgList = ( str(cing.verbosity), inputDir, outputDir,
+                         '.', '.', ARCHIVE_TYPE_BY_CH23, PROJECT_TYPE_CCPN,
+                         storeCING2db, CV_RANGES_STR, filterTopViolations)
 
         if doScriptOnEntryList(pythonScriptFileName,
                             entryListFileName,
@@ -1584,15 +1624,20 @@ class nrgCing(Lister):
 
     def createToposTokens(self):
         """Return True on error.
-        TODO: embed.
         """
         # Tune this to:
-#            expectedArgumentList = [ 'inputDir', 'outputDir', 'pdbConvention', 'restraintsConvention', 'archiveType', 'projectType' ]
-
-        extraArgListStr = "http://nmr.cmbi.umcn.nl/NRG-CING/input jd@nmr.cmbi.umcn.nl:/Library/WebServer/Documents/NRG-CING . . %s %s" % (
-                    ARCHIVE_TYPE_BY_CH23,
-                    PROJECT_TYPE_CCPN
-                     )
+#            verbosity         inputDir             outputDir
+#            pdbConvention     restraintsConvention archiveType         projectType
+#            storeCING2db      ranges               filterTopViolations
+        ranges = CV_RANGES_STR
+        filterTopViolations = 1
+        extraArgListTxt = """
+            %s
+            http://nmr.cmbi.umcn.nl/NRG-CING/input jd@nmr.cmbi.umcn.nl:/Library/WebServer/Documents/NRG-CING
+            . . %s %s
+            %s %s %s
+        """ % ( cing.verbosity, ARCHIVE_TYPE_BY_CH23, PROJECT_TYPE_CCPN, storeCING2db, ranges, filterTopViolations )
+        extraArgListStr = ' '.join( extraArgListTxt.split())
 
         NTmessage("Starting createToposTokens with extra params: [%s]" % extraArgListStr)
         self.entry_list_nmr = readLinesFromFile(os.path.join(self.results_dir, 'entry_list_nmr.csv'))
@@ -1630,12 +1675,13 @@ class nrgCing(Lister):
 
         if 0: # DEFAULT: False
             NTmessage("Going to use non-default entry_list_todo in prepare")
-#            self.entry_list_todo = "1brv 1hkt 1mo7 1mo8 1ozi 1p9j 1pd7 1qjt 1vj6 1y7n 2fws 2fwu 2jsx".split()
-            self.entry_list_todo = readLinesFromFile('/Users/jd/NRG/lists/bmrbPdbEntryList.csv')
+            self.entry_list_todo = "1a24 1a4d 1afp 1ai0 1b4y 1brv 1bus 1c2n 1cjg 1d3z 1hue 1ieh 1iv6 1jwe 1kr8 2cka 2fws 2hgh 2jmx 2k0e 2kib 2knr 2kz0 2rop".split()
+#            self.entry_list_todo = "1ai0 1b4y".split()
+#            self.entry_list_todo = readLinesFromFile('/Users/jd/NRG/lists/bmrbPdbEntryList.csv')
             self.entry_list_todo = NTlist( *self.entry_list_todo )
             self.entry_list_nmr = deepcopy(self.entry_list_todo)
             self.entry_list_nrg_docr = deepcopy(self.entry_list_todo)
-            if 1: # use actual info instead of 2 lists above.
+            if 0: # use actual info instead of 2 lists above.
                 self.searchPdbEntries()
 
         permutationArgumentList = NTdict() # per permutation hold the entry list.
@@ -1644,6 +1690,7 @@ class nrgCing(Lister):
             convertMmCifCoor = 0
             convertMrRestraints = 0
             convertStarCS = 0
+            filterCcpnAll = 0
             if entry_code in self.entry_list_nmr:
                 convertMmCifCoor = 1
             if entry_code in self.entry_list_nrg_docr:
@@ -1655,8 +1702,9 @@ class nrgCing(Lister):
                 continue
             if self.matches_many2one.has_key(entry_code):
                 convertStarCS = 1
-
-            argList = [convertMmCifCoor, convertMrRestraints, convertStarCS]
+            if convertMrRestraints: # Filter when there are restraints
+                filterCcpnAll = 1
+            argList = [convertMmCifCoor, convertMrRestraints, convertStarCS, filterCcpnAll]
             argStringList = [ str(x) for x in argList ]
             permutationKey = ' '.join(argStringList) # strings
             if not getDeepByKeysOrAttributes(permutationArgumentList, permutationKey):
@@ -1670,9 +1718,9 @@ class nrgCing(Lister):
 #            permutationKeyForFileName = re.compile('[ ,\[\]]').sub('', permutationKey)
             permutationKeyForFileName = permutationKey.replace(' ', '')
             extraArgList = permutationKey.split()
-            convertMmCifCoor, convertMrRestraints, convertStarCS = extraArgList
-            NTmessage("Keys: %s split to: %s %s %s with number of entries %d" % (
-                    permutationKey, convertMmCifCoor, convertMrRestraints, convertStarCS, len(permutationArgumentList[permutationKey])))
+            convertMmCifCoor, convertMrRestraints, convertStarCS, filterCcpnAll = extraArgList
+            NTmessage("Keys: %s split to: %s %s %s %s with number of entries %d" % (
+                    permutationKey, convertMmCifCoor, convertMrRestraints, convertStarCS, filterCcpnAll, len(permutationArgumentList[permutationKey])))
 
 #            NTdebug("Quitting for now.")
 #            continue

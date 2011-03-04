@@ -3,7 +3,6 @@ from cing.Libs.cython.superpose  import NTcVector #@UnresolvedImport
 from cing.core.molecule import Coordinate #@UnusedImport
 from cing.core.molecule import CoordinateOld #@UnusedImport
 from cing.core.molecule import NTdihedralOpt
-from random import random
 from unittest import TestCase
 import profile
 import pstats

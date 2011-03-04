@@ -19,12 +19,12 @@ from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.Libs.disk import mkdirs
 from cing.Libs.forkoff import * #@UnusedWildImport
 from cing.Libs.helper import detectCPUs
-from cing.Libs.network import getRandomKey
 from cing.NRG import * #@UnusedWildImport
 from cing.main import getStartMessage
 from cing.main import getStopMessage
 import commands
 from cing.Libs.disk import rmdir
+from cing import cingDirScripts
 
 try:
     from localConstants import pool_postfix_local, master_ssh_url_local
@@ -34,12 +34,14 @@ except:
 #    master_ssh_url = 'i@vc'
 
 cingDirNRG = os.path.join(cingPythonDir, 'cing', 'NRG')
-cingDirVC = os.path.join(cingPythonDir, 'cing', 'Scripts', 'vCing')
+cingDirVC = os.path.join(cingDirScripts, 'vCing')
 
 VALIDATE_ENTRY_NRG_STR = 'validateEntryNrg'
 
 # Possible targets are keyed from token to provide some security and brevity.
-cmdDict = { VALIDATE_ENTRY_NRG_STR: os.path.join(cingDirNRG, 'validateEntryForNrgByVC.py'),
+cmdDict = {
+#           VALIDATE_ENTRY_NRG_STR: os.path.join(cingDirNRG, 'validateEntryForNrgByVC.py'),
+           VALIDATE_ENTRY_NRG_STR: os.path.join(cingDirScripts, 'validateEntry.py'),
             'testCing': os.path.join(cingDirVC, 'test', 'cingByVCtest.py'),
             }
 
@@ -423,6 +425,7 @@ if __name__ == "__main__":
             if vc.cleanMaster():
                 NTerror("Failed to cleanMaster")
         elif destination == 'startMaster':
+            # Tokens already created by nrgCing.py
             if vc.startMaster(argListOther[0]):
                 NTerror("Failed to startMaster")
         else:

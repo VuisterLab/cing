@@ -1,6 +1,5 @@
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.core.molecule import Molecule
-from random import random
 from unittest import TestCase
 import unittest
 

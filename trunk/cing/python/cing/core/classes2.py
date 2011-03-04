@@ -127,3 +127,15 @@ class RestraintList(NTlist):
         return None
     #end def
 
+    def format(self, showAll = False):
+        if not showAll:
+            return
+        rTxtList = []
+        for r in self:
+            rTxtList.append( r.format() )
+        msg = '\n'
+        msg += '\n'.join(rTxtList)
+        return msg
+    # end def
+# end class
+

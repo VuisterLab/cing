@@ -6,7 +6,6 @@ from cing import header
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.PluginCode.required.reqProcheck import * #@UnusedWildImport
 from cing.main import getStartMessage
-from random import random
 
 try:
     import yasaramodule as yasara #@UnresolvedImport

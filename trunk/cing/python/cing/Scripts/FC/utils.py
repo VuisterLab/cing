@@ -115,14 +115,14 @@ def swapCheck(nmrConstraintStore,structureEnsemble,numSwapCheckRuns=1):
 #    swapCheck = StereoAssignmentSwapCheck(nmrConstraintStore,structureEnsemble,verbose = True)
     swapCheck = StereoAssignmentCleanup(nmrConstraintStore,structureEnsemble,verbose = True)
 
-#    violationCodes = {'xl': {'violation': 1.0, 'fraction': 0.00001},
-#                      'l': {'violation': 0.5, 'fraction': 0.5}}
-    # Use more restrictive cutoffs than the above defaults.
-    violationCodes = {'xl': {'violation': 1.0, 'fraction': 0.00001},
-                       'l': {'violation': 0.5, 'fraction': 0.5}}
+#    violationCodes = {'xl':                                             {'violation': 1.0,  'fraction': 0.00001},
+#                       'l':                                             {'violation': 0.5,  'fraction': 0.5},
+#                       StereoAssignmentCleanup.VIOLATION_CODE_S_STR:    {'violation': 0.001,'fraction': -999.9} # required for reporting smaller violations.
+#                       }
 
     for _swapCheckRun in range(0,numSwapCheckRuns):
-      swapCheck.checkSwapsAndClean(violationCodes = violationCodes)
+#      swapCheck.checkSwapsAndClean(violationCodes = violationCodes)
+      swapCheck.checkSwapsAndClean()
 
     NTmessage("\n")
 # end def

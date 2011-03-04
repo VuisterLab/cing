@@ -37,7 +37,7 @@ vmName = 'VC'
 #vmName = 'test'
 
 doSend = True
-doLink = False
+doLink = True
 
 
 #=======================================================================================
@@ -89,7 +89,8 @@ if doLink:
         if sshing( ssh_cmd ):
             NTerror("Failed to run ssh with options: " + ssh_cmd)
             sys.exit(1)
-
+else:
+    NTmessage("No linking done yet, do manually.")
 
 
 

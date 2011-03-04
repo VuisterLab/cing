@@ -3632,7 +3632,7 @@ def cns_calcstructure(pdbbase,
   # TAKE DEFAULTS FOR PARAMETER AND XPLOR
   if not parameter: parameter = os.path.join(nmvconf["Q_PATH"],nmvconf["Q_PAR"])
   if not cns: cns = nmvconf["CNS"]
-  if not seed: seed = random.randint(10000,99999)
+  if not seed: seed = randint(10000,99999)
   # INITIALIZE THE CNS SCRIPT CLASS
   scriptpath = nmvconf["TMP"]
   cns = cns_script(cns,scriptpath)
@@ -4707,7 +4707,7 @@ def cns_calcstructurecv(pdbbase,
   # TAKE DEFAULTS FOR PARAMETER AND XPLOR
   if not parameter: parameter = os.path.join(nmvconf["Q_PATH"],nmvconf["Q_PAR"])
   if not cns: cns = nmvconf["CNS"]
-  if not seed: seed = random.randint(10000,99999)
+  if not seed: seed = randint(10000,99999)
   # INITIALIZE THE CNS SCRIPT CLASS
   scriptpath = nmvconf["TMP"]
   cns = cns_script(cns,scriptpath,logfiles='keep')
@@ -6872,7 +6872,7 @@ def xplor_refstruct(inpdb,outpdb,psf,restraintlist,
     else:
       if os.path.exists(outpdb):
         os.rename(outpdb,outpdb+".%i-%i"%(attempt,maxtry))
-      seed = random.randint(100000,999999)
+      seed = randint(100000,999999)
       attempt += 1
 
 # A SHORT EM IN XPLOR
@@ -7075,7 +7075,7 @@ def xplor_emstruct(inpdb,outpdb,psf,restraintlist,
     if not xplr.atomchkerr:
       retry = 0
     else:
-      seed = random.randint(100000,999999)
+      seed = randint(100000,999999)
       attempt += 1
 
 
@@ -7101,7 +7101,7 @@ def xplornih_anneal2(pdbbase,
   if not parprot: parprot = nmvconf["PAR_PROT"]
   if not xplor: xplor = nmvconf["XPLOR"]
   # SET INITIAL SEED
-  if not seed: seed = random.randint(10000,99999)
+  if not seed: seed = randint(10000,99999)
   # THE PROGRESS INDICATOR
   #prog = progress_indicator(naccepted)
   #prog.increment(n_acc)
@@ -7517,7 +7517,7 @@ def xplornih_anneal2(pdbbase,
         accepted = 1
         annealed.append(finalpdb)
       # OTHER SEED FOR NEXT STRUCTURE
-      seed = random.randint(10000,99999)
+      seed = randint(10000,99999)
   # SEND FROM OTHER NODES
   if myid!=0:
     pypar.send(annealed,0)
@@ -7555,7 +7555,7 @@ def xplornih_anneal(pdbbase,
   if not parprot: parprot = nmvconf["PAR_PROT"]
   if not xplor: xplor = nmvconf["XPLOR"]
   # SET INITIAL SEED
-  if not seed: seed = random.randint(10000,99999)
+  if not seed: seed = randint(10000,99999)
   # THE PROGRESS INDICATOR
   #prog = progress_indicator(naccepted)
   n_acc = 0
@@ -8509,7 +8509,7 @@ def xplornih_anneal(pdbbase,
         accepted = 1
         annealed.append(finalpdb)
       # OTHER SEED FOR NEXT STRUCTURE
-      seed = random.randint(10000,99999)
+      seed = randint(10000,99999)
   # SEND FROM OTHER NODES
   if myid!=0:
     pypar.send(annealed,0)
@@ -8779,7 +8779,7 @@ def xplor_qfactor(pdbfile,psf,restraintlist,
   if not axispdb:   axispdb = nmvconf["PDB_AXIS"]
   if not axispsf:   axispsf = nmvconf["PSF_AXIS"]
   import random
-  seed = random.randint(100000,999999)
+  seed = randint(100000,999999)
   # INITIALIZE XPLOR SCRIPT
   xplr = xplor_script(xplor,scriptpath=nmvconf["TMP"],
                       logfiles='silent')
@@ -11943,7 +11943,7 @@ def qn_generatedataset(queen,xplr,restraintlist,info,maxerr=5.,nsets=1):
   while len(datasets) < nsets:
     dataset = {}
     # SHUFFLE RESTRAINT LIST
-    random.shuffle(restraintlist)
+    shuffle(restraintlist)
     tlist = []
     prog = progress_indicator(100)
     prog.increment(0)
@@ -12571,7 +12571,7 @@ def qn_infave(queen,xplr,dataset,convcutoff=0.01):
   while not done and cycles<=cyclescutoff:
     skipped = 0
     # SHUFFE LIST
-    random.shuffle(rlist)
+    shuffle(rlist)
     # CREATE CYCLED LIST
     slice = int(round(len(rlist)/5.0))
     lists = []
@@ -12764,7 +12764,7 @@ def qn_infave_fast(queen,xplr,dataset,ncycles=5):
       print "Starting cycles: %i to %i of %i"%(cycles+1,cycles+queen.numproc,ncycles)
     sys.stdout.flush()
     # SHUFFE LIST
-    random.shuffle(rlist)
+    shuffle(rlist)
     # CREATE FIVE CYCLED LISTS
     slice = int(round(len(rlist)/5.0))
     lists = []
@@ -13098,7 +13098,7 @@ def qn_infsort(queen,xplr,dataset):
     # SET AND SHUFFLE THE RANGE LIST
     if queen.myid==0:
       # SET THE TESTRANGE
-      random.shuffle(rlist)
+      shuffle(rlist)
       # DISTRIBUTE THE LIST OVER THE NODES
       for m in range(1,queen.numproc):
         pypar.send(rlist,m)
@@ -13180,7 +13180,7 @@ def qn_nrdataset(queen,xplr,dataset):
     outputtbl = os.path.join(queen.outputpath,'nr_%s.tbl.redundant'%filedict["FILE"])
     if os.path.exists(outputtbl): os.remove(outputtbl)
   # SHUFFLE THE LIST
-  random.shuffle(restraintlist)
+  shuffle(restraintlist)
   # CALCULATE BACKGROUND
   rdict,redundict = {},{}
   unc_bg = queen.uncertainty(xplr,rdict)
@@ -16646,7 +16646,7 @@ def nmv_createmindataset(projectname,datasetlist):
     # SET AND SHUFFLE THE RANGE LIST
     if myid==0:
       # SET THE TESTRANGE
-      random.shuffle(rlist)
+      shuffle(rlist)
       # DISTRIBUTE THE LIST OVER THE NODES
       for m in range(1,numproc):
         pypar.send(rlist,m)
@@ -16820,7 +16820,7 @@ def nmv_noesvsinfo(projectname,datasetlist,ncycles=10):
   for i in range(mylower,myupper):
     print "Started cycle %i of %i on CPU %i."%(i-mylower+1,myupper-mylower,myid+1)
     # RANDOMIZE THE LIST
-    random.shuffle(rlist)
+    shuffle(rlist)
     # DO THEM ALL
     for j in range(1,len(rlist)+1):
       tlist = rlist[:j]
@@ -17059,7 +17059,7 @@ def nmv_rmsdvsrandomnoes(projectname,datasetlist):
       xplor_calcstruct(os.path.join(pdbprefix,pdbbase),xplr.template,xplr.psf,refdict,[],averaging='cent',naccepted=nstruct)
       print "Calculating average reference structure."
       xplor_calcave(os.path.join(pdbprefix,pdbbase),nstruct,xplr.psf)
-      random.shuffle(rlist)
+      shuffle(rlist)
       for i in range(1,queen.numproc):
         pypar.send(rlist,i)
     else:
@@ -17075,7 +17075,7 @@ def nmv_rmsdvsrandomnoes(projectname,datasetlist):
     # SET THE RANGE FROM MPI JOBS
     if myid==0:
       keys = setdict.keys()
-      random.shuffle(keys)
+      shuffle(keys)
       for i in range(1,numproc):
         pypar.send(keys,i)
     else:
@@ -17370,7 +17370,7 @@ def nmv_avinformation_old(projectname,datasetlist):
     if myid==0:
       # SET THE TESTRANGE
       trange = range(0,101,1)
-      random.shuffle(trange)
+      shuffle(trange)
       # DISTRIBUTE THE LIST OVER THE NODES
       for m in range(1,numproc):
         pypar.send(trange,m)
@@ -17384,8 +17384,8 @@ def nmv_avinformation_old(projectname,datasetlist):
       for k in range(1):
         # COPY THE TEMPLIST
         ttlist = copy.copy(tlist)
-        random.random()
-        random.shuffle(ttlist)
+        random()
+        shuffle(ttlist)
         # SET THE SECTION SLICER
         if j>0:
           section = int(round((j/100.0)*len(ttlist)))
@@ -17630,7 +17630,7 @@ def nmv_createpdbpics(outputpath):
     path = os.path.join(outputpath,structure.lower())
     if not os.path.exists('%s.jpg'%path):
       # RUN YASARA
-      color = random.randint(0,180)
+      color = randint(0,180)
       macro=ysr_macro(nmvconf["YASARA_RUN"],errorfunc=error)
       macro.write(["ErrorExit On",
                    "Screensize 800,800",
@@ -19736,7 +19736,7 @@ def nmv_constructrmsdsurface(projectpath,
   print "Deleted %i structures for poor RG ratio."%rgdel
   # SHUFFLE OR SORT THE LIST
   projectlist.sort()
-  random.shuffle(projectlist)
+  shuffle(projectlist)
   # DIVIDE INTO TEST AND WORKING SET
   print len(projectlist)
   cnt = int((1.0-tfrac)*len(projectlist))
@@ -21300,7 +21300,7 @@ def nmv_dressproject(projectname,dataset):
     while trial <= maxtrial and not allaccepted:
       # SET THE SEED
       if trial == 1: seed = 1234567
-      else: seed = random.randint(1,1000000)
+      else: seed = randint(1,1000000)
       # DO THE REFINEMENT
       pdblist_output = []
       for pdb in pdblist_input:
@@ -23374,7 +23374,7 @@ def nmv_analyzenonstructuralgenomics():
     file.close()
   # LIST OF REGULAR NMR PDB FILES
   reglist = regd["NMR"]
-  random.shuffle(reglist)
+  shuffle(reglist)
   print "Found %i NMR structures."%len(reglist)
   # ANALYZE CONSORTIA
   print "Validating structure ensembles."
@@ -25146,7 +25146,7 @@ def nmv_anasubsets(projectname='3gb1',dataset='noe'):
     for i in range(nsets):
       print "Set    %3i of %3i."%(i+1,nsets)
       # SHUFFLE THE LIST
-      random.shuffle(fullist)
+      shuffle(fullist)
       # TAKE A SUBSET
       cnt = int((subset/100)*numberr)
       tstlist = fullist[:cnt]

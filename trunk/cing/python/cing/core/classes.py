@@ -933,6 +933,34 @@ Project: Top level Cing project class
         """
         return self.distances + self.dihedrals + self.rdcs
 
+    def allRestraints(self, restraintLoL = None):
+        """Return an RestraintList instance with all restraints
+        parameter defaults to self.distances
+
+        Sets a _parent attribute to find original list back like in NTtree.
+
+        Return None for empty list.
+        Return True on error.
+        """
+        if restraintLoL == None:
+            restraintLoL = self.distances
+        if not restraintLoL:
+            return None
+        restraintList = restraintLoL[0]
+        randomKey = getRandomKey()
+        if restraintList.__CLASS__ == DRL_LEVEL:
+            result = DistanceRestraintList('allRestraints_with_random_key_'+randomKey)
+        elif restraintList.__CLASS__ == ACL_LEVEL:
+            result = DihedralRestraintList('allRestraints_with_random_key_'+randomKey)
+        elif restraintList.__CLASS__ == RDCL_LEVEL:
+            result = RDCRestraintList('allRestraints_with_random_key_'+randomKey)
+
+        for rL in restraintLoL:
+            for r in rL:
+                r._parent = rL
+                result.append(r)
+        return result
+
     def hasDistanceRestraints(self):
         for drList in self.distances:
             if len(drList):
@@ -1063,6 +1091,105 @@ Project: Top level Cing project class
     def generateHtml(self, htmlOnly = False):
         return generateHtml(self, htmlOnly = htmlOnly)
 
+    """
+    Remove the largest violating distance restraints that meet a certain cutoff.
+    Violation are not averaged over models for this purpose.
+    Writes the removed restraints to a file.
+
+    Return False on error.
+
+    restraintLoL   Defaults to p.distances
+    cutoff         Tolerance above which to delete.
+    maxRemov       Maximum number of violations to remove. Largest violations will be removed.
+    fileName       Enter file name (with path) for output of removed constraints.
+    """
+    def filterHighRestraintViol(self, restraintLoL = None, cutoff=2.0, maxRemove=3):
+#                                fileName = 'high_viol.str'):
+        NTmessage( "==> Doing filterHighDistanceViol with arguments: cutoff %s maxRemove %s" % ( cutoff, maxRemove))
+
+        if restraintLoL == None:
+            restraintLoL = self.distances
+
+        if not restraintLoL:
+            NTdebug("No restraint list in filterHighDistanceViol.")
+            return 1
+        # end if
+
+        restraintList = self.allRestraints() # defaults to DRs
+#        NTdebug("restraintList: %s" % restraintList)
+        todoCount = len(restraintList)
+        if not todoCount:
+            NTdebug("No restraints in filterHighDistanceViol.")
+            return 1
+        # end if
+
+        if not restraintList.analyze():
+            NTerror("Failed to do restraintList.analyze()");
+            return 0
+        # end if
+#        NTdebug("restraintList still: %s" % restraintList)
+        restraintList.sort(byItem='violMax') # in place by default
+        restraintList.reverse()
+#        NTdebug("restraintList 3: %s" % restraintList)
+        maxViol = restraintList[0].violMax
+#        NTdebug("Highest violation is %.3f. (should be same as %.3f from list.)" % (maxViol, restraintList.violMax))
+        toRemoveCount = min(maxRemove, todoCount)
+#        restraintListToRemove = restraintList[:toRemoveCount] # slicing changes the data type from DistanceRestraintList to NTlist
+        del restraintList[toRemoveCount:]
+#        NTdebug("restraintListToRemove still: %s" % restraintList)
+
+#        NTdebug("Checking %s restraints to remove." % toRemoveCount)
+
+        toRemoveCount = 0
+        for idx, r in enumerate( restraintList ):
+#            NTdebug("Checking %s %s" % ( idx, r))
+            if r.violMax >= cutoff:
+#                NTdebug("toRemoveCount %s" % toRemoveCount)
+                toRemoveCount = idx + 1 # First restraint to be maintained.
+            else:
+                break
+        # end for
+
+        if toRemoveCount == len(restraintList):
+#            NTdebug("All restraints are high violating")
+            pass
+        else:
+#            NTdebug("Restraints high violating found: %s" % toRemoveCount)
+#            restraintListToRemove = restraintListToRemove[:toRemoveCount] # slice fails
+            del restraintList[toRemoveCount:]
+        if not toRemoveCount:
+            if maxViol >= cutoff:
+                NTerror('code bug in filterHighDistanceViol')
+                return 0
+            NTmessage("==> Nice, no restraints with violations above: %.3f (highest is: %.3f)" % (cutoff, maxViol))
+            return 1
+
+        if not restraintList.analyze():
+            NTerror("Failed to do restraintList.analyze()");
+            return 0
+        # end if
+        if cing.verbosity == cing.verbosityDebug:
+            NTdebug( "Removing %s restraints: " + restraintList.format(showAll=True))
+        else:
+            NTmessage( "==> Removing %s top violating restraints: " % len(restraintList) )
+
+
+        affectedRestraintLoL = NTlist()
+        for r in restraintList:
+            rL = r._parent
+            rL.removeIfPresent(r)
+            if affectedRestraintLoL.index(rL) < 0:
+                affectedRestraintLoL.append(rL)
+        for rL in affectedRestraintLoL:
+            if not rL.analyze():
+                NTerror("Failed to do restraintList.analyze()");
+                return 0
+            # end if
+            NTdebug("Left with: %s" % rL)
+#        NTmessage("Finished filterHighDistanceViol")
+        return True # success
+    # end def
+# end class
 
 
 class XMLProjectHandler(XMLhandler):
@@ -3056,7 +3183,7 @@ class DistanceRestraintList(RestraintList):
         #end for
     #end def
 
-    def format(self, allowHtml = False):
+    def format(self, allowHtml = False, showAll = False):
         msg = sprintf(
 '''
 classes
@@ -3101,6 +3228,7 @@ ROG score:         %7s
         header = '%s DistanceRestraintList "%s" (%s,%d) %s\n' % (
             dots, self.name, self.status, len(self), dots)
         msg = header + msg
+        msg += RestraintList.format(self, showAll = True)
         return msg
     #end def
 

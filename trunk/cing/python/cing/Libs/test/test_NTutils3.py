@@ -7,7 +7,6 @@ from cing.core.constants import * #@UnusedWildImport
 from cing.core.molecule import Atom
 from cing.core.molecule import Ensemble
 from cing.core.molecule import Molecule
-from random import random
 from unittest import TestCase
 import unittest
 

@@ -1,5 +1,4 @@
 from cing.Libs.NTutils import * #@UnusedWildImport
-import random
 
 todo = """
 
@@ -572,7 +571,7 @@ end if
 
     #------------------------------------------------------------------------
     def seed( self ):
-        return random.randint(10000,1000000)
+        return randint(10000,1000000)
 
 # END class Xplor -----------------------------------------------------------
 
