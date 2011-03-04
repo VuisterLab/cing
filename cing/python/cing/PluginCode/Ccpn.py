@@ -1491,6 +1491,53 @@ class Ccpn:
     # end def importFromCcpnRdcRestraint
 
 
+    def ccpnDistanceRestraintToString(self, ccpnConstraint):
+        """
+        """
+        lowerLimit = None
+        upperLimit = None
+        if hasattr(ccpnConstraint, 'lowerLimit'):
+            lowerLimit = ccpnConstraint.lowerLimit
+            upperLimit = ccpnConstraint.upperLimit
+        result = 'Constraint [%d]: [%s] - [%s]' % (
+            ccpnConstraint.serial,
+            val2Str(lowerLimit, '%.1f'),
+            val2Str(upperLimit, '%.1f')) # Deals with None.
+
+        for constItem in ccpnConstraint.sortedItems():
+            atomList = []
+            # Sometimes there may also be an ordered<Class> method.
+            resonanceList = None
+            if hasattr(constItem, 'orderedResonances'): # dihedrals don't have this.
+                resonanceList = constItem.orderedResonances
+            # Otherwise, use the usual sorted<Class> method.
+            if not resonanceList:
+                resonanceList = constItem.sortedResonances()
+            # Here, resonanceList should always have 2 resonances.
+
+            resonanceListLength = len(resonanceList)
+            assert(resonanceListLength == 2) # During a regular run (not with -O option given to python interpreter) this might cause a exception being thrown.
+            if resonanceListLength != 2:
+                NTcodeerror("expected a pair but found number: %d for ccpnConstraint %s" % (resonanceListLength, ccpnConstraint))
+                return None
+            for resonance in resonanceList:
+                resAtomList = []
+                resonanceSet = resonance.resonanceSet
+                if resonanceSet:
+                    for atomSet in resonanceSet.sortedAtomSets():
+                        # atom set is a group of atoms that are in fast exchange and therefore are not assigned to individually (e.g. methyl group).
+                        for atom in atomSet.sortedAtoms():
+                            resAtomList.append('%d.%s' % (
+                                atom.residue.seqCode, atom.name))
+                else:
+                    NTwarning("No resonanceSet (means unassigned) for ccpnConstraint %s" % ccpnConstraint)
+                resAtomList.sort()
+                resAtomString = ','.join(resAtomList)
+                atomList.append(resAtomString)
+            result += '  [%s] - [%s]' % (atomList[0], atomList[1])
+        # end for
+        return result
+    # end def
 
     def _getConstraintAtomPairList(self, ccpnConstraint):
         """Descrn: Get the atoms that may be assigned to the constrained resonances.
@@ -1528,48 +1575,10 @@ Note that this doesn't happen with other pseudos. Perhaps CCPN does not have the
         # for speed reasons put this debug info in block.
 #        if cing.verbosity >= cing.verbosityDebug:
 #        # Example code from Wim is a nice demonstration.
-        if False:
-            lowerLimit = None
-            upperLimit = None
-            if hasattr(ccpnConstraint, 'lowerLimit'):
-                lowerLimit = ccpnConstraint.lowerLimit
-                upperLimit = ccpnConstraint.upperLimit
-            NTdebug('Constraint [%d]: [%s] - [%s]' % (
-                ccpnConstraint.serial,
-                val2Str(lowerLimit, '%.1f'),
-                val2Str(upperLimit, '%.1f'))) # Deals with None.
+        if 0:
             for constItem in ccpnConstraint.sortedItems():
-                atomList = []
-                # Sometimes there may also be an ordered<Class> method.
-                resonanceList = None
-                if hasattr(constItem, 'orderedResonances'): # dihedrals don't have this.
-                    resonanceList = constItem.orderedResonances
-                # Otherwise, use the usual sorted<Class> method.
-                if not resonanceList:
-                    resonanceList = constItem.sortedResonances()
-                # Here, resonanceList should always have 2 resonances.
-
-                resonanceListLength = len(resonanceList)
-                assert(resonanceListLength == 2) # During a regular run (not with -O option given to python interpreter) this might cause a exception being thrown.
-                if resonanceListLength != 2:
-                    NTcodeerror("expected a pair but found number: %d for ccpnConstraint %s" % (resonanceListLength, ccpnConstraint))
-                    return None
-                for resonance in resonanceList:
-                    resAtomList = []
-                    resonanceSet = resonance.resonanceSet
-                    if resonanceSet:
-                        for atomSet in resonanceSet.sortedAtomSets():
-                            # atom set is a group of atoms that are in fast exchange and therefore are not assigned to individually (e.g. methyl group).
-                            for atom in atomSet.sortedAtoms():
-                                resAtomList.append('%d.%s' % (
-                                    atom.residue.seqCode, atom.name))
-                    else:
-                        NTwarning("No resonanceSet (means unassigned) for ccpnConstraint %s" % ccpnConstraint)
-                    resAtomList.sort()
-                    resAtomString = ','.join(resAtomList)
-                    atomList.append(resAtomString)
-                NTdebug('  [%s] - [%s]' % (atomList[0], atomList[1]))
-            NTdebug('')
+                NTdebug( 'ccpn restraint: %s' % self.ccpnDistanceRestraintToString(ccpnConstraint))
+#            NTdebug('')
 
         # Now the real code.
         atomPairList = []

@@ -24,9 +24,10 @@ from cing.core.classes import Project
 from cing.core.parameters import directories
 from queen import nmvconf
 from queen.q_utils import nmv_checkpython
+from random import shuffle
 import nmv
 import queen.pdb_file as pdb_file # watch out yasara has one too.
-import string,socket,shutil,copy,types,random
+import string,socket,shutil,copy,types
 
 cing.verbosity = cing.verbosityDebug
 
@@ -1838,7 +1839,7 @@ def qn_infave(queen,xplr,dataset,convcutoff=0.01):
   while not done and cycles<=cyclescutoff:
     skipped = 0
     # SHUFFE LIST
-    random.shuffle(rlist)
+    shuffle(rlist)
     # CREATE CYCLED LIST
     slice = int(round(len(rlist)/5.0))
     lists = []
@@ -2031,7 +2032,7 @@ def qn_infave_fast(queen,xplr,dataset,ncycles=25):
       print "Starting cycles: %i to %i of %i"%(cycles+1,cycles+queen.numproc,ncycles)
     sys.stdout.flush()
     # SHUFFE LIST
-    random.shuffle(rlist)
+    shuffle(rlist)
     # CREATE FIVE CYCLED LISTS
     slice = int(round(len(rlist)/5.0))
     lists = []
@@ -2343,7 +2344,7 @@ def qn_infsort(queen,xplr,dataset):
     # SET AND SHUFFLE THE RANGE LIST
     if queen.myid==0:
       # SET THE TESTRANGE
-      random.shuffle(rlist)
+      shuffle(rlist)
       # DISTRIBUTE THE LIST OVER THE NODES
       for m in range(1,queen.numproc):
         pypar.send(rlist,m)
@@ -2425,7 +2426,7 @@ def qn_nrdataset(queen,xplr,dataset):
     outputtbl = os.path.join(queen.outputpath,'nr_%s.tbl.redundant'%filedict["FILE"])
     if os.path.exists(outputtbl): os.remove(outputtbl)
   # SHUFFLE THE LIST
-  random.shuffle(restraintlist)
+  shuffle(restraintlist)
   # CALCULATE BACKGROUND
   rdict,redundict = {},{}
   unc_bg = queen.uncertainty(xplr,rdict)

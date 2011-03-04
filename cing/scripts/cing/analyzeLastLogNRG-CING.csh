@@ -112,3 +112,28 @@ python -u $CINGROOT/python/cing/NRG/nrgCing.py getEntryInfo > & log/getEntryInfo
 grep fraction log/getEntryInfo_2011-02-09.log | grep -v Failed | sed -e 's/\// /g' -e 's/[)]/ /g' | gawk 'BEGIN{print "pdb_id,f,STAR,CING"}{printf "\"%s\",%s,%s,%s\n", $1, $10, $14, $15}' | sort -nr > cs_conversion_results.csv
 scp -P 39676 localhost-nmr://Library/WebServer/Documents/devNRG-CING/cs_conversion_results.csv ~/workspace/nrgcing
 # process with Numbers
+
+
+# Process a few with wattos
+cd ~/workspace/nrgcing/docr
+set inputScript = $WATTOSROOT/macros/CheckAssignmentForComparisonFc.wcf
+set outputScript = t.wcf
+set x = 1brv
+foreach x ( 1a24 1a4d 1afp 1ai0 1b4y 1brv 1bus 1c2n 1cjg 1d3z 1hue 1ieh 1iv6 1jwe 1kr8 2cka 2fws 2hgh 2jmx 2k0e 2kib 2knr 2kz0 2rop )
+ set logfile = $x"_assign.log"
+ sed -e "s/XXXX/$x/g" $inputScript >  $outputScript
+ wattos < $outputScript >& $logfile
+end
+
+
+# Archive results for comparison
+cd ~/workspace/nrgcing
+tar -cvzf docrAssignWattos.tgz docr/*wattos.str docr/*.log
+# and
+cd /Library/WebServer/Documents/NRG-CING/prep/F
+tar -cvzf docrAssignFc.tgz */*/*.str */*/*.log
+
+
+
+
+

@@ -15,6 +15,9 @@ from gzip import GzipFile
 from numpy.core import fromnumeric
 from numpy.core.fromnumeric import amax
 from numpy.core.fromnumeric import amin
+from random import randint
+from random import random #@UnusedImport for outside this module
+from random import seed
 from string  import find
 from string import join
 from subprocess import PIPE
@@ -584,6 +587,25 @@ Sum                %s
         """
         NTlimit(self, min, max, byItem)
         return self
+    #end def
+
+# above fails on complex lists
+#    def limitByItem(self, byItem, min, max ):
+#        """
+#        For complex lists such as distance restraint list.
+#        """
+#        self.sort(byItem=byItem)
+#        restraintList.reverse()
+#        toRemoveCount = 0
+#        for idx, r in enumerate( restraintList ):
+#             if idx >= maxRemove:
+#                 break
+#             if r.violMax < cutoff:
+#                 break
+#             toRemoveCount
+#
+#        NTlimit(self, min, max, byItem)
+#        return self
     #end def
 
     #--------------------------------------------------------------
@@ -5328,3 +5350,12 @@ def truthToInt(i):
 def getCallerName():
     return inspect.stack()[1][3]
 
+def getRandomKey(size=6):
+    """Get a random alphanumeric string of a given size"""
+    ALPHANUMERIC = [chr(x) for x in range(48, 58) + range(65, 91) + range(97, 123)]
+    #random.shuffle(ALPHANUMERIC)
+
+    n = len(ALPHANUMERIC) - 1
+    seed(time.time()*time.time())
+
+    return ''.join([ALPHANUMERIC[randint(0, n)] for x in range(size)])

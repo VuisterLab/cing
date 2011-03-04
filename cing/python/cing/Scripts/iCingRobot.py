@@ -4,7 +4,6 @@
 
 from cing import cingDirTestsData
 from cing.Libs.NTutils import * #@UnusedWildImport
-from cing.Libs.network import getRandomKey
 import mimetools
 import urllib2
 

@@ -668,7 +668,7 @@ def partitionRestraints( project, tmp=None ):
 #end def
 
 
-def validateRestraints( project, toFile = True)   :
+def validateRestraints( project, toFile = True):
     """
     Calculate rmsd's and violation on restraints
     """
