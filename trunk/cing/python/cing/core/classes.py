@@ -164,6 +164,7 @@ Project: Top level Cing project class
 #                           dsspStatus = NTdict(completed = False, parsed = False),
                            whatifStatus = NTdict(completed = False, parsed = False),
                            wattosStatus = NTdict(completed = False, parsed = False),
+                           vascoStatus = NTdict(completed = False, parsed = False),
                            shiftxStatus = NTdict(completed = False, parsed = False),
                            x3dnaStatus  = NTdict(completed = False, parsed = False),
 
