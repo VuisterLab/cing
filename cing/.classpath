@@ -15,5 +15,6 @@
 	<classpathentry kind="lib" path="war/WEB-INF/lib/Wattos.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/GWT 1.5 extras"/>
 	<classpathentry kind="lib" path="/Users/jd/workspace35/wattos/lib/junit-3.8.1.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/commons-httpclient.jar"/>
 	<classpathentry kind="output" path="war/WEB-INF/classes"/>
 </classpath>

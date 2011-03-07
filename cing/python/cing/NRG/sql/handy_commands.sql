@@ -170,5 +170,13 @@ where E.entry_id = R.entry_id
 AND E.name = 'CGR26APiscataway'
 order by E.name, R.number;
 
-
+# Select for Vincent the protein entries with RDCs (about 350 today)
+COPY (
+SELECT e.pdb_id, e.rdc_count
+  FROM nrgcing.CINGENTRY E,  brief_summary s, nrgcing.cingsummary cingsummary
+  WHERE e.pdb_id = S.pdbid
+  AND e.pdb_id = cingsummary.pdb_id
+  AND '{2}' <@ S.chain_type
+  AND e.rdc_count > 0
+) TO '/tmp/rdc_entries.csv' WITH CSV HEADER;
 

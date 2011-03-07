@@ -1,6 +1,25 @@
 #!/usr/bin/env python
+from cing import cingDirTmp
+from cing import header
+from cing.Libs.NTutils import * #@UnusedWildImport
+from cing.Libs.disk import copy
+from cing.Libs.disk import rmdir
+from cing.NRG import * #@UnusedWildImport
+from cing.NRG.settings import * #@UnusedWildImport
+from cing.NRG.storeCING2db import doStoreCING2db
+from cing.PluginCode.required.reqVasco import VASCO_STR
+from cing.core.classes import Project
+from cing.core.constants import * #@UnusedWildImport
+from cing.core.parameters import plugins
+from cing.main import getStartMessage
+from cing.main import getStopMessage
+from shutil import rmtree
+import commands
+import shutil
+import urllib
 
-# One size fit all so the same code for iCing, VC and regular use.
+# One size fit all so the same code for VC and regular use.
+# NB iCing uses the simple doValidateiCing.py script.
 # Customized by arguments.
 
 # -1- Regular use:
@@ -33,22 +52,6 @@ For topos replace the first command by validateEntryNrg:
 validateEntryNrg 1brv http://nmr.cmbi.umcn.nl/NRG-CING/input jd@nmr.cmbi.umcn.nl:/Library/WebServer/Documents/NRG-CING . . BY_CH23_BY_ENTRY CCPN
 """
 
-from cing import cingDirTmp
-from cing import header
-from cing.Libs.NTutils import * #@UnusedWildImport
-from cing.Libs.disk import copy
-from cing.Libs.disk import rmdir
-from cing.NRG import * #@UnusedWildImport
-from cing.NRG.settings import * #@UnusedWildImport
-from cing.NRG.storeCING2db import doStoreCING2db
-from cing.core.classes import Project
-from cing.core.constants import * #@UnusedWildImport
-from cing.main import getStartMessage
-from cing.main import getStopMessage
-from shutil import rmtree
-import commands
-import shutil
-import urllib
 
 
 ARCHIVE_TYPE_FLAT = 'FLAT'
@@ -73,6 +76,7 @@ IDX_PROJECT_TYPE = 6
 IDX_STORE_DB = 7
 IDX_RANGES = 8
 IDX_FILTER_TOP = 9
+IDX_FILTER_VASCO = 10
 
 def main(entryId, *extraArgList):
     """inputDir may be a directory or a url. A url needs to start with http://.
@@ -109,7 +113,7 @@ def main(entryId, *extraArgList):
     expectedArgumentList = """
     verbosity         inputDir             outputDir
     pdbConvention     restraintsConvention archiveType         projectType
-    storeCING2db      ranges               filterTopViolations
+    storeCING2db      ranges               filterTopViolations filterVasco
     """.split()
     expectedNumberOfArguments = len(expectedArgumentList)
     if len(extraArgList) != expectedNumberOfArguments:
@@ -135,6 +139,9 @@ def main(entryId, *extraArgList):
     filterTopViolations = getDeepByKeysOrAttributes(extraArgList, IDX_FILTER_TOP)
     if filterTopViolations:
         filterTopViolations = int(filterTopViolations) # change '0' to 0
+    filterVasco = getDeepByKeysOrAttributes(extraArgList, IDX_FILTER_VASCO)
+    if filterVasco:
+        filterVasco = int(filterVasco)
 
     if archiveType == ARCHIVE_TYPE_FLAT:
         pass # default
@@ -160,6 +167,7 @@ def main(entryId, *extraArgList):
     NTdebug("storeCING2db:         %s" % storeCING2db)
     NTdebug("ranges:               %s" % ranges)
     NTdebug("filterTopViolations:  %s" % filterTopViolations)
+    NTdebug("filterVasco:          %s" % filterVasco)
     NTdebug("")
     NTdebug("Using derived settings:")
     NTdebug("modelCount:           %s" % modelCount)
@@ -267,13 +275,15 @@ def main(entryId, *extraArgList):
     if ranges != None:
         project.molecule.setRanges(ranges)
     project.molecule.superpose(ranges=ranges)
-    if filterTopViolations:
-        if not project.filterHighRestraintViol():
+    if filterTopViolations and not project.filterHighRestraintViol():
             NTerror("Failed to filterHighRestraintViol")
+####> MAIN UTILITY HERE
     if project.validate(htmlOnly=htmlOnly, ranges=ranges, doProcheck=doProcheck, doWhatif=doWhatif,
-            doWattos=doWattos, doQueeny = doQueeny, doTalos=doTalos):
+            doWattos=doWattos, doQueeny = doQueeny, doTalos=doTalos, filterVasco = filterVasco ):
         NTerror("Failed to validate project read")
         return True
+    # end if filterVasco
+
     project.save()
 
     if storeCING2db:

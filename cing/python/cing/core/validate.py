@@ -42,6 +42,7 @@ from cing.PluginCode.required.reqDssp import getDsspSecStructConsensus
 from cing.PluginCode.required.reqNih import NIH_STR
 from cing.PluginCode.required.reqProcheck import PROCHECK_STR
 from cing.PluginCode.required.reqShiftx import SHIFTX_STR
+from cing.PluginCode.required.reqVasco import VASCO_STR
 from cing.PluginCode.required.reqWattos import WATTOS_STR
 from cing.PluginCode.required.reqWattos import WATTOS_SUMMARY_STR
 from cing.PluginCode.required.reqWhatif import WHATIF_STR
@@ -93,7 +94,7 @@ def runCingChecks( project, toFile=True, ranges=None ):
 "Need this here so the code can be tested. I.e. returns a meaningful status if needed."
 def validate( project, ranges=None, parseOnly=False, htmlOnly=False,
         doShiftx = True,
-        doProcheck = True, doWhatif=True, doWattos=True, doTalos=True, doQueeny=True, doSuperpose = True,
+        doProcheck = True, doWhatif=True, doWattos=True, doTalos=True, doQueeny=True, doSuperpose = True, filterVasco = False,
         validateFastest = False, validateCingOnly = False, validateImageLess = False ):
     if ranges == None:
         ranges = project.molecule.ranges
@@ -104,6 +105,7 @@ def validate( project, ranges=None, parseOnly=False, htmlOnly=False,
         doWattos = False
         doTalos = False
         doQueeny = False
+        filterVasco = filterVasco
         if validateFastest:
             doShiftx = False
     if validateFastest or validateImageLess:
@@ -126,6 +128,16 @@ def validate( project, ranges=None, parseOnly=False, htmlOnly=False,
         project.runTalosPlus(parseOnly=parseOnly)
     if doSuperpose:
         project.superpose(ranges=ranges)
+
+    if filterVasco:
+        if not getDeepByKeysOrAttributes(plugins, VASCO_STR, IS_INSTALLED_STR):
+            NTdebug("Missing required plugin %s or not installed" % VASCO_STR)
+            return True
+        if not project.filterVasco():
+            NTerror("Failed to filterVasco but will continue with validation.")
+        # end if
+    # end if
+
     project.runCingChecks(toFile=True, ranges=ranges)
     project.setupHtml()
     project.generateHtml(htmlOnly = htmlOnly)
