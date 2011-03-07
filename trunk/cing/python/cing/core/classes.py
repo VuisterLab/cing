@@ -1067,10 +1067,10 @@ Project: Top level Cing project class
         return criticize(self, toFile = toFile)
 
     def validate(self, ranges = None, parseOnly = False, htmlOnly = False, doProcheck = True, doWhatif = True,
-                 doWattos = True, doQueeny = True, doTalos = True,
+                 doWattos = True, doQueeny = True, doTalos = True, filterVasco = False,
                  validateFastest = False, validateCingOnly = False, validateImageLess = False):
         return validate(self, ranges = ranges, parseOnly = parseOnly, htmlOnly = htmlOnly, doProcheck = doProcheck, doWhatif = doWhatif,
-                        doWattos = doWattos, doQueeny = doQueeny, doTalos = doTalos,
+                        doWattos = doWattos, doQueeny = doQueeny, doTalos = doTalos, filterVasco = filterVasco,
                         validateFastest = validateFastest, validateCingOnly = validateCingOnly, validateImageLess = validateImageLess)
 
     def runCingChecks(self, toFile=True, ranges = None):

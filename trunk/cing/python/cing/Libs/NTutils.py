@@ -5265,14 +5265,14 @@ def grep(fileName, txt, resultList = None, doQuiet=False, caseSensitive=True):
             NTcodeerror("Fix code in grep")
         lineMod = line
         if not caseSensitive:
-            lineMod = line.lower()
+            lineMod = lineMod.lower()
         if txt in lineMod:
 #            NTdebug("Matched line in grep: %s" % lineMod)
+            if resultList != None:
+                resultList.append(line)
             if doQuiet:
                 # important for not scanning whole file.
                 return 0
-            if resultList != None:
-                resultList.append(line)
             matchedLine = True
     if matchedLine:
         return 0

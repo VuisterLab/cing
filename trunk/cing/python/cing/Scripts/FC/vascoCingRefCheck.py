@@ -1,9 +1,13 @@
-#@PydevCodeAnalysisIgnore
+#!/usr/bin/env python
+# Run like (replace 1brv with any PDB entry)
+# $CINGROOT/python/cing/Scripts/FC/vascoCingRefCheck.py 1brv
+
+from cing.Libs.NTutils import * #@UnusedWildImport
 from memops.api import Implementation
 from memops.general.Io import loadProject
 from memops.universal.Util import returnInt, returnFloat
 from pdbe.software.vascoReferenceCheck import VascoReferenceCheck
-import glob, os
+import glob
 
 
 
