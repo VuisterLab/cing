@@ -7,10 +7,8 @@ from cing.Libs.disk import rmdir
 from cing.NRG import * #@UnusedWildImport
 from cing.NRG.settings import * #@UnusedWildImport
 from cing.NRG.storeCING2db import doStoreCING2db
-from cing.PluginCode.required.reqVasco import VASCO_STR
 from cing.core.classes import Project
 from cing.core.constants import * #@UnusedWildImport
-from cing.core.parameters import plugins
 from cing.main import getStartMessage
 from cing.main import getStopMessage
 from shutil import rmtree
