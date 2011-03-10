@@ -55,7 +55,7 @@ class Vasco(NTdict):
         #  pdbCode = '1brv'
         pdbCode = self.project.name
 
-        mol = self.project.mol
+        mol = self.project.molecule
 
         # Project checks
         if not self.project.molecule:

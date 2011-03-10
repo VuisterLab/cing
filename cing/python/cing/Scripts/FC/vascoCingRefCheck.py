@@ -1,15 +1,16 @@
 #!/usr/bin/env python
 # Run like (replace 1brv with any PDB entry)
+# Execute in a directory with both a CCPN and a CING project directory named 1brv and 1brv.cing respectively.
 # $CINGROOT/python/cing/Scripts/FC/vascoCingRefCheck.py 1brv
 
 from cing.Libs.NTutils import * #@UnusedWildImport
+from cing.core.classes import Project
+from cing.core.parameters import moleculeDirectories
 from memops.api import Implementation
 from memops.general.Io import loadProject
 from memops.universal.Util import returnInt, returnFloat
 from pdbe.software.vascoReferenceCheck import VascoReferenceCheck
 import glob
-
-
 
 
 """
@@ -22,18 +23,20 @@ vascoReferenceCheck.py, in pdbe.software (now part of SF CVS)
 
 class VascoCingReferenceCheck(VascoReferenceCheck):
 
-  cingDataDir = "."
-  dsspDataDirName = "dssp"
-  whatIfDataDirName = "Whatif"
-
   vascoRefDataPath = 'vascoRefData'
+  NTdebug("In CING using vascoRefDataPath %s" % vascoRefDataPath)
 
-  def setupDirectories(self,pdbCode):
+  def setupDirectories(self,cingProject,ccpnDir=None):
 
-    self.dsspDataDir = os.path.join(self.cingDataDir,pdbCode,self.dsspDataDirName)
-    self.whatIfDataDir = os.path.join(self.cingDataDir,pdbCode,self.whatIfDataDirName)
+    entryCode = cingProject.name
+    self.cingMoleculeDir = cingProject.moleculePath()
+    self.dsspDataDir = os.path.join(self.cingMoleculeDir,moleculeDirectories.dssp) # Use 'Dssp'
+    self.whatIfDataDir = os.path.join(self.cingMoleculeDir,moleculeDirectories.whatif)
 
-    self.ccpnDir = "%s/%s" % (pdbCode,pdbCode)
+    if ccpnDir:
+        self.ccpnDir = ccpnDir
+    else:
+        self.ccpnDir = '%s' % entryCode
 
   def writePdbFile(self):
 
@@ -206,8 +209,9 @@ class VascoCingReferenceCheck(VascoReferenceCheck):
     print self.shiftList.findAllApplicationData(application='VASCO')
 
 if __name__ == '__main__':
+  entryCode = sys.argv[1] # e.g. 1brv
+  cingProject = Project.open(entryCode, status='old')
 
-  pdbCode = '1brv'
 
   import Tkinter
 
@@ -219,7 +223,7 @@ if __name__ == '__main__':
 
   # Try the CING based check
   vascoReferenceCheck = VascoCingReferenceCheck(guiParent=root)
-  vascoReferenceCheck.setupDirectories(pdbCode)
+  vascoReferenceCheck.setupDirectories(cingProject,ccpnDir=None)
   vascoReferenceCheck.checkAllShiftLists()
 
   #vascoReferenceCheck.ccpnProject.saveModified()
