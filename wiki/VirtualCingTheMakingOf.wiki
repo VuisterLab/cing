@@ -9,10 +9,10 @@
  * Install Extras:
     {{{
 sudo apt-get install \
-    pymol python-matplotlib python-dev cython ipython imagemagick python-scipy \
+    pymol python-matplotlib python-dev cython ipython imagemagick python-scipy python-numpy \
     gawk subversion konsole tcsh csh povray povray-includes python-sqlalchemy \
     eclipse-plugin-cvs \
-    jedit \
+    jedit curl lynx \
     konsole \
     libx11-dev \
     libmotif-dev \
