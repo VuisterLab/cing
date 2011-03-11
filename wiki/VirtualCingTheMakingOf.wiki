@@ -3,7 +3,8 @@
  * From: http://releases.ubuntu.com/9.10/ubuntu-9.10-server-i386.iso This is the 32 bit edition of the Karmic Koala version of Ubuntu server.
  * Install Gnome GUI:
     * sudo apt-get update
-    * sudo apt-get install ubuntu-desktop
+    * sudo apt-get install ubuntu-desktop \
+            linux-generic-pae
     * restart: sudo halt
  * Install Extras:
     {{{
