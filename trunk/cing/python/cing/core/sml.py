@@ -1,29 +1,11 @@
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.Libs.fpconst import NaN as nan #@UnresolvedImport @UnusedImport ? need for restoring the project ?
-from cing.core.classes import Coplanar
-from cing.core.classes import DihedralRestraint
-from cing.core.classes import DihedralRestraintList
-from cing.core.classes import DistanceRestraint
-from cing.core.classes import DistanceRestraintList
-from cing.core.classes import Peak
-from cing.core.classes import PeakList
-from cing.core.classes import RDCRestraint
-from cing.core.classes import RDCRestraintList
+from cing.PluginCode.required.reqVasco import * #@UnusedWildImport
+from cing.core.classes import * #@UnusedWildImport
 from cing.core.constants import * #@UnusedWildImport
-from cing.core.database import AtomDef
-from cing.core.database import DihedralDef
-from cing.core.database import MolDef
-from cing.core.database import ResidueDef
-from cing.core.database import isNterminalAtom
-from cing.core.database import isCterminalAtom
-from cing.core.molecule import Atom
-from cing.core.molecule import Chain
-from cing.core.molecule import Coordinate #@UnusedImport
-from cing.core.molecule import Molecule
-from cing.core.molecule import Residue
-from cing.core.molecule import Resonance
-#from cing.Libs.fpconst import NaN as nan not used anymore.
-
+from cing.core.database import * #@UnusedWildImport
+from cing.core.molecule import * #@UnusedWildImport
+ 
 SMLstarthandlers = {}
 SMLendhandlers   = {}
 SMLversion       = 0.24
@@ -66,6 +48,11 @@ class SMLhandler:
     """
     Base class for decoding of the Simple-markup language storage.
 
+    JFD notes:
+        - Each file may contain only one element at the top. I.e. multiple objects must be nested into a single top one.
+        - Empty NTdict and NTlist are fine.
+        - See example unit test cases in test_sml.py
+        - The global SMLstarthandlers, SMLendhandlers get filled on the fly.
 Example file:
 
 <SML> 0.221
@@ -257,7 +244,7 @@ Example file:
     def readline( fp ):
         """
         Static method to read a line from fp, split it
-        return an list instance with line and splitted line
+        return an list instance with line and split line
         """
         line = fp.readline()
         if len(line) == 0: return None
@@ -265,7 +252,10 @@ Example file:
 #        result = NTlist(line, *line.split())
         #print '>', result, '<'
         # Much quicker then previous NTlist stuff!
-        if SMLhandler.debug: printf('%s l:%d> %s\n', SMLfileVersion, fp.NR, [line]+line.split())
+        if SMLhandler.debug: 
+#            s = sprintf('%s l:%d> %s\n', SMLfileVersion, fp.NR, [line]+line.split())
+            s = sprintf('%s l:%d> %s', SMLfileVersion, fp.NR, line)
+            NTmessage(s)
         return [line]+line.split()
     #end def
     readline = staticmethod( readline )
@@ -277,6 +267,7 @@ Example file:
 
         Returns newObj or None on error.
         """
+#        NTdebug("--> fromFile")        
         if not os.path.exists( fileName ):
             NTerror('Error SMLhandler.fromFile: file "%s" does not exist\n', fileName )
             return None
@@ -364,6 +355,7 @@ class SMLNTdictHandler( SMLhandler ):
     #end def
 
     def handle(self, line, fp, obj=None):
+#        NTdebug("Now in SMLNTdictHandler#handle at line: %s" % str(line))
         dictObj = NTdict()
         return self.dictHandler(dictObj, fp, obj)
     #end def
@@ -471,7 +463,8 @@ class SMLMoleculeHandler( SMLhandler ):
         fprintf( stream, "%s  %r\n", self.startTag, mol.nameTuple(SMLsaveFormat) )
 
 #       Can add attributes here; update endHandler if needed
-        for a in ['resonanceCount','resonanceSources','modelCount','ranges']:
+#        for a in ['resonanceCount','resonanceSources','modelCount','ranges']:
+        for a in ['modelCount','ranges']:
             if mol.has_key(a):
                 fprintf( stream, '%s = %r\n', a, mol[a] )
         #end for
@@ -480,6 +473,10 @@ class SMLMoleculeHandler( SMLhandler ):
 
         fprintf( stream, 'chains = ')
         mol.chains.toSML( stream )
+
+#       TODO: check because it might conflict with previous versions.
+        fprintf( stream, 'resonanceSources = ')
+        mol.resonanceSources.toSML( stream )
 
         fprintf( stream, "%s\n", self.endTag )
     #end def
@@ -1355,6 +1352,7 @@ def SML2obj( smlFile, externalObject=None ):
     """
     Generate obj from smlFile
     """
+#    NTdebug("--> SML2obj")
     obj = smlhandler.fromFile(smlFile, externalObject)
     return obj
 #end def
@@ -1391,19 +1389,3 @@ def decode( nameTuples, refObj ):
     #end for
     return result
 #end def
-
-# Just testing
-if __name__ == "__main__":
-
-    SMLhandler.debug = True
-
-    a = NTdict(aap=1,noot=2,mies=3)
-    b = NTdict(dd=a, kess=4)
-    print repr(a), repr(b)
-
-
-    obj2SML( b, 'bla2.sml')
-
-    c = SML2obj( 'bla2.sml')
-
-    print repr(a), repr(b), repr(c), repr(c.dd)

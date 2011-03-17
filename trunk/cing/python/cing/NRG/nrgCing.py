@@ -1640,8 +1640,8 @@ class nrgCing(Lister):
 
         if 0: # DEFAULT: False
             NTmessage("Going to use non-default entry_list_todo in prepare")
-            self.entry_list_todo = "1a24 1a4d 1afp 1ai0 1b4y 1brv 1bus 1c2n 1cjg 1d3z 1hue 1ieh 1iv6 1jwe 1kr8 2cka 2fws 2hgh 2jmx 2k0e 2kib 2knr 2kz0 2rop".split()
-#            self.entry_list_todo = "1ai0 1b4y".split()
+#            self.entry_list_todo = "1a24 1a4d 1afp 1ai0 1b4y 1brv 1bus 1c2n 1cjg 1d3z 1hue 1ieh 1iv6 1jwe 1kr8 2cka 2fws 2hgh 2jmx 2k0e 2kib 2knr 2kz0 2rop".split()
+            self.entry_list_todo = "1brv 2knr 1a24".split()
 #            self.entry_list_todo = readLinesFromFile('/Users/jd/NRG/lists/bmrbPdbEntryList.csv')
             self.entry_list_todo = NTlist( *self.entry_list_todo )
             self.entry_list_nmr = deepcopy(self.entry_list_todo)

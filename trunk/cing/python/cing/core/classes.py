@@ -26,8 +26,7 @@ from cing.Libs.pdb import initPDB
 from cing.PluginCode.required.reqNih import TALOSPLUS_LIST_STR
 from cing.PluginCode.required.reqWhatif import summaryCheckIdList
 from cing.core.CingSummary import CingSummary
-from cing.core.ROGscore import ROGscore
-from cing.core.classes2 import RestraintList
+from cing.core.classes2 import * #@UnusedWildImport
 from cing.core.constants import * #@UnusedWildImport
 from cing.core.molecule import Atom
 from cing.core.molecule import Ensemble
@@ -1310,7 +1309,7 @@ class ProjectList(NTlist):
     #end def
 
     def names(self, *patterns):
-        "Return a list of names of self, optionally screen using "
+        "Return a list of names of self, optionally screen using pattern"
         names = NTlist()
         for l in self:
             if len(patterns) == 0:
@@ -1325,6 +1324,20 @@ class ProjectList(NTlist):
             #end if
         #end for
         return names
+        
+    def getListByName(self, name):
+        "Return list by name or False"
+        names = self.names()
+        idx = names.index(name)
+        if idx < 0:
+            return
+        return self[idx]
+
+    def getListIdx(self, l):
+        "Return list by name or False"
+        name = l.name
+        names = self.names()
+        return names.index(name)
 
     def rename(self, oldName, newName):
         """

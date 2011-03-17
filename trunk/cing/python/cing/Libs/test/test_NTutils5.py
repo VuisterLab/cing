@@ -7,6 +7,7 @@ from cing import cingDirTmp
 from cing import cingRoot
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.Libs.disk import globLast
+from cing.core.database import NTdb
 from numpy import * #@UnusedWildImport
 from unittest import TestCase
 import unittest
@@ -165,6 +166,18 @@ class AllChecks(TestCase):
         self.assertTrue(dateTimeObject)
         self.assertTrue(dateTimeObject.year >= 2009)
 #        self.assertEquals(extension, '.txt')
+
+    """
+       E.g. if adl is the AtomDef NTlist
+    """
+    def testSelectByItems(self):
+        byItems = ( 'type', 'C_VIN' )
+        vadl = NTdb.allAtomDefs().selectByItems( *byItems )
+#       vadl = adl.
+        NTdebug("%s in db: %s" % (byItems[1], str(vadl)))
+        self.assertTrue( len(vadl) >= 11 ) # allow growth but not shrinkage.
+#        for ad in vadl:
+#            NTdebug(str(ad))
 
 if __name__ == "__main__":
     cing.verbosity = cing.verbosityDebug

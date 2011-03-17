@@ -1369,7 +1369,7 @@ def runTalosPlus(project, tmp=None, parseOnly=False):
         NTmessage('RunTalosPlus: no amino acid defined')
         return False
 
-    if project.molecule.resonanceCount == 0:
+    if len( project.molecule.resonanceSources ) == 0:
         NTmessage("==> RunTalosPlus: No resonances defined so no sense in running.")
         # JFD: This doesn't catch all cases.
         return False

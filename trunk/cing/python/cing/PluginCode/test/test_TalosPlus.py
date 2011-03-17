@@ -121,7 +121,7 @@ class AllChecks(TestCase):
 #            self.assertTrue(project.save())
             self.assertFalse(project.validate(htmlOnly=True, doProcheck=False, doWhatif=False, doWattos=False))
             for r, res in enumerate(project.molecule.allResidues()):
-                NTdebug("Working on %s" % res)
+#                NTdebug("Working on %s" % res)
                 for c, valueToCheck in enumerate(keyList):
                     if c == 2: # TODO: reenable this check when debugged.
                         continue

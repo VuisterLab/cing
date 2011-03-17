@@ -52,7 +52,7 @@ CS interest
 
 Our own lab (See VuisterLab.numbers file):
 1e91
-1gm1
+1gm1      PDZ2 domain like 1vj6 and 1ozi. This one is without ligand.
 1h95
 1hks
 1hkt,4046
@@ -62,7 +62,7 @@ Our own lab (See VuisterLab.numbers file):
 1p9j,5801
 1pd7,5808
 1qjt,4491
-1vj6,5131
+1vj6,6060 Match done by hand based on ligand. PDB and Vasco still link to 5131. Using title: 6060 "PDZ2 from PTP-BL (complex with APC)"
 1y7n,6113
 2fws,7009
 2fwu,7008 Entry called H2_2Ca internally with project H2_2Ca_64_100.cing from GWV

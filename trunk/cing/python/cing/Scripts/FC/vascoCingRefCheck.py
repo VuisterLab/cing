@@ -3,13 +3,16 @@
 # Execute in a directory with both a CCPN and a CING project directory named 1brv and 1brv.cing respectively.
 # $CINGROOT/python/cing/Scripts/FC/vascoCingRefCheck.py 1brv
 
+from cing import cingDirScripts
 from cing.Libs.NTutils import * #@UnusedWildImport
+from cing.PluginCode.required.reqVasco import * #@UnusedWildImport
 from cing.core.classes import Project
+from cing.core.classes2 import ResonanceList
 from cing.core.parameters import moleculeDirectories
 from memops.api import Implementation
 from memops.general.Io import loadProject
 from memops.universal.Util import returnInt, returnFloat
-from pdbe.software.vascoReferenceCheck import VascoReferenceCheck
+from pdbe.software.vascoReferenceCheck import VascoReferenceCheck #@UnresolvedImport
 import glob
 
 
@@ -22,210 +25,226 @@ vascoReferenceCheck.py, in pdbe.software (now part of SF CVS)
 """
 
 class VascoCingReferenceCheck(VascoReferenceCheck):
+    
+    vascoRefDataPath = os.path.join(cingDirScripts, 'FC', 'vascoRefData')
+    if not os.path.exists(vascoRefDataPath):
+            NTerror("In CING using vascoRefDataPath %s but is absent" % vascoRefDataPath)            
 
-  vascoRefDataPath = 'vascoRefData'
-  NTdebug("In CING using vascoRefDataPath %s" % vascoRefDataPath)
+    def setupDirectories(self, cingProject, ccpnDir=None):
+        self.cingProject = cingProject
+        entryCode = self.cingProject.name
+        self.cingMoleculeDir = cingProject.moleculePath()
+        self.dsspDataDir = os.path.join(self.cingMoleculeDir, moleculeDirectories.dssp) # Use 'Dssp'
+        self.whatIfDataDir = os.path.join(self.cingMoleculeDir, moleculeDirectories.whatif)
 
-  def setupDirectories(self,cingProject,ccpnDir=None):
+        if ccpnDir:
+                self.ccpnDir = ccpnDir
+        else:
+                self.ccpnDir = '%s' % entryCode
 
-    entryCode = cingProject.name
-    self.cingMoleculeDir = cingProject.moleculePath()
-    self.dsspDataDir = os.path.join(self.cingMoleculeDir,moleculeDirectories.dssp) # Use 'Dssp'
-    self.whatIfDataDir = os.path.join(self.cingMoleculeDir,moleculeDirectories.whatif)
+    def writePdbFile(self):
 
-    if ccpnDir:
-        self.ccpnDir = ccpnDir
-    else:
-        self.ccpnDir = '%s' % entryCode
+        pass
 
-  def writePdbFile(self):
+    def createSsInfo(self):
 
-    pass
+        print "Fetching DSSP secondary structure info..."
 
-  def createSsInfo(self):
+        fileNames = glob.glob(os.path.join(self.dsspDataDir, "model_*.dssp"))
 
-    print "Fetching DSSP secondary structure info..."
+        self.allSsInfo = {}
+        for fileName in fileNames:
+            self.readDsspInfoFile(fileName)
 
-    fileNames = glob.glob(os.path.join(self.dsspDataDir,"model_*.dssp"))
+        #
+        # Now determine the most common SS element for each
+        #
 
-    self.allSsInfo = {}
-    for fileName in fileNames:
-      self.readDsspInfoFile(fileName)
+        self.ssInfo = {}
 
-    #
-    # Now determine the most common SS element for each
-    #
+        for chainCode in self.allSsInfo.keys():
+            self.ssInfo[chainCode] = {}
+            for residueKey in self.allSsInfo[chainCode].keys():
 
-    self.ssInfo = {}
+                ssCodeDict = {}
 
-    for chainCode in self.allSsInfo.keys():
-      self.ssInfo[chainCode] = {}
-      for residueKey in self.allSsInfo[chainCode].keys():
+                for ssCode in self.allSsInfo[chainCode][residueKey]:
+                    if not ssCodeDict.has_key(ssCode):
+                        ssCodeDict[ssCode] = 0
+                    ssCodeDict[ssCode] += 1
 
-        ssCodeDict = {}
+                ssCodeMax = 0
+                ssCode = None
+                for ssCodeTemp in ssCodeDict.keys():
+                    if ssCodeDict[ssCodeTemp] > ssCodeMax:
+                        ssCodeMax = ssCodeDict[ssCodeTemp]
+                        ssCode = ssCodeTemp
 
-        for ssCode in self.allSsInfo[chainCode][residueKey]:
-          if not ssCodeDict.has_key(ssCode):
-            ssCodeDict[ssCode] = 0
-          ssCodeDict[ssCode] += 1
+                # Convert...
+                if ssCode in (' ',):
+                    ssCode = 'C'
 
-        ssCodeMax = 0
-        ssCode = None
-        for ssCodeTemp in ssCodeDict.keys():
-          if ssCodeDict[ssCodeTemp] > ssCodeMax:
-            ssCodeMax = ssCodeDict[ssCodeTemp]
-            ssCode = ssCodeTemp
+                self.ssInfo[chainCode][residueKey] = ssCode
 
-        # Convert...
-        if ssCode in (' ',):
-          ssCode = 'C'
+    def readDsspInfoFile(self, fileName):
 
-        self.ssInfo[chainCode][residueKey] = ssCode
+        fin = open(fileName)
+        lines = fin.readlines()
+        fin.close()
 
-  def readDsspInfoFile(self,fileName):
+        dataLine = False
+        for line in lines:
+            cols = line.split()
 
-    fin = open(fileName)
-    lines = fin.readlines()
-    fin.close()
+            if cols[0] == '#' and cols[1] == 'RESIDUE':
+                dataLine = True
 
-    dataLine = False
-    for line in lines:
-      cols = line.split()
+            elif dataLine:
+                # Note; No insertion code?
+                seqCode = returnInt(line[5:10])
+                chainCode = line[11:12]
+                secStruc = line[16:17]
 
-      if cols[0] == '#' and cols[1] == 'RESIDUE':
-        dataLine = True
+                if not self.allSsInfo.has_key(chainCode):
+                    self.allSsInfo[chainCode] = {}
 
-      elif dataLine:
-        # Note; No insertion code?
-        seqCode=returnInt(line[5:10])
-        chainCode=line[11:12]
-        secStruc=line[16:17]
+                seqKey = (seqCode, ' ')
 
-        if not self.allSsInfo.has_key(chainCode):
-          self.allSsInfo[chainCode]={}
+                if not self.allSsInfo[chainCode].has_key(seqKey):
+                    self.allSsInfo[chainCode][seqKey] = []
 
-        seqKey = (seqCode,' ')
+                self.allSsInfo[chainCode][seqKey].append(secStruc)
 
-        if not self.allSsInfo[chainCode].has_key(seqKey):
-          self.allSsInfo[chainCode][seqKey] = []
+    def createAsaInfo(self):
 
-        self.allSsInfo[chainCode][seqKey].append(secStruc)
+        print "Fetching WHATIF per-atom surface accessibility info..."
 
-  def createAsaInfo(self):
+        fileNames = glob.glob(os.path.join(self.whatIfDataDir, "wsvacc*.log"))
 
-    print "Fetching WHATIF per-atom surface accessibility info..."
+        self.allWhatIfInfo = {'chains': {}}
+        for fileName in fileNames:
+            self.readWhatIfAsaInfoFile(fileName)
 
-    fileNames = glob.glob(os.path.join(self.whatIfDataDir,"wsvacc*.log"))
+        #
+        # Now determine the median ASA for each
+        #
 
-    self.allWhatIfInfo = {'chains': {}}
-    for fileName in fileNames:
-      self.readWhatIfAsaInfoFile(fileName)
+        self.whatIfInfo = self.allWhatIfInfo
+        medianIndex = None
 
-    #
-    # Now determine the median ASA for each
-    #
+        for chainCode in self.whatIfInfo['chains'].keys():
+            for seqKey in self.whatIfInfo['chains'][chainCode].keys():
+                for atomName in self.whatIfInfo['chains'][chainCode][seqKey]['atoms'].keys():
+                    asaList = self.whatIfInfo['chains'][chainCode][seqKey]['atoms'][atomName]
+                    asaList.sort()
 
-    self.whatIfInfo = self.allWhatIfInfo
-    medianIndex = None
+                    if not medianIndex:
+                        medianIndex = int((len(asaList) / 2.0) + 0.5)
 
-    for chainCode in self.whatIfInfo['chains'].keys():
-      for seqKey in self.whatIfInfo['chains'][chainCode].keys():
-        for atomName in self.whatIfInfo['chains'][chainCode][seqKey]['atoms'].keys():
-          asaList = self.whatIfInfo['chains'][chainCode][seqKey]['atoms'][atomName]
-          asaList.sort()
+                    self.whatIfInfo['chains'][chainCode][seqKey]['atoms'][atomName] = [asaList[medianIndex]]
 
-          if not medianIndex:
-            medianIndex = int((len(asaList) / 2.0) + 0.5)
+    def readWhatIfAsaInfoFile(self, fileName):
 
-          self.whatIfInfo['chains'][chainCode][seqKey]['atoms'][atomName] = [asaList[medianIndex]]
+        fin = open(fileName)
+        lines = fin.readlines()
+        fin.close()
 
-  def readWhatIfAsaInfoFile(self,fileName):
+        dataLine = False #@UnusedVariable
+        for line in lines:
 
-    fin = open(fileName)
-    lines = fin.readlines()
-    fin.close()
+            line = line.strip()
 
-    dataLine = False #@UnusedVariable
-    for line in lines:
+            if line[0] == '*' or not line:
+                continue
 
-      line = line.strip()
+            fields = line.split(';')
 
-      if line[0] == '*' or not line:
-        continue
+            chainCode = fields[4]
 
-      fields = line.split(';')
+            insertionCode = fields[3]
+            if not insertionCode:
+                insertionCode = ' '
+            seqKey = (returnInt(fields[2]), insertionCode)
 
-      chainCode = fields[4]
+            atomName = fields[6]
+            # TODO: any problems with | at beginning and end?
+            accessibility = returnFloat(fields[7][1:-1])
 
-      insertionCode = fields[3]
-      if not insertionCode:
-        insertionCode = ' '
-      seqKey = (returnInt(fields[2]),insertionCode)
+            if not self.allWhatIfInfo['chains'].has_key(chainCode):
+                self.allWhatIfInfo['chains'][chainCode] = {}
 
-      atomName = fields[6]
-      # TODO: any problems with | at beginning and end?
-      accessibility = returnFloat(fields[7][1:-1])
+            if not self.allWhatIfInfo['chains'][chainCode].has_key(seqKey):
+                resLabel = fields[1]
+                self.allWhatIfInfo['chains'][chainCode][seqKey] = {'hasBadAtoms': False, 'resLabel': resLabel, 'atoms': {}}
 
-      if not self.allWhatIfInfo['chains'].has_key(chainCode):
-        self.allWhatIfInfo['chains'][chainCode]={}
+            if not self.allWhatIfInfo['chains'][chainCode][seqKey]['atoms'].has_key(atomName):
+                self.allWhatIfInfo['chains'][chainCode][seqKey]['atoms'][atomName] = []
 
-      if not self.allWhatIfInfo['chains'][chainCode].has_key(seqKey):
-        resLabel = fields[1]
-        self.allWhatIfInfo['chains'][chainCode][seqKey] = {'hasBadAtoms': False, 'resLabel': resLabel, 'atoms': {}}
+            self.allWhatIfInfo['chains'][chainCode][seqKey]['atoms'][atomName].append(accessibility)
 
-      if not self.allWhatIfInfo['chains'][chainCode][seqKey]['atoms'].has_key(atomName):
-        self.allWhatIfInfo['chains'][chainCode][seqKey]['atoms'][atomName] = []
+    def findResidue(self, chain, seqKey):
 
-      self.allWhatIfInfo['chains'][chainCode][seqKey]['atoms'][atomName].append(accessibility)
+        return chain.findFirstResidue(seqCode=seqKey[0], seqInsertCode=seqKey[1])
 
-  def findResidue(self,chain,seqKey):
+    def checkAllShiftLists(self):
 
-    return chain.findFirstResidue(seqCode=seqKey[0],seqInsertCode=seqKey[1])
+        ccpnProject = loadProject(self.ccpnDir)
 
-  def checkAllShiftLists(self):
+        for shiftList in ccpnProject.currentNmrProject.findAllMeasurementLists(className='ShiftList'):
 
-    ccpnProject = loadProject(self.ccpnDir)
+            self.checkProject(ccpnProject=ccpnProject, shiftListSerial=shiftList.serial)
+            self.tagProject()
+            self.tagCingProject()
+            self.correctCingProject()
 
-    for shiftList in ccpnProject.currentNmrProject.findAllMeasurementLists(className='ShiftList'):
+    """
+    Return True on error
+    """
+    def tagProject(self):
+        for (atomType, atomKey) in vascoAtomInfo:
+            (rerefValue, rerefError) = self.rerefInfo[atomKey]
+            if rerefValue != None:
+                appData1 = Implementation.AppDataFloat(value=rerefValue, application='VASCO', keyword='correction_%s' % atomType)
+                appData2 = Implementation.AppDataFloat(value=rerefError, application='VASCO', keyword='correctionError_%s' % atomType)
+                self.shiftList.addApplicationData(appData1)
+                self.shiftList.addApplicationData(appData2)
+        NTdebug("%s" % self.shiftList.findAllApplicationData(application='VASCO'))
 
-      self.checkProject(ccpnProject=ccpnProject,shiftListSerial=shiftList.serial)
-      self.tagProject()
-
-  def tagProject(self):
-
-    atomInfo = (('H',('H',None)),
-                ('N',('N',None)),
-                ('C_aliphatic',('C',3)))
-
-    for (atomType,atomKey) in atomInfo:
-      (rerefValue,rerefError) = self.rerefInfo[atomKey]
-      if rerefValue != None:
-        appData1 = Implementation.AppDataFloat(value=-rerefValue,application='VASCO',keyword='correction_%s' % atomType)
-        appData2 = Implementation.AppDataFloat(value=rerefError,application='VASCO',keyword='correctionError_%s' % atomType)
-
-        self.shiftList.addApplicationData(appData1)
-        self.shiftList.addApplicationData(appData2)
-
-    print self.shiftList.findAllApplicationData(application='VASCO')
+    def tagCingProject(self):
+        NTmessage("Tagging CING project with Vasco results.")
+        mol = self.cingProject.molecule
+        resonanceListName = getDeepByKeysOrAttributes( self.shiftList, NAME_STR ) # may be absent according to api.
+        if resonanceListName == None:
+            NTerror("Failed to get resonanceListName from CCPN which will not allow CING to match later on for e.g. Vasco. Continuing.")
+            return
+#        resonanceList = self.project.resonances.getListByName(resonanceListName)
+        resonanceList = self.project.molecule.resonanceSources.getListByName(resonanceListName)
+        if not isinstance(resonanceList, ResonanceList):
+            NTerror("Failed to get resonanceList by name: %s" % resonanceListName)
+            return
+        mol.setVascoChemicalShiftCorrections(self.rerefInfo, resonanceList ) 
+        mol.applyVascoChemicalShiftCorrections( resonanceList )              
+    # end def
+# end class
 
 if __name__ == '__main__':
-  entryCode = sys.argv[1] # e.g. 1brv
-  cingProject = Project.open(entryCode, status='old')
+    entryCode = sys.argv[1] # e.g. 1brv
+    cingProject = Project.open(entryCode, status='old')
 
-
-  import Tkinter
-
-  root = Tkinter.Tk()
-
-  # Try traditional for comparison
-  #vascoReferenceCheck = VascoReferenceCheck(guiParent=root)
-  #vascoReferenceCheck.checkProject(ccpnDir=ccpnDir)
-
-  # Try the CING based check
-  vascoReferenceCheck = VascoCingReferenceCheck(guiParent=root)
-  vascoReferenceCheck.setupDirectories(cingProject,ccpnDir=None)
-  vascoReferenceCheck.checkAllShiftLists()
-
-  #vascoReferenceCheck.ccpnProject.saveModified()
-
-
+    if 0: # DEFAULT 0 for not using original implementation
+          # Fails because of dependency on:
+#              File "/Users/jd/workspace35/ccpn/python/pdbe/software/vascoReferenceCheck.py", line 178, in createSsInfo
+#                from pdbe.analysis.external.stride.Util import StrideInfo #@UnresolvedImport
+#            ImportError: No module named external.stride.Util          
+        import Tkinter
+        root = Tkinter.Tk()        
+        ccpnDir = entryCode
+        vascoReferenceCheck = VascoReferenceCheck(guiParent=root)
+        vascoReferenceCheck.checkProject(ccpnDir=ccpnDir)
+    else:
+        # Try the CING based check
+        vascoReferenceCheck = VascoCingReferenceCheck(guiParent=None)
+        vascoReferenceCheck.setupDirectories(cingProject, ccpnDir=None)
+        vascoReferenceCheck.checkAllShiftLists()
+    #vascoReferenceCheck.ccpnProject.saveModified()
+# end if

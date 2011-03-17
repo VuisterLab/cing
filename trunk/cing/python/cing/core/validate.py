@@ -1229,8 +1229,8 @@ def moleculeValidateAssignments( molecule  ):
 
     @todo: Also correlate assignment with peak values (if present)
     """
-
-    funcName = moleculeValidateAssignments.func_name #@UnusedVariable
+#    NTdebug("Starting moleculeValidateAssignments")
+#    funcName = moleculeValidateAssignments.func_name #@UnusedVariable
     result   = NTlist()
 #    if molecule.resonanceCount == 0:
 #        NTdebug("Molecule.validateAssignments: No resonance assignments read so no real validation on it can be done. Let's try anyway.")
@@ -1250,18 +1250,28 @@ def moleculeValidateAssignments( molecule  ):
         return None
 
     keyList = assignmentCountMap.keys()
+    at = 0
+#    nt = 0
+    tt = 0
     for key in keyList:
         a = assignmentCountMap[key]
         n = notAssignmentCountMap[key]
         t = a + n
+        at += a
+        tt += t
         if not t:
             continue
         f = (1. * a) / t
         hasAssignment[key] = f > FRACTION_REQUIRED
 #        NTdebug("key, a, n, t, f, hasAssignment: %s" % str([key, a, n, t, f, hasAssignment]))
         msg += '   %s %s/%s/%.2f' % ( key, a, t, f)
+    # end for
+    ft = 0.
+    if tt:
+        ft = (1. * at) / tt    
+    msg += '   %s %s/%s/%.2f' % ( 'combined', at, tt, ft)
     NTmessage("==> Found assigned/overall/fraction for spins: " + msg)
-    NTmessage("==> Only spins with fraction >= %.2f will be flagged when missing: %s" % ( FRACTION_REQUIRED, str(hasAssignment)))
+#    NTdebug("==> Only spins with fraction >= %.2f will be flagged when missing: %s" % ( FRACTION_REQUIRED, str(hasAssignment)))
 
     for atm in molecule.allAtoms():
         atm.rogScore.reset()
