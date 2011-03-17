@@ -144,7 +144,9 @@ class Xeasy( NTdict ):
 
         # first set NONE shift for all atoms
         _root,file,ext = NTpath(self.protFile)
-        molecule.newResonances(file+ext)
+        rl = molecule.newResonances()
+        rl.name = file+ext
+#        TODO: finish recoding
 
         # now update the values
         for p in self.prot.itervalues():
@@ -459,7 +461,7 @@ def importXeasy( project, seqFile, protFile, convention ):
             NTmessage( '==> importXeasy: appended resonances from "%s"', protFile )
         #end if
 #            NTmessage( '%s', project.molecule.format() )
-        return project.molecule.resonanceCount-1
+        return len(project.molecule.resonanceSources)-1
 #end def
 
 def importXeasyPeaks( project, seqFile, protFile, peakFile, convention ):

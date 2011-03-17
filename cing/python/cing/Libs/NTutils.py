@@ -109,11 +109,20 @@ class NTlist(list, Lister):
         #end for
         self.av = None
         self.sd = None
+        self.name = None # Assumed by SMLhandler.list2SML in case of e.g. 
+        # DistanceRestraintList
+        self.status = None # same
         self.n = 0
 
     #end def
     def clear(self):
         self.__init__()
+
+    def copy(self):
+        """Generate a copy with 'shallow' references"""
+        result = NTlist()
+        result.addList(self)
+        return result
 
     def __call__(self, index=-1):
         if index < 0:
@@ -318,6 +327,27 @@ Sum                %s
         """
         return NTzap(self, *byItems)
     #end def
+    
+    def selectByItems(self, *byItems):
+        """use zap to yield a new sublist from self where items were found.
+        E.g.        vadl = NTdb.allAtomDefs().selectByItems( 'type', 'C_VIN' )
+        gives a list of all vinyl typed atom definitions in CING.
+        """
+        if len(byItems) < 2:
+            NTwarning("Use NTlist.selectByItems only for multiple levels. Otherwise use withProperties??")
+            return
+        result = NTlist()
+        byItemsTrunc = byItems[:-1]            
+        fullList = zip( self, self.zap(*byItemsTrunc))
+        finalItemValue = byItems[-1]
+        for item, value in fullList:
+            if value != finalItemValue:
+                continue
+            result.append(item) 
+        return result
+    #end def
+    
+    
 
     def removeDuplicates(self, useVersion = 2):
         """
@@ -587,25 +617,6 @@ Sum                %s
         """
         NTlimit(self, min, max, byItem)
         return self
-    #end def
-
-# above fails on complex lists
-#    def limitByItem(self, byItem, min, max ):
-#        """
-#        For complex lists such as distance restraint list.
-#        """
-#        self.sort(byItem=byItem)
-#        restraintList.reverse()
-#        toRemoveCount = 0
-#        for idx, r in enumerate( restraintList ):
-#             if idx >= maxRemove:
-#                 break
-#             if r.violMax < cutoff:
-#                 break
-#             toRemoveCount
-#
-#        NTlimit(self, min, max, byItem)
-#        return self
     #end def
 
     #--------------------------------------------------------------
@@ -2126,6 +2137,11 @@ class NTtree(NTdict):
         if parent == None:
             return None
         return parent.getParent(level=level-1)
+
+    def setParent(self, parent):
+        parent = self._parent
+        if parent == None:
+            return None
 
     def addChild(self, name, **kwds):
         child = NTtree(name=name, **kwds)

@@ -98,6 +98,8 @@ end
 echo $logFileList
 #grep Traceback $logFileList # fails because too large array.
 echo $logFileList | xargs grep Traceback
+# or as a one liner:
+ls */*/log_nrgCing/*_2011-03-15_13-36-18.log | xargs grep -i error
 
 # move the log files
 set list = ( `find . -depth 2 -name "[0-9]*" | cut -c6- | sort` )

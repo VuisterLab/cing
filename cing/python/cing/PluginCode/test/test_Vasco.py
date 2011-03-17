@@ -33,7 +33,7 @@ class AllChecks(TestCase):
         fastestTest = 1        # Not passed to the validate routine in order to customize checks for speed.
 
         modelCount=99
-        redoFromCingProject = False
+        redoFromCingProject = 1
         htmlOnly = True # default is False but enable it for faster runs without some actual data.
         doWhatif = True # disables whatif actual run
         doProcheck = True
@@ -42,25 +42,23 @@ class AllChecks(TestCase):
         doTalos = True
         filterVasco = True
         useNrgArchive = False
-        ranges = CV_STR
+        ranges = 'cv'
 #        ranges='173-177'
 #        ranges='6-13,29-45' # 1bus
 
         doSwapCheck = False
-        doRestoreCheck = False
-        doStoreCheck = False # DEFAULT: False Requires sqlAlchemy
-        doSave = not redoFromCingProject  # DEFAULT: False Requires sqlAlchemy
-        
+        doRestoreCheck = 1
+        doStoreCheck = 1 # DEFAULT: False Requires sqlAlchemy
         if fastestTest:
             modelCount=1 # DEFAULT 2
-#            redoFromCingProject = False
+            redoFromCingProject = 1
             htmlOnly = True
-            doWhatif = False
+            doWhatif = 1
             doProcheck = False
             doWattos = False
             doQueeny = False
             doTalos = False
-            filterVasco = False
+            filterVasco = 1
             doRestoreCheck = False
             doStoreCheck = False
         if redoFromCingProject:
@@ -70,7 +68,7 @@ class AllChecks(TestCase):
             doWattos = False
             doTalos = False
 
-        self.failIf(os.chdir(cingDirTmp), msg =
+        self.failIf(os.chdir('/Users/jd/workspace/nrgcing/Vasco'), msg =
             "Failed to change to directory for temporary test files: " + cingDirTmp)
         for i,entryId in enumerate(AllChecks.entryList):
 
@@ -88,7 +86,7 @@ class AllChecks(TestCase):
     #                inputArchiveDir = os.path.join('/Volumes/tera1/Library/WebServer/Documents/NRG-CING/recoordSync', entryId)
                     inputArchiveDir = os.path.join('/Volumes/tera1//Users/jd/ccpn_tmp/data/recoord', entryId)
                 else:
-                    inputArchiveDir = os.path.join(cingDirTestsData, "ccpn")
+                    inputArchiveDir = os.path.join(".")
 
                 ccpnFile = os.path.join(inputArchiveDir, entryId + ".tgz")
                 if not os.path.exists(ccpnFile):
@@ -126,8 +124,7 @@ class AllChecks(TestCase):
                     ccpnFile = entryId # set to local dir now.
                 # end if doSwapCheck
                 self.assertTrue(project.initCcpn(ccpnFolder = ccpnFile, modelCount=modelCount))
-                if doSave:
-                    self.assertTrue(project.save())
+                self.assertTrue(project.save())
 
             if False:
                 ranges = "173-183"
@@ -183,8 +180,6 @@ class AllChecks(TestCase):
                 from cing.PluginCode.sqlAlchemy import csqlAlchemy #@UnusedImport
                 if doStoreCING2db( entryId, ARCHIVE_NRG_ID, project=project):
                     NTerror("Failed to store CING project's data to DB but continuing.")
-            if doSave:
-                self.assertTrue(project.save())                    
         # end for
     # end def test
 

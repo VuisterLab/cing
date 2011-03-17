@@ -37,7 +37,6 @@ class RestraintList(NTlist):
         return self.__str__()
     #end def
     def rename(self, newName):
-        NTdebug("Renaming %s to %s" % ( self, newName))
         return self.projectList.rename(self.name, newName)
     #end def
     def renameToXplorCompatible(self):
@@ -139,3 +138,98 @@ class RestraintList(NTlist):
     # end def
 # end class
 
+class ResonanceList(NTlist):
+    """
+    Contains Resonance objects.
+    """
+    SML_SAVE_ATTRIBUTE_LIST = 'name status vascoApplied vascoResults'.split() # Used in cing.core.sml.SMLNTListWithAttrHandler
+    
+    # use the same spelling through out.
+    def __init__(self, name, status = 'keep'):
+        NTlist.__init__(self)
+        self.__CLASS__ = 'ResonanceList'
+        self.name = name        # Name of the list
+        self.status = status    # Status of the list; 'keep' indicates storage required
+        self.currentId = 0      # Id for each element of list
+        self._idDict = {}       # dictionary to look up id in case the list is sorted differently
+        self._byItem = None     # if not None: list was sorted _byItem.
+        self.vascoResults  = NTdict() # See applyVascoChemicalShiftCorrections
+        self.vascoApplied  = False
+#        self.rogScore = ROGscore()
+        self.SMLhandler.SML_SAVE_ATTRIBUTE_LIST = self.SML_SAVE_ATTRIBUTE_LIST
+    #end def
+    def __str__(self):
+#        return sprintf('<%s "%s" (%s,%d)>' % (self.__CLASS__, self.name, self.status, len(self)))
+        s = sprintf('<%s "%s">' % (self.__CLASS__, self.name))
+        return s
+    #end def
+    def __repr__(self):
+        return self.__str__()
+    #end def
+    def rename(self, newName):
+        self.name = newName
+#        return self.projectList.rename(self.name, newName)
+        return self
+    #end def
+    def append(self, item):
+#        if not hasattr(self, 'currentId'): # for deepcopy
+#            self.currentId = 0
+        item.id = self.currentId
+        item.parent = self # being able to go from restraint to restraint list is important.
+        NTlist.append(self, item)
+        self._idDict[item.id] = item
+        self.currentId += 1
+    #end def
+    def save(self, path = None):
+        """
+        Create a SML file
+        Return self or None on error
+
+        Sort the list on id before saving, to preserve (original) order from save to restore.
+        """
+        # sort the list on id number
+        NTsort( self, byItem='id', inplace=True)
+
+        if not path: path = self.objectPath
+        if self.SMLhandler.toFile(self, path) != self:
+            NTerror('%s.save: failed creating "%s"' % (self.__CLASS__, self. path))
+            return None
+        #end if
+
+        # restore original sorting
+        if self._byItem:
+            NTsort( self, byItem=self._byItem, inplace=True)
+
+        NTdetail('==> Saved %s to "%s"', self, path)
+        return self
+    #end def
+
+    def sort(self, byItem='id' ):
+        "Sort the list byItem; store the byItem "
+        NTsort( self, byItem, inplace=True)
+        self._byItem = byItem
+        return self
+    #end def
+
+    def getId(self, id):
+        """Return restraint instance with id
+        Returns None on error
+        """
+        if not self._idDict.has_key(id):
+            NTerror('ResonanceList.getId: invalid id (%d)', id)
+            return None
+        #end if
+        return self._idDict[id]
+    #end def
+
+    def format(self, showAll = False):
+        if not showAll:
+            return
+        rTxtList = []
+        for r in self:
+            rTxtList.append( r.format() )
+        msg = '\n'
+        msg += '\n'.join(rTxtList)
+        return msg
+    # end def
+# end class

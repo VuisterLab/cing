@@ -110,7 +110,6 @@ class Vasco(NTdict):
             NTmessage("Skipping Vasco because there is no chemical shift assignment.")
             return
 
-
         root = Tkinter.Tk() # Possible to do without gui?
 
 
@@ -125,13 +124,17 @@ class Vasco(NTdict):
 
         #vascoReferenceCheck.ccpnProject.saveModified()
     # end def
+    
+    def correctShiftList(self, shiftList, rerefInfo):
+        pass
+    
 # end class
 
 
 """
 Adjust the chemical shifts if needed and some certainty warrants the modification.
 Return True on error and
-False on succes
+False on success
 """
 def runVasco(project, ccpnFolder = None):
     try:
@@ -144,6 +147,7 @@ def runVasco(project, ccpnFolder = None):
         NTtracebackError()
         return True
     return project
+#end def
 
 def restoreVasco( project, tmp=None ):
     """

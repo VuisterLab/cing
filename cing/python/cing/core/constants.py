@@ -113,6 +113,9 @@ ACL_STR      = 'ACL'
 RDC_LEVEL = 'RDCRestraint'
 RDCL_LEVEL = 'RDCRestraintList'
 RDCL_STR      = 'RDCL'
+RESONANCE_LEVEL = 'Resonance'
+RESONANCEL_LEVEL = 'ResonanceList'
+RESONANCEL_STR      = 'RESONANCEL'
 COPLANAR_LEVEL = 'Coplanar'
 COPLANARL_LEVEL = 'CoplanarList'
 DIHEDRAL_BY_PROJECT_LEVEL = 'DihedralByProject'
@@ -123,7 +126,9 @@ SUMMARY_STR = 'summary'
 
 DATA_STR = 'data' # mostly for NRG.
 DB_STR = 'db'
+TYPE_STR = 'type' # db atom type
 SPINTYPE_STR = 'spinType'
+C_ALI_STR = 'C_ALI' # aliphatic db atom type
 
 DR_STR = 'distanceRestraints' # used as in residue.distanceRestraints
 AC_STR = 'dihedralRestraints' # used as in residue.dihedralRestraints
@@ -132,6 +137,8 @@ VIOL3_STR = 'violCount3'
 VIOL5_STR = 'violCount5'
 
 RESONANCES_STR = 'resonances'
+RESONANCE_LIST_IDX_ANY = -999 # will match assignment in any resonance list. 
+MERGED_STR = 'merged'
 
 # SQL stuff
 NAME_STR        = 'name'

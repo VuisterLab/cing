@@ -6,6 +6,7 @@ from cing.core.classes import DistanceRestraint
 from cing.core.classes import Peak
 from cing.core.classes import Project
 from cing.core.classes import RDCRestraint
+from cing.core.classes2 import ResonanceList
 from cing.core.constants import * #@UnusedWildImport
 from cing.core.database import NTdb
 from cing.core.molecule import Molecule
@@ -793,9 +794,17 @@ class Ccpn:
         if not len(shiftMapping):
             NTmessage("Skipping empty CS list.")
             return True
-        if not self.molecule.hasResonances():
-            self.molecule.newResonances() # do only once per import now. TODO: enable multiple resonances per atom per CCPN project.
-
+#        if not self.molecule.hasResonances():
+#            self.molecule.newResonances() # do only once per import now. TODO: enable multiple resonances per atom per CCPN project.
+        
+        resonanceListName = getDeepByKeysOrAttributes( ccpnShiftList, NAME_STR ) # may be absent according to api.
+        if resonanceListName == None:
+            NTerror("Failed to get resonanceListName from CCPN which will not allow CING to match later on for e.g. Vasco. Continuing.")
+        resonanceList = self.molecule.newResonances()
+        if not isinstance( resonanceList, ResonanceList ):
+            NTerror("Failed to create a new resonance list to the project.")
+            return True
+        resonanceList.rename(resonanceListName)
         knownTroubleResidues = {} # To avoid repeating the same messages over
         atomsTouched = {} # Use a hash to prevent double counting.
 
@@ -868,16 +877,17 @@ class Ccpn:
                 lastAtomResonance.ccpn = ccpnShift
                 ccpnShift.cing = lastAtomResonance
                 atomsTouched[a] = None
+                resonanceList.append( lastAtomResonance )
             except:
                 msg = "_getCcpnShiftList: %s, shift CCPN atom %s skipped"
                 NTwarning(msg, ccpnResidue.cing, ccpnAtom.name)
             # end try
         # end for.over shifts.
 
-        NTmessage("==> CCPN ShiftList '%s' imported from CCPN Nmr project '%s'",
-                         ccpnShiftList.name, ccpnShiftList.parent.name)
-        NTmessage("==> Count of (pseudo-)atom with resonances updated %s" % len(atomsTouched.keys()))
-        NTmessage("==> Count of resonanceSetDone %s (<= above count)" % len(resonanceSetDoneMap.keys()))
+#        NTdebug("==> CCPN ShiftList '%s' imported from CCPN Nmr project '%s' with %s items", ccpnShiftList.name, ccpnShiftList.parent.name, len(resonanceList))
+#        NTmessage("==> Count of (pseudo-)atom with resonances updated %s" % len(atomsTouched.keys()))
+#        NTdebug(  "==> Count of resonances in list added %s (should be the same)" % len(resonanceList))
+#        NTmessage("==> Count of resonanceSetDone %s (<= above count)" % len(resonanceSetDoneMap.keys()))
 
         return True
 
@@ -1103,7 +1113,7 @@ class Ccpn:
            http://www.ccpn.ac.uk/ccpn/data-model/python-api-v2-examples/assignment
         """
 
-        NTdebug("Now in _getShiftAtomNameMapping for ccpnShiftList (%r)" % ccpnShiftList)
+#        NTdebug("Now in _getShiftAtomNameMapping for ccpnShiftList (%r)" % ccpnShiftList)
         ccpnResonanceList = []
         ccpnResonanceToShiftMap = {}
         ccpnShiftMappingResult = {}
@@ -1146,42 +1156,42 @@ class Ccpn:
         return ccpnShiftMappingResult
 
 
-    def _setShift(self, shiftMapping, ccpnShiftList):
-        '''Descrn: Core function that sets resonances to atoms.
-           Inputs: Cing.Molecule instance (obj), ccp.molecule.MolSystem.MolSystem.
-           Output: Cing.Project or None on error.
-        '''
-        # TO DO: shiftMapping should pass cing objects
-        self.molecule.newResonances()
-
-        ccpnShifts = shiftMapping.keys()
-
-        for ccpnShift in ccpnShifts:
-            shiftValue = ccpnShift.value
-            shiftError = ccpnShift.error
-            ccpnResidue, ccpnAtoms = shiftMapping[ccpnShift]
-
-            for ccpnAtom in ccpnAtoms:
-                try:
-                    atom = ccpnAtom.cing
-                    atom.resonances().value = shiftValue
-                    atom.resonances().error = shiftError
-                    index = len(atom.resonances) - 1
-                    atom.setStereoAssigned() # untested for JFD has no test data.
-                    # Make mutual linkages between Ccpn and Cing objects
-                    # cingResonace.ccpn=ccpnShift, ccpnShift.cing=cinResonance
-                    atom.resonances[index].ccpn = ccpnShift
-                    ccpnShift.cing = atom.resonances[index]
-                except:
-                    NTwarning("_setShift: %s, shift CCPN atom %s skipped", ccpnResidue.cing, ccpnAtom.name)
-                # end try
-            # end for
-        # end for
-
-        NTdetail("==> CCPN ShiftList '%s' imported from Ccpn Nmr project '%s'",
-                       ccpnShiftList.name, ccpnShiftList.parent.name)
-        return True
-    # end def _setShift
+#    def _setShift(self, shiftMapping, ccpnShiftList):
+#        '''Descrn: Core function that sets resonances to atoms.
+#           Inputs: Cing.Molecule instance (obj), ccp.molecule.MolSystem.MolSystem.
+#           Output: Cing.Project or None on error.
+#        '''
+#        # TO DO: shiftMapping should pass cing objects
+#        self.molecule.newResonances()
+#
+#        ccpnShifts = shiftMapping.keys()
+#
+#        for ccpnShift in ccpnShifts:
+#            shiftValue = ccpnShift.value
+#            shiftError = ccpnShift.error
+#            ccpnResidue, ccpnAtoms = shiftMapping[ccpnShift]
+#
+#            for ccpnAtom in ccpnAtoms:
+#                try:
+#                    atom = ccpnAtom.cing
+#                    atom.resonances().value = shiftValue
+#                    atom.resonances().error = shiftError
+#                    index = len(atom.resonances) - 1
+#                    atom.setStereoAssigned() # untested for JFD has no test data.
+#                    # Make mutual linkages between Ccpn and Cing objects
+#                    # cingResonace.ccpn=ccpnShift, ccpnShift.cing=cinResonance
+#                    atom.resonances[index].ccpn = ccpnShift
+#                    ccpnShift.cing = atom.resonances[index]
+#                except:
+#                    NTwarning("_setShift: %s, shift CCPN atom %s skipped", ccpnResidue.cing, ccpnAtom.name)
+#                # end try
+#            # end for
+#        # end for
+#
+#        NTdetail("==> CCPN ShiftList '%s' imported from Ccpn Nmr project '%s'",
+#                       ccpnShiftList.name, ccpnShiftList.parent.name)
+#        return True
+#    # end def _setShift
 
     def _setPeak(self):
         '''Descrn: Core function that sets peaks imported from Ccpn for a

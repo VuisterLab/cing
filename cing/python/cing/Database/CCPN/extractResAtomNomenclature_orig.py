@@ -44,9 +44,8 @@ for chemComp in memopsRoot.chemComps:
             resCode = sysName.sysName
 
           for chemAtom in chemAtomAndSets:
-	    atomSysName = namingSystem.findFirstAtomSysName(atomName=chemAtom.name,
+            atomSysName = namingSystem.findFirstAtomSysName(atomName=chemAtom.name,
 	                                                    atomSubType=chemAtom.subType)
-
             #print chemAtom.name, [a.atomName for a in namingSystem.atomSysNames]
             if atomSysName:
 	      #print chemAtom.name, name
@@ -66,15 +65,14 @@ for chemComp in memopsRoot.chemComps:
       for chemAtomName in chemAtomNames:
         atomText = 'ATOM '
         for name in names:
-	  sysName = atomDict[chemAtomName].get(name, '-')
-          atomText += ' %5s %-7s' % (name, sysName)
+            sysName = atomDict[chemAtomName].get(name, '-') 
+            atomText += ' %5s %-7s' % (name, sysName)
+        atomText += '  CCPN %s' % chemAtomName
+        atomTexts.append(atomText)
 
-	atomText += '  CCPN %s' % chemAtomName
-	atomTexts.append(atomText)
+        atomData[chemCompVar] = atomTexts
 
-      atomData[chemCompVar] = atomTexts
-
-      resData.append( (resText, chemCompVar) )
+        resData.append( (resText, chemCompVar) )
 
 resData.sort()
 

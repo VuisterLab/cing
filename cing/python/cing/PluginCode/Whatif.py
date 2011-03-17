@@ -1062,8 +1062,8 @@ def runWhatif( project, ranges=None, parseOnly=False ):
               numberOfResidues, mol.modelCount, Whatif.NUMBER_RESIDUES_PER_SECONDS)
         msg += ' %s hours, %s minutes and %s seconds; please wait' % timeRunEstimatedList
         NTmessage(msg)
-        if totalNumberOfResidues < 100:
-            NTmessage("It takes much longer per residue for a small molecule/ensemble")
+#        if totalNumberOfResidues < 100:
+#            NTmessage("It takes much longer per residue for a small molecule/ensemble")
 
         scriptFullFileName =  os.path.join( whatifDir, scriptFileName )
         open(scriptFullFileName,"w").write(scriptComplete)
