@@ -1,6 +1,6 @@
 """
 Unit test execute as:
-python $CINGROOT/python/cing/PluginCode/test/test_ccpn.py
+python -u $CINGROOT/python/cing/PluginCode/test/test_Vasco.py
 """
 from cing import cingDirTestsData
 from cing import cingDirTmp
@@ -21,9 +21,9 @@ import unittest
 
 class AllChecks(TestCase):
 
-#    entryList = "1brv_cs_pk_2mdl".split() # DEFAULT because it contains many data types and is small/fast to run.
-#    entryList = "1cjg".split()
-    entryList = "1brv".split()
+    entryList = "1brv_cs_pk_2mdl".split() # DEFAULT because it contains many data types and is small/fast to run.
+#    entryList = "1ieh".split()
+#    entryList = "1brv".split()
 #    entryList = "2hgh".split()
 #    entryList = "1bus".split()
 #    entryList = "1a4d 1ai0 1brv_cs_pk_2mdl 1bus 2hgh".split()
@@ -33,7 +33,7 @@ class AllChecks(TestCase):
         fastestTest = 1        # Not passed to the validate routine in order to customize checks for speed.
 
         modelCount=99
-        redoFromCingProject = 1
+        redoFromCingProject = 0
         htmlOnly = True # default is False but enable it for faster runs without some actual data.
         doWhatif = True # disables whatif actual run
         doProcheck = True
@@ -43,17 +43,15 @@ class AllChecks(TestCase):
         filterVasco = True
         useNrgArchive = False
         ranges = 'cv'
-#        ranges='173-177'
-#        ranges='6-13,29-45' # 1bus
+        doSave = not redoFromCingProject
 
         doSwapCheck = False
         doRestoreCheck = 1
         doStoreCheck = 1 # DEFAULT: False Requires sqlAlchemy
         if fastestTest:
             modelCount=1 # DEFAULT 2
-            redoFromCingProject = 1
             htmlOnly = True
-            doWhatif = 1
+            doWhatif = 0
             doProcheck = False
             doWattos = False
             doQueeny = False
@@ -68,7 +66,9 @@ class AllChecks(TestCase):
             doWattos = False
             doTalos = False
 
-        self.failIf(os.chdir('/Users/jd/workspace/nrgcing/Vasco'), msg =
+
+#        cingDirTmp = '/Users/jd/workspace/nrgcing/Vasco' 
+        self.failIf(os.chdir(cingDirTmp), msg =
             "Failed to change to directory for temporary test files: " + cingDirTmp)
         for i,entryId in enumerate(AllChecks.entryList):
 
@@ -86,7 +86,8 @@ class AllChecks(TestCase):
     #                inputArchiveDir = os.path.join('/Volumes/tera1/Library/WebServer/Documents/NRG-CING/recoordSync', entryId)
                     inputArchiveDir = os.path.join('/Volumes/tera1//Users/jd/ccpn_tmp/data/recoord', entryId)
                 else:
-                    inputArchiveDir = os.path.join(".")
+#                    inputArchiveDir = os.path.join(".")
+                    inputArchiveDir = os.path.join(cingDirTestsData, "ccpn")
 
                 ccpnFile = os.path.join(inputArchiveDir, entryId + ".tgz")
                 if not os.path.exists(ccpnFile):
@@ -124,7 +125,8 @@ class AllChecks(TestCase):
                     ccpnFile = entryId # set to local dir now.
                 # end if doSwapCheck
                 self.assertTrue(project.initCcpn(ccpnFolder = ccpnFile, modelCount=modelCount))
-                self.assertTrue(project.save())
+                if doSave:
+                    self.assertTrue(project.save())
 
             if False:
                 ranges = "173-183"
@@ -167,9 +169,9 @@ class AllChecks(TestCase):
 #            if os.path.exists(entryId):
 #                self.assertFalse(shutil.rmtree(entryId))
 
-            if False:
+            if doSave:
                 self.assertTrue(project.save())
-                self.assertTrue(project.saveCcpn(entryId))
+#                self.assertTrue(project.saveCcpn(entryId))
 
             if doRestoreCheck:
                 del project
@@ -182,57 +184,6 @@ class AllChecks(TestCase):
                     NTerror("Failed to store CING project's data to DB but continuing.")
         # end for
     # end def test
-
-    def tttestCreateCcpn(self):
-        doRestraints = False
-        pdbConvention = IUPAC
-        restraintsConvention = CYANA
-
-        self.failIf(os.chdir(cingDirTmp), msg =
-            "Failed to change to directory for temporary test files: " + cingDirTmp)
-        for entryId in AllChecks.entryList:
-            # Allow pdb files to be of different naming systems for this test.
-            if entryId.startswith("2hgh"):
-                pdbConvention = CYANA
-            if entryId.startswith("1tgq"):
-                pdbConvention = PDB
-            if entryId.startswith("1brv"):
-                pdbConvention = IUPAC
-            if entryId.startswith("1YWUcdGMP"):
-                pdbConvention = XPLOR
-
-            project = Project(entryId)
-            self.failIf(project.removeFromDisk())
-            project = Project.open(entryId, status = 'new')
-            cyanaDirectory = os.path.join(cingDirTestsData, "cyana", entryId)
-            pdbFileName = entryId + ".pdb"
-            pdbFilePath = os.path.join(cyanaDirectory, pdbFileName)
-            project.initPDB(pdbFile = pdbFilePath, convention = pdbConvention)
-
-            if doRestraints:
-                NTdebug("Reading files from directory: " + cyanaDirectory)
-                kwds = {'uplFiles': [ entryId ],
-                        'acoFiles': [ entryId ]
-                          }
-                if entryId.startswith("1YWUcdGMP"):
-                    del(kwds['acoFiles'])
-
-                if os.path.exists(os.path.join(cyanaDirectory, entryId + ".prot")):
-                    self.assertTrue(os.path.exists(os.path.join(cyanaDirectory, entryId + ".seq")),
-                        "Converter for cyana also needs a seq file before a prot file can be imported")
-                    kwds['protFile'] = entryId
-                    kwds['seqFile'] = entryId
-
-                # Skip restraints if absent.
-                if os.path.exists(os.path.join(cyanaDirectory, entryId + ".upl")):
-                    project.cyana2cing(cyanaDirectory = cyanaDirectory, convention = restraintsConvention,
-                                copy2sources = True,
-                                **kwds)
-            # end if
-            project.save()
-            NTmessage( "Project: %s" % project)
-            ccpnFolder = entryId + "New"
-            self.assertTrue(project.saveCcpn(ccpnFolder))
 
 if __name__ == "__main__":
     cing.verbosity = verbosityDebug

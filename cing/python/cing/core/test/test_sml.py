@@ -95,7 +95,7 @@ class AllChecks(TestCase):
 #        print "Dict restored: ", repr(c), repr(c.dd)
 
     def testSml_6(self):
-        SMLhandler.debug = True
+        SMLhandler.debug = cing.verbosity == cing.verbosityDebug
         fn = 'testObject_6.sml'
 #        p = Project.open('testObject6', status = 'new')
         molecule = Molecule(name='moleculeName')
@@ -103,14 +103,17 @@ class AllChecks(TestCase):
         testObject = molecule.newResonances()
 #        testObject.append(Resonance(value=-999.9))
         testObject.vascoApplied = True
-        self.failIf( obj2SML( testObject, fn) == None)
-#        NTdebug("Written to: %r" % fn)
-#        testObjectRead = SML2obj( fn)        
-#        NTdebug("Restored to: %s" % str(testObjectRead))
+        if os.path.exists(fn):
+            os.unlink(fn)
+        savedObject = obj2SML( molecule, fn) 
+        self.failIf( savedObject == None)
+        NTdebug("Written to: %r" % fn)
+        testObjectRead = SML2obj( fn )        
+        NTdebug("Restored to: %s" % str(testObjectRead))
 #        self.failIf( len(testObjectRead) != 0 ) 
-#        self.failIf( getDeepByKeysOrAttributes(testObjectRead, 'vascoApplied') != True ) 
-#        self.failIf( len(c.dd.keys()) != 2 ) 
-#        print "Dict restored: ", repr(c), repr(c.dd)
+        self.failIf( getDeepByKeysOrAttributes(testObjectRead, RESONANCE_SOURCES_STR, 0, VASCO_APPLIED_STR) != True ) 
+    # end def 
+# end class 
 
 if __name__ == "__main__":
     cing.verbosity = verbosityDebug

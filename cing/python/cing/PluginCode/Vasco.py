@@ -26,7 +26,7 @@ if True: # block
     try:
         from cing.Scripts.FC.vascoCingRefCheck import VascoCingReferenceCheck # will do the below
 #        from pdbe.software.vascoReferenceCheck import VascoReferenceCheck #@UnusedImport
-        import Tkinter
+#        import Tkinter
     except:
         switchOutput(True)
         raise ImportWarning(VASCO_STR)
@@ -53,7 +53,7 @@ class Vasco(NTdict):
     """
     def _runVasco(self, parseOnly=True):
         #  pdbCode = '1brv'
-        pdbCode = self.project.name
+#        pdbCode = self.project.name
 
         mol = self.project.molecule
 
@@ -110,7 +110,7 @@ class Vasco(NTdict):
             NTmessage("Skipping Vasco because there is no chemical shift assignment.")
             return
 
-        root = Tkinter.Tk() # Possible to do without gui?
+#        root = Tkinter.Tk() # Possible to do without gui?
 
 
         # Try traditional for comparison
@@ -118,8 +118,8 @@ class Vasco(NTdict):
         #vascoReferenceCheck.checkProject(ccpnDir=ccpnDir)
 
         # Try the CING based check
-        vascoReferenceCheck = VascoCingReferenceCheck(guiParent=root)
-        vascoReferenceCheck.setupDirectories(pdbCode)
+        vascoReferenceCheck = VascoCingReferenceCheck()
+        vascoReferenceCheck.setupDirectories(self.project)
         vascoReferenceCheck.checkAllShiftLists()
 
         #vascoReferenceCheck.ccpnProject.saveModified()

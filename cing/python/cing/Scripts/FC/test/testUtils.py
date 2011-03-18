@@ -7,13 +7,29 @@ from cing import cingDirTestsData #@UnusedImport
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.PluginCode import Ccpn #@UnusedImport Inserted to trigger unit test failure.
 from cing.Scripts.FC.utils import getBmrbCsCountsFromFile
+from matplotlib import mlab
 from unittest import TestCase
 import unittest
 
 
 class AllChecks(TestCase):
 
-    def testGetBmrbCsCountsFromFile(self):
+    def testMedian(self):
+        lol = [ 
+#               [], # fails
+               [1.2],
+               [1.0, 2.0], # Get the inbetween value.
+               [1.0, 2.0, 4.0],
+               ]
+        expectedMedianList = [ 1.2, 1.5, 2.0]
+        for i,l in enumerate(lol):
+            ml = mlab.prctile(l,[50])
+            self.assertEqual(ml[0], expectedMedianList[i])
+        # end for
+    # end def
+    
+    
+    def _testGetBmrbCsCountsFromFile(self):
         useVersion = '2'
 
         expectedLoL = [

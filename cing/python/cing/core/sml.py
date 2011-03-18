@@ -459,7 +459,7 @@ class SMLMoleculeHandler( SMLhandler ):
                                     SMLsaveFormat
                                    )
                                 )
-
+ 
         fprintf( stream, "%s  %r\n", self.startTag, mol.nameTuple(SMLsaveFormat) )
 
 #       Can add attributes here; update endHandler if needed
@@ -1031,6 +1031,99 @@ class SMLRDCRestraintListHandler( SMLhandler ):
     #end def
 #end class
 RDCRestraintList.SMLhandler = SMLRDCRestraintListHandler()
+
+## TODO: Didn't think this was needed.
+#class SMLResonanceHandler( SMLhandler ):
+#
+#    def __init__(self):
+#        SMLhandler.__init__( self, name = RESONANCE_LEVEL )
+#    #end def
+#
+#    def handle(self, line, fp, project=None):
+##        return True
+#        r = Resonance()
+#        return self.dictHandler(r, fp, project)
+#    #end def
+#
+#    def toSML(self, r, stream ):
+#        """
+#            For Resonance (based on DistanceRestraint)
+#        """
+##        pass
+#        fprintf( stream, "%s\n", self.startTag )
+#        for a in ['value' ]:
+#            fprintf( stream, '    %-15s = %s\n', a, repr(r[a]) )
+#        #end for
+#        fprintf( stream, "%s\n", self.endTag )
+#    #end def
+##end class
+#Resonance.SMLhandler = SMLResonanceHandler()
+
+
+class SMLNTListWithAttrHandler( SMLhandler ):
+#    def __init__(self, name ):
+#        SMLhandler.__init__( self, name = name ) # adds this handler for when restoring.
+#        self.SML_SAVE_ATTRIBUTE_LIST   
+    #end def
+    SML_SAVE_ATTRIBUTE_LIST = None # overwritten by individual class instance to be saved.
+    
+    def handle(self, line, fp, obj=None):
+#        NTdebug("Now in SMLNTListWithAttrHandler#handle at line: %s" % str(line))
+        rlTop = NTdict()
+        rlTop = self.dictHandler(rlTop, fp)        
+        if rlTop == None:
+            NTerror("Failed to read resonance list top object.") 
+            return None
+        if not obj:
+            NTerror("In SMLNTListWithAttrHandler#endHandler no obj initialized")
+            return
+        rl = obj.newResonances() # obj is molecule This line is the only ResonanceList specific action to generalize further. 
+        for key in self.SML_SAVE_ATTRIBUTE_LIST:
+            if not hasattr( rlTop, key ):
+                NTerror("Failed to read expected attribute in top object: %s" % key)
+                return
+            setattr(rl, key, getattr(rlTop,key))
+        rl.addList(rlTop.theList)
+        return rl
+    #end def
+    
+#    def endHandler(self, rl, project):
+#        NTdebug("Now in SMLNTListWithAttrHandler#endHandler doing nothing")
+#        pass
+    #end def
+        
+    def toSML(self, rl, fp):
+        'This list will be encapsulated in a dictionary so the additional attributes can be saved.'        
+        fprintf( fp, '%s\n', self.startTag )
+        
+        # Build customary dictionary as top object to save.     
+        theDict = NTdict()
+        for key in self.SML_SAVE_ATTRIBUTE_LIST:
+            if not hasattr( rl, key ):
+                NTcodeerror("%s failed to see attribute in top object: %s" % (rl, key))
+                return
+            theDict[key] = getattr(rl, key)
+        theDict.theList = NTlist()
+#        theDict.theList.addList(rl) # TODO: when items DO get saved.
+
+        # save it regardless of content.
+        for key,value in theDict.iteritems():
+            fprintf( fp, '%s = ', key )
+            if hasattr(value,'SMLhandler') and value.SMLhandler != None:
+                value.SMLhandler.toSML( value, fp )
+            else:
+                fprintf( fp, '%r\n', value )
+            #end if
+        #end for            
+        fprintf( fp, '%s\n', self.endTag )
+        return rl
+    #end def
+#end class
+
+# Generalized
+ResonanceList.SMLhandler = SMLNTListWithAttrHandler(name = 'ResonanceList')
+ResonanceList.SMLhandler.SML_SAVE_ATTRIBUTE_LIST = ResonanceList.SML_SAVE_ATTRIBUTE_LIST 
+
 
 class SMLCoplanarHandler( SMLhandler ):
 

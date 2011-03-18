@@ -8,7 +8,9 @@ from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.PluginCode.required.reqVasco import * #@UnusedWildImport
 from cing.core.classes import Project
 from cing.core.classes2 import ResonanceList
+from cing.core.molecule import getListByName
 from cing.core.parameters import moleculeDirectories
+from matplotlib import mlab
 from memops.api import Implementation
 from memops.general.Io import loadProject
 from memops.universal.Util import returnInt, returnFloat
@@ -28,7 +30,7 @@ class VascoCingReferenceCheck(VascoReferenceCheck):
     
     vascoRefDataPath = os.path.join(cingDirScripts, 'FC', 'vascoRefData')
     if not os.path.exists(vascoRefDataPath):
-            NTerror("In CING using vascoRefDataPath %s but is absent" % vascoRefDataPath)            
+        NTerror("In CING using vascoRefDataPath %s but is absent" % vascoRefDataPath)            
 
     def setupDirectories(self, cingProject, ccpnDir=None):
         self.cingProject = cingProject
@@ -38,12 +40,11 @@ class VascoCingReferenceCheck(VascoReferenceCheck):
         self.whatIfDataDir = os.path.join(self.cingMoleculeDir, moleculeDirectories.whatif)
 
         if ccpnDir:
-                self.ccpnDir = ccpnDir
+            self.ccpnDir = ccpnDir
         else:
-                self.ccpnDir = '%s' % entryCode
+            self.ccpnDir = '%s' % entryCode
 
     def writePdbFile(self):
-
         pass
 
     def createSsInfo(self):
@@ -114,93 +115,126 @@ class VascoCingReferenceCheck(VascoReferenceCheck):
                     self.allSsInfo[chainCode][seqKey] = []
 
                 self.allSsInfo[chainCode][seqKey].append(secStruc)
-
+    # end def
+    
     def createAsaInfo(self):
-
+        'Return True on error.'
         print "Fetching WHATIF per-atom surface accessibility info..."
 
         fileNames = glob.glob(os.path.join(self.whatIfDataDir, "wsvacc*.log"))
 
         self.allWhatIfInfo = {'chains': {}}
         for fileName in fileNames:
-            self.readWhatIfAsaInfoFile(fileName)
-
+            if self.readWhatIfAsaInfoFile(fileName): # fills self.allWhatIfInfo
+                NTerror("Failed %s when reading file." % (getCallerName()))
+                return True
+        # end for
+        
         #
         # Now determine the median ASA for each
         #
-
+        # whatIfInfo is used in super class whereas allWhatIfInfo was filled before. 
         self.whatIfInfo = self.allWhatIfInfo
-        medianIndex = None
-
-        for chainCode in self.whatIfInfo['chains'].keys():
-            for seqKey in self.whatIfInfo['chains'][chainCode].keys():
-                for atomName in self.whatIfInfo['chains'][chainCode][seqKey]['atoms'].keys():
-                    asaList = self.whatIfInfo['chains'][chainCode][seqKey]['atoms'][atomName]
+        d = self.whatIfInfo['chains']
+#        medianIndex = None
+        for chainCode in d.keys():
+            for seqKey in d[chainCode].keys():
+                for atomName in d[chainCode][seqKey]['atoms'].keys():
+                    asaList =   d[chainCode][seqKey]['atoms'][atomName]
                     asaList.sort()
-
-                    if not medianIndex:
-                        medianIndex = int((len(asaList) / 2.0) + 0.5)
-
-                    self.whatIfInfo['chains'][chainCode][seqKey]['atoms'][atomName] = [asaList[medianIndex]]
+#                    if not medianIndex:
+#                    medianIndex = int((len(asaList) / 2.0) + 0.5) # fails with round off on single element lists.
+                    ml = mlab.prctile(asaList,[50])                    
+#                    if medianIndex < 0 or medianIndex >= len(asaList):
+#                        NTerror("Found improper median index %s for %s" % (medianIndex, str(asaList)))
+#                        return True
+#                    d[chainCode][seqKey]['atoms'][atomName] = [asaList[medianIndex]] # Resetting list to only include median
+                    d[chainCode][seqKey]['atoms'][atomName] = [ml[0]] # Reseting array because JFD is not sure it's a regular array from mlab.
+                # end for
+            # end for
+        # end for
+    # end def
 
     def readWhatIfAsaInfoFile(self, fileName):
+        'Return True on error.'
 
+#        NTdebug('Now in ' + getCallerName() + ' for ' + fileName)
         fin = open(fileName)
         lines = fin.readlines()
         fin.close()
-
+        atomsRead = 0
+        hydrogensSkipped = 0
+        skipHydrogens = False # already corrected for elsewhere?
         dataLine = False #@UnusedVariable
         for line in lines:
-
             line = line.strip()
-
+#            NTdebug('Line: ' + line)
             if line[0] == '*' or not line:
                 continue
 
             fields = line.split(';')
 
-            chainCode = fields[4]
-
+            resLabel = fields[1]
+            seqId = fields[2]
             insertionCode = fields[3]
+            chainCode = fields[4]
+            # field 5 has nothing?
+            atomName = fields[6]
+            accessibility = fields[7]
+            
+            
+            if skipHydrogens and atomName[0] == 'H':
+                hydrogensSkipped += 1 # are zero anyway.
+                continue
+            
             if not insertionCode:
                 insertionCode = ' '
-            seqKey = (returnInt(fields[2]), insertionCode)
+            seqKey = (returnInt(seqId), insertionCode)
 
-            atomName = fields[6]
-            # TODO: any problems with | at beginning and end?
-            accessibility = returnFloat(fields[7][1:-1])
+            if not (accessibility[0] == '|' and accessibility[-1] == '|'):
+                NTerror("Line without valid format for accessibility: " + line)
+                return True  
+            accessibility = returnFloat(accessibility[1:-1])
+            d = self.allWhatIfInfo['chains']
+            if not d.has_key(chainCode):
+                   d[chainCode] = {}
+            if not d[chainCode].has_key(seqKey):                
+                   d[chainCode][seqKey] = {'hasBadAtoms': False, 'resLabel': resLabel, 'atoms': {}}
+            if not d[chainCode][seqKey]['atoms'].has_key(atomName):
+                   d[chainCode][seqKey]['atoms'][atomName] = []
 
-            if not self.allWhatIfInfo['chains'].has_key(chainCode):
-                self.allWhatIfInfo['chains'][chainCode] = {}
-
-            if not self.allWhatIfInfo['chains'][chainCode].has_key(seqKey):
-                resLabel = fields[1]
-                self.allWhatIfInfo['chains'][chainCode][seqKey] = {'hasBadAtoms': False, 'resLabel': resLabel, 'atoms': {}}
-
-            if not self.allWhatIfInfo['chains'][chainCode][seqKey]['atoms'].has_key(atomName):
-                self.allWhatIfInfo['chains'][chainCode][seqKey]['atoms'][atomName] = []
-
-            self.allWhatIfInfo['chains'][chainCode][seqKey]['atoms'][atomName].append(accessibility)
+            d[chainCode][seqKey]['atoms'][atomName].append(accessibility)
+            atomsRead += 1
+        # end for
+#        NTdebug("Read %s atoms" % atomsRead)
+#        NTdebug("Skipped %s hydrogen" % hydrogensSkipped)
+#        NTdebug("Seen %s atoms" % (atomsRead + hydrogensSkipped))
+        if not atomsRead:
+            NTerror("Failed to read any atom")
+            return True
+        # end if
+    # end def
 
     def findResidue(self, chain, seqKey):
 
         return chain.findFirstResidue(seqCode=seqKey[0], seqInsertCode=seqKey[1])
+    # end def
 
     def checkAllShiftLists(self):
-
+        """
+        Return True on error
+        """        
         ccpnProject = loadProject(self.ccpnDir)
-
         for shiftList in ccpnProject.currentNmrProject.findAllMeasurementLists(className='ShiftList'):
-
             self.checkProject(ccpnProject=ccpnProject, shiftListSerial=shiftList.serial)
             self.tagProject()
-            self.tagCingProject()
-            self.correctCingProject()
+            if self.tagCingProject():
+                return True
 
-    """
-    Return True on error
-    """
     def tagProject(self):
+        """
+        Return True on error
+        """
         for (atomType, atomKey) in vascoAtomInfo:
             (rerefValue, rerefError) = self.rerefInfo[atomKey]
             if rerefValue != None:
@@ -209,21 +243,30 @@ class VascoCingReferenceCheck(VascoReferenceCheck):
                 self.shiftList.addApplicationData(appData1)
                 self.shiftList.addApplicationData(appData2)
         NTdebug("%s" % self.shiftList.findAllApplicationData(application='VASCO'))
+    # end def
 
     def tagCingProject(self):
-        NTmessage("Tagging CING project with Vasco results.")
+        """
+        Return True on error
+        """
+        NTmessage("Tagging CING project with Vasco results.")        
         mol = self.cingProject.molecule
         resonanceListName = getDeepByKeysOrAttributes( self.shiftList, NAME_STR ) # may be absent according to api.
         if resonanceListName == None:
             NTerror("Failed to get resonanceListName from CCPN which will not allow CING to match later on for e.g. Vasco. Continuing.")
-            return
+            return True
 #        resonanceList = self.project.resonances.getListByName(resonanceListName)
-        resonanceList = self.project.molecule.resonanceSources.getListByName(resonanceListName)
+        resonanceList = getListByName(mol.resonanceSources, resonanceListName)
         if not isinstance(resonanceList, ResonanceList):
             NTerror("Failed to get resonanceList by name: %s" % resonanceListName)
-            return
-        mol.setVascoChemicalShiftCorrections(self.rerefInfo, resonanceList ) 
-        mol.applyVascoChemicalShiftCorrections( resonanceList )              
+            NTerror("mol.resonanceSources: %s" % str(resonanceListName))
+            return True
+        if mol.setVascoChemicalShiftCorrections(self.rerefInfo, resonanceList ):
+            NTerror("Failed to setVascoChemicalShiftCorrections for: %s" % resonanceListName)
+            return True         
+        if mol.applyVascoChemicalShiftCorrections( resonanceList = resonanceList ):
+            NTerror("Failed to applyVascoChemicalShiftCorrections for: %s" % resonanceListName)
+            return True
     # end def
 # end class
 

@@ -139,6 +139,7 @@ VIOL5_STR = 'violCount5'
 RESONANCES_STR = 'resonances'
 RESONANCE_LIST_IDX_ANY = -999 # will match assignment in any resonance list. 
 MERGED_STR = 'merged'
+RESONANCE_SOURCES_STR = 'resonanceSources'
 
 # SQL stuff
 NAME_STR        = 'name'

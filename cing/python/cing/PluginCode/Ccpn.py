@@ -2361,7 +2361,7 @@ def saveCcpn(project, ccpnFolder, ccpnTgzFile = None):
        Inputs: Cing project.
        Output: Ccpn Project or None on error.
     '''
-
+    func_name = getCallerName()
     if project.has_key('ccpn'):
         ccpnProject = project.ccpn
         NTmessage('saveCcpn: Saving any changes to original CCPN project')
@@ -2379,7 +2379,7 @@ def saveCcpn(project, ccpnFolder, ccpnTgzFile = None):
     status = ccpnProject.saveModified() # TODO: can't change from original ccpnFolder
     switchOutput(True)
     if status:
-        NTerror("Failed ccpnProject.saveModified in " + saveCcpn.func_name)
+        NTerror("Failed ccpnProject.saveModified in " + func_name)
         return None
 
     NTmessage("Saved ccpn project to folder: %s" % ccpnFolder)
