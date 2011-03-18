@@ -2872,11 +2872,9 @@ def NTzap(theList, *byItems):
     """
     result = NTlist()
     for v in theList:
-        if v:
-            result.append(getDeepByKeysOrAttributes(v, *byItems))
-        else:
-            result.append(None)
-        #end if
+        # Removed extra check which is done in routine below anyway.
+        # The check was also wrong in the case of empty NTlists
+        result.append(getDeepByKeysOrAttributes(v, *byItems))
     #end for
     return result
 #end def

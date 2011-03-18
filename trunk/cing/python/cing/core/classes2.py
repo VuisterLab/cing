@@ -153,8 +153,8 @@ class ResonanceList(NTlist):
         self.currentId = 0      # Id for each element of list
         self._idDict = {}       # dictionary to look up id in case the list is sorted differently
         self._byItem = None     # if not None: list was sorted _byItem.
-        self.vascoResults  = NTdict() # See applyVascoChemicalShiftCorrections
-        self.vascoApplied  = False
+        self.vascoResults  = NTdict() # See applyVascoChemicalShiftCorrections # NB match with VASCO_RESULTS_STR
+        self.vascoApplied  = False # VASCO_APPLIED_STR
 #        self.rogScore = ROGscore()
         self.SMLhandler.SML_SAVE_ATTRIBUTE_LIST = self.SML_SAVE_ATTRIBUTE_LIST
     #end def

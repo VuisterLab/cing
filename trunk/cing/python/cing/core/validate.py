@@ -1230,7 +1230,7 @@ def moleculeValidateAssignments( molecule  ):
     @todo: Also correlate assignment with peak values (if present)
     """
 #    NTdebug("Starting moleculeValidateAssignments")
-#    funcName = moleculeValidateAssignments.func_name #@UnusedVariable
+    func_name = getCallerName()
     result   = NTlist()
 #    if molecule.resonanceCount == 0:
 #        NTdebug("Molecule.validateAssignments: No resonance assignments read so no real validation on it can be done. Let's try anyway.")
@@ -1246,7 +1246,7 @@ def moleculeValidateAssignments( molecule  ):
     FRACTION_REQUIRED = 0.85 # was 0.75 but let's only report real exceptions.
     msg = ''
     if not assignmentCountMap:
-        NTerror("Failed in moleculeValidateAssignments to get even an empty assignmentCountMap; skipping")
+        NTerror("Failed in %s to get even an empty assignmentCountMap; skipping" % func_name)
         return None
 
     keyList = assignmentCountMap.keys()
@@ -1299,7 +1299,7 @@ def moleculeValidateAssignments( molecule  ):
                     av = pseudo.db.shift.average
                     sd = pseudo.db.shift.sd
                 else:
-    #                NTdebug("%s: '%s' not in in DB SHIFTS", funcName, atm)
+#                    NTdebug("%s: '%s' not in in DB SHIFTS", func_name, atm)
                     av = None
                     sd = None
                 #end if

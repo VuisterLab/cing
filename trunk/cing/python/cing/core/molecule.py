@@ -7,21 +7,15 @@ from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.Libs.PyMMLib import ATOM
 from cing.Libs.PyMMLib import HETATM
 from cing.Libs.PyMMLib import PDBFile
-from cing.Libs.cython.superpose import NTcMatrix #@UnresolvedImport
-from cing.Libs.cython.superpose import NTcVector #@UnresolvedImport
-from cing.Libs.cython.superpose import calculateRMSD #@UnresolvedImport
-from cing.Libs.cython.superpose import superposeVectors #@UnresolvedImport
+from cing.Libs.cython.superpose import * #@UnresolvedImport @UnusedWildImport
 from cing.Libs.html import addPreTagLines
 from cing.Libs.html import hPlot
-from cing.PluginCode.required.reqDssp import DSSP_H
-from cing.PluginCode.required.reqDssp import DSSP_S
-from cing.PluginCode.required.reqDssp import getDsspSecStructConsensus
+from cing.PluginCode.required.reqDssp import * #@UnusedWildImport
 from cing.PluginCode.required.reqNih import TALOSPLUS_STR
 from cing.PluginCode.required.reqVasco import * #@UnusedWildImport
 from cing.core.classes2 import * #@UnusedWildImport
 from cing.core.constants import * #@UnusedWildImport
 from cing.core.database import AtomDef
-from math import acos
 from numpy import * #@UnusedWildImport overwrites such common functions as sum, max etc.
 from numpy import linalg as LA
 from operator import attrgetter
@@ -298,7 +292,8 @@ class Molecule( NTtree, ResidueList ):
 
         # These will be maintained by the appropriate routines
 #        self.resonanceCount   = 0
-        self.resonanceSources = NTlist() #  resonanceCount = len(self.resonanceSources)
+        self.resonanceSources = NTlist() #  resonanceCount = len(self.resonanceSources) # match RESONANCE_SOURCES_STR
+        # Used to contain NTlist of strings, now NTlist of ResonanceList's.
         self.modelCount       = 0
 
 #        self._coordinates = NTlist()       # internal array with coordinate references
@@ -1539,16 +1534,16 @@ class Molecule( NTtree, ResidueList ):
     def newResonances( self, source=None ):
         """Initialize a new resonance slot for every atom.
            atom.resonances() will point to this new resonance.
+           Return None on error.
         """
-        resonanceCount = len(self.resonanceSources)        
         if source == None:
-            sourceName = 'source_%d' % resonanceCount
+            sourceName = 'source_%d' % len(self.resonanceSources) 
             source = ResonanceList(sourceName)
+        if not isinstance(source, ResonanceList):
+            NTerror("In %s expected ResonanceList source but found %s" % (getCallerName(), source))
+            return None
         for atom in self.allAtoms():
             atom.addResonance()
-        #end for
-#        self.currentResonancesIndex = resonanceCount # not used anywhere
-#        self.resonanceCount += 1
         self.resonanceSources.append(source)
         return source
     #end def
@@ -1608,7 +1603,10 @@ class Molecule( NTtree, ResidueList ):
         #end for
     
     def setVascoChemicalShiftCorrections(self, rerefInfo, resonanceList ):
-        NTdebug("Doing setVascoChemicalShiftCorrections.")
+        """
+        Return True on error
+        """
+        NTdebug("Doing %s on %s." % (getCallerName(), resonanceList))
         if resonanceList.vascoResults:
             NTwarning("Reseting existing non-empty Vasco results")
         resonanceList.vascoResults.clear()
@@ -1629,16 +1627,20 @@ class Molecule( NTtree, ResidueList ):
     using setVascoChemicalShiftCorrections
     If resonanceList is None then do all present.
     Return True on error
+    
     """
     def applyVascoChemicalShiftCorrections(self, doRevert = False, resonanceList = None):
-        NTdebug("Doing applyVascoChemicalShiftCorrections with doRevert %s" % doRevert)
+        func_name = getCallerName()
+        NTdebug("Doing applyVascoChemicalShiftCorrections with doRevert %s on %s" % (doRevert, resonanceList))
         resonanceCount = len(self.resonanceSources)        
         resonanceLoL = [resonanceList]
         if resonanceList == None:
             resonanceLoL = self.resonanceSources
         for resonanceList in resonanceLoL:
-#            resonanceListIdx = self.project.resonances.getListIdx(resonanceList)
-            resonanceListIdx = self.resonanceSources.getListIdx(resonanceList)
+            resonanceListIdx = getListIdx(self.resonanceSources, resonanceList)
+            if resonanceListIdx < 0:
+                NTwarning("No resonanceListIdx in %s" % func_name)
+                return
             if resonanceList.vascoResults == None:
                 NTwarning("No even empty Vasco results")
                 return
@@ -1650,7 +1652,7 @@ class Molecule( NTtree, ResidueList ):
             if not resList:
                 NTmessage("Skipping applyVascoChemicalShiftCorrections because there are no common amino acids.")
                 return        
-            atomListAll = self.getAssignedAtomListForResList(resList, resonanceListIdx)
+            atomListAll = getAssignedAtomListForResList(resList, resonanceListIdx = resonanceListIdx)
             if not atomListAll:
                 NTerror("Failed to find any assigned atom in a common amino acid but Vasco did produce results for them.")
                 return True
@@ -1669,6 +1671,7 @@ class Molecule( NTtree, ResidueList ):
                 if not useCorrection:
                     NTmessage("Skipping uncertain correction for rerefTuple %s" % str(rerefTuple))
                     continue
+#                NTmessage("Correcting %s with %s" % (str(atomTuple), str(rerefTuple)))
                 
                 atomList = self.getAtomsWithCsInVascoClass(atomListAll, atomKey)            
                 atomListAlreadyDone = atomListDone.intersection(atomList)
@@ -1676,11 +1679,13 @@ class Molecule( NTtree, ResidueList ):
                     NTerror("Found overlapping atoms in CING for Vasco corrections: %s" % str(atomListAlreadyDone))
                     NTerror("Skipping all atoms and giving up")
                     return True
-                NTmessage("Applying Vasco correction for atomTuple %s and rerefTuple %s to %d resonances" % (str(atomTuple), str(rerefTuple), resonanceCount))
+                NTmessage("Applying Vasco correction for atomTuple %s and rerefTuple %s to %d resonances in %d atoms" % (str(atomTuple), str(rerefTuple), resonanceCount, len(atomList)))
                 if doRevert:
                     rerefValue = -rerefValue
-                for atm in atomList:
-                    atm.resonances[0] += rerefValue
+                for i,atm in enumerate(atomList):
+                    if not i:
+                        NTdebug("Correcting first atom %s resonance %s with %s" % ( atm,atm.resonances[resonanceListIdx], rerefValue))
+                    atm.resonances[resonanceListIdx] += rerefValue
                 atomListDone.addList(atomList)
             # end for   
             resonanceList.vascoApplied = not resonanceList.vascoApplied
@@ -4094,8 +4099,8 @@ Residue class: Defines residue properties
             if dihedralIndicatesSingleConformer == None:
                 NTerror("Failed to get rotameric state of %s" % self)
                 return True
-            NTdebug("res shiftDifference, csIndicatesAveraging, csIndicatesSingleConformer, cvIndicatesAveraging, dihedralIndicatesSingleConformer: %10s %8.3f %s %s %s %s" % (
-                   self, shiftDifference, csIndicatesAveraging, csIndicatesSingleConformer, cvIndicatesAveraging, dihedralIndicatesSingleConformer ))
+#            NTdebug("res shiftDifference, csIndicatesAveraging, csIndicatesSingleConformer, cvIndicatesAveraging, dihedralIndicatesSingleConformer: %10s %8.3f %s %s %s %s" % (
+#                   self, shiftDifference, csIndicatesAveraging, csIndicatesSingleConformer, cvIndicatesAveraging, dihedralIndicatesSingleConformer ))
 
             if dihedralIndicatesSingleConformer == DIHEDRAL_300_STR:
                 str = 'Conformer %s chi impossible regardless of csd value [%.3f]' % (dihedralIndicatesSingleConformer, shiftDifference)
@@ -4120,7 +4125,7 @@ Residue class: Defines residue properties
             # end if
             if not str:
                 continue
-            NTdebug("critque: %s %s" % ( color, str))
+#            NTdebug("critque: %s %s" % ( color, str))
             resultList.append( atomC1 ) # Just do this once.
 #            atomC1.validateAssignment.append(str)
             atomC1.rogScore.setMaxColor( color, comment = str )
@@ -5797,15 +5802,24 @@ def updateResonancesFromPeaks( peaks, axes = None)   :
 #end def
 
 def getListByName(ll, name):
-    "Return list by name or False"
+    """
+    Return list by name or False. 
+    Works on any NTlist that has name attributes in each element.
+    """
+#    NTdebug("Working on ll: %s" % str(ll))
+#    NTdebug("ll[0].name: %s" % ll[0].name)
     names = ll.zap('name')
+#    NTdebug("names: %s" % str(names))
     idx = names.index(name)
     if idx < 0:
         return
     return ll[idx]
 
 def getListIdx(ll, l):
-    "Return list by name or False"
+    """
+    Return list by name or False. 
+    Works on any NTlist that has name attributes in each element.
+    """
     name = l.name
     names = ll.zap('name')
     return names.index(name)

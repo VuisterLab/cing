@@ -1,14 +1,7 @@
 from cing import cingDirTmp
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.core.classes import Project
-from cing.core.molecule import Chain
-from cing.core.molecule import Coordinate
-from cing.core.molecule import Molecule
-from cing.core.molecule import NTangleOpt
-from cing.core.molecule import NTdihedralOpt
-from cing.core.molecule import NTdistanceOpt
-from cing.core.molecule import ensureValidChainId
-from cing.core.molecule import residueNumberDifference
+from cing.core.molecule import * #@UnusedWildImport
 from cing.main import format
 from unittest import TestCase
 import profile
@@ -225,6 +218,13 @@ class AllChecks(TestCase):
         ranges = mol.startStopList2ranges([res1, res2, res5, res6])
         self.assertEquals( 'A.1-3,B.9-10', ranges)
 
+    def testgetListByName(self):
+        lol = NTlist(ResonanceList('a'), ResonanceList('b'))
+        l = getListByName(lol, 'b')
+        self.assertTrue( l != None )
+        self.assertTrue( l.name == 'b' )
+        
+        
 if __name__ == "__main__":
     os.chdir(cingDirTmp)
     cing.verbosity = verbosityDebug

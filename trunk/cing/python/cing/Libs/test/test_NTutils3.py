@@ -67,7 +67,7 @@ class AllChecks(TestCase):
         myhtml.main("a", 'or by popup', **kw)
         myhtml.render()
 
-    def tttestBytesToFormattedString(self):
+    def testBytesToFormattedString(self):
         byteList = [ 1, 1000, 1300, 1600, 13000 * 1024, 130 * 1000 * 1024 * 1024  ]
         expectedResults = [ '0K', '1K', '1K', '2K', '13M', '127G' ]
         for i in range(len(byteList)):
@@ -85,33 +85,34 @@ class AllChecks(TestCase):
 #            i += 1
 
 
-    def tttestNTpath(self):
-        pathList = [ "/Users/jd/.cshrc", "/Users/jd/workspace35", "/Users/jd/workspace35/" ]
-        expectedDirectory = [ '/Users/jd' , "/Users/jd" , "/Users/jd/workspace35"]
-        expectedBasename = [ '','workspace35', '' ]
-        expectedExtension = [ '.cshrc', '', '' ]
+    def testNTpath(self):
+        NTmessage("Now in " + getCallerName())
+        # First item changed perhaps. used to be put in extension.
+        pathList = [            '/Users/jd/.cshrc', '/Users/jd/workspace35', '/Users/jd/workspace35/', '1brv.pdb', '.cshrc' ]
+        expectedDirectory = [   '/Users/jd',        '/Users/jd',             '/Users/jd/workspace35',  '.',        '.' ]
+        expectedBasename = [    '.cshrc',           'workspace35',           '',                       '1brv',     '.cshrc' ]
+        expectedExtension = [   '',                 '',                      '',                       '.pdb',     '' ]
         for i in range(len(pathList)):
             (directory, basename, extension) = NTpath(pathList[i])
-    #        self.assertEqual( r, expectedResults[i] )
             self.assertEquals(directory, expectedDirectory[i])
             self.assertEquals(basename, expectedBasename[i])
             self.assertEquals(extension, expectedExtension[i])
 
-    def tttestMsgHoL(self):
+    def testMsgHoL(self):
         msgHol = MsgHoL()
         for i in range(5):
             msgHol.appendMessage("Message %d" % i)
             msgHol.appendDebug("Debug %d" % i)
         msgHol.showMessage(MAX_MESSAGES=2)
 
-    def tttestCSV(self):
+    def testCSV(self):
         input = ['1brv', '9pcy' ]
         NTdebug("csv: [" + toCsv(input) + "]")
-    def tttestGetDateTimeStampForFileName(self):
+
+    def testGetDateTimeStampForFileName(self):
         NTdebug("getDateTimeStampForFileName: [" + getDateTimeStampForFileName() + "]")
 
 
 if __name__ == "__main__":
-#    cing.verbosity = verbosityNothing
     cing.verbosity = verbosityDebug
     unittest.main()
