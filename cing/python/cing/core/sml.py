@@ -8,7 +8,7 @@ from cing.core.molecule import * #@UnusedWildImport
  
 SMLstarthandlers = {}
 SMLendhandlers   = {}
-SMLversion       = 0.24
+SMLversion       = 0.25
 # version history:
 #  0.1: initial version
 #  0.2: NTlist and NTdict SML handlers; recursion in dict-like handlers
@@ -438,9 +438,16 @@ class SMLMoleculeHandler( SMLhandler ):
     #end def
 
     def endHandler(self, mol, _tmp=None):
+#        NTdebug("In %s with SMLfileVersion %s" % ( getCallerName(), SMLfileVersion ))
         # Restore linkage
         mol.chains = mol._children
         mol._check()
+        
+        if SMLfileVersion < 0.25:
+            if mol._convertResonanceSources(SMLfileVersion):
+                NTerror("Failed SMLMoleculeHandler#" + getCallerName())
+            # end if
+        # end if            
         return mol
     #end def
 
@@ -1077,13 +1084,14 @@ class SMLNTListWithAttrHandler( SMLhandler ):
         if not obj:
             NTerror("In SMLNTListWithAttrHandler#endHandler no obj initialized")
             return
-        rl = obj.newResonances() # obj is molecule This line is the only ResonanceList specific action to generalize further. 
+        # Skip the actual resonance creation because that is already done by molecule's handle.
+        rl = obj.newResonances(skipAtomResonanceCreation = True ) # obj is molecule This line is the only ResonanceList specific action to generalize further. 
         for key in self.SML_SAVE_ATTRIBUTE_LIST:
             if not hasattr( rlTop, key ):
                 NTerror("Failed to read expected attribute in top object: %s" % key)
                 return
             setattr(rl, key, getattr(rlTop,key))
-        rl.addList(rlTop.theList)
+        rl.addList(rlTop.theList) # not done yet.
         return rl
     #end def
     

@@ -24,9 +24,9 @@ from cing.NRG.settings import dDir
 from cing.Libs.forkoff import do_cmd
 cing.verbosity = cing.verbosityDebug
 
-workLocally = True
+workLocally = 0 # fails on nmr now.
 
-localDir = '/Users/jd/Documents/Virtual Machines'
+localDir = '/Users/jd/Documents/Virtual Machines.localized'
 destBaseDir = '/Volumes/tera1'
 if workLocally:
     destBaseDir = '/'

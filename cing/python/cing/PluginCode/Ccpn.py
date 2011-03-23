@@ -799,7 +799,7 @@ class Ccpn:
         
         resonanceListName = getDeepByKeysOrAttributes( ccpnShiftList, NAME_STR ) # may be absent according to api.
         if resonanceListName == None:
-            NTerror("Failed to get resonanceListName from CCPN which will not allow CING to match later on for e.g. Vasco. Continuing.")
+            NTwarning("Failed to get resonanceListName from CCPN which will not allow CING to match later on for e.g. Vasco. Continuing.")
         resonanceList = self.molecule.newResonances()
         if not isinstance( resonanceList, ResonanceList ):
             NTerror("Failed to create a new resonance list to the project.")
@@ -877,7 +877,7 @@ class Ccpn:
                 lastAtomResonance.ccpn = ccpnShift
                 ccpnShift.cing = lastAtomResonance
                 atomsTouched[a] = None
-                resonanceList.append( lastAtomResonance )
+#                resonanceList.append( lastAtomResonance )
             except:
                 msg = "_getCcpnShiftList: %s, shift CCPN atom %s skipped"
                 NTwarning(msg, ccpnResidue.cing, ccpnAtom.name)
