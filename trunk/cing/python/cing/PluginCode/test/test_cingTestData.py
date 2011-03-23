@@ -1,6 +1,9 @@
 """
 Unit test execute as:
 python $CINGROOT/python/cing/PluginCode/test/test_cingTestData.py
+
+This routine will test the backwards compatibility, that is: 
+reading cing projects that have been created with the CING api before the current one.
 """
 from cing import cingDirTestsData
 from cing import cingDirTmp
@@ -14,22 +17,19 @@ import unittest
 class AllChecks(TestCase):
 
     def testInitCcpn(self):
-        entryList = "1brv".split()
+        entryList = "1brv_023 1brv_024 1brv_025".split() # 0.24 version project with CS from NRG-CING.
+#        entryList = "1brv_025".split()
+#        entryList = "H2_2Ca_64_100".split()   # 0.24 version project with CS.     
 #        entryList = "1i1s 1ka3 1tgq 1y4o".split()
 #        if you have a local copy you can use it; make sure to adjust the path setting below.
-        fastestTest = True
+        validateFastest = True
 
         htmlOnly = False # default is False but enable it for faster runs without some actual data.
         doWhatif = False # disables whatif actual run
         doProcheck = False
         doWattos = False
         useNrgArchive = False
-        if fastestTest:
-            htmlOnly = True
-            doWhatif = False
-            doProcheck = False
-            doWattos = False
-#            useNrgArchive = False
+
         self.failIf(os.chdir(cingDirTmp), msg =
             "Failed to change to directory for temporary test files: " + cingDirTmp)
         for entryId in entryList:
@@ -53,10 +53,12 @@ class AllChecks(TestCase):
             project = Project.open(entryId, status = 'old')
             self.assertTrue(project, 'Failed opening project: ' + entryId)
 
-            self.assertFalse(project.validate(htmlOnly = htmlOnly,
-                                              doProcheck = doProcheck,
-                                              doWhatif = doWhatif,
-                                              doWattos=doWattos ))
+            if 1:
+                self.assertFalse(project.validate(htmlOnly = htmlOnly,
+                                                  doProcheck = doProcheck,
+                                                  doWhatif = doWhatif,
+                                                  doWattos=doWattos,
+                                                  validateFastest=validateFastest ))
             self.assertTrue(project.save())
             # Do not leave the old CCPN directory laying around since it might get added to by another test.
             if os.path.exists(entryId):

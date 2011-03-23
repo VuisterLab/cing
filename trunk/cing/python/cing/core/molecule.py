@@ -1428,8 +1428,8 @@ class Molecule( NTtree, ResidueList ):
             #end for
             l = len(atm.resonances)
             if l < resonanceCount:
-#                NTdebug('Molecule._check: atom %s has only %d resonances; expected %d; repairing now',
-#                          atm, l, resonanceCount)
+                NTdebug('Molecule._check: atom %s has only %d resonances; expected %d; repairing now',
+                          atm, l, resonanceCount)
                 for _i in range(l,resonanceCount):
                     atm.addResonance()
                 #end for
@@ -1531,7 +1531,28 @@ class Molecule( NTtree, ResidueList ):
         return resonanceCount
     #end def
 
-    def newResonances( self, source=None ):
+    def _convertResonanceSources(self, sMLfileVersion):
+        """Update to new data model as of sml
+        Return True on error.
+        """
+        msg = "In %s with sMLfileVersion %s" % ( getCallerName(), sMLfileVersion )
+#        NTdebug(msg)
+        if not isinstance( self.resonanceSources, NTlist):
+            NTerror( msg + " expected to have already restored an NTlist" )
+            return True
+        if len( self.resonanceSources ) == 0:
+#            NTdebug(msg + " and no resonance list found")
+            return
+        for i, resonanceSource in enumerate(self.resonanceSources):
+            if not isinstance( resonanceSource, str):
+                NTerror(msg + " expected string but found: %s" % resonanceSource)
+                return True
+            self.resonanceSources[i] = ResonanceList(resonanceSource)            
+        #end for
+    #end def
+        
+        
+    def newResonances( self, source=None, skipAtomResonanceCreation = False ):
         """Initialize a new resonance slot for every atom.
            atom.resonances() will point to this new resonance.
            Return None on error.
@@ -1542,8 +1563,9 @@ class Molecule( NTtree, ResidueList ):
         if not isinstance(source, ResonanceList):
             NTerror("In %s expected ResonanceList source but found %s" % (getCallerName(), source))
             return None
-        for atom in self.allAtoms():
-            atom.addResonance()
+        if not skipAtomResonanceCreation:
+            for atom in self.allAtoms():
+                atom.addResonance()
         self.resonanceSources.append(source)
         return source
     #end def

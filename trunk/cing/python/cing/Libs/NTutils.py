@@ -267,14 +267,6 @@ Sum                %s
         #end if
     #end def
 
-    def replaceIfPresent(self, item, itemNew):
-        idx = self.index(item)
-        if idx >= 0:
-            self.remove(item)
-            self.insert(idx,itemNew)
-        #end if
-    #end def
-
     def replace(self, item, newItem):
         index = self.index(item)
         if (index < 0):
@@ -5363,6 +5355,7 @@ def truthToInt(i):
 
 def getCallerName():
     return inspect.stack()[1][3]
+# end def
 
 def getRandomKey(size=6):
     """Get a random alphanumeric string of a given size"""
@@ -5373,3 +5366,11 @@ def getRandomKey(size=6):
     seed(time.time()*time.time())
 
     return ''.join([ALPHANUMERIC[randint(0, n)] for x in range(size)])
+# end def
+
+def isNoneorNaN(value):
+    if value == None:
+        return True
+    return isNaN(value)
+# end def
+    

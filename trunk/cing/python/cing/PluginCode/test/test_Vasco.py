@@ -33,7 +33,7 @@ class AllChecks(TestCase):
         fastestTest = 1        # Not passed to the validate routine in order to customize checks for speed.
 
         modelCount=99
-        redoFromCingProject = 0
+        redoFromCingProject = 0 # DEFAULT 0
         htmlOnly = True # default is False but enable it for faster runs without some actual data.
         doWhatif = True # disables whatif actual run
         doProcheck = True
@@ -43,7 +43,8 @@ class AllChecks(TestCase):
         filterVasco = True
         useNrgArchive = False
         ranges = 'cv'
-        doSave = not redoFromCingProject
+#        doSave = not redoFromCingProject
+        doSave = 1
 
         doSwapCheck = False
         doRestoreCheck = 1
@@ -56,15 +57,11 @@ class AllChecks(TestCase):
             doWattos = False
             doQueeny = False
             doTalos = False
-            filterVasco = 1
+            filterVasco = 0
             doRestoreCheck = False
             doStoreCheck = False
         if redoFromCingProject:
             useNrgArchive = False
-            doWhatif = False
-            doProcheck = False
-            doWattos = False
-            doTalos = False
 
 
 #        cingDirTmp = '/Users/jd/workspace/nrgcing/Vasco' 

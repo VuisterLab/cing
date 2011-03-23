@@ -140,7 +140,9 @@ class RestraintList(NTlist):
 
 class ResonanceList(NTlist):
     """
-    Contains Resonance objects.
+    Contains ResonanceList meta data.
+    NB the name is not necessarily unique within even the molecule. 
+    I.e. for PDB entry 1cjg and from NMR-STAR entry 4813 will get the resonance list name bmr4813_21.str twice from CCPN. 
     """
     SML_SAVE_ATTRIBUTE_LIST = 'name status vascoApplied vascoResults'.split() # Used in cing.core.sml.SMLNTListWithAttrHandler
     
@@ -233,3 +235,16 @@ class ResonanceList(NTlist):
         return msg
     # end def
 # end class
+
+def resonanceListGetIndexFirstObjectWithRealValue(resonanceList):
+    """
+    Return index of resonance that has an actual value or -1 if no such resonance exists in this list.
+    Input can be a NTlist or a ResonanceList instance.
+    """
+    for i, resonance in enumerate(resonanceList):
+        if isNoneorNaN(resonance.value):
+            continue
+        return i
+    # end for
+    return -1
+# end def

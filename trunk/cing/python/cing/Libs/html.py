@@ -19,6 +19,7 @@ from cing.PluginCode.required.reqNih import * #@UnusedWildImport
 from cing.PluginCode.required.reqWattos import * #@UnusedWildImport
 from cing.PluginCode.required.reqWhatif import * #@UnusedWildImport
 from cing.PluginCode.required.reqX3dna import X3DNA_STR
+from cing.core.classes2 import resonanceListGetIndexFirstObjectWithRealValue
 from cing.core.parameters import cingPaths
 from cing.core.parameters import directories
 from cing.core.parameters import htmlDirectories
@@ -2930,17 +2931,21 @@ class AtomsHTMLfile( HTMLfile ):
         if atom.has_key('shiftx') and len(atom.shiftx) > 0:
             sav = atom.shiftx.av
             ssd = atom.shiftx.sd
-        atomResonanceCollapsed = atom.resonances()
-
+#        NTdebug('resonances: %s' % str(atom.resonances))
+        atomResonanceCollapsed = None
+        idx = resonanceListGetIndexFirstObjectWithRealValue(atom.resonances)
+        if idx >= 0:
+            atomResonanceCollapsed = atom.resonances[idx]
+#        NTdebug('atomResonanceCollapsed: %s' % atomResonanceCollapsed)
         if atom.db.shift:
             dav = atom.db.shift.average
             dsd = atom.db.shift.sd
-        if atom.resonances():
+        if atomResonanceCollapsed:
             value = atomResonanceCollapsed.value
             error = atomResonanceCollapsed.error
 
 #        NTdebug("Looking at the resonances: %s using last: %s" % (atom.resonances, atomResonanceCollapsed))
-        if value:
+        if not isNoneorNaN(value):
             if sav:
                 delta = value - sav
             if dav:
