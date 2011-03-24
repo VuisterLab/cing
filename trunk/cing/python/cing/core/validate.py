@@ -1348,7 +1348,7 @@ def moleculeValidateAssignments( molecule  ):
                 #end if
 
                 # Check for protons with unassigned heavy atoms
-                if atm.isProton():
+                if atm.isProton() and not atm.isPseudoAtom():
                     heavyAtm = atm.heavyAtom()
                     if heavyAtm == None:
                         NTerror("Failed to get heavy for atm: %s" % atm)

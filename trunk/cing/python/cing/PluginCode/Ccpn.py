@@ -89,6 +89,8 @@ class Ccpn:
     CCPN_RDC_CONSTRAINT_LIST = 'RdcConstraintList'
     CCPN_CS_CONSTRAINT_LIST = 'ChemShiftConstraintList'
 
+    CCPN_CS_LIST = 'ShiftList'
+    
     CCPN_RUN_MEASUREMENT = 'MeasurementListData'
     CCPN_RUN_CONSTRAINT = 'ConstraintStoreData'
     CCPN_RUN_STRUCTURE = 'StructureEnsembleData'
@@ -787,9 +789,8 @@ class Ccpn:
            Output: True or None for error.
 
            NB CING data model has no CS list entity but rather stores the info at the atom & resonances level.
-        """
-
-#        NTdebug("Now in _getCcpnShiftList")
+        """        
+        NTdebug("Now in %s", getCallerName())
         shiftMapping = self._getShiftAtomNameMapping(ccpnShiftList, ccpnMolSystem)
         if not len(shiftMapping):
             NTmessage("Skipping empty CS list.")
@@ -797,13 +798,16 @@ class Ccpn:
 #        if not self.molecule.hasResonances():
 #            self.molecule.newResonances() # do only once per import now. TODO: enable multiple resonances per atom per CCPN project.
         
-        resonanceListName = getDeepByKeysOrAttributes( ccpnShiftList, NAME_STR ) # may be absent according to api.
+        resonanceListName = getDeepByKeysOrAttributes( ccpnShiftList, NAME_STR ) # may be absent according to api.        
         if resonanceListName == None:
             NTwarning("Failed to get resonanceListName from CCPN which will not allow CING to match later on for e.g. Vasco. Continuing.")
+            resonanceListName = 'source'
+        resonanceListName = getUniqueName( self.molecule.resonanceSources, resonanceListName)            
         resonanceList = self.molecule.newResonances()
         if not isinstance( resonanceList, ResonanceList ):
             NTerror("Failed to create a new resonance list to the project.")
             return True
+        NTdebug("Renaming resonance list from: %s to: %s" % ( resonanceList.name, resonanceListName) )
         resonanceList.rename(resonanceListName)
         knownTroubleResidues = {} # To avoid repeating the same messages over
         atomsTouched = {} # Use a hash to prevent double counting.
@@ -834,8 +838,8 @@ class Ccpn:
                 continue
 
             if not hasattr(ccpnResidue, 'cing'):
-                msg = "_getCcpnShiftList:CCPN residue %d %s skipped - no Cing link"
-                NTwarning(msg, ccpnResidue.seqCode, ccpnResidue.ccpCode)
+                msg = "%s:CCPN residue %d %s skipped - no Cing link"
+                NTwarning(msg, getCallerName(), ccpnResidue.seqCode, ccpnResidue.ccpCode)
                 knownTroubleResidues[ccpnResidue] = True
                 continue
 
@@ -879,8 +883,8 @@ class Ccpn:
                 atomsTouched[a] = None
 #                resonanceList.append( lastAtomResonance )
             except:
-                msg = "_getCcpnShiftList: %s, shift CCPN atom %s skipped"
-                NTwarning(msg, ccpnResidue.cing, ccpnAtom.name)
+                msg = "%s: %s, shift CCPN atom %s skipped"
+                NTwarning(msg, getCallerName(), ccpnResidue.cing, ccpnAtom.name)
             # end try
         # end for.over shifts.
 
@@ -904,7 +908,7 @@ class Ccpn:
         doneSetShifts = False
         ccpnCalc = self.ccpnCingRun
         if ccpnCalc:
-#            NTdebug("Using ccpnCalc object")
+            NTdebug("Using ccpnCalc object")
             ccpnMolSys = self.molecule.ccpn
             for measurementData in ccpnCalc.findAllData(className = self.CCPN_RUN_MEASUREMENT,
                                                         ioRole = 'input'):
@@ -914,7 +918,7 @@ class Ccpn:
 
         # No ccpCalc or ccpnCalc is empty
         if not doneSetShifts:
-#            NTdebug("Not using ccpnCalc object")
+            NTdebug("Not using ccpnCalc object")
             ccpnShiftLoL = []
             ccpnPeakLoL = self._getCcpnPeakLoL()
 
@@ -934,9 +938,14 @@ class Ccpn:
 
 
             if not ccpnShiftLoL:
-#                NTdebug("There are no shift lists at this point, CCPN will most likely only find one in the CCPN project")
-                ccpnShiftLoL = self.ccpnNmrProject.findAllMeasurementLists(className = 'ShiftList')
-
+                NTdebug("There are no shift lists at this point, CCPN will most likely only find one in the CCPN project")
+#                ccpnShiftLoL = self.ccpnNmrProject.findAllMeasurementLists(className = 'ShiftList') # not sorted
+                # Use sorting by CCPN.
+#                ccpnShiftLoL = filterListByObjectClassName( self.ccpnNmrProject.sortedMeasurementLists(), self.CCPN_CS_LIST )
+                # or as per Rasmus' suggestion:
+                l = self.ccpnNmrProject.sortedMeasurementLists() 
+                ccpnShiftLoL = [x for x in l if x.className == self.CCPN_CS_LIST]
+                NTdebug("There are shift lists: %s" % str(ccpnShiftLoL))
             if ccpnPeakLoL and (not ccpnShiftLoL):
                 NTwarning('CCPN project has no shift lists linked to experiments. Using any/all available shift lists')
 
@@ -1088,18 +1097,25 @@ class Ccpn:
 
         ccpnCalc = self.ccpnCingRun
         if ccpnCalc:
-            for peakData in ccpnCalc.findAllData(className = self.CCPN_RUN_PEAK,
-                                                 ioRole = 'input'):
+            NTdebug("In %s using ccpnCalc" % getCallerName())
+            for peakData in ccpnCalc.findAllData(className = self.CCPN_RUN_PEAK, ioRole = 'input'):
+                NTdebug("Using peakData %s" % peakData)                
                 peakList = peakData.peakList
                 if peakList: # Technically possible that it may have been deleted
+                    NTdebug("Using peakList %s" % peakList)                
                     peakLists.append(peakList)
         # No ccpnCalc or ccpnCalc is empty
-        if not peakLists:
-          for experiment in self.ccpnNmrProject.sortedExperiments():
-              for spectrum in experiment.sortedDataSources():
-                  for peakList in spectrum.peakLists:
-                      peakLists.append(peakList)
+        if not peakLists:          
+            NTdebug("In %s no peakLists yet" % getCallerName())
+            for experiment in self.ccpnNmrProject.sortedExperiments():
+                NTdebug("Using experiment %s" % experiment)
+                for spectrum in experiment.sortedDataSources():
+                    NTdebug("Using spectrum %s" % spectrum)
+                    for peakList in spectrum.peakLists:
+                        NTdebug("Using peakList %s" % peakList)
+                        peakLists.append(peakList)
 
+        NTdebug("In %s return peakLists %s" % (getCallerName(), str(peakLists)))
         return peakLists
 
     def _getShiftAtomNameMapping(self, ccpnShiftList, ccpnMolSystem):
@@ -2626,6 +2642,7 @@ def isRootDirectory(f):
 #        NTdebug("If the first slash is the last or second last BINGO: ["+f+"]")
         return True
     return False
+# end def
 
 def modifyResidueDescriptorForTerminii( ccpnResDescriptor, i, seqLength, molType):
     """
@@ -2715,8 +2732,7 @@ stereochemistry is cna be seen by examining the atom network.
 #    if ccpnResDescriptor != ccpnResDescriptorNew:
 #        NTdebug("Changed from %s to %s" % (ccpnResDescriptor,ccpnResDescriptorNew))
     return ccpnResDescriptorNew
-
-
+# end def    
 
 
 # register the function

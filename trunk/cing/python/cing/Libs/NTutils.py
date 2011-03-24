@@ -42,6 +42,8 @@ locale.setlocale(locale.LC_ALL, "")
 
 CONSENSUS_STR = 'consensus'
 
+MAX_TRIES_UNIQUE_NAME = 99999
+
 class Lister:
     MAX_LINE_SIZE_VALUE = 80 # who wants to see long lines of gibberish
     """Example from 'Learning Python from O'Reilly publisher'"""
@@ -2416,8 +2418,6 @@ class NTvalue(NTdict):
     Simple arithmic: +, -, *, /, ==, !=, >, >=, <, <=,
     fmt2 will be used when value exists but error does not.
     """
-    # JFD notes that the error should not be zero by default; checking for trouble because of change.
-    # GWV Please check; will this matter that you know?
     defaultFormat  = '%s (+- %s)'
     defaultFormat2 = '%s'
 
@@ -4603,6 +4603,7 @@ def getDeepByKeysOrAttributes(c, *keyList):
     c for complex objects.
     Hacked for attributes too, in case key does not exist
 
+    NB getDeepByKeysOrAttributes(o, '__class__', '__name__' ) doesn't give what you would expect.
     """
     if c == None:
         return None
@@ -5374,3 +5375,72 @@ def isNoneorNaN(value):
     return isNaN(value)
 # end def
     
+    
+
+def getUniqueName(objectListWithNameAttribute, baseName, nameFormat = "%s_%d" ):
+    """
+    Return unique name or False on error. 
+    E.g. for ResonanceSources object in which the ResonanceList objects have a name attribute.
+    
+    nameFormat may be specified to receive a string and an integer argument.
+    Works on any NTlist that has name attributes in each element.
+    """
+    nameList = objectListWithNameAttribute.zap( NAME_STR )
+#    NTdebug("Already have names: %s" % str(nameList))
+    
+    nameDict = NTlist2dict(nameList)
+    if not nameDict.has_key( baseName):
+        return baseName    
+    i = 1
+    while i < MAX_TRIES_UNIQUE_NAME: # This code is optimal unless number of objects get to 10**5.
+        newName = sprintf( nameFormat, baseName, i)
+        if not nameDict.has_key( newName ):
+            return newName
+        i += 1 
+# end def
+
+def getObjectByName(ll, name):
+    """
+    Return list by name or False. 
+    Works on any NTlist that has name attributes in each element.
+
+    E.g. for ResonanceSources object in which the ResonanceList objects have a name attribute.    
+    """
+#    NTdebug("Working on ll: %s" % str(ll))
+#    NTdebug("ll[0].name: %s" % ll[0].name)
+    names = ll.zap('name')
+#    NTdebug("names: %s" % str(names))
+    idx = names.index(name)
+    if idx < 0:
+        return
+    return ll[idx]
+# end def
+
+def getObjectIdx(ll, l):
+    """
+    Return list by name or False. 
+    Works on any NTlist that has name attributes in each element.
+    """
+    name = l.name
+    names = ll.zap('name')
+    return names.index(name)
+# end def
+
+
+def filterListByObjectClassName( l, className ):
+    'Return new list with only those objects that have given class name.'
+    result = []
+    if l == None:
+        return result
+    if not isinstance(l, list):
+        NTerror('Input is not a list but a %s' % str(l))
+        return result
+#    if len(l) == 0:
+#        return result
+    for o in l:
+        oClassName = getDeepByKeysOrAttributes(o, '__class__', '__name__' )
+#        NTdebug("oClassName: %s" % oClassName)
+        if oClassName == className:
+            result.append(o)
+    return result
+

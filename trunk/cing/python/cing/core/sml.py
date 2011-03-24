@@ -381,6 +381,42 @@ class SMLNTdictHandler( SMLhandler ):
 NTdict.SMLhandler = SMLNTdictHandler()
 
 
+# Make SMLhandlers for NTvalue
+# Needed because it's a subclass of NTdict
+class SMLNTvalueHandler( SMLhandler ):
+
+    def __init__(self, name = 'NTvalue' ):
+        SMLhandler.__init__( self, name = name )
+    #end def
+
+    def handle(self, line, fp, obj=None):
+        NTdebug("Now in %s#handle at line: %s" % (getCallerName(), str(line)))
+        dictObj = NTvalue(NaN)
+        return self.dictHandler(dictObj, fp, obj)
+    #end def
+
+    def toSML(self, theDict, stream=sys.stdout, *args, **kwds):
+        """
+        Write key value pairs of theDict to stream for restoring later with fromFile method
+        Returns theDict or None on error.
+        """
+#        fprintf( stream, '%s\n', self.startTag )
+#        for key,value in theDict.iteritems():
+#            fprintf( stream, '%s = ', key )
+#            if hasattr(value,'SMLhandler') and value.SMLhandler != None:
+#                value.SMLhandler.toSML( value, stream, *args, **kwds )
+#            else:
+#                fprintf( stream, '%r\n', value )
+#            #end if
+#        #end for
+#        fprintf( stream, '%s\n', self.endTag )
+        fprintf( stream, '%r\n', theDict )
+        return theDict
+    #end def
+#end class
+NTvalue.SMLhandler = SMLNTvalueHandler()
+
+
 class SMLMoleculeHandler( SMLhandler ):
 
     def __init__(self):
@@ -1091,7 +1127,8 @@ class SMLNTListWithAttrHandler( SMLhandler ):
                 NTerror("Failed to read expected attribute in top object: %s" % key)
                 return
             setattr(rl, key, getattr(rlTop,key))
-        rl.addList(rlTop.theList) # not done yet.
+#        rl.addList(rlTop.theList) # not done yet.
+        NTmessage("==> Restored %s" % rl)
         return rl
     #end def
     

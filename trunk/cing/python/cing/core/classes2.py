@@ -145,8 +145,9 @@ class ResonanceList(NTlist):
     I.e. for PDB entry 1cjg and from NMR-STAR entry 4813 will get the resonance list name bmr4813_21.str twice from CCPN. 
     """
     SML_SAVE_ATTRIBUTE_LIST = 'name status vascoApplied vascoResults'.split() # Used in cing.core.sml.SMLNTListWithAttrHandler
-    
     # use the same spelling through out.
+    
+    # NB the unusual init. Differs in that arguments aren't added to the list.
     def __init__(self, name, status = 'keep'):
         NTlist.__init__(self)
         self.__CLASS__ = 'ResonanceList'

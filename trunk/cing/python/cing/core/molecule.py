@@ -1551,14 +1551,13 @@ class Molecule( NTtree, ResidueList ):
         #end for
     #end def
         
-        
     def newResonances( self, source=None, skipAtomResonanceCreation = False ):
         """Initialize a new resonance slot for every atom.
            atom.resonances() will point to this new resonance.
            Return None on error.
         """
         if source == None:
-            sourceName = 'source_%d' % len(self.resonanceSources) 
+            sourceName = getUniqueName(self.resonanceSources, 'source' ) 
             source = ResonanceList(sourceName)
         if not isinstance(source, ResonanceList):
             NTerror("In %s expected ResonanceList source but found %s" % (getCallerName(), source))
@@ -1634,11 +1633,14 @@ class Molecule( NTtree, ResidueList ):
         resonanceList.vascoResults.clear()
         for atomTuple in vascoAtomInfo:
             _atomType, atomKey = atomTuple
-            rerefValue, _rerefError = rerefInfo[atomKey]
+            rerefValue, rerefError = rerefInfo[atomKey]
             if rerefValue == None:
                 NTdebug("Skipping atomType,atomKey: %s" % str(atomTuple))
                 continue
-            resonanceList.vascoResults[ atomTuple ] = rerefInfo[atomKey]
+            atomId = "_".join([atomKey[0], str(atomKey[1])]) # strings can be stored in SML. atomId will be e.g. "H,None" or "C,3"
+            rerefNTvalue = NTvalue(rerefValue, rerefError, fmt = '%.4f (+- %.4f)') # can also be sml-ed.
+#            resonanceList.vascoResults[ atomTuple ] = rerefInfo[atomKey]
+            resonanceList.vascoResults[ atomId ] = rerefNTvalue
         # end for         
     #end def
                 
@@ -1654,12 +1656,13 @@ class Molecule( NTtree, ResidueList ):
     def applyVascoChemicalShiftCorrections(self, doRevert = False, resonanceList = None):
         func_name = getCallerName()
         NTdebug("Doing applyVascoChemicalShiftCorrections with doRevert %s on %s" % (doRevert, resonanceList))
-        resonanceCount = len(self.resonanceSources)        
+#        resonanceCount = len(self.resonanceSources)        
         resonanceLoL = [resonanceList]
         if resonanceList == None:
             resonanceLoL = self.resonanceSources
         for resonanceList in resonanceLoL:
-            resonanceListIdx = getListIdx(self.resonanceSources, resonanceList)
+#            resonanceListIdx = getListIdx(self.resonanceSources, resonanceList)
+            resonanceListIdx = self.resonanceSources.index(resonanceList)
             if resonanceListIdx < 0:
                 NTwarning("No resonanceListIdx in %s" % func_name)
                 return
@@ -1680,18 +1683,23 @@ class Molecule( NTtree, ResidueList ):
                 return True
             atomListDone = NTlist() # watch out for double corrections.
             for atomTuple in vascoAtomInfo:
-                if not resonanceList.vascoResults.has_key(atomTuple):
-                    NTdebug("Skipping atomTuple: %s" % str(atomTuple))
-                    continue
                 _atomType, atomKey = atomTuple
-                rerefTuple = resonanceList.vascoResults[ atomTuple ]
-                rerefValue, rerefError = rerefTuple
-                if rerefValue == None:
-                    NTerror("Failed to find rerefValue for atomType,atomKey: %s" % str(atomTuple))
+                atomId = "_".join([atomKey[0], str(atomKey[1])])
+                rerefNTvalue = getDeepByKeysOrAttributes(resonanceList.vascoResults, atomId)
+                if rerefNTvalue == None:
+                    NTdebug("Skipping atomId: %s" % str(atomId))
+                    continue
+                rerefValue = rerefNTvalue.value
+                rerefError = rerefNTvalue.error
+                if isNoneorNaN( rerefValue ):
+                    NTerror("Found rerefValue of NaN for rerefNTvalue: %s", rerefNTvalue)
+                    continue
+                if isNoneorNaN( rerefError ):
+                    NTerror("Found rerefError of NaN for atomId: %s", rerefNTvalue)
                     continue
                 useCorrection = math.fabs(rerefValue) >= VASCO_CERTAINTY_FACTOR_CUTOFF * rerefError
                 if not useCorrection:
-                    NTmessage("Skipping uncertain correction for rerefTuple %s" % str(rerefTuple))
+                    NTmessage("Skipping uncertain correction for rerefNTvalue %s" % str(rerefNTvalue))
                     continue
 #                NTmessage("Correcting %s with %s" % (str(atomTuple), str(rerefTuple)))
                 
@@ -1701,13 +1709,17 @@ class Molecule( NTtree, ResidueList ):
                     NTerror("Found overlapping atoms in CING for Vasco corrections: %s" % str(atomListAlreadyDone))
                     NTerror("Skipping all atoms and giving up")
                     return True
-                NTmessage("Applying Vasco correction for atomTuple %s and rerefTuple %s to %d resonances in %d atoms" % (str(atomTuple), str(rerefTuple), resonanceCount, len(atomList)))
+                NTmessage("Applying Vasco correction for atomId %s and rerefTuple %s to resonance in %d atoms" % (atomId, rerefNTvalue, len(atomList)))
                 if doRevert:
                     rerefValue = -rerefValue
                 for i,atm in enumerate(atomList):
-                    if not i:
-                        NTdebug("Correcting first atom %s resonance %s with %s" % ( atm,atm.resonances[resonanceListIdx], rerefValue))
-                    atm.resonances[resonanceListIdx] += rerefValue
+                    r = atm.resonances[resonanceListIdx]
+                    if i < 2: # just show a couple for debugging.
+                        NTdebug("Correcting %3d atom %s resonance %s with %s" % ( i, atm, r, rerefValue))
+                    if isNoneorNaN(r.value):
+                        NTdebug("Skipping invalid resonance: %s" % r)
+                    else:
+                        r += rerefValue
                 atomListDone.addList(atomList)
             # end for   
             resonanceList.vascoApplied = not resonanceList.vascoApplied
@@ -5823,29 +5835,6 @@ def updateResonancesFromPeaks( peaks, axes = None)   :
     #end for
 #end def
 
-def getListByName(ll, name):
-    """
-    Return list by name or False. 
-    Works on any NTlist that has name attributes in each element.
-    """
-#    NTdebug("Working on ll: %s" % str(ll))
-#    NTdebug("ll[0].name: %s" % ll[0].name)
-    names = ll.zap('name')
-#    NTdebug("names: %s" % str(names))
-    idx = names.index(name)
-    if idx < 0:
-        return
-    return ll[idx]
-
-def getListIdx(ll, l):
-    """
-    Return list by name or False. 
-    Works on any NTlist that has name attributes in each element.
-    """
-    name = l.name
-    names = ll.zap('name')
-    return names.index(name)
-
 
 #==============================================================================
 #def saveMolecule( molecule, fileName=None)   :
@@ -5982,7 +5971,7 @@ def isValidChainId( chainId ):
 #        return False
 #    return True
 
-def ensureValidChainId(chainId ):
+def ensureValidChainId( chainId ):
     """See doc Molecule#ensureValidChainIdForThisMolecule
     In absence of an existing molecule this routine can only return the default chain id
     if the presented id is not valid.
@@ -6009,6 +5998,7 @@ def getNextAvailableChainId(chainIdListAlreadyUsed = []):
         len(Chain.DEFAULT_ChainNamesByAlphabet), issueId)
     msg += issueListUrl+`issueId`
     NTcodeerror(msg)
+# end def
 
 
 def unmatchedAtomByResDictToString(unmatchedAtomByResDict):
