@@ -91,6 +91,7 @@ valueKnownList = [
 class AllChecks(TestCase):
 #    entryList = []
     entryList = "1brv_cs_pk_2mdl".split() # don't use until issue 213 fixed.
+#    entryList = "1brv".split() # don't use until issue 213 fixed.
 #    entryList = "CtR69AParis".split() # don't use until issue 213 fixed.
 
     def testTalosPlus(self):

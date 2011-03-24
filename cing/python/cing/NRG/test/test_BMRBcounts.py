@@ -40,7 +40,7 @@ class AllChecks(TestCase):
         self.failIf(os.chdir(cingDirTmp), msg =
             "Failed to change to directory for temporary test files: " + cingDirTmp)
 
-        entryId = '1brv_cs_pk_2mdl'
+        entryId = '1brv'
         bmrbId = 4020
         inputArchiveDir = os.path.join(cingDirTestsData, "ccpn")
         ccpnFile = os.path.join(inputArchiveDir, entryId + ".tgz")

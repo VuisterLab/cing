@@ -21,10 +21,10 @@ import unittest
 
 class AllChecks(TestCase):
 
-    entryList = "1brv_cs_pk_2mdl".split() # DEFAULT because it contains many data types and is small/fast to run.
-#    entryList = "1ieh".split()
+#    entryList = "1brv".split() # DEFAULT because it contains many data types and is small/fast to run.
+    entryList = "1ieh".split()
 #    entryList = "1brv".split()
-#    entryList = "2hgh".split()
+#    entryList = "1cjg".split()
 #    entryList = "1bus".split()
 #    entryList = "1a4d 1ai0 1brv_cs_pk_2mdl 1bus 2hgh".split()
     def testInitFromAndSaveToCcpn(self):
@@ -38,13 +38,13 @@ class AllChecks(TestCase):
         doWhatif = True # disables whatif actual run
         doProcheck = True
         doWattos = True
-        doQueeny = True
+        doQueeny = True 
         doTalos = True
         filterVasco = True
         useNrgArchive = False
         ranges = 'cv'
-#        doSave = not redoFromCingProject
-        doSave = 1
+        doSave = not redoFromCingProject
+#        doSave = 1
 
         doSwapCheck = False
         doRestoreCheck = 1
@@ -52,12 +52,12 @@ class AllChecks(TestCase):
         if fastestTest:
             modelCount=1 # DEFAULT 2
             htmlOnly = True
-            doWhatif = 0
+            doWhatif = 1 # Only needed once.
             doProcheck = False
             doWattos = False
             doQueeny = False
             doTalos = False
-            filterVasco = 0
+            filterVasco = 1
             doRestoreCheck = False
             doStoreCheck = False
         if redoFromCingProject:

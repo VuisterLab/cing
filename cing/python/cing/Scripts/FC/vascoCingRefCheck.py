@@ -5,10 +5,10 @@
 
 from cing import cingDirScripts
 from cing.Libs.NTutils import * #@UnusedWildImport
+from cing.PluginCode.Ccpn import Ccpn
 from cing.PluginCode.required.reqVasco import * #@UnusedWildImport
 from cing.core.classes import Project
 from cing.core.classes2 import ResonanceList
-from cing.core.molecule import getListByName
 from cing.core.parameters import moleculeDirectories
 from matplotlib import mlab
 from memops.api import Implementation
@@ -225,10 +225,17 @@ class VascoCingReferenceCheck(VascoReferenceCheck):
         Return True on error
         """        
         ccpnProject = loadProject(self.ccpnDir)
-        for shiftList in ccpnProject.currentNmrProject.findAllMeasurementLists(className='ShiftList'):
-            self.checkProject(ccpnProject=ccpnProject, shiftListSerial=shiftList.serial)
+#        shiftLoL = ccpnProject.currentNmrProject.findAllMeasurementLists(className='ShiftList')
+        # Use sorting by CCPN.
+        shiftLoL = filterListByObjectClassName( ccpnProject.currentNmrProject.sortedMeasurementLists(), Ccpn.CCPN_CS_LIST )
+        NTdebug("Working on shiftLoL %s", str(shiftLoL))
+        
+        for i,shiftList in enumerate(shiftLoL):
+            shiftListSerial=shiftList.serial
+            NTdebug("Working on shiftListSerial %s", shiftListSerial)
+            self.checkProject(ccpnProject=ccpnProject, shiftListSerial=shiftListSerial)
             self.tagProject()
-            if self.tagCingProject():
+            if self.tagCingProject(shiftList, i):
                 return True
 
     def tagProject(self):
@@ -245,27 +252,38 @@ class VascoCingReferenceCheck(VascoReferenceCheck):
         NTdebug("%s" % self.shiftList.findAllApplicationData(application='VASCO'))
     # end def
 
-    def tagCingProject(self):
+    def tagCingProject(self, ccpnShiftList, i):
         """
-        Return True on error
+        Return True on error.
+        
+        Ensure that the name used below stays in sync with the scheme used by the CING CCPN importer.
+        In other words: no changes are allowed in the order of CS lists between CING and CCPN projects.
         """
-        NTmessage("Tagging CING project with Vasco results.")        
         mol = self.cingProject.molecule
-        resonanceListName = getDeepByKeysOrAttributes( self.shiftList, NAME_STR ) # may be absent according to api.
-        if resonanceListName == None:
-            NTerror("Failed to get resonanceListName from CCPN which will not allow CING to match later on for e.g. Vasco. Continuing.")
-            return True
-#        resonanceList = self.project.resonances.getListByName(resonanceListName)
-        resonanceList = getListByName(mol.resonanceSources, resonanceListName)
+#        resonanceListName = getDeepByKeysOrAttributes( ccpnShiftList, NAME_STR )
+#        if resonanceListName == None:
+#            NTerror("Failed to get resonanceListName from CCPN which will not allow CING to match later on for e.g. Vasco. Continuing.")
+#            resonanceListName = 'source'
+#        idx = getObjectIdxByName( mol.resonanceSources, resonanceListName ) 
+#        if i < 0:
+#            NTerror("Failed to get idx for resonanceListName %s" % resonanceListName )
+#            return True
+#        resonanceListName = mol.resonanceSources[idx]
+#        if resonanceListName == None:
+#            NTerror("Failed to get resonanceListName from CCPN which will not allow CING to match later on for e.g. Vasco. Continuing.")
+#            return True
+        
+        resonanceList = getDeepByKeysOrAttributes( mol.resonanceSources, i)
+        NTmessage("Tagging CING project with Vasco results for resonanceList: %s" % resonanceList)        
         if not isinstance(resonanceList, ResonanceList):
-            NTerror("Failed to get resonanceList by name: %s" % resonanceListName)
-            NTerror("mol.resonanceSources: %s" % str(resonanceListName))
+            NTerror("Failed to get resonanceList by idx: %s" % i)
+            NTerror("mol.resonanceSources: %s" % str(mol.resonanceSources))
             return True
         if mol.setVascoChemicalShiftCorrections(self.rerefInfo, resonanceList ):
-            NTerror("Failed to setVascoChemicalShiftCorrections for: %s" % resonanceListName)
+            NTerror("Failed to setVascoChemicalShiftCorrections for: %s" % resonanceList)
             return True         
         if mol.applyVascoChemicalShiftCorrections( resonanceList = resonanceList ):
-            NTerror("Failed to applyVascoChemicalShiftCorrections for: %s" % resonanceListName)
+            NTerror("Failed to applyVascoChemicalShiftCorrections for: %s" % resonanceList)
             return True
     # end def
 # end class
