@@ -2897,54 +2897,110 @@ class DihedralByProjectList( NTlist ):
 #end class
 
 class AtomsHTMLfile( HTMLfile ):
-    """Generate an Atoms html file for listing resonances
+    """Generate an Atoms html file for listing resonances.
+    
+    When resonanceListIdx = None as per default. Then the first existing resonance value will be shown.
+    This list will be the main target for an atom.
+    
+    For a valid resonanceListIdx the specific list's values (but no invalid resonance values) will be shown.    
     """
-    def __init__(self, project, atomList):
+    
+    def __init__(self, project, atomList, resonanceListIdx = None):
 
-        fileName = project.htmlPath( htmlDirectories.molecule, 'atoms.html' )
-        atomList.htmlLocation = ( fileName, HTMLfile.top )
-        HTMLfile.__init__( self, fileName, title = 'Atom List ' + atomList.name, project=project )
-        if hasattr(atomList, 'html'):
-            del(atomList.html)
-        atomList.html = self
+        self.project = project
         self.atomList = atomList
-
-        # set the fileName and tags to locate each atom
-        for atom in self.atomList:
-            tag = '_o'+str(atom.__OBJECTID__)
-            atom.htmlLocation = ( self.fileName, '#' + tag )
+        self.resonanceListIdx = resonanceListIdx
+        self.relatedAtomsHTMLfileList = NTlist()
+        
+        fname = self._getFileName(resonanceListIdx)
+        atomListTitlePostFix = self._getAtomListTitlePostFix(resonanceListIdx)
+        fileName = self.project.htmlPath( htmlDirectories.molecule, fname)
+        
+        NTdebug("Now initing AtomsHTMLfile %s %s %s", resonanceListIdx, fname, atomListTitlePostFix )            
+        HTMLfile.__init__( self, fileName, title = 'Atom List ' + atomListTitlePostFix, project=project )
+        
+        if resonanceListIdx == None:            
+            atomList.htmlLocation = ( fileName, HTMLfile.top )
+            if hasattr(atomList, 'html'):
+                del(atomList.html)
+            atomList.html = self
+            # set the fileName and tags to locate each atom
+            for atom in self.atomList:
+                tag = '_o'+str(atom.__OBJECTID__)
+                atom.htmlLocation = ( self.fileName, '#' + tag )
+            #end for 
+            for i in range( len(self.project.molecule.resonanceSources)):
+                relatedAtomsHTMLfile = AtomsHTMLfile( self.project, self.project.molecule.atomList, i )
+                self.relatedAtomsHTMLfileList.append(relatedAtomsHTMLfile)
+            #end for 
+        else:
+            pass
+        #end if
     #end def
 
+    def _getFileName(self, resonanceListIdx):
+        fname = 'atoms.html'
+        if resonanceListIdx != None:
+            fname = 'atoms_%s.html' % resonanceListIdx
+        return fname
+
+    def _getAtomListTitlePostFix(self, resonanceListIdx):
+        atomListTitlePostFix = self.atomList.name
+        if resonanceListIdx != None:
+            resonanceList = self.project.molecule.resonanceSources[resonanceListIdx]
+            atomListTitlePostFix = resonanceList.name
+        return atomListTitlePostFix
+
+    def _getResonanceCollapsed(self, atom):
+        atomResonanceCollapsed = None
+        if self.resonanceListIdx == None:            
+            idx = resonanceListGetIndexFirstObjectWithRealValue(atom.resonances)
+            if idx >= 0:
+                atomResonanceCollapsed = atom.resonances[idx]
+            # end if            
+        else:
+            atomResonanceCollapsed = atom.resonances[self.resonanceListIdx]
+        return atomResonanceCollapsed
+        
+    def _hasResonanceValue(self, atom):
+        atomResonanceCollapsed = self._getResonanceCollapsed(atom)
+        if atomResonanceCollapsed == None:
+            return False
+        return not isNoneorNaN(atomResonanceCollapsed.value)
+        
     def _atomRow(self, atom, table):
-        """Generate one row in table for atom
+        """Generate one row in table for atom.
+        Return True on error.
         """
-        #TODO: this code also appears in validateAssignments
+
         sav     = None
         ssd     = None
         delta   = None
         ddelta  = None
         dav     = None
-        dsd     = None
+        dsd     = None        
         value   = None
         error   = None
 
-        if atom.has_key('shiftx') and len(atom.shiftx) > 0:
+#        NTdebug('resonances: %s' % str(atom.resonances))
+        atomResonanceCollapsed = self._getResonanceCollapsed(atom)
+        if atomResonanceCollapsed != None:
+            value   = atomResonanceCollapsed.value
+            error   = atomResonanceCollapsed.error
+
+#        NTdebug("Looking at the resonances: %s using last: %s" % (atom.resonances, atomResonanceCollapsed))
+        if self.resonanceListIdx != None and isNoneorNaN(value):
+            NTcodeerror("Found 'empty' resonance value for specific resonance list %s. This should have been checked before" % self.resonanceListIdx)
+            return
+
+        if atom.has_key('shiftx') and len(atom.shiftx):
             sav = atom.shiftx.av
             ssd = atom.shiftx.sd
-#        NTdebug('resonances: %s' % str(atom.resonances))
-        atomResonanceCollapsed = None
-        idx = resonanceListGetIndexFirstObjectWithRealValue(atom.resonances)
-        if idx >= 0:
-            atomResonanceCollapsed = atom.resonances[idx]
-#        NTdebug('atomResonanceCollapsed: %s' % atomResonanceCollapsed)
+        
         if atom.db.shift:
             dav = atom.db.shift.average
             dsd = atom.db.shift.sd
-        if atomResonanceCollapsed:
-            value = atomResonanceCollapsed.value
-            error = atomResonanceCollapsed.error
-
-#        NTdebug("Looking at the resonances: %s using last: %s" % (atom.resonances, atomResonanceCollapsed))
+            
         if not isNoneorNaN(value):
             if sav:
                 delta = value - sav
@@ -2971,7 +3027,8 @@ class AtomsHTMLfile( HTMLfile ):
 
         table.nextColumn()
         # reference label of atom; insert a dummy character
-        self.main( 'i', '', id=atom.htmlLocation[1][1:])
+        if self.resonanceListIdx == None:        
+            self.main( 'i', '', id=atom.htmlLocation[1][1:])
 
         chName = NaNstring
         titleStr = NO_CHAIN_TO_GO_TO
@@ -3022,9 +3079,47 @@ class AtomsHTMLfile( HTMLfile ):
 
         self._resetCingContent()
 
-        self.header('h1', 'Atom List '+ self.atomList.name)
+        atomListTitlePostFix = self._getAtomListTitlePostFix(self.resonanceListIdx)
+        self.header('h1', 'Atom List '+ atomListTitlePostFix)
         self.insertMinimalHeader( self.atomList )
 
+            # Add links to specific lists
+        if self.resonanceListIdx == None:
+#            hasVascoCorrections = False
+            openedVascoList = False
+            for i in range( len(self.project.molecule.resonanceSources)):
+#                relatedAtomsHTMLfile = self.relatedAtomsHTMLfileList[ i ]
+                fn = self._getFileName(i)
+                atomListTitlePostFix = self._getAtomListTitlePostFix(i)
+                self.header('a', 'Atom List ' + atomListTitlePostFix, href = fn, title='Specific Atom List')
+                resonanceList = self.project.molecule.resonanceSources[i]
+                if resonanceList.hasVascoCorrectionsApplied():
+#                    hasVascoCorrections = True
+                    if not openedVascoList:
+                        self.main('', 'Vasco rereferenced: ')
+#                        self.main('ol', closeTag=False)
+                        openedVascoList = True
+                    self.main('a', resonanceList.name, href = self._getFileName(i))                    
+                # end if
+            # end for
+            for i in range( len(self.project.molecule.resonanceSources)):
+                relatedAtomsHTMLfile = self.relatedAtomsHTMLfileList[ i ]
+                relatedAtomsHTMLfile.generateHtml()
+            #end for 
+        else:
+            # Add link to main list
+            i = None
+            fn = self._getFileName(i)
+            atomListTitlePostFix = self._getAtomListTitlePostFix(i)
+            self.header('a', 'Atom List ' + atomListTitlePostFix, href = fn, title='Main Atom List')
+            # Add specific Vasco info
+            resonanceList = self.project.molecule.resonanceSources[self.resonanceListIdx]
+            if resonanceList.hasVascoCorrectionsApplied():
+                self.main('h3', 'Vasco rereferenced:')
+                self.main('', resonanceList.toVascoHtmlList())                    
+            # end if
+        # end if
+        
 #        refItem = os.path.join( self.project.moleculePath('analysis'),'validateAssignments.txt')
 #        abstractResource = NTdict()        # mimic an object
 #        abstractResource.htmlLocation = ( refItem, HTMLfile.top )
@@ -3058,6 +3153,12 @@ class AtomsHTMLfile( HTMLfile ):
         for atom in self.atomList:
             if not self.showAtom(atom):
                 continue
+            # end if
+            if self.resonanceListIdx != None:
+                if not self._hasResonanceValue(atom):
+                    continue
+                # end if
+            # end if
             atomListShown.append(atom)
             if atom.rogScore.isCritiqued():
                 atomListCritiqued.append(atom)
@@ -3095,7 +3196,6 @@ class AtomsHTMLfile( HTMLfile ):
         self.main("h1", "All atoms")
         table = MakeHtmlTable( self.main, columnFormats=columnFormats, classId="display", id="dataTables-atomList-long", **tableKwds )
         for atom in table.rows(atomListShown): # TODO select all when done debugging.
-#        for atom in table.rows(atomListShown[:100]): # TODO select all when done debugging.
             self._atomRow( atom, table )
         self.main("div", openTag=False)
         self.render()

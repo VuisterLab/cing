@@ -92,6 +92,8 @@ def doStoreCING2db( entry_code, archive_id, project = None):
     cchain = csql.cingchain
     cresidue = csql.cingresidue
     catom = csql.cingatom
+    cresonancelist = csql.cingresonancelist
+    cresonancelistperatomclass = csql.cingresonancelistperatomclass
 
     if doReadProject:
         # presume the directory still needs to be created.
@@ -300,6 +302,42 @@ def doStoreCING2db( entry_code, archive_id, project = None):
 #
 #    for instance in csql.session.query(centry):
 #        NTdebug( "Retrieved entry instance: %s" % instance.entry_id )
+
+    for resonanceList in project.molecule.resonanceSources:
+        nameResoL = resonanceList.name # Name has got to be key
+        appliedResoL = resonanceList.vascoApplied
+        rogResoL = resonanceList.rogScore.rogInt()        
+        result = execute(cresonancelist.insert().values(
+            entry_id=entry_id,
+            name=nameResoL,
+            applied=appliedResoL,
+            rog=rogResoL
+            )
+        )
+        s = select([cresonancelist.c.resonancelist_id],and_(cresonancelist.c.entry_id == entry_id, cresonancelist.c.name == nameResoL))
+        resonancelist_id = execute(s).fetchall()[0][0]
+        NTdebug("Inserted resonancelist_id %s" % resonancelist_id)
+        for atomId in resonanceList.vascoResults.keys():
+            rerefNTvalue = resonanceList.vascoResults[ atomId ]
+            result = execute(cresonancelistperatomclass.insert().values(
+                entry_id = entry_id,
+                resonancelist_id = resonancelist_id,
+                atomclass= atomId,
+                csd      = rerefNTvalue.value,
+                csd_err  = rerefNTvalue.error
+#                rog=rogResoL
+                )
+            )
+            s = select([cresonancelistperatomclass.c.cingresonancelistperatomclass_id],
+                       and_(cresonancelistperatomclass.c.entry_id == entry_id, 
+                            cresonancelistperatomclass.c.resonancelist_id == resonancelist_id,
+                            cresonancelistperatomclass.c.atomclass == atomId,
+                            ))
+            cingresonancelistperatomclass_id = execute(s).fetchall()[0][0]
+            NTdebug("Inserted cingresonancelistperatomclass_id %s" % cingresonancelistperatomclass_id)
+        # end for        
+    # end for        
+
     chainCommittedCount = 0
     residueCommittedCount = 0
     atomCommittedCount = 0

@@ -4,6 +4,7 @@ Created on Aug 30, 2010
 @author: jd
 '''
 from cing.Libs.NTutils import * #@UnusedWildImport
+from cing.PluginCode.required.reqVasco import * #@UnusedWildImport
 from cing.core.ROGscore import ROGscore
 
 class RestraintList(NTlist):
@@ -158,12 +159,60 @@ class ResonanceList(NTlist):
         self._byItem = None     # if not None: list was sorted _byItem.
         self.vascoResults  = NTdict() # See applyVascoChemicalShiftCorrections # NB match with VASCO_RESULTS_STR
         self.vascoApplied  = False # VASCO_APPLIED_STR
-#        self.rogScore = ROGscore()
+        self.rogScore = ROGscore()
         self.SMLhandler.SML_SAVE_ATTRIBUTE_LIST = self.SML_SAVE_ATTRIBUTE_LIST
     #end def
+    
+    def hasVascoCorrectionsApplied(self):
+        'A little bit more sophisticated routine to report no corrections of zero.'
+        return self.vascoApplied and self.hasVascoCorrectionsApplicable()
+    #end def
+
+    def hasVascoCorrectionsApplicable(self):
+        'A little bit more sophisticated routine to report no corrections of zero.'
+        for atomId in self.vascoResults.keys():
+            ntvalue =  self.vascoResults[ atomId ]
+            rerefValue = ntvalue.value
+            rerefError = ntvalue.error
+            useCorrection = math.fabs(rerefValue) >= VASCO_CERTAINTY_FACTOR_CUTOFF * rerefError # sync with molecule code.      
+            if useCorrection:
+                return True
+            # end if
+        # end for 
+        return False
+    #end def
+            
     def __str__(self):
-#        return sprintf('<%s "%s" (%s,%d)>' % (self.__CLASS__, self.name, self.status, len(self)))
-        s = sprintf('<%s "%s">' % (self.__CLASS__, self.name))
+        return self.toVascoHtmlList() # modify when needed.
+    
+    def toVascoHtmlList(self, showHeader = False):
+        'If showIndividualApplication the output will be multiple lines.'
+        s = ''
+        if showHeader:
+            s += '<h3>' 
+            s += self.name                
+            if self.vascoApplied:
+                s += ' (applied)'
+            else:
+                s += ' (ignored)'
+            s += '</h3>\n'
+        s += '<ul>\n'   
+        for atomId in self.vascoResults.keys():
+            ntvalue =  self.vascoResults[ atomId ]
+            s += '<li>'
+            atomClassId = getDeepByKeys(vascoMapAtomIdToHuman, atomId)
+            if atomClassId == None:
+                atomClassId = atomId
+            s += '%s: %s' % ( atomClassId, ntvalue)
+            rerefValue = ntvalue.value
+            rerefError = ntvalue.error
+            useCorrection = math.fabs(rerefValue) >= VASCO_CERTAINTY_FACTOR_CUTOFF * rerefError            
+            if useCorrection:
+                s += ' applied'
+            # end if
+            s += '</li>\n'
+        # end for
+        s += '</ul>\n'        
         return s
     #end def
     def __repr__(self):
