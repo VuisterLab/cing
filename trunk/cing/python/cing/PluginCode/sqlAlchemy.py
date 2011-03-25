@@ -149,13 +149,15 @@ class csqlAlchemy(cgenericSql):
 #        NTdebug("Initializing csqlAlchemy with user/db: %s/%s" % (user,db))
         cgenericSql.__init__(self, db_type=db_type, host=host, user=user, passwd=passwd, unix_socket=unix_socket, db=db, schema=schema, echo=echo)
         # be explicit here to take advantage of code analysis.
-        self.tableNameList = ['cingentry', 'cingchain', 'cingresidue', 'cingatom']
+        self.tableNameList = ['cingentry', 'cingchain', 'cingresidue', 'cingatom', 'cingresonancelist', 'cingresonancelistperatomclass']
 #        self.tableNameList = [ 'casdcing.'+x for x in self.tableNameList]
 #        self.entry = None
         self.cingentry = None
         self.cingchain = None
         self.cingresidue = None
         self.cingatom = None
+        self.cingresonancelist = None
+        self.cingresonancelistperatomclass = None
 
         self.levelIdResidue = "residue"  # mirrors WI setup.
         self.levelIdAtom = "atom"

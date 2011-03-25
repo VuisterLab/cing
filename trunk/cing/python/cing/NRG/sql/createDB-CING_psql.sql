@@ -325,3 +325,36 @@ CREATE INDEX atom_se3 ON casdcing.cingatom (sel_3);
 CREATE INDEX atom_se4 ON casdcing.cingatom (sel_4);
 CREATE INDEX atom_se5 ON casdcing.cingatom (sel_5);
 
+
+-- cingresonancelist
+CREATE TABLE casdcing.cingresonancelist
+(
+    resonancelist_id               SERIAL UNIQUE PRIMARY KEY,
+    entry_id                       INT              NOT NULL,
+    name                           VARCHAR(255),
+    applied                        BOOLEAN DEFAULT FALSE, -- only when applicable
+    rog                            INT DEFAULT NULL,
+    FOREIGN KEY (entry_id)         REFERENCES casdcing.cingentry (entry_id) ON DELETE CASCADE
+);
+CREATE INDEX cingresonancelist_001 ON casdcing.cingresonancelist (entry_id);
+CREATE INDEX cingresonancelist_002 ON casdcing.cingresonancelist (applied);
+CREATE INDEX cingresonancelist_003 ON casdcing.cingresonancelist (rog);
+
+-- cingresonancelist
+CREATE TABLE casdcing.cingresonancelistperatomclass
+(
+    cingresonancelistperatomclass_id SERIAL UNIQUE PRIMARY KEY,
+    resonancelist_id               INT              NOT NULL,
+    entry_id                       INT              NOT NULL,
+    atomclass                      VARCHAR(255),          -- atom clas
+    csd                            FLOAT DEFAULT NULL,
+    csd_err                        FLOAT DEFAULT NULL,    
+    rog                            INT DEFAULT NULL,
+    FOREIGN KEY (resonancelist_id) REFERENCES casdcing.cingresonancelist (resonancelist_id) ON DELETE CASCADE,
+    FOREIGN KEY (entry_id)         REFERENCES casdcing.cingentry (entry_id) ON DELETE CASCADE
+);
+
+CREATE INDEX cingresonancelistperatomclass_001 ON casdcing.cingresonancelistperatomclass (resonancelist_id);
+CREATE INDEX cingresonancelistperatomclass_002 ON casdcing.cingresonancelistperatomclass (entry_id);
+CREATE INDEX cingresonancelistperatomclass_003 ON casdcing.cingresonancelistperatomclass (atomclass);
+CREATE INDEX cingresonancelistperatomclass_004 ON casdcing.cingresonancelistperatomclass (rog);

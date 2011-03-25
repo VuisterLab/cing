@@ -1631,14 +1631,13 @@ class Molecule( NTtree, ResidueList ):
         if resonanceList.vascoResults:
             NTwarning("Reseting existing non-empty Vasco results")
         resonanceList.vascoResults.clear()
-        for atomTuple in vascoAtomInfo:
-            _atomType, atomKey = atomTuple
+        for atomKey in vascoAtomIdLoL:
             rerefValue, rerefError = rerefInfo[atomKey]
             if rerefValue == None:
-                NTdebug("Skipping atomType,atomKey: %s" % str(atomTuple))
+                NTdebug("Skipping atomKey: %s" % str(atomKey))
                 continue
             atomId = "_".join([atomKey[0], str(atomKey[1])]) # strings can be stored in SML. atomId will be e.g. "H,None" or "C,3"
-            rerefNTvalue = NTvalue(rerefValue, rerefError, fmt = '%.4f (+- %.4f)') # can also be sml-ed.
+            rerefNTvalue = NTvalue(rerefValue, rerefError, fmt = '%.3f (+- %.3f)') # can also be sml-ed.
 #            resonanceList.vascoResults[ atomTuple ] = rerefInfo[atomKey]
             resonanceList.vascoResults[ atomId ] = rerefNTvalue
         # end for         
@@ -1682,8 +1681,7 @@ class Molecule( NTtree, ResidueList ):
                 NTerror("Failed to find any assigned atom in a common amino acid but Vasco did produce results for them.")
                 return True
             atomListDone = NTlist() # watch out for double corrections.
-            for atomTuple in vascoAtomInfo:
-                _atomType, atomKey = atomTuple
+            for atomKey in vascoAtomIdLoL:
                 atomId = "_".join([atomKey[0], str(atomKey[1])])
                 rerefNTvalue = getDeepByKeysOrAttributes(resonanceList.vascoResults, atomId)
                 if rerefNTvalue == None:
@@ -1697,7 +1695,7 @@ class Molecule( NTtree, ResidueList ):
                 if isNoneorNaN( rerefError ):
                     NTerror("Found rerefError of NaN for atomId: %s", rerefNTvalue)
                     continue
-                useCorrection = math.fabs(rerefValue) >= VASCO_CERTAINTY_FACTOR_CUTOFF * rerefError
+                useCorrection = math.fabs(rerefValue) >= VASCO_CERTAINTY_FACTOR_CUTOFF * rerefError # Sync with resonanceList check
                 if not useCorrection:
                     NTmessage("Skipping uncertain correction for rerefNTvalue %s" % str(rerefNTvalue))
                     continue

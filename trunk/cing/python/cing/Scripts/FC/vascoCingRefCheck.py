@@ -242,7 +242,8 @@ class VascoCingReferenceCheck(VascoReferenceCheck):
         """
         Return True on error
         """
-        for (atomType, atomKey) in vascoAtomInfo:
+        for atomKey in vascoAtomIdLoL:
+            atomType = atomKey[0]
             (rerefValue, rerefError) = self.rerefInfo[atomKey]
             if rerefValue != None:
                 appData1 = Implementation.AppDataFloat(value=rerefValue, application='VASCO', keyword='correction_%s' % atomType)
