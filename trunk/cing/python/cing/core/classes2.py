@@ -183,7 +183,8 @@ class ResonanceList(NTlist):
     #end def
             
     def __str__(self):
-        return self.toVascoHtmlList() # modify when needed.
+        return sprintf('<%s "%s">' % (self.__CLASS__, self.name))        
+#        return self.toVascoHtmlList() # modify when needed.
     
     def toVascoHtmlList(self, showHeader = False):
         'If showIndividualApplication the output will be multiple lines.'

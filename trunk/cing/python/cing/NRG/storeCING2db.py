@@ -328,7 +328,7 @@ def doStoreCING2db( entry_code, archive_id, project = None):
 #                rog=rogResoL
                 )
             )
-            s = select([cresonancelistperatomclass.c.cingresonancelistperatomclass_id],
+            s = select([cresonancelistperatomclass.c.resonancelistperatomclass_id],
                        and_(cresonancelistperatomclass.c.entry_id == entry_id, 
                             cresonancelistperatomclass.c.resonancelist_id == resonancelist_id,
                             cresonancelistperatomclass.c.atomclass == atomId,

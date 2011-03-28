@@ -343,7 +343,7 @@ CREATE INDEX cingresonancelist_003 ON casdcing.cingresonancelist (rog);
 -- cingresonancelist
 CREATE TABLE casdcing.cingresonancelistperatomclass
 (
-    cingresonancelistperatomclass_id SERIAL UNIQUE PRIMARY KEY,
+    resonancelistperatomclass_id   SERIAL UNIQUE PRIMARY KEY,
     resonancelist_id               INT              NOT NULL,
     entry_id                       INT              NOT NULL,
     atomclass                      VARCHAR(255),          -- atom clas
