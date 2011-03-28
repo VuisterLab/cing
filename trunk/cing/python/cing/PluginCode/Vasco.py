@@ -23,12 +23,14 @@ if True: # block
     finally: # finally fails in python below 2.5
         switchOutput(True)
     # VASCO part
+#    switchOutput(True)
     try:
         from cing.Scripts.FC.vascoCingRefCheck import VascoCingReferenceCheck # will do the below
 #        from pdbe.software.vascoReferenceCheck import VascoReferenceCheck #@UnusedImport
 #        import Tkinter
     except:
         switchOutput(True)
+#        NTtracebackError()
         raise ImportWarning(VASCO_STR)
     finally: # finally fails in python below 2.5
         switchOutput(True)
