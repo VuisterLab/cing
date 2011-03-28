@@ -790,7 +790,7 @@ class Ccpn:
 
            NB CING data model has no CS list entity but rather stores the info at the atom & resonances level.
         """        
-        NTdebug("Now in %s", getCallerName())
+#        NTdebug("Now in %s", getCallerName())
         shiftMapping = self._getShiftAtomNameMapping(ccpnShiftList, ccpnMolSystem)
         if not len(shiftMapping):
             NTmessage("Skipping empty CS list.")
@@ -807,7 +807,7 @@ class Ccpn:
         if not isinstance( resonanceList, ResonanceList ):
             NTerror("Failed to create a new resonance list to the project.")
             return True
-        NTdebug("Renaming resonance list from: %s to: %s" % ( resonanceList.name, resonanceListName) )
+#        NTdebug("Renaming resonance list from: %s to: %s" % ( resonanceList.name, resonanceListName) )
         resonanceList.rename(resonanceListName)
         knownTroubleResidues = {} # To avoid repeating the same messages over
         atomsTouched = {} # Use a hash to prevent double counting.
@@ -918,7 +918,7 @@ class Ccpn:
 
         # No ccpCalc or ccpnCalc is empty
         if not doneSetShifts:
-            NTdebug("Not using ccpnCalc object")
+#            NTdebug("Not using ccpnCalc object")
             ccpnShiftLoL = []
             ccpnPeakLoL = self._getCcpnPeakLoL()
 
@@ -938,14 +938,14 @@ class Ccpn:
 
 
             if not ccpnShiftLoL:
-                NTdebug("There are no shift lists at this point, CCPN will most likely only find one in the CCPN project")
+#                NTdebug("There are no shift lists at this point, CCPN will most likely only find one in the CCPN project")
 #                ccpnShiftLoL = self.ccpnNmrProject.findAllMeasurementLists(className = 'ShiftList') # not sorted
                 # Use sorting by CCPN.
 #                ccpnShiftLoL = filterListByObjectClassName( self.ccpnNmrProject.sortedMeasurementLists(), self.CCPN_CS_LIST )
                 # or as per Rasmus' suggestion:
                 l = self.ccpnNmrProject.sortedMeasurementLists() 
                 ccpnShiftLoL = [x for x in l if x.className == self.CCPN_CS_LIST]
-                NTdebug("There are shift lists: %s" % str(ccpnShiftLoL))
+#                NTdebug("There are shift lists: %s" % str(ccpnShiftLoL))
             if ccpnPeakLoL and (not ccpnShiftLoL):
                 NTwarning('CCPN project has no shift lists linked to experiments. Using any/all available shift lists')
 
@@ -1097,25 +1097,25 @@ class Ccpn:
 
         ccpnCalc = self.ccpnCingRun
         if ccpnCalc:
-            NTdebug("In %s using ccpnCalc" % getCallerName())
+#            NTdebug("In %s using ccpnCalc" % getCallerName())
             for peakData in ccpnCalc.findAllData(className = self.CCPN_RUN_PEAK, ioRole = 'input'):
-                NTdebug("Using peakData %s" % peakData)                
+#                NTdebug("Using peakData %s" % peakData)                
                 peakList = peakData.peakList
                 if peakList: # Technically possible that it may have been deleted
-                    NTdebug("Using peakList %s" % peakList)                
+#                    NTdebug("Using peakList %s" % peakList)                
                     peakLists.append(peakList)
         # No ccpnCalc or ccpnCalc is empty
         if not peakLists:          
-            NTdebug("In %s no peakLists yet" % getCallerName())
+#            NTdebug("In %s no peakLists yet" % getCallerName())
             for experiment in self.ccpnNmrProject.sortedExperiments():
-                NTdebug("Using experiment %s" % experiment)
+#                NTdebug("Using experiment %s" % experiment)
                 for spectrum in experiment.sortedDataSources():
-                    NTdebug("Using spectrum %s" % spectrum)
+#                    NTdebug("Using spectrum %s" % spectrum)
                     for peakList in spectrum.peakLists:
-                        NTdebug("Using peakList %s" % peakList)
+#                        NTdebug("Using peakList %s" % peakList)
                         peakLists.append(peakList)
 
-        NTdebug("In %s return peakLists %s" % (getCallerName(), str(peakLists)))
+#        NTdebug("In %s return peakLists %s" % (getCallerName(), str(peakLists)))
         return peakLists
 
     def _getShiftAtomNameMapping(self, ccpnShiftList, ccpnMolSystem):

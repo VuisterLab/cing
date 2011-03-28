@@ -2916,7 +2916,7 @@ class AtomsHTMLfile( HTMLfile ):
         atomListTitlePostFix = self._getAtomListTitlePostFix(resonanceListIdx)
         fileName = self.project.htmlPath( htmlDirectories.molecule, fname)
         
-        NTdebug("Now initing AtomsHTMLfile %s %s %s", resonanceListIdx, fname, atomListTitlePostFix )            
+#        NTdebug("Now initing AtomsHTMLfile %s %s %s", resonanceListIdx, fname, atomListTitlePostFix )            
         HTMLfile.__init__( self, fileName, title = 'Atom List ' + atomListTitlePostFix, project=project )
         
         if resonanceListIdx == None:            
