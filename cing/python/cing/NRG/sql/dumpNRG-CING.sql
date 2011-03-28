@@ -10,6 +10,11 @@ COPY (SELECT * FROM casdcing.cingentry) 			TO '$cwd/casdcing.cingentry.csv' WITH
 COPY (SELECT * FROM casdcing.cingchain) 			TO '$cwd/casdcing.cingchain.csv' WITH CSV HEADER;
 COPY (SELECT * FROM casdcing.cingresidue) 			TO '$cwd/casdcing.cingresidue.csv' WITH CSV HEADER;
 COPY (SELECT * FROM casdcing.cingatom) 				TO '$cwd/casdcing.cingatom.csv' WITH CSV HEADER;
+
+-- secondary objects
+COPY (SELECT * FROM casdcing.cingresonancelist)                 TO '$cwd/casdcing.cingresonancelist.csv' WITH CSV HEADER;
+COPY (SELECT * FROM casdcing.cingresonancelistperatomclass)     TO '$cwd/casdcing.cingresonancelistperatomclass.csv' WITH CSV HEADER;
+
 -- derived tables
 COPY (SELECT * FROM casdcing.cingsummary) 			TO '$cwd/casdcing.cingsummary.csv' WITH CSV HEADER;
 COPY (SELECT * FROM casdcing.entry_list_selection) 	TO '$cwd/casdcing.entry_list_selection.csv' WITH CSV HEADER;

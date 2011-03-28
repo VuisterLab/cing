@@ -14,8 +14,14 @@ COPY casdcing.cingchain     FROM '$cwd/casdcing.cingchain.csv'   CSV HEADER;
 COPY casdcing.cingresidue 	FROM '$cwd/casdcing.cingresidue.csv' CSV HEADER;
 COPY casdcing.cingatom 		FROM '$cwd/casdcing.cingatom.csv' 	 CSV HEADER;
 
+COPY casdcing.cingresonancelist             FROM '$cwd/casdcing.cingresonancelist.csv'                CSV HEADER;
+COPY casdcing.cingresonancelistperatomclass FROM '$cwd/casdcing.cingresonancelistperatomclass.csv'    CSV HEADER;
+
 -- Now the sequences need to be initialized too.
 SELECT setval('casdcing.cingentry_entry_id_seq',     max(entry_id))      FROM casdcing.cingentry;
 SELECT setval('casdcing.cingchain_chain_id_seq',     max(chain_id))      FROM casdcing.cingchain;
 SELECT setval('casdcing.cingresidue_residue_id_seq', max(residue_id))    FROM casdcing.cingresidue;
 SELECT setval('casdcing.cingatom_atom_id_seq',       max(atom_id))       FROM casdcing.cingatom;
+
+SELECT setval('casdcing.cingresonancelist_resonancelist_id_seq',                         max(resonancelist_id))             FROM casdcing.cingresonancelist;
+SELECT setval('casdcing.cingresonancelistperatomclass_resonancelistperatomclass_id_seq', max(resonancelistperatomclass_id)) FROM casdcing.cingresonancelistperatomclass;
