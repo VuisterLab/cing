@@ -31,6 +31,7 @@ def importPlugin( pluginName ):
         except ImportWarning: # Disable after done debugging; can't use NTdebug yet.
             print "Skipping reload of an optional compound."
         except Exception:
+            NTtracebackError()
             NTexception('A reload failed for ' + pluginName)
             return None
 #    module = __import__( moduleName, globals(), locals(), [] )

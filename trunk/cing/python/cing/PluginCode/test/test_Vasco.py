@@ -9,6 +9,7 @@ from cing.Libs.forkoff import do_cmd
 from cing.NRG import ARCHIVE_NRG_ID
 from cing.NRG.storeCING2db import doStoreCING2db
 from cing.PluginCode.Ccpn import Ccpn #@UnusedImport needed to throw a ImportWarning so that the test is handled properly.
+from cing.PluginCode.Vasco import Vasco #@UnusedImport needed to throw a ImportWarning so that the test is handled properly.
 from cing.PluginCode.required.reqWattos import * #@UnusedWildImport
 from cing.Scripts.FC.utils import printSequenceFromCcpnProject
 from cing.Scripts.FC.utils import swapCheck

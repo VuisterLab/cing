@@ -131,7 +131,7 @@ def validate( project, ranges=None, parseOnly=False, htmlOnly=False,
 
     if filterVasco:
         if not getDeepByKeysOrAttributes(plugins, VASCO_STR, IS_INSTALLED_STR):
-            NTdebug("Missing required plugin %s or not installed" % VASCO_STR)
+            NTdebug("Missing required plugin %s or not installed." % VASCO_STR)
             return True
         if not project.runVasco():
             NTerror("Failed to filterVasco but will continue with validation.")
