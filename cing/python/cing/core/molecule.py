@@ -1627,14 +1627,14 @@ class Molecule( NTtree, ResidueList ):
         """
         Return True on error
         """
-        NTdebug("Doing %s on %s." % (getCallerName(), resonanceList))
+#        NTdebug("Doing %s on %s." % (getCallerName(), resonanceList))
         if resonanceList.vascoResults:
             NTwarning("Reseting existing non-empty Vasco results")
         resonanceList.vascoResults.clear()
         for atomKey in vascoAtomIdLoL:
             rerefValue, rerefError = rerefInfo[atomKey]
             if rerefValue == None:
-                NTdebug("Skipping atomKey: %s" % str(atomKey))
+#                NTdebug("Skipping atomKey: %s" % str(atomKey))
                 continue
             atomId = "_".join([atomKey[0], str(atomKey[1])]) # strings can be stored in SML. atomId will be e.g. "H,None" or "C,3"
             rerefNTvalue = NTvalue(rerefValue, rerefError, fmt = '%.3f (+- %.3f)') # can also be sml-ed.
@@ -1648,13 +1648,12 @@ class Molecule( NTtree, ResidueList ):
     Set doRevert to undo previously applied corrections.
     The corrections should first be made part of the CING project molecule.vascoResults
     using setVascoChemicalShiftCorrections
-    If resonanceList is None then do all present.
-    Return True on error
-    
+    If resonanceList is None then do all present.    
+    Return True on error    
     """
     def applyVascoChemicalShiftCorrections(self, doRevert = False, resonanceList = None):
         func_name = getCallerName()
-        NTdebug("Doing applyVascoChemicalShiftCorrections with doRevert %s on %s" % (doRevert, resonanceList))
+#        NTdebug("Doing applyVascoChemicalShiftCorrections with doRevert %s on %s" % (doRevert, resonanceList))
 #        resonanceCount = len(self.resonanceSources)        
         resonanceLoL = [resonanceList]
         if resonanceList == None:
@@ -1670,7 +1669,10 @@ class Molecule( NTtree, ResidueList ):
                 return
     #        if ( not self.vascoApplied and doRevert) or ( self.vascoApplied and not doRevert):
             if resonanceList.vascoApplied ^ doRevert: # boolean xor is equivalent of the above line.
-                NTwarning("Vasco results were applied is: %s but doRevert is %s" % (resonanceList.vascoApplied, doRevert ))
+                if 1: # DEFAULT 1
+                    NTerror("Vasco results were applied is: %s but doRevert is %s. Aborting." % (resonanceList.vascoApplied, doRevert ))
+                    NTerror("Consider reverting previous correction first.") # should we build that in already?
+                    return True
     
             resList = self.allCommonAaResidues()
             if not resList:
@@ -1685,7 +1687,7 @@ class Molecule( NTtree, ResidueList ):
                 atomId = "_".join([atomKey[0], str(atomKey[1])])
                 rerefNTvalue = getDeepByKeysOrAttributes(resonanceList.vascoResults, atomId)
                 if rerefNTvalue == None:
-                    NTdebug("Skipping atomId: %s" % str(atomId))
+#                    NTdebug("Skipping atomId: %s" % str(atomId))
                     continue
                 rerefValue = rerefNTvalue.value
                 rerefError = rerefNTvalue.error
@@ -1697,7 +1699,7 @@ class Molecule( NTtree, ResidueList ):
                     continue
                 useCorrection = math.fabs(rerefValue) >= VASCO_CERTAINTY_FACTOR_CUTOFF * rerefError # Sync with resonanceList check
                 if not useCorrection:
-                    NTmessage("Skipping uncertain correction for rerefNTvalue %s" % str(rerefNTvalue))
+                    NTmessage("Skipping uncertain correction for %10s of rerefNTvalue %s" % (atomId, str(rerefNTvalue)))
                     continue
 #                NTmessage("Correcting %s with %s" % (str(atomTuple), str(rerefTuple)))
                 

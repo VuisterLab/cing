@@ -89,6 +89,7 @@ def main(entryId, *extraArgList):
     doTalos = True
     tgzCing = True # default: True # Create a tgz for the cing project. In case of a CING project input it will be overwritten.
                     # NB leave this set to True or modify code below.
+    removeCcpnDirectory = 1 # perhaps not so in the future.
     modelCount = None # default setting is None
 #    ranges = None
 
@@ -140,6 +141,8 @@ def main(entryId, *extraArgList):
     filterVasco = getDeepByKeysOrAttributes(extraArgList, IDX_FILTER_VASCO)
     if filterVasco:
         filterVasco = int(filterVasco)
+    else:
+        filterVasco = 1 # Default should be True
 
     if archiveType == ARCHIVE_TYPE_FLAT:
         pass # default
@@ -297,10 +300,12 @@ def main(entryId, *extraArgList):
         except:
             NTtracebackError()
             NTerror("Failed to store CING project's data due to above traceback error.")
+    
     if projectType == PROJECT_TYPE_CCPN:
 #        fileNameTgz = entryId + '.tgz'
         os.unlink(fileNameTgz) # temporary ccpn tgz
-        rmdir(entryId) # temporary ccpn dir
+        if removeCcpnDirectory:
+            rmdir(entryId) # ccpn dir may contain vasco info.
 
     if tgzCing:
         directoryNameCing = entryId + ".cing"

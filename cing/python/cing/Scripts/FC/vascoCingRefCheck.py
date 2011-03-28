@@ -14,7 +14,8 @@ from matplotlib import mlab
 from memops.api import Implementation
 from memops.general.Io import loadProject
 from memops.universal.Util import returnInt, returnFloat
-from pdbe.software.vascoReferenceCheck import VascoReferenceCheck #@UnresolvedImport
+#from pdbe.software.vascoReferenceCheck import VascoReferenceCheck
+from pdbe2.analysis.shifts.vascoReferenceCheck import VascoReferenceCheck
 import glob
 
 
@@ -228,11 +229,11 @@ class VascoCingReferenceCheck(VascoReferenceCheck):
 #        shiftLoL = ccpnProject.currentNmrProject.findAllMeasurementLists(className='ShiftList')
         # Use sorting by CCPN.
         shiftLoL = filterListByObjectClassName( ccpnProject.currentNmrProject.sortedMeasurementLists(), Ccpn.CCPN_CS_LIST )
-        NTdebug("Working on shiftLoL %s", str(shiftLoL))
+#        NTdebug("Working on shiftLoL %s", str(shiftLoL))
         
         for i,shiftList in enumerate(shiftLoL):
             shiftListSerial=shiftList.serial
-            NTdebug("Working on shiftListSerial %s", shiftListSerial)
+#            NTdebug("Working on shiftListSerial %s", shiftListSerial)
             self.checkProject(ccpnProject=ccpnProject, shiftListSerial=shiftListSerial)
             self.tagProject()
             if self.tagCingProject(shiftList, i):
@@ -250,7 +251,7 @@ class VascoCingReferenceCheck(VascoReferenceCheck):
                 appData2 = Implementation.AppDataFloat(value=rerefError, application='VASCO', keyword='correctionError_%s' % atomType)
                 self.shiftList.addApplicationData(appData1)
                 self.shiftList.addApplicationData(appData2)
-        NTdebug("%s" % self.shiftList.findAllApplicationData(application='VASCO'))
+#        NTdebug("%s" % self.shiftList.findAllApplicationData(application='VASCO'))
     # end def
 
     def tagCingProject(self, ccpnShiftList, i):

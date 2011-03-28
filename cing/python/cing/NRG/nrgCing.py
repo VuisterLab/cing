@@ -6,7 +6,7 @@ indices that live on top of them. For weekly and for more mass updates.
 
 Execute like:
 
-python -u $CINGROOT/python/cing/NRG/nrgCing.py [entry_code] [updateWeekly prepare prepareEntry runCing runCingEntry storeCING2db createToposTokens getEntryInfo ]
+$CINGROOT/python/cing/NRG/nrgCing.py [entry_code] [updateWeekly prepare prepareEntry runCing runCingEntry storeCING2db createToposTokens getEntryInfo ]
 
 As a cron job this will:
     - create a todo list
@@ -1537,13 +1537,14 @@ class nrgCing(Lister):
         outputDir = self.results_dir
         storeCING2db = "1" # DEFAULT: '1' All arguments need to be strings.
         filterTopViolations = '1' # DEFAULT: '1'
+        filterVasco = '1'
         # Tune this to:
 #            verbosity         inputDir             outputDir
 #            pdbConvention     restraintsConvention archiveType         projectType
-#            storeCING2db      ranges               filterTopViolations
+#            storeCING2db      ranges               filterTopViolations filterVasco
         extraArgList = ( str(cing.verbosity), inputDir, outputDir,
                          '.', '.', ARCHIVE_TYPE_BY_CH23, PROJECT_TYPE_CCPN,
-                         storeCING2db, CV_RANGES_STR, filterTopViolations)
+                         storeCING2db, CV_RANGES_STR, filterTopViolations, filterVasco)
 
         if doScriptOnEntryList(pythonScriptFileName,
                             entryListFileName,
@@ -1638,10 +1639,10 @@ class nrgCing(Lister):
 
         NTmessage("Starting prepare using self.entry_list_todo")
 
-        if 0: # DEFAULT: False
+        if False: # DEFAULT: False
             NTmessage("Going to use non-default entry_list_todo in prepare")
 #            self.entry_list_todo = "1a24 1a4d 1afp 1ai0 1b4y 1brv 1bus 1c2n 1cjg 1d3z 1hue 1ieh 1iv6 1jwe 1kr8 2cka 2fws 2hgh 2jmx 2k0e 2kib 2knr 2kz0 2rop".split()
-            self.entry_list_todo = "1brv 2knr 1a24".split()
+            self.entry_list_todo = "1brv".split()
 #            self.entry_list_todo = readLinesFromFile('/Users/jd/NRG/lists/bmrbPdbEntryList.csv')
             self.entry_list_todo = NTlist( *self.entry_list_todo )
             self.entry_list_nmr = deepcopy(self.entry_list_todo)
