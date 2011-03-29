@@ -4,6 +4,10 @@ set x = 1brv
 set stage = rT
 set ranges = 171-188
 
+set x = H2_2Ca_64_100
+set stage = rT
+set ranges = 501-850
+
 
 -----------------------------------------------------------------------------------------------------------------------------------------
    Import into cing
@@ -108,14 +112,14 @@ Manually copy the appropriate .psf file to the $x.cing/Refine/$stage/PSF subdire
 
 Be sure to have the right name in parameter.py for the psfFile field
 PERHAPS: edit the generatePSF.inp to include better topology description:
-patch DISN
-    reference=1=( resid 173 )  reference=2=( resid 186 )
-end
-patch DISN
-    reference=1=( resid 176 )  reference=2=( resid 182 )
-end
-and run again:
-$x.cing/Refine/$stage/Jobs/generatePSF.csh
+        patch DISN
+            reference=1=( resid 173 )  reference=2=( resid 186 )
+        end
+        patch DISN
+            reference=1=( resid 176 )  reference=2=( resid 182 )
+        end
+        and run again:
+        $x.cing/Refine/$stage/Jobs/generatePSF.csh
 
 -----------------------------------------------------------------------------------------------------------------------------------------
   Analyze
@@ -126,7 +130,7 @@ Examine at least one log file in the Jobs directory for errors.
 JFD: - fixed bug with too long file name: @@1brv_cs_pk_2mdl.cing/Refine/refine1/Tables/dihedral_constraint_list.tbl
         The same for the other files. Easiest fix is to rename the lists to be no more than 10 chars.
 
--------------------------------1----------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------------------------------------
   Refine
 -----------------------------------------------------------------------------------------------------------------------------------------
 refine --project $x --name $stage --refine
