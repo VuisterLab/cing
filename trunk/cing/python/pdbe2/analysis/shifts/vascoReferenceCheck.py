@@ -311,8 +311,9 @@ class VascoReferenceCheck:
             #
 
             #shiftValues = []
-
-            shift = resonance.findFirstShift()
+            # JFD: Wim added extra selection to not get all shifts which 
+            # would lead to errors.
+            shift = resonance.findFirstShift(parentList=self.shiftList)
 
             """
             if shift:

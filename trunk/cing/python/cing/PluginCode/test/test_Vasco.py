@@ -22,10 +22,10 @@ import unittest
 
 class AllChecks(TestCase):
 
-    entryList = "1brv".split() # DEFAULT because it contains many data types and is small/fast to run.
+#    entryList = "1brv".split() # DEFAULT because it contains many data types and is small/fast to run.
 #    entryList = "1brv 1ieh 1cjg".split()
-#    entryList = "1brv".split()
-#    entryList = "1cjg".split()
+#    entryList = "1ieh".split()
+    entryList = "1cjg".split()
 #    entryList = "1bus".split()
 #    entryList = "1a4d 1ai0 1brv_cs_pk_2mdl 1bus 2hgh".split()
     def testInitFromAndSaveToCcpn(self):

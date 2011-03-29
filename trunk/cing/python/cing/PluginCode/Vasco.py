@@ -69,7 +69,7 @@ class Vasco(NTdict):
             return
 
         if not self.project.molecule.hasAminoAcid():
-           NTdebug("Skipping Vasco as there is no protein in the current molecule")
+           NTwarning("Skipping Vasco as there is no protein in the current molecule")
            return
 
         # WI checks
