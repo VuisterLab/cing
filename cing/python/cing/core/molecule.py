@@ -1041,7 +1041,8 @@ class Molecule( NTtree, ResidueList ):
             NTerror("Failed residueList2Ranges in rangesToExpandedRanges for ranges: %s" % ranges)
             return None
         if rangesNew != ranges:
-            NTdebug("Expanded ranges %s to %s" % (ranges,rangesNew))
+#            NTdebug("Expanded ranges %s to %s" % (ranges,rangesNew))
+            pass
         return rangesNew
 
     def _rangesStr2list( self, ranges ):
@@ -1629,7 +1630,7 @@ class Molecule( NTtree, ResidueList ):
         """
 #        NTdebug("Doing %s on %s." % (getCallerName(), resonanceList))
         if resonanceList.vascoResults:
-            NTwarning("Reseting existing non-empty Vasco results")
+            NTmessage("==> Reseting existing non-empty Vasco results")
         resonanceList.vascoResults.clear()
         for atomKey in vascoAtomIdLoL:
             rerefValue, rerefError = rerefInfo[atomKey]
@@ -1699,7 +1700,7 @@ class Molecule( NTtree, ResidueList ):
                     continue
                 useCorrection = math.fabs(rerefValue) >= VASCO_CERTAINTY_FACTOR_CUTOFF * rerefError # Sync with resonanceList check
                 if not useCorrection:
-                    NTmessage("Skipping uncertain correction for %10s of rerefNTvalue %s" % (atomId, str(rerefNTvalue)))
+#                    NTdebug("Skipping uncertain correction for %10s of rerefNTvalue %s" % (atomId, str(rerefNTvalue)))
                     continue
 #                NTmessage("Correcting %s with %s" % (str(atomTuple), str(rerefTuple)))
                 
@@ -1709,13 +1710,20 @@ class Molecule( NTtree, ResidueList ):
                     NTerror("Found overlapping atoms in CING for Vasco corrections: %s" % str(atomListAlreadyDone))
                     NTerror("Skipping all atoms and giving up")
                     return True
-                NTmessage("Applying Vasco correction for atomId %s and rerefTuple %s to resonance in %d atoms" % (atomId, rerefNTvalue, len(atomList)))
+                msg = '==> Applying '
                 if doRevert:
                     rerefValue = -rerefValue
-                for i,atm in enumerate(atomList):
+                    msg = '==> Reverting'
+                atomClassId = getDeepByKeys(vascoMapAtomIdToHuman, atomId)
+                if atomClassId == None:
+                    atomClassId = atomId
+                    
+                NTmessage(msg + " Vasco correction for %s with %8.3f to %d resonances in %s" % (atomClassId, rerefValue, len(atomList), resonanceList.name))
+#                for i,atm in enumerate(atomList):
+                for atm in atomList:
                     r = atm.resonances[resonanceListIdx]
-                    if i < 2: # just show a couple for debugging.
-                        NTdebug("Correcting %3d atom %s resonance %s with %s" % ( i, atm, r, rerefValue))
+#                    if i < 2: # just show a couple for debugging.
+#                        NTdebug("Correcting %3d atom %s resonance %s with %s" % ( i, atm, r, rerefValue))
                     if isNoneorNaN(r.value):
                         NTdebug("Skipping invalid resonance: %s" % r)
                     else:
@@ -1726,6 +1734,14 @@ class Molecule( NTtree, ResidueList ):
         # end for
     # end def
             
+    def hasVascoApplied(self):
+        for resonanceList in self.resonanceSources:
+            if resonanceList.vascoApplied:
+                return True
+        # end
+        return False
+    # end def
+        
     """
     Input e.g. 'C', 3 with the second parameter 
     Return False on error.

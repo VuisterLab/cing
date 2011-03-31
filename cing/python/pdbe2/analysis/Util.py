@@ -32,7 +32,7 @@ def runExecPerModel(fileName,reader,tempFile):
   # Make sure temporary dir exists
   #
   
-  (tempPathName,tempFileName) = os.path.split(tempFile)
+  (tempPathName,_tempFileName) = os.path.split(tempFile)
   if not os.path.exists(tempPathName):
     os.makedirs(tempPathName)
   

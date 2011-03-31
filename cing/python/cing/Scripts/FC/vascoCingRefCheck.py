@@ -44,13 +44,14 @@ class VascoCingReferenceCheck(VascoReferenceCheck):
             self.ccpnDir = ccpnDir
         else:
             self.ccpnDir = '%s' % entryCode
-
+    
+    
     def writePdbFile(self):
         pass
 
     def createSsInfo(self):
 
-        print "Fetching DSSP secondary structure info..."
+#        NTdebug("Fetching DSSP secondary structure info...")
 
         fileNames = glob.glob(os.path.join(self.dsspDataDir, "model_*.dssp"))
 
@@ -103,7 +104,13 @@ class VascoCingReferenceCheck(VascoReferenceCheck):
 
             elif dataLine:
                 # Note; No insertion code?
-                seqCode = returnInt(line[5:10])
+                seqCodeStr = line[5:10]
+                seqCodeStr = seqCodeStr.strip()
+                if len(seqCodeStr) < 1:
+                    NTdebug("Skipping line with empty seqCode string: " + line) # happens for PDB entry 1cjg for 2 residues
+                    continue    
+                
+                seqCode = returnInt(seqCodeStr)
                 chainCode = line[11:12]
                 secStruc = line[16:17]
 
@@ -120,7 +127,8 @@ class VascoCingReferenceCheck(VascoReferenceCheck):
     
     def createAsaInfo(self):
         'Return True on error.'
-        print "Fetching WHATIF per-atom surface accessibility info..."
+        if self.showMessages:
+            NTdebug( "Fetching WHATIF per-atom surface accessibility info..." )
 
         fileNames = glob.glob(os.path.join(self.whatIfDataDir, "wsvacc*.log"))
 
@@ -193,9 +201,17 @@ class VascoCingReferenceCheck(VascoReferenceCheck):
             seqKey = (returnInt(seqId), insertionCode)
 
             if not (accessibility[0] == '|' and accessibility[-1] == '|'):
-                NTerror("Line without valid format for accessibility: " + line)
-                return True  
-            accessibility = returnFloat(accessibility[1:-1])
+                NTerror("Skipping line without valid format for accessibility: " + line)
+                continue
+            if len(accessibility) < 3:
+                NTerror("Skipping line with too short accessibility string: " + line)
+                continue
+            accessibilityStr = accessibility[1:-1]
+            accessibilityStr = accessibilityStr.strip()
+            if len(accessibilityStr) < 1:
+                NTerror("Skipping line with empty accessibility string: " + line) # happens for PDB entry 1cjg for 2 residues
+                continue         
+            accessibility = returnFloat(accessibilityStr)
             d = self.allWhatIfInfo['chains']
             if not d.has_key(chainCode):
                    d[chainCode] = {}
@@ -217,7 +233,6 @@ class VascoCingReferenceCheck(VascoReferenceCheck):
     # end def
 
     def findResidue(self, chain, seqKey):
-
         return chain.findFirstResidue(seqCode=seqKey[0], seqInsertCode=seqKey[1])
     # end def
 
@@ -225,7 +240,17 @@ class VascoCingReferenceCheck(VascoReferenceCheck):
         """
         Return True on error
         """        
+        if not self.showMessages:
+#            print 'switching messaging off temporarily.'
+            switchOutput(False)        
         ccpnProject = loadProject(self.ccpnDir)
+        if not self.showMessages:
+            print 'switching messaging on again.'
+            switchOutput(True)
+        if ccpnProject == None:
+            NTerror("Failed to load CCPN project from: %s" % self.ccpnDir)
+            return True
+        
 #        shiftLoL = ccpnProject.currentNmrProject.findAllMeasurementLists(className='ShiftList')
         # Use sorting by CCPN.
         shiftLoL = filterListByObjectClassName( ccpnProject.currentNmrProject.sortedMeasurementLists(), Ccpn.CCPN_CS_LIST )
@@ -276,17 +301,27 @@ class VascoCingReferenceCheck(VascoReferenceCheck):
 #            return True
         
         resonanceList = getDeepByKeysOrAttributes( mol.resonanceSources, i)
-        NTmessage("Tagging CING project with Vasco results for resonanceList: %s" % resonanceList)        
         if not isinstance(resonanceList, ResonanceList):
             NTerror("Failed to get resonanceList by idx: %s" % i)
             NTerror("mol.resonanceSources: %s" % str(mol.resonanceSources))
             return True
+        NTmessage("==> Tagging CING project with Vasco results for resonanceList: %s" % resonanceList)        
+        
+        if resonanceList.vascoApplied: # boolean xor is equivalent of the above line.
+#            NTdebug("CS were rereferenced before so first undoing previous application.")
+            if mol.applyVascoChemicalShiftCorrections( resonanceList = resonanceList, doRevert = True ):
+                NTerror("Failed to undo Vasco rereferencing for: %s" % resonanceList)
+                return True
+            # end def
+        # end def
+            
         if mol.setVascoChemicalShiftCorrections(self.rerefInfo, resonanceList ):
             NTerror("Failed to setVascoChemicalShiftCorrections for: %s" % resonanceList)
             return True         
         if mol.applyVascoChemicalShiftCorrections( resonanceList = resonanceList ):
             NTerror("Failed to applyVascoChemicalShiftCorrections for: %s" % resonanceList)
             return True
+        # end def
     # end def
 # end class
 

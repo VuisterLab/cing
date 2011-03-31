@@ -112,24 +112,13 @@ class Vasco(NTdict):
             NTmessage("Skipping Vasco because there is no chemical shift assignment.")
             return
 
-#        root = Tkinter.Tk() # Possible to do without gui?
-
-
-        # Try traditional for comparison
-        #vascoReferenceCheck = VascoReferenceCheck(guiParent=root)
-        #vascoReferenceCheck.checkProject(ccpnDir=ccpnDir)
-
         # Try the CING based check
-        vascoReferenceCheck = VascoCingReferenceCheck()
+        vascoReferenceCheck = VascoCingReferenceCheck(showMessages=False)
         vascoReferenceCheck.setupDirectories(self.project)
         vascoReferenceCheck.checkAllShiftLists()
 
         #vascoReferenceCheck.ccpnProject.saveModified()
-    # end def
-    
-    def correctShiftList(self, shiftList, rerefInfo):
-        pass
-    
+    # end def    
 # end class
 
 

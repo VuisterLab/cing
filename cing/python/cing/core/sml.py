@@ -1128,7 +1128,7 @@ class SMLNTListWithAttrHandler( SMLhandler ):
                 return
             setattr(rl, key, getattr(rlTop,key))
 #        rl.addList(rlTop.theList) # not done yet.
-        NTmessage("==> Restored %s" % rl)
+#        NTmessage("==> Restored %s" % rl)
         return rl
     #end def
     

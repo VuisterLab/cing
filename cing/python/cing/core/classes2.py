@@ -287,6 +287,13 @@ class ResonanceList(NTlist):
     # end def
 # end class
 
+class StereoAssignmentCorrectionList(NTlist):
+    """
+    Contains meta data on the corrections done for stereospecific assignments such as 
+    in stereoAssignmentSwap TODO: finish, just a placeholder for now.
+    """
+# end class
+
 def resonanceListGetIndexFirstObjectWithRealValue(resonanceList):
     """
     Return index of resonance that has an actual value or -1 if no such resonance exists in this list.

@@ -39,7 +39,7 @@ class AllChecks(TestCase):
         doWhatif = True # disables whatif actual run
         doProcheck = True
         doWattos = True
-        doQueeny = True 
+        doQueeny = True
         doTalos = True
         filterVasco = True
         useNrgArchive = False

@@ -1152,9 +1152,10 @@ class nrgCing(Lister):
                            PHASE_R: os.path.join(self.results_dir, self.recoordSyncDir, entry_code),
                            PHASE_F: os.path.join(dir_F, entryCodeChar2and3, entry_code),
                            }
-        NTmessage("convertMmCifCoor       Start from mmCIF                                  %s" % convertMmCifCoor)
 
         NTmessage("interactive            interactive run is fast use zero for production   %s" % doInteractive)
+        NTmessage("")
+        NTmessage("convertMmCifCoor       Start from mmCIF                                  %s" % convertMmCifCoor)
         NTmessage("convertMrRestraints    Start from DOCR                                   %s" % convertMrRestraints)
         NTmessage("convertStarCS          Adds STAR CS to Ccpn with FC                      %s" % convertStarCS)
         NTmessage("filterCcpnAll          Filter CS and restraints with FC                  %s" % filterCcpnAll)
