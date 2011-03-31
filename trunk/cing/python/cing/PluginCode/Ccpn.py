@@ -30,6 +30,7 @@ if True: # for easy blocking of data, preventing the code to be resorted with im
         from ccp.util.Validation import getEnsembleValidationStore
         from ccp.util.Validation import getResidueValidation
         from memops.api.Implementation import MemopsRoot
+        from memops.api.Implementation import AppDataString
         from memops.general.Io import loadProject
     except:
         switchOutput(True)
@@ -121,6 +122,7 @@ class Ccpn:
         self.ccpnProject = None # set in readCcpnFolder
         self.ccpnMolSystemList = None # set in importFromCcpnMolecule
         self.ccpnNmrProject = None # set in importFromCcpnMolecule
+        self.ccpnNmrConstraintStore = None
         self.ccpnCingRun = None # set in importFromCcpnMolecule
         self.molecule = None # set in importFromCcpn ( importFromCcpnMolecule )
         project.ccpnFolder = ccpnFolder # Needed to store for conversion from ccpn to star.
@@ -327,6 +329,12 @@ class Ccpn:
         else:
             NTerror("Failed to importFromCcpnDistanceRestraint")
             return None
+        if not self.importFromCcpnDistanceRestraintMetaData():
+            NTdebug('Finished importFromCcpnDistanceRestraintMetaData')
+#            pass
+        else:
+            NTerror("Failed to importFromCcpnDistanceRestraintMetaData")
+            return None        
         if self.importFromCcpnDihedralRestraint():
 #            NTdebug('Finished importFromCcpnDihedralRestraint')
             pass
@@ -405,9 +413,19 @@ class Ccpn:
             # Default to
             ccpnConstraintLists = []
             for constraintStore in self.ccpnNmrProject.sortedNmrConstraintStores():
-                ccpnConstraintLists.extend(constraintStore.sortedConstraintLists())
-
+                ccpnConstraintListsTmp = constraintStore.sortedConstraintLists()
+                if len(ccpnConstraintListsTmp):
+                    ccpnConstraintLists.extend(ccpnConstraintListsTmp)
+                    if self.ccpnNmrConstraintStore == None:
+                        self.ccpnNmrConstraintStore = constraintStore # just use one for now
+                    else:
+                        NTwarning("Skipping additional nmrConstraintStore %s, just maintaining first." % constraintStore)
+                    # end if
+                # end if
+            # end for
+        # end if
         self.ccpnConstraintLists = ccpnConstraintLists
+        
 
         for ccpnMolSys in self.ccpnMolSystemList:
             moleculeName = self._ensureValidName(ccpnMolSys.code)
@@ -1389,10 +1407,48 @@ class Ccpn:
                 NTdetail("Ccpn distance restraint list remained empty and will be removed")
                 self.project.distances.delete(ccpnDistanceListName)
 
+
         msgHoL.showMessage()
         return True
     # end def importFromCcpnDistanceRestraint
 
+    def importFromCcpnDistanceRestraintMetaData(self):
+        '''Descrn: Import meta data from nmr constraint store.
+                put in by StereoAssignmentCleanup#storeToAppData
+           Output: True on error.
+        '''
+        if self.ccpnNmrConstraintStore == None:
+            NTdebug("Ignoring meta data because no self.ccpnNmrConstraintStore ")
+            return
+
+        if not hasattr(self.ccpnNmrConstraintStore, 'findAllApplicationData'):
+            NTdebug("Ignoring meta data because no self.ccpnNmrConstraintStore.findAllApplicationData")
+            return
+    
+        appDataList = self.ccpnNmrConstraintStore.findAllApplicationData(application='FormatConverter', keyword='stereoAssignmentCorrectionsFile')
+        if len(appDataList) == 0:
+            NTdebug("No FC meta data")
+            return
+        
+        if len(appDataList) > 1:
+            NTdebug("Ignoring FC meta data beyond the first element.")
+        appDataString = appDataList[0]
+        
+        if not isinstance(appDataString, AppDataString):
+            NTerror("FC meta data isn't a AppDataString")
+            return True
+        
+        star_text = appDataString.value
+        if not isinstance(star_text, str):
+            NTerror("FC meta data value isn't a String")
+            return True
+        
+        if len(star_text) < 100:
+            NTerror("FC meta data value isn't long enough to be valid")
+            return True
+        
+        NTdebug("Got it:\n" + star_text[:200]) # TODO: import into new CING object.
+    # end def importFromCcpnDistanceRestraintMetaData
 
     def importFromCcpnDihedralRestraint(self):
         '''Descrn: Import dihedral restraints from Ccpn.Project into Cing.Project.
@@ -2365,7 +2421,7 @@ def initCcpn(project, ccpnFolder, modelCount = None):
     if not os.path.exists( ccpnFolder ):
         NTerror('initCcpn: ccpnFolder "%s" does not exist', ccpnFolder)
         return None
-    ccpn = Ccpn(project = project, ccpnFolder = ccpnFolder)
+    ccpn = Ccpn(project = project, ccpnFolder = ccpnFolder )
     if not ccpn.importFromCcpn(modelCount = modelCount):
         NTerror("initCcpn: Failed importFromCcpn")
         return None

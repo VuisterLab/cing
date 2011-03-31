@@ -5136,9 +5136,14 @@ def _setOutStreamList(stream, outputStreamContainerList):
 
 
 
-"""Switch away from output; might be useful to silence verbose part of code or external program"""
 def switchOutput( showOutput, doStdOut=True, doStdErr=False):
-    if showOutput:
+    """
+    Switch away from output. Might be useful to silence verbose part of code or external program.
+
+    False: store original stream and switch to bit bucket.
+    True: return to original stream.
+    """
+    if showOutput:        
         if doStdOut:
             sys.stdout = _returnMyStdOut
             _setStdOutStreamsTo( _returnMyStdOut )

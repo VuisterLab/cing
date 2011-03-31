@@ -33,10 +33,11 @@ class VascoReferenceCheck:
     
     pass
 
-  def __init__(self,guiParent=None,dataEntry=None,messageReporter=None,multiDialog=None):
+  def __init__(self,guiParent=None,dataEntry=None,messageReporter=None,multiDialog=None, showMessages=True):
   
     self.guiParent = guiParent
-  
+    self.showMessages = showMessages
+    
     if not dataEntry:
       dataEntry = setupDataEntry(guiParent)
     self.dataEntry = dataEntry
@@ -51,7 +52,8 @@ class VascoReferenceCheck:
     
   def checkProject(self,ccpnProject=None,ccpnDir=None,structureEnsembleId=None,shiftListSerial=None):
 
-    print drawBox(" VASCO: calculating rereferencing...")
+    if self.showMessages:
+        print drawBox(" VASCO: calculating rereferencing...")
 
     #
     # Get info from CCPN project
@@ -177,7 +179,8 @@ class VascoReferenceCheck:
 
     from pdbe.analysis.external.stride.Util import StrideInfo #@UnresolvedImport
 
-    print "Calculating STRIDE secondary structure info..."
+    if self.showMessages:
+        print "Calculating STRIDE secondary structure info..."
     strideInfo = StrideInfo(self.tmpFilePath)
     self.ssInfo = strideInfo.getSsInfo()
     #print self.ssInfo
@@ -186,7 +189,8 @@ class VascoReferenceCheck:
 
     from pdbe.adatah.WhatIf import getWhatIfInfo #@UnresolvedImport
 
-    print "Fetching WHATIF data..."
+    if self.showMessages:
+        print "Fetching WHATIF data..."
     self.whatIfInfo = getWhatIfInfo(None,inputFile=self.tmpFilePath,outputWhatIfFile="tmp/%s.pp" % self.tmpFileName)
     #print self.whatIfInfo
     
@@ -234,7 +238,8 @@ class VascoReferenceCheck:
           #
 
           if curResidue != residue:
-            print "  ERROR two residues to same resonance!"
+            if self.showMessages:
+              print "  ERROR two residues to same resonance!"
             atomNameList = []
             break
 
@@ -278,7 +283,8 @@ class VascoReferenceCheck:
 
       chain = self.ccpnProject.currentMolSystem.findFirstChain(code=chainCode)
       if not chain:
-        print "No info for chain %s" % (chainCode)
+        if self.showMessages:
+          print "No info for chain %s" % (chainCode)
         continue
 
       molType = 'protein'
@@ -296,7 +302,8 @@ class VascoReferenceCheck:
         ccpCode = residue.ccpCode
 
         if not residue:
-          print "No info for chain %s, residue %s" % (chainCode,str(seqKey))
+          if self.showMessages:
+            print "No info for chain %s, residue %s" % (chainCode,str(seqKey))
           continue
 
         for resonance in self.resMapping.keys():
@@ -512,9 +519,10 @@ class VascoReferenceCheck:
     atomKeys = self.rerefInfo.keys()
     atomKeys.sort()
     
-    for atomKey in atomKeys:
-      print atomKey,
-      print self.rerefInfo[atomKey]
+    if self.showMessages:
+        for atomKey in atomKeys:
+          print atomKey,
+          print self.rerefInfo[atomKey]
       
 if __name__ == '__main__':
 

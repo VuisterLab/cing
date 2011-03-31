@@ -2521,6 +2521,8 @@ class DistanceRestraint(Restraint):
     STATUS_NOT_SIMPLIFIED = 'not simplified'
     STATUS_DEASSIGNED = 'deassigned'
     STATUS_NOT_DEASSIGNED = 'not deassigned'
+    STATUS_REMOVED_DUPLICATE = 'removed duplicate'
+    STATUS_NOT_REMOVED_DUPLICATE = 'not removed duplicate'
 
 #    def __init__( self, atomPairs=[], lower=0.0, upper=0.0, **kwds ):
     def __init__(self, atomPairs = NTlist(), lower = None, upper = None, **kwds):
@@ -2633,12 +2635,16 @@ class DistanceRestraint(Restraint):
     #end def
 
     def simplify(self):
-        """Return True on error"""
+        """Return True on error.
+        
+        Routine is iterative itself because both sides may contain ambis to collapse and remove.
+        """
+        statusOverall = self.STATUS_NOT_SIMPLIFIED
         status = self.STATUS_SIMPLIFIED
         while status == self.STATUS_SIMPLIFIED:
-            status = self.simplifySpecificallyForFcFeature()
+            status = self._simplify()
             if status == self.STATUS_SIMPLIFIED:
-                pass
+                statusOverall = status
 #                NTdebug("simplified restraint %s" % self)
             elif status == self.STATUS_NOT_SIMPLIFIED:
                 pass
@@ -2646,7 +2652,20 @@ class DistanceRestraint(Restraint):
             else:
                 NTerror("Encountered an error simplifying restraint %s" % self)
                 return True
-
+            # end if
+        # end while
+        
+        if self._removeDuplicateAtomPairs():
+            NTerror("Encountered an error in _removeDuplicateAtomPairs restraint %s" % self)
+            return True
+        # end if
+        while self._removeDuplicateAtomPairs2() == self.STATUS_REMOVED_DUPLICATE:
+            pass
+#            NTdebug("Removed duplicate")
+        # end if
+        return statusOverall
+    #end def
+    
 
     def deassignStereospecificity(self):
         """If the restraint involves a stereo specifically assignable atom then expand the list to include all
@@ -2683,16 +2702,23 @@ class DistanceRestraint(Restraint):
             return self.STATUS_DEASSIGNED
         return self.STATUS_NOT_DEASSIGNED
 
-    def simplifySpecificallyForFcFeature(self):
+    def _simplify(self):
         """FC likes to split Val QQG in QG1 and 2 making it appear to be an ambiguous OR typed XPLOR restraint
         were it is not really one. Undone here.
-        Return None on error.
-        STATUS_NOT_SIMPLIFIED for no simplifications done
-        STATUS_SIMPLIFIED for simplifications done
+        
+        Returns:
+        None                     error.
+        STATUS_NOT_SIMPLIFIED    no simplifications done
+        STATUS_SIMPLIFIED        simplifications done
+        
+        In the code:
+        
+        j stands for the index of the atomPair of the outer loop that might be removed upon simplification. 
+        i stands for the index of the atomPair of the inner loop that is compared to and that might be modified to include atoms from atomPair j. 
         """
 
-#        NTdebug('Starting simplifySpecificallyForFcFeature for %s' % ( self ) )
-        atomPairIdxJ = len(self.atomPairs)
+#        NTdebug('Starting _simplify for\n:%r' % ( self ) )
+        atomPairIdxJ = len(self.atomPairs) # starting from the end.
         while atomPairIdxJ > 1:
             atomPairIdxJ -= 1
             atomPairJ = self.atomPairs[atomPairIdxJ]
@@ -2700,8 +2726,8 @@ class DistanceRestraint(Restraint):
             atom0J = atomPairJ[0]
             atom1J = atomPairJ[1]
 
-#            NTdebug('Using atoms J %s and %s' % ( atom0J, atom1J) )
-            # speed up check on J.
+#            NTdebug('For atomPairIdxJ %d using atoms J %s and %s' % ( atomPairIdxJ, atom0J, atom1J) )
+            # speed up check on J as an early abort clause.
             if not (atom0J.hasPseudoAtom() or atom1J.hasPseudoAtom()):
                 if not (atom0J.getPseudoOfPseudoAtom() or atom1J.getPseudoOfPseudoAtom()):
 #                    NTdebug('Skipping restraint without pseudo representing J atoms')
@@ -2709,8 +2735,8 @@ class DistanceRestraint(Restraint):
 
             for atomPairIdxI in range(atomPairIdxJ): # Compare only with the previous atom pairs
                 atomPairI = self.atomPairs[atomPairIdxI]
-#                atom0I = atomPairI[0]
-#                atom1I = atomPairI[1]
+                atom0I = atomPairI[0] #@UnusedVariable
+                atom1I = atomPairI[1] #@UnusedVariable
 #                NTdebug('    Using atoms I %s and %s' % ( atom0I, atom1I) )
                 atomPairIset = set(atomPairI)
                 atomPairIntersection = atomPairIset.intersection(atomPairJset)
@@ -2718,55 +2744,207 @@ class DistanceRestraint(Restraint):
 #                    NTdebug('    No intersection')
                     continue
 
-                # At this point it is certain that there is an intersection of an atom between the two pairs.
+#                 At this point it is certain that there is an intersection of at least one atom between the two pairs.
                 if len(atomPairIntersection) != 1:
-                    NTcodeerror('Unexpected more than one atom in atom set intersection')
-                    return None
+#                    NTdebug('More than one atom in atom set intersection: %s' % atomPairIntersection)
+                    continue
 
-                atomPairInCommon = atomPairIntersection.pop()
+                atomInCommon = atomPairIntersection.pop() # get arbitrary element of set.
                 atomIinCommonIdx = 0
                 atomJinCommonIdx = 0
                 atomItoMergeIdx = 1
                 atomJtoMergeIdx = 1
-                if atomPairI[atomIinCommonIdx] != atomPairInCommon:
-                      atomIinCommonIdx = 1
-                      atomItoMergeIdx = 0
-                if atomPairJ[atomJinCommonIdx] != atomPairInCommon:
-                      atomJinCommonIdx = 1
-                      atomJtoMergeIdx = 0
+                if atomPairI[atomIinCommonIdx] != atomInCommon:
+                    atomIinCommonIdx = 1
+                    atomItoMergeIdx = 0
+                if atomPairJ[atomJinCommonIdx] != atomInCommon:
+                    atomJinCommonIdx = 1
+                    atomJtoMergeIdx = 0
 
                 # Now we know which atoms are in common and consequently the others should be tried to merge.
-#                NTdebug('    atominCommonIdx I %d and J %d' % ( atomIinCommonIdx, atomJinCommonIdx) )
+#                NTdebug('    atominCommonIdx I %d and J %d for %s' % ( atomIinCommonIdx, atomJinCommonIdx, atomInCommon) )
 
                 atomItoMerge = atomPairI[atomItoMergeIdx]
                 atomJtoMerge = atomPairJ[atomJtoMergeIdx]
 
-                if atomItoMerge.getSterospecificallyRelatedPartner() != atomJtoMerge:
-#                    NTdebug('    atoms toMerge I %s and J %s have different parent if at all' % ( atomItoMerge, atomJtoMerge) )
-                    continue
+                atomIinCommon = atomPairI[atomIinCommonIdx]
+                atomJinCommon = atomPairJ[atomJinCommonIdx]
 
-                #
+#                NTdebug('    atomIinCommon %s == atomJinCommon %s' % ( atomIinCommon, atomJinCommon ))
+                if atomIinCommon != atomJinCommon:
+                    NTcodeerror('    atoms toMerge I %s and J %s differ.' % ( atomItoMerge, atomJtoMerge) )
+                    continue
+                # end if
+
+                if atomItoMerge.getSterospecificallyRelatedPartner() != atomJtoMerge:
+#                    NTdebug('    atoms toMerge I %s and J %s have different parent if at all related.' % ( atomItoMerge, atomJtoMerge) ) # boring.
+                    continue
+                # end if
+                
                 pseudoOfAtom = atomItoMerge.pseudoAtom()
                 if not pseudoOfAtom:
 #                    NTdebug('    no pseudo for this atom %s' % atomItoMerge)
                     pseudoOfAtom = atomItoMerge.getPseudoOfPseudoAtom()
                     if not pseudoOfAtom:
-#                        NTerror('    no pseudo of pseudoatom %s' % atomItoMerge) # happens in 1y0j for <Atom A.VAL205.CG1>
+                        NTerror('    no pseudo of pseudoatom %s' % atomItoMerge) # happens in 1y0j for <Atom A.VAL205.CG1>
                         continue
+                    # end if
+                # end if
 
 #                NTdebug( "    New pop atom: %s" % pseudoOfAtom)
                 # Change I maintaining order
                 atomPairINewList = list(atomPairI)
                 atomPairINewList[atomItoMergeIdx] = pseudoOfAtom
                 self.atomPairs[atomPairIdxI] = tuple(atomPairINewList)
+#                NTdebug("Now self.atomPairs[atomPairIdxI]: %s" % str(self.atomPairs[atomPairIdxI]))
                 # Remove J
+#                NTdebug("Removing self.atomPairs[atomPairIdxJ]: %s" % str(self.atomPairs[atomPairIdxJ]))
                 del self.atomPairs[atomPairIdxJ]
-                # Return qucikly to keep code to the left (keep it simple).
+                # Return quickly to keep code to the left (keep it simple).
 #                NTdebug('Simplified.')
                 return self.STATUS_SIMPLIFIED
+            # end for
+        # end while
 #        NTdebug('Not simplified.')
         return self.STATUS_NOT_SIMPLIFIED
+    # end def
+        
+    def _removeDuplicateAtomPairs(self):
+        """
+        Used in simplify.
+        
+        Returns:
+        True                     error.
+        
+        In the code:
+        
+        j stands for the index of the atomPair of the outer loop that might be removed upon removal. 
+        i stands for the index of the atomPair of the inner loop that is compared to. 
+        """
 
+#        NTdebug('Starting %s for %s' % ( getCallerName(), self ) )
+        atomPairIdxJ = len(self.atomPairs) # starting from the end.
+        while atomPairIdxJ > 1:
+            atomPairIdxJ -= 1
+            atomPairJ = self.atomPairs[atomPairIdxJ]
+            atomPairJset = set(atomPairJ) # Important to use api of unsorted atoms in pair (left right will not matter)
+            atom0J = atomPairJ[0] #@UnusedVariable
+            atom1J = atomPairJ[1] #@UnusedVariable
+
+#            NTdebug('For atomPairIdxJ %d using atoms J %s and %s' % ( atomPairIdxJ, atom0J, atom1J) )
+
+            for atomPairIdxI in range(atomPairIdxJ): # Compare only with the previous atom pairs
+                atomPairI = self.atomPairs[atomPairIdxI]
+                atom0I = atomPairI[0] #@UnusedVariable
+                atom1I = atomPairI[1] #@UnusedVariable
+#                NTdebug('    Using atoms I %s and %s' % ( atom0I, atom1I) )
+                atomPairIset = set(atomPairI)
+                atomPairIntersection = atomPairIset.intersection(atomPairJset)
+                if not atomPairIntersection:
+#                    NTdebug('    No intersection')
+                    continue
+                if len(atomPairIntersection) != 2:
+#                    NTdebug('Only one atom in atom set intersection: %s' % atomPairIntersection)
+                    continue
+#                NTdebug("Removing self.atomPairs[atomPairIdxJ]: %s" % str(self.atomPairs[atomPairIdxJ]))
+                del self.atomPairs[atomPairIdxJ]
+            # end for
+        # end while
+        return
+    # end def
+            
+    def _removeDuplicateAtomPairs2(self):
+        """
+        Used in simplify.
+        
+        This code is more advanced than the above _removeDuplicateAtomPairs2 in that it will also 
+        check when pseudos are contained in other pseudos. The widest will be retained.
+        E.g.
+        For 1a24
+        783.00    A    20    PRO    QB    A    23    LEU    MD1   3.20    7.90    2.96    0.56    2.56    3.35    0.32    0.45    0.64    0    0    0    
+        783.01    A    20    PRO    QB    A    23    LEU    QD    3.20    7.90    2.96    0.56    2.56    3.35    0.32    0.45    0.64    0    0    0    
+        will be truncated to:
+        For 1a24
+        783       A    20    PRO    QB    A    23    LEU    QD    3.20    7.90    2.96    0.56    2.56    3.35    0.32    0.45    0.64    0    0    0    
+        
+        Watch for e.g. intraresidual LEU with multiple atompairs:
+        HB2 QD
+        QB  MD1
+        This can not be truncated whereas:
+        QB  MD1
+        HB2 QD
+        HB3 QD
+        can be to simply QB QD.
+        Therefore previous routines should already have cleaned up to:
+        QB  MD1
+        QB  QD
+        so that this routine will do the final collapse to QB QD.
+        
+        The ordering is irrelevant but must always be maintained.
+        
+        
+        pseudo code:
+        loop over atompairs i,j
+                atomset0i 
+                if(
+                   ( atomset0i.issuperset(atomset0j) and atomset1i.issuperset(atomset1j)) or
+                   ( atomset0i.issuperset(atomset1j) and atomset1i.issuperset(atomset0j))    )
+                    remove j and return
+                elif(
+                   ( atomset0j.issuperset(atomset0i) and atomset1j.issuperset(atomset1i)) or
+                   ( atomset0j.issuperset(atomset1i) and atomset1j.issuperset(atomset0i))    )
+                    remove i and return
+                                        
+        Returns:
+        True                     error.
+        STATUS_REMOVED_DUPLICATE = 'removed duplicate'
+        STATUS_NOT_REMOVED_DUPLICATE = 'not removed duplicate'
+        
+        In the code:
+        
+        j stands for the index of the atomPair of the outer loop that might be removed upon removal. 
+        i stands for the index of the atomPair of the inner loop that is compared to. 
+        """
+
+#        NTdebug('Starting %s for %s' % ( getCallerName(), self ) )
+        
+        n = len(self.atomPairs)
+        for atomPairIdxJ in range(n-1):
+            atomPairJ = self.atomPairs[atomPairIdxJ]
+#            atomPairJset = set(atomPairJ) # Important to use api of unsorted atoms in pair (left right will not matter)
+            atom0J = atomPairJ[0]
+            atom1J = atomPairJ[1]
+            atomset0J = set( atom0J.realAtoms() )
+            atomset1J = set( atom1J.realAtoms() )
+            
+#            NTdebug('For atomPairIdxJ %d using atoms J %s and %s' % ( atomPairIdxJ, atom0J, atom1J) )
+
+            for atomPairIdxI in range(atomPairIdxJ+1,n): # Compare only with the next atom pairs
+                atomPairI = self.atomPairs[atomPairIdxI]
+                atom0I = atomPairI[0] #@UnusedVariable
+                atom1I = atomPairI[1] #@UnusedVariable
+#                NTdebug('    Using atoms I %s and %s' % ( atom0I, atom1I) )
+
+                atomset0I = set( atom0I.realAtoms() )
+                atomset1I = set( atom1I.realAtoms() )
+                if(
+                   ( atomset0I.issuperset(atomset0J) and atomset1I.issuperset(atomset1J)) or
+                   ( atomset0I.issuperset(atomset1J) and atomset1I.issuperset(atomset0J))    ):                    
+#                    NTdebug("Removing self.atomPairs[atomPairIdxJ]: %s" % str(self.atomPairs[atomPairIdxJ]))
+                    del self.atomPairs[ atomPairIdxJ ]
+                    return self.STATUS_REMOVED_DUPLICATE
+                elif(
+                   ( atomset0J.issuperset(atomset0I) and atomset1J.issuperset(atomset1I)) or
+                   ( atomset0J.issuperset(atomset1I) and atomset1J.issuperset(atomset0I))    ):
+#                    NTdebug("Removing self.atomPairs[atomPairIdxI]: %s" % str(self.atomPairs[atomPairIdxI]))
+                    del self.atomPairs[ atomPairIdxI ]
+                    return self.STATUS_REMOVED_DUPLICATE
+                # end if
+            # end for
+        # end while
+        return self.STATUS_NOT_REMOVED_DUPLICATE
+    # end def
+        
     def appendPair(self, pair):
         """ pair is a (atom1,atom2) tuple
 
