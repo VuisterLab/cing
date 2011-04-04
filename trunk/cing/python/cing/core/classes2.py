@@ -287,11 +287,12 @@ class ResonanceList(NTlist):
     # end def
 # end class
 
-class StereoAssignmentCorrectionList(NTlist):
+class StereoAssignmentCorrection(NTdict):
     """
     Contains meta data on the corrections done for stereospecific assignments such as 
     in stereoAssignmentSwap TODO: finish, just a placeholder for now.
     """
+    
 # end class
 
 def resonanceListGetIndexFirstObjectWithRealValue(resonanceList):

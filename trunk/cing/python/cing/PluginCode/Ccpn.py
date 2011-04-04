@@ -130,7 +130,7 @@ class Ccpn:
         self.patchAtomNames = patchAtomNames
         self.skipWaters = skipWaters
         self.allowNonStandardResidue = allowNonStandardResidue
-
+        
     def _getCcpnRestraintLoL(self, allCcpnConstraintLists, classNames):
         """Descrn: Function to get a list of CCPN restraint lists given an
                    input list of CCPN Nmr Constraint Stores (containers for
@@ -1447,7 +1447,12 @@ class Ccpn:
             NTerror("FC meta data value isn't long enough to be valid")
             return True
         
-        NTdebug("Got it:\n" + star_text[:200]) # TODO: import into new CING object.
+        NTdebug("Got it:" + star_text[:9]) # TODO: import into new CING object.
+
+        projectDistList = self.project.distances
+        if not len(projectDistList):
+            NTwarning("self.project.distances is empty but FC meta data will still be added.")
+        projectDistList.__setattr__(STEREO_ASSIGNMENT_CORRECTIONS_STAR_STR, star_text)
     # end def importFromCcpnDistanceRestraintMetaData
 
     def importFromCcpnDihedralRestraint(self):
@@ -2790,6 +2795,68 @@ stereochemistry is cna be seen by examining the atom network.
     return ccpnResDescriptorNew
 # end def    
 
+def restoreCcpn(project, tmp = None):
+    """
+    Restore ccpn meta data if present
+
+    Return True on error
+    """
+    NTdebug("Now in " + getCallerName())
+
+    if not project:
+        NTerror('%s: no project defined' % getCallerName())
+        return True
+    #end if
+    if not project.molecule:
+        return True
+    #end if
+    rootPath = project.moleculePath( CCPN_LOWERCASE_STR )    
+    fileName = os.path.join(rootPath, STEREO_ASSIGN_FILENAME_STR)
+    if not os.path.exists(fileName):
+        NTdebug("No stereo assign meta data from ccpn because no file named: " + fileName)
+        return
+    star_text = readTextFromFile(fileName)
+    
+    projectDistList = project.distances
+    if not len(projectDistList):
+        NTwarning("self.project.distances is empty but FC meta data will still be added.")
+    projectDistList.__setattr__(STEREO_ASSIGNMENT_CORRECTIONS_STAR_STR, star_text)
+
+    NTmessage('==> Restored CCPN meta data')
+#end def
+
+def saveCcpnMetaData(project, tmp = None):
+    """
+    Save ccpn meta data if present
+
+    Return True on error
+    """
+    NTdebug("Now in " + getCallerName())
+
+    if not project:
+        NTerror('%s: no project defined' % getCallerName())
+        return True
+    #end if
+    if not project.molecule:
+        return True
+    #end if
+    projectDistList = project.distances
+    if not len(projectDistList):
+        NTdebug("self.project.distances is empty but FC meta data will still be looked for.")
+    star_text = getDeepByKeysOrAttributes(projectDistList, STEREO_ASSIGNMENT_CORRECTIONS_STAR_STR)
+    if not star_text:
+        NTdebug("No star_text")
+        return
+    rootPath = project.moleculePath( CCPN_LOWERCASE_STR )
+    fileName = os.path.join(rootPath, STEREO_ASSIGN_FILENAME_STR)
+    if not os.path.exists(rootPath):
+        NTdebug("No rootPath named: " + rootPath)
+        return
+    if writeTextToFile(fileName, star_text):
+        NTdebug("writeTextToFile failed to file: " + fileName)
+        return True
+    NTmessage('==> Stored CCPN meta data')
+#end def
 
 # register the function
 methods = [ (initCcpn, None),
@@ -2797,3 +2864,8 @@ methods = [ (initCcpn, None),
            (exportValidation2ccpn, None),
            (saveCcpn, None),
            ]
+
+saves    = [(saveCcpnMetaData, None)]
+restores = [(restoreCcpn, None)]
+
+#exports  = []

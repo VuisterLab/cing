@@ -279,6 +279,8 @@ def main(entryId, *extraArgList):
     if filterTopViolations and not project.filterHighRestraintViol():
             NTerror("Failed to filterHighRestraintViol")
 ####> MAIN UTILITY HERE
+    if 0: # DEFAULT 0
+        project.save()
     if project.validate(htmlOnly=htmlOnly, ranges=ranges, doProcheck=doProcheck, doWhatif=doWhatif,
             doWattos=doWattos, doQueeny = doQueeny, doTalos=doTalos, filterVasco = filterVasco ):
         NTerror("Failed to validate project read")

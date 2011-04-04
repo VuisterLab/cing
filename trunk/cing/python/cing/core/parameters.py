@@ -1,5 +1,6 @@
 from cing import osType
 from cing.Libs.NTutils import * #@UnusedWildImport
+from cing.PluginCode.required.reqCcpn import CCPN_STR
 import platform
 
 #-----------------------------------------------------------------------------
@@ -47,6 +48,7 @@ moleculeDirectories = NTdict(
     x3dna      = 'X3DNA',
     analysis   = 'Cing',
     shiftx     = 'Shiftx',
+    ccpn       =  CCPN_STR,
     html       = 'HTML',
     jmol       = 'Macros/Jmol',
     pymol      = 'Macros/pyMol',

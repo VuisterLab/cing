@@ -52,7 +52,7 @@ class TagTable (Lister):
             self.tagvalues  = [ [None] ]
 
         self.verbosity  = verbosity
-
+    
     "Returns the STAR text representation"
     def star_text ( self,
                     flavor                  = 'NMR-STAR'
@@ -167,7 +167,7 @@ class TagTable (Lister):
     def getIntListByColumnName(self, columnName):
         """Convenience function."""
         return self.getSpecificListByColumnName( columnName, int, "int")
-    def getInt(self, columnName, rowIdx):
+    def getInt(self, columnName, rowIdx=0):
         """Convenience function."""
         col = self.getSpecificListByColumnName( columnName, int, "int")
         if col == None:
@@ -188,7 +188,7 @@ class TagTable (Lister):
             NTerror('getInt: failed to convert to int for construct "%s"' % value)
         return result
 
-    def getFloat(self, columnName, rowIdx):
+    def getFloat(self, columnName, rowIdx=0):
         """Convenience function."""
         col = self.getSpecificListByColumnName( columnName, float, "float")
         if col == None:
@@ -208,6 +208,45 @@ class TagTable (Lister):
     #        NTtracebackError() # disable this verbose messaging after done debugging.
             NTerror('getFloat: failed to convert to float for construct "%s"' % value)
         return result
+
+    def getColCount(self):
+        return len(self.tagvalues)
+    
+    def getRowCount(self):
+        if not self.tagvalues:
+            return 0
+        return len(self.tagvalues[0])
+    
+    def getString(self, columnName=None, rowIdx=0, colIdx=0):        
+        """Convenience function.
+        Use by columnName -OR- by row/col indices.        
+        """
+        if columnName == None:
+            if rowIdx < 0:
+                NTerror("rowIdx < 0")
+                return
+            if colIdx < 0:
+                NTerror("colIdx < 0")
+                return
+            nr = self.getRowCount()
+            nc = self.getColCount()
+            if rowIdx >= nr:
+                NTerror("rowIdx (%s) >= nr (%s)" % ( rowIdx, nr))
+                return
+            if colIdx >= nc:
+                NTerror("colIdx (%s) >= nc (%s)" % ( colIdx, nc))
+                return
+            return self.tagvalues[colIdx][rowIdx]
+        col = self.getSpecificListByColumnName( columnName, str, "string")
+        if col == None:
+            NTerror("Failed to TagTable.getString for column %s and rowIdx %s" % (columnName, rowIdx) )
+            return None
+        n = len(col)
+        if rowIdx < 0 or rowIdx >= n:
+            NTerror("Failed to TagTable.getString for column %s and out of bounds rowIdx %s" % (columnName, rowIdx) )
+            return None
+        value = str(col[rowIdx])
+        return value
 
     def getFloatListByColumnName(self, columnName):
         """Convenience function."""
