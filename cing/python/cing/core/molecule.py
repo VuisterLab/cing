@@ -115,7 +115,7 @@ def getAssignedAtomListForResList(resList, isAssigned = True, resonanceListIdx=R
     """
     assignmentCountMap = AssignmentCountMap() # Just for checking against its keys.
 #    NTdebug("Now in getAssignedAtomListForResList starting with assignmentCountMap: %s" % assignmentCountMap.__str__(showEmptyElements=1))
-    
+
     atmList = NTlist()
     resultAtmList = NTlist()
     for res in resList:
@@ -170,9 +170,9 @@ def getAssignmentCountMapForResList(resList, isAssigned = True, resonanceListIdx
 
     If isAssigned is not set then the unassigned spins will be counted.
     Together with the assigned spins they should constitute all assignable spins.
-    
+
     Any resonance list will do.
-    
+
     Uses the routine getAssignedAtomListForResList.
     """
 #    NTdebug("Now in getAssignmentCountMapForResList with resonanceListIdx: %s" % resonanceListIdx)
@@ -182,7 +182,7 @@ def getAssignmentCountMapForResList(resList, isAssigned = True, resonanceListIdx
     if not resList:
         NTerror("Failed getAssignmentCountMapForResList because no resList; returning empty")
         return assignmentCountMap
-    
+
     resonanceListIdxList = [ resonanceListIdx ]
     if resonanceListIdx == RESONANCE_LIST_IDX_ANY:
         resonanceCount = len(resList[0].chain.molecule.resonanceSources)
@@ -228,7 +228,7 @@ class ResidueList():
     def countDsspSecStructConsensus(self):
         return countDsspSecStructConsensus(self.allResidues())
     def chothiaClass(self):
-        return chothiaClass(self.allResidues())    
+        return chothiaClass(self.allResidues())
     def chothiaClassInt(self):
         return chothiaClassInt(chothiaClass(self.allResidues()))
     def getAssignmentCountMap(self,isAssigned=True):
@@ -1527,7 +1527,7 @@ class Molecule( NTtree, ResidueList ):
         #end for
         file.close()
 
-        resonanceCount = len(self.resonanceSources)        
+        resonanceCount = len(self.resonanceSources)
         #NTdebug('Molecule.restoreResonances: %s (%d)', fileName, resonanceCount)
         return resonanceCount
     #end def
@@ -1548,17 +1548,17 @@ class Molecule( NTtree, ResidueList ):
             if not isinstance( resonanceSource, str):
                 NTerror(msg + " expected string but found: %s" % resonanceSource)
                 return True
-            self.resonanceSources[i] = ResonanceList(resonanceSource)            
+            self.resonanceSources[i] = ResonanceList(resonanceSource)
         #end for
     #end def
-        
+
     def newResonances( self, source=None, skipAtomResonanceCreation = False ):
         """Initialize a new resonance slot for every atom.
            atom.resonances() will point to this new resonance.
            Return None on error.
         """
         if source == None:
-            sourceName = getUniqueName(self.resonanceSources, 'source' ) 
+            sourceName = getUniqueName(self.resonanceSources, 'source' )
             source = ResonanceList(sourceName)
         if not isinstance(source, ResonanceList):
             NTerror("In %s expected ResonanceList source but found %s" % (getCallerName(), source))
@@ -1587,10 +1587,10 @@ class Molecule( NTtree, ResidueList ):
             check all the resonances in the list, optionally using selection
             and take the first one which has a assigned value,
             append or collapse the resonances list to single entry depending on append.
-            
+
             Return True on error.
         """
-        resonanceCount = len(self.resonanceSources)        
+        resonanceCount = len(self.resonanceSources)
         if not resonanceCount:
             NTmessage("Skipping molecule.mergeResonances because there are no resonances")
             return
@@ -1623,7 +1623,7 @@ class Molecule( NTtree, ResidueList ):
             if not append:
                 atom.resonances = NTlist( atom.resonances() )
         #end for
-    
+
     def setVascoChemicalShiftCorrections(self, rerefInfo, resonanceList ):
         """
         Return True on error
@@ -1641,21 +1641,21 @@ class Molecule( NTtree, ResidueList ):
             rerefNTvalue = NTvalue(rerefValue, rerefError, fmt = '%.3f (+- %.3f)') # can also be sml-ed.
 #            resonanceList.vascoResults[ atomTuple ] = rerefInfo[atomKey]
             resonanceList.vascoResults[ atomId ] = rerefNTvalue
-        # end for         
+        # end for
     #end def
-                
-    
+
+
     """
     Set doRevert to undo previously applied corrections.
     The corrections should first be made part of the CING project molecule.vascoResults
     using setVascoChemicalShiftCorrections
-    If resonanceList is None then do all present.    
-    Return True on error    
+    If resonanceList is None then do all present.
+    Return True on error
     """
     def applyVascoChemicalShiftCorrections(self, doRevert = False, resonanceList = None):
         func_name = getCallerName()
 #        NTdebug("Doing applyVascoChemicalShiftCorrections with doRevert %s on %s" % (doRevert, resonanceList))
-#        resonanceCount = len(self.resonanceSources)        
+#        resonanceCount = len(self.resonanceSources)
         resonanceLoL = [resonanceList]
         if resonanceList == None:
             resonanceLoL = self.resonanceSources
@@ -1674,11 +1674,11 @@ class Molecule( NTtree, ResidueList ):
                     NTerror("Vasco results were applied is: %s but doRevert is %s. Aborting." % (resonanceList.vascoApplied, doRevert ))
                     NTerror("Consider reverting previous correction first.") # should we build that in already?
                     return True
-    
+
             resList = self.allCommonAaResidues()
             if not resList:
                 NTmessage("Skipping applyVascoChemicalShiftCorrections because there are no common amino acids.")
-                return        
+                return
             atomListAll = getAssignedAtomListForResList(resList, resonanceListIdx = resonanceListIdx)
             if not atomListAll:
                 NTerror("Failed to find any assigned atom in a common amino acid but Vasco did produce results for them.")
@@ -1703,8 +1703,8 @@ class Molecule( NTtree, ResidueList ):
 #                    NTdebug("Skipping uncertain correction for %10s of rerefNTvalue %s" % (atomId, str(rerefNTvalue)))
                     continue
 #                NTmessage("Correcting %s with %s" % (str(atomTuple), str(rerefTuple)))
-                
-                atomList = self.getAtomsWithCsInVascoClass(atomListAll, atomKey)            
+
+                atomList = self.getAtomsWithCsInVascoClass(atomListAll, atomKey)
                 atomListAlreadyDone = atomListDone.intersection(atomList)
                 if atomListAlreadyDone:
                     NTerror("Found overlapping atoms in CING for Vasco corrections: %s" % str(atomListAlreadyDone))
@@ -1717,7 +1717,7 @@ class Molecule( NTtree, ResidueList ):
                 atomClassId = getDeepByKeys(vascoMapAtomIdToHuman, atomId)
                 if atomClassId == None:
                     atomClassId = atomId
-                    
+
                 NTmessage(msg + " Vasco correction for %s with %8.3f to %d resonances in %s" % (atomClassId, rerefValue, len(atomList), resonanceList.name))
 #                for i,atm in enumerate(atomList):
                 for atm in atomList:
@@ -1729,11 +1729,11 @@ class Molecule( NTtree, ResidueList ):
                     else:
                         r += rerefValue
                 atomListDone.addList(atomList)
-            # end for   
+            # end for
             resonanceList.vascoApplied = not resonanceList.vascoApplied
         # end for
     # end def
-            
+
     def hasVascoApplied(self):
         for resonanceList in self.resonanceSources:
             if resonanceList.vascoApplied:
@@ -1741,23 +1741,23 @@ class Molecule( NTtree, ResidueList ):
         # end
         return False
     # end def
-        
+
     """
-    Input e.g. 'C', 3 with the second parameter 
+    Input e.g. 'C', 3 with the second parameter
     Return False on error.
-    
-- where to get the selection groups for 
+
+- where to get the selection groups for
     hydrogen all, including aromatic and amides?
-    nitrogen all, 
+    nitrogen all,
     carbon "only aliphatic". In CING we use the atom type: 'C_ALI'. Ie. not aromatic.
-        Does this include e.g. 
-            Gly C, Asn CG, Arg CZ ? No because all have some other than C,H bound.        
+        Does this include e.g.
+            Gly C, Asn CG, Arg CZ ? No because all have some other than C,H bound.
             high ppm, proton attached
-                       
+
 ('C', 1) (None, None)                                           Group 1 (high ppm, no proton)
 ('C', 2) (None, None)                                           Group 2 aromaten (high ppm, proton attached)
 ('C', 3) (-1.6413276878937664, 0.058340678594975978)            Group 3 aliphatic (all but the other groups)
-('C', 4) (None, None)                                           Group 4 carbonylen 
+('C', 4) (None, None)                                           Group 4 carbonylen
 ('H', None) (-0.015514588071506744, 0.0091816571211084108)
 ('N', None) (-0.3314271261198754, 0.24086810646836765)
     """
@@ -1767,7 +1767,7 @@ class Molecule( NTtree, ResidueList ):
         if element not in vascoAtomTypeList:
             NTerror("atomType %s not in vascoAtomTypeList: %s" % ( element, str(vascoAtomTypeList)))
             return
-        spinType = elementToSpintypeMap[ element ]        
+        spinType = elementToSpintypeMap[ element ]
         atomListBySpintype = atomListAll.selectByItems(DB_STR, SPINTYPE_STR, spinType)
         group = atomKey[1]
         if group == None:
@@ -1779,8 +1779,8 @@ class Molecule( NTtree, ResidueList ):
         atomListBySpintypeAndType = atomListBySpintype.selectByItems(DB_STR, TYPE_STR, C_ALI_STR)
         return atomListBySpintypeAndType
     # end def
-        
-        
+
+
     def _saveStereoAssignments( self, stereoFileName ):
         """
         Save the stereo assignments to xml stereoFileName.
@@ -3610,7 +3610,7 @@ Residue class: Defines residue properties
         self.chain.replaceChild( self, newRes )
         self.chain   = None
         newRes.chain = newRes._parent
-        molecule = newRes.chain.molecule 
+        molecule = newRes.chain.molecule
         molecule.atomCount -= self.atomCount
 
         # Set new name references
@@ -4841,7 +4841,7 @@ coordinates: %s"""  , dots, self, dots
         if resonanceListIdx == RESONANCE_LIST_IDX_ANY:
             for resonance in self.resonances:
                 if resonance == None:
-                    continue 
+                    continue
                 if isNaN(resonance.value):
                     continue
                 return True
@@ -4849,7 +4849,7 @@ coordinates: %s"""  , dots, self, dots
             return False
         # end if
         if resonanceListIdx==None:
-            resonance = self.resonances()            
+            resonance = self.resonances()
         else:
             resonance = getDeepByKeysOrAttributes( self.resonances, resonanceListIdx )
             if resonance == None:

@@ -45,3 +45,7 @@ def unix2dos(text):
     return re.sub('([^\r])(\n)', '\1\r\n',text)
 def mac2unix(text):
     return re.sub('\r', '\n',text)
+
+def getHumanTagName(tagName):
+    "Replace _ by a space"
+    return tagName.replace('_', ' ')

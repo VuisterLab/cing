@@ -4,6 +4,7 @@ Started on Sep 21, 2010
 How to copy VC on nmr (production machine):
 
 -1- Suspend VC
+-2- Mount tera1 from nmr
 -3- Run this code which will do steps 4 through 6.
     python $CINGROOT/python/cing/Scripts/publishVC.py
 

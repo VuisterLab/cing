@@ -19,6 +19,8 @@ from cing.PluginCode.required.reqNih import * #@UnusedWildImport
 from cing.PluginCode.required.reqWattos import * #@UnusedWildImport
 from cing.PluginCode.required.reqWhatif import * #@UnusedWildImport
 from cing.PluginCode.required.reqX3dna import X3DNA_STR
+from cing.STAR.File import File
+from cing.STAR.Utils import getHumanTagName
 from cing.core.classes2 import resonanceListGetIndexFirstObjectWithRealValue
 from cing.core.parameters import cingPaths
 from cing.core.parameters import directories
@@ -682,7 +684,7 @@ class MakeHtmlTable:
 
     The classId parameter was introduced because the word class is a reserved word in Python.
     """
-    def __init__(self, html, classId="genericClassTable", showFooter=False, id=None, columnFormats=[], **kwds):
+    def __init__(self, html, classId="genericClassTable", showHeader=True, showFooter=False, id=None, columnFormats=[], **kwds):
         self.html = html
         self.columnFormats = columnFormats
         self.classId = classId
@@ -693,6 +695,7 @@ class MakeHtmlTable:
         self._columnOpen    = False
         self._currentColumn = -1
         self._doingHeader = False # temporarily set when filling header row.
+        self.showHeader = showHeader # Doesn't remove it but just disables showing it.
         self.kwds = kwds
     #end def
 
@@ -813,8 +816,10 @@ class MakeHtmlTable:
         if doFooter:
             tagId = 'tfoot'
 
-
-        self.html(tagId, closeTag=False)
+        formats = {}
+        if not self.showHeader:
+            formats = { 'style': "display:none;"}
+        self.html(tagId, closeTag=False, **formats)
         self.html('tr', closeTag=False)
         self._doingHeader = True
         for i,h in enumerate(headers):
@@ -2898,28 +2903,28 @@ class DihedralByProjectList( NTlist ):
 
 class AtomsHTMLfile( HTMLfile ):
     """Generate an Atoms html file for listing resonances.
-    
+
     When resonanceListIdx = None as per default. Then the first existing resonance value will be shown.
     This list will be the main target for an atom.
-    
-    For a valid resonanceListIdx the specific list's values (but no invalid resonance values) will be shown.    
+
+    For a valid resonanceListIdx the specific list's values (but no invalid resonance values) will be shown.
     """
-    
+
     def __init__(self, project, atomList, resonanceListIdx = None):
 
         self.project = project
         self.atomList = atomList
         self.resonanceListIdx = resonanceListIdx
         self.relatedAtomsHTMLfileList = NTlist()
-        
+
         fname = self._getFileName(resonanceListIdx)
         atomListTitlePostFix = self._getAtomListTitlePostFix(resonanceListIdx)
         fileName = self.project.htmlPath( htmlDirectories.molecule, fname)
-        
-#        NTdebug("Now initing AtomsHTMLfile %s %s %s", resonanceListIdx, fname, atomListTitlePostFix )            
+
+#        NTdebug("Now initing AtomsHTMLfile %s %s %s", resonanceListIdx, fname, atomListTitlePostFix )
         HTMLfile.__init__( self, fileName, title = 'Atom List ' + atomListTitlePostFix, project=project )
-        
-        if resonanceListIdx == None:            
+
+        if resonanceListIdx == None:
             atomList.htmlLocation = ( fileName, HTMLfile.top )
             if hasattr(atomList, 'html'):
                 del(atomList.html)
@@ -2928,11 +2933,11 @@ class AtomsHTMLfile( HTMLfile ):
             for atom in self.atomList:
                 tag = '_o'+str(atom.__OBJECTID__)
                 atom.htmlLocation = ( self.fileName, '#' + tag )
-            #end for 
+            #end for
             for i in range( len(self.project.molecule.resonanceSources)):
                 relatedAtomsHTMLfile = AtomsHTMLfile( self.project, self.project.molecule.atomList, i )
                 self.relatedAtomsHTMLfileList.append(relatedAtomsHTMLfile)
-            #end for 
+            #end for
         else:
             pass
         #end if
@@ -2953,21 +2958,21 @@ class AtomsHTMLfile( HTMLfile ):
 
     def _getResonanceCollapsed(self, atom):
         atomResonanceCollapsed = None
-        if self.resonanceListIdx == None:            
+        if self.resonanceListIdx == None:
             idx = resonanceListGetIndexFirstObjectWithRealValue(atom.resonances)
             if idx >= 0:
                 atomResonanceCollapsed = atom.resonances[idx]
-            # end if            
+            # end if
         else:
             atomResonanceCollapsed = atom.resonances[self.resonanceListIdx]
         return atomResonanceCollapsed
-        
+
     def _hasResonanceValue(self, atom):
         atomResonanceCollapsed = self._getResonanceCollapsed(atom)
         if atomResonanceCollapsed == None:
             return False
         return not isNoneorNaN(atomResonanceCollapsed.value)
-        
+
     def _atomRow(self, atom, table):
         """Generate one row in table for atom.
         Return True on error.
@@ -2978,7 +2983,7 @@ class AtomsHTMLfile( HTMLfile ):
         delta   = None
         ddelta  = None
         dav     = None
-        dsd     = None        
+        dsd     = None
         value   = None
         error   = None
 
@@ -2996,11 +3001,11 @@ class AtomsHTMLfile( HTMLfile ):
         if atom.has_key('shiftx') and len(atom.shiftx):
             sav = atom.shiftx.av
             ssd = atom.shiftx.sd
-        
+
         if atom.db.shift:
             dav = atom.db.shift.average
             dsd = atom.db.shift.sd
-            
+
         if not isNoneorNaN(value):
             if sav:
                 delta = value - sav
@@ -3027,7 +3032,7 @@ class AtomsHTMLfile( HTMLfile ):
 
         table.nextColumn()
         # reference label of atom; insert a dummy character
-        if self.resonanceListIdx == None:        
+        if self.resonanceListIdx == None:
             self.main( 'i', '', id=atom.htmlLocation[1][1:])
 
         chName = NaNstring
@@ -3099,13 +3104,13 @@ class AtomsHTMLfile( HTMLfile ):
                         self.main('', 'Vasco rereferenced: ')
 #                        self.main('ol', closeTag=False)
                         openedVascoList = True
-                    self.main('a', resonanceList.name, href = self._getFileName(i))                    
+                    self.main('a', resonanceList.name, href = self._getFileName(i))
                 # end if
             # end for
             for i in range( len(self.project.molecule.resonanceSources)):
                 relatedAtomsHTMLfile = self.relatedAtomsHTMLfileList[ i ]
                 relatedAtomsHTMLfile.generateHtml()
-            #end for 
+            #end for
         else:
             # Add link to main list
             i = None
@@ -3116,10 +3121,10 @@ class AtomsHTMLfile( HTMLfile ):
             resonanceList = self.project.molecule.resonanceSources[self.resonanceListIdx]
             if resonanceList.hasVascoCorrectionsApplied():
                 self.main('h3', 'Vasco rereferenced:')
-                self.main('', resonanceList.toVascoHtmlList())                    
+                self.main('', resonanceList.toVascoHtmlList())
             # end if
         # end if
-        
+
 #        refItem = os.path.join( self.project.moleculePath('analysis'),'validateAssignments.txt')
 #        abstractResource = NTdict()        # mimic an object
 #        abstractResource.htmlLocation = ( refItem, HTMLfile.top )
@@ -3445,6 +3450,145 @@ class RestraintListHTMLfile( HTMLfile ):
     #end def
 
 
+    def _generateDistanceRestraintSsaCorrectionsHtml(self, htmlOnly=False):
+        """Generate html for stereoAssignmentCorrectionsStar listing from STAR txt.
+
+        Return True on error.
+        """
+        projectDistList = self.project.distances
+        if not len(projectDistList):
+            NTerror("self.project.distances is empty but FC meta data will still be added.")
+            return True
+        star_text = getDeepByKeysOrAttributes( projectDistList, STEREO_ASSIGNMENT_CORRECTIONS_STAR_STR)
+        if not star_text:
+            NTdebug("Skipping creation of stereoAssignmentCorrectionsStar because none available.")
+            return
+
+
+        self.main("div", closeTag=False)
+        self.main("h3", "Stereospecific corrections on distance restraints %s" % time.asctime())
+
+        starFile = File()
+        if starFile.parse(text=star_text):
+            NTerror( "reading STAR text by STAR api." )
+            return True
+        if starFile.check_integrity():
+            print "Error: STAR text failed integrity check."
+            return True
+
+
+        sfList = starFile.getSaveFrames(category = "stereo_assignments")
+        if not sfList or len(sfList) != 1:
+            NTerror("Failed to get single saveframe but got list of: [%s]" % sfList)
+            return True
+
+        saveFrameAssign = sfList[0]
+        tagTableAssignHeader = saveFrameAssign.tagtables[0]
+        gS = tagTableAssignHeader.getString
+#        gF = tagTableAssignHeader.getFloat
+#        gI = tagTableAssignHeader.getInt
+
+        tagNameList = """
+            Triplet_count
+            Swap_count
+            Swap_percentage
+            Deassign_count
+            Deassign_percentage
+            Model_count
+            Total_e_low_states
+            Total_e_high_states
+            Crit_abs_e_diff
+            Crit_rel_e_diff
+            Crit_mdls_favor_pct
+            Crit_sing_mdl_viol
+            Crit_multi_mdl_viol
+            Crit_multi_mdl_pct
+            """.split()
+        tagNameListSize = len(tagNameList)
+        tagNameDescriptionList = [
+            "Number of triplets (atom-group pair and pseudo)",
+            "Number of triplets that were swapped",
+            "Percentage of triplets that were swapped",
+            "Number of deassigned triplets",
+            "Percentage of deassigned triplets",
+            "Number of models in ensemble",
+            "Energy of the states with the lower energies summed for all triplets (Ang.**2) ensemble averaged",
+            "Energy of the states with the higher energies summed for all triplets (Ang.**2) ensemble averaged",
+            "Criterium for swapping assignment on the absolute energy difference (Ang.**2)",
+            "Criterium for swapping assignment on the relative energy difference (Ang.**2)",
+            "Criterium for swapping assignment on the percentage of models favoring a swap",
+            "Criterium for deassignment on a single model violation (Ang.)",
+            "Criterium for deassignment on a multiple model violation (Ang.)",
+            "Criterium for deassignment on a percentage of models"
+        ]
+
+#        tagTypeIidxList = [0,1,3,5] # integers
+        valueList = [ gS("_Stereo_assign_list."+tagNameList[i]) for i in range(tagNameListSize)]
+        columnFormatsHeader = [   ('Property', {'title':'Parameter of stereospecific assignment check'} ),
+                                  ('Value',    {'title':'Plain value'} ),
+                                  ]
+#        tableKwdsHeader = {"cellpadding":"0", "cellspacing":"0", "border":"0", "float":"left", "clear": "both"}
+        tableKwdsHeader = {"cellpadding":"0", "cellspacing":"0", "border":"0" }
+        if 1:
+            tableHeader = MakeHtmlTable( self.main, showHeader=False, columnFormats=columnFormatsHeader, classId="display", id="dataTables-DRSsaHeader", **tableKwdsHeader )
+    #        tableHeader = MakeHtmlTable( self.main, showHeader=False, columnFormats=columnFormatsHeader, classId="display", **tableKwdsHeader )
+            for rowIdx in tableHeader.rows(range(tagNameListSize)): # count the abov
+                humanTagName = getHumanTagName(tagNameList[rowIdx])
+                cellKwds = {'title': tagNameDescriptionList[rowIdx]}
+                tableHeader.nextColumn(humanTagName, **cellKwds )
+                tableHeader.nextColumn(str(valueList[rowIdx]))
+            # end for
+        else:
+            NTdebug("Skipping header table of ssa")
+        # end if
+
+        if 0:
+            NTdebug("Skipping main table of ssa")
+            return
+
+        columnFormats = [   ('#',                       {'title':'Triplet number. Only ambiguous restraints show a dot'} ),
+                            ('ch',                      {'title':'Chain identifier'} ),
+                            ('ri',                      {'title':'Residue number'} ),
+                            ('rn',                      {'title':'Residue name'} ),
+                            ('at',                      {'title':'Name of pseudoatom representing the triplet'} ),
+                            ('Num',                     {'title':'Ordinal number of assignment (1 is assigned first)'} ),
+                            ('Swapped',                 {'title':'yes; if assignment state is swapped with respect to restraint file'} ),
+                            ('Models Favoring %',       {'title':'Percentage of models in which the assignment with the lowest overall energy is favored'} ),
+                            ('Energy Diff.%',           {'title':'Percentage of difference between lowest and highest overall energy with respect to the highest overall energy'} ),
+                            ('Energy Diff.',            {'title':'Difference between lowest and highest overall energy ensemble averaged'} ),
+                            ('Energy +',                {'title':'Energy of the highest overall energy state (Ang.**2) ensemble averaged'} ),
+                            ('Energy -',                {'title':'Energy of the lowest overall energy state (Ang.**2) ensemble averaged'} ),
+                            ('Constraint #',            {'title':'Number of restraints involved with the triplet. The highest ranking triplet on this number, is assigned first (optional)'} ),
+                            ('Constraint Ambi #',       {'title':'Number of restraints involved with the triplet that are ambiguous besides the ambiguity from this triplet'} ),
+                            ('Deassigned',              {'title':'yes; if restraints included in this triplet are deassigned'} ),
+                            ('Violation Max',           {'title':'Maximum unaveraged violation before deassignment (Ang.)'} ),
+                            ('Single Mdl Crit #',       {'title':'Number of violated restraints above threshold for a single model before deassignment (given by Single_mdl_crit_count)'} ),
+                            ('Multi Mdl Crit #',        {'title':'Number of violated restraints above threshold for a multiple models before deassignment (given by Multi_mdl_crit_count)'} ),
+                       ]
+        tableKwds = {"cellpadding":"0", "cellspacing":"0", "border":"0"}
+        self.main("h3", "Info per atom group %s" % time.asctime())
+        tagTableAssign = saveFrameAssign.tagtables[1]
+
+        table = MakeHtmlTable( self.main, columnFormats=columnFormats, classId="display", id="dataTables-DRSsaMain", **tableKwds )
+        colCount = len(columnFormats)
+        rowCount = tagTableAssign.getRowCount()
+        colCount2 = tagTableAssign.getColCount()
+        if colCount2 != (colCount-1):
+            NTerror("Failed to get correct columns %s but found %s from tagtable" % ( colCount, (colCount+1)))
+            return True
+        for rowIdx in table.rows(range(rowCount)): # count the abov
+            table.nextColumn(str(rowIdx+1))
+            for colIdx in range(1,colCount): # c
+                v = tagTableAssign.getString(columnName=None, rowIdx=rowIdx, colIdx=colIdx-1)
+                if colIdx == 1: # atoms etc.
+                    pass
+                table.nextColumn(v)
+            # end for
+        # end for
+        self.main("div", openTag=False)
+    #end def
+
+
     def _generateDistanceRestraintHtml(self, htmlOnly=False):
         """Generate html for DR listing.
 
@@ -3453,6 +3597,11 @@ class RestraintListHTMLfile( HTMLfile ):
 
         Checkbox will toggle between showing either first or second division.
         """
+
+        if 0: # DEBUG further.
+            if self._generateDistanceRestraintSsaCorrectionsHtml(htmlOnly=htmlOnly):
+                NTerror("Failed _generateDistanceRestraintSsaCorrectionsHtml")
+            return # TODO: finish
 
         columnFormats = [   ('#', {'title':'Restraint number. Only ambiguous restraints show a dot'} ),
 

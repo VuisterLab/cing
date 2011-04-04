@@ -44,6 +44,54 @@ jQuery(document).ready(function() {
 //        "bAutoWidth": false,
     } );
 
+
+    $("table[id^='dataTables-DRSsaHeader']").dataTable({
+        "bSort": false,
+        "bPaginate": false,
+        "bLengthChange": false,
+        "bFilter": false,
+        "bInfo": false,
+        "bProcessing": false,
+//        "sDom": 'T<"clear">lfrtip',
+        "bAutoWidth": true,
+        "aoColumns": [
+                      { "sType": "html",    "sClass": "left" }, // parameter
+                      { "sType": "numeric", "sClass": "left" }  // value
+                  ]
+    } );
+
+    $("table[id^='dataTables-DRSsaMain']").dataTable({
+        "bSort": true,
+        "aaSorting": [[0,'asc']],
+        "bPaginate": true,
+        "bLengthChange": true,
+        "iDisplayLength": 10000,
+        "bFilter": true,
+        "bInfo": true,
+        "bProcessing": true,
+        "sDom": 'T<"clear">lfrtip',
+        "aoColumns": [
+                      {"sType": "numeric", "sClass": "right" }, // 1 #
+                      {"sType": "html" }, 						// 2 ch
+                      {"sType": "numeric", "sClass": "right" }, // 3 resi
+                      {"sType": "html" }, 						// 4 resn
+                      {"sType": "html" },						// 5 atom name
+                      {"sType": "numeric", "sClass": "right" }, // 6 Num
+                      {"sType": "html"},  						// 7 Swapped
+                      {"sType": "numeric", "sClass": "right"},  // 8 Models Favoring
+                      {"sType": "numeric", "sClass": "right"},  // 9 Energy Diff.%
+                      {"sType": "numeric", "sClass": "right"},  //10 Energy Diff.
+                      {"sType": "numeric", "sClass": "right"},  //11 Energy +
+                      {"sType": "numeric", "sClass": "right"},  //12 Energy -
+                      {"sType": "numeric", "sClass": "right"},  //13 Constraint Count
+                      {"sType": "numeric", "sClass": "right"},  //14 Constraint Ambi Count
+                      {"sType": "html"},   						//15 Deassigned
+                      {"sType": "numeric", "sClass": "right"},  //16 Violation Max
+                      {"sType": "numeric", "sClass": "right"},  //17 Single Mdl Crit Count
+                      {"sType": "numeric", "sClass": "right"}   //18 Multi Mdl Crit Count
+                  ]
+    } );
+
     $("table[id^='dataTables-DRList']").dataTable({
         "bSort": true,
         "aaSorting": [[0,'asc']],

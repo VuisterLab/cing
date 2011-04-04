@@ -53,7 +53,7 @@ class AllChecks(TestCase):
                           ('col3', {})
                                  ]
 
-        t = MakeHtmlTable(h.main, classId="testJsTable", id="testJsTableId", columnFormats=columnFormats,
+        t = MakeHtmlTable(h.main, showHeader=False, classId="testJsTable", id="testJsTableId", columnFormats=columnFormats,
                           bla="0")
         for row in t.rows(range(2)):
             rStr = str(row)
@@ -66,6 +66,7 @@ class AllChecks(TestCase):
             t(None, rStr + "." + str(4))
 
         #end for
+        h.main('h3', 'Text to start below the table.')
         h.render()
 
 
