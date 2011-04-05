@@ -14,7 +14,7 @@ from unittest import TestCase
 import unittest
 
 class AllChecks(TestCase):
-    def testQueeny(self):
+    def test_queeny(self):
 
         runQueeny = 1  # DEFAULT: 1
         doStoreCheck = 1 # DEFAULT: 0 Requires sqlAlchemy

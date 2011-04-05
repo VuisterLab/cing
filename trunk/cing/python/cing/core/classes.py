@@ -16,7 +16,7 @@ from cing.Libs.disk import remove
 from cing.Libs.helper import getStartMessage
 from cing.Libs.helper import getStopMessage
 from cing.Libs.html import DihedralByProjectList
-from cing.Libs.html import addPreTagLines 
+from cing.Libs.html import addPreTagLines
 from cing.Libs.html import generateHtml
 from cing.Libs.html import renderHtml
 from cing.Libs.html import setupHtml
@@ -1324,7 +1324,7 @@ class ProjectList(NTlist):
             #end if
         #end for
         return names
-        
+
     def getListByName(self, name):
         "Return list by name or False"
         names = self.names()
@@ -2636,7 +2636,7 @@ class DistanceRestraint(Restraint):
 
     def simplify(self):
         """Return True on error.
-        
+
         Routine is iterative itself because both sides may contain ambis to collapse and remove.
         """
         statusOverall = self.STATUS_NOT_SIMPLIFIED
@@ -2654,7 +2654,7 @@ class DistanceRestraint(Restraint):
                 return True
             # end if
         # end while
-        
+
         if self._removeDuplicateAtomPairs():
             NTerror("Encountered an error in _removeDuplicateAtomPairs restraint %s" % self)
             return True
@@ -2665,7 +2665,7 @@ class DistanceRestraint(Restraint):
         # end if
         return statusOverall
     #end def
-    
+
 
     def deassignStereospecificity(self):
         """If the restraint involves a stereo specifically assignable atom then expand the list to include all
@@ -2705,16 +2705,16 @@ class DistanceRestraint(Restraint):
     def _simplify(self):
         """FC likes to split Val QQG in QG1 and 2 making it appear to be an ambiguous OR typed XPLOR restraint
         were it is not really one. Undone here.
-        
+
         Returns:
         None                     error.
         STATUS_NOT_SIMPLIFIED    no simplifications done
         STATUS_SIMPLIFIED        simplifications done
-        
+
         In the code:
-        
-        j stands for the index of the atomPair of the outer loop that might be removed upon simplification. 
-        i stands for the index of the atomPair of the inner loop that is compared to and that might be modified to include atoms from atomPair j. 
+
+        j stands for the index of the atomPair of the outer loop that might be removed upon simplification.
+        i stands for the index of the atomPair of the inner loop that is compared to and that might be modified to include atoms from atomPair j.
         """
 
 #        NTdebug('Starting _simplify for\n:%r' % ( self ) )
@@ -2780,7 +2780,7 @@ class DistanceRestraint(Restraint):
 #                    NTdebug('    atoms toMerge I %s and J %s have different parent if at all related.' % ( atomItoMerge, atomJtoMerge) ) # boring.
                     continue
                 # end if
-                
+
                 pseudoOfAtom = atomItoMerge.pseudoAtom()
                 if not pseudoOfAtom:
 #                    NTdebug('    no pseudo for this atom %s' % atomItoMerge)
@@ -2808,18 +2808,18 @@ class DistanceRestraint(Restraint):
 #        NTdebug('Not simplified.')
         return self.STATUS_NOT_SIMPLIFIED
     # end def
-        
+
     def _removeDuplicateAtomPairs(self):
         """
         Used in simplify.
-        
+
         Returns:
         True                     error.
-        
+
         In the code:
-        
-        j stands for the index of the atomPair of the outer loop that might be removed upon removal. 
-        i stands for the index of the atomPair of the inner loop that is compared to. 
+
+        j stands for the index of the atomPair of the outer loop that might be removed upon removal.
+        i stands for the index of the atomPair of the inner loop that is compared to.
         """
 
 #        NTdebug('Starting %s for %s' % ( getCallerName(), self ) )
@@ -2852,21 +2852,21 @@ class DistanceRestraint(Restraint):
         # end while
         return
     # end def
-            
+
     def _removeDuplicateAtomPairs2(self):
         """
         Used in simplify.
-        
-        This code is more advanced than the above _removeDuplicateAtomPairs2 in that it will also 
+
+        This code is more advanced than the above _removeDuplicateAtomPairs2 in that it will also
         check when pseudos are contained in other pseudos. The widest will be retained.
         E.g.
         For 1a24
-        783.00    A    20    PRO    QB    A    23    LEU    MD1   3.20    7.90    2.96    0.56    2.56    3.35    0.32    0.45    0.64    0    0    0    
-        783.01    A    20    PRO    QB    A    23    LEU    QD    3.20    7.90    2.96    0.56    2.56    3.35    0.32    0.45    0.64    0    0    0    
+        783.00    A    20    PRO    QB    A    23    LEU    MD1   3.20    7.90    2.96    0.56    2.56    3.35    0.32    0.45    0.64    0    0    0
+        783.01    A    20    PRO    QB    A    23    LEU    QD    3.20    7.90    2.96    0.56    2.56    3.35    0.32    0.45    0.64    0    0    0
         will be truncated to:
         For 1a24
-        783       A    20    PRO    QB    A    23    LEU    QD    3.20    7.90    2.96    0.56    2.56    3.35    0.32    0.45    0.64    0    0    0    
-        
+        783       A    20    PRO    QB    A    23    LEU    QD    3.20    7.90    2.96    0.56    2.56    3.35    0.32    0.45    0.64    0    0    0
+
         Watch for e.g. intraresidual LEU with multiple atompairs:
         HB2 QD
         QB  MD1
@@ -2879,13 +2879,13 @@ class DistanceRestraint(Restraint):
         QB  MD1
         QB  QD
         so that this routine will do the final collapse to QB QD.
-        
+
         The ordering is irrelevant but must always be maintained.
-        
-        
+
+
         pseudo code:
         loop over atompairs i,j
-                atomset0i 
+                atomset0i
                 if(
                    ( atomset0i.issuperset(atomset0j) and atomset1i.issuperset(atomset1j)) or
                    ( atomset0i.issuperset(atomset1j) and atomset1i.issuperset(atomset0j))    )
@@ -2894,20 +2894,20 @@ class DistanceRestraint(Restraint):
                    ( atomset0j.issuperset(atomset0i) and atomset1j.issuperset(atomset1i)) or
                    ( atomset0j.issuperset(atomset1i) and atomset1j.issuperset(atomset0i))    )
                     remove i and return
-                                        
+
         Returns:
         True                     error.
         STATUS_REMOVED_DUPLICATE = 'removed duplicate'
         STATUS_NOT_REMOVED_DUPLICATE = 'not removed duplicate'
-        
+
         In the code:
-        
-        j stands for the index of the atomPair of the outer loop that might be removed upon removal. 
-        i stands for the index of the atomPair of the inner loop that is compared to. 
+
+        j stands for the index of the atomPair of the outer loop that might be removed upon removal.
+        i stands for the index of the atomPair of the inner loop that is compared to.
         """
 
 #        NTdebug('Starting %s for %s' % ( getCallerName(), self ) )
-        
+
         n = len(self.atomPairs)
         for atomPairIdxJ in range(n-1):
             atomPairJ = self.atomPairs[atomPairIdxJ]
@@ -2916,7 +2916,7 @@ class DistanceRestraint(Restraint):
             atom1J = atomPairJ[1]
             atomset0J = set( atom0J.realAtoms() )
             atomset1J = set( atom1J.realAtoms() )
-            
+
 #            NTdebug('For atomPairIdxJ %d using atoms J %s and %s' % ( atomPairIdxJ, atom0J, atom1J) )
 
             for atomPairIdxI in range(atomPairIdxJ+1,n): # Compare only with the next atom pairs
@@ -2929,7 +2929,7 @@ class DistanceRestraint(Restraint):
                 atomset1I = set( atom1I.realAtoms() )
                 if(
                    ( atomset0I.issuperset(atomset0J) and atomset1I.issuperset(atomset1J)) or
-                   ( atomset0I.issuperset(atomset1J) and atomset1I.issuperset(atomset0J))    ):                    
+                   ( atomset0I.issuperset(atomset1J) and atomset1I.issuperset(atomset0J))    ):
 #                    NTdebug("Removing self.atomPairs[atomPairIdxJ]: %s" % str(self.atomPairs[atomPairIdxJ]))
                     del self.atomPairs[ atomPairIdxJ ]
                     return self.STATUS_REMOVED_DUPLICATE
@@ -2944,7 +2944,7 @@ class DistanceRestraint(Restraint):
         # end while
         return self.STATUS_NOT_REMOVED_DUPLICATE
     # end def
-        
+
     def appendPair(self, pair):
         """ pair is a (atom1,atom2) tuple
 
@@ -3424,48 +3424,6 @@ ROG score:         %7s
         return msg
     #end def
 
-    def formatHtml(self):
-
-        header = self.name
-        if hasattr(self, 'rogScore'):
-            if self.rogScore.isCritiqued():
-                header = '<font color="%s">%s</font>' % (self.rogScore.colorLabel, header)
-        header = '<h3>DistanceRestraintList %s</h3>' % header
-
-        msg = '''%s
-<BR>
-<table>
-<TR><TD>sequential    </TD><TD align="right">%4d</TD></TR>
-<TR><TD>intra-residual</TD><TD align="right">%4d</TD></TR>
-<TR><TD>medium-range  </TD><TD align="right">%4d</TD></TR>
-<TR><TD>long-range    </TD><TD align="right">%4d</TD></TR>
-<TR><TD>ambigious     </TD><TD align="right">%4d</TD></TR>
-<TR><TD>sum           </TD><TD align="right">%4d</TD></TR>
-</table>
-<BR>
-<table>
-<TR><TD>rmsd</TD>               <TD> %s +- %s                    </TD></TR>
-<TR><TD>violations <-0.1 A (lower-bound violations)</TD><TD align="right"> %4d </TD></TR>
-<TR><TD>violations > 0.1 A </TD><TD align="right"> %4d                          </TD></TR>
-<TR><TD>violations > 0.3 A </TD><TD align="right"> %4d                          </TD></TR>
-<TR><TD>violations > 0.5 A </TD><TD align="right"> %4d                          </TD></TR>
-</table>
-''' % (
-    header,
-    len(self.intraResidual),
-    len(self.sequential),
-    len(self.mediumRange),
-    len(self.longRange),
-    len(self.ambigious),
-    len(self),
-    val2Str(self.rmsdAv, "%7.3f", 7), val2Str(self.rmsdSd, "%6.3f", 6),
-    self.violCountLower,
-    self.violCount1,
-    self.violCount3,
-    self.violCount5
-  )
-        return msg
-    #end def
 #end class
 
 
@@ -3896,7 +3854,6 @@ ROG score:            %s
         msg = '''%s
 <BR>
 <table>
-<TR><TD>count               </TD><TD align="right">%4d</TD></TR>
 <TR><TD>rmsd:               </TD><TD> %s +- %s                    </TD></TR>
 <TR><TD>violations > 1 degree</TD><TD align="right"> %4d                          </TD></TR>
 <TR><TD>violations > 3 degrees</TD><TD align="right"> %4d                          </TD></TR>
@@ -3904,7 +3861,6 @@ ROG score:            %s
 </table>
 ''' % (
     header,
-    len(self),
     val2Str(self.rmsdAv, "%7.3f", 7), val2Str(self.rmsdSd, "%6.3f", 6),
     self.violCount1,
     self.violCount3,

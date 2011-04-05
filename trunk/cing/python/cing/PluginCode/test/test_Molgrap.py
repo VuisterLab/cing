@@ -46,7 +46,7 @@ class AllChecks(TestCase):
         project.save( )
         gifFileName = entryId+".gif"
         pathGif = os.path.join( self.cingDirTmpTest, gifFileName)
-        self.assertFalse(project.molecule.export2gif(pathGif, project=None))
+        self.assertFalse(project.molecule.export2gif(pathGif, project=project))
         self.assertTrue(os.path.exists(pathGif))
 
     def ttttestMolgrapRunFromCcpnFile(self):

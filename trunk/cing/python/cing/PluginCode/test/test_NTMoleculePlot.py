@@ -54,8 +54,6 @@ class AllChecks(TestCase):
         elif entryId.startswith("1bus"):
             ranges = "6-13,29-45"
 
-        self.failIf(os.chdir(cingDirTmp), msg=
-            "Failed to change to temp test directory for data: " + cingDirTmp)
         project = Project(entryId)
         project.removeFromDisk()
         project = Project.open(entryId, status='new')

@@ -91,7 +91,7 @@ class Ccpn:
     CCPN_CS_CONSTRAINT_LIST = 'ChemShiftConstraintList'
 
     CCPN_CS_LIST = 'ShiftList'
-    
+
     CCPN_RUN_MEASUREMENT = 'MeasurementListData'
     CCPN_RUN_CONSTRAINT = 'ConstraintStoreData'
     CCPN_RUN_STRUCTURE = 'StructureEnsembleData'
@@ -130,7 +130,7 @@ class Ccpn:
         self.patchAtomNames = patchAtomNames
         self.skipWaters = skipWaters
         self.allowNonStandardResidue = allowNonStandardResidue
-        
+
     def _getCcpnRestraintLoL(self, allCcpnConstraintLists, classNames):
         """Descrn: Function to get a list of CCPN restraint lists given an
                    input list of CCPN Nmr Constraint Stores (containers for
@@ -330,11 +330,11 @@ class Ccpn:
             NTerror("Failed to importFromCcpnDistanceRestraint")
             return None
         if not self.importFromCcpnDistanceRestraintMetaData():
-            NTdebug('Finished importFromCcpnDistanceRestraintMetaData')
-#            pass
+#            NTdebug('Finished importFromCcpnDistanceRestraintMetaData')
+            pass
         else:
             NTerror("Failed to importFromCcpnDistanceRestraintMetaData")
-            return None        
+            return None
         if self.importFromCcpnDihedralRestraint():
 #            NTdebug('Finished importFromCcpnDihedralRestraint')
             pass
@@ -425,7 +425,7 @@ class Ccpn:
             # end for
         # end if
         self.ccpnConstraintLists = ccpnConstraintLists
-        
+
 
         for ccpnMolSys in self.ccpnMolSystemList:
             moleculeName = self._ensureValidName(ccpnMolSys.code)
@@ -807,7 +807,7 @@ class Ccpn:
            Output: True or None for error.
 
            NB CING data model has no CS list entity but rather stores the info at the atom & resonances level.
-        """        
+        """
 #        NTdebug("Now in %s", getCallerName())
         shiftMapping = self._getShiftAtomNameMapping(ccpnShiftList, ccpnMolSystem)
         if not len(shiftMapping):
@@ -815,12 +815,12 @@ class Ccpn:
             return True
 #        if not self.molecule.hasResonances():
 #            self.molecule.newResonances() # do only once per import now. TODO: enable multiple resonances per atom per CCPN project.
-        
-        resonanceListName = getDeepByKeysOrAttributes( ccpnShiftList, NAME_STR ) # may be absent according to api.        
+
+        resonanceListName = getDeepByKeysOrAttributes( ccpnShiftList, NAME_STR ) # may be absent according to api.
         if resonanceListName == None:
             NTwarning("Failed to get resonanceListName from CCPN which will not allow CING to match later on for e.g. Vasco. Continuing.")
             resonanceListName = 'source'
-        resonanceListName = getUniqueName( self.molecule.resonanceSources, resonanceListName)            
+        resonanceListName = getUniqueName( self.molecule.resonanceSources, resonanceListName)
         resonanceList = self.molecule.newResonances()
         if not isinstance( resonanceList, ResonanceList ):
             NTerror("Failed to create a new resonance list to the project.")
@@ -961,7 +961,7 @@ class Ccpn:
                 # Use sorting by CCPN.
 #                ccpnShiftLoL = filterListByObjectClassName( self.ccpnNmrProject.sortedMeasurementLists(), self.CCPN_CS_LIST )
                 # or as per Rasmus' suggestion:
-                l = self.ccpnNmrProject.sortedMeasurementLists() 
+                l = self.ccpnNmrProject.sortedMeasurementLists()
                 ccpnShiftLoL = [x for x in l if x.className == self.CCPN_CS_LIST]
 #                NTdebug("There are shift lists: %s" % str(ccpnShiftLoL))
             if ccpnPeakLoL and (not ccpnShiftLoL):
@@ -1117,13 +1117,13 @@ class Ccpn:
         if ccpnCalc:
 #            NTdebug("In %s using ccpnCalc" % getCallerName())
             for peakData in ccpnCalc.findAllData(className = self.CCPN_RUN_PEAK, ioRole = 'input'):
-#                NTdebug("Using peakData %s" % peakData)                
+#                NTdebug("Using peakData %s" % peakData)
                 peakList = peakData.peakList
                 if peakList: # Technically possible that it may have been deleted
-#                    NTdebug("Using peakList %s" % peakList)                
+#                    NTdebug("Using peakList %s" % peakList)
                     peakLists.append(peakList)
         # No ccpnCalc or ccpnCalc is empty
-        if not peakLists:          
+        if not peakLists:
 #            NTdebug("In %s no peakLists yet" % getCallerName())
             for experiment in self.ccpnNmrProject.sortedExperiments():
 #                NTdebug("Using experiment %s" % experiment)
@@ -1424,31 +1424,30 @@ class Ccpn:
         if not hasattr(self.ccpnNmrConstraintStore, 'findAllApplicationData'):
             NTdebug("Ignoring meta data because no self.ccpnNmrConstraintStore.findAllApplicationData")
             return
-    
+
         appDataList = self.ccpnNmrConstraintStore.findAllApplicationData(application='FormatConverter', keyword='stereoAssignmentCorrectionsFile')
         if len(appDataList) == 0:
             NTdebug("No FC meta data")
             return
-        
+
         if len(appDataList) > 1:
             NTdebug("Ignoring FC meta data beyond the first element.")
         appDataString = appDataList[0]
-        
+
         if not isinstance(appDataString, AppDataString):
             NTerror("FC meta data isn't a AppDataString")
             return True
-        
+
         star_text = appDataString.value
         if not isinstance(star_text, str):
             NTerror("FC meta data value isn't a String")
             return True
-        
+
         if len(star_text) < 100:
             NTerror("FC meta data value isn't long enough to be valid")
             return True
-        
-        NTdebug("Got it:" + star_text[:9]) # TODO: import into new CING object.
 
+#        NTdebug("Got it:" + star_text[:9]) # TODO: import into new CING object.
         projectDistList = self.project.distances
         if not len(projectDistList):
             NTwarning("self.project.distances is empty but FC meta data will still be added.")
@@ -2438,7 +2437,6 @@ def saveCcpn(project, ccpnFolder, ccpnTgzFile = None):
        Inputs: Cing project.
        Output: Ccpn Project or None on error.
     '''
-    func_name = getCallerName()
     if project.has_key('ccpn'):
         ccpnProject = project.ccpn
         NTmessage('saveCcpn: Saving any changes to original CCPN project')
@@ -2456,7 +2454,7 @@ def saveCcpn(project, ccpnFolder, ccpnTgzFile = None):
     status = ccpnProject.saveModified() # TODO: can't change from original ccpnFolder
     switchOutput(True)
     if status:
-        NTerror("Failed ccpnProject.saveModified in " + func_name)
+        NTerror("Failed ccpnProject.saveModified in " + getCallerName())
         return None
 
     NTmessage("Saved ccpn project to folder: %s" % ccpnFolder)
@@ -2793,7 +2791,7 @@ stereochemistry is cna be seen by examining the atom network.
 #    if ccpnResDescriptor != ccpnResDescriptorNew:
 #        NTdebug("Changed from %s to %s" % (ccpnResDescriptor,ccpnResDescriptorNew))
     return ccpnResDescriptorNew
-# end def    
+# end def
 
 def restoreCcpn(project, tmp = None):
     """
@@ -2801,7 +2799,7 @@ def restoreCcpn(project, tmp = None):
 
     Return True on error
     """
-    NTdebug("Now in " + getCallerName())
+#    NTdebug("Now in " + getCallerName())
 
     if not project:
         NTerror('%s: no project defined' % getCallerName())
@@ -2810,19 +2808,19 @@ def restoreCcpn(project, tmp = None):
     if not project.molecule:
         return True
     #end if
-    rootPath = project.moleculePath( CCPN_LOWERCASE_STR )    
+    rootPath = project.moleculePath( CCPN_LOWERCASE_STR )
     fileName = os.path.join(rootPath, STEREO_ASSIGN_FILENAME_STR)
     if not os.path.exists(fileName):
         NTdebug("No stereo assign meta data from ccpn because no file named: " + fileName)
         return
     star_text = readTextFromFile(fileName)
-    
+
     projectDistList = project.distances
     if not len(projectDistList):
         NTwarning("self.project.distances is empty but FC meta data will still be added.")
     projectDistList.__setattr__(STEREO_ASSIGNMENT_CORRECTIONS_STAR_STR, star_text)
 
-    NTmessage('==> Restored CCPN meta data')
+#    NTmessage('==> Restored CCPN meta data')
 #end def
 
 def saveCcpnMetaData(project, tmp = None):
@@ -2831,8 +2829,7 @@ def saveCcpnMetaData(project, tmp = None):
 
     Return True on error
     """
-    NTdebug("Now in " + getCallerName())
-
+#    NTdebug("Now in " + getCallerName())
     if not project:
         NTerror('%s: no project defined' % getCallerName())
         return True
@@ -2855,7 +2852,7 @@ def saveCcpnMetaData(project, tmp = None):
     if writeTextToFile(fileName, star_text):
         NTdebug("writeTextToFile failed to file: " + fileName)
         return True
-    NTmessage('==> Stored CCPN meta data')
+#    NTmessage('==> Stored CCPN meta data')
 #end def
 
 # register the function

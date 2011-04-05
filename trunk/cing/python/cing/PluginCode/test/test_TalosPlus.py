@@ -94,7 +94,7 @@ class AllChecks(TestCase):
 #    entryList = "1brv".split() # don't use until issue 213 fixed.
 #    entryList = "CtR69AParis".split() # don't use until issue 213 fixed.
 
-    def testTalosPlus(self):
+    def test_TalosPlus(self):
         if not cingPaths.talos:
             raise ImportWarning('No Talos installed.')
 

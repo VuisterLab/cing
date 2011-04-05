@@ -13,7 +13,12 @@ import unittest
 
 class AllChecks(TestCase):
 
-    def testProcheck(self):
+    def test_Procheck(self):
+        cingDirTmpTest = os.path.join( cingDirTmp, getCallerName() )
+        mkdirs( cingDirTmpTest )
+        self.failIf(os.chdir(cingDirTmpTest), msg =
+            "Failed to change to test directory for files: " + cingDirTmpTest)
+
         runAqua = True
         showProcheckResults = False
         #entryId = "1ai0" # Most complex molecular system in any PDB NMR entry

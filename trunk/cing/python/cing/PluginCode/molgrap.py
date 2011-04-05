@@ -46,6 +46,7 @@ class Molgrap(NTdict):
         self.projectDirTmp = cingDirTmp
         if project:
             self.projectDirTmp = os.path.abspath(project.path(directories.tmp))
+#            NTdebug("Resetting Molgrap.projectDirTmp from %s to %s" % (cingDirTmp, self.projectDirTmp))
 #        NTdebug('Using self.projectDirTmp: ' + self.projectDirTmp)
 
     """Creates a large gif to path for the given molecule.
