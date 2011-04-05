@@ -3264,21 +3264,24 @@ class RestraintListHTMLfile( HTMLfile ):
             try:
                 previous = allRestraintLists[index-1]
                 self.insertHtmlLink( self.header, restraintList, previous, text = previous.name)
-            except: pass
+            except:
+                pass
         self.insertHtmlLink( self.header, restraintList, self.project, text = 'UP' )
         try:
             next = allRestraintLists[index+1]
             self.insertHtmlLink( self.header, restraintList, next, text = next.name )
-        except: pass
+        except:
+            pass
 
 #        self.main('h3',closeTag=False)
 #        for l in restraintList.format().split('\n')[:-1]:
-        self.main(None, restraintList.formatHtml())
+#        self.main(None, restraintList.formatHtml())
 #        self.main('h3',openTag=False)
 
         if restraintList.__CLASS__ == 'DistanceRestraintList':
             self._generateDistanceRestraintHtml(htmlOnly=htmlOnly)
         elif restraintList.__CLASS__ == 'DihedralRestraintList':
+            self.main(None, restraintList.formatHtml())
             self._generateDihedralRestraintHtml(htmlOnly=htmlOnly)
         elif restraintList.__CLASS__ == 'RDCRestraintList':
             pass
@@ -3464,10 +3467,6 @@ class RestraintListHTMLfile( HTMLfile ):
             NTdebug("Skipping creation of stereoAssignmentCorrectionsStar because none available.")
             return
 
-
-        self.main("div", closeTag=False)
-        self.main("h3", "Stereospecific corrections on distance restraints %s" % time.asctime())
-
         starFile = File()
         if starFile.parse(text=star_text):
             NTerror( "reading STAR text by STAR api." )
@@ -3529,22 +3528,24 @@ class RestraintListHTMLfile( HTMLfile ):
                                   ]
 #        tableKwdsHeader = {"cellpadding":"0", "cellspacing":"0", "border":"0", "float":"left", "clear": "both"}
         tableKwdsHeader = {"cellpadding":"0", "cellspacing":"0", "border":"0" }
-        if 1:
-            tableHeader = MakeHtmlTable( self.main, showHeader=False, columnFormats=columnFormatsHeader, classId="display", id="dataTables-DRSsaHeader", **tableKwdsHeader )
-    #        tableHeader = MakeHtmlTable( self.main, showHeader=False, columnFormats=columnFormatsHeader, classId="display", **tableKwdsHeader )
-            for rowIdx in tableHeader.rows(range(tagNameListSize)): # count the abov
-                humanTagName = getHumanTagName(tagNameList[rowIdx])
-                cellKwds = {'title': tagNameDescriptionList[rowIdx]}
-                tableHeader.nextColumn(humanTagName, **cellKwds )
-                tableHeader.nextColumn(str(valueList[rowIdx]))
-            # end for
-        else:
-            NTdebug("Skipping header table of ssa")
-        # end if
 
-        if 0:
-            NTdebug("Skipping main table of ssa")
-            return
+        k1 = 'togglable-element-ssa' # key to division unique within page.
+        onclickStr = "showHideByCheckBox('%s', this)" % (k1)
+        boxStr = "Stereospecific assignment corrections"
+#        boxStr += " " + time.asctime() # for debugging labelled with timestamp
+        self.main("h3", '', closeTag = False)
+        self.main("input", boxStr, type="checkbox", onclick=onclickStr, **checkBoxClassAttr)
+        self.main("h3", openTag = False)
+#        styleDisplayStr =  'display:' # Means item will be shown.
+        styleDisplayStr =  'display:none'
+        self.main("div", closeTag=False, id=k1, style=styleDisplayStr)
+        tableHeader = MakeHtmlTable( self.main, showHeader=False, columnFormats=columnFormatsHeader, classId="display", id="dataTables-DRSsaHeader", **tableKwdsHeader )
+        for rowIdx in tableHeader.rows(range(tagNameListSize)): # count the abov
+            humanTagName = getHumanTagName(tagNameList[rowIdx])
+            cellKwds = {'title': tagNameDescriptionList[rowIdx]}
+            tableHeader.nextColumn(humanTagName, **cellKwds )
+            tableHeader.nextColumn(str(valueList[rowIdx]))
+        # end for
 
         columnFormats = [   ('#',                       {'title':'Triplet number. Only ambiguous restraints show a dot'} ),
                             ('ch',                      {'title':'Chain identifier'} ),
@@ -3553,22 +3554,21 @@ class RestraintListHTMLfile( HTMLfile ):
                             ('at',                      {'title':'Name of pseudoatom representing the triplet'} ),
                             ('Num',                     {'title':'Ordinal number of assignment (1 is assigned first)'} ),
                             ('Swapped',                 {'title':'yes; if assignment state is swapped with respect to restraint file'} ),
-                            ('Models Favoring %',       {'title':'Percentage of models in which the assignment with the lowest overall energy is favored'} ),
-                            ('Energy Diff.%',           {'title':'Percentage of difference between lowest and highest overall energy with respect to the highest overall energy'} ),
-                            ('Energy Diff.',            {'title':'Difference between lowest and highest overall energy ensemble averaged'} ),
-                            ('Energy +',                {'title':'Energy of the highest overall energy state (Ang.**2) ensemble averaged'} ),
-                            ('Energy -',                {'title':'Energy of the lowest overall energy state (Ang.**2) ensemble averaged'} ),
-                            ('Constraint #',            {'title':'Number of restraints involved with the triplet. The highest ranking triplet on this number, is assigned first (optional)'} ),
-                            ('Constraint Ambi #',       {'title':'Number of restraints involved with the triplet that are ambiguous besides the ambiguity from this triplet'} ),
-                            ('Deassigned',              {'title':'yes; if restraints included in this triplet are deassigned'} ),
-                            ('Violation Max',           {'title':'Maximum unaveraged violation before deassignment (Ang.)'} ),
-                            ('Single Mdl Crit #',       {'title':'Number of violated restraints above threshold for a single model before deassignment (given by Single_mdl_crit_count)'} ),
-                            ('Multi Mdl Crit #',        {'title':'Number of violated restraints above threshold for a multiple models before deassignment (given by Multi_mdl_crit_count)'} ),
+                            ('Mdls Fav %',              {'title':'Percentage of models in which the assignment with the lowest overall energy is favored'} ),
+                            ('Nrg Dif %',               {'title':'Percentage of difference between lowest and highest overall energy with respect to the highest overall energy'} ),
+                            ('Nrg Dif',                 {'title':'Difference between lowest and highest overall energy ensemble averaged'} ),
+                            ('Nrg +',                   {'title':'Energy of the highest overall energy state (Ang.**2) ensemble averaged'} ),
+                            ('Nrg -',                   {'title':'Energy of the lowest overall energy state (Ang.**2) ensemble averaged'} ),
+                            ('Cnstr #',                 {'title':'Number of restraints involved with the triplet. The highest ranking triplet on this number, is assigned first (optional)'} ),
+                            ('Cnstr Amb #',             {'title':'Number of restraints involved with the triplet that are ambiguous besides the ambiguity from this triplet'} ),
+                            ('Deass',                   {'title':'yes; if restraints included in this triplet are deassigned'} ),
+                            ('Viol Max',                {'title':'Maximum unaveraged violation before deassignment (Ang.)'} ),
+                            ('Sngl Crit #',             {'title':'Number of violated restraints above threshold for a single model before deassignment (given by Single_mdl_crit_count)'} ),
+                            ('Mlt Crit #',              {'title':'Number of violated restraints above threshold for a multiple models before deassignment (given by Multi_mdl_crit_count)'} ),
                        ]
         tableKwds = {"cellpadding":"0", "cellspacing":"0", "border":"0"}
-        self.main("h3", "Info per atom group %s" % time.asctime())
+#        self.main("h3", "Info per atom group %s" % time.asctime())
         tagTableAssign = saveFrameAssign.tagtables[1]
-
         table = MakeHtmlTable( self.main, columnFormats=columnFormats, classId="display", id="dataTables-DRSsaMain", **tableKwds )
         colCount = len(columnFormats)
         rowCount = tagTableAssign.getRowCount()
@@ -3589,6 +3589,58 @@ class RestraintListHTMLfile( HTMLfile ):
     #end def
 
 
+    def  _generateDistanceRestraintMetaHtml(self, htmlOnly=False):
+
+        header = self.restraintList.name
+        if hasattr(self.restraintList, 'rogScore'):
+            if self.restraintList.rogScore.isCritiqued():
+                header = '<font color="%s">%s</font>' % (self.restraintList.rogScore.colorLabel, header)
+#        header = '<h3>DistanceRestraintList %s</h3>' % header
+
+        msg = '''
+<table>
+<TR><TD>sequential    </TD><TD align="right">%4d</TD></TR>
+<TR><TD>intra-residual</TD><TD align="right">%4d</TD></TR>
+<TR><TD>medium-range  </TD><TD align="right">%4d</TD></TR>
+<TR><TD>long-range    </TD><TD align="right">%4d</TD></TR>
+<TR><TD>ambigious     </TD><TD align="right">%4d</TD></TR>
+<TR><TD>sum           </TD><TD align="right">%4d</TD></TR>
+</table>
+
+<table>
+<TR><TD>rmsd</TD>               <TD> %s +- %s                    </TD></TR>
+<TR><TD>violations <-0.1 A (lower-bound violations)</TD><TD align="right"> %4d </TD></TR>
+<TR><TD>violations > 0.1 A </TD><TD align="right"> %4d                          </TD></TR>
+<TR><TD>violations > 0.3 A </TD><TD align="right"> %4d                          </TD></TR>
+<TR><TD>violations > 0.5 A </TD><TD align="right"> %4d                          </TD></TR>
+</table>
+''' % (
+            len(self.restraintList.intraResidual),
+            len(self.restraintList.sequential),
+            len(self.restraintList.mediumRange),
+            len(self.restraintList.longRange),
+            len(self.restraintList.ambigious),
+            len(self.restraintList),
+            val2Str(self.restraintList.rmsdAv, "%7.3f", 7), val2Str(self.restraintList.rmsdSd, "%6.3f", 6),
+            self.restraintList.violCountLower,
+            self.restraintList.violCount1,
+            self.restraintList.violCount3,
+            self.restraintList.violCount5
+          )
+        k1 = 'togglable-element-metadata-dr' # key to division unique within page.
+        onclickStr = "showHideByCheckBox('%s', this)" % (k1)
+        boxStr = "Summary"
+#        boxStr += " " + time.asctime() # for debugging labelled with timestamp
+        self.main("h3", '', closeTag = False)
+        self.main("input", boxStr, type="checkbox", onclick=onclickStr, **checkBoxClassAttr)
+        self.main("h3", openTag = False)
+#        styleDisplayStr =  'display:' # Means item will be shown.
+        styleDisplayStr =  'display:none'
+        self.main("div", closeTag=False, id=k1, style=styleDisplayStr)
+        self.main("", msg)
+        self.main("div", openTag=False)
+    #end def
+
     def _generateDistanceRestraintHtml(self, htmlOnly=False):
         """Generate html for DR listing.
 
@@ -3598,10 +3650,11 @@ class RestraintListHTMLfile( HTMLfile ):
         Checkbox will toggle between showing either first or second division.
         """
 
-        if 0: # DEBUG further.
-            if self._generateDistanceRestraintSsaCorrectionsHtml(htmlOnly=htmlOnly):
-                NTerror("Failed _generateDistanceRestraintSsaCorrectionsHtml")
-            return # TODO: finish
+        if self._generateDistanceRestraintMetaHtml():
+            NTerror("Failed _generateDistanceRestraintMetaHtml")
+
+        if self._generateDistanceRestraintSsaCorrectionsHtml(htmlOnly=htmlOnly):
+            NTerror("Failed _generateDistanceRestraintSsaCorrectionsHtml")
 
         columnFormats = [   ('#', {'title':'Restraint number. Only ambiguous restraints show a dot'} ),
 
@@ -3666,21 +3719,18 @@ class RestraintListHTMLfile( HTMLfile ):
         k2 = 'togglable-element-long'
 
         onclickStr = "toggleShowHideByCheckBox('%s', '%s', this)" % (k1, k2)
-        boxStr = "show critiqued or all"
-
+        boxStr = "Only critiques"
         if itemCritiquedPresent:
 #           checked="false"
-            self.main("h1", "Restraints", closeTag = False)
+            self.main("h3", '', closeTag = False)
             self.main("input", boxStr, type="checkbox", onclick=onclickStr, **checkBoxClassAttr)
-            self.main("h1", openTag = False)
-
-        if itemCritiquedPresent:
+            self.main("h3", openTag = False)
             # Make short hidden table.
 #            styleDisplayStr =  'display:' # Means item will be shown.
 #            if atomCritiquedPresent:
             styleDisplayStr =  'display:none'
             self.main("div", closeTag=False, id=k1, style=styleDisplayStr)
-            self.main("h1", "Critiqued restraints")
+            self.main("h3", "Critiqued restraints")
             table = MakeHtmlTable( self.main, columnFormats=columnFormats, classId="display", id="dataTables-DRList-short" , **tableKwds )
 
 
@@ -3691,7 +3741,7 @@ class RestraintListHTMLfile( HTMLfile ):
 
 
         self.main("div", closeTag=False, id=k2)
-        self.main("h1", "All restraints")
+        self.main("h3", "All restraints")
         table = MakeHtmlTable( self.main, columnFormats=columnFormats, classId="display", id="dataTables-DRList-long", **tableKwds )
         table.rows(range(pairListCount)) # set the rows
 #        for restraint in self.restraintList:

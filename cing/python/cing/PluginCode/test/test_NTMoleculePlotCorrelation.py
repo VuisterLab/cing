@@ -46,8 +46,6 @@ class AllChecks(TestCase):
 #        entryId = "2hgh_1model"
         entryId = "1hue"
 
-        self.failIf(os.chdir(cingDirTmp), msg =
-            "Failed to change to temp test directory for data: " + cingDirTmp)
         project = Project.open(entryId, status = 'new')
         self.assertTrue(project, 'Failed opening project: ' + entryId)
         if useNrgArchive: # default is False

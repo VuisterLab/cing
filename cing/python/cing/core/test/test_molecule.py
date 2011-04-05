@@ -10,6 +10,11 @@ import unittest #@UnusedImport Too difficult for code analyzer.
 
 class AllChecks(TestCase):
 
+    cingDirTmpTest = os.path.join( cingDirTmp, 'test_molecule' )
+    mkdirs( cingDirTmpTest )
+    os.chdir(cingDirTmpTest)
+
+
     def test_NTdihedral(self):
         # 1brv phi
         #ATOM      3  C   VAL A 171       2.427   1.356   3.559  1.00  0.00           C

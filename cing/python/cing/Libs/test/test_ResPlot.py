@@ -43,12 +43,6 @@ class AllChecks(TestCase):
             # Truncate from Val171-Glu189 to:
             ranges = "176-188"
 
-
-        cingDirTmpTest = os.path.join( cingDirTmp, getCallerName() )
-        mkdirs( cingDirTmpTest )
-        self.failIf(os.chdir(cingDirTmpTest), msg =
-            "Failed to change to test directory for files: " + cingDirTmpTest)
-
         project = Project( entryId )
         project.removeFromDisk()
         project = Project.open( entryId, status='new' )

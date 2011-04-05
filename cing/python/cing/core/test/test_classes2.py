@@ -10,16 +10,16 @@ import unittest
 
 class AllChecks(TestCase):
 
+    cingDirTmpTest = os.path.join( cingDirTmp, 'test_classes2' )
+    mkdirs( cingDirTmpTest )
+    os.chdir(cingDirTmpTest)
+
     def createSimpleFastProject(self):
         self.createSimpleFastProject2()
 
     def createSimpleFastProject2(self):
         entryId = 'test'
 
-        cingDirTmpTest = os.path.join( cingDirTmp, getCallerName() )
-        mkdirs( cingDirTmpTest )
-        self.failIf(os.chdir(cingDirTmpTest), msg =
-            "Failed to change to test directory for files: " + cingDirTmpTest)
         self.project = Project( entryId )
         self.project.removeFromDisk()
         self.project = Project.open( entryId, status='new' )
