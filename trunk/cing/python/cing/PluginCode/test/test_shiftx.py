@@ -11,7 +11,7 @@ import unittest
 
 class AllChecks(TestCase):
 
-    def testRun(self):
+    def test_shiftx(self):
         pdbConvention = IUPAC
 #        entryId = "1brv" # Small much studied PDB NMR entry
 #        entryId = "2hgh_1model"  RNA-protein complex.
@@ -30,8 +30,12 @@ class AllChecks(TestCase):
             pdbConvention = IUPAC
         if entryId.startswith("H2_2Ca_53"):
             pdbConvention = CYANA2
-        self.failIf( os.chdir(cingDirTmp), msg=
-            "Failed to change to directory for temporary test files: "+cingDirTmp)
+
+        cingDirTmpTest = os.path.join( cingDirTmp, getCallerName() )
+        mkdirs( cingDirTmpTest )
+        self.failIf(os.chdir(cingDirTmpTest), msg =
+            "Failed to change to test directory for files: " + cingDirTmpTest)
+
         project = Project( entryId )
         self.failIf( project.removeFromDisk())
         project = Project.open( entryId, status='new' )

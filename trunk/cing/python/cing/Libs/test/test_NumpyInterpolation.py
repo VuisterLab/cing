@@ -10,7 +10,9 @@ import unittest
 
 class AllChecks(TestCase):
 
-    os.chdir(cingDirTmp)
+    cingDirTmpTest = os.path.join( cingDirTmp, 'test_NumpyInterpolation' )
+    mkdirs( cingDirTmpTest )
+    os.chdir(cingDirTmpTest)
 
 
     def tttest_jfd_1(self):

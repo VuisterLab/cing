@@ -12,8 +12,11 @@ import unittest
 class AllChecks(TestCase):
 
     def testiCingRobot(self):
-        self.failIf(os.chdir(cingDirTmp), msg =
-            "Failed to change to directory for temporary test files: " + cingDirTmp)
+        cingDirTmpTest = os.path.join( cingDirTmp, getCallerName() )
+        mkdirs( cingDirTmpTest )
+        self.failIf(os.chdir(cingDirTmpTest), msg =
+            "Failed to change to test directory for files: " + cingDirTmpTest)
+
 #        url = 'http://restraintsgrid.bmrb.wisc.edu/servlet_data/NRG_ccpn_tmp'
     #    NTwarning("Expect errors without a server up and running.")
         NTmessage("Firing up the iCing robot; aka example interface to CING")

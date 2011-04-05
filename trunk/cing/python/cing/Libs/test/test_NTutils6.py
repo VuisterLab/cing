@@ -10,7 +10,9 @@ from unittest import TestCase
 import unittest
 
 class AllChecks(TestCase):
-    os.chdir(cingDirTmp)
+    cingDirTmpTest = os.path.join( cingDirTmp, 'test_NTutils6' )
+    mkdirs( cingDirTmpTest )
+    os.chdir(cingDirTmpTest)
 
     def testGetCallerName(self):
         self.failIf( getCallerName() != 'testGetCallerName')
@@ -23,7 +25,7 @@ class AllChecks(TestCase):
         expectedOutputList  = ['b', 'a_1']
         for i,input in enumerate(inputList):
             output = getUniqueName(resonanceSources, input)
-            self.assertEqual( output, expectedOutputList[i])        
+            self.assertEqual( output, expectedOutputList[i])
         self.assertEqual( getUniqueName(resonanceSources, 'a', nameFormat = '%s---%06d'), 'a---000001')
 
     def testFilterListByObjectClassName(self):
@@ -45,7 +47,7 @@ class AllChecks(TestCase):
         self.assertTrue( l.name == 'b' )
 
 def additionalTestRoutineByItself():
-    return getCallerName() 
+    return getCallerName()
 
 if __name__ == "__main__":
     cing.verbosity = cing.verbosityDebug

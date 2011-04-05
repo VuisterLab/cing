@@ -14,6 +14,10 @@ import unittest
 
 class AllChecks(TestCase):
 
+    cingDirTmpTest = os.path.join( cingDirTmp, 'test_Molgrap' )
+    mkdirs( cingDirTmpTest )
+    os.chdir(cingDirTmpTest)
+
     def testMolgrapRunFromPdbFile(self):
         pdbConvention = CYANA
 #        SETUP FIRST
@@ -34,8 +38,6 @@ class AllChecks(TestCase):
         pdbFileName = entryId+".pdb"
         pdbFilePath = os.path.join( cyanaDirectory, pdbFileName)
 
-        self.failIf( os.chdir(cingDirTmp), msg=
-            "Failed to change to directory for temporary test files: "+cingDirTmp)
         # does it matter to import it just now?
         project = Project( entryId )
         self.failIf( project.removeFromDisk())
@@ -43,7 +45,7 @@ class AllChecks(TestCase):
         project.initPDB( pdbFile=pdbFilePath, convention = pdbConvention )
         project.save( )
         gifFileName = entryId+".gif"
-        pathGif = os.path.join( cingDirTmp, gifFileName)
+        pathGif = os.path.join( self.cingDirTmpTest, gifFileName)
         self.assertFalse(project.molecule.export2gif(pathGif, project=None))
         self.assertTrue(os.path.exists(pathGif))
 

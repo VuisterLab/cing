@@ -13,17 +13,16 @@ import unittest
 
 class AllChecks(TestCase):
 
-    def testTalosPlus(self):
-        self.failIf( os.chdir(cingDirTmp), msg=
-            "Failed to change to directory for temporary test files: "+cingDirTmp)
+    def test_xplor_nih(self):
+        cingDirTmpTest = os.path.join( cingDirTmp, getCallerName() )
+        mkdirs( cingDirTmpTest )
+        self.failIf(os.chdir(cingDirTmpTest), msg =
+            "Failed to change to test directory for files: " + cingDirTmpTest)
 
         entryId = "gb1"
         pdbDirectory = os.path.join(cingDirTestsData,"xplor", entryId)
         pdbFileName = entryId+".pdb"
         pdbFilePath = os.path.join( pdbDirectory, pdbFileName)
-
-        self.failIf( os.chdir(cingDirTmp), msg=
-            "Failed to change to directory for temporary test files: "+cingDirTmp)
 
         project = Project( entryId )
         self.failIf( project.removeFromDisk())

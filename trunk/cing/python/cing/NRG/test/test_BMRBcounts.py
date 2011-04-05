@@ -14,10 +14,13 @@ import unittest
 
 class AllChecks(TestCase):
 
-    def _testCounts(self):
+    def _test_BMRBcounts(self):
 
-        self.failIf(os.chdir(cingDirTmp), msg =
-            "Failed to change to directory for temporary test files: " + cingDirTmp)
+        cingDirTmpTest = os.path.join( cingDirTmp, getCallerName() )
+        mkdirs( cingDirTmpTest )
+        self.failIf(os.chdir(cingDirTmpTest), msg =
+            "Failed to change to test directory for files: " + cingDirTmpTest)
+
         dbms = DBMS()
         bmrbCountTableName = 'BMRB_CS_counts'
         dbms.readCsvRelationList([bmrbCountTableName], os.path.join(cingDirData, 'NRG'))
@@ -35,10 +38,12 @@ class AllChecks(TestCase):
         self.assertEqual( getDeepByKeysOrAttributes( bmrbCountMap, bmrbId, '13C' ), 73)
         self.assertEqual( getDeepByKeysOrAttributes( bmrbCountMap, bmrbId, '15N' ), None)
 
-    def testCount2(self):
+    def test_BMRBcounts2(self):
 
-        self.failIf(os.chdir(cingDirTmp), msg =
-            "Failed to change to directory for temporary test files: " + cingDirTmp)
+        cingDirTmpTest = os.path.join( cingDirTmp, getCallerName() )
+        mkdirs( cingDirTmpTest )
+        self.failIf(os.chdir(cingDirTmpTest), msg =
+            "Failed to change to test directory for files: " + cingDirTmpTest)
 
         entryId = '1brv'
         bmrbId = 4020

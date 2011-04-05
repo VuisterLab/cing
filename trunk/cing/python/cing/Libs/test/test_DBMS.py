@@ -13,7 +13,9 @@ import unittest
 
 class AllChecks(TestCase):
 
-    os.chdir(cingDirTmp)
+    cingDirTmpTest = os.path.join( cingDirTmp, 'test_DBMS' )
+    mkdirs( cingDirTmpTest )
+    os.chdir(cingDirTmpTest)
 
     def testDBMSread(self):
         csvFileDir = os.path.join(cingDirTestsData, "dbms", 'Overview')

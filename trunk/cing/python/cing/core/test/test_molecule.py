@@ -218,11 +218,13 @@ class AllChecks(TestCase):
         ranges = mol.startStopList2ranges([res1, res2, res5, res6])
         self.assertEquals( 'A.1-3,B.9-10', ranges)
 
-        
-        
+
+
 if __name__ == "__main__":
-    os.chdir(cingDirTmp)
     cing.verbosity = verbosityDebug
+    cingDirTmpTest = os.path.join( cingDirTmp, 'test_molecule' )
+    mkdirs( cingDirTmpTest )
+    os.chdir(cingDirTmpTest)
     # Commented out because profiling isn't part of unit testing.
     if False:
         fn = 'fooprof'

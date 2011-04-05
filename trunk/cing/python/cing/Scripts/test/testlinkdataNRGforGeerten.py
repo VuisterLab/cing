@@ -10,9 +10,12 @@ import unittest
 
 class AllChecks(TestCase):
 
-    def tttestLinkdata(self):
-        self.failIf(os.chdir(cingDirTmp), msg =
-            "Failed to change to directory for temporary test files: " + cingDirTmp)
+    def _testlinkdataNRGforGeerten(self):
+        cingDirTmpTest = os.path.join( cingDirTmp, getCallerName() )
+        mkdirs( cingDirTmpTest )
+        self.failIf(os.chdir(cingDirTmpTest), msg =
+            "Failed to change to test directory for files: " + cingDirTmpTest)
+
         if os.path.exists(outputFnLinkData):
             os.remove(outputFnLinkData)
         self.assertFalse(linkdataNRG())

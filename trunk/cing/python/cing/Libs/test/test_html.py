@@ -3,7 +3,7 @@ Unit test execute as:
 python $CINGROOT/python/cing/PluginCode/test/test_html.py
 """
 from cing import cingDirTmp
-from cing import verbosityDebug
+from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.Libs.html import HTML_TAG_PRE
 from cing.Libs.html import HTML_TAG_PRE2
 from cing.Libs.html import HTMLfile
@@ -13,8 +13,6 @@ from cing.core.classes import Project
 from cing.core.molecule import Ensemble
 from cing.core.molecule import Molecule
 from unittest import TestCase
-import cing
-import os
 import unittest
 
 class AllChecks(TestCase):
@@ -26,8 +24,9 @@ class AllChecks(TestCase):
         self.assertEquals(removePreTagLines(msg), spuriousSpaceMsg)
 
     def setupSimplestProject(self):
-        self.failIf(os.chdir(cingDirTmp),
-                     msg="Failed to change to directory for temporary test files: " + cingDirTmp)
+        cingDirTmpTest = os.path.join( cingDirTmp, 'test_html' )
+        mkdirs( cingDirTmpTest )
+        os.chdir(cingDirTmpTest)
         entryId = 'test'
         project = Project(entryId)
         self.failIf(project.removeFromDisk())
@@ -72,4 +71,5 @@ class AllChecks(TestCase):
 
 if __name__ == "__main__":
     cing.verbosity = verbosityDebug
+#    NTdebug("Starting...")
     unittest.main()

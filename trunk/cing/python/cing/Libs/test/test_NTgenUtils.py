@@ -11,7 +11,9 @@ from unittest import TestCase
 import unittest
 
 class AllChecks(TestCase):
-    os.chdir(cingDirTmp)
+    cingDirTmpTest = os.path.join( cingDirTmp, 'test_NTgenUtils' )
+    mkdirs( cingDirTmpTest )
+    os.chdir(cingDirTmpTest)
 
     def testAnalyzeCingLog(self):
         # used txt instead of the normal log because .log files are excluded by svn by default.

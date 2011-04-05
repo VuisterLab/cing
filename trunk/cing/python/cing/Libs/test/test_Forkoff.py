@@ -26,9 +26,12 @@ def my_sleep(arg):
 
 class AllChecks(TestCase):
 
-    def ttttestRun(self):
+    def test_Forkoff(self):
         # important to switch to temp space before starting to generate files for the project.
-        os.chdir(cingDirTmp)
+        cingDirTmpTest = os.path.join( cingDirTmp, getCallerName() )
+        mkdirs( cingDirTmpTest )
+        self.failIf(os.chdir(cingDirTmpTest), msg =
+            "Failed to change to test directory for files: " + cingDirTmpTest)
         ## Test takes 5 seconds to run.
         ## Initializing f will also initialize an instance of class Process
         ## Can be interrupted by doing kill -2 pid which will be caught and dealt with.

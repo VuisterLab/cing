@@ -13,7 +13,7 @@ import unittest
 
 class AllChecks(TestCase):
 
-    def testProcheckNMR_Aqua(self):
+    def testProcheck(self):
         runAqua = True
         showProcheckResults = False
         #entryId = "1ai0" # Most complex molecular system in any PDB NMR entry
@@ -56,8 +56,12 @@ class AllChecks(TestCase):
     #        RESIDUES 115  A  136  A
     #        RESIDUES 145  A  190  A
 
-        self.failIf( os.chdir(cingDirTmp), msg=
-            "Failed to change to directory for temporary test files: "+cingDirTmp)
+
+        cingDirTmpTest = os.path.join( cingDirTmp, getCallerName() )
+        mkdirs( cingDirTmpTest )
+        self.failIf(os.chdir(cingDirTmpTest), msg =
+            "Failed to change to test directory for files: " + cingDirTmpTest)
+
         project = Project( entryId )
         self.failIf( project.removeFromDisk() )
         project = Project.open( entryId, status='new' )

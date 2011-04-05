@@ -18,7 +18,9 @@ import unittest
 class AllChecks(TestCase):
 
     # important to switch to temp space before starting to generate files for the project.
-    os.chdir(cingDirTmp)
+    cingDirTmpTest = os.path.join( cingDirTmp, 'test_NTMoleculePlot' )
+    mkdirs( cingDirTmpTest )
+    os.chdir(cingDirTmpTest)
 
     def testMoleculePlot(self):
 
@@ -230,8 +232,8 @@ class AllChecks(TestCase):
 
         NTdebug("Instantiating moleculePlotSet")
         moleculePlotSet = MoleculePlotSet(project=project, keyLoLoL=keyLoLoL)
-        moleculePlotSet.renderMoleculePlotSet('test_NTMoleculePlot.pdf',
-            createPngCopyToo=True)
+        pdfPath = '%s/test_NTMoleculePlot.pdf' % self.cingDirTmpTest
+        moleculePlotSet.renderMoleculePlotSet(pdfPath, createPngCopyToo=True)
 
     def ttttestDihedralComboPlot(self):
         ps = NTplotSet() # closes any previous plots

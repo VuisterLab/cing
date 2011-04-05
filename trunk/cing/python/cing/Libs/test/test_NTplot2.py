@@ -123,7 +123,9 @@ def plotTestHistoDihedral():
 class NTplot2Checks(TestCase):
 
     # important to switch to temp space before starting to generate files for the project.
-    os.chdir(cingDirTmp)
+    cingDirTmpTest = os.path.join( cingDirTmp, 'test_NTplot2' )
+    mkdirs( cingDirTmpTest )
+    os.chdir(cingDirTmpTest)
 
     def testPlotHistoDihedral(self):
         plotTestHistoDihedral()

@@ -6,6 +6,7 @@ from cing import verbosityError
 from cing import verbosityNothing
 from cing import verbosityOutput
 from cing import verbosityWarning
+from cing.Libs.disk import mkdirs #@UnusedImport
 from cing.Libs.fpconst import NaN
 from cing.Libs.fpconst import isNaN
 from cing.core.constants import * #@UnusedWildImport
@@ -43,6 +44,8 @@ locale.setlocale(locale.LC_ALL, "")
 CONSENSUS_STR = 'consensus'
 
 MAX_TRIES_UNIQUE_NAME = 99999
+
+#mkdirs( xxx )
 
 class Lister:
     MAX_LINE_SIZE_VALUE = 80 # who wants to see long lines of gibberish
@@ -111,7 +114,7 @@ class NTlist(list, Lister):
         #end for
         self.av = None
         self.sd = None
-        self.name = None # Assumed by SMLhandler.list2SML in case of e.g. 
+        self.name = None # Assumed by SMLhandler.list2SML in case of e.g.
         # DistanceRestraintList
         self.status = None # same
         self.n = 0
@@ -321,7 +324,7 @@ Sum                %s
         """
         return NTzap(self, *byItems)
     #end def
-    
+
     def selectByItems(self, *byItems):
         """use zap to yield a new sublist from self where items were found.
         E.g.        vadl = NTdb.allAtomDefs().selectByItems( 'type', 'C_VIN' )
@@ -331,17 +334,17 @@ Sum                %s
             NTwarning("Use NTlist.selectByItems only for multiple levels. Otherwise use withProperties??")
             return
         result = NTlist()
-        byItemsTrunc = byItems[:-1]            
+        byItemsTrunc = byItems[:-1]
         fullList = zip( self, self.zap(*byItemsTrunc))
         finalItemValue = byItems[-1]
         for item, value in fullList:
             if value != finalItemValue:
                 continue
-            result.append(item) 
+            result.append(item)
         return result
     #end def
-    
-    
+
+
 
     def removeDuplicates(self, useVersion = 2):
         """
@@ -5143,7 +5146,7 @@ def switchOutput( showOutput, doStdOut=True, doStdErr=False):
     False: store original stream and switch to bit bucket.
     True: return to original stream.
     """
-    if showOutput:        
+    if showOutput:
         if doStdOut:
             sys.stdout = _returnMyStdOut
             _setStdOutStreamsTo( _returnMyStdOut )
@@ -5379,37 +5382,37 @@ def isNoneorNaN(value):
         return True
     return isNaN(value)
 # end def
-    
-    
+
+
 
 def getUniqueName(objectListWithNameAttribute, baseName, nameFormat = "%s_%d" ):
     """
-    Return unique name or False on error. 
+    Return unique name or False on error.
     E.g. for ResonanceSources object in which the ResonanceList objects have a name attribute.
-    
+
     nameFormat may be specified to receive a string and an integer argument.
     Works on any NTlist that has name attributes in each element.
     """
     nameList = objectListWithNameAttribute.zap( NAME_STR )
 #    NTdebug("Already have names: %s" % str(nameList))
-    
+
     nameDict = NTlist2dict(nameList)
     if not nameDict.has_key( baseName):
-        return baseName    
+        return baseName
     i = 1
     while i < MAX_TRIES_UNIQUE_NAME: # This code is optimal unless number of objects get to 10**5.
         newName = sprintf( nameFormat, baseName, i)
         if not nameDict.has_key( newName ):
             return newName
-        i += 1 
+        i += 1
 # end def
 
 def getObjectByName(ll, name):
     """
-    Return list by name or False. 
+    Return list by name or False.
     Works on any NTlist that has name attributes in each element.
 
-    E.g. for ResonanceSources object in which the ResonanceList objects have a name attribute.    
+    E.g. for ResonanceSources object in which the ResonanceList objects have a name attribute.
     """
 #    NTdebug("Working on ll: %s" % str(ll))
 #    NTdebug("ll[0].name: %s" % ll[0].name)
@@ -5423,7 +5426,7 @@ def getObjectByName(ll, name):
 
 def getObjectIdx(ll, l):
     """
-    Return list by name or False. 
+    Return list by name or False.
     Works on any NTlist that has name attributes in each element.
     """
     name = l.name

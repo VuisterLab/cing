@@ -12,7 +12,7 @@ import unittest
 
 class AllChecks(TestCase):
 
-    def testRun(self):
+    def test_validate(self):
         fastestTest = True
 
         htmlOnly = False # default is False but enable it for faster runs without some actual data.
@@ -49,9 +49,10 @@ class AllChecks(TestCase):
 #        entryId = "1YWUcdGMP" # Example entry from external user, Martin Allan
 
 
-        self.failIf(os.chdir(cingDirTmp),
-                     msg = "Failed to change to directory for temporary test files: " + cingDirTmp
-                   )
+        cingDirTmpTest = os.path.join( cingDirTmp, getCallerName() )
+        mkdirs( cingDirTmpTest )
+        self.failIf(os.chdir(cingDirTmpTest), msg =
+            "Failed to change to test directory for files: " + cingDirTmpTest)
         project = Project.open(entryId, status = 'new')
         if not project:
             NTerror('Failed opening project %s', entryId)

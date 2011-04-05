@@ -1,14 +1,17 @@
 from cing import cingDirTmp
+from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.STAR.Text import comments_strip
 from unittest import TestCase
-import os
 import unittest
 #from cing import verbosityDebug
 #import cing
 
 
 class AllChecks(TestCase):
-    os.chdir(cingDirTmp)
+    cingDirTmpTest = os.path.join( cingDirTmp, 'test_Text' )
+    mkdirs( cingDirTmpTest )
+    os.chdir(cingDirTmpTest)
+
 
     def test(self):
 #        textExpectedAfterCollapse = ';<eol-string>mmy xie<eol-string>;\n_Test'

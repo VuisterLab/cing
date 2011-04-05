@@ -8,7 +8,10 @@ import unittest
 
 class AllChecks(TestCase, Lister):
 
-    os.chdir(cingDirTmp)
+    cingDirTmpTest = os.path.join( cingDirTmp, 'test_Utils' )
+    mkdirs( cingDirTmpTest )
+    os.chdir(cingDirTmpTest)
+
 
     def testTranspose(self):
         m1 = [ [1,2], [3,4] ]

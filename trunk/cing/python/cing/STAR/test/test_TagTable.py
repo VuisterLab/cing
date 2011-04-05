@@ -7,7 +7,10 @@ import unittest
 
 class AllChecks(TestCase):
 
-    os.chdir(cingDirTmp)
+    cingDirTmpTest = os.path.join( cingDirTmp, 'test_TagTable' )
+    mkdirs( cingDirTmpTest )
+    os.chdir(cingDirTmpTest)
+
 
     def testcheck_integrity(self):
 

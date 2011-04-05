@@ -4,14 +4,10 @@ python -u $CINGROOT/python/cing/PluginCode/test/test_eNMR.py
 """
 from cing import cingDirTestsData
 from cing import cingDirTmp
-from cing import verbosityDebug
-from cing import verbosityDetail
-from cing import verbosityOutput
+from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.PluginCode.Ccpn import Ccpn #@UnusedImport needed to throw a ImportWarning so that the test is handled properly.
 from cing.core.classes import Project
 from unittest import TestCase
-import cing
-import os
 import shutil
 import unittest
 
@@ -47,8 +43,12 @@ class AllChecks(TestCase):
             doProcheck = False
             doWattos = False
 #            useNrgArchive = False
-        self.failIf(os.chdir(cingDirTmp), msg =
-            "Failed to change to directory for temporary test files: " + cingDirTmp)
+        cingDirTmpTest = os.path.join( cingDirTmp, getCallerName() )
+        mkdirs( cingDirTmpTest )
+        self.failIf(os.chdir(cingDirTmpTest), msg =
+            "Failed to change to test directory for files: " + cingDirTmpTest)
+
+
         for entryId in entryList:
             print "Doing "+entryId
             project = Project.open(entryId, status = 'new')

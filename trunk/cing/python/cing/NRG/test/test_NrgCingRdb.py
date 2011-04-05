@@ -10,10 +10,13 @@ import unittest
 
 class AllChecks(TestCase):
 
-    def _testGetPdbIdList(self):
+    def _test_NrgCingRdb(self):
 
-        self.failIf(os.chdir(cingDirTmp), msg =
-            "Failed to change to directory for temporary test files: " + cingDirTmp)
+        cingDirTmpTest = os.path.join( cingDirTmp, getCallerName() )
+        mkdirs( cingDirTmpTest )
+        self.failIf(os.chdir(cingDirTmpTest), msg =
+            "Failed to change to test directory for files: " + cingDirTmpTest)
+
         m = nrgCingRdb(host='localhost')
         l = m.getPdbIdList()
         NTdebug("pdbIdList length: %d %s" % (len(l), l))

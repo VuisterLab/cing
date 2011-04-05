@@ -15,11 +15,13 @@ import unittest
 
 class AllChecks(TestCase):
 
-    def testBackEnd(self):
+    def test_matplotlib2D(self):
 
         # important to switch to temp space before starting to generate files for the project.
-        self.failIf(os.chdir(cingDirTmp), msg =
-            "Failed to change to directory for temporary test files: " + cingDirTmp)
+        cingDirTmpTest = os.path.join( cingDirTmp, getCallerName() )
+        mkdirs( cingDirTmpTest )
+        self.failIf(os.chdir(cingDirTmpTest), msg =
+            "Failed to change to test directory for files: " + cingDirTmpTest)
 
         # Trying to plot without GUI backend.
 #        use('Agg') Already present in NTplot.py

@@ -18,7 +18,9 @@ if not cingPaths.convert: # Requirement for test.
 class AllChecks(TestCase):
 
     # important to switch to temp space before starting to generate files for the project.
-    os.chdir(cingDirTmp)
+    cingDirTmpTest = os.path.join( cingDirTmp, 'test_Imagery' )
+    mkdirs( cingDirTmpTest )
+    os.chdir(cingDirTmpTest)
 
     def testConvert2Web(self):
 
@@ -26,7 +28,7 @@ class AllChecks(TestCase):
 #        fn = "1vnd_11_rstraints.ps"
         self.assertTrue( os.path.exists( cingDirTestsData) and os.path.isdir(cingDirTestsData ) )
         inputPath = os.path.join(cingDirTestsData,fn)
-        outputPath = cingDirTmp
+        outputPath = self.cingDirTmpTest
         self.failIf( os.chdir(outputPath), msg=
             "Failed to change to temporary test directory for data: "+outputPath)
         fileList = convert2Web( inputPath, outputDir=outputPath, doMontage=True )
@@ -39,10 +41,10 @@ class AllChecks(TestCase):
         fn1 = "pc_nmr_11_rstraints.pdf"
         self.assertFalse( joinPdfPagesByGhostScript( [fn1,fn1], "pc_nmr_11_rstraints_echo.pdf"))
 
-    def tttestConvert2Html(self):
+    def _testConvert2Html(self):
         inputPath = os.path.join( cingDirTestsData, 'imagery')
         inputPathList = map(os.path.join, [inputPath]*2, ['residuePlotSetAll001.png', 'residuePlotSetAll002.png'] )
-        outputPath = os.path.join( cingDirTmp, 'residuePlotSetAll.png' )
+        outputPath = os.path.join( self.cingDirTmpTest, 'residuePlotSetAll.png' )
         self.assertFalse( montage(inputPathList, outputPath) )
 
 if __name__ == "__main__":

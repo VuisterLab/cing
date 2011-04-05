@@ -13,7 +13,6 @@ Most functionality is hard-coded here so be careful reading the actual code.
 from ccpnmr.format.converters.PseudoPdbFormat import PseudoPdbFormat
 from cing import cingDirTmp
 from cing.Libs.NTutils import * #@UnusedWildImport
-from cing.Libs.disk import mkdirs
 from cing.NRG import CASD_NMR_BASE_NAME
 from cing.NRG.settings import baseDir
 from cing.core.classes import Project

@@ -14,7 +14,9 @@ from cing.NRG.PDBEntryLists import writeEntryListToFile
 import unittest
 
 cing.verbosity = cing.verbosityDebug
-os.chdir(cingDirTmp)
+cingDirTmpTest = os.path.join( cingDirTmp, 'getRCSB-PDB' )
+mkdirs( cingDirTmpTest )
+os.chdir(cingDirTmpTest)
 
 testing = False
 if testing: # testing with smaller set
