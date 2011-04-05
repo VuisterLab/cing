@@ -16,7 +16,6 @@ from cing import cingPythonDir
 from cing import cingRoot
 from cing import header
 from cing.Libs.NTutils import * #@UnusedWildImport
-from cing.Libs.disk import mkdirs
 from cing.Libs.forkoff import * #@UnusedWildImport
 from cing.Libs.helper import detectCPUs
 from cing.NRG import * #@UnusedWildImport

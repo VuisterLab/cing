@@ -13,10 +13,12 @@ import unittest
 
 class AllChecks(TestCase):
 
-    os.chdir(cingDirTmp)
+    cingDirTmpTest = os.path.join( cingDirTmp, 'test_classes' )
+    mkdirs( cingDirTmpTest )
+    os.chdir(cingDirTmpTest)
 
     def setupSimplestProject(self):
-        entryId = 'test'
+        entryId = 'setupSimplestProject'
         project = Project(entryId)
         self.failIf(project.removeFromDisk())
         project = Project.open(entryId, status='new')
@@ -68,12 +70,11 @@ class AllChecks(TestCase):
         NTmessage("hello")
         NTdebug(p.root)
 
-    def tttestRun(self):
+    def test_classes(self):
         htmlOnly = True
         pdbConvention = IUPAC
         entryId = "1brv_1model"        # Small much studied PDB NMR entry
-        self.failIf(os.chdir(cingDirTmp),
-                     msg="Failed to change to directory for temporary test files: "+cingDirTmp)
+
         project = Project.open(entryId, status='new')
         if not project:
             NTerror('Failed opening project %s', entryId)
@@ -96,15 +97,14 @@ class AllChecks(TestCase):
         project.renderHtml()
 
 
-    def tttest_HTMLfile(self):
+    def _test_HTMLfile(self):
 
         """
         Create two html files (project and molecule) that have relative links to each other.
         Exercising the machinery in HTMLfile class.
         """
         entryId = "test_HTMLfile"
-        self.failIf(os.chdir(cingDirTmp), msg=
-             "Failed to change to directory for temporary test files: "+cingDirTmp)
+
         project = Project(entryId)
         self.failIf(project.removeFromDisk())
         project = Project.open(entryId, status='new')
@@ -139,9 +139,8 @@ class AllChecks(TestCase):
         project.html.insertHtmlLinkInTag('li', section=project.html.main,
             source=project, destination=molecule, text='mol ref', id=None)
         # rerun for testing.
-        link = project.html.findHtmlLocation(project, molecule, id=None)
-        self.assertEquals('moleculeName/HTML/indexMolecule.html#_top',
-                           link)
+        _link = project.html.findHtmlLocation(project, molecule, id=None)
+#        self.assertEquals('moleculeName/HTML/indexMolecule.html#_top', link)
         project.html.main('ul', openTag=False)
 
         for htmlObj in [ project.html, molecule.html ]:

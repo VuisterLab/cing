@@ -25,9 +25,11 @@ class AllChecks(TestCase):
         NTdebug(`testDict`)
 
 
-    def testFind(self):
-        self.failIf(os.chdir(cingDirTmp), msg =
-            "Failed to change to temp test directory for data: " + cingDirTmp)
+    def test_NTutils(self):
+        cingDirTmpTest = os.path.join( cingDirTmp, getCallerName() )
+        mkdirs( cingDirTmpTest )
+        self.failIf(os.chdir(cingDirTmpTest), msg =
+            "Failed to change to test directory for files: " + cingDirTmpTest)
         namepattern, startdir = "test*.py", cingPythonDir # CVS is only for developers
         nameList = findFiles(namepattern, startdir)
         self.assertTrue(len(nameList) > 10)

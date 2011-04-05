@@ -6,7 +6,6 @@ python -u $CINGROOT/python/cing/NRG/doAnnotateNrgCing.py $x $y
 
 from cing import header
 from cing.Libs.NTutils import * #@UnusedWildImport
-from cing.Libs.disk import mkdirs
 from cing.Libs.forkoff import do_cmd
 from cing.NRG.PDBEntryLists import getBmrbLinks
 from cing.NRG.nrgCing import nrgCing

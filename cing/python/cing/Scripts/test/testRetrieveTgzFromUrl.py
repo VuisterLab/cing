@@ -4,20 +4,22 @@ python $CINGROOT/python/cing/PluginCode/test/test_xx.py
 """
 from cing import cingDirTestsData #@UnusedImport
 from cing import cingDirTmp
-from cing import verbosityDebug
+from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.Scripts.validateEntry import ARCHIVE_TYPE_BY_ENTRY
 from cing.Scripts.validateEntry import ARCHIVE_TYPE_FLAT #@UnusedImport
 from cing.Scripts.validateEntry import retrieveTgzFromUrl
 from unittest import TestCase
-import cing
-import os
 import unittest
 
 class AllChecks(TestCase):
 
     def testRetrieveTgzFromUrl(self):
-        self.failIf(os.chdir(cingDirTmp), msg =
-            "Failed to change to directory for temporary test files: " + cingDirTmp)
+
+        cingDirTmpTest = os.path.join( cingDirTmp, getCallerName() )
+        mkdirs( cingDirTmpTest )
+        self.failIf(os.chdir(cingDirTmpTest), msg =
+            "Failed to change to test directory for files: " + cingDirTmpTest)
+
 #        url = 'http://restraintsgrid.bmrb.wisc.edu/servlet_data/NRG_ccpn_tmp'
         url = 'file://Library/WebServer/Documents/NRG-CING/recoordSync'
 #        url = 'file:/%s/ccpn' % (cingDirTestsData)

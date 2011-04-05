@@ -15,7 +15,6 @@ from cing.Libs.DBMS import DBMS
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.Libs.disk import copy
 from cing.Libs.disk import globMultiplePatterns
-from cing.Libs.disk import mkdirs
 from cing.NRG import CASP_NMR_BASE_NAME
 from cing.NRG.PDBEntryLists import writeEntryListToFile
 from cing.core.constants import * #@UnusedWildImport

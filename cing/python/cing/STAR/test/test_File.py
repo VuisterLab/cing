@@ -15,7 +15,9 @@ import zipfile
 
 class AllChecks(TestCase):
         strf = File()
-        os.chdir(cingDirTmp)
+        cingDirTmpTest = os.path.join( cingDirTmp, 'test_File' )
+        mkdirs( cingDirTmpTest )
+        os.chdir(cingDirTmpTest)
 
         def testParse(self):
             text = """data_no_comments_here

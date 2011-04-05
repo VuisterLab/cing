@@ -8,7 +8,9 @@ import unittest
 
 class AllChecks(TestCase):
     # important to switch to temp space before starting to generate files for the project.
-    os.chdir(cingDirTmp)
+    cingDirTmpTest = os.path.join( cingDirTmp, 'test_disk' )
+    mkdirs( cingDirTmpTest )
+    os.chdir(cingDirTmpTest)
 
     def testDisk(self):
         DONE = "DONE"

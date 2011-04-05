@@ -13,7 +13,10 @@ import unittest
 class AllChecks(TestCase):
 
     # important to switch to temp space before starting to generate files for the project.
-    os.chdir(cingDirTmp)
+
+    cingDirTmpTest = os.path.join( cingDirTmp, 'test_ResPlot' )
+    mkdirs( cingDirTmpTest )
+    os.chdir(cingDirTmpTest)
 
     def testResPlot(self):
 
@@ -40,8 +43,12 @@ class AllChecks(TestCase):
             # Truncate from Val171-Glu189 to:
             ranges = "176-188"
 
-        self.failIf( os.chdir(cingDirTmp), msg=
-            "Failed to change to temp test directory for data: "+cingDirTmp)
+
+        cingDirTmpTest = os.path.join( cingDirTmp, getCallerName() )
+        mkdirs( cingDirTmpTest )
+        self.failIf(os.chdir(cingDirTmpTest), msg =
+            "Failed to change to test directory for files: " + cingDirTmpTest)
+
         project = Project( entryId )
         project.removeFromDisk()
         project = Project.open( entryId, status='new' )

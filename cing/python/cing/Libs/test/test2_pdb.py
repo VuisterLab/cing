@@ -34,8 +34,9 @@ class AllChecks(TestCase):
             pdbFileName = "pdb"+entryId+".ent"
             pdbFilePath = os.path.join( pdbDirectory, pdbFileName)
 
-            self.failIf( os.chdir(cingDirTmp), msg=
-                "Failed to change to directory for temporary test files: "+cingDirTmp)
+            cingDirTmpTest = os.path.join( cingDirTmp, 'test2_pdb' )
+            mkdirs( cingDirTmpTest )
+            os.chdir(cingDirTmpTest)
             # does it matter to import it just now?
             project = Project( entryId )
             self.failIf( project.removeFromDisk())

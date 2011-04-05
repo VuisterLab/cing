@@ -4,20 +4,16 @@ python $CINGROOT/python/cing/PluginCode/test/test2_ccpn.py
 """
 from cing import cingDirTestsData
 from cing import cingDirTmp
-from cing import verbosityDebug
-from cing import verbosityDetail
-from cing import verbosityOutput
+from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.core.classes import Project
 from shutil import move #@UnusedImport
 from unittest import TestCase
-import cing
-import os
 import shutil
 import unittest
 
 class AllChecks(TestCase):
 
-    def testInitCcpn(self):
+    def test_2ccpn(self):
         # failing entries: 1ai0, 1kr8 (same for 2hgh)
         entryList = "1iv6".split()
 #        entryList = "1brv".split()
@@ -40,8 +36,11 @@ class AllChecks(TestCase):
             doProcheck = False
             doWattos = False
 
-        self.failIf( os.chdir(cingDirTmp), msg=
-            "Failed to change to directory for temporary test files: "+cingDirTmp)
+        cingDirTmpTest = os.path.join( cingDirTmp, getCallerName() )
+        mkdirs( cingDirTmpTest )
+        self.failIf(os.chdir(cingDirTmpTest), msg =
+            "Failed to change to test directory for files: " + cingDirTmpTest)
+
         for entryId in entryList:
             project = Project.open( entryId, status='new' )
             self.assertTrue(project, 'Failed opening project: ' + entryId)

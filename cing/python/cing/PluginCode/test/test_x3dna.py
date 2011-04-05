@@ -16,7 +16,7 @@ import unittest
 
 class AllChecks(TestCase):
 
-    def testRun(self):
+    def test_x3dna(self):
         entryList = "1b4y".split() # triple helix but it only gets analyzed to a double helix.
 #        entryList = "1cjg".split()
 #        entryList = "2hgh".split()
@@ -26,8 +26,11 @@ class AllChecks(TestCase):
 
         useNrgArchive = False
         showValues = True
-        self.failIf(os.chdir(cingDirTmp), msg =
-            "Failed to change to directory for temporary test files: " + cingDirTmp)
+        cingDirTmpTest = os.path.join( cingDirTmp, getCallerName() )
+        mkdirs( cingDirTmpTest )
+        self.failIf(os.chdir(cingDirTmpTest), msg =
+            "Failed to change to test directory for files: " + cingDirTmpTest)
+
         for entryId in entryList:
             project = Project.open(entryId, status = 'new')
             self.assertTrue(project, 'Failed opening project: ' + entryId)

@@ -18,8 +18,10 @@ class AllChecks(TestCase):
             NTdebug("Skipping checks for there is no internet connection detected")
             return
 
-        self.failIf(os.chdir(cingDirTmp), msg =
-            "Failed to change to directory for temporary test files: " + cingDirTmp)
+        cingDirTmpTest = os.path.join( cingDirTmp, getCallerName() )
+        mkdirs( cingDirTmpTest )
+        self.failIf(os.chdir(cingDirTmpTest), msg =
+            "Failed to change to test directory for files: " + cingDirTmpTest)
 
         if False:
             status = isInternetConnected()

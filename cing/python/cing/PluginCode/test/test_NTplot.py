@@ -9,7 +9,9 @@ import unittest
 class AllChecks(TestCase):
 
     # important to switch to temp space before starting to generate files for the project.
-    os.chdir(cingDirTmp)
+    cingDirTmpTest = os.path.join( cingDirTmp, 'test_NTplot' )
+    mkdirs( cingDirTmpTest )
+    os.chdir(cingDirTmpTest)
 
     def testPlotVaria(self):
         ps = NTplotSet() # closes any previous plots

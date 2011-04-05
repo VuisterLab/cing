@@ -6,7 +6,6 @@ Created on Mar 30, 2010
 
 from cing import cingDirTmp
 from cing.Libs.NTutils import * #@UnusedWildImport
-from cing.Libs.disk import mkdirs
 from glob import glob
 from yasaramodule import * #@UnusedWildImport
 import yasara #@UnusedImport

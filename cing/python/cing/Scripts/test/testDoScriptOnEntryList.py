@@ -16,8 +16,12 @@ import unittest
 class AllChecks(TestCase):
 
     def testDoScriptOnEntryList(self):
-        self.failIf(os.chdir(cingDirTmp), msg =
-            "Failed to change to directory for temporary test files: " + cingDirTmp)
+
+        cingDirTmpTest = os.path.join( cingDirTmp, getCallerName() )
+        mkdirs( cingDirTmpTest )
+        self.failIf(os.chdir(cingDirTmpTest), msg =
+            "Failed to change to test directory for files: " + cingDirTmpTest)
+
         entryListFileName = "entry_list_todo.csv"
         entry_list_todo = [ 0,1,2,3,4,5,6,7,8,9 ]
         writeTextToFile(entryListFileName, toCsv(entry_list_todo))

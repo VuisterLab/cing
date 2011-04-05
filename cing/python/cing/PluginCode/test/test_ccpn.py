@@ -50,7 +50,7 @@ class AllChecks(TestCase):
         doRestoreCheck = False
         doStoreCheck = False # DEFAULT: False Requires sqlAlchemy
         doSave = not redoFromCingProject  # DEFAULT: False Requires sqlAlchemy
-        
+
         if fastestTest:
             modelCount=1 # DEFAULT 2
 #            redoFromCingProject = False
@@ -69,9 +69,10 @@ class AllChecks(TestCase):
             doProcheck = False
             doWattos = False
             doTalos = False
-
-        self.failIf(os.chdir(cingDirTmp), msg =
-            "Failed to change to directory for temporary test files: " + cingDirTmp)
+        cingDirTmpTest = os.path.join( cingDirTmp, getCallerName() )
+        mkdirs( cingDirTmpTest )
+        self.failIf(os.chdir(cingDirTmpTest), msg =
+            "Failed to change to test directory for files: " + cingDirTmpTest)
         for i,entryId in enumerate(AllChecks.entryList):
 
             if i:
@@ -184,8 +185,9 @@ class AllChecks(TestCase):
                 if doStoreCING2db( entryId, ARCHIVE_NRG_ID, project=project):
                     NTerror("Failed to store CING project's data to DB but continuing.")
             if doSave:
-                self.assertTrue(project.save())                    
+                self.assertTrue(project.save())
         # end for
+#        rmdir( cingDirTmpRandom ) # execute when all was successful
     # end def test
 
     def tttestCreateCcpn(self):
@@ -193,8 +195,11 @@ class AllChecks(TestCase):
         pdbConvention = IUPAC
         restraintsConvention = CYANA
 
-        self.failIf(os.chdir(cingDirTmp), msg =
-            "Failed to change to directory for temporary test files: " + cingDirTmp)
+        cingDirTmpTest = os.path.join( cingDirTmp, getCallerName() )
+        mkdirs( cingDirTmpTest )
+        self.failIf(os.chdir(cingDirTmpTest), msg =
+            "Failed to change to test directory for files: " + cingDirTmpTest)
+
         for entryId in AllChecks.entryList:
             # Allow pdb files to be of different naming systems for this test.
             if entryId.startswith("2hgh"):

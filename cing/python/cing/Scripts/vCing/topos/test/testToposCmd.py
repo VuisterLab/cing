@@ -18,7 +18,9 @@ vc = vCing()
 
 class AllChecks(TestCase):
     # important to switch to temp space before starting to generate files for the project.
-    os.chdir(cingDirTmp)
+    cingDirTmpTest = os.path.join( cingDirTmp, 'testToposCmd' )
+    mkdirs( cingDirTmpTest )
+    os.chdir(cingDirTmpTest)
 
     def tttttestAll(self): ###  TODO: fails in current setup.
 #        exitCode, token, tokenLock = vcMaster.nextTokenWithLock(lockTimeOut)

@@ -12,7 +12,9 @@ import unittest
 
 class AllChecks(TestCase):
 
-    os.chdir(cingDirTmp)
+    cingDirTmpTest = os.path.join( cingDirTmp, 'test_NTutils3' )
+    mkdirs( cingDirTmpTest )
+    os.chdir(cingDirTmpTest)
 
     def testROGscore(self):
         entryId = 'test'

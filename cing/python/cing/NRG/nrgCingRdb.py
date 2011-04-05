@@ -890,7 +890,11 @@ AND '{2}' <@ S.chain_type; -- contains at least one protein chain.
     def createScatterPlotGreenVersusRed(self):
         """This routine is a duplicate of the one developed afterwards/below.
         """
-        os.chdir(cingDirTmp)
+        cingDirTmpTest = os.path.join( cingDirTmp, getCallerName() )
+        mkdirs( cingDirTmpTest )
+        self.failIf(os.chdir(cingDirTmpTest), msg =
+            "Failed to change to test directory for files: " + cingDirTmpTest)
+
         m = self
         perEntryRog = m.perEntryRog
         s = select([m.e1.c.pdb_id, m.r1.c.rog, 100.0 * func.count(m.r1.c.rog) / m.e1.c.res_count

@@ -33,7 +33,7 @@ class AllChecks(TestCase):
 #                # Fails for some reason on Linux 64 bit with python2.4 with old numpy lib
 #                pass
 
-    def testRunWhatif(self):
+    def test_Whatif(self):
         #entryId = "1ai0" # Most complex molecular system in any PDB NMR entry
 #        entryId = "2hgh" # Small much studied PDB NMR entry; 48 models
 #        entryId = "1bus" # Small much studied PDB NMR entry:  5 models of 57 AA.: 285 residues.
@@ -49,7 +49,10 @@ class AllChecks(TestCase):
 #        ranges='6-13,29-45'
 
 
-        os.chdir(cingDirTmp)
+        cingDirTmpTest = os.path.join( cingDirTmp, getCallerName() )
+        mkdirs( cingDirTmpTest )
+        self.failIf(os.chdir(cingDirTmpTest), msg =
+            "Failed to change to test directory for files: " + cingDirTmpTest)
         project = Project( entryId )
         if not parseOnly:
             project.removeFromDisk()

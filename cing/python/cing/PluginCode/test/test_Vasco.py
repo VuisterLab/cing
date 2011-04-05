@@ -65,9 +65,12 @@ class AllChecks(TestCase):
             useNrgArchive = False
 
 
-#        cingDirTmp = '/Users/jd/workspace/nrgcing/Vasco' 
-        self.failIf(os.chdir(cingDirTmp), msg =
-            "Failed to change to directory for temporary test files: " + cingDirTmp)
+#        cingDirTmp = '/Users/jd/workspace/nrgcing/Vasco'
+        cingDirTmpTest = os.path.join( cingDirTmp, getCallerName() )
+        mkdirs( cingDirTmpTest )
+        self.failIf(os.chdir(cingDirTmpTest), msg =
+            "Failed to change to test directory for files: " + cingDirTmpTest)
+
         for i,entryId in enumerate(AllChecks.entryList):
 
             if i:

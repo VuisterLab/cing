@@ -2,7 +2,7 @@
 Unit test execute as:
 python $CINGROOT/python/cing/PluginCode/test/test_cingTestData.py
 
-This routine will test the backwards compatibility, that is: 
+This routine will test the backwards compatibility, that is:
 reading cing projects that have been created with the CING api before the current one.
 """
 from cing import cingDirTestsData
@@ -16,10 +16,10 @@ import unittest
 
 class AllChecks(TestCase):
 
-    def testInitCcpn(self):
+    def test_cingTestData(self):
         entryList = "1brv_023 1brv_024 1brv_025".split() # 0.24 version project with CS from NRG-CING.
 #        entryList = "1brv_025".split()
-#        entryList = "H2_2Ca_64_100".split()   # 0.24 version project with CS.     
+#        entryList = "H2_2Ca_64_100".split()   # 0.24 version project with CS.
 #        entryList = "1i1s 1ka3 1tgq 1y4o".split()
 #        if you have a local copy you can use it; make sure to adjust the path setting below.
         validateFastest = True
@@ -30,8 +30,11 @@ class AllChecks(TestCase):
         doWattos = False
         useNrgArchive = False
 
-        self.failIf(os.chdir(cingDirTmp), msg =
-            "Failed to change to directory for temporary test files: " + cingDirTmp)
+        cingDirTmpTest = os.path.join( cingDirTmp, getCallerName() )
+        mkdirs( cingDirTmpTest )
+        self.failIf(os.chdir(cingDirTmpTest), msg =
+            "Failed to change to test directory for files: " + cingDirTmpTest)
+
         for entryId in entryList:
             if useNrgArchive: # default is False
 #                inputArchiveDir = os.path.join('/Library/WebServer/Documents/NRG-CING/recoordSync', entryId)
@@ -49,7 +52,7 @@ class AllChecks(TestCase):
                 NTmessage("Removing old cing project directory: " + cingDirNew )
                 shutil.rmtree( cingDirNew )
 
-            shutil.copy(cingFile, cingDirTmp)
+            shutil.copy(cingFile, cingDirTmpTest)
             project = Project.open(entryId, status = 'old')
             self.assertTrue(project, 'Failed opening project: ' + entryId)
 

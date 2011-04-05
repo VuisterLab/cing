@@ -22,7 +22,9 @@ p = Process( max_time_to_wait_kill = max_time_to_wait)
 
 class AllChecks(TestCase):
     # important to switch to temp space before starting to generate files for the project.
-    os.chdir(cingDirTmp)
+    cingDirTmpTest = os.path.join( cingDirTmp, 'testvCing' )
+    mkdirs( cingDirTmpTest )
+    os.chdir(cingDirTmpTest)
 
     # Test will fail if topos hasn't been properly initialized.
     # It is not intended to be run every time the other cing unit test are.

@@ -12,21 +12,21 @@ import unittest
 
 class AllChecks(TestCase):
 
-    def testRun(self):
+    def test_superpose(self):
         pdbConvention = IUPAC
         entryId = "1brv"
 #        entryId = "2vb1_simple" # Protein solved by X-ray.
 
-        self.failIf( os.chdir(cingDirTmp), msg=
-            "Failed to change to directory for temporary test files: "+cingDirTmp)
+        cingDirTmpTest = os.path.join( cingDirTmp, getCallerName() )
+        mkdirs( cingDirTmpTest )
+        self.failIf(os.chdir(cingDirTmpTest), msg =
+            "Failed to change to test directory for files: " + cingDirTmpTest)
 
         pdbDirectory = os.path.join(cingDirTestsData,"pdb", entryId)
         pdbFileName = "pdb" + entryId + ".ent"
         pdbFilePath = os.path.join( pdbDirectory, pdbFileName)
         self.failIf( not os.path.exists(pdbFilePath), msg= "Failed to find file: "+pdbFilePath)
 
-        self.failIf( os.chdir(cingDirTmp), msg=
-            "Failed to change to directory for temporary test files: "+cingDirTmp)
         # does it matter to import it just now?
         project = Project( entryId )
         self.failIf( project.removeFromDisk())

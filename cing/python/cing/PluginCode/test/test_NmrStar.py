@@ -26,8 +26,11 @@ class AllChecks(TestCase):
         useNrgArchive = False # Default is False
 
 
-        self.failIf(os.chdir(cingDirTmp), msg =
-            "Failed top change to directory for temporary test files: " + cingDirTmp)
+        cingDirTmpTest = os.path.join( cingDirTmp, getCallerName() )
+        mkdirs( cingDirTmpTest )
+        self.failIf(os.chdir(cingDirTmpTest), msg =
+            "Failed to change to test directory for files: " + cingDirTmpTest)
+
         for entryId in entryList:
             project = Project.open(entryId, status = 'new')
             self.assertTrue(project, 'Failed opening project: ' + entryId)

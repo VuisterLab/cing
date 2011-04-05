@@ -12,14 +12,16 @@ import unittest
 
 class AllChecks(TestCase):
 
-    def testConversion(self):
+    def test_cyana2cing(self):
 #        SETUP FIRST
         projectId = "1pdb"
         cyanaDirectory = os.path.join( cingDirTestsData, "cyana", projectId )
         self.assertTrue( os.path.exists( cyanaDirectory) and os.path.isdir(cyanaDirectory ) )
 
-        self.failIf( os.chdir(cingDirTmp), msg=
-            "Failed to change to directory for temporary test files: "+cingDirTmp)
+        cingDirTmpTest = os.path.join( cingDirTmp, getCallerName() )
+        mkdirs( cingDirTmpTest )
+        self.failIf(os.chdir(cingDirTmpTest), msg =
+            "Failed to change to test directory for files: " + cingDirTmpTest)
 
         projectRootPath = os.path.join( cingDirTmp, projectId )
         projectRoot = Project.rootPath( projectRootPath )[0] # xeasy_project.cing in /tmp

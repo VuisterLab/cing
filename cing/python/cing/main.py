@@ -9,7 +9,9 @@ Usage: cing [options]       use -h or --help for listing
 
 Options:
   -h, --help            show this help message and exit
-  --test                Run set of test routines to verify installation.
+  --test                Run set of test routines to verify installation, use -c 1
+                          for any of these test routines in order to get nice
+                          sequential order of outputs.
   --testQ               Same as --test and just grepping for any errors.
   --test2               Run extensive tests on large data sets checking code
                         after fundamental changes.
@@ -135,6 +137,7 @@ from cing import cingVersion
 from cing import header
 from cing import starttime
 from cing.Libs.NTutils import * #@UnusedWildImport
+from cing.Libs.forkoff import ForkOff
 from cing.Libs.helper import * #@UnusedWildImport
 from cing.core.classes import Project
 from cing.core.molecule import Molecule
@@ -275,7 +278,8 @@ def testQuiet():
     fn = 'cingTest.log'
     NTmessage("\nStarting quiet test in %s logged to %s\n" % (cingDirTmp, fn))
     os.chdir(cingDirTmp)
-    cmdCingTest = 'python -u $CINGROOT/python/cing/main.py --test -v 0 > %s 2>&1' % ( fn )
+
+    cmdCingTest = 'python -u $CINGROOT/python/cing/main.py --test -c %d -v 0 > %s 2>&1' % ( cing.ncpus, fn )
 #    NTmessage("In cing.main doing [%s]" % cmdCingTest)
     status, content = commands.getstatusoutput(cmdCingTest)
     if status:
@@ -329,24 +333,41 @@ def testOverall(namepattern):
 #      nameList.append(name)
     # translate: '/Users/jd/workspace/cing/python/cing/Libs/test/test_NTplot.py'
     # to: cing.Libs.test.test_NTplot
-    lenCingPythonDirStr = len(cingPythonDir)
+
+    f = ForkOff(
+#            processes_max=1,     # use 1 if you really want to read it line by line.
+            processes_max=cing.ncpus,
+            max_time_to_wait=600, # on a very slow setup
+            verbosity=cing.verbosity
+            )
+    job_list = []
     for name in nameList:
-#        print name
-        tailPathStr = name[lenCingPythonDirStr + 1: - 3]
-        mod_name = join(tailPathStr.split('/'), '.')
-        if mod_name in excludedModuleList:
-            print "Skipping module:  " + mod_name
-            continue
-        try:
-            exec("import %s" % (mod_name))
-            exec("suite = unittest.defaultTestLoader.loadTestsFromModule(%s)" % (mod_name))
-            testVerbosity = 2
-            unittest.TextTestRunner(verbosity=testVerbosity).run(suite) #@UndefinedVariable
-            NTmessage('\n\n\n')
-        except ImportWarning, extraInfo:
-            NTmessage("Skipping test report of an optional compound: %s" % extraInfo)
-        except ImportError, extraInfo:
-            NTmessage("Skipping test report of an optional module: %s" % mod_name)
+        job_list.append( (testByName, (name, excludedModuleList)) )
+    done_list = f.forkoff_start(job_list, 0)
+    NTmessage("Finished ids: %s", done_list)
+
+    # Exit with timer info anywho. After this CING should exit so the tweak shouldn't break anything.
+    if cing.verbosity <= cing.verbosityError:
+        cing.verbosity = cing.verbosityOutput
+
+def testByName(name, excludedModuleList):
+    lenCingPythonDirStr = len(cingPythonDir)
+    tailPathStr = name[lenCingPythonDirStr + 1: - 3]
+    mod_name = join(tailPathStr.split('/'), '.')
+    if mod_name in excludedModuleList:
+        print "Skipping module:  " + mod_name
+        return
+
+    try:
+        exec("import %s" % (mod_name))
+        exec("suite = unittest.defaultTestLoader.loadTestsFromModule(%s)" % (mod_name))
+        testVerbosity = 2
+        unittest.TextTestRunner(verbosity=testVerbosity).run(suite) #@UndefinedVariable
+        NTmessage('\n\n\n')
+    except ImportWarning, extraInfo:
+        NTmessage("Skipping test report of an optional compound: %s" % extraInfo)
+    except ImportError, extraInfo:
+        NTmessage("Skipping test report of an optional module: %s" % mod_name)
 
     # Exit with timer info anywho. After this CING should exit so the tweak shouldn't break anything.
     if cing.verbosity <= cing.verbosityError:
@@ -539,6 +560,11 @@ def getParser():
                       dest="verbosity", action='store',
                       help="verbosity: [0(nothing)-9(debug)] no/less messages to stdout/stderr (default: 3)"
                      )
+    parser.add_option("-c", "--cores", "--ncpus", type='int',
+                      action="store",
+                      dest="ncpus",
+                      help="Number of separate threads to start. Can be below or above number the number of physical/logical cpu cores."
+                     )
     return parser
 #end def
 
@@ -572,8 +598,12 @@ def main():
         NTerror("Ignoring setting")
     # From this point on code may be executed that will go through the appropriate verbosity filtering
 
+    if options.ncpus > 0:
+        cing.ncpus = options.ncpus
+        NTdebug("Set the number of threads for cing to: %d" % cing.ncpus)
+
     NTmessage(header)
-    NTmessage(getStartMessage())
+    NTmessage(getStartMessage(ncpus=cing.ncpus))
 
     NTdebug(getInfoMessage())
 

@@ -30,7 +30,6 @@ from cing.Libs.NTgenUtils import analyzeCingLog
 from cing.Libs.NTgenUtils import analyzeFcLog
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.Libs.disk import globLast
-from cing.Libs.disk import mkdirs
 from cing.Libs.disk import rmdir
 from cing.Libs.helper import detectCPUs
 from cing.Libs.html import GOOGLE_ANALYTICS_TEMPLATE

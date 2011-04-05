@@ -14,7 +14,7 @@ import unittest
 
 class AllChecks(TestCase):
 
-    def testWattos(self):
+    def test_Wattos(self):
         "Testing wattos reading and working on a star file that first gets created by Wim's FC."
 
         # failing entries: 1ai0, 1kr8 (same for 2hgh)
@@ -36,8 +36,10 @@ class AllChecks(TestCase):
 #        ranges='16-29'
 
 
-        self.failIf(os.chdir(cingDirTmp), msg =
-            "Failed to change to directory for temporary test files: " + cingDirTmp)
+        cingDirTmpTest = os.path.join( cingDirTmp, getCallerName() )
+        mkdirs( cingDirTmpTest )
+        self.failIf(os.chdir(cingDirTmpTest), msg =
+            "Failed to change to test directory for files: " + cingDirTmpTest)
         for entryId in entryList:
             project = Project.open(entryId, status = 'new')
             self.assertTrue(project, 'Failed opening project: ' + entryId)

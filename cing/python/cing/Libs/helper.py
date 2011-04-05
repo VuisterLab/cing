@@ -121,16 +121,19 @@ def getOsType():
         return 'windows'
     return 'unknown'
 
-def getStartMessage():
+def getStartMessage(ncpus=None):
     """
     Copy catted from xplor
     user = "jd"
     on   = "Stella.local (darwin/32bit/2cores/2.6.6)
     at   = "(3676) 29-Oct-08 15:36:22
+
+    ncpus will be detected if not presented. Derive it from cing.ncpus and pass it in here is normal operation.
     """
     user = os.getenv("USER", "Unknown user")
     machine = os.getenv("HOST", "Unknown host") #only works with (t)csh shell
-    ncpus = detectCPUs()
+    if not ncpus:
+        ncpus = detectCPUs()
 #    ostype = os.getenv("OSTYPE", "Unknown os") #only works with (t)csh shell
     osType = getOsType()
     on = "%s (%s/%s/%scores/%s)" % (machine, osType, platform.architecture()[0], ncpus, sys.version.split()[0])

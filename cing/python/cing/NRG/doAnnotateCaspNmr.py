@@ -1,6 +1,5 @@
 from cing import header
 from cing.Libs.NTutils import * #@UnusedWildImport
-from cing.Libs.disk import mkdirs
 from cing.Libs.forkoff import do_cmd
 from cing.NRG.CaspNmrMassageCcpnProject import baseDir
 from cing.Scripts.FC.utils import importPseudoPdb

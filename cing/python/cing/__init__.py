@@ -82,7 +82,7 @@ NaNstring = "." # default if not set in localConstants. @UnusedVariable
 
 
 osType = getOsType()
-
+ncpus = detectCPUs() # use all if not specified by -c flag to main cing program.
 
 """Can be reset later when internet is up again"""
 internetConnected = isInternetConnected()
@@ -107,7 +107,7 @@ cingDirScripts         = os.path.join(cingPythonCingDir,"Scripts")
 cingDirData            = os.path.join(cingRoot,         "data")
 cingDirTmp             = os.path.join("/tmp" , "cing")
 
-# The TMPDIR environemnt variable will override the default above but not the one that
+# The TMPDIR environment variable will override the default above but not the one that
 # might be defined in localConstants.py.
 try:
     from localConstants import cingDirTmp #@UnresolvedImport
