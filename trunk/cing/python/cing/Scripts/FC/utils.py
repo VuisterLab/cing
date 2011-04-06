@@ -201,7 +201,7 @@ def fcProcessEntry( entry_code, ccpnTgzFile, outputCcpnTgzFile, functionToRun='s
     # end if doSwapCheck
 
     if doSaveProject:
-        NTmessage('Saving to new path')
+        NTmessage('Saving to new path: %s' % entry_code)
         saveProject(ccpnProject, newPath=entry_code, removeExisting=True)
     if doExport:
         if os.path.exists(outputCcpnTgzFile):
