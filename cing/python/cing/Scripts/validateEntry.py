@@ -302,7 +302,7 @@ def main(entryId, *extraArgList):
         except:
             NTtracebackError()
             NTerror("Failed to store CING project's data due to above traceback error.")
-    
+
     if projectType == PROJECT_TYPE_CCPN:
 #        fileNameTgz = entryId + '.tgz'
         os.unlink(fileNameTgz) # temporary ccpn tgz

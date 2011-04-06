@@ -165,7 +165,7 @@ def annotateEntry(entryCodeNew, *extraArgList):
 
     if doSaveProject:
 #        NTmessage('Checking validity and saving to new path')
-        NTmessage('Saving to new path')
+        NTmessage('Saving to new path: %s' % entryCodeNew)
 #        checkValid=True,
         saveProject(ccpnProject, newPath=entryCodeNew, removeExisting=True)
     if doExport:
