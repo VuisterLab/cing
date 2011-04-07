@@ -3576,12 +3576,48 @@ class RestraintListHTMLfile( HTMLfile ):
         if colCount2 != (colCount-1):
             NTerror("Failed to get correct columns %s but found %s from tagtable" % ( colCount, (colCount+1)))
             return True
-        for rowIdx in table.rows(range(rowCount)): # count the abov
-            table.nextColumn(str(rowIdx+1))
-            for colIdx in range(1,colCount): # c
-                v = tagTableAssign.getString(columnName=None, rowIdx=rowIdx, colIdx=colIdx-1)
-                if colIdx == 1: # atoms etc.
+        for rowIdx in table.rows(range(rowCount)): # count the above
+            atom = None
+            if 0: # this fails because of issue 294
+                chainName       = tagTableAssign.getString(rowIdx=rowIdx, colIdx=0)
+                resNum          = tagTableAssign.getInt(   rowIdx=rowIdx, colIdx=1)
+                pseudoAtomName  = tagTableAssign.getString(rowIdx=rowIdx, colIdx=3)
+                nameTuple = ( IUPAC, chainName, resNum, pseudoAtomName )
+                for item in nameTuple:
+                    if item == None:
+                        NTdebug("Failed to get valid item from nameTuple: " + str(nameTuple))
+                        nameTuple = None
+                        continue
+                    # end if
+                # end for
+                atom = self.project.molecule.decodeNameTuple( nameTuple ) # may be None input and output.
+                if not atom:
                     pass
+    #                NTdebug('In %s failed to map nameTuple %s', getCallerName(), str(nameTuple))
+
+            table.nextColumn(str(rowIdx+1))
+            startIdxDefaults = 1
+#            fill Atom In 4 Columns
+            if atom: # TODO: reuse next time this code comes up
+                startIdxDefaults = 5
+                residue = atom.residue
+                chain   = atom.residue.chain
+                chName = NaNstring
+                titleStr = NO_CHAIN_TO_GO_TO
+                if chain:
+                    chName = chain.name
+                    titleStr = sprintf('goto chain %s', chain._Cname(-1))
+                table.nextColumn()
+                self.insertHtmlLink( self.main, self.restraintList, chain,   text =       chName,   title = titleStr)
+                table.nextColumn(`residue.resNum`)
+                table.nextColumn()
+                self.insertHtmlLink( self.main, self.restraintList, residue, text = residue.resName, title = sprintf('goto residue %s', residue._Cname(-1)) )
+                table.nextColumn()
+                self.insertHtmlLink( self.main, self.restraintList, atom,    text = atom.name)
+            # end if
+
+            for colIdx in range(startIdxDefaults,colCount):
+                v = tagTableAssign.getString(columnName=None, rowIdx=rowIdx, colIdx=colIdx-1)
                 table.nextColumn(v)
             # end for
         # end for
