@@ -52,7 +52,7 @@ class TagTable (Lister):
             self.tagvalues  = [ [None] ]
 
         self.verbosity  = verbosity
-    
+
     "Returns the STAR text representation"
     def star_text ( self,
                     flavor                  = 'NMR-STAR'
@@ -167,25 +167,18 @@ class TagTable (Lister):
     def getIntListByColumnName(self, columnName):
         """Convenience function."""
         return self.getSpecificListByColumnName( columnName, int, "int")
-    def getInt(self, columnName, rowIdx=0):
+
+    def getInt(self, columnName=None, rowIdx=0, colIdx=0):
         """Convenience function."""
-        col = self.getSpecificListByColumnName( columnName, int, "int")
-        if col == None:
-            NTerror("Failed to TagTable.getInt for column %s and rowIdx %s" % (columnName, rowIdx) )
+        value = self.getString(columnName=columnName, rowIdx=rowIdx, colIdx=colIdx)
+        if value == NULL_STRING_DOT:
             return None
-        n = len(col)
-        if rowIdx < 0 or rowIdx >= n:
-            NTerror("Failed to TagTable.getInt for column %s and out of bounds rowIdx %s" % (columnName, rowIdx) )
-            return None
-        value = col[rowIdx]
-        result = None
         try:
-            if value == NULL_STRING_DOT:
-                return None
             result = int(value)
         except:
     #        NTtracebackError() # disable this verbose messaging after done debugging.
             NTerror('getInt: failed to convert to int for construct "%s"' % value)
+            return None
         return result
 
     def getFloat(self, columnName, rowIdx=0):
@@ -211,15 +204,15 @@ class TagTable (Lister):
 
     def getColCount(self):
         return len(self.tagvalues)
-    
+
     def getRowCount(self):
         if not self.tagvalues:
             return 0
         return len(self.tagvalues[0])
-    
-    def getString(self, columnName=None, rowIdx=0, colIdx=0):        
+
+    def getString(self, columnName=None, rowIdx=0, colIdx=0):
         """Convenience function.
-        Use by columnName -OR- by row/col indices.        
+        Use by columnName -OR- by row/col indices.
         """
         if columnName == None:
             if rowIdx < 0:

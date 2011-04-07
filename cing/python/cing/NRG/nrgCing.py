@@ -68,7 +68,6 @@ FAILURE_PREP_STR = "Failed to prepareEntry"
 class nrgCing(Lister):
     """Main class for preparing and running CING reports on NRG and maintaining the statistics."""
     def __init__(self,
-                 new_hits_entry_list=None,
                  useTopos=False,
                  getTodoList=True,
                  max_entries_todo=1,
@@ -174,10 +173,6 @@ class nrgCing(Lister):
 
         os.chdir(self.results_dir)
 
-        ## List of 'new' entries for which hits were found
-        self.new_hits_entry_list = NTlist()
-        if new_hits_entry_list:
-            self.new_hits_entry_list = new_hits_entry_list
         self.useTopos = useTopos
         self.getTodoList = getTodoList
         self.entry_list_pdb = NTlist()
@@ -234,8 +229,8 @@ class nrgCing(Lister):
 
         self.wattosVerbosity = cing.verbosity
         self.wattosMemory = '4g'
-        if not self.isProduction:
-            self.wattosMemory = '2g' # development machine Stella only has 4g total and this is only important for largest entries like 2ku2
+#        if not self.isProduction:
+#            self.wattosMemory = '2g' # development machine Stella only has 4g total and this is only important for largest entries like 2ku2
         self.wattosProg = "java -Djava.awt.headless=true -Xmx%s Wattos.CloneWars.UserInterface -at -verbosity %s" % (self.wattosMemory, self.wattosVerbosity)
         self.tokenListFileName = os.path.join(self.results_dir, 'token_list_todo.txt')
         self.vc = None
@@ -250,14 +245,15 @@ class nrgCing(Lister):
         self.updateIndices = True   # DEFAULT: True.
         self.getTodoList = True     # DEFAULT: True. If and only if new_hits_entry_list is empty and getTodoList is False; no entries will be attempted.
 
-        self.new_hits_entry_list = [] # DEFAULT: [].define empty for checking new ones.
-    #    self.new_hits_entry_list = ['1brv']
-    #    self.new_hits_entry_list         = string.split("2jqv 2jnb 2jnv 2jvo 2jvr 2jy7 2jy8 2oq9 2osq 2osr 2otr 2rn9 2rnb")
+        # The variable below is local and can be used to update a specific batch.
+        new_hits_entry_list = [] # DEFAULT: [].define empty for checking new ones.
+#        new_hits_entry_list = ['1brv']
+    #    new_hits_entry_list         = string.split("2jqv 2jnb 2jnv 2jvo 2jvr 2jy7 2jy8 2oq9 2osq 2osr 2otr 2rn9 2rnb")
 
-        if False: # DEFAULT False; use for processing a specific batch.
+        if 1: # DEFAULT False; use for processing a specific batch.
             entryListFileName = os.path.join(self.results_dir, 'entry_list_todo_all.csv')
-            self.new_hits_entry_list = readLinesFromFile(entryListFileName)
-            self.new_hits_entry_list = self.new_hits_entry_list[100:110]
+            new_hits_entry_list = readLinesFromFile(entryListFileName)
+#            new_hits_entry_list = new_hits_entry_list[100:110]
 
         NTmessage("In updateWeekly starting with:\n%r" % self)
 
@@ -266,8 +262,8 @@ class nrgCing(Lister):
             NTerror("Failed to searchPdbEntries")
             return True
 
-        if self.new_hits_entry_list:
-            self.entry_list_todo = NTlist(*self.new_hits_entry_list)
+        if new_hits_entry_list:
+            self.entry_list_todo = NTlist(*new_hits_entry_list)
         elif self.getTodoList:
             # Get todo list and some others.
             if self.getEntryInfo():
@@ -278,9 +274,13 @@ class nrgCing(Lister):
             if self.prepare():
                 NTerror("Failed to prepare")
                 return True
-            if self.getEntryInfo(): # needed to see which preps failed; they are then excluded from todo list.
+
+            if self.getEntryInfo(): # need to see which preps failed; they are then excluded from todo list.
                 NTerror("Failed to getEntryInfo (second time in updateWeekly).")
                 return True
+            # WARNING: the above command wipes out the self.entry_list_todo
+            if new_hits_entry_list:
+                self.entry_list_todo = NTlist(*new_hits_entry_list)
             self.entry_list_todo.difference( self.entry_list_prep_crashed )
             self.entry_list_todo.difference( self.entry_list_prep_failed )
             if self.runCing():
@@ -586,9 +586,8 @@ class nrgCing(Lister):
 
         host = 'localhost'
         schema=DEV_NRG_DB_SCHEMA
-        if self.isProduction:
-            host = 'nmr'
-            schema=NRG_DB_SCHEMA
+#        if self.isProduction:
+#            schema=NRG_DB_SCHEMA
         m = nrgCingRdb(host=host, schema=schema)
         self.entry_list_store_in_db = m.getPdbIdList()
         if not self.entry_list_store_in_db:
@@ -619,7 +618,7 @@ class nrgCing(Lister):
                 continue # don't mark it as stopped anymore.
             # end if
             if not entry_dict_store_in_db.has_key(entry_code):
-                NTmessage("%s not in db." % entry_code)
+#                NTmessage("%s not in db." % entry_code)
                 self.entry_list_store_not_in_db.append(entry_code)
                 continue # don't mark it as stopped anymore.
             # end if
@@ -1734,9 +1733,9 @@ class nrgCing(Lister):
         pythonScriptFileName = os.path.join(cingDirNRG, 'storeCING2db.py')
         entryListFileName = os.path.join( self.results_dir, 'entry_list_todo.csv')
         writeEntryListToFile(entryListFileName, self.entry_list_todo)
-        archive_id=ARCHIVE_DEV_NRG_ID
-        if self.isProduction:
-            archive_id=ARCHIVE_NRG_ID
+        archive_id=ARCHIVE_NRG_ID
+        if not self.isProduction:
+            archive_id=ARCHIVE_DEV_NRG_ID
         extraArgList = (archive_id,) # note that for length one tuples the comma is required.
 
         doScriptOnEntryList(pythonScriptFileName,
@@ -1784,7 +1783,6 @@ Additional modes I see:
     if len(sys.argv) > startArgListOther:
         argListOther = sys.argv[startArgListOther:]
     NTmessage('\nGoing to destination: %s with(out) on entry_code %s with extra arguments %s' % (destination, entry_code, str(argListOther)))
-#    NTmessage('isProduction:                                                %s' % (isProduction))
 
     try:
         if destination == 'updateWeekly':

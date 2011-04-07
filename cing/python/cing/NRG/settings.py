@@ -12,7 +12,7 @@ from cing.Libs.NTutils import * #@UnusedWildImport
 # -2- results base is tmpNRG-CING
 # -3- db schema is tmpnrgcing
 
-isProduction = 1 # DEFAULT: 1 override for development in localConstants.py
+isProduction = 1 # DEFAULT: 1 override for development in localConstants.py @UnusedVariable
 
 UJ              = '/Users/wim'
 WS              = os.path.join(UJ,'workspace')
@@ -41,8 +41,8 @@ PDBNMR2         = os.path.join(divDir,'nmr_restraints')
 
 
 results_base    = 'NRG-CING'
-if not isProduction:
-    results_base    = 'dev' + results_base
+#if not isProduction:
+#    results_base    = 'dev' + results_base
 results_dir     = os.path.join(dDir, results_base)
 big_dir         = results_dir                           # NRG data large in size.
 dir_star        = os.path.join(big_dir,'star')

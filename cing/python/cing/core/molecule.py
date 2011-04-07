@@ -3453,6 +3453,8 @@ Residue class: Defines residue properties
 
     """
     def __init__( self, resName, resNum, convention=INTERNAL, Nterminal=False, Cterminal=False, **kwds ):
+#        resNum is the author supplied number. This is called the seqCode in CCPN. It's key in CING.
+#        seqId in CCPN is 'Identifier corresponding to the molResidue identifier (self.molResidue.serial)' It's key in CCPN.
         #print '>',resName, resNum
         NTtree.__init__(self, __CLASS__ = 'Residue',
                               name=resName + str(resNum),    # Only a temporarily name, will be formalised after

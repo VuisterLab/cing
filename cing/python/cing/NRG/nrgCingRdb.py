@@ -76,8 +76,11 @@ class nrgCingRdb():
             self.cresidue = self.csql.cingresidue
             self.catom = self.csql.cingatom
 
-            self.csql.loadTable('cingsummary')
-            self.csql.loadTable('entry_list_selection')
+            try:
+                self.csql.loadTable('cingsummary')
+                self.csql.loadTable('entry_list_selection')
+            finally:
+                NTerror("Failed to load dep tables consider creating them manually in nrgCingRdb.__init__")
 
             self.csummary = self.csql.cingsummary
             self.centry_list_selection = self.csql.entry_list_selection
@@ -1170,9 +1173,10 @@ def bin_by(y, x, nbins=None, ymin=None, ymax=None):
 if __name__ == '__main__':
     cing.verbosity = verbosityDebug
 
-    schema = DEV_NRG_DB_SCHEMA
+#    schema = DEV_NRG_DB_SCHEMA
+    schema = NRG_DB_SCHEMA
     if isProduction:
-            schema = NRG_DB_SCHEMA
+        schema = NRG_DB_SCHEMA
 
     m = nrgCingRdb( schema=schema )
 

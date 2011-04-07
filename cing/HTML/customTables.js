@@ -65,7 +65,7 @@ jQuery(document).ready(function() {
         "aaSorting": [[0,'asc']],
         "bPaginate": true,
         "bLengthChange": true,
-        "iDisplayLength": 10000,
+        "iDisplayLength": 10,
         "bFilter": true,
         "bInfo": true,
         "bProcessing": true,
