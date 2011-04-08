@@ -143,6 +143,33 @@ def doStoreCING2db( entry_code, archive_id, project = None):
     chothia_class = molecule.chothiaClassInt()
 
     p_distance_count = project.distances.lenRecursive()
+
+    p_distance_count_sequential      =  None
+    p_distance_count_intra_residual  =  None
+    p_distance_count_medium_range    =  None
+    p_distance_count_long_range      =  None
+    p_distance_count_ambiguous       =  None
+    restraintList = project.allRestraints() # defaults to DRs
+    if p_distance_count != len(restraintList):
+        NTcodeerror("Expected the same numbers for project.distances.lenRecursive() and the size of project.allRestraints() but found: %s and %s" % ( p_distance_count, len(restraintList)))
+        p_distance_count = len(restraintList)
+    # end if
+    if p_distance_count:
+        if restraintList.analyze():
+            p_distance_count_sequential      =  len(restraintList.intraResidual)
+            p_distance_count_intra_residual  =  len(restraintList.sequential)
+            p_distance_count_medium_range    =  len(restraintList.mediumRange)
+            p_distance_count_long_range      =  len(restraintList.longRange)
+            p_distance_count_ambiguous       =  len(restraintList.ambiguous)
+        else:
+            NTerror("Failed to do restraintList.analyze()");
+        # end if
+    else:
+        NTdebug("No restraints in ", getCallerName())
+    # end if
+
+
+
     p_dihedral_count = project.dihedrals.lenRecursive()
     p_rdc_count = project.rdcs.lenRecursive()
     p_peak_count = project.peaks.lenRecursive()
@@ -171,6 +198,12 @@ def doStoreCING2db( entry_code, archive_id, project = None):
     p_cs13C_count = p_assignmentCountMap['13C']
     p_cs15N_count = p_assignmentCountMap['15N']
     p_cs31P_count = p_assignmentCountMap['31P']
+
+    p_ssa_count, p_ssa_swap_count, p_ssa_deassign_count = None, None, None
+    ssa_count_tuple = project.getSsaTripletCounts()
+    if ssa_count_tuple:
+        p_ssa_count, p_ssa_swap_count, p_ssa_deassign_count = ssa_count_tuple
+
     # WI
     p_wi_bbcchk = molecule.getDeepAvgByKeys(WHATIF_STR, BBCCHK_STR, VALUE_LIST_STR)
     p_wi_bmpchk = molecule.getDeepAvgByKeys(WHATIF_STR, BMPCHK_STR, VALUE_LIST_STR) # not used
@@ -225,6 +258,12 @@ def doStoreCING2db( entry_code, archive_id, project = None):
         res_count=molecule.residueCount,
         model_count=molecule.modelCount,
         distance_count=p_distance_count,
+        distance_count_sequential      = p_distance_count_sequential    ,
+        distance_count_intra_residual  = p_distance_count_intra_residual,
+        distance_count_medium_range    = p_distance_count_medium_range  ,
+        distance_count_long_range      = p_distance_count_long_range    ,
+        distance_count_ambiguous       = p_distance_count_ambiguous     ,
+
         dihedral_count=p_dihedral_count,
         rdc_count=p_rdc_count,
         peak_count=p_peak_count,
@@ -233,6 +272,10 @@ def doStoreCING2db( entry_code, archive_id, project = None):
         cs13c_count=p_cs13C_count,
         cs15n_count=p_cs15N_count,
         cs31p_count=p_cs31P_count,
+
+        ssa_count=p_ssa_count,
+        ssa_swap_count=p_ssa_swap_count,
+        ssa_deassign_count=p_ssa_deassign_count,
 
         dis_max_all = p_dis_max_all,
         dis_rms_all = p_dis_rms_all,
@@ -306,7 +349,7 @@ def doStoreCING2db( entry_code, archive_id, project = None):
     for resonanceList in project.molecule.resonanceSources:
         nameResoL = resonanceList.name # Name has got to be key
         appliedResoL = resonanceList.vascoApplied
-        rogResoL = resonanceList.rogScore.rogInt()        
+        rogResoL = resonanceList.rogScore.rogInt()
         result = execute(cresonancelist.insert().values(
             entry_id=entry_id,
             name=nameResoL,
@@ -329,14 +372,14 @@ def doStoreCING2db( entry_code, archive_id, project = None):
                 )
             )
             s = select([cresonancelistperatomclass.c.resonancelistperatomclass_id],
-                       and_(cresonancelistperatomclass.c.entry_id == entry_id, 
+                       and_(cresonancelistperatomclass.c.entry_id == entry_id,
                             cresonancelistperatomclass.c.resonancelist_id == resonancelist_id,
                             cresonancelistperatomclass.c.atomclass == atomId,
                             ))
             cingresonancelistperatomclass_id = execute(s).fetchall()[0][0]
             NTdebug("Inserted cingresonancelistperatomclass_id %s" % cingresonancelistperatomclass_id)
-        # end for        
-    # end for        
+        # end for
+    # end for
 
     chainCommittedCount = 0
     residueCommittedCount = 0

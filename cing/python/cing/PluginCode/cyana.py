@@ -172,7 +172,7 @@ def exportDistanceRestraint2cyana( dr, upper=True, convention=CYANA2 ):
         val = dr.lower
     #end if
 
-    if val == 0.0: # this will interfere with Cyana's def for ambigious restraints
+    if val == 0.0: # this will interfere with Cyana's def for ambiguous restraints
         val = 0.01
     #end if
 

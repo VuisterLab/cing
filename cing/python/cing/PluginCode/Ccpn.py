@@ -1427,7 +1427,7 @@ class Ccpn:
 
         appDataList = self.ccpnNmrConstraintStore.findAllApplicationData(application='FormatConverter', keyword='stereoAssignmentCorrectionsFile')
         if len(appDataList) == 0:
-            NTdebug("No FC meta data on SSA")
+#            NTdebug("No FC meta data on SSA")
             return
 
         if len(appDataList) > 1:
@@ -1447,7 +1447,8 @@ class Ccpn:
             NTerror("FC meta data value isn't long enough to be valid")
             return True
 
-        NTdebug("Got meta data on SSA:" + star_text[:30]) # TODO: import into new CING object.
+#        NTdebug("Got meta data on SSA")
+#                 + star_text[:30])
         projectDistList = self.project.distances
         if not len(projectDistList):
             NTwarning("self.project.distances is empty but FC meta data will still be added.")
@@ -2829,7 +2830,7 @@ def saveCcpnMetaData(project, tmp = None):
 
     Return True on error
     """
-    NTdebug("Now in " + getCallerName())
+#    NTdebug("Now in " + getCallerName())
     if not project:
         NTerror('%s: no project defined' % getCallerName())
         return True
@@ -2852,7 +2853,7 @@ def saveCcpnMetaData(project, tmp = None):
     if writeTextToFile(fileName, star_text):
         NTdebug("writeTextToFile failed to file: " + fileName)
         return True
-    NTdebug('Stored CCPN meta data (only SSA for now)')
+#    NTdebug('Stored CCPN meta data (only SSA for now)')
 #end def
 
 # register the function

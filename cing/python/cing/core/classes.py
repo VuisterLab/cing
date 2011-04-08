@@ -25,6 +25,7 @@ from cing.Libs.pdb import importPDB
 from cing.Libs.pdb import initPDB
 from cing.PluginCode.required.reqNih import TALOSPLUS_LIST_STR
 from cing.PluginCode.required.reqWhatif import summaryCheckIdList
+from cing.STAR.File import File
 from cing.core.CingSummary import CingSummary
 from cing.core.classes2 import * #@UnusedWildImport
 from cing.core.constants import * #@UnusedWildImport
@@ -757,6 +758,50 @@ Project: Top level Cing project class
         except:
             NTerror("Failed removeCcpnReferences")
 
+    def getSaveFrameAssign(self):
+        """
+        Return SSA saveframe embedded.
+        Return None on error.
+        """
+        if not len(self.distances):
+            NTdebug("self.project.distances is empty.")
+            return
+        star_text = getDeepByKeysOrAttributes( self.distances, STEREO_ASSIGNMENT_CORRECTIONS_STAR_STR)
+        if not star_text:
+            NTdebug("No SSA info embedded.")
+            return
+        starFile = File()
+        if starFile.parse(text=star_text):
+            NTerror( "In %s reading STAR text by STAR api" % getCallerName() )
+            return
+        if starFile.check_integrity():
+            NTerror( "In %s STAR text failed integrity check." % getCallerName() )
+            return
+        sfList = starFile.getSaveFrames(category = "stereo_assignments")
+        if not sfList or len(sfList) != 1:
+            NTerror("In %s failed to get single saveframe but got list of: [%s]" % ( getCallerName(), sfList))
+            return
+        saveFrameAssign = sfList[0]
+        return saveFrameAssign
+
+    def getSsaTripletCounts(self):
+        """
+        Return counts tuple:
+        Return None if not available.
+        """
+        saveFrameAssign = self.getSaveFrameAssign()
+        if not saveFrameAssign:
+            NTdebug("No SSA saveframe embedded.")
+            return
+        tagTableAssignHeader = saveFrameAssign.tagtables[0]
+        gI = tagTableAssignHeader.getInt
+        tagNameList = """   Triplet_count
+                            Swap_count
+                            Deassign_count
+        """.split()
+        result = [ gI("_Stereo_assign_list."+tagName) for tagName in tagNameList]
+        return tuple(result)
+
     def export(self):
         """Call export routines from the plugins to export the project
         """
@@ -1067,10 +1112,12 @@ Project: Top level Cing project class
         return criticize(self, toFile = toFile)
 
     def validate(self, ranges = None, parseOnly = False, htmlOnly = False, doProcheck = True, doWhatif = True,
-                 doWattos = True, doQueeny = True, doTalos = True, filterVasco = False,
+                 doWattos = True, doQueeny = True, doTalos = True,
+                 filterVasco = False, filterTopViolations = False,
                  validateFastest = False, validateCingOnly = False, validateImageLess = False):
         return validate(self, ranges = ranges, parseOnly = parseOnly, htmlOnly = htmlOnly, doProcheck = doProcheck, doWhatif = doWhatif,
-                        doWattos = doWattos, doQueeny = doQueeny, doTalos = doTalos, filterVasco = filterVasco,
+                        doWattos = doWattos, doQueeny = doQueeny, doTalos = doTalos,
+                        filterVasco = filterVasco, filterTopViolations = filterTopViolations,
                         validateFastest = validateFastest, validateCingOnly = validateCingOnly, validateImageLess = validateImageLess)
 
     def runCingChecks(self, toFile=True, ranges = None):
@@ -1103,8 +1150,9 @@ Project: Top level Cing project class
     maxRemov       Maximum number of violations to remove. Largest violations will be removed.
     fileName       Enter file name (with path) for output of removed constraints.
     """
-    def filterHighRestraintViol(self, restraintLoL = None, cutoff=2.0, maxRemove=3):
-#                                fileName = 'high_viol.str'):
+    def filterHighRestraintViol(self, restraintLoL = None, cutoff=2.0, maxRemove=3, toFile=True,
+                                fileName = 'distance_restraint_list_high_violations_filtered.str'):
+        cutoff= 0.10 # DEFAULT: disabled
         NTmessage( "==> Doing filterHighDistanceViol with arguments: cutoff %s maxRemove %s" % ( cutoff, maxRemove))
 
         if restraintLoL == None:
@@ -1114,7 +1162,7 @@ Project: Top level Cing project class
             NTdebug("No restraint list in filterHighDistanceViol.")
             return 1
         # end if
-
+        # Get instance of DistanceRestraintList
         restraintList = self.allRestraints() # defaults to DRs
 #        NTdebug("restraintList: %s" % restraintList)
         todoCount = len(restraintList)
@@ -1125,7 +1173,7 @@ Project: Top level Cing project class
 
         if not restraintList.analyze():
             NTerror("Failed to do restraintList.analyze()");
-            return 0
+            return
         # end if
 #        NTdebug("restraintList still: %s" % restraintList)
         restraintList.sort(byItem='violMax') # in place by default
@@ -1160,18 +1208,14 @@ Project: Top level Cing project class
         if not toRemoveCount:
             if maxViol >= cutoff:
                 NTerror('code bug in filterHighDistanceViol')
-                return 0
+                return
             NTmessage("==> Nice, no restraints with violations above: %.3f (highest is: %.3f)" % (cutoff, maxViol))
             return 1
 
         if not restraintList.analyze():
             NTerror("Failed to do restraintList.analyze()");
-            return 0
+            return
         # end if
-        if cing.verbosity == cing.verbosityDebug:
-            NTdebug( "Removing %s restraints: " + restraintList.format(showAll=True))
-        else:
-            NTmessage( "==> Removing %s top violating restraints: " % len(restraintList) )
 
 
         affectedRestraintLoL = NTlist()
@@ -1183,9 +1227,19 @@ Project: Top level Cing project class
         for rL in affectedRestraintLoL:
             if not rL.analyze():
                 NTerror("Failed to do restraintList.analyze()");
-                return 0
+                return
             # end if
-            NTdebug("Left with: %s" % rL)
+#            NTdebug("Left with: %s" % rL)
+        #end for
+
+        txt = restraintList.format(showAll=True)
+        if toFile:
+            fileName = self.path(self.molecule.name, self.moleculeDirectories.analysis, fileName)
+            NTmessage( '==> %s, removed %s restraints and written to %s' % ( getCallerName(), len(restraintList), fileName))
+            writeTextToFile(fileName, txt)
+        else:
+            NTmessage( "Removed distance restraints:\n" + txt)
+        #end if
 #        NTmessage("Finished filterHighDistanceViol")
         return True # success
     # end def
@@ -1843,7 +1897,7 @@ ranges:  %s
                 for r in p.distances:
                     fprintf( stream,'  %-23s %5d %5d %5d %5d %5d %5d   %-7s  %4d %4d %4d %4d    %5.3f +- %5.3f\n',
                             r.name,
-                            len(r), len(r.intraResidual), len(r.sequential), len(r.mediumRange), len(r.longRange), len(r.ambigious),
+                            len(r), len(r.intraResidual), len(r.sequential), len(r.mediumRange), len(r.longRange), len(r.ambiguous),
                             r.rogScore,
                             r.violCountLower, r.violCount1, r.violCount3, r.violCount5,
                             r.rmsdAv, r.rmsdSd
@@ -2982,7 +3036,7 @@ class DistanceRestraint(Restraint):
     def classify(self):
         """
         Return 0,1,2,3 depending on sequential, intra-residual, medium-range or long-range
-        Simply ignore ambigious assigned NOEs for now and take it as the first atom pair
+        Simply ignore ambiguous assigned NOEs for now and take it as the first atom pair
 
         return -1 on error
         """
@@ -3014,7 +3068,7 @@ class DistanceRestraint(Restraint):
         #end if
     #end def
 
-    def isAmbigious(self):
+    def isAmbiguous(self):
         return len(self.atomPairs) > 1
     #end def
 
@@ -3150,7 +3204,11 @@ class DistanceRestraint(Restraint):
             self.violMax = max(vAbs)
             self.violSum = sum(vAbs)
             self.violUpperMax = max(self.violations)
-            self.violLowerMax = math.fabs(min(self.violations))
+            self.violLowerMax = min(self.violations)
+            if self.violLowerMax < 0.0:
+                self.violLowerMax = math.fabs(self.violLowerMax)
+            else:
+                self.violLowerMax = 0.0
         #end if
 
         return (self.av, self.sd, self.min, self.max)
@@ -3213,7 +3271,7 @@ class DistanceRestraintList(RestraintList):
         self.sequential = NTlist()
         self.mediumRange = NTlist()
         self.longRange = NTlist()
-        self.ambigious = NTlist()
+        self.ambiguous = NTlist()
 
         # Duplicate analysis
         self.uniqueDistancesCount = 0        # count of all defined distance restraints
@@ -3298,7 +3356,7 @@ class DistanceRestraintList(RestraintList):
         self.sequential = NTlist()
         self.mediumRange = NTlist()
         self.longRange = NTlist()
-        self.ambigious = NTlist()
+        self.ambiguous = NTlist()
 
         for dr in self:
             dr.calculateAverage()
@@ -3326,7 +3384,7 @@ class DistanceRestraintList(RestraintList):
             elif c == 3:
                 self.longRange.append(dr)
             #end if
-            if dr.isAmbigious(): self.ambigious.append(dr)
+            if dr.isAmbiguous(): self.ambiguous.append(dr)
         #end for
 
         #Set max violations
@@ -3354,7 +3412,7 @@ class DistanceRestraintList(RestraintList):
         """
         pairs = {}
         for dr in self:
-            dr.atomPairs.sort() # improves matching for ambigious restraints
+            dr.atomPairs.sort() # improves matching for ambiguous restraints
             t = tuple(dr.atomPairs)
             pairs.setdefault(t, [])
             pairs[t].append(dr)
@@ -3379,11 +3437,11 @@ class DistanceRestraintList(RestraintList):
         msg = sprintf(
 '''
 classes
-  sequential:         %4d
   intra-residual:     %4d
+  sequential:         %4d
   medium-range:       %4d
   long-range:         %4d
-  ambigious:          %4d
+  ambiguous:          %4d
 
 counts
   singly defined      %4d
@@ -3402,7 +3460,11 @@ violations
 
 ROG score:         %7s
 ''',
-                        len(self.intraResidual), len(self.sequential), len(self.mediumRange), len(self.longRange), len(self.ambigious),
+                        len(self.intraResidual),
+                        len(self.sequential),
+                        len(self.mediumRange),
+                        len(self.longRange),
+                        len(self.ambiguous),
 
                         len(self.withoutDuplicates),
                         self.uniqueDistancesCount - len(self.withoutDuplicates),

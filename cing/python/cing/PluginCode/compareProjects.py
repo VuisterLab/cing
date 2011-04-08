@@ -503,7 +503,7 @@ def printRestraintScores( projects, stream=sys.stdout ):
             for r in p.distances:
                 fprintf( stream,'  %-23s %5d %5d %5d %5d %5d %5d   %-7s  %4d %4d %4d %4d    %5.3f +- %5.3f\n',
                         r.name,
-                        len(r), len(r.intraResidual), len(r.sequential), len(r.mediumRange), len(r.longRange), len(r.ambigious),
+                        len(r), len(r.intraResidual), len(r.sequential), len(r.mediumRange), len(r.longRange), len(r.ambiguous),
                         r.rogScore,
                         r.violCountLower, r.violCount1, r.violCount3, r.violCount5,
                         r.rmsdAv, r.rmsdSd

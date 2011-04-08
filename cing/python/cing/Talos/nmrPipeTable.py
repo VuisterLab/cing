@@ -195,7 +195,7 @@ class nmrPipeTable( NTdict ):
         """
         Read table from tabFile
         """
-        NTmessage('==> Reading nmrPipe table file ... ' )
+#        NTmessage('==> Reading nmrPipe table file ... ' )
 
         #end if
 

@@ -886,7 +886,7 @@ nrows:    %d''', self.tabFile, self.columnDefs.zap('name'), self.nrows
         """
         Read table from tabFile
         """
-        NTmessage('Reading nmrPipe table file %s', tabFile )
+#        NTmessage('Reading nmrPipe table file %s', tabFile )
 
         #end if
 

@@ -94,7 +94,8 @@ def runCingChecks( project, toFile=True, ranges=None ):
 "Need this here so the code can be tested. I.e. returns a meaningful status if needed."
 def validate( project, ranges=None, parseOnly=False, htmlOnly=False,
         doShiftx = True,
-        doProcheck = True, doWhatif=True, doWattos=True, doTalos=True, doQueeny=True, doSuperpose = True, filterVasco = False,
+        doProcheck = True, doWhatif=True, doWattos=True, doTalos=True, doQueeny=True, doSuperpose = True,
+        filterVasco = False, filterTopViolations = False,
         validateFastest = False, validateCingOnly = False, validateImageLess = False ):
     if ranges == None:
         ranges = project.molecule.ranges
@@ -141,6 +142,9 @@ def validate( project, ranges=None, parseOnly=False, htmlOnly=False,
             # end if
         # end if
     # end if
+    if filterTopViolations:
+        if not project.filterHighRestraintViol():
+            NTerror("Failed to filterHighRestraintViol but will continue with validation.")
 
     project.runCingChecks(toFile=True, ranges=ranges)
     project.setupHtml()
@@ -1272,7 +1276,7 @@ def moleculeValidateAssignments( molecule  ):
     # end for
     ft = 0.
     if tt:
-        ft = (1. * at) / tt    
+        ft = (1. * at) / tt
     msg += '   %s %s/%s/%.2f' % ( 'combined', at, tt, ft)
     NTmessage("==> Found assigned/overall/fraction for spins: " + msg)
 #    NTdebug("==> Only spins with fraction >= %.2f will be flagged when missing: %s" % ( FRACTION_REQUIRED, str(hasAssignment)))

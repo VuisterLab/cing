@@ -144,7 +144,7 @@ class CingSummary( NTdict ):
         """Return a single tuple of relevant results ed.
         """
         return (drl.name, drl.status,
-                len(drl), len(drl.intraResidual), len(drl.sequential),len(drl.mediumRange),len(drl.longRange),len(drl.ambigious),
+                len(drl), len(drl.intraResidual), len(drl.sequential),len(drl.mediumRange),len(drl.longRange),len(drl.ambiguous),
                 NTvalue(drl.rmsdAv, drl.rmsdSd, fmt='%.4f +/ %.4f'), drl.violCountLower, drl.violCount1, drl.violCount3, drl.violCount5, str(drl.rogScore)
                )
     #end def

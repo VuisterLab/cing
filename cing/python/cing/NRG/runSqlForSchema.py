@@ -1,6 +1,6 @@
 """
 Execute like:
-python -u $CINGROOT/python/cing/NRG/runSqlForSchema.py devnrgcing    $CINGROOT/python/cing/NRG/sql/setupDB-CING_psql.sql  .
+python -u $CINGROOT/python/cing/NRG/runSqlForSchema.py devnrgcing    $CINGROOT/python/cing/NRG/sql/setup_Schema.sql  .
 python -u $CINGROOT/python/cing/NRG/runSqlForSchema.py devnrgcing    $CINGROOT/python/cing/NRG/sql/createDB-CING_psql.sql  .
 
 python -u $CINGROOT/python/cing/NRG/runSqlForSchema.py nrgcing    $CINGROOT/python/cing/NRG/sql/dumpNRG-CING.sql        $D/NRG-CING/pgsql

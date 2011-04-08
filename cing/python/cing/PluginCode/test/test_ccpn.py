@@ -41,6 +41,7 @@ class AllChecks(TestCase):
         doQueeny = True
         doTalos = True
         filterVasco = True
+        filterTopViolations = True
         useNrgArchive = False
         ranges = CV_STR
 #        ranges='173-177'
@@ -127,8 +128,8 @@ class AllChecks(TestCase):
                     ccpnFile = entryId # set to local dir now.
                 # end if doSwapCheck
                 self.assertTrue(project.initCcpn(ccpnFolder = ccpnFile, modelCount=modelCount))
-                if doSave:
-                    self.assertTrue(project.save())
+#                if doSave:
+#                    self.assertTrue(project.save())
 
             if False:
                 ranges = "173-183"
@@ -155,7 +156,8 @@ class AllChecks(TestCase):
                                               doWattos=doWattos,
                                               doQueeny = doQueeny,
                                               doTalos=doTalos,
-                                              filterVasco=filterVasco
+                                              filterVasco=filterVasco,
+                                              filterTopViolations = filterTopViolations
                                                ))
                 if doWattos:
                     mol = project.molecule

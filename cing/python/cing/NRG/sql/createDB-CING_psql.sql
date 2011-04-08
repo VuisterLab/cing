@@ -65,6 +65,11 @@ CREATE TABLE casdcing.cingentry
     res_count                      INT DEFAULT NULL,     -- (30) number of residues
     model_count                    INT DEFAULT NULL,
     distance_count                 INT DEFAULT NULL,
+    distance_count_sequential      INT DEFAULT NULL,
+    distance_count_intra_residual  INT DEFAULT NULL,
+    distance_count_medium_range    INT DEFAULT NULL,
+    distance_count_long_range      INT DEFAULT NULL,
+    distance_count_ambiguous       INT DEFAULT NULL,
     dihedral_count                 INT DEFAULT NULL,
     rdc_count                      INT DEFAULT NULL,
     peak_count                     INT DEFAULT NULL,
@@ -73,6 +78,9 @@ CREATE TABLE casdcing.cingentry
     cs13c_count                    INT DEFAULT NULL,
     cs15n_count                    INT DEFAULT NULL,
     cs31p_count                    INT DEFAULT NULL,
+    ssa_count                      INT DEFAULT NULL,
+    ssa_swap_count                 INT DEFAULT NULL,
+    ssa_deassign_count             INT DEFAULT NULL,
     omega_dev_av_all               FLOAT DEFAULT NULL, --   cing
     cv_backbone                    FLOAT DEFAULT NULL,
     cv_sidechain                   FLOAT DEFAULT NULL,
@@ -348,7 +356,7 @@ CREATE TABLE casdcing.cingresonancelistperatomclass
     entry_id                       INT              NOT NULL,
     atomclass                      VARCHAR(255),          -- atom clas
     csd                            FLOAT DEFAULT NULL,
-    csd_err                        FLOAT DEFAULT NULL,    
+    csd_err                        FLOAT DEFAULT NULL,
     rog                            INT DEFAULT NULL,
     FOREIGN KEY (resonancelist_id) REFERENCES casdcing.cingresonancelist (resonancelist_id) ON DELETE CASCADE,
     FOREIGN KEY (entry_id)         REFERENCES casdcing.cingentry (entry_id) ON DELETE CASCADE
