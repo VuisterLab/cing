@@ -250,7 +250,7 @@ class nrgCing(Lister):
 #        new_hits_entry_list = ['1brv']
     #    new_hits_entry_list         = string.split("2jqv 2jnb 2jnv 2jvo 2jvr 2jy7 2jy8 2oq9 2osq 2osr 2otr 2rn9 2rnb")
 
-        if 1: # DEFAULT False; use for processing a specific batch.
+        if 0: # DEFAULT False; use for processing a specific batch.
             entryListFileName = os.path.join(self.results_dir, 'entry_list_todo_all.csv')
             new_hits_entry_list = readLinesFromFile(entryListFileName)
 #            new_hits_entry_list = new_hits_entry_list[100:110]

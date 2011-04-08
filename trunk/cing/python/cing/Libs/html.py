@@ -16,10 +16,10 @@ from cing.Libs.find import find2 # Important to differ from NTutil's otherwise f
 from cing.PluginCode.required.reqMatplib import MATPLIB_STR
 from cing.PluginCode.required.reqMolgrap import MOLGRAP_STR
 from cing.PluginCode.required.reqNih import * #@UnusedWildImport
+from cing.PluginCode.required.reqNmrStar import * #@UnusedWildImport
 from cing.PluginCode.required.reqWattos import * #@UnusedWildImport
 from cing.PluginCode.required.reqWhatif import * #@UnusedWildImport
 from cing.PluginCode.required.reqX3dna import X3DNA_STR
-from cing.STAR.File import File
 from cing.STAR.Utils import getHumanTagName
 from cing.core.classes2 import resonanceListGetIndexFirstObjectWithRealValue
 from cing.core.parameters import cingPaths
@@ -3458,71 +3458,19 @@ class RestraintListHTMLfile( HTMLfile ):
 
         Return True on error.
         """
-        projectDistList = self.project.distances
-        if not len(projectDistList):
-            NTerror("self.project.distances is empty but FC meta data will still be added.")
-            return True
-        star_text = getDeepByKeysOrAttributes( projectDistList, STEREO_ASSIGNMENT_CORRECTIONS_STAR_STR)
-        if not star_text:
-            NTdebug("Skipping creation of stereoAssignmentCorrectionsStar because none available.")
+        saveFrameAssign = self.project.getSaveFrameAssign()
+        if not saveFrameAssign:
+            NTdebug("No SSA saveframe embedded.")
             return
-
-        starFile = File()
-        if starFile.parse(text=star_text):
-            NTerror( "reading STAR text by STAR api." )
-            return True
-        if starFile.check_integrity():
-            print "Error: STAR text failed integrity check."
-            return True
-
-
-        sfList = starFile.getSaveFrames(category = "stereo_assignments")
-        if not sfList or len(sfList) != 1:
-            NTerror("Failed to get single saveframe but got list of: [%s]" % sfList)
-            return True
-
-        saveFrameAssign = sfList[0]
         tagTableAssignHeader = saveFrameAssign.tagtables[0]
         gS = tagTableAssignHeader.getString
 #        gF = tagTableAssignHeader.getFloat
 #        gI = tagTableAssignHeader.getInt
 
-        tagNameList = """
-            Triplet_count
-            Swap_count
-            Swap_percentage
-            Deassign_count
-            Deassign_percentage
-            Model_count
-            Total_e_low_states
-            Total_e_high_states
-            Crit_abs_e_diff
-            Crit_rel_e_diff
-            Crit_mdls_favor_pct
-            Crit_sing_mdl_viol
-            Crit_multi_mdl_viol
-            Crit_multi_mdl_pct
-            """.split()
-        tagNameListSize = len(tagNameList)
-        tagNameDescriptionList = [
-            "Number of triplets (atom-group pair and pseudo)",
-            "Number of triplets that were swapped",
-            "Percentage of triplets that were swapped",
-            "Number of deassigned triplets",
-            "Percentage of deassigned triplets",
-            "Number of models in ensemble",
-            "Energy of the states with the lower energies summed for all triplets (Ang.**2) ensemble averaged",
-            "Energy of the states with the higher energies summed for all triplets (Ang.**2) ensemble averaged",
-            "Criterium for swapping assignment on the absolute energy difference (Ang.**2)",
-            "Criterium for swapping assignment on the relative energy difference (Ang.**2)",
-            "Criterium for swapping assignment on the percentage of models favoring a swap",
-            "Criterium for deassignment on a single model violation (Ang.)",
-            "Criterium for deassignment on a multiple model violation (Ang.)",
-            "Criterium for deassignment on a percentage of models"
-        ]
+        tagNameListSize = len(tagNameListSsaHeader)
 
 #        tagTypeIidxList = [0,1,3,5] # integers
-        valueList = [ gS("_Stereo_assign_list."+tagNameList[i]) for i in range(tagNameListSize)]
+        valueList = [ gS("_Stereo_assign_list."+tagNameListSsaHeader[i]) for i in range(tagNameListSize)]
         columnFormatsHeader = [   ('Property', {'title':'Parameter of stereospecific assignment check'} ),
                                   ('Value',    {'title':'Plain value'} ),
                                   ]
@@ -3532,8 +3480,9 @@ class RestraintListHTMLfile( HTMLfile ):
         k1 = 'togglable-element-ssa' # key to division unique within page.
         onclickStr = "showHideByCheckBox('%s', this)" % (k1)
         boxStr = "Stereospecific assignment corrections"
+        titleStr = 'Select this box to see the stereospecific assignment corrections made to the distance restraints if any'
 #        boxStr += " " + time.asctime() # for debugging labelled with timestamp
-        self.main("h3", '', closeTag = False)
+        self.main("h3", '', title=titleStr, closeTag = False)
         self.main("input", boxStr, type="checkbox", onclick=onclickStr, **checkBoxClassAttr)
         self.main("h3", openTag = False)
 #        styleDisplayStr =  'display:' # Means item will be shown.
@@ -3541,8 +3490,8 @@ class RestraintListHTMLfile( HTMLfile ):
         self.main("div", closeTag=False, id=k1, style=styleDisplayStr)
         tableHeader = MakeHtmlTable( self.main, showHeader=False, columnFormats=columnFormatsHeader, classId="display", id="dataTables-DRSsaHeader", **tableKwdsHeader )
         for rowIdx in tableHeader.rows(range(tagNameListSize)): # count the abov
-            humanTagName = getHumanTagName(tagNameList[rowIdx])
-            cellKwds = {'title': tagNameDescriptionList[rowIdx]}
+            humanTagName = getHumanTagName(tagNameListSsaHeader[rowIdx])
+            cellKwds = {'title': tagNameDescriptionListSsaHeader[rowIdx]}
             tableHeader.nextColumn(humanTagName, **cellKwds )
             tableHeader.nextColumn(str(valueList[rowIdx]))
         # end for
@@ -3635,11 +3584,11 @@ class RestraintListHTMLfile( HTMLfile ):
 
         msg = '''
 <table>
-<TR><TD>sequential    </TD><TD align="right">%4d</TD></TR>
 <TR><TD>intra-residual</TD><TD align="right">%4d</TD></TR>
+<TR><TD>sequential    </TD><TD align="right">%4d</TD></TR>
 <TR><TD>medium-range  </TD><TD align="right">%4d</TD></TR>
 <TR><TD>long-range    </TD><TD align="right">%4d</TD></TR>
-<TR><TD>ambigious     </TD><TD align="right">%4d</TD></TR>
+<TR><TD>ambiguous     </TD><TD align="right">%4d</TD></TR>
 <TR><TD>sum           </TD><TD align="right">%4d</TD></TR>
 </table>
 
@@ -3655,7 +3604,7 @@ class RestraintListHTMLfile( HTMLfile ):
             len(self.restraintList.sequential),
             len(self.restraintList.mediumRange),
             len(self.restraintList.longRange),
-            len(self.restraintList.ambigious),
+            len(self.restraintList.ambiguous),
             len(self.restraintList),
             val2Str(self.restraintList.rmsdAv, "%7.3f", 7), val2Str(self.restraintList.rmsdSd, "%6.3f", 6),
             self.restraintList.violCountLower,
