@@ -764,11 +764,11 @@ Project: Top level Cing project class
         Return None on error.
         """
         if not len(self.distances):
-            NTdebug("self.project.distances is empty.")
+#            NTdebug("self.project.distances is empty.")
             return
         star_text = getDeepByKeysOrAttributes( self.distances, STEREO_ASSIGNMENT_CORRECTIONS_STAR_STR)
         if not star_text:
-            NTdebug("No SSA info embedded.")
+#            NTdebug("No SSA info embedded.")
             return
         starFile = File()
         if starFile.parse(text=star_text):
@@ -791,7 +791,7 @@ Project: Top level Cing project class
         """
         saveFrameAssign = self.getSaveFrameAssign()
         if not saveFrameAssign:
-            NTdebug("No SSA saveframe embedded.")
+#            NTdebug("No SSA saveframe embedded.")
             return
         tagTableAssignHeader = saveFrameAssign.tagtables[0]
         gI = tagTableAssignHeader.getInt
@@ -1151,8 +1151,8 @@ Project: Top level Cing project class
     fileName       Enter file name (with path) for output of removed constraints.
     """
     def filterHighRestraintViol(self, restraintLoL = None, cutoff=2.0, maxRemove=3, toFile=True,
-                                fileName = 'distance_restraint_list_high_violations_filtered.str'):
-        cutoff= 0.10 # DEFAULT: disabled
+                                fileName = DISTANCE_RESTRAINT_LIST_HIGH_VIOLATIONS_FILTERED_STR):
+#        cutoff= 0.10 # DEFAULT: disabled
         NTmessage( "==> Doing filterHighDistanceViol with arguments: cutoff %s maxRemove %s" % ( cutoff, maxRemove))
 
         if restraintLoL == None:

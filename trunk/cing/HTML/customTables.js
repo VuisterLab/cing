@@ -39,26 +39,25 @@ jQuery(document).ready(function() {
         "iDisplayLength": 10000,
         "bFilter": true,
         "bProcessing": true,
+        "bAutoWidth": false, // recalculates the column widths on the fly but as this fails it's switched off.
         "sDom": 'T<"clear">lfrtip'
 //        "bStateSave": true, // uses cookie! test first! Not really nicer..
-//        "bAutoWidth": false,
     } );
 
 
-    $("table[id^='dataTables-DRSsaHeader']").dataTable({
-        "bSort": false,
-        "bPaginate": false,
-        "bLengthChange": false,
-        "bFilter": false,
-        "bInfo": false,
-        "bProcessing": false,
-//        "sDom": 'T<"clear">lfrtip',
-        "bAutoWidth": true,
-        "aoColumns": [
-                      { "sType": "html",    "sClass": "left" }, // parameter
-                      { "sType": "numeric", "sClass": "left" }  // value
-                  ]
-    } );
+//    $("table[id^='dataTables-DRSsaHeader']").dataTable({
+//        "bSort": false,
+//        "bPaginate": false,
+//        "bLengthChange": false,
+//        "bFilter": false,
+//        "bInfo": false,
+//        "bProcessing": false,
+////        "sDom": 'T<"clear">lfrtip',
+//        "aoColumns": [
+//                      { "sType": "html",    "sClass": "left" }, // parameter
+//                      { "sType": "numeric", "sClass": "left" }  // value
+//                  ]
+//    } );
 
     $("table[id^='dataTables-DRSsaMain']").dataTable({
         "bSort": true,
@@ -69,6 +68,7 @@ jQuery(document).ready(function() {
         "bFilter": true,
         "bInfo": true,
         "bProcessing": true,
+        "bAutoWidth": false,
         "sDom": 'T<"clear">lfrtip',
         "aoColumns": [
                       {"sType": "numeric", "sClass": "right" }, // 1 #
@@ -101,6 +101,7 @@ jQuery(document).ready(function() {
         "bFilter": true,
         "bInfo": true,
         "bProcessing": true,
+        "bAutoWidth": false,
         "sDom": 'T<"clear">lfrtip',
         "aoColumns": [
                       { "sType": "numeric", "sClass": "right" }, // #
@@ -141,6 +142,7 @@ jQuery(document).ready(function() {
         "bFilter": true,
         "bInfo": true,
         "bProcessing": true,
+        "bAutoWidth": false,
         "sDom": 'T<"clear">lfrtip',
         "aoColumns": [
                       { "sType": "numeric", "sClass": "right" },// #
@@ -175,6 +177,7 @@ jQuery(document).ready(function() {
         "bFilter": true,
         "bInfo": true,
         "bProcessing": true,
+        "bAutoWidth": false,
         "sDom": 'T<"clear">lfrtip',
         "aoColumns": [
                       { "sType": "numeric", "sClass": "right" }, // #
@@ -204,6 +207,7 @@ jQuery(document).ready(function() {
         "bFilter": true,
         "bInfo": true,
         "bProcessing": true,
+        "bAutoWidth": false,
         "sDom": 'T<"clear">lfrtip',
         "aoColumns": [
                       { "sType": "numeric", "sClass": "right" }, // #
@@ -239,6 +243,7 @@ jQuery(document).ready(function() {
         "bFilter": true,
         "bInfo": true,
         "bProcessing": true,
+        "bAutoWidth": false,
         "sDom": 'T<"clear">lfrtip',
         "aoColumns": [
                       { "sType": "numeric", "sClass": "right" }, // #
@@ -280,6 +285,7 @@ jQuery(document).ready(function() {
         "bFilter": true,
         "bInfo": true,
         "bProcessing": true,
+        "bAutoWidth": false,
         "sDom": 'T<"clear">lfrtip',
         "aoColumns": [
                       { "sType": "numeric", "sClass": "right" }, // #
@@ -329,6 +335,8 @@ jQuery(document).ready(function() {
         "iDisplayLength": 10,
         "bInfo": true,
         "bProcessing": true,
+        "bAutoWidth": false,
+        "sDom": 'T<"clear">lfrtip',
         "aaSorting": [[8,'desc'],[0,'asc']],
         "aoColumns": [
           { "sType": "html", "sClass": "right" }, // 0 #
@@ -350,6 +358,8 @@ jQuery(document).ready(function() {
         "iDisplayLength": 10,
         "bInfo": true,
         "bProcessing": true,
+        "bAutoWidth": false,
+        "sDom": 'T<"clear">lfrtip',
         "aaSorting": [[9,'desc'],[0,'asc']],
         "aoColumns": [
 /*          { "sType": "numeric", "sClass": "right", "bVisible": false, "sWidth": "30em"  }, */

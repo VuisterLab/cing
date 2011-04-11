@@ -142,12 +142,12 @@ class RestraintList(NTlist):
 class ResonanceList(NTlist):
     """
     Contains ResonanceList meta data.
-    NB the name is not necessarily unique within even the molecule. 
-    I.e. for PDB entry 1cjg and from NMR-STAR entry 4813 will get the resonance list name bmr4813_21.str twice from CCPN. 
+    NB the name is not necessarily unique within even the molecule.
+    I.e. for PDB entry 1cjg and from NMR-STAR entry 4813 will get the resonance list name bmr4813_21.str twice from CCPN.
     """
     SML_SAVE_ATTRIBUTE_LIST = 'name status vascoApplied vascoResults'.split() # Used in cing.core.sml.SMLNTListWithAttrHandler
     # use the same spelling through out.
-    
+
     # NB the unusual init. Differs in that arguments aren't added to the list.
     def __init__(self, name, status = 'keep'):
         NTlist.__init__(self)
@@ -162,7 +162,7 @@ class ResonanceList(NTlist):
         self.rogScore = ROGscore()
         self.SMLhandler.SML_SAVE_ATTRIBUTE_LIST = self.SML_SAVE_ATTRIBUTE_LIST
     #end def
-    
+
     def hasVascoCorrectionsApplied(self):
         'A little bit more sophisticated routine to report no corrections of zero.'
         return self.vascoApplied and self.hasVascoCorrectionsApplicable()
@@ -174,30 +174,30 @@ class ResonanceList(NTlist):
             ntvalue =  self.vascoResults[ atomId ]
             rerefValue = ntvalue.value
             rerefError = ntvalue.error
-            useCorrection = math.fabs(rerefValue) >= VASCO_CERTAINTY_FACTOR_CUTOFF * rerefError # sync with molecule code.      
+            useCorrection = math.fabs(rerefValue) >= VASCO_CERTAINTY_FACTOR_CUTOFF * rerefError # sync with molecule code.
             if useCorrection:
                 return True
             # end if
-        # end for 
+        # end for
         return False
     #end def
-            
+
     def __str__(self):
-        return sprintf('<%s "%s">' % (self.__CLASS__, self.name))        
+        return sprintf('<%s "%s">' % (self.__CLASS__, self.name))
 #        return self.toVascoHtmlList() # modify when needed.
-    
+
     def toVascoHtmlList(self, showHeader = False):
         'If showIndividualApplication the output will be multiple lines.'
         s = ''
         if showHeader:
-            s += '<h3>' 
-            s += self.name                
+            s += '<h3>'
+            s += self.name
             if self.vascoApplied:
                 s += ' (applied)'
             else:
                 s += ' (ignored)'
             s += '</h3>\n'
-        s += '<ul>\n'   
+        s += '<ul>\n'
         for atomId in self.vascoResults.keys():
             ntvalue =  self.vascoResults[ atomId ]
             s += '<li>'
@@ -207,13 +207,15 @@ class ResonanceList(NTlist):
             s += '%s: %s' % ( atomClassId, ntvalue)
             rerefValue = ntvalue.value
             rerefError = ntvalue.error
-            useCorrection = math.fabs(rerefValue) >= VASCO_CERTAINTY_FACTOR_CUTOFF * rerefError            
+            useCorrection = math.fabs(rerefValue) >= VASCO_CERTAINTY_FACTOR_CUTOFF * rerefError
             if useCorrection:
                 s += ' applied'
+            else:
+                s += ' not applied'
             # end if
             s += '</li>\n'
         # end for
-        s += '</ul>\n'        
+        s += '</ul>\n'
         return s
     #end def
     def __repr__(self):
@@ -289,10 +291,10 @@ class ResonanceList(NTlist):
 
 class StereoAssignmentCorrection(NTdict):
     """
-    Contains meta data on the corrections done for stereospecific assignments such as 
+    Contains meta data on the corrections done for stereospecific assignments such as
     in stereoAssignmentSwap TODO: finish, just a placeholder for now.
     """
-    
+
 # end class
 
 def resonanceListGetIndexFirstObjectWithRealValue(resonanceList):
