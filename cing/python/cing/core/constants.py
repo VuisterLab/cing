@@ -137,10 +137,11 @@ VIOL3_STR = 'violCount3'
 VIOL5_STR = 'violCount5'
 
 RESONANCES_STR = 'resonances'
-RESONANCE_LIST_IDX_ANY = -999 # will match assignment in any resonance list. 
+RESONANCE_LIST_IDX_ANY = -999 # will match assignment in any resonance list.
 MERGED_STR = 'merged'
 RESONANCE_SOURCES_STR = 'resonanceSources'
 STEREO_ASSIGNMENT_CORRECTIONS_STAR_STR = 'stereoAssignmentCorrectionsStar'
+DISTANCE_RESTRAINT_LIST_HIGH_VIOLATIONS_FILTERED_STR = 'distance_restraint_list_high_violations_filtered.txt'
 
 # SQL stuff
 NAME_STR        = 'name'

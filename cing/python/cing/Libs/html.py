@@ -3089,7 +3089,7 @@ class AtomsHTMLfile( HTMLfile ):
         self.insertMinimalHeader( self.atomList )
 
             # Add links to specific lists
-        if self.resonanceListIdx == None:
+        if self.resonanceListIdx == None: # MAIN list
 #            hasVascoCorrections = False
             openedVascoList = False
             for i in range( len(self.project.molecule.resonanceSources)):
@@ -3101,7 +3101,7 @@ class AtomsHTMLfile( HTMLfile ):
                 if resonanceList.hasVascoCorrectionsApplied():
 #                    hasVascoCorrections = True
                     if not openedVascoList:
-                        self.main('', 'Vasco rereferenced: ')
+                        self.main('', 'Vasco rereferencing information: ')
 #                        self.main('ol', closeTag=False)
                         openedVascoList = True
                     self.main('a', resonanceList.name, href = self._getFileName(i))
@@ -3111,7 +3111,7 @@ class AtomsHTMLfile( HTMLfile ):
                 relatedAtomsHTMLfile = self.relatedAtomsHTMLfileList[ i ]
                 relatedAtomsHTMLfile.generateHtml()
             #end for
-        else:
+        else: # SPECIFIC list
             # Add link to main list
             i = None
             fn = self._getFileName(i)
@@ -3120,8 +3120,16 @@ class AtomsHTMLfile( HTMLfile ):
             # Add specific Vasco info
             resonanceList = self.project.molecule.resonanceSources[self.resonanceListIdx]
             if resonanceList.hasVascoCorrectionsApplied():
-                self.main('h3', 'Vasco rereferenced:')
+                k1 = 'togglable-element-vasco' # key to division unique within page.
+                onclickStr = "showHideByCheckBox('%s', this)" % (k1)
+                boxStr = "Vasco rereferencing information"
+                self.main("h3", '', closeTag = False)
+                self.main("input", boxStr, type="checkbox", onclick=onclickStr, **checkBoxClassAttr)
+                self.main("h3", openTag = False)
+                styleDisplayStr =  'display:none'
+                self.main("div", closeTag=False, id=k1, style=styleDisplayStr)
                 self.main('', resonanceList.toVascoHtmlList())
+                self.main("div", openTag=False)
             # end if
         # end if
 
@@ -3170,27 +3178,21 @@ class AtomsHTMLfile( HTMLfile ):
 
         # reenable after testing is done.
         atomCritiquedPresent = len(atomListCritiqued) > 0
-#        atomCritiquedPresent =  False
-
         k1 = 'togglable-element-short' # key to division unique within page.
         k2 = 'togglable-element-long'
-        self.main('h1', 'Atoms', closeTag=False)
-
-        onclickStr = "toggleShowHideByCheckBox('%s', '%s', this)" % (k1, k2)
-        boxStr = "show critiqued or all"
 
         if atomCritiquedPresent:
-#           checked="false"
+            onclickStr = "toggleShowHideByCheckBox('%s', '%s', this)" % (k1, k2)
+            boxStr = "Only critiqued atoms"
+            self.main('h3', '', closeTag=False)
             self.main("input", boxStr, type="checkbox", onclick=onclickStr, **checkBoxClassAttr)
-        self.main('h1', openTag=False)
-
-        if atomCritiquedPresent:
+            self.main('h3', openTag=False)
             # Make short hidden table.
 #            styleDisplayStr =  'display:' # Means item will be shown.
 #            if atomCritiquedPresent:
             styleDisplayStr =  'display:none'
             self.main("div", closeTag=False, id=k1, style=styleDisplayStr)
-            self.main("h1", "Critiqued atoms")
+#            self.main("h1", "Critiqued atoms")
             table = MakeHtmlTable( self.main, columnFormats=columnFormats, classId="display", id="dataTables-atomList-short" , **tableKwds )
             for atom in table.rows( atomListCritiqued ):
                 self._atomRow( atom, table )
@@ -3198,7 +3200,7 @@ class AtomsHTMLfile( HTMLfile ):
 
 
         self.main("div", closeTag=False, id=k2)
-        self.main("h1", "All atoms")
+#        self.main("h1", "All atoms")
         table = MakeHtmlTable( self.main, columnFormats=columnFormats, classId="display", id="dataTables-atomList-long", **tableKwds )
         for atom in table.rows(atomListShown): # TODO select all when done debugging.
             self._atomRow( atom, table )
@@ -3453,6 +3455,33 @@ class RestraintListHTMLfile( HTMLfile ):
     #end def
 
 
+    def _generateDistanceRestraintFilterHighViolationCorrectionsHtml(self, htmlOnly=False):
+        """Generate html for filtered highly violating restraints.
+
+        Return True on error.
+        """
+        p = self.project
+        fileName = p.path(p.molecule.name, p.moleculeDirectories.analysis, DISTANCE_RESTRAINT_LIST_HIGH_VIOLATIONS_FILTERED_STR)
+        if not os.path.exists(fileName):
+            return
+        k1 = 'togglable-element-filter_high_violation' # key to division unique within page.
+        onclickStr = "showHideByCheckBox('%s', this)" % (k1)
+        boxStr = "Filtered severe violations"
+        titleStr = 'Show the few restraints that were filtered out because they were violated severely.'
+        self.main("h3", '', title=titleStr, closeTag = False)
+        self.main("input", boxStr, type="checkbox", onclick=onclickStr, **checkBoxClassAttr)
+        self.main("h3", openTag = False)
+
+        styleDisplayStr =  'display:none'
+        self.main("div", closeTag=False, id=k1, style=styleDisplayStr)
+        txt = readTextFromFile(fileName)
+        if not txt:
+            NTerror("Failed to read: " + fileName)
+            return True
+        self.main("pre", txt)
+        self.main("div", openTag=False)
+    #end def
+
     def _generateDistanceRestraintSsaCorrectionsHtml(self, htmlOnly=False):
         """Generate html for stereoAssignmentCorrectionsStar listing from STAR txt.
 
@@ -3475,12 +3504,12 @@ class RestraintListHTMLfile( HTMLfile ):
                                   ('Value',    {'title':'Plain value'} ),
                                   ]
 #        tableKwdsHeader = {"cellpadding":"0", "cellspacing":"0", "border":"0", "float":"left", "clear": "both"}
-        tableKwdsHeader = {"cellpadding":"0", "cellspacing":"0", "border":"0" }
+#        tableKwdsHeader = {"cellpadding":"0", "cellspacing":"0", "border":"0" }
 
         k1 = 'togglable-element-ssa' # key to division unique within page.
         onclickStr = "showHideByCheckBox('%s', this)" % (k1)
         boxStr = "Stereospecific assignment corrections"
-        titleStr = 'Select this box to see the stereospecific assignment corrections made to the distance restraints if any'
+        titleStr = 'Show the stereospecific assignment corrections made to the distance restraints if any.'
 #        boxStr += " " + time.asctime() # for debugging labelled with timestamp
         self.main("h3", '', title=titleStr, closeTag = False)
         self.main("input", boxStr, type="checkbox", onclick=onclickStr, **checkBoxClassAttr)
@@ -3488,7 +3517,8 @@ class RestraintListHTMLfile( HTMLfile ):
 #        styleDisplayStr =  'display:' # Means item will be shown.
         styleDisplayStr =  'display:none'
         self.main("div", closeTag=False, id=k1, style=styleDisplayStr)
-        tableHeader = MakeHtmlTable( self.main, showHeader=False, columnFormats=columnFormatsHeader, classId="display", id="dataTables-DRSsaHeader", **tableKwdsHeader )
+#        tableHeader = MakeHtmlTable( self.main, showHeader=False, columnFormats=columnFormatsHeader, classId="display", id="dataTables-DRSsaHeader", **tableKwdsHeader )
+        tableHeader = MakeHtmlTable( self.main, showHeader=False, columnFormats=columnFormatsHeader)
         for rowIdx in tableHeader.rows(range(tagNameListSize)): # count the abov
             humanTagName = getHumanTagName(tagNameListSsaHeader[rowIdx])
             cellKwds = {'title': tagNameDescriptionListSsaHeader[rowIdx]}
@@ -3518,6 +3548,8 @@ class RestraintListHTMLfile( HTMLfile ):
         tableKwds = {"cellpadding":"0", "cellspacing":"0", "border":"0"}
 #        self.main("h3", "Info per atom group %s" % time.asctime())
         tagTableAssign = saveFrameAssign.tagtables[1]
+
+#        self.main("br", '')
         table = MakeHtmlTable( self.main, columnFormats=columnFormats, classId="display", id="dataTables-DRSsaMain", **tableKwds )
         colCount = len(columnFormats)
         rowCount = tagTableAssign.getRowCount()
@@ -3634,13 +3666,13 @@ class RestraintListHTMLfile( HTMLfile ):
 
         Checkbox will toggle between showing either first or second division.
         """
-
         if self._generateDistanceRestraintMetaHtml():
             NTerror("Failed _generateDistanceRestraintMetaHtml")
 
         if self._generateDistanceRestraintSsaCorrectionsHtml(htmlOnly=htmlOnly):
             NTerror("Failed _generateDistanceRestraintSsaCorrectionsHtml")
-
+        if self._generateDistanceRestraintFilterHighViolationCorrectionsHtml(htmlOnly=htmlOnly):
+            NTerror("Failed _generateDistanceRestraintFilterHighViolationCorrectionsHtml")
         columnFormats = [   ('#', {'title':'Restraint number. Only ambiguous restraints show a dot'} ),
 
                             ('ch1', {'title':'Chain identifier of first atom'} ),
@@ -3704,7 +3736,7 @@ class RestraintListHTMLfile( HTMLfile ):
         k2 = 'togglable-element-long'
 
         onclickStr = "toggleShowHideByCheckBox('%s', '%s', this)" % (k1, k2)
-        boxStr = "Only critiques"
+        boxStr = "Only critiqued restraints"
         if itemCritiquedPresent:
 #           checked="false"
             self.main("h3", '', closeTag = False)
@@ -3715,7 +3747,7 @@ class RestraintListHTMLfile( HTMLfile ):
 #            if atomCritiquedPresent:
             styleDisplayStr =  'display:none'
             self.main("div", closeTag=False, id=k1, style=styleDisplayStr)
-            self.main("h3", "Critiqued restraints")
+#            self.main("h3", "Critiqued restraints")
             table = MakeHtmlTable( self.main, columnFormats=columnFormats, classId="display", id="dataTables-DRList-short" , **tableKwds )
 
 
@@ -3726,7 +3758,7 @@ class RestraintListHTMLfile( HTMLfile ):
 
 
         self.main("div", closeTag=False, id=k2)
-        self.main("h3", "All restraints")
+#        self.main("h3", "All restraints")
         table = MakeHtmlTable( self.main, columnFormats=columnFormats, classId="display", id="dataTables-DRList-long", **tableKwds )
         table.rows(range(pairListCount)) # set the rows
 #        for restraint in self.restraintList:
@@ -3783,13 +3815,12 @@ class RestraintListHTMLfile( HTMLfile ):
         k2 = 'togglable-element-long'
 
         onclickStr = "toggleShowHideByCheckBox('%s', '%s', this)" % (k1, k2)
-        boxStr = "show critiqued or all"
-
+        boxStr = "Only critiqued restraints"
         if itemCritiquedPresent:
 #           checked="false"
-            self.main("h1", "Restraints", closeTag = False)
+            self.main("h3", "", closeTag = False)
             self.main("input", boxStr, type="checkbox", onclick=onclickStr, **checkBoxClassAttr)
-            self.main("h1", openTag = False)
+            self.main("h3", openTag = False)
 
         if itemCritiquedPresent:
             # Make short hidden table.
@@ -3797,7 +3828,7 @@ class RestraintListHTMLfile( HTMLfile ):
 #            if atomCritiquedPresent:
             styleDisplayStr =  'display:none'
             self.main("div", closeTag=False, id=k1, style=styleDisplayStr)
-            self.main("h1", "Critiqued restraints")
+#            self.main("h1", "Critiqued restraints")
             table = MakeHtmlTable( self.main, columnFormats=columnFormats, classId="display", id="dataTables-ACList-short" , **tableKwds )
 
             for item in table.rows( itemListCritiqued ):
@@ -3806,7 +3837,7 @@ class RestraintListHTMLfile( HTMLfile ):
 
 
         self.main("div", closeTag=False, id=k2)
-        self.main("h1", "All atoms")
+#        self.main("h1", "All atoms")
         table = MakeHtmlTable( self.main, columnFormats=columnFormats, classId="display", id="dataTables-ACList-long", **tableKwds )
         for item in table.rows( self.restraintList ):
             self._rowAc( item, table )
@@ -3968,13 +3999,14 @@ class PeakListHTMLfile( HTMLfile ):
         k2 = 'togglable-element-long'
 
         onclickStr = "toggleShowHideByCheckBox('%s', '%s', this)" % (k1, k2)
-        boxStr = "show critiqued or all"
+#        boxStr = "show critiqued or all"
+        boxStr = "Only critiqued peaks"
 
         if itemCritiquedPresent:
 #           checked="false"
-            self.main("h1", "Peaks", closeTag = False)
+            self.main("h3", "", closeTag = False)
             self.main("input", boxStr, type="checkbox", onclick=onclickStr, **checkBoxClassAttr)
-            self.main("h1", openTag = False)
+            self.main("h3", openTag = False)
 
         if itemCritiquedPresent:
             # Make short hidden table.
