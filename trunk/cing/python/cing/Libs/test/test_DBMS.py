@@ -4,10 +4,16 @@ python $CINGROOT/python/cing/Libs/test/test_DBMS.py
 """
 from cing import cingDirTestsData
 from cing import cingDirTmp
+from cing import cingRoot
 from cing.Libs.DBMS import DBMS
 from cing.Libs.DBMS import Relation
+from cing.Libs.DBMS import addColumnHeaderRowToCsvFile
+from cing.Libs.DBMS import sortRelationByColumnListFromCsvFile
+from cing.Libs.DBMS import sort_table
 from cing.Libs.NTutils import * #@UnusedWildImport
+from cing.NRG.PDBEntryLists import matchBmrbPdbDataDir
 from glob import glob
+from shutil import copyfile
 from unittest import TestCase
 import unittest
 
@@ -36,6 +42,32 @@ class AllChecks(TestCase):
         rowList = mTableHash['2rop']
         self.assertEqual(11041,rowList[1])
         NTdebug('\n'+str(mTable))
+
+    def testAddColumnHeaderRowToCsvFile(self):
+        adit_fn = 'adit_nmr_matched_pdb_bmrb_entry_ids.csv' # already contains one header row but let's add another one.
+        src = os.path.join(cingRoot, matchBmrbPdbDataDir, adit_fn)
+        copyfile(src, adit_fn)
+        columnOrder = 'bmrb_id pdb_id'.split()
+        self.assertFalse( addColumnHeaderRowToCsvFile(adit_fn, columnOrder))
+
+    def testSortTable(self):
+        mytable = (
+            ('Joe', 'Clark', 1989),
+            ('Charlie', 'Babbitt', 1988),
+            ('Frank', 'Abagnale', 2002),
+            ('Bill', 'Clark', 2009),
+            ('Alan', 'Clark', 1804),
+            )
+        for row in sort_table(mytable, (1,0)):
+            print row
+
+    def testSortCsvFile(self):
+        fn = 'adit_nmr_matched_pdb_bmrb_entry_ids.csv' # already contains one header row but let's add another one.
+#        fn = 'test.csv' # already contains one header row but let's add another one.
+        src = os.path.join(cingRoot, matchBmrbPdbDataDir, fn)
+        copyfile(src, fn)
+        self.assertFalse( sortRelationByColumnListFromCsvFile( fn, columnList=(1,0), containsHeaderRow=True))
+
 
 if __name__ == "__main__":
     cing.verbosity = verbosityDebug

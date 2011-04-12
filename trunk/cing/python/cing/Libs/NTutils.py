@@ -349,7 +349,10 @@ Sum                %s
     def removeDuplicates(self, useVersion = 2):
         """
         Removes all duplicate
-        Can be optimized when needed by doing a sorted lookup table; It is extremely slow to take a slice every time."""
+        Can be optimized when needed by doing a sorted lookup table; It is extremely slow to take a slice every time.
+        Return the duplicate list when using version 2.
+        """
+
         if len(self) <= 1:
             return
 #        useVersion = 2
@@ -386,16 +389,19 @@ Sum                %s
             #end while
         else:
             # Only add new items to a temporary list
+            duplicateList = NTlist()
             seenDictionary = {}
             result = []
             for i in range(len(self)):
                 if not seenDictionary.has_key(self[i]):
                     seenDictionary[ self[i] ] = None
                     result.append( self[i] )
+                else:
+                    duplicateList.append( self[i] )
             #end for
             del self[0:len(self)]
             self.addList(result)
-#            self.
+            return duplicateList
         # end if
     #end def
     def difference(self, other):
@@ -4695,7 +4701,7 @@ def gunzip(fileNameZipped, outputFileName=None, removeOriginal=False):
     outF.write(s)
     outF.close()
     if removeOriginal:
-        NTdebug("Removing file: %s" % fileNameZipped)
+#        NTdebug("Removing file: %s" % fileNameZipped)
         os.unlink(fileNameZipped)
 
 

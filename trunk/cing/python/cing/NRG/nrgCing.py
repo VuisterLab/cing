@@ -24,6 +24,7 @@ Sum                4971048.908
 
 from cing import cingDirScripts
 from cing import cingPythonCingDir
+from cing import cingRoot
 from cing import header
 from cing.Libs import disk
 from cing.Libs.NTgenUtils import analyzeCingLog
@@ -135,30 +136,6 @@ class nrgCing(Lister):
 #        self.matches_many2one = {
 #'1b4y': 4400 ,
 #'1brv': 4020 ,
-#'1bus': 53   ,
-#'1c2n': 1646 ,
-#'1cjg': 4813 ,
-#'1d3z': 6457 ,
-#'1hkt': 4046 ,
-#'1hue': 4047 ,
-#'1ieh': 4969 ,
-#'1iv6': 5317 ,
-#'1mo7': 5577 ,
-#'1mo8': 5576 ,
-#'1nk2': 4141 ,
-#'1ozi': 5762 ,
-#'1p9j': 5801 ,
-#'1pd7': 5808 ,
-#'1qjt': 4491 ,
-#'1vj6': 5131 ,
-#'1y7n': 6113 ,
-#'2fws': 7009 ,
-#'2fwu': 7008 ,
-#'2jmx': 15072,
-#'2jsx': 15381,
-#'2kib': 20074,
-#'2kz0': 16995,
-#'2rop': 11041,
 # }
         # Retrieve the linkages between BMRB and PDB entries.
         self.matches_many2one = getBmrbLinks()
@@ -256,6 +233,28 @@ class nrgCing(Lister):
 #            new_hits_entry_list = new_hits_entry_list[100:110]
 
         NTmessage("In updateWeekly starting with:\n%r" % self)
+
+        if 1: # DEFAULT: 1 disable when testing.
+            NTmessage("Updating matches between BMRB and PDB")
+            try:
+                cmd = "%s/python/cing/NRG/matchBmrbPdb.py" % cingRoot
+                redirectOutputToFile = "matchBmrbPdb.log"
+                matchBmrbPdbProgram = ExecuteProgram(cmd, redirectOutputToFile=redirectOutputToFile)
+                exitCode = matchBmrbPdbProgram()
+                if exitCode:
+                    NTerrorT("Failed to " % cmd)
+                else:
+                    self.matches_many2one = getBmrbLinks()
+            except:
+                NTtracebackError()
+                NTerror("Failed to update matches between BMRB and PDB but continueing with " + getCallerName())
+            # end try
+        # end if
+        if not self.matches_many2one:
+            NTerror("Failed to get BMRB-PDB links")
+            return True
+        # end if
+        NTmessage("Using %s BMRB-PDB matches" % len(self.matches_many2one.keys()))
 
         # Get the PDB info to see which entries can/should be done.
         if self.searchPdbEntries():
@@ -1840,4 +1839,5 @@ Additional modes I see:
         NTtracebackError()
     finally:
         NTmessage(getStopMessage(cing.starttime))
-
+    # end try
+# end if

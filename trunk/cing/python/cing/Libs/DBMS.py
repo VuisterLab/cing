@@ -8,6 +8,7 @@ much like the code in Wattos.Database.DBMS.
 from StringIO import StringIO
 from cing.Libs.NTutils import * #@UnusedWildImport
 import csv
+import operator
 import urllib
 
 DEFAULT_COLUMN_LABEL = 'COLUMN_' # a number will be added.
@@ -80,6 +81,15 @@ class Relation():
         for i in range(self.sizeRows()):
             column[i] = value
     # end def
+
+    def renameColumn(self, idx, label):
+        oldLabel = self.columnOrder[idx]
+#        NTdebug("Renaming column %s at idx %s to %s" % (oldLabel, idx, label))
+        col = self.getColumn(oldLabel)
+        del self.attr[oldLabel]
+        self.attr[label] = col
+        self.columnOrder[idx] = label
+
 
     def getColumn(self, label):
         if label not in self.columnOrder:
@@ -394,35 +404,86 @@ class Relation():
                 row.append(value)
         return result
 
-    def getValue( self, row, column):
+    def getValue( self, rowIdx, columnIdx):
         """
         Returns None on error.
         Returns module variable NULL_STRING for None values. Modify if needed.
         """
-        label = self.getColumnLabel(column);
+        label = self.getColumnLabel(columnIdx);
 #        // Sanity checks
         if label == False:
-            NTerror("Failed to Relation.getValue for column idx %s. Existing column labels:" % (
-                column, str(self.columnOrder)))
+            NTerror("Failed to Relation.getValue for columnIdx idx %s. Existing columnIdx labels:" % (
+                columnIdx, str(self.columnOrder)))
             return None
-        column = self.getColumnByIdx(column)
+        columnIdx = self.getColumnByIdx(columnIdx)
         sizeRows = self.sizeRows()
-        if row < 0 or row >= self.sizeRows():
-            NTerror("Failed to Relation.getValue for row idx %s is not in range of (0,%s) for column %s." % (
-                row, label, sizeRows))
+        if rowIdx < 0 or rowIdx >= self.sizeRows():
+            NTerror("Failed to Relation.getValue for rowIdx idx %s is not in range of (0,%s) for columnIdx %s." % (
+                rowIdx, label, sizeRows))
             return None
 
-        return column[row]
+        return columnIdx[rowIdx]
+    # end def
 
-    def getValueString( self, row, column):
+    def getValueString( self, rowIdx, columnIdx):
         """
         Returns None on error.
         Returns module variable NULL_STRING for None values. Modify if needed.
         """
-        value = self.getValue( row, column)
+        value = self.getValue( rowIdx, columnIdx)
         if value == None:
             return NULL_STRING
         return str(value)
+    # end def
+
+    def toLol( self ):
+        """
+        Creates a standard list of lists.
+        """
+        sizeRows = self.sizeRows()
+        sizeColumns = self.sizeColumns()
+        result = []
+        for _i in range(sizeRows):
+            result.append([None] * sizeColumns)
+#        NTdebug("result:\n%s" % result)
+        for colIdx in range(sizeColumns):
+            column = self.getColumnByIdx(colIdx)
+            for rowIdx in range(sizeRows):
+                result[rowIdx][colIdx] =  column[rowIdx]
+            # end for
+        # end for
+        return result
+    # end def
+
+    def fromLol( self, lol ):
+        """
+        Moves data from standard list of lists in.
+        """
+        sizeRows = self.sizeRows()
+        sizeColumns = self.sizeColumns()
+        for colIdx in range(sizeColumns):
+            column = self.getColumnByIdx(colIdx)
+            for rowIdx in range(sizeRows):
+                column[rowIdx] = lol[rowIdx][colIdx]
+            # end for
+        # end for
+    # end def
+
+
+    def sortRelationByColumnIdx( self, columnList):
+        """
+        First rewrites the relation to a normal LoL for which standard techniques are used."
+        return True on error
+        """
+        table = self.toLol()
+#        NTdebug("Table setup:\n%s" % table)
+        tableNew = sort_table(table, columnList)
+#        NTdebug("tableNew:\n%s" % tableNew)
+        if self.fromLol(tableNew):
+            NTerror("Failed " + getCallerName())
+            return True
+    # end def
+# end class
 
 
 class DBMS():
@@ -449,14 +510,66 @@ class DBMS():
         if relation.readCsvFile(csv_fileName, containsHeaderRow):
             NTerror("Failed to read csv file: " + csv_fileName)
             return True
+    # end def
 
 # Convenience method
 def getRelationFromCsvFile( csvPath, containsHeaderRow=True):
-    'return True on error'
+    'Return True on error'
     dbms = DBMS()
     (directory, relationName, _extension) = NTpath(csvPath)
-    if dbms.readCsvRelation( relationName, csvFileDir=directory, containsHeaderRow=containsHeaderRow):
+    if dbms.readCsvRelation( relationName, csvFileDir=directory, containsHeaderRow=containsHeaderRow ):
         NTerror("Failed to getRelationFromCsvFile")
         return True
     return dbms.tables[relationName]
+# end def
+
+def addColumnHeaderRowToCsvFile( csvPath, columnOrder ):
+    'Return True on error.'
+    r = getRelationFromCsvFile(csvPath, False)
+    if r == True:
+        NTerror("Failed to read file in " + getCallerName())
+        return True
+    lread = r.sizeColumns()
+    lnew = len(columnOrder)
+    if lread != lnew:
+        NTerror("Read %s columns but got number of names for them: %s" % (lread, lnew))
+        return True
+#    NTdebug("Read %s" % r)
+    for idx in range(lnew):
+        r.renameColumn(idx, columnOrder[idx])
+    r.writeCsvFile()
+# end def
+
+def sortRelationByColumnListFromCsvFile( csvPath, columnList=None, containsHeaderRow=True):
+    'Return True on error'
+    dbms = DBMS()
+    (directory, relationName, _extension) = NTpath(csvPath)
+    if dbms.readCsvRelation( relationName, csvFileDir=directory, containsHeaderRow=containsHeaderRow ):
+        NTerror("Failed to getRelationFromCsvFile")
+        return True
+    r = dbms.tables[relationName]
+    if columnList == None:
+        columnList = [0]
+#    NTdebug("Relation read:\n%s" % r)
+    if r.sortRelationByColumnIdx(columnList):
+        NTerror("Failed to sortRelationByColumnIdx")
+        return True
+#    NTdebug("Relation sorted:\n%s" % r)
+    if r.writeCsvFile():
+        NTerror("Failed to writeCsvFile")
+        return True
+# end def
+
+# Stolen from http://www.saltycrane.com/blog/2007/12/how-to-sort-table-by-columns-in-python/
+# by:
+def sort_table(table, cols):
+    """ sort a table by multiple columns
+        table: a list of lists (or tuple of tuples) where each inner list
+               represents a row
+        cols:  a list (or tuple) specifying the column numbers to sort by
+               e.g. (1,0) would sort by column 1, then by column 0
+    """
+    for col in reversed(cols):
+        table = sorted(table, key=operator.itemgetter(col))
+    return table
 

@@ -6,10 +6,10 @@ python -u $CINGROOT/python/cing/NRG/PDBEntryLists.py
 #from ccp.format.nmrStar.projectIO import NmrStarProjectFile
 from cing import cingDirData
 from cing import cingPythonDir
-from cing import cingRoot
 from cing.Libs.DBMS import DBMS
 from cing.Libs.DBMS import getRelationFromCsvFile
 from cing.Libs.NTutils import * #@UnusedWildImport
+from cing.NRG.settings import matchBmrbPdbDir
 import urllib
 import urllib2
 
@@ -48,7 +48,8 @@ def getBmrbLinks():
     Returns matches_many2one hash.
     """
     dbms = DBMS()
-    matchBmrbPdbDataDirLocal = os.path.join(cingRoot, matchBmrbPdbDataDir) # Needs to change to live resource as well.
+#    matchBmrbPdbDataDirLocal = os.path.join(cingRoot, matchBmrbPdbDataDir) # Needs to change to live resource as well.
+    matchBmrbPdbDataDirLocal = matchBmrbPdbDir
     dbms.readCsvRelationList([ matchBmrbPdbTable ], matchBmrbPdbDataDirLocal)
     mTable = dbms.tables[matchBmrbPdbTable]
 #    NTmessage("mTable:\n%s" % mTable.__str__(show_rows=False))
@@ -141,8 +142,6 @@ def readEntryListFromFile(fileName, headerCount=0):
 
 
 def getBmrbEntries():
-    """Includes solution and solid state NMR if onlyNMR is chosen
-    """
     r1 = urllib.urlopen(bmrbUrl)
     data = r1.read()
     fileNameGz = getFileName(bmrbUrl)
@@ -152,7 +151,7 @@ def getBmrbEntries():
     bmrbDepRelation = getRelationFromCsvFile( fileName, containsHeaderRow=0 )
     bmrbDateList = bmrbDepRelation.getColumnByIdx(0)
     bmrbIdList = [ int(bmrbData[5:]) for bmrbData in bmrbDateList ]
-    NTdebug("Read %s entries in bmrbDateList" % len(bmrbIdList))
+    NTmessage("Read %s BMRB entries from DB dump" % len(bmrbIdList))
     bmrbIdList.sort()
     return bmrbIdList
 
