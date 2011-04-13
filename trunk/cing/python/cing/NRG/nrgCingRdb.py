@@ -79,7 +79,8 @@ class nrgCingRdb():
             try:
                 self.csql.loadTable('cingsummary')
                 self.csql.loadTable('entry_list_selection')
-            finally:
+            except:
+                NTtracebackError()
                 NTerror("Failed to load dep tables consider creating them manually in nrgCingRdb.__init__")
 
             self.csummary = self.csql.cingsummary
@@ -1192,6 +1193,7 @@ if __name__ == '__main__':
         m.createScatterPlotGreenVersusRed()
     if 0:
         pdbIdList = m.getPdbIdList()
+        NTmessage("Found %s pdb ids in db" % len(pdbIdList))
 
     if 0:
         m.showCounts()

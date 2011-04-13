@@ -150,7 +150,10 @@ def doStoreCING2db( entry_code, archive_id, project = None):
     p_distance_count_long_range      =  None
     p_distance_count_ambiguous       =  None
     restraintList = project.allRestraints() # defaults to DRs
-    if p_distance_count != len(restraintList):
+    lenRestraintList = 0
+    if restraintList:
+        lenRestraintList = len(restraintList)
+    if p_distance_count != lenRestraintList:
         NTcodeerror("Expected the same numbers for project.distances.lenRecursive() and the size of project.allRestraints() but found: %s and %s" % ( p_distance_count, len(restraintList)))
         p_distance_count = len(restraintList)
     # end if
@@ -165,7 +168,7 @@ def doStoreCING2db( entry_code, archive_id, project = None):
             NTerror("Failed to do restraintList.analyze()");
         # end if
     else:
-        NTdebug("No restraints in ", getCallerName())
+        NTdebug("No restraints in %s" % getCallerName())
     # end if
 
 

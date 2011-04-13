@@ -984,7 +984,9 @@ Project: Top level Cing project class
 
         Sets a _parent attribute to find original list back like in NTtree.
 
-        Return None for empty list.
+        Return None for empty list because return needs to be specific
+        and it can't when it's empty.
+
         Return True on error.
         """
         if restraintLoL == None:

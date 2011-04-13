@@ -6,7 +6,7 @@ indices that live on top of them. For weekly and for more mass updates.
 
 Execute like:
 
-$CINGROOT/python/cing/NRG/nrgCing.py [entry_code] [updateWeekly prepare prepareEntry runCing runCingEntry storeCING2db createToposTokens getEntryInfo ]
+$CINGROOT/python/cing/NRG/nrgCing.py [entry_code] [updateWeekly prepare prepareEntry runCing runCingEntry storeCING2db storeCING2dbEntry createToposTokens getEntryInfo ]
 
 As a cron job this will:
     - create a todo list
@@ -242,7 +242,7 @@ class nrgCing(Lister):
                 matchBmrbPdbProgram = ExecuteProgram(cmd, redirectOutputToFile=redirectOutputToFile)
                 exitCode = matchBmrbPdbProgram()
                 if exitCode:
-                    NTerrorT("Failed to " % cmd)
+                    NTerrorT("Failed to %s" % cmd)
                 else:
                     self.matches_many2one = getBmrbLinks()
             except:
@@ -479,7 +479,7 @@ class nrgCing(Lister):
         NTmessage("Time taken by prepare statistics\n%s" % timeTakenList.statsFloat())
         self.reportHeadAndTailEntriesByDuration(self.timeTakenDict)
 
-        NTmessage("Starting to scan CING report/log.")
+        NTmessage("\nStarting to scan CING report/log.")
         self.timeTakenDict = NTdict()
         subDirList = os.listdir(DATA_STR)
         for subDir in subDirList:
@@ -593,6 +593,7 @@ class nrgCing(Lister):
             NTerror("Failed to get any entry from NRG-CING RDB")
             self.entry_list_store_in_db = NTlist()
         entry_dict_store_in_db = list2dict(self.entry_list_store_in_db)
+        NTmessage("Found %s entries in RDB" % len(self.entry_list_store_in_db))
 
         NTmessage("Scanning the store logs of entries done.")
         self.timeTakenDict = NTdict()
@@ -1722,7 +1723,8 @@ class nrgCing(Lister):
         if 0: # DEFAULT: False
             NTmessage("Going to use non-default entry_list_todo in storeCING2db")
 #            self.entry_list_todo = '1brv'.split()
-            self.entry_list_todo = readLinesFromFile('/Users/jd/NRG/lists/entry_list_vuisterlab.csv')
+#            self.entry_list_todo = readLinesFromFile('/Users/jd/NRG/lists/entry_list_vuisterlab.csv')
+            self.entry_list_todo = readLinesFromFile(os.path.join(self.results_dir, 'entry_list_todo_all.csv'))
             self.entry_list_todo = NTlist( *self.entry_list_todo )
 
         NTmessage("Found entries in NRG-CING todo: %d" % len(self.entry_list_todo))

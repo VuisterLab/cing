@@ -2812,7 +2812,7 @@ def restoreCcpn(project, tmp = None):
     rootPath = project.moleculePath( CCPN_LOWERCASE_STR )
     fileName = os.path.join(rootPath, STEREO_ASSIGN_FILENAME_STR)
     if not os.path.exists(fileName):
-        NTdebug("No stereo assign meta data from ccpn because no file named: " + fileName)
+#        NTdebug("No stereo assign meta data from ccpn because no file named: " + fileName)
         return
     star_text = readTextFromFile(fileName)
 
@@ -2843,7 +2843,7 @@ def saveCcpnMetaData(project, tmp = None):
         NTdebug("self.project.distances is empty but FC meta data will still be looked for.")
     star_text = getDeepByKeysOrAttributes(projectDistList, STEREO_ASSIGNMENT_CORRECTIONS_STAR_STR)
     if not star_text:
-        NTdebug("No star_text")
+#        NTdebug("No star_text")
         return
     rootPath = project.moleculePath( CCPN_LOWERCASE_STR )
     fileName = os.path.join(rootPath, STEREO_ASSIGN_FILENAME_STR)
