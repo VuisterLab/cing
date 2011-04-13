@@ -31,7 +31,7 @@ jQuery(document).ready(function() {
                       { "sType": "numeric", "sClass": "right"}, // error
                       { "sType": "numeric", "sClass": "right"}, // delta
 
-                      { "sType": "html", "sClass": "left", "sWidth":"100em" } // criteria is html too (list)
+                      { "sType": "html", "sClass": "left" } // criteria is html too (list)
                   ],
         // Pagination options.
         "bPaginate": true,
@@ -129,7 +129,8 @@ jQuery(document).ready(function() {
                      {"sType": "numeric", "sClass": "right"},   //        c.1
                      {"sType": "numeric", "sClass": "right"},   //        c.3
                      {"sType": "numeric", "sClass": "right"},   //        c.5
-                      { "sType": "html", "sWidth":"100em", "sClass": "left" } // criteria is html too (list)
+//                     { "sType": "html", "sWidth":"100em", "sClass": "left" } // criteria is html too (list)
+                     { "sType": "html", "sClass": "left" } // criteria is html too (list)
                   ]
     } );
 
@@ -163,7 +164,8 @@ jQuery(document).ready(function() {
                     {"sType": "numeric", "sClass": "right"},   //        vAv
                     {"sType": "numeric", "sClass": "right"},   //        vSd
                     {"sType": "numeric", "sClass": "right"},   //        vMax
-                      { "sType": "html", "sWidth":"100em", "sClass": "left" }
+//                    { "sType": "html", "sWidth":"100em", "sClass": "left" }
+                    { "sType": "html", "sClass": "left" }
                   ]
     } );
 
@@ -195,7 +197,7 @@ jQuery(document).ready(function() {
                       { "sType": "html" },                		// resn
                       { "sType": "html" }, 						// atom name
 
-                      { "sType": "html", "sWidth":"100em", "sClass": "left" } // criteria is html too (list)
+                      { "sType": "html", "sClass": "left" } // criteria is html too (list)
                   ]
     } );
     $("table[id^='dataTables-2dPeakList']").dataTable({
@@ -231,7 +233,7 @@ jQuery(document).ready(function() {
                       { "sType": "html" },
                       { "sType": "html" },
 
-                      { "sType": "html", "sWidth":"100em", "sClass": "left" } // criteria is html too (list)
+                      { "sType": "html", "sClass": "left" } // criteria is html too (list)
                   ]
     } );
     $("table[id^='dataTables-3dPeakList']").dataTable({
@@ -273,7 +275,7 @@ jQuery(document).ready(function() {
                       { "sType": "html" },
                       { "sType": "html" },
 
-                      { "sType": "html", "sWidth":"100em", "sClass": "left" } // criteria is html too (list)
+                      { "sType": "html", "sClass": "left" } // criteria is html too (list)
                   ]
     } );
     $("table[id^='dataTables-4dPeakList']").dataTable({
@@ -322,7 +324,7 @@ jQuery(document).ready(function() {
                       { "sType": "html" },
 
 
-                      { "sType": "html", "sWidth":"100em", "sClass": "left" } // criteria is html too (list)
+                      { "sType": "html", "sClass": "left" } // criteria is html too (list)
                   ]
     } );
 

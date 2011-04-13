@@ -4,11 +4,13 @@ Used for eNMR/weNMR workshop data sets.
 """
 
 from ccpnmr.format.converters.NmrStarFormat import NmrStarFormat
+from cing import issueListUrl
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.Libs.forkoff import do_cmd
 from cing.Scripts.FC.constants import * #@UnusedWildImport
 from glob import glob
 from memops.api import Implementation
+from memops.api.Implementation import ApiError
 import shutil
 
 try:
@@ -110,6 +112,16 @@ def importFullStarProjects(starFileName, projectName, inputDir='.', outputDir='.
 #                  setSinglePossEquiv=1,
 ##                  strucGen=structureGeneration,
 #                  allowPopups=allowPopups, minimalPrompts=minimalPrompts, verbose=verbose, **keywds)
+    # Catch entries like mentioned in issue
+
+    try:
+        ccpnProject.checkAllValid()
+    except ApiError:
+        NTtracebackError()
+        NTerror("Failed ccpnProject.checkAllValid")
+        NTerror("See issue: %s%d" % (issueListUrl, 266))
+        return False
+
     ccpnProject.saveModified()
 
     if not os.path.exists(ccpnProjectPath):

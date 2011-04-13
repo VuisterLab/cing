@@ -184,8 +184,8 @@ Average            %s
 Standard deviation %s
 Minimum            %s
 Maximum            %s
-Sum                %s
-""" % ( self.n,
+Sum                %s""" % ( 
+        self.n,
         val2Str(self.av, fmt),
         val2Str(self.sd, fmt),
         val2Str(self.min(), fmt),

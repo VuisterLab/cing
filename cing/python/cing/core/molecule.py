@@ -4619,7 +4619,7 @@ coordinates: %s"""  , dots, self, dots
     def toString(self, showChainId=True, showResidueType=True):
         res = self._parent
         if not res:
-            NTerror("Failed to get parent residue for atom with name: %s" % self.name)
+#            NTwarning("Failed to get parent residue for atom with name: %s" % self.name) # serious but tends to get too verbose a messaging.
             return None
 
         if showChainId:

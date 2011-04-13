@@ -29,8 +29,8 @@ class AllChecks(TestCase):
             self.assertTrue(status)
 
         if False:
-            l = getBmrbNmrGridEntriesDOCRfREDDone()
-            NTdebug("getBmrbNmrGridEntriesDOCRfREDDone NMR: %d %s" % (len(l), l))
+            l = getBmrbNmrGridEntriesDOCRDone()
+            NTdebug("getBmrbNmrGridEntriesDOCRDone NMR: %d %s" % (len(l), l))
             self.assertTrue(l)
         if False:
             l = getBmrbNmrGridEntries()

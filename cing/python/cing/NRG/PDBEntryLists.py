@@ -93,6 +93,9 @@ def getBmrbNmrGridEntriesDOCRfREDDone():
   return result
 
 def getBmrbNmrGridEntriesDOCRDone():
+  badDocrEntryList = '1lcc 1lcd'.split() # Disable this manual correction when NRG issssue 272 is fixed.
+  # See CING issue 266
+#  badDocrEntryList = []
   result = []
   urlLocation = urlDB2 + "/mrfile.txt"
 ##61458    7567    4-filtered-FRED    2gov    2006-05-11
@@ -102,11 +105,17 @@ def getBmrbNmrGridEntriesDOCRDone():
   r1.close()
   dataLines = data.split("\n")
   for dataLine in dataLines:
-    if dataLine:
-        (_mrfile_id, _entry_id, stage, pdbCode, _date_modified) = dataLine.split()
-        if stage == "3-converted-DOCR":
-            if pdbCode not in result:
-                result.append(pdbCode)
+    if not dataLine:
+        continue
+    (_mrfile_id, _entry_id, stage, pdbCode, _date_modified) = dataLine.split()
+    if stage == "3-converted-DOCR":
+        if pdbCode in badDocrEntryList:
+            continue
+        if pdbCode in result:
+            continue
+        result.append(pdbCode)
+    # end if
+  # end for
   result.sort()
   return result
 
