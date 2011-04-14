@@ -1,5 +1,6 @@
 VASCO_STR       = "Vasco" # key to the entities (atoms, residues, etc under which the results will be stored
 
+# Used in html
 H_STR = 'H'
 N_STR = 'N'
 C_STR = 'C'
@@ -7,6 +8,7 @@ C_ALIPHATIC_STR = 'C_aliphatic'
 
 vascoAtomTypeList = ( H_STR, N_STR, C_STR )
 
+# Used in Vasco
 vascoAtomIdLoL = (
             (H_STR, None),
             (N_STR, None),
@@ -21,4 +23,13 @@ VASCO_APPLIED_STR = 'vascoApplied'
 VASCO_RESULTS_STR = 'vascoResults'
 VASCO_SUMMARY_STR = 'vascoSummary'
 
-vascoMapAtomIdToHuman = {'H_None': H_STR, 'N_None': N_STR, 'C_3': 'Cali'}
+# Keys used in RDB and values used in html.
+H_None_STR = 'H_None'
+N_None_STR = 'N_None'
+C_3_STR = 'C_3'
+vascoMapAtomIdToHuman = {H_None_STR: H_STR, N_None_STR: N_STR, C_3_STR: 'Cali'}
+
+# Used in RDB
+atomclass_STR           = 'atomclass'
+csd_STR                 = 'csd'
+csd_err_STR             = 'csd_err'

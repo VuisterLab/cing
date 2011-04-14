@@ -155,3 +155,39 @@ COPY nrgcing.cingentry ( entry_id,name,bmrb_id,casd_id,pdb_id,is_solid,is_parama
 FROM '$cwd/casdcing.cingentry.csv'    CSV HEADER;
 
 entry_id,name,bmrb_id,casd_id,pdb_id,is_solid,is_paramagnetic,is_membrane,is_multimeric,chothia_class,protein_count,dna_count,rna_count,dna_rna_hybrid_count,is_minimized,software_collection,software_processing,software_analysis,software_struct_solution,software_refinement,in_recoord,in_casd,in_dress,ranges,res_count,model_count,distance_count,dihedral_count,rdc_count,peak_count,cs_count,cs1h_count,cs13c_count,cs15n_count,wi_angchk,wi_bbcchk,wi_bmpchk,wi_bndchk,wi_c12chk,wi_chichk,wi_flpchk,wi_hndchk,wi_inochk,wi_nqachk,wi_omechk,wi_pl2chk,wi_pl3chk,wi_plnchk,wi_quachk,wi_ramchk,wi_rotchk,pc_gf,pc_gf_phipsi,pc_gf_chi12,pc_gf_chi1,pc_rama_core,pc_rama_allow,pc_rama_gener,pc_rama_disall,noe_compl4,rog,dis_max_all,dis_rms_all,dis_av_all,dis_av_viol,dis_c1_viol,dis_c3_viol,dis_c5_viol,dih_max_all,dih_rms_all,dih_av_all,dih_av_viol,dih_c1_viol,dih_c3_viol,dih_c5_viol
+
+-- A couple of new items
+SELECT name, rdc_count+distance_count+dihedral_count as restr_count,
+rdc_count, dihedral_count, distance_count
+-- distance_count, distance_count_sequential, distance_count_intra_residual, distance_count_medium_range, distance_count_long_range, distance_count_ambiguous
+FROM "nrgcing"."cingentry" e
+order by name;
+
+SELECT name, distance_count, cs_count
+FROM "nrgcing"."cingentry" e
+where
+distance_count = 0 AND
+cs_count > 0
+order by name;
+
+SELECT name,
+    ssa_count         ,
+    ssa_swap_count    ,
+    ssa_deassign_count
+FROM "nrgcing"."cingentry" e
+where ssa_count IS NOT NULL
+order by name;
+
+-- for H_None, N_None, C_3 and 
+SELECT name, resonancelist_id, atomclass,
+to_char(csd, '0.99') as csds,
+to_char(csd_err, '0.99') as csd_errs
+FROM "nrgcing"."cingentry" e, nrgcing.cingresonancelistperatomclass pa
+where e.entry_id = pa.entry_id AND
+atomclass = 'C_3'
+order by csd, resonancelist_id;
+
+
+
+delete FROM "nrgcing"."cingentry" e;
+SELECT name FROM "nrgcing"."cingentry" e;

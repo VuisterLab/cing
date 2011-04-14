@@ -72,4 +72,8 @@ Our own lab (See VuisterLab.numbers file):
 2klt
 3phy
 
+Coordinate interest
+2lb7    Has no restraints, no cs, is recent (2011-03-23)
+1arq    No restraints but does have CS, is old     (1993-08-24)
+
 All with BMRB entry: see nrgCing.py in prepare()

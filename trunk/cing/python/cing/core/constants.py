@@ -90,8 +90,10 @@ OPERATION_OUT                    = 'out'
 ATOM_LEVEL     = 'ATOM'
 RES_LEVEL      = 'RESIDUE'
 CHAIN_LEVEL    = 'CHAIN'
-MOLECULE_LEVEL = 'MOLECULE'
-PROJECT_LEVEL  = 'PROJECT'
+#MOLECULE_LEVEL = 'MOLECULE'
+PROJECT_LEVEL  = 'PROJECT' # use project only.
+CSL_LEVEL      = 'CSL'               # cingresonancelist
+CSLPA_LEVEL    = 'CSL_PER_ATOMCLASS' # cingresonancelistperatomclass
 
 ATOM_STR = 'atom'
 RES_STR = 'res'

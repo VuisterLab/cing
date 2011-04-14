@@ -10,7 +10,7 @@ import unittest
 
 class AllChecks(TestCase):
 
-    def _test_NrgCingRdb(self):
+    def test_NrgCingRdb(self):
 
         cingDirTmpTest = os.path.join( cingDirTmp, getCallerName() )
         mkdirs( cingDirTmpTest )
