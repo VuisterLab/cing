@@ -211,6 +211,7 @@ class nrgCing(Lister):
         self.wattosProg = "java -Djava.awt.headless=true -Xmx%s Wattos.CloneWars.UserInterface -at -verbosity %s" % (self.wattosMemory, self.wattosVerbosity)
         self.tokenListFileName = os.path.join(self.results_dir, 'token_list_todo.txt')
         self.vc = None
+        self.showTimings = 0 # Show a summary of times spend by various stages.
 
     def initVc(self):
         NTmessage("Setting up vCing")
@@ -476,8 +477,9 @@ class nrgCing(Lister):
             self.entry_list_prep_done.append(entry_code)
         # end for
         timeTakenList = NTlist(*self.timeTakenDict.values())
-        NTmessage("Time taken by prepare statistics\n%s" % timeTakenList.statsFloat())
-        self.reportHeadAndTailEntriesByDuration(self.timeTakenDict)
+        if self.showTimings:
+            NTmessage("Time taken by prepare statistics\n%s" % timeTakenList.statsFloat())
+            self.reportHeadAndTailEntriesByDuration(self.timeTakenDict)
 
         NTmessage("\nStarting to scan CING report/log.")
         self.timeTakenDict = NTdict()
@@ -579,12 +581,13 @@ class nrgCing(Lister):
             # end for entryDir
         # end for subDir
         timeTakenList = NTlist(*self.timeTakenDict.values())
-        NTmessage("Time taken by validation statistics\n%s" % timeTakenList.statsFloat())
-        self.reportHeadAndTailEntriesByDuration(self.timeTakenDict)
+        if self.showTimings:
+            NTmessage("Time taken by validation statistics\n%s" % timeTakenList.statsFloat())
+            self.reportHeadAndTailEntriesByDuration(self.timeTakenDict)
 
 
         host = 'localhost'
-        schema=DEV_NRG_DB_SCHEMA
+        schema=NRG_DB_SCHEMA
 #        if self.isProduction:
 #            schema=NRG_DB_SCHEMA
         m = nrgCingRdb(host=host, schema=schema)
@@ -592,8 +595,8 @@ class nrgCing(Lister):
         if not self.entry_list_store_in_db:
             NTerror("Failed to get any entry from NRG-CING RDB")
             self.entry_list_store_in_db = NTlist()
-        entry_dict_store_in_db = list2dict(self.entry_list_store_in_db)
         NTmessage("Found %s entries in RDB" % len(self.entry_list_store_in_db))
+        entry_dict_store_in_db = list2dict(self.entry_list_store_in_db)
 
         NTmessage("Scanning the store logs of entries done.")
         self.timeTakenDict = NTdict()
@@ -640,8 +643,9 @@ class nrgCing(Lister):
         # Consider the entries updated as not done.
 
         timeTakenList = NTlist(*self.timeTakenDict.values())
-        NTmessage("Time taken by storeCING2db statistics\n%s" % timeTakenList.statsFloat())
-        self.reportHeadAndTailEntriesByDuration(self.timeTakenDict)
+        if self.showTimings:
+            NTmessage("Time taken by storeCING2db statistics\n%s" % timeTakenList.statsFloat())
+            self.reportHeadAndTailEntriesByDuration(self.timeTakenDict)
 
         if not self.entry_list_tried:
             NTerror("Failed to find entries that CING tried.")
@@ -745,7 +749,7 @@ class nrgCing(Lister):
 
     def doWriteEntryLoL(self):
 
-        NTmessage("Writing the entry list of each list to file")
+#        NTmessage("Writing the entry list of each list to file")
 
         writeTextToFile("entry_list_pdb.csv", toCsv(self.entry_list_pdb))
         writeTextToFile("entry_list_nmr.csv", toCsv(self.entry_list_nmr))
@@ -1646,8 +1650,10 @@ class nrgCing(Lister):
             self.entry_list_todo = NTlist( *self.entry_list_todo )
             self.entry_list_nmr = deepcopy(self.entry_list_todo)
             self.entry_list_nrg_docr = deepcopy(self.entry_list_todo)
-            if 0: # use actual info instead of 2 lists above.
+            if 1: # use actual info instead of 2 lists above.
                 self.searchPdbEntries()
+        if 0: # DEFAULT 0
+            self.entry_list_todo = NTlist( *self.entry_list_nmr )
 
         permutationArgumentList = NTdict() # per permutation hold the entry list.
 
@@ -1724,7 +1730,7 @@ class nrgCing(Lister):
             NTmessage("Going to use non-default entry_list_todo in storeCING2db")
 #            self.entry_list_todo = '1brv'.split()
 #            self.entry_list_todo = readLinesFromFile('/Users/jd/NRG/lists/entry_list_vuisterlab.csv')
-            self.entry_list_todo = readLinesFromFile(os.path.join(self.results_dir, 'entry_list_todo_all.csv'))
+            self.entry_list_todo = readLinesFromFile(os.path.join(self.results_dir, 'entry_list_todo_nmr_all.csv'))
             self.entry_list_todo = NTlist( *self.entry_list_todo )
 
         NTmessage("Found entries in NRG-CING todo: %d" % len(self.entry_list_todo))

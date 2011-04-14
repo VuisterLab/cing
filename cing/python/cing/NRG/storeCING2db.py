@@ -144,11 +144,11 @@ def doStoreCING2db( entry_code, archive_id, project = None):
 
     p_distance_count = project.distances.lenRecursive()
 
-    p_distance_count_sequential      =  None
-    p_distance_count_intra_residual  =  None
-    p_distance_count_medium_range    =  None
-    p_distance_count_long_range      =  None
-    p_distance_count_ambiguous       =  None
+    p_distance_count_sequential      =  0
+    p_distance_count_intra_residual  =  0
+    p_distance_count_medium_range    =  0
+    p_distance_count_long_range      =  0
+    p_distance_count_ambiguous       =  0
     restraintList = project.allRestraints() # defaults to DRs
     lenRestraintList = 0
     if restraintList:
@@ -171,9 +171,12 @@ def doStoreCING2db( entry_code, archive_id, project = None):
         NTdebug("No restraints in %s" % getCallerName())
     # end if
 
-
-
-    p_dihedral_count = project.dihedrals.lenRecursive()
+#    p_dihedral_count = project.dihedrals.lenRecursive() # Note Talos derived would be counted this way.
+    p_dihedral_count = 0
+    for dihList in project.dihedrals:
+        if dihList.isFromTalos(): continue
+        p_dihedral_count += len(dihList)
+    # end for
     p_rdc_count = project.rdcs.lenRecursive()
     p_peak_count = project.peaks.lenRecursive()
 

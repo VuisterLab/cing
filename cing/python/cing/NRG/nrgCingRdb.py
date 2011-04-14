@@ -10,16 +10,17 @@ from cing.Libs.NTplot import * #@UnusedWildImport
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.NRG import * #@UnusedWildImport
 from cing.NRG.settings import * #@UnusedWildImport
+from cing.PluginCode.matplib import * #@UnusedWildImport
 from cing.PluginCode.required.reqDssp import * #@UnusedWildImport
 from cing.PluginCode.required.reqProcheck import * #@UnusedWildImport
 from cing.PluginCode.required.reqQueeny import * #@UnusedWildImport
+from cing.PluginCode.required.reqVasco import * #@UnusedWildImport
 from cing.PluginCode.required.reqWattos import * #@UnusedWildImport
 from cing.PluginCode.required.reqWhatif import * #@UnusedWildImport
 from cing.PluginCode.sqlAlchemy import cgenericSql
 from cing.PluginCode.sqlAlchemy import csqlAlchemy
 from cing.PluginCode.sqlAlchemy import printResult
 from matplotlib import is_interactive
-from cing.PluginCode.matplib import * #@UnusedWildImport
 from pylab import * #@UnusedWildImport # imports plt too now.
 from scipy import * #@UnusedWildImport
 from scipy import optimize
@@ -46,6 +47,8 @@ NO_LEGEND_STR = 'noLegend'
 EMPTY_PROGID = ""
 SYMBOL_BY_ENTRY = 'symbolByEntry'
 IS_TRUE = 'isTrue'
+#IS_EQUAL_STR = '=' # Requires a (column, value)
+IS_OTHER_VALUE_STR = 'IS_OTHER_VALUE' # Used in combination with a column name.
 IS_EQUAL_OR_GREATER_THAN_STR = '>=' # Requires a (column, value)
 IS_SMALLER_THAN_STR = '<' # I think Geerten used this small distinction to get mutually exclusive sets.
 IS_FALSE = 'isFalse'
@@ -54,7 +57,6 @@ if False:
     from matplotlib import use #@UnusedImport
     use('TkAgg') # Instead of agg
     interactive(True)
-
 
 class nrgCingRdb():
     def __init__(self,host='localhost', user=PDBJ_DB_USER_NAME, db=PDBJ_DB_NAME, schema=NRG_DB_SCHEMA):
@@ -75,7 +77,8 @@ class nrgCingRdb():
             self.cchain = self.csql.cingchain
             self.cresidue = self.csql.cingresidue
             self.catom = self.csql.cingatom
-
+            self.ccsl   = self.csql.cingresonancelist
+            self.ccslpa = self.csql.cingresonancelistperatomclass
             try:
                 self.csql.loadTable('cingsummary')
                 self.csql.loadTable('entry_list_selection')
@@ -92,6 +95,7 @@ class nrgCingRdb():
             self.r1 = self.cresidue.alias()
             self.r2 = self.cresidue.alias()
             self.a1 = self.catom.alias()
+            # No further short cuts for chemical shift list info.
 
             self.s1 = self.centry_list_selection.alias()
             self.perEntryRog = NTdict()
@@ -202,6 +206,10 @@ AND '{2}' <@ S.chain_type; -- contains at least one protein chain.
             table = m.r1
         elif level == ATOM_LEVEL:
             table = m.a1
+        elif level == CSL_LEVEL:
+            table = m.ccsl
+        elif level == CSLPA_LEVEL:
+            table = m.ccslpa
         return table
 
     def level2level_id(self, level):
@@ -216,16 +224,18 @@ AND '{2}' <@ S.chain_type; -- contains at least one protein chain.
         NTexit("Bad level: %s" % level)
 
     def getLevelNumber(self, level):
+        """Level number for tables other than atom, res, cha, and project is undefined
+        A None will indicate that.
+        """
         if level == ATOM_LEVEL:
             return 0
         if level == RES_LEVEL:
             return 1
         if level == CHAIN_LEVEL:
             return 2
-        if level == PROJECT_LEVEL:
+        if level == PROJECT_LEVEL or level == CSL_LEVEL or level == CSLPA_LEVEL:
             return 3
         NTexit("In getLevelNumber bad level: %s" % level)
-
 
     def getTitleFromStats(self, av, sd, n, minValue, maxValue):
         return "av/sd/n %.3f %.3f %d min/max %.3f %.3f" % (av, sd, n, minValue, maxValue )
@@ -250,7 +260,10 @@ AND '{2}' <@ S.chain_type; -- contains at least one protein chain.
             falseAttribute = getDeepByKeysOrAttributes( plotDict, IS_FALSE)
             if falseAttribute != None:
                 titleStr += ' F:' + falseAttribute
-
+        filterForOtherValueEqual = getDeepByKeysOrAttributes( plotDict, IS_OTHER_VALUE_STR)
+        if filterForOtherValueEqual:
+            for col, val in filterForOtherValueEqual:
+                titleStr += ' %s=%s' % (col,val)
         if getDeepByKeysOrAttributes( plotDict, USE_MIN_VALUE_STR) and \
            getDeepByKeysOrAttributes( plotDict, USE_MAX_VALUE_STR):
             xmin = getDeepByKeysOrAttributes( plotDict, USE_MIN_VALUE_STR)
@@ -284,6 +297,7 @@ AND '{2}' <@ S.chain_type; -- contains at least one protein chain.
         filterZero = getDeepByKeysOrAttributes( plotDict, ONLY_NON_ZERO)
         doTrending = getDeepByKeysOrAttributes( plotDict, DO_TRENDING)
         filterForTruth = getDeepByKeysOrAttributes( plotDict, IS_TRUE) or getDeepByKeysOrAttributes( plotDict, IS_FALSE)
+        filterForOtherValueEqual = getDeepByKeysOrAttributes( plotDict, IS_OTHER_VALUE_STR)
 
         if doTrending: # optimalization is to ignore the 'pure' X-ray,
             # First get the entry entry_name info
@@ -314,6 +328,16 @@ AND '{2}' <@ S.chain_type; -- contains at least one protein chain.
                 return
             truthResultDict = NTdict() # hash by entry filterId
             truthResultDict.appendFromTable(truthResultTable)
+
+        if filterForOtherValueEqual:
+            filterForOtherValueEqualColList = []
+            filterForOtherValueEqualValList = []
+            for col, val in filterForOtherValueEqual:
+                filterForOtherValueEqualColList.append(col)
+                filterForOtherValueEqualValList.append(val)
+            # end for
+            NTdebug("Filtering on %s by values %s" % ( str(filterForOtherValueEqualColList), str(filterForOtherValueEqualValList)))
+        # end if
 
         if filterForSmallerThan:
             columnNameForComp1, value = getDeepByKeysOrAttributes( plotDict, IS_SMALLER_THAN_STR)
@@ -368,12 +392,18 @@ AND '{2}' <@ S.chain_type; -- contains at least one protein chain.
                 s = select([table.c[ENTRY_ID_STR], table.c[CHAIN_ID_STR], table.c[RESIDUE_ID_STR], table.c[columnName]])
             elif level == CHAIN_LEVEL:
                 s = select([table.c[ENTRY_ID_STR], table.c[CHAIN_ID_STR], table.c[columnName]])
-            elif level == MOLECULE_LEVEL:
+#            elif level == MOLECULE_LEVEL:
+#                s = select([table.c[ENTRY_ID_STR], table.c[columnName]])
+            else: # same for mol and other levels.
                 s = select([table.c[ENTRY_ID_STR], table.c[columnName]])
             s = s.where(table.c[columnName]!=None)
             if filterZero:
                 s = s.where(table.c[columnName]!=0.0)
-#                s = s.where(table.c[columnName]!=0) # don't use this because truncation will be tried.
+            if filterForOtherValueEqual:
+                for col, val in filterForOtherValueEqual:
+                    s = s.where(table.c[col]==val)
+                # end for
+            # end if
 #            NTdebug("SQL:\n%s\n" % s)
             checkResultTable = m.execute(s).fetchall()
         except:
@@ -692,41 +722,46 @@ AND '{2}' <@ S.chain_type; -- contains at least one protein chain.
         # NB The level of project is equivalent to the entry level in the database.
         # Sorted by project, program.
 
-#        if doTrending:
-#            os.chdir(dir_plotTrending)
+        os.chdir(dir_plot)
+        if doTrending:
+            os.chdir(dir_plotTrending)
+
         e0 = {IS_SMALLER_THAN_STR: (CV_BACKBONE_STR, 0.9), IS_TRUE: SEL1_STR } #@UnusedVariable
         e1 = {IS_SMALLER_THAN_STR: (CV_BACKBONE_STR, 0.9) } #@UnusedVariable
 
-        try:
-            djaflsjlfjalskdjf #@UndefinedVariable
-            from localPlotList import plotList
-        except:
-#            NTtracebackError()
-            plotList = []
-            for cutoff_max in arange(0.1, 1.0, 0.1):
-                cutoff_min = cutoff_max - 0.1
-                plotList.append( [ RES_LEVEL, WHATIF_STR, RAMCHK_STR, {
-                IS_SMALLER_THAN_STR:          (CV_BACKBONE_STR, cutoff_max),
-                IS_EQUAL_OR_GREATER_THAN_STR: (CV_BACKBONE_STR, cutoff_min) } ] )
-#            plotList = [
-#            [ PROJECT_LEVEL, CING_STR, DISTANCE_COUNT_STR,dict4 ],
-#            [ PROJECT_LEVEL, WHATIF_STR, RAMCHK_STR, {ONLY_SELECTION:1} ],
-#            [ RES_LEVEL, WHATIF_STR, RAMCHK_STR, e1 ],
-#            [ RES_LEVEL, CING_STR, RDB_QUEENY_INFORMATION_STR,  {IS_FALSE: SEL1_STR} ],
-#            [ RES_LEVEL, CING_STR, RDB_QUEENY_UNCERTAINTY1_STR, {IS_FALSE: SEL1_STR} ],
-#            [ RES_LEVEL, CING_STR, RDB_QUEENY_UNCERTAINTY2_STR, {IS_FALSE: SEL1_STR} ],
-#            [ RES_LEVEL, CING_STR, RDB_QUEENY_INFORMATION_STR,  {IS_TRUE: SEL1_STR} ],
-#            [ RES_LEVEL, CING_STR, RDB_QUEENY_UNCERTAINTY1_STR, {IS_TRUE: SEL1_STR} ],
-#            [ RES_LEVEL, CING_STR, RDB_QUEENY_UNCERTAINTY2_STR, {IS_TRUE: SEL1_STR} ],
-#            [ RES_LEVEL, CING_STR, RMSD_BACKBONE_STR, {IS_TRUE: SEL1_STR} ],
-#            [ RES_LEVEL, CING_STR, RMSD_SIDECHAIN_STR, {IS_TRUE: SEL1_STR} ],
-#            [ RES_LEVEL, CING_STR, RMSD_BACKBONE_STR, {IS_FALSE: SEL1_STR} ],
-#            [ RES_LEVEL, CING_STR, RMSD_SIDECHAIN_STR, {IS_FALSE: SEL1_STR} ],
-#            [ RES_LEVEL, CING_STR, CV_BACKBONE_STR, {IS_TRUE: SEL1_STR} ],
-#            [ RES_LEVEL, CING_STR, CV_SIDECHAIN_STR, {IS_TRUE: SEL1_STR} ],
-#            [ RES_LEVEL, CING_STR, CV_BACKBONE_STR, {IS_FALSE: SEL1_STR} ],
-#            [ RES_LEVEL, CING_STR, CV_SIDECHAIN_STR, {IS_FALSE: SEL1_STR} ],
-#            ]
+        if 1: # default 0
+            plotList = [
+#                        [ RES_LEVEL,   PC_STR,             pc_gf_CHI12_STR,   {USE_MIN_VALUE_STR: -5.0, USE_MAX_VALUE_STR: 5.0} ],
+                        [ CSLPA_LEVEL, VASCO_STR,          csd_STR,           {IS_OTHER_VALUE_STR: (( atomclass_STR, H_None_STR),) } ],
+                        [ CSLPA_LEVEL, VASCO_STR,          csd_STR,           {IS_OTHER_VALUE_STR: (( atomclass_STR, N_None_STR),) } ],
+                        [ CSLPA_LEVEL, VASCO_STR,          csd_STR,           {IS_OTHER_VALUE_STR: (( atomclass_STR, C_3_STR),) } ],
+                    ]
+#            plotList = []
+#            for cutoff_max in arange(0.1, 1.0, 0.1):
+#                cutoff_min = cutoff_max - 0.1
+#                plotList.append( [ RES_LEVEL, WHATIF_STR, RAMCHK_STR, {
+#                IS_SMALLER_THAN_STR:          (CV_BACKBONE_STR, cutoff_max),
+#                IS_EQUAL_OR_GREATER_THAN_STR: (CV_BACKBONE_STR, cutoff_min) } ] )
+    #            plotList = [
+    #            [ PROJECT_LEVEL, CING_STR, DISTANCE_COUNT_STR,dict4 ],
+    #            [ PROJECT_LEVEL, WHATIF_STR, RAMCHK_STR, {ONLY_SELECTION:1} ],
+    #            [ RES_LEVEL, WHATIF_STR, RAMCHK_STR, e1 ],
+    #            [ RES_LEVEL, CING_STR, RDB_QUEENY_INFORMATION_STR,  {IS_FALSE: SEL1_STR} ],
+    #            [ RES_LEVEL, CING_STR, RDB_QUEENY_UNCERTAINTY1_STR, {IS_FALSE: SEL1_STR} ],
+    #            [ RES_LEVEL, CING_STR, RDB_QUEENY_UNCERTAINTY2_STR, {IS_FALSE: SEL1_STR} ],
+    #            [ RES_LEVEL, CING_STR, RDB_QUEENY_INFORMATION_STR,  {IS_TRUE: SEL1_STR} ],
+    #            [ RES_LEVEL, CING_STR, RDB_QUEENY_UNCERTAINTY1_STR, {IS_TRUE: SEL1_STR} ],
+    #            [ RES_LEVEL, CING_STR, RDB_QUEENY_UNCERTAINTY2_STR, {IS_TRUE: SEL1_STR} ],
+    #            [ RES_LEVEL, CING_STR, RMSD_BACKBONE_STR, {IS_TRUE: SEL1_STR} ],
+    #            [ RES_LEVEL, CING_STR, RMSD_SIDECHAIN_STR, {IS_TRUE: SEL1_STR} ],
+    #            [ RES_LEVEL, CING_STR, RMSD_BACKBONE_STR, {IS_FALSE: SEL1_STR} ],
+    #            [ RES_LEVEL, CING_STR, RMSD_SIDECHAIN_STR, {IS_FALSE: SEL1_STR} ],
+    #            [ RES_LEVEL, CING_STR, CV_BACKBONE_STR, {IS_TRUE: SEL1_STR} ],
+    #            [ RES_LEVEL, CING_STR, CV_SIDECHAIN_STR, {IS_TRUE: SEL1_STR} ],
+    #            [ RES_LEVEL, CING_STR, CV_BACKBONE_STR, {IS_FALSE: SEL1_STR} ],
+    #            [ RES_LEVEL, CING_STR, CV_SIDECHAIN_STR, {IS_FALSE: SEL1_STR} ],
+    #            ]
+        # end try
 
 
         for p in plotList:
@@ -734,6 +769,11 @@ AND '{2}' <@ S.chain_type; -- contains at least one protein chain.
             if doTrending:
                 plotDict[DO_TRENDING] = 1
             chk_id_unique = '.'.join([level,progId,chk_id])
+            filterForOtherValueEqual = getDeepByKeysOrAttributes( plotDict, IS_OTHER_VALUE_STR)
+            if filterForOtherValueEqual:
+                for col, val in filterForOtherValueEqual:
+                    chk_id_unique += '.%s=%s' % (col,val)
+
             NTdebug("Starting with: %s" % chk_id_unique)
             cutoff_min = getDeepByKeysOrAttributes( plotDict, IS_SMALLER_THAN_STR, 1)
             cutoff_max = getDeepByKeysOrAttributes( plotDict, IS_EQUAL_OR_GREATER_THAN_STR, 1)
@@ -884,7 +924,12 @@ AND '{2}' <@ S.chain_type; -- contains at least one protein chain.
             xlabel(chk_id_unique)
             title(titleStr)
             for fmt in ['png' ]:
-                fn = "plotHist_%s_%s_%s.%s" % (chk_id_unique, cutoff_min, cutoff_max, fmt)
+                fn = "plotHist_" + chk_id_unique
+                if cutoff_min != None:
+                    fn += "_%s" % cutoff_min
+                if cutoff_max != None:
+                    fn += "_%s" % cutoff_max
+                fn += "." + fmt
                 NTdebug("Writing " + fn)
                 savefig(fn)
         # end for plot
@@ -1176,12 +1221,14 @@ if __name__ == '__main__':
 
 #    schema = DEV_NRG_DB_SCHEMA
     schema = NRG_DB_SCHEMA
-    if isProduction:
-        schema = NRG_DB_SCHEMA
+#    if isProduction:
+#        schema = NRG_DB_SCHEMA
+    host = 'localhost'
+    if 0: # DEFAULT 0
+        host = 'nmr.cmbi.umcn.nl'
+    m = nrgCingRdb( schema=schema, host = host )
 
-    m = nrgCingRdb( schema=schema )
-
-    if 0:
+    if 1:
         m.createPlots(doTrending = False)
     if 0:
         m.createScatterPlots()
