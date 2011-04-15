@@ -4,7 +4,8 @@
 set isProduction = 1 # causes sleep and certainly no svn update.
 
 #setenv TARGET_SDIR 'jurgenfd@gb-ui-kun.els.sara.nl:/home/jurgenfd/tmp/cingTmp'
-setenv TARGET_SDIR 'jd@nmr.cmbi.umcn.nl:/Users/jd/tmp/cingTmp'
+#setenv TARGET_SDIR 'jd@nmr.cmbi.umcn.nl:/Users/jd/tmp/cingTmp'
+setenv TARGET_SDIR 'jd@dodos.dyndns.org:/Users/jd/tmp/cingTmp'
 setenv TARGET_PORT ''
 
 if ( ! $isProduction ) then

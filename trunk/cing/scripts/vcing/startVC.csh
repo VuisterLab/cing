@@ -31,14 +31,15 @@ set log_file = "startVC_$time_string.log"
 cd
 
 # first time write to log do not append.
-echo "Startup script version 1.1 for VC at: $time_string on host: $HOST" |& tee $log_file
-# update log file on target of course this bits itself but it seems to be fine.
-scp -q $log_file $TARGET_SDIR
+echo "Startup script version 1.2 for VC at: $time_string on host: $HOST" |& tee $log_file
 
 if ( $isProduction ) then
     echo "Sleeping for $initialSleep seconds so system can come up with network etc." | & tee -a $log_file
     sleep $initialSleep # give 2 minutes for getting systems up. If the machine autoshuts this might have to be longer.
 endif
+
+# update log file on target of course this bites itself but it seems to be fine.
+scp -q $log_file $TARGET_SDIR
 
 if ( $doSvnUpdate ) then
     # When svn updating this file will corrupt my fine little system here by biting it's own tail. Manual step needed.

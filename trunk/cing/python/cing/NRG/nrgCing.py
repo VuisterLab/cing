@@ -1594,18 +1594,23 @@ class nrgCing(Lister):
     def createToposTokens(self):
         """Return True on error.
         """
-        # Tune this to:
-#            verbosity         inputDir             outputDir
-#            pdbConvention     restraintsConvention archiveType         projectType
-#            storeCING2db      ranges               filterTopViolations
+
+        # Sync below code with validateEntry#main
+        inputUrl = 'http://nmr.cmbi.ru.nl/NRG-CING/input' # NB cmbi.umcn.nl domain is not available inside cmbi weird.
+#        outputUrl = 'jd@nmr.cmbi.umcn.nl:/Library/WebServer/Documents/NRG-CING'
+        outputUrl = 'jd@dodos.dyndns.org:/Library/WebServer/Documents/NRG-CING'
+        storeCING2db = 0
         ranges = CV_RANGES_STR
         filterTopViolations = 1
+        filterVasco = 1
+
         extraArgListTxt = """
-            %s
-            http://nmr.cmbi.umcn.nl/NRG-CING/input jd@nmr.cmbi.umcn.nl:/Library/WebServer/Documents/NRG-CING
-            . . %s %s
             %s %s %s
-        """ % ( cing.verbosity, ARCHIVE_TYPE_BY_CH23, PROJECT_TYPE_CCPN, storeCING2db, ranges, filterTopViolations )
+            . . %s %s
+            %s %s %s %s
+        """ % ( cing.verbosity,  inputUrl, outputUrl,
+                ARCHIVE_TYPE_BY_CH23, PROJECT_TYPE_CCPN,
+                storeCING2db, ranges, filterTopViolations, filterVasco )
         extraArgListStr = ' '.join( extraArgListTxt.split())
 
         NTmessage("Starting createToposTokens with extra params: [%s]" % extraArgListStr)
@@ -1617,7 +1622,7 @@ class nrgCing(Lister):
         if 1: # DEFAULT: False
 #            self.entry_list_todo = readLinesFromFile('/Users/jd/NRG/lists/bmrbPdbEntryList_perm011_2713entries.csv')
             self.entry_list_todo = readLinesFromFile('/Users/jd/NRG/lists/bmrbPdbEntryList.csv')
-#            self.entry_list_todo = "1brv".split()
+            self.entry_list_todo = "1n6t".split() # Or other 10 residue entries:  1n6t 1p9f 1idv 1kuw 1n9u 1nxn 1gac 1hff 1t5n 1r4h
             self.entry_list_todo = NTlist( *self.entry_list_todo )
 
 
@@ -1644,16 +1649,18 @@ class nrgCing(Lister):
 
         if 0: # DEFAULT: False
             NTmessage("Going to use non-default entry_list_todo in prepare")
-            self.entry_list_todo = "1a24 1a4d 1afp 1ai0 1b4y 1brv 1bus 1c2n 1cjg 1d3z 1hue 1ieh 1iv6 1jwe 1kr8 2cka 2fws 2hgh 2jmx 2k0e 2kib 2knr 2kz0 2rop".split()
+#            self.entry_list_todo = "1a24 1a4d 1afp 1ai0 1b4y 1brv 1bus 1c2n 1cjg 1d3z 1hue 1ieh 1iv6 1jwe 1kr8 2cka 2fws 2hgh 2jmx 2k0e 2kib 2knr 2kz0 2rop".split()
 #            self.entry_list_todo = "1brv".split()
 #            self.entry_list_todo = readLinesFromFile('/Users/jd/NRG/lists/bmrbPdbEntryList.csv')
+#            self.entry_list_todo = NTlist( *self.entry_list_todo )
+#            self.entry_list_todo = readLinesFromFile(os.path.join(self.results_dir, 'entry_list_nmr_random_1-500.csv'))
+#            self.entry_list_todo = readLinesFromFile(os.path.join(self.results_dir, 'entry_list_prep_todo.csv'))
+#            self.entry_list_nmr = deepcopy(self.entry_list_todo)
+#            self.entry_list_nrg_docr = deepcopy(self.entry_list_todo)
+        if 0: # DEFAULT: False
+            self.searchPdbEntries()
+            self.entry_list_todo = readLinesFromFile(os.path.join(self.results_dir, 'entry_list_prep_todo.csv'))
             self.entry_list_todo = NTlist( *self.entry_list_todo )
-            self.entry_list_nmr = deepcopy(self.entry_list_todo)
-            self.entry_list_nrg_docr = deepcopy(self.entry_list_todo)
-            if 1: # use actual info instead of 2 lists above.
-                self.searchPdbEntries()
-        if 0: # DEFAULT 0
-            self.entry_list_todo = NTlist( *self.entry_list_nmr )
 
         permutationArgumentList = NTdict() # per permutation hold the entry list.
 
