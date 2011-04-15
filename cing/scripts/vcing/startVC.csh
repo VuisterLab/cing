@@ -42,9 +42,7 @@ endif
 
 if ( $doSvnUpdate ) then
     # When svn updating this file will corrupt my fine little system here by biting it's own tail. Manual step needed.
-    cd $CINGROOT
-    echo "Doing svn update." | & tee -a $log_file
-    svn --force --non-interactive --accept theirs-full update . | & tee -a $log_file
+    $CINGROOT/scripts/vcing/syncVCcode.csh | & tee -a $log_file
     cd
 endif
 scp -q $log_file $TARGET_SDIR
