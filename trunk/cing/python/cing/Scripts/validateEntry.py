@@ -4,6 +4,7 @@ from cing import header
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.Libs.disk import copy
 from cing.Libs.disk import rmdir
+from cing.Libs.network import sendFileByScp
 from cing.NRG import * #@UnusedWildImport
 from cing.NRG.settings import * #@UnusedWildImport
 from cing.NRG.storeCING2db import doStoreCING2db
@@ -322,15 +323,9 @@ def main(entryId, *extraArgList):
             NTerror("Failed to tar status: %s with result %s" % (status, result))
             return True
         if isRemoteOutputDir:
-            cmdScp = 'scp %s %s' % (tgzFileNameCing, outputDir)
-            NTdebug("cmdScp: %s" % cmdScp)
-            status, result = commands.getstatusoutput(cmdScp)
-            if status:
+            if sendFileByScp(tgzFileNameCing, outputDir):
                 NTerror("Failed to send File By Scp status: %s with result %s" % (status, result))
                 return True
-#            if vc.sendFileByScp( tgzFileNameCing, outputDir):
-#                NTerror("Failed to sendFileByScp")
-#                return True
             # end if
             NTmessage("Removing tgz result: %s" % tgzFileNameCing)
             os.remove(tgzFileNameCing)

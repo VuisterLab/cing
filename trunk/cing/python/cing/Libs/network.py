@@ -1,6 +1,7 @@
 # Obtained thru Tim Stevens.
 
 from cing.Libs.NTutils import * #@UnusedWildImport
+import commands
 import mimetools
 import mimetypes
 import urllib2
@@ -88,4 +89,29 @@ def sendRequest(url, fields, files=None):
 
     return response.read()
 
+
+def sendFileByScp( fileName, targetUrl, ensureDirIsPresent = True):
+    "Returns True for on error"
+    userNameAtDomain, targetDir = targetUrl.split(':')
+    if ensureDirIsPresent:
+        cmdSsh = 'ssh %s mkdir -p %s' % (userNameAtDomain, targetDir)
+        NTdebug("cmdSsh: %s" % cmdSsh)
+        status, result = commands.getstatusoutput(cmdSsh)
+        if status:
+            if 'File exists' in result:
+                pass # this is ok
+            else:
+                NTerror("Failed to create remote directory %s by ssh to %s. Status: %s with result %s" % (userNameAtDomain, targetDir, status, result))
+                return True
+            # end if
+        # end if
+    # end if
+
+    cmdScp = 'scp %s %s' % (fileName, targetUrl)
+    NTdebug("cmdScp: %s" % cmdScp)
+    status, result = commands.getstatusoutput(cmdScp)
+    if status:
+        NTerror("Failed to sendFileByScp status: %s with result %s" % (status, result))
+        return True
+# end def
 

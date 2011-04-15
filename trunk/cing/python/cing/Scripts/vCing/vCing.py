@@ -17,13 +17,13 @@ from cing import cingRoot
 from cing import header
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.Libs.forkoff import * #@UnusedWildImport
-from cing.Libs.helper import detectCPUs
 from cing.NRG import * #@UnusedWildImport
 from cing.main import getStartMessage
 from cing.main import getStopMessage
 import commands
 from cing.Libs.disk import rmdir
 from cing import cingDirScripts
+from cing.Libs.network import sendFileByScp
 
 try:
     from localConstants import pool_postfix_local, master_ssh_url_local
@@ -94,7 +94,7 @@ class vCing(Lister):
 #            jd:dodos/vCingSlave/ pwd
 #            /Library/WebServer/Documents/tmp/vCingSlave
 #            jd:dodos/vCingSlave/ ls -l
-#            lrwxr-xr-x  1 jd  admin  18 Apr 15 21:39 XXXXX@ -> /Volumes/tetra/XXXXX
+#            lrwxr-xr-x  1 jd  admin  18 Apr 15 21:39 vCingXXXXX@ -> /Volumes/tetra/vCingXXXXX
             NTwarning("Creating path that probably should be created manually because it might be an indirect one: %s" % self.MASTER_TARGET_DIR)
             mkdirs(self.MASTER_TARGET_DIR)
         if not os.path.exists(self.MASTER_TARGET_DIR):
@@ -245,22 +245,12 @@ class vCing(Lister):
         prefix = self.getPrefixForLevel(level_id)
 
         writeTextToFile(logFile, prefix + msg)
-        if self.sendFileByScp(logFile, self.MASTER_TARGET_LOG2):
+        targetUrl = '/'.join([self.MASTER_TARGET_URL, self.MASTER_TARGET_LOG2])
+        if sendFileByScp(logFile, targetUrl):
             NTerror("Failed to sendFileByScp with status: %s" % status)
             return True
-
-
-    def sendFileByScp(self, logFile, directory):
-        "Returns True for on error"
-        targetUrl = '/'.join([self.MASTER_TARGET_URL, directory])
-        cmdScp = 'scp %s %s' % (logFile, targetUrl)
-        NTdebug("cmdScp: %s" % cmdScp)
-        status, result = commands.getstatusoutput(cmdScp)
-        if status:
-            NTerror("Failed to sendFileByScp status: %s with result %s" % (status, result))
-        return status
+        # end if
     # end def
-
 
     def runSlaveThread(self):
         """
@@ -325,7 +315,8 @@ class vCing(Lister):
 
             fs = os.path.getsize(log_file_name)
             NTmessage("Payload returned with status: %s and log file size %s" % (cmdExitCode, fs))
-            if self.sendFileByScp(log_file_name, self.MASTER_TARGET_LOG):
+            targetUrl = '/'.join([self.MASTER_TARGET_URL, self.MASTER_TARGET_LOG])
+            if sendFileByScp(log_file_name, targetUrl):
                 NTerror("In runSlaveThread failed sendFileByScp")
             if cmdExitCode:
                 NTerror("Failed payload")
@@ -371,7 +362,7 @@ class vCing(Lister):
 
 
         job_list = []
-        ncpus = detectCPUs()
+        ncpus = cing.ncpus
         if False: # DEFAULT: False
             ncpus = 4
         for i in range(ncpus):
@@ -383,7 +374,7 @@ class vCing(Lister):
             job = (do_cmd, (cmd,))
             job_list.append(job)
 
-        delay_between_submitting_jobs = 10
+        delay_between_submitting_jobs = 60
         f = ForkOff(processes_max=ncpus, max_time_to_wait=self.max_time_to_wait)
         done_entry_list = f.forkoff_start(job_list, delay_between_submitting_jobs)
         NTdebug("In runSlave Should never get here in runSlave.")
