@@ -190,4 +190,8 @@ order by csd, resonancelist_id;
 
 
 delete FROM "nrgcing"."cingentry" e;
-SELECT name FROM "nrgcing"."cingentry" e;
+
+SELECT name, res_count FROM "nrgcing"."cingentry" e
+where res_count > 9
+order by res_count asc
+limit 10;

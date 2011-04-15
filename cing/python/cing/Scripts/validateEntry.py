@@ -108,7 +108,7 @@ def main(entryId, *extraArgList):
     NTmessage(header)
     NTmessage(getStartMessage())
 
-    # Note that for NRG-CING an additional argument may be given.
+    # Sync below code with nrgCing#createToposTokens
     expectedArgumentList = """
     verbosity         inputDir             outputDir
     pdbConvention     restraintsConvention archiveType         projectType

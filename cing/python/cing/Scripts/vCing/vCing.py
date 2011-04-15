@@ -73,7 +73,7 @@ class vCing(Lister):
         self.MASTER_SSH_URL = master_ssh_url_local
         if master_ssh_url:
             self.MASTER_SSH_URL = master_ssh_url
-        self.MASTER_D = '/Library/WebServer/Documents' # This is a mac but can be adjusted.
+        self.MASTER_D = '/Library/WebServer/Documents' # This is a mac but can be adjusted ;-)
         self.MASTER_TARGET_DIR = self.MASTER_D + '/tmp/vCingSlave/' + self.toposPool
         self.MASTER_TARGET_URL = self.MASTER_SSH_URL + ':' + self.MASTER_TARGET_DIR
 #        self.MASTER_SOURCE_SDIR = self.MASTER_D_URL + '/tmp/vCingSlave/' + self.toposPool
@@ -82,29 +82,36 @@ class vCing(Lister):
         self.time_sleep_when_no_token = 5 * 60                        # 5 minutes
         self.lockTimeOut = 5 * 60                                     # 5 minutes
 
-    def prepareMaster(self):
-        logDir = os.path.join(self.MASTER_TARGET_DIR, self.MASTER_TARGET_LOG)
-        log2Dir = os.path.join(self.MASTER_TARGET_DIR, self.MASTER_TARGET_LOG2)
-        resultDir = os.path.join(self.MASTER_TARGET_DIR, self.MASTER_TARGET_RESULT)
-        for d in (logDir, log2Dir, resultDir, cingDirTmp):
-            NTdebug("Creating %s" % d)
-            mkdirs(d)
-
-        # now manually fill pool with something like this:
-#        $CINGROOT/scripts/vcing/topos/topos createTokensFromLinesInFile vCingXXXXXX ~/toposTestTokens.txt
-        # or use interface at:
-        # https://topos.grid.sara.nl/4.1/pools/vCingXXXXXX/tokens/
-        # replacing XXXXXX of course.
+    def cleanMaster(self):
+        return self.prepareMaster(doClean=True)
     # end def
 
-    def cleanMaster(self):
-        logDir = os.path.join(self.MASTER_TARGET_DIR, self.MASTER_TARGET_LOG)
-        log2Dir = os.path.join(self.MASTER_TARGET_DIR, self.MASTER_TARGET_LOG2)
-        resultDir = os.path.join(self.MASTER_TARGET_DIR, self.MASTER_TARGET_RESULT)
-        for d in (logDir, log2Dir, resultDir, cingDirTmp):
-            NTdebug("Removing and recreating %s" % d)
-            rmdir(d)
+    def prepareMaster(self, doClean=False):
+        "Return True on error."
+        cwd = os.getcwd()
+        if not os.path.exists(self.MASTER_TARGET_DIR):
+            # Setup in April 2011. Where XXXXXX is the not to be committed pool id.
+#            jd:dodos/vCingSlave/ pwd
+#            /Library/WebServer/Documents/tmp/vCingSlave
+#            jd:dodos/vCingSlave/ ls -l
+#            lrwxr-xr-x  1 jd  admin  18 Apr 15 21:39 XXXXX@ -> /Volumes/tetra/XXXXX
+            NTwarning("Creating path that probably should be created manually because it might be an indirect one: %s" % self.MASTER_TARGET_DIR)
+            mkdirs(self.MASTER_TARGET_DIR)
+        if not os.path.exists(self.MASTER_TARGET_DIR):
+            NTerror("Failed to create: " + self.MASTER_TARGET_DIR)
+            return True
+        os.chdir(self.MASTER_TARGET_DIR)
+        for d in (self.MASTER_TARGET_LOG, self.MASTER_TARGET_LOG2, self.MASTER_TARGET_RESULT):
+            if doClean:
+                NTdebug("Removing and recreating %s" % d)
+                rmdir(d)
+            else:
+                NTdebug("Creating if needed %s" % d)
             mkdirs(d)
+        # end for
+        os.chdir(cwd)
+    # end def
+
 
     def addTokenListToTopos(self, fileName):
         cmdTopos = ' '.join([self.toposProg, 'createTokensFromLinesInFile', self.toposPool, fileName])

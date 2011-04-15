@@ -23,6 +23,7 @@ PDB  BMRB  Notes
 1ieh  4969 all beta from WFV (2002)
 1iv6  5317 complex
 1otz       Large X-ray entry at 3.3 Ang., 60 chains.
+1uao       Smallest sheet of only 10 AA.
 1v0e       Large X-ray entry with ~5,000 residues (hexamer of 666 AA) containing 3,000+ water molecules
 2fws  7009 First Ca2+ binding domain of the Na,Ca-exchanger (NCX1) from GWV (2006).
 2jmx 15072 All beta from Neuhaus (2007).
