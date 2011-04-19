@@ -229,7 +229,7 @@ class nrgCing(Lister):
     #    new_hits_entry_list         = string.split("2jqv 2jnb 2jnv 2jvo 2jvr 2jy7 2jy8 2oq9 2osq 2osr 2otr 2rn9 2rnb")
 
         if 0: # DEFAULT False; use for processing a specific batch.
-            entryListFileName = os.path.join(self.results_dir, 'entry_list_todo_all.csv')
+            entryListFileName = os.path.join(self.results_dir, 'entry_list_nmr_random_1-500.csv')
             new_hits_entry_list = readLinesFromFile(entryListFileName)
 #            new_hits_entry_list = new_hits_entry_list[100:110]
 
@@ -474,6 +474,12 @@ class nrgCing(Lister):
                 NTmessage("%s %s" % (entry_code, resultList[0]))
             if timeTaken:
                 self.timeTakenDict[entry_code] = timeTaken
+            # Check resulting file.
+            ccpnInputFilePath = os.path.join(self.results_dir, self.inputDir, entryCodeChar2and3, "%s.tgz" % entry_code)
+            if not os.path.exists(ccpnInputFilePath):
+                self.entry_list_prep_failed.append(entry_code)
+                NTerror("%s Failed to find ccpn input file: %s" % (entry_code,ccpnInputFilePath))
+                continue
             self.entry_list_prep_done.append(entry_code)
         # end for
         timeTakenList = NTlist(*self.timeTakenDict.values())
@@ -1474,6 +1480,7 @@ class nrgCing(Lister):
                 finalPhaseId = PHASE_F
             # end if
         # end filterCcpnAll
+        NTmessage("Before copyToInputDir")
         if copyToInputDir:
             if not finalPhaseId:
                 NTerror("Failed to finish any prep stage.")
@@ -1501,14 +1508,14 @@ class nrgCing(Lister):
                 os.remove(fullDst)
 #            os.link(finalInputTgz, fullDst) # Will use less resources but will be expanded when copied between resources.
             disk.copy(finalInputTgz, fullDst)
-#            NTdebug("Copied input %s to: %s" % (finalInputTgz, dst))
+            NTmessage("Copied input %s to: %s" % (finalInputTgz, fullDst)) # should be a debug statement.
         else:
             NTwarning("Did not copy input %s" % finalInputTgz)
         # end else
         if 0: # DEFAULT: 0
             self.entry_list_todo = [ entry_code ]
             self.runCing()
-        NTmessage("Done with %s" % entry_code)
+        NTmessage("Done prepareEntry with %s" % entry_code)
     # end def
 
 
@@ -1596,7 +1603,9 @@ class nrgCing(Lister):
         """
 
         # Sync below code with validateEntry#main
-        inputUrl = 'http://nmr.cmbi.ru.nl/NRG-CING/input' # NB cmbi.umcn.nl domain is not available inside cmbi weird.
+#        inputUrl = 'http://nmr.cmbi.ru.nl/NRG-CING/input' # NB cmbi.umcn.nl domain is not available inside cmbi weird.
+#        inputUrl = 'http://nmr.cmbi.umcn.nl/NRG-CING/input' # NB cmbi.umcn.nl domain is not available inside cmbi weird.
+        inputUrl = 'http://dodos.dyndns.org/NRG-CING/input' # NB cmbi.umcn.nl domain is not available inside cmbi weird.
 #        outputUrl = 'jd@nmr.cmbi.umcn.nl:/Library/WebServer/Documents/NRG-CING'
         outputUrl = 'jd@dodos.dyndns.org:/Library/WebServer/Documents/NRG-CING'
         storeCING2db = 0
@@ -1619,10 +1628,10 @@ class nrgCing(Lister):
         self.entry_list_todo = NTlist()
         self.entry_list_todo.addList(self.entry_list_nmr)
         self.entry_list_todo = self.entry_list_todo.difference(self.entry_list_done)
-        if 1: # DEFAULT: False
-#            self.entry_list_todo = readLinesFromFile('/Users/jd/NRG/lists/bmrbPdbEntryList_perm011_2713entries.csv')
-            self.entry_list_todo = readLinesFromFile('/Users/jd/NRG/lists/bmrbPdbEntryList.csv')
-            self.entry_list_todo = "1n6t".split() # Or other 10 residue entries:  1n6t 1p9f 1idv 1kuw 1n9u 1nxn 1gac 1hff 1t5n 1r4h
+        if True: # DEFAULT: True
+            self.entry_list_todo = readLinesFromFile(os.path.join(self.results_dir, 'entry_list_nmr_random_4-3001-7000.csv'))
+#            self.entry_list_todo = "1n6t".split() # Or other 10 residue entries:  1n6t 1p9f 1idv 1kuw 1n9u 1hff  1r4h
+            # invalids 1nxn 1gac 1t5n
             self.entry_list_todo = NTlist( *self.entry_list_todo )
 
 
@@ -1776,11 +1785,12 @@ Additional modes I see:
     cing.verbosity = verbosityDebug
     max_entries_todo = 40  # DEFAULT: 40
     useTopos = 0           # DEFAULT: 0
+    processes_max = None # Default None to be determined by os.
 
     NTmessage(header)
     NTmessage(getStartMessage())
     ## Initialize the project
-    m = nrgCing(isProduction=isProduction, max_entries_todo=max_entries_todo, useTopos=useTopos)
+    m = nrgCing(isProduction=isProduction, max_entries_todo=max_entries_todo, useTopos=useTopos, processes_max = processes_max )
 
     destination = sys.argv[1]
     hasPdbId = False

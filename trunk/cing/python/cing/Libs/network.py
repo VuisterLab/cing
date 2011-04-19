@@ -90,8 +90,9 @@ def sendRequest(url, fields, files=None):
     return response.read()
 
 
-def sendFileByScp( fileName, targetUrl, ensureDirIsPresent = True):
+def sendFileByScp( fileName, targetUrl, ensureDirIsPresent = True, ntriesMax = 2):
     "Returns True for on error"
+
     userNameAtDomain, targetDir = targetUrl.split(':')
     if ensureDirIsPresent:
         cmdSsh = 'ssh %s mkdir -p %s' % (userNameAtDomain, targetDir)
@@ -106,12 +107,20 @@ def sendFileByScp( fileName, targetUrl, ensureDirIsPresent = True):
             # end if
         # end if
     # end if
-
-    cmdScp = 'scp %s %s' % (fileName, targetUrl)
+    # -l units are kbit/s
+    cmdScp = 'scp -v -l 40000 %s %s' % (fileName, targetUrl)
     NTdebug("cmdScp: %s" % cmdScp)
-    status, result = commands.getstatusoutput(cmdScp)
-    if status:
+    for tryCount in range(ntriesMax):
+        NTdebug("Try count: %s" % tryCount)
+        if tryCount:
+            NTwarning("Retrying count: %s" % tryCount)
+        status, result = commands.getstatusoutput(cmdScp)
+        if not status:
+            NTdebug("Succeeded sendFileByScp by command: %s" % cmdScp)
+            return
+        # end if
         NTerror("Failed to sendFileByScp status: %s with result %s" % (status, result))
-        return True
+    # end for
+    NTerror("Failed to sendFileByScp after all %s tries." % ntriesMax)
+    return True
 # end def
-
