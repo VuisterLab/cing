@@ -108,7 +108,8 @@ def sendFileByScp( fileName, targetUrl, ensureDirIsPresent = True, ntriesMax = 2
         # end if
     # end if
     # -l units are kbit/s
-    cmdScp = 'scp -v -l 40000 %s %s' % (fileName, targetUrl)
+    cmdScp = 'scp %s %s' % (fileName, targetUrl)
+#    cmdScp = 'rsync -ave ssh %s %s/' % (fileName, targetUrl)
     NTdebug("cmdScp: %s" % cmdScp)
     for tryCount in range(ntriesMax):
         NTdebug("Try count: %s" % tryCount)
@@ -124,3 +125,25 @@ def sendFileByScp( fileName, targetUrl, ensureDirIsPresent = True, ntriesMax = 2
     NTerror("Failed to sendFileByScp after all %s tries." % ntriesMax)
     return True
 # end def
+
+def getFileByRsyncOver( sourceUrl, targetUrl, rsyncOptions = "-r", ntriesMax = 2):
+    "Returns True for on error"
+    # NB the trailing / just to be sure it goes to a directory.
+    # consider using --max-delete=NUM when using delete options.
+    cmd = 'rsync %s -ave ssh %s %s/' % (rsyncOptions, sourceUrl, targetUrl)
+#    NTdebug("cmd: %s" % cmd)
+    for tryCount in range(ntriesMax):
+#        NTdebug("Try count: %s" % tryCount)
+        if tryCount:
+            NTwarning("Retrying count: %s" % tryCount)
+        status, result = commands.getstatusoutput(cmd)
+        if not status:
+            NTdebug("Succeeded sendFileByScp by command: %s" % cmd)
+            return
+        # end if
+        NTerror("Failed to sendFileByScp status: %s with result %s" % (status, result))
+    # end for
+    NTerror("Failed to sendFileByScp after all %s tries." % ntriesMax)
+    return True
+# end def
+

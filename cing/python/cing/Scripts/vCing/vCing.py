@@ -26,7 +26,7 @@ from cing import cingDirScripts
 from cing.Libs.network import sendFileByScp
 
 try:
-    from localConstants import pool_postfix_local, master_ssh_url_local
+    from localConstants import * #@UnusedWildImport
 except:
     NTtracebackError() # codes below are nonsense.
 #    pool_postfix = 'invalidPostFix'
@@ -58,7 +58,7 @@ class vCing(Lister):
     MASTER_TARGET_LOG2 = 'log2' # For slave's log (just a one or two lines
     MASTER_TARGET_RESULT = 'result' # Payload result
 
-    def __init__(self, master_ssh_url=None, cmdDict='', toposPool = None, max_time_to_wait_per_job = 60 * 60 * 6):
+    def __init__(self, master_ssh_url=None, master_d=None, cmdDict='', toposPool = None, max_time_to_wait_per_job = 60 * 60 * 6):
         self.toposDir = os.path.join(cingRoot, "scripts", "vcing", "topos")
         self.toposRealm = 'https://topos.grid.sara.nl/4.1/'
         self.toposPool = 'vCing' + pool_postfix_local
@@ -73,7 +73,9 @@ class vCing(Lister):
         self.MASTER_SSH_URL = master_ssh_url_local
         if master_ssh_url:
             self.MASTER_SSH_URL = master_ssh_url
-        self.MASTER_D = '/Library/WebServer/Documents' # This is a mac but can be adjusted ;-)
+        self.MASTER_D = master_d_local
+        if master_d:
+            self.MASTER_D = master_d
         self.MASTER_TARGET_DIR = self.MASTER_D + '/tmp/vCingSlave/' + self.toposPool
         self.MASTER_TARGET_URL = self.MASTER_SSH_URL + ':' + self.MASTER_TARGET_DIR
 #        self.MASTER_SOURCE_SDIR = self.MASTER_D_URL + '/tmp/vCingSlave/' + self.toposPool
