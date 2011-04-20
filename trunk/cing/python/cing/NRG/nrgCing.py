@@ -1603,12 +1603,12 @@ class nrgCing(Lister):
         """
 
         # Sync below code with validateEntry#main
-        inputUrl = 'http://nmr.cmbi.ru.nl/NRG-CING/input' # NB cmbi.umcn.nl domain is not available inside cmbi weird.
-#        inputUrl = 'http://nmr.cmbi.umcn.nl/NRG-CING/input' # NB cmbi.umcn.nl domain is not available inside cmbi weird.
+#        inputUrl = 'http://nmr.cmbi.ru.nl/NRG-CING/input' # NB cmbi.umcn.nl domain is not available inside cmbi weird.
+        inputUrl = 'ssh://jurgenfd@gb-ui-kun.els.sara.nl:/home/jurgenfd/D/NRG-CING/input'
 #        inputUrl = 'http://dodos.dyndns.org/NRG-CING/input' # NB cmbi.umcn.nl domain is not available inside cmbi weird.
 #        outputUrl = 'jd@nmr.cmbi.umcn.nl:/Library/WebServer/Documents/NRG-CING'
 #        outputUrl = 'jd@dodos.dyndns.org:/Library/WebServer/Documents/NRG-CING'
-        outputUrl = 'jurgenfd@gb-ui-kun.els.sara.nl:/home/jurgenfd/tmp'
+        outputUrl = 'ssh://jurgenfd@gb-ui-kun.els.sara.nl:/home/jurgenfd/D/NRG-CING'
 #
         storeCING2db = 0
         ranges = CV_RANGES_STR
@@ -1631,7 +1631,7 @@ class nrgCing(Lister):
         self.entry_list_todo.addList(self.entry_list_nmr)
         self.entry_list_todo = self.entry_list_todo.difference(self.entry_list_done)
         if True: # DEFAULT: True
-#            self.entry_list_todo = readLinesFromFile(os.path.join(self.results_dir, 'entry_list_nmr_random_5_7001-8859.csv'))
+#            self.entry_list_todo = readLinesFromFile(os.path.join(self.results_dir, 'entry_list_nmr_random_6.csv'))
             self.entry_list_todo = "1n6t".split() # Or other 10 residue entries:  1n6t 1p9f 1idv 1kuw 1n9u 1hff  1r4h
             # invalids 1nxn 1gac 1t5n
             self.entry_list_todo = NTlist( *self.entry_list_todo )

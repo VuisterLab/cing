@@ -4,7 +4,7 @@ from cing import header
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.Libs.disk import copy
 from cing.Libs.disk import rmdir
-from cing.Libs.network import sendFileByScp
+from cing.Libs.network import * #@UnusedWildImport
 from cing.NRG import * #@UnusedWildImport
 from cing.NRG.settings import * #@UnusedWildImport
 from cing.NRG.storeCING2db import doStoreCING2db
@@ -13,8 +13,8 @@ from cing.core.constants import * #@UnusedWildImport
 from cing.main import getStartMessage
 from cing.main import getStopMessage
 from shutil import rmtree
-import commands
 import shutil
+import string
 import urllib
 
 # One size fit all so the same code for VC and regular use.
@@ -211,7 +211,9 @@ def main(entryId, *extraArgList):
     fileNameTgz = formatFileName % entryId
 
 #    NTdebug("fileNameTgz: %s" % fileNameTgz)
-    if inputDir.startswith("http") or inputDir.startswith("file"):
+    allowedInputProtocolList = 'http file ssh'.split()
+    inputProtocal = string.split( inputDir, ':' )[0]
+    if inputProtocal in allowedInputProtocolList:
         stillToRetrieve = False
         if os.path.exists(fileNameTgz):
             if FORCE_RETRIEVE_INPUT:
@@ -228,6 +230,8 @@ def main(entryId, *extraArgList):
             NTerror("Tgz should already have been present skipping entry")
             return
         # end if
+    else:
+        NTdebug("Entry not retrieved which might be normal in some situations.")
     # end if.
 
     if projectType == PROJECT_TYPE_CING:
@@ -323,8 +327,9 @@ def main(entryId, *extraArgList):
             NTerror("Failed to tar status: %s with result %s" % (status, result))
             return True
         if isRemoteOutputDir:
-            if sendFileByScp(tgzFileNameCing, outputDir):
+            if putFileBySsh(tgzFileNameCing, outputDir, ntriesMax = 2):
                 NTerror("Failed to send File By Scp status: %s with result %s" % (status, result))
+                NTerror("Maintaining results.")
                 return True
             # end if
             NTmessage("Removing tgz result: %s" % tgzFileNameCing)
@@ -350,6 +355,7 @@ def retrieveTgzFromUrl(entryId, url, archiveType=ARCHIVE_TYPE_FLAT, formatFileNa
     if os.path.exists(fileNameTgz):
         NTmessage("Tgz already present, skipping download")
         return
+#    NTdebug("fileNameTgz: %s" % fileNameTgz)
 
     pathInsert = ''
     # TODO: check
@@ -373,21 +379,16 @@ def retrieveTgzFromUrl(entryId, url, archiveType=ARCHIVE_TYPE_FLAT, formatFileNa
         if os.path.exists(fileNameTgz):
             NTmessage('Removing old copy: %s' % fileNameTgz)
             os.unlink(fileNameTgz)
-#        os.symlink(fullPathSource, fileNameTgz)
-#        cwd = os.getcwd()
-#        print "fullPathSource:",fullPathSource
-#        print "fileNameTgz:",fileNameTgz
-#        print "cwd:",cwd
-
         copy(fullPathSource, fileNameTgz)
-
-    elif url.startswith('http:/'):
+    elif url.startswith('http://'):
         urlNameTgz = "%s%s/%s" % (url, pathInsert, fileNameTgz)
         NTmessage("downloading url: %s to: %s" % (urlNameTgz, fileNameTgz))
         urllib.urlretrieve(urlNameTgz, fileNameTgz)
-#    elif url.startswith('ssh:/'):
-#        urllib2.urlretrieve(urlNameTgz, fileNameTgz)
-    # ssh://[<user>[;fingerprint=<host-key fingerprint>]@]<host>[:<port>] from http://en.wikipedia.org/wiki/URI_scheme
+    elif url.startswith('ssh://'):
+        urlNameTgz = "%s%s/%s" % (url, pathInsert, fileNameTgz)
+        NTmessage("Retrieving by ssh: %s to: %s" % (urlNameTgz, fileNameTgz))
+        if getFileBySsh(urlNameTgz, fileNameTgz, ntriesMax = 2):
+            NTerror( "Giving up ")
     else:
         NTerror("url has to start with http:/ or file:/ but was: %s" % (url))
         return True

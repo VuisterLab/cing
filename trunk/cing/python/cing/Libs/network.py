@@ -90,8 +90,16 @@ def sendRequest(url, fields, files=None):
     return response.read()
 
 
-def sendFileByScp( fileName, targetUrl, ensureDirIsPresent = True, ntriesMax = 2):
-    "Returns True for on error"
+def putFileBySsh( fileName, targetUrl, ensureDirIsPresent = True, rsyncOptions = '', ntriesMax = 1):
+    "Returns True on error"
+
+    if not os.path.exists(fileName):
+        NTerror("Failed to %s because of missing input file %s." % (getCallerName(), fileName))
+        return True
+
+    if targetUrl.startswith('ssh://'):
+        sshUrlLength = len('ssh://')
+        targetUrl = targetUrl[sshUrlLength:]
 
     userNameAtDomain, targetDir = targetUrl.split(':')
     if ensureDirIsPresent:
@@ -108,29 +116,8 @@ def sendFileByScp( fileName, targetUrl, ensureDirIsPresent = True, ntriesMax = 2
         # end if
     # end if
     # -l units are kbit/s
-    cmdScp = 'scp %s %s' % (fileName, targetUrl)
-#    cmdScp = 'rsync -ave ssh %s %s/' % (fileName, targetUrl)
-    NTdebug("cmdScp: %s" % cmdScp)
-    for tryCount in range(ntriesMax):
-        NTdebug("Try count: %s" % tryCount)
-        if tryCount:
-            NTwarning("Retrying count: %s" % tryCount)
-        status, result = commands.getstatusoutput(cmdScp)
-        if not status:
-            NTdebug("Succeeded sendFileByScp by command: %s" % cmdScp)
-            return
-        # end if
-        NTerror("Failed to sendFileByScp status: %s with result %s" % (status, result))
-    # end for
-    NTerror("Failed to sendFileByScp after all %s tries." % ntriesMax)
-    return True
-# end def
-
-def getFileByRsyncOver( sourceUrl, targetUrl, rsyncOptions = "-r", ntriesMax = 2):
-    "Returns True for on error"
-    # NB the trailing / just to be sure it goes to a directory.
-    # consider using --max-delete=NUM when using delete options.
-    cmd = 'rsync %s -ave ssh %s %s/' % (rsyncOptions, sourceUrl, targetUrl)
+#    cmd = 'scp %s %s' % (fileName, targetUrl)
+    cmd = 'rsync %s -ave ssh %s %s/' % (rsyncOptions, fileName, targetUrl)
 #    NTdebug("cmd: %s" % cmd)
     for tryCount in range(ntriesMax):
 #        NTdebug("Try count: %s" % tryCount)
@@ -138,12 +125,39 @@ def getFileByRsyncOver( sourceUrl, targetUrl, rsyncOptions = "-r", ntriesMax = 2
             NTwarning("Retrying count: %s" % tryCount)
         status, result = commands.getstatusoutput(cmd)
         if not status:
-            NTdebug("Succeeded sendFileByScp by command: %s" % cmd)
+#            NTdebug("Succeeded putFileBySsh by command: %s" % cmd)
             return
         # end if
-        NTerror("Failed to sendFileByScp status: %s with result %s" % (status, result))
+        NTerror("Failed to putFileBySsh status: %s with result %s" % (status, result))
     # end for
-    NTerror("Failed to sendFileByScp after all %s tries." % ntriesMax)
+    NTerror("Failed to putFileBySsh after all %s tries." % ntriesMax)
+    return True
+# end def
+
+def getFileBySsh( sourceUrl, targetUrl, rsyncOptions = '', ntriesMax = 1):
+    "Returns True on error"
+    # NB the trailing / just to be sure it goes to a directory.
+    # consider using --max-delete=NUM when using delete options.
+    if sourceUrl.startswith('ssh://'):
+        sshUrlLength = len('ssh://')
+#        sourceUrlOrg = sourceUrl
+        sourceUrl = sourceUrl[sshUrlLength:]
+#        NTdebug("Rewrote sourceUrl %s to: %s" % ( sourceUrlOrg, sourceUrl))
+    # end if
+    cmd = 'rsync %s -ave ssh %s %s' % (rsyncOptions, sourceUrl, targetUrl)
+#    NTdebug("cmd: %s" % cmd)
+    for tryCount in range(ntriesMax):
+#        NTdebug("Try count: %s" % tryCount)
+        if tryCount:
+            NTwarning("Retrying count: %s" % tryCount)
+        status, result = commands.getstatusoutput(cmd)
+        if not status:
+#            NTdebug("Succeeded %s by command: %s" % (getCallerName(), cmd))
+            return
+        # end if
+        NTerror("Failed to %s status: %s with result %s" % ((getCallerName(), status, result)))
+    # end for
+    NTerror("Failed to %s after all %s tries." % ((getCallerName(), ntriesMax)))
     return True
 # end def
 
