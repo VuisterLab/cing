@@ -31,7 +31,7 @@ set log_file = "startVC_$time_string.log"
 cd
 
 # first time write to log do not append.
-echo "Startup script version 1.2 for VC at: $time_string on host: $HOST" |& tee $log_file
+echo "Startup script version 1.3 for VC at: $time_string on host: $HOST" |& tee $log_file
 
 if ( $isProduction ) then
     echo "Sleeping for $initialSleep seconds so system can come up with network etc." | & tee -a $log_file

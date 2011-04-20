@@ -1,27 +1,29 @@
 from cing import cingDirTestsData
+from cing import cingDirTmp
 from cing.Libs.NTutils import * #@UnusedWildImport
-from cing.Libs.network import getFileByRsyncOver
-from cing.Libs.network import sendFileByScp
+from cing.Libs.network import * #@UnusedWildImport
 from unittest import TestCase
 import unittest
 
 class AllChecks(TestCase):
 
-    def _test_sendFileByScp(self):
-        entryId = '1brv'
-        fileName = os.path.join(cingDirTestsData, "ccpn", entryId + ".tgz")
-#        fileName = '/home/i/workspace/whatif/bindata/ALCONT.ACT'
-#        fileName = '/Users/jd/workspace35/whatif/bindata/ALCONT.ACT'
+    cingDirTmpTest = os.path.join( cingDirTmp, 'test_network' )
+    mkdirs( cingDirTmpTest )
+    os.chdir(cingDirTmpTest)
+
+    def _test_putFileBySsh(self):
+        fileName = os.path.join(cingDirTestsData, "ccpn", '1brv' + ".tgz") #@UnusedVariable
+#        fileName = '%s/bindata/ALCONT.ACT'
+        fileName = '/Users/jd/workspace35/whatif/bindata/ALCONT.ACT'
 #        targetUrl = 'jd@dodos.dyndns.org:/Users/jd/tmp/x/y/z/a/b'
         targetUrl = 'jurgenfd@gb-ui-kun.els.sara.nl:/home/jurgenfd/tmp'
-        NTdebug("Trying targetUrl: %s" % targetUrl)
-        self.assertFalse( sendFileByScp( fileName, targetUrl ))
+        self.assertFalse( putFileBySsh( fileName, targetUrl, ntriesMax = 2 ))
 
-    def _test_getFileByScp(self):
+    def _test_getFileBySsh(self):
         fn = 't'
-        sourceUrl = 'jurgenfd@gb-ui-kun.els.sara.nl:/data/home/jurgenfd/' + fn
-        targetUrl = '/Users/jd'
-        self.assertFalse( getFileByRsyncOver( sourceUrl, targetUrl ))
+        sourceUrl = 'ssh://jurgenfd@gb-ui-kun.els.sara.nl:/home/jurgenfd/' + fn
+#        targetUrl = '/Users/jd'
+        self.assertFalse( getFileBySsh( sourceUrl, '.', ntriesMax = 2 ))
     # end def
 # end class
 

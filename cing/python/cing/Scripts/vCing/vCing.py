@@ -11,19 +11,18 @@
 # Author: Jurgen F. Doreleijers
 # Thu Oct 14 23:56:36 CEST 2010
 
+from cing import cingDirScripts
 from cing import cingDirTmp
 from cing import cingPythonDir
 from cing import cingRoot
 from cing import header
 from cing.Libs.NTutils import * #@UnusedWildImport
+from cing.Libs.disk import rmdir
 from cing.Libs.forkoff import * #@UnusedWildImport
+from cing.Libs.network import * #@UnusedWildImport
 from cing.NRG import * #@UnusedWildImport
 from cing.main import getStartMessage
 from cing.main import getStopMessage
-import commands
-from cing.Libs.disk import rmdir
-from cing import cingDirScripts
-from cing.Libs.network import sendFileByScp
 
 try:
     from localConstants import * #@UnusedWildImport
@@ -69,7 +68,6 @@ class vCing(Lister):
         self.toposProg = os.path.join(self.toposDir, "topos")
         self.toposProgCreateTokens = os.path.join(self.toposDir, "createTokens")
 
-        self.DEFAULT_URL = 'http://nmr.cmbi.ru.nl/NRG-CING/recoordSync'
         self.MASTER_SSH_URL = master_ssh_url_local
         if master_ssh_url:
             self.MASTER_SSH_URL = master_ssh_url
@@ -248,8 +246,8 @@ class vCing(Lister):
 
         writeTextToFile(logFile, prefix + msg)
         targetUrl = '/'.join([self.MASTER_TARGET_URL, self.MASTER_TARGET_LOG2])
-        if sendFileByScp(logFile, targetUrl):
-            NTerror("Failed to sendFileByScp with status: %s" % status)
+        if putFileBySsh(logFile, targetUrl):
+            NTerror("Failed to putFileBySsh with status: %s" % status)
             return True
         # end if
     # end def
@@ -318,8 +316,8 @@ class vCing(Lister):
             fs = os.path.getsize(log_file_name)
             NTmessage("Payload returned with status: %s and log file size %s" % (cmdExitCode, fs))
             targetUrl = '/'.join([self.MASTER_TARGET_URL, self.MASTER_TARGET_LOG])
-            if sendFileByScp(log_file_name, targetUrl):
-                NTerror("In runSlaveThread failed sendFileByScp")
+            if putFileBySsh(log_file_name, targetUrl):
+                NTerror("In runSlaveThread failed putFileBySsh")
             if cmdExitCode:
                 NTerror("Failed payload")
                 if self.deleteLock(tokenLock):
@@ -366,7 +364,7 @@ class vCing(Lister):
         job_list = []
         ncpus = cing.ncpus
         if False: # DEFAULT: False
-            ncpus = 4
+            ncpus = 1
         for i in range(ncpus):
             date_stamp = getDateTimeStampForFileName()
             base_name = NTpath(__file__)[1]
