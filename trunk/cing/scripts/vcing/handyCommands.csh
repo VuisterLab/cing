@@ -17,3 +17,7 @@ rm $list
 # Check signature of last logs coming in. Replace XXXX
 cd /Library/WebServer/Documents/tmp/vCingSlave/vCingXXXX/log
 ls -tr | tail | gawk '{printf " %s", $0}' | xargs grep cores
+
+
+foreach try in ( 0 1 2 )
+    

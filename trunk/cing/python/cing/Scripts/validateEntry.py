@@ -385,6 +385,9 @@ def retrieveTgzFromUrl(entryId, url, archiveType=ARCHIVE_TYPE_FLAT, formatFileNa
         urlNameTgz = "%s%s/%s" % (url, pathInsert, fileNameTgz)
         NTmessage("downloading url: %s to: %s" % (urlNameTgz, fileNameTgz))
         urllib.urlretrieve(urlNameTgz, fileNameTgz)
+#    elif url.startswith('ssh:/'):
+#        urllib2.urlretrieve(urlNameTgz, fileNameTgz)
+    # ssh://[<user>[;fingerprint=<host-key fingerprint>]@]<host>[:<port>] from http://en.wikipedia.org/wiki/URI_scheme
     else:
         NTerror("url has to start with http:/ or file:/ but was: %s" % (url))
         return True
