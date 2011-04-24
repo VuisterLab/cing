@@ -3484,7 +3484,7 @@ ROG score:         %7s
         header = '%s DistanceRestraintList "%s" (%s,%d) %s\n' % (
             dots, self.name, self.status, len(self), dots)
         msg = header + msg
-        msg += RestraintList.format(self, showAll = True)
+        msg += RestraintList.format(self, showAll = False)
         return msg
     #end def
 

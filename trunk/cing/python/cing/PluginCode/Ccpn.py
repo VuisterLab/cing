@@ -2840,7 +2840,8 @@ def saveCcpnMetaData(project, tmp = None):
     #end if
     projectDistList = project.distances
     if not len(projectDistList):
-        NTdebug("self.project.distances is empty but FC meta data will still be looked for.")
+        pass
+#        NTdebug("self.project.distances is empty but FC meta data will still be looked for.")
     star_text = getDeepByKeysOrAttributes(projectDistList, STEREO_ASSIGNMENT_CORRECTIONS_STAR_STR)
     if not star_text:
 #        NTdebug("No star_text")
