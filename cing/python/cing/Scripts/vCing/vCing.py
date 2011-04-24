@@ -4,7 +4,7 @@
 # Use:
 # $CINGROOT/python/cing/Scripts/vCing/vCing.py runSlaveThread
 # $CINGROOT/python/cing/Scripts/vCing/vCing.py runSlave
-
+# $CINGROOT/python/cing/Scripts/vCing/vCing.py startMaster $D/NRG-CING/token_list_todo.txt
 # In order to test killing capabilities try (replacing 99999 by pid):
 # E.g. set pid = 4237 && kill -2 $pid && sleep 10 && kill -2 $pid
 
@@ -17,10 +17,10 @@ from cing import cingPythonDir
 from cing import cingRoot
 from cing import header
 from cing.Libs.NTutils import * #@UnusedWildImport
-from cing.Libs.disk import rmdir
 from cing.Libs.forkoff import * #@UnusedWildImport
 from cing.Libs.network import * #@UnusedWildImport
 from cing.NRG import * #@UnusedWildImport
+from cing.Scripts.vCing.Utils import prepareMaster
 from cing.main import getStartMessage
 from cing.main import getStopMessage
 
@@ -87,30 +87,11 @@ class vCing(Lister):
     # end def
 
     def prepareMaster(self, doClean=False):
-        "Return True on error."
-        cwd = os.getcwd()
-        if not os.path.exists(self.MASTER_TARGET_DIR):
-            # Setup in April 2011. Where XXXXXX is the not to be committed pool id.
-#            jd:dodos/vCingSlave/ pwd
-#            /Library/WebServer/Documents/tmp/vCingSlave
-#            jd:dodos/vCingSlave/ ls -l
-#            lrwxr-xr-x  1 jd  admin  18 Apr 15 21:39 vCingXXXXX@ -> /Volumes/tetra/vCingXXXXX
-            NTwarning("Creating path that probably should be created manually because it might be an indirect one: %s" % self.MASTER_TARGET_DIR)
-            mkdirs(self.MASTER_TARGET_DIR)
-        if not os.path.exists(self.MASTER_TARGET_DIR):
-            NTerror("Failed to create: " + self.MASTER_TARGET_DIR)
-            return True
-        os.chdir(self.MASTER_TARGET_DIR)
-        for d in (self.MASTER_TARGET_LOG, self.MASTER_TARGET_LOG2, self.MASTER_TARGET_RESULT):
-            if doClean:
-                NTdebug("Removing and recreating %s" % d)
-                rmdir(d)
-            else:
-                NTdebug("Creating if needed %s" % d)
-            mkdirs(d)
-        # end for
-        os.chdir(cwd)
-    # end def
+        """
+        Return True on error.
+        Moved out of this setup so it can be run with a very limited CING install on gb-ui-kun.els.sara.nl
+        """
+        return prepareMaster(MASTER_TARGET_DIR=self.MASTER_TARGET_DIR, doClean=doClean)
 
 
     def addTokenListToTopos(self, fileName):

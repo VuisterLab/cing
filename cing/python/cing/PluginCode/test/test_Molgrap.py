@@ -23,6 +23,7 @@ class AllChecks(TestCase):
 #        SETUP FIRST
         #entryId = "1ai0" # Most complex molecular system in any PDB NMR entry
 #        entryId = "1a4d" # Small much studied PDB NMR entry
+#        entryId = "1zwj" # X-ray entry of CESG interest.
         entryId = "1brv_1model" # Small much studied PDB NMR entry
 #        entryId = "2hgh_1model"
         if entryId.startswith("1YWUcdGMP"):
@@ -49,7 +50,7 @@ class AllChecks(TestCase):
         self.assertFalse(project.molecule.export2gif(pathGif, project=project))
         self.assertTrue(os.path.exists(pathGif))
 
-    def ttttestMolgrapRunFromCcpnFile(self):
+    def _testMolgrapRunFromCcpnFile(self):
 #        entryId = "1cjg" # Nucleic acid entry.
 
         entryId = "1brv" # Nucleic acid entry.

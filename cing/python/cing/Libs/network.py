@@ -103,9 +103,9 @@ def putFileBySsh( fileName, targetUrl, ensureDirIsPresent = True, rsyncOptions =
 
     userNameAtDomain, targetDir = targetUrl.split(':')
     if ensureDirIsPresent:
-        cmdSsh = 'ssh %s mkdir -p %s' % (userNameAtDomain, targetDir)
-        NTdebug("cmdSsh: %s" % cmdSsh)
-        status, result = commands.getstatusoutput(cmdSsh)
+        cmd = 'ssh %s mkdir -p %s' % (userNameAtDomain, targetDir)
+        NTdebug("cmd: %s" % cmd)
+        status, result = commands.getstatusoutput(cmd)
         if status:
             if 'File exists' in result:
                 pass # this is ok
@@ -118,7 +118,7 @@ def putFileBySsh( fileName, targetUrl, ensureDirIsPresent = True, rsyncOptions =
     # -l units are kbit/s
 #    cmd = 'scp %s %s' % (fileName, targetUrl)
     cmd = 'rsync %s -ave ssh %s %s/' % (rsyncOptions, fileName, targetUrl)
-#    NTdebug("cmd: %s" % cmd)
+    NTdebug("cmd: %s" % cmd)
     for tryCount in range(ntriesMax):
 #        NTdebug("Try count: %s" % tryCount)
         if tryCount:

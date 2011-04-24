@@ -1,10 +1,15 @@
 #!/bin/tcsh
+# Find all invalid Tgz in dir and further process with handyCommands.csh
+# USAGE: $CINGROOT/scripts/vcing/listInvalidTgz.csh >& ~/listInvalidTgz.log &
+#
 
-# Find all invalid Tgz in dir
+#set D = /Volumes/tetra/D
+set D = /Volumes/terad/D
 
 set inputDir = $D/NRG-CING/data
 cd $inputDir
-set list = ( `find . -name "*.tgz" -maxdepth 3 `)
+echo "Working from $cwd"
+set list = ( `find . -maxdepth 3 -name "*.tgz"`)
 #set list = ( "br/1brv/1brv.cing.tgz" )
 echo "Working on $#list tgz"
 

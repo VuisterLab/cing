@@ -7,6 +7,7 @@ indices that live on top of them. For weekly and for more mass updates.
 Execute like:
 
 $CINGROOT/python/cing/NRG/nrgCing.py [entry_code] [updateWeekly prepare prepareEntry runCing runCingEntry storeCING2db storeCING2dbEntry createToposTokens getEntryInfo ]
+$CINGROOT/python/cing/NRG/nrgCing.py createToposTokens
 
 As a cron job this will:
     - create a todo list
@@ -48,8 +49,7 @@ from cing.Scripts.validateEntry import PROJECT_TYPE_CCPN
 from cing.core.classes import Project
 from cing.main import getStartMessage
 from cing.main import getStopMessage
-from shutil import copyfile
-from shutil import rmtree
+from shutil import * #@UnusedWildImport
 import commands
 import csv
 import shutil
@@ -1081,9 +1081,10 @@ class nrgCing(Lister):
         """
         NTmessage("Doing postProcessEntryAfterVc on  %s" % entry_code)
 
-        doRemoves = 1 # DEFAULT 1 disable for testing.
+        doRemoves = 0 # DEFAULT 0 enable to clean up.
         doLog = 1 # DEFAULT 1 disable for testing.
         doTgz = 1 # DEFAULT 1 disable for testing.
+        doCopyTgz = 1
 
         entryCodeChar2and3 = entry_code[1:3]
         entryDir = os.path.join(self.data_dir , entryCodeChar2and3, entry_code)
@@ -1118,16 +1119,29 @@ class nrgCing(Lister):
             logLastFileNew = '%s_%s.log' % (entry_code, date_stamp)
             logLastFileNewFull = os.path.join(newLogDir, logLastFileNew)
             NTdebug("Copy from %s to %s" % (logLastFile, logLastFileNewFull))
-            copyfile(logLastFile, logLastFileNewFull)
+            copy2(logLastFile, logLastFileNewFull)
             if doRemoves:
                 os.remove(logLastFile)
         # end if doLog
 
         if doTgz:
             tgzFileNameCing = entry_code + ".cing.tgz"
+            if os.path.exists(tgzFileNameCing):
+                NTdebug("Removing local tgz %s" % (tgzFileNameCing))
+                os.remove(tgzFileNameCing)
+            if doCopyTgz:
+                tgzFileNameCingMaster = os.path.join(self.vc.MASTER_D, 'NRG-CING', 'data', entryCodeChar2and3, entry_code, tgzFileNameCing)
+                if not os.path.exists(tgzFileNameCingMaster):
+                    NTerror("Skipping %s because failed to find master's: %s" % (entry_code, tgzFileNameCingMaster))
+                    return True
+                copy2(tgzFileNameCingMaster, '.')
             if not os.path.exists(tgzFileNameCing):
-                NTerror("Skipping %s because tgz %s not found in: %s" % (entry_code, tgzFileNameCing, os.getcwd()))
+                NTerror("Skipping %s because local tgz %s not found in: %s" % (entry_code, tgzFileNameCing, os.getcwd()))
                 return True
+            fileNameCing = entry_code + ".cing"
+            if os.path.exists(fileNameCing):
+                NTdebug("Removing local .cing %s" % (fileNameCing))
+                rmtree(fileNameCing)
             cmd = "tar -xzf %s" % tgzFileNameCing
             NTdebug("cmd: %s" % cmd)
             status, result = commands.getstatusoutput(cmd)
@@ -1582,9 +1596,9 @@ class nrgCing(Lister):
         self.entry_list_todo = NTlist()
         self.entry_list_todo.addList(self.entry_list_nmr)
         self.entry_list_todo = self.entry_list_todo.difference(self.entry_list_done)
-        if 0:
+        if 1:
             NTmessage("Going to use non-default entry_list_todo in postProcessAfterVc")
-            self.entry_list_todo = readLinesFromFile('/Users/jd/NRG/lists/bmrbPdbEntryList.csv')
+            self.entry_list_todo = readLinesFromFile(os.path.join(self.results_dir, 'entry_list_good_tgz.csv'))
             self.entry_list_todo = NTlist( *self.entry_list_todo )
 
         NTmessage("Found entries in NMR          : %d" % len(self.entry_list_nmr))
@@ -1631,8 +1645,8 @@ class nrgCing(Lister):
         self.entry_list_todo.addList(self.entry_list_nmr)
         self.entry_list_todo = self.entry_list_todo.difference(self.entry_list_done)
         if True: # DEFAULT: True
-#            self.entry_list_todo = readLinesFromFile(os.path.join(self.results_dir, 'entry_list_nmr_random_6.csv'))
-            self.entry_list_todo = "1n6t".split() # Or other 10 residue entries:  1n6t 1p9f 1idv 1kuw 1n9u 1hff  1r4h
+            self.entry_list_todo = readLinesFromFile(os.path.join(self.results_dir, 'entry_list_nmr_random_8.csv'))
+#            self.entry_list_todo = "1n6t".split() # Or other 10 residue entries:  1n6t 1p9f 1idv 1kuw 1n9u 1hff  1r4h
             # invalids 1nxn 1gac 1t5n
             self.entry_list_todo = NTlist( *self.entry_list_todo )
 

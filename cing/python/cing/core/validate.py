@@ -513,7 +513,7 @@ Total    %3d  (%3.0f%%)""" % ( c[2], p[2], c[1], p[1], c[0], p[0], total, 100.0 
 
 def summary( project, toFile = True, ranges=None ):
     """
-    Generate a summary string and store to text file
+    Generate a summary string and store to text file by default.
     Return summary string or None on error.
     """
 
