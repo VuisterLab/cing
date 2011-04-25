@@ -80,7 +80,7 @@ class nrgCing(Lister):
                  updateIndices=True,
                  isProduction=True
                 ):
-        self.assumeAllAreDone = 0 # DEFAULT: 0 when assumed all are done. Disables some messaging in case not all are done.
+        self.assumeAllAreDone = 1 # DEFAULT: 1 when assumed all are done. Disables some messaging in case not all are done.
         self.writeWhyNot = writeWhyNot
         "Write the info for the WhyNot database"
         self.writeTheManyFiles = writeTheManyFiles
@@ -1596,9 +1596,10 @@ class nrgCing(Lister):
         self.entry_list_todo = NTlist()
         self.entry_list_todo.addList(self.entry_list_nmr)
         self.entry_list_todo = self.entry_list_todo.difference(self.entry_list_done)
-        if 1:
+        if 1: # Default 1 for now.
             NTmessage("Going to use non-default entry_list_todo in postProcessAfterVc")
-            self.entry_list_todo = readLinesFromFile(os.path.join(self.results_dir, 'entry_list_good_tgz.csv'))
+            self.entry_list_todo = readLinesFromFile(os.path.join(self.results_dir, 'entry_list_good_tgz_after_7.csv'))
+#            self.entry_list_todo = '1brv 9pcy'.split()
             self.entry_list_todo = NTlist( *self.entry_list_todo )
 
         NTmessage("Found entries in NMR          : %d" % len(self.entry_list_nmr))
@@ -1760,9 +1761,9 @@ class nrgCing(Lister):
 
         if 0: # DEFAULT: False
             NTmessage("Going to use non-default entry_list_todo in storeCING2db")
-#            self.entry_list_todo = '1brv'.split()
+            self.entry_list_todo = '1brv'.split()
 #            self.entry_list_todo = readLinesFromFile('/Users/jd/NRG/lists/entry_list_vuisterlab.csv')
-            self.entry_list_todo = readLinesFromFile(os.path.join(self.results_dir, 'entry_list_todo_nmr_all.csv'))
+#            self.entry_list_todo = readLinesFromFile(os.path.join(self.results_dir, 'entry_list_todo_nmr_all.csv'))
             self.entry_list_todo = NTlist( *self.entry_list_todo )
 
         NTmessage("Found entries in NRG-CING todo: %d" % len(self.entry_list_todo))
@@ -1773,8 +1774,8 @@ class nrgCing(Lister):
         entryListFileName = os.path.join( self.results_dir, 'entry_list_todo.csv')
         writeEntryListToFile(entryListFileName, self.entry_list_todo)
         archive_id=ARCHIVE_NRG_ID
-        if not self.isProduction:
-            archive_id=ARCHIVE_DEV_NRG_ID
+#        if not self.isProduction:
+#            archive_id=ARCHIVE_DEV_NRG_ID
         extraArgList = (archive_id,) # note that for length one tuples the comma is required.
 
         doScriptOnEntryList(pythonScriptFileName,

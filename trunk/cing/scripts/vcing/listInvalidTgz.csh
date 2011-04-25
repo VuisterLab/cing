@@ -3,6 +3,7 @@
 # USAGE: $CINGROOT/scripts/vcing/listInvalidTgz.csh >& ~/listInvalidTgz.log &
 #
 
+#set D = /home/jurgenfd/D
 #set D = /Volumes/tetra/D
 set D = /Volumes/terad/D
 

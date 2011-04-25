@@ -365,7 +365,6 @@ def doStoreCING2db( entry_code, archive_id, project = None):
         )
         s = select([cresonancelist.c.resonancelist_id],and_(cresonancelist.c.entry_id == entry_id, cresonancelist.c.name == nameResoL))
         resonancelist_id = execute(s).fetchall()[0][0]
-        NTdebug("Inserted resonancelist_id %s" % resonancelist_id)
         for atomId in resonanceList.vascoResults.keys():
             rerefNTvalue = resonanceList.vascoResults[ atomId ]
             result = execute(cresonancelistperatomclass.insert().values(
@@ -382,9 +381,10 @@ def doStoreCING2db( entry_code, archive_id, project = None):
                             cresonancelistperatomclass.c.resonancelist_id == resonancelist_id,
                             cresonancelistperatomclass.c.atomclass == atomId,
                             ))
-            cingresonancelistperatomclass_id = execute(s).fetchall()[0][0]
-            NTdebug("Inserted cingresonancelistperatomclass_id %s" % cingresonancelistperatomclass_id)
+#            cingresonancelistperatomclass_id = execute(s).fetchall()[0][0]
+#            NTdebug("Inserted cingresonancelistperatomclass_id %s" % cingresonancelistperatomclass_id)
         # end for
+        NTdebug("Inserted resonancelist_id %s with name %s and atoms %s" % (resonancelist_id, nameResoL, str(resonanceList.vascoResults.keys())))
     # end for
 
     chainCommittedCount = 0
