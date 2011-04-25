@@ -9,7 +9,9 @@ wc entry_list_*_tgz_*.csv
 set list = ( `grep ERROR $D/NRG-CING/$listLog | gawk '{print $2}' `)
 echo "Found $#list entries"
 
-
+# find tgz entries:
+cd /Volumes/tera1/D/NRG-CING/data
+find . -maxdepth 3 -name "*.tgz" | cut -c 6-9
 
 # Check signature of last logs coming in. Replace XXXX
 cd /Library/WebServer/Documents/tmp/vCingSlave/vCingXXXX/log
@@ -25,7 +27,7 @@ Busy with:
 jd:nmr/tmpNRG-CING/ jobs
 [1]  + Running                       sudo rsync -avr /Volumes/tera4/NRG-CING /Volumes/terad/ >>& ~/rsyncNRG-CING.log
 [3]    Running                       sudo rsync -avr /Volumes/tera4/pgdata /Volumes/terad/ >>& ~/rsyncpgdata.log
-[4]    Running                       sudo rsync -ave ssh jurgenfd@gb-ui-kun.els.sara.nl:/home/jurgenfd/D . >>& rsyncD.log
+sudo rsync -ave ssh jurgenfd@gb-ui-kun.els.sara.nl:/home/jurgenfd/D /Volumes/D/ >>& rsyncD.log
 
 snmr
 cd /Volumes/terad

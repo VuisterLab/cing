@@ -334,7 +334,6 @@ CREATE INDEX atom_se4 ON casdcing.cingatom (sel_4);
 CREATE INDEX atom_se5 ON casdcing.cingatom (sel_5);
 
 
--- cingresonancelist
 CREATE TABLE casdcing.cingresonancelist
 (
     resonancelist_id               SERIAL UNIQUE PRIMARY KEY,
@@ -348,7 +347,6 @@ CREATE INDEX cingresonancelist_001 ON casdcing.cingresonancelist (entry_id);
 CREATE INDEX cingresonancelist_002 ON casdcing.cingresonancelist (applied);
 CREATE INDEX cingresonancelist_003 ON casdcing.cingresonancelist (rog);
 
--- cingresonancelist
 CREATE TABLE casdcing.cingresonancelistperatomclass
 (
     resonancelistperatomclass_id   SERIAL UNIQUE PRIMARY KEY,

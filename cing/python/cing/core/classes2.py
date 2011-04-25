@@ -128,7 +128,7 @@ class RestraintList(NTlist):
     #end def
 
     def format(self, showAll = False):
-        NTdebug("Now in classes2.RestraintList#" + getCallerName())
+#        NTdebug("Now in classes2.RestraintList#" + getCallerName())
         if not showAll:
             return ''
         rTxtList = []
