@@ -12,6 +12,7 @@
 
 from cing import header
 from cing.Libs.NTutils import * #@UnusedWildImport
+from cing.Libs.helper import getSvnRevision
 from cing.NRG import * #@UnusedWildImport
 from cing.PluginCode.required.reqDssp import * #@UnusedWildImport
 from cing.PluginCode.required.reqProcheck import * #@UnusedWildImport
@@ -21,6 +22,7 @@ from cing.PluginCode.required.reqWhatif import * #@UnusedWildImport
 from cing.PluginCode.sqlAlchemy import csqlAlchemy
 from cing.core.classes import Project
 from cing.core.molecule import getAssignmentCountMapForResList
+from cing.core.parameters import directories
 from cing.main import getStartMessage
 from cing.main import getStopMessage
 from sqlalchemy.sql.expression import and_
@@ -130,6 +132,39 @@ def doStoreCING2db( entry_code, archive_id, project = None):
             return True
 #    else:
 #        NTdebug("No original entry present yet.")
+
+    logFileNameList = project.getLogFileNameList(latestListedFirst = False) #sorted chronologically with latest latest.
+    rev_first = None
+    rev_last = getSvnRevision()
+    datetime_first = None
+    datetime_last = datetime.datetime.now()
+
+    if not logFileNameList:
+        NTerror("Failed to get log file name list; aborting.")
+        return True
+
+    firstIdx = 0
+    lastIdx = -1
+    for logIdx in ( firstIdx, lastIdx):
+        logFileName = logFileNameList[logIdx]
+        logFilePath = os.path.join( project.path(directories.logs), logFileName)
+        result = getRevisionAndDateTimeFromCingLog( logFilePath )
+        if not result:
+            NTerror("In %s failed to getRevisionAndDateTimeFromCingLog for: %s" % (getCallerName(), logFilePath))
+            continue # with next log.
+        # end if
+        rev, datetime_seen = result
+        if logIdx == firstIdx:
+            rev_first = rev
+            datetime_first = datetime_seen
+        else:
+            if rev_last != rev:
+                NTcodeerror("Mismatching rev %s with rev extracted from self log: %s" % ( rev_last, rev))
+            # should be pretty close to now datetime set above.
+            datetime_last = datetime_seen # Better to use the start date of log than now time.
+            NTdebug("Modifying datetime_last %s to %s" % (datetime_last, datetime_seen) )
+        # end if
+    # end for
 
     ranges = getDeepByKeysOrAttributes(molecule,RANGES_STR)
     p_rmsd_backbone = getDeepByKeysOrAttributes(molecule, RMSD_STR, BACKBONE_AVERAGE_STR)
@@ -252,6 +287,11 @@ def doStoreCING2db( entry_code, archive_id, project = None):
         pdb_id=pdb_id,
         casd_id=casd_id,
         name=entry_code,
+        rev_first = rev_first,
+        rev_last = rev_last,
+        datetime_first = datetime_first,
+        datetime_last = datetime_last,
+
         is_multimeric=is_multimeric,
         chothia_class=chothia_class,
         ranges=ranges,

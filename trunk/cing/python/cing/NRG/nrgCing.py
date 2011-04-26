@@ -199,6 +199,8 @@ class nrgCing(Lister):
         self.timeTakenDict = NTdict()
         self.inputModifiedDict = NTdict()     # This is the most recent of mmCIF, NRG, BMRB CS.
         self.entry_list_obsolete = NTlist()
+        self.entry_list_missing_prep = NTlist()
+
         self.ENTRY_DELETED_COUNT_MAX = 2
         self.MAX_ERROR_COUNT_CING_LOG = 1000
         self.MAX_ERROR_COUNT_FC_LOG = 99999 # 104d had 16. 108d had 460
@@ -416,6 +418,7 @@ class nrgCing(Lister):
         self.entry_list_store_done = NTlist()
 
         self.entry_list_obsolete = NTlist()
+        self.entry_list_missing_prep = NTlist()
         self.entry_list_tried = NTlist()
         self.entry_list_untried = NTlist()
         self.entry_list_crashed = NTlist()
@@ -513,6 +516,16 @@ class nrgCing(Lister):
                     else:
                         NTerror("Entry %s in NRG-CING not obsoleted since there were already removed: %s entries." % (
                             entry_code, self.ENTRY_DELETED_COUNT_MAX))
+                # end if
+                if not entry_code in self.entry_list_prep_done:
+                    NTwarning("Found entry %s in NRG-CING but no prep done. Will be removed completely from NRG-CING too" % entry_code)
+                    if len(self.entry_list_missing_prep) < self.ENTRY_DELETED_COUNT_MAX:
+                        rmdir(entrySubDir)
+                        self.entry_list_missing_prep.append(entry_code)
+                    else:
+                        NTerror("Entry %s in NRG-CING not removed since there were already removed: %s entries." % (
+                            entry_code, self.ENTRY_DELETED_COUNT_MAX))
+                    # end if
                 # end if
 
                 # Look for last log file
@@ -676,6 +689,7 @@ class nrgCing(Lister):
         NTmessage("Found %4d entries that CING did (B=A-C-S-U)." % len(self.entry_list_done))
         NTmessage("Found %4d entries todo (A-B)." % len(self.entry_list_todo))
         NTmessage("Found %4d entries in NRG-CING made obsolete." % len(self.entry_list_obsolete))
+        NTmessage("Found %4d entries in NRG-CING without prep." % len(self.entry_list_missing_prep))
 
         NTmessage("Found %4d entries that CING store tried." % len(self.entry_list_store_tried))
         NTmessage("Found %4d entries that CING store crashed." % len(self.entry_list_store_crashed))
@@ -778,6 +792,7 @@ class nrgCing(Lister):
         writeTextToFile("entry_list_timing.csv", toCsv(self.timeTakenDict))
         writeTextToFile("entry_list_updated.csv", toCsv(self.entry_list_updated))
         writeTextToFile("entry_list_obsolete.csv", toCsv(self.entry_list_obsolete))
+        writeTextToFile("entry_list_missing_prep.csv", toCsv(self.entry_list_missing_prep))
 
         writeTextToFile("entry_list_store_tried.csv", toCsv(self.entry_list_store_tried))
         writeTextToFile("entry_list_store_crashed.csv", toCsv(self.entry_list_store_crashed))
@@ -1191,7 +1206,6 @@ class nrgCing(Lister):
 
         if convertMmCifCoor:
             NTmessage("  mmCIF")
-#            convertStarCoor = 0 # DEFAULT 1: TODO: code.
 
             C_sub_entry_dir = os.path.join(dir_C, entryCodeChar2and3)
             C_entry_dir = os.path.join(C_sub_entry_dir, entry_code)

@@ -35,12 +35,16 @@ CREATE TABLE casdcing.cingentry
 (
     entry_id                       SERIAL UNIQUE PRIMARY KEY,
     name                           VARCHAR(255),
+    rev_first                      INT DEFAULT NULL, -- CING revision of first project initialization which must have the import of data
+    rev_last                       INT DEFAULT NULL, -- CING revision of last project save.
+    timestamp_first                timestamp DEFAULT NULL, -- Dates (seconds since epoch) of the above.
+    timestamp_last                 timestamp DEFAULT NULL,
     sel_1                     BOOLEAN DEFAULT NULL, -- registers used for selections see comment section above.
     sel_2                     BOOLEAN DEFAULT NULL,
     sel_3                     BOOLEAN DEFAULT NULL,
     sel_4                     BOOLEAN DEFAULT NULL,
     sel_5                     BOOLEAN DEFAULT NULL,
-    bmrb_id                        INT,
+    bmrb_id                        INT DEFAULT NULL,
     casd_id                        VARCHAR(255) UNIQUE,
     pdb_id                         VARCHAR(255), -- (10)
     is_solid                       BOOLEAN DEFAULT NULL, -- ssnmr

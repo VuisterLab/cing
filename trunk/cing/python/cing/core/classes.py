@@ -54,6 +54,7 @@ from cing.core.validate import validateDihedrals
 from cing.core.validate import validateModels
 from cing.core.validate import validateRestraints
 from glob import glob
+from glob import glob1
 from shutil import rmtree
 import tarfile
 __version__ = cing.__version__
@@ -952,6 +953,22 @@ Project: Top level Cing project class
 #        NTdebug("Closed stream2 (should now NOT show up in log too)" )
     #end def
 
+    def getLogFileNameList(self, latestListedFirst = True):
+        """
+        Returns a list of project log files sorted chronologically with latest first.
+        NB the latest includes the current log.
+        """
+        logsDir = self.path(directories.logs)
+        logFileList = glob1(logsDir, '*.txt')
+        if logFileList:
+            logFileList.sort()
+            if latestListedFirst:
+                logFileList.reverse() # Important to have latest on top because they might get long. Use p.removeOlderLogs() then.
+            # end if
+        # end if
+        l = len(logFileList)
+        NTdebug("Found %d logs: %s" % (l, str(logFileList)))
+        return logFileList
 #    def newPeakList( self, name, status='keep'):
 #        """Dummy for compatibility
 #        """
