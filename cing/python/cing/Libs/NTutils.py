@@ -184,7 +184,7 @@ Average            %s
 Standard deviation %s
 Minimum            %s
 Maximum            %s
-Sum                %s""" % ( 
+Sum                %s""" % (
         self.n,
         val2Str(self.av, fmt),
         val2Str(self.sd, fmt),
@@ -5006,7 +5006,11 @@ def readLinesFromFile(fileName, doStrip=True):
     return lineList
 
 def readTextFromFile(fileName):
+    "Return the string or None on error."
 #    NTdebug("Reading from file %s" % ( fileName))
+    if not os.path.exists(fileName):
+        NTwarning("Failed to find %s" % fileName )
+        return None
     fp = open(fileName, 'r')
     content = fp.read()
     return content
@@ -5457,4 +5461,49 @@ def filterListByObjectClassName( l, className ):
         if oClassName == className:
             result.append(o)
     return result
+# end def
 
+def getRevisionAndDateTimeFromCingLog( fileName ):
+    """Return int revision and date or None on error."""
+    txt = readTextFromFile(fileName)
+    if txt == None:
+        NTerror("In %s failed to find %s" % ( getCallerName(), fileName))
+        return None
+    # Parse
+##======================================================================================================
+##| CING: Common Interface for NMR structure Generation version 0.95 (r972)       AW,JFD,GWV 2004-2011 |
+##======================================================================================================
+#User: i          on: vc (linux/32bit/8cores/2.6.4)              at: (10370) Sat Apr 16 14:24:12 2011
+    txtLineList = txt.splitlines()
+    if len(txtLineList) < 2:
+        NTerror("In %s failed to find at least two lines in %s" % ( getCallerName(), fileName))
+        return None
+    txtLine = txtLineList[1]
+    reMatch = re.compile('^.+\(r(\d+)\)') # The number between brackets.
+    searchObj = reMatch.search(txtLine)
+    if not searchObj:
+        NTerror("In %s failed to find a regular expression match for the revision number in line %s" % ( getCallerName(), txtLine))
+        return None
+    rev = int(searchObj.group(1))
+
+    if len(txtLineList) < 4:
+        NTerror("In %s failed to find at least four lines in %s" % ( getCallerName(), fileName))
+        return None
+    txtLine = txtLineList[3]
+    reMatch = re.compile('^.+\(\d+\) (.+)$') # The 24 character standard notation from time.asctime()
+    searchObj = reMatch.search(txtLine)
+    if not searchObj:
+        NTerror("In %s failed to find a regular expression match for the start timestamp in line %s" % ( getCallerName(), txtLine))
+        return None
+    tsStr = searchObj.group(1) #    Sat Apr 16 14:24:12 2011
+    try:
+#        struct_timeObject = time.strptime(tsStr)
+        dt = datetime.datetime(*(time.strptime(tsStr)[0:6]))
+#        dt = datetime.datetime.strptime(tsStr)
+    except:
+        NTtracebackError()
+        NTerror("Failed to parse datetime from: %s" % tsStr )
+        return None
+
+    return rev, dt
+# end def

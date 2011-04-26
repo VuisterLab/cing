@@ -196,7 +196,7 @@ def getPdbEntries(onlyNmr=False, mustHaveExperimentalNmrData=False, onlySolidSta
     for record in f.readlines():
         entry_code = record.rstrip().lower()
         if not is_pdb_code(entry_code):
-            NTwarning("In %s found an invalid entry code: %s from record '%s'" % (getCallerName(), str(entry_code), record)) # TODO: fix this shouldn't happen; first seen on April 24, 2011.
+#            NTwarning("In %s found an invalid entry code: %s from record '%s'" % (getCallerName(), str(entry_code), record)) # TODO: fix this shouldn't happen; first seen on April 24, 2011.
             continue
         result.append( entry_code )
     if not result:
