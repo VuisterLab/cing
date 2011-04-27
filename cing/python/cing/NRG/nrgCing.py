@@ -204,7 +204,7 @@ class nrgCing(Lister):
         self.ENTRY_DELETED_COUNT_MAX = 2
         self.MAX_ERROR_COUNT_CING_LOG = 1000
         self.MAX_ERROR_COUNT_FC_LOG = 99999 # 104d had 16. 108d had 460
-        self.FRACTION_CS_CONVERSION_REQUIRED = 0.05 # DEFAULT: 0.95
+        self.FRACTION_CS_CONVERSION_REQUIRED = 0.05 # DEFAULT: 0.05
 
         self.wattosVerbosity = cing.verbosity
         self.wattosMemory = '4g'
@@ -588,7 +588,7 @@ class nrgCing(Lister):
                     self.entry_list_stopped.append(entry_code)
                     continue
 
-                if self.isProduction: # DEFAULT: True but disabled for testing.
+                if self.isProduction: # Disable for testing.
                     molGifFile = os.path.join(cingDirEntry, entry_code, "HTML/mol.gif")
                     if not os.path.exists(molGifFile):
                         NTmessage("%s Since mol.gif file %s was not found assumed to have stopped" % (entry_code, projectHtmlFile))
@@ -1552,9 +1552,7 @@ class nrgCing(Lister):
         """
 
         NTmessage("Starting runCing")
-#        return True
-
-        if 0: # DEFAULT
+        if 0: # DEFAULT 0
             NTmessage("Going to use non-default entry_list_todo in runCing")
 #            self.entry_list_todo = readLinesFromFile('/Users/jd/NRG/lists/bmrbPdbEntryList.csv')
             self.entry_list_todo = "1brv 1hkt 1mo7 1mo8 1ozi 1p9j 1pd7 1qjt 1vj6 1y7n 2fws 2fwu 2jsx".split()
@@ -1564,8 +1562,6 @@ class nrgCing(Lister):
                 NTerror("Failed to searchPdbEntries")
                 return True
 
-
-#        NTdebug("Not using topos")
         entryListFileName = "entry_list_todo.csv"
         writeTextToFile(entryListFileName, toCsv(self.entry_list_todo))
 
@@ -1589,8 +1585,6 @@ class nrgCing(Lister):
                             processes_max=self.processes_max,
                             delay_between_submitting_jobs=5, # why is this so long? because of time outs at tang?
                             max_time_to_wait=self.max_time_to_wait,
-                            # <Molecule "2p80" (C:20,R:1162,A:24552,M:20)>
-                            START_ENTRY_ID=0, # default: 0
                             MAX_ENTRIES_TODO=self.max_entries_todo,
                             extraArgList=extraArgList):
             NTerror("Failed to doScriptOnEntryList")
@@ -1686,8 +1680,8 @@ class nrgCing(Lister):
 
         NTmessage("Starting prepare using self.entry_list_todo")
 
-        if 0: # DEFAULT: False
-            NTmessage("Going to use non-default entry_list_todo in prepare")
+        if 0: # DEFAULT: 0
+            NTmessage("Going to use specific entry_list_todo in prepare")
 #            self.entry_list_todo = "1a24 1a4d 1afp 1ai0 1b4y 1brv 1bus 1c2n 1cjg 1d3z 1hue 1ieh 1iv6 1jwe 1kr8 2cka 2fws 2hgh 2jmx 2k0e 2kib 2knr 2kz0 2rop".split()
 #            self.entry_list_todo = "1brv".split()
 #            self.entry_list_todo = readLinesFromFile('/Users/jd/NRG/lists/bmrbPdbEntryList.csv')
