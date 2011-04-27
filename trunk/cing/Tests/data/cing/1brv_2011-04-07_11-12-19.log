@@ -1,0 +1,34 @@
+======================================================================================================
+| CING: Common Interface for NMR structure Generation version 0.95 (r962)       AW,JFD,GWV 2004-2011 |
+======================================================================================================
+User: jd         on: Duvel.local (darwin/64bit/4cores/2.6.6)    at: (46660) Thu Apr  7 11:12:26 2011
+
+Going to destination: prepareEntry with(out) on entry_code 1brv with extra arguments ['0', '1', '1', '1']
+interactive            interactive run is fast use zero for production   True
+
+convertMmCifCoor       Start from mmCIF                                  0
+convertMrRestraints    Start from DOCR                                   1
+convertStarCS          Adds STAR CS to Ccpn with FC                      1
+filterCcpnAll          Filter CS and restraints with FC                  1
+Doing                                                                 1brv
+  DOCR CCPN
+  star CS
+Testing completeness of FC merge by comparing input STAR with output CING counts
+Parsing STAR file: /Users/jd/wattosTestingPlatform/bmrb/rsync/bmr4020/bmr4020_21.str
+BMRB AssignmentCountMap( 13C = 73, 15N = 0, 1H = 183, 31P = 0 )
+==> Importing data from Ccpn project "1brv"
+Non-standard (residues and their) atoms added:
+GLU : [ 189]
+==> Calculating rmsd's (ranges: 171-189, models: 0-47)
+==> Ccpn molecule '1brv' imported
+DEBUG: No FC meta data on SSA
+==> Ccpn project imported
+Found fraction of at least   cutoff 0.05 at 1.00  overall (STAR/CING: 256/255)
+  filter
+         -1- assign
+Done with 1brv
+CING started at : Thu Apr  7 11:12:21 2011
+CING stopped at : Thu Apr  7 11:13:06 2011
+CING took       : 45.271 s
+
+
