@@ -283,8 +283,7 @@ class nrgCing(Lister):
             # WARNING: the above command wipes out the self.entry_list_todo
             if new_hits_entry_list:
                 self.entry_list_todo = NTlist(*new_hits_entry_list)
-            self.entry_list_todo.difference( self.entry_list_prep_crashed )
-            self.entry_list_todo.difference( self.entry_list_prep_failed )
+            self.entry_list_todo = self.entry_list_todo.intersection( self.entry_list_prep_done )
             if self.runCing():
                 NTerror("Failed to runCing")
                 return True
@@ -658,7 +657,7 @@ class nrgCing(Lister):
         # end for
 
         # Consider the entries updated as not done.
-        self.entry_list_done.difference(self.entry_list_updated)
+        self.entry_list_done = self.entry_list_done.difference(self.entry_list_updated)
         # Consider the entries updated as not done.
 
         timeTakenList = NTlist(*self.timeTakenDict.values())

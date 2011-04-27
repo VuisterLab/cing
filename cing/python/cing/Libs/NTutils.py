@@ -427,6 +427,12 @@ Sum                %s""" % (
         """Returns a new set of self minus other
         This is a common operation. Order in list will not be altered.
         If duplicates are present in this/self list then they might not all be removed (multiset semantics).
+        So by examples at: http://en.wikipedia.org/wiki/Multiset
+
+        { 1, 1, 1, 3 } intersection { 1, 1, 2 } = { 1, 1 }         # intersection (upside down letter u)
+        { 1, 1 } unionMinus { 1, 2 }            = { 1, 1, 2 }      # union because only one 1 is present in the second set one 1 from the first set gets added. This may be implemented in another union
+        { 1, 1 } unionPlus  { 1, 2 }            = { 1, 1, 1, 2 }   # union (letter u) This method.
+        { 1, 2, 3} \ {2,3,4}                    = { 1 }            # difference (backslash) An example from http://en.wikipedia.org/wiki/Difference_(set_theory)
         """
         result = deepcopy(self)
         hashedSelf = NTdict() # use in order to speed up operations.
