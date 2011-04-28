@@ -21,6 +21,10 @@ class AllChecks(TestCase):
         l = m.getPdbIdList()
         NTdebug("pdbIdList length: %d %s" % (len(l), l))
         self.assertTrue(l)
+        if 1 and l:
+            entry_code = l[0]
+            self.assertFalse( m.removeEntry(entry_code))
+        # end if
 
 
 if __name__ == "__main__":

@@ -51,7 +51,7 @@ class AllChecks(TestCase):
             self.assertTrue(len(nmrExpList) >= 5385)  # November 10, 2009
             NTdebug("getPdbEntries NMR exp: %d" % (len(nmrExpList)))
 
-        if 1:
+        if 0:
             nmrList = getPdbEntries(onlyNmr = True)
             self.assertTrue(nmrList)
             NTdebug("getPdbEntries NMR: %d" % (len(nmrList)))

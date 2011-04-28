@@ -186,7 +186,7 @@ class pdbCing(Lister):
         self.entry_list_todo = NTlist()
         self.timeTakenDict = NTdict()
         self.entry_list_obsolete = NTlist()
-        self.ENTRY_DELETED_COUNT_MAX = 2
+        self.ENTRY_TO_DELETE_COUNT_MAX = 2
 
 
     def getBmrbLinks(self):
@@ -257,12 +257,12 @@ class pdbCing(Lister):
                 entrySubDir = os.path.join(DATA_STR, subDir, entry_code)
                 if not entry_code in self.entry_list_pdb:
                     NTwarning("Found entry %s in PDB-CING-CING but not in PDB. Will be obsoleted in PDB-CING too" % entry_code)
-                    if len(self.entry_list_obsolete) < self.ENTRY_DELETED_COUNT_MAX:
+                    if len(self.entry_list_obsolete) < self.ENTRY_TO_DELETE_COUNT_MAX:
                         rmdir(entrySubDir)
                         self.entry_list_obsolete.append(entry_code)
                     else:
                         NTerror("Entry %s in PDB-CING not obsoleted since there were already removed: %s" % (
-                            entry_code, self.ENTRY_DELETED_COUNT_MAX))
+                            entry_code, self.ENTRY_TO_DELETE_COUNT_MAX))
                 # end if
 
                 cingDirEntry = os.path.join(entrySubDir, entry_code + ".cing")

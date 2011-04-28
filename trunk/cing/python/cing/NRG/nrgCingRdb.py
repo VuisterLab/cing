@@ -135,7 +135,7 @@ class nrgCingRdb():
 
 
     def getPdbIdList(self, fromNrg=True):
-        "Return None on error."
+        "Return None on error. And NTlist otherwise."
         table = self.centry
         columnName = PDB_ID_STR
 
@@ -152,18 +152,37 @@ class nrgCingRdb():
             return
 
         if pdbIdTable == None:
-            NTerror("Failed retrieval from NRG-CING rdb from table %s and column %s" % (table, columnName))
+            NTerror("Failed retrieval from NRG-CING RDB from table %s and column %s" % (table, columnName))
             return None
 
         if not pdbIdTable:
-            NTwarning("Failed to retrieve any entries from NRG-CING rdb from table %s and column %s" % (table, columnName))
+            NTwarning("Failed to retrieve any entries from NRG-CING RDB from table %s and column %s" % (table, columnName))
             return []
 
         pdbIdDateResultDict = NTdict() # hash by entry id
         pdbIdDateResultDict.appendFromTable(pdbIdTable, 0, 0)
         pdbIdList = pdbIdDateResultDict.keys()
         pdbIdList.sort()
+        pdbIdList = NTlist( *pdbIdList )
         return pdbIdList
+    # end def
+
+    def removeEntry(self, entry_code):
+        "Return True on error."
+        NTdebug("In %s entry_code: %s" % (getCallerName, entry_code))
+        result = self.execute(self.centry.delete().where(self.centry.c.pdb_id == entry_code))
+
+        if not result.rowcount:
+            NTwarning("Failed to remove entry: %s" % entry_code )
+
+        if result.rowcount:
+            NTdebug("Removed original entries numbering: %s" % result.rowcount)
+            if result.rowcount > 1:
+                NTerror("Removed more than the expected ONE entry; this could be serious.")
+                return True
+    #    else:
+    #        NTdebug("No original entry present yet.")
+        NTmessage("Finished with %s" % getCallerName())
     # end def
 
     def createDepTables(self):
