@@ -201,8 +201,8 @@ class nrgCing(Lister):
         self.entry_list_obsolete = NTlist()
         self.entry_list_missing_prep = NTlist()
 
-        self.ENTRY_DELETED_COUNT_MAX = 2
-        self.MAX_ERROR_COUNT_CING_LOG = 1000
+        self.ENTRY_TO_DELETE_COUNT_MAX = 2
+        self.MAX_ERROR_COUNT_CING_LOG = 2000 # 2hym has 1726 and 2bgf is the only entry over 5,000 Just used for reporting. The entry is still included and considered 'done'.
         self.MAX_ERROR_COUNT_FC_LOG = 99999 # 104d had 16. 108d had 460
         self.FRACTION_CS_CONVERSION_REQUIRED = 0.05 # DEFAULT: 0.05
 
@@ -509,21 +509,21 @@ class nrgCing(Lister):
                 entrySubDir = os.path.join(DATA_STR, subDir, entry_code)
                 if not entry_code in self.entry_list_nmr:
                     NTwarning("Found entry %s in NRG-CING but not in PDB-NMR. Will be obsoleted in NRG-CING too" % entry_code)
-                    if len(self.entry_list_obsolete) < self.ENTRY_DELETED_COUNT_MAX:
+                    if len(self.entry_list_obsolete) < self.ENTRY_TO_DELETE_COUNT_MAX:
                         rmdir(entrySubDir)
                         self.entry_list_obsolete.append(entry_code)
                     else:
                         NTerror("Entry %s in NRG-CING not obsoleted since there were already removed: %s entries." % (
-                            entry_code, self.ENTRY_DELETED_COUNT_MAX))
+                            entry_code, self.ENTRY_TO_DELETE_COUNT_MAX))
                 # end if
                 if not entry_code in self.entry_list_prep_done:
                     NTwarning("Found entry %s in NRG-CING but no prep done. Will be removed completely from NRG-CING too" % entry_code)
-                    if len(self.entry_list_missing_prep) < self.ENTRY_DELETED_COUNT_MAX:
+                    if len(self.entry_list_missing_prep) < self.ENTRY_TO_DELETE_COUNT_MAX:
                         rmdir(entrySubDir)
                         self.entry_list_missing_prep.append(entry_code)
                     else:
                         NTerror("Entry %s in NRG-CING not removed since there were already removed: %s entries." % (
-                            entry_code, self.ENTRY_DELETED_COUNT_MAX))
+                            entry_code, self.ENTRY_TO_DELETE_COUNT_MAX))
                     # end if
                 # end if
 
@@ -537,11 +537,12 @@ class nrgCing(Lister):
                 entryCrashed = False
                 timeTaken, entryCrashed, nr_error, nr_warning, nr_message, nr_debug = analyzeCingLog(logLastFile)
                 if entryCrashed:
+                    NTmessage("For %s found %s/%s timeTaken/entryCrashed and %d/%d/%d/%d error,warning,message, and debug lines. Crashed." % (entry_code, timeTaken, entryCrashed, nr_error, nr_warning, nr_message, nr_debug) )
                     self.entry_list_crashed.append(entry_code)
                     continue # don't mark it as stopped anymore.
                 # end if
                 if nr_error > self.MAX_ERROR_COUNT_CING_LOG:
-                    NTmessage("For %s found %s/%s timeTaken/entryCrashed and %d/%d/%d/%d error,warning,message, and debug lines." % (entry_code, timeTaken, entryCrashed, nr_error, nr_warning, nr_message, nr_debug) )
+                    NTmessage("For %s found %s/%s timeTaken/entryCrashed and %d/%d/%d/%d error,warning,message, and debug lines. Could still be ok." % (entry_code, timeTaken, entryCrashed, nr_error, nr_warning, nr_message, nr_debug) )
 #                    NTmessage("Found %s which is over %s please check: %s" % (nr_error, self.MAX_ERROR_COUNT_CING_LOG, entry_code))
 
                 if timeTaken:
@@ -616,6 +617,29 @@ class nrgCing(Lister):
         NTmessage("Found %s entries in RDB" % len(self.entry_list_store_in_db))
         entry_dict_store_in_db = list2dict(self.entry_list_store_in_db)
 
+        # Remove a few entries in RDB that are not done.
+        entry_list_in_db_not_done =  self.entry_list_store_in_db.difference(self.entry_list_done)
+        if entry_list_in_db_not_done:
+            NTmessage("There are %s entries in RDB that are not currently done: %s" % (len(entry_list_in_db_not_done), str(entry_list_in_db_not_done)))
+        else:
+            NTdebug("All entries in RDB are also done")
+        # endif
+        entry_list_in_db_to_remove = NTlist( *entry_list_in_db_not_done )
+        if len(entry_list_in_db_not_done) > self.ENTRY_TO_DELETE_COUNT_MAX:
+            entry_list_in_db_to_remove = entry_list_in_db_not_done[:self.ENTRY_TO_DELETE_COUNT_MAX] # doesn't make it into a NTlist.
+            entry_list_in_db_to_remove = NTlist( *entry_list_in_db_to_remove )
+        if entry_list_in_db_to_remove:
+            NTmessage("There are %s entries in RDB that will be removed: %s" % (len(entry_list_in_db_to_remove), str(entry_list_in_db_to_remove)))
+        else:
+            NTdebug("No entries in RDB need to be removed.")
+        # end if
+        for entry_code in entry_list_in_db_to_remove:
+            if m.removeEntry( entry_code ):
+                NTerror("Failed to remove %s from RDB" % entry_code )
+            # end if
+        # end for
+
+
         NTmessage("Scanning the store logs of entries done.")
         self.timeTakenDict = NTdict()
         for entry_code in self.entry_list_done:
@@ -623,7 +647,7 @@ class nrgCing(Lister):
             logDir = os.path.join(self.results_dir, DATA_STR, entryCodeChar2and3, entry_code, LOG_STORE_CING2DB )
             logLastFile = globLast(logDir + '/*.log')#            NTdebug("logLastFile: %s" % logLastFile)
             if not logLastFile:
-                if self.isProduction and 0: # DEFAULT: 0 or 1 when assumed all are done by store instead of validate. This is not always the case!
+                if self.isProduction and self.assumeAllAreDone: # DEFAULT: 0 or 1 when assumed all are done by store instead of validate. This is not always the case!
                     NTmessage("Failed to find any store log file in directory: %s" % logDir)
                 continue
             self.entry_list_store_tried.append(entry_code)

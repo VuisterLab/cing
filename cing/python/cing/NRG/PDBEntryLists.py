@@ -193,10 +193,10 @@ def getPdbEntries(onlyNmr=False, mustHaveExperimentalNmrData=False, onlySolidSta
     req = urllib2.Request(url=rpcUrl, data=queryText)
     f = urllib2.urlopen(req)
     result = []
-    for record in f.readlines():
+    for i, record in enumerate(f.readlines()): #@UnusedVariable
         entry_code = record.rstrip().lower()
         if not is_pdb_code(entry_code):
-#            NTwarning("In %s found an invalid entry code: %s from record '%s'" % (getCallerName(), str(entry_code), record)) # TODO: fix this shouldn't happen; first seen on April 24, 2011.
+#            NTwarning("In %s found an invalid entry code: %s from record (%s) '%s'" % (getCallerName(), str(entry_code), i, record)) # Reported to Wolfgang on April 24, 2011.
             continue
         result.append( entry_code )
     if not result:
