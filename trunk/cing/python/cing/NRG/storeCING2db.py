@@ -82,7 +82,9 @@ def doStoreCING2db( entry_code, archive_id, project = None):
 
 
 #    csql = csqlAlchemy(user=archive_user, db=archive_db, echo=False)
-    csql = csqlAlchemy(user=user_name, db=db_name,schema=schema)
+#    echo = 'debug'
+    echo = False # Default no echo. Can be True or 'debug'.
+    csql = csqlAlchemy(user=user_name, db=db_name,schema=schema, echo=echo)
 
     if csql.connect():
         NTerror("Failed to connect to DB")
@@ -136,8 +138,8 @@ def doStoreCING2db( entry_code, archive_id, project = None):
     logFileNameList = project.getLogFileNameList(latestListedFirst = False) #sorted chronologically with latest latest.
     rev_first = None
     rev_last = getSvnRevision()
-    datetime_first = None
-    datetime_last = datetime.datetime.now()
+    timestamp_first = None
+    timestamp_last = datetime.datetime.now()
 
     if not logFileNameList:
         NTerror("Failed to get log file name list; aborting.")
@@ -156,13 +158,13 @@ def doStoreCING2db( entry_code, archive_id, project = None):
         rev, datetime_seen = result
         if logIdx == firstIdx:
             rev_first = rev
-            datetime_first = datetime_seen
+            timestamp_first = datetime_seen
         else:
             if rev_last != rev:
                 NTcodeerror("Mismatching rev %s with rev extracted from self log: %s" % ( rev_last, rev))
             # should be pretty close to now datetime set above.
-            datetime_last = datetime_seen # Better to use the start date of log than now time.
-            NTdebug("Modifying datetime_last %s to %s" % (datetime_last, datetime_seen) )
+            timestamp_last = datetime_seen # Better to use the start date of log than now time.
+            NTdebug("Modifying timestamp_last %s to %s" % (timestamp_last, datetime_seen) )
         # end if
     # end for
 
@@ -289,8 +291,8 @@ def doStoreCING2db( entry_code, archive_id, project = None):
         name=entry_code,
         rev_first = rev_first,
         rev_last = rev_last,
-        datetime_first = datetime_first,
-        datetime_last = datetime_last,
+        timestamp_first = timestamp_first,
+        timestamp_last = timestamp_last,
 
         is_multimeric=is_multimeric,
         chothia_class=chothia_class,

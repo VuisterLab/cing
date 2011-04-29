@@ -201,7 +201,7 @@ class nrgCing(Lister):
         self.entry_list_obsolete = NTlist()
         self.entry_list_missing_prep = NTlist()
 
-        self.ENTRY_TO_DELETE_COUNT_MAX = 2
+        self.ENTRY_TO_DELETE_COUNT_MAX = 40 # can be as many as fail every time.
         self.MAX_ERROR_COUNT_CING_LOG = 2000 # 2hym has 1726 and 2bgf is the only entry over 5,000 Just used for reporting. The entry is still included and considered 'done'.
         self.MAX_ERROR_COUNT_FC_LOG = 99999 # 104d had 16. 108d had 460
         self.FRACTION_CS_CONVERSION_REQUIRED = 0.05 # DEFAULT: 0.05
@@ -1795,6 +1795,7 @@ class nrgCing(Lister):
             self.entry_list_todo = '1brv'.split()
 #            self.entry_list_todo = readLinesFromFile('/Users/jd/NRG/lists/entry_list_vuisterlab.csv')
 #            self.entry_list_todo = readLinesFromFile(os.path.join(self.results_dir, 'entry_list_todo_nmr_all.csv'))
+            self.entry_list_todo = readLinesFromFile(os.path.join('/Users/jd', 'entry_list_to_store.csv'))
             self.entry_list_todo = NTlist( *self.entry_list_todo )
 
         NTmessage("Found entries in NRG-CING todo: %d" % len(self.entry_list_todo))

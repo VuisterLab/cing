@@ -168,21 +168,24 @@ class nrgCingRdb():
     # end def
 
     def removeEntry(self, entry_code):
-        "Return True on error."
-        NTdebug("In %s entry_code: %s" % (getCallerName, entry_code))
+        """
+        Return True on error.
+        If no entry was present then the return is still None.
+        """
+        NTdebug("In %s entry_code: %s" % (getCallerName(), entry_code))
         result = self.execute(self.centry.delete().where(self.centry.c.pdb_id == entry_code))
 
         if not result.rowcount:
             NTwarning("Failed to remove entry: %s" % entry_code )
 
         if result.rowcount:
-            NTdebug("Removed original entries numbering: %s" % result.rowcount)
+#            NTdebug("Removed original entries numbering: %s" % result.rowcount)
             if result.rowcount > 1:
                 NTerror("Removed more than the expected ONE entry; this could be serious.")
                 return True
     #    else:
     #        NTdebug("No original entry present yet.")
-        NTmessage("Finished with %s" % getCallerName())
+#        NTdebug("Finished with %s" % getCallerName())
     # end def
 
     def createDepTables(self):

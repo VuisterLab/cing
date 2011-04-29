@@ -137,6 +137,29 @@ WHERE e.wi_c12chk > 0
 
 SELECT count( distinct a.wi_mo2chk) FROM "nrgcing"."cingatom" as a;
 
+SELECT rev_first, count(*)
+FROM "nrgcing"."cingentry" e
+group by rev_first
+order by rev_first desc
+;
+
+SELECT name
+FROM "nrgcing"."cingentry" e
+where rev_first IS NULL
+;
+
+select name, rev_first
+-- delete
+FROM "nrgcing"."cingentry" e
+where rev_first < 990
+;
+
+
+select name, timestamp_last
+FROM "nrgcing"."cingentry" e
+;
+
+where timestamp_first > '2011-04-25'
 
 
 
@@ -147,3 +170,4 @@ CREATE TABLE nrgcing.testtable
     name                           VARCHAR(255),
     pdb_id                         VARCHAR(255)
 );
+
