@@ -1,7 +1,7 @@
 # Refinement setup
 
 set x = 1brv
-set stage = rT
+set stage = rA
 set ranges = 171-188
 
 set x = H2_2Ca_64_100
@@ -82,6 +82,7 @@ Options:
 
 refine --project $x --name $stage --setup --overwrite --superpose $ranges
 
+
 ==> Generated setup under "./$x.cing/Refine/$stage"
 -----------------------------------------------------------------------------------------------------------------------------------------
   Edit parameters.py file
@@ -93,14 +94,14 @@ Edit "./$x.cing/Refine/$stage/parameters.py" before continuing
   Manually edit the Ca.tbl file to the following format
 -----------------------------------------------------------------------------------------------------------------------------------------
 XPLOR: d dminus dplus
-assi (resid 516 and name OE1)       (resid 800 and name * and not segid WAT1)          2.900     0.900     0.000
-assi (resid 578 and name OD1)       (resid 800 and name * and not segid WAT1)          2.900     0.900     0.000
-assi (resid 648 and name OE1)       (resid 800 and name * and not segid WAT1)          2.900     0.900     0.000
-assi (resid 580 and name O)         (resid 800 and name * and not segid WAT1)          2.900     0.900     0.000
-assi (resid 552 and name OD2)       (resid 850 and name * and not segid WAT1)          2.900     0.900     0.000
-assi (resid 578 and name OD2)       (resid 850 and name * and not segid WAT1)          2.900     0.900     0.000
-assi (resid 646 and name O)         (resid 900 and name * and not segid WAT1)          2.900     0.900     0.000
-assi (resid 649 and name OG)        (resid 900 and name * and not segid WAT1)          2.900     0.900     0.000
+assi (resid 578 and name OD1)       (resid 800 and name "CA+2")         2.800     2.800     0.000
+assi (resid 578 and name OD2)       (resid 850 and name "CA+2")         2.800     2.800     0.000
+assi (resid 580 and name O)         (resid 800 and name "CA+2")         2.800     2.800     0.000
+assi (resid 648 and name OE1)       (resid 800 and name "CA+2")         2.800     2.800     0.000
+assi (resid 648 and name OE2)       (resid 800 and name "CA+2")         2.800     2.800     0.000
+assi (resid 552 and name OD1)       (resid 850 and name "CA+2")         2.800     2.800     0.000
+assi (resid 516 and name OE2)       (resid 800 and name "CA+2")         2.800     2.800     0.000
+assi (resid 516 and name OE1)       (resid 800 and name "CA+2")         2.800     2.800     0.000
 
 # Then create the psf etc.
 refine --project $x --name $stage --superpose $ranges --psf
