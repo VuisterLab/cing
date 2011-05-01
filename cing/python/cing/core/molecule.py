@@ -1950,13 +1950,20 @@ class Molecule( NTtree, ResidueList ):
         Takes into account residues with missing coordinates as long as they are all missing.
         By default the bonds that are determined with a certainty above CUTOFF_SCORE will actually be
         applied.
+        Will consider CYS and CYSS.
+
+        Return a pairlist that may or may not be empty.
+        A pair is a tuple of residue objects.
+        Return True on error
         """
+        pairList = []
+
         CUTOFF_SCORE = 0.9 # Default is 0.9
         CUTOFF_SCORE_MAYBE = 0.3 # Default is 0.3
 
         if self.modelCount == 0:
             NTwarning('idDisulfides: no models for "%s"', self)
-            return
+            return pairList
         #end if
 
         cys=self.residuesWithProperties('CYS') # Called cysteine if thiol sidechain is not oxidized.
@@ -1978,7 +1985,6 @@ class Molecule( NTtree, ResidueList ):
             elif not len(coordinatesRetrieved): # model count see entry 1abt and issue 137
 #                NTdebug("No coordinates for CA, skipping residue: %s" % c)
                 del( cys[i] )
-        pairList = []
         disulfides = [] # same as pairList but with scoreList.
         cyssDict2Pair = {}
         # all cys(i), cys(j) pairs with j>i
@@ -2063,7 +2069,7 @@ class Molecule( NTtree, ResidueList ):
                         continue
                     c.mutate('CYSS') # this looses connections to ccpn in residue and atom objects.
         #end if
-
+        return pairList
     # end def
 
     def syncModels(self ):

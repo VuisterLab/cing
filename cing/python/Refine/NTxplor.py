@@ -330,7 +330,7 @@ end"""
 
 
     #------------------------------------------------------------------------
-    def readMolCode( self ):
+    def readMolCode( self, useCoordinates = True ):
         """Return code for setup of molecular files"""
         code = """
 {*==========================================================================*}
@@ -338,15 +338,10 @@ end"""
 {*==========================================================================*}
 """
         for mol in self.molecules:
-            code = code + """
-structure
-  @""" + self.checkPath( self.directories.psf, mol.psfFile ) + """
-end
-
-coordinates
-  @""" + self.checkPath( self.inPath, mol.pdbFile ) + """
-
-"""
+            code += "structure @%s end\n" % self.checkPath( self.directories.psf, mol.psfFile )
+            if useCoordinates: # end is in PDB file.
+                code += "coordinates @%s\n" % self.checkPath( self.inPath, mol.pdbFile )
+            # end if
         #end for
         return code
 
@@ -870,6 +865,252 @@ set message on echo on end
 stop
 """
 
+# END class WaterRefine -----------------------------------------------------------
+
+#==============================================================================
+# Quick and fast anneal
+# Adapted from anneal.py fro
+#==============================================================================
+class Anneal( Xplor ):
+
+    #------------------------------------------------------------------------
+    def __init__( self, config, *args, **kwds ):
+        Xplor.__init__( self, config, *args, **kwds )
+        if self.verbose:
+            #self.keysformat()
+            NTmessage('%s\n', self.format())
+        #end if
+    #end if
+    def createScript( self ):
+        """ Create script.
+        Return True on error.
+        """
+
+
+        restraintsAnalysisCode = self.restraintsAnalysisCode()
+        if None in [ restraintsAnalysisCode ]:
+            NTerror("In WaterRefine#createScript: Failed to generate code for at least one part.")
+            return True
+
+
+        self.script = """
+{*==========================================================================*}
+remarks Anneal protocol adapted from tutorial/nmr/sa_new.inp
+remarks in XPLOR-NIH (Charles D. Schwieters)
+remarks by Jurgen F. Doreleijers 2011-04-30
+{*==========================================================================*}
+
+""" + \
+self.setupPTcode() + self.readMolCode() + """
+
+set message on echo on end
+
+remarks file  nmr/sa.inp
+remarks  Simulated annealing protocol for NMR structure determination.
+remarks  The starting structure for this protocol can be any structure with
+remarks  a reasonable geometry, such as randomly assigned torsion angles or
+remarks  extended strands.
+remarks  Author: Michael Nilges
+
+{====>}
+evaluate ($init_t = 1000 )       {*Initial simulated annealing temperature.*}
+{====>}
+evaluate ($high_steps= 24000 )         {*Total number of steps at high temp.*}
+{====>}
+evaluate ($cool_steps = 3000 )      {*Total number of steps during cooling.*}
+
+
+noe
+{====>}
+   nres=3000             {*Estimate greater than the actual number of NOEs.*}
+   class all
+{====>}
+   @il8_noe.tbl                           {*Read NOE distance ranges.*}
+   @il8_hbonds.tbl
+end
+
+{====>}
+restraints dihedral
+   nass = 1000
+   @il8_dihe.tbl                       {*Read dihedral angle restraints.*}
+end
+
+
+{* Reduce the scaling factor on the force applied to disulfide            *}
+{* bonds and angles from 1000.0 to 100.0 in order to reduce computation instability. *}
+parameter
+      bonds ( name SG ) ( name SG ) 100. TOKEN
+      angle ( name CB ) ( name SG ) ( name SG ) 50. TOKEN
+end
+
+
+flags exclude * include bonds angle impr vdw noe cdih end
+
+                        {*Friction coefficient for MD heatbath, in 1/ps.   *}
+vector do (fbeta=10) (all)
+                        {*Uniform heavy masses to speed molecular dynamics.*}
+vector do (mass=100) (all)
+
+noe                             {*Parameters for NOE effective energy term.*}
+  ceiling=1000
+  averaging  * cent
+  potential  * soft
+  scale      * 50.
+  sqoffset   * 0.0
+  sqconstant * 1.0
+  sqexponent * 2
+  soexponent * 1
+  asymptote  * 0.1                         {*Initial value--modified later.*}
+  rswitch    * 0.5
+end
+
+parameter                       {*Parameters for the repulsive energy term.*}
+    nbonds
+      repel=1.                   {*Initial value for repel--modified later.*}
+      rexp=2 irexp=2 rcon=1.
+      nbxmod=3
+      wmin=0.01
+      cutnb=4.5 ctonnb=2.99 ctofnb=3.
+      tolerance=0.5
+   end
+end
+
+restraints dihedral
+      scale=5.
+end
+
+coor copy end
+
+set seed """ + str(self.seed()) + """ end
+
+! We loop until we have an accepted structure, maximum trials=1
+evaluate ($end_count = 1)
+evaluate ($count = 0)
+
+while ($count < $end_count ) loop main
+
+    coor swap end
+    coor copy end
+
+      {* ============================================= Initial minimization.*}
+    restraints dihedral   scale=5.   end
+    noe asymptote * 0.1  end
+    parameter  nbonds repel=1.   end end
+    constraints interaction
+            (all) (all) weights * 1  vdw 0.002 end end
+    minimize powell nstep=50 drop=10.  nprint=25 end
+
+
+      {* ======================================== High-temperature dynamics.*}
+    constraints interaction (all) (all)
+                weights * 1  angl 0.4  impr 0.1 vdw 0.002 end end
+
+    evaluate ($nstep1=int($high_steps * 2. / 3. ) )
+    evaluate ($nstep2=int($high_steps * 1. / 3. ) )
+
+    dynamics  verlet
+       nstep=$nstep1   timestep=0.005   iasvel=maxwell   firstt=$init_t
+       tcoupling=true  tbath=$init_t  nprint=50  iprfrq=0
+    end
+
+
+      {* ============== Tilt the asymptote and increase weights on geometry.*}
+    noe asymptote * 1.0  end
+
+    constraints interaction
+               (all) (all) weights * 1  vdw 0.002  end end
+
+    {* Bring scaling factor for S-S bonds back *}
+    parameter
+       bonds ( name SG ) ( name SG ) 1000. TOKEN
+       angle ( name CB ) ( name SG ) ( name SG ) 500. TOKEN
+    end
+
+    dynamics  verlet
+       nstep=$nstep2   timestep=0.005    iasvel=current   tcoupling=true
+       tbath=$init_t  nprint=50  iprfrq=0
+    end
+
+     {* ==================================================  Cool the system.*}
+
+    restraints dihedral   scale=200.   end
+
+    evaluate ($final_t = 100)      { K }
+    evaluate ($tempstep = 50)      { K }
+
+    evaluate ($ncycle = ($init_t-$final_t)/$tempstep)
+    evaluate ($nstep = int($cool_steps/$ncycle))
+
+    evaluate ($ini_rad  = 0.9)        evaluate ($fin_rad  = 0.75)
+    evaluate ($ini_con=  0.003)       evaluate ($fin_con=  4.0)
+
+    evaluate ($bath  = $init_t)
+    evaluate ($k_vdw = $ini_con)
+    evaluate ($k_vdwfact = ($fin_con/$ini_con)^(1/$ncycle))
+    evaluate ($radius=    $ini_rad)
+    evaluate ($radfact = ($fin_rad/$ini_rad)^(1/$ncycle))
+
+    evaluate ($i_cool = 0)
+    while ($i_cool < $ncycle) loop cool
+       evaluate ($i_cool=$i_cool+1)
+
+       evaluate ($bath  = $bath  - $tempstep)
+       evaluate ($k_vdw=min($fin_con,$k_vdw*$k_vdwfact))
+       evaluate ($radius=max($fin_rad,$radius*$radfact))
+
+       parameter  nbonds repel=$radius   end end
+       constraints interaction (all) (all)
+                      weights * 1. vdw $k_vdw end end
+
+       dynamics  verlet
+          nstep=$nstep time=0.005 iasvel=current firstt=$bath
+          tcoup=true tbath=$bath nprint=$nstep iprfrq=0
+       end
+
+
+    {====>}                                                  {*Abort condition.*}
+       evaluate ($critical=$temp/$bath)
+       if ($critical >  10. ) then
+          display  ****&&&& rerun job with smaller timestep (i.e., 0.003)
+          stop
+       end if
+
+    end loop cool
+
+    {* ================================================= Final minimization.*}
+
+    constraints interaction (all) (all) weights * 1. vdw 1. end end
+    parameter
+       nbonds
+          repel=0.80
+          rexp=2 irexp=2 rcon=1.
+          nbxmod=3
+          wmin=0.01
+          cutnb=6.0 ctonnb=2.99 ctofnb=3.
+          tolerance=1.5
+       end
+    end
+
+    minimize powell nstep=1000 drop=10.0 nprint=25 end
+"""  + \
+restraintsAnalysisCode + """
+
+if ($accept = 0 ) then
+  exit main
+else
+  evaluate ( $count = $count + 1 )
+end if
+
+end loop main
+
+""" + \
+self.writeMolCode() + """
+
+set message on echo on end
+
+stop
+"""
+
 # END class Refine -----------------------------------------------------------
 
 
@@ -1046,27 +1287,18 @@ segment
     coord @""" + self.pdbFile + """
   end
 end
-"""
-        for resid in self.patchHISD:
-            self.script = self.script + """
-patch HISD
-   reference=nil=( resid """ + str(resid) + """ )
-end
-"""
-        for resid in self.patchHISE:
-            self.script = self.script + """
-patch HISE
-   reference=nil=( resid """ + str(resid) + """ )
-end
-"""
-        for resid in self.patchCISP:
-            self.script = self.script + """
-patch CISP
-   reference=nil=( resid """ + str(resid) + """ )
-end
-"""
 
-        self.script = self.script + """
+"""
+        for pair in self.patchDISN:
+            self.script += "patch DISN  reference=1  =( resid %s )  reference=2=( resid %s )        end\n" % pair
+        for resid in self.patchHISD:
+            self.script += "patch HISD  reference=nil=( resid %s ) end\n" % resid
+        for resid in self.patchHISE:
+            self.script += "patch HISE  reference=nil=( resid %s ) end\n" % resid
+        for resid in self.patchCISP:
+            self.script += "patch CISP  reference=nil=( resid %s ) end\n" % resid
+
+        self.script += """
 write psf output=""" + self.psfFile  + """ end
 
 set message on echo on end
@@ -1076,3 +1308,108 @@ stop
 
 # END class GeneratePSF---------------------------------------------------------
 
+
+
+
+#==============================================================================
+# Generate extended structure
+#==============================================================================
+class GenerateTemplate( Xplor ):
+
+    #------------------------------------------------------------------------
+    def __init__( self, config, *args, **kwds ):
+        NTmessage("a")
+
+        Xplor.__init__( self, config, *args, **kwds )
+        # make relative Path
+        self.psfFile = self.checkPath( self.directories.psf, self.psfFile )
+#        self.outPath = self.directories.template
+        if self.verbose:
+            #self.keysformat()
+            NTmessage('%s\n', self.format())
+        #end if
+    #endif
+
+    #------------------------------------------------------------------------
+    def createScript( self ):
+        """ Create script.
+        Return True on error.
+        """
+
+        self.script = """
+{*==========================================================================*}
+remarks  file  nmr/generate_template.inp
+remarks  Generates a "template" coordinate set.  This produces
+remarks  an arbitrary extended conformation with ideal geometry.
+remarks  Author: Axel T. Brunger
+{*==========================================================================*}
+
+""" + \
+self.setupPTcode() + "\n\n" + \
+"structure @" + self.psfFile +  " end\n\n" + \
+"""
+
+set seed """ + str(self.seed()) + """ end
+
+vector ident (x) ( all )
+vector do (x=x/10.) ( all )
+vector do (y=random(0.5) ) ( all )
+vector do (z=random(0.5) ) ( all )
+
+vector do (fbeta=50) (all)                 {*Friction coefficient, in 1/ps.*}
+vector do (mass=100) (all)                         {*Heavy masses, in amus.*}
+
+{* JFD note the above parameters are reset here *}
+parameter
+   nbonds
+      cutnb=5.5 rcon=20. nbxmod=-2 repel=0.9  wmin=0.1 tolerance=1.
+      rexp=2 irexp=2 inhibit=0.25
+   end
+end
+
+flags exclude * include bond angle vdw end
+
+minimize powell nstep=50  nprint=10 end
+
+flags include impr end
+
+minimize powell nstep=50 nprint=10 end
+
+dynamics  verlet
+   nstep=50  timestep=0.001 iasvel=maxwell  firsttemp= 300.
+   tcoupling = true  tbath = 300.   nprint=50  iprfrq=0
+end
+
+parameter
+   nbonds
+      rcon=2. nbxmod=-3 repel=0.75
+   end
+end
+
+minimize powell nstep=100 nprint=25 end
+
+dynamics  verlet
+   nstep=500  timestep=0.005 iasvel=maxwell  firsttemp= 300.
+   tcoupling = true  tbath = 300.   nprint=100  iprfrq=0
+end
+
+flags exclude vdw elec end
+vector do (mass=1.) ( name h* )
+hbuild selection=( name h* ) phistep=360 end
+flags include vdw elec end
+
+minimize powell nstep=200 nprint=50 end
+
+{*Write coordinates.*}
+
+remarks produced by Refine.NTxplor.GenerateTemplate
+
+""" + self.writeMolCode() + """
+
+set message on echo on end
+
+stop
+"""
+
+
+# END class GeneratePSF---------------------------------------------------------

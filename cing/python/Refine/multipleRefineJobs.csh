@@ -1,15 +1,15 @@
 #!/bin/tcsh
-
-set stage = r2
+# Run like: $CINGROOT/python/Refine/multipleRefineJobs.csh
+set stage = rT
 set x = 1brv
 set ranges = '171-189'
 
-if ( 1 ) then
+if ( 0 ) then
   set x = LdCof_jfd_ref
   set ranges = '6-23,26-57,63-141'
 endif
 
-@ jobCountMax = 10
+@ jobCountMax = 5
 @ modelCountMax = 10
 @ modelsPerJob = $modelCountMax / $jobCountMax
 @ jobCount = 0 # default is zero

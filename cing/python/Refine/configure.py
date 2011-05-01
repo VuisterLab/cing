@@ -38,12 +38,14 @@ config = NTdict(
                        ],
     directories      = NTdict(
         converted    = 'Converted',
-        analyzed     = 'Analyzed',
-        refined      = 'Refined',
+        analyzed     = 'Analyzed', # analyzed from refine
+        annealed     = 'Annealed', # annealed from template
+        template     = 'Template', # extended structure at random
+        refined      = 'Refined',  # from analyzed
         tables       = 'Tables',
         jobs         = 'Jobs',
         psf          = 'PSF',
-	toppar	     = 'Toppar'
+        toppar	     = 'Toppar'
     )
 )
 

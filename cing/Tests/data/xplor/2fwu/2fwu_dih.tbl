@@ -1,0 +1,1141 @@
+assign 
+     (resid 639 and name N)        
+     (resid 639 and name CA)       
+     (resid 639 and name C)        
+     (resid 640 and name N)        
+         1.00   153.00    30.00 2
+
+assign 
+     (resid 527 and name C)        
+     (resid 528 and name N)        
+     (resid 528 and name CA)       
+     (resid 528 and name C)        
+         1.00   -88.00    18.00 2
+
+assign 
+     (resid 623 and name C)        
+     (resid 624 and name N)        
+     (resid 624 and name CA)       
+     (resid 624 and name C)        
+         1.00   -67.00    28.00 2
+
+assign 
+     (resid 582 and name N)        
+     (resid 582 and name CA)       
+     (resid 582 and name C)        
+     (resid 583 and name N)        
+         1.00   167.00    32.00 2
+
+assign 
+     (resid 527 and name N)        
+     (resid 527 and name CA)       
+     (resid 527 and name C)        
+     (resid 528 and name N)        
+         1.00   143.00    24.00 2
+
+assign 
+     (resid 504 and name C)        
+     (resid 505 and name N)        
+     (resid 505 and name CA)       
+     (resid 505 and name C)        
+         1.00  -102.00    20.00 2
+
+assign 
+     (resid 505 and name N)        
+     (resid 505 and name CA)       
+     (resid 505 and name C)        
+     (resid 506 and name N)        
+         1.00   140.00    38.00 2
+
+assign 
+     (resid 506 and name N)        
+     (resid 506 and name CA)       
+     (resid 506 and name C)        
+     (resid 507 and name N)        
+         1.00   141.00    44.00 2
+
+assign 
+     (resid 509 and name N)        
+     (resid 509 and name CA)       
+     (resid 509 and name C)        
+     (resid 510 and name N)        
+         1.00   135.00    84.00 2
+
+assign 
+     (resid 510 and name C)        
+     (resid 511 and name N)        
+     (resid 511 and name CA)       
+     (resid 511 and name C)        
+         1.00  -128.00    26.00 2
+
+assign 
+     (resid 511 and name N)        
+     (resid 511 and name CA)       
+     (resid 511 and name C)        
+     (resid 512 and name N)        
+         1.00   149.00    22.00 2
+
+assign 
+     (resid 511 and name C)        
+     (resid 512 and name N)        
+     (resid 512 and name CA)       
+     (resid 512 and name C)        
+         1.00  -118.00    32.00 2
+
+assign 
+     (resid 512 and name C)        
+     (resid 513 and name N)        
+     (resid 513 and name CA)       
+     (resid 513 and name C)        
+         1.00  -104.00    26.00 2
+
+assign 
+     (resid 513 and name N)        
+     (resid 513 and name CA)       
+     (resid 513 and name C)        
+     (resid 514 and name N)        
+         1.00   134.00    26.00 2
+
+assign 
+     (resid 514 and name N)        
+     (resid 514 and name CA)       
+     (resid 514 and name C)        
+     (resid 515 and name N)        
+         1.00   151.00    26.00 2
+
+assign 
+     (resid 514 and name C)        
+     (resid 515 and name N)        
+     (resid 515 and name CA)       
+     (resid 515 and name C)        
+         1.00  -101.00    58.00 2
+
+assign 
+     (resid 515 and name N)        
+     (resid 515 and name CA)       
+     (resid 515 and name C)        
+     (resid 516 and name N)        
+         1.00   128.00    38.00 2
+
+assign 
+     (resid 517 and name C)        
+     (resid 518 and name N)        
+     (resid 518 and name CA)       
+     (resid 518 and name C)        
+         1.00   -96.00    52.00 2
+
+assign 
+     (resid 518 and name N)        
+     (resid 518 and name CA)       
+     (resid 518 and name C)        
+     (resid 519 and name N)        
+         1.00   139.00    46.00 2
+
+assign 
+     (resid 519 and name C)        
+     (resid 520 and name N)        
+     (resid 520 and name CA)       
+     (resid 520 and name C)        
+         1.00  -124.00    24.00 2
+
+assign 
+     (resid 520 and name N)        
+     (resid 520 and name CA)       
+     (resid 520 and name C)        
+     (resid 521 and name N)        
+         1.00   130.00    10.00 2
+
+assign 
+     (resid 520 and name C)        
+     (resid 521 and name N)        
+     (resid 521 and name CA)       
+     (resid 521 and name C)        
+         1.00  -125.00    40.00 2
+
+assign 
+     (resid 521 and name N)        
+     (resid 521 and name CA)       
+     (resid 521 and name C)        
+     (resid 522 and name N)        
+         1.00   136.00    42.00 2
+
+assign 
+     (resid 521 and name C)        
+     (resid 522 and name N)        
+     (resid 522 and name CA)       
+     (resid 522 and name C)        
+         1.00  -113.00    32.00 2
+
+assign 
+     (resid 522 and name C)        
+     (resid 523 and name N)        
+     (resid 523 and name CA)       
+     (resid 523 and name C)        
+         1.00  -122.00    28.00 2
+
+assign 
+     (resid 523 and name N)        
+     (resid 523 and name CA)       
+     (resid 523 and name C)        
+     (resid 524 and name N)        
+         1.00   131.00    26.00 2
+
+assign 
+     (resid 523 and name C)        
+     (resid 524 and name N)        
+     (resid 524 and name CA)       
+     (resid 524 and name C)        
+         1.00   -94.00    48.00 2
+
+assign 
+     (resid 528 and name N)        
+     (resid 528 and name CA)       
+     (resid 528 and name C)        
+     (resid 529 and name N)        
+         1.00   162.00    34.00 2
+
+assign 
+     (resid 528 and name C)        
+     (resid 529 and name N)        
+     (resid 529 and name CA)       
+     (resid 529 and name C)        
+         1.00   -61.00    20.00 2
+
+assign 
+     (resid 529 and name N)        
+     (resid 529 and name CA)       
+     (resid 529 and name C)        
+     (resid 530 and name N)        
+         1.00   -33.00    24.00 2
+
+assign 
+     (resid 534 and name N)        
+     (resid 534 and name CA)       
+     (resid 534 and name C)        
+     (resid 535 and name N)        
+         1.00   128.00    28.00 2
+
+assign 
+     (resid 534 and name C)        
+     (resid 535 and name N)        
+     (resid 535 and name CA)       
+     (resid 535 and name C)        
+         1.00  -127.00    18.00 2
+
+assign 
+     (resid 535 and name N)        
+     (resid 535 and name CA)       
+     (resid 535 and name C)        
+     (resid 536 and name N)        
+         1.00   133.00    20.00 2
+
+assign 
+     (resid 535 and name C)        
+     (resid 536 and name N)        
+     (resid 536 and name CA)       
+     (resid 536 and name C)        
+         1.00  -108.00    32.00 2
+
+assign 
+     (resid 536 and name N)        
+     (resid 536 and name CA)       
+     (resid 536 and name C)        
+     (resid 537 and name N)        
+         1.00   132.00    20.00 2
+
+assign 
+     (resid 536 and name C)        
+     (resid 537 and name N)        
+     (resid 537 and name CA)       
+     (resid 537 and name C)        
+         1.00  -124.00    26.00 2
+
+assign 
+     (resid 538 and name C)        
+     (resid 539 and name N)        
+     (resid 539 and name CA)       
+     (resid 539 and name C)        
+         1.00  -135.00    22.00 2
+
+assign 
+     (resid 539 and name N)        
+     (resid 539 and name CA)       
+     (resid 539 and name C)        
+     (resid 540 and name N)        
+         1.00   165.00    18.00 2
+
+assign 
+     (resid 540 and name N)        
+     (resid 540 and name CA)       
+     (resid 540 and name C)        
+     (resid 541 and name N)        
+         1.00   151.00    22.00 2
+
+assign 
+     (resid 541 and name N)        
+     (resid 541 and name CA)       
+     (resid 541 and name C)        
+     (resid 542 and name N)        
+         1.00   149.00    28.00 2
+
+assign 
+     (resid 541 and name C)        
+     (resid 542 and name N)        
+     (resid 542 and name CA)       
+     (resid 542 and name C)        
+         1.00  -128.00    54.00 2
+
+assign 
+     (resid 542 and name N)        
+     (resid 542 and name CA)       
+     (resid 542 and name C)        
+     (resid 543 and name N)        
+         1.00   144.00    36.00 2
+
+assign 
+     (resid 546 and name C)        
+     (resid 547 and name N)        
+     (resid 547 and name CA)       
+     (resid 547 and name C)        
+         1.00  -109.00    62.00 2
+
+assign 
+     (resid 547 and name N)        
+     (resid 547 and name CA)       
+     (resid 547 and name C)        
+     (resid 548 and name N)        
+         1.00   133.00    32.00 2
+
+assign 
+     (resid 553 and name N)        
+     (resid 553 and name CA)       
+     (resid 553 and name C)        
+     (resid 554 and name N)        
+         1.00   150.00    40.00 2
+
+assign 
+     (resid 554 and name C)        
+     (resid 555 and name N)        
+     (resid 555 and name CA)       
+     (resid 555 and name C)        
+         1.00   -74.00    48.00 2
+
+assign 
+     (resid 555 and name N)        
+     (resid 555 and name CA)       
+     (resid 555 and name C)        
+     (resid 556 and name N)        
+         1.00   138.00    34.00 2
+
+assign 
+     (resid 558 and name C)        
+     (resid 559 and name N)        
+     (resid 559 and name CA)       
+     (resid 559 and name C)        
+         1.00  -117.00    50.00 2
+
+assign 
+     (resid 559 and name N)        
+     (resid 559 and name CA)       
+     (resid 559 and name C)        
+     (resid 560 and name N)        
+         1.00   142.00    40.00 2
+
+assign 
+     (resid 559 and name C)        
+     (resid 560 and name N)        
+     (resid 560 and name CA)       
+     (resid 560 and name C)        
+         1.00  -115.00    32.00 2
+
+assign 
+     (resid 560 and name C)        
+     (resid 561 and name N)        
+     (resid 561 and name CA)       
+     (resid 561 and name C)        
+         1.00  -115.00    60.00 2
+
+assign 
+     (resid 561 and name C)        
+     (resid 562 and name N)        
+     (resid 562 and name CA)       
+     (resid 562 and name C)        
+         1.00  -110.00    26.00 2
+
+assign 
+     (resid 562 and name C)        
+     (resid 563 and name N)        
+     (resid 563 and name CA)       
+     (resid 563 and name C)        
+         1.00   -98.00    48.00 2
+
+assign 
+     (resid 563 and name N)        
+     (resid 563 and name CA)       
+     (resid 563 and name C)        
+     (resid 564 and name N)        
+         1.00   145.00    56.00 2
+
+assign 
+     (resid 564 and name N)        
+     (resid 564 and name CA)       
+     (resid 564 and name C)        
+     (resid 565 and name N)        
+         1.00   -35.00    16.00 2
+
+assign 
+     (resid 564 and name C)        
+     (resid 565 and name N)        
+     (resid 565 and name CA)       
+     (resid 565 and name C)        
+         1.00   -66.00    24.00 2
+
+assign 
+     (resid 569 and name N)        
+     (resid 569 and name CA)       
+     (resid 569 and name C)        
+     (resid 570 and name N)        
+         1.00   159.00    22.00 2
+
+assign 
+     (resid 569 and name C)        
+     (resid 570 and name N)        
+     (resid 570 and name CA)       
+     (resid 570 and name C)        
+         1.00  -121.00    46.00 2
+
+assign 
+     (resid 570 and name N)        
+     (resid 570 and name CA)       
+     (resid 570 and name C)        
+     (resid 571 and name N)        
+         1.00   143.00    42.00 2
+
+assign 
+     (resid 571 and name N)        
+     (resid 571 and name CA)       
+     (resid 571 and name C)        
+     (resid 572 and name N)        
+         1.00   132.00    28.00 2
+
+assign 
+     (resid 571 and name C)        
+     (resid 572 and name N)        
+     (resid 572 and name CA)       
+     (resid 572 and name C)        
+         1.00  -106.00    30.00 2
+
+assign 
+     (resid 572 and name C)        
+     (resid 573 and name N)        
+     (resid 573 and name CA)       
+     (resid 573 and name C)        
+         1.00  -128.00    28.00 2
+
+assign 
+     (resid 573 and name N)        
+     (resid 573 and name CA)       
+     (resid 573 and name C)        
+     (resid 574 and name N)        
+         1.00   134.00    24.00 2
+
+assign 
+     (resid 573 and name C)        
+     (resid 574 and name N)        
+     (resid 574 and name CA)       
+     (resid 574 and name C)        
+         1.00   -82.00    16.00 2
+
+assign 
+     (resid 574 and name C)        
+     (resid 575 and name N)        
+     (resid 575 and name CA)       
+     (resid 575 and name C)        
+         1.00  -115.00    40.00 2
+
+assign 
+     (resid 576 and name C)        
+     (resid 577 and name N)        
+     (resid 577 and name CA)       
+     (resid 577 and name C)        
+         1.00  -104.00    38.00 2
+
+assign 
+     (resid 577 and name C)        
+     (resid 578 and name N)        
+     (resid 578 and name CA)       
+     (resid 578 and name C)        
+         1.00  -109.00    74.00 2
+
+assign 
+     (resid 578 and name N)        
+     (resid 578 and name CA)       
+     (resid 578 and name C)        
+     (resid 579 and name N)        
+         1.00   144.00    38.00 2
+
+assign 
+     (resid 580 and name C)        
+     (resid 581 and name N)        
+     (resid 581 and name CA)       
+     (resid 581 and name C)        
+         1.00   -86.00    38.00 2
+
+assign 
+     (resid 581 and name C)        
+     (resid 582 and name N)        
+     (resid 582 and name CA)       
+     (resid 582 and name C)        
+         1.00  -129.00    44.00 2
+
+assign 
+     (resid 584 and name C)        
+     (resid 585 and name N)        
+     (resid 585 and name CA)       
+     (resid 585 and name C)        
+         1.00  -118.00    62.00 2
+
+assign 
+     (resid 585 and name N)        
+     (resid 585 and name CA)       
+     (resid 585 and name C)        
+     (resid 586 and name N)        
+         1.00   152.00    22.00 2
+
+assign 
+     (resid 585 and name C)        
+     (resid 586 and name N)        
+     (resid 586 and name CA)       
+     (resid 586 and name C)        
+         1.00  -123.00    32.00 2
+
+assign 
+     (resid 586 and name N)        
+     (resid 586 and name CA)       
+     (resid 586 and name C)        
+     (resid 587 and name N)        
+         1.00   148.00    30.00 2
+
+assign 
+     (resid 586 and name C)        
+     (resid 587 and name N)        
+     (resid 587 and name CA)       
+     (resid 587 and name C)        
+         1.00  -144.00    46.00 2
+
+assign 
+     (resid 587 and name C)        
+     (resid 588 and name N)        
+     (resid 588 and name CA)       
+     (resid 588 and name C)        
+         1.00  -132.00    40.00 2
+
+assign 
+     (resid 588 and name C)        
+     (resid 589 and name N)        
+     (resid 589 and name CA)       
+     (resid 589 and name C)        
+         1.00  -125.00    38.00 2
+
+assign 
+     (resid 589 and name N)        
+     (resid 589 and name CA)       
+     (resid 589 and name C)        
+     (resid 590 and name N)        
+         1.00   131.00    18.00 2
+
+assign 
+     (resid 590 and name N)        
+     (resid 590 and name CA)       
+     (resid 590 and name C)        
+     (resid 591 and name N)        
+         1.00   152.00    36.00 2
+
+assign 
+     (resid 590 and name C)        
+     (resid 591 and name N)        
+     (resid 591 and name CA)       
+     (resid 591 and name C)        
+         1.00  -123.00    34.00 2
+
+assign 
+     (resid 591 and name N)        
+     (resid 591 and name CA)       
+     (resid 591 and name C)        
+     (resid 592 and name N)        
+         1.00   140.00    26.00 2
+
+assign 
+     (resid 595 and name N)        
+     (resid 595 and name CA)       
+     (resid 595 and name C)        
+     (resid 596 and name N)        
+         1.00   150.00    30.00 2
+
+assign 
+     (resid 595 and name C)        
+     (resid 596 and name N)        
+     (resid 596 and name CA)       
+     (resid 596 and name C)        
+         1.00  -102.00    58.00 2
+
+assign 
+     (resid 606 and name C)        
+     (resid 607 and name N)        
+     (resid 607 and name CA)       
+     (resid 607 and name C)        
+         1.00   -97.00    38.00 2
+
+assign 
+     (resid 616 and name N)        
+     (resid 616 and name CA)       
+     (resid 616 and name C)        
+     (resid 617 and name N)        
+         1.00   134.00    50.00 2
+
+assign 
+     (resid 626 and name N)        
+     (resid 626 and name CA)       
+     (resid 626 and name C)        
+     (resid 627 and name N)        
+         1.00   -42.00    12.00 2
+
+assign 
+     (resid 627 and name C)        
+     (resid 628 and name N)        
+     (resid 628 and name CA)       
+     (resid 628 and name C)        
+         1.00   -65.00    24.00 2
+
+assign 
+     (resid 628 and name C)        
+     (resid 629 and name N)        
+     (resid 629 and name CA)       
+     (resid 629 and name C)        
+         1.00   -67.00    24.00 2
+
+assign 
+     (resid 629 and name N)        
+     (resid 629 and name CA)       
+     (resid 629 and name C)        
+     (resid 630 and name N)        
+         1.00   -38.00    22.00 2
+
+assign 
+     (resid 629 and name C)        
+     (resid 630 and name N)        
+     (resid 630 and name CA)       
+     (resid 630 and name C)        
+         1.00   -68.00    20.00 2
+
+assign 
+     (resid 630 and name C)        
+     (resid 631 and name N)        
+     (resid 631 and name CA)       
+     (resid 631 and name C)        
+         1.00   -75.00    26.00 2
+
+assign 
+     (resid 631 and name N)        
+     (resid 631 and name CA)       
+     (resid 631 and name C)        
+     (resid 632 and name N)        
+         1.00   -22.00    36.00 2
+
+assign 
+     (resid 634 and name C)        
+     (resid 635 and name N)        
+     (resid 635 and name CA)       
+     (resid 635 and name C)        
+         1.00  -139.00    14.00 2
+
+assign 
+     (resid 635 and name N)        
+     (resid 635 and name CA)       
+     (resid 635 and name C)        
+     (resid 636 and name N)        
+         1.00   157.00    22.00 2
+
+assign 
+     (resid 635 and name C)        
+     (resid 636 and name N)        
+     (resid 636 and name CA)       
+     (resid 636 and name C)        
+         1.00   -98.00    34.00 2
+
+assign 
+     (resid 636 and name N)        
+     (resid 636 and name CA)       
+     (resid 636 and name C)        
+     (resid 637 and name N)        
+         1.00   131.00    38.00 2
+
+assign 
+     (resid 638 and name C)        
+     (resid 639 and name N)        
+     (resid 639 and name CA)       
+     (resid 639 and name C)        
+         1.00  -116.00    32.00 2
+
+assign 
+     (resid 639 and name C)        
+     (resid 640 and name N)        
+     (resid 640 and name CA)       
+     (resid 640 and name C)        
+         1.00  -130.00    38.00 2
+
+assign 
+     (resid 641 and name N)        
+     (resid 641 and name CA)       
+     (resid 641 and name C)        
+     (resid 642 and name N)        
+         1.00   131.00    26.00 2
+
+assign 
+     (resid 641 and name C)        
+     (resid 642 and name N)        
+     (resid 642 and name CA)       
+     (resid 642 and name C)        
+         1.00  -113.00    40.00 2
+
+assign 
+     (resid 642 and name C)        
+     (resid 643 and name N)        
+     (resid 643 and name CA)       
+     (resid 643 and name C)        
+         1.00  -104.00    52.00 2
+
+assign 
+     (resid 643 and name N)        
+     (resid 643 and name CA)       
+     (resid 643 and name C)        
+     (resid 644 and name N)        
+         1.00   124.00    22.00 2
+
+assign 
+     (resid 643 and name C)        
+     (resid 644 and name N)        
+     (resid 644 and name CA)       
+     (resid 644 and name C)        
+         1.00  -102.00    38.00 2
+
+assign 
+     (resid 644 and name N)        
+     (resid 644 and name CA)       
+     (resid 644 and name C)        
+     (resid 645 and name N)        
+         1.00   125.00    26.00 2
+
+assign 
+     (resid 645 and name C)        
+     (resid 646 and name N)        
+     (resid 646 and name CA)       
+     (resid 646 and name C)        
+         1.00   -96.00    36.00 2
+
+assign 
+     (resid 588 and name N)        
+     (resid 588 and name CA)       
+     (resid 588 and name C)        
+     (resid 589 and name N)        
+         1.00   145.00    24.00 2
+
+assign 
+     (resid 587 and name N)        
+     (resid 587 and name CA)       
+     (resid 587 and name C)        
+     (resid 588 and name N)        
+         1.00   163.00    16.00 2
+
+assign 
+     (resid 574 and name N)        
+     (resid 574 and name CA)       
+     (resid 574 and name C)        
+     (resid 575 and name N)        
+         1.00   127.00    24.00 2
+
+assign 
+     (resid 628 and name N)        
+     (resid 628 and name CA)       
+     (resid 628 and name C)        
+     (resid 629 and name N)        
+         1.00   -38.00    10.00 2
+
+assign 
+     (resid 503 and name C)        
+     (resid 504 and name N)        
+     (resid 504 and name CA)       
+     (resid 504 and name C)        
+         1.00   -98.00    34.00 2
+
+assign 
+     (resid 560 and name N)        
+     (resid 560 and name CA)       
+     (resid 560 and name C)        
+     (resid 561 and name N)        
+         1.00   131.00    22.00 2
+
+assign 
+     (resid 594 and name C)        
+     (resid 595 and name N)        
+     (resid 595 and name CA)       
+     (resid 595 and name C)        
+         1.00  -129.00    24.00 2
+
+assign 
+     (resid 605 and name C)        
+     (resid 606 and name N)        
+     (resid 606 and name CA)       
+     (resid 606 and name C)        
+         1.00  -111.00    42.00 2
+
+assign 
+     (resid 516 and name N)        
+     (resid 516 and name CA)       
+     (resid 516 and name C)        
+     (resid 517 and name N)        
+         1.00   -33.00    12.00 2
+
+assign 
+     (resid 504 and name N)        
+     (resid 504 and name CA)       
+     (resid 504 and name C)        
+     (resid 505 and name N)        
+         1.00   136.00    26.00 2
+
+assign 
+     (resid 556 and name N)        
+     (resid 556 and name CA)       
+     (resid 556 and name C)        
+     (resid 557 and name N)        
+         1.00   133.00    18.00 2
+
+assign 
+     (resid 589 and name C)        
+     (resid 590 and name N)        
+     (resid 590 and name CA)       
+     (resid 590 and name C)        
+         1.00  -137.00    26.00 2
+
+assign 
+     (resid 575 and name N)        
+     (resid 575 and name CA)       
+     (resid 575 and name C)        
+     (resid 576 and name N)        
+         1.00   124.00    18.00 2
+
+assign 
+     (resid 513 and name C)        
+     (resid 514 and name N)        
+     (resid 514 and name CA)       
+     (resid 514 and name C)        
+         1.00  -137.00    16.00 2
+
+assign 
+     (resid 642 and name N)        
+     (resid 642 and name CA)       
+     (resid 642 and name C)        
+     (resid 643 and name N)        
+         1.00   127.00    16.00 2
+
+assign 
+     (resid 577 and name N)        
+     (resid 577 and name CA)       
+     (resid 577 and name C)        
+     (resid 578 and name N)        
+         1.00   122.00    32.00 2
+
+assign 
+     (resid 624 and name C)        
+     (resid 625 and name N)        
+     (resid 625 and name CA)       
+     (resid 625 and name C)        
+         1.00   -66.35    10.35 2
+
+assign 
+     (resid 537 and name N)        
+     (resid 537 and name CA)       
+     (resid 537 and name C)        
+     (resid 538 and name N)        
+         1.00   135.00    30.00 2
+
+assign 
+     (resid 563 and name C)        
+     (resid 564 and name N)        
+     (resid 564 and name CA)       
+     (resid 564 and name C)        
+         1.00   -58.00    10.00 2
+
+assign 
+     (resid 522 and name N)        
+     (resid 522 and name CA)       
+     (resid 522 and name C)        
+     (resid 523 and name N)        
+         1.00   140.00    28.00 2
+
+assign 
+     (resid 550 and name C)        
+     (resid 551 and name N)        
+     (resid 551 and name CA)       
+     (resid 551 and name C)        
+         1.00   -65.00    28.00 2
+
+assign 
+     (resid 581 and name N)        
+     (resid 581 and name CA)       
+     (resid 581 and name C)        
+     (resid 582 and name N)        
+         1.00   127.00    12.00 2
+
+assign 
+     (resid 561 and name N)        
+     (resid 561 and name CA)       
+     (resid 561 and name C)        
+     (resid 562 and name N)        
+         1.00   129.00    28.00 2
+
+assign 
+     (resid 512 and name N)        
+     (resid 512 and name CA)       
+     (resid 512 and name C)        
+     (resid 513 and name N)        
+         1.00   133.00    16.00 2
+
+assign 
+     (resid 626 and name C)        
+     (resid 627 and name N)        
+     (resid 627 and name CA)       
+     (resid 627 and name C)        
+         1.00   -66.00    10.00 2
+
+assign 
+     (resid 524 and name N)        
+     (resid 524 and name CA)       
+     (resid 524 and name C)        
+     (resid 525 and name N)        
+         1.00   131.00    22.00 2
+
+assign 
+     (resid 540 and name C)        
+     (resid 541 and name N)        
+     (resid 541 and name CA)       
+     (resid 541 and name C)        
+         1.00  -120.00    42.00 2
+
+assign 
+     (resid 533 and name C)        
+     (resid 534 and name N)        
+     (resid 534 and name CA)       
+     (resid 534 and name C)        
+         1.00  -107.00    28.00 2
+
+assign 
+     (resid 575 and name C)        
+     (resid 576 and name N)        
+     (resid 576 and name CA)       
+     (resid 576 and name C)        
+         1.00  -106.00    22.00 2
+
+assign 
+     (resid 615 and name C)        
+     (resid 616 and name N)        
+     (resid 616 and name CA)       
+     (resid 616 and name C)        
+         1.00   -84.00    38.00 2
+
+assign 
+     (resid 508 and name C)        
+     (resid 509 and name N)        
+     (resid 509 and name CA)       
+     (resid 509 and name C)        
+         1.00  -141.00    20.00 2
+
+assign 
+     (resid 552 and name C)        
+     (resid 553 and name N)        
+     (resid 553 and name CA)       
+     (resid 553 and name C)        
+         1.00   -96.00    48.00 2
+
+assign 
+     (resid 625 and name C)        
+     (resid 626 and name N)        
+     (resid 626 and name CA)       
+     (resid 626 and name C)        
+         1.00   -64.00    12.00 2
+
+assign 
+     (resid 596 and name N)        
+     (resid 596 and name CA)       
+     (resid 596 and name C)        
+     (resid 597 and name N)        
+         1.00   121.00    10.00 2
+
+assign 
+     (resid 606 and name N)        
+     (resid 606 and name CA)       
+     (resid 606 and name C)        
+     (resid 607 and name N)        
+         1.00   147.00    30.00 2
+
+assign 
+     (resid 570 and name C)        
+     (resid 571 and name N)        
+     (resid 571 and name CA)       
+     (resid 571 and name C)        
+         1.00  -128.00    32.00 2
+
+assign 
+     (resid 539 and name C)        
+     (resid 540 and name N)        
+     (resid 540 and name CA)       
+     (resid 540 and name C)        
+         1.00  -134.00    24.00 2
+
+assign 
+     (resid 624 and name N)        
+     (resid 624 and name CA)       
+     (resid 624 and name C)        
+     (resid 625 and name N)        
+         1.00   -41.00    22.00 2
+
+assign 
+     (resid 562 and name N)        
+     (resid 562 and name CA)       
+     (resid 562 and name C)        
+     (resid 563 and name N)        
+         1.00   126.00    30.00 2
+
+assign 
+     (resid 526 and name C)        
+     (resid 527 and name N)        
+     (resid 527 and name CA)       
+     (resid 527 and name C)        
+         1.00  -114.00    46.00 2
+
+assign 
+     (resid 649 and name N)        
+     (resid 649 and name CA)       
+     (resid 649 and name C)        
+     (resid 650 and name N)        
+         1.00   131.00    44.00 2
+
+assign 
+     (resid 531 and name N)        
+     (resid 531 and name CA)       
+     (resid 531 and name C)        
+     (resid 532 and name N)        
+         1.00   151.00    46.00 2
+
+assign 
+     (resid 627 and name N)        
+     (resid 627 and name CA)       
+     (resid 627 and name C)        
+     (resid 628 and name N)        
+         1.00   -32.00    20.00 2
+
+assign 
+     (resid 646 and name N)        
+     (resid 646 and name CA)       
+     (resid 646 and name C)        
+     (resid 647 and name N)        
+         1.00   128.00    10.00 2
+
+assign 
+     (resid 565 and name N)        
+     (resid 565 and name CA)       
+     (resid 565 and name C)        
+     (resid 566 and name N)        
+         1.00   -36.00    20.00 2
+
+assign 
+     (resid 648 and name C)        
+     (resid 649 and name N)        
+     (resid 649 and name CA)       
+     (resid 649 and name C)        
+         1.00   -93.00    60.00 2
+
+assign 
+     (resid 632 and name C)        
+     (resid 633 and name N)        
+     (resid 633 and name CA)       
+     (resid 633 and name C)        
+         1.00   -86.00    48.00 2
+
+assign 
+     (resid 633 and name N)        
+     (resid 633 and name CA)       
+     (resid 633 and name C)        
+     (resid 634 and name N)        
+         1.00   132.00    36.00 2
+
+assign 
+     (resid 576 and name N)        
+     (resid 576 and name CA)       
+     (resid 576 and name C)        
+     (resid 577 and name N)        
+         1.00   124.00    18.00 2
+
+assign 
+     (resid 515 and name C)        
+     (resid 516 and name N)        
+     (resid 516 and name CA)       
+     (resid 516 and name C)        
+         1.00   -61.00    20.00 2
+
+assign 
+     (resid 572 and name N)        
+     (resid 572 and name CA)       
+     (resid 572 and name C)        
+     (resid 573 and name N)        
+         1.00   142.00    16.00 2
+
+assign 
+     (resid 568 and name C)        
+     (resid 569 and name N)        
+     (resid 569 and name CA)       
+     (resid 569 and name C)        
+         1.00  -138.00    26.00 2
+
+assign 
+     (resid 530 and name C)        
+     (resid 531 and name N)        
+     (resid 531 and name CA)       
+     (resid 531 and name C)        
+         1.00  -104.00    26.00 2
+
+assign 
+     (resid 551 and name N)        
+     (resid 551 and name CA)       
+     (resid 551 and name C)        
+     (resid 552 and name N)        
+         1.00   -30.00    24.00 2
+
+assign 
+     (resid 555 and name C)        
+     (resid 556 and name N)        
+     (resid 556 and name CA)       
+     (resid 556 and name C)        
+         1.00   -99.00    30.00 2
+
+assign 
+     (resid 630 and name N)        
+     (resid 630 and name CA)       
+     (resid 630 and name C)        
+     (resid 631 and name N)        
+         1.00   -39.00    24.00 2
+
+assign 
+     (resid 625 and name N)        
+     (resid 625 and name CA)       
+     (resid 625 and name C)        
+     (resid 626 and name N)        
+         1.00   -39.40    10.00 2
+
+assign 
+     (resid 607 and name N)        
+     (resid 607 and name CA)       
+     (resid 607 and name C)        
+     (resid 608 and name N)        
+         1.00   127.00    30.00 2
+
