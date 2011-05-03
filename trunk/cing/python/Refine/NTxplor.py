@@ -1,4 +1,5 @@
 from cing.Libs.NTutils import * #@UnusedWildImport
+from cing.Libs.forkoff import do_cmd
 
 todo = """
 
@@ -29,8 +30,9 @@ class refineParameters( NTdict ):
 
     def __init__(self, **kwds):
         NTdict.__init__( self, __CLASS__ = "refineParameters",
-
-      baseName          = 'model%03d.pdb',      # Basename used for pdb files
+    # For documentation see below
+      ncpus             = None,
+      baseName          = 'model%03d.pdb',
       models            = '',
       overwrite         = False,                # Overwrite existing files
       verbose           = False,                # verbose on/off
@@ -41,7 +43,8 @@ class refineParameters( NTdict ):
       patchHISD         = [],                   # HISD patches are needed for CYANA->XPLOR compatibility.
       patchHISE         = [],                   # HISE patches are needed for CYANA->XPLOR compatibility.
       patchCISP         = [],                   # Cis prolines
-      patchDISN         = [],                   # Disulfide pairs
+      patchDISN         = [],                   # Disulfide pairs without actual bond.
+      patchDISU         = [],                   # Disulfide pairs
 
       # initial analysis, The advantage of doing this is that missing protons will not cause a bombed out xplor
       # Disadvantage is that violations might differ if SSA is incompatible with IUPAC.
@@ -84,9 +87,11 @@ class refineParameters( NTdict ):
       outPath           = '',       # Run time, no need to edit
       basePath          = '',       # Run time, no need to edit
 
-      __FORMAT__ = """
+      __FORMAT__ = """from Refine.NTxplor import * #@UnusedWildImport
+
 parameters = refineParameters(
-      baseName          = "%(baseName)s",
+      ncpus             = %(ncpus)s,       # Will be taken from os by default like in CING
+      baseName          = "%(baseName)s",  # Basename used for pdb files
 
       # ascii list to select the model(s) to refine; e.g 0-19
       # can also be modified as command-line argument
@@ -107,8 +112,10 @@ parameters = refineParameters(
       patchHISE         = %(patchHISE)s,
       # Cis-proline patches are needed for CYANA->XPLOR compatibility; enter your residue numbers here
       patchCISP         = %(patchCISP)s,
-      # Disulfide pairs
+      # Disulfide pairs (fake)
       patchDISN         = %(patchDISN)s,
+      # Disulfide pairs (real)
+      patchDISU         = %(patchDISU)s,
 
       # initial analysis
       minimizeProtons   = %(minimizeProtons)s,
@@ -141,11 +148,6 @@ parameters = refineParameters(
       bestModels        = "%(bestModels)s",
       # Superpose residues; asciilist e.g. 200-270,276-300,320-350
       superpose         = "%(superpose)s",
-
-      # Run time, no need to edit
-      # basePath        = %(basePath)s
-      # inPath          = %(inPath)s
-      # outPath         = %(outPath)s
 )
 """
 )
@@ -244,6 +246,7 @@ class Xplor( refineParameters ):
         #end for
 
         self.script = None
+        self.resultFile  = None     # Can be set to be checked after each command to be checked for existence
 
         self.setdefault( 'run_cluster', 'n' )
         self.setdefault( 'queu_cluster', '/usr/local/pbs/bin/qsub -l nodes=1:ppn=1 ')
@@ -307,6 +310,9 @@ class Xplor( refineParameters ):
     #------------------------------------------------------------------------
     def setupPTcode( self ):
         """Return code for setup of parameters, topology and structure files"""
+
+#        NTdebug("Now in %s" % getCallerName())
+
         code = '''
 {*==========================================================================*}
 {*=== READ THE PARAMETER AND TOPOLOGY FILES ================================*}
@@ -332,6 +338,9 @@ end"""
     #------------------------------------------------------------------------
     def readMolCode( self, useCoordinates = True ):
         """Return code for setup of molecular files"""
+
+#        NTdebug("Now in %s" % getCallerName())
+
         code = """
 {*==========================================================================*}
 {*=== READ MOLECULAR FILES =================================================*}
@@ -345,6 +354,15 @@ end"""
         #end for
         return code
 
+    def getPdbFilePath(self):
+        'Return None on error'
+        if not self.molecules:
+            NTerror("Failed to find self.molecules with mol")
+            return
+        mol = self.molecules[0]
+        return self.newPath( self.outPath, mol.pdbFile )
+    # end def
+
     #------------------------------------------------------------------------
     def writeMolCode( self ):
         """Return code for writing of molecular files"""
@@ -357,7 +375,7 @@ end"""
             code = code + """
 write coordinates
   sele=""" + mol.selectionCode + """
-  output=""" + self.newPath( self.outPath, mol.pdbFile ) + """
+  output=""" + self.getPdbFilePath() + """
 end
 """
         return code
@@ -526,7 +544,7 @@ end if
 
     #------------------------------------------------------------------------
     def runScript( self ):
-
+        """Return True on error"""
         # Write script to file
         scriptFileName = self.joinPath(self.directories.jobs, self.jobName + '.inp')
         scriptFile = open( scriptFileName, 'w' )
@@ -537,7 +555,7 @@ end if
 
         # Create job/log file
         jobFileName = self.joinPath(self.directories.jobs, self.jobName + '.csh')
-        jobFile=open( jobFileName, 'w' )
+        jobFile = open( jobFileName, 'w' )
         logFileName = self.joinPath(self.directories.jobs, self.jobName + '.log')
 
         fprintf( jobFile, '#!/bin/tcsh\n' )
@@ -555,14 +573,34 @@ end if
             NTmessage('==> Starting XPLOR job "%s"\n', jobFileName)
 
         if self.useCluster:
-            NTmessage( 'Sending job to the queu %s\n', self.queu_cluster )
+            NTmessage( 'Sending job to the queue %s\n', self.queu_cluster )
             os.system( '%s %s &' % (self.queu_cluster, jobFileName) )
             time.sleep(5)
         else:
-            os.system('%s' % jobFileName )
-# ask sander why?
-#        os.rename(tlog,log)
+#            xplorProgram = ExecuteProgram( jobFileName, redirectOutput = False)
+            if do_cmd(jobFileName):
+#            if xplorProgram(): # An exit code of zero means success.
+                NTerror("Failed to run job from: %s" % jobFileName)
+                return True
+#            os.system('%s' % jobFileName )
+        # end if
 
+        if cing.verbosity < cing.verbosityDebug:
+#        if 1: # DEFAULT: 1 to remove temporary files
+            NTmessage("Removing job and script files")
+            os.unlink(jobFileName)
+            os.unlink(scriptFileName)
+        # end if
+
+        if self.resultFile:
+            if os.path.exists(self.resultFile):
+                NTdebug("Found result file: %s" % self.resultFile)
+            else:
+                NTerror("Failed to find resulting file: %s" % self.resultFile)
+                return True
+            # end if
+        # end if
+    # end def
 
     #------------------------------------------------------------------------
     def seed( self ):
@@ -580,9 +618,6 @@ class WaterRefine( Xplor ):
     def __init__( self, config, *args, **kwds ):
 
         Xplor.__init__( self, config, *args, **kwds )
-        self.inPath  = self.directories.analyzed
-        self.outPath = self.directories.refined
-
         if self.verbose:
             #self.keysformat()
             NTmessage('%s\n', self.format())
@@ -844,6 +879,7 @@ constraints interaction
 (not resname TIP* and not resname ANI)
 end
 
+! Read by parse again.
 energy end
 
 """  + \
@@ -880,6 +916,8 @@ class Anneal( Xplor ):
             #self.keysformat()
             NTmessage('%s\n', self.format())
         #end if
+        self.pdbFile = self.checkPath( self.inPath, self.templateFile ) # NB input PDB file.
+        self.resultFile = self.getPdbFilePath() # Expected output PDB file
     #end if
     def createScript( self ):
         """ Create script.
@@ -901,8 +939,10 @@ remarks by Jurgen F. Doreleijers 2011-04-30
 {*==========================================================================*}
 
 """ + \
-self.setupPTcode() + self.readMolCode() + """
-
+self. setupPTcode() + \
+self.readMolCode(useCoordinates = False) + \
+"coordinates @%s\n" % self.pdbFile + \
+"""
 set message on echo on end
 
 remarks file  nmr/sa.inp
@@ -919,22 +959,8 @@ evaluate ($high_steps= 24000 )         {*Total number of steps at high temp.*}
 {====>}
 evaluate ($cool_steps = 3000 )      {*Total number of steps during cooling.*}
 
-
-noe
-{====>}
-   nres=3000             {*Estimate greater than the actual number of NOEs.*}
-   class all
-{====>}
-   @il8_noe.tbl                           {*Read NOE distance ranges.*}
-   @il8_hbonds.tbl
-end
-
-{====>}
-restraints dihedral
-   nass = 1000
-   @il8_dihe.tbl                       {*Read dihedral angle restraints.*}
-end
-
+""" +\
+self.restraintsCode() + """
 
 {* Reduce the scaling factor on the force applied to disulfide            *}
 {* bonds and angles from 1000.0 to 100.0 in order to reduce computation instability. *}
@@ -951,19 +977,6 @@ vector do (fbeta=10) (all)
                         {*Uniform heavy masses to speed molecular dynamics.*}
 vector do (mass=100) (all)
 
-noe                             {*Parameters for NOE effective energy term.*}
-  ceiling=1000
-  averaging  * cent
-  potential  * soft
-  scale      * 50.
-  sqoffset   * 0.0
-  sqconstant * 1.0
-  sqexponent * 2
-  soexponent * 1
-  asymptote  * 0.1                         {*Initial value--modified later.*}
-  rswitch    * 0.5
-end
-
 parameter                       {*Parameters for the repulsive energy term.*}
     nbonds
       repel=1.                   {*Initial value for repel--modified later.*}
@@ -975,135 +988,119 @@ parameter                       {*Parameters for the repulsive energy term.*}
    end
 end
 
-restraints dihedral
-      scale=5.
-end
-
 coor copy end
 
 set seed """ + str(self.seed()) + """ end
 
-! We loop until we have an accepted structure, maximum trials=1
-evaluate ($end_count = 1)
-evaluate ($count = 0)
+coor swap end
+coor copy end
 
-while ($count < $end_count ) loop main
-
-    coor swap end
-    coor copy end
-
-      {* ============================================= Initial minimization.*}
-    restraints dihedral   scale=5.   end
-    noe asymptote * 0.1  end
-    parameter  nbonds repel=1.   end end
-    constraints interaction
-            (all) (all) weights * 1  vdw 0.002 end end
-    minimize powell nstep=50 drop=10.  nprint=25 end
+  {* ============================================= Initial minimization.*}
+!    restraints dihedral   scale=5.   end
+noe asymptote * 0.1  end
+parameter  nbonds repel=1.   end end
+constraints interaction
+        (all) (all) weights * 1  vdw 0.002 end end
+minimize powell nstep=50 drop=10.  nprint=25 end
 
 
-      {* ======================================== High-temperature dynamics.*}
-    constraints interaction (all) (all)
-                weights * 1  angl 0.4  impr 0.1 vdw 0.002 end end
+  {* ======================================== High-temperature dynamics.*}
+constraints interaction (all) (all)
+            weights * 1  angl 0.4  impr 0.1 vdw 0.002 end end
 
-    evaluate ($nstep1=int($high_steps * 2. / 3. ) )
-    evaluate ($nstep2=int($high_steps * 1. / 3. ) )
+evaluate ($nstep1=int($high_steps * 2. / 3. ) )
+evaluate ($nstep2=int($high_steps * 1. / 3. ) )
 
-    dynamics  verlet
-       nstep=$nstep1   timestep=0.005   iasvel=maxwell   firstt=$init_t
-       tcoupling=true  tbath=$init_t  nprint=50  iprfrq=0
-    end
-
-
-      {* ============== Tilt the asymptote and increase weights on geometry.*}
-    noe asymptote * 1.0  end
-
-    constraints interaction
-               (all) (all) weights * 1  vdw 0.002  end end
-
-    {* Bring scaling factor for S-S bonds back *}
-    parameter
-       bonds ( name SG ) ( name SG ) 1000. TOKEN
-       angle ( name CB ) ( name SG ) ( name SG ) 500. TOKEN
-    end
-
-    dynamics  verlet
-       nstep=$nstep2   timestep=0.005    iasvel=current   tcoupling=true
-       tbath=$init_t  nprint=50  iprfrq=0
-    end
-
-     {* ==================================================  Cool the system.*}
-
-    restraints dihedral   scale=200.   end
-
-    evaluate ($final_t = 100)      { K }
-    evaluate ($tempstep = 50)      { K }
-
-    evaluate ($ncycle = ($init_t-$final_t)/$tempstep)
-    evaluate ($nstep = int($cool_steps/$ncycle))
-
-    evaluate ($ini_rad  = 0.9)        evaluate ($fin_rad  = 0.75)
-    evaluate ($ini_con=  0.003)       evaluate ($fin_con=  4.0)
-
-    evaluate ($bath  = $init_t)
-    evaluate ($k_vdw = $ini_con)
-    evaluate ($k_vdwfact = ($fin_con/$ini_con)^(1/$ncycle))
-    evaluate ($radius=    $ini_rad)
-    evaluate ($radfact = ($fin_rad/$ini_rad)^(1/$ncycle))
-
-    evaluate ($i_cool = 0)
-    while ($i_cool < $ncycle) loop cool
-       evaluate ($i_cool=$i_cool+1)
-
-       evaluate ($bath  = $bath  - $tempstep)
-       evaluate ($k_vdw=min($fin_con,$k_vdw*$k_vdwfact))
-       evaluate ($radius=max($fin_rad,$radius*$radfact))
-
-       parameter  nbonds repel=$radius   end end
-       constraints interaction (all) (all)
-                      weights * 1. vdw $k_vdw end end
-
-       dynamics  verlet
-          nstep=$nstep time=0.005 iasvel=current firstt=$bath
-          tcoup=true tbath=$bath nprint=$nstep iprfrq=0
-       end
+dynamics  verlet
+   nstep=$nstep1   timestep=0.005   iasvel=maxwell   firstt=$init_t
+   tcoupling=true  tbath=$init_t  nprint=50  iprfrq=0
+end
 
 
-    {====>}                                                  {*Abort condition.*}
-       evaluate ($critical=$temp/$bath)
-       if ($critical >  10. ) then
-          display  ****&&&& rerun job with smaller timestep (i.e., 0.003)
-          stop
-       end if
+  {* ============== Tilt the asymptote and increase weights on geometry.*}
+noe asymptote * 1.0  end
 
-    end loop cool
+constraints interaction
+           (all) (all) weights * 1  vdw 0.002  end end
 
-    {* ================================================= Final minimization.*}
+{* Bring scaling factor for S-S bonds back *}
+parameter
+   bonds ( name SG ) ( name SG ) 1000. TOKEN
+   angle ( name CB ) ( name SG ) ( name SG ) 500. TOKEN
+end
 
-    constraints interaction (all) (all) weights * 1. vdw 1. end end
-    parameter
-       nbonds
-          repel=0.80
-          rexp=2 irexp=2 rcon=1.
-          nbxmod=3
-          wmin=0.01
-          cutnb=6.0 ctonnb=2.99 ctofnb=3.
-          tolerance=1.5
-       end
-    end
+dynamics  verlet
+   nstep=$nstep2   timestep=0.005    iasvel=current   tcoupling=true
+   tbath=$init_t  nprint=50  iprfrq=0
+end
 
-    minimize powell nstep=1000 drop=10.0 nprint=25 end
+ {* ==================================================  Cool the system.*}
+
+!    restraints dihedral   scale=200.   end
+
+evaluate ($final_t = 100)      { K }
+evaluate ($tempstep = 50)      { K }
+
+evaluate ($ncycle = ($init_t-$final_t)/$tempstep)
+evaluate ($nstep = int($cool_steps/$ncycle))
+
+evaluate ($ini_rad  = 0.9)        evaluate ($fin_rad  = 0.75)
+evaluate ($ini_con=  0.003)       evaluate ($fin_con=  4.0)
+
+evaluate ($bath  = $init_t)
+evaluate ($k_vdw = $ini_con)
+evaluate ($k_vdwfact = ($fin_con/$ini_con)^(1/$ncycle))
+evaluate ($radius=    $ini_rad)
+evaluate ($radfact = ($fin_rad/$ini_rad)^(1/$ncycle))
+
+evaluate ($i_cool = 0)
+while ($i_cool < $ncycle) loop cool
+   evaluate ($i_cool=$i_cool+1)
+
+   evaluate ($bath  = $bath  - $tempstep)
+   evaluate ($k_vdw=min($fin_con,$k_vdw*$k_vdwfact))
+   evaluate ($radius=max($fin_rad,$radius*$radfact))
+
+   parameter  nbonds repel=$radius   end end
+   constraints interaction (all) (all)
+                  weights * 1. vdw $k_vdw end end
+
+   dynamics  verlet
+      nstep=$nstep time=0.005 iasvel=current firstt=$bath
+      tcoup=true tbath=$bath nprint=$nstep iprfrq=0
+   end
+
+
+{====>}                                                  {*Abort condition.*}
+   evaluate ($critical=$temp/$bath)
+   if ($critical >  10. ) then
+      display  ****&&&& rerun job with smaller timestep (i.e., 0.003)
+      stop
+   end if
+
+end loop cool
+
+{* ================================================= Final minimization.*}
+
+constraints interaction (all) (all) weights * 1. vdw 1. end end
+parameter
+   nbonds
+      repel=0.80
+      rexp=2 irexp=2 rcon=1.
+      nbxmod=3
+      wmin=0.01
+      cutnb=6.0 ctonnb=2.99 ctofnb=3.
+      tolerance=1.5
+   end
+end
+
+minimize powell nstep=1000 drop=10.0 nprint=25 end
+
+! Read by parse again.
+energy end
+
 """  + \
-restraintsAnalysisCode + """
-
-if ($accept = 0 ) then
-  exit main
-else
-  evaluate ( $count = $count + 1 )
-end if
-
-end loop main
-
-""" + \
+restraintsAnalysisCode + \
 self.writeMolCode() + """
 
 set message on echo on end
@@ -1127,8 +1124,9 @@ class Analyze( Xplor ):
     def __init__( self, config, *args, **kwds ):
 
         Xplor.__init__( self, config, *args, **kwds )
-        self.inPath  = self.directories.converted
-        self.outPath = self.directories.analyzed
+#        self.inPath  = self.directories.converted # defined by initializer
+#        self.outPath = self.directories.analyzed
+        self.resultFile = self.getPdbFilePath() # Expected output PDB file
 
         if self.verbose:
             #self.keysformat()
@@ -1261,7 +1259,7 @@ class GeneratePSF( Xplor ):
         # make relative Path
         self.pdbFile = self.checkPath( self.directories.converted, self.pdbFile )
         self.psfFile = self.newPath( self.directories.psf, self.psfFile )
-
+        self.resultFile = self.psfFile
         if self.verbose:
             #self.keysformat()
             NTmessage('%s\n', self.format())
@@ -1291,6 +1289,8 @@ end
 """
         for pair in self.patchDISN:
             self.script += "patch DISN  reference=1  =( resid %s )  reference=2=( resid %s )        end\n" % pair
+        for pair in self.patchDISU:
+            self.script += "patch DISU  reference=1  =( resid %s )  reference=2=( resid %s )        end\n" % pair
         for resid in self.patchHISD:
             self.script += "patch HISD  reference=nil=( resid %s ) end\n" % resid
         for resid in self.patchHISE:
@@ -1318,11 +1318,11 @@ class GenerateTemplate( Xplor ):
 
     #------------------------------------------------------------------------
     def __init__( self, config, *args, **kwds ):
-        NTmessage("a")
 
         Xplor.__init__( self, config, *args, **kwds )
         # make relative Path
         self.psfFile = self.checkPath( self.directories.psf, self.psfFile )
+        self.resultFile = self.getPdbFilePath()
 #        self.outPath = self.directories.template
         if self.verbose:
             #self.keysformat()
@@ -1365,6 +1365,14 @@ parameter
       cutnb=5.5 rcon=20. nbxmod=-2 repel=0.9  wmin=0.1 tolerance=1.
       rexp=2 irexp=2 inhibit=0.25
    end
+end
+
+{* Nill the scaling factor on the force applied to disulfide            *}
+{* bonds and angles from 1000.0 to 100.0 in order to reduce computation instability *}
+{* and keep the chain extended. *}
+parameter
+      bonds ( name SG ) ( name SG ) 0. TOKEN
+      angle ( name CB ) ( name SG ) ( name SG ) 0. TOKEN
 end
 
 flags exclude * include bond angle vdw end

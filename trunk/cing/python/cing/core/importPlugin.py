@@ -48,9 +48,7 @@ def importPlugin( pluginName ):
         NTdebug( "Skipping import of an optional plugin: [%s]" % pluginName )
         isInstalled = False
     except:
-#        traceBackObject = sys.exc_info()[2]
-        traceBackString = format_exc()
-        NTerror(traceBackString)
+        NTtracebackError()
         NTerror( 'Failed to import pluginCodeModule: [%s]' % pluginName)
         return None
 

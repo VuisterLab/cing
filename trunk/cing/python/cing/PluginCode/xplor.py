@@ -3,6 +3,12 @@
 # Configure amount of data to keep. nothing, 1 mb, 10 mb, 100 mb.
 # nothing is just data in cing.
 # Charles mentioning that except nucleic acids the IUPAC conventions can be generated for CING.
+#from Refine.refine import doSetup # This would be a circular import to avoid
+from cing.Libs.NTutils import * #@UnusedWildImport
+from cing.core.classes import * #@UnusedWildImport
+from cing.core.constants import * #@UnusedWildImport
+from cing.core.molecule import * #@UnusedWildImport
+
 
 """
 Adds export2xplor methods to:
@@ -36,15 +42,6 @@ Atom, Molecule and Project classes.
 !!NEED to Check periodicity in dihedrals
 
 """
-from cing.Libs.NTutils import * #@UnusedWildImport
-from cing.core.classes import DihedralRestraint
-from cing.core.classes import DihedralRestraintList
-from cing.core.classes import DistanceRestraint
-from cing.core.classes import DistanceRestraintList
-from cing.core.classes import Project
-from cing.core.constants import * #@UnusedWildImport
-from cing.core.molecule import Atom
-from cing.core.molecule import Molecule
 
 #==============================================================================
 # XPLOR stuff
@@ -376,9 +373,11 @@ def getDistanceRestraintFromXplorMemory( project, convention ):
     return result
 #end def
 
+
 #-----------------------------------------------------------------------------
 # register the functions in the project class
 methods  = [(newMoleculeFromXplor, None),
+#            (recalculate, None), # JFD really wanted it here but makes cyclic defs.
            ]
 #saves    = []
 #restores = []

@@ -144,7 +144,9 @@ class ForkOff:
         ## Check job list for variable type errors
         for job in job_list:
             func = job[0]
-            args = job[1]
+            args = ()
+            if len(job) > 1:
+                args = job[1]
             if type(args) != types.TupleType:
                 NTerror("given argument not of type Tuple for job: %s", job)
                 return []
@@ -263,7 +265,9 @@ class ForkOff:
             if ( self.processes_open    < self.processes_max  and
                  self.processes_started < self.processes_todo ):
                 func = job_list[ self.processes_started ][0]
-                args = job_list[ self.processes_started ][1]
+                args = ()
+                if len(job_list[ self.processes_started ]) > 1:
+                    args = job_list[ self.processes_started ][1]
                 self.processes_open     += 1
                 self.processes_started  += 1
                 pid = self.p.process_fork( func, args )

@@ -5513,3 +5513,14 @@ def getRevisionAndDateTimeFromCingLog( fileName ):
 
     return rev, dt
 # end def
+
+def execfile_(filename, globals_=None, locals_=None):
+    "Carefull this program can kill."
+    if globals_ is None:
+        globals_ = globals()
+    if locals_ is None:
+        locals_ = globals_
+    text = file(filename, 'r').read()
+    exec text in globals_, locals_
+# end def
+

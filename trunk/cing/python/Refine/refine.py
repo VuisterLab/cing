@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 """
-#------------------------------------------------------------------------------
+Execute as (or use alias refine):
 
- refine.py
+python $CINGROOT/python/Refine/refine.py
 
  GWV 23 February/March 2005: water refinement
  GWV March 2007: Adapted for usage with cing
@@ -18,44 +18,78 @@
 #------------------------------------------------------------------------------
 """
 from Refine.NTxplor import * #@UnusedWildImport
+from Refine.Utils import * #@UnusedWildImport
 from Refine.configure import config
-from cing import cingRevision
 from cing.Libs.AwkLike import AwkLike
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.Libs.disk import copy
+from cing.Libs.forkoff import ForkOff
 from cing.core.classes import Project
-from cing.core.constants import * #@UnusedWildImport
+#from cing.core.constants import * #@UnusedWildImport
 #from cing.core.molecule import mapMolecules #@UnusedImport
 
-def importFromRefine(config, params, project):
+TEMPLATE_FILE_NAME = 'template.pdb'
+
+# class wrapper to allow passing of key-argument
+# to compare dict function
+class CompareDict:
+    def __init__(self, key):
+        self.key = key
+    #end def
+
+    def __call__(self, a, b):
+        return cmp(a[self.key], b[self.key])
+    #end def
+#end class
+
+# class wrapper to allow passing of a key-argument
+# to dict entry
+class Key:
+    def __init__(self, key):
+        self.key = key
+    #end def
+
+    def __call__(self, a):
+        return a[self.key]
+    #end def
+#end class
+
+def importFromRefine(config, params, project, options):
     """
-    Import data from params.basePath/Refined directory as new molecule
+    Import data from params.basePath/XXX directory as new molecule.
+    The input can be from the Refined or from the Annealed directory.
+
     Use params.bestModels
 
     Return Molecule or None on error
     """
+    inPath     = config.directories.refined
+    if options.useAnnealed:
+        inPath     = config.directories.annealed
 
     xplor = Xplor(config, params)
 
     models = asci2list(xplor.bestModels)
     if len(models) == 0:
-        NTerror('moleculeFromRefine: no bestModels defined\n')
-        return None
+        NTerror('%s: no bestModels defined' % getCallerName())
+        return
     #end if
 
     project.restore()
 
     # import the coordinates from Xplor PDB files
-    path = xplor.joinPath(xplor.directories.refined, xplor.baseName)
+    path = xplor.joinPath(inPath, xplor.baseName)
     NTmessage('==> Importing coordinates from %s, models %s', path, models)
     project.molecule.initCoordinates()
     for m in models:
         xplorFile = sprintf(path, m)
         if not os.path.exists(xplorFile):
-            NTerror('importFromRefine: model "%s" not found\n', xplorFile)
-            continue
+            NTerror('%s: model "%s" not found' % (getCallerName(), xplorFile))
+            return
         #end if
-        project.molecule.importFromPDB(xplorFile, convention=XPLOR, nmodels=1)
+        if not project.molecule.importFromPDB(xplorFile, convention=XPLOR, nmodels=1):
+            NTerror("Failed to importFromPDB from: " + getCallerName())
+            return
     #end for
     project.molecule.updateAll()
 
@@ -63,24 +97,28 @@ def importFromRefine(config, params, project):
     project.molecules.rename(project.molecule.name, xplor.name)
     print project.molecule.format()
 
-    if 'superpose' in xplor and len(xplor.superpose) > 0:
+#    if 'superpose' in xplor and len(xplor.superpose) > 0:
+    if getDeepByKeysOrAttributes(xplor, 'superpose'):
         project.molecule.superpose(ranges=xplor.superpose)
 
     print project.format()
 
     project.close()
+    return project.molecule
 #end def
 
 
 def doSetup(config, project, basePath, options):
     """Generate the directory setup and parameter.py file from project and basePath
-       Export the data from project
+       Export the data from project.
+       Return True on error.
     """
 
     if os.path.exists(basePath):
         removedir(basePath)
     #end if
 
+#    from Refine.NTxplor import Xplor #@Reimport JFD: I don't know why needed....
     xplor = Xplor(config, basePath=basePath) # generates the directories and initialize parameter setup
 
     # copy xplor parameter and topology files
@@ -91,11 +129,11 @@ def doSetup(config, project, basePath, options):
     #print ">>", xplor
 
     # restore the data
-    project.restore()
+#    project.restore() # JFD: why ? I get doubling of restraint lists by this.
     NTmessage(project.format())
     if project.molecule == None:
         NTerror('doSetup: No molecule defined for project %s\n', project)
-        sys.exit(1)
+        return True
     #end if
 
     project.validateRestraints(toFile=True)
@@ -142,11 +180,15 @@ def doSetup(config, project, basePath, options):
     for res in project.molecule.residuesWithProperties('cPRO'):
         xplor.patchCISP.append(res.resNum)
     disulfide_bridges = project.molecule.idDisulfides(toFile=False, applyBonds=False)
+
+    if disulfide_bridges == True:
+        NTerror("Failed to analyze disulfide bridges.")
+    elif disulfide_bridges:
+        NTmessage("==> Located disulfide bridges %s" % str(disulfide_bridges))
     for (res1, res2) in disulfide_bridges:
-        xplor.patchDISN.append((res1.resNum, res2.resNum))
+        xplor.patchDISU.append((res1.resNum, res2.resNum))
 
-
-    # save the parameterfile
+    # save the parameter file
     parfile = xplor.joinPath('parameters.py')
     xplor.toFile(parfile)
 
@@ -160,11 +202,12 @@ def generatePSF(config, params, doPrint=0):
     '''PSF generation'''
     NTmessage("Generating .psf file for xplor")
     models = asci2list(params.models)
+    pdbFile= params.baseName % models[0]
     psfJob = GeneratePSF(
          config,
          params,
-#                         inPath     = config.directories.converted,
-         pdbFile=params.baseName % models[0],
+         pdbFile=pdbFile,
+#                         outPath    = config.directories.psf,
          jobName='generatePSF'
     )
     psfJob.createScript()
@@ -174,6 +217,7 @@ def generatePSF(config, params, doPrint=0):
     psfJob.runScript()
 #end def
 
+
 def generateTemplate(config, params, doPrint=0):
     '''Extended structure generation'''
     NTmessage("Generating .pdb file for xplor")
@@ -182,27 +226,31 @@ def generateTemplate(config, params, doPrint=0):
          params,
          molecules=[
                          NTdict(
-                            pdbFile="template.pdb",
+                            pdbFile=TEMPLATE_FILE_NAME,
                             selectionCode='(all)'
                          ),
                         ],
          outPath    = config.directories.template,
          jobName='generateTemplate'
     )
-    NTmessage("2")
     templateJob.createScript()
     if doPrint:
         templateJob.printScript()
     #end if
+
     templateJob.runScript()
 #end def
 
 
-def analyze(config, params, doPrint=0):
+def analyze(config, params, doPrint=0, useAnnealed = False):
     '''Analyze a run
     Returns True on failure.
     '''
     NTmessage("Analyzing a run")
+
+    inPath     = config.directories.converted
+    if useAnnealed:
+        inPath     = config.directories.annealed
 
     # first create the jobs, run later
     analyzeJobs = []
@@ -218,8 +266,8 @@ def analyze(config, params, doPrint=0):
                                                 selectionCode='(not resn TIP3 and not resn ANI)'
                                   ),
                          ],
-#                         inPath     = config.directories.converted,
-#                         outPath    = config.directories.analyzed,
+                         inPath     = inPath,
+                         outPath    = config.directories.analyzed,
                         jobName='analyze_%d' % i,
                      )
 
@@ -227,6 +275,7 @@ def analyze(config, params, doPrint=0):
     #end for
 
 
+    job_list = []
     for job in analyzeJobs:
         if job.createScript():
             NTerror("In refine#analyze failed to create at least one job's script.")
@@ -234,8 +283,16 @@ def analyze(config, params, doPrint=0):
         if doPrint:
             job.printScript()
         #end if
-        job.runScript()
+#        job.runScript()
+        job_list.append((job.runScript,) )
     #end for
+    f = ForkOff(
+            processes_max=cing.ncpus,
+            max_time_to_wait=600,
+            verbosity=cing.verbosity
+        )
+    done_list = f.forkoff_start(job_list, 0) # delay 0 second between jobs.
+    NTmessage("Finished ids: %s", done_list)
 #end def
 
 
@@ -256,22 +313,32 @@ def refine(config, params, doPrint=0):
                                     selectionCode='(not resn TIP3 and not resn ANI)'
                                  ),
                                 ],
-#                   inPath     = config.directories.analyzed,
-#                   outPath    = config.directories.refined,
+                   inPath     = config.directories.analyzed,
+                   outPath    = config.directories.refined,
                    jobName='refine_%d' % i,
             )
         )
 
+    job_list = []
     for job in refineJobs:
         job.createScript()
         if doPrint:
             job.printScript()
-        job.runScript()
+#        job.runScript()
+        job_list.append((job.runScript,) )
     #end for
+    f = ForkOff(
+            processes_max=cing.ncpus,
+            max_time_to_wait=6000,
+            verbosity=cing.verbosity
+        )
+    done_list = f.forkoff_start(job_list, 0) # delay 0 second between jobs.
+    NTmessage("Finished ids: %s", done_list)
 #end def
 
-def anneal(config, params, doPrint=0):
 
+def anneal(config, params, doPrint=0):
+    NTdebug("Now in %s" % getCallerName())
     # first create the jobs, run later
     annealJobs = []
     for i in asci2list(params.models):
@@ -289,33 +356,52 @@ def anneal(config, params, doPrint=0):
                                 ],
                    inPath     = config.directories.template,
                    outPath    = config.directories.annealed,
+                   templateFile = TEMPLATE_FILE_NAME,
                    jobName='anneal_%d' % i,
             )
         )
 
+    job_list = []
     for job in annealJobs:
         job.createScript()
         if doPrint:
             job.printScript()
-        job.runScript()
+        job_list.append((job.runScript,) )
+#        job.runScript()
     #end for
+    f = ForkOff(
+            processes_max=cing.ncpus,
+            max_time_to_wait=600,
+            verbosity=cing.verbosity
+        )
+    done_list = f.forkoff_start(job_list, 0) # delay 0 second between jobs.
+    NTmessage("Finished ids: %s", done_list)
 #end def
 
 
-def parseRefineOutput(config, params, options):
+def parseRefineOutput(config, params, options ):
     """
     Parse the output in the Jobs directory
     params is a NTxplor instance
 
+    Return None on error.
     """
 
     xplor = Xplor(config, params, outPath=config.directories.refined)
+
+    logFileNameFmt = 'refine_%d.log'
+    resultFileName = 'parsedOutput.txt'
+    bestModelsFileNameFmt = 'best%dModels.txt'
+    if options.useAnnealed:
+        logFileNameFmt = 'anneal_%d.log'
+        resultFileName = 'parsedAnnealOutput.txt'
+        bestModelsFileNameFmt = 'best%dModelsAnneal.txt'
 
     results = NTlist()
     # parse all output files
     for i in asci2list(params.models):
 
-        file = xplor.checkPath(xplor.directories.jobs, 'refine_%d.log' % i)
+        file = xplor.checkPath(xplor.directories.jobs, logFileNameFmt % i)
         NTmessage('==> Parsing %s', file)
 
         data = NTdict(fileName=file,
@@ -327,27 +413,33 @@ def parseRefineOutput(config, params, options):
         foundDIHED = 0
         awkf = AwkLike(file)
         for line in awkf:
+#            NTdebug("line: %s" % line.dollar[0])
             if (not foundEnergy) and find(line.dollar[0], '--------------- cycle=     1 ----------------') >= 0:
                 awkf.next()
+#                NTdebug("Getting total energy from line: %s" % line.dollar[0])
                 data['Etotal'] = float(line.dollar[0][11:22])
 
                 awkf.next()
-                awkf.next()
-                data['Enoe'] = float(line.dollar[0][68:75])
+#                NTdebug("Getting NOE energy from line: %s" % line.dollar[0])
+                if line.dollar[0].count("E(NOE"): # Dirty hack; use regexp next time.
+#                    NTdebug("Bingo")
+                    data['Enoe'] = float(line.dollar[0][68:75])
+                else:
+                    awkf.next()
+#                    NTdebug("Getting NOE energy (try 2) from line: %s" % line.dollar[0])
+                    data['Enoe'] = float(line.dollar[0][68:75])
+                # end if
                 foundEnergy = 1
-
             elif (not foundNOE1) and find(line.dollar[0], 'NOEPRI: RMS diff. =') >= 0:
                 data['NOErmsd'] = float(line.dollar[5][:-1])
                 data['NOEbound1'] = float(line.dollar[7][:-2])
                 data['NOEviol1'] = int(line.dollar[8])
                 foundNOE1 = 1
-
             elif (not foundNOE2) and find(line.dollar[0], 'NOEPRI: RMS diff. =') >= 0:
                 data['NOEbound2'] = float(line.dollar[7][:-2])
                 data['NOEviol2'] = int(line.dollar[8])
                 data['NOEnumber'] = float(line.dollar[10])
                 foundNOE2 = 1
-
             elif (not foundDIHED) and find(line.dollar[0], 'Number of dihedral angle restraints=') >= 0:
                 data['DIHEDnumber'] = int(line.dollar[6])
                 awkf.next()
@@ -357,9 +449,7 @@ def parseRefineOutput(config, params, options):
                 data['DIHEDrmsd'] = float(line.dollar[3])
                 foundDIHED = 1
             #endif
-
         #end for
-
         results.append(data)
     #end for
 
@@ -377,7 +467,7 @@ def parseRefineOutput(config, params, options):
     #endif
 
     # print results to file and screen
-    resultFile = open(xplor.joinPath('parsedOutput.txt'), 'w')
+    resultFile = open(xplor.joinPath(resultFileName), 'w')
     printf('\n=== Results: sorted on "%s" ===\n', options.sortField)
     fprintf(resultFile, '=== Results: sorted on "%s" ===\n', options.sortField)
     fmt = '%-10s '
@@ -415,7 +505,7 @@ def parseRefineOutput(config, params, options):
         printf('\n\n')
         fprintf(resultFile, '\n\n')
 
-        fname = xplor.joinPath('best%dModels.txt' % bestModels)
+        fname = xplor.joinPath(bestModelsFileNameFmt % bestModels)
         f = open(fname, 'w')
         params.bestModels = ''
         for i in range(0, bestModels):
@@ -434,143 +524,69 @@ def parseRefineOutput(config, params, options):
 
     #print '>>>'
     #print xplor.format( params.__FORMAT__ )
-
     return results
 #end def
-#------------------------------------------------------------------------------
 
-# class wrapper to allow passing of key-argument
-# to compare dict function
-class CompareDict:
-    def __init__(self, key):
-        self.key = key
-    #end def
+def fullAnneal( config, parameters, project, options ):
+    """
+    Recalculate the coordinates.
+    Return True on error.
+    """
+    options.name = 'annealed'
 
-    def __call__(self, a, b):
-        return cmp(a[self.key], b[self.key])
-    #end def
-#end class
+    refinePath = project.path(project.directories.refine )
+    NTmessage('==> refinePath: %s', refinePath)
+    basePath = os.path.join( refinePath, options.name)
+    NTmessage('==> basePath: %s', basePath)
 
-# class wrapper to allow passing of a key-argument
-# to dict entry
-class Key:
-    def __init__(self, key):
-        self.key = key
-    #end def
+    NTmessage("-- analyze --")
+    if doSetup(config, project, basePath, options):
+        NTerror("Failed setup")
+        return True
+    # end if
 
-    def __call__(self, a):
-        return a[self.key]
-    #end def
-#end class
+    NTmessage("-- generatePSF --")
+    if generatePSF(config, parameters):
+        NTerror("Failed generatePSF")
+        return True
+    # end if
+
+    NTmessage("-- generateTemplate --")
+    if generateTemplate(config, parameters):
+        NTerror("Failed generateTemplate")
+        return True
+    # end if
+
+    NTmessage("-- anneal --")
+    if anneal(config, parameters):
+        NTerror("Failed anneal")
+        return True
+    # end if
+
+    NTmessage("-- analyze --")
+    if analyze(config, parameters, useAnnealed = True):
+        NTerror("Failed analyze")
+        return True
+    # end if
+
+    NTmessage("-- parseRefineOutput --")
+    if not parseRefineOutput(config, parameters, options):
+        NTerror("Failed parseRefineOutput")
+        return True
+    # end if
+
+    NTmessage("-- importFromRefine --")
+    if not importFromRefine(config, parameters, project, options):
+        NTerror("Failed importFromRefine")
+        return True
+    # end if
+
+#end def
 
 
-#------------------------------------------------------------------------------
-## main section
-#------------------------------------------------------------------------------
-if __name__ == '__main__':
-
-    version = cing.cingVersion
-    usage = "usage: refine.py [options]"
-
-    parser = OptionParser(usage=usage, version=version)
-    parser.add_option("--doc",
-                      action="store_true",
-                      dest="doc", default=False,
-                      help="print extended documentation to stdout"
-                     )
-    parser.add_option("--project",
-                      dest="project", default=None,
-                      help="Cing project name (required); data will be in PROJECT.cing/Refine/NAME",
-                      metavar="PROJECT"
-                     )
-    parser.add_option("--name",
-                      dest="name", default=None,
-                      help="NAME of the refinement run (required)",
-                      metavar="NAME"
-                     )
-    parser.add_option("-s", "--setup",
-                      action="store_true",
-                      dest="doSetup", default=False,
-                      help="Generate directory structure, parameter file, export project data",
-                     )
-    parser.add_option("-f", "--psf",
-                      action="store_true",
-                      dest="doPSF", default=False,
-                      help="Generate PSF file (default: no PSF)"
-                     )
-    parser.add_option("-g", "--generateTemplate",
-                      action="store_true",
-                      dest="generateTemplate", default=False,
-                      help="Generate template PDB file (default: no PSF)"
-                     )
-
-    parser.add_option("-a", "--analyze",
-                      action="store_true",
-                      dest="doAnalyze", default=False,
-                      help="Initial analysis (default: no analysis)"
-                     )
-    parser.add_option("-r", "--refine",
-                      action="store_true",
-                      dest="doRefine", default=False,
-                      help="Refine the structures (default: no refine)"
-                     )
-    parser.add_option("-e", "--anneal",
-                      action="store_true",
-                      dest="doAnneal", default=False,
-                      help="Anneal the structures (default: no anneal)"
-                     )
-    parser.add_option("-p", "--print",
-                      action="store_true",
-                      dest="doPrint", default=False,
-                      help="Print script before running (default: no print)"
-                     )
-    parser.add_option("--models",
-                      dest="models", default=None,
-                      help="Model indices (e.g. 0,2-5,7,10-13)",
-                      metavar="MODELS"
-                     )
-    parser.add_option("--overwrite",
-                      action="store_true",
-                      dest="overwrite", default=False,
-                      help="Overwrite existing files (default: from parameters.py)"
-                     )
-    parser.add_option("--parse",
-                      action="store_true",
-                      dest="doParse", default=False,
-                      help="Parse the output of the refine run (default: no parse)"
-                     )
-    parser.add_option("--sort",
-                      dest="sortField", default=None,
-                      help="sort field for parse option",
-                      metavar="SORTFIELD"
-                     )
-    parser.add_option("--best",
-                      dest="bestModels", default=0,
-                      help="Number of best models for parse option",
-                      metavar="BESTMODELS"
-                     )
-    parser.add_option("--import",
-                      action="store_true",
-                      dest="doImport", default=False,
-                      help="Import the best models from PROJECT.cing/Refine/NAME/Refined (default: no import)"
-                     )
-    parser.add_option("--superpose",
-                      dest="superpose", default=None,
-                      help="superpose ranges; e.g. 503-547,550-598,800,801",
-                      metavar="SUPERPOSE"
-                     )
-    parser.add_option("-v", "--verbosity", type='int',
-                      default=cing.verbosityDefault,
-                      dest="verbosity", action='store',
-                      help="verbosity: [0(nothing)-9(debug)] no/less messages to stdout/stderr (default: 3)"
-                     )
-    parser.add_option("--ipython",
-                      action="store_true",
-                      dest="ipython",
-                      help="Start ipython interpreter"
-                     )
-
-    (options, args) = parser.parse_args()
+def run():
+    parser = getRefineParser()
+    (options, _args) = parser.parse_args()
 
     if options.verbosity >= 0 and options.verbosity <= 9:
         cing.verbosity = options.verbosity
@@ -586,7 +602,7 @@ if __name__ == '__main__':
     if options.doc:
         parser.print_help(file=sys.stdout)
         NTmessage("%s\n", __doc__)
-        sys.exit(0)
+        return
     #end if
 
     #------------------------------------------------------------------------------
@@ -595,19 +611,20 @@ if __name__ == '__main__':
     parser.check_required('--project')
 
     NTmessage(dots * 10 + "\n")
-    versionStr = "     Refine version %s" % version
-    if cingRevision:
-        versionStr += " (r%d)" % cingRevision
-    NTmessage(versionStr)
-    NTmessage("\n" + dots * 10 + "\n")
+#    versionStr = "     Refine reversion %s" % cing.revision
+#    if cingRevision:
+#        versionStr += " (r%d)" % cingRevision
+#    NTmessage(versionStr)
+#    NTmessage("\n" + dots * 10 + "\n")
 
     #------------------------------------------------------------------------------
     # Project
     #------------------------------------------------------------------------------
-    project = Project.open(options.project, status='old', restore=False)
+    project = Project.open(options.project, status='old',
+                           restore=1) #DEFAULT 0
     if project == None:
         NTerror("Failed to get a project")
-        sys.exit(1)
+        return True
     #end if
     basePath = project.path(project.directories.refine, options.name)
 
@@ -616,7 +633,7 @@ if __name__ == '__main__':
     #------------------------------------------------------------------------------
     if options.doSetup:
         doSetup(config, project, basePath, options)
-        sys.exit(0)
+#        return # We had like to continue in new setup.
     #end if
 
     #------------------------------------------------------------------------------
@@ -631,10 +648,9 @@ if __name__ == '__main__':
     #------------------------------------------------------------------------------
     # read parameters file
     #------------------------------------------------------------------------------
-    parameters = None #@UndefinedVariable dummy for pydev extensions code analysis
-    paramfile = project.path(project.directories.refine, options.name, 'parameters.py')
-    execfile(paramfile)
-    NTmessage('==> Read user parameters %s\n', paramfile)
+    parameters = getParameters( basePath, 'parameters')
+#    NTdebug('==> parameters\n%s\n', str(parameters))
+
     parameters.basePath = basePath
     parameters.name = options.name
 
@@ -657,33 +673,38 @@ if __name__ == '__main__':
     #------------------------------------------------------------------------------
     if options.doPSF:
         generatePSF(config, parameters, options.doPrint)
-    elif options.doAnalyze:
-        analyze(config, parameters, options.doPrint)
     elif options.generateTemplate:
         generateTemplate(config, parameters, options.doPrint)
-    elif options.doRefine:
-        refine(config, parameters, options.doPrint)
     elif options.doAnneal:
         anneal(config, parameters, options.doPrint)
+    elif options.doAnalyze:
+        analyze(config, parameters, options.doPrint, useAnnealed = options.useAnnealed )
+    elif options.doRefine:
+        refine(config, parameters, options.doPrint)
     elif options.doParse:
-        results = parseRefineOutput(config, parameters, options)
+        _results = parseRefineOutput(config, parameters, options)
     elif options.doImport:
-        mol = importFromRefine(config, parameters, project)
+        _mol = importFromRefine(config, parameters, project, options)
+    elif options.fullAnneal:
+        fullAnneal(config, parameters, project, options)
     else:
-        NTerror('refine.py, invalid option\n')
-
+        if not options.doSetup:
+            NTerror('refine.py, invalid option\n')
+            return True
+        else:
+            NTmessage("Done after setup.")
     #end if
-    #------------------------------------------------------------------------------------
-    # ipython
-    #------------------------------------------------------------------------------------
+
     if options.ipython:
         from IPython.Shell import IPShellEmbed
         ipshell = IPShellEmbed(['-prompt_in1', 'CING \#> '],
                                 banner='--------Dropping to IPython--------',
-                                exit_msg='--------Leaving IPython--------'
-                              )
+                                exit_msg='--------Leaving IPython--------' )
         ipshell()
     #end if
+#end def
 
 
-
+if __name__ == '__main__':
+    if run():
+        NTerror("Failed refine.py")

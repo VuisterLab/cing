@@ -8,7 +8,9 @@
 #
 # This configuration file contains all necessary information
 # for the refine.py script.
-from cing.Libs.NTutils import * #@UnusedWildImport
+#from cing.Libs.NTutils import * #@UnusedWildImport
+from cing.Libs.NTutils import NTdict
+import os
 
 refinePath = os.path.join(os.getenv('CINGROOT','.'), 'python','Refine')
 xplorPath  = os.getenv('xplorPath','.')
@@ -16,7 +18,7 @@ xplorPath  = os.getenv('xplorPath','.')
 # **********************************************************
 # editing below here should generally not be necessary
 # **********************************************************
-# Relabelled from config to refineConfig for apparent clashes with other config.
+# Relabeled from config to refineConfig for apparent clashes with other config.
 config = NTdict(
 
     XPLOR            =  xplorPath,
