@@ -123,9 +123,11 @@ PERHAPS: edit the generatePSF.inp to include better topology description:
         $x.cing/Refine/$stage/Jobs/generatePSF.csh
 
 -----------------------------------------------------------------------------------------------------------------------------------------
-  Analyze
+  Analyze starting from converted or from annealed already.
 -----------------------------------------------------------------------------------------------------------------------------------------
-refine --project $x --name $stage --analyze --overwrite --ipython
+refine --project $x --name $stage --analyze                --overwrite
+or
+refine --project $x --name $stage --analyze --useAnnealed  --overwrite
 
 Examine at least one log file in the Jobs directory for errors.
 JFD: - fixed bug with too long file name: @@1brv_cs_pk_2mdl.cing/Refine/refine1/Tables/dihedral_constraint_list.tbl

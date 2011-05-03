@@ -727,6 +727,8 @@ def main():
             project.initBMRB(bmrbFile=options.initBMRB, moleculeName=project.name)
         elif options.initCcpn:
             project = Project.open(options.name, status='new')
+#            if options.ensemble:
+#                modelCount = len(asci2list( options.ensemble ))
             project.initCcpn(ccpnFolder=options.initCcpn)
     #    elif options.loadCcpn:
     #        project = Project.open(options.name, status='create', restore=False)

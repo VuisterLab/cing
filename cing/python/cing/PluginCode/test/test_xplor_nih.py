@@ -32,8 +32,6 @@ class AllChecks(TestCase):
         project.validate(htmlOnly=True, doProcheck=False, doWhatif=False, doWattos=False, doTalos=False)
         project.save()
 
-
-
 if __name__ == "__main__":
     cing.verbosity = verbosityDebug
     unittest.main()
