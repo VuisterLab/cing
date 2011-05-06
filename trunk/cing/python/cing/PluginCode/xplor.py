@@ -47,12 +47,53 @@ Atom, Molecule and Project classes.
 # XPLOR stuff
 #==============================================================================
 
+# Xplor characters that need quoting
+xplorWildCardList = '* % # +'.split()
+# Only quote character in xplor.
+xplorQuoteCharacter = '"'
+
+def quoteAtomNameIfNeeded(atomNameXplor):
+    '''
+    Adds quotes to atom names if needed in xplor.
+    Usually this is not even desirable as e.g. GLU HB* or U H2'
+    but for CA+2 it is because it's a wild card that would not expand right.
+    @param atomNameXplor:
+    '''
+    if '"' in  atomNameXplor:
+        NTerror("A double quote may not occur in any xplor name")
+        return None
+    needed = False
+#    for xplorWildCard in xplorWildCardList:
+#        if xplorWildCard in atomNameXplor:
+#            needed = True
+#    if not needed:
+#        return atomNameXplor
+
+    # Now special case the ions that are the only ones that need the quotes, see ion.top
+    # See $CINGROOT/python/Refine/toppar/ion.top NB this is specific to the library.
+    # E.g.
+#RESIdue CA2 {calcium 2+}
+#  GROUp
+#    ATOM CA+2 TYPE=CA+2 CHARge=+2.0 END
+#END {CA2}
+    reMatch = re.compile('[-+](\d)$') # The 24 character standard notation from time.asctime()
+    searchObj = reMatch.search(atomNameXplor)
+    if searchObj:
+        NTdebug("Special case for ions found: for %s" % atomNameXplor)
+        needed = True
+
+    if not needed:
+        return atomNameXplor
+    return '"%s"' % atomNameXplor
+
 #-----------------------------------------------------------------------------
 def exportAtom2xplor( atom ):
     """returns string in xplor format"""
+    atomNameXplor = atom.translate(XPLOR)
+    atomNameXplor = quoteAtomNameIfNeeded(atomNameXplor)
     return sprintf( '(resid %-3d and name %s)',
                       atom.residue.resNum,
-                      atom.translate(XPLOR)
+                      atomNameXplor
                    )
 #end def
 # add as a method to Atom Class
@@ -157,7 +198,7 @@ DihedralRestraintList.export2xplor = exportDihedralRestraintList2xplor
 
 
 #-----------------------------------------------------------------------------
-def exportMolecule2xplor( molecule, path)   :
+def exportMolecule2xplor( molecule, path):
     """Export coordinates of molecule to pdbFile in XPLOR convention;
        generate modelCount files,
        path should be in the form name%03d.pdb, to allow for multiple files
@@ -169,7 +210,7 @@ def exportMolecule2xplor( molecule, path)   :
         pdbFile = molecule.toPDB( model=model, convention = XPLOR)
         if not pdbFile:
             return None
-        pdbFile.save( sprintf( path, model )   )
+        pdbFile.save( sprintf( path, model ))
         del(pdbFile)
     #end for
     return molecule

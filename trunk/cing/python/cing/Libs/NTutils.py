@@ -2170,6 +2170,7 @@ class NTtree(NTdict):
 
     def removeChild(self, child):
         if not child in self._children:
+#            NTdebug("not child in self._children: for %s in %s", child, self._children)
             return None
         if child.name in self:
             del(self[ child.name ])
@@ -4124,7 +4125,10 @@ class ExecuteProgram(NTdict):
             self.jobcount += 1
 #        NTdebug('==> Executing ('+cmd+') ... ')
 #        NTdebug("Executing command: [%s]" % cmd)
-        code = os.system(cmd)
+        if 1: # take alternative without output buffering?
+            code = os.system(cmd)
+        else:
+            pass
 #        NTdebug( "Got back from system the exit code: " + `code` )
         return code
 #end class

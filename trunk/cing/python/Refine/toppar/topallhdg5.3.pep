@@ -20,6 +20,8 @@ SET ECHO=FALSE END
 ! %SEGMENT-ERR: max. number of LAST exceeded
 ! %SEGMENT-ERR: max. number of LAST exceeded
 
+! Edited JFD 2011-05-06 adjusted for working with NRG-CING setup.
+!   Reenabled the proper NTER patches.
 
 
 link  PPGP head - GLY tail + PRO end
@@ -42,7 +44,7 @@ first IONS            tail + ZN2 end
 !first IONS            tail + HEB end
 !first IONS            tail + HEC end
 first PROP            tail + PRO end
-!first NTER            tail + *   end
+first NTER            tail + *   end
 first ACET            tail + ACE end
 
 !last  IONS head - NA1            end
@@ -57,7 +59,7 @@ last  IONS head - ZN2            end
 !last  IONS head - PO4            end
 !last  IONS head - HEB            end
 !last  IONS head - HEC            end
-!last  CTER head - *              end
+last  CTER head - *              end
 
 
 SET ECHO=TRUE END

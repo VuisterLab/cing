@@ -1,0 +1,9 @@
+set echo on message all end
+
+eval( $1 = 1.0 )
+eval( $1 = "a'" )
+eval( $1 = a' )
+!eval( $1 = 'a"' ) ! invalid
+eval( $1 = "a''" )
+eval( $1 = a'' )
+eval( $1 = 'a )

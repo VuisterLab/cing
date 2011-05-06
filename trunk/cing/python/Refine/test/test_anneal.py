@@ -4,12 +4,12 @@ python $CINGROOT/python/Refine/test/test_anneal.py
 
 For testing execution of cing inside of Xplor-NIH python interpreter with the data living outside of it.
 """
+from Refine.NTxplor import * #@UnusedWildImport
 from Refine.Utils import getParameters
 from Refine.configure import refinePath
 from cing import cingDirTestsData
 from cing import cingDirTmp
 from cing.Libs.NTutils import * #@UnusedWildImport
-from cing.Libs.forkoff import do_cmd
 from cing.core.classes import Project
 from shutil import copyfile
 from unittest import TestCase
@@ -21,16 +21,16 @@ class AllChecks(TestCase):
         modelCount = 99
         fastestTest = 1
         if fastestTest:
-            modelCount = 4 # DEFAULT 2
+            modelCount = 1 # DEFAULT 2
 
-        entryList  = "1brv     2fwu                      ".split()
-        rangesList = "171-188  501-850                   ".split()
+        entryList  = "1brv     2fwu     2fws               ".split()
+        rangesList = "171-188  501-850  371-650                 ".split()
         cingDirTmpTest = os.path.join(cingDirTmp, getCallerName())
         mkdirs(cingDirTmpTest)
         self.failIf(os.chdir(cingDirTmpTest), msg=
             "Failed to change to test directory for files: " + cingDirTmpTest)
         for i, entryId in enumerate(entryList):
-            if i != 1: # Selection of the entries.
+            if i != 0: # Selection of the entries.
                 continue
             inputArchiveDir = os.path.join(cingDirTestsData, "ccpn")
             ccpnFile = os.path.join(inputArchiveDir, entryId + ".tgz")
@@ -51,25 +51,28 @@ class AllChecks(TestCase):
             refineExecPath = os.path.join(refinePath, "refine.py")
             cmd = '%s --project %s -n %s --setup --fullAnneal --useAnnealed --overwrite --models %s --superpose %s --sort Enoe' % (
                 refineExecPath, entryId, name, models, ranges)
-            self.assertFalse( do_cmd(cmd) )
+            self.assertFalse( do_cmd(cmd,bufferedOutput=0) )
         # end for
     # end def
 
 
     def _test_execfile_replacement_(self):
-        'succeeds'
-        paramfile = 'parametersTest.py'
-        NTmessage('==> Reading user parameters %s', paramfile)
+        'succeeds here but when taken in unit check it fails again.'
+#        NTdebug('==> test_execfile_replacement_')
+        paramfile = os.path.join(refinePath, 'test', DATA_STR, 'parametersToTest.py' )
+#        NTmessage('==> Reading user parameters %s', paramfile)
 #        parameters = None # Defining it here would kill the workings.
         execfile_(paramfile, globals()) # Standard execfile fails anyhow for functions and is obsolete in Python 3
-#        NTdebug('==> parameters\n%s\n', str(parameters)) #@UndefinedVariable but really it is at this point.
         self.assertEquals(parameters.ncpus, 7777777) #@UndefinedVariable
     # end def
 
     def _test_getParameters(self):
+#        NTdebug('==> test_getParameters')
         basePath = os.path.join(refinePath, 'test', DATA_STR )
         moduleName = 'parametersToTest'
+#        parameters  = refineParameters
         parameters = getParameters(basePath, moduleName)
+        self.assertTrue(parameters)
         self.assertEquals(parameters.ncpus, 7777777) #@UndefinedVariable
     # end def
 

@@ -26,7 +26,13 @@ def my_sleep(arg):
 
 class AllChecks(TestCase):
 
-    def test_Forkoff(self):
+    def _test_sleep(self):
+        cmd = ''
+        for i in range(2):
+            cmd += 'echo %s; sleep 1; ' % i
+        do_cmd(cmd, bufferedOutput=0)
+
+    def _test_Forkoff(self):
         # important to switch to temp space before starting to generate files for the project.
         cingDirTmpTest = os.path.join( cingDirTmp, getCallerName() )
         mkdirs( cingDirTmpTest )
@@ -52,7 +58,7 @@ class AllChecks(TestCase):
         done_list = f.forkoff_start(job_list, 0)
         NTmessage("Finished ids: %s", done_list)
 
-    def ttttttttttestRun2(self):
+    def _testRun2(self):
         ## Initializing f will also initialize an instance of class Process
         ## Can be interrupted by doing kill -2 pid which will be caught and dealt with.
         f = ForkOff(

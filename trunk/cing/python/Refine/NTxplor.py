@@ -1,3 +1,4 @@
+from cing.Libs.NTgenUtils import analyzeXplorLog
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.Libs.forkoff import do_cmd
 
@@ -87,7 +88,8 @@ class refineParameters( NTdict ):
       outPath           = '',       # Run time, no need to edit
       basePath          = '',       # Run time, no need to edit
 
-      __FORMAT__ = """from Refine.NTxplor import * #@UnusedWildImport
+      __FORMAT__ = """
+from Refine.NTxplor import * #@UnusedWildImport
 
 parameters = refineParameters(
       ncpus             = %(ncpus)s,       # Will be taken from os by default like in CING
@@ -247,6 +249,7 @@ class Xplor( refineParameters ):
 
         self.script = None
         self.resultFile  = None     # Can be set to be checked after each command to be checked for existence
+        self.allowedErrors = 0 # Some jobs may throw a couple of errors. Which will not be considered fatal.
 
         self.setdefault( 'run_cluster', 'n' )
         self.setdefault( 'queu_cluster', '/usr/local/pbs/bin/qsub -l nodes=1:ppn=1 ')
@@ -577,12 +580,10 @@ end if
             os.system( '%s %s &' % (self.queu_cluster, jobFileName) )
             time.sleep(5)
         else:
-#            xplorProgram = ExecuteProgram( jobFileName, redirectOutput = False)
-            if do_cmd(jobFileName):
-#            if xplorProgram(): # An exit code of zero means success.
+            if do_cmd(jobFileName, bufferedOutput=0):
                 NTerror("Failed to run job from: %s" % jobFileName)
                 return True
-#            os.system('%s' % jobFileName )
+            # end if
         # end if
 
         if cing.verbosity < cing.verbosityDebug:
@@ -600,6 +601,17 @@ end if
                 return True
             # end if
         # end if
+        timeTaken, entryCrashed, nr_error, nr_warning, nr_message, nr_debug = analyzeXplorLog(logFileName) #@UnusedVariable
+
+        # When reporting always show log file name because output to stderr easily gets mingled.
+        if entryCrashed:
+            NTerror("Script crashed according to log file: %s" % logFileName)
+            return True
+        if not timeTaken:
+            NTwarning("Failed to find the time taken from log file: %s" % logFileName)
+        if nr_error > self.allowedErrors:
+            NTerror("Script produced %s errors according to log file: %s which is more than the allowed %s" % (nr_error, logFileName, self.allowedErrors))
+            return True
     # end def
 
     #------------------------------------------------------------------------
@@ -1260,6 +1272,10 @@ class GeneratePSF( Xplor ):
         self.pdbFile = self.checkPath( self.directories.converted, self.pdbFile )
         self.psfFile = self.newPath( self.directories.psf, self.psfFile )
         self.resultFile = self.psfFile
+        # Allow the following:
+# %SEGMNT-ERR: No matching first patch found
+# %SEGMNT-ERR: no matching LAST patch found
+        self.allowedErrors = 0 # now ignored.
         if self.verbose:
             #self.keysformat()
             NTmessage('%s\n', self.format())

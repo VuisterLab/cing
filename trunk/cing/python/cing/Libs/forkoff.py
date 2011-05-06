@@ -20,24 +20,32 @@ ___revision__ = "$Revision$"
 ___date__     = "$Date$"
 
 
-def do_cmd( cmd ):
+def do_cmd( cmd, bufferedOutput = True ):
     """
     Returns False for success.
     """
     NTmessage( "Doing command: %s" % cmd )
-
+    output = None
     ##  Try command and check for non-zero exit status
 #    pipe = os.popen( cmd )
-    pipe = Popen(cmd, shell=True, stdout=PIPE).stdout
-    output = pipe.read()
-
+    if bufferedOutput:
+        p = Popen(cmd, shell=True, stdout=PIPE)
+        pipe = p.stdout
+        output = pipe.read()
+        status = pipe.close()
+        if output:
+            NTmessage( output )
+    else:
+        p = Popen(cmd, shell=True, stdout=PIPE)
+        pipe = p.stdout
+        line = p.stdout.readline()        
+        while line:
+            NTmessageNoEOL( line )
+            line = p.stdout.readline()
+        status = pipe.close()
     ##  The program exit status is available by the following construct
     ##  The status will be the exit number unless the program executed
     ##  successfully in which case it will be None.
-    status = pipe.close()
-
-    if output:
-        NTmessage( output )
 
     ## Success
     if status == None:
@@ -45,7 +53,7 @@ def do_cmd( cmd ):
 
     NTerror("Failed shell command:")
     NTerror( cmd )
-    NTerror("Output: %s" % output)
+#    NTerror("Output: %s" % output)
     NTerror("Status: %s" % status)
     return True
 # end def

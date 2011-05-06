@@ -54,7 +54,7 @@ class Key:
     #end def
 #end class
 
-def importFromRefine(config, params, project, options):
+def importFrom(config, params, project, options):
     """
     Import data from params.basePath/XXX directory as new molecule.
     The input can be from the Refined or from the Annealed directory.
@@ -75,7 +75,8 @@ def importFromRefine(config, params, project, options):
         return
     #end if
 
-    project.restore()
+    if not project.contentIsRestored:
+        project.restore()
 
     # import the coordinates from Xplor PDB files
     path = xplor.joinPath(inPath, xplor.baseName)
@@ -118,7 +119,6 @@ def doSetup(config, project, basePath, options):
         removedir(basePath)
     #end if
 
-#    from Refine.NTxplor import Xplor #@Reimport JFD: I don't know why needed....
     xplor = Xplor(config, basePath=basePath) # generates the directories and initialize parameter setup
 
     # copy xplor parameter and topology files
@@ -214,7 +214,7 @@ def generatePSF(config, params, doPrint=0):
     if doPrint:
         psfJob.printScript()
     #end if
-    psfJob.runScript()
+    return psfJob.runScript()
 #end def
 
 
@@ -238,7 +238,7 @@ def generateTemplate(config, params, doPrint=0):
         templateJob.printScript()
     #end if
 
-    templateJob.runScript()
+    return templateJob.runScript()
 #end def
 
 
@@ -379,7 +379,7 @@ def anneal(config, params, doPrint=0):
 #end def
 
 
-def parseRefineOutput(config, params, options ):
+def parseOutput(config, params, options ):
     """
     Parse the output in the Jobs directory
     params is a NTxplor instance
@@ -569,15 +569,15 @@ def fullAnneal( config, parameters, project, options ):
         return True
     # end if
 
-    NTmessage("-- parseRefineOutput --")
-    if not parseRefineOutput(config, parameters, options):
-        NTerror("Failed parseRefineOutput")
+    NTmessage("-- parseOutput --")
+    if not parseOutput(config, parameters, options):
+        NTerror("Failed parseOutput")
         return True
     # end if
 
-    NTmessage("-- importFromRefine --")
-    if not importFromRefine(config, parameters, project, options):
-        NTerror("Failed importFromRefine")
+    NTmessage("-- importFrom --")
+    if not importFrom(config, parameters, project, options):
+        NTerror("Failed importFrom")
         return True
     # end if
 
@@ -627,13 +627,13 @@ def run():
         return True
     #end if
     basePath = project.path(project.directories.refine, options.name)
-
+    NTdebug("basePath: " + basePath)
     #------------------------------------------------------------------------------
     # Setup
     #------------------------------------------------------------------------------
     if options.doSetup:
         doSetup(config, project, basePath, options)
-#        return # We had like to continue in new setup.
+#        return # We had like to continue in new setup. So don't exit here.
     #end if
 
     #------------------------------------------------------------------------------
@@ -682,9 +682,9 @@ def run():
     elif options.doRefine:
         refine(config, parameters, options.doPrint)
     elif options.doParse:
-        _results = parseRefineOutput(config, parameters, options)
+        _results = parseOutput(config, parameters, options)
     elif options.doImport:
-        _mol = importFromRefine(config, parameters, project, options)
+        _mol = importFrom(config, parameters, project, options)
     elif options.fullAnneal:
         fullAnneal(config, parameters, project, options)
     else:
