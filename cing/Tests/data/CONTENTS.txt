@@ -9,4 +9,3 @@ Files:
 CONTENTS.txt                This file.
 2vb1_simple.pdb             Protein solved by X-ray.
 pc_nmr_11_rstraints.ps      Example data for postscript converter integration.
-log_validateEntry_1brv.txt  For unit test in $CINGROOT/python/cing/Libs/test/test_NTgenUtils.py

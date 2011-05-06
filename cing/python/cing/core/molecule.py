@@ -500,6 +500,29 @@ class Molecule( NTtree, ResidueList ):
         return chain
     #end def
 
+    def removeChain( self, chain)   :
+        '''
+        Removes a chain. If none give it will be the last chain.
+        @param chain:
+        '''
+        if not chain in self._children:
+            NTerror( '%s: chain "%s" not present in molecule %s', getCallerName(), chain, self )
+            return None
+        #end if
+
+        # update the counts
+        self.chainCount -= 1
+        ch = self.removeChild( chain )
+        if ch == None:
+            NTerror('%s: error removing %s from %s', getCallerName(), ch, self)
+            return None
+        else:
+            ch.molecule = None
+            NTmessage('==> Removed chain %s from %s', ch, self )
+            return ch
+        #end if
+    #end def
+
     def allChains( self ):
         """Returns a list of all chains of molecule"""
         return self.subNodes( depth = 1 )
@@ -5350,6 +5373,7 @@ coordinates: %s"""  , dots, self, dots
 #        modelId = model - 1
 
         pdbAtmName = self.translate( convention )
+#        NTdebug("Translated self: %s to name %s", self, pdbAtmName)
         if not pdbAtmName:
             if self.name.startswith('Q'):
                 return None
@@ -5357,6 +5381,7 @@ coordinates: %s"""  , dots, self, dots
             pdbAtmName = self.name
 
         pdbResName = self.residue.translate( convention )
+#        NTdebug("Translated res: %s to name %s", self.residue, pdbResName)
         if not pdbResName:
 #            NTdebug("Failed to translate from CING to convention: %s residue: %-20s returning CING residue name" % ( convention, self.residue ))
             pdbResName = self.residue.name

@@ -27,6 +27,10 @@ set x = 1brv
 set stage = annealed
 set ranges = 171-188
 set models = 0-1
+set x = 2fwu
+set ranges = 500-850
+
+
 cing                -n $x --initCcpn $x.tgz --ensemble $models
 
 refine --project $x -n $stage --setup --fullAnneal --useAnnealed --overwrite --models $models --superpose $ranges --sort Enoe
