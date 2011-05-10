@@ -20,41 +20,28 @@ NOTES TO CHECK
 
 
 
-WORKFLOW just ANNEAL -- should work --
+WORKFLOW
 
-cd
-set x = 1brv
-set stage = annealed
-set ranges = 171-188
-set models = 0-1
-set x = 2fwu
-set ranges = 500-850
-
+set x = H2_2Ca_64_100
+set stage = $x"_redo"
+set ranges = all
+set models = 0-19
 
 cing                -n $x --initCcpn $x.tgz --ensemble $models
 
-refine --project $x -n $stage --setup --fullAnneal --useAnnealed --overwrite --models $models --superpose $ranges --sort Enoe
-# or
+# -Choose the terseness of the commands you like from the below 3 options
+# -1-
+refine --project $x -n $stage --setup --fullAnnealAndRefine --overwrite --models $models --superpose $ranges --sort Enoe
+# or -2-
+refine --project $x -n $stage --setup --fullAnneal --overwrite --models $models --superpose $ranges --sort Enoe
+refine --project $x -n $stage         --fullRefine --overwrite --models $models --superpose $ranges --sort Enoe
+# or -3-
 refine --project $x -n $stage --setup                   --overwrite --superpose $ranges
 refine --project $x -n $stage --psf                     --overwrite
 refine --project $x -n $stage --generateTemplate        --overwrite
 refine --project $x -n $stage --anneal                  --overwrite
 refine --project $x -n $stage --analyze --useAnnealed   --overwrite
-refine --project $x -n $stage --parse   --useAnnealed   --sort Enoe
-refine --project $x -n $stage --import  --useAnnealed   --superpose $ranges
-
-
-WORKFLOW ANNEAL plus REFINE --todo--
-
-set x = 1brv
-set stage = waterRefined
-set ranges = 171-188
-
-cing                -n $x --initCcpn $x.tgz
-refine --project $x -n $stage --setup                   --overwrite --superpose $ranges
-refine --project $x -n $stage --psf                     --overwrite
-refine --project $x -n $stage --generateTemplate        --overwrite
-refine --project $x -n $stage --anneal                  --overwrite
-refine --project $x -n $stage --analyze --useAnnealed   --overwrite
-refine --project $x -n $stage --parse   --useAnnealed   --sort Enoe
-refine --project $x -n $stage --import  --useAnnealed   --superpose $ranges
+# and then WORKFLOW refine
+refine --project $x -n $stage --refine  --overwrite         --models $models
+refine --project $x -n $stage --parse   --sort Enoe         --models $models
+refine --project $x -n $stage --import  --superpose $ranges --models $models

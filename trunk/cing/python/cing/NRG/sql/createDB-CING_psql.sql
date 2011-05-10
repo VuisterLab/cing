@@ -50,9 +50,9 @@ CREATE TABLE casdcing.cingentry
     is_solid                       BOOLEAN DEFAULT NULL, -- ssnmr
     is_paramagnetic                BOOLEAN DEFAULT NULL, -- paramagnetic.
     is_membrane                    BOOLEAN DEFAULT NULL, -- membrane
-    is_multimeric                  BOOLEAN DEFAULT NULL, --
+    is_multimeric                  BOOLEAN DEFAULT NULL, -- E.g. 1hue is a dimer and would be true. Doesn't necessarily need to be a symmetric multimer however.
     chothia_class                  INT DEFAULT NULL,     -- (10) alpha, beta, of a/b, a+b, or coil
-    protein_count                  INT DEFAULT NULL,
+    protein_count                  INT DEFAULT NULL,     -- Number of protein chains. Not necessarily unique so e.g. 1hue has 2 that are identical (homodimer). TODO: fill.
     dna_count                      INT DEFAULT NULL,
     rna_count                      INT DEFAULT NULL,
     dna_rna_hybrid_count           INT DEFAULT NULL,

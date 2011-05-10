@@ -90,12 +90,21 @@ def getRefineParser():
                       dest="useAnnealed", default=False,
                       help="Use the annealed workflow"
                      )
+    parser.add_option("--fullRefine",
+                      action="store_true",
+                      dest="fullRefine", default=False,
+                      help="Complete refine workflow (optionally after anneal)"
+                     )
     parser.add_option("--fullAnneal",
                       action="store_true",
                       dest="fullAnneal", default=False,
                       help="Complete anneal workflow"
                      )
-
+    parser.add_option("--fullAnnealAndRefine",
+                      action="store_true",
+                      dest="fullAnnealAndRefine", default=False,
+                      help="Complete anneal and refine workflow"
+                     )
     parser.add_option("-r", "--refine",
                       action="store_true",
                       dest="doRefine", default=False,

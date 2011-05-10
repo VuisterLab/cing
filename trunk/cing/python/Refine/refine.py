@@ -54,7 +54,7 @@ class Key:
     #end def
 #end class
 
-def importFrom(config, params, project, options):
+def importFrom(config, project, params, options):
     """
     Import data from params.basePath/XXX directory as new molecule.
     The input can be from the Refined or from the Annealed directory.
@@ -67,7 +67,7 @@ def importFrom(config, params, project, options):
     if options.useAnnealed:
         inPath     = config.directories.annealed
 
-    xplor = Xplor(config, params)
+    xplor = Xplor(config, params, project=project)
 
     models = asci2list(xplor.bestModels)
     if len(models) == 0:
@@ -80,22 +80,27 @@ def importFrom(config, params, project, options):
 
     # import the coordinates from Xplor PDB files
     path = xplor.joinPath(inPath, xplor.baseName)
-    NTmessage('==> Importing coordinates from %s, models %s', path, models)
+    NTmessage('==> Importing coordinates from %s, models %s (low verbosity on later models)', path, models)
     project.molecule.initCoordinates()
-    for m in models:
+    for i, m in enumerate(models):
         xplorFile = sprintf(path, m)
         if not os.path.exists(xplorFile):
             NTerror('%s: model "%s" not found' % (getCallerName(), xplorFile))
             return
         #end if
-        if not project.molecule.importFromPDB(xplorFile, convention=XPLOR, nmodels=1):
+        verbosity = None
+        if i != 0: # Only show regular messages for first model
+#            NTmessage("Setting verbosity to errors only")
+            verbosity = cing.verbosityError
+        if not project.molecule.importFromPDB(xplorFile, convention=XPLOR, nmodels=1, verbosity = verbosity):
             NTerror("Failed to importFromPDB from: " + getCallerName())
             return
     #end for
     project.molecule.updateAll()
 
-    # rename the molecule
-    project.molecules.rename(project.molecule.name, xplor.name)
+    # rename the molecule if needed
+    if project.molecule.name != xplor.name: # It's fine if the name already matches. Certainly the coordinates are already zipped.        
+        project.molecules.rename(project.molecule.name, xplor.name)
     print project.molecule.format()
 
 #    if 'superpose' in xplor and len(xplor.superpose) > 0:
@@ -119,7 +124,7 @@ def doSetup(config, project, basePath, options):
         removedir(basePath)
     #end if
 
-    xplor = Xplor(config, basePath=basePath) # generates the directories and initialize parameter setup
+    xplor = Xplor(config, basePath=basePath, project=project) # generates the directories and initialize parameter setup
 
     # copy xplor parameter and topology files
     for fname in os.listdir(os.path.join(xplor.refinePath, 'toppar')):
@@ -162,9 +167,11 @@ def doSetup(config, project, basePath, options):
 
     # export structures in Xplor-PDB format
     xplor.baseName = project.molecule.name + '_%03d.pdb'
-    path = xplor.joinPath(xplor.directories.converted, xplor.baseName)
+    # Only used for psf generation:
+    xplor.baseNameByChain = project.molecule.name + '_%s_%03d.pdb'
+    path = xplor.joinPath(xplor.directories.converted, xplor.baseNameByChain)
     NTmessage('==> Exporting %s to XPLOR PDB-files (%s)', project.molecule, path)
-    project.molecule.export2xplor(path)
+    project.molecule.export2xplor(path, chainName = ALL_CHAINS_STR)
     xplor.models = sprintf('%d-%d', 0, project.molecule.modelCount - 1)
     xplor.bestModels = sprintf('%d-%d', 0, project.molecule.modelCount - 1)
     #TODO
@@ -174,11 +181,11 @@ def doSetup(config, project, basePath, options):
     xplor.psfFile = project.molecule.name + '.psf'
     # Set the patches for the psf file
     for res in project.molecule.residuesWithProperties('HIS'):
-        xplor.patchHISD.append(res.resNum)
+        xplor.patchHISD.append((res.chain.name, res.resNum))
     for res in project.molecule.residuesWithProperties('HISE'):
-        xplor.patchHISE.append(res.resNum)
+        xplor.patchHISE.append((res.chain.name, res.resNum))
     for res in project.molecule.residuesWithProperties('cPRO'):
-        xplor.patchCISP.append(res.resNum)
+        xplor.patchCISP.append((res.chain.name, res.resNum))
     disulfide_bridges = project.molecule.idDisulfides(toFile=False, applyBonds=False)
 
     if disulfide_bridges == True:
@@ -186,7 +193,8 @@ def doSetup(config, project, basePath, options):
     elif disulfide_bridges:
         NTmessage("==> Located disulfide bridges %s" % str(disulfide_bridges))
     for (res1, res2) in disulfide_bridges:
-        xplor.patchDISU.append((res1.resNum, res2.resNum))
+        xplor.patchDISU.append( ((res1.chain.name, res1.resNum), 
+                                 (res2.chain.name, res2.resNum)))
 
     # save the parameter file
     parfile = xplor.joinPath('parameters.py')
@@ -198,15 +206,16 @@ def doSetup(config, project, basePath, options):
 #end def
 
 
-def generatePSF(config, params, doPrint=0):
+def generatePSF(config, project, params, doPrint=0):
     '''PSF generation'''
     NTmessage("Generating .psf file for xplor")
-    models = asci2list(params.models)
-    pdbFile= params.baseName % models[0]
+#    models = asci2list(params.models)
+#    pdbFile= params.baseName % models[0]
     psfJob = GeneratePSF(
          config,
          params,
-         pdbFile=pdbFile,
+#         pdbFile=pdbFile,
+         project=project,
 #                         outPath    = config.directories.psf,
          jobName='generatePSF'
     )
@@ -218,13 +227,14 @@ def generatePSF(config, params, doPrint=0):
 #end def
 
 
-def generateTemplate(config, params, doPrint=0):
+def generateTemplate(config, project, params, doPrint=0):
     '''Extended structure generation'''
     NTmessage("Generating .pdb file for xplor")
     templateJob = GenerateTemplate(
          config,
          params,
-         molecules=[
+         project = project,
+         molecules=[ # JFD: noting that these molecules aren't meant to be the same as the chains in a CING project. At least I'm not certain.
                          NTdict(
                             pdbFile=TEMPLATE_FILE_NAME,
                             selectionCode='(all)'
@@ -242,11 +252,12 @@ def generateTemplate(config, params, doPrint=0):
 #end def
 
 
-def analyze(config, params, doPrint=0, useAnnealed = False):
+def analyze(config, project, params, doPrint=0, useAnnealed = False):
     '''Analyze a run
     Returns True on failure.
     '''
     NTmessage("Analyzing a run")
+         
 
     inPath     = config.directories.converted
     if useAnnealed:
@@ -258,6 +269,7 @@ def analyze(config, params, doPrint=0, useAnnealed = False):
         job = Analyze(
                         config,
                         params,
+                        project = project,
                         fileNum=i,
                         molecules=[
                                       NTdict(
@@ -293,10 +305,13 @@ def analyze(config, params, doPrint=0, useAnnealed = False):
         )
     done_list = f.forkoff_start(job_list, 0) # delay 0 second between jobs.
     NTmessage("Finished ids: %s", done_list)
+    if not done_list:
+        NTerror("Failed to analyze %s", i)
+        return True    
 #end def
 
 
-def refine(config, params, doPrint=0):
+def refine(config, project, params, doPrint=0):
 
     # first create the jobs, run later
     refineJobs = []
@@ -305,6 +320,7 @@ def refine(config, params, doPrint=0):
             WaterRefine(
                    config,
                    params,
+                   project = project,
                    fileNum=i,
                    molecules=[
                                  NTdict(
@@ -334,10 +350,14 @@ def refine(config, params, doPrint=0):
         )
     done_list = f.forkoff_start(job_list, 0) # delay 0 second between jobs.
     NTmessage("Finished ids: %s", done_list)
+    if not done_list:
+        NTerror("Failed to refine %s", i)
+        return True
+    
 #end def
 
 
-def anneal(config, params, doPrint=0):
+def anneal(config, project, params, doPrint=0):
     NTdebug("Now in %s" % getCallerName())
     # first create the jobs, run later
     annealJobs = []
@@ -346,6 +366,7 @@ def anneal(config, params, doPrint=0):
             Anneal(
                    config,
                    params,
+                   project = project,
                    fileNum=i,
                    molecules=[
                                  NTdict(
@@ -376,10 +397,13 @@ def anneal(config, params, doPrint=0):
         )
     done_list = f.forkoff_start(job_list, 0) # delay 0 second between jobs.
     NTmessage("Finished ids: %s", done_list)
+    if not done_list:
+        NTerror("Failed to anneal %s", i)
+        return True
 #end def
 
 
-def parseOutput(config, params, options ):
+def parseOutput(config, project, params, options ):
     """
     Parse the output in the Jobs directory
     params is a NTxplor instance
@@ -387,7 +411,7 @@ def parseOutput(config, params, options ):
     Return None on error.
     """
 
-    xplor = Xplor(config, params, outPath=config.directories.refined)
+    xplor = Xplor(config, params, project=project, outPath=config.directories.refined)
 
     logFileNameFmt = 'refine_%d.log'
     resultFileName = 'parsedOutput.txt'
@@ -527,12 +551,63 @@ def parseOutput(config, params, options ):
     return results
 #end def
 
-def fullAnneal( config, parameters, project, options ):
+def fullAnnealAndRefine( config, project, parameters, options ):
+    'Calling fullAnneal and then fullRefine'
+    NTmessage("-- %s --" % getCallerName())    
+    
+    NTdebug("-- Calling fullAnneal --")
+    if fullAnneal(config, project, parameters, options):
+        NTerror("Failed fullAnneal")
+        return True
+    # end if
+
+    NTdebug("-- Calling fullRefine --")
+    if fullRefine(config, project, parameters, options):
+        NTerror("Failed generatePSF")
+        return True
+    # end if
+#end def
+
+def fullRefine( config, project, parameters, options ):
+    """
+    Refine the coordinates and process them back into CING.
+    Return True on error.
+    """
+    NTmessage("-- %s --" % getCallerName())
+#    options.name = 'annealed'
+    options.useAnnealed = False    
+    refinePath = project.path(project.directories.refine )
+    NTmessage('==> refinePath: %s', refinePath)
+    basePath = os.path.join( refinePath, options.name)
+    NTmessage('==> basePath: %s', basePath)
+
+    NTmessage("-- refine --")
+    if refine(config, project, parameters ):
+        NTerror("Failed refine")
+        return True
+    # end if
+
+    NTmessage("-- parseOutput --")    
+    if not parseOutput(config, project, parameters, options):
+        NTerror("Failed parseOutput")
+        return True
+    # end if
+
+    NTmessage("-- importFrom --")
+    if not importFrom(config, project, parameters, options):
+        NTerror("Failed importFrom")
+        return True
+    # end if
+
+
+def fullAnneal( config, project, parameters, options  ):
     """
     Recalculate the coordinates.
     Return True on error.
     """
-    options.name = 'annealed'
+    options.useAnnealed = True # Might be set before and will be reset if refining next.
+
+    NTmessage("-- %s --" % getCallerName())
 
     refinePath = project.path(project.directories.refine )
     NTmessage('==> refinePath: %s', refinePath)
@@ -546,41 +621,44 @@ def fullAnneal( config, parameters, project, options ):
     # end if
 
     NTmessage("-- generatePSF --")
-    if generatePSF(config, parameters):
+    if generatePSF(config, project, parameters):
         NTerror("Failed generatePSF")
         return True
     # end if
 
     NTmessage("-- generateTemplate --")
-    if generateTemplate(config, parameters):
+    if generateTemplate(config, project, parameters):
         NTerror("Failed generateTemplate")
         return True
     # end if
 
     NTmessage("-- anneal --")
-    if anneal(config, parameters):
+    if anneal(config, project, parameters):
         NTerror("Failed anneal")
         return True
     # end if
 
     NTmessage("-- analyze --")
-    if analyze(config, parameters, useAnnealed = True):
+    if analyze(config, project, parameters, useAnnealed = True):
         NTerror("Failed analyze")
         return True
     # end if
-
+    
+    if options.fullAnnealAndRefine:
+        NTmessage("Skipping parseOutput and importFrom because we'll jump straight into refine now.")
+        return
+    
     NTmessage("-- parseOutput --")
-    if not parseOutput(config, parameters, options):
+    if not parseOutput(config, project, parameters, options):
         NTerror("Failed parseOutput")
         return True
     # end if
 
     NTmessage("-- importFrom --")
-    if not importFrom(config, parameters, project, options):
+    if not importFrom(config, project, parameters, options):
         NTerror("Failed importFrom")
         return True
     # end if
-
 #end def
 
 
@@ -648,8 +726,10 @@ def run():
     #------------------------------------------------------------------------------
     # read parameters file
     #------------------------------------------------------------------------------
+#    NTdebug('==> will read parameters')
     parameters = getParameters( basePath, 'parameters')
 #    NTdebug('==> parameters\n%s\n', str(parameters))
+    NTdebug('==> Read parameters')
 
     parameters.basePath = basePath
     parameters.name = options.name
@@ -672,21 +752,25 @@ def run():
     # Action selection
     #------------------------------------------------------------------------------
     if options.doPSF:
-        generatePSF(config, parameters, options.doPrint)
+        generatePSF(config, project, parameters, options.doPrint)
     elif options.generateTemplate:
-        generateTemplate(config, parameters, options.doPrint)
+        generateTemplate(config, project, parameters, options.doPrint)
     elif options.doAnneal:
-        anneal(config, parameters, options.doPrint)
+        anneal(config, project, parameters, options.doPrint)
     elif options.doAnalyze:
-        analyze(config, parameters, options.doPrint, useAnnealed = options.useAnnealed )
+        analyze(config, project, parameters, options.doPrint, useAnnealed = options.useAnnealed )
     elif options.doRefine:
-        refine(config, parameters, options.doPrint)
+        refine(config, project, parameters, options.doPrint)
     elif options.doParse:
-        _results = parseOutput(config, parameters, options)
+        _results = parseOutput(config, project, parameters, options)
     elif options.doImport:
-        _mol = importFrom(config, parameters, project, options)
+        importFrom(config, project, parameters, options)
     elif options.fullAnneal:
-        fullAnneal(config, parameters, project, options)
+        fullAnneal(config, project, parameters, options)
+    elif options.fullRefine:
+        fullRefine(config, project, parameters, options)
+    elif options.fullAnnealAndRefine:
+        fullAnnealAndRefine( config, project, parameters, options)
     else:
         if not options.doSetup:
             NTerror('refine.py, invalid option\n')

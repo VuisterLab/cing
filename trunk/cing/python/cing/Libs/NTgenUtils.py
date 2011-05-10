@@ -133,7 +133,10 @@ ignoreLineXplorList = [
 #    "No matching LAST patch found",
     "%POWELL-ERR: Line search abandoned",  # Happens for generateTemplate
     "%POWELL-ERR: all atoms fixed. No action", # Happens for analyze_
-    "SET-ERR: error in selection - no atoms spec." # Happens for e.g. when atoms do not match to xplor for the noe distance restraints.
+    "SET-ERR: error in selection - no atoms spec.", # Happens for e.g. when atoms do not match to xplor for the noe distance restraints.
+    "%NOE-ERR: problem at", # See above
+    "%PATCH-ERR:", # Happens for 2fwu when ions are tried to be patched as a regular AA.
+    "%NOESET-ERR: duplicate class name specified.", # Happens e.g. for 2kn9 for second restraint lists. Code runs fine though.    
 ]
 
 def analyzeXplorLog(logFile, extraIgnoreLineList=[], extraIgnoreCountList = []):
@@ -165,7 +168,7 @@ def analyzeXplorLog(logFile, extraIgnoreLineList=[], extraIgnoreCountList = []):
             for ignoreLine in ignoreLineXplorList:
                 ignoreLineLower = ignoreLine.lower()
                 if lineLower.count(ignoreLineLower):
-                    NTdebug("Ignoring line for error count: %s" % line)
+#                    NTdebug("Ignoring line for error count: %s" % line)
                     toIgnore = True
                     break # finding one is enough
                 # end if
@@ -173,7 +176,7 @@ def analyzeXplorLog(logFile, extraIgnoreLineList=[], extraIgnoreCountList = []):
             if toIgnore:
                 result[4] += 1
                 continue
-#            NTdebug("Found error in line: %s" % line)
+            NTwarning("Found eeeeeeror in line: %s" % line)
             result[2] += 1
         elif line.startswith(' %') and line.count('WRN'):
             NTdebug("Found warning in line: %s" % line)

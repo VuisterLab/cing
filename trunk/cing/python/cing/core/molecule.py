@@ -2761,6 +2761,7 @@ Return an Molecule instance or None on error
     #end def
 
     def toPDB(self, fileName = None, model=None, ranges=None, convention=IUPAC, max_models=None,
+              chainName = None,
               useRangesForLoweringOccupancy=False):
         """
         Return a PyMMlib PDBfile instance or None on error
@@ -2769,6 +2770,7 @@ Return an Molecule instance or None on error
         Note that the first model is model numbered zero.
         Return None on error or pdbfile object on success.
         If the fileName is set it will do an actual write.
+        If chainName is set it will limit to given chain name.
         """
 
         if self.modelCount == 0:
@@ -2817,6 +2819,9 @@ Return an Molecule instance or None on error
 
             atmCount = 1
             for chain in self.allChains():
+                if chainName and chain.name != chainName:
+#                    NTdebug("Skipping chain %s in %s" % (chain.name, getCallerName()))
+                    continue
                 lastAtm = None
                 for res in chain.allResidues():
                     inSelection = resHashSelection.has_key(res)
@@ -2860,6 +2865,11 @@ Return an Molecule instance or None on error
             #end for
 
         #end for
+        
+        if not atmCount:
+            NTerror("No atoms counted for write in %s", getCallerName())
+            return None
+        
         record = PyMMLib.END()
         pdbFile.append( record )
 

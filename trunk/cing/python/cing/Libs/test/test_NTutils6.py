@@ -60,9 +60,31 @@ class AllChecks(TestCase):
             expectedDt = datetime.datetime(2011, 4, 7, 11, 12, 26)
         self.assertEqual( result[1], expectedDt )
 
-
+    def testNTflatten(self):
+        inputList = [ (1,), # stupid tuples need an extra comma
+                      [2],
+                      (3,4),
+                      (5,(6,7)),
+                      (('A', 6), ('A', 9)),
+                     ]
+        expectedList = [ (1,),
+                         (2,),
+                         (3,4),
+                         (5,6,7),
+                         ('A', 6, 'A', 9),
+                        ]
+        for i, obj in enumerate(inputList):
+            self.assertEquals( NTflatten(obj), expectedList[i] )
+        pair = (('A', 6), ('A', 9))
+#        valueList =  NTflatten(pair)        
+#        NTmessage("valueList: %s" % valueList)
+        _x = "patch DISU  reference=1  =( segi %s and resid %s )  reference=2=( segi %s and resid %s )        end\n" % NTflatten(pair)
+#        NTmessage("x: %s" % x)
+# end class
+            
 def additionalTestRoutineByItself():
     return getCallerName()
+# end def
 
 if __name__ == "__main__":
     cing.verbosity = cing.verbosityDebug

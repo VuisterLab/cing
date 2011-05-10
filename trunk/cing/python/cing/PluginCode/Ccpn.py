@@ -2849,7 +2849,7 @@ def saveCcpnMetaData(project, tmp = None):
     rootPath = project.moleculePath( CCPN_LOWERCASE_STR )
     fileName = os.path.join(rootPath, STEREO_ASSIGN_FILENAME_STR)
     if not os.path.exists(rootPath):
-        NTdebug("No rootPath named: " + rootPath)
+#        NTdebug("No rootPath named: " + rootPath)
         return
     if writeTextToFile(fileName, star_text):
         NTdebug("writeTextToFile failed to file: " + fileName)

@@ -35,7 +35,7 @@ defaultPrintChainCode = '.'
 #==============================================================================
 # PDB stuff
 #==============================================================================
-def importFromPDB(molecule, pdbFile, convention = IUPAC, nmodels = None, allowNonStandardResidue = True)   :
+def importFromPDB(molecule, pdbFile, convention = IUPAC, nmodels = None, allowNonStandardResidue = True, verbosity = None):
     """Import coordinates from pdbFile (optionally: first nmodels)
        convention e.g. PDB, CYANA, CYANA2, XPLOR, IUPAC
 
@@ -43,12 +43,16 @@ def importFromPDB(molecule, pdbFile, convention = IUPAC, nmodels = None, allowNo
     """
     if not molecule:
         return None
-
+    savedVerbosity = cing.verbosity
+    if verbosity != None:
+#        print 'cing.verbosity = %s' % verbosity
+        cing.verbosity = verbosity
     parser = pdbParser(pdbFile, convention = convention)
     if not parser:
         return None
     parser.map2molecule(molecule)
     parser.importCoordinates(nmodels = nmodels)
+    cing.verbosity = savedVerbosity
     return molecule
 #end def
 # Add as a method to Molecule class
@@ -124,7 +128,9 @@ class pdbParser:
 
         atmCount = 0
         foundModel = False
-        for record in self.pdbRecords:
+        for i,record in enumerate(self.pdbRecords): #@UnusedVariable
+#            if i >= 459:
+#                NTdebug("Working on record: %s" % record)
             recordName = record._name.strip()
             if recordName == "MODEL":
                 foundModel = True
@@ -133,7 +139,7 @@ class pdbParser:
                 self.modelCount += 1
 
             if recordName == "ATOM" or recordName == "HETATM":
-
+                
                 # Not all PDB files have chainID's !@%^&*
                 # They do; if none returned then take the space that is always present!
                 # JFD adds: take a look at 1ai0
@@ -141,6 +147,8 @@ class pdbParser:
                 #    Luckily the residues all have non-overlapping numbers. So let's program against
                 #    this study case. Might have to be optimized.
                 chainId = ' '
+                if record.has_key('segID'): # Priority is given to chainID because xplor-nih doesn't write chain id in Refine setup.
+                    chainId = record.segID.strip()
                 if record.has_key('chainID'):
                     chainId = record.chainID
                 if mapChainId.has_key(chainId):
@@ -295,6 +303,7 @@ class pdbParser:
                     atm.atom = None
                     if atm.skip or (not atm.db):
 #                        NTerror("pdbParser#map2molecule was flagged before right?")
+#                        NTdebug( '>> %s' % atm )
                         continue
                     #t = (IUPAC, chn.name, res.resNum, atm.db.name)
                     # GV the atm.db.name is BY DEFINITION in INTERNAL format!
@@ -302,8 +311,8 @@ class pdbParser:
                     # repeated here. It also will cause a potential swap of atoms
                     t = (INTERNAL, chn.name, res.resNum, atm.db.name)
                     atm.atom = molecule.decodeNameTuple(t)
-                    #if res.resNum==503:
-                    #    print '>>', atm.name, t, atm.atom
+#                    if res.resNum==83:
+#                        NTdebug(  '>> %s %s %s', atm.name, t, atm.atom )
 #                    if not atm.atom: # for the non-standard residues and atoms.
 #                        t = (INTERNAL, chn.name, res.resNum, atm.db.name)
 #                        atm.atom = molecule.decodeNameTuple(t)
@@ -325,7 +334,7 @@ class pdbParser:
         self.molecule = molecule
 
         if unmatchedAtomByResDict:
-            msg = "pdbParser.map2molecule: Strange! ERROR mapping atom for:\n"
+            msg = "pdbParser.map2molecule: Strange! Warning mapping atom for:\n"
             msg += unmatchedAtomByResDictToString(unmatchedAtomByResDict)
             NTwarning(msg)
     #end def

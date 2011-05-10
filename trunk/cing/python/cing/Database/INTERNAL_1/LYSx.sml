@@ -7,7 +7,7 @@
 	commonName = 'LYSx'
 	shortName  = 'K'
 	comment    = 'Non-protonated (neutral) Lys (uncommon)'
-	nameDict   = {'CCPN': 'protein Lys deprot:HZ3', 'INTERNAL_0': 'LYSx', 'CYANA': 'LYS', 'CYANA2': None, 'INTERNAL_1': 'LYSx', 'IUPAC': 'LYS', 'AQUA': 'LYS', 'BMRBd': None, 'XPLOR': None, 'PDB': None}
+	nameDict   = {'CCPN': 'protein Lys deprot:HZ3', 'INTERNAL_0': 'LYSx', 'CYANA': 'LYS', 'CYANA2': None, 'INTERNAL_1': 'LYSx', 'IUPAC': 'LYS', 'AQUA': 'LYS', 'BMRBd': None, 'XPLOR': 'LYS', 'PDB': None}
 	properties = ['protein', 'aliphatic', 'large', 'charged', 'isLysine']
 
 	dihedrals  = <NTlist>
