@@ -43,7 +43,7 @@ class RestraintList(NTlist):
     def renameToXplorCompatible(self):
         l = len(self.name)
         if l < MAX_SIZE_XPLOR_RESTRAINT_LIST_NAME:
-             NTdebug("Kept the original xplor compatible drl name: %s" % self.name)
+#             NTdebug("Kept the original xplor compatible drl name: %s" % self.name)
              return
         prefix = 'pl'
         if self.__CLASS__ == DRL_LEVEL:

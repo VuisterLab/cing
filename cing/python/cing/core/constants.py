@@ -284,6 +284,7 @@ QshiftReverseColorScheme = False
 
 DS_STORE_STR = ".DS_Store" # A mac OSX file that should be ignored by CING.
 
+ALL_CHAINS_STR = 'ALL_CHAINS'
 MAX_SIZE_XPLOR_RESTRAINT_LIST_NAME = 10
 #maxlength = 20 - len('viol.noe.')
 

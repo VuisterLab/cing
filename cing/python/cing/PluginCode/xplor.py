@@ -79,7 +79,7 @@ def quoteAtomNameIfNeeded(atomNameXplor):
     reMatch = re.compile('[-+](\d)$') # The 24 character standard notation from time.asctime()
     searchObj = reMatch.search(atomNameXplor)
     if searchObj:
-        NTdebug("Special case for ions found: for %s" % atomNameXplor)
+#        NTdebug("Special case for ions found: for %s" % atomNameXplor)
         needed = True
 
     if not needed:
@@ -91,7 +91,9 @@ def exportAtom2xplor( atom ):
     """returns string in xplor format"""
     atomNameXplor = atom.translate(XPLOR)
     atomNameXplor = quoteAtomNameIfNeeded(atomNameXplor)
-    return sprintf( '(resid %-3d and name %s)',
+    chainId = atom.residue.chain.name
+    return sprintf( '(segi %s and resi %4d and name %-4s)',
+                      chainId,
                       atom.residue.resNum,
                       atomNameXplor
                    )
@@ -102,31 +104,37 @@ Atom.export2xplor = exportAtom2xplor
 
 #-----------------------------------------------------------------------------
 def exportDistanceRestraint2xplor( distanceRestraint ):
-    """Return string with restraint in Xplor format"""
-    # Strange xplor syntax
-    atm1,atm2 = distanceRestraint.atomPairs[0]
-    s = sprintf('assi %-30s %-30s %8.3f  %8.3f  %8.3f',
-                atm1.export2xplor(),atm2.export2xplor(),
-                distanceRestraint.upper, distanceRestraint.upper-distanceRestraint.lower, 0.0  # syntax xplor: d, dminus, dplus
-               )
-
-    for atm1,atm2 in distanceRestraint.atomPairs[1:]:
-        s = s + sprintf( '\n  or %-30s %-30s ', atm1.export2xplor(), atm2.export2xplor() )
-    #end for
+    """Return string with restraint in Xplor format
+    Return None on error.
+    """
+    if distanceRestraint.upper == None:
+        NTerror("Skipping restraint because no upper bound: %s", distanceRestraint)
+        return
+    dminus = distanceRestraint.upper
+    if distanceRestraint.lower != None:
+        dminus = distanceRestraint.upper-distanceRestraint.lower                
+    s = sprintf('assi ')
+    for i,atmList in enumerate( distanceRestraint.atomPairs ):
+        if len(atmList) != 2:
+            NTerror("Skipping restraint because bad number of atom selections. Expected 2 but found: %s in: %s", distanceRestraint, len(atmList))
+            return
+        
+        if i != 0:
+            s += sprintf( '\n  or ')                    
+        for atm in atmList:
+            atomSelStr = atm.export2xplor()
+            if atomSelStr == None:
+                NTerror("Skipping restraint because bad atom selection: %s", distanceRestraint)
+                return
+            s += sprintf( '%-30s ', atomSelStr )
+        # end for
+        if i == 0:
+            s += sprintf('%8.3f  %8.3f  0.0', distanceRestraint.upper, dminus )  # syntax xplor: d, dminus, dplus
+    # end for
     return s
-#    s = sprintf( 'assi %-30s %-30s  %8.3f  %8.3f  %8.3f',
-#                 distanceRestraint.atomPairs[0][0].export2xplor(),
-#                 distanceRestraint.atomPairs[0][1].export2xplor(),
-#                 distanceRestraint.upper, distanceRestraint.upper-distanceRestraint.lower, 0.0  # syntax xplor: d, dminus, dplus
-#               )
-#    for atm1,atm2 in distanceRestraint.atomPairs[1:]:
-#        s = s + sprintf( '\n  or %-30s %-30s',
-#                        distanceRestraint.atomPairs[0][0].export2xplor(),
-#                        distanceRestraint.atomPairs[0][1].export2xplor(),
-#                       )
-#    #end for
-#    return s
 #end def
+
+
 # add as a method to DistanceRestraint Class
 DistanceRestraint.export2xplor = exportDistanceRestraint2xplor
 
@@ -136,16 +144,21 @@ def exportDistanceRestraintList2xplor( drl, path)   :
     """Export a distanceRestraintList (DRL) to xplor format:
        return drl or None on error
     """
+    msgHol = MsgHoL()    
     fp = open( path, 'w' )
     if not fp:
         NTerror('exportDistanceRestraintList2xplor: unable to open "%s"\n', path )
         return None
     #end def
     for dr in drl:
-        fprintf( fp, '%s\n', dr.export2xplor() )
+        drStr = dr.export2xplor()
+        if drStr == None:
+            msgHol.appendMessage(str(dr))
+            continue
+        fprintf( fp, '%s\n', drStr )
     #end for
-
     fp.close()
+    msgHol.showMessage(MAX_MESSAGES=20)
     NTmessage('==> Exported %s to "%s"', drl, path)
     #end if
     return drl
@@ -198,19 +211,30 @@ DihedralRestraintList.export2xplor = exportDihedralRestraintList2xplor
 
 
 #-----------------------------------------------------------------------------
-def exportMolecule2xplor( molecule, path):
+def exportMolecule2xplor( molecule, path, chainName = None):
     """Export coordinates of molecule to pdbFile in XPLOR convention;
        generate modelCount files,
        path should be in the form name%03d.pdb, to allow for multiple files
        for each model
-
+       When the chain name is given then only that chain will be written.
+       If it is the special case of  it will do a recursive call here.
        return Molecule or None on error
     """
+    if chainName == ALL_CHAINS_STR:
+        for chain in molecule.allChains():
+            exportMolecule2xplor( molecule, path, chainName = chain.name)
+#        NTdebug("Finished writing all chains.")
+        return
+    
     for model in range(molecule.modelCount):
-        pdbFile = molecule.toPDB( model=model, convention = XPLOR)
+        pdbFile = molecule.toPDB( model=model, convention = XPLOR, chainName = chainName)
         if not pdbFile:
             return None
-        pdbFile.save( sprintf( path, model ))
+        if chainName:
+            pdbFileName = sprintf( path, chainName, model )
+        else:
+            pdbFileName = sprintf( path, model )
+        pdbFile.save( pdbFileName )
         del(pdbFile)
     #end for
     return molecule

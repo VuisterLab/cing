@@ -7,7 +7,7 @@
 	commonName = 'ASPH'
 	shortName  = 'D'
 	comment    = 'protonated (neutral) ASP (uncommon)'
-	nameDict   = {'CCPN': 'protein Asp prot:HD2', 'INTERNAL_0': 'ASPH', 'CYANA': 'ASP', 'CYANA2': None, 'INTERNAL_1': 'ASPH', 'IUPAC': 'ASP', 'AQUA': 'ASP', 'BMRBd': 'ASP', 'XPLOR': None, 'PDB': 'ASP'}
+	nameDict   = {'CCPN': 'protein Asp prot:HD2', 'INTERNAL_0': 'ASPH', 'CYANA': 'ASP', 'CYANA2': None, 'INTERNAL_1': 'ASPH', 'IUPAC': 'ASP', 'AQUA': 'ASP', 'BMRBd': 'ASP', 'XPLOR': 'ASP', 'PDB': 'ASP'}
 	properties = ['protein', 'aliphatic', 'charged', 'isAsparticAcid']
 
 	dihedrals  = <NTlist>

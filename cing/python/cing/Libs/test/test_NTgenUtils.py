@@ -32,11 +32,11 @@ class AllChecks(TestCase):
         fnList      = "test_xplor_crashed.log test_xplor_errors.log test_xplor_normal.log".split()
 #        fnList      = "test_xplor_crashed.log test_xplor_errors.log".split()
         timeTakenList   = [ None, 0.2796, 3.3409 ]
-        crashList       = [ True, None, None ]
-        errorList       = [ 1840,   62, 0 ]
-        warningList       = [ 0,   0, 0 ]
-        messageList     = [  237,  157, 1166 ]
-        totalList       = [ 2077,  219, 1166 ]
+        crashList       = [ True,   None, None ]
+        errorList       = [ 1840,      4, 0 ]
+        warningList     = [    0,      0, 0 ]
+        messageList     = [  237,    215, 1166 ]
+        totalList       = [ 2077,    219, 1166 ]
         for i,fn in enumerate(fnList):
             logFile = os.path.join( logPath, fn )
             NTdebug("analyzing log: %s" % logFile)

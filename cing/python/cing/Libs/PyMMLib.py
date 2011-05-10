@@ -1196,7 +1196,7 @@ class ATOM(PDBRecord):
         ("z", 47, 54, "float.3", "rjust", None),
         ("occupancy", 55, 60, "float.2", "rjust", None),
         ("tempFactor", 61, 66, "float.2", "rjust", None),
-        ("segID", 73, 76, "string", "rjust", None),
+        ("segID", 73, 76, "string", "rjust", None), # Used by xplor-nih
         ("element", 77, 78, "string", "rjust", None),
         ("charge", 79, 80, "string", "rjust", None)]
 

@@ -17,14 +17,23 @@ import unittest
 
 class AllChecks(TestCase):
 
-    def _test_anneal(self):
+    def _test_refine(self):
         modelCount = 99
+        target = '--fullAnnealAndRefine'
+#        target = '--fullAnneal'
+        
         fastestTest = 1
         if fastestTest:
-            modelCount = 1 # DEFAULT 2
+            modelCount = 4 # DEFAULT 2
 
-        entryList  = "1brv     2fwu     2fws               ".split()
-        rangesList = "171-188  501-850  371-650                 ".split()
+        if 1:
+            entryList  = "1brv     2fwu     2fws               ".split()
+            rangesList = "171-188  501-850  371-650                 ".split()
+        else:        
+            entryList  = "2kvf 1mvz 2cka 2ctm 2e5o 2kn9 2xks".split() # see below for set description.
+            rangesList = ['cv' for i in range(len(entryList))]
+        # end if
+        
         cingDirTmpTest = os.path.join(cingDirTmp, getCallerName())
         mkdirs(cingDirTmpTest)
         self.failIf(os.chdir(cingDirTmpTest), msg=
@@ -39,7 +48,7 @@ class AllChecks(TestCase):
             if not os.path.exists(entryId + ".tgz"):
                 copyfile(ccpnFile, os.path.join('.', entryId + ".tgz"))
 
-            name = 'annealed'
+            name = '%s_redo' % entryId
             ranges = rangesList[i]
             models = '0-%d' % (modelCount-1)
 
@@ -49,8 +58,8 @@ class AllChecks(TestCase):
             del project
 
             refineExecPath = os.path.join(refinePath, "refine.py")
-            cmd = '%s --project %s -n %s --setup --fullAnneal --useAnnealed --overwrite --models %s --superpose %s --sort Enoe' % (
-                refineExecPath, entryId, name, models, ranges)
+            cmd = '%s --project %s -n %s --setup %s --useAnnealed --overwrite --models %s --superpose %s --sort Enoe' % (
+                refineExecPath, entryId, name, target, models, ranges)
             self.assertFalse( do_cmd(cmd,bufferedOutput=0) )
         # end for
     # end def
@@ -76,7 +85,13 @@ class AllChecks(TestCase):
         self.assertEquals(parameters.ncpus, 7777777) #@UndefinedVariable
     # end def
 
-
+# Weirdo set:
+# HISH 2cka    
+# HISE 2ctm    
+# cPRO 2e5o    
+# ASPH 2xks    
+# GLUH 1mvz    
+# ZN   2kn9    
 
 if __name__ == "__main__":
     cing.verbosity = verbosityDebug

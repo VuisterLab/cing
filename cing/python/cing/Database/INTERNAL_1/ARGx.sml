@@ -7,7 +7,7 @@
 	commonName = 'ARGx'
 	shortName  = 'R'
 	comment    = 'non-protonated (neutral) ARG (uncommon)'
-	nameDict   = {'CCPN': 'protein Arg deprot:HH12', 'INTERNAL_0': 'ARGx', 'CYANA': 'ARG', 'CYANA2': None, 'INTERNAL_1': 'ARGx', 'IUPAC': 'ARG', 'AQUA': 'ARG', 'BMRBd': None, 'XPLOR': None, 'PDB': None}
+	nameDict   = {'CCPN': 'protein Arg deprot:HH12', 'INTERNAL_0': 'ARGx', 'CYANA': 'ARG', 'CYANA2': None, 'INTERNAL_1': 'ARGx', 'IUPAC': 'ARG', 'AQUA': 'ARG', 'BMRBd': None, 'XPLOR': 'ARG', 'PDB': None}
 	properties = ['protein', 'aliphatic', 'large', 'charged', 'isArginine']
 
 	dihedrals  = <NTlist>

@@ -5528,3 +5528,24 @@ def execfile_(filename, globals_=None, locals_=None):
     exec text in globals_, locals_
 # end def
 
+def NTflatten(obj):
+    'Returns a tuple instead of the more commonly used NTlist or straight up list because this is going to be used for formatted printing.'
+    if not isinstance(obj, (list, tuple)):
+        NTerror("Object is not a list or tuple: %s", obj)
+        return None
+    result =[]
+    for element in obj:
+        if isinstance(element, (list, tuple)):
+            elementFlattened = NTflatten(element)
+            if not isinstance(elementFlattened, (list, tuple)):
+                NTerror("ElementFlattened is not a list or tuple: %s", obj)
+                return None
+            result += elementFlattened
+        else:
+            result.append(element)
+        # end if
+    # end for
+    return tuple( result )
+# end def
+
+    

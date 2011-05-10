@@ -26,14 +26,21 @@ Cluster issues
 """
 
 #------------------------------------------------------------------------------
-
+nstepheat = 100
+nstephot = 2000
+nstepcool = 200
+if 0: # DEFAULT 0 Use 1 for testing quickly.
+    nstepheat /= 10
+    nstephot /= 10
+    nstepcool /= 10
 class refineParameters( NTdict ):
 
     def __init__(self, **kwds):
         NTdict.__init__( self, __CLASS__ = "refineParameters",
-    # For documentation see below
+    # For documentation see below    
       ncpus             = None,
-      baseName          = 'model%03d.pdb',
+      baseName          = 'model_%03d.pdb',
+      baseNameByChain   = 'model_%s_%03d.pdb',
       models            = '',
       overwrite         = False,                # Overwrite existing files
       verbose           = False,                # verbose on/off
@@ -65,17 +72,17 @@ class refineParameters( NTdict ):
       # type of non-bonded parameters: "PROLSQ" "PARMALLH6" "PARALLHDG" "OPLSX"
       # The water refinement uses the OPLSX parameters
       nonBonded         = 'OPLSX',
-      temp              = 500,                  # temperature (K); 500 initially
+      temp              = 500,                  # temperature (K); 500 initially      
       mdheat            = NTdict( # 100,0.003 initially with Chris
-                                    nstep  = 100,       # number of MD steps
+                                    nstep  = nstepheat,       # number of MD steps # DEFAULT: 100
                                     timest = 0.003,     # timestep of MD (ps)
                                 ),
       mdhot             = NTdict( # 2000, 0.004 initially with Chris
-                                    nstep  = 2000,      # number of MD steps
+                                    nstep  = nstephot,      # number of MD steps # DEFAULT: 2000
                                     timest = 0.004,     # timestep of MD (ps)
                                   ),
       mdcool            = NTdict( # 200, 0.004 initially with Chris
-                                    nstep  = 200,       # number of MD steps
+                                    nstep  = nstepcool,       # number of MD steps # DEFAULT: 200
                                     timest = 0.004,     # timestep of MD (ps)
                                  ),
 
@@ -94,6 +101,7 @@ from Refine.NTxplor import * #@UnusedWildImport
 parameters = refineParameters(
       ncpus             = %(ncpus)s,       # Will be taken from os by default like in CING
       baseName          = "%(baseName)s",  # Basename used for pdb files
+      baseNameByChain   = "%(baseNameByChain)s", # Only used for psf generation in XPLOR-NIH
 
       # ascii list to select the model(s) to refine; e.g 0-19
       # can also be modified as command-line argument
@@ -246,6 +254,12 @@ class Xplor( refineParameters ):
         for dummy_dirname, dirpath in self.directories.items():
             self.makePath( self.joinPath( dirpath ) )
         #end for
+
+#        self.project = None # Must be set in specific job. It's used for a tighter integration.
+        if not self.project: # will throw an exception.
+            NTerror("Need a CING project access in Xplor class.")
+            return
+        #end if
 
         self.script = None
         self.resultFile  = None     # Can be set to be checked after each command to be checked for existence
@@ -1268,16 +1282,10 @@ class GeneratePSF( Xplor ):
     def __init__( self, config, *args, **kwds ):
 
         Xplor.__init__( self, config, *args, **kwds )
-        # make relative Path
-        self.pdbFile = self.checkPath( self.directories.converted, self.pdbFile )
         self.psfFile = self.newPath( self.directories.psf, self.psfFile )
         self.resultFile = self.psfFile
-        # Allow the following:
-# %SEGMNT-ERR: No matching first patch found
-# %SEGMNT-ERR: no matching LAST patch found
-        self.allowedErrors = 0 # now ignored.
+        self.allowedErrors = 0
         if self.verbose:
-            #self.keysformat()
             NTmessage('%s\n', self.format())
         #end if
     #endif
@@ -1294,25 +1302,31 @@ remarks modified for XPLOR-NIH
 """ + \
 self.setupPTcode() + """
 set message on echo on end
-
-segment
+"""
+        
+        for chain in self.project.molecule.allChains():
+            topScript = self.joinPath( self.directories.toppar,'topallhdg5.3.pep') # Customize for mol type?
+            pdbFile = self.checkPath( self.directories.converted, self.baseNameByChain % (chain.name,0) )
+            self.script += """
+segment        
+  name=%s
   chain
-    @""" + self.joinPath( self.directories.toppar,'topallhdg5.3.pep') + """
-    coord @""" + self.pdbFile + """
+    @%s
+    coord @%s
   end
 end
+""" % ( chain.name, topScript, pdbFile )
 
-"""
         for pair in self.patchDISN:
-            self.script += "patch DISN  reference=1  =( resid %s )  reference=2=( resid %s )        end\n" % pair
+            self.script += "patch DISN  reference=1  =( segi %s and resid %s )  reference=2=( segi %s and resid %s )        end\n" % NTflatten(pair)
         for pair in self.patchDISU:
-            self.script += "patch DISU  reference=1  =( resid %s )  reference=2=( resid %s )        end\n" % pair
-        for resid in self.patchHISD:
-            self.script += "patch HISD  reference=nil=( resid %s ) end\n" % resid
-        for resid in self.patchHISE:
-            self.script += "patch HISE  reference=nil=( resid %s ) end\n" % resid
-        for resid in self.patchCISP:
-            self.script += "patch CISP  reference=nil=( resid %s ) end\n" % resid
+            self.script += "patch DISU  reference=1  =( segi %s and resid %s )  reference=2=( segi %s and resid %s )        end\n" % NTflatten(pair)
+        for resid in self.patchHISD:                    
+            self.script += "patch HISD  reference=nil=( segi %s and resid %s ) end\n" % NTflatten(resid)
+        for resid in self.patchHISE:                    
+            self.script += "patch HISE  reference=nil=( segi %s and resid %s ) end\n" % NTflatten(resid)
+        for resid in self.patchCISP:                    
+            self.script += "patch CISP  reference=nil=( segi %s and resid %s ) end\n" % NTflatten(resid)
 
         self.script += """
 write psf output=""" + self.psfFile  + """ end

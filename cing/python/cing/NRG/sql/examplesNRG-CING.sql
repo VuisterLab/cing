@@ -195,3 +195,59 @@ SELECT name, res_count FROM "nrgcing"."cingentry" e
 where res_count > 9
 order by res_count asc
 limit 10;
+
+DROP TABLE IF EXISTS nrgcing.aa;
+CREATE table nrgcing.aa
+(
+    name                           VARCHAR(25)
+);
+COPY nrgcing.aa      FROM '/Users/jd/workspace35/cing/Tests/data/cing/aa.csv'    CSV HEADER;
+
+-- find unique residue names
+SELECT r.name, e.name, count( r.name )
+FROM
+"nrgcing"."cingentry" e,
+"nrgcing"."cingresidue" r,
+"nrgcing"."cingchain" c
+ where
+r.entry_id = e.entry_id AND
+c.entry_id = e.entry_id AND
+r.name  in ( 'ALA', 'ARG', 'ASN', 'ASP', 'CYS', 'GLN', 'GLU', 'GLY', 'HIS', 'ILE', 'LEU', 'LYS', 'MET', 'PHE', 'PRO', 'SER', 'THR', 'TRP', 'TYR', 'VAL',  'CYSS', 'HISH', 'HISE', 'GLUH', 'ASPH', 'cPRO')
+group by r.name, e.name
+order by count(r.name) desc;
+
+SELECT r.name, e.name, e.distance_count_long_range, count( r.name )
+FROM
+"nrgcing"."cingentry" e,
+"nrgcing"."cingresidue" r,
+"nrgcing"."cingchain" c
+ where
+r.entry_id = e.entry_id AND
+c.entry_id = e.entry_id AND
+e.is_multimeric = false AND e.res_count > 30 AND
+e.distance_count_long_range > 30 AND r.distance_count > 1 AND
+e.rdc_count = 0 AND
+r.name  not in like 'LYSx'
+group by r.name, e.name, e.distance_count_long_range
+order by count(r.name) asc;
+
+
+SELECT e.name, e.distance_count_long_range, e.res_count 
+FROM
+"nrgcing"."cingentry" e
+where
+e.name = '1brv'
+
+
+SELECT count(*) 
+SELECT *
+SELECT e.name, e.distance_count_long_range, e.res_count 
+FROM
+"nrgcing"."cingentry" e
+where
+e.is_multimeric = true AND e.res_count < 50 AND
+e.distance_count_long_range > 30 AND
+e.rdc_count = 0 AND e.chothia_class IS NOT NULL
+
+
+order by e.distance_count_long_range asc;
