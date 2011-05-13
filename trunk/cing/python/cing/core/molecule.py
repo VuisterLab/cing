@@ -5225,16 +5225,14 @@ coordinates: %s"""  , dots, self, dots
 
     def hasPseudoAtom( self ):
         """Return True if atom has a correponding pseudoAtom"""
-        return ( self.db.pseudo != None )
+        return self.db.pseudo != None
     #end def
 
     def pseudoAtom( self ):
         """Return the pseudoAtom instance (if exist, or None otherwise)"""
-        if self.hasPseudoAtom():
-            return self.residue.getAtom( self.db.pseudo )
-        else:
+        if not self.hasPseudoAtom():
             return None
-        #end if
+        return self.residue.getAtom( self.db.pseudo )
     #end def
 
     def pseudoAtomList( self ):

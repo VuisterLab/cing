@@ -80,6 +80,31 @@ class AllChecks(TestCase):
 #        NTmessage("valueList: %s" % valueList)
         _x = "patch DISU  reference=1  =( segi %s and resid %s )  reference=2=( segi %s and resid %s )        end\n" % NTflatten(pair)
 #        NTmessage("x: %s" % x)
+
+    def test_sort(self):
+#        inputList = [ 3, 1, 2]
+#        inputList = NTlist(*inputList)
+#        inputList.mmm = 3        
+#        expectedOutputList = [1, 2, 3]
+#        expectedOutputList = NTlist(*expectedOutputList)
+#        self.assertEqual( expectedOutputList, inputList.sort())
+        
+        # Complexer object
+        inputList = NTlist()
+        inputList.append({'a': 2, 'b': 1})
+        inputList.append({'a': 1, 'b': 2})
+        inputList.append({'a': 4, 'b': 3})
+        expectedOutputList = NTlist()
+        expectedOutputList.append({'a': 1, 'b': 2})
+        expectedOutputList.append({'a': 2, 'b': 1})
+        expectedOutputList.append({'a': 4, 'b': 3})
+
+#        NTsort( inputList, byItem='a', inplace=True)
+        NTsort( inputList, 'a', inplace=True )
+#        inputList.reverse()
+        self.assertEqual( expectedOutputList, inputList)
+        
+        
 # end class
             
 def additionalTestRoutineByItself():

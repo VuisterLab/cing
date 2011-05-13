@@ -30,18 +30,6 @@ from cing.core.classes import Project
 
 TEMPLATE_FILE_NAME = 'template.pdb'
 
-# class wrapper to allow passing of key-argument
-# to compare dict function
-class CompareDict:
-    def __init__(self, key):
-        self.key = key
-    #end def
-
-    def __call__(self, a, b):
-        return cmp(a[self.key], b[self.key])
-    #end def
-#end class
-
 # class wrapper to allow passing of a key-argument
 # to dict entry
 class Key:
@@ -475,7 +463,7 @@ def parseOutput(config, project, params, options ):
             #endif
         #end for
         results.append(data)
-    #end for
+    #end for i
 
     keys = ['model', 'Etotal', 'Enoe', 'NOErmsd', 'NOEnumber', 'NOEbound1',
             'NOEviol1', 'NOEbound2', 'NOEviol2',
@@ -484,49 +472,55 @@ def parseOutput(config, project, params, options ):
 
     # sort the results
     if options.sortField in keys:
-        myComp = CompareDict(options.sortField)
-        results.sort(myComp)
+#        NTdebug("Now sorting on field: %s" % options.sortField)
+#        if 0: # The below failed at some point but is also not much in use. Removing.
+#            myComp = CompareDict(options.sortField)
+#            results.sort(myComp)
+#        else:
+            NTsort( results, options.sortField, inplace=True )            
     else:
         options.sortField = None
     #endif
 
     # print results to file and screen
     resultFile = open(xplor.joinPath(resultFileName), 'w')
-    printf('\n=== Results: sorted on "%s" ===\n', options.sortField)
-    fprintf(resultFile, '=== Results: sorted on "%s" ===\n', options.sortField)
+    NTmessage('\n=== Results: sorted on "%s" ===' % options.sortField)
+    fprintf(resultFile, '=== Results: sorted on "%s" ===\n', options.sortField)    
     fmt = '%-10s '
     for k in keys:
-        printf(fmt, str(k))
+        NTmessageNoEOL(fmt % str(k))
         fprintf(resultFile, fmt, str(k))
     #end for
-    printf('\n')
+    NTmessage('')
     fprintf(resultFile, '\n')
     for data in results:
         for k in keys:
             if k in data:
-                printf(fmt, str(data[k]))
+                NTmessageNoEOL(fmt % str(data[k]))
                 fprintf(resultFile, fmt, str(data[k]))
             else:
-                printf(fmt, '-')
+                NTmessageNoEOL(fmt % '-')
                 fprintf(resultFile, fmt, '-')
         #end for
-        printf('\n')
+        NTmessage('')
         fprintf(resultFile, '\n')
     #end for
 
     # best results
     bestModels = int(options.bestModels)
     if bestModels > 0:
-        printf('\n=== Averages best %d models ===\n', bestModels)
-        fprintf(resultFile, '\n=== Averages best %d models ===\n', bestModels)
+        msgLine = '\n=== Averages best %d models ===' % bestModels
+        NTmessage(msgLine)
+        fprintf(resultFile, msgLine + '\n' )
         for key in keys:
             getKey = Key(key)
-            values = map(getKey, results)
+            values = map(getKey, results[:bestModels])
             av, sd, dummy_n = NTaverage(values)
-            printf('%-12s: %10.3f +/- %-10.3f\n', key, av, sd)
-            fprintf(resultFile, '%-12s: %10.3f +/- %-10.3f\n', key, av, sd)
+            msgLine = '%-12s: %10.3f +/- %-10.3f' % ( key, av, sd)
+            NTmessage(msgLine)
+            fprintf(resultFile, msgLine + '\n')
         #end for
-        printf('\n\n')
+        NTmessage('\n')
         fprintf(resultFile, '\n\n')
 
         fname = xplor.joinPath(bestModelsFileNameFmt % bestModels)

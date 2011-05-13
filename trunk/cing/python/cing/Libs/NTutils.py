@@ -3439,7 +3439,6 @@ def XML2obj(path=None, string=None):
 class Sorter:
     def _helper (self, data, aux, inplace):
 #        print DATA_STR, data
-#        print 'aux>', aux
         aux.sort()
 
         result = [data[i] for dummy, i in aux]
@@ -3449,6 +3448,7 @@ class Sorter:
     #end def
 
     def byItem(self, data, itemindex=None, inplace=False):
+#        print "Now in byItem with data: %s and itemindex %s" % (data, itemindex)
         if itemindex is None:
             if inplace:
 #                data.sort() # Gave recursion
