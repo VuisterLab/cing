@@ -23,9 +23,10 @@ NOTES TO CHECK
 WORKFLOW
 
 set x = H2_2Ca_64_100
+set x = 2kvf
 set stage = $x"_redo"
 set ranges = all
-set models = 0-19
+set models = 0-3
 
 cing                -n $x --initCcpn $x.tgz --ensemble $models
 

@@ -580,7 +580,7 @@ def summary( project, toFile = True, ranges=None ):
         if hasattr(pc, SUMMARY_STR):
             msg += "\n%s Procheck Summary %s\n" % (dots, dots )
             if mol.useRanges(pc.ranges):
-                msg += '     (ranges %s)\n' + pc.ranges
+                msg += '     (ranges %s)\n' % pc.ranges
             msg += '\n' + addPreTagLines(pc.summary.format())
         else:
             NTerror("Failed to find the procheck summary attribute")

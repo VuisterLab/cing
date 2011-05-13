@@ -17,7 +17,7 @@ import unittest
 
 class AllChecks(TestCase):
 
-    def test_PDBEntryLists(self):
+    def _test_PDBEntryLists(self): #DEFAULT disabled because it's a specific test for services not commonly used.
         cingDirTmpTest = os.path.join( cingDirTmp, getCallerName() )
         mkdirs( cingDirTmpTest )
         self.failIf(os.chdir(cingDirTmpTest), msg =
