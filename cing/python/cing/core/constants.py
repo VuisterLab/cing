@@ -69,6 +69,19 @@ Y_AXIS = 1
 Z_AXIS = 2
 A_AXIS = 3
 
+SYMMETRY_NA_STR = 'SYMMETRY_NA' # Not applicable e.g. without a molecule.
+SYMMETRY_ND_STR = 'SYMMETRY_ND' # Not determined.
+SYMMETRY_C1_STR = 'SYMMETRY_C1' # No symmetry
+SYMMETRY_C2_STR = 'SYMMETRY_C2' # Homodimer
+SYMMETRY_C3_STR = 'SYMMETRY_C3' # 
+SYMMETRY_C5_STR = 'SYMMETRY_C5' # 2kyv all helical 
+SYMMETRY_D2_STR = 'SYMMETRY_D2' # 1olg  No symmetry
+
+SYMMETRY_NCS_PER_RESIDUE_CUTOFF = 1.0 # angstrom
+SYMMETRY_DR_PER_RESIDUE_CUTOFF = 1.0 # angstrom
+
+FASTA_UNCOMMON_RESIDUE_STR = 'X'
+
 CYANA_NON_RESIDUES = ['PL','LL2','link']
 
 # Color labels for HTML/CSS output
@@ -101,6 +114,7 @@ CHAIN_STR = 'chain'
 MOLECULE_STR = 'molecule'
 PROJECT_STR = 'project'
 ATOMS_STR = 'atoms'
+COORDINATES_STR = 'coordinates'
 
 ANY_ENTITY_LEVEL = 'ANY_ENTITY'
 
@@ -128,9 +142,12 @@ SUMMARY_STR = 'summary'
 
 DATA_STR = 'data' # mostly for NRG.
 DB_STR = 'db'
+COMMON_NAME_STR = 'commonName'
 TYPE_STR = 'type' # db atom type
 SPINTYPE_STR = 'spinType'
 C_ALI_STR = 'C_ALI' # aliphatic db atom type
+CA_STR = 'CA'
+C1Prime_STR = "C1'"
 
 DR_STR = 'distanceRestraints' # used as in residue.distanceRestraints
 AC_STR = 'dihedralRestraints' # used as in residue.dihedralRestraints

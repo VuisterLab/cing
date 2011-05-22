@@ -27,7 +27,9 @@ class AllChecks(TestCase):
             _d = NTdihedralOpt(cList[0], cList[1], cList[2], cList[3])
 #            NTdebug("d: %8.3f" % d )
 
-
+    def testSuperposeChains(self):
+        pass
+    
 if __name__ == "__main__":
     cing.verbosity = verbosityDebug
     profile.run('unittest.main()', 'fooprof')

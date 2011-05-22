@@ -25,9 +25,12 @@ if ( -e $log_file ) then
     exit 1
 endif
 
-if ( $HOST != 'vc' ) then
+# For vCloud the machines will be numbered but still start with the vc prefix
+set hostStart = ( `echo $HOST | gawk '{print tolower($0)}' | cut -c1-2` ) 
+if ( $hostStart != 'vc' ) then
     echo "ERROR: tried to run $prog_string on a non VC machine: $HOST"
     echo "ERROR: this is not recommended since it might do svn/cvs updates"
+    echo "DEBUG: The host string should have started with vc regardless of capitablization but was found to be: $hostStart"
     exit 1
 endif
 

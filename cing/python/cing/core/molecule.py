@@ -23,6 +23,7 @@ from parameters   import plotParameters
 import database
 import numpy
 
+
 #==============================================================================
 # Global variables
 #==============================================================================
@@ -237,6 +238,8 @@ class ResidueList():
         return allResiduesWithCoordinates(self.allResidues())
     def allCommonAaResidues(self):
         return allCommonAaResidues(self.allResidues())
+
+
 
 #==============================================================================
 class Molecule( NTtree, ResidueList ):
@@ -500,7 +503,7 @@ class Molecule( NTtree, ResidueList ):
         return chain
     #end def
 
-    def removeChain( self, chain)   :
+    def removeChain( self, chain):
         '''
         Removes a chain. If none give it will be the last chain.
         @param chain:
@@ -1803,6 +1806,49 @@ class Molecule( NTtree, ResidueList ):
         return atomListBySpintypeAndType
     # end def
 
+    def getSymmetry( self ):
+        'Return string like SYMMETRY_C2_STR or None on error.'
+        allChains = self.allChains()
+        lAllChains = len(allChains)
+        if not lAllChains:
+            NTwarning("No chains; yet?")
+            return SYMMETRY_NA_STR
+        if lAllChains == 1:
+            NTdebug("Single chains.")
+            return SYMMETRY_C1_STR
+        chain0 = allChains[0]
+        chain1 = allChains[1]
+        if lAllChains == 2:
+            NTdebug("Double chains.")
+            hasSameSequence = chain0.hasSameSequence(chain1)
+            NTdebug("hasSameSequence %s" % hasSameSequence)
+            if hasSameSequence == None:
+                NTerror("In %s hasSameSequence Failed" % getCallerName())
+                return None
+            if hasSameSequence:
+                # TODO: finish
+#                ncsSymmetryPerResidue = chain0.getNcsSymmetryPerResidue( chain1 )
+                ncsSymmetryPerResidue = 0.0
+                NTdebug("ncsSymmetryPerResidue %s" % ncsSymmetryPerResidue)
+                if ncsSymmetryPerResidue == None:
+                    NTerror("In %s getNcsSymmetryPerResidue Failed" % getCallerName())
+                    return None                
+                if  ncsSymmetryPerResidue < SYMMETRY_NCS_PER_RESIDUE_CUTOFF:
+                    drSymmetry = chain0.getSymmetryDRPerResidue( chain1 )
+                    NTdebug("drSymmetry %s" % drSymmetry)
+                    if drSymmetry == None:
+                        NTerror("In %s getSymmetryDRPerResidue Failed" % getCallerName())
+                        return None                
+                    if drSymmetry < SYMMETRY_DR_PER_RESIDUE_CUTOFF:
+                        return SYMMETRY_C2_STR # homo dimer
+                    else:
+                        return SYMMETRY_C1_STR 
+                else:
+                    return SYMMETRY_C1_STR
+            else:
+                return SYMMETRY_C1_STR
+        return SYMMETRY_ND_STR
+
 
     def _saveStereoAssignments( self, stereoFileName ):
         """
@@ -2107,15 +2153,22 @@ class Molecule( NTtree, ResidueList ):
             actualCoordinateListLength = len(atom.coordinates)
             # The pseudos above handled and the atoms for which normally there are no coordinates
             # will be saved.
-            if (actualCoordinateListLength == 0) or (actualCoordinateListLength == n):
+            if actualCoordinateListLength == 0:
+#                NTdebug("Skipping %s without any coordinate." % atom)
+                continue
+            if actualCoordinateListLength == n:
+#                NTdebug("Skipping atoms with coordinates for all models.")
                 continue
             atomListToSyncToSink.append(atom)
 
         if not atomListToSyncToSink:
+#            NTdebug("All atoms are sync-ed between models.")
             return
 
         unmatchedAtomByResDict = {}
-        for atom in atomListToSyncToSink:
+        for i, atom in enumerate(atomListToSyncToSink): #@UnusedVariable
+#            if i <= 10:
+#                NTdebug("Sink [%s] %s with %s coordinates whereas modelcount is %s." % (i, atom, len(atom.coordinates), self.modelCount))
             res = atom._parent
             if not res.removeAtom(atom.name):
                 NTcodeerror("Failed to delete atom %s from residue %s" % ( atom, res ))
@@ -2966,7 +3019,7 @@ class Ensemble( NTlist ):
         self.molecule           = molecule
 
         if self.molecule == None:
-            return # allow he class to be initialised without a molecule instance
+            return # allow he class to be initialized without a molecule instance
 
         for i in range(0,molecule.modelCount):
             mName = sprintf('%s_model_%d', molecule.name, i)
@@ -3365,6 +3418,99 @@ Chain class: defines chain properties and methods
         #end if
     #end def
 
+    def hasSameSequence(self, other):
+        seq0 = self.toSequence()
+        seq1 = other.toSequence()
+        NTdebug("Comparing sequences: \n%s\n%s" % (seq0, seq1))
+        return seq0 == seq1
+            
+
+    def getNcsSymmetryPerResidue( self, other ):
+        'TODO: finish code'
+        lol = self.getRepresentingAtomListsPerResidue( other )
+        if lol == None:
+            NTwarning("In %s failed to getRepresentingAtomListsPerResidue" % getCallerName())
+            return None            
+#        a0List, a1List = lol
+#        a0Size = len(a0List)
+#        allResiduesWithCoord = self.allResiduesWithCoordinates()
+#        selectedModels = range(self._parent.modelCount)
+#        ranges = CV_STR
+#        NTdetail("==> Calculating inter-chain rmsd (ranges: %s, models: %s)" % (ranges, selectedModels))
+#        comment = 'Ranges %s' % ranges
+#        self.rmsd = RmsdResult( selectedModels, allResiduesWithCoord, comment=comment )
+        
+        
+    def getSymmetryDRPerResidue( self, other ):
+        """
+        Return None on error or the distance between Calphas or C1' averaged of the length
+        In case the type of chain is unknown then the first atom in such a residue will be taken for comparison.
+        """
+        lol = self.getRepresentingAtomListsPerResidue( other )
+        if lol == None:
+            NTwarning("In %s failed to getRepresentingAtomListsPerResidue" % getCallerName())
+            return None            
+        a0List, a1List = lol
+        a0Size = len(a0List)
+        a0PairCount = a0Size / 2
+        if a0PairCount == 0:
+            return 0.0
+        sumDd = 0.0
+        for i in range( a0PairCount ):
+            aA0 = a0List[i]
+            aA1 = a1List[a0Size-i]
+            dA = aA0.distance( aA1 ) 
+            aB0 = a0List[a0Size-i]
+            aB1 = a1List[i]
+            dB = aB0.distance( aB1 )
+            dd = fabs(dA,dB)
+            sumDd += dd
+        result =  sumDd / a0PairCount
+        return result
+        
+    def getRepresentingAtomListsPerResidue( self, other ):
+        """
+        Return tuple of coordinate list for self, other for representative atoms.
+        """
+        seq0 = self.toSequence(withCoordinate=True)
+        seq1 = other.toSequence(withCoordinate=True)
+        if seq0 != seq1:
+            NTwarning("In %s sequences don't match between\n%s and \n%s" % (getCallerName(), seq0, seq1))
+            return None
+        r0List = self.allResiduesWithCoordinates()
+        r1List = other.allResiduesWithCoordinates()
+
+        a0List = []
+        a1List = []
+        for i,r0 in enumerate(r0List):
+            r1 = r1List[i]
+            r0CommonName = getDeepByKeysOrAttributes(r0, DB_STR, COMMON_NAME_STR )
+            r1CommonName = getDeepByKeysOrAttributes(r1, DB_STR, COMMON_NAME_STR )
+            if r0CommonName != r1CommonName: # allow both to be unknown.
+                NTerror("In %s residue common names don't match between\n%s and \n%s" % (getCallerName(), r0, r1))
+                return None
+            comparisonAtom0 = getDeepByKeysOrAttributes(r0, ATOMS_STR, 0)
+            comparisonAtom1 = getDeepByKeysOrAttributes(r1, ATOMS_STR, 0)
+            if comparisonAtom0 == None or comparisonAtom1 == None:
+                NTerror("In %s residue %s or %s has no atoms" % (getCallerName(), r0, r1))
+                return None
+            if getDeepByKeysOrAttributes( r0, CA_STR ):
+                comparisonAtom0 = getDeepByKeysOrAttributes(r0, CA_STR)
+                comparisonAtom1 = getDeepByKeysOrAttributes(r1, CA_STR)
+            elif getDeepByKeysOrAttributes( r0, C1Prime_STR ):
+                comparisonAtom0 = getDeepByKeysOrAttributes(r0, C1Prime_STR)
+                comparisonAtom1 = getDeepByKeysOrAttributes(r1, C1Prime_STR)
+#            c0 = getDeepByKeysOrAttributes(comparisonAtom0, COORDINATES_STR, 0)
+#            c1 = getDeepByKeysOrAttributes(comparisonAtom1, COORDINATES_STR, 0)
+#            if c0 == None or c1 == None:
+#                NTdebug("In %s atom %s or %s has no coordinate in first model. Skipping residue/atom" % (getCallerName(), comparisonAtom0, comparisonAtom1))
+#                continue
+            a0List.append(comparisonAtom0)
+            a1List.append(comparisonAtom1)
+        # end for
+        return a0List, a1List
+    #end def
+                             
     def allChains( self ):
         """return self"""
         return self.subNodes( depth = 0 )
@@ -3402,6 +3548,52 @@ Chain class: defines chain properties and methods
         return result
     #end def
 
+    def superposeToOtherChainFirstModel( self, other, backboneOnly=True, includeProtons = False, iterations=2, autoLimit=0.7 ):
+        """
+        Superpose the coordinates of this chain to the other chain.
+        returns ensemble or NoneObject on error
+        TODO: finish
+        """
+
+        NTdebug("Now in superposeToOtherChainFirstModel")
+        if self._parent.modelCount <= 0:
+            return NoneObject
+        #end if
+        selectedResidues = self.allResiduesWithCoordinates()
+        fitted = self.selectFitAtoms( selectedResidues, backboneOnly=backboneOnly, includeProtons = includeProtons )
+
+        NTmessage("==> Superposing: fitted %s on %d atoms (backboneOnly=%s, includeProtons=%s)",
+                      self, len(fitted), backboneOnly, includeProtons )
+        
+#        for i in range(1):
+#            ch = self
+#            if i == 1:
+#                ch = other
+#            mName = sprintf('%s_model_0', ch.name)
+#            m = Model(mName, i )
+#            self.append( m )
+#        #end for
+#        self.averageModel = Model('averageModel', molecule.modelCount )
+#
+#        # Assemble the coordinates of the models
+#        for atm in molecule.allAtoms():
+#            if len(atm.coordinates) == molecule.modelCount:
+#                for i in range(0,molecule.modelCount):
+#                    self[i].coordinates.append( atm.coordinates[i] )
+#                #end for
+#                self.averageModel.coordinates.append( atm.meanCoordinate )
+#            #end if
+#        #end for
+#        
+#        self.ensemble.superpose( fitted, iterations=iterations )
+##        NTdebug("... rmsd's: [ %s] average: %.2f +- %.2f",
+##                self.ensemble.rmsd.format('%.2f '), self.ensemble.rmsd.av, self.ensemble.rmsd.sd
+##               )
+#        r = self.calculateRMSDs(ranges=ranges) #@UnusedVariable
+##        NTdetail( r.format() )
+#        return self.ensemble
+    #end def
+
     def countDsspSecStructConsensus(self):
         """Determine if molecule has at least one of alpha or beta protein regions.
         Molecule may contain other types of macromolecules than protein.
@@ -3436,6 +3628,38 @@ Chain class: defines chain properties and methods
         return result
     #end def
 
+    def toSequence(self, withCoordinate = False):
+        """Short of a fasta sequence just give one letter sequence"""
+        result =''
+        if withCoordinate:
+            rList = self.allResiduesWithCoordinates()
+        else:
+            rList = self.allResidues()
+            
+        for r in rList:
+            oneLetter = getDeepByKeysOrDefault(r, FASTA_UNCOMMON_RESIDUE_STR, 'db', 'shortName')
+            if len(oneLetter) != 1:
+                NTwarning("Failed to get oneLetter for residue type of %s reset to %s" % (r, FASTA_UNCOMMON_RESIDUE_STR))
+                oneLetter =FASTA_UNCOMMON_RESIDUE_STR
+            result += oneLetter
+        return result
+    #end def
+        
+    def toMolecule(self):
+        NTerror('In %s create a new instance of a molecule. UNTESTED' % getCallerName())        
+        newMolecule = deepcopy(self._parent)
+        newMolecule.project = None # Try to not damage original project.
+        
+        for chain in newMolecule.allChains():
+            if chain.name == self.name:
+                continue
+            if newMolecule.removeChain( chain ) == None:
+                NTerror("Failed to remove surplus chain from new Molecule instance.")
+                return None
+        # end for
+        return newMolecule
+    #end def
+    
     def toSML(self, stream=sys.stdout ):
         if hasattr(Chain,'SMLhandler'):
             Chain.SMLhandler.toSML( self, stream )

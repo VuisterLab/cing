@@ -176,6 +176,7 @@ def doStoreCING2db( entry_code, archive_id, project = None):
 
     chainList = molecule.allChains()
     is_multimeric = len(chainList) > 1
+    symmetry = molecule.getSymmetry()
 
     chothia_class = molecule.chothiaClassInt()
 
@@ -295,6 +296,7 @@ def doStoreCING2db( entry_code, archive_id, project = None):
         timestamp_last = timestamp_last,
 
         is_multimeric=is_multimeric,
+        symmetry=symmetry,
         chothia_class=chothia_class,
         ranges=ranges,
 #        omega_dev_av_all = p_omega_dev_av_all,
