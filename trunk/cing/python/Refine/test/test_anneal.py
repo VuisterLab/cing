@@ -27,8 +27,8 @@ class AllChecks(TestCase):
             modelCount = 4 # DEFAULT 2
 
         if 1:
-            entryList  = "1brv     2fwu     2fws               ".split()
-            rangesList = "171-188  501-850  371-650                 ".split()
+            entryList  = "1brv     2fwu     2fws               1olg".split()
+            rangesList = "171-188  501-850  371-650            cv  ".split()
         else:        
             entryList  = "2kvf 1mvz 2cka 2ctm 2e5o 2kn9 2xks".split() # see below for set description.
             rangesList = ['cv' for i in range(len(entryList))]
@@ -39,7 +39,7 @@ class AllChecks(TestCase):
         self.failIf(os.chdir(cingDirTmpTest), msg=
             "Failed to change to test directory for files: " + cingDirTmpTest)
         for i, entryId in enumerate(entryList):
-            if i != 0: # Selection of the entries.
+            if i != 3: # Selection of the entries.
                 continue
             inputArchiveDir = os.path.join(cingDirTestsData, "ccpn")
             ccpnFile = os.path.join(inputArchiveDir, entryId + ".tgz")

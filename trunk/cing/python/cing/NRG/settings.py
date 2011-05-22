@@ -40,7 +40,8 @@ CIFZ2           = os.path.join(divDir,'mmCIF')
 PDBNMR2         = os.path.join(divDir,'nmr_restraints')
 
 
-results_base    = 'NRG-CING'
+results_base         = 'NRG-CING'
+results_base_redo    = 'NMR_REDO'
 #if not isProduction:
 #    results_base    = 'dev' + results_base
 results_dir     = os.path.join(dDir, results_base)

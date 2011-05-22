@@ -429,7 +429,9 @@ class Ccpn:
 
         for ccpnMolSys in self.ccpnMolSystemList:
             moleculeName = self._ensureValidName(ccpnMolSys.code)
+#            NTdebug("Working on ccpnMolSys.code: %s became moleculeName: %s" % (ccpnMolSys.code,moleculeName))
             if self.isNonDescriptiveMolSysDefault(moleculeName):
+#                NTdebug("Swapping out non-descriptive molecule name %s for %s" % (moleculeName, self.project.name))
                 moleculeName = self.project.name
             moleculeName = self.project.uniqueKey(moleculeName)
 

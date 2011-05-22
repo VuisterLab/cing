@@ -1926,6 +1926,13 @@ class NTdict(dict):
         for key, value in fromDict.iteritems():
             self[key] = value
 
+    def toDict(self):
+        result = {}
+        for key, value in self.iteritems():
+            result[ key ] = value
+        return result
+        
+
     #------------------------------------------------------------------
     # XML routines
     #------------------------------------------------------------------
