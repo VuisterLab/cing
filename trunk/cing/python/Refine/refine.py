@@ -462,6 +462,10 @@ def parseOutput(config, project, params, options ):
                 foundDIHED = 1
             #endif
         #end for
+        Etotal = getDeepByKeysOrAttributes( data, 'Etotal' )
+        if Etotal == None:
+            NTwarning("Failed to read energy for model: %s (probably crashed/stopped)." % i)
+            continue
         results.append(data)
     #end for i
 
