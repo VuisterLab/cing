@@ -2,9 +2,23 @@
 -- python -u $CINGROOT/python/cing/NRG/runSqlForSchema.py devnrgcing    $CINGROOT/python/cing/NRG/sql/setup_Schema.sql    .
 
 -- create it
-create schema casdcing;
+CREATE SCHEMA casdcing;
 
 -- creating the account
-create role casdcing1 LOGIN CREATEDB SUPERUSER PASSWORD '4I4KMS';
+CREATE ROLE casdcing1 LOGIN CREATEDB SUPERUSER PASSWORD '4I4KMS';
 -- not needed really...
-alter role casdcing1 WITH PASSWORD '4I4KMS'
+ALTER ROLE casdcing1 WITH PASSWORD '4I4KMS'
+
+
+-- Create a 'normal' user pbreader
+CREATE ROLE pbreader WITH LOGIN NOSUPERUSER NOCREATEDB NOCREATEROLE PASSWORD 'pass';
+
+-- Grant CONNECT to pdbmlplus
+GRANT CONNECT ON DATABASE pdbmlplus TO pbreader;
+
+-- Grant USAGE of nrgcing
+GRANT USAGE ON SCHEMA nrgcing TO pbreader;
+
+-- Grant SELECT of any column in all tables in schema nrgcing
+CREATE FUNCTION execute(text) returns void AS $BODY$BEGIN EXECUTE $1; END;$BODY$ language plpgsql;
+SELECT execute('GRANT SELECT ON nrgcing.' || tablename || ' TO pbreader;') FROM pg_tables WHERE schemaname = 'nrgcing';
