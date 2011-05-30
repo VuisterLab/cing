@@ -149,7 +149,7 @@ def linkdataNRG():
 
     #Below, the finaltext is composed. First the original 4 columns are set back. After that, some other information is added. All information is
     #separated by a acomma.
-    finaltext='pdbid1,pdbid2,length_total,length_match,matchfraction,experimental_meth_pdb2,Perc_most_fav_1,Ramchk_1,Bbcchk_1,Rotchk_1,ROG_Groen_1,ROG_Oranje_1,ROG_Rood_1,Perc_most_fav_2,Ramchk_2,Bbcchk_2,C12chk_2,ROG_Groen_2,ROG_Oranje_2,ROG_Rood_2\n'
+    finaltext='pdbid1,pdbid2,length_total,length_match,matchfraction,experimental_meth_pdb2,Perc_most_fav_1,Ramchk_1,Bbcchk_1,Rotchk_1,ROG_Green_1,ROG_Orange_1,ROG_Red_1,Perc_most_fav_2,Ramchk_2,Bbcchk_2,C12chk_2,ROG_Green_2,ROG_Orange_2,ROG_Red_2\n'
     dictList = [pc_rama_coredict,ramchkdict,bbcchkdict,rotchkdict,perEntryRogdict]
     for k in range(len(pdbidlist1)):
         if k>1 and pdbidlist1[k]!=pdbidlist1[k-1]:
@@ -182,10 +182,10 @@ def linkdataNRG():
 
     #writes the file:
 #    out_file = open("/mnt/hgfs/Documents/Analysis entries/output.csv","w")
-    out_file = open(outputFnLinkData,"w")
-    out_file.write(finaltext)
-    out_file.close()
-
+    #out_file = open(outputFnLinkData,"w")
+    #out_file.write(finaltext)
+    #out_file.close()
+print 'hello'
 
 if __name__ == '__main__':
     linkdataNRG()
