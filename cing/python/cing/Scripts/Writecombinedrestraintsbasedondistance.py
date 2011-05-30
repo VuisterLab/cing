@@ -8,14 +8,13 @@ First the script is going to deassign all HB's in the specific Leucine, secondly
 the violations in the trans and in the gauche + combination and finally it combines the
 restraints in the project. Script follows on script rotateleucinesinyasara.py Script cannot
 handle multimers.
-!!Be carefull: Make a copy of your project before you run this one. This script will alter
+!!Be careful: Make a copy of your project before you run this one. This script will alter
 the restraints in you project. It is not possible to restore them!!
 '''
-import sys #@UnusedWildImport
-from munkres import Munkres, print_matrix #@UnusedWildImport
+from munkres import Munkres
 from cing.core.classes import * #@UnusedWildImport
 from cing.core.molecule import * #@UnusedWildImport
-from collections import defaultdict #@UnusedWildImport
+from collections import defaultdict
 
 def adddihrestr(proj,lower,upper,leunumberlist):
     '''Adding dihedral restraints'''
@@ -131,7 +130,7 @@ def classifyrestraints(prl,leu,treshold):
     drlleu=leu.distanceRestraints #distance restraints of leucine g
     for k in range(len(drlleu)):
         found=0;
-        dr=drlleu[k] #distancerestraint k of this leucine
+        dr=drlleu[k] #distance restraint k of this leucine
         for j in range(len(scal)):
             if found==1:
                 break
@@ -182,7 +181,7 @@ def dictvalues(vdict):
     return(vdict,v,lenv,)
 
 def reversedict(vdict):
-    from collections import defaultdict #@UnusedWildImport
+#    from collections import defaultdict #@Reimport
     rdict=defaultdict(list)
     for ii,jj in vdict.items():
         rdict[jj].append(ii)
@@ -200,11 +199,11 @@ def tableprint(table,length):
 
 def makedifferencetable(drlcolumns,drlrows,lendrlcolumns,lendrlrows):
     """
-    table gives the absoulte differences in upperbounds between the restraints
+    table gives the absolute differences in upper-bounds between the restraints
     in the a-set and the b-set. So you can look up every difference in upperbound
     between two restraints, one of a and one of b.
     """
-    table=[ [ 0 for i in range(lendrlcolumns) ] for j in range(lendrlrows) ] #table with only zeros
+    table=[ [ 0 for _i in range(lendrlcolumns) ] for _j in range(lendrlrows) ] #table with only zeros
     for c in range(lendrlcolumns):
         for r in range(lendrlrows):
             diff=drlcolumns[c][0]-drlrows[r][0]
@@ -221,7 +220,7 @@ def makeallowedtable(table,drlcolumns,drlrows,lendrlcolumns,lendrlrows):
     of restraints will not be used.
     """
     maxi=9999999 #Munkres cannot work with float("infinity") and None objects
-    allowedtable=[ [ 0 for i in range(lendrlcolumns) ] for j in range(lendrlrows) ] #table with only zeros
+    allowedtable=[ [ 0 for _i in range(lendrlcolumns) ] for _j in range(lendrlrows) ] #table with only zeros
     for c in range(lendrlcolumns):
         for r in range(lendrlrows):
             diff=table[r][c]
@@ -267,7 +266,7 @@ def checkcolumn(lendrlrows,allowedtable,column,maxi,ncolumnlist):
 
 def checkindexes(indexes,allowedtable,table,maxi,n,invdrlcolumnsdict,invdrlrowsdict,drlcolumns,drlrows,lendrlrows):
     'rows and columns with the same index will form restraintpairs'
-    values=[]#values of allowedtable of restraintcombinations in rows and colums. Not necessary.
+    values=[]#values of allowedtable of restraint combinations in rows and columns. Not necessary.
     rows=[]
     columns=[]
     ncolumnlist=[] #columns of table which should be deassigned.
@@ -394,7 +393,7 @@ def appendrestraints(disrlist,proj):
     return proj
 
 def deassignrestraints(n,proj,leu,deldeasrestr):
-    NTmessage('Following restraint pairs are deassignend:')
+    NTmessage('Following restraint pairs are deassigned:')
     atomindexes=[0,1]
     for i in n: #deassign restraints in n
         delrestr=0
@@ -468,7 +467,7 @@ def alterrestraintsforleus(leunumberlist,proj,prl,treshold,deasHB,dihrCHI2):
     for i in leunumberlist:
         prlleu=prl.molecules[0].residuesWithProperties('LEU')[i]
         projleu=proj.molecules[0].residuesWithProperties('LEU')[i]
-        NTmessage('\nStart calculationsfor %s:'%prlleu.name)
+        NTmessage('\nStart calculations for %s:'%prlleu.name)
         proj=writerestraintsforleu(prl,proj,prlleu,projleu,treshold,deasHB)
     if dihrCHI2==True:
         upper=245
@@ -477,7 +476,8 @@ def alterrestraintsforleus(leunumberlist,proj,prl,treshold,deasHB,dihrCHI2):
     return proj
 
 if __name__ == '__main__':
-    proj_path='/home/i/tmp/karenVCdir/'
+#    proj_path='/home/i/tmp/karenVCdir/'
+    proj_path='/Users/jd/workspace/'
     proj_name='H2_2Ca_64_100'
     molec_name='refine1'
     prl_name='H2_2Ca_64_100_3_rotleucines'

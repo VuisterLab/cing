@@ -1,7 +1,7 @@
 '''
 Created on May 25, 2011
 
-@author: Karen
+@author: Karen Berntsen
 
 This script will load a PDB-file, takes the first model and makes two extra models, one with the Leucines in g+
 and one with the Leucines in tr. These three models will be saved as a new PDB-file.
@@ -12,7 +12,6 @@ import shutil
 from cing.core.classes import * #@UnusedWildImport
 from cing.core.molecule import * #@UnusedWildImport
 from yasaramodule import * #@UnusedWildImport
-#from cing.main import yasara #Don't know yet how to use this.
 import yasara
 
 def leunumbers(proj,cv):
@@ -81,11 +80,13 @@ def rotateleucines(proj_path,proj_name,molec_name,chainlist,leucines):
 if __name__ == '__main__':
     "some definitions"
     #proj_path='/mnt/hgfs/Documents/'
-    proj_path='/home/i/tmp/karenVCdir/'
+#    proj_path='/home/i/tmp/karenVCdir/'
+    proj_path='/Users/jd/workspace/'
     proj_name='H2_2Ca_64_100'
     molec_name='refine1'
     chainlist=['A','A','A']
     cv=0.1
-    proj = Project.open('%s%s'%(proj_path,proj_name),status = 'old')
+    proj_path_full = os.path.join(proj_path, proj_name)
+    proj = Project.open(proj_path_full,status = 'old')
     leucines,leulist=leunumbers(proj,cv)
     rotateleucines(proj_path,proj_name,molec_name,chainlist,leucines)
