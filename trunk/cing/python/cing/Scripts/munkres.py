@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: iso-8859-1 -*-
+import copy
+import sys
 
 # Documentation is intended to be processed by Epydoc.
 
@@ -93,27 +95,25 @@ Usage
 
 Construct a Munkres object::
 
-    from munkres import Munkres
+from cing.Scripts.munkres import *
 
-    m = Munkres()
+m = Munkres()
 
 Then use it to compute the lowest cost assignment from a cost matrix. Here's
 a sample program::
 
-    from munkres import Munkres, print_matrix
-
-    matrix = [[5, 9, 1],
-              [10, 3, 2],
-              [8, 7, 4]]
-    m = Munkres()
-    indexes = m.compute(matrix)
-    print_matrix(matrix, msg='Lowest cost through this matrix:')
-    total = 0
-    for row, column in indexes:
-        value = matrix[row][column]
-        total += value
-        print '(%d, %d) -> %d' % (row, column, value)
-    print 'total cost: %d' % total
+matrix = [[5, 9, 1],
+          [10, 3, 2],
+          [8, 7, 4]]
+m = Munkres()
+indexes = m.compute(matrix)
+print_matrix(matrix, msg='Lowest cost through this matrix:')
+total = 0
+for row, column in indexes:
+    value = matrix[row][column]
+    total += value
+    print '(%d, %d) -> %d' % (row, column, value)
+print 'total cost: %d' % total
 
 Running that program produces::
 
@@ -220,7 +220,7 @@ So, the above profit-calculation program can be recast as::
 References
 ==========
 
-1. http://www.public.iastate.edu/~ddoty/HungarianAlgorithm.html
+1. http://www.public.iastate.edu/~ddoty/HungarianAlgorithm.html (outdated)
 
 2. Harold W. Kuhn. The Hungarian Method for the assignment problem.
    *Naval Research Logistics Quarterly*, 2:83-97, 1955.
@@ -276,7 +276,6 @@ __docformat__ = 'restructuredtext'
 # Imports
 # ---------------------------------------------------------------------------
 
-import sys
 
 # ---------------------------------------------------------------------------
 # Exports
@@ -322,8 +321,7 @@ class Munkres:
 
         Please use the module function ``make_cost_matrix()``.
         """
-        import munkres
-        return munkres.make_cost_matrix(profit_matrix, inversion_function)
+        return make_cost_matrix(profit_matrix, inversion_function)
 
     make_cost_matrix = staticmethod(make_cost_matrix)
 
@@ -388,7 +386,7 @@ class Munkres:
         self.n = len(self.C)
         self.original_length = len(cost_matrix)
         self.original_width = len(cost_matrix[0])
-        self.row_covered = [False for i in range(self.n)]
+        self.row_covered = [False for _i in range(self.n)]
         self.col_covered = [False for i in range(self.n)]
         self.Z0_r = 0
         self.Z0_c = 0
@@ -428,8 +426,8 @@ class Munkres:
     def __make_matrix(self, n, val):
         """Create an *n*x*n* matrix, populating it with the specific value."""
         matrix = []
-        for i in range(n):
-            matrix += [[val for j in range(n)]]
+        for _i in range(n):
+            matrix += [[val for _j in range(n)]]
         return matrix
 
     def __step1(self):
@@ -437,7 +435,7 @@ class Munkres:
         For each row of the matrix, find the smallest element and
         subtract it from every element in its row. Go to Step 2.
         """
-        C = self.C
+#        _C = self.C
         n = self.n
         for i in range(n):
             minval = min(self.C[i])

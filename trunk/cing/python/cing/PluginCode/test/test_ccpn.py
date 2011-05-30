@@ -32,7 +32,7 @@ class AllChecks(TestCase):
 #    entryList = "1a4d 1ai0 1brv_cs_pk_2mdl 1bus 2hgh".split()
     def test_ccpn(self):
 
-        cing.verbosity = verbosityDebug
+#        cing.verbosity = verbosityDebug
 #        if you have a local copy you can use it; make sure to adjust the path setting below.
         fastestTest = 1        # Not passed to the validate routine in order to customize checks for speed.
 

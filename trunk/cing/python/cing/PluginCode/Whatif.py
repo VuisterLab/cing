@@ -413,7 +413,7 @@ end y
 #                NTmessage('Failed to have increased model idx at least once for checkId %s' % checkId)
                 continue
 
-            ensembleValueList = getDeepByKeysOrAttributes( self.molecule, WHATIF_STR, checkId, VALUE_LIST_STR )
+            ensembleValueList = getDeepByKeysOrAttributes( self.molecule, WHATIF_STR, checkId, VALUE_LIST_STR )            
             ensembleValueList[modelIdx] = value
 
             ensembleQualList = getDeepByKeysOrAttributes( self.molecule, WHATIF_STR, checkId, QUAL_LIST_STR )
@@ -1117,7 +1117,7 @@ def runWhatif( project, ranges=None, parseOnly=False ):
         modelCheckDbFullFileName =  os.path.join( whatifDir, modelCheckDbFileName )
 
         if whatif._parseCheckdb( modelCheckDbFullFileName, model ):
-            NTerror("\nrunWhatif: Failed to parse check db %s", modelCheckDbFileName)
+            NTerror("runWhatif: Failed to parse check db %s", modelCheckDbFileName)
             return True
         #end if
     #end for
@@ -1132,10 +1132,14 @@ def runWhatif( project, ranges=None, parseOnly=False ):
         NTerror("Path does not exist: %s" % (pathPdbOut))
         return True
 
-    if whatif._processWhatifSummary(pathPdbOut):
-        NTerror("runWhatif: Failed to process WHATIF summary file")
+    try:
+        if whatif._processWhatifSummary(pathPdbOut):
+            NTerror("runWhatif: Failed to process WHATIF summary file")
+            return True
+    except:
+        NTtracebackError()
+        NTerror("Skipping restore of whatif summary.") 
         return True
-
     whatif._makeSummary()
 
     # complete the whatif data structure with NoneObjects
