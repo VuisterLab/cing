@@ -97,6 +97,8 @@ class Ccpn:
     CCPN_RUN_STRUCTURE = 'StructureEnsembleData'
     CCPN_RUN_RESIDUE = 'MolResidueData'
     CCPN_RUN_PEAK = 'PeakListData'
+    
+    CCPN_CLASSNAME_STR = 'className'
 
     CCPN_CLASS_RESTRAINT = { RESTRAINT_IDX_DISTANCE: CCPN_DISTANCE_CONSTRAINT,
                             RESTRAINT_IDX_HBOND: CCPN_HBOND_CONSTRAINT,
@@ -143,9 +145,12 @@ class Ccpn:
 
         ccpnRestraintLists = []
         for ccpnRestraintList in allCcpnConstraintLists:
-            if ccpnRestraintList.className in classNames:
+            className = getDeepByKeysOrAttributes(ccpnRestraintList, self.CCPN_CLASSNAME_STR)
+            if className == None:
+                NTwarning("Failed to find className for ccpnRestraintList: %s. Skipping import of it." % str(ccpnRestraintList))
+                continue
+            if className in classNames:
                 ccpnRestraintLists.append(ccpnRestraintList)
-
         return ccpnRestraintLists
 
     def readCcpnFolder(self):
@@ -251,13 +256,15 @@ class Ccpn:
         ccpnMolSystem = None
         if ccpnCalc: # Fails for NRG-CING but a nice feature for use from within Analysis etc.
             # Mol System is the one associated with chosen structure
-            structureData = ccpnCalc.findFirstData(className = self.CCPN_RUN_STRUCTURE,
-                                                   ioRole = 'input')
-            if structureData:
-              ccpnMolSystem = structureData.structureEnsemble.molSystem
-            else:
-              ccpnMolSystem = None
-
+            structureData = ccpnCalc.findFirstData(className = self.CCPN_RUN_STRUCTURE, ioRole = 'input')
+            if structureData:            
+#              ccpnMolSystem = structureData.structureEnsemble.molSystem # Fails for Ulrich Schwartz's project that has no attribute molSystem
+                ccpnMolSystem = getDeepByKeysOrAttributes(structureData, 'structureEnsemble', 'molSystem')
+                if not ccpnMolSystem:
+                    NTwarning("Found the unusual case of having structureData but no molSystem in structureData.structureEnsemble")
+                #end if
+            #end if
+        #end if
         # Determine which CCPN molSystems to work with
         if moleculeName and ccpnMolSystem:
             if ccpnMolSystem and (ccpnMolSystem.code != moleculeName):
