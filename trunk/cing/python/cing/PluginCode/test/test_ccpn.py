@@ -25,7 +25,8 @@ class AllChecks(TestCase):
 #    entryList = "1cjg".split()
 #    entryList = "1hue".split()
 #    entryList = "1dum".split()
-    entryList = "1brv".split()
+    entryList = "1brv".split() # DEFAULT: 1brv
+#    entryList = "CC1_260511".split() # DEFAULT: 1brv
 #    entryList = "2hgh".split()
 #    entryList = "1bus".split()
 #    entryList = "1a4d 1ai0 1brv_cs_pk_2mdl 1bus 2hgh".split()

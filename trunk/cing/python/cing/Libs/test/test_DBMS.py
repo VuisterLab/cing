@@ -52,11 +52,11 @@ class AllChecks(TestCase):
 
     def testSortTable(self):
         mytable = (
-            ('Joe', 'Clark', 1989),
-            ('Charlie', 'Babbitt', 1988),
-            ('Frank', 'Abagnale', 2002),
-            ('Bill', 'Clark', 2009),
-            ('Alan', 'Clark', 1804),
+            ('Joe',     'Clark',    1989),
+            ('Charlie', 'Babbitt',  1988),
+            ('Frank',   'Abagnale', 2002),
+            ('Bill',    'Clark',    2009),
+            ('Alan',    'Clark',    1804),
             )
         for row in sort_table(mytable, (1,0)):
             NTmessage( str(row) )
