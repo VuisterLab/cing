@@ -187,7 +187,7 @@ def analyzeXplorLog(logFile, extraIgnoreLineList=[], extraIgnoreCountList = []):
         else:
             result[4] += 1
             if line.count('total CPU time='):
-                NTdebug("Matched time in line: %s" % line)
+#                NTdebug("Matched time in line: %s" % line)
                 timeTakenStr = r.dollar[r.NF - 1]
                 result[0] = float(timeTakenStr)
     #            NTdebug("Found time: %s" % self.timeTakenDict[entry_code])

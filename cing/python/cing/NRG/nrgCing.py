@@ -42,6 +42,7 @@ from cing.NRG.nrgCingRdb import nrgCingRdb #@Reimport # why doesn't pydev see th
 from cing.NRG.settings import * #@UnusedWildImport
 from cing.Scripts.FC.utils import getBmrbCsCountsFromFile
 from cing.Scripts.doScriptOnEntryList import doScriptOnEntryList
+from cing.Scripts.vCing.vCing import TEST_CING_STR
 from cing.Scripts.vCing.vCing import VALIDATE_ENTRY_NRG_STR
 from cing.Scripts.vCing.vCing import vCing
 from cing.Scripts.validateEntry import ARCHIVE_TYPE_BY_CH23
@@ -1644,7 +1645,7 @@ class nrgCing(Lister):
 
 
 
-    def createToposTokens(self):
+    def createToposTokens(self, jobId = TEST_CING_STR):
         """Return True on error.
         """
 
@@ -1678,7 +1679,8 @@ class nrgCing(Lister):
         self.entry_list_todo = self.entry_list_todo.difference(self.entry_list_done)
         if True: # DEFAULT: True
             self.entry_list_todo = readLinesFromFile(os.path.join(self.results_dir, 'entry_list_nmr_random_8.csv'))
-#            self.entry_list_todo = "1n6t".split() # Or other 10 residue entries:  1n6t 1p9f 1idv 1kuw 1n9u 1hff  1r4h
+#            self.entry_list_todo = self.entry_list_todo[:19]
+#            self.entry_list_todo = "1brv".split() # Or other 10 residue entries:  1n6t 1p9f 1idv 1kuw 1n9u 1hff  1r4h
             # invalids 1nxn 1gac 1t5n
             self.entry_list_todo = NTlist( *self.entry_list_todo )
 
@@ -1692,7 +1694,7 @@ class nrgCing(Lister):
 
         tokenList = []
         for entry_code in self.entry_list_todo:
-            tokenStr = ' '.join([VALIDATE_ENTRY_NRG_STR, entry_code, extraArgListStr])
+            tokenStr = ' '.join([jobId, entry_code, extraArgListStr])
             tokenList.append(tokenStr)
         tokenListStr = '\n'.join(tokenList)
         NTmessage("Writing tokens to: [%s]" % self.tokenListFileName)
@@ -1821,13 +1823,12 @@ class nrgCing(Lister):
                             expectPdbEntryList = True,
                             extraArgList = extraArgList)
         NTmessage("Done with storeCING2db.")
-    # end def
+    # end def        
 # end class.
 
-
-if __name__ == '__main__':
+def runNrgCing():
     """
-Additional modes I see:
+    Additional modes I see:
         batchUpdate        Run validation checks to NRG-CING web site.
         prepare            Only moves the entries through prep stages.
     """
@@ -1894,7 +1895,8 @@ Additional modes I see:
             if m.postProcessEntryAfterVc(entry_code):
                 NTerror("Failed to postProcessEntryAfterVc")
         elif destination == 'createToposTokens':
-            if m.createToposTokens():
+            if m.createToposTokens(jobId=VALIDATE_ENTRY_NRG_STR):
+#            if m.createToposTokens():
                 NTerror("Failed to createToposTokens")
         elif destination == 'storeCING2db':
             if m.storeCING2db():
@@ -1905,13 +1907,27 @@ Additional modes I see:
                 NTerror("Failed to storeCING2db")
         elif destination == 'getEntryInfo':
             if m.getEntryInfo(reportCsConversion = 0): # DEFAULT: 0
-                NTerror("Failed to getEntryInfo")
+                NTerror("Failed to getEntryInfo")                
+        # NMR_REDO specific
+        elif destination == 'refine':
+            if not entry_code:
+                NTerror("Failed refine because no entry code.")
+            else:                
+                m.entry_list_todo = [ entry_code ]
+            if m.refineEntry(): # in nmr_redo
+                NTerror("Failed to refineEntry")
         else:
             NTerror("Unknown destination: %s" % destination)
         # end if
+        
+        
     except:
         NTtracebackError()
     finally:
         NTmessage(getStopMessage(cing.starttime))
     # end try
-# end if
+# end def    
+
+
+if __name__ == '__main__':
+    runNrgCing()

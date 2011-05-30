@@ -25,14 +25,14 @@ xplor -py $CINGROOT/python/xplornih/anneal.py $x 20 1234 >& anneal.log
 """
 
 from atomAction import SetProperty
-from atomSel import AtomSel
+from atomSel import AtomSel #@UnresolvedImport
 from ivm import IVM
 from noePotTools import create_NOEPot
-from potList import PotList
+from potList import PotList #@UnresolvedImport
 from psfGen import seqToPSF
 from selectTools import IVM_groupRigidSidechain
 from simulationTools import StructureLoop
-from xplorPot import XplorPot
+from xplorPot import XplorPot #@UnresolvedImport
 import os
 import protocol
 import psfGen

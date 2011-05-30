@@ -1145,8 +1145,8 @@ Project: Top level Cing project class
     def checkForSaltbridges(self, cutoff = 0.5, toFile = False):
         return checkForSaltbridges(self, cutoff = cutoff, toFile = toFile)
 
-    def partitionRestraints(self, tmp = None):
-        return partitionRestraints(self, tmp = tmp)
+    def partitionRestraints(self):
+        return partitionRestraints(self)
 
     def setupHtml(self):
         return setupHtml(self)

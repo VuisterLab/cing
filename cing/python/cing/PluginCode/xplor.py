@@ -1,9 +1,9 @@
-# TODO rename to Xplor-NIH
 # get target in DR.
 # Configure amount of data to keep. nothing, 1 mb, 10 mb, 100 mb.
 # nothing is just data in cing.
 # Charles mentioning that except nucleic acids the IUPAC conventions can be generated for CING.
 #from Refine.refine import doSetup # This would be a circular import to avoid
+from Refine.refine import * #@UnusedWildImport
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.core.classes import * #@UnusedWildImport
 from cing.core.constants import * #@UnusedWildImport
@@ -211,7 +211,7 @@ DihedralRestraintList.export2xplor = exportDihedralRestraintList2xplor
 
 
 #-----------------------------------------------------------------------------
-def exportMolecule2xplor( molecule, path, chainName = None):
+def exportMolecule2xplor( molecule, path, chainName = None, model = None):
     """Export coordinates of molecule to pdbFile in XPLOR convention;
        generate modelCount files,
        path should be in the form name%03d.pdb, to allow for multiple files
@@ -226,7 +226,11 @@ def exportMolecule2xplor( molecule, path, chainName = None):
 #        NTdebug("Finished writing all chains.")
         return
     
-    for model in range(molecule.modelCount):
+    modelList = range(molecule.modelCount)
+    if model != None:
+        modelList = [ model ]
+        
+    for model in modelList:
         pdbFile = molecule.toPDB( model=model, convention = XPLOR, chainName = chainName)
         if not pdbFile:
             return None
@@ -438,10 +442,51 @@ def getDistanceRestraintFromXplorMemory( project, convention ):
     return result
 #end def
 
+def fullRedo(project, modelCountAnneal = 200, bestAnneal = 50, best = 25):
+    'Return True on error.'
+        
+    NTmessage("==> Recalculating and refining a new enesemble in cing.PluginCode.xplor#%s" % getCallerName())
+    
+    if 0: # DEFAULT: 0
+        modelCountAnneal, bestAnneal, best = 4,3,2
+    if project == None:
+        NTerror("Failed to get a project")
+        return True
+    #end if
 
+    
+    parser = getRefineParser() # Get some defaults assumed to exist in the setup.
+    (options, _args) = parser.parse_args([''])
+    options.name = '%s_redo' % project.name
+#    options.sort = 'Enoe'
+    options.modelsAnneal = '0-%d' % (modelCountAnneal-1) # Needs to be specified because default is to use modelCount from project
+    options.modelCountAnneal = modelCountAnneal
+    options.bestAnneal = bestAnneal 
+    options.best = best
+    options.superpose = 'cv'
+    options.overwrite=1
+        
+    basePath = project.path(project.directories.refine, options.name)
+    NTmessage("basePath: " + basePath)
+    
+    NTmessage("==> Reading configuration")
+    NTmessage('refinePath:     %s', config.refinePath)
+    NTmessage('xplor:          %s', config.XPLOR)
+    NTmessage("parameterFiles: %s", config.parameterFiles)
+    NTmessage("topologyFiles:  %s", config.topologyFiles)
+
+    parameters = fullAnnealAndRefine( config, project, options)
+    if not parameters:
+        NTerror("Failed to do fullAnnealAndRefine")
+        return True
+    #end if
+#end def
+        
+        
 #-----------------------------------------------------------------------------
 # register the functions in the project class
 methods  = [(newMoleculeFromXplor, None),
+            (fullRedo, None)
 #            (recalculate, None), # JFD really wanted it here but makes cyclic defs.
            ]
 #saves    = []

@@ -1536,6 +1536,7 @@ class NTdict(dict):
         """Return a formatted string of the items
            Uses format or stored attribute __FORMAT__ or default
         """
+#        NTdebug("Now in %s" % getCallerName())
         if (format == None):
             # use the predefined format if no format given
             format = self.__FORMAT__

@@ -251,3 +251,14 @@ e.rdc_count = 0 AND e.chothia_class IS NOT NULL
 
 
 order by e.distance_count_long_range asc;
+
+
+-- Get small dimers
+SELECT *
+FROM
+"nrgcing"."cingentry" e
+where
+e.is_multimeric = true AND e.res_count < 50 AND
+e.distance_count_long_range > 30 AND
+e.rdc_count = 0 AND 
+e.chothia_class IS NOT NULL AND e.chothia_class !=3

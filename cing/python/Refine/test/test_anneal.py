@@ -18,17 +18,24 @@ import unittest
 class AllChecks(TestCase):
 
     def _test_refine(self):
-        modelCount = 99
-        target = '--fullAnnealAndRefine'
-#        target = '--fullAnneal'
+        'Too big to run by default.'
+        cing.verbosity = verbosityDebug
         
+        modelCountAnneal, bestAnneal, best = 200, 50, 25
+#        targetList = '--fullAnnealAndRefine '.split()
+        # NB without leading --
+        targetNumberList= '1   2                3      4             5             6      7     8'.split() #@UnusedVariable
+        targetList      = 'psf generateTemplate anneal analyze       parse         refine parse import'.split() 
+        targetOptionLoL = '.   .                .      --useAnnealed --useAnnealed .      .     .     '.split()
         fastestTest = 1
         if fastestTest:
-            modelCount = 4 # DEFAULT 2
-
+            numberOfStagesTodo = 2 # 8 max
+            targetList      = 'psf generateTemplate anneal analyze       parse         refine parse import'.split()[:numberOfStagesTodo]
+            targetOptionLoL = '.   .                .      --useAnnealed --useAnnealed .      .     .     '.split()[:numberOfStagesTodo]
+            modelCountAnneal, bestAnneal, best = 4, 3, 2
         if 1:
-            entryList  = "1brv     2fwu     2fws               1olg".split()
-            rangesList = "171-188  501-850  371-650            cv  ".split()
+            entryList  = "1dum 1brv     2fwu     2fws               1olg".split()
+            rangesList = "cv   171-188  501-850  371-650            cv  ".split()
         else:        
             entryList  = "2kvf 1mvz 2cka 2ctm 2e5o 2kn9 2xks".split() # see below for set description.
             rangesList = ['cv' for i in range(len(entryList))]
@@ -39,8 +46,8 @@ class AllChecks(TestCase):
         self.failIf(os.chdir(cingDirTmpTest), msg=
             "Failed to change to test directory for files: " + cingDirTmpTest)
         for i, entryId in enumerate(entryList):
-            if i != 3: # Selection of the entries.
-                continue
+            if i != 0: # Selection of the entries.
+                continue 
             inputArchiveDir = os.path.join(cingDirTestsData, "ccpn")
             ccpnFile = os.path.join(inputArchiveDir, entryId + ".tgz")
             if not os.path.exists(ccpnFile):
@@ -48,19 +55,31 @@ class AllChecks(TestCase):
             if not os.path.exists(entryId + ".tgz"):
                 copyfile(ccpnFile, os.path.join('.', entryId + ".tgz"))
 
+            modelsAnneal = '0-%d' % (modelCountAnneal-1) # Needs to be specified because default is to use modelCount from project
             name = '%s_redo' % entryId
             ranges = rangesList[i]
-            models = '0-%d' % (modelCount-1)
-
+#            models = '0-%d' % (modelCount-1)
+            
             project = Project.open(entryId, status = 'new')
-            self.assertTrue(project.initCcpn(ccpnFolder = ccpnFile, modelCount=modelCount))
+            self.assertTrue(project.initCcpn(ccpnFolder = ccpnFile, modelCount=1))
             project.save()
             del project
 
+
             refineExecPath = os.path.join(refinePath, "refine.py")
-            cmd = '%s --project %s -n %s --setup %s --useAnnealed --overwrite --models %s --superpose %s --sort Enoe' % (
-                refineExecPath, entryId, name, target, models, ranges)
+#            cmd = '%s --project %s -n %s --setup %s --useAnnealed --overwrite --models %s --superpose %s --sort Enoe' % (
+#                refineExecPath, entryId, name, target, models, ranges)           
+            cmd = '%s -v %s --project %s -n %s --setup --overwrite --superpose %s --modelsAnneal %s --modelCountAnneal %s --bestAnneal %s --best %s' % (
+                refineExecPath, cing.verbosity, entryId, name, ranges, modelsAnneal, modelCountAnneal, bestAnneal, best)
             self.assertFalse( do_cmd(cmd,bufferedOutput=0) )
+            for i, target in enumerate(targetList):
+                targetOptionList = targetOptionLoL[i]
+                if targetOptionList == '.':
+                    targetOptionList = ''
+                cmd = '%s --project %s -n %s --%s %s' % (refineExecPath, entryId, name, target, targetOptionList)
+                NTmessage('')
+                self.assertFalse( do_cmd(cmd,bufferedOutput=0) )
+            # end for target
         # end for
     # end def
 

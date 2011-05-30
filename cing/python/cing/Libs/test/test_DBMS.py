@@ -59,7 +59,7 @@ class AllChecks(TestCase):
             ('Alan', 'Clark', 1804),
             )
         for row in sort_table(mytable, (1,0)):
-            NTmessage( row )
+            NTmessage( str(row) )
 
     def testSortCsvFile(self):
         fn = 'adit_nmr_matched_pdb_bmrb_entry_ids.csv' # already contains one header row but let's add another one.

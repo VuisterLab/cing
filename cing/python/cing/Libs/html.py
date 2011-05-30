@@ -3489,7 +3489,7 @@ class RestraintListHTMLfile( HTMLfile ):
         """
         saveFrameAssign = self.project.getSaveFrameAssign()
         if not saveFrameAssign:
-            NTdebug("No SSA saveframe embedded.")
+#            NTdebug("No SSA saveframe embedded.")
             return
         tagTableAssignHeader = saveFrameAssign.tagtables[0]
         gS = tagTableAssignHeader.getString

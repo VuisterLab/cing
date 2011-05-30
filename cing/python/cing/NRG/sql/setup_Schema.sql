@@ -16,9 +16,10 @@ CREATE ROLE pbreader WITH LOGIN NOSUPERUSER NOCREATEDB NOCREATEROLE PASSWORD 'pa
 -- Grant CONNECT to pdbmlplus
 GRANT CONNECT ON DATABASE pdbmlplus TO pbreader;
 
--- Grant USAGE of nrgcing
-GRANT USAGE ON SCHEMA nrgcing TO pbreader;
+-- Grant USAGE of database
+GRANT USAGE ON SCHEMA casdcing TO pbreader;
 
 -- Grant SELECT of any column in all tables in schema nrgcing
 CREATE FUNCTION execute(text) returns void AS $BODY$BEGIN EXECUTE $1; END;$BODY$ language plpgsql;
-SELECT execute('GRANT SELECT ON nrgcing.' || tablename || ' TO pbreader;') FROM pg_tables WHERE schemaname = 'nrgcing';
+--SELECT execute('GRANT SELECT ON nrgcing.'  || tablename || ' TO pbreader;') FROM pg_tables WHERE schemaname = 'nrgcing';
+  SELECT execute('GRANT SELECT ON casdcing.' || tablename || ' TO pbreader;') FROM pg_tables WHERE schemaname = 'casdcing';

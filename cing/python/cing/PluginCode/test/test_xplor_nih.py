@@ -3,6 +3,7 @@ Unit test execute as:
 python $CINGROOT/python/cing/PluginCode/test/test_xplor_nih.py
 
 For testing execution of cing inside of Xplor-NIH python interpreter with the data living outside of it.
+This is not yet achieved and the test is useless at this point.
 """
 from cing import cingDirTestsData
 from cing import cingDirTmp

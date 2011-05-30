@@ -21,7 +21,7 @@ xplorPath  = os.getenv('xplorPath','.')
 # Relabeled from config to refineConfig for apparent clashes with other config.
 config = NTdict(
 
-    XPLOR            =  xplorPath,
+    XPLOR            = xplorPath,
 
 # (waterrefine) xplor stuff, directories, etc.
     refinePath       = refinePath,
