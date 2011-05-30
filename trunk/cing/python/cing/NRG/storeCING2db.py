@@ -250,6 +250,21 @@ def doStoreCING2db( entry_code, archive_id, project = None):
     if ssa_count_tuple:
         p_ssa_count, p_ssa_swap_count, p_ssa_deassign_count = ssa_count_tuple
 
+    # Queen
+    rdbItemList = [ 0, 0, 0]
+    projectItemList = [ QUEENY_INFORMATION_STR, QUEENY_UNCERTAINTY1_STR, QUEENY_UNCERTAINTY2_STR]
+    for r in project.molecule.allResidues():
+        for i, rdbItemName in enumerate(projectItemList):
+            v = r.getDeepByKeys(rdbItemName)
+            if v != None:                
+                rdbItemList[i] += v
+    NTdebug("rdbItemList: %s (before potential nilling)" % str(rdbItemList))
+    if rdbItemList[0] < 0.001:
+        rdbItemList = [None, None, None]
+    # end if
+    NTdebug("rdbItemList: %s" % str(rdbItemList))
+    p_queen_information, p_queen_uncertainty1, p_queen_uncertainty2 = rdbItemList
+    
     # WI
     p_wi_bbcchk = molecule.getDeepAvgByKeys(WHATIF_STR, BBCCHK_STR, VALUE_LIST_STR)
     p_wi_bmpchk = molecule.getDeepAvgByKeys(WHATIF_STR, BMPCHK_STR, VALUE_LIST_STR) # not used
@@ -346,6 +361,11 @@ def doStoreCING2db( entry_code, archive_id, project = None):
         dih_c1_viol = p_dih_c1_viol,
         dih_c3_viol = p_dih_c3_viol,
         dih_c5_viol = p_dih_c5_viol,
+
+        # Queen
+        queen_information  = p_queen_information,
+        queen_uncertainty1 = p_queen_uncertainty1,
+        queen_uncertainty2 = p_queen_uncertainty2,
 
         wi_bbcchk=p_wi_bbcchk,
         wi_bmpchk=p_wi_bmpchk,

@@ -1,45 +1,22 @@
-from cing import header
 from cing.Libs.NTutils import * #@UnusedWildImport
-from cing.Libs.disk import rmdir
 from cing.Libs.forkoff import do_cmd
-from cing.NRG.CasdNmrMassageCcpnProject import getRangesForTarget
-from cing.NRG.CasdNmrMassageCcpnProject import getTargetForFullEntryName
-from cing.Scripts.validateEntry import retrieveTgzFromUrl
-from cing.core.classes import Project
+from cing.NRG.CasdNmrMassageCcpnProject import * #@UnusedWildImport
+from cing.Scripts.validateEntry import * #@UnusedWildImport
 from cing.core.constants import * #@UnusedWildImport
-from cing.main import getStartMessage
-from cing.main import getStopMessage
-from shutil import rmtree
-import shutil
-#from cing.Scripts.Analysis.PyRPF import DEFAULT_CONSIDER_ALIASED_POSITIONS
-#from cing.Scripts.Analysis.PyRPF import DEFAULT_DIAGONAL_EXCLUSION_SHIFT
-#from cing.Scripts.Analysis.PyRPF import DEFAULT_DISTANCE_THRESHOLD
-#from cing.Scripts.Analysis.PyRPF import DEFAULT_PROCHIRAL_EXCLUSION_SHIFT
 
-
-ARCHIVE_TYPE_FLAT = 'FLAT'
-ARCHIVE_TYPE_BY_ENTRY = 'BY_ENTRY'
-ARCHIVE_TYPE_BY_CH23 = 'BY_CH23'
-ARCHIVE_TYPE_BY_CH23_BY_ENTRY = 'BY_CH23_BY_ENTRY'
-
-PROJECT_TYPE_CING = CING
-PROJECT_TYPE_CCPN = CCPN
-PROJECT_TYPE_CYANA = CYANA
-PROJECT_TYPE_PDB = PDB
-#PROJECT_TYPE_XPLOR = 3 # Not done yet.
-PROJECT_TYPE_DEFAULT = PROJECT_TYPE_CING
 
 def main(entryId, *extraArgList):
     """inputDir may be a directory or a url. A url needs to start with http://.
     """
 
-    fastestTest = False # default: False
+    fastestTest = 1 # default: False
 #    ranges=AUTO_STR # default is None retrieved from DBMS csv files.
     htmlOnly = False # default: False but enable it for faster runs without some actual data.
     doWhatif = True # disables whatif actual run
     doProcheck = True
     doWattos = True
     doTalos = True
+    doStoreCheck = True # DEFAULT: True Requires sqlAlchemy
     tgzCing = True # default: True # Create a tgz for the cing project. In case of a CING project input it will be overwritten.
     modelCount = None # default setting is None
     if fastestTest:
@@ -258,6 +235,10 @@ def main(entryId, *extraArgList):
 #           prochiralExclusion=DEFAULT_PROCHIRAL_EXCLUSION_SHIFT,
 #           diagonalExclusion=DEFAULT_DIAGONAL_EXCLUSION_SHIFT
 #    )
+
+    if doStoreCheck:
+        if doStoreCING2db( entryId, ARCHIVE_CASD_ID, project=project):
+            NTerror("Failed to store CING project's data to DB but continuing.")
 
     project.save()
     if projectType == PROJECT_TYPE_CCPN:

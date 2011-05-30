@@ -53,6 +53,12 @@ class TagTable (Lister):
 
         self.verbosity  = verbosity
 
+    def rowCount(self):
+        return len(self.tagvalues)
+    
+    def colCount(self):
+        return len(self.tagnames)
+    
     "Returns the STAR text representation"
     def star_text ( self,
                     flavor                  = 'NMR-STAR'

@@ -93,7 +93,10 @@ CREATE TABLE casdcing.cingentry
     cv_sidechain                   FLOAT DEFAULT NULL,
     rmsd_backbone                  FLOAT DEFAULT NULL,
     rmsd_sidechain                 FLOAT DEFAULT NULL,
-    wi_angchk                      FLOAT DEFAULT NULL, --   whatif (averages over the ensemble of selected models)
+    queen_information              FLOAT DEFAULT NULL, --   queen
+    queen_uncertainty1             FLOAT DEFAULT NULL,
+    queen_uncertainty2             FLOAT DEFAULT NULL,
+    wi_angchk                      FLOAT DEFAULT NULL, --   whatif (averages over the ensemble of selected models)      
     wi_bbcchk                      FLOAT DEFAULT NULL,
     wi_bmpchk                      FLOAT DEFAULT NULL,
     wi_bndchk                      FLOAT DEFAULT NULL,
