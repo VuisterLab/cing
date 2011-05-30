@@ -28,7 +28,7 @@ class AllChecks(TestCase):
 
     # Test will fail if topos hasn't been properly initialized.
     # It is not intended to be run every time the other cing unit test are.
-    def ttttestvCingMaster(self):
+    def _testvCingMaster(self):
         exitCode, token, tokenLock = vc.nextTokenWithLock(lockTimeOut)
         if exitCode:
             NTdebug("Failed to vc.nextTokenWithLock(). Was the token deleted?")

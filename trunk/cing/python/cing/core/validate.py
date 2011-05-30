@@ -629,7 +629,7 @@ def summary( project, toFile = True, ranges=None ):
     return msg
 #end def
 
-def partitionRestraints( project, tmp=None ):
+def partitionRestraints( project ):
     """
     Partition the restraints and generate per-residue lists
     """

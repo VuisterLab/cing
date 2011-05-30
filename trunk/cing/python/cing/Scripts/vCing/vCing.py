@@ -7,6 +7,9 @@
 # $CINGROOT/python/cing/Scripts/vCing/vCing.py startMaster $D/NRG-CING/token_list_todo.txt
 # In order to test killing capabilities try (replacing 99999 by pid):
 # E.g. set pid = 4237 && kill -2 $pid && sleep 10 && kill -2 $pid
+# If all fails try something like:
+# ps -eF --cols 999 | grep -i runSlaveThread | grep -v grep | gawk '{print $2}' 
+# check to see you got the expected number of threads and finally put the kill behind like: | xargs kill -2
 
 # Author: Jurgen F. Doreleijers
 # Thu Oct 14 23:56:36 CEST 2010
@@ -35,12 +38,13 @@ cingDirNRG = os.path.join(cingPythonDir, 'cing', 'NRG')
 cingDirVC = os.path.join(cingDirScripts, 'vCing')
 
 VALIDATE_ENTRY_NRG_STR = 'validateEntryNrg'
+TEST_CING_STR          = 'testCing'
 
 # Possible targets are keyed from token to provide some security and brevity.
 cmdDict = {
 #           VALIDATE_ENTRY_NRG_STR: os.path.join(cingDirNRG, 'validateEntryForNrgByVC.py'),
            VALIDATE_ENTRY_NRG_STR: os.path.join(cingDirScripts, 'validateEntry.py'),
-            'testCing': os.path.join(cingDirVC, 'test', 'cingByVCtest.py'),
+           TEST_CING_STR:          os.path.join(cingDirVC, 'test', 'cingByVCtest.py'),
             }
 
 class vCing(Lister):

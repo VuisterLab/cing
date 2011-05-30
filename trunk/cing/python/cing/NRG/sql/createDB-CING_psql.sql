@@ -12,7 +12,7 @@
 --
 -- Or edit and execute:
 -- python -u $CINGROOT/python/cing/NRG/runSqlForSchema.py devnrgcing    $CINGROOT/python/cing/NRG/sql/createDB-CING_psql.sql    .
--- python -u $CINGROOT/python/cing/NRG/runSqlForSchema.py casdcing    $CINGROOT/python/cing/NRG/sql/createDB-CING_psql.sql    .
+-- python -u $CINGROOT/python/cing/NRG/runSqlForSchema.py casdcing      $CINGROOT/python/cing/NRG/sql/createDB-CING_psql.sql    .
 
 -- Should be autocommiting by default but I saw it didn't once.
 SET AUTOCOMMIT=1;
@@ -51,7 +51,9 @@ CREATE TABLE casdcing.cingentry
     is_paramagnetic                BOOLEAN DEFAULT NULL, -- paramagnetic.
     is_membrane                    BOOLEAN DEFAULT NULL, -- membrane
     is_multimeric                  BOOLEAN DEFAULT NULL, -- E.g. 1hue is a dimer and would be true. Doesn't necessarily need to be a symmetric multimer however.
-    symmetry                       VARCHAR(255) DEFAULT NULL, -- E.g. D2 by SYMMETRY_D2_STR 
+    symmetry                       VARCHAR(255) DEFAULT NULL, -- E.g. D2 by SYMMETRY_D2_STR
+    ncs_symmetry                    FLOAT DEFAULT NULL, 
+    dr_symmetry                     FLOAT DEFAULT NULL,
     chothia_class                  INT DEFAULT NULL,     -- (10) alpha, beta, of a/b, a+b, or coil
     protein_count                  INT DEFAULT NULL,     -- Number of protein chains. Not necessarily unique so e.g. 1hue has 2 that are identical (homodimer). TODO: fill.
     dna_count                      INT DEFAULT NULL,

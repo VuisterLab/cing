@@ -69,16 +69,15 @@ Y_AXIS = 1
 Z_AXIS = 2
 A_AXIS = 3
 
-SYMMETRY_NA_STR = 'SYMMETRY_NA' # Not applicable e.g. without a molecule.
-SYMMETRY_ND_STR = 'SYMMETRY_ND' # Not determined.
-SYMMETRY_C1_STR = 'SYMMETRY_C1' # No symmetry
-SYMMETRY_C2_STR = 'SYMMETRY_C2' # Homodimer
+SYMMETRY_C1_STR = 'SYMMETRY_C1' # No symmetry or undetermined. Use None for unknown.
+SYMMETRY_C2_STR = 'SYMMETRY_C2' # Homodimer such as 1hue
 SYMMETRY_C3_STR = 'SYMMETRY_C3' # 
 SYMMETRY_C5_STR = 'SYMMETRY_C5' # 2kyv all helical 
 SYMMETRY_D2_STR = 'SYMMETRY_D2' # 1olg  No symmetry
 
-SYMMETRY_NCS_PER_RESIDUE_CUTOFF = 1.0 # angstrom
-SYMMETRY_DR_PER_RESIDUE_CUTOFF = 1.0 # angstrom
+# In NMR the symmetry is not always enfoced so really these cutoffs have little use.
+SYMMETRY_NCS_CUTOFF = 10.0 # angstrom. E.g. 1hue: 4.6                   1dum: 0.7. ONly bb used and no protons.
+SYMMETRY_DR_CUTOFF  = 10.0 # angstrom. E.g. 1hue: 2.2 (not enforced)    1dum: 0.3 # averaged over all models.
 
 FASTA_UNCOMMON_RESIDUE_STR = 'X'
 

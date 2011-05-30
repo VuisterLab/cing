@@ -4,6 +4,7 @@ Created on May 2, 2011
 @author: jd
 '''
 from Refine.NTxplor import * #@UnusedWildImport
+from Refine.constants import *
 from cing.Libs.NTutils import * #@UnusedWildImport
 
 def getParameters( basePath, extraModuleName):
@@ -87,9 +88,11 @@ def getRefineParser():
                      )
     parser.add_option("-u", "--useAnnealed",
                       action="store_true",
-                      dest="useAnnealed", default=False,
+                      dest=USE_ANNEALED_STR, default=False,
                       help="Use the annealed workflow"
                      )
+    # NB the 'fullXXXX' and 'useAnnealed' options will be the only parameters maintained.
+    # Most other options will be put into 'parameters'. 
     parser.add_option("--fullRefine",
                       action="store_true",
                       dest="fullRefine", default=False,
@@ -120,11 +123,6 @@ def getRefineParser():
                       dest="doPrint", default=False,
                       help="Print script before running (default: no print)"
                      )
-    parser.add_option("--models",
-                      dest="models", default=None,
-                      help="Model indices (e.g. 0,2-5,7,10-13)",
-                      metavar="MODELS"
-                     )
     parser.add_option("--overwrite",
                       action="store_true",
                       dest="overwrite", default=False,
@@ -140,11 +138,32 @@ def getRefineParser():
                       help="sort field for parse option",
                       metavar="SORTFIELD"
                      )
-    parser.add_option("--best",
-                      dest="bestModels", default=0,
-                      help="Number of best models for parse option",
-                      metavar="BESTMODELS"
+    parser.add_option("--modelsAnneal",
+                      dest="modelsAnneal", default='',
+                      help="Annealed models",
                      )
+    parser.add_option("--models",
+                      dest="models", default='',
+                      help="Model indices (e.g. 0,2-5,7,10-13)",
+                      metavar="MODELS"
+                     )
+    parser.add_option("--bestModels",
+                      dest="bestModels", default='',
+                      help="Best refined models",
+                     )
+    parser.add_option("--modelCountAnneal",
+                      dest="modelCountAnneal", default=0, type="int",
+                      help="Number of annealed models"
+                      )
+    parser.add_option("--bestAnneal",
+                      dest="bestAnneal", default=0, type="int",
+                      help="Number of best annealed models",
+                     )
+    parser.add_option("--best",
+                      dest="best", default=0, type="int",
+                      help="Number of best refined models",
+                     )
+        
     parser.add_option("--import",
                       action="store_true",
                       dest="doImport", default=False,
@@ -166,3 +185,16 @@ def getRefineParser():
                       help="Start ipython interpreter"
                      )
     return parser
+# end def
+
+def setParametersFromOptions(project, options, parameters):
+    # NB we're using the dest fields of the parser. E.g. sortField and not sort
+    optionNameList = 'name modelCountAnneal bestAnneal best modelsAnneal models bestModels overwrite sortField superpose'.split()
+    optionNameList += [ USE_ANNEALED_STR ]
+    for optionName in optionNameList:
+        optionValue = getDeepByKeysOrAttributes(options, optionName)
+        if not optionValue:
+            continue
+        parameters[ optionName ] = optionValue
+    # end for
+# end def

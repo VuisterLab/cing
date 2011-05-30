@@ -73,7 +73,6 @@ def doStoreCING2db( entry_code, archive_id, project = None):
 
     NTdebug("Starting doStoreCING2db using:")
     NTdebug("entry_code:           %s" % entry_code)
-#    NTdebug("inputDir:             %s" % inputDir)
     NTdebug("archive_id:           %s" % archive_id)
     NTdebug("user_name:            %s" % user_name)
     NTdebug("db_name:              %s" % db_name)
@@ -164,7 +163,7 @@ def doStoreCING2db( entry_code, archive_id, project = None):
                 NTcodeerror("Mismatching rev %s with rev extracted from self log: %s" % ( rev_last, rev))
             # should be pretty close to now datetime set above.
             timestamp_last = datetime_seen # Better to use the start date of log than now time.
-            NTdebug("Modifying timestamp_last %s to %s" % (timestamp_last, datetime_seen) )
+#            NTdebug("Modifying timestamp_last %s to %s" % (timestamp_last, datetime_seen) )
         # end if
     # end for
 
@@ -176,8 +175,11 @@ def doStoreCING2db( entry_code, archive_id, project = None):
 
     chainList = molecule.allChains()
     is_multimeric = len(chainList) > 1
-    symmetry = molecule.getSymmetry()
-
+    symmetryResult = molecule.getSymmetry()
+    symmetry, ncsSymmetry, drSymmetry = None, None, None
+    if symmetryResult != None:
+        symmetry, ncsSymmetry, drSymmetry = symmetryResult
+        
     chothia_class = molecule.chothiaClassInt()
 
     p_distance_count = project.distances.lenRecursive()
@@ -205,8 +207,8 @@ def doStoreCING2db( entry_code, archive_id, project = None):
         else:
             NTerror("Failed to do restraintList.analyze()");
         # end if
-    else:
-        NTdebug("No restraints in %s" % getCallerName())
+#    else:
+#        NTdebug("No restraints in %s" % getCallerName())
     # end if
 
 #    p_dihedral_count = project.dihedrals.lenRecursive() # Note Talos derived would be counted this way.
@@ -297,6 +299,8 @@ def doStoreCING2db( entry_code, archive_id, project = None):
 
         is_multimeric=is_multimeric,
         symmetry=symmetry,
+        ncs_symmetry = ncsSymmetry, 
+        dr_symmetry  = drSymmetry ,
         chothia_class=chothia_class,
         ranges=ranges,
 #        omega_dev_av_all = p_omega_dev_av_all,

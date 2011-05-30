@@ -117,6 +117,8 @@ class AllChecks(TestCase):
                 if r:
 #                    NTdebug("Adding atoms to residue: %s" % r)
                     r.addAllAtoms()
+                    for atom in r.allAtoms():
+                        atom.addCoordinate(0.0, 1.0, 2.0, 40.0)
 #                else:
 #                    NTdebug("Skipping atoms for residue: %s" % r)
                 # end if
@@ -223,7 +225,12 @@ class AllChecks(TestCase):
         ranges = mol.startStopList2ranges([res1, res2, res5, res6])
         self.assertEquals( 'A.1-3,B.9-10', ranges)
 
-
+        # Check other routine
+        chain0 = mol.allChains()[0]
+        chain1 = mol.allChains()[1]
+        atomList = chain0.getRepresentingAtomListsPerResidue(chain1)
+        NTdebug("atomList: %s" % str(atomList))
+        self.assertEquals( len(atomList[0]), 4)
 
 if __name__ == "__main__":
     cing.verbosity = verbosityDebug

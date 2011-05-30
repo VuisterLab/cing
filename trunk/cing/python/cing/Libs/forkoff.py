@@ -367,7 +367,8 @@ class Process:
         if pid:
             ## Parent here
             if self.verbosity > 3:
-                NTmessage("Forked an independent process with pid: %s" % pid)
+                pass
+#                NTmessage("Forked an independent process with pid: %s" % pid)
             return pid
 
         if pid == None:

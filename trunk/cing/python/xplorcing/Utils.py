@@ -5,7 +5,7 @@ Created on Apr 28, 2011
 '''
 from random import randint
 from random import seed
-from xplorSimulation import getXplorSimulation
+from xplorSimulation import getXplorSimulation #@UnresolvedImport
 import time
 
 def getRandomSeed(size=6):
@@ -27,7 +27,7 @@ def addIon(sel):
     Should be called after PSF information is generated.
     """
 
-    from atomSel import AtomSel
+    from atomSel import AtomSel #@UnresolvedImport
 
     if isinstance(sel,str):
         sel = AtomSel(sel)

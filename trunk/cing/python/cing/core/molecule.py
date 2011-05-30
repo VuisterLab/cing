@@ -219,6 +219,53 @@ def allCommonAaResidues(resList):
             result.append(r)
     return result
 
+def selectFitAtoms( fitResidues, backboneOnly=True, includeProtons = False ):
+    """
+    Select the atoms to be fitted from a list of fitResidues
+    return NTlist instance or NoneObject on error
+
+    No longer changes self.ranges
+    """
+
+    if not fitResidues:
+        NTerror("In %s failed to get any residue in fitResidues" % getCallerName())
+        return NoneObject
+    #end if
+    
+    r0 = fitResidues[0]
+    c0 = r0._parent
+    m0 = c0._parent
+    modelCount = m0.modelCount
+    if modelCount <= 0:
+        return NoneObject
+    #end if
+
+##        self.ensemble = Ensemble( molecule )
+
+    # Partition the Atoms
+    fitted        = []
+#        fitResidues   = self.ranges2list( ranges )
+    # store the ranges
+#        self.ranges   = list2asci( fitResidues.zap('resNum'))
+#        self.ranges   = self.residueList2Ranges( fitResidues )
+
+    for res in fitResidues:
+        for a in res.allAtoms():
+            if len(a.coordinates) != modelCount:
+                continue
+            if ( (not includeProtons and a.isProton()) ):
+                continue
+            if backboneOnly and a.isSidechain():
+                continue
+            else:
+                fitted.append( a )
+            #end if
+        #end for
+    #end for
+#    NTdebug("Atom list to be fitted (len:%s):\n%s" % (len(fitted), fitted))
+    return fitted
+#end def
+
 
 """
 Call methods of this class like:
@@ -238,7 +285,8 @@ class ResidueList():
         return allResiduesWithCoordinates(self.allResidues())
     def allCommonAaResidues(self):
         return allCommonAaResidues(self.allResidues())
-
+    def selectFitAtoms(self, fitResidueList, backboneOnly=True, includeProtons = False ):
+        return selectFitAtoms(fitResidueList, backboneOnly=backboneOnly, includeProtons = includeProtons )
 
 
 #==============================================================================
@@ -1806,16 +1854,17 @@ class Molecule( NTtree, ResidueList ):
         return atomListBySpintypeAndType
     # end def
 
-    def getSymmetry( self ):
-        'Return string like SYMMETRY_C2_STR or None on error.'
+    def getSymmetry( self, modelIdx = 0 ):
+        'Return tuple like [SYMMETRY_C2_STR, 4.62, 2.56] or None on error.'
         allChains = self.allChains()
         lAllChains = len(allChains)
+        result = [ SYMMETRY_C1_STR, None, None ]
         if not lAllChains:
             NTwarning("No chains; yet?")
-            return SYMMETRY_NA_STR
+            return None
         if lAllChains == 1:
             NTdebug("Single chains.")
-            return SYMMETRY_C1_STR
+            return result
         chain0 = allChains[0]
         chain1 = allChains[1]
         if lAllChains == 2:
@@ -1824,30 +1873,27 @@ class Molecule( NTtree, ResidueList ):
             NTdebug("hasSameSequence %s" % hasSameSequence)
             if hasSameSequence == None:
                 NTerror("In %s hasSameSequence Failed" % getCallerName())
-                return None
-            if hasSameSequence:
-                # TODO: finish
-#                ncsSymmetryPerResidue = chain0.getNcsSymmetryPerResidue( chain1 )
-                ncsSymmetryPerResidue = 0.0
-                NTdebug("ncsSymmetryPerResidue %s" % ncsSymmetryPerResidue)
-                if ncsSymmetryPerResidue == None:
-                    NTerror("In %s getNcsSymmetryPerResidue Failed" % getCallerName())
-                    return None                
-                if  ncsSymmetryPerResidue < SYMMETRY_NCS_PER_RESIDUE_CUTOFF:
-                    drSymmetry = chain0.getSymmetryDRPerResidue( chain1 )
-                    NTdebug("drSymmetry %s" % drSymmetry)
-                    if drSymmetry == None:
-                        NTerror("In %s getSymmetryDRPerResidue Failed" % getCallerName())
-                        return None                
-                    if drSymmetry < SYMMETRY_DR_PER_RESIDUE_CUTOFF:
-                        return SYMMETRY_C2_STR # homo dimer
-                    else:
-                        return SYMMETRY_C1_STR 
-                else:
-                    return SYMMETRY_C1_STR
-            else:
+                return result
+            if not hasSameSequence:
                 return SYMMETRY_C1_STR
-        return SYMMETRY_ND_STR
+            ncsSymmetry = chain0.calculateRmsd( chain1, modelIdx = 0 ) # Only for first model
+            drSymmetry = chain0.getSymmetryDR( chain1, modelIdx = 0 )
+
+            NTdebug("ncsSymmetry %.2f" % ncsSymmetry)
+            NTdebug("drSymmetry  %.2f" % drSymmetry)
+            if ncsSymmetry == None:
+                NTerror("In %s getNcsSymmetryPerResidue Failed" % getCallerName())
+                return None                
+            if drSymmetry == None:
+                NTerror("In %s getSymmetryDR Failed" % getCallerName())
+                return None                
+            if  ncsSymmetry < SYMMETRY_NCS_CUTOFF and drSymmetry < SYMMETRY_DR_CUTOFF:
+                result[0] = SYMMETRY_C2_STR
+                result[1] = ncsSymmetry
+                result[2] = drSymmetry
+                return result # homo dimer
+            return result
+        return result
 
 
     def _saveStereoAssignments( self, stereoFileName ):
@@ -2425,43 +2471,6 @@ Return an Molecule instance or None on error
 #        """Integer value for fast lookup in db"""
 #        return self.mapColorString2Int[ self.colorLabel ]
 
-    def selectFitAtoms( self, fitResidues, backboneOnly=True, includeProtons = False ):
-        """
-        Select the atoms to be fitted from a list of fitResidues
-        return NTlist instance or NoneObject on error
-
-        No longer changes self.ranges
-        """
-
-        if self.modelCount <= 0:
-            return NoneObject
-        #end if
-
-##        self.ensemble = Ensemble( molecule )
-
-        # Partition the Atoms
-        fitted        = []
-#        fitResidues   = self.ranges2list( ranges )
-        # store the ranges
-#        self.ranges   = list2asci( fitResidues.zap('resNum'))
-#        self.ranges   = self.residueList2Ranges( fitResidues )
-
-        for res in fitResidues:
-            for a in res.allAtoms():
-                if len(a.coordinates) != self.modelCount:
-                    continue
-                if ( (not includeProtons and a.isProton()) ):
-                    continue
-                if backboneOnly and a.isSidechain():
-                    continue
-                else:
-                    fitted.append( a )
-                #end if
-            #end for
-        #end for
-#        NTdebug("Atom list to be fitted:\n%s" % fitted)
-        return fitted
-    #end def
 
     def _autoRanges(self, autoLimit=LIMIT_RANGES):
         """
@@ -3115,9 +3124,13 @@ class Ensemble( NTlist ):
     #end def
 
     def __str__( self ):
-        return sprintf( '<Ensemble ("%s", models:%d, rmsd to mean: %.2f)>',
-                        self.molecule.name, len(self), self.averageModel.rmsd
-                      )
+        # Can be called before rmsd calculated.
+        molName = getDeepByKeysOrAttributes(self, 'molecule', NAME_STR)
+        rmsd = getDeepByKeysOrAttributes(self, 'averageModel', RMSD_STR)
+        if rmsd != None:
+            rmsd = "%.2f" % rmsd
+        result = '<Ensemble ("%s", models:%d, rmsd to mean: %s)>' % (molName, len(self), rmsd)
+        return result
     #end def
 
     def __repr__( self ):
@@ -3154,11 +3167,13 @@ class Model( NTcMatrix ):
         """
         v1 = self.fitCoordinates.zap( 'e' )
         v2 = other.fitCoordinates.zap( 'e' )
+#        NTdebug("v1[:10]: %s" % str(v1[:10]))
+#        NTdebug("v2[:10]: %s" % str(v2[:10]))
         if len(v1) != len(v2):
             NTerror("Model.superpose: unequal length fitCoordinates (%s and %s)", self, other)
             return NaN
         #end if
-
+        
         smtx = superposeVectors( v1, v2 )
         #copy the result to self
         smtx.copy( self )
@@ -3423,54 +3438,84 @@ Chain class: defines chain properties and methods
         seq1 = other.toSequence()
         NTdebug("Comparing sequences: \n%s\n%s" % (seq0, seq1))
         return seq0 == seq1
+    #end def
             
+            
+    def calculateRmsd( self, other, firstModelOnly = True, backboneOnly=True, includeProtons = False, modelIdx = 0 ):
+        """
+        Calculate pairwise rmsd between self and other chain for the first model only.
+        Return None on error.
+        The routine will not change the actual coordinates.
+        """
+        if modelIdx != 0:
+            NTerror("Code only able to do first model right now but found request for model: %s" % modelIdx)
+            return None
+        ensemble = Ensemble()
+        fittedL = NTlist()
+        chainList = [self, other]
+        for idx, chain in enumerate(chainList):
+            fitAtoms = chain.selectFitAtoms( chain.allResidues(), backboneOnly=backboneOnly, includeProtons = includeProtons )
+            if not fitAtoms:
+                NTerror( "In %s failed to selectFitAtoms for %s" % ( getCallerName(), chain))
+                return None                
+            fittedL.append( fitAtoms )       
+                 
+            model = Model(chain.name, idx)
+            for atom in fitAtoms:
+                # Input should remain unchanged.
+                c = atom.coordinates[0].copy()
+                model.coordinates.append( c )
+                model.fitCoordinates.append( c )
+            ensemble.append(model)
+#            NTdebug("Appended %s to %s" % (model, ensemble))
+        # end for            
+        rmsd = ensemble[1].superpose(ensemble[0])
+        if rmsd  == None:
+            NTerror("Failed to %s" % getCallerName())
+        return rmsd
+    #end def
 
-    def getNcsSymmetryPerResidue( self, other ):
-        'TODO: finish code'
-        lol = self.getRepresentingAtomListsPerResidue( other )
-        if lol == None:
-            NTwarning("In %s failed to getRepresentingAtomListsPerResidue" % getCallerName())
-            return None            
-#        a0List, a1List = lol
-#        a0Size = len(a0List)
-#        allResiduesWithCoord = self.allResiduesWithCoordinates()
-#        selectedModels = range(self._parent.modelCount)
-#        ranges = CV_STR
-#        NTdetail("==> Calculating inter-chain rmsd (ranges: %s, models: %s)" % (ranges, selectedModels))
-#        comment = 'Ranges %s' % ranges
-#        self.rmsd = RmsdResult( selectedModels, allResiduesWithCoord, comment=comment )
         
-        
-    def getSymmetryDRPerResidue( self, other ):
+    def getSymmetryDR( self, other, modelIdx = None ):
         """
         Return None on error or the distance between Calphas or C1' averaged of the length
         In case the type of chain is unknown then the first atom in such a residue will be taken for comparison.
+        The average over the whole ensemble will be used.
         """
-        lol = self.getRepresentingAtomListsPerResidue( other )
-        if lol == None:
+        atomList = self.getRepresentingAtomListsPerResidue( other )
+#        NTdebug("atomList: %s" % str(atomList))
+        
+        if atomList == None:
             NTwarning("In %s failed to getRepresentingAtomListsPerResidue" % getCallerName())
             return None            
-        a0List, a1List = lol
+        a0List, a1List = atomList
         a0Size = len(a0List)
+        a1Size = len(a1List)
+        if a0Size != a1Size:
+            NTwarning("In %s failed to get same size for representing atom lists %s and %s" % (getCallerName(), a0Size, a1Size))
+            return None
         a0PairCount = a0Size / 2
+        NTdebug("In %s analyzing %s pairs" % (getCallerName(), a0PairCount))
         if a0PairCount == 0:
             return 0.0
+              
         sumDd = 0.0
         for i in range( a0PairCount ):
-            aA0 = a0List[i]
-            aA1 = a1List[a0Size-i]
-            dA = aA0.distance( aA1 ) 
-            aB0 = a0List[a0Size-i]
-            aB1 = a1List[i]
-            dB = aB0.distance( aB1 )
-            dd = fabs(dA,dB)
-            sumDd += dd
+            atomA0 = a0List[i]
+            atomA1 = a1List[a0Size-i-1]
+            atomB0 = a0List[a0Size-i-1]
+            atomB1 = a1List[i]
+            dA = atomA0.distance( atomA1, modelIdx = modelIdx )[0] # (av,sd,minv,maxv)
+            dB = atomB0.distance( atomB1, modelIdx = modelIdx )[0]
+            sumDd += fabs(dA-dB)
+#            NTdebug("pair %3d %s %s %s %s %.2f %.2f sumDd: %.2f" % (i, atomA0, atomA1, atomB0, atomB1, dA, dB, sumDd))
+        # end for
         result =  sumDd / a0PairCount
         return result
         
     def getRepresentingAtomListsPerResidue( self, other ):
         """
-        Return tuple of coordinate list for self, other for representative atoms.
+        Return tuple of coordinate list for self, other for representative atoms that are present in both chains given.
         """
         seq0 = self.toSequence(withCoordinate=True)
         seq1 = other.toSequence(withCoordinate=True)
@@ -3640,7 +3685,7 @@ Chain class: defines chain properties and methods
             oneLetter = getDeepByKeysOrDefault(r, FASTA_UNCOMMON_RESIDUE_STR, 'db', 'shortName')
             if len(oneLetter) != 1:
                 NTwarning("Failed to get oneLetter for residue type of %s reset to %s" % (r, FASTA_UNCOMMON_RESIDUE_STR))
-                oneLetter =FASTA_UNCOMMON_RESIDUE_STR
+                oneLetter = FASTA_UNCOMMON_RESIDUE_STR
             result += oneLetter
         return result
     #end def
@@ -4690,6 +4735,10 @@ e.g.
             raise AttributeError
     #end def
 
+    def copy(self):
+        'Return a copy of self'
+        return Coordinate(x=self.e.x, y=self.e.y, z=self.e.z, Bfac=self.Bfac, occupancy=self.occupancy, atom = self.atom )
+    
     def __setattr__(self, item, value):
         if  item == 'x':
             self.e[0] = value
@@ -4957,20 +5006,24 @@ coordinates: %s"""  , dots, self, dots
         self.resonances.append( r )
     #end def
 
-    def distance( self, other ):
+    def distance( self, other, modelIdx = None ):        
         """Return (av,sd,min,max) tuple corresponding to distance
-           between self and other or None on error
-           Set the distances array for later usage.
+           between self and other or None on error.
+           Optional parameter modelIdx can select a single model.
+           Set the distances array for later usage. JFD: when?
         """
         lenSelf = len( self.coordinates)
         if lenSelf == 0:
             return None
         #end if
-        if (lenSelf != len( other.coordinates ) ):
+        if lenSelf != len( other.coordinates ):
             return None
         #end if
         self.distances = NTlist()
-        for i in range(0, lenSelf):
+        modelToDoList = range(0, lenSelf)
+        if modelIdx != None:
+            modelToDoList = [ modelIdx ] 
+        for i in modelToDoList:            
             self.distances.append( NTdistanceOpt(self.coordinates[i], other.coordinates[i]) )
         #end for
         av,sd,dummy = self.distances.average()
@@ -5611,6 +5664,13 @@ coordinates: %s"""  , dots, self, dots
                 return None
 #            NTdebug("Failed to translate from CING to convention: %s atom: %-20s returning CING atom name" % (convention, self))
             pdbAtmName = self.name
+#        if convention == XPLOR and self.residue.isCterminal():
+#            if  self.name == 'O':
+#                pdbAtmName = 'OT1'
+#            elif self.name == 'OXT':
+#                pdbAtmName = 'OT2'
+#            # endif
+#        # end if
 
         pdbResName = self.residue.translate( convention )
 #        NTdebug("Translated res: %s to name %s", self.residue, pdbResName)
@@ -5627,7 +5687,9 @@ coordinates: %s"""  , dots, self, dots
             record = ATOM()
 
         chainId = self.residue.chain.name
-
+        if len(chainId) > 1:
+            NTerror("chain id was longer than allowed 1 character: [%s]" % chainId)
+            return None
         record.serial     = pdbIndex
         record.name       = pdbAtmName
         record.resName    = pdbResName
@@ -5639,6 +5701,7 @@ coordinates: %s"""  , dots, self, dots
         record.z          = coor[2]
         record.tempFactor = coor.Bfac
         record.occupancy  = coor.occupancy
+        record.segID      = chainId + '   '
 
         return record
     #end def
