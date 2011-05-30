@@ -55,22 +55,21 @@ def storeCING2dbLoop(archive_id, entryList=None, expectPdbEntryList = True):
 if __name__ == '__main__':
     cing.verbosity = cing.verbosityDebug
     #cing.verbosity = cing.verbosityDefault
-    archive_id = ARCHIVE_NRG_ID
+#    archive_id = ARCHIVE_NRG_ID
 #    entryList = '1brv'.split()
 #    entryList = '1a4d 1a24 1afp 1ai0 1b4y 1brv 1bus 1cjg 1d3z 1hkt 1hue 1ieh 1iv6 1jwe 1kr8 2hgh 2k0e'.split()
-    entryList = []
+#    entryList = []
 
-    if 0:
-        archive_id = ARCHIVE_CASP_ID
-        entryList = 'T0538TS001 T0538Org'.split()
-    elif 1:
-        archive_id = ARCHIVE_CASD_ID
+#    archive_id = ARCHIVE_CASP_ID
+#    entryList = 'T0538TS001 T0538Org'.split()
+
+    archive_id = ARCHIVE_CASD_ID
 #        entryList = None # will use all entries in startDir, 'list', 'entry_list_all.csv'
-#        entryList = 'CGR26APiscataway CGR26AUtrecht2 VpR247Seattle2'.split()
-        entryList = 'AR3436APiscataway2 AtT13Piscataway CGR26APiscataway CtR69APiscataway ET109AoxPiscataway2 ET109AredPiscataway2 HR5537APiscataway2 NeR103APiscataway PGR122APiscataway VpR247Piscataway2'.split()
-    elif 0:
-        archive_id = ARCHIVE_PDB_ID
-#        entryList = '1brv'.split()
-        entryList = "3kff 3a4r 3a34 3i40 2xdy 3mcd 3ild 1brv 1hkt".split()
+    entryList = 'NeR103ALyon2'.split()
+#        entryList = 'AR3436APiscataway2 AtT13Piscataway CGR26APiscataway CtR69APiscataway ET109AoxPiscataway2 ET109AredPiscataway2 HR5537APiscataway2 NeR103APiscataway PGR122APiscataway VpR247Piscataway2'.split()
+
+#    archive_id = ARCHIVE_PDB_ID
+##        entryList = '1brv'.split()
+#    entryList = "3kff 3a4r 3a34 3i40 2xdy 3mcd 3ild 1brv 1hkt".split()
 
     storeCING2dbLoop(archive_id, entryList=entryList)

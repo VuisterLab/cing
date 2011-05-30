@@ -1,0 +1,339 @@
+data_completeness_observable_info
+
+save_file_characteristics
+   _Saveframe_category   file_characteristics
+
+   _File_version         1.0
+   _Author              "Jurgen F. Doreleijers"
+
+   loop_
+      _Date
+      _Details
+
+       2004-01-30 "First creation from Aqua lib" 
+
+   stop_
+
+save_
+
+
+save_completeness_observable_info
+   _Saveframe_category   completeness_observable_info
+
+   _Details             
+;
+The listed residues/atom combination is considered observable in an NMR 
+NOESY experiment.
+;
+
+   loop_
+      _Comp_ID
+      _Atom_ID
+
+       ALA  H    
+       ALA  HA   
+       ALA  MB  
+       ARG  H    
+       ARG  HA   
+       ARG  HB2  
+       ARG  HB3  
+       ARG  QG   
+       ARG  QD   
+       ARG  HE    
+       ARGx H    
+       ARGx HA   
+       ARGx HB2  
+       ARGx HB3  
+       ARGx QG   
+       ARGx QD   
+       ARGx HE   
+       ASN  H    
+       ASN  HA   
+       ASN  HB2  
+       ASN  HB3  
+       ASN  HD21 
+       ASN  HD22 
+       ASP  H    
+       ASP  HA   
+       ASP  HB2  
+       ASP  HB3  
+       ASPH H    
+       ASPH HA   
+       ASPH HB2  
+       ASPH HB3  
+       CYS  H    
+       CYS  HA   
+       CYS  HB2  
+       CYS  HB3  
+       CYSS H    
+       CYSS HA   
+       CYSS HB2  
+       CYSS HB3  
+       GLN  H    
+       GLN  HA   
+       GLN  HB2  
+       GLN  HB3  
+       GLN  QG   
+       GLN  HE21 
+       GLN  HE22 
+       GLU  H    
+       GLU  HA   
+       GLU  HB2  
+       GLU  HB3  
+       GLU  QG   
+       GLUH H    
+       GLUH HA   
+       GLUH HB2  
+       GLUH HB3  
+       GLUH QG   
+       GLY  H    
+       GLY  HA2  
+       GLY  HA3         
+       HIS  H    
+       HIS  HA   
+       HIS  HB2  
+       HIS  HB3  
+       HIS  HD2  
+       HIS  HE1         
+       HISH H    
+       HISH HA   
+       HISH HB2  
+       HISH HB3  
+       HISH HD2  
+       HISH HE1         
+       HISE H    
+       HISE HA   
+       HISE HB2  
+       HISE HB3  
+       HISE HD2  
+       HISE HE1         
+       ILE  H    
+       ILE  HA   
+       ILE  HB   
+       ILE  MG   
+       ILE  QG   
+       ILE  MD   
+       LEU  H    
+       LEU  HA   
+       LEU  HB2  
+       LEU  HB3  
+       LEU  HG   
+       LEU  MD1  
+       LEU  MD2  
+       LYS  H    
+       LYS  HA   
+       LYS  HB2  
+       LYS  HB3  
+       LYS  QG   
+       LYS  QD   
+       LYS  QE   
+       MET  H    
+       MET  HA   
+       MET  HB2  
+       MET  HB3  
+       MET  QG   
+       MET  ME   
+       PHE  H    
+       PHE  HA   
+       PHE  HB2  
+       PHE  HB3  
+       PHE  QD   
+       PHE  QE   
+       PHE  HZ   
+       PRO  HA   
+       PRO  HB2  
+       PRO  HB3  
+       PRO  QG   
+       PRO  QD   
+       cPRO HA   
+       cPRO HB2  
+       cPRO HB3  
+       cPRO QG   
+       cPRO QD   
+       SER  H    
+       SER  HA   
+       SER  HB2  
+       SER  HB3  
+       THR  H    
+       THR  HA   
+       THR  HB   
+       THR  MG   
+       TRP  H    
+       TRP  HA   
+       TRP  HB2  
+       TRP  HB3  
+       TRP  HD1  
+       TRP  HE1  
+       TRP  HE3  
+       TRP  HZ2  
+       TRP  HZ3  
+       TRP  HH2  
+       TYR  H    
+       TYR  HA   
+       TYR  HB2  
+       TYR  HB3  
+       TYR  QD   
+       TYR  QE   
+       VAL  H    
+       VAL  HA   
+       VAL  HB   
+       VAL  MG1  
+       VAL  MG2  
+
+       ADE  H4'  
+       ADE  H3'  
+       ADE  H2'  
+       ADE  H2'' 
+       ADE  H1'  
+       ADE  Q5'  
+       ADE  H8   
+       ADE  H61  
+       ADE  H62  
+       ADE  H2   
+       CYT  H4'  
+       CYT  H3'  
+       CYT  H2'  
+       CYT  H2'' 
+       CYT  H1'  
+       CYT  Q5'  
+       CYT  H41  
+       CYT  H42  
+       CYT  H5   
+       CYT  H6   
+       GUA  H4'  
+       GUA  H3'  
+       GUA  H2'  
+       GUA  H2'' 
+       GUA  H1'  
+       GUA  Q5'  
+       GUA  H8   
+       GUA  H21  
+       GUA  H22  
+       GUA  H1   
+       THY  H4'  
+       THY  H3'  
+       THY  H2'  
+       THY  H2'' 
+       THY  H1'  
+       THY  Q5'  
+       THY  M7   
+       THY  H6   
+       THY  H3   
+       URA  H4'  
+       URA  H3'  
+       URA  H2'  
+       URA  H1'  
+       URA  Q5'  
+       URA  H3   
+       URA  H5   
+       URA  H6   
+       DUR  H4'  
+       DUR  H3'  
+       DUR  H2'  
+       DUR  H2'' 
+       DUR  H1'  
+       DUR  Q5'  
+       DUR  H3   
+       DUR  H5   
+       DUR  H6   
+
+       A  H4'  
+       A  H3'  
+       A  H2'  
+       A  H2'' 
+       A  H1'  
+       A  Q5'  
+       A  H8   
+       A  H61  
+       A  H62  
+       A  H2   
+       C  H4'  
+       C  H3'  
+       C  H2'  
+       C  H2'' 
+       C  H1'  
+       C  Q5'  
+       C  H41  
+       C  H42  
+       C  H5   
+       C  H6   
+       G  H4'  
+       G  H3'  
+       G  H2'  
+       G  H2'' 
+       G  H1'  
+       G  Q5'  
+       G  H8   
+       G  H21  
+       G  H22  
+       G  H1   
+       T  H4'  
+       T  H3'  
+       T  H2'  
+       T  H2'' 
+       T  H1'  
+       T  Q5'  
+       T  M7   
+       T  H6   
+       T  H3   
+       U  H4'  
+       U  H3'  
+       U  H2'  
+       U  H1'  
+       U  Q5'  
+       U  H3   
+       U  H5   
+       U  H6   
+
+       DA  H4'  
+       DA  H3'  
+       DA  H2'  
+       DA  H2'' 
+       DA  H1'  
+       DA  Q5'  
+       DA  H8   
+       DA  H61  
+       DA  H62  
+       DA  H2   
+       DC  H4'  
+       DC  H3'  
+       DC  H2'  
+       DC  H2'' 
+       DC  H1'  
+       DC  Q5'  
+       DC  H41  
+       DC  H42  
+       DC  H5   
+       DC  H6   
+       DG  H4'  
+       DG  H3'  
+       DG  H2'  
+       DG  H2'' 
+       DG  H1'  
+       DG  Q5'  
+       DG  H8   
+       DG  H21  
+       DG  H22  
+       DG  H1   
+       DT  H4'  
+       DT  H3'  
+       DT  H2'  
+       DT  H2'' 
+       DT  H1'  
+       DT  Q5'  
+       DT  M7   
+       DT  H6   
+       DT  H3   
+       DU  H4'  
+       DU  H3'  
+       DU  H2'  
+       DU  H1'  
+       DU  Q5'  
+       DU  H3   
+       DU  H5   
+       DU  H6   
+       
+   stop_
+
+save_
+

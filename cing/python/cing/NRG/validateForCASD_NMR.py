@@ -17,13 +17,13 @@ cingDirNRG = os.path.join(cingPythonDir, 'cing', 'NRG' )
 pythonScriptFileName = os.path.join(cingDirNRG, 'validateEntryForCasd.py')
 #pythonScriptFileName = os.path.join(cingDirNRG, 'storeCASDCING2db.py')
 
-if False:
+if 1:
     entryListFileName = os.path.join(startDir, 'list', 'entry_list_all.csv')
 #    entryListFileName = os.path.join(startDir, 'list', 'entry_list_all_org.csv')
 #    entryListFileName = os.path.join(startDir, 'list', 'entry_list_redo.csv')
 else:
     entryListFileName = os.path.join(startDir, 'list', 'entry_list_single.csv')
-    entryList = 'AtT13Paris'.split()
+    entryList = 'NeR103ALyon2'.split()
     writeEntryListToFile(entryListFileName, entryList)
 
 inputDirCASD_NMR = 'file:///Users/jd/%s/data' % CASD_NMR_BASE_NAME
@@ -36,11 +36,11 @@ max_time_to_wait = 60 * 60 * 6 # 2p80 took the longest: 5.2 hours.
 doScriptOnEntryList(pythonScriptFileName,
                     entryListFileName,
                     startDir,
-                    processes_max = 2,
+                    processes_max = 4,
                     delay_between_submitting_jobs = 5, # why is this so long? because of time outs at tang?
                     max_time_to_wait = max_time_to_wait, # 1y4o took more than 600. This is one of the optional arguments.
                     # 1ai0 took over 20 min; let's set this to 1 hour
                     START_ENTRY_ID = 0,
-                    MAX_ENTRIES_TODO = 100,
+                    MAX_ENTRIES_TODO = 4,
                     expectPdbEntryList = False,
                     extraArgList = extraArgList)
