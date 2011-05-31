@@ -97,6 +97,16 @@ b
         y.append(300)
         self.assertEquals( x.lenRecursive(), 3)
 
+    def testLenRecursive(self):
+        x = NTdict(a=None)
+        self.assertEquals( x.lenRecursive(), 1)
+        x.b = NTlist(1,2)
+        self.assertEquals( x.lenRecursive(), 3)
+        x.c = {'foo': {'bar': [ 1,2 ]}} # Can be any mix of elements. Only finals count
+        self.assertEquals( x.lenRecursive(), 5)
+        x.d = ( 3, None, 5) # even tuples
+        self.assertEquals( x.lenRecursive(), 8)
+
     def testGetDeepAvgByKeys(self):
         d=NTdict()
         l = NTlist()
@@ -120,7 +130,15 @@ b
         x = l.getConsensus(minFraction=0.5)
         self.assertEquals( x, 'abc')
 
+    def testGetDeepByKeysOrAttributesSimple(self):
+        cing.verbosity = cing.verbosityDebug
+        d = {}
+        keyList = 'a b c'.split()
+        setDeepByKeys(d, None, *keyList)
+        NTdebug("Simpler object: %r" % d)
+
     def testGetDeepByKeysOrAttributes(self):
+        cing.verbosity = cing.verbosityDebug
         value = 123
         d = {}
         keyList = 'a b c'.split()
@@ -136,6 +154,7 @@ b
         self.assertFalse(valueOut) # None will evaluate to False as well.
 
     def testGetDeepByKeysOrAttributes2(self):
+        cing.verbosity = cing.verbosityDebug
 
         inputTable = [['a'],['b']]
         expected = NTdict( a=None, b=None )
@@ -146,6 +165,7 @@ b
         NTdebug("Created: %r" % result)
         self.assertTrue( expected.isEquivalent(result ))
 
+        # 2D
         inputTable = [['a','foo'],['b','bar']]
         expected = NTdict( a='foo', b='bar' )
         result = NTdict()
@@ -154,7 +174,7 @@ b
         NTdebug("Created: %r" % result)
         self.assertTrue( expected.isEquivalent(result ))
 
-#        # Finally 3D
+#        # 3D
         inputTable = [['a','foo', 'abba'],['b','bar', 'waterloo']]
         expected = { 'a':{ 'foo':'abba'}, 'b':{ 'bar':'waterloo'}}
         result = NTdict()
@@ -164,6 +184,35 @@ b
         self.assertTrue( result.isEquivalent(expected ))
 ##        self.failUnlessRaises( AttributeError, expected.isEquivalent(result )) Dont care why this fails....
 
+        NTdebug("3D done but first transposing")
+        result = NTdict()
+        inputTable = [['a','b'],['foo','bar'],['abba','waterloo'],]
+        expected = { 'a':{ 'foo':'abba'}, 'b':{ 'bar': 'waterloo'}}        
+        result.appendFromTableGeneric(inputTable, *idxColumnKeyList, invertFirst=True)
+        NTdebug("Created: %r" % result)
+        self.assertTrue( result.isEquivalent( expected ))
+##        self.failUnlessRaises( AttributeError, expected.isEquivalent(result )) Dont care why this fails....
+
+        NTdebug("3D transposing and added column")
+        result = NTdict()
+        x = 'abba' # Needs to evaluate to True
+        inputTable = [['a','b'],['foo','bar']]
+        expected = { 'a':{ 'foo':x}, 'b':{ 'bar': x}}        
+        result.appendFromTableGeneric(inputTable, *idxColumnKeyList, invertFirst=True, appendBogusColumn=x)
+        NTdebug("Created: %r" % result)
+        self.assertTrue( result.isEquivalent( expected ))
+##        self.failUnlessRaises( AttributeError, expected.isEquivalent(result )) Dont care why this fails....
+    # end def
+
+
+    def test_transpose(self):
+        '''Compute the transpose of a matrix.'''
+        input = [ [1,2,3], [4,5,6] ]
+        expected = [ [1,4], [2,5], [3,6] ]
+        output = transpose(input)
+        self.assertEquals(output, expected)
+    # end def
+# end class
 
 if __name__ == "__main__":
     cing.verbosity = cing.verbosityDebug

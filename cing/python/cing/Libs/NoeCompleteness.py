@@ -1,11 +1,13 @@
-#@PydevCodeAnalysisIgnore
 '''
 Created on May 30, 2011
 
 @author: jd
 '''
+from cing import cingDirLibs
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.STAR.File import File
+from cing.core.classes2 import AtomList
+from cing.core.classes import DistanceRestraint
 
 OVER_NUMBER_OF_SIGMAS_STR    = ">sigma"
 NO_MULTIMER_STR              = "no multimer"
@@ -14,119 +16,224 @@ NO_INTRAS_STR                = "no intras"
 #/** The eight is used for overflow */
 MAX_SHELLS_OBSERVED = 9
 
-class NoeCompleteness:
-    def __init__(self, project):
+class NoeCompleteness( NTdict ):
+    def __init__(self, project, **kwds):
+        NTdict.__init__(self, **kwds)        
         self.project = project
-        self.completenessLib = CompletenessLib()
+        self.completenessLib = NoeCompletenessAtomLib()
+        self.modelCount = self.project.molecule.modelCount
+        self.atomList = AtomList()
+        self.resDistanceHoH = {}  # only up to self.max_dist_expectedOverall
+        self.resRadiusHash = {}   # don't pollute our data model but store locally. Key residue, value: radius float
+        self.atomDistanceHoH = {} # only up to self.max_dist_expectedOverall
         
     def doCompletenessCheck( self, 
-             max_dist_expectedOverall,
-             min_dist_observed,
-             max_dist_observed,
-             numb_shells_observed,
-             min_dist_expected,
-             max_dist_expected,
-             numb_shells_expected,
-             avg_power_models,
-             avg_method,
-             monomers,
-             use_intra,
-             ob_file_name,
-             summaryFileNameCompleteness,
-             write_dc_lists,
-             file_name_base_dc,
-             resList = None, # Subset of residues             
+             max_dist_expectedOverall = 4.0,
+             min_dist_observed = 2.0,
+             max_dist_observed = 4.0,
+             numb_shells_observed = 2,
+             min_dist_expected = 2.0,
+             max_dist_expected = 10.0,
+             numb_shells_expected = 16.0,
+             avg_power_models = 1.0, # unused
+             avg_method = 1,# unused
+             monomers = 1,# unused
+             use_intra = False,
+             ob_file_name = None,
+             summaryFileNameCompleteness = "tmp_dir/XXXX_DOCR_compl_sum",
+             write_dc_lists = True,
+             file_name_base_dc  = "tmp_dir/XXXX_DOCR_compl",
+             resList = None, # Subset of residues                                  
              ):
-        'Convenience method.'
-        isPerShellRun = False
-        for r in range(2):
-            if r:
-                isPerShellRun = True
-            if not self._doCompletenessCheck(
-                    max_dist_expectedOverall,
-                    min_dist_observed,
-                    max_dist_observed,
-                    numb_shells_observed,
-                    min_dist_expected,
-                    max_dist_expected,
-                    numb_shells_expected,
-                    isPerShellRun,
-                    avg_power_models,
-                    avg_method,
-                    monomers,
-                    use_intra,
-                    ob_file_name,
-                    summaryFileNameCompleteness,
-                    write_dc_lists,
-                    file_name_base_dc,
-                    resList = resList, # Subset of residues
-                    ):
-                NTerror("Failed to run " + r + " of completeness check.");
+        'Convenience method.    Return None on error or completeness on success. '
+
+        
+        self.max_dist_expectedOverall = max_dist_expectedOverall
+        self.min_dist_expected      = min_dist_expected
+        self.max_dist_expected      = max_dist_expected
+        self.numb_shells_expected   = numb_shells_expected
+
+        self.min_dist_observed      = min_dist_observed
+        self.max_dist_observed      = max_dist_observed
+        self.numb_shells_observed   = numb_shells_observed
+
+        self.avg_power_models       = avg_power_models # Unused as of yet.
+        self.avg_method             = avg_method
+        self.monomers               = monomers
+        
+        self.use_intra                      = use_intra                  
+        self.ob_file_name                   = ob_file_name               
+        self.summaryFileNameCompleteness    = summaryFileNameCompleteness
+        self.write_dc_lists                 = write_dc_lists             
+        self.file_name_base_dc              = file_name_base_dc          
+        self.resList                        = resList
+        
+        self.isPerShellRun = False
+        
+        if self.cacheDistanceInformation():
+            NTerror("Failed to cacheDistanceInformation")
+            return
+        for i in range(2):
+            if i:
+                self.isPerShellRun = True
+            if not self.doCompletenessCheckInnerLoop():
+                NTerror("Failed to run %d of completeness check." % i);
                 return
             # end if
         # end for
         return True
     # end def
     
+    def cacheDistanceInformation(self):
+        'Fills below distance sets for later use. Return True on error.'
+        
+        NTdebug("Now in %s" % getCallerName())        
+        
+        if not self.getAtomList():
+            NTerror("Failed getAtomList")
+            return True
+        
+        self.resDistanceHoH = {}  # only up to self.max_dist_expectedOverall
+        self.resRadiusHash = {}   # don't pollute our data model but store locally. Key residue, value: radius float
+        self.atomDistanceHoH = {} # only up to self.max_dist_expectedOverall
+        # Partition by residue for efficiency
+        n = len(self.resList)
+        m = len(self.atomList)
+        for r in range(n): # rows by columns; rc            
+            residue = self.resList[r]
+            radiusList = residue.radius()
+#            NTdebug("Found radii: %s" % str(radiusList))
+            if not radiusList:
+                NTdebug("Failed to get radius for %s" % residue)
+                continue
+            radius = max(radiusList)
+            setDeepByKeys(self.resRadiusHash, radius, residue)
+        # end for
     
-    def _doCompletenessCheck( self,
-             max_dist_expectedOverall,
-             min_dist_observed,
-             max_dist_observed,
-             numb_shells_observed,
-             min_dist_expected,
-             max_dist_expected,
-             numb_shells_expected,
-             isPerShellRun,
-             avg_power_models,
-             avg_method,
-             monomers,
-             use_intra,
-             ob_file_name,
-             summaryFileNameCompleteness,
-             write_dc_lists,
-             file_name_base_dc            ,
-             resList = None, # Subset of residues
-             ):
+        for r in range(n): # rows by columns; rc
+            residue1 = self.resList[r]
+            NTdebug("Working on residue1 %s" % residue1)
+            residue1Radius = getDeepByKeysOrAttributes(self.resRadiusHash, residue1)
+            if not residue1Radius:
+                NTdebug("Skipping radiusLess residue1 %s" % residue1)
+                continue
+            rStart = r + 1
+            if self.use_intra:
+                rStart = r            
+            for c in range(rStart, n): # Just do above the diagonal
+                residue2 = self.resList[c]
+                NTdebug("Working on residue2 %s" % residue2)
+                residue2Radius = getDeepByKeysOrAttributes(self.resRadiusHash, residue2)
+                if not residue2Radius:
+                    NTdebug("Skipping radiusLess residue2 %s" % residue2)
+                    continue
+                distanceList = residue1.distance( residue2 )
+                if not distanceList:
+                    NTerror("Failed to get distance between %s and %s. Skipping pair" % (residue1, residue2))
+                    continue
+                distance = min(distanceList)
+                cutoff = self.max_dist_expectedOverall + residue1Radius + residue2Radius
+                valueTuple = (residue1, residue2, distance, residue1Radius, residue2Radius,cutoff)
+                if distance > cutoff:
+                    NTdebug("Skipping distant residue pair %20s/%20s at %8.3f with radii %8.3f, %8.3f and cutoff %8.3f" % valueTuple)
+                else:
+                    NTdebug("Adding residue pair           %20s/%20s at %8.3f with radii %8.3f, %8.3f and cutoff %8.3f" % valueTuple)
+                    setDeepByKeys(self.resDistanceHoH, distance, residue1, residue2)
+                # end if
+            # end for
+        # end for
+                
+        for r in range(m): # rows by columns; rc
+            atom1 = self.atomList[r]
+            residue1 = atom1._parent
+#            NTdebug("Working on atom1 %s" % atom1)
+            presenceResidue1 = getDeepByKeysOrAttributes( self.resDistanceHoH, residue1 )
+            if not presenceResidue1:
+                NTdebug("Skipping completely missing residue1 %s for %s" % (residue1, atom1)) # Will occur for last residue since matrix is sparse.
+                continue
+            rStart = r + 1
+            if self.use_intra:
+                rStart = r
+            for c in range(rStart, m): # Just do above the diagonal
+                atom2 = self.atomList[c]
+                if atom2 == atom1: # may occur when including intra residuals.
+                    continue 
+                residue2 = atom2._parent
+#                NTdebug("Working on atom2 %s" % atom2)
+                distanceResidue1and2 = getDeepByKeysOrAttributes( self.resDistanceHoH, residue1, residue2 )
+                if distanceResidue1and2 == None: # Watch out zero is allowed for the distance
+                    NTdebug("Skipping missing combo residue1/2 %s/%s for atom1/2 %s/%s" % ( residue1, residue2, atom1, atom2))
+                    continue
+                atomPairs = NTlist()
+                atomPairs.append((atom1,atom2))
+                dr = DistanceRestraint(atomPairs=atomPairs)
+        #        dr.upper = self.max_dist_expectedOverall # Not really used but nice.
+                distance, _sd, _min, _max = dr.calculateAverage()
+                valueTuple = (atom1, atom2, distance)
+                if distance == None:
+                    NTwarning("Failed to get distance for %s" % str(valueTuple))
+                    continue
+                valueTuple = (atom1, atom2, distance)
+                if distance > self.max_dist_expectedOverall:
+                    NTdebug("Skipping distant atom pair %20s/%20s with distance %8.3f" % valueTuple)
+                else:
+                    NTdebug("Adding atom pair           %20s/%20s with distance %8.3f" % valueTuple)
+                    setDeepByKeys(self.atomDistanceHoH, distance, atom1, atom2)
+                # end if
+            # end for
+        # end for
+        NTdebug("resList          count: %s" % len(self.resList))            
+        NTdebug("atomList         count: %s" % len(self.atomList))            
+        NTdebug("resDistanceHoH   count: %s" % lenRecursive( self.resDistanceHoH ))
+        NTdebug("resRadiusHash    count: %s" % lenRecursive( self.resRadiusHash ))
+        NTdebug("atomDistanceHoH  count: %s" % lenRecursive( self.atomDistanceHoH ))
+    # end def
+        
+    
+    def addTheoreticalConstraints(self):
+        return
+    # end def
+         
+    def doCompletenessCheckInnerLoop( self ):
         """
     Analyzes the completeness of selected residues.
     Reset the completeness lib first in the ui if needed to change from standard.
     If there are no observable atoms in the coordinate list (e.g. entry 8drh) no
-    results will be generated but the return status will still be true for success.
+    results will be generated but the return status will still be True for success.
     The same if no restraints were observed.
+    
+   Return None on error or completeness on success. 
      """
 
-        if numb_shells_observed > MAX_SHELLS_OBSERVED:
-            numb_shells_observed = MAX_SHELLS_OBSERVED
+        if self.numb_shells_observed > MAX_SHELLS_OBSERVED:
+            self.numb_shells_observed = MAX_SHELLS_OBSERVED
         # end def
 
-        if not isPerShellRun:
-            max_dist_expected = max_dist_expectedOverall
+        if not self.isPerShellRun:
+            self.max_dist_expected = self.max_dist_expectedOverall
         # end def
         
 
-        self.min_dist_expected      = min_dist_expected;
-        self.max_dist_expected      = max_dist_expected;
-        self.numb_shells_expected   = numb_shells_expected;
-
-        self.min_dist_observed      = min_dist_observed;
-        self.max_dist_observed      = max_dist_observed;
-        self.numb_shells_observed   = numb_shells_observed;
-
-        self.avg_power_models       = avg_power_models;
-        self.avg_method             = avg_method;
-        self.monomers               = monomers;
-
-        showValues = False
-#        // Store the selections that can get changed by this code.
-#        BitSet atomSelectedSave     = (BitSet) gumbo.atom.selected.clone();
-#        BitSet dcSelectedSave       = (BitSet) dc.selected.clone();
-#        BitSet dcListSelectedSave   = (BitSet) dcList.selected.clone();
-
-
-        modelCount = self.project.molecule.modelCount
-        doFancyAveraging = avg_power_models != 1.0 # faster to do simpel averaging.
-        NTdebug("doFancyAveraging: %s" % doFancyAveraging)
+#        Create the sets anew
+        dcSetNameList = [
+            "USet", # universe of experimental constraints
+            "VSet", # universe of theoretical constraints
+            "WSet", # union of U and V
+            "XSet", # ((U - (E u O)) u V but keeps shrinking on removal of (I u S). Internal to Wattos.
+            "ESet", # exceptional
+            "OSet", # not observable
+            "ISet", # intra residual not to be analyzed
+            "SSet", # surplus
+            "ASet", # set of observable experimental distance constraints
+            "BSet", # set of observable theoretical ...
+            "MSet", # A n B
+            "CSet", # A - M
+            "DSet", # B - M
+            "LSet", # contributions with lower bounds
+            "PSet"  # contributions with upper bounds
+        ]
+        for dcSetName in dcSetNameList:
+            setDeepByKeys(self, NTlist(), dcSetName)
 
 #        // Find constraints
 #        BitSet dcInEntry = SQLSelect.selectBitSet( dc.dbms,
@@ -141,7 +248,7 @@ class NoeCompleteness:
 #            return true;
 #        }                
 
-
+        """
         if self.getAtomsObservableObjects(resList)) {
             General.showError("Failed to get the observable atoms within the first model");
             return false;
@@ -197,21 +304,6 @@ class NoeCompleteness:
                 return false;
             }
         }
-        USet =  dc.mainRelation.getColumnBit( "USet" );
-        VSet =  dc.mainRelation.getColumnBit( "VSet" );
-        WSet =  dc.mainRelation.getColumnBit( "WSet" );
-        XSet =  dc.mainRelation.getColumnBit( "XSet" );
-        ESet =  dc.mainRelation.getColumnBit( "ESet" );
-        OSet =  dc.mainRelation.getColumnBit( "OSet" );
-        ISet =  dc.mainRelation.getColumnBit( "ISet" );
-        SSet =  dc.mainRelation.getColumnBit( "SSet" );
-        ASet =  dc.mainRelation.getColumnBit( "ASet" );
-        BSet =  dc.mainRelation.getColumnBit( "BSet" );
-        MSet =  dc.mainRelation.getColumnBit( "MSet" );
-        CSet =  dc.mainRelation.getColumnBit( "CSet" );
-        DSet =  dc.mainRelation.getColumnBit( "DSet" );
-        LSet =  dc.mainRelation.getColumnBit( "LSet" );
-        PSet =  dc.mainRelation.getColumnBit( "PSet" );
 
         BitSet[] setsToWrite    = {  USet,   VSet,   WSet,   ESet,   OSet,   ISet,   SSet,   ASet,   BSet,   MSet,   CSet,   DSet };
         String[] setsToWriteStr = { "USet", "VSet", "WSet", "ESet", "OSet", "ISet", "SSet", "ASet", "BSet", "MSet", "CSet", "DSet" }; // stupid
@@ -237,16 +329,22 @@ class NoeCompleteness:
         }
         General.showDebug("Constraints (O): " + PrimitiveArray.toString( OSet, showValues ));
         ASet.andNot( OSet ); // keeps shrinking
-// THEO
-        BitSet result = addTheoreticalConstraints(ASet, max_dist_expected, use_intra); // Looking only in ASet to match
-        if ( result == null  ) {
-            General.showError("Failed to addTheoreticalConstraints");
-            return false;
-        }
-        General.showDebug("Found number of theo constraints: " + result.cardinality());
-        VSet.or( result );
-        XSet.or( VSet );    // keeps shrinking
-        XSet.or( ASet);
+        """
+#// THEO
+
+        return True # TODO: pick up from here.
+    
+        result = self.addTheoreticalConstraints()
+        if not result:
+            NTerror("Failed to addTheoreticalConstraints");
+            return
+        # end if
+        NTmessage("Found number of theo constraints: %s" % len(result));
+        self.VSet =  result
+        self.XSet.union( self.VSet )    # keeps shrinking
+#        XSet.or( ASet);
+        
+        """
 // INTRAS
         status = dc.classify(XSet);
         if ( ! status ) {
@@ -462,10 +560,100 @@ class NoeCompleteness:
 
         return true;
     }
+    """
+        return True
+    # end def        
     
+    def getAtomList( self ):
+        'Return list or None on error.'
+        NTdebug("Now in %s" % getCallerName())        
+        self.atomList = AtomList()
+        if not self.resList:
+            NTdebug("Setting resList to all residues")
+            self.resList =  self.project.molecule.allResidues()
+        for res in self.resList:
+            for atom in res.allAtoms():
+                if not atom.hasCoordinates(allRealAtomCoordinatesNeeded=True):
+                    continue
+                if self.completenessLib.inAtomLib(atom):
+#                    NTdebug("Found observable atom: %s" % atom)
+                    self.atomList.append(atom)
+                # end if
+#                NTdebug("Found non-observable atom: %s" % atom)
+            # end for
+        # end for
+        NTdebug("Found observable atoms: %s\n%s" % (len(self.atomList), str(self.atomList)))
+        return self.atomList
+    # end def    
 # end class
-    
-class CompletenessLib:
+
+            
+def doCompletenessCheck( project,
+             max_dist_expectedOverall = 4.0,
+             min_dist_observed = 2.0,
+             max_dist_observed = 4.0,
+             numb_shells_observed = 2,
+             min_dist_expected = 2.0,
+             max_dist_expected = 10.0,
+             numb_shells_expected = 16.0,
+             avg_power_models = 1.0,
+             avg_method = 1,
+             monomers = 1,
+             use_intra = False,
+             ob_file_name = None,
+             summaryFileNameCompleteness = "tmp_dir/XXXX_DOCR_compl_sum",
+             write_dc_lists = True,
+             file_name_base_dc  = "tmp_dir/XXXX_DOCR_compl",
+             resList = None, # Subset of residues
+             ):    
+    """
+        NB it will not yet do a full completeness check it's just framed this way for future work.
+        
+       max_dist_expectedOverall  = Maximum distance expected (4.0 suggested)
+
+       min_dist_observed         = Minimum distance observed for per shell listing (2.0 suggested)
+       max_dist_observed         = Maximum distance observed for per shell listing (4.0 suggested)
+       numb_shells_observed      = Number of shells observed for per shell listing (2 suggested; max is 9)
+
+       min_dist_expected         = Minimum distance expected for per shell listing (2.0 suggested)
+       max_dist_expected         = Maximum distance expected for per shell listing (10.0 suggested)
+       numb_shells_expected      = Number of shells expected for per shell listing (16 suggested; no max)
+
+       avg_power_models          = Averaging power over models (1.0 suggested)
+       avg_method                = Averaging method id. Center,Sum,R6 are 0,1, and 2 respectively : (1 suggested)
+       monomers                  = Number of monomers but only relevant when Sum averaging is selected: (1 suggested)
+       ob_file_name              = Enter file name of a standard set of observable atoms (fullPath/ob_standard.str or None suggested)
+       use_intra                 = Should intraresiduals be considered (n suggested)
+       summaryFileNameCompleteness = Enter file name base (with path) for output of completeness check summary
+       write_dc_lists            = Should distance constraints be written (y suggested)
+       file_name_base_dc         = Enter file name base (with path) for surplus analysis and distance constraints (if selected) to be written
+       resList                   = CING residue list or None for all residues with coordinates
+       
+       Return None on error or completeness on success. 
+"""
+    NTdebug("Now in %s" % getCallerName())        
+    nc = NoeCompleteness(project)
+    return nc.doCompletenessCheck(
+             max_dist_expectedOverall   = max_dist_expectedOverall   ,
+             min_dist_observed          = min_dist_observed          ,
+             max_dist_observed          = max_dist_observed          ,
+             numb_shells_observed       = numb_shells_observed       ,
+             min_dist_expected          = min_dist_expected          ,
+             max_dist_expected          = max_dist_expected          ,
+             numb_shells_expected       = numb_shells_expected       ,
+             avg_power_models           = avg_power_models           ,
+             avg_method                 = avg_method                 ,
+             monomers                   = monomers                   ,
+             use_intra                  = use_intra                  ,
+             ob_file_name               = ob_file_name               ,
+             summaryFileNameCompleteness= summaryFileNameCompleteness,
+             write_dc_lists             = write_dc_lists             ,
+             file_name_base_dc          = file_name_base_dc          ,
+             resList = resList           
+            )
+# end def
+
+class NoeCompletenessAtomLib:
 #    /** Local resource */
     STR_FILE_DIR = "Data"
     STR_FILE_NAME = "ob_standard.str"
@@ -478,11 +666,24 @@ class CompletenessLib:
         
 #    /** Creates a new instance of AtomMap */
     def __init__(self):  
-        self.obs = self.readStarFile()
+        self.obs = self.readStarFile() # table of 2 columns
+        self.obsHoH = self.toHoH() # Hashed by resName and atomName
         
+    def toHoH(self):
+        self.obsHoH = NTdict()
+        idxColumnKeyList = [] # indicates all.
+        self.obsHoH.appendFromTableGeneric(self.obs, *idxColumnKeyList, invertFirst=True, appendBogusColumn=True)
+#        NTdebug("self.obs: %s" % str(self.obs))
+        NTdebug("self.obsHoH: %r" % self.obsHoH)
+        return self.obsHoH 
         
+    def inAtomLib(self, atom):
+        v = getDeepByKeysOrAttributes( self.obsHoH, atom._parent.resName, atom.name )
+#        NTdebug('In %s atom._parent.resName, atom.name: [%s] [%s] [%s]' % ( getCallerName(), atom._parent.resName, atom.name, v ))
+        return v
+    
     def readStarFile( self, fn = None):
-        NTdebug("Now in %s" % getCallerName)              
+        NTdebug("Now in NoeCompletenessAtomLib#readStarFile" )              
         if not fn:
             fn = os.path.join( cingDirLibs, self.STR_FILE_DIR, self.STR_FILE_NAME)
         starFile = File(filename=fn)

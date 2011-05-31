@@ -162,16 +162,8 @@ class NTlist(list, Lister):
     #end def
 
     def lenRecursive(self):
-        """Recursively walk thru any children elements that are also of type NTlist
-        [ [1], [2,3] ] will give a length of 3
-        """
-        count = 0
-        for element in self:
-            if isinstance(element, NTlist):
-                count += element.lenRecursive()
-            else:
-                count += 1
-        return count
+        "convenience method"
+        return lenRecursive(self)
 
     def statsFloat(self):
         """Return standard statistics in case the data is interpreted as floats.
@@ -1564,6 +1556,9 @@ class NTdict(dict):
         self.__FORMAT__ = fmt
     #end def
 
+    def lenRecursive(self):
+        "convenience method"
+        return lenRecursive(self)
 
     def printAttr(self, stream=sys.stdout, hidden=0):
         """print attributes of structure; mainly fo debugging.
@@ -1679,11 +1674,25 @@ class NTdict(dict):
 #        m = len(self)
 #        NTdebug("NTdict grew from %d to %d items" % ( n, m))
 
-    def appendFromTableGeneric(self, myTable=None, *idxColumnKeyList):
+    def appendFromTableGeneric(self, myTable=None, *idxColumnKeyList, **kwds):
         '''
         Creates a nested dictionary with at each level the next column.
         See unit test examples.
         '''
+                
+        if getDeepByKeysOrAttributes(kwds, 'appendBogusColumn'):
+            value = getDeepByKeysOrAttributes(kwds, 'appendBogusColumn')
+            NTdebug("First appendBogusColumn input table.")
+            myTable = myTable[:] # shallow copy
+            myTable.append( [value]*len(myTable[0]) ) # add a bogus column for the below feature.
+            NTdebug("myTable: %s" % str(myTable))
+        # end if
+                
+        if getDeepByKeysOrAttributes(kwds, 'invertFirst'):
+            NTdebug("First transposing input table.")
+            myTable = transpose(myTable)
+        # end if
+        
         n = len(self) #@UnusedVariable
         nTable = len(myTable)
         if nTable == 0:
@@ -1710,7 +1719,8 @@ class NTdict(dict):
                 setDeepByKeys(self, None, *keyList)
         m = len(self) #@UnusedVariable
 #        NTdebug("NTdict grew from %d to %d items" % ( n, m))
-
+    # end def
+    
     def appendFromList(self, myList): # simply hash
 #        n = len(self)
         for value in myList:
@@ -5556,4 +5566,38 @@ def NTflatten(obj):
     return tuple( result )
 # end def
 
-    
+def transpose(a):
+    '''Compute the transpose of a matrix. Moved from svd package where it was disabled.'''
+    m = len(a)
+    n = len(a[0])
+    at = []
+    for i in range(n): at.append([0.0]*m)
+    for i in range(m):
+        for j in range(n):
+            at[j][i]=a[i][j]
+    return at
+# end def
+
+
+def lenRecursive(o):
+    """Count the number of values recursively. Walk thru any children elements that are also of type dict
+    {a:{b:None, c:None} will give a length of 2
+    """
+    if not isinstance(o, (list, tuple, dict)):
+        NTerror("In lenRecursive the input was not a dict or list instance but was a %s" % str(o))
+        return None
+    count = 0    
+    eList = o
+    if isinstance(o, dict):
+        eList = o.values()        
+    for element in eList:
+        if element == None:
+             count += 1
+             continue
+        if isinstance(element, (list, tuple, dict)):
+            count += lenRecursive(element)
+            continue
+        count += 1        
+    # end for
+    return count
+# end def

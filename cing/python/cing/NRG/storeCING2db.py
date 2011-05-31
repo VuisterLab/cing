@@ -258,11 +258,11 @@ def doStoreCING2db( entry_code, archive_id, project = None):
             v = r.getDeepByKeys(rdbItemName)
             if v != None:                
                 rdbItemList[i] += v
-    NTdebug("rdbItemList: %s (before potential nilling)" % str(rdbItemList))
+#    NTdebug("rdbItemList: %s (before potential nilling)" % str(rdbItemList))
     if rdbItemList[0] < 0.001:
         rdbItemList = [None, None, None]
     # end if
-    NTdebug("rdbItemList: %s" % str(rdbItemList))
+#    NTdebug("rdbItemList: %s" % str(rdbItemList))
     p_queen_information, p_queen_uncertainty1, p_queen_uncertainty2 = rdbItemList
     
     # WI
@@ -452,7 +452,7 @@ def doStoreCING2db( entry_code, archive_id, project = None):
 #            cingresonancelistperatomclass_id = execute(s).fetchall()[0][0]
 #            NTdebug("Inserted cingresonancelistperatomclass_id %s" % cingresonancelistperatomclass_id)
         # end for
-        NTdebug("Inserted resonancelist_id %s with name %s and atoms %s" % (resonancelist_id, nameResoL, str(resonanceList.vascoResults.keys())))
+#        NTdebug("Inserted resonancelist_id %s with name %s and atoms %s" % (resonancelist_id, nameResoL, str(resonanceList.vascoResults.keys())))
     # end for
 
     chainCommittedCount = 0

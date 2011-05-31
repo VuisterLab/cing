@@ -262,3 +262,17 @@ e.is_multimeric = true AND e.res_count < 50 AND
 e.distance_count_long_range > 30 AND
 e.rdc_count = 0 AND 
 e.chothia_class IS NOT NULL AND e.chothia_class !=3
+
+
+-- 
+SELECT name, queen_information, queen_uncertainty1, queen_uncertainty2
+FROM "casdcing"."cingentry" e
+where queen_information IS NOT NULL
+order by name
+;
+
+SELECT name
+FROM "casdcing"."cingentry" e
+where queen_information IS NULL
+order by name
+;
