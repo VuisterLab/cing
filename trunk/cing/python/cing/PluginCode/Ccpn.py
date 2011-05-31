@@ -1427,11 +1427,11 @@ class Ccpn:
            Output: True on error.
         '''
         if self.ccpnNmrConstraintStore == None:
-            NTdebug("Ignoring meta data because no self.ccpnNmrConstraintStore ")
+#            NTdebug("Ignoring meta data because no self.ccpnNmrConstraintStore ")
             return
 
         if not hasattr(self.ccpnNmrConstraintStore, 'findAllApplicationData'):
-            NTdebug("Ignoring meta data because no self.ccpnNmrConstraintStore.findAllApplicationData")
+#            NTdebug("Ignoring meta data because no self.ccpnNmrConstraintStore.findAllApplicationData")
             return
 
         appDataList = self.ccpnNmrConstraintStore.findAllApplicationData(application='FormatConverter', keyword='stereoAssignmentCorrectionsFile')

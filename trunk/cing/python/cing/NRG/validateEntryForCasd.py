@@ -256,7 +256,6 @@ def main(entryId, *extraArgList):
 
 
 if __name__ == "__main__":
-    cing.verbosity = verbosityNothing
     cing.verbosity = verbosityDebug
 
 #        sys.exit(1) # can't be used in forkoff api

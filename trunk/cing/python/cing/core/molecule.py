@@ -1863,7 +1863,7 @@ class Molecule( NTtree, ResidueList ):
             NTwarning("No chains; yet?")
             return None
         if lAllChains == 1:
-            NTdebug("Single chains.")
+#            NTdebug("Single chains.")
             return result
         chain0 = allChains[0]
         chain1 = allChains[1]
@@ -3129,7 +3129,11 @@ class Ensemble( NTlist ):
         rmsd = getDeepByKeysOrAttributes(self, 'averageModel', RMSD_STR)
         if rmsd != None:
             rmsd = "%.2f" % rmsd
-        result = '<Ensemble ("%s", models:%d, rmsd to mean: %s)>' % (molName, len(self), rmsd)
+        coordinatesFirstModel = getDeepByKeysOrAttributes(self, 0, COORDINATES_STR)
+        coordinateCountFirstModel = 0
+        if coordinatesFirstModel:
+            coordinateCountFirstModel = len(coordinatesFirstModel)
+        result = '<Ensemble ("%s", models:%d, coordinates:%d, rmsd to mean: %s)>' % (molName, len(self), coordinateCountFirstModel, rmsd)
         return result
     #end def
 
@@ -3200,6 +3204,69 @@ class Model( NTcMatrix ):
         return self.rmsd
     #end def
 
+    def radius(self):
+        '''Will return None if not at least two of the given atoms contain coordinates.
+     Calls for the coordinats of the enclosing box that is alligned with the axes (
+     this gives an upper limit but is not necessarily the smallest enclosing box.)          
+         ''' 
+        cornerCoordinatePair = self.getEnclosingBoxCorners()
+        if not cornerCoordinatePair:
+            NTwarning("Failed to getEnclosingBoxCorners for %s" % self)
+            return None
+        distance = cornerCoordinatePair[0].distance( cornerCoordinatePair[1] )
+        radius =  distance / 2
+        return radius;
+    #end def
+        
+    def center(self):
+        '''Will return None if not at least one atom contain coordinates.
+         '''
+        if not self.coordinates:
+            NTwarning("Failed to get center of coordinate-less %s" % self)
+            return
+        
+        center = Coordinate()
+        for coordinate in self.coordinates:
+            center.e += coordinate.e
+        center.e /= len(self.coordinates)
+        return center
+    #end def
+        
+    def distance(self, other):
+        '''Will return None if not at least one atom contain coordinates.
+         '''
+        if not self.coordinates:
+            NTwarning("Failed to get center of coordinate-less %s" % self)
+            return
+        
+        center = self.center()
+        centerOther = other.center()
+        return center.distance(centerOther)
+    #end def
+        
+
+        
+    def getEnclosingBoxCorners(self):
+        """      Creates a minimum-volume axis-aligned
+          bounding box of the points, then selects the smallest 
+          enclosing sphere of the box with the sphere centered at the
+          boxes center.
+          Returns two opposite corners of the box or None on error.
+        """
+        if not self.coordinates:
+            NTwarning("Failed to find any coordinates in %s" % self)
+            return None        
+        minCoordinate = self.coordinates[0].copy()
+        maxCoordinate = self.coordinates[0].copy()
+#        NTdebug("Looping in getEnclosingBoxCorners for %s" % self)
+        for coordinate in self.coordinates:
+            minCoordinate.setToMin( coordinate )
+            maxCoordinate.setToMax( coordinate )
+#         end for
+        return minCoordinate, maxCoordinate
+    # end def
+    
+            
     def transform( self ):
         # Transform all coordinates according to rotation/translation matrix
         for c in self.coordinates:
@@ -3208,7 +3275,7 @@ class Model( NTcMatrix ):
     #end def
 
     def __str__( self ):
-        return sprintf('<Model "%s" (coor:%d,fit:%d)>', self.name, len(self.coordinates), len(self.fitCoordinates) )
+        return sprintf('<Model "%s" (index:%d,coor:%d,fit:%d)>', self.name, self.index, len(self.coordinates), len(self.fitCoordinates) )
     #end def
 
     def __repr__( self ):
@@ -4086,6 +4153,9 @@ Residue class: Defines residue properties
         return (self.chain.molecule.name, self.chain.name, self.resNum, None, None, None, convention)
     #end def
 
+    def getModelCount(self):
+        return self.chain.molecule.modelCount
+    
     def getAtom( self, atomName, convention = INTERNAL ):
         """
         Return Atom instance of atomName, or None if it does not exist
@@ -4567,6 +4637,54 @@ Residue class: Defines residue properties
         NTdebug("For %s found %s" % (self, str))
         if color == COLOR_RED:
             atomCb.rogScore.setMaxColor( COLOR_RED, atomCb.validateAssignment )
+        # end if
+    # end def
+    
+    def toEnsemble(self):
+        result = Ensemble()
+        modelCount = self.getModelCount()
+        for i in range(modelCount):
+            model = Model(self.name, i)
+            result.append(model)
+#            NTdebug("Working on %s" % str(model))            
+            for atom in self.atoms:
+#                NTdebug("Working on %s" % atom)            
+                coordinate = getDeepByKeysOrAttributes(atom.coordinates, i)
+                if not coordinate:
+                    continue
+#                NTdebug("Working on %s" % coordinate)            
+                model.coordinates.append(coordinate)
+            # end for
+#            NTdebug("Created: %s" % model)
+            if not model.coordinates:
+                NTwarning("Failed to find any coordinates in model %s for %s" % (i, self ))
+                break
+        # end for
+#        NTdebug("Created: %s" % str(result))
+        return result
+    # end def
+        
+    def radius(self):
+        'The NTlist over all possible models. May be empty list or None on error.'
+        ensemble = self.toEnsemble()
+        resultList = [model.radius() for model in ensemble]                
+        return NTlist(*resultList)
+    # end def
+
+    def center(self):
+        'The NTlist over all possible models. May be empty list or None on error.'
+        ensemble = self.toEnsemble()
+        resultList = [model.center() for model in ensemble]                
+        return NTlist(*resultList)
+    # end def
+            
+    def distance(self, other):
+        'Between the centers of self and other. The list over all possible models.'
+        ensemble = self.toEnsemble()
+        otherEnsemble = other.toEnsemble()
+        resultList = [model.distance(otherEnsemble[i]) for i,model in enumerate(ensemble)]                
+        return NTlist(*resultList)
+    # end def    
 #end class
 
 class Dihedral( NTlist ):
@@ -4738,6 +4856,19 @@ e.g.
     def copy(self):
         'Return a copy of self'
         return Coordinate(x=self.e.x, y=self.e.y, z=self.e.z, Bfac=self.Bfac, occupancy=self.occupancy, atom = self.atom )
+    # end def
+    
+    def setToMin(self, other):
+        for d in range(3):
+            self.e[d] = min(self.e[d], other.e[d])
+        # end for
+    # end def
+    
+    def setToMax(self, other):
+        for d in range(3):
+            self.e[d] = max(self.e[d], other.e[d])
+        # end for
+    # end def
     
     def __setattr__(self, item, value):
         if  item == 'x':
@@ -4792,9 +4923,11 @@ e.g.
     #end def
 
     def distance( self, other ):
+        if other == None:
+            return None
         return self.e.distance( other.e )
     #end def
-
+    
     def dot( self, other ):
         return self.e.dot( other.e )
     #end def
@@ -4811,7 +4944,27 @@ e.g.
         return sprintf('Coordinate( x=%f, y=%f, z=%f, Bfac=%f, occupancy=%f )',
                        self.e[0], self.e[1], self.e[2], self.Bfac, self.occupancy
                       )
-
+    def __eq__(self, other):
+        'Just consider the xyz for now'
+#        NTdebug("In %s checking equivalence between %s and %s" % (getCallerName(), self, other))
+        if other == None: # This may make a sort instable?
+            return False
+        return self.__cmp__(other) == 0
+    # end def
+    
+    def __cmp__(self, other):
+        'Just consider the xyz for now'
+#        NTdebug("In %s comparing %s and %s" % (getCallerName(), self, other))
+        if other == None: # This may make a sort instable?
+            return -1
+        distance = self.distance(other)
+        if distance < 0.001:
+            return 0
+        if self.e[0] < self.e[0]:
+            return -1
+        return 1 
+    # end def
+        
     def nameTuple(self, convention=INTERNAL):
         """Return the 7-element name tuple:
            (moleculeName, chainName, resNum, atomName, modelIndex, resonanceIndex, convention)
@@ -4960,12 +5113,28 @@ coordinates: %s"""  , dots, self, dots
         self.coordinates.append( c )
     #end def
 
-    def hasCoordinates(self):
+    def hasCoordinates(self, allRealAtomCoordinatesNeeded=False):
         """
-        Returns True if atom has coordinates
+        Returns True if atom has coordinates.
+        In the case of this atom being a pseudo atom we'll check all real atoms
+        and by default return True if any one of them has coordinates.
         """
 #        NTdebug("Checking atom.hasCoordinates for %s" % self)
-        return len(self.coordinates) > 0
+        if len(self.coordinates):
+            return True
+        if not self.isPseudoAtom():
+            return False
+        realAtoms = self.realAtoms()
+        
+        atomCountWithCoordinates = 0
+        for atom in realAtoms:
+            if atom.hasCoordinates():
+                if not allRealAtomCoordinatesNeeded:
+                    return True
+                atomCountWithCoordinates += 1
+            # end if
+        # end for
+        return atomCountWithCoordinates == len(realAtoms)
     #end def
 
     def hasMissingCoordinates(self):

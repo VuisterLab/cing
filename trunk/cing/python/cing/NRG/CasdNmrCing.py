@@ -1,4 +1,6 @@
 """
+Execute like: python -u $CINGROOT/python/cing/NRG/CasdNmrCing.py
+
 This script will use CASD-NMR files to generate CING reports, see
 Scripts/validateforCASD_NMR.py
 
@@ -19,9 +21,6 @@ WARNING: Trying to finish up by waiting for subprocesses
 WARNING: only 965 out of 1000 jobs were started (not all successfully finished perhaps)
 or similar. The minus of -15 is necessary because it needs to signal it's children.
 
-Execute like:
-
-python -u $CINGROOT/python/cing/NRG/CasdNmrCing.py
 """
 
 from cing import cingPythonCingDir
@@ -414,8 +413,8 @@ class casdNmrCing(Lister):
         ## following statement is equivalent to a unix command like:
         NTdebug("Looking for PDB entries from different databases.")
 
-        (self.entry_list_tried, self.entry_list_done, self.entry_list_crashed) = \
-            self.getCingEntriesTriedAndDone()
+        resultList = self.getCingEntriesTriedAndDone()
+        self.entry_list_tried, self.entry_list_done, self.entry_list_crashed = resultList
         if not self.entry_list_tried:
             NTwarning("Failed to find entries that CING tried.")
 #            return 0

@@ -155,6 +155,19 @@ cdef class NTcVector:
         return self
     #end def
 
+    def __mul__( NTcVector self, double factor ):
+        cdef NTcVector result
+        result = NTcVector( self[0] * factor, self[1]  * factor, self[2] * factor )
+        return result
+    #end def
+
+    def __div__( NTcVector self, double factor ):
+        cdef NTcVector result
+        result = NTcVector( self[0] / factor, self[1]  / factor, self[2] / factor )
+        return result
+    #end def
+
+
     def __sub__( NTcVector self, NTcVector other not None ):
         cdef NTcVector result
         result = NTcVector( self[0] - other[0], self[1] - other[1], self[2] - other[2] )

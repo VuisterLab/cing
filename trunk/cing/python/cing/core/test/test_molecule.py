@@ -31,6 +31,26 @@ class AllChecks(TestCase):
         self.assertAlmostEqual( NTangleOpt(    cc1, cc2, cc3      ), 124.4, 1)
         self.assertAlmostEqual( NTdistanceOpt( cc1, cc2           ),   1.4, 1)
 
+    def test_CoordinateOperations(self):
+        cc1 = Coordinate( 2.427,   1.356,   3.559 )
+        cc2 = Coordinate( 1.878,   0.162,   3.927 )
+        cc3 = Coordinate( 0.906,  -0.611,   3.099 )
+        cc4 = Coordinate(-0.287,   0.182,   2.484 )
+        coordinateList = [cc1, cc2, cc3, cc4]
+        model = Model('model', 0)
+        model.coordinates.append(*coordinateList)
+        ccExpected = Coordinate(1.878,   0.162,   3.559 )
+        ccFound = cc1.copy()
+        ccFound.setToMin(cc2)
+        self.assertTrue( ccFound == ccExpected )
+
+        ccExpected = Coordinate(2.427,   1.356,   3.927 )
+        ccFound = cc1.copy()
+        ccFound.setToMax(cc2)
+        self.assertTrue( ccFound == ccExpected )
+
+    # end def
+    
     def test_EnsureValidChainId(self):
         self.assertEquals( ensureValidChainId('A'), 'A')
         self.assertEquals( ensureValidChainId('a'), 'a')

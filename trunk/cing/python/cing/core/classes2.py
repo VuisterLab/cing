@@ -310,3 +310,16 @@ def resonanceListGetIndexFirstObjectWithRealValue(resonanceList):
     # end for
     return -1
 # end def
+
+class AtomList( NTlist ):
+    def __init__(self, *args):
+        NTlist.__init__(self, *args)
+        
+    def radius(self):
+        'Get the radius of the sphere that contains all atoms in all models'
+        
+        
+class CoordinateList( NTlist ):
+    def __init__(self, *args):
+        NTlist.__init__(self, *args)
+            

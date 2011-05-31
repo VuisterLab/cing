@@ -966,8 +966,8 @@ Project: Top level Cing project class
                 logFileList.reverse() # Important to have latest on top because they might get long. Use p.removeOlderLogs() then.
             # end if
         # end if
-        l = len(logFileList)
-        NTdebug("Found %d logs: %s" % (l, str(logFileList)))
+#        l = len(logFileList)
+#        NTdebug("Found %d logs: %s" % (l, str(logFileList)))
         return logFileList
 #    def newPeakList( self, name, status='keep'):
 #        """Dummy for compatibility
