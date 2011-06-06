@@ -20,7 +20,7 @@ class AllChecks(TestCase):
     mkdirs( cingDirTmpTest )
     os.chdir(cingDirTmpTest)
 
-    def test_NoeCompletenessLib(self):
+    def _test_NoeCompletenessLib(self):
 #        cing.verbosity = cing.verbosityDebug
         ncl = NoeCompletenessAtomLib()
         self.assertTrue(ncl)
@@ -48,13 +48,13 @@ class AllChecks(TestCase):
         NTdebug("resList: %s" % resList)
         self.assertTrue(resList)
         
-        resultCompleteness = doCompletenessCheck( project,
+        resultCompleteness = doCompleteness( project,
              max_dist_expectedOverall = 4.0,
              use_intra = True,
              ob_file_name = None,
-             summaryFileNameCompleteness = "%s_DOCR_compl_sum" % entryId,
+             summaryFileNameCompleteness = "%s_compl_sum" % entryId,
              write_dc_lists = True,
-             file_name_base_dc  = "%s_DOCR_compl" % entryId,
+             file_name_base_dc  = "%s_compl" % entryId,
              resList = resList
         )
         self.assertTrue(resultCompleteness)

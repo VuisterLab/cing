@@ -2516,7 +2516,6 @@ class Restraint(NTdict):
     On initialization the atom pairs will be tested for validity and reported in self.isValid
     """
     def __init__(self, lower, upper, **kwds):
-
         NTdict.__init__(self, lower = lower,
                               upper = upper,
                               **kwds
@@ -2599,11 +2598,7 @@ class DistanceRestraint(Restraint):
 
 #    def __init__( self, atomPairs=[], lower=0.0, upper=0.0, **kwds ):
     def __init__(self, atomPairs = NTlist(), lower = None, upper = None, **kwds):
-
-        Restraint.__init__(self, lower = lower,
-                               upper = upper,
-                               **kwds
-                        )
+        Restraint.__init__(self, lower = lower, upper = upper, **kwds)
         self.__CLASS__ = DR_LEVEL
         self.atomPairs = NTlist()
         self.distances = None     # list with distances for each model; None: not yet defined

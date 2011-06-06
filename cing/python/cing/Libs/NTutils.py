@@ -1682,14 +1682,14 @@ class NTdict(dict):
                 
         if getDeepByKeysOrAttributes(kwds, 'appendBogusColumn'):
             value = getDeepByKeysOrAttributes(kwds, 'appendBogusColumn')
-            NTdebug("First appendBogusColumn input table.")
+#            NTdebug("First appendBogusColumn input table.")
             myTable = myTable[:] # shallow copy
             myTable.append( [value]*len(myTable[0]) ) # add a bogus column for the below feature.
-            NTdebug("myTable: %s" % str(myTable))
+#            NTdebug("myTable: %s" % str(myTable))
         # end if
                 
         if getDeepByKeysOrAttributes(kwds, 'invertFirst'):
-            NTdebug("First transposing input table.")
+#            NTdebug("First transposing input table.")
             myTable = transpose(myTable)
         # end if
         
