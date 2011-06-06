@@ -138,7 +138,7 @@ b
         NTdebug("Simpler object: %r" % d)
 
     def testGetDeepByKeysOrAttributes(self):
-        cing.verbosity = cing.verbosityDebug
+#        cing.verbosity = cing.verbosityDebug
         value = 123
         d = {}
         keyList = 'a b c'.split()
@@ -154,7 +154,7 @@ b
         self.assertFalse(valueOut) # None will evaluate to False as well.
 
     def testGetDeepByKeysOrAttributes2(self):
-        cing.verbosity = cing.verbosityDebug
+#        cing.verbosity = cing.verbosityDebug
 
         inputTable = [['a'],['b']]
         expected = NTdict( a=None, b=None )

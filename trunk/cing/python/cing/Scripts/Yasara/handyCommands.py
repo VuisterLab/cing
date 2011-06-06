@@ -8,7 +8,7 @@ from cing import cingDirTmp
 from cing.Libs.NTutils import * #@UnusedWildImport
 from glob import glob
 from yasaramodule import * #@UnusedWildImport
-import yasara #@UnusedImport
+import yasara #@UnusedImport @UnresolvedImport
 
 #filename = '/Users/jd/CASD-NMR-CING/data/eR/NeR103ACheshire/Author/mod.pdb'
 #LoadPDB(filename, center=None, correct=None, model=None, download=None)

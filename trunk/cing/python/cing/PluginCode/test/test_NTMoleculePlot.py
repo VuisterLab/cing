@@ -9,6 +9,8 @@ from cing.Libs.html import image2DdihedralWidth
 from cing.Libs.html import image2Ddihedralheight
 from cing.PluginCode.matplib import * #@UnusedWildImport
 from cing.PluginCode.required.reqWhatif import * #@UnusedWildImport
+from cing.PluginCode.dssp import Dssp #@UnusedImport needed to throw a ImportWarning so that the test is handled properly.
+from cing.PluginCode.Whatif import Whatif #@UnusedImport needed to throw a ImportWarning so that the test is handled properly.
 from cing.core.classes import Project
 from cing.core.constants import * #@UnusedWildImport
 from unittest import TestCase
