@@ -171,27 +171,30 @@ def exportDistanceRestraint2cyana( dr, upper=True, convention=CYANA2 ):
     else:
         val = dr.lower
     #end if
+    if val == None:
+        NTerror("Failed to get lower or upper bound value for %s" % str(dr))
+        return None
 
     if val == 0.0: # this will interfere with Cyana's def for ambiguous restraints
         val = 0.01
     #end if
+    
 
     for atm1,atm2 in dr.atomPairs:
+        res1 = atm1.residue
+        res2 = atm2.residue
+        res1Name = res1.translate(convention)
+        res2Name = res2.translate(convention)
+        argList = [ res1.resNum, res1Name, atm1.translate(convention),
+                    res2.resNum, res2Name, atm2.translate(convention)]
         if first:
-            result = sprintf('%-3d %-4s %-4s  %-3d %-4s %-4s %7.2f',
-                             atm1.residue.resNum, atm1.residue.translate(convention), atm1.translate(convention),
-                             atm2.residue.resNum, atm2.residue.translate(convention), atm2.translate(convention),
-                             val
-                            )
+            argList.append(val)
+            result =    '%-3d %-4s %-4s  %-3d %-4s %-4s %7.2f' % tuple( argList )
             first = False
         else:
-            #Ambigous
-            result = result + '\n' + \
-                     sprintf('%-3d %-4s %-4s  %-3d %-4s %-4s %7.2f',
-                             atm1.residue.resNum, atm1.residue.translate(convention), atm1.translate(convention),
-                             atm2.residue.resNum, atm2.residue.translate(convention), atm2.translate(convention),
-                             0.0
-                            )
+            argList.append(0.0)
+            #Ambiguous
+            result += '\n%-3d %-4s %-4s  %-3d %-4s %-4s %7.2f' % tuple( argList )
         #end if
     #end for
     return result

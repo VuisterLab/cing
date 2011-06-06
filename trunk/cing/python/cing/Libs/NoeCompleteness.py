@@ -6,8 +6,9 @@ Created on May 30, 2011
 from cing import cingDirLibs
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.STAR.File import File
-from cing.core.classes2 import AtomList
 from cing.core.classes import DistanceRestraint
+from cing.core.classes import DistanceRestraintList
+from cing.core.classes2 import AtomList
 
 OVER_NUMBER_OF_SIGMAS_STR    = ">sigma"
 NO_MULTIMER_STR              = "no multimer"
@@ -22,7 +23,8 @@ class NoeCompleteness( NTdict ):
         self.project = project
         self.completenessLib = NoeCompletenessAtomLib()
         self.modelCount = self.project.molecule.modelCount
-        self.atomList = AtomList()
+        self.atomList = AtomList() # only observables.
+        self.atomHash = NTdict() # hash of atomList
         self.resDistanceHoH = {}  # only up to self.max_dist_expectedOverall
         self.resRadiusHash = {}   # don't pollute our data model but store locally. Key residue, value: radius float
         self.atomDistanceHoH = {} # only up to self.max_dist_expectedOverall
@@ -34,41 +36,54 @@ class NoeCompleteness( NTdict ):
              numb_shells_observed = 2,
              min_dist_expected = 2.0,
              max_dist_expected = 10.0,
-             numb_shells_expected = 16.0,
+             numb_shells_expected = 16,
              avg_power_models = 1.0, # unused
              avg_method = 1,# unused
              monomers = 1,# unused
              use_intra = False,
              ob_file_name = None,
-             summaryFileNameCompleteness = "tmp_dir/XXXX_DOCR_compl_sum",
+             summaryFileNameCompleteness = "tmp_dir/XXXX_compl_sum",
              write_dc_lists = True,
-             file_name_base_dc  = "tmp_dir/XXXX_DOCR_compl",
+             file_name_base_dc  = "tmp_dir/XXXX_compl",
              resList = None, # Subset of residues                                  
              ):
         'Convenience method.    Return None on error or completeness on success. '
-
         
-        self.max_dist_expectedOverall = max_dist_expectedOverall
-        self.min_dist_expected      = min_dist_expected
-        self.max_dist_expected      = max_dist_expected
-        self.numb_shells_expected   = numb_shells_expected
-
-        self.min_dist_observed      = min_dist_observed
-        self.max_dist_observed      = max_dist_observed
-        self.numb_shells_observed   = numb_shells_observed
-
-        self.avg_power_models       = avg_power_models # Unused as of yet.
-        self.avg_method             = avg_method
-        self.monomers               = monomers
-        
+        self.max_dist_expectedOverall       = max_dist_expectedOverall
+        self.min_dist_expected              = min_dist_expected
+        self.max_dist_expected              = max_dist_expected
+        self.numb_shells_expected           = numb_shells_expected
+        self.min_dist_observed              = min_dist_observed
+        self.max_dist_observed              = max_dist_observed
+        self.numb_shells_observed           = numb_shells_observed
+        self.avg_power_models               = avg_power_models # Unused as of yet.
+        self.avg_method                     = avg_method
+        self.monomers                       = monomers
         self.use_intra                      = use_intra                  
         self.ob_file_name                   = ob_file_name               
         self.summaryFileNameCompleteness    = summaryFileNameCompleteness
         self.write_dc_lists                 = write_dc_lists             
         self.file_name_base_dc              = file_name_base_dc          
-        self.resList                        = resList
+        self.resList                        = resList        
+        self.isPerShellRun                  = False
         
-        self.isPerShellRun = False
+        NTmessage("max_dist_expectedOverall     : %8.3f" % self.max_dist_expectedOverall   )
+        NTmessage("min_dist_expected            : %8.3f" % self.min_dist_expected          )
+        NTmessage("max_dist_expected            : %8.3f" % self.max_dist_expected          )
+        NTmessage("numb_shells_expected         : %d   " % self.numb_shells_expected       )
+        NTmessage("min_dist_observed            : %8.3f" % self.min_dist_observed          )
+        NTmessage("max_dist_observed            : %8.3f" % self.max_dist_observed          )
+        NTmessage("numb_shells_observed         : %d   " % self.numb_shells_observed       )
+        NTmessage("avg_power_models             : %s   " % self.avg_power_models           )
+        NTmessage("avg_method                   : %s   " % self.avg_method                 )
+        NTmessage("monomers                     : %s   " % self.monomers                   )
+        NTmessage("use_intra                    : %s   " % self.use_intra                  )
+        NTmessage("ob_file_name                 : %s   " % self.ob_file_name               )
+        NTmessage("summaryFileNameCompleteness  : %s   " % self.summaryFileNameCompleteness)
+        NTmessage("write_dc_lists               : %s   " % self.write_dc_lists             )
+        NTmessage("file_name_base_dc            : %s   " % self.file_name_base_dc          )
+        NTmessage("resList                      : %s   " % str(self.resList)               )
+        NTmessage("isPerShellRun                : %s   " % self.isPerShellRun              )
         
         if self.cacheDistanceInformation():
             NTerror("Failed to cacheDistanceInformation")
@@ -89,6 +104,16 @@ class NoeCompleteness( NTdict ):
         
         NTdebug("Now in %s" % getCallerName())        
         
+        resListNew = NTlist()
+        for residue in self.resList:
+            if not self.completenessLib.obsHoH.has_key(residue.resName):
+                NTdebug("Skipping %s" % residue)            
+                continue
+            # end if
+            resListNew.append(residue)
+        # end for
+        self.resList = resListNew
+        
         if not self.getAtomList():
             NTerror("Failed getAtomList")
             return True
@@ -98,9 +123,13 @@ class NoeCompleteness( NTdict ):
         self.atomDistanceHoH = {} # only up to self.max_dist_expectedOverall
         # Partition by residue for efficiency
         n = len(self.resList)
-        m = len(self.atomList)
-        for r in range(n): # rows by columns; rc            
+#        m = len(self.atomList)
+        for r in range(n): # rows by columns; rc
             residue = self.resList[r]
+            if not self.completenessLib.obsHoH.has_key(residue.resName):
+                NTdebug("Skipping %s" % residue)            
+                continue
+            NTdebug("Doing radius of %s" % residue)            
             radiusList = residue.radius()
 #            NTdebug("Found radii: %s" % str(radiusList))
             if not radiusList:
@@ -112,22 +141,19 @@ class NoeCompleteness( NTdict ):
     
         for r in range(n): # rows by columns; rc
             residue1 = self.resList[r]
-            NTdebug("Working on residue1 %s" % residue1)
+            NTdebug("Caching distances starting from %s" % residue1)            
             residue1Radius = getDeepByKeysOrAttributes(self.resRadiusHash, residue1)
             if not residue1Radius:
-                NTdebug("Skipping radiusLess residue1 %s" % residue1)
-                continue
+                residue1Radius = 0.0
             rStart = r + 1
             if self.use_intra:
                 rStart = r            
             for c in range(rStart, n): # Just do above the diagonal
                 residue2 = self.resList[c]
-                NTdebug("Working on residue2 %s" % residue2)
                 residue2Radius = getDeepByKeysOrAttributes(self.resRadiusHash, residue2)
                 if not residue2Radius:
-                    NTdebug("Skipping radiusLess residue2 %s" % residue2)
-                    continue
-                distanceList = residue1.distance( residue2 )
+                    residue2Radius = 0.0
+                distanceList = residue1.distance( residue2 ) # center to center
                 if not distanceList:
                     NTerror("Failed to get distance between %s and %s. Skipping pair" % (residue1, residue2))
                     continue
@@ -135,51 +161,87 @@ class NoeCompleteness( NTdict ):
                 cutoff = self.max_dist_expectedOverall + residue1Radius + residue2Radius
                 valueTuple = (residue1, residue2, distance, residue1Radius, residue2Radius,cutoff)
                 if distance > cutoff:
-                    NTdebug("Skipping distant residue pair %20s/%20s at %8.3f with radii %8.3f, %8.3f and cutoff %8.3f" % valueTuple)
-                else:
-                    NTdebug("Adding residue pair           %20s/%20s at %8.3f with radii %8.3f, %8.3f and cutoff %8.3f" % valueTuple)
-                    setDeepByKeys(self.resDistanceHoH, distance, residue1, residue2)
+#                    NTdebug("Skipping distant residue pair %20s/%20s at %8.3f with radii %8.3f, %8.3f and cutoff %8.3f" % valueTuple)
+                    continue
+                # end if
+#                NTdebug("Adding residue pair           %20s/%20s at %8.3f with radii %8.3f, %8.3f and cutoff %8.3f" % valueTuple)
+                setDeepByKeys(self.resDistanceHoH, distance, residue1, residue2)
                 # end if
             # end for
         # end for
                 
-        for r in range(m): # rows by columns; rc
-            atom1 = self.atomList[r]
-            residue1 = atom1._parent
+        key1List = self.resDistanceHoH.keys()
+        key1List.sort()
+        for r,residue1 in enumerate(key1List):
+#            atom1 = self.atomList[r]
+#            residue1 = self.resList[r]
+#            atom1._parent
+            NTdebug("Getting precise distances starting from residue1 %s" % residue1)
+            atom1List = AtomList()
+            for atom1 in residue1.allAtoms():
+                if self.atomHash.has_key(atom1):
+                    atom1List.append(atom1)
+                # end if  
+            # end for  
 #            NTdebug("Working on atom1 %s" % atom1)
-            presenceResidue1 = getDeepByKeysOrAttributes( self.resDistanceHoH, residue1 )
-            if not presenceResidue1:
-                NTdebug("Skipping completely missing residue1 %s for %s" % (residue1, atom1)) # Will occur for last residue since matrix is sparse.
-                continue
-            rStart = r + 1
-            if self.use_intra:
-                rStart = r
-            for c in range(rStart, m): # Just do above the diagonal
-                atom2 = self.atomList[c]
-                if atom2 == atom1: # may occur when including intra residuals.
-                    continue 
-                residue2 = atom2._parent
-#                NTdebug("Working on atom2 %s" % atom2)
-                distanceResidue1and2 = getDeepByKeysOrAttributes( self.resDistanceHoH, residue1, residue2 )
-                if distanceResidue1and2 == None: # Watch out zero is allowed for the distance
-                    NTdebug("Skipping missing combo residue1/2 %s/%s for atom1/2 %s/%s" % ( residue1, residue2, atom1, atom2))
-                    continue
-                atomPairs = NTlist()
-                atomPairs.append((atom1,atom2))
-                dr = DistanceRestraint(atomPairs=atomPairs)
-        #        dr.upper = self.max_dist_expectedOverall # Not really used but nice.
-                distance, _sd, _min, _max = dr.calculateAverage()
-                valueTuple = (atom1, atom2, distance)
-                if distance == None:
-                    NTwarning("Failed to get distance for %s" % str(valueTuple))
-                    continue
-                valueTuple = (atom1, atom2, distance)
-                if distance > self.max_dist_expectedOverall:
-                    NTdebug("Skipping distant atom pair %20s/%20s with distance %8.3f" % valueTuple)
-                else:
-                    NTdebug("Adding atom pair           %20s/%20s with distance %8.3f" % valueTuple)
-                    setDeepByKeys(self.atomDistanceHoH, distance, atom1, atom2)
-                # end if
+#            presenceResidue1 = getDeepByKeysOrAttributes( self.resDistanceHoH, residue1 )
+#            if not presenceResidue1:
+#                NTdebug("Skipping completely missing residue1 %s" % (residue1)) # Will occur for last residue since matrix is sparse.
+#                continue
+            resDistanceHash = self.resDistanceHoH[residue1]
+            key2List = resDistanceHash.keys()
+            key2List.sort()
+            for c,residue2 in enumerate(key2List):
+#                NTdebug("Getting precise distances starting from residue2 %s" % residue2)                                
+                
+#                distanceResidue1and2 = getDeepByKeysOrAttributes( self.resDistanceHoH, residue1, residue2 )
+#                if distanceResidue1and2 == None: # Watch out zero is allowed for the distance
+##                    NTdebug("Skipping missing combo residue1/2 %s/%s for atom1/2 %s/%s" % ( residue1, residue2, atom1, atom2))
+#                    continue
+
+#                if not self.use_intra:
+#                    if residue1 == residue2:
+#                        NTcodeerror("Combo with self for %s should not occur here." % residue1)
+#                        return True
+#                    # end if
+#                # end if
+
+                # Only here do we loop over possible atom combos
+                atom2List = AtomList()
+                for atom2 in residue2.allAtoms():
+                    if self.atomHash.has_key(atom2):
+                        atom2List.append(atom2)
+                    # end if  
+                # end for  
+
+                for atom1 in atom1List:
+#                    NTdebug("Working on atom1 %s" % atom1)
+                    for atom2 in atom2List:
+                        if atom1 == atom2:
+                            continue
+                        # end if
+                              
+#                        NTdebug("Working on atom2 %s" % atom2)
+                        
+                        atomPairs = NTlist()
+                        atomPairs.append((atom1,atom2))
+                        dr = DistanceRestraint(atomPairs=atomPairs)
+                #        dr.upper = self.max_dist_expectedOverall # Not really used but nice.
+                        distance, _sd, _min, _max = dr.calculateAverage()
+                        valueTuple = (atom1, atom2, distance)
+                        if distance == None:
+                            NTwarning("Failed to get distance for %s" % str(valueTuple))
+                            continue
+                        valueTuple = (atom1, atom2, distance)
+                        if distance > self.max_dist_expectedOverall:
+                            pass
+        #                        NTdebug("Skipping distant atom pair %20s/%20s with distance %8.3f" % valueTuple)
+                        else:
+        #                        NTdebug("Adding atom pair           %20s/%20s with distance %8.3f" % valueTuple)
+                            setDeepByKeys(self.atomDistanceHoH, distance, atom1, atom2)
+                        # end if
+                    # end for
+                # end for
             # end for
         # end for
         NTdebug("resList          count: %s" % len(self.resList))            
@@ -191,7 +253,30 @@ class NoeCompleteness( NTdict ):
         
     
     def addTheoreticalConstraints(self):
-        return
+        result = DistanceRestraintList('Vset')
+        key1List = self.atomDistanceHoH.keys()
+        key1List.sort()
+        for atom1 in key1List:
+            atomDistanceHash = self.atomDistanceHoH[ atom1 ]
+            key2List = atomDistanceHash.keys()
+            key2List.sort()
+            for atom2 in key2List:
+                atomDistance = atomDistanceHash[ atom2 ]
+                if atomDistance == None:
+                    NTerror("No atom distance found for %s/%s" % (atom1,atom2))
+                    continue
+                if atomDistance >= self.max_dist_expected: # non-inclusive bound.
+                    continue
+                if atomDistance < (MIN_DISTANCE_ANY_ATOM_PAIR - 0.4):
+                    NTdebug("Small distance %8.3f found for %s/%s" % (atomDistance, atom1,atom2))
+#                NTmessage("Looking at distance %8.3f for %s/%s" % (atomDistance, atom1,atom2))
+                atomPairsTuple = (atom1, atom2)
+                atomPairs = NTlist(atomPairsTuple)
+                dr = DistanceRestraint(atomPairs=atomPairs, lower = atomDistance, upper = atomDistance) # Looks weird in xplor otherwise.
+                result.append(dr)
+            # end for 
+        # end for 
+        return result
     # end def
          
     def doCompletenessCheckInnerLoop( self ):
@@ -304,10 +389,14 @@ class NoeCompleteness( NTdict ):
                 return false;
             }
         }
-
         BitSet[] setsToWrite    = {  USet,   VSet,   WSet,   ESet,   OSet,   ISet,   SSet,   ASet,   BSet,   MSet,   CSet,   DSet };
-        String[] setsToWriteStr = { "USet", "VSet", "WSet", "ESet", "OSet", "ISet", "SSet", "ASet", "BSet", "MSet", "CSet", "DSet" }; // stupid
+"""
+        
+        
+#        setsToWriteStrList =  'USet VSet WSet ESet OSet ISet SSet ASet BSet MSet CSet DSet'.split() # for future
+        setsToWriteStrList =  'VSet '.split()
 
+        """
         BitSet splitDcs = SQLSelect.selectBitSet( dc.dbms,
                 dc.mainRelation,
                 Constr.DEFAULT_ATTRIBUTE_SET_DC_LIST[ RelationSet.RELATION_ID_COLUMN_NAME ],
@@ -329,10 +418,8 @@ class NoeCompleteness( NTdict ):
         }
         General.showDebug("Constraints (O): " + PrimitiveArray.toString( OSet, showValues ));
         ASet.andNot( OSet ); // keeps shrinking
-        """
+"""
 #// THEO
-
-        return True # TODO: pick up from here.
     
         result = self.addTheoreticalConstraints()
         if not result:
@@ -442,32 +529,24 @@ class NoeCompleteness( NTdict ):
         gumbo.entry.selected.set(currentEntryId);   // only use the current entry
         gumbo.mol.selected.clear();  // clearing the molecules will disable writing them
         gumbo.atom.selected.clear(); // clearing the atoms     will disable writing them
-        if ( write_dc_lists && (!isPerShellRun)) {
-            for (int setId=0;setId<setsToWrite.length;setId++) {
-                BitSet setToWrite = setsToWrite[setId];
-                String setName = setsToWriteStr[setId];
-                String fileName = file_name_base_dc+"_"+setName+".str";
-                dc.selected.clear();
-                dc.selected.or(setToWrite);
-                if ( dc.selected.cardinality() > 0 ) {
-                    General.showOutput("Writing the set: " + setName + " to file: " + fileName
-                            + " with number of dcs: " + dc.selected.cardinality());
-                    gumbo.entry.writeNmrStarFormattedFileSet(fileName,null,ui);
-                } else {
-                    General.showOutput("Not writing set: " + setName + " to file: " + fileName
-                            + " because there are no dcs in it");
-                    File oldDump = new File( fileName );
-                    if ( oldDump.exists() && oldDump.isFile() && oldDump.canRead() ) {
-                        General.showDebug("Removing old dump.");
-                        if ( ! oldDump.delete() ) {
-                            General.showWarning("Failed to remove old dump");
-                        }
-                    }
-                }
-            }
-        }
-        int entryId = gumbo.entry.getEntryId();
+        """
+        if self.write_dc_lists and not self.isPerShellRun:                        
+            for i,setName in enumerate(setsToWriteStrList):
+                drl = getDeepByKeysOrAttributes(self, setName)
+                if drl == None:
+                    NTerror("Failed to get set %d by name [%s]" % (i, setName))
+                    continue
+                if not drl:
+                    NTdebug("Found empty set %s" % setName)
+                fileNameBase = self.file_name_base_dc+"_"+setName
+                NTmessage("Writing the set: " + setName + " to file name base: " + fileNameBase
+                        + " with number of dcs: %s" % len(drl));
+                drl.export2cyana( fileNameBase, convention=CYANA2)
+                drl.export2xplor( fileNameBase + '.tbl' )
+            #end for
+        # end if
 
+        """
         if ( ! isPerShellRun ) {
             // Create star nodes
             db = new DataBlock();
@@ -583,12 +662,14 @@ class NoeCompleteness( NTdict ):
             # end for
         # end for
         NTdebug("Found observable atoms: %s\n%s" % (len(self.atomList), str(self.atomList)))
+        self.atomHash = NTdict()
+        self.atomHash.appendFromList(self.atomList)
         return self.atomList
     # end def    
 # end class
 
             
-def doCompletenessCheck( project,
+def doCompleteness( project,
              max_dist_expectedOverall = 4.0,
              min_dist_observed = 2.0,
              max_dist_observed = 4.0,
@@ -601,9 +682,9 @@ def doCompletenessCheck( project,
              monomers = 1,
              use_intra = False,
              ob_file_name = None,
-             summaryFileNameCompleteness = "tmp_dir/XXXX_DOCR_compl_sum",
+             summaryFileNameCompleteness = "tmp_dir/XXXX_compl_sum",
              write_dc_lists = True,
-             file_name_base_dc  = "tmp_dir/XXXX_DOCR_compl",
+             file_name_base_dc  = "tmp_dir/XXXX_compl",
              resList = None, # Subset of residues
              ):    
     """

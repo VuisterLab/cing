@@ -79,6 +79,8 @@ SYMMETRY_D2_STR = 'SYMMETRY_D2' # 1olg  No symmetry
 SYMMETRY_NCS_CUTOFF = 10.0 # angstrom. E.g. 1hue: 4.6                   1dum: 0.7. ONly bb used and no protons.
 SYMMETRY_DR_CUTOFF  = 10.0 # angstrom. E.g. 1hue: 2.2 (not enforced)    1dum: 0.3 # averaged over all models.
 
+MIN_DISTANCE_ANY_ATOM_PAIR = 1.8
+
 FASTA_UNCOMMON_RESIDUE_STR = 'X'
 
 CYANA_NON_RESIDUES = ['PL','LL2','link']

@@ -29,7 +29,6 @@ def exportAtom2aqua(atom):
 Atom.export2aqua = exportAtom2aqua
 #-----------------------------------------------------------------------------
 
-MIN_DISTANCE_ANY_ATOM_PAIR = 1.8
 MAX_DISTANCE_ANY_ATOM_PAIR = 999.9
 
 def export2aqua(project, tmp=None):
