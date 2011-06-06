@@ -18,7 +18,7 @@ import unittest
 class AllChecks(TestCase):
 
     def _test_refine(self):
-        'Too big to run by default.'
+        'Running a full recalculation. This test is too big to run by default. Ignore any errors from it in a incomplete setup.'
         cing.verbosity = verbosityDebug
         
         modelCountAnneal, bestAnneal, best = 200, 50, 25

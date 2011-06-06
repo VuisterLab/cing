@@ -22,6 +22,7 @@ from cing.core.classes import Project
 from cing.core.constants import * #@UnusedWildImport
 from cing.core.molecule import Chain
 from cing.core.molecule import commonAAList
+import yasara #@UnresolvedImport
 
 # Keep a copy of the CING project.
 doSave = False
@@ -70,7 +71,6 @@ def doYasaraAddHydrogens( entryCode, chainCode ):
     # above ensures it exists at this point.
     localPdbFileName = entryCode+chainCode+".pdb"
 
-    import yasara
     yasara.info.mode = 'txt'
     yasara.Console('off')
     NTmessage('Using Yasara on %s' % entryCode)
@@ -99,7 +99,6 @@ def doYasaraRewritePdb( entryCode ):
     localPdbFileName = entryCode+"_org.pdb"
     copy(pdbFileName, localPdbFileName)
 
-    import yasara
     yasara.info.mode = 'txt'
     yasara.Console('off')
     NTmessage('Using Yasara on %s' % entryCode)

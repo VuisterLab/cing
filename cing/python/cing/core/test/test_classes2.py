@@ -130,7 +130,7 @@ class AllChecks(TestCase):
             self.assertEqual( firstAtom.getRepresentativePseudoAtom(atomList), pseudoListResultExpected[i])
 
     def test_CombinationToPseudoDouble(self):
-        'Simulate 1a24 1254.00     A    3    TYR    QD    A    8    GLN    QG'
+#        'Simulate 1a24 1254.00     A    3    TYR    QD    A    8    GLN    QG'
         self.createSimpleFastProject()
 
         e = self.r3 # GLN
@@ -146,7 +146,7 @@ class AllChecks(TestCase):
 #        NTdebug("after: %r" % distanceRestraint  )
 
     def test_CombinationToPseudoDouble_2(self):
-        'Simulate 1a24 1254.00     A    3    TYR    QD    A    8    GLN    QB'
+#        'Simulate 1a24 1254.00     A    3    TYR    QD    A    8    GLN    QB'
         self.createSimpleFastProject()
 
 #        e = self.r3 # GLN
@@ -162,7 +162,7 @@ class AllChecks(TestCase):
 #        NTdebug("after: %r" % distanceRestraint  )
 
     def test_CombinationToPseudoQuadruple(self):
-        'Simulate 1a24 1254.00     A    3    TYR    QR    A    8    GLN    QB'
+#        'Simulate 1a24 1254.00     A    3    TYR    QR    A    8    GLN    QB'
         self.createSimpleFastProject()
 
         y = self.r5 # PHE

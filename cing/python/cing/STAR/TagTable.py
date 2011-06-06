@@ -2,21 +2,7 @@
 Classes for dealing with STAR syntax
 """
 from cing.Libs.NTutils import * #@UnusedWildImport
-from cing.STAR.Text import isStarNan
-from cing.STAR.Text import pattern_quoted
-from cing.STAR.Text import pattern_quotes_needed
-from cing.STAR.Text import pattern_quotes_needed_2
-from cing.STAR.Text import pattern_tag_name
-from cing.STAR.Text import pattern_tagname_2
-from cing.STAR.Text import pattern_tags_loop
-from cing.STAR.Text import pattern_tags_loop_2
-from cing.STAR.Text import pattern_tagtable_loop_2
-from cing.STAR.Text import pattern_tagtable_stop_2
-from cing.STAR.Text import pattern_unquoted_find
-from cing.STAR.Text import quotes_add
-from cing.STAR.Text import tag_value_parse
-from cing.STAR.Text import tag_value_quoted_parse
-from cing.STAR.Utils import transpose
+from cing.STAR.Text import * #@UnusedWildImport
 import types
 
 

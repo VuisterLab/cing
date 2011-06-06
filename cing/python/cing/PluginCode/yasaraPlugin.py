@@ -34,15 +34,15 @@ from cing.main import pformat
 try:
 #    import yasara
 #    from yasaramodule import *
-    from yasara import HUD
-    from yasaramodule import ColorPar
-    from yasaramodule import ColorRes
-    from yasaramodule import Console
-    from yasaramodule import LoadPDB
-    from yasaramodule import MarkAtom
-    from yasaramodule import PropRes
-    from yasaramodule import SaveBmp
-    from yasaramodule import Style
+    from yasara import HUD #@UnresolvedImport
+    from yasaramodule import ColorPar #@UnresolvedImport
+    from yasaramodule import ColorRes #@UnresolvedImport
+    from yasaramodule import Console #@UnresolvedImport
+    from yasaramodule import LoadPDB #@UnresolvedImport
+    from yasaramodule import MarkAtom #@UnresolvedImport
+    from yasaramodule import PropRes #@UnresolvedImport
+    from yasaramodule import SaveBmp #@UnresolvedImport
+    from yasaramodule import Style #@UnresolvedImport
 except:
     raise ImportWarning(YASARA_STR)
 finally: # finally fails in python below 2.5

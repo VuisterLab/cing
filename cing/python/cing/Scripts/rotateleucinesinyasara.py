@@ -12,7 +12,7 @@ import shutil
 from cing.core.classes import * #@UnusedWildImport
 from cing.core.molecule import * #@UnusedWildImport
 from yasaramodule import * #@UnusedWildImport
-import yasara
+import yasara #@UnresolvedImport
 
 def leunumbers(proj,cv):
     leucines=[]

@@ -21,13 +21,13 @@ class AllChecks(TestCase):
     os.chdir(cingDirTmpTest)
 
     def test_NoeCompletenessLib(self):
-        cing.verbosity = cing.verbosityDebug
+#        cing.verbosity = cing.verbosityDebug
         ncl = NoeCompletenessAtomLib()
         self.assertTrue(ncl)
         
         
     def test_ArtificialRestraints(self):
-        cing.verbosity = cing.verbosityDebug
+#        cing.verbosity = cing.verbosityDebug
         entryId = "1brv" # Testing entry with just 2 models.
 #        entryId = "1nk4" # Interest of Winston
 #        ranges = 'A.173-178'
