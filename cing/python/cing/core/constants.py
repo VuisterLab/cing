@@ -80,6 +80,8 @@ SYMMETRY_NCS_CUTOFF = 10.0 # angstrom. E.g. 1hue: 4.6                   1dum: 0.
 SYMMETRY_DR_CUTOFF  = 10.0 # angstrom. E.g. 1hue: 2.2 (not enforced)    1dum: 0.3 # averaged over all models.
 
 MIN_DISTANCE_ANY_ATOM_PAIR = 1.8
+# Needs to be one word for otherwise the restore failed.
+THEORETICAL_RESTRAINT_LIST_STR = "theoreticalRestraintList"
 
 FASTA_UNCOMMON_RESIDUE_STR = 'X'
 
@@ -110,12 +112,15 @@ CSL_LEVEL      = 'CSL'               # cingresonancelist
 CSLPA_LEVEL    = 'CSL_PER_ATOMCLASS' # cingresonancelistperatomclass
 
 ATOM_STR = 'atom'
+ATOMS_STR = 'atoms'
 RES_STR = 'res'
 CHAIN_STR = 'chain'
 MOLECULE_STR = 'molecule'
 PROJECT_STR = 'project'
 ATOMS_STR = 'atoms'
 COORDINATES_STR = 'coordinates'
+DIHEDRAL_STR = 'dihedral'
+DIHEDRALS_STR = 'dihedrals'
 
 ANY_ENTITY_LEVEL = 'ANY_ENTITY'
 

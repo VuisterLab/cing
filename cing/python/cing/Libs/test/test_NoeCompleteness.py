@@ -10,7 +10,6 @@ from cing import cingDirTestsData
 from cing import cingDirTmp
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.Libs.NoeCompleteness import * #@UnusedWildImport
-from cing.core.classes import Project
 from unittest import TestCase
 import unittest
 
@@ -27,7 +26,9 @@ class AllChecks(TestCase):
         
         
     def test_ArtificialRestraints(self):
-#        cing.verbosity = cing.verbosityDebug
+        cing.verbosity = cing.verbosityDebug
+        doCompletenessCheck         = 0  # DEFAULT True
+        doTheoreticalDihedralCheck  = True  # DEFAULT True
         entryId = "1brv" # Testing entry with just 2 models.
 #        entryId = "1nk4" # Interest of Winston
 #        ranges = 'A.173-178'
@@ -48,17 +49,31 @@ class AllChecks(TestCase):
         NTdebug("resList: %s" % resList)
         self.assertTrue(resList)
         
-        resultCompleteness = doCompleteness( project,
-             max_dist_expectedOverall = 4.0,
-             use_intra = True,
-             ob_file_name = None,
-             summaryFileNameCompleteness = "%s_compl_sum" % entryId,
-             write_dc_lists = True,
-             file_name_base_dc  = "%s_compl" % entryId,
-             resList = resList
-        )
-        self.assertTrue(resultCompleteness)
-        
+        if doCompletenessCheck:
+            resultCompleteness = doCompleteness( project,
+                 max_dist_expectedOverall = 4.0,
+                 use_intra = True,
+#                 ob_file_name = None, # Defaults to ob_standard.str
+                 ob_file_name = os.path.join( cingDirLibs, NoeCompletenessAtomLib.STR_FILE_DIR, 'ob_all_stereo.str'),
+                 summaryFileNameCompleteness = "%s_compl_sum" % entryId,
+                 write_dc_lists = True,
+                 file_name_base_dc  = "%s_compl" % entryId,
+                 resList = resList
+            )
+            self.assertTrue(resultCompleteness)
+
+        if doTheoreticalDihedralCheck:        
+            resultTheoreticalDihedral = doTheoreticalDihedral( project,
+                 variance = 10, 
+#                 ob_file_name = None, # defaults to dih_standard.str
+                 ob_file_name = os.path.join( cingDirLibs, NoeCompletenessAtomLib.STR_FILE_DIR, 'dih_backbone.str'),
+                 write_ac_lists = True,
+                 file_name_base_ac  = "%s_dihedral" % entryId,
+                 resList = resList
+            )
+            self.assertTrue(resultTheoreticalDihedral)
+    # end def
+# end class        
         
 if __name__ == "__main__":    
     unittest.main()

@@ -54,7 +54,7 @@ def exportDihedralRestraint2cyana( dr, convention ):
 
     res, angleName, _db = dr.retrieveDefinition()
     if res:
-        return sprintf( '%4d %-4s %-6s %6.1f %6.1f',
+        return sprintf( '%4d %-4s %-7s %6.1f %6.1f', # longest name seems to be EPSILON (7 chars)
                         res.resNum, res.translate(convention),
                         angleName, dr.lower, dr.upper
                       )

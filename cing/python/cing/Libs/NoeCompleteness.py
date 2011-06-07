@@ -5,10 +5,7 @@ Created on May 30, 2011
 '''
 from cing import cingDirLibs
 from cing.Libs.NTutils import * #@UnusedWildImport
-from cing.STAR.File import File
-from cing.core.classes import DistanceRestraint
-from cing.core.classes import DistanceRestraintList
-from cing.core.classes2 import AtomList
+from cing.core.classes import * #@UnusedWildImport
 
 OVER_NUMBER_OF_SIGMAS_STR    = ">sigma"
 NO_MULTIMER_STR              = "no multimer"
@@ -21,8 +18,9 @@ class NoeCompleteness( NTdict ):
     def __init__(self, project, **kwds):
         NTdict.__init__(self, **kwds)        
         self.project = project
-        self.completenessLib = NoeCompletenessAtomLib()
+        self.lib = NoeCompletenessAtomLib()
         self.modelCount = self.project.molecule.modelCount
+        self.resList = NTlist()        
         self.atomList = AtomList() # only observables.
         self.atomHash = NTdict() # hash of atomList
         self.resDistanceHoH = {}  # only up to self.max_dist_expectedOverall
@@ -85,6 +83,9 @@ class NoeCompleteness( NTdict ):
         NTmessage("resList                      : %s   " % str(self.resList)               )
         NTmessage("isPerShellRun                : %s   " % self.isPerShellRun              )
         
+        if ob_file_name:
+            self.lib.readStarFile(ob_file_name)
+            
         if self.cacheDistanceInformation():
             NTerror("Failed to cacheDistanceInformation")
             return
@@ -106,7 +107,7 @@ class NoeCompleteness( NTdict ):
         
         resListNew = NTlist()
         for residue in self.resList:
-            if not self.completenessLib.obsHoH.has_key(residue.resName):
+            if not self.lib.obsHoH.has_key(residue.resName):
                 NTdebug("Skipping %s" % residue)            
                 continue
             # end if
@@ -126,7 +127,7 @@ class NoeCompleteness( NTdict ):
 #        m = len(self.atomList)
         for r in range(n): # rows by columns; rc
             residue = self.resList[r]
-            if not self.completenessLib.obsHoH.has_key(residue.resName):
+            if not self.lib.obsHoH.has_key(residue.resName):
                 NTdebug("Skipping %s" % residue)            
                 continue
             NTdebug("Doing radius of %s" % residue)            
@@ -653,8 +654,8 @@ class NoeCompleteness( NTdict ):
         for res in self.resList:
             for atom in res.allAtoms():
                 if not atom.hasCoordinates(allRealAtomCoordinatesNeeded=True):
-                    continue
-                if self.completenessLib.inAtomLib(atom):
+                    continue                
+                if self.lib.inLib(atom._parent.resName, atom.name):
 #                    NTdebug("Found observable atom: %s" % atom)
                     self.atomList.append(atom)
                 # end if
@@ -746,9 +747,11 @@ class NoeCompletenessAtomLib:
         
         
 #    /** Creates a new instance of AtomMap */
-    def __init__(self):  
-        self.obs = self.readStarFile() # table of 2 columns
-        self.obsHoH = self.toHoH() # Hashed by resName and atomName
+    def __init__(self, fn = None):  
+        self.obsHoH = NTdict() # Set in readStarFile.
+        self.obs = None #  Set in readStarFile.  # table of 2 columns
+        if not self.readStarFile(fn=fn):
+            NTerror("Failed to readStarFile")
         
     def toHoH(self):
         self.obsHoH = NTdict()
@@ -758,15 +761,15 @@ class NoeCompletenessAtomLib:
         NTdebug("self.obsHoH: %r" % self.obsHoH)
         return self.obsHoH 
         
-    def inAtomLib(self, atom):
-        v = getDeepByKeysOrAttributes( self.obsHoH, atom._parent.resName, atom.name )
+    def inLib(self, k1, k2):
+        v = getDeepByKeysOrAttributes( self.obsHoH, k1, k2 )
 #        NTdebug('In %s atom._parent.resName, atom.name: [%s] [%s] [%s]' % ( getCallerName(), atom._parent.resName, atom.name, v ))
         return v
     
     def readStarFile( self, fn = None):
-        NTdebug("Now in NoeCompletenessAtomLib#readStarFile" )              
         if not fn:
             fn = os.path.join( cingDirLibs, self.STR_FILE_DIR, self.STR_FILE_NAME)
+        NTdebug("Now in %s reading from fn: [%s]" % (getCallerName(), fn))              
         starFile = File(filename=fn)
         starFile.read()
 
@@ -788,5 +791,109 @@ class NoeCompletenessAtomLib:
         varAtomID      = tT.getStringListByColumnName(self.tagNameAtomID)
         self.obs = [varCompID, varAtomID]
         atomCount = tT.getRowCount()
-        NTdebug("Found number of elements in obs : %s" % atomCount)  
-        return self.obs      
+        NTdebug("Found number of elements in obs : %s" % atomCount)
+        self.obsHoH = self.toHoH() # Hashed by resName and atomName/dihedralName          
+        return self.obs 
+# end class
+
+class TheoreticalDihedralLib(NoeCompletenessAtomLib):
+    STR_FILE_NAME                  = "dih_standard.str"
+    saveframeNodeCategoryName      = "theoretical_dihedral_observable_info"
+    tagNameAtomID                  = "_Dih_ID" # overloaded for simplicity
+# end class
+                        
+class TheoreticalDihedral( NoeCompleteness ):
+    def __init__(self, project, **kwds):
+        NoeCompleteness.__init__(self, project, **kwds)        
+        self.project = project
+        self.lib = TheoreticalDihedralLib()
+
+    def doTheoreticalDihedral( self, 
+             variance           = 10.0, 
+             ob_file_name       = None,
+             write_ac_lists     = True,
+             file_name_base_ac  = THEORETICAL_RESTRAINT_LIST_STR,
+             resList            = None, # Subset of residues
+             ):
+        'Convenience method.    Return None on error or completeness on success. '
+        
+        self.variance                = variance         
+        self.ob_file_name            = ob_file_name         
+        self.write_ac_lists          = write_ac_lists   
+        self.file_name_base_ac       = file_name_base_ac
+        self.resList                 = resList          
+        
+        NTmessage("variance          : %8.3f" % self.variance            )
+        NTmessage("write_ac_lists    : %s"    % self.write_ac_lists      )
+        NTmessage("file_name_base_ac : %s"    % self.file_name_base_ac   )
+        NTmessage("resList           : %s   " % str(self.resList)        )
+        
+        if ob_file_name:
+            self.lib.readStarFile(ob_file_name)
+            
+        result = DihedralRestraintList('Vset')
+        for residue in self.resList:
+            residueDef = residue.db
+            for dihedralDef in residueDef.dihedrals:
+                comboStr = "%s %s" % (residue, dihedralDef)
+                if not self.lib.inLib(residue.resName, dihedralDef.name):
+                    NTdebug("Skipping unwelcome " + comboStr)
+                    continue
+                dihedral = getDeepByKeysOrAttributes(residue, dihedralDef.name )
+                if not dihedral:
+                    NTdebug("No dihedral for " + comboStr)
+                    continue
+                atoms = getDeepByKeysOrAttributes(dihedral, ATOMS_STR)
+                if not atoms:
+                    NTerror("Failed to find atoms for " + comboStr)
+                    continue
+                dihedralAverage = dihedral.calculateValues()
+                if not dihedralAverage or isNaN(dihedralAverage[0]):
+                    NTerror("Failed to find dihedralAverage for " + comboStr)
+                    continue                    
+                cav, _cv = dihedralAverage
+                lower = cav - variance
+                upper = cav + variance
+                dihedralRestraint = DihedralRestraint(atoms=atoms, lower=lower, upper=upper)
+                result.append(dihedralRestraint)
+            # end for 
+        # end for 
+        if self.write_ac_lists:                        
+            if not result:
+                NTdebug("Found empty result list")
+                return result
+        # end if
+        NTmessage("Writing the list to file name base: " + self.file_name_base_ac
+                + " with number of restraints: %s" % len(result));
+        result.export2cyana( self.file_name_base_ac + '.aco', convention=CYANA2)
+        result.export2xplor( self.file_name_base_ac + '.tbl' )
+        return result
+    # end def
+# end class
+           
+           
+def doTheoreticalDihedral( project,
+             variance           = 10.0, 
+             ob_file_name       = 'dih_standard.str',
+             write_ac_lists     = True,
+             file_name_base_ac  = THEORETICAL_RESTRAINT_LIST_STR,
+             resList            = None, # Subset of residues
+             ):    
+    """        
+       variance  = Plus and minus deviation from target allowed (10.0 suggested)
+       write_ac_lists            = Should constraints be written (y suggested)
+       file_name_base_ac         = Enter file name base (with path) for output
+       resList                   = CING residue list or None for all residues with coordinates
+       
+       Return None on error or completeness on success. 
+    """
+    NTdebug("Now in %s" % getCallerName())        
+    td = TheoreticalDihedral(project)
+    return td.doTheoreticalDihedral(
+             variance           = variance           ,
+             ob_file_name       = ob_file_name       ,
+             write_ac_lists     = write_ac_lists     ,
+             file_name_base_ac  = file_name_base_ac  ,
+             resList            = resList           
+            )
+# end def
