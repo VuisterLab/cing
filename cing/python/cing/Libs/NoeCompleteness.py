@@ -43,6 +43,7 @@ class NoeCompleteness( NTdict ):
              summaryFileNameCompleteness = "tmp_dir/XXXX_compl_sum",
              write_dc_lists = True,
              file_name_base_dc  = "tmp_dir/XXXX_compl",
+             hbOnly=False,             
              resList = None, # Subset of residues                                  
              ):
         'Convenience method.    Return None on error or completeness on success. '
@@ -61,7 +62,8 @@ class NoeCompleteness( NTdict ):
         self.ob_file_name                   = ob_file_name               
         self.summaryFileNameCompleteness    = summaryFileNameCompleteness
         self.write_dc_lists                 = write_dc_lists             
-        self.file_name_base_dc              = file_name_base_dc          
+        self.file_name_base_dc              = file_name_base_dc
+        self.hbOnly                         = hbOnly          
         self.resList                        = resList        
         self.isPerShellRun                  = False
         
@@ -81,6 +83,7 @@ class NoeCompleteness( NTdict ):
         NTmessage("write_dc_lists               : %s   " % self.write_dc_lists             )
         NTmessage("file_name_base_dc            : %s   " % self.file_name_base_dc          )
         NTmessage("resList                      : %s   " % str(self.resList)               )
+        NTmessage("hbOnly                       : %s   " % self.hbOnly                     )               
         NTmessage("isPerShellRun                : %s   " % self.isPerShellRun              )
         
         if ob_file_name:
@@ -130,7 +133,7 @@ class NoeCompleteness( NTdict ):
             if not self.lib.obsHoH.has_key(residue.resName):
                 NTdebug("Skipping %s" % residue)            
                 continue
-            NTdebug("Doing radius of %s" % residue)            
+#            NTdebug("Doing radius of %s" % residue)            
             radiusList = residue.radius()
 #            NTdebug("Found radii: %s" % str(radiusList))
             if not radiusList:
@@ -223,7 +226,8 @@ class NoeCompleteness( NTdict ):
                         # end if
                               
 #                        NTdebug("Working on atom2 %s" % atom2)
-                        
+                        if self.hbOnly and not atom1.canFormHydrogenBondWith( atom2 ):
+                            continue
                         atomPairs = NTlist()
                         atomPairs.append((atom1,atom2))
                         dr = DistanceRestraint(atomPairs=atomPairs)
@@ -686,6 +690,7 @@ def doCompleteness( project,
              summaryFileNameCompleteness = "tmp_dir/XXXX_compl_sum",
              write_dc_lists = True,
              file_name_base_dc  = "tmp_dir/XXXX_compl",
+             hbOnly = False,             
              resList = None, # Subset of residues
              ):    
     """
@@ -731,6 +736,7 @@ def doCompleteness( project,
              summaryFileNameCompleteness= summaryFileNameCompleteness,
              write_dc_lists             = write_dc_lists             ,
              file_name_base_dc          = file_name_base_dc          ,
+             hbOnly = hbOnly,             
              resList = resList           
             )
 # end def
@@ -874,7 +880,7 @@ class TheoreticalDihedral( NoeCompleteness ):
            
 def doTheoreticalDihedral( project,
              variance           = 10.0, 
-             ob_file_name       = 'dih_standard.str',
+             ob_file_name       = None,
              write_ac_lists     = True,
              file_name_base_ac  = THEORETICAL_RESTRAINT_LIST_STR,
              resList            = None, # Subset of residues

@@ -5596,7 +5596,32 @@ coordinates: %s"""  , dots, self, dots
         """
         return database.isOxygen(self.db)
     #end def
-
+    
+    def isDonor( self ):
+        """Return Tue if atm is hydrogen. May be modified in future!
+        """
+        return self.isProton()
+    #end def
+    
+    def isAcceptor( self ):
+        """Return Tue if atm is O/N/S. May be modified in future!
+        """
+        return self.isOxygen() or self.isNitrogen() or self.isSulfur() 
+    #end def
+    
+    def canFormHydrogenBondWith(self, other):
+        'Note that donor needs to be hydrogen for now.'
+        isDonor = self.isDonor()
+        isAcceptor = other.isAcceptor()
+        if isDonor and isAcceptor:
+            return True
+        isDonor = other.isDonor()
+        isAcceptor = self.isAcceptor()
+        if isDonor and isAcceptor:
+            return True
+        return False
+    # end def
+    
     def hasProperties(self, *properties):
         """
         Returns True if Atom has properties, expand with db properties for atom

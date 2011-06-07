@@ -27,10 +27,12 @@ class AllChecks(TestCase):
         
     def test_ArtificialRestraints(self):
         cing.verbosity = cing.verbosityDebug
-        doCompletenessCheck         = 0  # DEFAULT True
+        doCompletenessCheck         = True  # DEFAULT True
         doTheoreticalDihedralCheck  = True  # DEFAULT True
+        doHydrogenBondCheck         = True  # DEFAULT True
         entryId = "1brv" # Testing entry with just 2 models.
 #        entryId = "1nk4" # Interest of Winston
+#        entryId = "1jve" # Interest of Winston
 #        ranges = 'A.173-178'
         ranges = None
 
@@ -54,7 +56,7 @@ class AllChecks(TestCase):
                  max_dist_expectedOverall = 4.0,
                  use_intra = True,
 #                 ob_file_name = None, # Defaults to ob_standard.str
-                 ob_file_name = os.path.join( cingDirLibs, NoeCompletenessAtomLib.STR_FILE_DIR, 'ob_all_stereo.str'),
+#                 ob_file_name = os.path.join( cingDirLibs, NoeCompletenessAtomLib.STR_FILE_DIR, 'ob_all_stereo.str'),
                  summaryFileNameCompleteness = "%s_compl_sum" % entryId,
                  write_dc_lists = True,
                  file_name_base_dc  = "%s_compl" % entryId,
@@ -66,12 +68,29 @@ class AllChecks(TestCase):
             resultTheoreticalDihedral = doTheoreticalDihedral( project,
                  variance = 10, 
 #                 ob_file_name = None, # defaults to dih_standard.str
-                 ob_file_name = os.path.join( cingDirLibs, NoeCompletenessAtomLib.STR_FILE_DIR, 'dih_backbone.str'),
+#                 ob_file_name = os.path.join( cingDirLibs, NoeCompletenessAtomLib.STR_FILE_DIR, 'dih_backbone.str'),
                  write_ac_lists = True,
                  file_name_base_ac  = "%s_dihedral" % entryId,
                  resList = resList
             )
             self.assertTrue(resultTheoreticalDihedral)
+
+        if doHydrogenBondCheck:
+            resultHydrogenBondCheck = doCompleteness( project,
+                 max_dist_expectedOverall = 2.7, # you might want this tighter. In Wattos I use:
+#        Float   hbHADistance         = new Float(   Strings.getInputFloat(  UserInterface.in, "Hydrogen bond distance between proton and acceptor cutoff (2.7 Angstroms suggested)", null));
+#        Float   hbDADistance         = new Float(   Strings.getInputFloat(  UserInterface.in, "Hydrogen bond distance between donor and acceptor cutoff (3.35 Angstroms suggested)", null));
+                 
+                 use_intra = True,
+                 ob_file_name = os.path.join( cingDirLibs, NoeCompletenessAtomLib.STR_FILE_DIR, 'ob_hydrogen_bond.str'),
+                 write_dc_lists = True,
+                 file_name_base_dc  = "%s_hb" % entryId,
+                 hbOnly = True,
+                 resList = resList
+            )
+            self.assertTrue(resultHydrogenBondCheck)
+
+
     # end def
 # end class        
         
