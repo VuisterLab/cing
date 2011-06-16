@@ -152,8 +152,9 @@ def doStoreCING2db( entry_code, archive_id, project = None):
         return True
 
     firstIdx = 0
-    lastIdx = -1
-    for logIdx in ( firstIdx, lastIdx):
+#    lastIdx = -1 # Just do first for now and take the last from the above defaults.
+#    for logIdx in ( firstIdx, lastIdx):
+    for logIdx in ( firstIdx, ):
         logFileName = logFileNameList[logIdx]
         logFilePath = os.path.join( project.path(directories.logs), logFileName)
         result = getRevisionAndDateTimeFromCingLog( logFilePath )

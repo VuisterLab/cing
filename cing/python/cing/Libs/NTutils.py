@@ -5047,7 +5047,7 @@ def readTextFromFile(fileName):
 def writeTextToFile(fileName, txt):
     """Returns True on error. Txt is assumed to be the empty string if None given."""
     if not txt:
-        NTdebug("Writing empty file: %s" % fileName)
+#        NTdebug("Writing empty file: %s" % fileName)
         txt = EMPTY_STRING
 #        NTerror("Failed to writeTextToFile for text: [%s]" % str(txt))
 #        return True

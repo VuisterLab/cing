@@ -183,5 +183,7 @@ if __name__ == "__main__":
     cing.verbosity = cing.verbosityDebug
     try:
         status = annotateEntry(*sys.argv[1:])
+    except:
+        NTtracebackError()
     finally:
         NTmessage(getStopMessage(cing.starttime))

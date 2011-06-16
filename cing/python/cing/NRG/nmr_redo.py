@@ -43,32 +43,21 @@ class NmrRedo(nrgCing):
 )
         kwds = kwds.toDict()
         nrgCing.__init__( self, **kwds ) # Steal most from super class. @UndefinedVariable for init??? JFD; doesn't understand.
-        # Dir as base in which all info and scripts like this one resides
-        self.base_dir = os.path.join(cingPythonCingDir, "NMR_REDO")
         self.results_base = results_base_redo
-        self.results_dir = os.path.join(self.D, self.results_base)
-        self.data_dir = os.path.join(self.results_dir, DATA_STR)
 
-        # The csv file name for indexing pdb
-        self.index_pdb_file_name = self.results_dir + "/index/index_pdb.csv"
-        self.why_not_db_comments_dir = None
-        self.why_not_db_raw_dir = None
-        self.why_not_db_comments_file = None
 
-        os.chdir(self.results_dir)
         self.ENTRY_TO_DELETE_COUNT_MAX = 0 # can be as many as fail every time.
         self.usedCcpnInput = 0  # For NMR_REDO it is not from the start.
         self.validateEntryExternalDone = 0
         self.nrgCing = nrgCing() # Use as little as possible thru this convenience variable.
                 
         self.archive_id = ARCHIVE_NMR_REDO_ID        
-        self.schema_id = mapArchive2Schema[ self.archive_id ]
-        self.log_dir = mapArchive2LogDir[ self.archive_id ]
         self.validateEntryExternalDone = False # DEFAULT: True in the future and then it won't chainge but for nrgCing it is True from the start.
         self.entry_list_possible = self.getPossibleEntryList()
-        os.chdir(self.results_dir)
+
+        self.updateDerivedResourceSettings() # The paths previously initialized in nrgCing. Will also chdir.
         
-        if 1:
+        if 0:
             self.entry_list_todo = NTlist() 
             self.entry_list_todo += "1brv 1dum".split()
         if 0: # DEFAULT: 0
@@ -107,13 +96,16 @@ class NmrRedo(nrgCing):
         storeCING2db = "1" # DEFAULT: '1' All arguments need to be strings.
         filterTopViolations = '0' # DEFAULT: '1'
         filterVasco = '0'
+        singleCoreOperation = '1'
         # Tune this to:
 #            verbosity         inputDir             outputDir
 #            pdbConvention     restraintsConvention archiveType         projectType
 #            storeCING2db      ranges               filterTopViolations filterVasco
+#            singleCoreOperation
+
         extraArgList = ( str(cing.verbosity), inputDir, outputDir,
                          '.', '.', ARCHIVE_TYPE_BY_CH23_BY_ENTRY, PROJECT_TYPE_CING,
-                         storeCING2db, CV_RANGES_STR, filterTopViolations, filterVasco)
+                         storeCING2db, CV_RANGES_STR, filterTopViolations, filterVasco, singleCoreOperation)
 
         if doScriptOnEntryList(pythonScriptFileName,
                             entryListFileName,

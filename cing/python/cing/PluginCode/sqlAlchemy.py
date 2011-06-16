@@ -1,8 +1,5 @@
 from cing.Libs.NTutils import * #@UnusedWildImport
-from cing.NRG import CASD_DB_NAME
-from cing.NRG import CASD_DB_USER_NAME
-from cing.NRG import PDBJ_DB_NAME
-from cing.NRG import PDBJ_DB_USER_NAME
+from cing.NRG import * #@UnusedWildImport
 from cing.PluginCode.required.reqOther import *
 import gc
 import warnings
@@ -34,6 +31,7 @@ if True: # for easy blocking of data, preventing the code to be resorted with im
     finally:
         switchOutput(True)
 #    NTdebug('Using SqlAlchemy')
+# end if
 
 class cgenericSql(NTdict):
     "Class for connecting to any MySql database."
@@ -58,6 +56,7 @@ class cgenericSql(NTdict):
         self.echo = echo
         self.metadata = MetaData()
         self.tableNameList = []
+    # end def
 
     def close(self, wait_time=1.0, force_gc = True):
         # close the connection
@@ -71,6 +70,7 @@ class cgenericSql(NTdict):
             time.sleep(wait_time)
         if force_gc:
             gc.collect()
+    # end def
 
     def connect(self):
         "Return True on error"
@@ -116,10 +116,13 @@ class cgenericSql(NTdict):
             if dBversionFloat < 5.1:
                 NTerror("Need to have at least version 5.1.x of MySql installed")
                 return True
+            # end if
+        # end if
+    # end def
 
     def loadTable(self, tableName):
 #        NTdebug("Loading table %s" % tableName)
-        warnings.simplefilter('ignore', category=SAWarning)
+        warnings.simplefilter('ignore', category=SAWarning) # keep log interesting.
         #warnings.filters.insert(0, ('ignore', None, SAWarning, None, 0))
 
         self[tableName] = Table(tableName, self.metadata, autoload=True, schema=self.schema)
@@ -142,6 +145,9 @@ class cgenericSql(NTdict):
 #                NTdebug("Table: %s" % t.name)
             warnings.simplefilter("default") # reset to default warning behavior.
 #            warnings.warn("depreciated 123", DeprecationWarning)
+        # end if
+    # end def
+# end class
 
 class csqlAlchemy(cgenericSql):
     """AKA the Queen's English"""
@@ -149,7 +155,7 @@ class csqlAlchemy(cgenericSql):
 #        NTdebug("Initializing csqlAlchemy with user/db: %s/%s" % (user,db))
         cgenericSql.__init__(self, db_type=db_type, host=host, user=user, passwd=passwd, unix_socket=unix_socket, db=db, schema=schema, echo=echo)
         # be explicit here to take advantage of code analysis.
-        self.tableNameList = ['cingentry', 'cingchain', 'cingresidue', 'cingatom', 'cingresonancelist', 'cingresonancelistperatomclass']
+        self.tableNameList = 'cingentry cingchain cingresidue cingatom cingresonancelist cingresonancelistperatomclass cingsummary entry_list_selection'.split()
 #        self.tableNameList = [ 'casdcing.'+x for x in self.tableNameList]
 #        self.entry = None
         self.cingentry = None
@@ -158,9 +164,12 @@ class csqlAlchemy(cgenericSql):
         self.cingatom = None
         self.cingresonancelist = None
         self.cingresonancelistperatomclass = None
+        self.cingsummary = None
+        self.entry_list_selection = None
 
         self.levelIdResidue = "residue"  # mirrors WI setup.
         self.levelIdAtom = "atom"
+    # end def
 
     def autoload(self):
         """Return True on error"""
@@ -168,21 +177,28 @@ class csqlAlchemy(cgenericSql):
         if not self.cingentry:
             NTerror("Failed to retrieve the cingentry table")
             return True
-
-
+        # end if
+        if not self.entry_list_selection:
+            NTerror("Failed to retrieve the entry_list_selection table")
+            return True
+        # end if
+    # end def
+# end class
 
 def printResult(result):
     if result.rowcount < 1:
         return
     for row in result:
         NTmessage(str(row))
+    # end for
+# end def
 
 if __name__ == '__main__':
     cing.verbosity = verbosityDebug
     if True: # default: True
         db_name = PDBJ_DB_NAME
         user_name = PDBJ_DB_USER_NAME
-        schema = CASD_DB_NAME
+        schema = NRG_DB_NAME
     else:
         db_name = CASD_DB_NAME
         user_name = CASD_DB_USER_NAME
@@ -190,3 +206,4 @@ if __name__ == '__main__':
     csql = csqlAlchemy(user=user_name, db=db_name,schema=schema)
     csql.connect()
     csql.autoload()
+# end if
