@@ -66,7 +66,7 @@ class nrgCingRdb():
             self.csql.connect()
             self.execute = self.csql.conn.execute
             if 0: # DEFAULT True but disable for quicker testing.
-                self.createDepTables()
+                self.populateDepTables()
             self.csql.autoload()
             #csql.close()
 
@@ -188,7 +188,7 @@ class nrgCingRdb():
 #        NTdebug("Finished with %s" % getCallerName())
     # end def
 
-    def createDepTables(self):
+    def populateDepTables(self):
         NTmessage("creating temporary tables")
 
 

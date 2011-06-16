@@ -54,7 +54,7 @@ class AllChecks(TestCase):
     # end def
     
     def _test_fullRedo(self):
-        'Too big to run by default.'
+        'Full recalculation and refinement by xplor nih. Too big to run by default.'
         NTdebug("Now in %s" % getCallerName())
         entryList  = "1brv_023     1dum                      ".split()
         cingDirTmpTest = os.path.join(cingDirTmp, getCallerName())

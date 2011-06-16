@@ -32,7 +32,8 @@ PDB  BMRB  Notes
 2knr       Interest of Wim. SG project with distance restraints.
 2kz0 16995 alpha/beta BolA protein from the Seattle Structural Genomics Center
 2rop 11041 separated 2 domains (2008)
-
+2lc5  15663 2011 entry with 2 calcium ions nice example for testing NMR_REDO setup.
+ 
 On the restraint side:
 **********************
 1a24 Hydrogen bonds

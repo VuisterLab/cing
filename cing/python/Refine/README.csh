@@ -6,7 +6,7 @@
 
 set x = 1brv
 set stage = $x"_redo"
-set ranges = all
+set ranges = auto
 # Derived but may be overriden.
 #set modelsAnneal     = 0-3 # selected by modelCountAnneal
 #set models           = 0-2 # selected by bestAnneal                                        ORG

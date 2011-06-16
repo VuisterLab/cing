@@ -182,6 +182,7 @@ Project: Top level Cing project class
                            plugins = plugins
                          )
 
+        self.statusObjectNameList = 'procheckStatus dsspStatus whatifStatus wattosStatus vascoStatus shiftxStatus x3dnaStatus'.split()
         # These Project lists are dynamic and will be filled  on restoring a project
         # They also maintain some internal settings
         # new( name ), append( instance), save(), restore() and path( name ) and names() comprise core functionality
@@ -431,7 +432,18 @@ Project: Top level Cing project class
     #end def
     exists = staticmethod(exists)
 
+    def setStatusObjects(self, parsed=None, completed = None):
+        'Only update the parameter that is not None (True or False)'
+#             = 'procheckStatus dsspStatus whatifStatus wattosStatus vascoStatus shiftxStatus x3dnaStatus'.split()
+        for statusObjectName in self.statusObjectNameList:
+            if parsed != None:
+                setDeepByKeys(self, parsed, statusObjectName, PARSED_STR)
+            if completed != None:
+                setDeepByKeys(self, completed, statusObjectName, COMPLETED_STR)
+        # end for
+    # end def
 
+        
     def open(name, status = 'create', restore = True):
         """Static method open returns a new/existing Project instance depending on status.
 
@@ -515,11 +527,7 @@ Project: Top level Cing project class
 
             pr.contentIsRestored = False
 
-            pr.whatifStatus.parsed = False
-            pr.shiftxStatus.parsed = False
-#            pr.dsspStatus.parsed = False
-            pr.procheckStatus.parsed = False
-            pr.x3dnaStatus.parsed = False
+            pr.setStatusObjects(parsed=False)
 
             try:
                 # <= 0.75 version have string
@@ -835,16 +843,18 @@ Project: Top level Cing project class
         # Store names and references and append
         self.molecule = molecule
         self.molecules.append(molecule)
+        self.createMoleculeDirectories(molecule)
+        return self.molecule
+    #end def
 
+    def createMoleculeDirectories(self, molecule):
+        """generate the required directories for export and HTML data."""
         # generate the required directories for export and HTML data
         for dir in moleculeDirectories.values():
             self.mkdir(molecule.name, dir)
         #end for
-
-# GV 21 Jun 08: do not know why we would need a save here
-#        self.molecule.save( path = self.molecule.objectPath )
-        return self.molecule
     #end def
+
 
     def newMolecule(self, name, sequenceFile, convention = LOOSE):
         """Return Molecule instance or None on error

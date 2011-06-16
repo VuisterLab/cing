@@ -12,8 +12,7 @@ import os
 
 
 if False:
-#    os.chdir('/Library/WebServer/Documents/NRG-CING/pgsql')
-    os.chdir('/Volumes/tera4/NRG-CING/pgsql')
+    os.chdir('/Library/WebServer/Documents/NRG-CING/pgsql')
     dbms = DBMS()
     relationName = 'nrgcing.cingentry'
     dbms.readCsvRelationList([relationName], '.')

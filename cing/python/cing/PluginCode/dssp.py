@@ -278,7 +278,7 @@ def restoreDssp(project, tmp = None):
 
     project.status.setdefault('dssp', dsspDefault())
     # old parameter
-    if 'dsspStatus' in project and project.dsspStatus and project.dsspStatus.completed:
+    if getDeepByKeysOrAttributes( project, 'dsspStatus', COMPLETED_STR):
         project.status.dssp.completed = True
         project.status.dssp.molecule = project.molecule.nameTuple()
         project.dsspStatus = None # key is removed on next save

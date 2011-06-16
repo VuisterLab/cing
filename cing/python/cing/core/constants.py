@@ -52,6 +52,7 @@ CING_STR   = CING
 # No shift value for Xeasy.
 NOSHIFT         =  999.000
 NULL_STRING_DOT ='.'
+EMPTY_STRING =''
 # ranges definitions. NB: a None value for ranges in function calls will cause CING to pick ranges up from molecule.ranges.
 EMPTY_RANGES_STR = NULL_STRING_DOT
 CV_RANGES_STR = 'cv'
@@ -61,7 +62,8 @@ LIMIT_RANGES = 0.7
 
 # PLUGINS
 IS_INSTALLED_STR = 'isInstalled'
-
+PARSED_STR = 'parsed'
+COMPLETED_STR = 'completed'
 dots = '-----------'
 
 X_AXIS = 0

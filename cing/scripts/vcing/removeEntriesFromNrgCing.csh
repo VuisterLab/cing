@@ -4,8 +4,6 @@
 #
 
 #set D = /home/jurgenfd/D
-#set D = /Volumes/tetra/D
-#set D = /Volumes/terad/D
 
 set inputDir = $D/NRG-CING/data
 cd $inputDir

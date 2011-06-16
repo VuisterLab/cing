@@ -180,3 +180,7 @@ SELECT e.pdb_id, e.rdc_count
   AND e.rdc_count > 0
 ) TO '/tmp/rdc_entries.csv' WITH CSV HEADER;
 
+SELECT pdb_id, model_count
+FROM nrgcing.CINGENTRY
+WHERE model_count > 50
+order by model_count

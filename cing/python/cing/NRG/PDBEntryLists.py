@@ -60,6 +60,7 @@ def getBmrbLinks():
 def getBmrbNmrGridEntries():
   result = []
   urlLocation = urlDB2 + "/entry.txt"
+  NTdebug("Loading from %s" % urlLocation)
 ##4583    \N    108d    \N    \N
 ##4584    \N    149d    \N    \N
   r1 = urllib.urlopen(urlLocation)

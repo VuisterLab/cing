@@ -109,6 +109,7 @@ class NTlist(list, Lister):
     def __init__(self, *args):
         list.__init__(self)
         self.current = None
+#        if args: # handle case when called with None type. Failes as of yet.
         for a in args:
             self.append(a)
         #end for
@@ -161,9 +162,9 @@ class NTlist(list, Lister):
         pydoc.doc(self, title='%s')
     #end def
 
-    def lenRecursive(self):
+    def lenRecursive(self, max_depth = 5):
         "convenience method"
-        return lenRecursive(self)
+        return lenRecursive(self, max_depth = max_depth )
 
     def statsFloat(self):
         """Return standard statistics in case the data is interpreted as floats.
@@ -1556,9 +1557,9 @@ class NTdict(dict):
         self.__FORMAT__ = fmt
     #end def
 
-    def lenRecursive(self):
+    def lenRecursive(self, max_depth = 5):
         "convenience method"
-        return lenRecursive(self)
+        return lenRecursive(self, max_depth = max_depth)
 
     def printAttr(self, stream=sys.stdout, hidden=0):
         """print attributes of structure; mainly fo debugging.
@@ -5044,7 +5045,13 @@ def readTextFromFile(fileName):
     return content
 
 def writeTextToFile(fileName, txt):
-    """Returns True on error"""
+    """Returns True on error. Txt is assumed to be the empty string if None given."""
+    if not txt:
+        NTdebug("Writing empty file: %s" % fileName)
+        txt = EMPTY_STRING
+#        NTerror("Failed to writeTextToFile for text: [%s]" % str(txt))
+#        return True
+    # end def
 #    NTdebug("Writing to %s text (first 20 chars) [%s]" % ( fileName, txt[:20]))
     try:
         fp = open(fileName, 'w')
@@ -5066,6 +5073,9 @@ def writeDataToFile(fileName, data):
         return True
 
 def toCsv(input):
+    'Return None on empty or invalid input.'
+    if not input:
+        return None
     result = ''
     if isinstance(input, list):
         for item in input:
@@ -5579,7 +5589,7 @@ def transpose(a):
 # end def
 
 
-def lenRecursive(o):
+def lenRecursive(o, max_depth = 5):
     """Count the number of values recursively. Walk thru any children elements that are also of type dict
     {a:{b:None, c:None} will give a length of 2
     """
@@ -5595,9 +5605,22 @@ def lenRecursive(o):
              count += 1
              continue
         if isinstance(element, (list, tuple, dict)):
-            count += lenRecursive(element)
+            new_depth = max_depth - 1
+            if new_depth < 0:
+                count += 1 # still count but do not go to infinity and beyond
+                continue 
+            count += lenRecursive(element, new_depth)
             continue
         count += 1        
     # end for
     return count
 # end def
+
+def setToSingleCoreOperation():
+    if cing.ncpus > 1:
+        NTmessage("Scaling back to single core operations")
+        cing.ncpus = 1
+        return
+    NTmessage("Maintaining single core operations")
+# end def
+    

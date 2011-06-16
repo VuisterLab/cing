@@ -4,7 +4,7 @@ Started on Sep 21, 2010
 How to copy VC on nmr (production machine):
 
 -1- Suspend VC
--2- Mount tera1 from nmr
+-2- Mount disk from nmr
 -3- Run this code which will do steps 4 through 6.
     python $CINGROOT/python/cing/Scripts/publishVC.py
 
@@ -12,7 +12,7 @@ How to copy VC on nmr (production machine):
 -4- cd ~jd/Documents/Virt*
 -5- Replace the date in the below command and run:
     VCsecret is kept a secret.
-    tar -cpBf - VC.vmwarevm | gzip --fast > /Volumes/tera1/Library/WebServer/Documents/$VCsecret/VC_32bit_2010-09-21.tgz
+    tar -cpBf - VC.vmwarevm | gzip --fast > /Library/WebServer/Documents/$VCsecret/VC_32bit_2010-09-21.tgz
 -6- On nmr:
     cd $D/$VCsecret
     ln -f VC_32bit_2010-09-21.tgz VC.tgz
@@ -28,10 +28,10 @@ cing.verbosity = cing.verbosityDebug
 workLocally = 0 # fails on nmr now.
 
 localDir = '/Users/jd/Documents/Virtual Machines.localized'
-destBaseDir = '/Volumes/tera1'
+destBaseDir = '/Volumes/tria1'
 if workLocally:
     destBaseDir = '/'
-remoteDirBase = os.path.join('/Volumes/tera1', dDir[1:])
+remoteDirBase = os.path.join('/Volumes/tria1', dDir[1:])
 
 #vmName = 'Ubuntu_10_4_32_bit'
 vmName = 'VC'

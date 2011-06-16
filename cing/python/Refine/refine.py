@@ -53,8 +53,9 @@ def importFrom(config, project, parameters):
     Import data from parameters.basePath/XXX directory as new molecule.
     The input can be from the Refined or from the Annealed directory.
 
-    Use parameters.bestModels or 
+    Use parameters.bestModels or xxx 
 
+    Will do a project level save when done successfully.
     Return Molecule or None on error
     """
     NTmessage("\n-- importFrom --")
@@ -84,7 +85,7 @@ def importFrom(config, project, parameters):
     # import the coordinates from Xplor PDB files
     path = xplor.joinPath(inPath, xplor.baseName)
     NTmessage('==> Importing coordinates from %s, models %s (low verbosity on later models)', path, models)
-    project.molecule.initCoordinates()
+    project.molecule.initCoordinates(resetStatusObjects = True)
     for i, m in enumerate(models):
         xplorFile = sprintf(path, m)
         if not os.path.exists(xplorFile):
@@ -104,12 +105,20 @@ def importFrom(config, project, parameters):
     # rename the molecule if needed
     if project.molecule.name != xplor.name: # It's fine if the name already matches. Certainly the coordinates are already zipped.        
         project.molecules.rename(project.molecule.name, xplor.name)
-    print project.molecule.format()
+        msg = "Renamed molecule to " + project.molecule.name
+        project.addHistory(msg)
+        NTmessage( msg )
+    # end if        
+    project.updateProject()
+    NTmessage( "Molecule: %s" % project.molecule.format() )
+
+    project.createMoleculeDirectories(project.molecule)
 
     if getDeepByKeysOrAttributes(parameters, 'superpose'):
         project.molecule.superpose(ranges=parameters.superpose)
 
-    print project.format()
+#    NTmessage( "Project to save: %s" % project.format())
+#    project.save()
 
 #    project.close() # JFD: how come it gets closed but a molecule is still returned?
     return project.molecule

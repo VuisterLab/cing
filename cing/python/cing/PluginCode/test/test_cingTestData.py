@@ -39,8 +39,8 @@ class AllChecks(TestCase):
             if useNrgArchive: # default is False
 #                inputArchiveDir = os.path.join('/Library/WebServer/Documents/NRG-CING/recoordSync', entryId)
                 # Mounted from nmr.cmbi.ru.nl
-#                inputArchiveDir = os.path.join('/Volumes/tera1/Library/WebServer/Documents/NRG-CING/recoordSync', entryId)
-                inputArchiveDir = os.path.join('/Volumes/tera1//Users/jd/ccpn_tmp/data/recoord', entryId)
+#                inputArchiveDir = os.path.join('/Library/WebServer/Documents/NRG-CING/recoordSync', entryId)
+                inputArchiveDir = os.path.join('/Users/jd/ccpn_tmp/data/recoord', entryId)
             else:
                 inputArchiveDir = os.path.join(cingDirTestsData, "cing")
 
