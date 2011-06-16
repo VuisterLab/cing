@@ -7,6 +7,7 @@ Open the ???.r3d files in pymol or so; they're nice.
 from cing import cingDirTestsData
 from cing import cingDirTmp
 from cing.Libs.NTutils import * #@UnusedWildImport
+from cing.PluginCode.Ccpn import Ccpn #@UnusedImport needed to throw a ImportWarning so that the test is handled properly.
 from cing.PluginCode.required.reqX3dna import * #@UnusedWildImport
 from cing.PluginCode.x3dna import createHtmlX3dna
 from cing.core.classes import Project

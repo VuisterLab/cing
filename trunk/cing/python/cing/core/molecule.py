@@ -954,6 +954,10 @@ class Molecule( NTtree, ResidueList ):
         if selectedResidues == None:
             NTerror("In setResiduesFromRanges failed to get selection of residues for ranges: [%s]" % ranges)
             return None
+        
+        if not isinstance(selectedResidues, list):
+            NTerror("In setResiduesFromRanges failed to setResiduesFromRanges because result is not a list; not propagating this error.")
+            return None
 
         self.selectedResidues = selectedResidues
         return selectedResidues
@@ -1137,7 +1141,11 @@ class Molecule( NTtree, ResidueList ):
         if ranges == AUTO_RANGES_STR:
             result = self._autoRanges()
             if result == None:
-                NTerror('In _rangesStr2list failed _autoRanges')
+                NTerror('In _rangesStr2list failed _autoRanges got None result')
+                return None
+            if not isinstance( result, list ):
+                NTerror('In _rangesStr2list failed _autoRanges because result is not a list')
+                return None
             return result
 
         rangesCollapsed = ranges.replace(' ', '')
@@ -1228,7 +1236,11 @@ class Molecule( NTtree, ResidueList ):
             for item in ranges:
                 if isinstance( item, int ):
                     if resnumDict.has_key(item):
-                        result.append(resnumDict[item])
+                        resNumValue = resnumDict[item]
+                        if not isinstance(resNumValue, Residue):
+                            NTerror("resNumValue is not an Residue but [%s]." % str(resNumValue))
+                            return None
+                        result.append( resNumValue )
                     else:
                         NTerror('Error Molecule.ranges2list: invalid residue number item [%d]\n', item )
                 elif isinstance( item, Residue ):
@@ -1855,13 +1867,17 @@ class Molecule( NTtree, ResidueList ):
     # end def
 
     def getSymmetry( self, modelIdx = 0 ):
-        'Return tuple like [SYMMETRY_C2_STR, 4.62, 2.56] or None on error.'
+        """"
+        Return tuple like [SYMMETRY_C2_STR, 4.62, 2.56]
+        [SYMMETRY_C1_STR, None, None] on no availability or warning level.
+         None on error.
+         """
         allChains = self.allChains()
         lAllChains = len(allChains)
         result = [ SYMMETRY_C1_STR, None, None ]
         if not lAllChains:
             NTwarning("No chains; yet?")
-            return None
+            return result
         if lAllChains == 1:
 #            NTdebug("Single chains.")
             return result
@@ -1875,7 +1891,7 @@ class Molecule( NTtree, ResidueList ):
                 NTerror("In %s hasSameSequence Failed" % getCallerName())
                 return result
             if not hasSameSequence:
-                return SYMMETRY_C1_STR
+                return result
             ncsSymmetry = chain0.calculateRmsd( chain1, modelIdx = 0 ) # Only for first model
             drSymmetry = chain0.getSymmetryDR( chain1, modelIdx = 0 )
 
@@ -1887,12 +1903,13 @@ class Molecule( NTtree, ResidueList ):
             if drSymmetry == None:
                 NTerror("In %s getSymmetryDR Failed" % getCallerName())
                 return None                
+            result[1] = ncsSymmetry
+            result[2] = drSymmetry
             if  ncsSymmetry < SYMMETRY_NCS_CUTOFF and drSymmetry < SYMMETRY_DR_CUTOFF:
                 result[0] = SYMMETRY_C2_STR
-                result[1] = ncsSymmetry
-                result[2] = drSymmetry
-                return result # homo dimer
             return result
+        # end if
+        NTdebug("Ignoring multimers with 3 or more chains for now.")
         return result
 
 
@@ -1981,14 +1998,20 @@ class Molecule( NTtree, ResidueList ):
         return self
     #end def
 
-    def initCoordinates(self):
+    def initCoordinates(self, resetStatusObjects = False): # JFD: should we do this by default?
         """
         Initialize the coordinate lists of all atoms
         set modelCount to 0
+        Resets all the project status objects to not parsed or even completed if resetStatusObjects is set.
         """
         for atm in self.allAtoms():
             atm.coordinates = NTlist()
         self.modelCount = 0
+        if resetStatusObjects:
+            self.project.setStatusObjects(parsed = False, completed = False)
+        # end if
+    #end def
+        
 
     def updateTopology( self)   :
         """Define the _topology key for all atoms.
@@ -2478,7 +2501,7 @@ Return an Molecule instance or None on error
         Return a list of residues
         """
         if getDeepByKeysOrAttributes(self.project, 'status', TALOSPLUS_STR, 'completed'):
-            NTdebug("Deriving auto ranges from talos plus")
+#            NTdebug("Deriving auto ranges from talos plus")
 #        if self.project.status.has_key('talosPlus') and self.project.status.talosPlus.completed:
             # we will do two passes:
             # First: select all residues that have S2> autoLimit
@@ -2510,11 +2533,18 @@ Return an Molecule instance or None on error
                 return r
             NTwarning(' Molecule._autoRanges: empty list by Talos. Considering other criteria.')
         # end if
-        NTdebug(' Molecule._autoRanges: no talos+ data')
+#        NTdebug(' Molecule._autoRanges: no talos+ data')
         if self.modelCount > 1:
-            NTdebug(' Molecule._autoRanges: using cv to auto determine ranges')
-            return self.rangesByCv()
-        NTdebug(' Molecule._autoRanges: returning all residues')
+#            NTdebug(' Molecule._autoRanges: using cv to auto determine ranges')
+            rangesStr = self.rangesByCv()
+            if rangesStr == None:
+                NTerror(' Molecule.rangesByCv failed: returning all residues')
+                return self.allResidues()
+            # end def
+            return self.ranges2list(rangesStr) # Potentially cyclic; watch out.
+        # end def
+            
+#        NTdebug(' Molecule._autoRanges: returning all residues')
         return self.allResidues()
     #end def
 

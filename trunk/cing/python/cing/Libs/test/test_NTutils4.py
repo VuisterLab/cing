@@ -107,6 +107,25 @@ b
         x.d = ( 3, None, 5) # even tuples
         self.assertEquals( x.lenRecursive(), 8)
 
+    def testLenRecursiveCyclic(self):
+        x = NTdict(a=None)
+        y = NTdict(b=x)
+        self.assertEquals( y.lenRecursive(), 1)
+        x.cyclic = y        
+        self.assertRaises( RuntimeError, y.lenRecursive, max_depth = 999 ) # 99 is allowed and would fail this unit check.       
+        self.assertEquals( y.lenRecursive(max_depth = 0), 1) # y.b
+        self.assertEquals( y.lenRecursive(max_depth = 1), 2) # y.b.a
+        self.assertEquals( y.lenRecursive(max_depth = 2), 2) # y.b.a and y.b.cyclic ?
+        self.assertEquals( y.lenRecursive(max_depth = 3), 3) # y.b.a, y.b.cyclic, and y.b.cyclic.b ?
+        self.assertEquals( y.lenRecursive(max_depth = 5), 4) 
+        self.assertEquals( y.lenRecursive(max_depth = 9), 6) 
+        self.assertEquals( y.lenRecursive(max_depth = 99),51) 
+        
+        z = [[1,2],[3,4,5]]
+        self.assertEquals( lenRecursive(z, max_depth = 0),2) 
+        self.assertEquals( lenRecursive(z, max_depth = 1),5) 
+        self.assertEquals( lenRecursive(z, max_depth = 2),5) 
+
     def testGetDeepAvgByKeys(self):
         d=NTdict()
         l = NTlist()

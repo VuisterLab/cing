@@ -20,6 +20,7 @@ class AllChecks(TestCase):
     def _test_refine(self):
         'Running a full recalculation. This test is too big to run by default. Ignore any errors from it in a incomplete setup.'
         cing.verbosity = verbosityDebug
+        testDirectly = False # For direct unit check see test_xplor.py 
         
         modelCountAnneal, bestAnneal, best = 200, 50, 25
 #        targetList = '--fullAnnealAndRefine '.split()
@@ -27,7 +28,7 @@ class AllChecks(TestCase):
         targetNumberList= '1   2                3      4             5             6      7     8'.split() #@UnusedVariable
         targetList      = 'psf generateTemplate anneal analyze       parse         refine parse import'.split() 
         targetOptionLoL = '.   .                .      --useAnnealed --useAnnealed .      .     .     '.split()
-        fastestTest = 1
+        fastestTest = True
         if fastestTest:
             numberOfStagesTodo = 2 # 8 max
             targetList      = 'psf generateTemplate anneal analyze       parse         refine parse import'.split()[:numberOfStagesTodo]
@@ -46,7 +47,7 @@ class AllChecks(TestCase):
         self.failIf(os.chdir(cingDirTmpTest), msg=
             "Failed to change to test directory for files: " + cingDirTmpTest)
         for i, entryId in enumerate(entryList):
-            if i != 0: # Selection of the entries.
+            if i != 1: # Selection of the entries.
                 continue 
             inputArchiveDir = os.path.join(cingDirTestsData, "ccpn")
             ccpnFile = os.path.join(inputArchiveDir, entryId + ".tgz")
@@ -63,23 +64,28 @@ class AllChecks(TestCase):
             project = Project.open(entryId, status = 'new')
             self.assertTrue(project.initCcpn(ccpnFolder = ccpnFile, modelCount=1))
             project.save()
-            del project
 
-
-            refineExecPath = os.path.join(refinePath, "refine.py")
-#            cmd = '%s --project %s -n %s --setup %s --useAnnealed --overwrite --models %s --superpose %s --sort Enoe' % (
-#                refineExecPath, entryId, name, target, models, ranges)           
-            cmd = '%s -v %s --project %s -n %s --setup --overwrite --superpose %s --modelsAnneal %s --modelCountAnneal %s --bestAnneal %s --best %s' % (
-                refineExecPath, cing.verbosity, entryId, name, ranges, modelsAnneal, modelCountAnneal, bestAnneal, best)
-            self.assertFalse( do_cmd(cmd,bufferedOutput=0) )
-            for i, target in enumerate(targetList):
-                targetOptionList = targetOptionLoL[i]
-                if targetOptionList == '.':
-                    targetOptionList = ''
-                cmd = '%s --project %s -n %s --%s %s' % (refineExecPath, entryId, name, target, targetOptionList)
-                NTmessage('')
+            if not testDirectly:
+                del project
+                refineExecPath = os.path.join(refinePath, "refine.py")
+    #            cmd = '%s --project %s -n %s --setup %s --useAnnealed --overwrite --models %s --superpose %s --sort Enoe' % (
+    #                refineExecPath, entryId, name, target, models, ranges)           
+                cmd = '%s -v %s --project %s -n %s --setup --overwrite --superpose %s --modelsAnneal %s --modelCountAnneal %s --bestAnneal %s --best %s' % (
+                    refineExecPath, cing.verbosity, entryId, name, ranges, modelsAnneal, modelCountAnneal, bestAnneal, best)
                 self.assertFalse( do_cmd(cmd,bufferedOutput=0) )
-            # end for target
+                for i, target in enumerate(targetList):
+                    targetOptionList = targetOptionLoL[i]
+                    if targetOptionList == '.':
+                        targetOptionList = ''
+                    cmd = '%s --project %s -n %s --%s %s' % (refineExecPath, entryId, name, target, targetOptionList)
+                    NTmessage('')
+                    self.assertFalse( do_cmd(cmd,bufferedOutput=0) )
+                # end for target
+                continue
+            # end if
+            # For direct check see test_xplor.py
+#            status = project.fullRedo(modelCountAnneal = modelCountAnneal, bestAnneal = bestAnneal, best = best)                         
+#            self.assertFalse(status, "Failed fullAnnealAndRefine.")
         # end for
     # end def
 

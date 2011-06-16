@@ -374,3 +374,15 @@ CREATE INDEX cingresonancelistperatomclass_001 ON casdcing.cingresonancelistpera
 CREATE INDEX cingresonancelistperatomclass_002 ON casdcing.cingresonancelistperatomclass (entry_id);
 CREATE INDEX cingresonancelistperatomclass_003 ON casdcing.cingresonancelistperatomclass (atomclass);
 CREATE INDEX cingresonancelistperatomclass_004 ON casdcing.cingresonancelistperatomclass (rog);
+
+CREATE table casdcing.cingsummary
+(
+    pdb_id                         VARCHAR(255) UNIQUE PRIMARY KEY,
+    weight                         FLOAT DEFAULT NULL
+);
+
+CREATE table casdcing.entry_list_selection
+(
+    pdb_id                         VARCHAR(255) UNIQUE PRIMARY KEY
+);
+

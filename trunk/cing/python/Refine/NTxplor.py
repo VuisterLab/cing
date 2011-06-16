@@ -25,12 +25,13 @@ readable
 Cluster issues
 """
 
+FAST_FOR_TESTING = 0 # DEFAULT 0 Use 1 for testing quickly. TODO: set to default value.
 #------------------------------------------------------------------------------
 timest = 0.003
 nstepheat = 100
 nstephot = 2000
 nstepcool = 200
-if 0: # DEFAULT 0 Use 1 for testing quickly. TODO: mod
+if FAST_FOR_TESTING: 
     nstepheat /= 10
     nstephot /= 10
     nstepcool /= 10
@@ -982,7 +983,7 @@ class Anneal( Xplor ):
         """
         high_steps = 24000 # DEFAULT 24000
         cool_steps =  3000 # DEFAULT  3000
-        if 0: # DEFAULT: 0 use for debugging quickly.
+        if FAST_FOR_TESTING: # DEFAULT: 0 use for debugging quickly.
             high_steps /= 10
             cool_steps /= 10
         restraintsAnalysisCode = self.restraintsAnalysisCode()

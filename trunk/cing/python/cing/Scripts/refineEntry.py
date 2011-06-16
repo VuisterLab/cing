@@ -7,18 +7,24 @@ from cing.Scripts.validateEntry import * #@UnusedWildImport
 from cing.core.constants import * #@UnusedWildImport
 
 
-# -1- Regular use:
+# -1- Regular use: from nmr_redo.
 
 # Execute like:
-# cd /Library/WebServer/Documents/NRG-CING/data/br/1brv
-# python -u /Users/jd/workspace35/cing/python/cing/Scripts/refineEntry.py 1brv \
-# file:///Library/WebServer/Documents/NRG-CING/input /Library/WebServer/Documents/NRG-CING . . BY_ENTRY CCPN True
+# cd /Library/WebServer/Documents/NMR_REDO/data/br/1brv
+# python -u /Users/jd/workspace35/cing/python/cing/Scripts/refineEntry.py 1brv 9 \
+# file:///Library/WebServer/Documents/NRG-CING/data \
+#        /Library/WebServer/Documents/NMR_REDO \
+# . . BY_CH23_BY_ENTRY CING 1 auto 0 0
+
+#x = ARCHIVE_TYPE_BY_CH23_BY_ENTRY
 
 def main(entryId, *extraArgList):
     """inputDir may be a directory or a url. A url needs to start with http://.
     """
 
     fastestTest = 0 # default: 0
+    
+    modelCountAnneal, bestAnneal, best = 200, 50, 25    
     htmlOnly = False # default: False but enable it for faster runs without some actual data.
     doWhatif = True # disables whatif actual run
     doProcheck = True
@@ -27,11 +33,12 @@ def main(entryId, *extraArgList):
     doTalos = True
     tgzCing = True # default: True # Create a tgz for the cing project. In case of a CING project input it will be overwritten.
                     # NB leave this set to True or modify code below.
-    modelCount = None # default setting is None
+#    modelCount = None # default setting is None
 #    ranges = None
 
     if fastestTest:
-        modelCount = 2 # if this is more and there is only one model present it leads to an error message.
+        modelCountAnneal, bestAnneal, best = 4, 3, 2        
+#        modelCount = 2 # if this is more and there is only one model present it leads to an error message.
         htmlOnly = True
         doWhatif = False
         doProcheck = False
@@ -50,6 +57,7 @@ def main(entryId, *extraArgList):
     verbosity         inputDir             outputDir
     pdbConvention     restraintsConvention archiveType         projectType
     storeCING2db      ranges               filterTopViolations filterVasco
+    setToSingleCoreOperation
     """.split()
     expectedNumberOfArguments = len(expectedArgumentList)
     if len(extraArgList) != expectedNumberOfArguments:
@@ -80,6 +88,7 @@ def main(entryId, *extraArgList):
         filterVasco = int(filterVasco)
     else:
         filterVasco = 1 # Default should be True
+    singleCoreOperation = getDeepByKeysOrAttributes(extraArgList, IDX_FILTER_SINGLE_CORE_OPERATION )
 
     if archiveType == ARCHIVE_TYPE_FLAT:
         pass # default
@@ -106,10 +115,19 @@ def main(entryId, *extraArgList):
     NTdebug("ranges:               %s" % ranges)
     NTdebug("filterTopViolations:  %s" % filterTopViolations)
     NTdebug("filterVasco:          %s" % filterVasco)
+    NTdebug("singleCoreOperation:  %s" % singleCoreOperation)
     NTdebug("")
     NTdebug("Using derived settings:")
-    NTdebug("modelCount:           %s" % modelCount)
+    NTdebug("modelCountAnneal:     %s" % modelCountAnneal)
+    NTdebug("bestAnneal:           %s" % bestAnneal)
+    NTdebug("best:                 %s" % best)
     NTdebug("isRemoteOutputDir:    %s" % isRemoteOutputDir)
+    
+    # For NMR_REDO required as most efficient.
+    if singleCoreOperation: 
+        setToSingleCoreOperation()
+
+    
     # presume the directory still needs to be created.
     cingEntryDir = entryId + ".cing"
 
@@ -131,6 +149,7 @@ def main(entryId, *extraArgList):
     if isRemoteOutputDir:
         os.chdir(cingDirTmp)
     else:
+        mkdirs(outputDir)
         os.chdir(outputDir)
 
     project = Project(entryId)
@@ -172,8 +191,8 @@ def main(entryId, *extraArgList):
 
     if projectType == PROJECT_TYPE_CING:
         # Needs to be copied because the open method doesn't take a directory argument..
-        fullFileNameTgz = os.path.join(inputDir, fileNameTgz)
-        shutil.copy(fullFileNameTgz, '.')
+#        fullFileNameTgz = os.path.join(inputDir, fileNameTgz)
+#        shutil.copy(fullFileNameTgz, '.')
         project = Project.open(entryId, status='old')
         if not project:
             NTerror("Failed to init old project")
@@ -185,15 +204,17 @@ def main(entryId, *extraArgList):
     # end if
 
 ####> MAIN UTILITY HERE
-    if project.fullAnnealAndRefine():
+    if project.fullRedo(modelCountAnneal = modelCountAnneal, bestAnneal = bestAnneal, best = best):  
         NTerror("Failed fullAnnealAndRefine.")
-        return True        
+        return True
+    
+          
     
     if ranges != None:
         project.molecule.setRanges(ranges)
     project.molecule.superpose(ranges=ranges)
 
-    if 0: # DEFAULT 0
+    if 1: # DEFAULT 1?
         project.save()
     if project.validate(htmlOnly=htmlOnly, ranges=ranges, doProcheck=doProcheck, doWhatif=doWhatif,
             doWattos=doWattos, doQueeny = doQueeny, doTalos=doTalos, filterVasco = filterVasco ):

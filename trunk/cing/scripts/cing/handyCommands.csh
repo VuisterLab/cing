@@ -54,7 +54,7 @@ cat top10_CTR69A.tmp | gawk 'BEGIN{i=1;;printf "MODEL       %2d\n", i}\
 # Copy from development to production
 
 #ON PRODUCTION
-cd /Volumes/tera4/CASD-NMR-CING/dataPrep
+cd $D/CASD-NMR-CING/dataPrep
 #\rm -rf */*/Nijmegen/*
 \rm -rf */*/Author/*
 ( cd /Volumes/jd/CASD-NMR-CING/data && tar -cpBf - */*/Author/* ) | ( tar -xpvf - )

@@ -87,7 +87,7 @@ def allDoYasaraRewritePdb():
         doYasaraRewritePdb(entry)
 
 def removeTempFilesAllEntries():
-    entry_list_done = readLinesFromFile(os.path.join('/Volumes/tera4/NRG-CING', 'entry_list_done.csv'))
+    entry_list_done = readLinesFromFile(os.path.join('/Volumes/tria1/NRG-CING', 'entry_list_done.csv'))
     for entryCode in entry_list_done:
         NTmessage(entryCode)
         removeTempFiles(entryCode)
@@ -97,8 +97,8 @@ def removeTempFilesAllEntries():
 def removeTempFiles(entryCode):
 #    entryCode = '1brv'
     ch23 = entryCode[1:3]
-#    D = '/Library/WebServer/Documents'
-    D = '/Volumes/tera4'
+    D = '/Library/WebServer/Documents'
+#    D = '/Volumes/tria3'
     projectDir = D + '/NRG-CING/data/%s/%s/%s.cing' % (ch23, entryCode, entryCode)
     molDir = projectDir + '/' + entryCode
     Whatif.removeTempFiles(os.path.join( molDir, moleculeDirectories.whatif ))

@@ -26,7 +26,7 @@ class AllChecks(TestCase):
 #    entryList = "1hue".split()
 #    entryList = "1dum".split()
     entryList = "1brv".split() # DEFAULT: 1brv
-#    entryList = "CC1_260511".split() # DEFAULT: 1brv
+#    entryList = "2yhh".split() # DEFAULT: 1brv
 #    entryList = "2hgh".split()
 #    entryList = "1bus".split()
 #    entryList = "1a4d 1ai0 1brv_cs_pk_2mdl 1bus 2hgh".split()
@@ -36,18 +36,18 @@ class AllChecks(TestCase):
 #        if you have a local copy you can use it; make sure to adjust the path setting below.
         fastestTest = 1        # Not passed to the validate routine in order to customize checks for speed.
 
-        modelCount=99
-        redoFromCingProject = False
-        htmlOnly = True # default is False but enable it for faster runs without some actual data.
-        doWhatif = True # disables whatif actual run
-        doProcheck = True
-        doWattos = True
-        doQueeny = True
-        doTalos = True
-        filterVasco = True
-        filterTopViolations = True
-        useNrgArchive = False
-        ranges = CV_STR
+        modelCount=99                  # DEFAULT: 99 
+        redoFromCingProject = False    # DEFAULT: False 
+        htmlOnly = True                # DEFAULT: True # default is False but enable it for faster runs without some actual data.
+        doWhatif = True                # DEFAULT: True # disables whatif actual run
+        doProcheck = True              # DEFAULT: True 
+        doWattos = True                # DEFAULT: True 
+        doQueeny = True                # DEFAULT: True 
+        doTalos = True                 # DEFAULT: True 
+        filterVasco = True             # DEFAULT: True 
+        filterTopViolations = True     # DEFAULT: True 
+        useNrgArchive = False          # DEFAULT: False 
+        ranges = CV_STR                # DEFAULT: CV_STR 
 #        ranges='173-177'
 #        ranges='6-13,29-45' # 1bus
 
@@ -59,15 +59,15 @@ class AllChecks(TestCase):
         if fastestTest:
             modelCount=2 # DEFAULT 2
 #            redoFromCingProject = False
-            htmlOnly = True
-            doWhatif = False
-            doProcheck = False
-            doWattos = False
-            doQueeny = False
-            doTalos = False
-            filterVasco = False
-            doRestoreCheck = False
-            doStoreCheck = False
+            htmlOnly = True            # DEFAULT: True
+            doWhatif = False           # DEFAULT: False
+            doProcheck = False         # DEFAULT: False
+            doWattos = False           # DEFAULT: False
+            doQueeny = False           # DEFAULT: False
+            doTalos = False            # DEFAULT: False
+            filterVasco = False        # DEFAULT: False
+            doRestoreCheck = False     # DEFAULT: False
+            doStoreCheck = False       # DEFAULT: False
         if redoFromCingProject:
             useNrgArchive = False
             doWhatif = False
@@ -91,8 +91,8 @@ class AllChecks(TestCase):
                 if useNrgArchive: # default is False
     #                inputArchiveDir = os.path.join('/Library/WebServer/Documents/NRG-CING/recoordSync', entryId)
                     # Mounted from nmr.cmbi.ru.nl
-    #                inputArchiveDir = os.path.join('/Volumes/tera1/Library/WebServer/Documents/NRG-CING/recoordSync', entryId)
-                    inputArchiveDir = os.path.join('/Volumes/tera1//Users/jd/ccpn_tmp/data/recoord', entryId)
+    #                inputArchiveDir = os.path.join('/Volumes/tria1/Library/WebServer/Documents/NRG-CING/recoordSync', entryId)
+                    inputArchiveDir = os.path.join('/Users/jd/ccpn_tmp/data/recoord', entryId)
                 else:
                     inputArchiveDir = os.path.join(cingDirTestsData, "ccpn")
 

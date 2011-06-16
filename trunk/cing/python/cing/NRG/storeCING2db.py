@@ -8,6 +8,9 @@
 # cd /Library/WebServer/Documents/NRG-CING/data/br/1brv; \
 # python -u $CINGROOT/python/cing/NRG/storeCING2db.py 1brv ARCHIVE_NRG
 #
+# cd /Library/WebServer/Documents/NMR_REDO/data/br/1brv; \
+# python -u $CINGROOT/python/cing/NRG/storeCING2db.py 1brv ARCHIVE_NMR_REDO
+#
 # NB this script fails if the Postgresql backend is not installed. Which is exactly why it's kept out of CING's core routines.
 
 from cing import header
@@ -44,7 +47,7 @@ def doStoreCING2db( entry_code, archive_id, project = None):
     pdb_id = None
     casd_id = None
     schema = PDB_DB_NAME
-    if archive_id == ARCHIVE_NRG_ID or archive_id == ARCHIVE_DEV_NRG_ID or archive_id == ARCHIVE_PDB_ID:
+    if archive_id == ARCHIVE_NRG_ID or archive_id == ARCHIVE_DEV_NRG_ID or archive_id == ARCHIVE_PDB_ID or archive_id == ARCHIVE_NMR_REDO_ID:
         pdb_id = entry_code
         if pdb_id == None:
             NTerror("Expected pdb_id argument")
@@ -56,7 +59,9 @@ def doStoreCING2db( entry_code, archive_id, project = None):
             schema = NRG_DB_NAME
         elif archive_id == ARCHIVE_DEV_NRG_ID:
             schema = DEV_NRG_DB_NAME
-
+        elif archive_id == ARCHIVE_NMR_REDO_ID:
+            schema = NMR_REDO_DB_NAME
+        # end if
     elif archive_id == ARCHIVE_CASD_ID or archive_id == ARCHIVE_CASP_ID:
         casd_id = entry_code
         if casd_id == None:
@@ -66,9 +71,11 @@ def doStoreCING2db( entry_code, archive_id, project = None):
         schema = CASD_DB_NAME
         if archive_id == ARCHIVE_CASP_ID:
             schema = CASP_DB_NAME
+        # end if
     else:
         NTerror("Expected valid archive_id argument but got: %s" % archive_id)
         return True
+    # end if
 
 
     NTdebug("Starting doStoreCING2db using:")
@@ -175,14 +182,14 @@ def doStoreCING2db( entry_code, archive_id, project = None):
 
     chainList = molecule.allChains()
     is_multimeric = len(chainList) > 1
-    symmetryResult = molecule.getSymmetry()
     symmetry, ncsSymmetry, drSymmetry = None, None, None
+    symmetryResult = molecule.getSymmetry()
     if symmetryResult != None:
         symmetry, ncsSymmetry, drSymmetry = symmetryResult
         
     chothia_class = molecule.chothiaClassInt()
 
-    p_distance_count = project.distances.lenRecursive()
+    p_distance_count = project.distances.lenRecursive(max_depth = 1)
 
     p_distance_count_sequential      =  0
     p_distance_count_intra_residual  =  0
@@ -194,7 +201,7 @@ def doStoreCING2db( entry_code, archive_id, project = None):
     if restraintList:
         lenRestraintList = len(restraintList)
     if p_distance_count != lenRestraintList:
-        NTcodeerror("Expected the same numbers for project.distances.lenRecursive() and the size of project.allRestraints() but found: %s and %s" % ( p_distance_count, len(restraintList)))
+        NTcodeerror("Expected the same numbers for project.distances.lenRecursive(max_depth = 1) and the size of project.allRestraints() but found: %s and %s" % ( p_distance_count, len(restraintList)))
         p_distance_count = len(restraintList)
     # end if
     if p_distance_count:
@@ -217,8 +224,8 @@ def doStoreCING2db( entry_code, archive_id, project = None):
         if dihList.isFromTalos(): continue
         p_dihedral_count += len(dihList)
     # end for
-    p_rdc_count = project.rdcs.lenRecursive()
-    p_peak_count = project.peaks.lenRecursive()
+    p_rdc_count = project.rdcs.lenRecursive(max_depth = 1)
+    p_peak_count = project.peaks.lenRecursive(max_depth = 1)
 
     rL = project.distanceRestraintNTlist
     # None may exist.
@@ -501,9 +508,9 @@ def doStoreCING2db( entry_code, archive_id, project = None):
             sel_1R = molecule.rangesContainsResidue(residue)
             dssp_id = getDsspSecStructConsensusId(residue)
 
-            r_distance_count = residue.distanceRestraints.lenRecursive() # filled by filled in partition restraints
-            r_dihedral_count = residue.dihedralRestraints.lenRecursive()
-            r_rdc_count = residue.rdcRestraints.lenRecursive()
+            r_distance_count = residue.distanceRestraints.lenRecursive(max_depth = 1) # filled by filled in partition restraints
+            r_dihedral_count = residue.dihedralRestraints.lenRecursive(max_depth = 1)
+            r_rdc_count = residue.rdcRestraints.lenRecursive(max_depth = 1)
 
 #            NTdebug("r_distance_count r_dihedral_count r_rdc_count %d %d %d" % (r_distance_count, r_dihedral_count, r_rdc_count))
             # TODO: test with cs present
