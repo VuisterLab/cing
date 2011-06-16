@@ -12,11 +12,12 @@ from cing.Libs.NTutils import * #@UnusedWildImport
 # -2- results base is tmpNRG-CING
 # -3- db schema is tmpnrgcing
 
-isProduction = 1 # DEFAULT: 1 override for development in localConstants.py @UnusedVariable
+isProduction        = 1 # DEFAULT: 1 override for development in localConstants.py @UnusedVariable Disables some operations for need for speed.
+assumeAllAreDone    = 1 # DEFAULT: 1 when assumed all are done. Disables some messaging in case not all are done. @UnusedVariable
 
-UJ              = '/Users/wim'
-WS              = os.path.join(UJ,'workspace')
-dDir            = '/Library/WebServer/Documents'            # Web dir.
+UJ                  = '/Users/wim'
+WS                  = os.path.join(UJ,'workspace')
+dDir                = '/Library/WebServer/Documents'            # Web dir.
 
 try:
     from localConstants import * #@UnusedWildImport

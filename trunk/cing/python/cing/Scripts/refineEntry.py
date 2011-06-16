@@ -57,7 +57,7 @@ def main(entryId, *extraArgList):
     verbosity         inputDir             outputDir
     pdbConvention     restraintsConvention archiveType         projectType
     storeCING2db      ranges               filterTopViolations filterVasco
-    setToSingleCoreOperation
+    singleCoreOperation
     """.split()
     expectedNumberOfArguments = len(expectedArgumentList)
     if len(extraArgList) != expectedNumberOfArguments:

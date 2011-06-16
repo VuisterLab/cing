@@ -276,3 +276,19 @@ FROM "casdcing"."cingentry" e
 where queen_information IS NULL
 order by name
 ;
+
+SELECT s.pdbid AS pdb_id, SUM(p2.val * p3.val) AS weight
+FROM pdbj.brief_summary s
+JOIN pdbj."E://entity" e ON e.docid = s.docid
+JOIN "//entity/pdbx_number_of_molecules" p2    ON p2.docid = e.docid AND p2.pos BETWEEN e.pstart AND e.pend
+JOIN "//entity/formula_weight" p3              ON p3.docid = e.docid AND p3.pos BETWEEN e.pstart AND e.pend
+GROUP BY s.pdbid
+INTO TABLE nrgcing.cingsummary
+
+create table nrgcing.cingsummary as
+SELECT s.pdbid AS pdb_id, SUM(p2.val * p3.val) AS weight
+FROM pdbj.brief_summary s
+JOIN pdbj."E://entity" e ON e.docid = s.docid
+JOIN "//entity/pdbx_number_of_molecules" p2    ON p2.docid = e.docid AND p2.pos BETWEEN e.pstart AND e.pend
+JOIN "//entity/formula_weight" p3              ON p3.docid = e.docid AND p3.pos BETWEEN e.pstart AND e.pend
+GROUP BY s.pdbid

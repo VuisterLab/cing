@@ -79,13 +79,6 @@ class nrgCingRdb():
             self.catom = self.csql.cingatom
             self.ccsl   = self.csql.cingresonancelist
             self.ccslpa = self.csql.cingresonancelistperatomclass
-            try:
-                self.csql.loadTable('cingsummary')
-                self.csql.loadTable('entry_list_selection')
-            except:
-                NTtracebackError()
-                NTerror("Failed to load dep tables consider creating them manually in nrgCingRdb.__init__")
-
             self.csummary = self.csql.cingsummary
             self.centry_list_selection = self.csql.entry_list_selection
 
@@ -1250,7 +1243,7 @@ if __name__ == '__main__':
         host = 'nmr.cmbi.umcn.nl'
     m = nrgCingRdb( schema=schema, host = host )
 
-    if 1:
+    if 0:
         m.createPlots(doTrending = False)
     if 0:
         m.createScatterPlots()
