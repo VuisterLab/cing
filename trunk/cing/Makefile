@@ -15,5 +15,5 @@ install:
 	cd python/cing/Libs/cython; python compile.py build_ext --inplace
 
 test:
-	python -u python/cing/main.py --testQ -c 1
+	python -u python/cing/main.py --testQ
 
