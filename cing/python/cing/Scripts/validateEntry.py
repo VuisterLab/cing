@@ -76,7 +76,7 @@ IDX_STORE_DB = 7
 IDX_RANGES = 8
 IDX_FILTER_TOP = 9
 IDX_FILTER_VASCO = 10
-IDX_FILTER_SINGLE_CORE_OPERATION = 11
+IDX_SINGLE_CORE_OPERATION = 11
 
 def main(entryId, *extraArgList):
     """inputDir may be a directory or a url. A url needs to start with http://.
@@ -146,7 +146,7 @@ def main(entryId, *extraArgList):
         filterVasco = int(filterVasco)
     else:
         filterVasco = 1 # Default should be True
-    singleCoreOperation = getDeepByKeysOrAttributes(extraArgList, IDX_FILTER_SINGLE_CORE_OPERATION )
+    singleCoreOperation = getDeepByKeysOrAttributes(extraArgList, IDX_SINGLE_CORE_OPERATION )
 
     if archiveType == ARCHIVE_TYPE_FLAT:
         pass # default

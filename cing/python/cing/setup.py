@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 # Please note the lack of imports here to cing specific code.
 # The idea is that this script runs without PYTHONPATH being set yet.
 from string import atoi
@@ -16,7 +18,7 @@ import time
 """
 python YOUR_CING_PATH_HERE/python/cing/setup.py
 E.g.:
-python /Users/jd/workspace/cing/python/cing/setup.py
+python /Users/jd/workspace/cing/python/cing/setup.py -csh
 
 Generates either cing.csh or cing.sh to source in your .cshrc or .bashrc
 (or equivalent) respective file
@@ -305,6 +307,7 @@ def _writeCingShellFile(isTcsh):
     fp = open(cname,'w')
     fp.write(text)
     fp.close()
+    os.chmod(cname, 0755)
 
     print ''
     print '==> Please check/modify %s <===' % (cname)
@@ -327,6 +330,16 @@ def _writeCingShellFile(isTcsh):
 if __name__ == '__main__':
 #    cing.verbosity = verbosityOutput # Default is no output of anything.
 
+    isTcsh = None
+    if len(sys.argv) > 1:
+        if sys.argv[1] == '-tcsh':
+            isTcsh = True
+        elif sys.argv[1] == '-sh':
+            isTcsh = False
+        else:
+            print 'Failed to process argument(s) in sys.argv: [' + str(sys.argv) + ']'
+        # end if
+    # end if
     check_python()
     check_matplotlib()
     check_ccpn()
@@ -518,11 +531,13 @@ if __name__ == '__main__':
 #    userShell = os.environ.get('SHELL')
 #    Better not use the above as this gives on JFD's mac: /bin/bash and actually
 #    use tcsh. Better ask a question once.
-    answer = None
-    print ''
-    while answer not in ["y","n"]:
-        answer = raw_input("Do you use tcsh/csh [y] or bash/sh/ksh/zsh/ash etc. [n]; please enter y or n:")
-    isTcsh = answer == "y"
-
+    if isTcsh == None:
+        answer = None
+        print ''
+        while answer not in ["y","n"]:
+            answer = raw_input("Do you use tcsh/csh [y] or bash/sh/ksh/zsh/ash etc. [n]; please enter y or n:")
+        isTcsh = answer == "y"
+    # end if
+    
     _writeCingShellFile(isTcsh)
     _NTmessage("TODO: configure MolProbity by running it's setup.sh") # TODO:
