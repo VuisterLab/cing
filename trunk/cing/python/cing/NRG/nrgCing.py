@@ -216,6 +216,13 @@ class nrgCing(Lister):
         
         self.updateDerivedResourceSettings() # The paths previously initialized with None.
         
+        self.entry_list_bad_nrg_docr = NTlist() # List of entries that might be in NRG but are invalid. NRG-CING will start from coordinates only.
+        self.entry_list_bad_overall = NTlist() # List of entries that NRG-CING should not even attempt.
+
+        self.entry_list_bad_nrg_docr.addList( '1lcc 1lcd 2l2z'.split() ) # See NRG issue 272 bad ccpn docr project
+#        self.entry_list_bad_overall.addList( '134d '.split() ) # CING Issue 266 fixed.
+
+        
         if 0:
             self.entry_list_todo = NTlist() 
             self.entry_list_todo += "1brv 1dum".split()
@@ -234,6 +241,46 @@ class nrgCing(Lister):
             self.entry_list_todo = readLinesFromFile(os.path.join(self.results_dir, 'entry_list_prep_todo.csv'))
             self.entry_list_todo = NTlist( *self.entry_list_todo )
     # end def
+        
+    def setPossibleEntryList(self, redo = True):        
+        """
+        Defines which entries should be possible to prepare and run. 
+        Return True on error.
+        """
+        self.entry_list_possible = NTlist()
+        if 0:
+            self.entry_list_possible += '1brv 1dum'.split()
+            return
+        # end if
+
+        if not self.entry_list_nmr:
+            if self.usePreviousPdbEntries and not redo:
+                NTmessage("Using previously found entries from the PDB and NRG databases.")
+                self.entry_list_nmr         = getEntryListFromCsvFile('entry_list_nmr.csv')
+            else:
+                ## following statement is equivalent to a unix command like:
+    #            NTmessage("Looking for entries from the PDB database.")
+                self.entry_list_nmr = NTlist()
+                self.entry_list_nmr.addList(getPdbEntries(onlyNmr=True))
+                if not self.entry_list_nmr:
+                    NTerror("No NMR entries found")
+                    return True
+                # end if
+            # end if
+        # end if
+        NTmessage("Found %d NMR entries." % self.entry_list_nmr )
+        NTmessage("Subtracting %d NMR entries that are known to fail because of issue(s)." % len(self.entry_list_bad_overall))
+#        self.entry_list_bad_nrg_docr = NTlist() # List of entries that might be in NRG but are invalid. NRG-CING will start from coordinates only.
+        self.entry_list_possible = self.entry_list_nmr.difference( self.entry_list_bad_overall )
+        NTmessage("Keeping %d NMR entries that should be possible." % len(self.entry_list_possible))
+        self.entry_list_obsolete_bad = self.entry_list_bad_overall.difference( self.entry_list_nmr )
+        if self.entry_list_obsolete_bad:
+            NTmessage("Consider removing from code the list of bad entries which are no longer in PDB: %s" % str(self.entry_list_obsolete_bad))
+        else:
+            NTmessage("No bad entries in code that are: %s" % str(self.entry_list_obsolete_bad))
+        
+    # end def
+    
         
     def updateDerivedResourceSettings(self):
         '''
@@ -267,11 +314,6 @@ class nrgCing(Lister):
         NTdebug("log_dir:                 %s" % self.log_dir)        
     # end def
             
-    def getPossibleEntryList(self):
-        self.entry_list_possible = NTlist() # NEW: monomeric, and beyond.
-        self.entry_list_possible += '1brv 1dum'.split()
-        return self.entry_list_possible
-    # end def
 
     def initVc(self):
         NTmessage("Setting up vCing")
@@ -465,15 +507,12 @@ class nrgCing(Lister):
 
         NTmessage("Get the entries tried, todo, crashed, and stopped in NRG-CING from file system.")
 
-        if 0: # DEFAULT 0 this is done by updateWeekly already.
-#        if not self.entry_list_pdb: # DEFAULT 0 this is done by updateWeekly already.
-            NTmessage("Going to do searchPdbEntries from getEntryInfo")
-            if self.searchPdbEntries():
-                NTerror("Failed to searchPdbEntries")
+        if not self.entry_list_possible: # DEFAULT 0 this is done by updateWeekly already.            
+            if self.setPossibleEntryList():
+                NTerror("Failed to setPossibleEntryList")
                 return True
             # end if
         # end if
-
         self.entry_list_prep_tried = NTlist()
         self.entry_list_prep_crashed = NTlist()
         self.entry_list_prep_failed = NTlist()

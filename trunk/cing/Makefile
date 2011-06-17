@@ -1,17 +1,19 @@
 # CING makefile
-# gv 10 June 2008
+# gv  June 10, 2008
+# jfd 2011-06-17
 #
 
+all:	install test
+		
 install:
 	@echo "==> Installing CING setup script ..."
-	@python python/cing/setup.py
-
-superpose:
-	@echo "==> Installing the cython dependency"
-	@/bin/rm -f python/cing/Libs/cython/superpose.so
-	@/bin/rm -f python/cing/Libs/cython/superpose.c
-	@cd python/cing/Libs/cython; python compile.py build_ext --inplace
+	-/bin/rm -f cing.sh
+	-/bin/rm -f python/cing/Libs/cython/superpose.so
+	-/bin/rm -f python/cing/Libs/cython/superpose.c
+	python python/cing/setup.py -sh
+	@echo "==> Building CING cython dependencies ..."
+	cd python/cing/Libs/cython; python compile.py build_ext --inplace
 
 test:
-	python python/cing/main.py --test -v 0
+	python -u python/cing/main.py --testQ -c 1
 
