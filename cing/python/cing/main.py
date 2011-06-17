@@ -351,6 +351,7 @@ def testOverall(namepattern):
         cing.verbosity = cing.verbosityOutput
 
 def testByName(name, excludedModuleList):
+    useUnitTest = 1
     lenCingPythonDirStr = len(cingPythonDir)
     tailPathStr = name[lenCingPythonDirStr + 1: - 3]
     mod_name = join(tailPathStr.split('/'), '.')
@@ -362,7 +363,10 @@ def testByName(name, excludedModuleList):
         exec("import %s" % (mod_name))
         exec("suite = unittest.defaultTestLoader.loadTestsFromModule(%s)" % (mod_name))
         testVerbosity = 2
-        unittest.TextTestRunner(verbosity=testVerbosity).run(suite) #@UndefinedVariable
+        if useUnitTest:
+            unittest.TextTestRunner(verbosity=testVerbosity).run(suite) #@UndefinedVariable
+        else:
+            unittest.TextTestRunner(verbosity=testVerbosity).run(suite) #@UndefinedVariable
         NTmessage('\n\n\n')
     except ImportWarning, extraInfo:
         NTmessage("Skipping test report of an optional compound: %s" % extraInfo)
