@@ -274,6 +274,7 @@ def script(scriptFile, *a, **k):
 
 
 def testQuiet():
+    'Return True on error'
     cing.verbosity = cing.verbosityOutput
     fn = 'cingTest.log'
     NTmessage("\nStarting quiet test in %s logged to %s\n" % (cingDirTmp, fn))
@@ -304,6 +305,7 @@ def testQuiet():
         NTmessage("Ran %d tests ok\n" % len(resultList))
     else:
         NTerror("Failed to do a single test ok")
+        return True
 #end def
 
 def testOverall(namepattern):
@@ -619,16 +621,24 @@ def main():
     # JFD: already present in __init__.py.
 
     if options.test:
-        testOverall(namepattern="test_*.py")
+        if testOverall(namepattern="test_*.py"):
 #        testOverall(namepattern="test_NTutils*.py")
+            sys.exit(1)
+        # end if
         sys.exit(0)
     if options.test2:
-        testOverall(namepattern="test2_*.py")
+        if testOverall(namepattern="test2_*.py"):
+            sys.exit(1)
+        # end if
         sys.exit(0)
 
     if options.testQ:
-        testQuiet()
+        if testQuiet():
+            sys.exit(1)
+        # end if
         sys.exit(0)
+    # end if
+        
 
     #------------------------------------------------------------------------------------
     # Extended documentation

@@ -1892,7 +1892,7 @@ class nrgCing(Lister):
             entryListFileName = "entry_list_todo_prep_perm_%s.csv" % permutationKeyForFileName
             writeTextToFile(entryListFileName, toCsv(permutationArgumentList[permutationKey]))
             pythonScriptFileName = __file__ # recursive call in fact.
-            extraArgList = ['prepareEntry' ] + extraArgList
+            extraArgList = ['prepare' ] + extraArgList
             if doScriptOnEntryList(pythonScriptFileName,
                                 entryListFileName,
                                 self.results_dir,
