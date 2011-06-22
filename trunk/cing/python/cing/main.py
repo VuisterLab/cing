@@ -312,7 +312,8 @@ def testOverall(namepattern):
     # Use silent testing from top level.
 #    cing.verbosity = verbosityError
     # Add the ones you don't want to test (perhaps you know they don't work yet)
-    excludedModuleList = [ cingPythonDir + "/Cython*",
+    excludedModuleList = [ 
+#                           cingPythonDir + "/Cython*",
                            cingPythonDir + "/cyana2cing*",
 #                           cingPythonDir + "/cing.PluginCode",
 #                           cingPythonDir + "/cing.PluginCode.test.test_Whatif",

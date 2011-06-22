@@ -8,7 +8,7 @@
 install:
 	@echo "==> Installing CING setup script ..."
 	-/bin/rm -f cing.csh
-	python python/cing/setup.py -tcsh
+	python python/cing/setupCing.py -tcsh
 
 build_cython:
 	@echo "==> Building CING cython dependencies ..."
@@ -18,3 +18,16 @@ build_cython:
 
 test:
 	python -u python/cing/main.py --testQ
+
+	
+#sloccount:
+#	sloccount --duplicates --wide --details divergence/*.py divergence/test/*.py > sloccount.sc
+
+nose:
+#	nosetests --with-xunit --with-coverage --verbose --where=python/cing/core/test
+	nosetests --with-xunit --with-coverage --verbose --cover-package=cing --where=python/cing
+#	nosetests --testmatch=test_.+.py
+#	coverage xml
+
+#pylint:
+#	pylint --max-line-length=120 --disable="E0602,W0511" -f parseable --include-ids=y divergence > pylint.txt || exit 0

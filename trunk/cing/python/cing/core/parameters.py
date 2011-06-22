@@ -92,7 +92,7 @@ cingPaths = NTdict(
     classpath    = os.getenv('CLASSPATH')
 )
 
-# Keep the below in sync with the one in setup.py
+# Keep the below in sync with the one in setupCing.py
 PLEASE_ADD_EXECUTABLE_HERE = "PLEASE_ADD_EXECUTABLE_HERE"
 
 for key in cingPaths.keys():

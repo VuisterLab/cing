@@ -140,13 +140,15 @@ def testEntry(entry):
     if not os.path.exists(diffOrgWattosWattosFile):
         NTwarning("failed to diff file: ", orgWattosWrittenFile + ", " + wattosWrittenFile)
 
-    try:
-        os.unlink(entry + ".zip")
-        os.unlink(orgWattosWrittenFile)
-        os.unlink(pystarlibWrittenFile)
-    except:
-        pass
-
+    if 1:
+        try:
+            os.unlink(entry + ".zip")
+            os.unlink(orgWattosWrittenFile)
+            os.unlink(pystarlibWrittenFile)
+        except:
+            pass
+        # end try
+    # end if
 
 """
 Extra Test Routine going over some entries in the NMR Restraints Grid

@@ -1,3 +1,7 @@
+"""
+Unit test execute as:
+python -u $CINGROOT/python/cing/STAR/test/test_Utils.py
+"""
 from cing import cingDirTmp
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.STAR import Utils

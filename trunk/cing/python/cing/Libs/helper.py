@@ -7,7 +7,7 @@ import time
 import urllib2
 
 """Very simple functions only here that can be instantiated without the general CING setup.
-Called from cing's main __init__.py and setup.py.
+Called from cing's main __init__.py and setupCing.py.
 """
 
 #Block to keep in sync with the one in helper.py

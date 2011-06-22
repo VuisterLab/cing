@@ -7,8 +7,8 @@ from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.PluginCode.required.reqDssp import DSSP_STR
 from cing.PluginCode.required.reqProcheck import SECSTRUCT_STR
 from cing.core.constants import * #@UnusedWildImport
+from cing.core.parameters import PLEASE_ADD_EXECUTABLE_HERE
 from cing.core.parameters import cingPaths
-from cing.setup import PLEASE_ADD_EXECUTABLE_HERE
 from glob import glob
 
 if True: # block
