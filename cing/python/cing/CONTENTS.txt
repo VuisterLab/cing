@@ -15,5 +15,5 @@ localConstants.py       Settings that can be imported from python/cing/__init__.
                         NB this file is absent from svn. An example can be adapted
                         from: scripts/cing/localSettingsExample.py
 main.py                 The CING program.
-setup.py                Run to set up environment variables and check installation.
+setupCing.py            Run to set up environment variables and check installation.
 valSets.cfg             Validation settings. Might be moved around.

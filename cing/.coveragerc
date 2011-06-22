@@ -1,0 +1,9 @@
+[run]
+# Omit the Cython distribution inside CING
+source=cing.core
+
+#[report]
+#include=cing.core
+
+#[xml]
+#output=coverage.xml
