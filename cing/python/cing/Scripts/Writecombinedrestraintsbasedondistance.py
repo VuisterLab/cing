@@ -15,6 +15,7 @@ from munkres import Munkres
 from cing.core.classes import * #@UnusedWildImport
 from cing.core.molecule import * #@UnusedWildImport
 from collections import defaultdict
+from itertools import combinations
 
 def adddihrestr(proj,lower,upper,leunumberlist):
     '''Adding dihedral restraints'''
@@ -240,8 +241,123 @@ def makeallowedtable(table,drlcolumns,drlrows,lendrlcolumns,lendrlrows):
         #endfor
     #endfor
     stringtable=tableprint(allowedtable,15)
-    NTdebug('Allowed table is:\n%s'%stringtable)
+    NTmessage('Allowed table is:\n%s'%stringtable)
     return(allowedtable,maxi)
+
+def calculateindexes(allowedtable,lendrlcolumns,lendrlrows):
+    combs=calculatecombs(lendrlcolumns,lendrlrows)
+    totalvaluenew='INF'
+    if lendrlrows!=lendrlcolumns:
+        nCr=calcnCr(lendrlrows,lendrlcolumns)
+        if nCr>30000: #to reduce the amount of calculation time, a faster but less optimal algorithm will be used.
+            NTmessage('nCr = %s. It will take too long to calculate all possibilities first.\nCombinations may be not optimal'%nCr)
+            indexes=munkindexes(allowedtable)
+        else:
+            for i in combs:#for all possible combinations:
+                totalvalue,indexes1,indexes2,table1,table2=calulateallcombinations(i,allowedtable,lendrlrows)
+                if totalvalue<totalvaluenew:#the lower totalvalue, the more information is kept.
+                    totalvaluenew=totalvalue
+                    finalindexes1=indexes1
+                    finalindexes2=indexes2
+                    _finaltable1=table1
+                    _finaltable2=table2
+                    finalcomb=i
+                #endif
+            indexes=translateindexes(finalcomb,finalindexes1,finalindexes2,lendrlrows)
+            #endfor
+        #endif
+    else:
+        indexes=munkindexes(allowedtable)
+    #endif
+    return indexes,totalvaluenew
+
+def munkindexes(allowedtable):
+    munk=Munkres()
+    indexes=munk.compute(allowedtable)
+    return indexes
+
+def calcnCr(n,k):
+    if n>=k and k>=0:
+        facn=fac(n)
+        fack=fac(k)
+        facnk=fac(n-k)
+        nCr=facn/(fack*facnk)
+    else:
+        'k<0 or k>n; cannot calculate n nCr k.'
+        nCr=None
+    #endif
+    return nCr
+
+def fac(X):
+    if X==1:
+        return 1
+    else:
+        return X*fac(X-1)
+
+def calculatecombs(lendrlcolumns,lendrlrows):
+    li=range(lendrlrows)
+    comb=combinations(li,lendrlcolumns)
+    combs=[]
+    for i in comb: #Calculates all combinations of square matrices to give to munkres.
+        j=list(i)
+        combs.append(j)
+    return combs
+
+def calulateallcombinations(comb,allowedtable,lendrlrows):
+    #Calculates the total sum of the differences in upper bound of distance restraints for the given combinations.
+    munk=Munkres()
+    totalvalue=0
+    table1=[]
+    table2=[]
+    count=0
+    for j in range(lendrlrows):
+        if count<len(comb) and comb[count]==j:
+            table1.append(allowedtable[j])
+            count+=1
+        else:
+            table2.append(allowedtable[j])
+        #endif
+    #endfor
+    indexes1=munk.compute(table1)
+    for row, column in indexes1:
+        value=table1[row][column]
+        totalvalue+=value
+    indexes2=[]
+    #endfor
+    for k in range(len(table2)):
+        mini=min(table2[k])
+        for ii,jj in enumerate(table2[k]): #finding column index for the lowest value in the row.
+            if jj==mini:
+                columnind=ii
+            #endif
+        #endfor
+        indexes2.append((k,columnind))
+    #endfor
+    #indexes2=munk.compute(table2) #I used this before I realised that taking the minima will give a better result.
+    for row, column in indexes2:
+        value=table2[row][column]
+        totalvalue+=value
+    #endfor
+    return(totalvalue,indexes1,indexes2,table1,table2)
+
+def translateindexes(comb,indexes1,indexes2,lendrlrows):
+    count1=0
+    count2=0
+    finalindexes=[]
+    for j in range(lendrlrows):
+        if count1<len(comb) and comb[count1]==j:
+            index=indexes1[count1]
+            newindex=(j,index[1])
+            finalindexes.append(newindex)
+            count1+=1
+        else:
+            index=indexes2[count2]
+            newindex=(j,index[1])
+            finalindexes.append(newindex)
+            count2+=1
+        #endif
+    #endfor
+    return finalindexes
 
 def checkcolumn(lendrlrows,allowedtable,column,maxi,ncolumnlist):
     minix=[] #list of values of specified column
@@ -307,7 +423,7 @@ def checkrow(lendrlrows,drlrows,invdrlrowsdict,allowedtable,maxi,rows,columns,va
         if found==0: #this row needs to be combined with a column
             left.append(i)
     #endfor
-    for i in left:
+    for i in left: #I don't expect we'll need this any more after adding calculateindexes. Only needed is nCr >30000.
         mini=min(allowedtable[i])
         if mini==maxi: #if there is no combination allowed for this row it will be deassigned
             nrowlist.append(i)
@@ -441,7 +557,6 @@ def deassignrestraints(n,proj,leu,deldeasrestr):
     return(proj)
 
 def writerestraintsforleu(prl,proj,prlleu,projleu,treshold,deasHB=True):
-
     if deasHB==True: #if HB's needs to be deassigned
         proj,_deassHBaplistproj=deassignHB(proj,projleu)
         prl,_deassHBaplistprl=deassignHB(prl,prlleu)#just to be able to compare the two projects later on
@@ -452,9 +567,13 @@ def writerestraintsforleu(prl,proj,prlleu,projleu,treshold,deasHB=True):
     invdrlrowsdict=reversedict(drlrowsdict)
     table=makedifferencetable(drlcolumns, drlrows,lendrlcolumns,lendrlrows)
     allowedtable,maxi=makeallowedtable(table,drlcolumns,drlrows,lendrlcolumns,lendrlrows)
-    munk = Munkres() #algorithm to make combinations of lowest costs
-    indexes = munk.compute(allowedtable)
+    if False: #this is the old version of the algorithm; works faster, but gives less optimal results.
+        munk = Munkres() #algorithm to make combinations of lowest costs
+        _indexes = munk.compute(allowedtable)
+    indexes,totalvaluenew=calculateindexes(allowedtable,lendrlcolumns,lendrlrows)
     n,rows,columns,_values=checkindexes(indexes,allowedtable,table,maxi,n,invdrlcolumnsdict,invdrlrowsdict,drlcolumns,drlrows,lendrlrows)
+    if totalvaluenew!='INF':
+        NTmessage('total sum of differences between upperbounds of combined restraints is %.2f A.'%(float(totalvaluenew)/1000))
     #n=checkdeasrHB(n,deassHBaplistproj) Not necessary anymore since distances are recalculated after deassignment HB's.
     restraintpairdict=makerestraintpairdict(invdrlrowsdict,invdrlcolumnsdict,drlrows,drlcolumns,rows,columns)
     disrlist,dellist=makedisrlist(restraintpairdict,proj)
@@ -476,8 +595,8 @@ def alterrestraintsforleus(leunumberlist,proj,prl,treshold,deasHB,dihrCHI2):
     return proj
 
 if __name__ == '__main__':
-#    proj_path='/home/i/tmp/karenVCdir/'
-    proj_path='/Users/jd/workspace/'
+#    proj_path='/Users/jd/workspace/'
+    proj_path='/home/i/tmp/karenVCdir/'
     proj_name='H2_2Ca_64_100'
     molec_name='refine1'
     prl_name='H2_2Ca_64_100_3_rotleucines'
