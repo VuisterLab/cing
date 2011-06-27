@@ -11,6 +11,7 @@ save_file_characteristics
       _Details
 
        2004-01-30 "First creation from Aqua lib" 
+       2011-06-27 "Updated for CING lib" 
 
    stop_
 
@@ -30,173 +31,450 @@ NOESY experiment.
       _Comp_ID
       _Atom_ID
 
-       ALA  N   
-       ALA  CA  
-       ALA  CB  
-       ALA  C   
-       ALA  O   
-       ARG  N   
-       ARG  CA  
-       ARG  CB  
-       ARG  CG  
-       ARG  CD  
-       ARG  NE  
-       ARG  CZ  
-       ARG  NH1 
-       ARG  NH2 
-       ARG  C   
-       ARG  O   
-       ASN  N   
-       ASN  CA  
-       ASN  CB  
-       ASN  CG  
-       ASN  OD1 
-       ASN  ND2 
-       ASN  C   
-       ASN  O   
-       ASP  N   
-       ASP  CA  
-       ASP  CB  
-       ASP  CG  
-       ASP  OD1 
-       ASP  OD2 
-       ASP  C   
-       ASP  O   
-       CYS  N   
-       CYS  CA  
-       CYS  CB  
-       CYS  SG  
-       CYS  C   
-       CYS  O   
-       GLN  N   
-       GLN  CA  
-       GLN  CB  
-       GLN  CG  
-       GLN  CD  
-       GLN  OE1 
-       GLN  NE2 
-       GLN  C   
-       GLN  O   
-       GLU  N   
-       GLU  CA  
-       GLU  CB  
-       GLU  CG  
-       GLU  CD  
-       GLU  OE1 
-       GLU  OE2 
-       GLU  C   
-       GLU  O   
-       GLY  N   
-       GLY  CA  
-       GLY  C   
-       GLY  O   
-       HIS  N   
-       HIS  CA  
-       HIS  CB  
-       HIS  CG  
-       HIS  ND1 
-       HIS  CD2 
-       HIS  CE1 
-       HIS  NE2 
-       HIS  C   
-       HIS  O   
-       ILE  N   
-       ILE  CA  
-       ILE  CB  
-       ILE  CG2 
-       ILE  CG1 
-       ILE  CD1 
-       ILE  C   
-       ILE  O   
-       LEU  N   
-       LEU  CA  
-       LEU  CB  
-       LEU  CG  
-       LEU  CD1 
-       LEU  CD2 
-       LEU  C   
-       LEU  O   
-       LYS  N   
-       LYS  CA  
-       LYS  CB  
-       LYS  CG  
-       LYS  CD  
-       LYS  CE  
-       LYS  NZ  
-       LYS  C   
-       LYS  O   
-       MET  N   
-       MET  CA  
-       MET  CB  
-       MET  CG  
-       MET  SD  
-       MET  CE  
-       MET  C   
-       MET  O   
-       PHE  N   
-       PHE  CA  
-       PHE  CB  
-       PHE  CG  
-       PHE  CD1 
-       PHE  CE1 
-       PHE  CZ  
-       PHE  CE2 
-       PHE  CD2 
-       PHE  C   
-       PHE  O   
-       PRO  N   
-       PRO  CD  
-       PRO  CA  
-       PRO  CB  
-       PRO  CG  
-       PRO  C   
-       PRO  O   
-       SER  N   
-       SER  CA  
-       SER  CB  
-       SER  OG  
-       SER  C   
-       SER  O   
-       THR  N   
-       THR  CA  
-       THR  CB  
-       THR  OG1 
-       THR  CG2 
-       THR  C   
-       THR  O   
-       TRP  N   
-       TRP  CA  
-       TRP  CB  
-       TRP  CG  
-       TRP  CD1 
-       TRP  CD2 
-       TRP  CE3 
-       TRP  CE2 
-       TRP  NE1 
-       TRP  CZ3 
-       TRP  CZ2 
-       TRP  CH2 
-       TRP  C   
-       TRP  O   
-       TYR  N   
-       TYR  CA  
-       TYR  CB  
-       TYR  CG  
-       TYR  CD1 
-       TYR  CE1 
-       TYR  CZ  
-       TYR  CE2 
-       TYR  CD2 
-       TYR  OH  
-       TYR  C   
-       TYR  O   
-       VAL  N   
-       VAL  CA  
-       VAL  CB  
-       VAL  CG1 
-       VAL  CG2 
-       VAL  C   
-       VAL  O   
+A    C1'       
+A    C2        
+A    C2'       
+A    C3'       
+A    C4        
+A    C4'       
+A    C5        
+A    C5'       
+A    C6        
+A    C8        
+A    N1        
+A    N3        
+A    N6        
+A    N7        
+A    N9        
+A    O2'       
+A    O3'       
+A    O4'       
+A    O5'       
+A    OP1       
+A    OP2       
+A    P         
+ALA  C         
+ALA  CA        
+ALA  CB        
+ALA  N         
+ALA  O         
+ALA  OXT       
+ARG  C         
+ARG  CA        
+ARG  CB        
+ARG  CD        
+ARG  CG        
+ARG  CZ        
+ARG  N         
+ARG  NE        
+ARG  NH1       
+ARG  NH2       
+ARG  O         
+ARG  OXT       
+ARGx C         
+ARGx CA        
+ARGx CB        
+ARGx CD        
+ARGx CG        
+ARGx CZ        
+ARGx N         
+ARGx NE        
+ARGx NH1       
+ARGx NH2       
+ARGx O         
+ARGx OXT       
+ASN  C         
+ASN  CA        
+ASN  CB        
+ASN  CG        
+ASN  N         
+ASN  ND2       
+ASN  O         
+ASN  OD1       
+ASN  OXT       
+ASP  C         
+ASP  CA        
+ASP  CB        
+ASP  CG        
+ASP  N         
+ASP  O         
+ASP  OD1       
+ASP  OD2       
+ASP  OXT       
+ASPH C         
+ASPH CA        
+ASPH CB        
+ASPH CG        
+ASPH N         
+ASPH O         
+ASPH OD1       
+ASPH OD2       
+ASPH OXT       
+C    C1'       
+C    C2        
+C    C2'       
+C    C3'       
+C    C4        
+C    C4'       
+C    C5        
+C    C5'       
+C    C6        
+C    N1        
+C    N3        
+C    N4        
+C    O2        
+C    O2'       
+C    O3'       
+C    O4'       
+C    O5'       
+C    OP1       
+C    OP2       
+C    P         
+CA2P CA        
+CYS  C         
+CYS  CA        
+CYS  CB        
+CYS  N         
+CYS  O         
+CYS  OXT       
+CYS  SG        
+CYSS C         
+CYSS CA        
+CYSS CB        
+CYSS N         
+CYSS O         
+CYSS OXT       
+CYSS SG        
+DA   C1'       
+DA   C2        
+DA   C2'       
+DA   C3'       
+DA   C4        
+DA   C4'       
+DA   C5        
+DA   C5'       
+DA   C6        
+DA   C8        
+DA   N1        
+DA   N3        
+DA   N6        
+DA   N7        
+DA   N9        
+DA   O3'       
+DA   O4'       
+DA   O5'       
+DA   OP1       
+DA   OP2       
+DA   P         
+DC   C1'       
+DC   C2        
+DC   C2'       
+DC   C3'       
+DC   C4        
+DC   C4'       
+DC   C5        
+DC   C5'       
+DC   C6        
+DC   N1        
+DC   N3        
+DC   N4        
+DC   O2        
+DC   O3'       
+DC   O4'       
+DC   O5'       
+DC   OP1       
+DC   OP2       
+DC   P         
+DG   C1'       
+DG   C2        
+DG   C2'       
+DG   C3'       
+DG   C4        
+DG   C4'       
+DG   C5        
+DG   C5'       
+DG   C6        
+DG   C8        
+DG   N1        
+DG   N2        
+DG   N3        
+DG   N7        
+DG   N9        
+DG   O3'       
+DG   O4'       
+DG   O5'       
+DG   O6        
+DG   OP1       
+DG   OP2       
+DG   P         
+DT   C1'       
+DT   C2        
+DT   C2'       
+DT   C3'       
+DT   C4        
+DT   C4'       
+DT   C5        
+DT   C5'       
+DT   C6        
+DT   C7        
+DT   N1        
+DT   N3        
+DT   O2        
+DT   O3'       
+DT   O4        
+DT   O4'       
+DT   O5'       
+DT   OP1       
+DT   OP2       
+DT   P         
+G    C1'       
+G    C2        
+G    C2'       
+G    C3'       
+G    C4        
+G    C4'       
+G    C5        
+G    C5'       
+G    C6        
+G    C8        
+G    N1        
+G    N2        
+G    N3        
+G    N7        
+G    N9        
+G    O2'       
+G    O3'       
+G    O4'       
+G    O5'       
+G    O6        
+G    OP1       
+G    OP2       
+G    P         
+GLN  C         
+GLN  CA        
+GLN  CB        
+GLN  CD        
+GLN  CG        
+GLN  N         
+GLN  NE2       
+GLN  O         
+GLN  OE1       
+GLN  OXT       
+GLU  C         
+GLU  CA        
+GLU  CB        
+GLU  CD        
+GLU  CG        
+GLU  N         
+GLU  O         
+GLU  OE1       
+GLU  OE2       
+GLU  OXT       
+GLUH C         
+GLUH CA        
+GLUH CB        
+GLUH CD        
+GLUH CG        
+GLUH N         
+GLUH O         
+GLUH OE1       
+GLUH OE2       
+GLUH OXT       
+GLY  C         
+GLY  CA        
+GLY  N         
+GLY  O         
+GLY  OXT       
+HIS  C         
+HIS  CA        
+HIS  CB        
+HIS  CD2       
+HIS  CE1       
+HIS  CG        
+HIS  N         
+HIS  ND1       
+HIS  NE2       
+HIS  O         
+HIS  OXT       
+HISE C         
+HISE CA        
+HISE CB        
+HISE CD2       
+HISE CE1       
+HISE CG        
+HISE N         
+HISE ND1       
+HISE NE2       
+HISE O         
+HISE OXT       
+HISH C         
+HISH CA        
+HISH CB        
+HISH CD2       
+HISH CE1       
+HISH CG        
+HISH N         
+HISH ND1       
+HISH NE2       
+HISH O         
+HISH OXT       
+HOH  O         
+ILE  C         
+ILE  CA        
+ILE  CB        
+ILE  CD1       
+ILE  CG1       
+ILE  CG2       
+ILE  N         
+ILE  O         
+ILE  OXT       
+LEU  C         
+LEU  CA        
+LEU  CB        
+LEU  CD1       
+LEU  CD2       
+LEU  CG        
+LEU  N         
+LEU  O         
+LEU  OXT       
+LGLY C         
+LGLY N         
+LGLY O         
+LGLY OXT       
+LYS  C         
+LYS  CA        
+LYS  CB        
+LYS  CD        
+LYS  CE        
+LYS  CG        
+LYS  N         
+LYS  NZ        
+LYS  O         
+LYS  OXT       
+LYSx C         
+LYSx CA        
+LYSx CB        
+LYSx CD        
+LYSx CE        
+LYSx CG        
+LYSx N         
+LYSx NZ        
+LYSx O         
+LYSx OXT       
+MET  C         
+MET  CA        
+MET  CB        
+MET  CE        
+MET  CG        
+MET  N         
+MET  O         
+MET  OXT       
+MET  SD        
+PHE  C         
+PHE  CA        
+PHE  CB        
+PHE  CD1       
+PHE  CD2       
+PHE  CE1       
+PHE  CE2       
+PHE  CG        
+PHE  CZ        
+PHE  N         
+PHE  O         
+PHE  OXT       
+PRO  C         
+PRO  CA        
+PRO  CB        
+PRO  CD        
+PRO  CG        
+PRO  N         
+PRO  O         
+PRO  OXT       
+SER  C         
+SER  CA        
+SER  CB        
+SER  N         
+SER  O         
+SER  OG        
+SER  OXT       
+SS   C         
+SS   CA        
+SS   CB        
+SS   N         
+SS   O         
+THR  C         
+THR  CA        
+THR  CB        
+THR  CG2       
+THR  N         
+THR  O         
+THR  OG1       
+THR  OXT       
+TRP  C         
+TRP  CA        
+TRP  CB        
+TRP  CD1       
+TRP  CD2       
+TRP  CE2       
+TRP  CE3       
+TRP  CG        
+TRP  CH2       
+TRP  CZ2       
+TRP  CZ3       
+TRP  N         
+TRP  NE1       
+TRP  O         
+TRP  OXT       
+TYR  C         
+TYR  CA        
+TYR  CB        
+TYR  CD1       
+TYR  CD2       
+TYR  CE1       
+TYR  CE2       
+TYR  CG        
+TYR  CZ        
+TYR  N         
+TYR  O         
+TYR  OH        
+TYR  OXT       
+U    C1'       
+U    C2        
+U    C2'       
+U    C3'       
+U    C4        
+U    C4'       
+U    C5        
+U    C5'       
+U    C6        
+U    N1        
+U    N3        
+U    O2        
+U    O2'       
+U    O3'       
+U    O4        
+U    O4'       
+U    O5'       
+U    OP1       
+U    OP2       
+U    P         
+VAL  C         
+VAL  CA        
+VAL  CB        
+VAL  CG1       
+VAL  CG2       
+VAL  N         
+VAL  O         
+VAL  OXT       
+ZN   ZN        
+cPRO C         
+cPRO CA        
+cPRO CB        
+cPRO CD        
+cPRO CG        
+cPRO N         
+cPRO O         
+cPRO OXT       
 
    stop_
 
