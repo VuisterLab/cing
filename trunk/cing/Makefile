@@ -5,6 +5,10 @@
 
 #all:	install test fails because cython needs to be found.
 		
+clean:
+	@echo "Cleaning up CING installation"
+	-/bin/rm -f cing.csh
+	
 install:
 	@echo "==> Installing CING setup script ..."
 	-/bin/rm -f cing.csh
@@ -16,18 +20,18 @@ build_cython:
 	-/bin/rm -f python/cing/Libs/cython/superpose.c
 	cd python/cing/Libs/cython; python compile.py build_ext --inplace
 
-test:
-	python -u python/cing/main.py --testQ
-
-	
-#sloccount:
-#	sloccount --duplicates --wide --details divergence/*.py divergence/test/*.py > sloccount.sc
+# Using nose instead.
+#test:
+#	python -u python/cing/main.py --testQ -c 1
 
 nose:
-#	nosetests --with-xunit --with-coverage --verbose --where=python/cing/core/test
+	# Write the .coverage and nosetest.xml
 	nosetests --with-xunit --with-coverage --verbose --cover-package=cing --where=python/cing
-#	nosetests --testmatch=test_.+.py
-#	coverage xml
+	# Convert .coverage to coverage.xml
+	coverage xml
 
-#pylint:
-#	pylint --max-line-length=120 --disable="E0602,W0511" -f parseable --include-ids=y divergence > pylint.txt || exit 0
+pylint:
+	cd python; pylint --rcfile .pylintrc cing > pylint.txt || exit 0
+	
+sloccount:
+	sloccount --duplicates --wide --details python src > sloccount.sc

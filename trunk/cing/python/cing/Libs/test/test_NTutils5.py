@@ -119,7 +119,8 @@ class AllChecks(TestCase):
             self.assertEquals( stringMeansBooleanTrue(inputStr), resultList[i]==1)
 
     def testAsci2list(self):
-        """
+        
+        _help = """
         Possible 5 situations:
         a      # 1 # positive int
         -a     # 2 # single int

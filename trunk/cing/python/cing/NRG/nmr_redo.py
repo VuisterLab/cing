@@ -80,8 +80,8 @@ class NmrRedo(nrgCing):
         self.entry_list_possible = NTlist() # NEW: monomeric, and beyond.
         self.entry_list_possible += '1brv 1dum'.split()
         return self.entry_list_possible
-    # end def  
-
+    # end def   
+    
     def refine(self):
         """On self.entry_list_todo.
         Return True on error.
@@ -118,7 +118,7 @@ class NmrRedo(nrgCing):
             NTerror("Failed to doScriptOnEntryList")
             return True
         # end if
-    # end def  
+    # end def        
 # end class.
 
 if __name__ == '__main__':

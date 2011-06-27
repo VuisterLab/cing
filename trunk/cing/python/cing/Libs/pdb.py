@@ -684,7 +684,9 @@ def importPDB(project, pdbFile, convention = IUPAC, nmodels = None):
 #end def
 
 def export2PDB(project, tmp = None):
-    """Export coordinates to pdb file
+    """
+    Export coordinates to pdb file.
+    Return filename on first exported file or None for error.
     """
     for mol in project.molecules:
         if mol.modelCount > 0:

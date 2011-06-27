@@ -1,6 +1,6 @@
 """
 Unit test execute as:
-python -u $CINGROOT/python/cing/Scripts/test/testiCingRobot.py
+python -u $CINGROOT/python/cing/Scripts/test/test_vCingMaster.py
 """
 from cing import cingDirTestsData #@UnusedImport
 from cing import cingDirTmp
@@ -11,7 +11,7 @@ import unittest
 
 class AllChecks(TestCase):
 
-    def testvCingMaster(self):
+    def _test_vCingMaster(self):
         cingDirTmpTest = os.path.join( cingDirTmp, getCallerName() )
         mkdirs( cingDirTmpTest )
         self.failIf(os.chdir(cingDirTmpTest), msg =

@@ -18,6 +18,7 @@ assumeAllAreDone    = 1 # DEFAULT: 1 when assumed all are done. Disables some me
 UJ                  = '/Users/wim'
 WS                  = os.path.join(UJ,'workspace')
 dDir                = '/Library/WebServer/Documents'            # Web dir.
+VCsecret            = 'a/b/c' # Overriden locally. @UnusedVariable Only used in publishVC.py
 
 try:
     from localConstants import * #@UnusedWildImport

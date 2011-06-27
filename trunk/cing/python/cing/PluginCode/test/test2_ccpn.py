@@ -13,7 +13,7 @@ import unittest
 
 class AllChecks(TestCase):
 
-    def test_2ccpn(self):
+    def _test_2ccpn(self):
         # failing entries: 1ai0, 1kr8 (same for 2hgh)
         entryList = "1iv6".split()
 #        entryList = "1brv".split()
@@ -51,7 +51,8 @@ class AllChecks(TestCase):
             self.assertFalse(project.validate(htmlOnly=htmlOnly,
                                               doProcheck = doProcheck,
                                               doWhatif=doWhatif,
-                                              doWattos=doWattos ))
+                                              doWattos=doWattos,
+                                               ))
 #            self.assertFalse(project.removeCcpnReferences())
             # Do not leave the old CCPN directory laying around since it might get added to by another test.
             if os.path.exists(entryId):

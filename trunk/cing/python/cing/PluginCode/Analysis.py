@@ -2,6 +2,7 @@ from cing import __author__
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.PluginCode.required.reqAnalysis import * #@UnusedWildImport
 from cing.PluginCode.required.reqCcpn import * #@UnusedWildImport
+from nose.plugins.skip import SkipTest
 
 __author__ += 'Tim Stevens '
 
@@ -16,7 +17,8 @@ if True: # for easy blocking of data, preventing the code to be resorted with im
         from cing.Scripts.Analysis.PyRPF import * #@UnusedWildImport
     except:
         switchOutput(True)
-        raise ImportWarning(ANALYSIS_STR)
+#        raise ImportWarning(ANALYSIS_STR)
+        raise SkipTest(ANALYSIS_STR)        
     finally: # finally fails in python below 2.5
         switchOutput(True)
 #    NTdebug('Imported plugin Analysis version %s' % version)

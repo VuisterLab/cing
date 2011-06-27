@@ -3,6 +3,7 @@ from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.core.classes import Project
 from cing.core.parameters import cingPaths
 from cing.core.parameters import plugins
+from nose.plugins.skip import SkipTest
 import glob
 
 # NB This routine gets executed before main.py gets a chance to set the verbosity.
@@ -28,8 +29,10 @@ def importPlugin( pluginName ):
             plugin = plugins[pluginName]
 #            NTdebug("reloading same module just to see it change")
             reload( plugin.module )
-        except ImportWarning: # Disable after done debugging; can't use NTdebug yet.
-            print "Skipping reload of an optional compound."
+        except ImportWarning, extraInfo: # Disable after done debugging; can't use NTdebug yet.
+            NTmessage("Skipping reload of an optional compound (please recode to use SkipTest): %s" % extraInfo)           
+        except SkipTest, extraInfo:
+            NTmessage("Skipping reload report of an optional compound: %s" % extraInfo)            
         except Exception:
             NTtracebackError()
             NTexception('A reload failed for ' + pluginName)
@@ -45,8 +48,10 @@ def importPlugin( pluginName ):
         isInstalled = True
 #        NTdebug( "Installed plugin: [%s]" % pluginName )
     except ImportWarning:
-        NTdebug( "Skipping import of an optional plugin: [%s]" % pluginName )
+        NTdebug( "Skipping import of an optional plugin: [%s] (please recode to use SkipTest)" % pluginName )
         isInstalled = False
+    except SkipTest:
+        NTdebug("Skipping import of an optional plugin: [%s]" % pluginName )            
     except:
         NTtracebackError()
         NTerror( 'Failed to import pluginCodeModule: [%s]' % pluginName)

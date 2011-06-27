@@ -19,11 +19,11 @@ class AllChecks(TestCase):
     mkdirs( cingDirTmpTest )
     os.chdir(cingDirTmpTest)
 
-    def _test_NoeCompletenessLib(self):
-#        cing.verbosity = cing.verbosityDebug
-        ncl = NoeCompletenessAtomLib()
-        self.assertTrue(ncl)
-        
+#    def _test_NoeCompletenessLib(self):
+##        cing.verbosity = cing.verbosityDebug
+#        ncl = NoeCompletenessAtomLib()
+#        self.assertTrue(ncl)
+#        
         
     def test_ArtificialRestraints(self):
         cing.verbosity = cing.verbosityDebug
@@ -57,6 +57,7 @@ class AllChecks(TestCase):
                  use_intra = True,
 #                 ob_file_name = None, # Defaults to ob_standard.str
 #                 ob_file_name = os.path.join( cingDirLibs, NoeCompletenessAtomLib.STR_FILE_DIR, 'ob_all_stereo.str'),
+                 ob_file_name = os.path.join( cingDirLibs, NoeCompletenessAtomLib.STR_FILE_DIR, 'ob_heavy.str'),
                  summaryFileNameCompleteness = "%s_compl_sum" % entryId,
                  write_dc_lists = True,
                  file_name_base_dc  = "%s_compl" % entryId,
