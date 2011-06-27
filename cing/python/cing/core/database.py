@@ -802,6 +802,19 @@ def isProton( atmDef ):
     return (atmDef.spinType == '1H')
 #end def
 
+def isHeavy( atmDef ):
+    """
+    Return True for any atom that is not a proton or a pseudo.
+    I.e. a pseudo of carbons (Leu QD) is not a 'heavy'.
+    Note the same code is in molecule.py        
+    """
+    if isProton(atmDef):
+        return False
+    if isPseudoAtom(atmDef):
+        return False
+    return True
+#end def
+
 def isCarbon( atmDef ):
     """Return Tue if atm is 13C
     """

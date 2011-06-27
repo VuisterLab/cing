@@ -25,7 +25,7 @@ Minimum              28.148
 Maximum            18593.635
 Sum                4971048.908
 """
-
+ 
 from cing import cingPythonCingDir
 from cing.Libs import disk
 from cing.Libs.NTgenUtils import * #@UnusedWildImport
@@ -73,7 +73,7 @@ class nrgCing(Lister):
                 ):
         self.assumeAllAreDone = assumeAllAreDone
         self.writeWhyNot = writeWhyNot
-        "Write the info for the WhyNot database"
+        # Write the info for the WhyNot database
         self.writeTheManyFiles = writeTheManyFiles
         "Write the info for the WhyNot database in files per entry; too verbose and not used anymore?"
         self.updateIndices = updateIndices
@@ -212,7 +212,8 @@ class nrgCing(Lister):
         self.usePreviousPdbEntries      = True  # DEFAULT: False 
         self.usedCcpnInput              = True  # DEFAULT: True For NMR_REDO it is not from the start.
         self.validateEntryExternalDone  = True  # DEFAULT: True For NMR_REDO it is not from the start.
-        self.entry_list_possible = self.getPossibleEntryList()
+        self.entry_list_possible = None # Set below 
+        self.setPossibleEntryList()
         
         self.updateDerivedResourceSettings() # The paths previously initialized with None.
         
@@ -971,7 +972,7 @@ class nrgCing(Lister):
             NTmessage("Skipping create WHY_NOT list")
             return
 
-        whyNot = WhyNot.WhyNot() # stupid why this needs to be fully specified.
+        whyNot = WhyNot() # stupid why this needs to be fully specified.
         # Loop for speeding up the checks. Most are not nmr.
         for entry_code in self.entry_list_pdb:
             whyNotEntry = WhyNotEntry(entry_code)
@@ -1950,7 +1951,16 @@ class nrgCing(Lister):
                             expectPdbEntryList = True,
                             extraArgList = extraArgList)
         NTmessage("Done with storeCING2db.")
-    # end def        
+    # end def
+    
+    def refine(self):
+        """
+        Needs to be overriden by e.g. nmr_redo.
+        Return True on error.
+        """
+        return True
+    # end def
+    
 # end class.
 
 def runNrgCing( useClass = nrgCing ):

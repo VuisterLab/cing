@@ -503,9 +503,10 @@ Project: Top level Cing project class
 
             root, newName = Project.rootPath(name)
             if not root:
+                NTerror('Project.open: unable to open Project "%s" because root is [%s].', name, root)
                 return None
             if not os.path.exists(root):
-                NTerror('Project.open: unable to open Project "%s"', name)
+                NTerror('Project.open: unable to open Project "%s" because root [%s] was not found.', name, root)
                 return None
             #end if
 

@@ -63,7 +63,8 @@ class NoeCompleteness( NTdict ):
         self.summaryFileNameCompleteness    = summaryFileNameCompleteness
         self.write_dc_lists                 = write_dc_lists             
         self.file_name_base_dc              = file_name_base_dc
-        self.hbOnly                         = hbOnly          
+        self.hbOnly                         = hbOnly  
+        self.excludeBonded                  = True
         self.resList                        = resList        
         self.isPerShellRun                  = False
         
@@ -84,6 +85,7 @@ class NoeCompleteness( NTdict ):
         NTmessage("file_name_base_dc            : %s   " % self.file_name_base_dc          )
         NTmessage("resList                      : %s   " % str(self.resList)               )
         NTmessage("hbOnly                       : %s   " % self.hbOnly                     )               
+        NTmessage("excludeBonded                : %s   " % self.excludeBonded              )               
         NTmessage("isPerShellRun                : %s   " % self.isPerShellRun              )
         
         if ob_file_name:
@@ -220,6 +222,10 @@ class NoeCompleteness( NTdict ):
 
                 for atom1 in atom1List:
 #                    NTdebug("Working on atom1 %s" % atom1)
+#                    atom1topology = atom1.topology()
+#                    if atom1topology == None:
+#                        NTerror("Failed to get atom1's topology; skipping %s" % atom1)
+#                        continue
                     for atom2 in atom2List:
                         if atom1 == atom2:
                             continue
@@ -228,6 +234,10 @@ class NoeCompleteness( NTdict ):
 #                        NTdebug("Working on atom2 %s" % atom2)
                         if self.hbOnly and not atom1.canFormHydrogenBondWith( atom2 ):
                             continue
+                        if self.excludeBonded and atom1.isBondedTo( atom2 ):
+#                            NTdebug("Skipping bonded pair")
+                            continue
+                        # end if
                         atomPairs = NTlist()
                         atomPairs.append((atom1,atom2))
                         dr = DistanceRestraint(atomPairs=atomPairs)

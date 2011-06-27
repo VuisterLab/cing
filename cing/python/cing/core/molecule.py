@@ -5344,13 +5344,26 @@ coordinates: %s"""  , dots, self, dots
     #end def
 
     def topology( self ):
-        """return list of Atom instances defining the topology. Returns None on error"""
+        """
+        Return list of Atom instances defining the topology. Returns None on error
+        The topology is simply a list of Atom instances that are directly bonded.
+        """
         if self._topology != None:
             return self._topology
         #old style#
         return translateTopology( self._parent, self.db.topology )
     #end def
 
+    def isBondedTo(self, other):
+        topology = self.topology() # nicely self caching.
+        if topology == None:
+            NTerror("Failed to get topology; assuming atoms are not bonded.")
+            return False
+        bonded = other in topology
+#        NTdebug("Found atoms %20s/%20s are %s bonded." % ( self, other, bonded))
+        return bonded
+    #end def
+    
     def isAssigned( self, resonanceListIdx=None ):
         """return true if atom current resonance has a valid assignment
         Special case of resonanceListIdx is RESONANCE_LIST_IDX_ANY  will match assignment in any list.
@@ -5528,6 +5541,18 @@ coordinates: %s"""  , dots, self, dots
             NTwarning("Failed to get any atom in topology for heavy atom routine: %s" % self)
             return None
         return self.topology()[0]
+    #end def
+
+    def isHeavy( self ):
+        """
+        Return True for any atom that is not a proton or a pseudo.
+        I.e. a pseudo of carbons (Leu QD) is not a 'heavy'.        
+        """
+        if self.isProton():
+            return False
+        if self.isPseudoAtom():
+            return False
+        return True
     #end def
 
     def isAromatic( self ):

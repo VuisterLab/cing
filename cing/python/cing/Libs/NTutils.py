@@ -3904,8 +3904,9 @@ class SetupError(Exception):
 class CodeError(Exception):
     "Program code error"
 
-class ImportWarning(Exception):
-    "Optional code warning"
+# New in version 2.5.
+#class ImportWarning(Exception):
+#    "Optional code warning"
 
 
 class NTfile(file):

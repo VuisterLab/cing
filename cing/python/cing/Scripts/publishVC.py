@@ -21,8 +21,8 @@ How to copy VC on nmr (production machine):
 @author: jd
 '''
 from cing.Libs.NTutils import * #@UnusedWildImport
-from cing.NRG.settings import dDir
 from cing.Libs.forkoff import do_cmd
+from cing.NRG.settings import * #@UnusedWildImport
 cing.verbosity = cing.verbosityDebug
 
 workLocally = 0 # fails on nmr now.
@@ -45,7 +45,7 @@ doLink = True
 # NO CHANGES NEEDED BELOW THIS LINE
 #=======================================================================================
 os.chdir(localDir)
-VCsecret = os.getenv('VCsecret')
+#VCsecret = os.getenv('VCsecret') # unsafe
 if not VCsecret:
     NTerror("Failed to find VCsecret env variable.")
     sys.exit(1)

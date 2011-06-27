@@ -1,6 +1,6 @@
 """
 Unit test execute as:
-python $CINGROOT/python/cing/PluginCode/test/test_xx.py
+python $CINGROOT/python/cing/PluginCode/test/test_RetrieveTgzFromUrl.py
 """
 from cing import cingDirTestsData #@UnusedImport
 from cing import cingDirTmp
@@ -13,7 +13,7 @@ import unittest
 
 class AllChecks(TestCase):
 
-    def testRetrieveTgzFromUrl(self):
+    def _test_RetrieveTgzFromUrl(self):
 
         cingDirTmpTest = os.path.join( cingDirTmp, getCallerName() )
         mkdirs( cingDirTmpTest )
@@ -21,7 +21,7 @@ class AllChecks(TestCase):
             "Failed to change to test directory for files: " + cingDirTmpTest)
 
 #        url = 'http://restraintsgrid.bmrb.wisc.edu/servlet_data/NRG_ccpn_tmp'
-        url = 'file://Library/WebServer/Documents/NRG-CING/recoordSync'
+        url = 'file:///Library/WebServer/Documents/NRG-CING/recoordSync'
 #        url = 'file:/%s/ccpn' % (cingDirTestsData)
         entryId = '108d'
 #        entryId = '1brv'

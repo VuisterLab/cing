@@ -1,6 +1,6 @@
 """
 Unit test execute as:
-python $CINGROOT/python/cing/Scripts/test/testDoScriptOnEntryList.py
+python $CINGROOT/python/cing/Scripts/test/test_DoScriptOnEntryList.py
 """
 from cing import cingDirScripts
 from cing import cingDirTestsData #@UnusedImport
@@ -15,7 +15,7 @@ import unittest
 
 class AllChecks(TestCase):
 
-    def testDoScriptOnEntryList(self):
+    def test_DoScriptOnEntryList(self):
 
         cingDirTmpTest = os.path.join( cingDirTmp, getCallerName() )
         mkdirs( cingDirTmpTest )
@@ -35,7 +35,7 @@ class AllChecks(TestCase):
                             '.',
                             processes_max = 8,
                             delay_between_submitting_jobs = 5,
-                            max_time_to_wait = 5,
+                            max_time_to_wait = 20,
                             START_ENTRY_ID = 0,
                             MAX_ENTRIES_TODO = 1,
                             extraArgList = extraArgList,

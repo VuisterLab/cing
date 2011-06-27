@@ -1,14 +1,18 @@
 #!/bin/tcsh -e
 # Run with absolut path e.g.:
 #
-#        /Users/i/workspace/cing/cingBuildAndTest.csh
+#        $CINGROOT/cingBuildAndTest.csh
 #
 # Used by Jenkins to build and test CING installation automatically on various platforms. 
 # Important to use shell setup from user; hence the above no -f option.
 
 cd $0:h
-echo "DEBUG: Now in cwd: $cwd"
+
 echo "DEBUG: PATH       1: $PATH"
+echo "DEBUG: PYTHONPATH 1: $PYTHONPATH"
+echo "DEBUG: CLASSPATH  1: $CLASSPATH"
+
+setenv CINGROOT $cwd
 
 # Unset inherited environment
 # Alternatively we could use env for this as in:
@@ -25,25 +29,32 @@ else
     echo "DEBUG: CCPNMR_TOP_DIR 1: undefined"
 endif
 
-echo "DEBUG: PYTHONPATH 1: $PYTHONPATH"
+echo "DEBUG: PYTHONPATH 2: $PYTHONPATH"
 
-make -j -f Makefile install
-echo "DEBUG: PATH       2  : $PATH"
-
+make clean
+make install
 source cing.csh
-make -j -f Makefile build_cython
-# echo "DEBUG: PATH       3  : $PATH"
-# echo "DEBUG: PYTHONPATH 3  : $PYTHONPATH"
-# echo "DEBUG: CINGROOT   3  : $CINGROOT"
-setenv
+make build_cython
 
-make -j -f Makefile test
+echo "DEBUG: PATH       3  : $PATH"
+echo "DEBUG: PYTHONPATH 3  : $PYTHONPATH"
+echo "DEBUG: CINGROOT   3  : $CINGROOT"
 
-# Disabled for now because it will burn too many cycles.
-#make -j -f Makefile nose
-#if ( $status ) then
-#    echo "Failed nose"
-#    exit 1
-#endif
+# Comment out the next line after done testing for it's a security issue.
+setenv | sort
+
+#make test
+
+# Just see if it can return a zero status code on starting
+cing --noProject
+
+# Just count Source Lines Of Code.
+make sloccount
+# Still fails on some deps. So listing last in line.
+make nose
+# Still fails 
+make pylint
+
+
 
 echo "Done"

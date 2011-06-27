@@ -1,6 +1,6 @@
 """
 Unit test execute as:
-python -u $CINGROOT/python/cing/Scripts/test/testlinkdataNRGforGeerten.py
+python -u $CINGROOT/python/cing/Scripts/test/test_linkdataNRGforGeerten.py
 """
 from cing import cingDirTmp, cingDirTestsData #@UnusedImport
 from cing.Libs.NTutils import * #@UnusedWildImport
@@ -10,7 +10,7 @@ import unittest
 
 class AllChecks(TestCase):
 
-    def _testlinkdataNRGforGeerten(self):
+    def _test_linkdataNRGforGeerten(self):
         cingDirTmpTest = os.path.join( cingDirTmp, getCallerName() )
         mkdirs( cingDirTmpTest )
         self.failIf(os.chdir(cingDirTmpTest), msg =

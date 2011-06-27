@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+    <dict>
+        <key>Label</key>
+        <string>org.jenkins-ci</string>
+        <key>UserName</key>
+        <string>daemon</string>
+        <key>GroupName</key>
+        <string>daemon</string>
+        <key>ProgramArguments</key>
+        <array>
+            <string>/usr/bin/java</string>
+            <string>-Xmx512m</string>
+            <string>-jar</string>
+            <string>/Users/jd/.jenkins/war/WEB-INF/jenkins-cli.jar</string>
+        </array>
+        <key>RunAtLoad</key>
+        <true/>
+        <key>KeepAlive</key>
+        <true/>
+        <key>EnvironmentVariables</key>
+        <dict>
+            <key>JENKINS_HOME</key>
+            <string>/Users/Shared/Jenkins/Home</string>
+        </dict>
+    </dict>
+</plist>

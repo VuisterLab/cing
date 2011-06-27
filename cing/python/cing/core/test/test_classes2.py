@@ -82,7 +82,7 @@ class AllChecks(TestCase):
         _x = "dr after 4: %s" % formatall(distanceRestraint)
 
     def test_simplifySpecificallyForFcFeature_2(self):
-        'disfunctional as of yet'
+        # disfunctional as of yet
         self.createSimpleFastProject()
         self.distanceRestraintList = self.project.distances.new(DR_LEVEL, status = 'keep')
         atomPairs = NTlist()
@@ -189,7 +189,7 @@ class AllChecks(TestCase):
 #        NTdebug("after: %r" % distanceRestraint  )
 
     def test_Simplify2(self):
-        """
+        _help = """
         For 1a24
         783.00    A    20    PRO    QB    A    23    LEU    MD1   3.20    7.90    2.96    0.56    2.56    3.35    0.32    0.45    0.64    0    0    0
         783.01    A    20    PRO    QB    A    23    LEU    QD    3.20    7.90    2.96    0.56    2.56    3.35    0.32    0.45    0.64    0    0    0
@@ -207,7 +207,7 @@ class AllChecks(TestCase):
 #        NTdebug("after: %r" % distanceRestraint  )
 
     def test_Simplify3(self):
-        """
+        _help = """
         For 1a24
         783.00    A    20    PRO    QB    A    23    LEU    MD1   3.20    7.90    2.96    0.56    2.56    3.35    0.32    0.45    0.64    0    0    0
         783.01    A    20    PRO    QB    A    23    LEU    QD    3.20    7.90    2.96    0.56    2.56    3.35    0.32    0.45    0.64    0    0    0
