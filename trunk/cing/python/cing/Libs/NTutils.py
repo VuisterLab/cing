@@ -5104,16 +5104,16 @@ NTdetail  = PrintWrap(verbose=verbosityDetail)
 NTdebug   = PrintWrap(verbose=verbosityDebug, prefix = prefixDebug)
 NTmessageNoEOL = PrintWrap(verbose=verbosityOutput, noEOL=True)
 
-kwds = {'useDate':True, 'useProcessId':True, 'doubleToStandardStreams': True}
-NTnothingT              = PrintWrap(verbose=verbosityNothing                            , **kwds)
-NTerrorT                = PrintWrap(verbose=verbosityError, prefix = prefixError        , **kwds)
-NTcodeerrorT            = PrintWrap(verbose=verbosityError, prefix = prefixCodeError    , **kwds)
-NTexceptionT            = PrintWrap(verbose=verbosityError, prefix = prefixException    , **kwds)
-NTwarningT              = PrintWrap(verbose=verbosityWarning, prefix = prefixWarning    , **kwds)
-NTmessageT              = PrintWrap(verbose=verbosityOutput                             , **kwds)
-NTdetailT               = PrintWrap(verbose=verbosityDetail                             , **kwds)
-NTdebugT                = PrintWrap(verbose=verbosityDebug, prefix = prefixDebug        , **kwds)
-NTmessageNoEOLT         = PrintWrap(verbose=verbosityOutput, noEOL=True                 , **kwds)
+kwdsPrintWrap = {'useDate':True, 'useProcessId':True, 'doubleToStandardStreams': True}
+NTnothingT              = PrintWrap(verbose=verbosityNothing                            , **kwdsPrintWrap)
+NTerrorT                = PrintWrap(verbose=verbosityError, prefix = prefixError        , **kwdsPrintWrap)
+NTcodeerrorT            = PrintWrap(verbose=verbosityError, prefix = prefixCodeError    , **kwdsPrintWrap)
+NTexceptionT            = PrintWrap(verbose=verbosityError, prefix = prefixException    , **kwdsPrintWrap)
+NTwarningT              = PrintWrap(verbose=verbosityWarning, prefix = prefixWarning    , **kwdsPrintWrap)
+NTmessageT              = PrintWrap(verbose=verbosityOutput                             , **kwdsPrintWrap)
+NTdetailT               = PrintWrap(verbose=verbosityDetail                             , **kwdsPrintWrap)
+NTdebugT                = PrintWrap(verbose=verbosityDebug, prefix = prefixDebug        , **kwdsPrintWrap)
+NTmessageNoEOLT         = PrintWrap(verbose=verbosityOutput, noEOL=True                 , **kwdsPrintWrap)
 
 NTmessageList = (
   NTnothing,  NTerror ,  NTcodeerror ,  NTexception ,  NTwarning ,  NTmessage ,  NTdetail ,  NTdebug,  NTmessageNoEOL,

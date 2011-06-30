@@ -7,6 +7,7 @@
 # Important to use shell setup from user; hence the above no -f option.
 
 cd $0:h
+#ulimit -a -H
 
 echo "DEBUG: PATH       1: $PATH"
 echo "DEBUG: PYTHONPATH 1: $PYTHONPATH"
@@ -39,21 +40,34 @@ make build_cython
 echo "DEBUG: PATH       3  : $PATH"
 echo "DEBUG: PYTHONPATH 3  : $PYTHONPATH"
 echo "DEBUG: CINGROOT   3  : $CINGROOT"
-
+echo
+echo
 # Comment out the next line after done testing for it's a security issue.
-setenv | sort
+#setenv | sort
 
 #make test
 
-# Just see if it can return a zero status code on starting
+echo "Testing cing setup by a quick start up and testing for zero status for exit code"
+echo
 cing --noProject
+echo
 
-# Just count Source Lines Of Code.
+echo "Counting Source Lines Of Code."
+echo
 make sloccount
-# Still fails on some deps. So listing last in line.
-make nose
+echo
+
 # Still fails 
+echo 
+echo 
 make pylint
+echo
+
+# Still fails on some deps. So listing last in line.
+echo "Unit testing with the nose framework"
+echo
+make nose
+echo
 
 
 

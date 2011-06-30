@@ -1,3 +1,4 @@
+'required items for this plugin for CING setup'
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.PluginCode.required.reqProcheck import * #@UnusedWildImport
 
@@ -13,7 +14,7 @@ DSSP_ID_C = 2
 
 mapDssp2Int = {DSSP_H: DSSP_ID_H, DSSP_S : DSSP_ID_S, DSSP_C : DSSP_ID_C, None: None}
 
-def to3StateUpper( strNTList ):
+def to3StateDssp( strNTList ):
     """Personal communications JFD with Rob Hooft and Gert Vriend.
 
     3, H -> H
@@ -39,7 +40,7 @@ def getDsspSecStructConsensus( res ):
     secStructList = res.getDeepByKeys(DSSP_STR,SECSTRUCT_STR)
     result = None
     if secStructList:
-        secStructList = to3StateUpper( secStructList )
+        secStructList = to3StateDssp( secStructList )
 #        result = secStructList.getConsensus(CONSENSUS_SEC_STRUCT_FRACTION) # will set it if not present yet.
         result = secStructList.getConsensus(useLargest=True) # will set it if not present yet.
 #    NTdebug('secStruct res: %s %s %s', res, secStructList, secStruct)

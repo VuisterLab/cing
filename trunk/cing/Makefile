@@ -3,7 +3,7 @@
 # jfd 2011-06-17
 #
 
-#all:	install test fails because cython needs to be found.
+all:	clean install build_cython sloccount pylint nose
 		
 clean:
 	@echo "Cleaning up CING installation"
@@ -24,14 +24,19 @@ build_cython:
 #test:
 #	python -u python/cing/main.py --testQ -c 1
 
-nose:
-	# Write the .coverage and nosetest.xml
-	nosetests --with-xunit --with-coverage --verbose --cover-package=cing --where=python/cing
-	# Convert .coverage to coverage.xml
-	coverage xml
+sloccount:
+	-/bin/rm -f sloccount.sc
+	sloccount --duplicates --wide --details python src > sloccount.sc
 
 pylint:
-	cd python; pylint --rcfile .pylintrc cing > pylint.txt || exit 0
-	
-sloccount:
-	sloccount --duplicates --wide --details python src > sloccount.sc
+	-/bin/rm -f python/pylint.txt
+	-cd python; pylint --rcfile .pylintrc cing > pylint.txt || exit 0
+		
+nose:
+	# Write the .coverage and nosetest.xml
+	# Uses .coveragerc
+	-/bin/rm -f nosetests.xml coverage.xml .coverage
+	-nosetests --with-xunit --with-coverage --verbose --cover-package=cing --where=python/cing
+	# Convert .coverage to coverage.xml
+	-coverage xml
+

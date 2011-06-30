@@ -1,3 +1,4 @@
+'required items for this plugin for CING setup'
 from cing.Libs.NTutils import * #@UnusedWildImport
 
 PROCHECK_STR       = "procheck" # key to the entities (atoms, residues, etc under which the results will be stored
@@ -45,7 +46,7 @@ PCgFactorMinValue = - 3.0
 PCgFactorMaxValue = 1.0
 PCgFactorReverseColorScheme = True
 
-def to3StateUpper( strNTList ):
+def to3StatePC( strNTList ):
     """Exactly the same as Procheck postscript plots was attempted.
 
     S,B,h,e,t, ,None--> space character
@@ -81,3 +82,4 @@ def to3StateUpper( strNTList ):
             n = ' '
         result.append( n )
     return result
+

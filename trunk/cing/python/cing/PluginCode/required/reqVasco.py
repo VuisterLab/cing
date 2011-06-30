@@ -1,3 +1,4 @@
+'required items for this plugin for CING setup'
 VASCO_STR       = "Vasco" # key to the entities (atoms, residues, etc under which the results will be stored
 
 # Used in html

@@ -27,6 +27,10 @@ from cing.Scripts.vCing.Utils import prepareMaster
 from cing.main import getStartMessage
 from cing.main import getStopMessage
 
+# Will be overriden by local settings.
+master_ssh_url_local = 'joe@nmr' #@UnusedVariable
+master_d_local = '/Volumes/joe/D' #@UnusedVariable
+pool_postfix_local = 'joe' #@UnusedVariable
 try:
     from localConstants import * #@UnusedWildImport
 except:

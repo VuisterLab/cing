@@ -1,6 +1,6 @@
 [run]
 # Omit the Cython distribution inside CING
-source=cing.core
+source=cing
 
 #[report]
 #include=cing.core

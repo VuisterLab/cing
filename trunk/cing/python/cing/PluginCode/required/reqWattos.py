@@ -1,3 +1,4 @@
+'required items for this plugin for CING setup'
 WATTOS_STR       = "Wattos" # key to the entities (atoms, residues, etc under which the results will be stored
 
 NOE_COMPL4_STR = 'noe_compl4'

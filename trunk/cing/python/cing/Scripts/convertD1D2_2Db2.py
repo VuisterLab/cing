@@ -14,7 +14,7 @@ python $CINGROOT/python/cing/Scripts/convertD1D2_2Db2.py
 from cing import cingDirData
 from cing import cingDirTmp
 from cing.Libs.NTutils import * #@UnusedWildImport
-from cing.PluginCode.required.reqDssp import to3StateUpper
+from cing.PluginCode.required.reqDssp import to3StateDssp
 from cing.Scripts.getPhiPsiWrapper import BFACTOR_COLUMN
 from cing.Scripts.getPhiPsiWrapper import DEFAULT_BFACTOR_PERCENTAGE_FILTER
 from cing.Scripts.getPhiPsiWrapper import DEFAULT_MAX_BFACTOR
@@ -131,7 +131,7 @@ def main():
     #1zzk,A,THR ,  19,E, 223.2, 190.1
             (entryId, chainId, resType, resNum, ssType, d1, _d2, _max_bfactor, _idx) = row
             resNum = int(resNum)
-            ssType = to3StateUpper(ssType)[0]
+            ssType = to3StateDssp(ssType)[0]
             resType = resType.strip()
             db = NTdb.getResidueDefByName( resType )
             if not db:
