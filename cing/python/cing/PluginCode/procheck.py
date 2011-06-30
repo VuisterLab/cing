@@ -738,7 +738,7 @@ def getProcheckSecStructConsensus( res ):
     secStructList = res.getDeepByKeys(PROCHECK_STR,SECSTRUCT_STR)
     result = None
     if secStructList:
-        secStructList = to3StateUpper( secStructList )
+        secStructList = to3StatePC( secStructList )
 #        result = secStructList.getConsensus(CONSENSUS_SEC_STRUCT_FRACTION) # will set it if not present yet.
         result = secStructList.getConsensus(useLargest=True) # will set it if not present yet.
 #    NTdebug('secStruct res: %s %s %s', res, secStructList, secStruct)

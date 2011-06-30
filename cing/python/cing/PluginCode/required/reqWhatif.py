@@ -1,3 +1,4 @@
+'required items for this plugin for CING setup'
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.core.constants import * #@UnusedWildImport
 

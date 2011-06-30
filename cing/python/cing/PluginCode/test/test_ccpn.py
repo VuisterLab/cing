@@ -2,6 +2,7 @@
 Unit test execute as:
 python $CINGROOT/python/cing/PluginCode/test/test_ccpn.py
 """
+
 from cing import cingDirTestsData
 from cing import cingDirTmp
 from cing.Libs.NTutils import * #@UnusedWildImport
@@ -20,7 +21,7 @@ from unittest import TestCase
 import unittest
 
 class AllChecks(TestCase):
-
+    'Test case'
 #    entryList = "1brv_cs_pk_2mdl".split() # DEFAULT because it contains many data types and is small/fast to run.
 #    entryList = "1cjg".split()
 #    entryList = "1hue".split()
@@ -31,7 +32,7 @@ class AllChecks(TestCase):
 #    entryList = "1bus".split()
 #    entryList = "1a4d 1ai0 1brv_cs_pk_2mdl 1bus 2hgh".split()
     def test_ccpn(self):
-
+        'Testing ccpn'
 #        cing.verbosity = verbosityDebug
 #        if you have a local copy you can use it; make sure to adjust the path setting below.
         fastestTest = 1        # Not passed to the validate routine in order to customize checks for speed.
@@ -197,6 +198,7 @@ class AllChecks(TestCase):
     # end def test
 
     def tttestCreateCcpn(self):
+        'Disabled test because...'
         doRestraints = False
         pdbConvention = IUPAC
         restraintsConvention = CYANA

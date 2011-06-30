@@ -78,10 +78,10 @@ class AllChecks(TestCase):
 
 
     def tttestTo3StateUpper(self):
-        self.assertEquals(     to3StateUpper(['S','E']), [' ','S'])
-        self.assertEquals(     to3StateUpper(['h','H']), [' ','H'])
-        self.assertNotEquals(  to3StateUpper([' ','H']), ['H','H'])
-        self.assertEquals(     to3StateUpper(['X','H']), [' ','H'])
+        self.assertEquals(     to3StateDssp(['S','E']), [' ','S'])
+        self.assertEquals(     to3StateDssp(['h','H']), [' ','H'])
+        self.assertNotEquals(  to3StateDssp([' ','H']), ['H','H'])
+        self.assertEquals(     to3StateDssp(['X','H']), [' ','H'])
 
     def tttestPlotSet(self):
 #        hardcopySize = (60,30)

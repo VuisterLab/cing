@@ -1,3 +1,5 @@
+'required items for this plugin for CING setup'
+
 NMRSTAR_STR       = "NmrStar"
 
 tagNameListSsaHeader = """

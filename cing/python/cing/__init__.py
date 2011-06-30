@@ -22,6 +22,7 @@ setupCing.py            Run to set up environment variables and check installati
 valSets.cfg             Validation settings. Might be moved around.
 
 """
+
 from cing.Libs.helper import *
 
 programName     = 'CING'

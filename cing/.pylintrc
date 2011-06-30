@@ -1,4 +1,5 @@
 [MASTER]
+# This file is in ~ and hard linked into different projects.
 
 # Specify a configuration file.
 #rcfile=
@@ -12,7 +13,7 @@ profile=no
 
 # Add <file or directory> to the black list. It should be a base name, not a
 # path. You may set this option multiple times.
-ignore=CVS
+ignore=CVS,invalidClass,Bogus
 
 # Pickle collected data for later comparisons.
 persistent=yes
@@ -33,26 +34,29 @@ load-plugins=
 # can either give multiple identifier separated by comma (,) or put this option
 # multiple time (only on the command line, not in the configuration file where
 # it should appear only once).
+
+#C0322 pattern_unquoted_find: Operator not preceded by a space    Text.py /pystarlib/src/STAR line 178    PyLint Problem
+#C0323 Operator not followed by a space
 #C0324 Comma not followed by a space
+#F0401 Unable to import. Pydev
+#R0911 File.parse] Too many return statements (14/6)   File.py /pystarlib/src/STAR line 87 PyLint Problem
+#R0912 File.parse] Too many branches (37/12)   File.py /pystarlib/src/STAR line 87 PyLint Problem
+#R0913 File.__init__] Too many arguments (6/5) File.py /pystarlib/src/STAR line 28 PyLint Problem
+#R0914 File.parse] Too many local variables (22/15)    File.py /pystarlib/src/STAR line 87 PyLint Problem
+#R0915 File.parse] Too many statements (112/50)    File.py /pystarlib/src/STAR line 87 PyLint Problem
+#W0401 Wildcard import STAR.Text   File.py /pystarlib/src/STAR line 8  PyLint Problem
+#W0402 Uses of a deprecated module 'string'
+#W0611 Unused import. Pydev
 #W0614 Unused import
 #W0702 No exception type(s) specified
-#C0323 Operator not followed by a space
-#F0401 Unable to import. Pydev
-#W0611 Unused import. Pydev
-#ID:File.py  [R0913, File.__init__] Too many arguments (6/5) File.py /pystarlib/src/STAR line 28 PyLint Problem
-#ID:File.py  [R0911, File.parse] Too many return statements (14/6)   File.py /pystarlib/src/STAR line 87 PyLint Problem
-#ID:File.py  [R0912, File.parse] Too many branches (37/12)   File.py /pystarlib/src/STAR line 87 PyLint Problem
-#ID:File.py  [R0914, File.parse] Too many local variables (22/15)    File.py /pystarlib/src/STAR line 87 PyLint Problem
-#ID:File.py  [R0915, File.parse] Too many statements (112/50)    File.py /pystarlib/src/STAR line 87 PyLint Problem
-#ID:File.py  [W0401] Wildcard import STAR.Text   File.py /pystarlib/src/STAR line 8  PyLint Problem
-
-disable=C0323,C0324,E0602,F0401,W0401,W0511,W0611,W0614,W0702,R0911,R0912,R0913,R0914,R0915
+disable=C0322,C0323,C0324,E0602,F0401,W0401,W0402,W0511,W0611,W0614,W0702,R0911,R0912,R0913,R0914,R0915
 
 
 [REPORTS]
 
 # Set the output format. Available formats are text, parseable, colorized, msvs
 # (visual studio) and html
+# NB: For Eclipse integration with pydev it needs to be text but for Jenkins integration it needs to be parseable.
 output-format=parseable
 
 # Include message's id in output
@@ -64,7 +68,8 @@ include-ids=yes
 files-output=no
 
 # Tells whether to display a full report or only the messages
-reports=yes
+#reports=yes
+reports=no
 
 # Python expression which should return a note less than 10 (10 is the highest
 # note). You have access to the variables errors warning, statement which
@@ -88,11 +93,11 @@ bad-functions=map,filter,apply,input
 
 # Regular expression which should only match correct module names
 #module-rgx=(([a-z_][a-z0-9_]*)|([A-Z][a-zA-Z0-9]+))$
-module-rgx=(([a-z_][a-z0-9_]*)|([a-zA-Z][a-zA-Z0-9]+))$
+module-rgx=(([a-z_][a-zA-Z0-9_]*)|([a-zA-Z][a-zA-Z0-9]+))$
 
 # Regular expression which should only match correct module level names
 #const-rgx=(([A-Z_][A-Z0-9_]*)|(__.*__))$
-const-rgx=(([a-z_][a-z0-9_]*)|([a-zA-Z][a-zA-Z0-9]+))$
+const-rgx=(([a-zA-Z_][a-zA-Z0-9_]*)|([a-zA-Z][a-zA-Z0-9]+))$
 
 # Regular expression which should only match correct class names
 class-rgx=[A-Z_][a-zA-Z0-9]+$
@@ -122,10 +127,12 @@ variable-rgx=[a-z_][a-zA-Z0-9_]{1,30}$
 inlinevar-rgx=[A-Za-z_][A-Za-z0-9_]*$
 
 # Good variable names which should always be accepted, separated by a comma
-good-names=i,j,k,ex,Run,_
+#good-names=i,j,k,ex,Run,_
+good-names=a,b,c,d,e,f,g,h,i,j,k,m,n,p,q,r,s,t,u,v,w,x,y,z,ex,Run,_
 
 # Bad variable names which should always be refused, separated by a comma
-bad-names=foo,bar,baz,toto,tutu,tata
+#bad-names=foo,bar,baz,toto,tutu,tata
+bad-names=foo,bar,baz,toto,tutu,tata,l,o
 
 # Regular expression which should only match functions or classes name which do
 # not require a docstring
@@ -135,7 +142,7 @@ no-docstring-rgx=__.*__
 [FORMAT]
 
 # Maximum number of characters on a single line.
-max-line-length=120
+max-line-length=140
 
 # Maximum number of lines in a module
 max-module-lines=5000
@@ -231,13 +238,13 @@ max-statements=50
 max-parents=7
 
 # Maximum number of attributes for a class (see R0902).
-max-attributes=7
+max-attributes=10
 
 # Minimum number of public methods for a class (see R0903).
 min-public-methods=2
 
 # Maximum number of public methods for a class (see R0904).
-max-public-methods=20
+max-public-methods=40
 
 
 [IMPORTS]

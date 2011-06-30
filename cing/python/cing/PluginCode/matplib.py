@@ -1137,7 +1137,7 @@ y coordinate is in axis coordinates (from 0 to 1) when the renderer asks for the
 #            NTdebug( 'getsecStructElementList l before reduced to 3 states: %s', l )
             secStruct = None
             if l:
-                l = to3StateUpper( l )
+                l = to3StateDssp( l )
 #                secStruct = l.getConsensus(CONSENSUS_SEC_STRUCT_FRACTION) # will set it if not present yet.
                 secStruct = l.getConsensus(useLargest=True) # will set it if not present yet.
 

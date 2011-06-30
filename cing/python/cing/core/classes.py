@@ -2721,7 +2721,7 @@ class DistanceRestraint(Restraint):
         statusOverall = self.STATUS_NOT_SIMPLIFIED
         status = self.STATUS_SIMPLIFIED
         while status == self.STATUS_SIMPLIFIED:
-            status = self._simplify()
+            status = self.simplifyForFc()
             if status == self.STATUS_SIMPLIFIED:
                 statusOverall = status
 #                NTdebug("simplified restraint %s" % self)
@@ -2734,11 +2734,11 @@ class DistanceRestraint(Restraint):
             # end if
         # end while
 
-        if self._removeDuplicateAtomPairs():
-            NTerror("Encountered an error in _removeDuplicateAtomPairs restraint %s" % self)
+        if self.removeDuplicateAtomPairs():
+            NTerror("Encountered an error in removeDuplicateAtomPairs restraint %s" % self)
             return True
         # end if
-        while self._removeDuplicateAtomPairs2() == self.STATUS_REMOVED_DUPLICATE:
+        while self.removeDuplicateAtomPairs2() == self.STATUS_REMOVED_DUPLICATE:
             pass
 #            NTdebug("Removed duplicate")
         # end if
@@ -2781,7 +2781,7 @@ class DistanceRestraint(Restraint):
             return self.STATUS_DEASSIGNED
         return self.STATUS_NOT_DEASSIGNED
 
-    def _simplify(self):
+    def simplifyForFc(self):
         """FC likes to split Val QQG in QG1 and 2 making it appear to be an ambiguous OR typed XPLOR restraint
         were it is not really one. Undone here.
 
@@ -2796,7 +2796,7 @@ class DistanceRestraint(Restraint):
         i stands for the index of the atomPair of the inner loop that is compared to and that might be modified to include atoms from atomPair j.
         """
 
-#        NTdebug('Starting _simplify for\n:%r' % ( self ) )
+#        NTdebug('Starting simplifyForFc for\n:%r' % ( self ) )
         atomPairIdxJ = len(self.atomPairs) # starting from the end.
         while atomPairIdxJ > 1:
             atomPairIdxJ -= 1
@@ -2888,7 +2888,7 @@ class DistanceRestraint(Restraint):
         return self.STATUS_NOT_SIMPLIFIED
     # end def
 
-    def _removeDuplicateAtomPairs(self):
+    def removeDuplicateAtomPairs(self):
         """
         Used in simplify.
 
@@ -2932,11 +2932,11 @@ class DistanceRestraint(Restraint):
         return
     # end def
 
-    def _removeDuplicateAtomPairs2(self):
+    def removeDuplicateAtomPairs2(self):
         """
         Used in simplify.
 
-        This code is more advanced than the above _removeDuplicateAtomPairs2 in that it will also
+        This code is more advanced than the above removeDuplicateAtomPairs2 in that it will also
         check when pseudos are contained in other pseudos. The widest will be retained.
         E.g.
         For 1a24

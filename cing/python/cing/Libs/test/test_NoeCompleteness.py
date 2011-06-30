@@ -15,6 +15,7 @@ import unittest
 
 
 class AllChecks(TestCase):
+    'Test case'
     cingDirTmpTest = os.path.join( cingDirTmp, 'test_NoeCompleteness' )
     mkdirs( cingDirTmpTest )
     os.chdir(cingDirTmpTest)
@@ -26,6 +27,7 @@ class AllChecks(TestCase):
 #        
         
     def test_ArtificialRestraints(self):
+        'test_ArtificialRestraints'
         cing.verbosity = cing.verbosityDebug
         doCompletenessCheck         = True  # DEFAULT True
         doTheoreticalDihedralCheck  = True  # DEFAULT True
@@ -33,6 +35,10 @@ class AllChecks(TestCase):
         entryId = "1brv" # Testing entry with just 2 models.
 #        entryId = "1nk4" # Interest of Winston
 #        entryId = "1jve" # Interest of Winston
+#        entryId = "1NK4_DNA" # Interest of Winston
+#        entryId = "complexfit_6_0627_DNA" # Interest of Winston
+
+
 #        ranges = 'A.173-178'
         ranges = None
 
@@ -79,8 +85,8 @@ class AllChecks(TestCase):
         if doHydrogenBondCheck:
             resultHydrogenBondCheck = doCompleteness( project,
                  max_dist_expectedOverall = 2.7, # you might want this tighter. In Wattos I use:
-#        Float   hbHADistance         = new Float(   Strings.getInputFloat(  UserInterface.in, "Hydrogen bond distance between proton and acceptor cutoff (2.7 Angstroms suggested)", null));
-#        Float   hbDADistance         = new Float(   Strings.getInputFloat(  UserInterface.in, "Hydrogen bond distance between donor and acceptor cutoff (3.35 Angstroms suggested)", null));
+# Float   hbHADistance Hydrogen bond distance between proton and acceptor cutoff (2.7 Angstroms suggested)
+# Float   hbDADistance Hydrogen bond distance between donor and acceptor cutoff (3.35 Angstroms suggested)
                  
                  use_intra = True,
                  ob_file_name = os.path.join( cingDirLibs, NoeCompletenessAtomLib.STR_FILE_DIR, 'ob_hydrogen_bond.str'),

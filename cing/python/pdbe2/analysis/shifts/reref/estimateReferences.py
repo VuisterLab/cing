@@ -1,3 +1,4 @@
+# pylint: disable-all
 ## Automatically adapted for numpy.oldnumeric Dec 01, 2009 by 
 
 #

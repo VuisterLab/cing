@@ -1,7 +1,7 @@
 from cing import cingDirData
 from cing import cingDirTmp
 from cing.Libs.NTutils import * #@UnusedWildImport
-from cing.PluginCode.required.reqDssp import to3StateUpper
+from cing.PluginCode.required.reqDssp import to3StateDssp
 from cing.core.molecule import common20AADict
 from cing.core.validate import binCount
 from cing.core.validate import bins360
@@ -65,7 +65,7 @@ def main():
 #        7a3h,A,VAL ,   6,H, -71.2, -33.6
 #        7a3h,A,GLU ,   7,H, -63.5, -41.6
         (entryId, _chainId, resType, _resNum, ssType, chi1, chi2, _max_bfactor) = row
-        ssType = to3StateUpper(ssType)[0]
+        ssType = to3StateDssp(ssType)[0]
         resType = resType.strip()
         chi1 = chi1.strip()
         chi2 = chi2.strip()
