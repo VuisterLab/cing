@@ -13,7 +13,7 @@ profile=no
 
 # Add <file or directory> to the black list. It should be a base name, not a
 # path. You may set this option multiple times.
-ignore=CVS,invalidClass,Bogus
+#ignore=Bogus
 
 # Pickle collected data for later comparisons.
 persistent=yes
@@ -49,7 +49,11 @@ load-plugins=
 #W0611 Unused import. Pydev
 #W0614 Unused import
 #W0702 No exception type(s) specified
-disable=C0322,C0323,C0324,E0602,F0401,W0401,W0402,W0511,W0611,W0614,W0702,R0911,R0912,R0913,R0914,R0915
+#I0013 Ignoring entire file
+#W0122  Use of the exec statement runAll.py   /pystarlib/src/STAR/test    line 14 PyLint Problem
+#I0011 Locally disabling certain class of messages.
+#W0142 NTlist.selectByItems: Used * or ** magic   NTutils.py  /cing/python/cing/Libs  line 310    PyLint Problem
+disable=C0322,C0323,C0324,E0602,F0401,I0011,I0013,W0122,W0142,W0401,W0402,W0511,W0611,W0614,W0702,R0911,R0912,R0913,R0914,R0915
 
 
 [REPORTS]
@@ -68,8 +72,8 @@ include-ids=yes
 files-output=no
 
 # Tells whether to display a full report or only the messages
-#reports=yes
-reports=no
+reports=yes
+#reports=no
 
 # Python expression which should return a note less than 10 (10 is the highest
 # note). You have access to the variables errors warning, statement which
@@ -89,7 +93,8 @@ comment=no
 required-attributes=
 
 # List of builtins function names that should not be used, separated by a comma
-bad-functions=map,filter,apply,input
+#bad-functions=map,filter,apply,input
+bad-functions=filter,input
 
 # Regular expression which should only match correct module names
 #module-rgx=(([a-z_][a-z0-9_]*)|([A-Z][a-zA-Z0-9]+))$
@@ -244,7 +249,7 @@ max-attributes=10
 min-public-methods=2
 
 # Maximum number of public methods for a class (see R0904).
-max-public-methods=40
+max-public-methods=60
 
 
 [IMPORTS]

@@ -2,9 +2,7 @@
 Whatif Module
 First version: gv June 3, 2007
 """
-# Fix these strings so we can get some automated code checking by pydev extensions.
-# Also, we want to put these defs on top before the imports to prevent cycle in
-# look up.
+
 from cing import issueListUrl
 from cing.Libs.AwkLike import AwkLike
 from cing.Libs.NTplot import * #@UnusedWildImport
@@ -787,8 +785,10 @@ Name   :    0 ; A    ;   40 ; THR  ; _    ; HG21 ; _
                 return None
     #end def
 
-    def report( self ):
-        return ''.join( file( self.path( Whatif.reportFile ), 'r').readlines())
+#    def report( self ):
+#        'Get the report text from file.'
+#        return ''.join( file( self.path( Whatif.reportFile ), 'r').readlines())
+#    #end def
 
     def explain( checkID=None ):
         """

@@ -22,9 +22,12 @@ class RestraintList(NTlist):
         self._idDict = {}       # dictionary to look up id in case the list is sorted differently
         self._byItem = None     # if not None: list was sorted _byItem.
 
+        self.projectList = None
         self.rmsd = None        # rmsd per model, None indicate no analysis done
         self.rmsdAv = 0.0
         self.rmsdSd = 0.0
+        self.violAv = 0.0
+        self.violMaxAll = 0.0        
         self.violCount1 = 0       # Total violations over 0.1 A (1 degree)
         self.violCount3 = 0       # Total violations over 0.3 A (3 degrees)
         self.violCount5 = 0       # Total violations over 0.5 A (5 degrees)
@@ -38,13 +41,15 @@ class RestraintList(NTlist):
         return self.__str__()
     #end def
     def rename(self, newName):
+        'rename'
         return self.projectList.rename(self.name, newName)
     #end def
     def renameToXplorCompatible(self):
+        'rename to Xplor Compatible'
         l = len(self.name)
         if l < MAX_SIZE_XPLOR_RESTRAINT_LIST_NAME:
 #             NTdebug("Kept the original xplor compatible drl name: %s" % self.name)
-             return
+            return
         prefix = 'pl'
         if self.__CLASS__ == DRL_LEVEL:
             prefix = DRL_STR
@@ -61,6 +66,7 @@ class RestraintList(NTlist):
     #end def
 
     def append(self, restraint):
+        'Add a restraint to list.'
         restraint.id = self.currentId
         restraint.parent = self # being able to go from restraint to restraint list is important.
         NTlist.append(self, restraint)
@@ -77,7 +83,8 @@ class RestraintList(NTlist):
         # sort the list on id number
         NTsort( self, byItem='id', inplace=True)
 
-        if not path: path = self.objectPath
+        if not path: 
+            path = self.objectPath
         if self.SMLhandler.toFile(self, path) != self:
             NTerror('%s.save: failed creating "%s"' % (self.__CLASS__, self. path))
             return None
@@ -228,6 +235,7 @@ class ResonanceList(NTlist):
         return self
     #end def
     def append(self, item):
+        'Append'
 #        if not hasattr(self, 'currentId'): # for deepcopy
 #            self.currentId = 0
         item.id = self.currentId
@@ -246,7 +254,8 @@ class ResonanceList(NTlist):
         # sort the list on id number
         NTsort( self, byItem='id', inplace=True)
 
-        if not path: path = self.objectPath
+        if not path: 
+            path = self.objectPath
         if self.SMLhandler.toFile(self, path) != self:
             NTerror('%s.save: failed creating "%s"' % (self.__CLASS__, self. path))
             return None

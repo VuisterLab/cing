@@ -1,3 +1,4 @@
+#@PydevCodeAnalysisIgnore # pylint: disable-all
 from cing import __author__
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.PluginCode.required.reqAnalysis import * #@UnusedWildImport
@@ -9,12 +10,14 @@ __author__ += 'Tim Stevens '
 if True: # for easy blocking of data, preventing the code to be resorted with imports above.
     switchOutput(False)
     try:
+        # pylint: disable=E0611
         from ccpnmr.analysis.Version import version #@UnusedImport @UnresolvedImport
         from ccpnmr.analysis.core.ExperimentBasic import getThroughSpacePeakLists #@UnusedImport IS used. @UnresolvedImport
         from ccpnmr.analysis.Analysis import Analysis as AnalysisApp #@UnresolvedImport
         # The defs below are not moved into this module so that Analysis and CING both have access to them.
         # Analysis can't import any cing code.
         from cing.Scripts.Analysis.PyRPF import * #@UnusedWildImport
+        # pylint: enable E0611
     except:
         switchOutput(True)
 #        raise ImportWarning(ANALYSIS_STR)
@@ -22,11 +25,11 @@ if True: # for easy blocking of data, preventing the code to be resorted with im
     finally: # finally fails in python below 2.5
         switchOutput(True)
 #    NTdebug('Imported plugin Analysis version %s' % version)
-"""
-    Adds Analysis functionality.
-"""
 
 class Analysis:
+    """
+    Adds Analysis functionality.
+    """
     def __init__(self, project):
         self.project = project
         self.app = None # Do explicit initAnalysis

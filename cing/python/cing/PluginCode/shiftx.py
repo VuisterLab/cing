@@ -59,7 +59,7 @@ format file:
         NTerror("Failed to find %s" % fileName)
         return True
 
-    atomDict = molecule._getAtomDict(IUPAC, chainId)
+    atomDict = molecule.getAtomDict(IUPAC, chainId)
 
     for line in AwkLike( fileName, commentString = '#', minNF = 4 ):
         if (line.float(4) != -666.000):

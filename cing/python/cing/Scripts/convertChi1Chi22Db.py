@@ -74,13 +74,13 @@ def main():
         if isNaN(chi1) or isNaN(chi2):
             continue
         if not inRange(chi1):
-            NTerror("chi1 not in range for row: %s" % `row`)
+            NTerror("chi1 not in range for row: %s" % repr(row))
             return
         if not inRange(chi2):
-            NTerror("chi2 not in range for row: %s" % `row`)
+            NTerror("chi2 not in range for row: %s" % repr(row))
             return
         if not common20AADict.has_key(resType):
-            NTdebug("Residue not in common 20 for row: %s" % `row`)
+            NTdebug("Residue not in common 20 for row: %s" % repr(row))
             rowCount -= 1
             continue
 

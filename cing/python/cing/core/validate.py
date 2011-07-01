@@ -91,12 +91,12 @@ def runCingChecks( project, toFile=True, ranges=None ):
     project.getCingSummaryDict()
 #end def
 
-"Need this here so the code can be tested. I.e. returns a meaningful status if needed."
 def validate( project, ranges=None, parseOnly=False, htmlOnly=False,
         doShiftx = True,
         doProcheck = True, doWhatif=True, doWattos=True, doTalos=True, doQueeny=True, doSuperpose = True,
         filterVasco = False, filterTopViolations = False,
         validateFastest = False, validateCingOnly = False, validateImageLess = False ):
+    "Need this here so the code can be tested. I.e. returns a meaningful status if needed."
     if ranges == None:
         ranges = project.molecule.ranges
 
@@ -1532,7 +1532,7 @@ def validateDihedrals(self):
 
             plotpars = self.plotParameters.getdefault(dihed,'dihedralDefault')
 
-            cav, _cv, _n = d.cAverage(min=plotpars.min, max=plotpars.max)
+            cav, _cv, _n = d.cAverage(minValue=plotpars.min, maxValue=plotpars.max)
             NTlimit( d, cav-180.0, cav+180.0 )
 
             goodAndOutliers = peirceTest( d )
@@ -1830,7 +1830,7 @@ def zscaleHist( hist2d, Cav, Csd ):
     hist2d /= Csd
     return hist2d
 
-def getValueFromHistogramUsingInterpolation( hist, v0, v1, bins):
+def getValueFromHistogramUsingInterpolation( hist, v0, v1, bins=None):
     """Returns the value from the bin pointed to by v0,v1.
         think
     v0 row    y-axis

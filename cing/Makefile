@@ -30,7 +30,13 @@ sloccount:
 
 pylint:
 	-/bin/rm -f python/pylint.txt
-	-cd python; pylint --rcfile .pylintrc cing > pylint.txt || exit 0
+	-cd python; pylint --rcfile ../.pylintrc --report=no cing.core                                          > pylint.txt || exit 0
+	-cd python; pylint --rcfile ../.pylintrc --report=no cing.Database                                     >> pylint.txt || exit 0
+	-cd python; pylint --rcfile ../.pylintrc --report=no cing.Libs                                         >> pylint.txt || exit 0
+	-cd python; pylint --rcfile ../.pylintrc --report=no cing.NRG                                          >> pylint.txt || exit 0
+	-cd python; pylint --rcfile ../.pylintrc --report=no cing.PluginCode                                   >> pylint.txt || exit 0
+	-cd python; pylint --rcfile ../.pylintrc --report=no cing.Scripts                                      >> pylint.txt || exit 0
+	-cd python; pylint --rcfile ../.pylintrc --report=no cing.Talos                                        >> pylint.txt || exit 0
 		
 nose:
 	# Write the .coverage and nosetest.xml

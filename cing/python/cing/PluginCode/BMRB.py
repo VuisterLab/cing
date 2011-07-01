@@ -8,16 +8,10 @@ from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.core.constants import * #@UnusedWildImport
 from cing.core.molecule import Chain
 from cing.core.molecule import Molecule
-#from cing.Libs.fpconst import NaN
 
 bmrbAtomType2spinTypeCingMap = { 'H': '1H', 'C': '13C', 'N': '15N', 'P': '31P' }
 bmrbResType2CingMap = { 'H': '1H', 'C': '13C', 'N': '15N', 'P': '31P' }
 
-class NMRrestraintsGrid:
-    def __init__(self):
-        self.bmrbUrl = "http://www.bmrb.wisc.edu"
-
-#==============================================================================
 def initBMRB( project, bmrbFile, moleculeName  = None ):
     """
         Initialize from edited BMRB file
@@ -27,20 +21,21 @@ def initBMRB( project, bmrbFile, moleculeName  = None ):
     project.appendMolecule( mol )
 
     error = False
-    for f in AwkLike( bmrbFile, minNF = 8, commentString = '#' ):
+    record = None
+    for record in AwkLike( bmrbFile, minNF = 8, commentString = '#' ):
 
-        resName = f.dollar[3]
-        resNum  = f.int(2)
+        resName = record.dollar[3]
+        resNum  = record.int(2)
 
-        atomName = f.dollar[4]
-#        shift   = f.float(6)
-#        serror  = f.float(7)
-#        ambig   = f.int(8)
-        res = mol._addResidue( Chain.defaultChainId, resName, resNum, IUPAC )
+        atomName = record.dollar[4]
+#        shift   = record.float(6)
+#        serror  = record.float(7)
+#        ambig   = record.int(8)
+        res = mol.addResidue( Chain.defaultChainId, resName, resNum, IUPAC )
 
         if (not res):
             NTerror( 'Error initBMRB: invalid residue %s %s line %d (%s)\n',
-                    resName, atomName, f.NR, f.dollar[0]
+                    resName, atomName, record.NR, record.dollar[0]
                     )
             error = True
         #end if
@@ -50,7 +45,7 @@ def initBMRB( project, bmrbFile, moleculeName  = None ):
     if error:
         NTmessage( '==> initBMRB: completed with error(s)' )
     else:
-        NTmessage( '==> initBMRB: successfully parsed %d lines from %s', f.NR, f.FILENAME )
+        NTmessage( '==> initBMRB: successfully parsed %d lines from %s', record.NR, record.FILENAME )
     #end if
     NTmessage("%s", mol.format() )
 

@@ -57,6 +57,7 @@ lineCountMax = 1000 * 1000 * 100 # in fact only 1 M lines
 #lineCountMax = 2 # testing order
 
 def main():
+    'See above.'
     cvs_file_abs_name_gz = os.path.join(cingDirData, 'PluginCode', 'Whatif', cvs_file_abs_name + '.gz')
     gunzip(cvs_file_abs_name_gz)
     reader = csv.reader(open(cvs_file_abs_name, "rb"), quoting=csv.QUOTE_NONE)
@@ -144,7 +145,7 @@ def main():
 #                NTdebug("d1 %s is a NaN on row: %s" % (d1,row))
                 continue
             if not inRange(d1):
-                NTerror("d1 not in range for row: %s" % `row`)
+                NTerror("d1 not in range for row: %s" % str(row))
                 return
 
             if not (resType in common20AAList):
@@ -170,7 +171,7 @@ def main():
     NTmessage("Got count of values: %r" % len(value) )
     # fill FOUR types of hist.
     # TODO: filter differently for pro/gly
-    keyListSorted1 = valueBySs0AndResTypes.keys();
+    keyListSorted1 = valueBySs0AndResTypes.keys()
     keyListSorted1.sort()
     for isI in (True, False):
         if isI:
@@ -194,11 +195,11 @@ def main():
             NTmessage("Count %6d in valueBySs[%s]" % (sum(hist1d), ssType))
             setDeepByKeys(histd1BySs, hist1d, ssType)
 
-            keyListSorted2 = valueBySsAndResTypes[ssType].keys();
+            keyListSorted2 = valueBySsAndResTypes[ssType].keys()
             keyListSorted2.sort()
             for resType in keyListSorted2:
     #            NTmessage("Working on valueBySsAndResTypes for [%s][%s]" % (ssType, resType)) # nice for balancing output verbosity.
-                keyListSorted3 = valueBySsAndResTypes[ssType][resType].keys();
+                keyListSorted3 = valueBySsAndResTypes[ssType][resType].keys()
                 keyListSorted3.sort()
                 for prevResType in keyListSorted3:
     #                NTmessage("Working on valueBySsAndResTypes[%s][%s][%s]" % (ssType, resType, prevResType))
@@ -219,7 +220,7 @@ def main():
     for ssType in keyListSorted1:
         for resType in keyListSorted2:
 #            NTmessage("Working on valueBySsAndResTypes for [%s][%s]" % (ssType, resType)) # nice for balancing output verbosity.
-            keyListSorted3 = valueBySs0AndResTypes[ssType][resType].keys();
+            keyListSorted3 = valueBySs0AndResTypes[ssType][resType].keys()
             keyListSorted3.sort()
             for resTypePrev in keyListSorted3:
                 keyListSorted4 = keyListSorted3[:] # take a copy
@@ -234,7 +235,7 @@ def main():
                         continue
                     m1 = mat(hist1,dtype='float')
                     m2 = mat(hist2,dtype='float')
-                    m2 = m2.transpose()
+                    m2 = m2.transpose() # pylint: disable=E1101
                     hist2d = multiply(m1,m2)
 
                     cTuple = getEnsembleAverageAndSigmaFromHistogram( hist2d )
@@ -250,10 +251,10 @@ def main():
                     setDeepByKeys( histd1CtupleBySsAndResTypes, cTuple, ssType, resType, resTypePrev, resTypeNext)
     # end for isI
 
-    keyListSorted1 = valueByResTypes.keys();
+    keyListSorted1 = valueByResTypes.keys()
     keyListSorted1.sort()
     for resType in keyListSorted1:
-        keyListSorted2 = valueByResTypes[resType].keys();
+        keyListSorted2 = valueByResTypes[resType].keys()
         keyListSorted2.sort()
         for prevResType in keyListSorted2:
             d1List = valueByResTypes[resType][prevResType]
