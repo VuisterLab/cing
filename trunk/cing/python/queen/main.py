@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+#@PydevCodeAnalysisIgnore # pylint: disable-all
 """
 QUEEN   : QUantitative Evaluation of Experimental Nmr restraints
 

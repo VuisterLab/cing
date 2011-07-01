@@ -1,3 +1,6 @@
+'''
+Collaborative Computing Project for NMR 
+'''
 from cing import issueListUrl
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.Libs.forkoff import do_cmd
@@ -16,7 +19,6 @@ from shutil import rmtree
 import shutil
 import string
 import tarfile
-
 
 if True: # for easy blocking of data, preventing the code to be resorted with imports above.
     from cing.PluginCode.required.reqCcpn import * #@UnusedWildImport
@@ -38,20 +40,20 @@ if True: # for easy blocking of data, preventing the code to be resorted with im
     finally: # finally fails in python below 2.5
         switchOutput(True)
 #    NTmessage('Using Ccpn')
-"""
-    Adds initialize from CCPN project files
-    Class to accommodate a ccpn project and import it into a CING project instance
-
-    Steps:
-    - Parse the ccpn file using the CCPN api
-    - Import the coordinates.
-    - Import the experimental data.
-
-    The allowNonStandardResidue determines if the non-standard residues and atoms are read. If so they will be shown as
-    a regular message. Otherwise they will be shown as a warning. Just like MolMol does; the unknown atoms per residue.
-"""
 
 class Ccpn:
+    """
+        Adds initialize from CCPN project files
+        Class to accommodate a ccpn project and import it into a CING project instance
+    
+        Steps:
+        - Parse the ccpn file using the CCPN api
+        - Import the coordinates.
+        - Import the experimental data.
+    
+        The allowNonStandardResidue determines if the non-standard residues and atoms are read. If so they will be shown as
+        a regular message. Otherwise they will be shown as a warning. Just like MolMol does; the unknown atoms per residue.
+    """
 #    NTdebug("Using CCPN version %s" % currentModelVersion)
 
     SMALL_FLOAT_FOR_DIHEDRAL_ANGLES = 1.e-9
@@ -125,6 +127,7 @@ class Ccpn:
         self.ccpnMolSystemList = None # set in importFromCcpnMolecule
         self.ccpnNmrProject = None # set in importFromCcpnMolecule
         self.ccpnNmrConstraintStore = None
+        self.ccpnConstraintLists = None
         self.ccpnCingRun = None # set in importFromCcpnMolecule
         self.molecule = None # set in importFromCcpn ( importFromCcpnMolecule )
         project.ccpnFolder = ccpnFolder # Needed to store for conversion from ccpn to star.
@@ -393,8 +396,8 @@ class Ccpn:
             self.ccpnProject.cingRun = run
 
             if run:
-              runText = '%s:%s' % (nmrCalcStore.name, run.serial)
-              NTmessage('==> Using run specification "%s" from CCPN project', runText)
+                runText = '%s:%s' % (nmrCalcStore.name, run.serial)
+                NTmessage('==> Using run specification "%s" from CCPN project', runText)
         else:
             self.ccpnCingRun = ccpnCalc = None
 
@@ -412,7 +415,7 @@ class Ccpn:
         if ccpnCalc: # Fails for NRG-CING but a nice feature for use from within Analysis etc.
             ccpnConstraintLists = set() # Repeats technically possible
             for constraintData in ccpnCalc.findAllData(className = self.CCPN_RUN_CONSTRAINT, ioRole = 'input'):
-              ccpnConstraintLists.update(constraintData.constraintLists)
+                ccpnConstraintLists.update(constraintData.constraintLists)
             ccpnConstraintLists = list(ccpnConstraintLists)
 
         # No ccpnCalc or ccpnCalc could be empty
@@ -515,8 +518,8 @@ class Ccpn:
             maxModelCount = len(ccpnStructureEnsemble.models)
             if modelCount:
                 if maxModelCount > modelCount:
-                     maxModelCount = modelCount
-                     NTmessage("Limiting the number of imported models to: %d" % maxModelCount)
+                    maxModelCount = modelCount
+                    NTmessage("Limiting the number of imported models to: %d" % maxModelCount)
             self.molecule.modelCount += maxModelCount
             ccpnMolCoordList = [ccpnStructureEnsemble]
 
@@ -700,7 +703,7 @@ class Ccpn:
                             continue
                         atom = res.addAtom(atomName)
                         if not atom:
-                            NTdebug('Failed to add atom to residue for tuple %s' % `cingNameTuple`)
+                            NTdebug('Failed to add atom to residue for tuple %s' % repr(cingNameTuple))
                             continue
                         if not unmatchedAtomByResDict.has_key(ccpnResName3Letter):
                             unmatchedAtomByResDict[ ccpnResName3Letter ] = ([], [])
@@ -1862,7 +1865,7 @@ Note that this doesn't happen with other pseudos. Perhaps CCPN does not have the
         self.ccpnProject.cingRun = None
         return True
 
-    def createCcpn(self, ccpnFolder = None):
+    def createCcpn(self):
         """Descrn: Create a new CCPN project and associates it to a Cing.Project.
            Inputs: Cing.Project instance.
            Output: True for success, None for error.
@@ -1899,12 +1902,13 @@ Note that this doesn't happen with other pseudos. Perhaps CCPN does not have the
         # they could be better filled in the future
         # What are the dimension nucleii?
         # What is the point referencing?
-
-        for peakList in self.project.peaks:
-            if peakList.ccpn:
-                continue
-            pass
-
+        pass
+#        for peakList in self.project.peaks:
+#            if peakList.ccpn:
+#                continue
+            # end if
+        # end for
+    # end def
 
     def createCcpnMolSystem(self):
         """Descrn: Create from first Cing.Molecule a ccpn molSystem.
@@ -2191,7 +2195,7 @@ Note that this doesn't happen with other pseudos. Perhaps CCPN does not have the
             structureEnsemble = self.ccpnProject.newStructureEnsemble(molSystem = ccpnMolSystem, ensembleId = ensembleId)
 
             models = []
-            for modelIndex in range(molecule.modelCount): #@UnusedVariable
+            for _modelIndex in range(molecule.modelCount): #@UnusedVariable
                 models.append(structureEnsemble.newModel())
             # end for
 
@@ -2277,9 +2281,9 @@ Note that this doesn't happen with other pseudos. Perhaps CCPN does not have the
         for dihedralRestraintList in self.project.dihedrals:
             ccpnDihedralList = ccpnConstraintStore.newDihedralConstraintList(name =
                                                         dihedralRestraintList.name)
-            for dihedralRestraint in dihedralRestraintList: #@UnusedVariable
-                upper = distanceRestraint.lower
-                lower = distanceRestraint.upper
+            for dihedralRestraint in dihedralRestraintList:
+                upper = dihedralRestraint.lower
+                lower = dihedralRestraint.upper
                 resonances = (None, None, None, None)
                 ccpnRestraint = ccpnDihedralList.newDihedralConstraint(resonances = resonances)
                 ccpnRestraint.newDihedralConstraintItem(lowerLimit = lower, upperLimit = upper)
@@ -2369,18 +2373,19 @@ def getRestraintBoundList(constraint, restraintTypeIdx, msgHoL):
     else:
         if constraint.targetValue == None:
             pass
-#            msgHoL.appendDebug("One or both of the two bounds are None but no target available to derive them. Lower/upper: [%s,%s]" % (lower, upper))
+#            msg = "One or both of the two bounds are None but no target available to derive them. Lower/upper: [%s,%s]" % (lower, upper)
+#            msgHoL.appendDebug(msg)
         else:
             # When there is a target value and no lower or upper we will use a error of zero by default which makes
             # the range of their error zero in case the error was not defined. This is a reasonable assumption according
             # to JFD.
             error = constraint.error or 0
             if error < 0:
-                msgHoL.appendError("Found error below zero; taking absolute value of error: " + `error`)
+                msgHoL.appendError("Found error below zero; taking absolute value of error: %r" % error)
                 error = - error
             if restraintTypeIdx == Ccpn.RESTRAINT_IDX_DIHEDRAL:
                 if error > 180.:
-                    msgHoL.appendWarning("Found dihedral angle restraint error above half circle; which means all's possible; translated well to CING: " + `error`)
+                    msgHoL.appendWarning("Found dihedral angle restraint error above half circle; which means all's possible; translated well to CING: %r" % error)
                     return (0.0, - Ccpn.SMALL_FLOAT_FOR_DIHEDRAL_ANGLES)
 
             if lower == None:
@@ -2803,9 +2808,10 @@ stereochemistry is cna be seen by examining the atom network.
     return ccpnResDescriptorNew
 # end def
 
-def restoreCcpn(project, tmp = None):
+def restoreCcpn(project, tmp=None):
     """
     Restore ccpn meta data if present
+    tmp is not used but needed to fit into the api.
 
     Return True on error
     """
@@ -2836,6 +2842,7 @@ def restoreCcpn(project, tmp = None):
 def saveCcpnMetaData(project, tmp = None):
     """
     Save ccpn meta data if present
+    tmp is not used but needed to fit into the api.
 
     Return True on error
     """

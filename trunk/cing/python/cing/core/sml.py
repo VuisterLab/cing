@@ -448,12 +448,12 @@ class SMLMoleculeHandler( SMLhandler ):
                 if SMLfileVersion < 0.23:
                 # older _sequence format without N-, C-terminal defs <= 0.23
                     for chain, resName, resNum, convention in _sequence:
-                        mol._addResidue( chain, resName, resNum, convention )
+                        mol.addResidue( chain, resName, resNum, convention )
                     #end for
                 else:
                 # Newer _sequence format with N-, C-terminal defs >= 0.23
                     for chain, resName, resNum, Nterminal, Cterminal, convention in _sequence:
-                        mol._addResidue( chain, resName, resNum, convention, Nterminal, Cterminal )
+                        mol.addResidue( chain, resName, resNum, convention, Nterminal, Cterminal )
                     #end for
                 #end if
             elif l > 3 and SMLstarthandlers.has_key(line[3]):

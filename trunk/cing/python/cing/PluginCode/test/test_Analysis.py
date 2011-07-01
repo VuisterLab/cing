@@ -19,7 +19,7 @@ class AllChecks(TestCase):
 
     entryList = "1brv_cs_pk_2mdl".split()
 
-    def tttestAnalysisRpf(self):
+    def _testAnalysisRpf(self):
         'Skip until project has been improved; looks like peaks without CS are found.'
 #        if you have a local copy you can use it; make sure to adjust the path setting below.
         fastestTest = True

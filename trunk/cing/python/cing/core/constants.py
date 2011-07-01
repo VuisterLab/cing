@@ -49,6 +49,15 @@ nomenClatureConventions = [INTERNAL_0, INTERNAL_1, AQUA, IUPAC, CYANA, CYANA2, X
 
 CING       = 'CING'
 CING_STR   = CING
+
+ERROR_ID = "ERROR"
+WARNING_ID = "WARNING"
+MESSAGE_ID = "MESSAGE"
+DEBUG_ID = "DEBUG"
+
+CONSENSUS_STR = 'consensus'
+MAX_TRIES_UNIQUE_NAME = 99999
+
 # No shift value for Xeasy.
 NOSHIFT         =  999.000
 NULL_STRING_DOT ='.'
@@ -312,6 +321,8 @@ DS_STORE_STR = ".DS_Store" # A mac OSX file that should be ignored by CING.
 ALL_CHAINS_STR = 'ALL_CHAINS'
 MAX_SIZE_XPLOR_RESTRAINT_LIST_NAME = 10
 #maxlength = 20 - len('viol.noe.')
+
+DEFAULT_SML_HANDLER_STRING = 'Default handler from SMLhandled'
 
 "Don't report on the next atoms"
 # Add these to CING lib later. For now, it's just clobbering the output to report on them.

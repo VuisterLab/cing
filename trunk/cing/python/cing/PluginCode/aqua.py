@@ -8,7 +8,7 @@ Unit testing is done thru procheck.
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.core.constants import * #@UnusedWildImport
 from cing.core.molecule import Atom
-#-----------------------------------------------------------------------------
+
 def exportAtom2aqua(atom):
     """
         returns string in aqua format from the manual:
@@ -84,7 +84,8 @@ def export2aqua(project, tmp=None):
                     if not lower:
                         lower = MIN_DISTANCE_ANY_ATOM_PAIR
                     if not isinstance(lower, float):
-                        NTcodeerror("What is the lower class: %s" % lower.__class__) # JFD Failed to reproduce the cause of issue 185 so keeping this statement in.
+                        # JFD Failed to reproduce the cause of issue 185 so keeping this statement in.
+                        NTcodeerror("What is the lower class: %s" % lower.__class__) 
                         return True
 
 #                    NTdebug("lower: %s" % lower)
@@ -103,7 +104,7 @@ def export2aqua(project, tmp=None):
 #                    NTdebug("result: %s" % result)
 
                     if len(dr.atomPairs) > 1:
-                        msgHol.appendWarning("Ambiguous restraint exported as unambiguous for Aqua  [" + `ambiDistanceCount` + "]")
+                        msgHol.appendWarning("Ambiguous restraint exported as unambiguous for Aqua  [%r]" % ambiDistanceCount)
                         ambiDistanceCount += 1
                     for atomPair in dr.atomPairs[1:]:
                         result += ('\n#       %s %s AMBI not read by Aqua' % (
@@ -112,10 +113,9 @@ def export2aqua(project, tmp=None):
                     # end for
                 else:
                     # Dihedral
-                    """Return string with restraint in Aqua format
-                        ANGLE  [CHAIN id]  residue_name  residue_number  [INSERT code]
-                        ...angle_name  bound_high  bound_low
-                    """
+#                    Return string with restraint in Aqua format
+#                        ANGLE  [CHAIN id]  residue_name  residue_number  [INSERT code]
+#                        ...angle_name  bound_high  bound_low                    
                     result = None
                     # (<Residue>, angleName, <AngleDef>) tuple
                     _Residue, angleName, _AngleDef = dr.retrieveDefinition()

@@ -1,4 +1,4 @@
-#@PydevCodeAnalysisIgnore
+#@PydevCodeAnalysisIgnore # pylint: disable-all
 import os, sys, Tkinter
 
 from memops.gui.Button          import Button

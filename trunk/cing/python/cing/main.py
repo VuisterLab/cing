@@ -329,7 +329,7 @@ def testOverall(namepattern):
 #                '/Users/jd/workspace35/cing/python/cing/PluginCode/test/test_NmrStar.py',
 #                '/Users/jd/workspace35/cing/python/cing/PluginCode/test/test_ccpn.py'
 #                ]
-    NTdebug('Will unit check: ' + `nameList`)
+    NTdebug('Will unit check: ' + repr(nameList))
 #    nameList = nameList[0:5]
 #    namepattern = "*Test.py"
 #    nameList2 = findFiles(namepattern, startdir)

@@ -1,5 +1,6 @@
 """
-Implementation of the CING API
+Implementation of the CING API's main classes.
+Split into 3 for better performance.
 """
 from ConfigParser import ConfigParser
 from cing import cingPythonCingDir
@@ -136,51 +137,45 @@ Project: Top level Cing project class
 
         root, name = Project.rootPath(name)
 
-        NTdict.__init__(self,
-                           __CLASS__ = 'Project',
+        NTdict.__init__(self, __CLASS__ = 'Project')
 
-                           version = cingVersion,
+        self.version = cingVersion       
+        self.root = root
+        self.name = name.strip()
+        self.created = time.asctime()      
+        self.molecule = None # Current Molecule instance
 
-                           root = root,
-                           name = name.strip(),
-                           created = time.asctime(),
+        self.moleculeNames = NTlist() # list to store molecule names for save and restore
+        self.peakListNames = NTlist() # list to store peaklist names for save and restore
+        self.distanceListNames = NTlist() # list to store distancelist names names for save and restore
+        self.dihedralListNames = NTlist() # list to store dihedrallist names for save and restore
+        self.rdcListNames = NTlist() # list to store rdclist names for save and restore
+        self.coplanarListNames = NTlist() # list to store  names for save and restore
+        self.dihedralByProjectListNames = NTlist() # list to store  names for save and restore
+        self.dihedralByResidue = NTtree( DIHEDRAL_BY_RESIDUE_STR ) # Used to be set in DihedralByResidueHTMLfile but that's too late.
+        self.reports = NTlist() # list with validation reports names
 
-                           molecule = None, # Current Molecule instance
+        self.history = History()
+        self.contentIsRestored = False # True if Project.restore() has been called
+        self.storedInCcpnFormat = False
 
-                           moleculeNames = NTlist(), # list to store molecule names for save and restore
-                           peakListNames = NTlist(), # list to store peaklist names for save and restore
-                           distanceListNames = NTlist(), # list to store distancelist names names for save and restore
-                           dihedralListNames = NTlist(), # list to store dihedrallist names for save and restore
-                           rdcListNames = NTlist(), # list to store rdclist names for save and restore
-                           coplanarListNames = NTlist(), # list to store  names for save and restore
-                           dihedralByProjectListNames = NTlist(), # list to store  names for save and restore
-                           dihedralByResidue = NTtree( DIHEDRAL_BY_RESIDUE_STR ), # Used to be set in DihedralByResidueHTMLfile.__init__ but that's too late.
-                           reports = NTlist(), # list with validation reports names
+        self.procheckStatus = NTdict(completed = False, parsed = False, ranges = None)
 
-                           history = History(),
-                           contentIsRestored = False, # True if Project.restore() has been called
-                           storedInCcpnFormat = False, #
+        self.whatifStatus = NTdict(completed = False, parsed = False)
+        self.wattosStatus = NTdict(completed = False, parsed = False)
+        self.vascoStatus = NTdict(completed = False, parsed = False)
+        self.shiftxStatus = NTdict(completed = False, parsed = False)
+        self.x3dnaStatus  = NTdict(completed = False, parsed = False)
+        self.status = NTdict() # General status dict for external programs
 
-                           procheckStatus = NTdict(completed = False, parsed = False, ranges = None),
-#                           dsspStatus = NTdict(completed = False, parsed = False),
-                           whatifStatus = NTdict(completed = False, parsed = False),
-                           wattosStatus = NTdict(completed = False, parsed = False),
-                           vascoStatus = NTdict(completed = False, parsed = False),
-                           shiftxStatus = NTdict(completed = False, parsed = False),
-                           x3dnaStatus  = NTdict(completed = False, parsed = False),
-
-                           status = NTdict(), # General status dict for external programs
-
-
-                           # store a reference to the global things we might need
-                           gui = None, # Reference to CingGui instance
-                           directories = directories,
-                           moleculeDirectories = moleculeDirectories,
-                           validationSubDirectories = validationSubDirectories,
-                           cingPaths = cingPaths,
-                           plotParameters = plotParameters,
-                           plugins = plugins
-                         )
+#        store a reference to the global things we might need
+        self.gui = None # Reference to CingGui instance
+        self.directories = directories
+        self.moleculeDirectories = moleculeDirectories
+        self.validationSubDirectories = validationSubDirectories
+        self.cingPaths = cingPaths
+        self.plotParameters = plotParameters
+        self.plugins = plugins
 
         self.statusObjectNameList = 'procheckStatus dsspStatus whatifStatus wattosStatus vascoStatus shiftxStatus x3dnaStatus'.split()
         # These Project lists are dynamic and will be filled  on restoring a project
@@ -608,8 +603,9 @@ Project: Top level Cing project class
         # have to use cing.verbosity to work?
         if os.path.exists(tmpdir) and cing.verbosity != cing.verbosityDebug:
             removedir(tmpdir)
-        for dir in directories.values():
-            pr.mkdir(dir)
+        for d in directories.values():            
+#            NTdebug('dir: %r' % d)
+            pr.mkdir(d)
         #end for
 
         pr.addLog()
@@ -696,9 +692,9 @@ Project: Top level Cing project class
                 pass
 #                NTdebug("Skipping save for disabled plugin: %s" % p)
             else:
-                for f, o in p.saves:
-#                    NTdebug("Save for plugin: %s with %s on object %s" % (p,f,o))
-                    f(self, o)
+                for f, object in p.saves:
+#                    NTdebug("Save for plugin: %s with %s on object %s" % (p,f,object))
+                    f(self, object)
             #end for
         #end for
 
@@ -1132,8 +1128,8 @@ Project: Top level Cing project class
     def criticizePeaks(self, toFile = True):
         return criticizePeaks(self, toFile = toFile)
 
-    def fixStereoAssignments(self, toFile = True):
-        return fixStereoAssignments(self, toFile = toFile)
+    def fixStereoAssignments(self):
+        return fixStereoAssignments(self)
 
     def summary(self, toFile = True):
         return summary(self, toFile = toFile)
@@ -1296,6 +1292,19 @@ class XMLProjectHandler(XMLhandler):
 
 #register this handler
 projecthandler = XMLProjectHandler()
+
+class ProjectListMember():
+    """An element of ProjectList always has certain attributes to add.
+    """
+    def __init__(self):
+        """
+        Just add some properties.
+        """
+        self.project = None
+        self.objectPath = None
+        self.projectList = None
+    # end def
+# end class
 
 
 class ProjectList(NTlist):
@@ -2100,7 +2109,7 @@ ranges:  %s
                 if res in selectedResidues:
                     pass
                 else:
-                    cmd = fprintf(stream, 'ColorRes object %d residue %d, %s\n', p.id+1, res.resNum, YasaraColorDict[res.rogScore.colorLabel]) #@UnusedVariable
+                    fprintf(stream, 'ColorRes object %d residue %d, %s\n', p.id+1, res.resNum, YasaraColorDict[res.rogScore.colorLabel])
         #end for
         fprintf(stream, 'Console on\n')
     #end def
@@ -2428,10 +2437,11 @@ class Peak(NTdict, Lister):
 #end class
 
 
-class PeakList(NTlist):
+class PeakList(NTlist, ProjectListMember):
 
     def __init__(self, name, status = 'keep'):
         NTlist.__init__(self)
+        ProjectListMember.__init__(self)
         self.name = name
         self.status = status
         self.listIndex = -1 # list is not appended to anything yet
@@ -2497,7 +2507,8 @@ class PeakList(NTlist):
         Create a SML file
         Return self or None on error
         """
-        if not path: path = self.objectPath
+        if not path: 
+            path = self.objectPath
         if self.SMLhandler.toFile(self, path) != self:
             NTerror('PeakList.save: failed creating "%s"', path)
             return None

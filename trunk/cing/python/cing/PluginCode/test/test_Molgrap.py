@@ -44,7 +44,7 @@ class AllChecks(TestCase):
         self.failIf( project.removeFromDisk())
         project = Project.open( entryId, status='new' )
         project.initPDB( pdbFile=pdbFilePath, convention = pdbConvention )
-        project.save( )
+        project.save()
         gifFileName = entryId+".gif"
         pathGif = os.path.join( self.cingDirTmpTest, gifFileName)
         self.assertFalse(project.molecule.export2gif(pathGif, project=project))

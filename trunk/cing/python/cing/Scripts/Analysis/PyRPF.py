@@ -1,4 +1,4 @@
-#@PydevCodeAnalysisIgnore
+#@PydevCodeAnalysisIgnore # pylint: disable-all
 
 # TBD Later
 # Notifiers, in on valid objects, peak Lists, ensembles

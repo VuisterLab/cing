@@ -1,3 +1,4 @@
+#@PydevCodeAnalysisIgnore # pylint: disable-all
 """
 # slow cooling protocol in torsion angle space for protein G. Uses
 # NOE, RDC, J-coupling restraints.

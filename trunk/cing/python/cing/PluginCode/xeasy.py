@@ -109,7 +109,7 @@ class Xeasy( NTdict ):
         """map entries of the prot-dict onto an atom of molecule
         """
 #        NTdebug('Xeasy.map2molecule: %s', molecule)
-        resNumDict = molecule._getResNumDict()
+        resNumDict = molecule.getResNumDict()
         maxToReport = 100 # no need to fill screen.
         errCount = 0
         for p in self.prot.itervalues():

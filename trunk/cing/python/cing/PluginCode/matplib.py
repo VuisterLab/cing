@@ -25,6 +25,7 @@ try:
     from matplotlib import pyplot
     from matplotlib.cm import LUTSIZE
     from matplotlib.cm import datad
+    from matplotlib.cm import gray #pylint: disable=E0611
     from matplotlib.colors import LinearSegmentedColormap
     from matplotlib.patches import Ellipse
     from matplotlib.patches import Patch
@@ -214,6 +215,7 @@ class NTplot( NTdict ):
         self.currentPoint = endPoint
     #end def
 
+    #pylint: disable=E0202
     def line( self, startPoint, endPoint, attributes=defaultAttributes):
         if not attributes:
             attributes=defaultAttributes
@@ -817,7 +819,7 @@ class NTplot( NTdict ):
         if False:
             Z1 = array(([0,1]*3 + [1,0]*3)*3)
             Z1.shape = 6,6
-            imshow(Z1, cmap=cm.gray, interpolation='nearest', extent=extent)
+            imshow(Z1, cmap=gray, interpolation='nearest', extent=extent)
 
         for i,myHist in enumerate(histList):
 #        for i,myHist in enumerate(histList[0:1]):
@@ -1425,15 +1427,15 @@ class HelixIconList(RangeIconList):
 #                NTdebug("Jumping v a full turn ahead, u: %8.3f", v)
                 v += 360.
             if u == 90 or s == 270:
-                a = [v-hw,        triangular(v)]
+                a = [v-hw,        triangularFunction(v)]
                 b = [v+hw,        a[1]]
-                c = [v-hw+ 90.,   triangular(v+90.)]
+                c = [v-hw+ 90.,   triangularFunction(v+90.)]
                 d = [v+hw+ 90.,   c[1]]
-                e = [v-hw+180.,   triangular(v+180.)]
+                e = [v-hw+180.,   triangularFunction(v+180.)]
                 f = [v+hw+180.,   e[1]]
-                g = [v-hw+270.,   triangular(v+270.)]
+                g = [v-hw+270.,   triangularFunction(v+270.)]
                 h = [v+hw+270.,   g[1]]
-                i = [v   + 90.,   triangular(hw)]
+                i = [v   + 90.,   triangularFunction(hw)]
                 j = [v   +270.,   1.-i[1]]
 
 #            NTdebug("plotting poly %d at s,t,u: %8.3f %8.3f %8.3f ", drawnPoly, s,t,u )
@@ -1743,10 +1745,10 @@ def triangularList( xList, c=360. ):
     """
     r = []
     for x in xList:
-        r.append(triangular(x, c))
+        r.append(triangularFunction(x, c))
     return r
 
-def triangular( x, c=360. ):
+def triangularFunction( x, c=360. ):
     loc = x % c
     phase = loc / c # phase is in resList [0,1>
     if phase <= 0.5:
@@ -1865,8 +1867,8 @@ class MultipleLocatorByOffset(MultipleLocator):
         'Return the locations of the ticks'
 
         try:
-            self.verify_intervals()
-            vmin, vmax = self.viewInterval.get_bounds()
+            self.verify_intervals() # pylint: disable=E1101
+            vmin, vmax = self.viewInterval.get_bounds()  # pylint: disable=E1101
         except:
             vmin, vmax = self.axis.get_view_interval()
 
@@ -2428,6 +2430,7 @@ def makeDihedralHistogramPlot( project, residue, dihedralName, binsize = 5, html
         # end if
 
     # Always plot the cav line
+    # pylint: disable=E1102
     plot.line( (aAv, 0), (aAv, ylimMax),
                lineAttributes(color=plotparams.average, width=width) )
     return ps

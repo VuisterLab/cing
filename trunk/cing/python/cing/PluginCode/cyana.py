@@ -8,7 +8,7 @@ Methods:
         convention = CYANA or CYANA2
         return a DistanceRestraintList or None on error
 
-  Project.importAco( acoFile, convention ):
+  Project.importAco( acoFile ):
         Read Cyana acoFile
         convention = CYANA or CYANA2
         return a DihedralRestraintList or None on error
@@ -36,11 +36,6 @@ from cing.core.constants import * #@UnusedWildImport
 from cing.core.molecule import translateTopology
 import shutil
 
-#==============================================================================
-# CYANA stuff
-#==============================================================================
-
-#-----------------------------------------------------------------------------
 def exportDihedralRestraint2cyana( dr, convention ):
     """Return string with distanceRestraint (dr) in cyana format or None on error
        ( 512 THR   PSI     116.0   148.0)
@@ -91,7 +86,7 @@ def exportDihedralRestraintList2cyana( drl, path, convention)   :
 DihedralRestraintList.export2cyana = exportDihedralRestraintList2cyana
 
 
-def importAco( project, acoFile, convention ):
+def importAco( project, acoFile ):
     """Read Cyana acoFile
        ( 512 THR   PSI     116.0   148.0)
        convention = CYANA or CYANA2
@@ -113,9 +108,9 @@ def importAco( project, acoFile, convention ):
         return None
     #end if
 
-    dir,name,_ext = NTpath( acoFile )
+    _dir,name,_ext = NTpath( acoFile )
     result     = project.dihedrals.new( name=name, status='keep')
-    resNumDict = molecule._getResNumDict()
+    resNumDict = molecule.getResNumDict()
 
     NTmessage("Now reading: " + acoFile)
     for line in AwkLike( acoFile, commentString = '#' , minNF = 5):
@@ -149,7 +144,7 @@ def importAco( project, acoFile, convention ):
     #end for
 
     if errorCount:
-        NTerror("Found number of errors importing upl file: " + `errorCount`)
+        NTerror("Found number of errors importing upl file: %s" % errorCount)
 #    NTmessage("Imported items: " + `len(result)`)
     NTmessage('==> importAco: new %s from "%s"', result, acoFile )
     return result
@@ -262,9 +257,9 @@ def importUpl( project, uplFile, convention, lower = 0.0 ):
         return None
     #end if
 
-    dir,name,_ext = NTpath( uplFile )
+    _dir,name,_ext = NTpath( uplFile )
     result        = project.distances.new( name=name, status='keep')
-    atomDict      = molecule._getAtomDict(convention)
+    atomDict      = molecule.getAtomDict(convention)
 
     for line in AwkLike( uplFile, commentString="#", minNF=7 ):
 #        if line.isComment():
@@ -275,7 +270,7 @@ def importUpl( project, uplFile, convention, lower = 0.0 ):
 #            continue
         atmIdxList = [[1,3],[4,6]]
         atmList = []
-        i=0
+#        i=0
         for atmIdx in atmIdxList:
 #            NTdebug("Doing atmIdx: " + `atmIdx`)
             t = (line.int(atmIdx[0]), line.dollar[atmIdx[1]])
@@ -290,10 +285,10 @@ def importUpl( project, uplFile, convention, lower = 0.0 ):
                 if errorCount == maxErrorCount+1:
                     NTerror("And so on")
                 errorCount += 1
-                i+=1
+#                i+=1
                 continue
             atmList.append( atm )
-            i+=1
+#            i+=1
         if len(atmList) != 2:
             continue
         # Unpack convenience variables.
@@ -323,7 +318,7 @@ def importUpl( project, uplFile, convention, lower = 0.0 ):
             r.QF = line.float( 13 )
     #end for
     if errorCount:
-        NTerror("Found number of errors importing upl file: " + `errorCount`)
+        NTerror("Found number of errors importing upl file: %s" % errorCount)
 
 #    NTmessage("Imported upl items: " + `len(result)`)
     NTmessage('==> importUpl: new %s from "%s"', result, uplFile )
@@ -351,7 +346,7 @@ atom stereo "HA1  HA2   519"   # GLY
         return None
 
     molecule = project.molecule
-    atomDict = molecule._getAtomDict(convention)
+    atomDict = molecule.getAtomDict(convention)
     count = 0
     for line in AwkLike( stereoFileName, minNF=5 ):
         if line.dollar[1] == 'atom' and line.dollar[2] == 'stereo':
@@ -368,7 +363,8 @@ atom stereo "HA1  HA2   519"   # GLY
                     atm.stereoAssigned = True
                     count += 1
                     #print atm.nameTuple()
-                    if atm.residue.db.name in ['VAL', 'LEU'] and atm.isMethylProton():        # Val, Ile methyls: Carbon implicit in CYANA defs
+                    # Val, Ile methyls: Carbon implicit in CYANA defs
+                    if atm.residue.db.name in ['VAL', 'LEU'] and atm.isMethylProton():        
                         heavy = atm.heavyAtom()
                         heavy.stereoAssigned = True
                         count += 1
@@ -383,7 +379,7 @@ atom stereo "HA1  HA2   519"   # GLY
 #end def
 
 #-----------------------------------------------------------------------------
-def export2cyana( project, tmp=None ):
+def export2cyana( project):
     """Export restraints in CYANA and CYANA2 formats
     """
     for drl in project.dihedrals:
@@ -489,7 +485,7 @@ def cyana2cing( project, cyanaDirectory, convention=CYANA2, copy2sources=True, u
 
     for f in kwds['acoFiles']:
         acoFile = os.path.join( cyanaDirectory, f + '.aco')
-        if (project.importAco( acoFile, convention )):
+        if (project.importAco( acoFile )):
             sources.append( acoFile )
 #            project.patch.aco.append( acoFile )
         #end if
@@ -516,7 +512,7 @@ def cyana2cing( project, cyanaDirectory, convention=CYANA2, copy2sources=True, u
 ##            project.importUpl( f, project.patch.convention )
 #        #end for
 #        for f in project.patch.aco:
-#            project.importAco( f, project.patch.convention )
+#            project.importAco( f )
 #        #end for
 #    #end if
 ##end def

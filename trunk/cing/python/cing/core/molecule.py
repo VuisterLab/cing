@@ -267,27 +267,41 @@ def selectFitAtoms( fitResidues, backboneOnly=True, includeProtons = False ):
 #end def
 
 
-"""
-Call methods of this class like:
-molecule.allCommonAaResidues()
-because Molecule is a subclass of this ResidueList
-"""
-class ResidueList():
+class ResidueList(SMLhandled):
+    """
+    Call methods of this class like:
+    molecule.allCommonAaResidues()
+    because Molecule is a subclass of this ResidueList
+    """
+    def __init__(self):
+        SMLhandled.__init__(self)
+    def allResidues(self):
+        'convenience method'
+        NTcodeerror("In %s the sub class needs to overide this method." % getCallerName())
+        return None
     def countDsspSecStructConsensus(self):
+        'convenience method'
         return countDsspSecStructConsensus(self.allResidues())
     def chothiaClass(self):
+        'convenience method'
         return chothiaClass(self.allResidues())
     def chothiaClassInt(self):
+        'convenience method'
         return chothiaClassInt(chothiaClass(self.allResidues()))
     def getAssignmentCountMap(self,isAssigned=True):
+        'convenience method'
         return getAssignmentCountMapForResList(self.allResidues(), isAssigned=isAssigned)
     def allResiduesWithCoordinates(self):
+        'convenience method'
         return allResiduesWithCoordinates(self.allResidues())
     def allCommonAaResidues(self):
+        'convenience method'
         return allCommonAaResidues(self.allResidues())
     def selectFitAtoms(self, fitResidueList, backboneOnly=True, includeProtons = False ):
+        'convenience method'
         return selectFitAtoms(fitResidueList, backboneOnly=backboneOnly, includeProtons = includeProtons )
-
+    # end def    
+# end class
 
 #==============================================================================
 class Molecule( NTtree, ResidueList ):
@@ -472,7 +486,7 @@ class Molecule( NTtree, ResidueList ):
         issueId = 130
         msg = "CING exhausted the available %d chain identifiers; see issue %d here:\n" % (
             len(Chain.DEFAULT_ChainNamesByAlphabet), issueId)
-        msg += issueListUrl+`issueId`
+        msg += issueListUrl+repr(issueId)
         NTcodeerror(msg)
 
     def keepSelectedModels(self, modelListStr):
@@ -488,7 +502,7 @@ class Molecule( NTtree, ResidueList ):
                 return
             lastModelIdx = selectedModels[ - 1]
             if lastModelIdx >= self.modelCount:
-                NTwarning("Last selected model index (" + `lastModelIdx` + ") is not in ensemble; please check input string: [" + modelListStr + "]")
+                NTwarning("Last selected model index (%r) is not in ensemble; please check input string: [%s]" % (lastModelIdx,modelListStr))
                 return
 
     #        NTdebug("Truncating ensemble to: [" + modelListStr +"]")
@@ -500,8 +514,8 @@ class Molecule( NTtree, ResidueList ):
             for m in l:
                 if m not in selectedModels:
                     modelToRemoveList.append(m)
-            NTmessage("Keeping  " + `len(selectedModels)` + " models : [" + `modelListStr` + "]")
-            NTmessage("Removing " + `len(modelToRemoveList)` + " models : [" + `modelToRemoveList` + "]")
+            NTmessage("Keeping   %s models : [%r]" % ( len(selectedModels), modelListStr))
+            NTmessage("Removing  %s models : [%r]" % ( len(modelToRemoveList), modelToRemoveList))
 
             for atm in self.allAtoms():
                 atmCoordCount = len(atm.coordinates) # some atoms have no coordinates or just some
@@ -746,7 +760,7 @@ class Molecule( NTtree, ResidueList ):
         return None
     #end def
 
-    def _getResNumDict(self):
+    def getResNumDict(self):
         """
         Return dict instance with resNum, Residue mappings.
         For decoding usage with CYANA/XEASY routines
@@ -754,7 +768,7 @@ class Molecule( NTtree, ResidueList ):
         resNumDict = dict()
         for res in self.allResidues():
             if resNumDict.has_key(res.resNum):
-                NTerror('Molecule._getResNumDict: multiple mapped residues (%s,%s)',
+                NTerror('Molecule.getResNumDict: multiple mapped residues (%s,%s)',
                         res, resNumDict[res,res.resNum]
                        )
             resNumDict[res.resNum] = res
@@ -846,7 +860,7 @@ class Molecule( NTtree, ResidueList ):
         NTcodeerror("Need to code dict in _getAtomDictWithchain")
         return None
 
-    def _getAtomDict(self, convention=INTERNAL, ChainId = _DEFAULT_CHAIN_ID): # would like to have said Chain.defaultChainId but isn't known yet.
+    def getAtomDict(self, convention=INTERNAL, ChainId = _DEFAULT_CHAIN_ID): # would like to have said Chain.defaultChainId but isn't known yet.
         """
         Return a dict instance with (resNum, atomName), Atom mappings.
         NB. atomName according to convention
@@ -866,7 +880,7 @@ class Molecule( NTtree, ResidueList ):
                         # GV needs to check if this still needs to be an error or as is, down graded to warning level.
                         # see example in H2_2Ca_53 with test_shiftx routine. FIXME:
                         # GV, Yes maintain, but  test for aname should reduce warnings
-#                        NTwarning('In Molecule._getAtomDict found multiple mapped atoms (new key, old key): (%-20s,%-20s)',
+#                        NTwarning('In Molecule.getAtomDict found multiple mapped atoms (new key, old key): (%-20s,%-20s)',
 #                                    atm, atomDict[t])
                         pass
                     else:
@@ -1568,7 +1582,7 @@ class Molecule( NTtree, ResidueList ):
                 NTerror('Molecule._restoreSequence: error parsing xml-file "%s"', sequenceFile)
                 return None
             for chainId, resName, resNum, convention in sequence:
-                self._addResidue( chainId, resName, resNum, convention )
+                self.addResidue( chainId, resName, resNum, convention )
             #end for
         #end if
         #NTdebug('Molecule._restoreSequence: %s', sequenceFile)
@@ -2367,7 +2381,7 @@ Return an Molecule instance or None on error
                 else:
                     Cterminal = False
 
-                molecule._addResidue( chainId, resName, resNum, convention, Nterminal=Nterminal, Cterminal=Cterminal )
+                molecule.addResidue( chainId, resName, resNum, convention, Nterminal=Nterminal, Cterminal=Cterminal )
             #end if
         #end for
         NTmessage("%s", molecule.format())
@@ -2375,7 +2389,7 @@ Return an Molecule instance or None on error
     #end def
     initialize = staticmethod( initialize )
 
-    def _addResidue( self, chainId, resName, resNum, convention, Nterminal=False, Cterminal=False ):
+    def addResidue( self, chainId, resName, resNum, convention, Nterminal=False, Cterminal=False ):
         """
         Internal routine to add a residue to molecule
         Add chain if not yet present
@@ -2384,7 +2398,7 @@ Return an Molecule instance or None on error
         """
 #        rn = translateResidueName( convention, resName, INTERNAL )
 #        if (rn == None):
-#            NTerror('Molecule._addResidue: chain %s, residue "%s" not valid for convention "%s"',
+#            NTerror('Molecule.addResidue: chain %s, residue "%s" not valid for convention "%s"',
 #                     chainId, resName, convention
 #                   )
 #            return None
@@ -2866,17 +2880,17 @@ Return an Molecule instance or None on error
         """
 
         if self.modelCount == 0:
-            NTerror("modelCount is zero in Molecule instance: " + `self`)
+            NTerror("modelCount is zero in Molecule instance: %r" % self)
             return None
 
         if model==None:
             models = NTlist(*range( self.modelCount ))
         else:
             if model<0:
-                NTerror("model number is below zero in Molecule instance: " + `self` + " and model number: " + model)
+                NTerror("model number is below zero in Molecule instance: %r and model number: %s" % (self,  model))
                 return None
             if model >= self.modelCount:
-                NTerror("model number is larger than modelCount in Molecule instance: " + `self`)
+                NTerror("model number is larger than modelCount in Molecule instance: %r" % self)
                 return None
             models = NTlist(model)
 
@@ -3328,19 +3342,19 @@ class RmsdResult( NTdict ):
     def __init__(self, modelList, ranges, comment='' ):
         NTdict.__init__( self,
                          __CLASS__       = 'RmsdResult',
-                         backbone        = NTfill(0.0, len(modelList)), # needs to match BACKBONE_STR
-                         backboneCount   = 0,
-                         backboneAverage = NTvalue( NaN, NaN, fmt='%4.2f +- %4.2f', fmt2='%4.2f' ),
-
-                         heavyAtoms      = NTfill(0.0, len(modelList)), # needs to match HEAVY_ATOMS_STR
-                         heavyAtomsCount = 0,
-                         heavyAtomsAverage = NTvalue( NaN, NaN, fmt='%4.2f +- %4.2f', fmt2='%4.2f'  ),
-
-                         models          = modelList,
-                         closestToMean   = -1,    #indicates undefined
-                         ranges          = ranges,
-                         comment         = comment
                        )
+        self.backbone        = NTfill(0.0, len(modelList)) # needs to match BACKBONE_STR
+        self.backboneCount   = 0
+        self.backboneAverage = NTvalue( NaN, NaN, fmt='%4.2f +- %4.2f', fmt2='%4.2f' )
+
+        self.heavyAtoms      = NTfill(0.0, len(modelList)) # needs to match HEAVY_ATOMS_STR
+        self.heavyAtomsCount = 0
+        self.heavyAtomsAverage = NTvalue( NaN, NaN, fmt='%4.2f +- %4.2f', fmt2='%4.2f'  )
+
+        self.models          = modelList
+        self.closestToMean   = -1    #indicates undefined
+        self.ranges          = ranges
+        self.comment         = comment        
     #end def
 
     def _closest(self):
@@ -4837,7 +4851,7 @@ class Dihedral( NTlist ):
                                       )
                        )
 
-        cav,cv,_n = self.cAverage(min=self.range[0],max=self.range[1])
+        cav,cv,_n = self.cAverage(minValue=self.range[0],maxValue=self.range[1])
 
         self.limit(self.range[0], self.range[1])
         return cav,cv
@@ -5329,7 +5343,7 @@ coordinates: %s"""  , dots, self, dots
         for i in range(0, lenSelf):
             self.angles.append( NTangleOpt(other1.coordinates[i], self.coordinates[i], other2.coordinates[i], radians=radians ) )
         #end for
-        cav,cv,dummy = self.angles.cAverage( min=min, max=max, radians= radians )
+        cav,cv,dummy = self.angles.cAverage( minValue=min, maxValue=max, radians= radians )
         return (cav,cv)
     #end def
 
@@ -5902,7 +5916,7 @@ coordinates: %s"""  , dots, self, dots
 #            NTdebug("but only found coordinates length: " + `len(self.coordinates)`)
             return None
         if model < 0:
-            NTcodeerror("In Atom.atomToPDB found model to be <0: " + `model`)
+            NTcodeerror("In Atom.atomToPDB found model to be <0: %r" % model)
             return None
 #        modelId = model - 1
 
@@ -5960,10 +5974,12 @@ coordinates: %s"""  , dots, self, dots
            return record on success or None on error
         """
         pdbAtmName = self.translate( convention )
-        if not pdbAtmName: return None
+        if not pdbAtmName: 
+            return None
 
         pdbResName = self.residue.translate( convention )
-        if not pdbResName: return None
+        if not pdbResName: 
+            return None
 
         record = PyMMLib.TER()
 
@@ -6589,7 +6605,7 @@ def getNextAvailableChainId(chainIdListAlreadyUsed = []):
     issueId = 130
     msg = "CING exhausted the available %d chain identifiers; see issue %d here:\n" % (
         len(Chain.DEFAULT_ChainNamesByAlphabet), issueId)
-    msg += issueListUrl+`issueId`
+    msg += issueListUrl+repr(issueId)
     NTcodeerror(msg)
 # end def
 

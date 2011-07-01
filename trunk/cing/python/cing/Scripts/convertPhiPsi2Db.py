@@ -71,10 +71,10 @@ def main():
         phi = float(phi)
         psi = float(psi)
         if not (inRange(phi, isRange360=isRange360) and inRange(psi, isRange360=isRange360)):
-            NTerror("phi and/or psi not in range for row: %s" % `row`)
+            NTerror("phi and/or psi not in range for row: %s" % repr(row))
             return
         if not common20AADict.has_key(resType):
-            NTdebug("Residue not in common 20 for row: %s" % `row`)
+            NTdebug("Residue not in common 20 for row: %s" % repr(row))
             rowCount -= 1
             continue
 
@@ -89,7 +89,7 @@ def main():
 #    NTdebug('valuesByEntrySsAndResType:\n%s'%valuesByEntrySsAndResType)
 #    (Cav, Csd, _Cn) = getRescaling(valuesByEntrySsAndResType)
     (Cav, Csd) = (1.0, 1.0)
-    NTdebug("Overall found av,sd,n: " + `(Cav, Csd)`)
+    NTdebug("Overall found av,sd: %r %r" % (Cav, Csd))
 
     for ssType in valuesBySsAndResType.keys():
         for resType in valuesBySsAndResType[ssType].keys():

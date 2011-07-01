@@ -1,3 +1,4 @@
+#@PydevCodeAnalysisIgnore # pylint: disable-all
 ## Automatically adapted for numpy.oldnumeric Dec 01, 2009 by 
 
 #
@@ -22,19 +23,20 @@ def histogram(data, nbins, range = None):
     data = Numeric.array(data, Numeric.Float)
     
     if range is None:
-	min = Numeric.minimum.reduce(data)
-	max = Numeric.maximum.reduce(data)
+        min = Numeric.minimum.reduce(data)
+        max = Numeric.maximum.reduce(data)
     else:
-	min, max = range
-	data = Numeric.repeat(data,
-			      Numeric.logical_and(Numeric.less_equal(data, max),
-						  Numeric.greater_equal(data,
-									min)))
+        min, max = range
+        data = Numeric.repeat(data,
+                  Numeric.logical_and(Numeric.less_equal(data, max),
+                          Numeric.greater_equal(data,
+                                    min)))
+    # end if
     bin_width = (max-min)/nbins
     
     data = Numeric.floor((data - min)/bin_width).astype(Numeric.Int)
     histo = Numeric.add.reduce(Numeric.equal(
-	Numeric.arange(nbins)[:,Numeric.NewAxis], data), -1)
+    Numeric.arange(nbins)[:,Numeric.NewAxis], data), -1)
     histo[-1] = histo[-1] + Numeric.add.reduce(Numeric.equal(nbins, data))
     bins = min + bin_width*(Numeric.arange(nbins)+0.5)
     return Numeric.transpose(Numeric.array([bins, histo]))
@@ -115,13 +117,14 @@ def pca(data):
     return val, vec, pc
 
 def covarianceMatrix(data, normalize = 1):
-	npoints, dimension = shape(data)
-        if normalize: data = data - Numeric.sum(data)/npoints
+    npoints, dimension = shape(data)
+    if normalize: 
+        data = data - Numeric.sum(data)/npoints
 
-        if dimension > npoints:
-            return dot(data, Numeric.transpose(data)) / (npoints-1)
+    if dimension > npoints:
+        return dot(data, Numeric.transpose(data)) / (npoints-1)
         
-	return dot(transpose(data), data)/(npoints-1)
+    return dot(transpose(data), data)/(npoints-1)
 
 def principalComponents(data, normalize = 1, isCovarianceMatrix = 0):
     if not isCovarianceMatrix:
@@ -142,9 +145,9 @@ def zScores(data, ravel = None):
     import numpy.oldnumeric as Numeric #@Reimport
 
     if ravel is None:
-	    d = Numeric.array(data)
+        d = Numeric.array(data)
     else:
-	    d = Numeric.ravel(Numeric.array(data))
+        d = Numeric.ravel(Numeric.array(data))
     average = average(d)
     sd = standardDeviation(d)
 
@@ -181,14 +184,15 @@ def nonRedundantSet(d, threshold, distanceMatrix = 1):
     ok = 1
 
     while ok:
-	nNeighbours = Numeric.sum(d)
-	if len(nNeighbours) <= 1: break
-	maxx = max(nNeighbours[1:])
-	others = Numeric.nonzero(equal(nNeighbours[1:], maxx))+1
-	candidate = whrandom.choice(others)
-	ok = nNeighbours[candidate]
-	if ok: d = deleteRowAndColumn(d, candidate-1, candidate)
-
+        nNeighbours = Numeric.sum(d)
+        if len(nNeighbours) <= 1: break
+        maxx = max(nNeighbours[1:])
+        others = Numeric.nonzero(equal(nNeighbours[1:], maxx))+1
+        candidate = whrandom.choice(others)
+        ok = nNeighbours[candidate]
+        if ok: d = deleteRowAndColumn(d, candidate-1, candidate)
+    # end while
+    
     return d[:,0]
 
 def non_redundant_set(d, threshold):
@@ -212,17 +216,17 @@ def non_redundant_set(d, threshold):
     ok = 1
 
     while ok:
-	nNeighbours = Numeric.sum(d)-1
-	if len(nNeighbours) <= 1: break
-	maxx = max(nNeighbours[1:])
-	others = nonzero(equal(nNeighbours[1:], maxx))+1
-	candidate = random.choice(others)
-
+        nNeighbours = Numeric.sum(d)-1
+        if len(nNeighbours) <= 1: break
+        maxx = max(nNeighbours[1:])
+        others = nonzero(equal(nNeighbours[1:], maxx))+1
+        candidate = random.choice(others)
+    
         ok = nNeighbours[candidate]
 
         if ok:
             d = deleteRowAndColumn(d, candidate-1, candidate)
-
+    #end while
     return d[:,0]
 
 def gaussArray(s, mu, sigma):
@@ -233,13 +237,13 @@ def gaussArray(s, mu, sigma):
 #    import random
 
     try:
-	l = s[0]*s[1]
+        l = s[0]*s[1]
     except:
-	l=s[0]
+        l=s[0]
 
     z = zeros(l,Float)
     for i in range(l):
-	z[i] = random.gauss(mu, sigma)
+        z[i] = random.gauss(mu, sigma)
 
     return reshape(z, s)
 
