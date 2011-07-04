@@ -324,8 +324,8 @@ MAX_SIZE_XPLOR_RESTRAINT_LIST_NAME = 10
 
 DEFAULT_SML_HANDLER_STRING = 'Default handler from SMLhandled'
 
-"Don't report on the next atoms"
-# Add these to CING lib later. For now, it's just clobbering the output to report on them.
+#: Don't report on the next atoms
+#: Add these to CING lib later. For now, it's just clobbering the output to report on them.
 ATOM_LIST_TO_IGNORE_REPORTING = []
 hideMissingAtomsJfdKnowsAbout = True # default should be False
 if hideMissingAtomsJfdKnowsAbout:

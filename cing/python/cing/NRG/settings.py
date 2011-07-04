@@ -4,16 +4,18 @@ Settings for the NRG-CING
 Test by:
 python $CINGROOT/python/cing/NRG/settings.py
 """
-
-from cing.Libs.NTutils import * #@UnusedWildImport
+from cing.Libs.NTutils import NTdebug
+import os
 
 # If on production machine then
 # -1- the urls will differ from localhost to nmr.cmbi.ru.nl or so.
 # -2- results base is tmpNRG-CING
 # -3- db schema is tmpnrgcing
 
-isProduction        = 1 # DEFAULT: 1 override for development in localConstants.py @UnusedVariable Disables some operations for need for speed.
-assumeAllAreDone    = 1 # DEFAULT: 1 when assumed all are done. Disables some messaging in case not all are done. @UnusedVariable
+#: override for development in localConstants.py @UnusedVariable Disables some operations for need for speed.
+isProduction        = 1 # DEFAULT: 1  @UnusedVariable
+#: when assumed all are done. Disables some messaging in case not all are done.
+assumeAllAreDone    = 1 # DEFAULT: 1  @UnusedVariable
 
 UJ                  = '/Users/wim'
 WS                  = os.path.join(UJ,'workspace')
