@@ -1,22 +1,5 @@
 #!/usr/bin/env python
-from cing import cingDirTmp
-from cing import header
-from cing.Libs.NTutils import * #@UnusedWildImport
-from cing.Libs.disk import copy
-from cing.Libs.disk import rmdir
-from cing.Libs.network import * #@UnusedWildImport
-from cing.NRG import * #@UnusedWildImport
-from cing.NRG.settings import * #@UnusedWildImport
-from cing.NRG.storeCING2db import doStoreCING2db
-from cing.core.classes import Project
-from cing.core.constants import * #@UnusedWildImport
-from cing.main import getStartMessage
-from cing.main import getStopMessage
-from shutil import rmtree
-import shutil
-import string
-import urllib
-
+"""
 # One size fit all so the same code for VC and regular use.
 # NB iCing uses the simple doValidateiCing.py script.
 # Customized by arguments.
@@ -37,7 +20,6 @@ import urllib
 # file:///Users/jd/wattosTestingPlatform/pdb/data/structures/divided/pdb /Library/WebServer/Documents/PDB-CING . . BY_CH23 PDB
 
 # -2- VC use:
-"""
 9
 $CINGROOT/python/cing/NRG/validateEntryForNrgByVC.py 1brv \
 http://nmr.cmbi.ru.nl/NRG-CING/prep/C \
@@ -48,8 +30,27 @@ Retrieves from http://nmr.cmbi.ru.nl/NRG-CING/prep/C/br/1brv/1brv.tgz
 Scps to                 :     jd@localhost:/tmp/data/br/1brv/1brv.cing.tgz
 
 For topos replace the first command by validateEntryNrg:
-validateEntryNrg 1brv http://nmr.cmbi.umcn.nl/NRG-CING/input jd@nmr.cmbi.umcn.nl:/Library/WebServer/Documents/NRG-CING . . BY_CH23_BY_ENTRY CCPN
+validateEntryNrg 1brv http://nmr.cmbi.umcn.nl/NRG-CING/input \
+    jd@nmr.cmbi.umcn.nl:/Library/WebServer/Documents/NRG-CING . . BY_CH23_BY_ENTRY CCPN
 """
+from cing import cingDirTmp
+from cing import header
+from cing.Libs.NTutils import * #@UnusedWildImport
+from cing.Libs.disk import copy
+from cing.Libs.disk import rmdir
+from cing.Libs.network import * #@UnusedWildImport
+from cing.NRG import * #@UnusedWildImport
+from cing.NRG.settings import * #@UnusedWildImport
+from cing.NRG.storeCING2db import doStoreCING2db
+from cing.core.classes import Project
+from cing.core.constants import * #@UnusedWildImport
+from cing.main import getStartMessage
+from cing.main import getStopMessage
+from shutil import rmtree
+import shutil
+import string
+import urllib
+
 
 
 
@@ -78,6 +79,7 @@ IDX_FILTER_TOP = 9
 IDX_FILTER_VASCO = 10
 IDX_SINGLE_CORE_OPERATION = 11
 
+
 def main(entryId, *extraArgList):
     """inputDir may be a directory or a url. A url needs to start with http://.
     """
@@ -103,9 +105,9 @@ def main(entryId, *extraArgList):
         doWattos = False
         doQueeny = False
         doTalos = False
-    FORCE_REDO = True
-    FORCE_RETRIEVE_INPUT = True
-
+        
+    forceRedo = True
+    forceRetrieveInput = True
 
     NTmessage(header)
     NTmessage(getStartMessage())
@@ -121,7 +123,7 @@ def main(entryId, *extraArgList):
     if len(extraArgList) != expectedNumberOfArguments:
         NTmessage("consider updating code to include all sequential parameters: %s" % str(expectedArgumentList))
         if len(extraArgList) > expectedNumberOfArguments:
-            NTerror("Got arguments: " + `extraArgList`)
+            NTerror("Got arguments: " + str(extraArgList))
             NTerror("Failed to get expected number of arguments: %d got %d" % (
                 expectedNumberOfArguments, len(extraArgList)))
             NTerror("Expected arguments: %s" % expectedArgumentList)
@@ -187,7 +189,7 @@ def main(entryId, *extraArgList):
     cingEntryDir = entryId + ".cing"
 
     if os.path.isdir(cingEntryDir):
-        if FORCE_REDO:
+        if forceRedo:
             NTmessage("Enforcing a redo")
             rmtree(cingEntryDir)
         else:
@@ -225,7 +227,7 @@ def main(entryId, *extraArgList):
     if inputProtocal in allowedInputProtocolList:
         stillToRetrieve = False
         if os.path.exists(fileNameTgz):
-            if FORCE_RETRIEVE_INPUT:
+            if forceRetrieveInput:
                 os.unlink(fileNameTgz)
                 stillToRetrieve = True
             # end if
@@ -233,7 +235,7 @@ def main(entryId, *extraArgList):
             stillToRetrieve = True
         # end if
         if stillToRetrieve:
-             retrieveTgzFromUrl(entryId, inputDir, archiveType=archiveType, formatFileName=formatFileName)
+            retrieveTgzFromUrl(entryId, inputDir, archiveType=archiveType, formatFileName=formatFileName)
         # end if
         if not os.path.exists(fileNameTgz):
             NTerror("Tgz should already have been present skipping entry")
@@ -291,7 +293,7 @@ def main(entryId, *extraArgList):
         project.molecule.setRanges(ranges)
     project.molecule.superpose(ranges=ranges)
     if filterTopViolations and not project.filterHighRestraintViol():
-            NTerror("Failed to filterHighRestraintViol")
+        NTerror("Failed to filterHighRestraintViol")    
 ####> MAIN UTILITY HERE
     if 0: # DEFAULT 0
         project.save()
@@ -352,7 +354,7 @@ def main(entryId, *extraArgList):
 # end def
 
 
-def retrieveTgzFromUrl(entryId, url, archiveType=ARCHIVE_TYPE_FLAT, formatFileName='%s.tgz'):
+def retrieveTgzFromUrl(entryId, url, archiveType=ARCHIVE_TYPE_FLAT, formatFileName='%s.tgz'): # pylint: disable=W0613
     """Retrieves tgz file from url to current working dir assuming the
     source is named:      $url/$x/$x.tgz
     Will skip the download if it's already present.
@@ -413,6 +415,7 @@ if __name__ == "__main__":
     cing.verbosity = verbosityDebug
 #        sys.exit(1) # can't be used in forkoff api
     try:
-        status = main(*sys.argv[1:])
+        _status = main(*sys.argv[1:])
     finally:
         NTmessage(getStopMessage(cing.starttime))
+

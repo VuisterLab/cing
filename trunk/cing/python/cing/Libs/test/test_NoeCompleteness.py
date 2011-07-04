@@ -37,6 +37,7 @@ class AllChecks(TestCase):
 #        entryId = "1jve" # Interest of Winston
 #        entryId = "1NK4_DNA" # Interest of Winston
 #        entryId = "complexfit_6_0627_DNA" # Interest of Winston
+#        entryId = "polxbinary" # Interest of Winston
 
 
 #        ranges = 'A.173-178'
@@ -61,9 +62,8 @@ class AllChecks(TestCase):
             resultCompleteness = doCompleteness( project,
                  max_dist_expectedOverall = 4.0,
                  use_intra = True,
-#                 ob_file_name = None, # Defaults to ob_standard.str
-#                 ob_file_name = os.path.join( cingDirLibs, NoeCompletenessAtomLib.STR_FILE_DIR, 'ob_all_stereo.str'),
-                 ob_file_name = os.path.join( cingDirLibs, NoeCompletenessAtomLib.STR_FILE_DIR, 'ob_heavy.str'),
+                 ob_file_name = None, # Defaults to ob_standard.str
+#                 ob_file_name = os.path.join( cingDirLibs, NoeCompletenessAtomLib.STR_FILE_DIR, ''ob_heavy.str'.str')
                  summaryFileNameCompleteness = "%s_compl_sum" % entryId,
                  write_dc_lists = True,
                  file_name_base_dc  = "%s_compl" % entryId,
