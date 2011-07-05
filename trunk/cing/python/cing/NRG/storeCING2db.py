@@ -18,6 +18,7 @@ from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.Libs.helper import getSvnRevision
 from cing.NRG import * #@UnusedWildImport
 from cing.PluginCode.required.reqDssp import * #@UnusedWildImport
+from cing.PluginCode.required.reqNih import * #@UnusedWildImport
 from cing.PluginCode.required.reqProcheck import * #@UnusedWildImport
 from cing.PluginCode.required.reqQueeny import * #@UnusedWildImport
 from cing.PluginCode.required.reqWattos import * #@UnusedWildImport
@@ -579,7 +580,8 @@ def doStoreCING2db( entry_code, archive_id, project = None):
             r_qcs_bb = residue.getDeepAvgByKeys(QSHIFT_STR, BACKBONE_STR, VALUE_LIST_STR)
             r_qcs_hvy = residue.getDeepAvgByKeys(QSHIFT_STR, HEAVY_ATOMS_STR, VALUE_LIST_STR)
             r_qcs_prt = residue.getDeepAvgByKeys(QSHIFT_STR, PROTONS_STR, VALUE_LIST_STR)
-
+            # Talos+ but from different location in data model.
+            r_qcs_s2 = residue.getDeepByKeys(TALOSPLUS_STR, S2_STR)
 
             # CING
             r_chk_ramach = residue.getDeepAvgByKeys(CHK_STR, RAMACHANDRAN_CHK_STR, VALUE_LIST_STR)
@@ -686,6 +688,7 @@ def doStoreCING2db( entry_code, archive_id, project = None):
                 qcs_bb          = r_qcs_bb,
                 qcs_hvy         = r_qcs_hvy,
                 qcs_prt         = r_qcs_prt,
+                qcs_s2          = r_qcs_s2,
                 rog=rogR
                 )
             )

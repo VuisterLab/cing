@@ -227,7 +227,7 @@ CHI2_STR = 'CHI2'
 OMEGA_STR = 'OMEGA'
 CV_STR = 'cv'
 CAV_STR = 'cav'
-S2_STR = 'S2' # used in TalosPlus
+S2_STR = 'S2' # used in TalosPlus. For the talosPlus variable see reqNih.py
 
 DIHEDRAL_NAME_Cb4N = 'Cb4N'
 DIHEDRAL_NAME_Cb4C = 'Cb4C'
