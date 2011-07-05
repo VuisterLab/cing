@@ -41,7 +41,8 @@ import time
 
 
 # For plotting with thousand separators.
-locale.setlocale(locale.LC_ALL, "")
+# Disabled in an emergency fix for this failed after upgrade Mac Ports to 2.6.7
+#locale.setlocale(locale.LC_ALL, "")
 
 class NTlist(list, Lister, SMLhandled):
     """
