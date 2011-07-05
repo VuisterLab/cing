@@ -4,6 +4,8 @@
     <dict>
         <key>Label</key>
         <string>org.jenkins-ci</string>
+        <key>Disabled</key>
+        <false/>
         <key>UserName</key>
         <string>daemon</string>
         <key>GroupName</key>
@@ -22,7 +24,7 @@
         <key>EnvironmentVariables</key>
         <dict>
             <key>JENKINS_HOME</key>
-            <string>/Users/Shared/Jenkins/Home</string>
+            <string>/Users/jd/.jenkins</string>
         </dict>
     </dict>
 </plist>

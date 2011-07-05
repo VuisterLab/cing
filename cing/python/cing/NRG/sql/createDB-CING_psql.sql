@@ -265,6 +265,7 @@ CREATE TABLE casdcing.cingresidue
     qcs_bb                         FLOAT DEFAULT NULL,
     qcs_hvy                        FLOAT DEFAULT NULL,
     qcs_prt                        FLOAT DEFAULT NULL,
+    qcs_s2                         FLOAT DEFAULT NULL,
 
     dis_max_all                    FLOAT DEFAULT NULL,
     dis_rms_all                    FLOAT DEFAULT NULL,

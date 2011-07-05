@@ -64,3 +64,6 @@ ProxyPassReverse  /NRG-D2R http://localhost:2021/
 ProxyPass         /NRG-CING-D2R http://localhost:2020/
 ProxyPassReverse  /NRG-CING-D2R http://localhost:2020/
 
+# For the gwt tomcat server NOTE HOW IMPORTANT THESE STUPID SLASHES ARE
+#ProxyPass         /jenkins http://localhost:8081/jenkins/
+#ProxyPassReverse  /jenkins http://localhost:8081/jenkins/

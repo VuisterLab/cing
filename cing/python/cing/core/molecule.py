@@ -2522,12 +2522,14 @@ Return an Molecule instance or None on error
             # Second: fill gaps of one for 0.5<S2<autoLimit
             for res in self.allResidues():
                 res._tmp = 0 # 0: do not qualify; 1: qualify first round; 2: check in second round
-                if res.talosPlus and not isNaN(res.talosPlus.S2):
-                    if res.talosPlus.S2>autoLimit:
-                        res._tmp = 1
-                    elif res.talosPlus.S2>0.5:
-                        res._tmp = 2
-                    #end if
+                s2 = getDeepByKeysOrAttributes(res, TALOSPLUS_STR, S2_STR)
+                if s2 == None:
+                    continue                    
+                #end if
+                if s2>autoLimit:
+                    res._tmp = 1
+                elif s2>0.5:
+                    res._tmp = 2
                 #end if
             #end if
 
