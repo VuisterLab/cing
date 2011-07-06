@@ -30,7 +30,7 @@ from xml.sax import saxutils
 import array
 import datetime
 import inspect
-import locale
+import locale # used in nrgCingRdb @UnusedImport
 import math
 import optparse
 import os
@@ -42,6 +42,7 @@ import time
 
 # For plotting with thousand separators.
 # Disabled in an emergency fix for this failed after upgrade Mac Ports to 2.6.7
+# Not important enough to reenable.
 #locale.setlocale(locale.LC_ALL, "")
 
 class NTlist(list, Lister, SMLhandled):
@@ -2032,7 +2033,7 @@ class NTtree(NTdict):
         self.saveXML('name', '_children')
     #end def
 
-    def _Cname(self, depth=0):
+    def cName(self, depth=0):
         """Return name constructor with 'depth' levels"""
         result = self.name
         parent = self._parent
@@ -2042,7 +2043,7 @@ class NTtree(NTdict):
             parent = parent._parent
         return result
 
-    def _Cname2(self, depth=0):
+    def cName2(self, depth=0):
         """Return name constructor using ['name']
            with 'depth' levels
         """
@@ -2058,7 +2059,7 @@ class NTtree(NTdict):
         return '<%s %s>' % (self._className(), self.name)
 
     def __repr__( self ):
-        return '<%s %s (%d)>' % (self.__CLASS__, self._Cname( -1 ), self.__OBJECTID__)
+        return '<%s %s (%d)>' % (self.__CLASS__, self.cName( -1 ), self.__OBJECTID__)
     #end def
 
     def _decodeTreeName(self, nodeNames ):
@@ -2355,13 +2356,13 @@ class NTparameter(NTtree):
     def writeFile(self, fileName)   :
         fp = open(fileName, 'w')
         for p in self.allLeaves():
-            fprintf(fp, '%-40s = %s\n', p._Cname(-1) + '.value', repr(p))
+            fprintf(fp, '%-40s = %s\n', p.cName(-1) + '.value', repr(p))
         #end for
         fp.close()
     #end def
 
     def __str__(self):
-        return self._Cname(-1)
+        return self.cName(-1)
     #end def
 
     def __repr__(self):

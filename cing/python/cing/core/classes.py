@@ -3256,8 +3256,8 @@ class DistanceRestraint(Restraint):
         """
         s = ''
         for p in self.atomPairs:
-#            s = s + sprintf('(%-11s - %11s)   ', p[0]._Cname(1), p[1]._Cname(1))
-            s = s + sprintf('(%-13s - %13s)   ', p[0]._Cname(2), p[1]._Cname(2)) # include chain id.
+#            s = s + sprintf('(%-11s - %11s)   ', p[0].cName(1), p[1].cName(1))
+            s = s + sprintf('(%-13s - %13s)   ', p[0].cName(2), p[1].cName(2)) # include chain id.
         #end for
         return s.strip()
     #end def
@@ -4037,7 +4037,7 @@ class RDCRestraint(DistanceRestraint):
         """
         s = ''
         for p in self.atomPairs:
-            s = s + sprintf('(%-11s - %11s)   ', p[0]._Cname(1), p[1]._Cname(1))
+            s = s + sprintf('(%-11s - %11s)   ', p[0].cName(1), p[1].cName(1))
         #end for
         return s.strip()
     #end def
@@ -4045,7 +4045,7 @@ class RDCRestraint(DistanceRestraint):
     def format(self):
 #        s = '('
 #        for p in self.atoms:
-#            s = s + sprintf('%-11s ', p._Cname(1) )
+#            s = s + sprintf('%-11s ', p.cName(1) )
 #        #end for
 #        s = s.strip() + ')'
         return  sprintf('%-25s %-6s (Target: %6.1f %6.1f) %s',

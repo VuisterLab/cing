@@ -28,6 +28,7 @@ class AllChecks(TestCase):
 #            entry_code = l[0]
 #            self.assertFalse( m.removeEntry(entry_code))
         # end if
+        self.assertFalse( m.showCounts())
 
 if __name__ == "__main__":
     cing.verbosity = verbosityDebug

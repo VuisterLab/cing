@@ -99,7 +99,7 @@ class CingSummary( NTdict ):
                 rog[1] += 1
             else:
                 rog[2] += 1
-            self.CING_residueROG.append( (residue._Cname(-1), residue.rogScore) )
+            self.CING_residueROG.append( (residue.cName(-1), residue.rogScore) )
         #end for
         total = reduce(lambda x, y: x+y+0.0, rog) # total expressed as a float because of 0.0
         for i, _x in enumerate(rog): rog[i] = rog[i]*100.0/total
