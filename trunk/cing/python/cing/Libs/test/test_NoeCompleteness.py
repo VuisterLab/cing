@@ -27,8 +27,8 @@ class AllChecks(TestCase):
 #        
         
     def test_ArtificialRestraints(self):
-        'test_ArtificialRestraints'
-        cing.verbosity = cing.verbosityDebug
+        'test artificialRestraints'
+#        cing.verbosity = cing.verbosityDebug
         doCompletenessCheck         = True  # DEFAULT True
         doTheoreticalDihedralCheck  = True  # DEFAULT True
         doHydrogenBondCheck         = True  # DEFAULT True
@@ -102,4 +102,5 @@ class AllChecks(TestCase):
 # end class        
         
 if __name__ == "__main__":    
+    cing.verbosity = cing.verbosityDebug
     unittest.main()
