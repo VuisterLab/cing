@@ -1,8 +1,6 @@
-# python -u $CINGROOT/python/cing/NRG/nrgCingRdb.py
-# reload cing.NRG.nrgCingRdb
-# from cing.NRG.nrgCingRdb import *
 """
 Create plots like the GreenVersusRed scatter by entry.
+Use: python -u $CINGROOT/python/cing/NRG/nrgCingRdb.py 
 """
 
 from cing import cingDirTmp
@@ -65,7 +63,7 @@ class nrgCingRdb():
             self.csql = csqlAlchemy(host=host, user=user, db=db, schema=schema)
             self.csql.connect()
             self.execute = self.csql.conn.execute
-            if 0: # DEFAULT True but disable for quicker testing.
+            if True: # DEFAULT True but disable for quicker testing.
                 self.populateDepTables()
             self.csql.autoload()
             #csql.close()
@@ -106,6 +104,8 @@ class nrgCingRdb():
             self.engine = self.jsql.engine
             self.brief_summary = self.jsql.brief_summary
             self.bs = self.brief_summary.alias()
+        # end if
+    # end def
 
     def showCounts(self):
         m = self
@@ -125,7 +125,8 @@ class nrgCingRdb():
             countList = [m.query(table).count() for table in tableList]
             countStrTuple = tuple([locale.format('%.0f', value, True) for value in countList])
             NTmessage("There are %s entries in summary and %s entries in selection." % countStrTuple)
-
+        # end if
+    # end def
 
     def getPdbIdList(self, fromNrg=True):
         "Return None on error. And NTlist otherwise."
@@ -213,6 +214,8 @@ AND '{2}' <@ S.chain_type; -- contains at least one protein chain.
             result = self.execute(stmt)
             printResult(result)
 
+        # end for
+    # end def
 
     def getDbTable( self, level ):
         m = self
@@ -226,6 +229,7 @@ AND '{2}' <@ S.chain_type; -- contains at least one protein chain.
         elif level == CSLPA_LEVEL:
             table = m.ccslpa
         return table
+    # end def
 
     def level2level_id(self, level):
         if level == ATOM_LEVEL:
@@ -237,6 +241,7 @@ AND '{2}' <@ S.chain_type; -- contains at least one protein chain.
         if level == PROJECT_LEVEL:
             return ENTRY_ID_STR
         NTexit("Bad level: %s" % level)
+    # end def
 
     def getLevelNumber(self, level):
         """Level number for tables other than atom, res, cha, and project is undefined
@@ -251,9 +256,11 @@ AND '{2}' <@ S.chain_type; -- contains at least one protein chain.
         if level == PROJECT_LEVEL or level == CSL_LEVEL or level == CSLPA_LEVEL:
             return 3
         NTexit("In getLevelNumber bad level: %s" % level)
+    # end def
 
     def getTitleFromStats(self, av, sd, n, minValue, maxValue):
         return "av/sd/n %.3f %.3f %d min/max %.3f %.3f" % (av, sd, n, minValue, maxValue )
+    # end def
 
     def getTitleFromDict(self, plotDict):
         titleStr = ''
@@ -291,6 +298,7 @@ AND '{2}' <@ S.chain_type; -- contains at least one protein chain.
             titleStr += ' %s<%s' % getDeepByKeysOrAttributes( plotDict, IS_SMALLER_THAN_STR)
 
         return titleStr
+    # end def
 
     def getFloatLoLFromDb(self, level, progId, chk_id, **plotDict):
         '''Returns a LoL with the
@@ -521,6 +529,7 @@ AND '{2}' <@ S.chain_type; -- contains at least one protein chain.
     #    result = [float(y[i]) for i in range(len(x))]
 #        NTdebug("result: %s" % str(result))
         return result
+    # end def
 
 
     def createScatterPlots(self):

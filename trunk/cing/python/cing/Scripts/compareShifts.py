@@ -36,7 +36,7 @@ def printatom(atm):
     else:
         ss = '()      '
     #end if
-    return sprintf('%-12s %10.3f  %s', atm._Cname(1), atm.resonances().value, ss)
+    return sprintf('%-12s %10.3f  %s', atm.cName(1), atm.resonances().value, ss)
 #end def
 
 def compareShifts(projectA, projectB):

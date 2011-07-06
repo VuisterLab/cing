@@ -326,7 +326,7 @@ def makeDihedralPlot( project, residueList, dihedralName1, dihedralName2,
 
     if not plotTitle:
         if isSingleResiduePlot:
-            plotTitle = residue._Cname(2)
+            plotTitle = residue.cName(2)
         else:
             plotTitle = '%d residues'
 
@@ -649,21 +649,21 @@ def _navigateHtml( obj ):
     # Refs to move to previous, next residue or UP
     previous = obj.sibling(-1)
     if previous:
-        name = previous._Cname(-1)
+        name = previous.cName(-1)
         obj.html.insertHtmlLink( obj.html.header, obj, previous, text = name, id=HTMLfile.headerSectionId,
                                  title = sprintf('goto %s', name)
                                )
 
     if obj._parent:
-        name = obj._parent._Cname(-1)
+        name = obj._parent.cName(-1)
         obj.html.insertHtmlLink( obj.html.header, obj, obj._parent, text = 'UP',
                                  title = sprintf('goto %s', name)
                                )
 
     next = obj.sibling(1)
     if next:
-        name = next._Cname(-1)
-        obj.html.insertHtmlLink( obj.html.header, obj, next, text = next._Cname(-1), id=HTMLfile.headerSectionId,
+        name = next.cName(-1)
+        obj.html.insertHtmlLink( obj.html.header, obj, next, text = next.cName(-1), id=HTMLfile.headerSectionId,
                                  title = sprintf('goto %s', name)
                                )
 #end def
@@ -2080,7 +2080,7 @@ class MoleculeHTMLfile( HTMLfile ):
 
     def _generateHeader(self):
         """generate header html for this Molecule"""
-        self.header('h1', 'Molecule '+self.molecule._Cname(-1) )
+        self.header('h1', 'Molecule '+self.molecule.cName(-1) )
         _navigateHtml( self.molecule )
     #end def
 
@@ -2455,7 +2455,7 @@ class ChainHTMLfile( HTMLfile ):
 
     def _generateHeader(self):
         # generate header html for this residue
-        self.header('h1', self.chain._Cname(-1) )
+        self.header('h1', self.chain.cName(-1) )
         _navigateHtml( self.chain )
     #end def
 
@@ -2493,7 +2493,7 @@ class ResidueHTMLfile( HTMLfile ):
 
     def _generateHeader(self, plottedList):
         # generate header html for this residue
-        self.header('h1', self.residue._Cname(-1) )
+        self.header('h1', self.residue.cName(-1) )
         _navigateHtml( self.residue )
 
         self.header('a', 'Help', href = self.relativePath()+HTMLfile.help_html, title='goto page with help')
@@ -2719,13 +2719,13 @@ class ResidueHTMLfile( HTMLfile ):
                     titleStr = NO_CHAIN_TO_GO_TO
                     if chain:
                         chName = chain.name
-                        titleStr = sprintf('goto chain %s', chain._Cname(-1))
+                        titleStr = sprintf('goto chain %s', chain.cName(-1))
                     self.insertHtmlLink( self.right, self.residue, chain,   text = chName,   title = titleStr )
                     if residue == self.residue:
                         self.right( 'i', residue.name )
                     else:
-                        self.insertHtmlLink( self.right, self.residue, residue, text = residue.name, title = sprintf('goto residue %s', residue._Cname(-1)) )
-                    self.insertHtmlLink( self.right, self.residue, atom,    text = atom.name,    title = sprintf('goto atom %s', atom._Cname(-1)) )
+                        self.insertHtmlLink( self.right, self.residue, residue, text = residue.name, title = sprintf('goto residue %s', residue.cName(-1)) )
+                    self.insertHtmlLink( self.right, self.residue, atom,    text = atom.name,    title = sprintf('goto atom %s', atom.cName(-1)) )
                 # end for
                 if isAmbi:
                     t(None,'etc.')
@@ -3039,14 +3039,14 @@ class AtomsHTMLfile( HTMLfile ):
         titleStr = NO_CHAIN_TO_GO_TO
         if chain:
             chName = chain.name
-            titleStr = sprintf('goto chain %s', chain._Cname(-1))
+            titleStr = sprintf('goto chain %s', chain.cName(-1))
 
         self.insertHtmlLink( self.main, self.atomList, chain,   text =       chName,   title = titleStr)
 
         table.nextColumn(`residue.resNum`)
 
         table.nextColumn()
-        self.insertHtmlLink( self.main, self.atomList, residue, text = residue.resName, title = sprintf('goto residue %s', residue._Cname(-1)) )
+        self.insertHtmlLink( self.main, self.atomList, residue, text = residue.resName, title = sprintf('goto residue %s', residue.cName(-1)) )
 
         table.nextColumn(atom.name)
         spinTypeStr = getDeepByKeys(atom, 'db', 'spinType')
@@ -3336,11 +3336,11 @@ class RestraintListHTMLfile( HTMLfile ):
                 titleStr = NO_CHAIN_TO_GO_TO
                 if chain:
                     chName = chain.name
-                    titleStr = sprintf('goto chain %s', chain._Cname(-1))
+                    titleStr = sprintf('goto chain %s', chain.cName(-1))
                 self.insertHtmlLink( self.main, self.restraintList, chain,   text =       chName,   title = titleStr)
                 table.nextColumn(`residue.resNum`)
                 table.nextColumn()
-                self.insertHtmlLink( self.main, self.restraintList, residue, text = residue.resName, title = sprintf('goto residue %s', residue._Cname(-1)) )
+                self.insertHtmlLink( self.main, self.restraintList, residue, text = residue.resName, title = sprintf('goto residue %s', residue.cName(-1)) )
                 table.nextColumn()
                 self.insertHtmlLink( self.main, self.restraintList, atom,    text = atom.name)
                 i += 1
@@ -3413,12 +3413,12 @@ class RestraintListHTMLfile( HTMLfile ):
             titleStr = NO_CHAIN_TO_GO_TO
             if chain:
                 chName = chain.name
-                titleStr = sprintf('goto chain %s', chain._Cname(-1))
+                titleStr = sprintf('goto chain %s', chain.cName(-1))
 
             self.insertHtmlLink( self.main, self.restraintList, chain,   text =       chName,   title = titleStr)
             table.nextColumn(`residue.resNum`)
             table.nextColumn()
-            self.insertHtmlLink( self.main, self.restraintList, residue, text = residue.resName, title = sprintf('goto residue %s', residue._Cname(-1)) )
+            self.insertHtmlLink( self.main, self.restraintList, residue, text = residue.resName, title = sprintf('goto residue %s', residue.cName(-1)) )
         # end if
 
         nameStr = restraint.getDihedralName()
@@ -3433,7 +3433,7 @@ class RestraintListHTMLfile( HTMLfile ):
                 atom = restraint.atoms[i]
                 table.nextColumn()
                 self.insertHtmlLink( self.main, self.restraintList, atom,    text = atom.name,
-                    title = sprintf('goto atom %s', atom._Cname(-1)) )
+                    title = sprintf('goto atom %s', atom.cName(-1)) )
             # end if
         # end for
 
@@ -3587,12 +3587,12 @@ class RestraintListHTMLfile( HTMLfile ):
                 titleStr = NO_CHAIN_TO_GO_TO
                 if chain:
                     chName = chain.name
-                    titleStr = sprintf('goto chain %s', chain._Cname(-1))
+                    titleStr = sprintf('goto chain %s', chain.cName(-1))
                 table.nextColumn()
                 self.insertHtmlLink( self.main, self.restraintList, chain,   text =       chName,   title = titleStr)
                 table.nextColumn(`residue.resNum`)
                 table.nextColumn()
-                self.insertHtmlLink( self.main, self.restraintList, residue, text = residue.resName, title = sprintf('goto residue %s', residue._Cname(-1)) )
+                self.insertHtmlLink( self.main, self.restraintList, residue, text = residue.resName, title = sprintf('goto residue %s', residue.cName(-1)) )
                 table.nextColumn()
                 self.insertHtmlLink( self.main, self.restraintList, atom,    text = atom.name)
             # end if
@@ -3919,15 +3919,15 @@ class PeakListHTMLfile( HTMLfile ):
             titleStr = NO_CHAIN_TO_GO_TO
             if chain:
                 chName = chain.name
-                titleStr = sprintf('goto chain %s', chain._Cname(-1))
+                titleStr = sprintf('goto chain %s', chain.cName(-1))
 
             self.insertHtmlLink( self.main, self.peakList, chain,   text =       chName,   title = titleStr)
             table.nextColumn(`residue.resNum`)
             table.nextColumn()
-            self.insertHtmlLink( self.main, self.peakList, residue, text = residue.resName, title = sprintf('goto residue %s', residue._Cname(-1)) )
+            self.insertHtmlLink( self.main, self.peakList, residue, text = residue.resName, title = sprintf('goto residue %s', residue.cName(-1)) )
             table.nextColumn()
             self.insertHtmlLink( self.main, self.peakList, atom,    text = atom.name
-                                 , title = sprintf('goto atom %s', atom._Cname(-1)))
+                                 , title = sprintf('goto atom %s', atom.cName(-1)))
         # end for
 # CRITIQUE
         if peak.rogScore.isCritiqued():

@@ -425,7 +425,7 @@ class Molecule( NTtree, ResidueList ):
     #end def
 
     def __repr__(self):
-        return sprintf('<Molecule %s>', self._Cname(-1))
+        return sprintf('<Molecule %s>', self.cName(-1))
     #end def
 
     def setAllChildrenByKey(self, key, value):
@@ -1597,7 +1597,7 @@ class Molecule( NTtree, ResidueList ):
         for atm in self.allAtoms():
             for r in atm.resonances:
                 fprintf( fp, 'self%s.addResonance( value=%s, error=%s )\n',
-                              atm._Cname2( 2 ),
+                              atm.cName2( 2 ),
                               repr(r.value), repr(r.error)
                        )
             #end for
@@ -1983,7 +1983,7 @@ class Molecule( NTtree, ResidueList ):
         for atm in self.allAtoms():
             for c in atm.coordinates:
                 fprintf( fp, 'self%s.addCoordinate( %r, %r, %r, Bfac=%r )\n',
-                              atm._Cname2( 2 ), c[0], c[1], c[2], c.Bfac)
+                              atm.cName2( 2 ), c[0], c[1], c[2], c.Bfac)
         fp.close()
         #NTdebug('Molecule.saveCoordinates: %s', fileName)
 
@@ -3462,7 +3462,7 @@ Chain class: defines chain properties and methods
         allAtoms()              : Returns a list of all atom objects of chain.
 
     Methods inherited from NTtree:
-        _Cname( depth )         : Returns name expanded to depth
+        cName( depth )         : Returns name expanded to depth
         addChild( child )       :
         sibling( relativeIndex ) :
         traverse()              :
@@ -3911,12 +3911,12 @@ Residue class: Defines residue properties
     #end def
 
     def __repr__(self):
-#        return sprintf('<Residue %s>', self._Cname(-1))
+#        return sprintf('<Residue %s>', self.cName(-1))
         return self.__str__()
     #end def
 
     def __str__(self):
-#        return sprintf('<Residue %s>', self._Cname(-1))
+#        return sprintf('<Residue %s>', self.cName(-1))
         return sprintf('<Residue %s>', self.toString())
     #end def
 
@@ -4022,7 +4022,7 @@ Residue class: Defines residue properties
             return None
         #end if
 
-#        NTdetail('==> Mutating %s to %s', self._Cname(-1), resName )
+#        NTdetail('==> Mutating %s to %s', self.cName(-1), resName )
 
         # remove old name references
         del( self._parent[self.name] )
@@ -5108,8 +5108,8 @@ Atom class: Defines object for storing atom properties
     #end def
 
     def __str__( self ):
-#        return self._Cname( 1 )
-        return '<%s %s>' % ( self._className(), self._Cname(2) ) # Include chain id as well as residue id.
+#        return self.cName( 1 )
+        return '<%s %s>' % ( self._className(), self.cName(2) ) # Include chain id as well as residue id.
     #end def
 
     def format(self):

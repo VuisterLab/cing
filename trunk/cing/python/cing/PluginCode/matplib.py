@@ -2368,7 +2368,7 @@ def makeDihedralHistogramPlot( project, residue, dihedralName, binsize = 5, html
 #    NTdebug( 'angle: ' + `angle`)
     ps = NTplotSet() # closes any previous plots
     ps.hardcopySize = (600,369)
-    plot = NTplot( title  = residue._Cname(2),
+    plot = NTplot( title  = residue.cName(2),
       xRange = (plotparams.min, plotparams.max),
       xTicks = range(int(plotparams.min), int(plotparams.max+1), plotparams.ticksize),
       xLabel = dihedralName,

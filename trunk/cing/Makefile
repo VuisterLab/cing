@@ -50,5 +50,5 @@ nose:
 	
 test:
 	# This Makefil test -does- need to succeed for the make to be successful.
-	python -u python/cing/main.py --testQ
+	python -u python/cing/main.py --testQ -c 1
 

@@ -27,6 +27,7 @@ Atom:
 
     shiftx, shiftx.av, shiftx.sd: NTlist instance with shiftx predictions, average and sd
 """
+
 from cing.Libs.Geometry import violationAngle
 from cing.Libs.NTplot import ssIdxToType
 from cing.Libs.NTutils import * #@UnusedWildImport
@@ -59,6 +60,11 @@ from numpy.lib.index_tricks import ogrid
 from numpy.lib.twodim_base import histogram2d
 
 CUTOFF_SALTBRIDGE_BY_Calpha = 20.0 # DEFAULT: 20
+
+TRANS_OMEGA_VALUE = 179.6
+CIS_OMEGA_VALUE = 0.0
+OMEGA_SD = 4.7
+
 
 
 def runCingChecks( project, toFile=True, ranges=None ):
@@ -162,7 +168,8 @@ def criticizePeaks( project, toFile=True ):
         return
     #end if
 
-    for atm in project.molecule.allAtoms(): atm.peakPositions = NTlist()
+    for atm in project.molecule.allAtoms(): 
+        atm.peakPositions = NTlist()
 
     # criticize peak based on deviation of assigned value
     # make a list of all assigned peaks positions for each atom
@@ -322,10 +329,8 @@ def _criticizeResidue( residue, valSets ):
         #end for
     #end if
 
-    #OMEGA refs from: Wilson et al. Who checks the checkers? Four validation tools applied to eight atomic resolution structures. J Mol Biol (1998) vol. 276 pp. 417-436
-    TRANS_OMEGA_VALUE = 179.6
-    CIS_OMEGA_VALUE = 0.0
-    OMEGA_SD = 4.7
+    #OMEGA refs from: Wilson et al. Who checks the checkers? Four validation tools applied to eight atomic resolution structures. 
+    #J Mol Biol (1998) vol. 276 pp. 417-436
     for key in ['OMEGA']:
         if residue.hasProperties('protein') and key in residue and residue[key]:
             d = residue[key] # NTlist object
@@ -335,7 +340,8 @@ def _criticizeResidue( residue, valSets ):
                 v = violationAngle(value=value, lowerBound=TRANS_OMEGA_VALUE, upperBound=TRANS_OMEGA_VALUE)
                 if v > 90.: # Check a cis
                     v = violationAngle(value=value, lowerBound=CIS_OMEGA_VALUE, upperBound=CIS_OMEGA_VALUE)
-#                NTdebug('found residue %s model %d omega to violate from square trans/cis: %8.3f (omega: %8.3f)' % ( residue, modelId, v, value) )
+#                NTdebug('found residue %s model %d omega to violate from square trans/cis: %8.3f (omega: %8.3f)' % ( 
+#                            residue, modelId, v, value) )
                 vList.append(v)
             #end for
 #            rmsViol = 0.0
@@ -414,10 +420,12 @@ def _criticizeResidue( residue, valSets ):
 Residue.criticize = _criticizeResidue
 
 def criticize(project, toFile=True):
-    # initialize
-
-    # GV: Criticize restraints, peaks etc first
-    # Restraint red ROGs get carried as orange to residue ROGs
+    """
+    initialize
+    
+    GV: Criticize restraints, peaks etc first
+    Restraint red ROGs get carried as orange to residue ROGs
+    """
 
     # Restraints lists
     for drl in project.allRestraintLists():
@@ -443,16 +451,59 @@ def criticize(project, toFile=True):
 #                res.chain.rogScore.setMaxColor(res.rogScore.colorLabel, 'Inferred from residue ROG scores')
         #end for
 
-        if len(project.molecule[COLOR_RED]) > 0:
-            project.molecule.rogScore.setMaxColor(COLOR_RED,'Inferred from residue ROG scores')
-        elif len(project.molecule[COLOR_ORANGE]) > 0:
-            project.molecule.rogScore.setMaxColor(COLOR_ORANGE,'Inferred from residue ROG scores')
-
+        useOldMethod = 0
+        if useOldMethod:
+            msg = 'Inferred from residue ROG scores'
+            if len(project.molecule[COLOR_RED]) > 0:
+                project.molecule.rogScore.setMaxColor(COLOR_RED, msg)
+            elif len(project.molecule[COLOR_ORANGE]) > 0:
+                project.molecule.rogScore.setMaxColor(COLOR_ORANGE, msg)
+        else:
+            # Alternatively we could use the image in:
+            # http://code.google.com/p/cing/issues/detail?id=297
+            # which is parameterized as:
+            # orange: y = 20 + x
+            #    red: y = x  - 20
+            # with x being red and y being orange
+            # E.g.
+#            xPer yPer yPerCutoffRed yPerCutoffOrange Rog
+#               0    0 -20           20               Orange
+#             100    0  80           100              Red
+#               0  100 -20           20               Green            
+            xResidueCount = len( project.molecule[COLOR_RED] )
+            yResidueCount = len( project.molecule[COLOR_ORANGE] )
+            zResidueCount = len( project.molecule[COLOR_GREEN] )
+            residueCount = xResidueCount + yResidueCount + zResidueCount
+            residueCount2 = len(project.molecule.allResidues())
+            if project.molecule.allResidues():
+                if not residueCount:
+                    NTcodeerror("Got zero residues counted with rog score whereas there are residues in the molecule. " +
+                                "Keeping default molecule rog score")
+                elif residueCount2 != residueCount:
+                    NTcodeerror("CING fails to do basic arithmics. residueCount2 != residueCount as in %s != %s" % (
+                                residueCount2, residueCount))
+                else:
+                    xPer = 100. * xResidueCount / residueCount
+                    yPer = 100. * yResidueCount / residueCount
+                    yPerCutoffRed    = xPer - 20
+                    yPerCutoffOrange = xPer + 20
+                    msg = 'Residue perc. ROG (red/green: %s/%s).' % (xPer,yPer)
+                    NTdebug(msg)
+                    # TODO: NB if the rog was more severe before it will not be reset here. 
+                    if yPer < yPerCutoffRed:
+                        project.molecule.rogScore.setMaxColor(COLOR_RED,msg)
+                    elif yPer < yPerCutoffOrange:
+                        project.molecule.rogScore.setMaxColor(COLOR_ORANGE,msg)
+                # end if
+            # end if
+        # end if
+        # end if
+                
         if toFile:
             path = project.moleculePath('analysis', 'ROG.txt')
             f = file(path,'w')
             for residue in project.molecule.allResidues():
-                fprintf(f, '%-15s %4d %-6s  ', residue._Cname(-1), residue.resNum, residue.rogScore.colorLabel)
+                fprintf(f, '%-15s %4d %-6s  ', residue.cName(-1), residue.resNum, residue.rogScore.colorLabel)
                 keys = residue.rogScore.keys()
                 for key in ['BBCCHK', 'C12CHK', 'RAMCHK', 'gf', 'OMEGA']:
                     if key in keys:
@@ -465,6 +516,7 @@ def criticize(project, toFile=True):
             #end for
             f.close()
             NTdetail('==> Criticizing project: output to "%s"', path)
+
 
             # Generate an xml summary file
             # When Whatif optional component isn't installed this fails. Disabled for now.
@@ -517,8 +569,8 @@ def summary( project, toFile = True, ranges=None ):
     Return summary string or None on error.
     """
 
+    #: For keeping track of which programs/checks were not run
     incompleteItems = []
-    """For keeping track of which programs/checks were not run"""
 
     if not project.molecule:
         NTerror('Project.Summary: Strange, there was no molecule in this project')
@@ -661,7 +713,9 @@ def partitionRestraints( project ):
     for drl in project.dihedrals:
         for restraint in drl:
             atom = restraint.atoms[2]
-            if not atom: # Failed for entry 8psh but in fact this shouldn't occur because the atoms should not exist then. NB this only happens after restoring.
+            if not atom: 
+                # Failed for entry 8psh but in fact this shouldn't occur because the atoms should not exist then. 
+                #NB this only happens after restoring.
                 NTerror("Found restraint without an atom at index 2. For restraint: %s" % restraint)
                 continue
             residue = atom.residue
@@ -696,7 +750,8 @@ def validateRestraints( project, toFile = True):
 #    fps = []
 #    fps.append( sys.stdout )
 
-    if not project.molecule: return
+    if not project.molecule: 
+        return
 
     msg = ""
     msg += sprintf('%s\n', project.format() )
@@ -748,11 +803,12 @@ def validateRestraints( project, toFile = True):
         count = 0
         for res in project.molecule.allResidues():
             rL = res[ restraintListAtribute ]
-            getStatsRestraintNTlist(rL, res)
+            getStatsRestraintNTlist(rL)
 
             # print every 10 lines
             if not count % 30:
-                    msg += sprintf('%-18s %15s  %15s   %s\n', '--- RESIDUE ---', '--- PHI ---', '--- PSI ---', '-- dist 0.1A 0.3A 0.5A   rmsd   violAv violMaxAll --')
+                msg += sprintf('%-18s %15s  %15s   %s\n', '--- RESIDUE ---', '--- PHI ---', '--- PSI ---', 
+                               '-- dist 0.1A 0.3A 0.5A   rmsd   violAv violMaxAll --')
             #end if
             if res.has_key('PHI'):
                 phi = NTvalue( res.PHI.cav, res.PHI.cv, fmt='%7.1f %7.2f', fmt2='%7.1f' )
@@ -765,7 +821,7 @@ def validateRestraints( project, toFile = True):
                 psi = NTvalue( '-', '-', fmt='%7s %7s', fmt2='%7s' )
             #end if
             try:
-                    msg += sprintf( '%-18s %-15s  %-15s      %3d %4d %4d %4d  %6.3f %6.3f %6.3f\n',
+                msg += sprintf( '%-18s %-15s  %-15s      %3d %4d %4d %4d  %6.3f %6.3f %6.3f\n',
                      res, phi, psi,
                          len(rL),
                          rL.violCount1,
@@ -911,9 +967,9 @@ def validateSaltbridge( residue1, residue2 ):
     residue1, residue2: Residue instances of type E,D,H,K,R
 
     Arbitrarily set the criteria for ion-pair r,theta to be within 2 sd of average,
-    else set type to none.
+    else set sb_type to none.
 
-    Returns summary NTdict or None on error.
+    Returns sb_summary NTdict or None on error.
 
 
     """
@@ -983,13 +1039,13 @@ def validateSaltbridge( residue1, residue2 ):
 
     # get the vectors c1, c1a, c2, c2a for each model and compute the result
     result  = NTlist()
-    summary = NTdict(
+    sb_summary = NTdict(
         residue1 = residue1,
         residue2 = residue2,
         comment  = """
 Ref: Kumar, S. and Nussinov, R. Biophys. J. 83, 1595-1612 (2002)
 Arbitrarily set the criteria for ion-pair (r,theta) to be within
-2 sd ~ 2*(1.2A,39) of average (7.6A,118), else set type to 'not observed'.
+2 sd ~ 2*(1.2A,39) of average (7.6A,118), else set sb_type to 'not observed'.
 """,
         __FORMAT__ = '------------------ Saltbridge ------------------\n' +\
                      'residues:          %(residue1)s %(residue2)s\n' +\
@@ -1048,17 +1104,17 @@ Arbitrarily set the criteria for ion-pair (r,theta) to be within
 
         criterium2 = count>0
         if   criterium1 and criterium2:
-            type = 0
+            sb_type = 0
         elif criterium1 and not criterium2:
-            type = 1
+            sb_type = 1
         elif not criterium1 and criterium2:
-            type = 2
+            sb_type = 2
         elif not criterium1 and not criterium2 and rl < 7.6+2.1*2 and 118-39*2< theta and theta < 118+39*2:
-            type = 3
+            sb_type = 3
         else:
-            type = 4
+            sb_type = 4
 
-        counts[type] += 1
+        counts[sb_type] += 1
 
         data = NTdict(
             residue1   = residue1,
@@ -1068,11 +1124,11 @@ Arbitrarily set the criteria for ion-pair (r,theta) to be within
             theta      = theta,
             criterium1 = criterium1,
             criterium2 = criterium2,
-            type       = types[type],
+            sb_type       = types[sb_type],
 
             __FORMAT__ = '--- saltbridge analysis %(residue1)s-%(residue2)s ---\n' +\
                          'model: %(model)d\n' +\
-                         'type:  %(type)s\n' +\
+                         'type:  %(sb_type)s\n' +\
                          'r (A): %(r).1f\n' +\
                          'theta: %(theta).1f\n' +\
                          'criteria: %(criterium1)s, %(criterium2)s\n'
@@ -1080,23 +1136,23 @@ Arbitrarily set the criteria for ion-pair (r,theta) to be within
         result.append(data)
     #end for over models
 
-    summary.result = result
+    sb_summary.result = result
     r_resultNTList = result.zap('r') # cache for speed
-    summary.rAv, summary.rSd, summary.modelCount = r_resultNTList.average()
+    sb_summary.rAv, sb_summary.rSd, sb_summary.modelCount = r_resultNTList.average()
     if r_resultNTList:
-        summary.min   = min( r_resultNTList )
-        summary.max   = max( r_resultNTList )
+        sb_summary.min   = min( r_resultNTList )
+        sb_summary.max   = max( r_resultNTList )
     else:
-        summary.min   = NaN
-        summary.max   = NaN
+        sb_summary.min   = NaN
+        sb_summary.max   = NaN
 
-    summary.thetaAv, summary.thetaSd, _n = result.zap('theta').average()
-    summary.types = zip( types,counts)
-    if not summary.rSd:
-        summary.rSd = -999.9 # wait until we have a standard approach for dealing with Nans. TODO:
-    if not summary.thetaSd:
-        summary.thetaSd = -999.9 # wait until we have a standard approach for dealing with Nans. TODO:
-    return summary
+    sb_summary.thetaAv, sb_summary.thetaSd, _n = result.zap('theta').average()
+    sb_summary.types = zip( types,counts)
+    if not sb_summary.rSd:
+        sb_summary.rSd = -999.9 # wait until we have a standard approach for dealing with Nans. TODO:
+    if not sb_summary.thetaSd:
+        sb_summary.thetaSd = -999.9 # wait until we have a standard approach for dealing with Nans. TODO:
+    return sb_summary
 #end def
 Residue.checkSaltbridge = validateSaltbridge
 
@@ -1164,8 +1220,10 @@ def checkHbond( donorH, acceptor,
         #end if
         result.modelCount += 1
     #end for
-    if len(distances) > 0: result.distance, result.distanceSD, _n = distances.average()
-    if len(angles) > 0: result.angle, result.angleCV, _n = angles.cAverage()
+    if len(distances) > 0: 
+        result.distance, result.distanceSD, _n = distances.average()
+    if len(angles) > 0: 
+        result.angle, result.angleCV, _n = angles.cAverage()
     result.accepted = ((float(len( result.acceptedModels)) / float(len( result.data ))) >= fraction)
     del distances
     del angles
@@ -1222,6 +1280,7 @@ SHIFT                           = 'SHIFT'
 # To use the below?
 CIS_PRO_MISSED                  = 'CIS_PRO_MISSED'
 TRANS_PRO_MISSED                = 'TRANS_PRO_MISSED'
+FRACTION_REQUIRED = 0.85 # was 0.75 but let's only report real exceptions.
 
 def moleculeValidateAssignments( molecule  ):
     """
@@ -1251,7 +1310,6 @@ def moleculeValidateAssignments( molecule  ):
     assignmentCountMap = molecule.getAssignmentCountMap()
     notAssignmentCountMap = molecule.getAssignmentCountMap(isAssigned=False)
     hasAssignment = {}
-    FRACTION_REQUIRED = 0.85 # was 0.75 but let's only report real exceptions.
     msg = ''
     if not assignmentCountMap:
         NTerror("Failed in %s to get even an empty assignmentCountMap; skipping" % func_name)
@@ -1587,7 +1645,8 @@ def validateDihedralCombinations(project):
             continue
         ssType = getDsspSecStructConsensus(residue)
         if not ssType:
-#            msgHol.appendDebug("Failed to getDsspSecStructConsensus from validateDihedralCombinations for residue; skipping: %s" % (residue))
+#            msgHol.appendDebug("Failed to getDsspSecStructConsensus from validateDihedralCombinations for residue; skipping: %s" % (
+#                residue))
             continue
         # The assumption is that the derived residues can be represented by the regular.
         resName = getDeepByKeysOrDefault(residue, residue.resName, 'nameDict', PDB)
@@ -1631,7 +1690,8 @@ def validateDihedralCombinations(project):
                 if None in triplet:
 #                    NTdebug( 'Skipping residue without triplet %s' % residue)
                     continue
-#                resTypeList = [getDeepByKeys(triplet[i].db.nameDict, IUPAC) for i in tripletIdxList]  # Note that this was a major bug before today June 3, 2010.
+                # Note that this was a major bug before June 3, 2010.
+#                resTypeList = [getDeepByKeys(triplet[i].db.nameDict, IUPAC) for i in tripletIdxList]  
                 resTypeList = [getDeepByKeys(triplet[i].db.nameDict, IUPAC) for i in range(3)]
             else:
                 NTcodeerror("validateDihedralCombinations called for non Rama/Janin/d1d2")
@@ -1644,7 +1704,8 @@ def validateDihedralCombinations(project):
 #                    NTdebug("Failed to get the D1D2 hist for %s; skipping. Perhaps a non-protein residue was a neighbor?" % residue)
                     continue
                 if len(myHistList) != 3:
-                    NTdebug("Expected exactly one but found %s histogram for %s with ssType %s; skipping" % (len(myHistList),residue, ssType))
+                    NTdebug("Expected exactly one but found %s histogram for %s with ssType %s; skipping" % (
+                        len(myHistList),residue, ssType))
                     continue
 #                myHist = myHistList[0]
             else:
@@ -1658,7 +1719,8 @@ def validateDihedralCombinations(project):
             d2 = getDeepByKeysOrAttributes(residue, dihedralName2)
 
             if not (d1 and d2):
-#                NTdebug( 'in validateDihedralCombinations dihedrals not found for residue: %s and checkId %s; skipping' % (residue, checkId ))
+#                NTdebug( 'in validateDihedralCombinations dihedrals not found for residue: %s and checkId %s; skipping' % (
+                    #residue, checkId ))
                 continue
 
             if not (len(d1) and len(d2)):
@@ -1681,16 +1743,16 @@ def validateDihedralCombinations(project):
                 keyList += resTypeList
 #                NTdebug("Checking with keyList [%s]" % str(keyList))
                 if normalizeBeforeCombining: # can't use predefined ones. Of course the debug checking below makes no sense with this.
-                    Ctuple = getEnsembleAverageAndSigmaFromHistogram( myHist )
-    #                Ctuple = getArithmeticAverageAndSigmaFromHistogram( myHist ) # TODO: discuss with GWV.
-                    (c_av, c_sd, hisMin, hisMax) = Ctuple #@UnusedVariable
+                    cTuple = getEnsembleAverageAndSigmaFromHistogram( myHist )
+    #                cTuple = getArithmeticAverageAndSigmaFromHistogram( myHist ) # TODO: discuss with GWV.
+                    (c_av, c_sd, hisMin, hisMax) = cTuple #@UnusedVariable
                 else:
-                    Ctuple = getDeepByKeysOrAttributes( histCtupleBySsAndResType, *keyList)
+                    cTuple = getDeepByKeysOrAttributes( histCtupleBySsAndResType, *keyList)
         #            NTdebug("keyList: %s" % str(keyList))
-                    if not Ctuple:
-                        NTwarning("Failed to get Ctuple for residue %s with keyList %s; skipping" % (residue, keyList))
+                    if not cTuple:
+                        NTwarning("Failed to get cTuple for residue %s with keyList %s; skipping" % (residue, keyList))
                         continue
-                    (c_av, c_sd, hisMin, hisMax, keyListStr) = Ctuple
+                    (c_av, c_sd, hisMin, hisMax, keyListStr) = cTuple
                     keyListQueryStr = str(keyList)
                     if keyListStr != keyListQueryStr:
                         NTerror("Got keyListStr != keyListQueryStr: %s and %s" % (keyListStr, keyListQueryStr))
@@ -1712,14 +1774,15 @@ def validateDihedralCombinations(project):
                     a1 = d1[modelIdx]
                     a2 = d2[modelIdx]
                     # NB the histogram is setup with rows/columns corresponding to y/x-axis so reverse the order of the call here:
-                    ck = getValueFromHistogramUsingInterpolation( myHistP, a2, a1, bins)
+                    ck = getValueFromHistogram( myHistP, a2, a1, bins)
                     zk = ( ck - c_av ) / c_sd
                     zkList.append(zk)
 #                    if modelIdx == 0: # costly checks to be disabled later.
                     if False:
     #                if checkIdx == 2: # costly checks to be disabled later.
     #                if cing.verbosity >= cing.verbosityDebug: # costly checks to be disabled later.
-                        msg = "chk %d ssType %4s res %20s mdl %2d a2 %8.2f a1 %8.2f c_av %12.3f c_sd %12.3f ck %12.3f zk %8.2f h- %12.3f h+ %12.3f z- %8.2f z+ %8.2f" % (
+                        msg = ("chk %d ssType %4s res %20s mdl %2d a2 %8.2f a1 %8.2f " +
+                               "c_av %12.3f c_sd %12.3f ck %12.3f zk %8.2f h- %12.3f h+ %12.3f z- %8.2f z+ %8.2f") % (
                                     checkIdx,
                                     ssType,residue,modelIdx,a2, a1,
                                     c_av, c_sd,ck,zk,
@@ -1750,7 +1813,8 @@ def validateDihedralCombinations(project):
                     ensembleValueList[modelIdx] = max(ensembleValueLoL[modelIdx])
 #                    if modelIdx == 0:
                     if False:
-                        NTdebug("For modelIdx %s found: %s and selected max: %s" % (modelIdx, str(ensembleValueLoL[modelIdx]), ensembleValueList[modelIdx] ))
+                        NTdebug("For modelIdx %s found: %s and selected max: %s" % (modelIdx, str(ensembleValueLoL[modelIdx]), 
+                                                                                    ensembleValueList[modelIdx] ))
         # end for checkIdx
     # end for residue
     msgHol.showMessage(MAX_MESSAGES=10, MAX_DEBUGS = 10)
@@ -1825,12 +1889,13 @@ bins180 = (xGrid180,yGrid180)
 xGrid180P,yGrid180P = ogrid[ plotparams180P.min:plotparams180P.max:binSize, plotparams180P.min:plotparams180P.max:binSize ]
 bins180P = (xGrid180P,yGrid180P)
 
-def zscaleHist( hist2d, Cav, Csd ):
-    hist2d -= Cav
-    hist2d /= Csd
+def zscaleHist( hist2d, cAv, cSd ):
+    'Histogram will be subtracted by cAv and divided by cSd'
+    hist2d -= cAv
+    hist2d /= cSd
     return hist2d
 
-def getValueFromHistogramUsingInterpolation( hist, v0, v1, bins=None):
+def getValueFromHistogram( hist, v0, v1, bins=None):
     """Returns the value from the bin pointed to by v0,v1.
         think
     v0 row    y-axis
@@ -1852,17 +1917,17 @@ def getRescaling(valuesByEntrySsAndResType):
 
     TODO: ADJUST FOR CIRCULAR NATURE.
     '''
-    C = NTlist()
+    cList = NTlist()
     for entryId in valuesByEntrySsAndResType.keys():
-        histRamaBySsAndResTypeExcludingEntry = getSumHistExcludingEntry( valuesByEntrySsAndResType, entryId)
-#        NTdebug("histRamaBySsAndResTypeExcludingEntry: %s" % histRamaBySsAndResTypeExcludingEntry )
+        histRamaBySsAndResTypeNoEntry = getSumHistExcludingEntry( valuesByEntrySsAndResType, entryId)
+#        NTdebug("histRamaBySsAndResTypeNoEntry: %s" % histRamaBySsAndResTypeNoEntry )
         z = NTlist()
         for ssType in valuesByEntrySsAndResType[ entryId ].keys():
             for resType in valuesByEntrySsAndResType[ entryId ][ssType].keys():
                 angleDict =valuesByEntrySsAndResType[  entryId ][ssType][resType]
                 angleList0 = angleDict[ 'phi' ]
                 angleList1 = angleDict[ 'psi' ]
-                his = getDeepByKeys(histRamaBySsAndResTypeExcludingEntry,ssType,resType)
+                his = getDeepByKeys(histRamaBySsAndResTypeNoEntry,ssType,resType)
                 if his == None:
                     NTdebug('when testing not all residues are present in smaller sets.')
                     continue
@@ -1876,36 +1941,38 @@ def getRescaling(valuesByEntrySsAndResType):
                     continue
                 if True: # disable when done debugging.
                     keyList = [ ssType, resType ]
-                    Ctuple = getDeepByKeysOrAttributes( hPlot.histRamaCtupleBySsAndResType, *keyList)
-                    if not Ctuple:
-                        NTwarning("Failed to get Ctuple for keyList %s; skipping" % (keyList))
+                    cTuple = getDeepByKeysOrAttributes( hPlot.histRamaCtupleBySsAndResType, *keyList)
+                    if not cTuple:
+                        NTwarning("Failed to get cTuple for keyList %s; skipping" % (keyList))
                         continue
-                    (c_av_stored, c_sd_stored, minHist, maxHist, keyListStr) = Ctuple #@UnusedVariable
+                    (_c_av_stored, _c_sd_stored, minHist, maxHist, _keyListStr) = cTuple
                     if hisMin != minHist:
                         NTerror(" hisMin != minHist: %8.0f %8.0f" % (hisMin, minHist))
                     elif hisMax != maxHist:
                         NTerror(" hisMax != maxHist: %8.0f %8.0f" % (hisMax, maxHist))
                     # TODO: extend checks to stored; then when debugged rewrite the code to use only the stored.
                 for k in range(len(angleList0)):
-                    ck = getValueFromHistogramUsingInterpolation(
-                        histRamaBySsAndResTypeExcludingEntry[ssType][resType],
+                    ck = getValueFromHistogram(
+                        histRamaBySsAndResTypeNoEntry[ssType][resType],
                         angleList0[k], angleList1[k])
                     zk = ( ck - c_av ) / c_sd
 #                    NTdebug("For entry %s ssType %s residue type %s resid %3d found ck %8.3f zk %8.3f" %(entryId,ssType,resType,k,ck,zk))
                     z.append( zk )
         (av, sd, n) = z.average()
         NTdebug("%4s,%8.3f,%8.3f,%d" %( entryId, av, sd, n))
-        C.append( av )
-    (Cav, Csd, Cn) = C.average()
-    return (Cav, Csd, Cn)
+        cList.append( av )
+#    (Cav, Csd, Cn) = cList.average()
+#    return (Cav, Csd, Cn)
+    return cList.average()
+# end def
 
 
-def getSumHistExcludingEntry( valuesByEntrySsAndResType,  entryIdToExclude, isRange360=True):
+def getSumHistExcludingEntry( valuesByEntrySsAndResType,  entryIdToExclude):
     """Todo generalize to do other angles."""
     xRange = (plotparams360.min, plotparams360.max)
     yRange = (plotparams360.min, plotparams360.max)
     hrange = (xRange, yRange)
-    histRamaBySsAndResTypeExcludingEntry = {}
+    histRamaBySsAndResTypeNoEntry = {}
     result = {}
 
     for entryId in valuesByEntrySsAndResType.keys():
@@ -1931,13 +1998,14 @@ def getSumHistExcludingEntry( valuesByEntrySsAndResType,  entryIdToExclude, isRa
                 angleList0, # think columns (x)
                 bins = binCount,
                 range= hrange)
-            setDeepByKeys( histRamaBySsAndResTypeExcludingEntry, hist2d, ssType, resType )
+            setDeepByKeys( histRamaBySsAndResTypeNoEntry, hist2d, ssType, resType )
 
-    return histRamaBySsAndResTypeExcludingEntry
+    return histRamaBySsAndResTypeNoEntry
 
 
 
 def inRange(a, isRange360=True):
+    'Return True if the value is within range [0,360] by default or [-180,180] if not isRange360'
     if isRange360:
         if a < plotparams360.min or a > plotparams360.max:
             return False
@@ -1946,9 +2014,8 @@ def inRange(a, isRange360=True):
         return False
     return True
 
-def getStatsRestraintNTlist(rL, residue=None):
+def getStatsRestraintNTlist(rL):
     """
-    residue attribute may be None, e.g. when the list is over all residues as in a project or other list.
     Routine will add stats to rL NTlist object.
     Routine should be adjusted for any type of restraint other than distance / dihedral.
     rL stands for restraint list.
