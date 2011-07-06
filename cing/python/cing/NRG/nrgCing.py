@@ -6,8 +6,8 @@ indices that live on top of them. For weekly and for more mass updates.
 Execute like:
 
 $CINGROOT/python/cing/NRG/nrgCing.py [entry_code] \
-    [updateWeekly prepare runCing runCingEntry storeCING2db 
-     createToposTokens getEntryInfo searchPdbEntries createToposTokens]
+     updateWeekly prepare runCing runCingEntry storeCING2db 
+     createToposTokens getEntryInfo searchPdbEntries createToposTokens
 
 $CINGROOT/python/cing/NRG/nrgCing.py 1brv prepare
 $CINGROOT/python/cing/NRG/nrgCing.py 1brv runCing
@@ -25,7 +25,7 @@ Minimum              28.148
 Maximum            18593.635
 Sum                4971048.908
 """
- 
+
 from cing import * #@UnusedWildImport # pylint: disable=W0622
 from cing.Libs import disk
 from cing.Libs.NTgenUtils import * #@UnusedWildImport

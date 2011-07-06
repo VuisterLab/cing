@@ -35,22 +35,16 @@ echo "DEBUG: PYTHONPATH 2: $PYTHONPATH"
 make clean
 make install
 source cing.csh
-make build_cython
+make cython
 
 echo "DEBUG: PATH       3  : $PATH"
 echo "DEBUG: PYTHONPATH 3  : $PYTHONPATH"
 echo "DEBUG: CINGROOT   3  : $CINGROOT"
 echo
 echo
+
 # Comment out the next line after done testing for it's a security issue.
 #setenv | sort
-
-#make test
-
-echo "Testing cing setup by a quick start up and testing for zero status for exit code"
-echo
-cing --noProject
-echo
 
 echo "Counting Source Lines Of Code."
 echo
@@ -67,6 +61,16 @@ echo
 echo "Unit testing with the nose framework"
 echo
 make nose
+echo
+
+echo "Starting cing up and testing for zero status for exit code"
+echo
+cing --noProject
+echo
+
+echo "Full regular cing test that needs to be successful (single core)"
+echo
+make test
 echo
 
 

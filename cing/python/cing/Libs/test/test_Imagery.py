@@ -48,6 +48,5 @@ class AllChecks(TestCase):
         self.assertFalse( montage(inputPathList, outputPath) )
 
 if __name__ == "__main__":
-    cing.verbosity = verbosityError
     cing.verbosity = verbosityDebug
     unittest.main()

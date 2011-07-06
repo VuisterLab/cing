@@ -10,17 +10,15 @@ sudo launchctl load /Library/LaunchAgents/org.jenkins-ci.plist
 java -jar /Applications/Jenkins/jenkins.war --argumentsRealm.passwd.jurgenfd=XXXX --argumentsRealm.roles.jurgenfd=admin --httpPort=8081 --httpListenAddress=127.0.0.1 --ajp13Port=8010 --prefix=/jenkins
 
 
+# mac ports gives pylint-2.6 0.23.0 (only recently; this was 0.20 which was a real pain in the..)
+# mac ports gives py26-nose  1.0.0_0
 
-sloccount:
-    port install sloccount
-    
-pylint:
-    easy_install pylint  should give version 0.23.0 but fails to install for right python. TODO:
-    mac ports gives 
-    
-nosetest:
-    mac ports gives   py26-nose 1.0.0_0
-    
 # For selecting python 26 in mac ports.    
 sudo port select --set python python26    
+port install sloccount py26-lint py26-nose
     
+
+# Rename to version aspecifics for easy of code maintenance.
+    cd /opt/local/bin
+    sudo ln -s coverage-2.6    coverage
+    sudo ln -s nosetests-2.6   nosetests
