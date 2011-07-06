@@ -2,7 +2,7 @@
 
 == Mac version ==
 {{{
-Mac OS X 10.5.7 (9J61)
+OSX 10.6.7
 }}}
 
 == Install Mac Ports ==
@@ -11,31 +11,51 @@ From http://www.macports.org/
 
 == Install mandatory deps ==
 
-As root do (takes several hours if gcc needs to be compiled):
+As root do (takes several hours once gcc needs to be compiled):
 {{{
-port install py26-matplotlib py26-ipython py26-pil py26-scipy povray imagemagick ghostscript 
+port install povray imagemagick ghostscript 
 }}}
-Make sure the matplotlib version is at least 0.99.1.1.
 
-I do create a soft link for the python2.6 executable as root:
+{{{
+sudo port install python26 python_select 
+port select --set python python26   
+}}}
+The last line works in contrast to the line I had before:
+{{{
+python_select python26 
+}}}
+
+{{{
+port install py26-matplotlib +tkinter +gtk2
+}}}
+Make sure the matplotlib version is at least 0.99.1.1. Check with: {{{port installed | grep matp}}}
+Mine currently shows: py26-matplotlib @1.0.1_3+gtk2+tkinter (active)
+
+{{{
+port install py26-ipython py26-pil py26-scipy 
+}}}
+
+I do create a soft links for the python2.6 executables as root:
 {{{
 cd /opt/local/bin
 ln -s python2.6 python
 ln -s ipython-2.6 ipython
 }}}
+This is about the only manual 'correction' I do to my mac ports. Perhaps this causes more bads than good?
 
-== Install optional packages NOT NEEDED ==
-
-=== MYSQL ===
+== Install optional packages besides python NOT NEEDED ==
 {{{
-port install py26-mysql
+port install pymol gawk xeyes
+sudo port upgrade --enforce-variants gcc44 +gfortran
 }}}
+For Whatif (optional dep) the gfortran variant is needed.
 
-=== Postgres ===
+== Install optional python packages NOT NEEDED ==
 {{{
-port install py26-sqlalchemy py26-psycopg2
+port install py26-curl py26-mysql py26-sqlalchemy py26-psycopg2
 }}}
-The last module will also install postgres but I don't use the port install since the Japanese pdbmlplus requires specifics in the build. JFD forgot how he got: /opt/local/share/java/postgresql.jar but is Eclipse needs it.
+The py26-psycopg2 module will also install postgres but I don't use the port install since the Japanese pdbmlplus requires specifics in the build.
 
+Not easy. Please let me know if there's an easier way to do this e.g. with homebrew?
 
 From here you should follow the generalized [SetupCING]
