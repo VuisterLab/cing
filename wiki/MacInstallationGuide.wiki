@@ -2,60 +2,65 @@
 
 == Mac version ==
 {{{
-OSX 10.6.7
+Steps taken on nmr.cmbi.ru.nl (8 cores): OSX 10.5.7
+Order might matter.
 }}}
 
 == Install Mac Ports ==
 
+Start from a clean install from:
 From http://www.macports.org/
 
 == Install mandatory deps ==
 
-As root do (takes several hours once gcc needs to be compiled):
+=== gawk as test and also my whole .cshrc inits depend on it. ===
 {{{
-port install povray imagemagick ghostscript 
+sudo port install gawk
 }}}
 
+=== Start doing [https://trac.macports.org/wiki/howto/ParallelBuilding multiple] make jobs ===
+{{{
+sudo vi /opt/local/etc/macports/macports.conf
+}}}
+With top you can see the load on the machine increasing from 1 to a max of 4 (on 8 cores) during subsequent builds.
+
+===Get python26 selected early on.===
 {{{
 sudo port install python26 python_select 
-port select --set python python26   
-}}}
-The last line works in contrast to the line I had before:
-{{{
-python_select python26 
+port select --set python python26  
 }}}
 
+===Now the matplotlib MONSTER ===
+This is going to install gcc so it will take about 5 hours. Mostly being stuck on [http://x4350.blogspot.com/2011/06/building-atlas-on-macports-takes.html atlas].
 {{{
 port install py26-matplotlib +tkinter +gtk2
 }}}
-Make sure the matplotlib version is at least 0.99.1.1. Check with: {{{port installed | grep matp}}}
-Mine currently shows: py26-matplotlib @1.0.1_3+gtk2+tkinter (active)
 
+===Done in 10 minutes. Smaller python deps.===
 {{{
-port install py26-ipython py26-pil py26-scipy 
+port install py26-curl py26-mysql py26-sqlalchemy py26-psycopg2 py26-scipy
 }}}
 
-I do create a soft links for the python2.6 executables as root:
+===Done in 15 minutes OPTIONAL===
 {{{
-cd /opt/local/bin
-ln -s python2.6 python
-ln -s ipython-2.6 ipython
+port install pymol xeyes
 }}}
-This is about the only manual 'correction' I do to my mac ports. Perhaps this causes more bads than good?
 
-== Install optional packages besides python NOT NEEDED ==
+===Jenkins related installs, pretty fast. OPTIONAL===
 {{{
-port install pymol gawk xeyes
-sudo port upgrade --enforce-variants gcc44 +gfortran
+port install sloccount py26-lint py26-nose py26-coverage
 }}}
-For Whatif (optional dep) the gfortran variant is needed.
-
-== Install optional python packages NOT NEEDED ==
+Rename to version aspecifics for easy of code maintenance.===
 {{{
-port install py26-curl py26-mysql py26-sqlalchemy py26-psycopg2
+    cd /opt/local/bin
+    sudo ln -s coverage-2.6    coverage
+    sudo ln -s nosetests-2.6   nosetests
+    sudo ln -s pylint-2.6      pylint
 }}}
-The py26-psycopg2 module will also install postgres but I don't use the port install since the Japanese pdbmlplus requires specifics in the build.
 
-Not easy. Please let me know if there's an easier way to do this e.g. with homebrew?
+===More installs for CING (provides convert and ps2pdf)===
+{{{
+port install povray ghostscript ImageMagick
+}}}
 
 From here you should follow the generalized [SetupCING]
