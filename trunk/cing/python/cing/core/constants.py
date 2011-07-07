@@ -73,7 +73,8 @@ LIMIT_RANGES = 0.7
 IS_INSTALLED_STR = 'isInstalled'
 PARSED_STR = 'parsed'
 COMPLETED_STR = 'completed'
-dots = '-----------'
+dots   = '-----------'               #: 11 dashes
+dots20 = '--------------------'      #: 20 dashes inlined for efficiency?
 
 X_AXIS = 0
 Y_AXIS = 1

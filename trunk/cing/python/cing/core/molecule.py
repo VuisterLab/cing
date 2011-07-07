@@ -43,8 +43,6 @@ NTmolParameters = NTdict(
     stereoFile     = 'stereo.xml'
 )
 
-#dots = '-----------' # moved to constants.py
-
 chothiaClassA = 'a'
 chothiaClassB = 'b'
 chothiaClassAB = 'a/b'
@@ -406,7 +404,7 @@ class Molecule( NTtree, ResidueList ):
                           'resonances:  %d per atom; sources %s\n' +\
                           'assignments: %d (%d stereo)\n' +\
                           '%s',
-                           self.header( dots ),
+                           self.header(),
                            self.chainCount, self.chains,
                            self.residueCount,
                            self.atomCount,
@@ -414,7 +412,7 @@ class Molecule( NTtree, ResidueList ):
                            len(self.resonanceSources),
                            self.resonanceSources, # ResonanceLoL
                            self.nAssigned, self.nStereoAssigned,
-                           self.footer(dots)
+                           self.footer()
                          )
         return result
     #end def
@@ -1442,11 +1440,11 @@ class Molecule( NTtree, ResidueList ):
     #end def
     open = staticmethod(open)
 
-    def _open094( path )   :
+    def openMol_094( path )   :
         """Static method to restore molecule from SML file path: 0.75< version <= 0.90
            returns Molecule instance or None on error
         """
-        #print '*** Opening using Molecule._open094'
+        #print '*** Opening using Molecule.openMol_094'
 
         if (not os.path.exists( path )):
             NTerror('Molecule.open: smlFile "%s" not found\n', path)
@@ -1466,24 +1464,24 @@ class Molecule( NTtree, ResidueList ):
 
         return mol
     #end def
-    _open094 = staticmethod(_open094)
+    openMol_094 = staticmethod(openMol_094)
 
-    def _open075( path )   :
+    def openMol_075( path )   :
         """Static method to restore molecule from directory path
            implements the <=0.75 storage model
            returns Molecule instance or None on error
         """
         # old format
-        NTdetail('Molecule._open075: opening from old format "%s"', path)
+        NTdetail('Molecule.openMol_075: opening from old format "%s"', path)
 
         if (not os.path.exists( path )):
-            NTerror('Molecule._open075: path "%s" not found\n', path)
+            NTerror('Molecule.openMol_075: path "%s" not found\n', path)
             return None
         #end if
 
         content = XML2obj( path=os.path.join( path, NTmolParameters.contentFile ) )
         if not content:
-            NTerror('Molecule._open075: error reading xml file "%s"\n',
+            NTerror('Molecule.openMol_075: error reading xml file "%s"\n',
                      os.path.join( path, NTmolParameters.contentFile )
                    )
             return None
@@ -1493,7 +1491,7 @@ class Molecule( NTtree, ResidueList ):
 
         mol = Molecule( name = content.name )
         if not mol:
-            NTerror('Molecule._open075: initializing molecule\n')
+            NTerror('Molecule.openMol_075: initializing molecule\n')
             return None
         #end if
 
@@ -1513,7 +1511,7 @@ class Molecule( NTtree, ResidueList ):
 
         return mol
     #end def
-    _open075 = staticmethod(_open075)
+    openMol_075 = staticmethod(openMol_075)
 
     def _check(self):
         # check for potential atoms with incomplete resonances
@@ -3377,8 +3375,8 @@ class RmsdResult( NTdict ):
     def __str__(self):
         return sprintf('<RmsdResult %s>', self.comment)
 
-    def header(self, dots='-'*20):
-        return sprintf('%s %s %s', dots, self, dots)
+    def header(self, mdots=dots20): #: default is to use 11 dashes but here it's 20.
+        return sprintf('%s %s %s', mdots, self, mdots)
 
     def format(self, allowHtml=False):
         msg = sprintf(
@@ -3485,9 +3483,9 @@ Chain class: defines chain properties and methods
 
     def __init__( self, name, **kwds ):
         NTtree.__init__( self, name=name, __CLASS__='Chain', **kwds )
-        self.__FORMAT__ =  self.header( dots ) + '\n' +\
+        self.__FORMAT__ =  self.header() + '\n' +\
                           'residues (%(residueCount)d): %(residues)s\n' +\
-                           self.footer( dots )
+                           self.footer()
         self.rogScore = ROGscore()
         self[CHK_STR] = NTdict()
         self.residues = self._children
@@ -3903,11 +3901,11 @@ Residue class: Defines residue properties
         self.rogScore = ROGscore()
         self[CHK_STR] = NTdict()
 
-        self.__FORMAT__ =  self.header( dots ) + '\n' +\
+        self.__FORMAT__ =  self.header( ) + '\n' +\
                           'shortName:  %(shortName)s\n' +\
                           'chain:      %(chain)s\n' +\
                           'atoms (%(atomCount)2d): %(atoms)s\n' +\
-                           self.footer( dots )
+                           self.footer( )
     #end def
 
     def __repr__(self):
@@ -6243,11 +6241,11 @@ class Resonance( NTvalue  ):
                                 atom       = atom,
                                 resonanceIndex = -1 # undefined
                          )
-        self.__FORMAT__ =  self.header( dots ) + '\n' +\
+        self.__FORMAT__ =  self.header() + '\n' +\
                           'atom:  %(atom)-12s\n' +\
                           'value: %(value)7.3f\n' +\
                           'error: %(error)7.3f\n' +\
-                           self.footer( dots )
+                           self.footer()
 
     #end def
 

@@ -123,7 +123,7 @@ class AllChecks(TestCase):
             self.assertTrue(project.initCcpn(ccpnFolder=ccpnFile, modelCount=modelCount))
 #            self.assertFalse(project.runTalosPlus())
 #            self.assertTrue(project.save())
-            self.assertFalse(project.validate(htmlOnly=True, doProcheck=False, doWhatif=False, doWattos=False))
+            self.assertFalse(project.validate(htmlOnly=True, doProcheck=False, doWhatif=False, doWattos=False, doQueeny=False))
             for r, res in enumerate(project.molecule.allResidues()):
 #                NTdebug("Working on %s" % res)
                 for c, valueToCheck in enumerate(keyList):

@@ -13,12 +13,11 @@ java -jar /Applications/Jenkins/jenkins.war --argumentsRealm.passwd.jurgenfd=XXX
 # mac ports gives pylint-2.6 0.23.0 (only recently; this was 0.20 which was a real pain in the..)
 # mac ports gives py26-nose  1.0.0_0
 
-# For selecting python 26 in mac ports.    
-sudo port select --set python python26    
-port install sloccount py26-lint py26-nose
+port install sloccount py26-lint py26-nose py26-coverage
     
 
 # Rename to version aspecifics for easy of code maintenance.
     cd /opt/local/bin
     sudo ln -s coverage-2.6    coverage
     sudo ln -s nosetests-2.6   nosetests
+    sudo ln -s pylint-2.6      pylint
