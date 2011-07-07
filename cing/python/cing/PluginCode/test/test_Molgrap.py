@@ -4,6 +4,7 @@ python $CINGROOT/python/cing/PluginCode/test/test_Molgrap.py
 """
 from cing import cingDirTestsData
 from cing import cingDirTmp
+from cing import cingPythonCingDir
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.PluginCode.molgrap import Molgrap #@UnusedImport Keep to indicate dep and proper handeling.
 from cing.core.classes import Project
@@ -49,6 +50,9 @@ class AllChecks(TestCase):
         pathGif = os.path.join( self.cingDirTmpTest, gifFileName)
         self.assertFalse(project.molecule.export2gif(pathGif, project=project))
         self.assertTrue(os.path.exists(pathGif))
+        
+        pathGifDefault =  os.path.join( cingPythonCingDir, 'PluginCode', DATA_STR, 'UnknownImage.gif' )
+        self.assertFalse(os.path.getsize(pathGif) == os.path.getsize(pathGifDefault))
 
     def _testMolgrapRunFromCcpnFile(self):
 #        entryId = "1cjg" # Nucleic acid entry.

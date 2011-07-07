@@ -15,13 +15,13 @@ class AllChecks(TestCase):
         x3 = "Message to debug 3"
 
 
-        print x1
+#        print x1
         NTdebug(x1)
         switchOutput(showOutput = False, doStdOut = True)
-        print x2 # should not show up.and doesn't
+#        print x2 # should not show up.and doesn't
         NTdebug(x2) # TODO: prevent this message from showing up.
         switchOutput(showOutput = True, doStdOut = True)
-        print x3
+#        print x3
         NTdebug(x3)
 
     # enable next test when the switchOutput can be used.
@@ -150,7 +150,7 @@ b
         self.assertEquals( x, 'abc')
 
     def testGetDeepByKeysOrAttributesSimple(self):
-        cing.verbosity = cing.verbosityDebug
+#        cing.verbosity = cing.verbosityDebug
         d = {}
         keyList = 'a b c'.split()
         setDeepByKeys(d, None, *keyList)

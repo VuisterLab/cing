@@ -34,7 +34,8 @@ pool_postfix_local = 'joe' #@UnusedVariable
 try:
     from localConstants import * #@UnusedWildImport
 except:
-    NTtracebackError() # codes below are nonsense.
+    pass
+#    NTtracebackError() # codes below are nonsense.
 #    pool_postfix = 'invalidPostFix'
 #    master_ssh_url = 'i@vc'
 

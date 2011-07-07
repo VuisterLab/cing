@@ -60,10 +60,9 @@ from numpy.lib.index_tricks import ogrid
 from numpy.lib.twodim_base import histogram2d
 
 CUTOFF_SALTBRIDGE_BY_Calpha = 20.0 # DEFAULT: 20
-
-TRANS_OMEGA_VALUE = 179.6
-CIS_OMEGA_VALUE = 0.0
-OMEGA_SD = 4.7
+TRANS_OMEGA_VALUE           = 179.6
+CIS_OMEGA_VALUE             = 0.0
+OMEGA_SD                    = 4.7  # Know from literature of hi-res X-ray structures.
 
 
 
@@ -92,7 +91,7 @@ def runCingChecks( project, toFile=True, ranges=None ):
         project.molecule.idDisulfides(toFile=toFile, applyBonds=False)
 
     project.criticize(toFile)
-    project.summary(toFile)
+    project.summaryForProject(toFile)
     project.mkMacros()
     project.getCingSummaryDict()
 #end def
@@ -487,7 +486,7 @@ def criticize(project, toFile=True):
                     yPer = 100. * yResidueCount / residueCount
                     yPerCutoffRed    = xPer - 20
                     yPerCutoffOrange = xPer + 20
-                    msg = 'Residue perc. ROG (red/green: %s/%s).' % (xPer,yPer)
+                    msg = 'Residue perc. ROG (red/green: %.0f/%.0f).' % (xPer,yPer)
                     NTdebug(msg)
                     # TODO: NB if the rog was more severe before it will not be reset here. 
                     if yPer < yPerCutoffRed:
@@ -563,7 +562,7 @@ Total    %3d  (%3.0f%%)""" % ( c[2], p[2], c[1], p[1], c[0], p[0], total, 100.0 
 #end def
 
 
-def summary( project, toFile = True, ranges=None ):
+def summaryForProject( project, toFile = True, ranges=None ):
     """
     Generate a summary string and store to text file by default.
     Return summary string or None on error.

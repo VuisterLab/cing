@@ -1657,7 +1657,7 @@ class ProjectHTMLfile( HTMLfile ):
 #        htmlsum.header('h1', 'Summary project ' + self.project.name )
 #        htmlsum.header('a', 'Home', href='../../index.html' )    #TODO: fix explicitly coded path
 
-        s = self.project.summary(toFile = False).split('\n')
+        s = self.project.summaryForProject( toFile = False).split('\n' )
 
         # Create a two-state machinery.
         summaryLineCount = len(s)

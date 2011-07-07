@@ -1,17 +1,21 @@
-# Execute like:
-# cd /Library/WebServer/Documents/CASD-NMR-CING/data/eR/NeR103ALyon2; \
-# python -u $CINGROOT/python/cing/NRG/storeCING2db.py NeR103ALyon2 ARCHIVE_CASD
-#
-# cd /Library/WebServer/Documents/CASP-NMR-CING/data/05/T0538Org; \
-# python -u $CINGROOT/python/cing/NRG/storeCING2db.py T0538Org ARCHIVE_CASP
-#
-# cd /Library/WebServer/Documents/NRG-CING/data/br/1brv; \
-# python -u $CINGROOT/python/cing/NRG/storeCING2db.py 1brv ARCHIVE_NRG
-#
-# cd /Library/WebServer/Documents/NMR_REDO/data/br/1brv; \
-# python -u $CINGROOT/python/cing/NRG/storeCING2db.py 1brv ARCHIVE_NMR_REDO
-#
-# NB this script fails if the Postgresql backend is not installed. Which is exactly why it's kept out of CING's core routines.
+"""
+Stores data into RDB for one entry
+
+Execute like:
+cd /Library/WebServer/Documents/CASD-NMR-CING/data/eR/NeR103ALyon2; \
+python -u $CINGROOT/python/cing/NRG/storeCING2db.py NeR103ALyon2 ARCHIVE_CASD
+
+cd /Library/WebServer/Documents/CASP-NMR-CING/data/05/T0538Org; \
+python -u $CINGROOT/python/cing/NRG/storeCING2db.py T0538Org ARCHIVE_CASP
+
+cd /Library/WebServer/Documents/NRG-CING/data/br/1brv; \
+python -u $CINGROOT/python/cing/NRG/storeCING2db.py 1brv ARCHIVE_NRG
+
+cd /Library/WebServer/Documents/NMR_REDO/data/br/1brv; \
+python -u $CINGROOT/python/cing/NRG/storeCING2db.py 1brv ARCHIVE_NMR_REDO
+
+NB this script fails if the Postgresql backend is not installed. Which is exactly why it's kept out of CING's core routines.
+"""
 
 from cing import header
 from cing.Libs.NTutils import * #@UnusedWildImport
@@ -48,7 +52,7 @@ def doStoreCING2db( entry_code, archive_id, project = None):
     pdb_id = None
     casd_id = None
     schema = PDB_DB_NAME
-    if archive_id == ARCHIVE_NRG_ID or archive_id == ARCHIVE_DEV_NRG_ID or archive_id == ARCHIVE_PDB_ID or archive_id == ARCHIVE_NMR_REDO_ID:
+    if archive_id in  [ ARCHIVE_NRG_ID, ARCHIVE_DEV_NRG_ID, ARCHIVE_PDB_ID, ARCHIVE_NMR_REDO_ID]:
         pdb_id = entry_code
         if pdb_id == None:
             NTerror("Expected pdb_id argument")
@@ -63,7 +67,7 @@ def doStoreCING2db( entry_code, archive_id, project = None):
         elif archive_id == ARCHIVE_NMR_REDO_ID:
             schema = NMR_REDO_DB_NAME
         # end if
-    elif archive_id == ARCHIVE_CASD_ID or archive_id == ARCHIVE_CASP_ID:
+    elif archive_id in [ ARCHIVE_CASD_ID, ARCHIVE_CASP_ID]:
         casd_id = entry_code
         if casd_id == None:
             NTerror("Expected casd_id argument")
@@ -135,7 +139,8 @@ def doStoreCING2db( entry_code, archive_id, project = None):
         result = execute(centry.delete().where(centry.c.pdb_id == pdb_id))
 
     if result.rowcount:
-        NTdebug("Removed original entries numbering: %s" % result.rowcount)
+        if result.rowcount != 1:
+            NTdebug("Removed original entries numbering: %s" % result.rowcount)
         if result.rowcount > 1:
             NTerror("Removed more than the expected ONE entry; this could be serious.")
             return True
@@ -203,7 +208,9 @@ def doStoreCING2db( entry_code, archive_id, project = None):
     if restraintList:
         lenRestraintList = len(restraintList)
     if p_distance_count != lenRestraintList:
-        NTcodeerror("Expected the same numbers for project.distances.lenRecursive(max_depth = 1) and the size of project.allRestraints() but found: %s and %s" % ( p_distance_count, len(restraintList)))
+        msg = ( "Expected the same numbers for project.distances.lenRecursive(max_depth = 1) " +
+            "and the size of project.allRestraints() but found: %s and %s") % ( p_distance_count, len(restraintList))
+        NTcodeerror(msg)
         p_distance_count = len(restraintList)
     # end if
     if p_distance_count:
@@ -214,7 +221,7 @@ def doStoreCING2db( entry_code, archive_id, project = None):
             p_distance_count_long_range      =  len(restraintList.longRange)
             p_distance_count_ambiguous       =  len(restraintList.ambiguous)
         else:
-            NTerror("Failed to do restraintList.analyze()");
+            NTerror("Failed to do restraintList.analyze()")
         # end if
 #    else:
 #        NTdebug("No restraints in %s" % getCallerName())
@@ -223,7 +230,8 @@ def doStoreCING2db( entry_code, archive_id, project = None):
 #    p_dihedral_count = project.dihedrals.lenRecursive() # Note Talos derived would be counted this way.
     p_dihedral_count = 0
     for dihList in project.dihedrals:
-        if dihList.isFromTalos(): continue
+        if dihList.isFromTalos(): 
+            continue
         p_dihedral_count += len(dihList)
     # end for
     p_rdc_count = project.rdcs.lenRecursive(max_depth = 1)
@@ -461,7 +469,8 @@ def doStoreCING2db( entry_code, archive_id, project = None):
 #            cingresonancelistperatomclass_id = execute(s).fetchall()[0][0]
 #            NTdebug("Inserted cingresonancelistperatomclass_id %s" % cingresonancelistperatomclass_id)
         # end for
-#        NTdebug("Inserted resonancelist_id %s with name %s and atoms %s" % (resonancelist_id, nameResoL, str(resonanceList.vascoResults.keys())))
+#        NTdebug("Inserted resonancelist_id %s with name %s and atoms %s" % (
+#            resonancelist_id, nameResoL, str(resonanceList.vascoResults.keys())))
     # end for
 
     chainCommittedCount = 0
@@ -749,7 +758,8 @@ def doStoreCING2db( entry_code, archive_id, project = None):
                     if not hasUsefulColumn:
                         continue
                     a_rog = atom.rogScore.rogInt()
-                    atomInfoList = [entry_id,chain_id,residue_id,a_name,a_wi_chichk,a_wi_dunchk,a_wi_hndchk, a_wi_pl2chk, a_wi_wgtchk, a_cs,a_cs_err,a_cs_ssa,a_rog]
+                    atomInfoList = [entry_id,chain_id,residue_id,
+                        a_name,a_wi_chichk,a_wi_dunchk,a_wi_hndchk, a_wi_pl2chk, a_wi_wgtchk, a_cs,a_cs_err,a_cs_ssa,a_rog]
 #                    NTdebug("Inserting atom: " + str(atomInfoList))
                     try:
                         result = execute(catom.insert().values(

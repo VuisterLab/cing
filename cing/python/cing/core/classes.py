@@ -47,7 +47,7 @@ from cing.core.validate import criticizePeaks
 from cing.core.validate import fixStereoAssignments
 from cing.core.validate import partitionRestraints
 from cing.core.validate import runCingChecks
-from cing.core.validate import summary
+from cing.core.validate import summaryForProject
 from cing.core.validate import validate
 from cing.core.validate import validateAssignments
 from cing.core.validate import validateDihedralCombinations
@@ -66,8 +66,8 @@ __credits__ = cing.__credits__
 
 projects = NTlist()
 
-"CRV stands for CRiteria Value CRS stands for CRiteria String"
-CRV_NONE = "-999.9";
+#: CRV stands for CRiteria Value CRS stands for CRiteria String
+CRV_NONE = "-999.9"
 
 #-----------------------------------------------------------------------------
 # Cing classes and routines
@@ -294,9 +294,9 @@ Project: Top level Cing project class
                     value = bool(item[1])
                 except:
                     value = item[1]
-            valueStr = `value`
+            valueStr = repr(value)
             if self.valSets.has_key(key):
-                valueFromStr = `self.valSets[key]`
+                valueFromStr = repr(self.valSets[key])
                 if valueStr == valueFromStr:
                     continue  # no print
 #                NTdebug("Replacing value for key " + key + " from " + valueFromStr + " with " + valueStr)
@@ -358,11 +358,11 @@ Project: Top level Cing project class
            Check for presence.
            Return the result
         """
-        dir = self.path(*args)
-        if not os.path.exists(dir):
-#            NTdebug( "project.mkdir: %s" % dir )
-            os.makedirs(dir)
-        return dir
+        d = self.path(*args)
+        if not os.path.exists(d):
+#            NTdebug( "project.mkdir: %s" % d )
+            os.makedirs(d)
+        return d
     #end def
 
     def moleculePath(self, subdir = None, *args):
@@ -379,16 +379,16 @@ Project: Top level Cing project class
 
     def validationPath(self, *args):
         """Path relative to validation directory for molecule.
-        Create path if does not exist.
+        Create directory if does not exist.
 
         **** Highly redundant with moleculePath at present time, but should replace it eventually ***
 
-        Return path or None in case of error.
+        Return pathName or None in case of error.
         """
         if not self.molecule:
             return None
-        path = self.mkdir(self.molecule.name, *args) # should become self.mkdir( 'Validation', self.molecule.name )
-        return path
+        pathName = self.mkdir(self.molecule.name, *args) # should become self.mkdir( 'Validation', self.molecule.name )
+        return pathName
     #end def
 
 
@@ -552,19 +552,19 @@ Project: Top level Cing project class
                     return None
 
                 for molName in pr.moleculeNames:
+                    pathName = pr.path(directories.molecules, molName) # old reference, versions 0.48-0.75
                     if pr.version <= 0.48:
-                        path = pr.path('Molecules', molName) # old reference
-                    else:
-                        path = pr.path(directories.molecules, molName) # old reference, versions 0.48-0.75
-#                    NTdebug('Project.open: trying molecule conversion from %s', path)
-                    if not os.path.exists(path):
-                        NTerror('Project.open: old molecule path "%s" does not exist.', path)
+                        pathName = pr.path('Molecules', molName) # old reference
+                    # end if
+#                    NTdebug('Project.open: trying molecule conversion from %s', pathName)
+                    if not os.path.exists(pathName):
+                        NTerror('Project.open: old molecule pathName "%s" does not exist.', pathName)
                         return None
-                    mol = Molecule._open075(path)
+                    mol = Molecule.openMol_075(pathName)
                     if not mol:
                         NTerror('Project.Open: conversion from version %s failed on molecule %s', pr.version, molName)
                         return None
-                    removedir(path)
+                    removedir(pathName)
                     # Save molecule to new format
                     mol.save(pr.molecules.path(molName))
                 #end for
@@ -577,10 +577,10 @@ Project: Top level Cing project class
             # changed for allowing to store special database entries.
             elif round(pr.version*1000) < 950: # i.e. versions 0.94 and lower
                 for molName in pr.moleculeNames:
-                    path = pr.molecules.path(molName)
-                    mol = Molecule._open094(path+'.molecule')
-                    mol.save(path)
-                    remove(path+'.molecule')
+                    pathName = pr.molecules.path(molName)
+                    mol = Molecule.openMol_094(pathName+'.molecule')
+                    mol.save(pathName)
+                    remove(pathName+'.molecule')
                 #end for
                 # restore
                 pr.restore()
@@ -692,9 +692,9 @@ Project: Top level Cing project class
                 pass
 #                NTdebug("Skipping save for disabled plugin: %s" % p)
             else:
-                for f, object in p.saves:
-#                    NTdebug("Save for plugin: %s with %s on object %s" % (p,f,object))
-                    f(self, object)
+                for f, obj in p.saves:
+#                    NTdebug("Save for plugin: %s with %s on object %s" % (p,f,obj))
+                    f(self, obj)
             #end for
         #end for
 
@@ -721,8 +721,8 @@ Project: Top level Cing project class
 
         # Molecules
         for molName in self.moleculeNames:
-            path = self.molecules.path(molName)
-            mol = Molecule.open(path)
+            pathName = self.molecules.path(molName)
+            mol = Molecule.open(pathName)
             if mol:
                 mol.status = 'keep'
                 self.appendMolecule(mol)
@@ -847,8 +847,8 @@ Project: Top level Cing project class
     def createMoleculeDirectories(self, molecule):
         """generate the required directories for export and HTML data."""
         # generate the required directories for export and HTML data
-        for dir in moleculeDirectories.values():
-            self.mkdir(molecule.name, dir)
+        for d in moleculeDirectories.values():
+            self.mkdir(molecule.name, d)
         #end for
     #end def
 
@@ -875,8 +875,8 @@ Project: Top level Cing project class
         """Restore molecule 'name'
         Return Molecule instance or None on error
         """
-        path = self.molecules.path(name)
-        mol = Molecule.open(path)
+        pathName = self.molecules.path(name)
+        mol = Molecule.open(pathName)
 
         if mol:
             mol.status = 'keep'
@@ -1038,10 +1038,10 @@ Project: Top level Cing project class
                 return True
         return False
 
-    def header(self, dots = '---------'):
+    def header(self, mdots=dots):
         """Subclass header to generate using __CLASS__, name and dots.
         """
-        return sprintf('%s %s: %s %s', dots, self.__CLASS__, self.name, dots)
+        return sprintf('%s %s: %s %s', dots, self.__CLASS__, self.name, mdots)
     #end def
 
     def __str__(self):
@@ -1067,8 +1067,7 @@ Project: Top level Cing project class
     #end def
 
     def format(self):
-        dots = '-----------'
-        result = self.header(dots) + '\n' + \
+        result = self.header() + '\n' + \
                             'created:    %(created)s\n'
         result = result % self
         for firstString, item in [('molecules:  ', 'molecules'),
@@ -1078,9 +1077,9 @@ Project: Top level Cing project class
                                  ('rdcs:       ', 'rdcs'),
                                  ('coplanars:  ', 'coplanars'),
                                 ]:
-            result = result + self._list2string(self[item], firstString, 2) + '\n'
+            result += self._list2string(self[item], firstString, 2) + '\n'
         #end for
-        result = result + self.footer(dots)
+        result += self.footer() # Project.footer defaults to NTdict 
         return result
     #end def
 
@@ -1131,8 +1130,8 @@ Project: Top level Cing project class
     def fixStereoAssignments(self):
         return fixStereoAssignments(self)
 
-    def summary(self, toFile = True):
-        return summary(self, toFile = toFile)
+    def summaryForProject(self, toFile = True):
+        return summaryForProject(self, toFile = toFile)
 
     def criticize(self, toFile = True):
         return criticize(self, toFile = toFile)
@@ -1867,7 +1866,7 @@ ranges:  %s
            p.cingSummary = p.getCingSummaryDict()
 
         self.printTitle('Overall scores target '+self.name, 20*(l+1), stream)
-    #    line = '-'*20*(l+1)
+    #    line = dots20*(l+1)
     #   fprintf( stream, '%s\n    Overall scores %s\n%s\n\n', line, self.name, line )
         fprintf( stream, '%-20s%s\n\n', 'Parameter', self.entries.zap('group').format('%-20s'))
 
@@ -1910,9 +1909,9 @@ ranges:  %s
         if l == 0:
             return
 
-    #    print '-'*20*(l+1)
+    #    print dots20*(l+1)
     #    print ' Restraints target', self[0].target
-    #    print '-'*20*(l+1)
+    #    print dots20*(l+1)
     #    print
 
         hlen=40
@@ -1964,9 +1963,9 @@ ranges:  %s
 
         l = len(self)
 
-        print '-'*20*(l+1)
+        print dots20*(l+1)
         print '    Residues'
-        print '-'*20*(l+1)
+        print dots20*(l+1)
         p0 = self[0]
         for res in p0.molecule.allResidues():
             printf('%s %s %s\n',  '-'*5, res, '-'*5 )
@@ -2365,14 +2364,14 @@ class Peak(NTdict, Lister):
         self.peakIndex = PeakIndex
         PeakIndex += 1
 
-        self.__FORMAT__ = self.header(dots) + '\n' + \
+        self.__FORMAT__ = self.header() + '\n' + \
                            'dimension:  %(dimension)dD\n' + \
                            'positions:  %(positions)s\n' + \
                            'height:     %(height)s\n' + \
                            'volume:     %(volume)s\n' + \
                            'resonances: %(resonances)s\n' + \
                            'rogScore:   %(rogScore)s\n' + \
-                           self.footer(dots)
+                           self.footer()
 
         self.dimension = dimension
 
@@ -2429,10 +2428,10 @@ class Peak(NTdict, Lister):
                        )
     #end def
 
-    def header(self, dots = '---------'):
+    def header(self, mdots = dots):
         """Subclass header to generate using __CLASS__, peakIndex and dots.
         """
-        return sprintf('%s %s: %d %s', dots, self.__CLASS__, self.peakIndex, dots)
+        return sprintf('%s %s: %d %s', mdots, self.__CLASS__, self.peakIndex, mdots)
     #end def
 #end class
 
@@ -4302,7 +4301,7 @@ class Coplanar(NTdict):
         NTdict.__init__(self,
                          __CLASS__ = COPLANAR_LEVEL,
                          resList = resList)
-        self.__FORMAT__ = self.header(dots) + '\n' + \
+        self.__FORMAT__ = self.header() + '\n' + \
                           'residues:  %(resList)s\n'
         self.name = name
     #end def

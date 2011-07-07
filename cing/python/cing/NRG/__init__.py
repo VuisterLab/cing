@@ -43,6 +43,6 @@ schemaIdList  = [ CASD_DB_NAME,    PDB_DB_NAME,    NRG_DB_NAME,    DEV_NRG_DB_SC
 archiveIdList = [ ARCHIVE_CASD_ID, ARCHIVE_PDB_ID, ARCHIVE_NRG_ID, ARCHIVE_DEV_NRG_ID,   ARCHIVE_CASP_ID, ARCHIVE_NMR_REDO_ID   ]
 
 mapArchive2Schema = {}
-for i,archiveId in enumerate( archiveIdList ):
-    mapArchive2Schema[ archiveId ] = schemaIdList[i]
+for _idxArchiveId,archiveId in enumerate( archiveIdList ):
+    mapArchive2Schema[ archiveId ] = schemaIdList[_idxArchiveId]
 

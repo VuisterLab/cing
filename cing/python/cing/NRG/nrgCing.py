@@ -454,7 +454,7 @@ class nrgCing(Lister): # pylint: disable=C0103
     # end def run
 
 
-    def reportHeadAndTailEntries(self, timeTakenDict):
+    def reportHeadAndTailEntries(self, timeTakenDict): # pylint: disable=R0201
         'Report the head and tail of all entries.'
         timeTakenList = NTlist(*timeTakenDict.values())
         if len(timeTakenList) < 1:
@@ -2013,7 +2013,7 @@ class nrgCing(Lister): # pylint: disable=C0103
         NTmessage("Done with storeCING2db.")
     # end def
     
-    def refine(self):
+    def refine(self):  # pylint: disable=R0201
         """
         Needs to be overriden by e.g. nmr_redo.
         Return True on error.

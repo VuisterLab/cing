@@ -437,7 +437,7 @@ def printOverallScores( projects, stream = sys.stdout ):
         return
 
     printTitle('Overall scores target '+projects.name, 20*(l+1), stream)
-#    line = '-'*20*(l+1)
+#    line = dots20*(l+1)
 #   fprintf( stream, '%s\n    Overall scores %s\n%s\n\n', line, projects.name, line )
     fprintf( stream, '%-20s%s\n\n', 'Parameter', projects.entries.zap('group').format('%-20s'))
 
@@ -477,9 +477,9 @@ def printRestraintScores( projects, stream=sys.stdout ):
     if l == 0:
         return
 
-#    print '-'*20*(l+1)
+#    print dots20*(l+1)
 #    print ' Restraints target', projects[0].target
-#    print '-'*20*(l+1)
+#    print dots20*(l+1)
 #    print
 
     hlen=40
@@ -539,9 +539,9 @@ def printResidueScores( projects ):
 
     l = len(projects)
 
-    print '-'*20*(l+1)
+    print dots20*(l+1)
     print '    Residues'
-    print '-'*20*(l+1)
+    print dots20*(l+1)
     p0 = projects[0]
     for res in p0.molecule.allResidues():
         printf('%s %s %s\n',  '-'*5, res, '-'*5 )

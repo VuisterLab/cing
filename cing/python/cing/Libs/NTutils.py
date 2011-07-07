@@ -1476,15 +1476,15 @@ class NTdict(dict):
         return result
     #end def
 
-    def keysformat(self, dots='-'*20):
+    def keysformat(self, mdots=dots20):
         """set __FORMAT__ to list all keys
         """
-        fmt = self.header(dots) + '\n'
+        fmt = self.header(mdots) + '\n'
         for key in self.keys():
-            s = '%-' + str(len(dots)) + 's '
-            fmt = fmt +  s%(str(key)+':') + '%(' + str(key) + ')s\n'
+            s = '%-' + str(len(mdots)) + 's '
+            fmt += s%(str(key)+':') + '%(' + str(key) + ')s\n'
         #end for
-        fmt = fmt + self.footer(dots)
+        fmt += self.footer(mdots=mdots)
         self.__FORMAT__ = fmt
     #end def
 
@@ -1506,20 +1506,20 @@ class NTdict(dict):
         return msg
     #end def
 
-    def header(self, dots = '-'*20):
+    def header(self, mdots = dots20):
         """Generate a header using __CLASS__ and dots.
         """
-        return sprintf('%s %s %s', dots, self.__CLASS__, dots)
+        return sprintf('%s %s %s', mdots, self.__CLASS__, mdots)
     #end def
 
-    def footer(self, dots = '-'*20):
+    def footer(self, mdots = dots20):
         """Generate a footer using dots of the same length as header.
         """
-        header = self.header(dots)
+        header = self.header(mdots = mdots)
         lheader = len(header)
-        s = dots
+        s = mdots
         while len(s) < lheader:
-            s = s + dots
+            s += mdots
         #end while
         return s[0:lheader]
     #end def
@@ -2252,10 +2252,10 @@ class NTtree(NTdict):
                 child.subNodes(result = result, depth = depth-1)
         return result
 
-    def header(self, dots = '---------'):
+    def header(self, mdots = dots):
         """Subclass header to generate using __CLASS__, name and dots.
         """
-        return sprintf('%s %s: %s %s', dots, self.__CLASS__, self.name, dots)
+        return sprintf('%s %s: %s %s', mdots, self.__CLASS__, self.name, mdots)
 
 #end class
 
