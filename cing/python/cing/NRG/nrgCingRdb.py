@@ -15,8 +15,8 @@ from cing.PluginCode.required.reqQueeny import * #@UnusedWildImport
 from cing.PluginCode.required.reqVasco import * #@UnusedWildImport
 from cing.PluginCode.required.reqWattos import * #@UnusedWildImport
 from cing.PluginCode.required.reqWhatif import * #@UnusedWildImport
-from cing.PluginCode.sqlAlchemy import cgenericSql
-from cing.PluginCode.sqlAlchemy import csqlAlchemy
+from cing.PluginCode.sqlAlchemy import CgenericSql
+from cing.PluginCode.sqlAlchemy import CsqlAlchemy
 from cing.PluginCode.sqlAlchemy import printResult
 from matplotlib import is_interactive
 from pylab import * #@UnusedWildImport # imports plt too now.
@@ -60,7 +60,7 @@ class nrgCingRdb():
     def __init__(self,host='localhost', user=PDBJ_DB_USER_NAME, db=PDBJ_DB_NAME, schema=NRG_DB_SCHEMA):
         self.schema = schema
         if True: # block the NRG-CING stuff away from other schema
-            self.csql = csqlAlchemy(host=host, user=user, db=db, schema=schema)
+            self.csql = CsqlAlchemy(host=host, user=user, db=db, schema=schema)
             self.csql.connect()
             self.execute = self.csql.conn.execute
             if True: # DEFAULT True but disable for quicker testing.
@@ -92,7 +92,7 @@ class nrgCingRdb():
             self.perEntryRog = NTdict()
 
         if True:
-            self.jsql = cgenericSql(host=host, user=PDBJ_DB_USER_NAME, db=PDBJ_DB_NAME, schema=PDBJ_DB_SCHEMA)
+            self.jsql = CgenericSql(host=host, user=PDBJ_DB_USER_NAME, db=PDBJ_DB_NAME, schema=PDBJ_DB_SCHEMA)
             self.jsql.connect()
             self.jsql.autoload()
 
@@ -183,7 +183,7 @@ class nrgCingRdb():
     # end def
 
     def populateDepTables(self):
-        NTmessage("creating temporary tables")
+        NTmessage("Creating temporary tables; disable this step for speedier testing in nrgCingRdb.__init__()")
 
 
         stmt1 = 'drop table if exists %s.cingsummary cascade' % self.schema
@@ -1266,7 +1266,7 @@ if __name__ == '__main__':
         pdbIdList = m.getPdbIdList()
         NTmessage("Found %s pdb ids in db" % len(pdbIdList))
 
-    if 0:
+    if 1:
         m.showCounts()
 
     NTmessage("done with nrgCingRdb")

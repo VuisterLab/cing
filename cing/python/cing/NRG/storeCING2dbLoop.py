@@ -1,5 +1,7 @@
-# python -u $CINGROOT/python/cing/NRG/storeCING2dbLoop.py
-# NB this script fails if the MySql backend is not installed.
+"""
+python -u $CINGROOT/python/cing/NRG/storeCING2dbLoop.py
+# NB this script fails if the backend is not installed.
+"""
 from cing import cingPythonDir
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.NRG import * #@UnusedWildImport
@@ -9,7 +11,7 @@ from cing.Scripts.doScriptOnEntryList import doScriptOnEntryList
 
 
 def storeCING2dbLoop(archive_id, entryList=None, expectPdbEntryList = True):
-
+    'simplest loop over all entries for a quicky.'
     if archive_id == ARCHIVE_CASD_ID:
         startDir = os.path.join(dDir,'CASD-NMR-CING')
         expectPdbEntryList = False
@@ -55,21 +57,22 @@ def storeCING2dbLoop(archive_id, entryList=None, expectPdbEntryList = True):
 if __name__ == '__main__':
     cing.verbosity = cing.verbosityDebug
     #cing.verbosity = cing.verbosityDefault
-#    archive_id = ARCHIVE_NRG_ID
-#    entryList = '1brv'.split()
-#    entryList = '1a4d 1a24 1afp 1ai0 1b4y 1brv 1bus 1cjg 1d3z 1hkt 1hue 1ieh 1iv6 1jwe 1kr8 2hgh 2k0e'.split()
-#    entryList = []
+    
+    if 1:
+        arch_id = ARCHIVE_NRG_ID
+        eList = '1brv'.split()
+    #    eList = '1a4d 1a24 1afp 1ai0 1b4y 1brv 1bus 1cjg 1d3z 1hkt 1hue 1ieh 1iv6 1jwe 1kr8 2hgh 2k0e'.split()
+    #    eList = []
+    elif 0:
+        arch_id = ARCHIVE_CASP_ID
+        eList = 'T0538TS001 T0538Org'.split()
+    elif 0:
+        arch_id = ARCHIVE_CASD_ID
+    #        eList = None # will use all entries in startDir, 'list', 'entry_list_all.csv'
+        eList = 'NeR103ALyon2'.split()
+    elif 0:
+        arch_id = ARCHIVE_PDB_ID
+    #        eList = '1brv'.split()
+        eList = "3kff 3a4r 3a34 3i40 2xdy 3mcd 3ild 1brv 1hkt".split()
 
-#    archive_id = ARCHIVE_CASP_ID
-#    entryList = 'T0538TS001 T0538Org'.split()
-
-    archive_id = ARCHIVE_CASD_ID
-#        entryList = None # will use all entries in startDir, 'list', 'entry_list_all.csv'
-    entryList = 'NeR103ALyon2'.split()
-#        entryList = 'AR3436APiscataway2 AtT13Piscataway CGR26APiscataway CtR69APiscataway ET109AoxPiscataway2 ET109AredPiscataway2 HR5537APiscataway2 NeR103APiscataway PGR122APiscataway VpR247Piscataway2'.split()
-
-#    archive_id = ARCHIVE_PDB_ID
-##        entryList = '1brv'.split()
-#    entryList = "3kff 3a4r 3a34 3i40 2xdy 3mcd 3ild 1brv 1hkt".split()
-
-    storeCING2dbLoop(archive_id, entryList=entryList)
+    storeCING2dbLoop(archive_id=arch_id, entryList=eList)

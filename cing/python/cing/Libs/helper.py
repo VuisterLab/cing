@@ -1,40 +1,14 @@
-from subprocess import PIPE
-from subprocess import Popen
+"""
+Very simple functions only here that can be instantiated without the general CING setup.
+Called from cing's main __init__.py and setupCing.py.
+"""
+from cing.Libs.helper2 import _NTgetoutput
 import os
 import platform
 import sys
 import time
 import urllib2
 
-"""Very simple functions only here that can be instantiated without the general CING setup.
-Called from cing's main __init__.py and setupCing.py.
-"""
-
-#Block to keep in sync with the one in helper.py
-#===============================================================================
-def _NTgetoutput( cmd ):
-    """Return output from command as (stdout,sterr) tuple"""
-#    inp,out,err = os.popen3( cmd ) # not forward compatible to python 2.6.
-    p = Popen(cmd, shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE, close_fds=True)
-    (inp,out,err) = (p.stdin, p.stdout, p.stderr)
-
-    output = ''
-    for line in out.readlines():
-        output += line
-    errors = ''
-    for line in err.readlines():
-        errors += line
-    inp.close()
-    out.close()
-    err.close()
-    return (output,errors)
-def _NTerror(msg):
-    print "ERROR:",msg
-def _NTwarning(msg):
-    print "WARNING:",msg
-def _NTmessage(msg):
-    print msg
-#===============================================================================
 
 def getSvnRevision():
     """Return the revision number (int) or None if the revision isn't known. It depends on svn being available on the system."""
@@ -50,10 +24,12 @@ def getSvnRevision():
                     cingRevisionStr = cingSvnInfo.split()[ - 1]
                     cingRevision = int(cingRevisionStr)
                     return cingRevision
+                # end if
+            # end for
+        # end if
     except:
         pass
 #        _NTwarning("Failed to getSvnRevision()" )
-    return None
 # end def
 
 def isInternetConnected():
@@ -75,24 +51,25 @@ def isInternetConnected():
 # end def
 
 def detectCPUs():
- """
- Detects the number of CPUs on a system. Cribbed from pp.
- """
- # Linux, Unix and MacOS:
- if hasattr(os, "sysconf"):
-     if os.sysconf_names.has_key("SC_NPROCESSORS_ONLN"):
-         # Linux & Unix:
-         ncpus = os.sysconf("SC_NPROCESSORS_ONLN")
-         if isinstance(ncpus, int) and ncpus > 0:
-             return ncpus
-     else: # OSX:
-         return int(os.popen2("sysctl -n hw.ncpu")[1].read())
- # Windows:
- if os.environ.has_key("NUMBER_OF_PROCESSORS"):
-         ncpus = int(os.environ["NUMBER_OF_PROCESSORS"]);
-         if ncpus > 0:
-             return ncpus
- return 1 # Default
+    """
+    Detects the number of CPUs on a system. Cribbed from pp.
+    """
+    # Linux, Unix and MacOS:
+    if hasattr(os, "sysconf"):
+        if os.sysconf_names.has_key("SC_NPROCESSORS_ONLN"):
+            # Linux & Unix:
+            ncpus = os.sysconf("SC_NPROCESSORS_ONLN")
+            if isinstance(ncpus, int) and ncpus > 0:
+                return ncpus
+        else: # OSX:
+            return int(os.popen2("sysctl -n hw.ncpu")[1].read())
+    # Windows:
+    if os.environ.has_key("NUMBER_OF_PROCESSORS"):
+        ncpus = int(os.environ["NUMBER_OF_PROCESSORS"])
+        if ncpus > 0:
+            return ncpus
+    return 1 # Default
+# end def
 
 def getOsType():
     """Return the type of OS, mapped to either darwin, linux, or windows from sys.platform"""
@@ -120,6 +97,7 @@ def getOsType():
     if sys.platform.startswith('win'):
         return 'windows'
     return 'unknown'
+# end def
 
 def getStartMessage(ncpus=None):
     """
@@ -143,8 +121,9 @@ def getStartMessage(ncpus=None):
 #    atForFileName = "%s" % at
 #    atForFileName = re.sub('[ :]', '_', atForFileName)
     return "User: %-10s on: %-42s at: %32s" % (user, on, at)
-#(3737) Thu Oct 21 11:19:30 2010
-#Stella.local (darwin/32bit/2cores/2.6.6)
+    #(3737) Thu Oct 21 11:19:30 2010
+    #Stella.local (darwin/32bit/2cores/2.6.6)
+# end def
 
 def getStopMessage(starttime):
     """From Wattos
@@ -159,3 +138,4 @@ def getStopMessage(starttime):
     msg += "CING stopped at : %s\n" % now
     msg += "CING took       : %-.3f s\n\n" % (time.time() - starttime)
     return msg
+# end def

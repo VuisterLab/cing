@@ -1,20 +1,4 @@
 #!/usr/bin/env python
-
-# Please note the lack of imports here to cing specific code.
-# The idea is that this script runs without PYTHONPATH being set yet.
-from string import atoi
-from string import strip
-from subprocess import PIPE
-from subprocess import Popen
-import os
-import sys
-import time
-#import warnings
-
-# disabling some output that can safely be ignored
-#warnings.simplefilter('ignore', category=UserWarning)
-# fixed problem instead now.
-
 """
 python setupCing.py
 E.g.:
@@ -36,38 +20,24 @@ path when you run setup. If they are not; you may continue without their
 respective functionalities.
 """
 
-#Block to keep in sync with the one in helper.py
-#===============================================================================
-def _NTgetoutput( cmd ):
-    """Return output from command as (stdout,sterr) tuple"""
-#    inp,out,err = os.popen3( cmd )
-    p = Popen(cmd, shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE, close_fds=True)
-    (inp,out,err) = (p.stdin, p.stdout, p.stderr)
+# Please note the lack of imports here to cing specific code.
+# The idea is that this script runs without PYTHONPATH being set yet.
+from cing.Libs.helper2 import _NTerror
+from cing.Libs.helper2 import _NTgetoutput
+from cing.Libs.helper2 import _NTmessage
+from cing.Libs.helper2 import _NTwarning
+from string import atoi
+from string import strip
+import os
+import sys
+import time
+#import warnings
 
-    output = ''
-    for line in out.readlines():
-        output += line
-    errors = ''
-    for line in err.readlines():
-        errors += line
-    inp.close()
-    out.close()
-    err.close()
-    return (output,errors)
-def _NTerror(msg):
-    print "ERROR:",msg
-def _NTwarning(msg):
-    print "WARNING:",msg
-def _NTmessage(msg):
-    print msg
-#===============================================================================
-
-#------------------------------------------------------------------------------------
-# generate setup csh or bash script
-#------------------------------------------------------------------------------------
+# disabling some output that can safely be ignored
+#warnings.simplefilter('ignore', category=UserWarning)
+# fixed problem instead now.
 
 PLEASE_ADD_EXECUTABLE_HERE = "PLEASE_ADD_EXECUTABLE_HERE"
-
 CING_SHELL_TEMPLATE = \
 '''
 #############################################
@@ -90,13 +60,12 @@ CING_SHELL_TEMPLATE = \
 %(export)s  CINGROOT%(equals)s%(cingRoot)s
 %(export)s  CYTHON%(equals)s%(cingRoot)s/dist/Cython
 %(export)s  PYMOL_PATH%(equals)s%(pyMolPath)s
-%(export)s  YASARA_PATH%(equals)s%(yasaraPath)s
 
 # Adding each component individually to PYTHONPATH
 %(export)s  CING_VARS%(equals)s$CINGROOT/python
 %(export)s  CING_VARS%(equals)s${CING_VARS}:$CYTHON
 %(export)s  CING_VARS%(equals)s${CING_VARS}:$PYMOL_PATH/modules
-%(export)s  CING_VARS%(equals)s${CING_VARS}:$YASARA_PATH/yasara/pym:$YASARA_PATH/yasara/plg
+%(export)s  CING_VARS%(equals)s${CING_VARS}:%(yasaraPath)s/yasara/pym:%(yasaraPath)s/yasara/plg
 
 if %(conditional)s then
     %(export)s PYTHONPATH%(equals)s${CING_VARS}:${PYTHONPATH}
@@ -136,19 +105,24 @@ cingRoot = os.path.split(cingPythonDir)[0]
 ######################################################################################################
 
 def check_python():
+    'Python needs to be at least 2 but below 3.'
     hasDep = True
     version = float(sys.version[:3])
-    if version < 2.5:
-        _NTerror('Failed to find Python version 2.5 or higher.')
+    if version < 2.5 or version >= 3.0:
+        _NTerror('Failed to find Python version 2.5 or higher and not 3 or above.')
         _NTerror('Current version is %s' % sys.version[:5])
-        _NTerror("Python 2.4 in the package managers such as yum, fink, port, and apt come with a 'mat plot lib' version that doesn't work with CING.")
+        _NTerror("Python 2.4 in the package managers such as yum, fink, port, and apt " + 
+                 "come with a 'matplotlib' version that doesn't work with CING.")
         hasDep = False
     if hasDep:
-        _NTmessage("........ Found 'python'")
+        _NTmessage("........ Found 'python'        %s" % str(version))
+        
+        
     else:
         _NTwarning('Failed to find good python.')
 
 def check_matplotlib():
+    'matplotlib needs to be at 0.98.3-1 or higher'
     try:
         from matplotlib.axis import XAxis
     except:
@@ -167,7 +141,7 @@ def check_matplotlib():
         return
 
     try:
-        import matplotlib.pylab #@UnusedImport
+        import matplotlib.pylab #@UnusedImport # pylint: disable=W0612
     except:
         _NTmessage('Could not find matplotlib (b) (optional)')
         return
@@ -175,11 +149,12 @@ def check_matplotlib():
 
 
 def check_ccpn():
+    'ccpnmr is an opional python package.'
 #    print '\nCCPN distribution:',
     missing = []
     gotRequiredCcpnModules = False
     try:
-        import ccpnmr #@UnusedImport @UnresolvedImport
+        import ccpnmr #@UnusedImport @UnresolvedImport # pylint: disable=W0612
         gotRequiredCcpnModules = True
 #        print 'ok.'
     except:
@@ -238,11 +213,11 @@ def check_ccpn():
 #    return result
 
 def check_cython():
-
+    'Mandatory cython python package'
 #    print 'Cython module   ',
     result = 0
     try:
-        import Cython.Distutils #@UnusedImport @UnresolvedImport
+        import Cython.Distutils #@UnusedImport @UnresolvedImport # pylint: disable=W0612
 #        print 'ok.'
         result = 1
 #        print "Great you have Cython! Please try to compile CING's Cython libs running:"
@@ -281,7 +256,7 @@ def check_cython():
 #    return result
 
 
-def _writeCingShellFile(isTcsh):
+def _writeCingShellFile(isTcsh): # pylint: disable=W0621
     '''Generate the Cing Shell file for csh or bash'''
     if isTcsh:
         parametersDict['export'] = 'setenv'
@@ -365,9 +340,12 @@ if __name__ == '__main__':
         _NTmessage("Could not find 'xplor'  (optional)")
         parametersDict['xplorPath']  = PLEASE_ADD_EXECUTABLE_HERE
     else:
-        _NTmessage("........ Found 'xplor'")
-        parametersDict['xplorPath']  = strip(xplorPath)
-#    parametersDict['xplorPath']  = 'xplor' # is now an alias like: env -i PATH=$PATH HOME=$HOME USER=$USER /Users/jd/workspace/xplor-nih-2.27/bin/xplor
+        xplorPath = strip(xplorPath)
+        _NTmessage("........ Found 'xplor'         %s" % xplorPath)        
+        parametersDict['xplorPath']  = xplorPath
+    # end if
+    # is now an alias like: env -i PATH=$PATH HOME=$HOME USER=$USER /Users/jd/workspace/xplor-nih-2.27/bin/xplor
+#    parametersDict['xplorPath']  = 'xplor' 
 
 #    procheckPath,err  = _NTgetoutput('which $prodir/procheck_nmr.scr')
     if os.environ.has_key("prodir"):
@@ -378,11 +356,13 @@ if __name__ == '__main__':
             _NTwarning("Could not find 'procheck_nmr'  (optional)")
             parametersDict['procheckPath']  = PLEASE_ADD_EXECUTABLE_HERE
         else:
-            _NTmessage("........ Found 'procheck_nmr'")
+            _NTmessage("........ Found 'procheck_nmr'  %s" % procheckPath)        
             parametersDict['procheckPath'] = procheckPath
+        # end if
     else:
         _NTmessage("Could not find 'procheck_nmr'  (optional)")
         parametersDict['procheckPath']  = PLEASE_ADD_EXECUTABLE_HERE
+    # end if
 
 #    procheckPath,err  = _NTgetoutput('which $prodir/procheck_nmr.scr')
     if os.environ.has_key("aquaroot"):
@@ -393,11 +373,13 @@ if __name__ == '__main__':
             _NTwarning("Could not find 'aqua'  (optional)")
             parametersDict['aqpcPath']  = PLEASE_ADD_EXECUTABLE_HERE
         else:
-            _NTmessage("........ Found 'aqua'")
+            _NTmessage("........ Found 'aqua'          %s" % aqpcPath)
             parametersDict['aqpcPath'] = aqpcPath
+        # end if
     else:
         _NTmessage("Could not find 'aqua'")
         parametersDict['aqpcPath']  = PLEASE_ADD_EXECUTABLE_HERE
+    # end if
 
     whatifPath,err  = _NTgetoutput('which DO_WHATIF.COM')
     parametersDict['whatifPath']  = PLEASE_ADD_EXECUTABLE_HERE
@@ -406,34 +388,42 @@ if __name__ == '__main__':
         defaultWhatifPath = '/home/vriend/whatif/DO_WHATIF.COM'
         if os.path.exists(defaultWhatifPath):
             whatifPath = defaultWhatifPath
+    # end if
     if not whatifPath:
         _NTmessage("Could not find 'what if'  (optional)")
     else:
-        _NTmessage("........ Found 'what if'")
         whatifPath = strip(whatifPath)
+        _NTmessage("........ Found 'what if'       %s" % whatifPath)
+        
         parametersDict['whatifPath'] = whatifPath
         head, _tail = os.path.split( whatifPath )
         dsspPath = os.path.join( head, 'dssp', 'DSSP.EXE' )
         if not os.path.exists(dsspPath):
             _NTmessage("Could not find 'dssp'")
         else:
-            _NTmessage("........ Found 'dssp'")
+            _NTmessage("........ Found 'dssp'          %s" % dsspPath)
             parametersDict['dsspPath'] = dsspPath
+        # end if
+    # end if
 
-    time = 0
+    wattosRevision = -1
     try:
-        wattosAtTheReady,err  = _NTgetoutput('java Wattos.Utils.Programs.GetEpochTime')
+#        wattosAtTheReady,err  = _NTgetoutput('java Wattos.Utils.Programs.GetEpochTime')
+        wattosAtTheReady,err  = _NTgetoutput('java Wattos.Utils.Programs.GetRevision')
 #        _NTmessage("wattosAtTheReady: " + wattosAtTheReady)
 #        _NTmessage("err: " + err)
-        time = atoi(wattosAtTheReady)
+        wattosRevision = atoi(wattosAtTheReady)
     except:
         pass
+    # end try
+        
 #    NTdebug("time: " + `time`)
-    if time < 1197298392169: # time at: Mon Dec 10 15:56:33 CET 2007
+    if wattosRevision < 0: # time at: Mon Dec 10 15:56:33 CET 2007
         _NTmessage("Could not find 'wattos'  (optional)")
 #        _NTmessage("Failed to get epoch time. This was a test of Wattos installation.'")
     else:
-        _NTmessage("........ Found 'wattos'")
+        _NTmessage("........ Found 'wattos'        r%s" % str(wattosRevision))         
+    # end if
 
     convertPath,err  = _NTgetoutput('which convert')
     if not convertPath:
@@ -442,6 +432,7 @@ if __name__ == '__main__':
     else:
         _NTmessage("........ Found 'convert'")
         parametersDict['convertPath'] = strip(convertPath)
+    # end if
 
     ghostscriptPath,err  = _NTgetoutput('which gs')
     if not ghostscriptPath:
@@ -450,38 +441,47 @@ if __name__ == '__main__':
     else:
         _NTmessage("........ Found 'ghostscript'")
         parametersDict['ghostscriptPath'] = strip(ghostscriptPath)
+    # end if
 
     ps2pdfPath,err  = _NTgetoutput('which ps2pdf14')
     if not ps2pdfPath:
         _NTwarning("Could not find 'ps2pdf' (from Ghostscript)")
         parametersDict['ps2pdfPath']  = PLEASE_ADD_EXECUTABLE_HERE
     else:
-        _NTmessage("........ Found 'ps2pdf'")
+        ps2pdfPath = strip(ps2pdfPath)
         parametersDict['ps2pdfPath'] = strip(ps2pdfPath)
+        _NTmessage("........ Found 'ps2pdf'        %s" % ps2pdfPath)        
+    # end if
 
     molmolPath,err  = _NTgetoutput('which molmol')
     if not molmolPath:
         _NTmessage("Could not find 'molmol'  (optional)")
         parametersDict['molmolPath']  = PLEASE_ADD_EXECUTABLE_HERE
     else:
-        _NTmessage("........ Found 'molmol'")
-        parametersDict['molmolPath'] = strip(molmolPath)
+        molmolPath = strip(molmolPath)
+        _NTmessage("........ Found 'molmol'        %s" % molmolPath)        
+        parametersDict['molmolPath'] = molmolPath
+    # end if
 
     povrayPath,err  = _NTgetoutput('which povray')
     if not povrayPath:
         _NTmessage("Could not find 'povray'  (optional)")
         parametersDict['povrayPath']  = PLEASE_ADD_EXECUTABLE_HERE
     else:
-        _NTmessage("........ Found 'povray'")
-        parametersDict['povrayPath'] = strip(povrayPath)
+        povrayPath = strip(povrayPath)
+        _NTmessage("........ Found 'povray'        %s" % povrayPath)        
+        parametersDict['povrayPath'] = povrayPath
+    # end if
 
     talosPath,err  = _NTgetoutput('which talos+')
     if not talosPath:
         _NTmessage("Could not find 'talos+'  (optional)")
         parametersDict['talosPath']  = PLEASE_ADD_EXECUTABLE_HERE
     else:
-        _NTmessage("........ Found 'talos+'")
-        parametersDict['talosPath'] = strip(talosPath)
+        talosPath = strip(talosPath)
+        _NTmessage("........ Found 'talos+'        %s" % talosPath)        
+        parametersDict['talosPath'] = talosPath
+    # end if
 
     # TODO: enable real location finder. This just works for some cases but we shouldn't bother
     # others. The integration code is actually not finished.
@@ -494,26 +494,18 @@ if __name__ == '__main__':
         if  os.path.exists(pyMolPathToTest):
             pyMolPath = pyMolPathToTest
             break
-
+        # end if
+    # end for
     if not pyMolPath:
         if False: # DEFAULT: False TODO: enable when done.
             _NTmessage("Could not find 'pymol' code (optional)")
         parametersDict['pyMolPath']  = PLEASE_ADD_EXECUTABLE_HERE
     else:
-        _NTmessage("........ Found 'pymol' code")
+        pyMolPath = strip(pyMolPath)
+        _NTmessage("........ Found 'pymol' code    %s" % pyMolPath)
         parametersDict['pyMolPath'] = strip(pyMolPath)
-
-    # TODO: enable real location finder. This just works for JFD but shouldn't bother
-    # others.
-#    yasaraBasePath,err  = ('/Applications/YASARA-dynamics 8.2.3.app', None)
-    yasaraBasePath,err  = ('/Applications/YASARA.app', None)
-    if not os.path.exists(yasaraBasePath):
-        _NTmessage("Could not find 'yasara' code (optional)")
-        parametersDict['yasaraPath']  = PLEASE_ADD_EXECUTABLE_HERE
-    else:
-        _NTmessage("........ Found 'yasara'")
-        parametersDict['yasaraPath'] = strip(yasaraBasePath)
-
+    # end if
+    
     # Just to get a message to user; not important.
     pyMolBinPath,err  = _NTgetoutput('which pymol')
     if not pyMolBinPath:
@@ -524,9 +516,38 @@ if __name__ == '__main__':
         _NTmessage("Could not find 'pymol' (optional)")
 #        parametersDict['pyMolBinPath']  = PLEASE_ADD_EXECUTABLE_HERE
     else:
-        _NTmessage("........ Found 'pymol' binary")
+        pyMolBinPath = strip( pyMolBinPath )
+        _NTmessage("........ Found 'pymol' binary  %s" % pyMolBinPath)
 #        parametersDict['pyMolBinPath'] = strip(pyMolPath)
+    # end if
 
+    
+    # Linux:
+    yasaraPath = None
+    yasaraFullPath,err  = _NTgetoutput('which yasara')
+    if yasaraFullPath:
+        yasaraFullPath = strip(yasaraFullPath)
+        n = len(yasaraFullPath)
+        m = len('yasara')
+        # Truncate the /yasara from the path
+        yasaraPath = yasaraFullPath[0:n-m] 
+    else:
+        # Mac name in e.g. /Applications/YASARA.app/Contents/MacOS/yasara.app
+        yasaraFullPath,err  = _NTgetoutput('which yasara.app')
+        if yasaraFullPath:
+            yasaraFullPath = strip(yasaraFullPath)
+            n = len(yasaraFullPath)
+            m = len('Contents/MacOS/yasara.app')
+            yasaraPath = yasaraFullPath[0:n-m] 
+        # end if
+    # end if
+    if not yasaraPath:
+        _NTmessage("Could not find 'yasara' code (optional)")
+        parametersDict['yasaraPath']  = PLEASE_ADD_EXECUTABLE_HERE
+    else:
+        _NTmessage("........ Found 'yasara'        %s" % yasaraPath)
+        parametersDict['yasaraPath'] = yasaraPath
+    # end if
 
 #    userShell = os.environ.get('SHELL')
 #    Better not use the above as this gives on JFD's mac: /bin/bash and actually
