@@ -2,7 +2,7 @@
 """
 python setupCing.py
 E.g.:
-python /Users/jd/workspace/cing/python/cing/setupCing.py -tcsh
+python $CINGROOT/python/cing/setupCing.py -tcsh
 
 Generates either cing.csh or cing.sh to source in your .cshrc or .bashrc
 (or equivalent) respective file
@@ -96,7 +96,7 @@ CING_SHELL_TEMPLATE = \
 %(export)s  CING_VARS%(equals)s$CINGROOT/python
 %(export)s  CING_VARS%(equals)s${CING_VARS}:$CYTHON
 %(export)s  CING_VARS%(equals)s${CING_VARS}:$PYMOL_PATH/modules
-%(export)s  CING_VARS%(equals)s${CING_VARS}:%(yasaraPath)s/yasara/pym:%(yasaraPath)s/yasara/plg
+%(export)s  CING_VARS%(equals)s${CING_VARS}:%(yasaraPath)s/pym:%(yasaraPath)s/plg
 
 if %(conditional)s then
     %(export)s PYTHONPATH%(equals)s${CING_VARS}:${PYTHONPATH}
@@ -441,8 +441,8 @@ if __name__ == '__main__':
     try:
 #        wattosAtTheReady,err  = _NTgetoutput('java Wattos.Utils.Programs.GetEpochTime')
         wattosAtTheReady,err  = _NTgetoutput('java Wattos.Utils.Programs.GetRevision')
-#        _NTmessage("wattosAtTheReady: " + wattosAtTheReady)
-#        _NTmessage("err: " + err)
+#        _NTmessage("wattosAtTheReady: [%s]" % wattosAtTheReady)
+#        _NTmessage("err:              [%s]" % err)
         wattosRevision = atoi(wattosAtTheReady)
     except:
         pass
@@ -556,20 +556,26 @@ if __name__ == '__main__':
     # Linux:
     yasaraPath = None
     yasaraFullPath,err  = _NTgetoutput('which yasara')
+    # For Linux the sub dirs are parallel to executable.
     if yasaraFullPath:
         yasaraFullPath = strip(yasaraFullPath)
         n = len(yasaraFullPath)
-        m = len('yasara')
+        m = len('/yasara')
         # Truncate the /yasara from the path
         yasaraPath = yasaraFullPath[0:n-m] 
     else:
         # Mac name in e.g. /Applications/YASARA.app/Contents/MacOS/yasara.app
+        # For Mac the sub dirs are subbed by to executable like in:
+        # /Applications/YASARA.app/yasara/plg
         yasaraFullPath,err  = _NTgetoutput('which yasara.app')
         if yasaraFullPath:
             yasaraFullPath = strip(yasaraFullPath)
             n = len(yasaraFullPath)
-            m = len('Contents/MacOS/yasara.app')
-            yasaraPath = yasaraFullPath[0:n-m] 
+            m = len('/Contents/MacOS/yasara.app')
+            yasaraPath = yasaraFullPath[0:n-m] + '/yasara'
+            if not os.path.exists(yasaraPath):
+                _NTerror("Failed to find OSX yasara install.")
+                yasaraPath = None
         # end if
     # end if
     if not yasaraPath:
