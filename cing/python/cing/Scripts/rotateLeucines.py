@@ -24,6 +24,7 @@ def selectBadLeucineList(proj,cv):
 #    leucines=[] # String list
     leuList=[]  # Residue object list.
     mol = proj.molecule
+    modelCount=len(proj.models)
     leuSel=mol.residuesWithProperties('LEU')
     for leu in leuSel:
         chi1cv  = getDeepByKeysOrAttributes(leu, CHI1_STR, CV_STR)
@@ -51,7 +52,7 @@ def selectBadLeucineList(proj,cv):
         leuList.append(leuSel[4])
 #    leucines.append(str(leuSel[4].resNum))
     NTmessage('Found wrong leucines: ' + str(leuList))
-    return leuList
+    return leuList,modelCount
 # end def
 
 def copyProject(proj_path,proj_name,prl_name):
@@ -62,30 +63,38 @@ def copyProject(proj_path,proj_name,prl_name):
     NTmessage('Project has been copied')
 # end def
 
-def rotating(proj_path,prl_name,molec_name,leuList):
+def rotating(proj_path,prl_name,molec_name,leuList,modelCount):
     """
     load original pdb
     Soup needs to be empty when starting?
-    Return True on error.    
-    """    
+    Return True on error.
+    """
     pdb_path='%s/%s.cing/Export/PDB/%s.pdb'%(proj_path,prl_name,molec_name)
     if not os.path.exists(pdb_path):
         NTerror("Failed to find input for Yasara: %s" % pdb_path)
         return True
-    for i in range(3):
-        yasara.LoadPDB(pdb_path,model=1)
+    #CHI1=[-60,180]
+    #CHI1=[-60,-49,-41,-48,-53,-63,-75,-79,-78,-70,180,-169,-163,-162,-170,180,171,168,166,173]
+    CHI1=[-60,-60,-41,-53,-75,-78,180,-169,-162,180,168,173]
+    #CHI2=[180,60]
+    #CHI2=[-165,-173,180,169,161,154,157,167,180,-171,79,75,68,60,53,49,54,60,69,73]
+    CHI2=[180,-165,180,161,157,180,60,75,60,49,60,73]
+    if prl_name.startswith('1brv'):
+        CHI1=[-60,-53,180,173]
+        CHI2=[180,161,60,73]
+    lc=len(CHI1)
+    for i in range(lc):#number of different chi1/chi2 combinations
+        yasara.LoadPDB(pdb_path)
     NTmessage('Rotating Leucines with Yasara:')
-    CHI1=[-60,180]
-    CHI2=[180,60]
-    for i in range(2): # two conformations
+    for i in range(lc): # ten conformations
         for j in range(len(leuList)): # zero or more leu
             leu = leuList[j]
             resNumber = leu.resNum
             chainId = leu._parent.name
-            res='Res LEU %s Mol %s Obj %s'%(resNumber,chainId,str(i+2))
+            res='Res LEU %s Mol %s Obj %s-%s'%(resNumber,chainId,str(modelCount*i+1),str(modelCount*(i+1)))
             yasara.Dihedral('N  %s'%res,'CA %s'%res,'CB %s'%res,'CG  %s'%res,bound='Yes',set=CHI1[i])
             yasara.Dihedral('CA %s'%res,'CB %s'%res,'CG %s'%res,'CD1 %s'%res,bound='Yes',set=CHI2[i])
-    yasara.SavePDB('objects 1-3','%s/%s'%(proj_path,prl_name),format='IUPAC',transform='No')
+    yasara.SavePDB('objects 1-%s'%(lc*modelCount),'%s/%s'%(proj_path,prl_name),format='IUPAC',transform='No')
 # end def
 
 def deleteDirs(proj_path,proj_name,molec_name):
@@ -103,7 +112,7 @@ def changeCoordinates(proj_path,prl_name):
     prl.save()
 # end def
 
-def rotateLeucines(proj_path,proj_name,molec_name,leuList):
+def rotateLeucines(proj_path,proj_name,molec_name,leuList,modelCount):
     'Return True on error.'
     yasara.info.mode = "txt"
     yasara.info.licenseshown = 0
@@ -114,7 +123,7 @@ def rotateLeucines(proj_path,proj_name,molec_name,leuList):
         NTmessage("Removing previously existing directory: %s" % locOut)
         rmdir( locOut )
     copyProject(proj_path,proj_name,prl_name)
-    if rotating(proj_path,prl_name,molec_name,leuList):
+    if rotating(proj_path,prl_name,molec_name,leuList,modelCount):
         return True
     deleteDirs(proj_path,proj_name,molec_name)
     if changeCoordinates(proj_path,prl_name):
@@ -131,7 +140,7 @@ def runRotateLeucines(runDir, inputArchiveDir, entryId, cv = 0.1):
         NTerror("The .tgz %s is missing." % cingFile)
         return True
     # end if
-        
+
     cingDirNew = os.path.join(runDir, entryId + ".cing")
     if os.path.exists(cingDirNew):
         NTmessage("Removing old cing project directory: " + cingDirNew )
@@ -149,27 +158,27 @@ def runRotateLeucines(runDir, inputArchiveDir, entryId, cv = 0.1):
         NTerror('Failed to export2PDB')
         return True
     # end if
-                 
-    leuList = selectBadLeucineList(project,cv)
+
+    leuList,modelCount = selectBadLeucineList(project,cv)
     if leuList == None:
         NTerror('Failed to selectBadLeucineList')
         return True
     # end if
-        
-    if rotateLeucines(runDir, entryId, moleculeName, leuList):
+
+    if rotateLeucines(runDir, entryId, moleculeName, leuList,modelCount):
         NTerror('Failed to rotateLeucines')
-        return True        
+        return True
     # end if
 # end def
-        
+
 if __name__ == '__main__':
     # Localize next three lines.
     runDir = os.path.join(cingDirTmp, 'test_RotateLeucinesInYasara')
     inputArchiveDir = os.path.join(cingDirTestsData, "cing")
     entryId = '1brv'
-    
+
     if runRotateLeucines(runDir, inputArchiveDir, entryId):
         NTerror("Failed runRotateLeucines")
         sys.exit(1)
     # end if
-# end if    
+# end if
