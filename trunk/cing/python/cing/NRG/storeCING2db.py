@@ -182,8 +182,8 @@ def doStoreCING2db( entry_code, archive_id, project = None):
     # end for
 
     ranges = getDeepByKeysOrAttributes(molecule,RANGES_STR)
-    p_rmsd_backbone = getDeepByKeysOrAttributes(molecule, RMSD_STR, BACKBONE_AVERAGE_STR)
-    p_rmsd_sidechain = getDeepByKeysOrAttributes(molecule, RMSD_STR, HEAVY_ATOM_AVERAGE_STR)
+    p_rmsd_backbone = getDeepByKeysOrAttributes(molecule, RMSD_STR, BACKBONE_AVERAGE_STR, VALUE_STR)
+    p_rmsd_sidechain = getDeepByKeysOrAttributes(molecule, RMSD_STR, HEAVY_ATOM_AVERAGE_STR, VALUE_STR)
     p_cv_backbone = getDeepByKeysOrAttributes(molecule, CV_BACKBONE_STR)
     p_cv_sidechain = getDeepByKeysOrAttributes(molecule, CV_SIDECHAIN_STR)
 

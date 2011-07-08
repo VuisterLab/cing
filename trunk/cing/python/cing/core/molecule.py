@@ -384,7 +384,11 @@ class Molecule( NTtree, ResidueList ):
         self.cv_sidechain = None
 
         self.selectedResidues = None # this is a python array
-
+#        for color in [COLOR_GREEN,COLOR_ORANGE,COLOR_RED]:
+#            self[color] = NTlist()
+        self.green = NTlist()
+        self.orange = NTlist()
+        self.red = NTlist()
     #end def
 
     def format(self):
@@ -476,6 +480,50 @@ class Molecule( NTtree, ResidueList ):
 
         return self.getNextAvailableChainId()
 
+    def getRogColor(self):
+        """
+        Use the image in:
+        http://code.google.com/p/cing/issues/detail?id=297
+        which is parameterized as:
+        orange: y = 20 + x
+           red: y = x  - 20
+        with x being red percentage and y being orange percentage
+        E.g.
+               redPer oraPer grePerCutoffRed grePerCutoffOrange Rog
+                  0    0 -20           20               Orange
+                100    0  80           100              Red
+                  0  100 -20           20               Green            
+        """
+        redCount = len( self[COLOR_RED] )
+        oraCount = len( self[COLOR_ORANGE] ) # just included for completeness.
+        greCount = len( self[COLOR_GREEN] )
+        NTdebug("Found red/orange/green %s/%s/%s" % (redCount, oraCount, greCount))
+        residueCount = redCount + oraCount + greCount
+        # First do some sanity checks.
+        residueCount2 = len(self.allResidues())
+        if not residueCount:
+            NTcodeerror("Got zero residues counted with rog score whereas there are residues in the molecule. " +
+                        "Keeping default molecule rog score")
+            return None
+        # end if
+        if residueCount2 != residueCount:
+            NTcodeerror("CING fails to do basic arithmics. residueCount2 != residueCount as in %s != %s" % (
+                        residueCount2, residueCount))
+            return None
+        # end if
+        redPer = 100. * redCount / residueCount
+        oraPer = 100. * oraCount / residueCount
+        grePer = 100. * greCount / residueCount 
+        grePerCutoffRed    = redPer - 20
+        grePerCutoffOrange = redPer + 20
+        msg = 'Residue perc. ROG (red/orange/green: %.0f/%.0f/%.0f).' % (redPer,oraPer,grePer)
+        NTdebug(msg)
+        if grePer < grePerCutoffRed:
+            return COLOR_RED
+        if grePer < grePerCutoffOrange:
+            return COLOR_ORANGE
+        return COLOR_GREEN
+    # end def
 
     def getNextAvailableChainId(self ):
         for chainId in Chain.DEFAULT_ChainNamesByAlphabet:

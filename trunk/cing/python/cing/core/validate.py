@@ -439,7 +439,8 @@ def criticize(project, toFile=True):
     if project.molecule:
         project.molecule.rogScore.reset()
         for color in [COLOR_GREEN,COLOR_ORANGE,COLOR_RED]:
-            project.molecule[color] = NTlist()
+            project.molecule[color].clear() # is a NTlist
+        #end for
 
         for chain in project.molecule.allChains():
             _criticizeChain( chain, project.valSets )
@@ -448,54 +449,24 @@ def criticize(project, toFile=True):
 #                _criticizeResidue( res, project.valSets ) # now done in _criticizeChain
                 project.molecule[res.rogScore.colorLabel].append(res)
 #                res.chain.rogScore.setMaxColor(res.rogScore.colorLabel, 'Inferred from residue ROG scores')
+            #end for
         #end for
 
         useOldMethod = 0
+        msg = 'Inferred from residue ROG scores'
+        color = project.molecule.getRogColor()
         if useOldMethod:
-            msg = 'Inferred from residue ROG scores'
             if len(project.molecule[COLOR_RED]) > 0:
-                project.molecule.rogScore.setMaxColor(COLOR_RED, msg)
+                color = COLOR_RED
             elif len(project.molecule[COLOR_ORANGE]) > 0:
-                project.molecule.rogScore.setMaxColor(COLOR_ORANGE, msg)
-        else:
-            # Alternatively we could use the image in:
-            # http://code.google.com/p/cing/issues/detail?id=297
-            # which is parameterized as:
-            # orange: y = 20 + x
-            #    red: y = x  - 20
-            # with x being red and y being orange
-            # E.g.
-#            xPer yPer yPerCutoffRed yPerCutoffOrange Rog
-#               0    0 -20           20               Orange
-#             100    0  80           100              Red
-#               0  100 -20           20               Green            
-            xResidueCount = len( project.molecule[COLOR_RED] )
-            yResidueCount = len( project.molecule[COLOR_ORANGE] )
-            zResidueCount = len( project.molecule[COLOR_GREEN] )
-            residueCount = xResidueCount + yResidueCount + zResidueCount
-            residueCount2 = len(project.molecule.allResidues())
-            if project.molecule.allResidues():
-                if not residueCount:
-                    NTcodeerror("Got zero residues counted with rog score whereas there are residues in the molecule. " +
-                                "Keeping default molecule rog score")
-                elif residueCount2 != residueCount:
-                    NTcodeerror("CING fails to do basic arithmics. residueCount2 != residueCount as in %s != %s" % (
-                                residueCount2, residueCount))
-                else:
-                    xPer = 100. * xResidueCount / residueCount
-                    yPer = 100. * yResidueCount / residueCount
-                    yPerCutoffRed    = xPer - 20
-                    yPerCutoffOrange = xPer + 20
-                    msg = 'Residue perc. ROG (red/green: %.0f/%.0f).' % (xPer,yPer)
-                    NTdebug(msg)
-                    # TODO: NB if the rog was more severe before it will not be reset here. 
-                    if yPer < yPerCutoffRed:
-                        project.molecule.rogScore.setMaxColor(COLOR_RED,msg)
-                    elif yPer < yPerCutoffOrange:
-                        project.molecule.rogScore.setMaxColor(COLOR_ORANGE,msg)
-                # end if
+                color = COLOR_ORANGE
             # end if
-        # end if
+        # end if        
+        if color == None:
+            NTerror("Failed to determine the entry rog score color")
+        else:                
+            # TODO: NB if the rog was more severe before it will not be reset here. 
+            project.molecule.rogScore.setMaxColor(color,msg)
         # end if
                 
         if toFile:
@@ -2073,3 +2044,4 @@ def getStatsRestraintNTlist(rL):
 
 #    NTdebug("Found restraintCount,n: %s %s" % (restraintCount,n))
 # end def
+

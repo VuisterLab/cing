@@ -172,6 +172,11 @@ class AllChecks(TestCase):
                         completenessRes = res.getDeepByKeys( WATTOS_STR, COMPLCHK_STR, VALUE_LIST_STR)
                         NTdebug("%s: %s" % (res, completenessRes))
                     # end for
+                # end if
+                color = project.molecule.getRogColor()
+                NTdebug("The color of this molecule is: %s" % color)
+                self.assertFalse( color == COLOR_RED ) # ;-)
+            # end if
 #            self.assertTrue(project.exportValidation2ccpn())
 #            self.assertFalse(project.removeCcpnReferences())
             # Do not leave the old CCPN directory laying around since it might get added to by another test.
