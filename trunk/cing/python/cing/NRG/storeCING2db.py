@@ -27,7 +27,7 @@ from cing.PluginCode.required.reqProcheck import * #@UnusedWildImport
 from cing.PluginCode.required.reqQueeny import * #@UnusedWildImport
 from cing.PluginCode.required.reqWattos import * #@UnusedWildImport
 from cing.PluginCode.required.reqWhatif import * #@UnusedWildImport
-from cing.PluginCode.sqlAlchemy import csqlAlchemy
+from cing.PluginCode.sqlAlchemy import CsqlAlchemy
 from cing.core.classes import Project
 from cing.core.molecule import getAssignmentCountMapForResList
 from cing.core.parameters import directories
@@ -92,10 +92,10 @@ def doStoreCING2db( entry_code, archive_id, project = None):
     NTdebug("doReadProject:        %s" % doReadProject)
 
 
-#    csql = csqlAlchemy(user=archive_user, db=archive_db, echo=False)
+#    csql = CsqlAlchemy(user=archive_user, db=archive_db, echo=False)
 #    echo = 'debug'
     echo = False # Default no echo. Can be True or 'debug'.
-    csql = csqlAlchemy(user=user_name, db=db_name,schema=schema, echo=echo)
+    csql = CsqlAlchemy(user=user_name, db=db_name,schema=schema, echo=echo)
 
     if csql.connect():
         NTerror("Failed to connect to DB")

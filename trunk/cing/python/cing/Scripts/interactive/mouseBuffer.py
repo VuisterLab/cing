@@ -9,7 +9,7 @@ from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.PluginCode.required.reqDssp import * #@UnusedWildImport
 from cing.PluginCode.required.reqWattos import * #@UnusedWildImport
 from cing.PluginCode.required.reqWhatif import * #@UnusedWildImport
-from cing.PluginCode.sqlAlchemy import csqlAlchemy
+from cing.PluginCode.sqlAlchemy import CsqlAlchemy
 from cing.core.classes import Project
 from cing.core.constants import * #@UnusedWildImport
 from cing.main import getStartMessage
@@ -54,7 +54,7 @@ molecule = project.molecule
 
 p.validate(parseOnly=True, htmlOnly=True)
 
-csql = csqlAlchemy()
+csql = CsqlAlchemy()
 if csql.connect():
     NTerror("Failed to connect to DB")
     sys.exit(1)

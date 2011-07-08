@@ -17,8 +17,8 @@ from cing.PluginCode.required.reqDssp import * #@UnusedWildImport
 from cing.PluginCode.required.reqProcheck import * #@UnusedWildImport
 from cing.PluginCode.required.reqWattos import * #@UnusedWildImport
 from cing.PluginCode.required.reqWhatif import * #@UnusedWildImport
-from cing.PluginCode.sqlAlchemy import cgenericSql
-from cing.PluginCode.sqlAlchemy import csqlAlchemy
+from cing.PluginCode.sqlAlchemy import CgenericSql
+from cing.PluginCode.sqlAlchemy import CsqlAlchemy
 from pylab import * #@UnusedWildImport # imports plt too now.
 from scipy import * #@UnusedWildImport
 from sqlalchemy.schema import Table #@UnusedImport
@@ -40,11 +40,11 @@ outputFnLinkData = 'output.csv'
 
 def linkdataNRG():
     #connection to the database:
-    csql = csqlAlchemy(host=HOST, user=PDBJ_DB_USER_NAME, db=PDBJ_DB_NAME, schema=NRG_DB_SCHEMA)
+    csql = CsqlAlchemy(host=HOST, user=PDBJ_DB_USER_NAME, db=PDBJ_DB_NAME, schema=NRG_DB_SCHEMA)
     csql.connect()
     execute = csql.conn.execute
 
-    jsql = cgenericSql(host=HOST, user=PDBJ_DB_USER_NAME, db=PDBJ_DB_NAME, schema=PDBJ_DB_SCHEMA)
+    jsql = CgenericSql(host=HOST, user=PDBJ_DB_USER_NAME, db=PDBJ_DB_NAME, schema=PDBJ_DB_SCHEMA)
     jsql.connect()
     jsql.autoload()
 

@@ -87,7 +87,7 @@ class AllChecks(TestCase):
             if doStoreCheck:
 #                # Does require:
                 try:
-                    from cing.PluginCode.sqlAlchemy import csqlAlchemy #@UnusedImport
+                    from cing.PluginCode.sqlAlchemy import CsqlAlchemy #@UnusedImport
                     pdbEntryId = entryId[0:4]
                     if doStoreCING2db( pdbEntryId, ARCHIVE_DEV_NRG_ID, project=project):
                         NTerror("Failed to store CING project's data to DB but continuing.")

@@ -10,7 +10,7 @@ from cing.NRG import NRG_DB_NAME
 from cing.NRG import PDBJ_DB_NAME
 from cing.NRG import PDBJ_DB_USER_NAME
 from cing.NRG.PDBEntryLists import * #@UnusedWildImport
-from cing.PluginCode.sqlAlchemy import csqlAlchemy
+from cing.PluginCode.sqlAlchemy import CsqlAlchemy
 from unittest import TestCase
 from sqlalchemy.sql.expression import select
 import unittest
@@ -38,7 +38,7 @@ class AllChecks(TestCase):
         NTdebug("db_name:              %s" % db_name)
         NTdebug("schema:               %s" % schema)
 
-        csql = csqlAlchemy(user=user_name, db=db_name,schema=schema)
+        csql = CsqlAlchemy(user=user_name, db=db_name,schema=schema)
         self.assertFalse( csql.connect(), "Failed to connect to DB")
         csql.autoload()
 

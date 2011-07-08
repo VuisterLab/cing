@@ -7,7 +7,8 @@ sudo launchctl load /Library/LaunchAgents/org.jenkins-ci.plist
 
 
 # Or directly:
-java -jar /Applications/Jenkins/jenkins.war --argumentsRealm.passwd.jurgenfd=XXXX --argumentsRealm.roles.jurgenfd=admin --httpPort=8081 --httpListenAddress=127.0.0.1 --ajp13Port=8010 --prefix=/jenkins
+java -jar /Applications/Jenkins/jenkins.war --argumentsRealm.passwd.jurgenfd=XXXX --argumentsRealm.roles.jurgenfd=admin \
+    --httpPort=8081 --httpListenAddress=127.0.0.1 --ajp13Port=8010 --prefix=/jenkins
 
 
 # mac ports gives pylint-2.6 0.23.0 (only recently; this was 0.20 which was a real pain in the..)
