@@ -8,9 +8,11 @@ First the script is going to deassign all HB's in the specific Leucine, secondly
 the violations in the trans and in the gauche + combination and finally it combines the
 restraints in the project. Script follows on script rotateleucinesinyasara.py Script cannot
 handle multimers.
+
 !!Be careful: Make a copy of your project before you run this one. This script will alter
 the restraints in you project. It is not possible to restore them!!
 '''
+
 from munkres import Munkres
 from cing.core.classes import * #@UnusedWildImport
 from cing.core.molecule import * #@UnusedWildImport
@@ -18,8 +20,10 @@ from collections import defaultdict
 from itertools import combinations
 
 def addDihRestr(proj,lower,upper,leuNumberList):
-    '''Adding CHI2 dihedral restraints to leucines, specified in leuNumberList. lower and upper are the lower bound and upper bound of the restraint.'''
-    '''The restraints will be put in a new restraintlist'''
+    '''
+    Adding CHI2 dihedral restraints to leucines, specified in leuNumberList. lower and upper are the lower bound and upper bound of the restraint.
+    The restraints will be put in a new restraintlist
+    '''
     #molec=proj.molecule.A
     leu=[]
     for r in leuNumberList:
@@ -39,7 +43,10 @@ def addDihRestr(proj,lower,upper,leuNumberList):
     return proj
 
 def checkDoubleRestraints(proj,leu):
-    '''After deassignment, some atomPairs occur twice in the distance restraint list. This script will delete the one with the highest upperbound.'''
+    '''
+    After deassignment, some atomPairs occur twice in the distance restraint list. 
+    This script will delete the one with the highest upperbound.
+    '''
     NTmessage('Checking for double restraints after deassignment')
     delList=[]
     drlist=leu.distanceRestraints
@@ -74,6 +81,7 @@ def checkRestraintsExistance(restraintlist,proj):
     if count==0:
         NTerror('No restraints found')
     return()
+#end def
 
 def deassignHB(proj,leu):
     '''Deassignes HBs in specified leucines. It will replace the old restraint, in order to delete all the other information.'''
@@ -105,10 +113,14 @@ def deassignHB(proj,leu):
     proj=checkDoubleRestraints(proj,leu)
     proj.distances[0].analyze()
     return (proj,deassHBaplist)
+#end def
 
 def checkDeasrHB(n,deassHBaplist):
-    '''If an atom pair with a HB is already deassigned, it must be removed from the list to deassign. deassHBaplist is the list which is already deassigned
-    and n is the list of restraints, which violate in trans and gauche+, which should be deassigned.'''
+    '''
+    If an atom pair with a HB is already deassigned, it must be removed from the list to deassign. 
+    deassHBaplist is the list which is already deassigned
+    and n is the list of restraints, which violate in trans and gauche+, which should be deassigned.
+    '''
     NTmessage('checkDeasrHB is running')
     atomIndexes=[0,1]
     delList=[]
@@ -117,7 +129,7 @@ def checkDeasrHB(n,deassHBaplist):
     for dr in n:
         for j in deassHBaplist:
             if str(dr[atomIndexes[0]])==str(j[atomIndexes[0]]) and str(dr[atomIndexes[1]])==str(j[atomIndexes[1]]):
-               delList.append(dr)
+                delList.append(dr)
     for dr in delList:
         n.remove(dr)
         NTmessage('%s will not be removed.'%str(dr))
@@ -145,7 +157,7 @@ def classifyRestraints(prl,leu,treshold):
     NTmessage('Divide restraints into classes for %s'%leu.name)
     drlleu=leu.distanceRestraints #distance restraints of leucine g
     for k in range(len(drlleu)):
-        found=0;
+        found=0
         dr=drlleu[k] #distance restraint k of this leucine
         for a in range(len(scall)): #loops over the atoms in scall
             if found==1:
@@ -183,11 +195,12 @@ def classifyRestraints(prl,leu,treshold):
                     trdict[dr.atomPairs[0]]=(dr.upper,violTreshTr)
                 elif violCountGp>(violCountTr+tresholdModelCount) and violGp>violTr:
                     gpdict[dr.atomPairs[0]]=(dr.upper,violTreshGp)
-                elif violCountGp<tresholdModelCount and violCountTr<tresholdModelCount: #less than 10 violations is not enough to classify restraint.
+                elif violCountGp<tresholdModelCount and violCountTr<tresholdModelCount: 
+                    #less than 10 violations is not enough to classify restraint.
                     u.append(dr.atomPairs[0])
                 else:
                     n.append(dr.atomPairs[0])
-                found=1;
+                found=1
                 break
                 #endif
             #endfor
@@ -220,7 +233,10 @@ def dictValues(vdict):
     return(vdict,v,lenv,)
 
 def reverseDict(vdict):
-    '''Interchange of keys and values in a dictionary. In case a value occurs twice, the dictionary will have two keys in a list for that value.'''
+    '''
+    Interchange of keys and values in a dictionary. 
+    In case a value occurs twice, the dictionary will have two keys in a list for that value.
+    '''
     rdict=defaultdict(list)
     for ii,jj in vdict.items():
         rdict[jj].append(ii)
@@ -337,15 +353,15 @@ def interChange(a,b):
     if type(b)==type(a):
         return b,a
 
-def transpose(table):
+def transposeTable(table):
     '''transposes a table, so the rows will be columns and the columns will be rows.'''
     if not table:
         return []
     return map(lambda *row: list(row), *table)
 
 def calculateIndexes(allowedTable,lenDrlColumns,lenDrlRows):
-    NTmessage('Calculating optimal indexes')
     '''Calculates ideal combination of restraints, based on the allowedTable. It returns the indexes of the table.'''
+    NTmessage('Calculating optimal indexes')
     totalValueNew='INF'
     if not lenDrlRows!=lenDrlColumns:
         nCr=calcnCr(lenDrlRows,lenDrlColumns)
@@ -387,7 +403,7 @@ def calcnCr(n,k):
         facnk=fac(n-k)
         nCr=facn/(fack*facnk)
     else:
-        'k<0 or k>n; cannot calculate n nCr k.'
+        #: k<0 or k>n; cannot calculate n nCr k.
         nCr=None
     #endif
     return nCr
@@ -413,8 +429,10 @@ def calculateCombs(lenDrlColumns,lenDrlRows):
     return combs
 
 def calulateAllCombinations(comb,allowedTable,lenDrlRows):
-    '''Calculates the total sum of the differences in upper bound of distance restraints for the given combinations. The lower the sum, the less information
-    is lost.'''
+    '''
+    Calculates the total sum of the differences in upper bound of distance restraints for the given combinations. 
+    The lower the sum, the less information is lost.
+    '''
     munk=Munkres()
     totalvalue=0
     table1=[]
@@ -471,7 +489,10 @@ def translateIndexes(comb,indexes1,indexes2,lenDrlRows):
     return finalIndexes
 
 def checkIndexes(indexes,allowedTable,table,maxi,deassignList,invdrlColumnsdict,invdrlRowsdict,drlColumns,drlRows,lenDrlRows):
-    '''rows and columns represent the restraintpairs. Checks wether there is choosen a maximum (=not allowed) value and if all rows are combined with a column.'''
+    '''
+    Rows and columns represent the restraintpairs. Checks wether there is choosen a maximum (=not allowed) value and if all rows are 
+    combined with a column.
+    '''
     values=[]#values of allowedTable of restraint combinations in rows and columns. Not necessary.
     rows=[]
     columns=[]
@@ -576,10 +597,12 @@ def makeDisRList(restraintPairDict,proj):
         ap1=[]
         ap2=[]
         for j in proj.distances[0]:
-            if str(j.atomPairs[0][atomIndexes[0]])==str(i[0][atomIndexes[0]]) and str(j.atomPairs[0][atomIndexes[1]])==str(i[0][atomIndexes[1]]):
+            if str(j.atomPairs[0][atomIndexes[0]])==str(i[0][atomIndexes[0]]) and \
+               str(j.atomPairs[0][atomIndexes[1]])==str(i[0][atomIndexes[1]]):
                 ap1=j.atomPairs[:]
                 delList.append(j)
-            elif str(j.atomPairs[0][atomIndexes[0]])==str(i[1][atomIndexes[0]]) and str(j.atomPairs[0][atomIndexes[1]])==str(i[1][atomIndexes[1]]):
+            elif str(j.atomPairs[0][atomIndexes[0]])==str(i[1][atomIndexes[0]]) and \
+                 str(j.atomPairs[0][atomIndexes[1]])==str(i[1][atomIndexes[1]]):
                 ap2=j.atomPairs[0][:]
                 delList.append(j)
             #endif
@@ -695,13 +718,14 @@ def writeRestraintsForLeu(prl,proj,prlleu,projleu,treshold,deasHB):
     invdrlRowsdict=reverseDict(drlRowsdict)
     table=makeDifferenceTable(drlColumns, drlRows,lenDrlColumns,lenDrlRows)
     allowedTable,maxi=makeAllowedTable(table,drlColumns,drlRows,lenDrlColumns,lenDrlRows)
-    allowedTable,table,lenDrlRows,lenDrlColumns,drlRows,drlColumns,n=checkAllowedTable(allowedTable,table,maxi,n,lenDrlColumns,lenDrlRows,drlColumns,drlRows,invdrlColumnsdict,invdrlRowsdict)
+    allowedTable,table,lenDrlRows,lenDrlColumns,drlRows,drlColumns,n=checkAllowedTable(allowedTable,table,maxi,n,
+                                                            lenDrlColumns,lenDrlRows,drlColumns,drlRows,invdrlColumnsdict,invdrlRowsdict)
     if lenDrlRows<lenDrlColumns:
         drlColumnsdict,drlRowsdict=interChange(drlColumnsdict,drlRowsdict)
         lenDrlColumns,lenDrlRows=interChange(lenDrlColumns,lenDrlRows)
         drlColumns,drlRows=interChange(drlColumns,drlRows)
-        table=transpose(table)
-        allowedTable=transpose(allowedTable)
+        table=transposeTable(table)
+        allowedTable=transposeTable(allowedTable)
     stringTable=tablePrint(table,5)
     NTmessage('Difference table is:\n%s'%stringTable)
     stringAllowedTable=tablePrint(allowedTable,15)
@@ -713,13 +737,15 @@ def writeRestraintsForLeu(prl,proj,prlleu,projleu,treshold,deasHB):
         indexes,totalValueNew=calculateIndexes(allowedTable,lenDrlColumns,lenDrlRows)
         #Code below was only used to set the indexes of the table by hand.
         #if projleu.resNum==589:
-        #    indexes=[(0,0),(1,3),(2,1),(3,2),(4,4),(5,6),(6,5),(7,7),(8,7),(9,10),(10,9),(11,12),(12,11),(13,11),(14,12),(15,8),(16,13),(17,14),(18,14),(19,15),(20,8),(21,8)]
+        #    indexes=[(0,0),(1,3),(2,1),(3,2),(4,4),(5,6),(6,5),(7,7),(8,7),(9,10),(10,9),(11,12),(12,11),(13,11),
+#            (14,12),(15,8),(16,13),(17,14),(18,14),(19,15),(20,8),(21,8)]
         #elif projleu.resNum==596:
         #    indexes=[(0,1),(1,0),(2,0),(3,3),(4,4),(5,5),(6,12),(7,2),(8,6),(9,8),(10,7),(11,9),(12,10),(13,11)]
         #elif projleu.resNum==618:
         #    indexes=[(0,0),(1,1)]
         #totalValueNew='INF'
-        n,rows,columns,_values=checkIndexes(indexes,allowedTable,table,maxi,n,invdrlColumnsdict,invdrlRowsdict,drlColumns,drlRows,lenDrlRows)
+        n,rows,columns,_values=checkIndexes(indexes,allowedTable,table,maxi,n,invdrlColumnsdict,
+                                            invdrlRowsdict,drlColumns,drlRows,lenDrlRows)
         if totalValueNew!='INF':
             NTmessage('total sum of differences between upperbounds of combined restraints is %.2f A.'%(float(totalValueNew)/1000))
         #n=checkDeasrHB(n,deassHBaplistproj) Not necessary anymore since distances are recalculated after deassignment HB's.
@@ -731,8 +757,11 @@ def writeRestraintsForLeu(prl,proj,prlleu,projleu,treshold,deasHB):
     return proj
 
 def alterRestraintsForLeus(leuNumberList,proj,prl,treshold,deasHB,dihrCHI2):
-    '''This script rotates over all leucines and combines its restraints. After that, a CHI2restraint will be added to each of the specified leucines.
-    leuNumberList=list of indices which leucines should be taken. So if you have 5 leucines and you want the first and the fourth, leuNumberList=[1,4]
+    '''
+    This script rotates over all leucines and combines its restraints. After that, a CHI2restraint will be added to each of the 
+    specified leucines.
+    leuNumberList=list of indices which leucines should be taken. So if you have 5 leucines and you want the first and the fourth, 
+    leuNumberList=[1,4]
     proj=project that you want to change
     prl=copy of project with 3 models with leucines in different conformations, created in rotateLeucines.py
     treshold gives the treshold value for the violations.
