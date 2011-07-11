@@ -38,7 +38,7 @@ for residue in project.molecule.allResidues(): #@UndefinedVariable
     for atm in atoms:
         if not atm:
             NTmessage('%-8s  ', '-X-')
-        elif atm.isAssigned():
+        elif atm.isAssigned(resonanceListIdx=RESONANCE_LIST_IDX_ANY):
             NTmessage('%-8.3f  ', atm.shift() )
         else:
             NTmessage('%-8s  ', '-?-' )

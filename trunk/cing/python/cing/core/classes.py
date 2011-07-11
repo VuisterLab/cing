@@ -2396,10 +2396,14 @@ class Peak(NTdict, Lister):
     #end def
 
     def isAssigned(self, axis):
-        if (axis >= self.dimension): return False
-        if (axis >= len(self.resonances)): return False
-        if (self.resonances[axis] == None): return False
-        if (self.resonances[axis].atom == None): return False
+        if axis >= self.dimension: 
+            return False
+        if axis >= len(self.resonances): 
+            return False
+        if self.resonances[axis] == None: 
+            return False
+        if self.resonances[axis].atom == None: 
+            return False
         return True
     #end def
 

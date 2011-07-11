@@ -184,7 +184,7 @@ def criticizePeaks( project, toFile=True ):
                 resonance = peak.resonances[i]
                 if resonance and resonance.atom != None and resonance.value != NOSHIFT:
                     resonance.atom.peakPositions.append(peak.positions[i])
-                    if not resonance.atom.isAssigned():
+                    if not resonance.atom.isAssigned(resonanceListIdx=RESONANCE_LIST_IDX_ANY):
                         peak.rogScore.setMaxColor( COLOR_ORANGE,
                                                     sprintf('%s unassigned', resonance.atom)
                                                   )
@@ -453,7 +453,6 @@ def criticize(project, toFile=True):
         #end for
 
         useOldMethod = 0
-        msg = 'Inferred from residue ROG scores'
         color = project.molecule.getRogColor()
         if useOldMethod:
             if len(project.molecule[COLOR_RED]) > 0:
@@ -465,8 +464,9 @@ def criticize(project, toFile=True):
         if color == None:
             NTerror("Failed to determine the entry rog score color")
         else:                
-            # TODO: NB if the rog was more severe before it will not be reset here. 
-            project.molecule.rogScore.setMaxColor(color,msg)
+            # TODO: NB if the rog was more severe before it will not be reset here.
+            NTdebug("If worse, setting molecule rog color to: %s" % color) 
+            project.molecule.rogScore.setMaxColor(color, 'Inferred from residue ROG scores')
         # end if
                 
         if toFile:
@@ -1209,7 +1209,7 @@ def _fixStereoAssignments( project  ):
             # check stereo methyl protons
             if atm.isMethylProton():
                 heavy = atm.heavyAtom()
-                if heavy and heavy.isAssigned() and not heavy.isStereoAssigned():
+                if heavy and heavy.isAssigned(resonanceListIdx=RESONANCE_LIST_IDX_ANY) and not heavy.isStereoAssigned():
                     heavy.stereoAssigned = True
                     NTmessage('==> fixed stereo assignment %s', heavy)
                 #end if
@@ -1217,13 +1217,13 @@ def _fixStereoAssignments( project  ):
             # check stereo methyl carbon
             elif atm.isMethyl() and atm.isCarbon():
                 pseudo = atm.attachedProtons(includePseudo=True).last()
-                if pseudo and pseudo.isAssigned() and not pseudo.isStereoAssigned():
+                if pseudo and pseudo.isAssigned(resonanceListIdx=RESONANCE_LIST_IDX_ANY) and not pseudo.isStereoAssigned():
                     pseudo.stereoAssigned = True
                     NTmessage('==> fixed stereo assignment %s', pseudo)
                 #end if
             #end if
             partner = atm.proChiralPartner()
-            if partner and partner.isAssigned() and not partner.isStereoAssigned():
+            if partner and partner.isAssigned(resonanceListIdx=RESONANCE_LIST_IDX_ANY) and not partner.isStereoAssigned():
                 partner.stereoAssigned = True
                 NTmessage('==> fixed stereo assignment %s', partner)
             #end if
@@ -1323,8 +1323,9 @@ def moleculeValidateAssignments( molecule  ):
                 NTerror("Failed to validateChemicalShiftLeu for %s" % res)
 
         for atm in res.allAtoms():
-            if atm.isAssigned():
-                shift = atm.shift()
+            if atm.isAssigned(resonanceListIdx=RESONANCE_LIST_IDX_ANY):
+#                NTdebug('Assigned atom: %s' % atm)
+                shift = atm.shift(resonanceListIdx=RESONANCE_LIST_IDX_ANY)
                 pseudo = atm.pseudoAtom()
 
                 # Check the shift against the database
@@ -1340,31 +1341,40 @@ def moleculeValidateAssignments( molecule  ):
                     sd = None
                 #end if
 
-                if av and sd:
-                    delta = math.fabs(shift - av) / sd
-                    if delta > 3.0:
-                        string = sprintf('%.1f*sd from (%.2f,%.2f)', delta, av, sd )
+                if av != None and sd:
+                    delta = math.fabs((shift - av) / sd)
+                    if sd < 0.0:
+                        NTerror("Found negative sd. Skipping critiqueing.")
+                        continue
+                    msg = sprintf('%.1f*sd from (%.2f,%.2f)', delta, av, sd )
+                    debug_msg = sprintf('    shift %.2f, ' % shift)
+#                    NTdebug(debug_msg)
+                    if delta > 3.0:                        
                         result.append( atm )
-                        atm.validateAssignment.append(string)
+                        atm.validateAssignment.append(msg)
+#                        NTdebug("Found situation 2: " + msg)                        
+                    else:
+                        pass
+#                        NTdebug("Found situation 3: " + msg)
                     #end if
                 #end if
 
                 # Check if not both realAtom and pseudoAtom are assigned
-                if atm.hasPseudoAtom() and atm.pseudoAtom().isAssigned():
-                    string = sprintf('%s: and %s', MULTIPLE_ASSIGNMENT, atm.pseudoAtom() )
-    #                NTmessage('%-20s %s', atm, string)
+                if atm.hasPseudoAtom() and atm.pseudoAtom().isAssigned(resonanceListIdx=RESONANCE_LIST_IDX_ANY):
+                    msg = sprintf('%s: and %s', MULTIPLE_ASSIGNMENT, atm.pseudoAtom() )
+    #                NTmessage('%-20s %s', atm, msg)
                     result.append( atm )
-                    atm.validateAssignment.append(string)
+                    atm.validateAssignment.append(msg)
                 #end if
 
                 # Check if not pseudoAtom and realAtom are assigned
                 if atm.isPseudoAtom():
                     for a in atm.realAtoms():
-                        if a.isAssigned():
-                            string = sprintf('%s: and %s', MULTIPLE_ASSIGNMENT, a )
-    #                        NTmessage('%-20s %s', atm, string)
+                        if a.isAssigned(resonanceListIdx=RESONANCE_LIST_IDX_ANY):
+                            msg = sprintf('%s: and %s', MULTIPLE_ASSIGNMENT, a )
+    #                        NTmessage('%-20s %s', atm, msg)
                             result.append( atm )
-                            atm.validateAssignment.append(string)
+                            atm.validateAssignment.append(msg)
                         #end if
                     #end for
                 #end if
@@ -1374,11 +1384,11 @@ def moleculeValidateAssignments( molecule  ):
                     for a in atm.pseudoAtom().realAtoms():
                         if a.isMethylProtonButNotPseudo():
                             continue
-                        if not a.isAssigned():
-                            string = sprintf('%s: expected %s', MISSING_ASSIGNMENT, a )
-    #                        NTmessage('%-20s %s', atm, string )
+                        if not a.isAssigned(resonanceListIdx=RESONANCE_LIST_IDX_ANY):
+                            msg = sprintf('%s: expected %s', MISSING_ASSIGNMENT, a )
+    #                        NTmessage('%-20s %s', atm, msg )
                             result.append( atm )
-                            atm.validateAssignment.append(string)
+                            atm.validateAssignment.append(msg)
                         #end if
                     #end for
                 #end if
@@ -1388,37 +1398,37 @@ def moleculeValidateAssignments( molecule  ):
                     heavyAtm = atm.heavyAtom()
                     if heavyAtm == None:
                         NTerror("Failed to get heavy for atm: %s" % atm)
-                    elif not heavyAtm.isAssigned():
+                    elif not heavyAtm.isAssigned(resonanceListIdx=RESONANCE_LIST_IDX_ANY):
                         spinType = getDeepByKeys(heavyAtm, 'db', 'spinType')
                         if spinType:
                             # Only complain if type has at least one assignment.
                             if getDeepByKeys( hasAssignment, spinType):
-                                string = sprintf('%s: %s', EXPECTED_ASSIGNMENT, heavyAtm )
-            #                    NTmessage('%-20s %s', atm, string )
+                                msg = sprintf('%s: %s', EXPECTED_ASSIGNMENT, heavyAtm )
+            #                    NTmessage('%-20s %s', atm, msg )
                                 result.append( atm )
-                                atm.validateAssignment.append(string)
+                                atm.validateAssignment.append(msg)
                     #end if
                 #end if atm.isProton()
 
                 # stereo assignments checks
                 if atm.isStereoAssigned():
                     if not atm.isProChiral():
-                        string = sprintf('%s: %s', INVALID_STEREO_ASSIGNMENT, atm )
+                        msg = sprintf('%s: %s', INVALID_STEREO_ASSIGNMENT, atm )
                         result.append( atm )
-                        atm.validateAssignment.append(string)
+                        atm.validateAssignment.append(msg)
                     else:
                         # Check prochiral partner assignments
                         partner = atm.proChiralPartner()
                         if partner:
-                            if not partner.isAssigned():
-                                string = sprintf('%s: %s unassigned', INVALID_STEREO_ASSIGNMENT, partner )
+                            if not partner.isAssigned(resonanceListIdx=RESONANCE_LIST_IDX_ANY):
+                                msg = sprintf('%s: %s unassigned', INVALID_STEREO_ASSIGNMENT, partner )
                                 result.append( atm )
-                                atm.validateAssignment.append(string)
+                                atm.validateAssignment.append(msg)
                             else:
                                 if not partner.isStereoAssigned():
-                                    string = sprintf('%s: %s not stereo assigned', INVALID_STEREO_ASSIGNMENT, partner )
+                                    msg = sprintf('%s: %s not stereo assigned', INVALID_STEREO_ASSIGNMENT, partner )
                                     result.append( atm )
-                                    atm.validateAssignment.append(string)
+                                    atm.validateAssignment.append(msg)
                                 #end if
                             #end if
                         #end if
@@ -1431,14 +1441,14 @@ def moleculeValidateAssignments( molecule  ):
                     if atm.name.endswith('1'): # JFD: don't do both.
                         if heavy and heavy.isAssigned():
                             if atm.isStereoAssigned() and not heavy.isStereoAssigned():
-                                string = sprintf('%s: %s not stereo assigned', INVALID_STEREO_ASSIGNMENT, heavy )
+                                msg = sprintf('%s: %s not stereo assigned', INVALID_STEREO_ASSIGNMENT, heavy )
                                 result.append( atm )
-                                atm.validateAssignment.append(string)
+                                atm.validateAssignment.append(msg)
                             #end if
                             if not atm.isStereoAssigned() and heavy.isStereoAssigned():
-                                string = sprintf('%s: %s is stereo assigned', INVALID_STEREO_ASSIGNMENT, heavy )
+                                msg = sprintf('%s: %s is stereo assigned', INVALID_STEREO_ASSIGNMENT, heavy )
                                 result.append( atm )
-                                atm.validateAssignment.append(string)
+                                atm.validateAssignment.append(msg)
                             #end if
                         #end if
                     #end if
@@ -1448,37 +1458,37 @@ def moleculeValidateAssignments( molecule  ):
                     # check stereo methyl carbon
                     if atm.isMethyl() and atm.isCarbon():
                         pseudo = atm.attachedProtons(includePseudo=True).last()
-                        if pseudo and pseudo.isAssigned():
+                        if pseudo and pseudo.isAssigned(resonanceListIdx=RESONANCE_LIST_IDX_ANY):
                             if atm.isStereoAssigned() and not pseudo.isStereoAssigned():
-                                string = sprintf('%s: %s not stereo assigned', INVALID_STEREO_ASSIGNMENT, pseudo )
+                                msg = sprintf('%s: %s not stereo assigned', INVALID_STEREO_ASSIGNMENT, pseudo )
                                 result.append( atm )
-                                atm.validateAssignment.append(string)
+                                atm.validateAssignment.append(msg)
                             #end if
                             if not atm.isStereoAssigned() and pseudo.isStereoAssigned():
-                                string = sprintf('%s: %s is stereo assigned', INVALID_STEREO_ASSIGNMENT, pseudo )
+                                msg = sprintf('%s: %s is stereo assigned', INVALID_STEREO_ASSIGNMENT, pseudo )
                                 result.append( atm )
-                                atm.validateAssignment.append(string)
+                                atm.validateAssignment.append(msg)
                             #end if
                         #end if
                     #end if
                 #end if
 
             else:
+#                NTdebug('Unassigned atom: %s' % atm)
                 # Atm is not assigned but stereo assignment is set
                 if atm.isStereoAssigned():
-                    string = sprintf('%s: not assigned but stereo-assignment %s set', INVALID_STEREO_ASSIGNMENT, atm )
+                    msg = sprintf('%s: not assigned but stereo-assignment %s set', INVALID_STEREO_ASSIGNMENT, atm )
                     result.append( atm )
-                    atm.validateAssignment.append(string)
+                    atm.validateAssignment.append(msg)
                 #end if
 
                 if atm.isProChiral():
                     partner = atm.proChiralPartner()
-                    if partner and partner.isAssigned() and partner.isStereoAssigned():
-                        string = sprintf('%s: prochiral partner %s is stereo assigned', INVALID_STEREO_ASSIGNMENT, partner )
+                    if partner and partner.isAssigned(resonanceListIdx=RESONANCE_LIST_IDX_ANY) and partner.isStereoAssigned():
+                        msg = sprintf('%s: prochiral partner %s is stereo assigned', INVALID_STEREO_ASSIGNMENT, partner )
                         result.append( atm )
-                        atm.validateAssignment.append(string)
+                        atm.validateAssignment.append(msg)
                 #end if
-
             #end if atm.isAssigned():
 
             if atm.validateAssignment:
@@ -1488,10 +1498,9 @@ def moleculeValidateAssignments( molecule  ):
             #end if
         #end for atoms
     #end for residues
-
-
     return result
 #end def
+
 #Patch the Molecule class
 Molecule.validateAssignments = moleculeValidateAssignments
 

@@ -34,7 +34,7 @@ def exportShifts2Sparky( molecule, fileName=None, onlyAssigned=1)   :
     count = 0
     for ac in allAtoms( molecule ):
 #        shift = ac.resonances().value
-        assigned = ac.isAssigned()
+        assigned = ac.isAssigned(resonanceListIdx=RESONANCE_LIST_IDX_ANY)
         if (onlyAssigned and assigned) or (not onlyAssigned):
             fprintf(  f,'%-5s %-5s %-5s %10.3f %10.3f %7d\n',
                       ac._parent.shortName,

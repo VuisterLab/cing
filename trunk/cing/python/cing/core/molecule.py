@@ -395,8 +395,10 @@ class Molecule( NTtree, ResidueList ):
         self.nAssigned = 0
         self.nStereoAssigned = 0
         for atm in self.allAtoms():
-            if atm.isAssigned(): self.nAssigned += 1
-            if atm.isStereoAssigned(): self.nStereoAssigned += 1
+            if atm.isAssigned(resonanceListIdx=RESONANCE_LIST_IDX_ANY):
+                self.nAssigned += 1
+            if atm.isStereoAssigned(): 
+                self.nStereoAssigned += 1
         #end for
 
         result = sprintf(
@@ -4559,7 +4561,7 @@ Residue class: Defines residue properties
 
         If the csd < 0.01 then the resonances were assumed to overlap and no critiques are attempted.
 
-        TODO:
+        TODO: Figure out how to handle multiple lists of shifts.
             -
         """
 
@@ -5427,7 +5429,8 @@ coordinates: %s"""  , dots, self, dots
     #end def
     
     def isAssigned( self, resonanceListIdx=None ):
-        """return true if atom current resonance has a valid assignment
+        """
+        Return true if atom current resonance has a valid assignment
         Special case of resonanceListIdx is RESONANCE_LIST_IDX_ANY  will match assignment in any list.
         """
         if resonanceListIdx == RESONANCE_LIST_IDX_ANY:
@@ -5452,12 +5455,33 @@ coordinates: %s"""  , dots, self, dots
         return not isNaN(resonance.value)
     #end def
 
-    def shift( self ):
-        if self.isAssigned():
-            return self.resonances().value
+    def shift( self, resonanceListIdx=None  ):
+        '''
+        Return the chemical shift value of this atom if available or NaN if not.
+        Special case of resonanceListIdx is RESONANCE_LIST_IDX_ANY  will match assignment in any list.        
+        '''
+        if not self.isAssigned( resonanceListIdx=resonanceListIdx ):
+            return NaN
+        # end if
+        resonance = None
+        
+        if resonanceListIdx == RESONANCE_LIST_IDX_ANY:
+            for resonance in self.resonances:
+                if resonance == None:
+                    continue
+                if isNaN(resonance.value):
+                    continue
+                break # Found useful resonance.
+            # end for
+        elif resonanceListIdx != None:
+            resonance = self.resonances( index = resonanceListIdx )
         else:
+            resonance = self.resonances()
+        #end if
+        if resonance == None:
             return NaN
         #end if
+        return resonance.value        
     #end def
 
     def swapAssignments( self, other ):
@@ -5748,7 +5772,7 @@ coordinates: %s"""  , dots, self, dots
 
         props = NTlist(*self.db.properties)
 
-        if self.isAssigned():
+        if self.isAssigned(resonanceListIdx=RESONANCE_LIST_IDX_ANY):
             props.append('isAssigned','assigned')
         else:
             props.append('isNotAssigned','notassigned')

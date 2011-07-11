@@ -1121,7 +1121,7 @@ DATA ATOMNAMES HA CA CB C N HN
     for resId,res in enumerate(residues):
         for ac in res.allAtoms():
             atomName = ac.translate(IUPAC)
-            if (ac.isAssigned() and ( atomName in talosNuclei)):
+            if (ac.isAssigned(resonanceListIdx=RESONANCE_LIST_IDX_ANY) and ( atomName in talosNuclei)):
                 shift = ac.shift() # save the shift, because Gly QA pseudo atom does get expanded
                 for ra in ac.realAtoms():
                     atomName = ra.translate(IUPAC)
