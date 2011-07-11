@@ -192,8 +192,9 @@ class AllChecks(TestCase):
                 project = Project.open(entryId, status = 'old')
                 self.assertTrue(project, 'Failed reopening project: ' + entryId)
             if doStoreCheck:
-#                # Does require:
-                from cing.PluginCode.sqlAlchemy import CsqlAlchemy #@UnusedImport
+#                # Does require below import which is used here to trigger import warning in case it's not installed.
+                # pylint: disable=W0612
+                from cing.PluginCode.sqlAlchemy import CsqlAlchemy #@UnusedImport # pylint: disable=W0404
                 if doStoreCING2db( entryId, ARCHIVE_NRG_ID, project=project):
                     NTerror("Failed to store CING project's data to DB but continuing.")
             if doSave:

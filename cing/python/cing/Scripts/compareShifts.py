@@ -62,7 +62,7 @@ def compareShifts(projectA, projectB):
         for a1 in res1.atoms:
             a2 = a1.map #check if this atom exists in res2
             a1.delta = None
-            if a2 and a1.isAssigned() and a2.isAssigned():
+            if a2 and a1.isAssigned(resonanceListIdx=RESONANCE_LIST_IDX_ANY) and a2.isAssigned(resonanceListIdx=RESONANCE_LIST_IDX_ANY):
                 a1.delta = a1.resonances().value - a2.resonances().value
             #end if
 
@@ -74,7 +74,7 @@ def compareShifts(projectA, projectB):
                 pc2 = None
             #end if
             a1.deltaPC = None # delta with prochiral atom
-            if pc2 and a1.isAssigned() and pc2.isAssigned():
+            if pc2 and a1.isAssigned(resonanceListIdx=RESONANCE_LIST_IDX_ANY) and pc2.isAssigned(resonanceListIdx=RESONANCE_LIST_IDX_ANY):
                 a1.deltaPC = a1.resonances().value - pc2.resonances().value
             #end if
         #end for

@@ -611,28 +611,28 @@ Sum                %s""" % (
             return '[]'
         #end if
 
-        string = '['
+        msg = '['
         for item in self:
-            string = string + str(item) +', '
+            msg = msg + str(item) +', '
         #end for
-        string = string[:-2]+']'
-        return string
+        msg = msg[:-2]+']'
+        return msg
     #end def
 
 # gv 19 Jun 08: reintroduced functionality, but shorter
     def __repr__(self):
-        string = list.__repr__(self)
-        return 'NTlist(' + string[1:-1] + ')'
+        msg = list.__repr__(self)
+        return 'NTlist(' + msg[1:-1] + ')'
 
 #        if len(self) == 0:
 #            return 'NTlist()'
 #        #end if
-#        string = 'NTlist('
+#        msg = 'NTlist('
 #        for item in self:
-#            string = string + repr( item ) +', '
+#            msg = msg + repr( item ) +', '
 #        #end for
-#        string = string[:-2]+')'
-#        return string
+#        msg = msg[:-2]+')'
+#        return msg
     #end def
 
     def format(self, fmt = None):
@@ -646,37 +646,37 @@ Sum                %s""" % (
         if fmt == None:
             fmt = self.__FORMAT__ # Garanteed now.
         #end if
-        string = ''
+        msg = ''
         for item in self:
             if fmt:
                 if isinstance(item, list):
                     for subitem in item:
-                        string += fmt % subitem
+                        msg += fmt % subitem
                 else:
-                    string += fmt % item
+                    msg += fmt % item
             else:
-                string += repr(item) +' '
+                msg += repr(item) +' '
             #end if
         #end for
-        return string
+        return msg
     #end def
 
     def formatAll(self, start=0, stop=None):
         """
-        Generat string with every element of self on a single line using the format() method of the items
+        Generate string with every element of self on a single line using the format() method of the items
         Optionally run from start to stop
         """
         if stop == None:
             stop = len(self)
-        string = ''
+        msg = ''
         for i in range(start, stop):
             object = self[i]
             if hasattr(object, 'format'):
-                string +=  object.format() + '\n'
+                msg +=  object.format() + '\n'
             else:
-                string +=  str(object) + '\n'
+                msg +=  str(object) + '\n'
         #end for
-        return string
+        return msg
     #end def
 
 
@@ -1063,12 +1063,12 @@ class NTvector(list):
             return '(V:)'
         #end if
 
-        string = '(V: '
+        msg = '(V: '
         for item in self:
-            string = string + sprintf(self.fmt, item) +', '
+            msg += sprintf(self.fmt, item) +', '
         #end for
-        string = string[:-2]+')'
-        return string
+        msg = msg[:-2]+')'
+        return msg
     #end def
 #end class
 

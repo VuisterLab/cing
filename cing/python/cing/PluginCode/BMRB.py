@@ -108,11 +108,11 @@ def importFromBMRB( project, bmrbFile ):
     # now fix the assignments;
     for atm in mol.allAtoms():
         # Check if all realAtoms are assigned in case there is a pseudo atom
-        if atm.isAssigned() and not atm.isStereoAssigned() and atm.hasPseudoAtom():
+        if atm.isAssigned(resonanceListIdx=RESONANCE_LIST_IDX_ANY) and not atm.isStereoAssigned() and atm.hasPseudoAtom():
             fix = False
             pseudo = atm.pseudoAtom()
             for a in pseudo.realAtoms():
-                if not a.isAssigned():
+                if not a.isAssigned(resonanceListIdx=RESONANCE_LIST_IDX_ANY):
                     fix = True
                     break
                 #end if

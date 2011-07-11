@@ -385,7 +385,7 @@ def _calcQshift( atmList ):
     sumDeltaSq    = 0.0
     sumMeasuredSq = 0.0
     for atm in atmList:
-        if atm.has_key('shiftx') and len(atm.shiftx)>0 and atm.isAssigned():
+        if atm.has_key('shiftx') and len(atm.shiftx)>0 and atm.isAssigned(resonanceListIdx=RESONANCE_LIST_IDX_ANY):
             atm.shiftx.average()
             measured = atm.shift()
             sumMeasuredSq += measured**2
