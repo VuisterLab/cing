@@ -499,7 +499,7 @@ class Molecule( NTtree, ResidueList ):
         redCount = len( self[COLOR_RED] )
         oraCount = len( self[COLOR_ORANGE] ) # just included for completeness.
         greCount = len( self[COLOR_GREEN] )
-        NTdebug("Found red/orange/green %s/%s/%s" % (redCount, oraCount, greCount))
+#        NTdebug("Found red/orange/green %s/%s/%s" % (redCount, oraCount, greCount))
         residueCount = redCount + oraCount + greCount
         # First do some sanity checks.
         residueCount2 = len(self.allResidues())
@@ -518,8 +518,8 @@ class Molecule( NTtree, ResidueList ):
         grePer = 100. * greCount / residueCount 
         grePerCutoffRed    = redPer - 20
         grePerCutoffOrange = redPer + 20
-        msg = 'Residue perc. ROG (red/orange/green: %.0f/%.0f/%.0f).' % (redPer,oraPer,grePer)
-        NTdebug(msg)
+        msg = 'Residue perc. ROG (red/orange/green: %.0f/%.0f/%.0f).' % (redPer,oraPer,grePer) #@UnusedVariable
+#        NTdebug(msg)
         if grePer < grePerCutoffRed:
             return COLOR_RED
         if grePer < grePerCutoffOrange:

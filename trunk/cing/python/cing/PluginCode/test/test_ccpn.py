@@ -26,11 +26,14 @@ class AllChecks(TestCase):
 #    entryList = "1cjg".split()
 #    entryList = "1hue".split()
 #    entryList = "1dum".split()
-    entryList = "1brv".split() # DEFAULT: 1brv
-#    entryList = "2yhh".split() # DEFAULT: 1brv
+    entryList = "1brv".split()
+#    entryList = "1brv 2k6q".split() # DEFAULT: 1brv 2k6q
+#    entryList = "2yhh".split() 
 #    entryList = "2hgh".split()
 #    entryList = "1bus".split()
 #    entryList = "1a4d 1ai0 1brv_cs_pk_2mdl 1bus 2hgh".split()
+#    entryList = "2k6q".split()
+    
     def test_ccpn(self):
         'Testing ccpn'
 #        cing.verbosity = verbosityDebug
