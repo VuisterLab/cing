@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+#@PydevCodeAnalysisIgnore # pylint: disable-all
 from cing.Libs.NTutils import * #@UnusedWildImport
 from queen.main import * #@UnusedWildImport
 
@@ -47,7 +48,7 @@ if options.dihedral: type="DIHE"
 else: type="DIST"
 # GROUP RESTRAINTS
 if options.group:
-  if type!="DIST": NTerror("Only distance restraints can be grouped")
+  if type!="DIST": nTerror("Only distance restraints can be grouped")
   else:
     groupout = rfile_group(args[0])
     filelist = groupout[0]
@@ -75,8 +76,8 @@ if options.visualize:
   # CHECK FOR YASARA
   if os.path.exists(nmvconf["YASARA"]):
     # CHECK IF A PDB FILE IS PROVIDED
-    if not options.pdbfile: NTerror("Please provide a PDB file (-p PDBFILE option)")
+    if not options.pdbfile: nTerror("Please provide a PDB file (-p PDBFILE option)")
     tbl = args[0]
     rfile_visualize(tbl,options.pdbfile,nmvconf["YASARA"],options.number)
   else:
-    NTerror("YASARA not found! Adjust YASARA path in queen.conf")
+    nTerror("YASARA not found! Adjust YASARA path in queen.conf")

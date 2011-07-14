@@ -16,11 +16,11 @@ if True: # block
     useModule = True
     # TODO: test if the binary is actually applicable to the system os.
     if not os.path.exists( cingPaths.shiftx ):
-        NTmessage("Missing shiftx which is a dep for shiftx")
+        nTmessage("Missing shiftx which is a dep for shiftx")
         useModule = False
     if not useModule:
         raise ImportWarning('shiftx')
-#    NTmessage('Using shiftx')
+#    nTmessage('Using shiftx')
 
 contentFile = 'content.xml'
 
@@ -56,7 +56,7 @@ format file:
     Return True on error; eg. when the file is absent.
     """
     if not os.path.exists(fileName):
-        NTerror("Failed to find %s" % fileName)
+        nTerror("Failed to find %s" % fileName)
         return True
 
     atomDict = molecule.getAtomDict(IUPAC, chainId)
@@ -76,7 +76,7 @@ format file:
 
             if not atm:
                 pass
-#                NTerror('parseShiftxOutput: chainId [%s] line %d (%s)', chainId, line.NR, line.dollar[0] )
+#                nTerror('parseShiftxOutput: chainId [%s] line %d (%s)', chainId, line.NR, line.dollar[0] )
                 # happens for all LYS without HZ3.
             else:
                 atm.shiftx.append( line.float(4) )
@@ -103,22 +103,22 @@ def runShiftx( project, parseOnly=False, model=None   ):
         return restoreShiftx( project )
 
     if project.molecule == None:
-        NTerror('runShiftx: no molecule defined')
+        nTerror('runShiftx: no molecule defined')
         return None
     #end if
     if project.molecule.modelCount == 0:
-        NTwarning('runShiftx: no models for "%s"', project.molecule)
+        nTwarning('runShiftx: no models for "%s"', project.molecule)
         return None
     #end if
     if model != None and model >= project.molecule.modelCount:
-        NTerror('runShiftx: invalid model (%d) for "%s"', model, project.molecule)
+        nTerror('runShiftx: invalid model (%d) for "%s"', model, project.molecule)
         return None
     #end if
     if not project.molecule.hasAminoAcid():
-        NTmessage('==> Skipping runShiftx because no amino acids are present.')
+        nTmessage('==> Skipping runShiftx because no amino acids are present.')
         return project
 
-    NTmessage('==> Running shiftx' )
+    nTmessage('==> Running shiftx' )
 
     skippedAtoms = [] # Keep a list of skipped atoms for later
     skippedResidues = [] # Only used for presenting to end user not actually used for skipping.
@@ -142,7 +142,7 @@ def runShiftx( project, parseOnly=False, model=None   ):
         #end for
     #end for
     if skippedResidues:
-        NTmessage('==> runShiftx: %s non-protein residues will be skipped.' %  len(skippedResidues))
+        nTmessage('==> runShiftx: %s non-protein residues will be skipped.' %  len(skippedResidues))
 
     if model!=None:
         models = NTlist( model )
@@ -180,17 +180,17 @@ def runShiftx( project, parseOnly=False, model=None   ):
 
         pdbFile = project.molecule.toPDB( model=model, convention = IUPAC  )
         if not pdbFile:
-            NTerror("runShiftx: Failed to generate a pdb file for model: " + `model`)
+            nTerror("runShiftx: Failed to generate a pdb file for model: " + `model`)
             return None
 
         pdbFile.save( model_base_name + '.pdb'   )
         for chain in project.molecule.allChains():
 
             if chain in skippedChains:
-#                NTdebug('Skipping chain code [%s]: no protein residues' % (chain.name))
+#                nTdebug('Skipping chain code [%s]: no protein residues' % (chain.name))
                 pass
             else:
-#                NTdebug('Doing chain code [%s]' % (chain.name))
+#                nTdebug('Doing chain code [%s]' % (chain.name))
                 # quotes needed because by default the chain id is a space now.
     #            chainId =  "'" + chain.name + "'"
                 # According to the readme in shiftx with the source this is the way to call it.
@@ -201,9 +201,9 @@ def runShiftx( project, parseOnly=False, model=None   ):
                 shiftx(chainId, rootname + '.pdb', outputFile )
                 outputFile = os.path.join(root,outputFile)
     #            outputFile = os.path.abspath(outputFile)
-#                NTdebug('runShiftx: Parsing file: %s for chain Id: [%s]' % (outputFile,chain.name))
+#                nTdebug('runShiftx: Parsing file: %s for chain Id: [%s]' % (outputFile,chain.name))
                 if parseShiftxOutput( outputFile, project.molecule, chain.name ):
-                    NTerror("Failed parseShiftxOutput for %s" % outputFile) # TODO: check if continuation is reasonable.
+                    nTerror("Failed parseShiftxOutput for %s" % outputFile) # TODO: check if continuation is reasonable.
             #end if
         #end for
         del( pdbFile )
@@ -236,7 +236,7 @@ def _averageMethylAndMethylene( project, models ):
     Routine to average the methyl proton shifts and b-methylene, before calculating average per atom
     """
     nmodels = len(models)
-#    NTdebug('shiftx: doing _averageMethylAndMethylene')
+#    nTdebug('shiftx: doing _averageMethylAndMethylene')
     for atm in project.molecule.allAtoms():
         if atm.isCarbon():
 
@@ -254,13 +254,13 @@ def _averageMethylAndMethylene( project, models ):
 
                 if not skip:
                     shiftsComplete = True # fails for issue 201 with entry 2e5r For atom [<Atom MET57.CE>] proton [<Atom MET57.HE2>]
-                    shifts  = NTfill(0.0,nmodels)
+                    shifts  = nTfill(0.0,nmodels)
                     for i in range(nmodels):
                         for p in protons:
                             if len(p.shiftx) > i:
                                 shifts[i] += p.shiftx[i]
                             else:
-                                NTerror("For atom [%s] proton [%s] no shiftx found; skipping _averageMethylAndMethylene" % (atm, p) )
+                                nTerror("For atom [%s] proton [%s] no shiftx found; skipping _averageMethylAndMethylene" % (atm, p) )
                                 shiftsComplete = False
                             # end if
                         #end for
@@ -282,7 +282,7 @@ def averageShiftx( project, tmp=None ):
     """Average shiftx array for each atom
     """
 
-#    NTdebug('shiftx: doing averageShiftx')
+#    nTdebug('shiftx: doing averageShiftx')
     if project.molecule == None:
         return
     #end if
@@ -307,7 +307,7 @@ def restoreShiftx( project, tmp=None ):
     root = project.moleculePath( 'shiftx' )
 
     if project.molecule == None:
-        NTdebug('restoreShiftx: no molecule defined')
+        nTdebug('restoreShiftx: no molecule defined')
         return None
     #end if
 
@@ -321,14 +321,14 @@ def restoreShiftx( project, tmp=None ):
         xmlFile = os.path.join( root, contentFile )
 
         if os.path.exists( xmlFile ):
-            NTdetail('==> Restoring shiftx results')
-#            NTdebug('Using xmlFile "%s"', xmlFile)
+            nTdetail('==> Restoring shiftx results')
+#            nTdebug('Using xmlFile "%s"', xmlFile)
         else:
-            NTwarning('Shiftx results xmlFile "%s" not found', xmlFile)
+            nTwarning('Shiftx results xmlFile "%s" not found', xmlFile)
             return None
         #end if
 
-        shiftxResult = XML2obj( xmlFile )
+        shiftxResult = xML2obj( xmlFile )
         if not shiftxResult:
             return None
 
@@ -339,25 +339,25 @@ def restoreShiftx( project, tmp=None ):
     #end if
 
     project.shiftxStatus.keysformat()
-#    NTdebug( 'project.shiftxStatus:\n%s', project.shiftxStatus.format() )
+#    nTdebug( 'project.shiftxStatus:\n%s', project.shiftxStatus.format() )
 
     if not project.shiftxStatus.completed:
         return project
 
 
     if project.shiftxStatus.moleculeName != project.molecule.name:
-        NTwarning('restoreShiftx: current molecule name "%s" does not match xmlFile "%s"',
+        nTwarning('restoreShiftx: current molecule name "%s" does not match xmlFile "%s"',
                    project.molecule.name, project.shiftxStatus.moleculeName )
-#        NTerror("Assuming this means that the shiftx results should not be restored.")
+#        nTerror("Assuming this means that the shiftx results should not be restored.")
 #        return
 
     # This needs fixing; current fix for projects  with longer root paths
     _tmp1 = project.shiftxStatus.path.split('/')[-2:] # last two directories
     _tmp2 = root.split('/')[-2:] # last two directories
     if _tmp1 != _tmp2:
-        NTwarning('restoreShiftx: current shiftx root path "%s" does not match xmlFile "%s"', root, project.shiftxStatus.path)
+        nTwarning('restoreShiftx: current shiftx root path "%s" does not match xmlFile "%s"', root, project.shiftxStatus.path)
     # end if
-    NTmessage("==> Restoring shiftx results")
+    nTmessage("==> Restoring shiftx results")
     for chainName, outputFile in project.shiftxStatus.chains:
         parseShiftxOutput( os.path.join(root,outputFile), project.molecule, chainName )
     #end for
@@ -416,10 +416,10 @@ def calcQshift( project, tmp=None ):
     """Calculate per residue Q factors between assignment and shiftx results
     """
     if not project.molecule:
-        NTmessage('calcQshift: no molecule defined')
+        nTmessage('calcQshift: no molecule defined')
         return None
     #end if
-    NTdetail('==> Calculating Q-factors for chemical shift')
+    nTdetail('==> Calculating Q-factors for chemical shift')
     for res in project.molecule.allResidues():
         atms = res.allAtoms()
         bb = NTlist()
@@ -451,7 +451,7 @@ protons:    %(protons)6.3f"""
 
 def removeTempFiles( todoDir ):
 #    whatifDir        = project.mkdir( project.molecule.name, project.moleculeDirectories.whatif  )
-    NTdebug("Removing temporary files generated by shiftx")
+    nTdebug("Removing temporary files generated by shiftx")
     try:
 #        removeListLocal = ["prodata", "ps.number", "aqua.cmm", "resdefs.dat", "mplot.in", '.log' ]
         removeList = []
@@ -463,12 +463,12 @@ def removeTempFiles( todoDir ):
                 removeList.append(fn)
         for fn in removeList:
             if not os.path.exists(fn):
-                NTdebug("shiftx.removeTempFiles: Expected to find a file to be removed but it doesn't exist: " + fn )
+                nTdebug("shiftx.removeTempFiles: Expected to find a file to be removed but it doesn't exist: " + fn )
                 continue
-#            NTdebug("Removing: " + fn)
+#            nTdebug("Removing: " + fn)
             os.unlink(fn)
     except:
-        NTdebug("shiftx.removeTempFiles: Failed to remove all temporary files that were expected")
+        nTdebug("shiftx.removeTempFiles: Failed to remove all temporary files that were expected")
 #end def
 
 # register the functions

@@ -34,7 +34,7 @@ def initBMRB( project, bmrbFile, moleculeName  = None ):
         res = mol.addResidue( Chain.defaultChainId, resName, resNum, IUPAC )
 
         if (not res):
-            NTerror( 'Error initBMRB: invalid residue %s %s line %d (%s)\n',
+            nTerror( 'Error initBMRB: invalid residue %s %s line %d (%s)\n',
                     resName, atomName, record.NR, record.dollar[0]
                     )
             error = True
@@ -43,11 +43,11 @@ def initBMRB( project, bmrbFile, moleculeName  = None ):
 
     error = error or (project.importBMRB( bmrbFile)    == None)
     if error:
-        NTmessage( '==> initBMRB: completed with error(s)' )
+        nTmessage( '==> initBMRB: completed with error(s)' )
     else:
-        NTmessage( '==> initBMRB: successfully parsed %d lines from %s', record.NR, record.FILENAME )
+        nTmessage( '==> initBMRB: successfully parsed %d lines from %s', record.NR, record.FILENAME )
     #end if
-    NTmessage("%s", mol.format() )
+    nTmessage("%s", mol.format() )
 
     if error:
         return None
@@ -63,7 +63,7 @@ def importFromBMRB( project, bmrbFile ):
     """
 
     if not project.molecule:
-        NTerror("Error importBMRB: no molecule defined" )
+        nTerror("Error importBMRB: no molecule defined" )
         return None
     #end if
 
@@ -94,7 +94,7 @@ def importFromBMRB( project, bmrbFile ):
         atm = mol.decodeNameTuple( (IUPAC, Chain.defaultChainId, resNum, atomName) )
 
         if not atm:
-            NTerror( 'Error initBMRB: invalid atom %s %s line %d (%s)',
+            nTerror( 'Error initBMRB: invalid atom %s %s line %d (%s)',
                     resName, atomName, f.NR, f.dollar[0] )
             error = True
         else:
@@ -122,15 +122,15 @@ def importFromBMRB( project, bmrbFile ):
                 pseudo.resonances().error = atm.resonances().error
                 atm.resonances().value = NaN
                 atm.resonances().value = NaN
-                NTmessage('Deassigned %s, assigned %s', atm, pseudo)
+                nTmessage('Deassigned %s, assigned %s', atm, pseudo)
             #end if
         #end if
     #end for
 
     if error:
-        NTerror( '==> importFromBMRB: completed with error(s)' )
+        nTerror( '==> importFromBMRB: completed with error(s)' )
     else:
-        NTmessage( '==> importFromBMRB: successfully parsed %d lines from %s', f.NR, f.FILENAME )
+        nTmessage( '==> importFromBMRB: successfully parsed %d lines from %s', f.NR, f.FILENAME )
     #end if
 
     if error:

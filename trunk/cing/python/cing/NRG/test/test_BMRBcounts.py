@@ -29,7 +29,7 @@ class AllChecks(TestCase):
         bmrbCountTable.convertColumn(0) # default is integer data type converting the read strings
         bmrbCountTable.convertColumn(2)
         bmrbCountTableProper = bmrbCountTable.toTable()
-#        NTdebug("Found table: %r" % bmrbCountTableProper)
+#        nTdebug("Found table: %r" % bmrbCountTableProper)
         bmrbCountMap = NTdict()
 #        idxColumnKeyList = [0, 1, 2]
         idxColumnKeyList = []
@@ -59,16 +59,16 @@ class AllChecks(TestCase):
         p_cs15N_count = assignmentCountMap['15N']
 
         bmrbCountMap = getBmrbCsCounts()
-        NTdebug("bmrbCountMap %r" % bmrbCountMap)
+        nTdebug("bmrbCountMap %r" % bmrbCountMap)
         entryMap = getDeepByKeysOrAttributes( bmrbCountMap, bmrbId )
-        NTdebug("entryMap %r" % entryMap)
+        nTdebug("entryMap %r" % entryMap)
         d_cs1H_count = getDeepByKeysOrAttributes( entryMap, '1H' )
         d_cs13C_count = getDeepByKeysOrAttributes( entryMap, '13C' )
         d_cs15N_count = getDeepByKeysOrAttributes( entryMap, '15N' )
 
-        NTdebug("db: %s project: %s" % ( d_cs1H_count, p_cs1H_count ) )
-        NTdebug("db: %s project: %s" % ( d_cs13C_count, p_cs13C_count ) )
-        NTdebug("db: %s project: %s" % ( d_cs15N_count, p_cs15N_count ) )
+        nTdebug("db: %s project: %s" % ( d_cs1H_count, p_cs1H_count ) )
+        nTdebug("db: %s project: %s" % ( d_cs13C_count, p_cs13C_count ) )
+        nTdebug("db: %s project: %s" % ( d_cs15N_count, p_cs15N_count ) )
 
 #        self.assertTrue( d_cs1H_count, p_cs1H_count) # was 183
 #        self.assertTrue( d_cs13C_count, p_cs13C_count) # was 73

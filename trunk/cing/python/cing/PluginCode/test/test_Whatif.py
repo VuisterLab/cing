@@ -16,19 +16,19 @@ import unittest
 
 class AllChecks(TestCase):
 
-#    def tttestHistogram(self):
+#    def _testHistogram(self):
 #        resType = 'GLY'
 #        for ssType in histRamaBySsAndResType.keys(): #@UndefinedVariable
 #            hist = histRamaBySsAndResType[ssType][resType]
 #            sumHist =  sum(sum(hist))
 #            maxHist =  amax(amax(hist))
-#            NTdebug( 'histRamaBySsAndResType[%s][%s]' % (ssType, resType))
-#            NTdebug( 'sumHist [%4d] maxHist [%4d]' % (sumHist, maxHist))
+#            nTdebug( 'histRamaBySsAndResType[%s][%s]' % (ssType, resType))
+#            nTdebug( 'sumHist [%4d] maxHist [%4d]' % (sumHist, maxHist))
 #            sys.output_line_width = 9999 # queried below.
 #            set_printoptions( threshold = 9999 )# should be larger than items to be printed 36*36=1296
 #            try:
 #                strHist = array2string(hist, max_line_width = 9999, precision = 0, suppress_small = None, separator='')
-#                NTdebug( '\n%s' % strHist )
+#                nTdebug( '\n%s' % strHist )
 #            except:
 #                # Fails for some reason on Linux 64 bit with python2.4 with old numpy lib
 #                pass
@@ -60,7 +60,7 @@ class AllChecks(TestCase):
 #            cyanaDirectory = os.path.join(cingDirTestsData,"cyana", entryId)
 #            pdbFileName = entryId+".pdb"
 #            pdbFilePath = os.path.join( cyanaDirectory, pdbFileName)
-#            NTdebug("Reading files from directory: " + cyanaDirectory)
+#            nTdebug("Reading files from directory: " + cyanaDirectory)
 #            project.initPDB( pdbFile=pdbFilePath, convention = pdbConvention )
             inputArchiveDir = os.path.join(cingDirTestsData, "ccpn")
 
@@ -79,7 +79,7 @@ class AllChecks(TestCase):
         project.save()
         if showValues:
             for res in project.molecule.allResidues():
-                NTdebug(`res`)
+                nTdebug(`res`)
                 whatifResDict = res.getDeepByKeys(WHATIF_STR)
                 if not whatifResDict:
                     continue
@@ -88,7 +88,7 @@ class AllChecks(TestCase):
                 for checkID in checkIDList:
                     valueList = whatifResDict.getDeepByKeys(checkID,VALUE_LIST_STR)
                     qualList  = whatifResDict.getDeepByKeys(checkID,QUAL_LIST_STR)
-                    NTdebug("%10s valueList: %-80s qualList: %-80s" % ( checkID, valueList, qualList))
+                    nTdebug("%10s valueList: %-80s qualList: %-80s" % ( checkID, valueList, qualList))
         # Do not leave the old CCPN directory laying around since it might get added to by another test.
         if os.path.exists(entryId):
             self.assertFalse(shutil.rmtree(entryId))

@@ -12,17 +12,17 @@ import unittest
 class AllChecks(TestCase):
 
     def testPrints(self):
-#        NTexception("Now in testPrints")
-#        NTerror("test")
+#        nTexception("Now in testPrints")
+#        nTerror("test")
         pass
 
     def testRemoveRecursivelyAttribute(self):
         testDict = { 0: 1, "ccpn": 77}
         self.assertEqual(len(testDict.keys()), 2)
-        NTdebug(`testDict`)
+        nTdebug(`testDict`)
         removeRecursivelyAttribute(testDict, "ccpn")
         self.assertEqual(len(testDict.keys()), 1)
-        NTdebug(`testDict`)
+        nTdebug(`testDict`)
 
 
     def test_NTutils(self):
@@ -97,7 +97,7 @@ class AllChecks(TestCase):
             angleList = NTlist()
             angleList.append(cv1)
             angleList.append(cv2)
-            circularVariance = NTcVarianceAverage(angleList)
+            circularVariance = nTcVarianceAverage(angleList)
             if circularVariance == None:
                 self.assertEqual(circularVariance, cav)
             else:
@@ -122,44 +122,44 @@ class AllChecks(TestCase):
 
 
     def testNTaverage(self):
-        l = NTlist(4, 9, 11, 12, 17, 5, 8, 12, 14)
-        (av, sd, n) = l.average()
-        NTdebug("av %s, sd %s, n %s" % (av, sd, n))
+        myList = NTlist(4, 9, 11, 12, 17, 5, 8, 12, 14)
+        (av, sd, n) = myList.average()
+        nTdebug("av %s, sd %s, n %s" % (av, sd, n))
         self.assertAlmostEqual(av, 10.22, places = 1) # verified in Excel stddev function.
         self.assertAlmostEqual(sd, 4.18, places = 1)
         self.assertEquals(n, 9)
 
-        l = NTlist(1, None, 1, 1)
-        (av, sd, n) = l.average()
-        NTdebug("av %s, sd %s, n %s" % (av, sd, n))
+        myList = NTlist(1, None, 1, 1)
+        (av, sd, n) = myList.average()
+        nTdebug("av %s, sd %s, n %s" % (av, sd, n))
         self.assertAlmostEqual(av, 1.0, places = 1)
         self.assertAlmostEqual(sd, 0.0, places = 1)
         self.assertEquals(n, 3)
 
-        l = NTlist(1, 2)
-        (av, sd, n) = l.average()
-        NTdebug("av %s, sd %s, n %s" % (av, sd, n))
+        myList = NTlist(1, 2)
+        (av, sd, n) = myList.average()
+        nTdebug("av %s, sd %s, n %s" % (av, sd, n))
         self.assertAlmostEqual(av, 1.5, places = 1)
         self.assertAlmostEqual(sd, 0.707, places = 2)
         self.assertEquals(n, 2)
 
-        l = NTlist(1)
-        (av, sd, n) = l.average()
-        NTdebug("(one element) av %s, sd %f, n %s" % (av, sd, n))
+        myList = NTlist(1)
+        (av, sd, n) = myList.average()
+        nTdebug("(one element) av %s, sd %f, n %s" % (av, sd, n))
         self.assertAlmostEqual(av, 1.0, places = 1)
         self.assertTrue(isNaN(sd))
         self.assertEquals(n, 1)
 
-        l = NTlist()
-        (av, sd, n) = l.average()
-        NTdebug("av %s, sd %s, n %s" % (av, sd, n))
+        myList = NTlist()
+        (av, sd, n) = myList.average()
+        nTdebug("av %s, sd %s, n %s" % (av, sd, n))
         self.assertTrue(isNaN(av))
         self.assertTrue(isNaN(sd))
         self.assertEquals(n, 0)
 
-        l = NTlist(0.0, 0.0, 0.0)
-        (av, sd, n) = l.average()
-        NTdebug("av %s, sd %s, n %s" % (av, sd, n))
+        myList = NTlist(0.0, 0.0, 0.0)
+        (av, sd, n) = myList.average()
+        nTdebug("av %s, sd %s, n %s" % (av, sd, n))
         self.assertEquals(av, 0)
         self.assertEquals(sd, 0)
         self.assertEquals(n, 3)
@@ -185,19 +185,19 @@ class AllChecks(TestCase):
         xLyLunion = xL.union(yL) # Uses multi set semantics
         self.assertEquals(xLyLunion, ['a', 'b', 'c', 'c'])
 
-    def tttestSwitchOutput( self):
+    def _testSwitchOutput( self):
         """Note that this fails but used to work.
         Is this because it gets called upon importing the CCPN module already. Nop.?
         """
-        NTdebug("Message to debug")
-        NTerror("Intended message to error")
+        nTdebug("Message to debug")
+        nTerror("Intended message to error")
         switchOutput( showOutput=False, doStdOut=True, doStdErr=True)
         print "Message to regular sys.stdout should not be printed"
-        NTdebug("Message to debug 2 should not be printed")
-        NTerror("Message to error 2 should not be printed")
+        nTdebug("Message to debug 2 should not be printed")
+        nTerror("Message to error 2 should not be printed")
         switchOutput( showOutput=True, doStdOut=True, doStdErr=True)
-        NTdebug("Message to debug 3")
-        NTerror("Intended message to error 3")
+        nTdebug("Message to debug 3")
+        nTerror("Intended message to error 3")
 
 
 if __name__ == "__main__":

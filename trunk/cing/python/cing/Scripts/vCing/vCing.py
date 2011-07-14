@@ -105,23 +105,23 @@ class vCing(Lister):
 
     def addTokenListToTopos(self, fileName):
         cmdTopos = ' '.join([self.toposProg, 'createTokensFromLinesInFile', self.toposPool, fileName])
-        NTdebug("In addTokenListToTopos doing [%s]" % cmdTopos)
+        nTdebug("In addTokenListToTopos doing [%s]" % cmdTopos)
         status, result = commands.getstatusoutput(cmdTopos)
-        NTdebug("In addTokenListToTopos got status: %s and result (if any) [%s]" % (status, result))
+        nTdebug("In addTokenListToTopos got status: %s and result (if any) [%s]" % (status, result))
         return status
 
     def startMaster(self, tokenListFileName):
         if self.addTokenListToTopos(tokenListFileName):
-            NTerror("In startMaster failed addTokenListToTopos")
+            nTerror("In startMaster failed addTokenListToTopos")
             return True
     # end def
 
 
     def refreshLock(self, lockname, lockTimeOut):
         cmdTopos = ' '.join([self.toposProg, 'refreshLock', self.toposPool, lockname, `lockTimeOut`])
-        NTdebug("In refreshLock doing [%s]" % cmdTopos)
+        nTdebug("In refreshLock doing [%s]" % cmdTopos)
         status, result = commands.getstatusoutput(cmdTopos)
-        NTdebug("In refreshLock got status: %s and result (if any) [%s]" % (status, result))
+        nTdebug("In refreshLock got status: %s and result (if any) [%s]" % (status, result))
         return status
     # end def
 
@@ -130,17 +130,17 @@ class vCing(Lister):
         sleepTime = lockTimeOut / 2 + 1
         sleptTime = 0
         while True:
-            NTdebug("refreshLock will now sleep for: %s" % sleepTime)
+            nTdebug("refreshLock will now sleep for: %s" % sleepTime)
             time.sleep(sleepTime)
             sleptTime += sleepTime
-            NTdebug("keepLockFresh doing a refreshLock")
+            nTdebug("keepLockFresh doing a refreshLock")
             status = self.refreshLock(lockname, lockTimeOut)
-#            NTdebug("In keepLockFresh got status: %s and result (if any) [%s]" % (status, result))
+#            nTdebug("In keepLockFresh got status: %s and result (if any) [%s]" % (status, result))
             if status:
-                NTmessage("In keepLockFresh got status: %s. This indicates that the token process finished." % status)
+                nTmessage("In keepLockFresh got status: %s. This indicates that the token process finished." % status)
                 break
             if sleptTime > maxSleapingTime:
-                NTerror("refreshLock should have exited by itself but apparently not after: %s" % sleptTime)
+                nTerror("refreshLock should have exited by itself but apparently not after: %s" % sleptTime)
                 break
             # end if
         # end while
@@ -149,13 +149,13 @@ class vCing(Lister):
     def nextTokenWithLock(self, lockTimeOut):
         "Returns status 1 for on error"
         cmdTopos = ' '.join([self.toposProg, 'nextTokenWithLock', self.toposPool, `lockTimeOut`])
-        NTdebug("In nextTokenWithLock doing [%s]" % cmdTopos)
+        nTdebug("In nextTokenWithLock doing [%s]" % cmdTopos)
         status, tokeninfo = commands.getstatusoutput(cmdTopos)
         if status:
             return [status, None, None]
         resultList = tokeninfo.split()
         if len(resultList) != 2:
-            NTerror("Failed to find tokeninfo as expected with 2 parts from: %s" % tokeninfo)
+            nTerror("Failed to find tokeninfo as expected with 2 parts from: %s" % tokeninfo)
             return None
         return [status] + resultList
     # end def
@@ -172,37 +172,37 @@ class vCing(Lister):
         i = 0
         while i < ntries:
             i += 1
-            NTdebug("In getToken doing [%s]" % cmdTopos)
+            nTdebug("In getToken doing [%s]" % cmdTopos)
             status, tokenContent = commands.getstatusoutput(cmdTopos)
             if not status:
-                NTdebug("Got token content on try: %d: [%s]" % (i, tokenContent))
+                nTdebug("Got token content on try: %d: [%s]" % (i, tokenContent))
                 return tokenContent
-            NTwarning("Failed to get token on try: %d with output message: [%s]" % (i, tokenContent))
+            nTwarning("Failed to get token on try: %d with output message: [%s]" % (i, tokenContent))
             # end if
-            NTdebug("In getToken sleeping %s" % sleepTime)
+            nTdebug("In getToken sleeping %s" % sleepTime)
             time.sleep(sleepTime)
         # end while
-        NTerror("Giving up trying to get token after %d tries" % ntries)
+        nTerror("Giving up trying to get token after %d tries" % ntries)
         return None
     # end def
 
     def deleteToken(self, token):
         "Returns status 1 for on error"
         cmdTopos = ' '.join([self.toposProg, 'deleteToken', self.toposPool, token])
-        NTdebug("In deleteToken doing [%s]" % cmdTopos)
+        nTdebug("In deleteToken doing [%s]" % cmdTopos)
         status, result = commands.getstatusoutput(cmdTopos)
         if status:
-            NTerror("Failed to deleteToken status: %s with result %s" % (status, result))
+            nTerror("Failed to deleteToken status: %s with result %s" % (status, result))
         return status
     # end def
 
     def deleteLock(self, lock):
         "Returns status 1 for on error"
         cmdTopos = ' '.join([self.toposProg, 'deleteLock', self.toposPool, lock])
-        NTdebug("In deleteLock doing [%s]" % cmdTopos)
+        nTdebug("In deleteLock doing [%s]" % cmdTopos)
         status, result = commands.getstatusoutput(cmdTopos)
         if status:
-            NTerror("Failed to deleteLock status: %s with result %s" % (status, result))
+            nTerror("Failed to deleteLock status: %s with result %s" % (status, result))
         return status
     # end def
 
@@ -226,10 +226,10 @@ class vCing(Lister):
     def slaveEndAndLog(self, level_id, token, tokenContent, msg):
         "Returns True for on error"
         time.sleep(2)
-        NTdebug("Ending with slave %s for token: %s containing %s with message: %s" % (level_id, token, tokenContent, msg))
+        nTdebug("Ending with slave %s for token: %s containing %s with message: %s" % (level_id, token, tokenContent, msg))
         status = self.deleteToken(token)
         if status:
-            NTerror("Failed in slaveEndAndLog to deleteToken with status: %s" % status)
+            nTerror("Failed in slaveEndAndLog to deleteToken with status: %s" % status)
         logFile = self.getLogFileName(token, tokenContent)
 
         prefix = self.getPrefixForLevel(level_id)
@@ -237,7 +237,7 @@ class vCing(Lister):
         writeTextToFile(logFile, prefix + msg)
         targetUrl = '/'.join([self.MASTER_TARGET_URL, self.MASTER_TARGET_LOG2])
         if putFileBySsh(logFile, targetUrl):
-            NTerror("Failed to putFileBySsh with status: %s" % status)
+            nTerror("Failed to putFileBySsh with status: %s" % status)
             return True
         # end if
     # end def
@@ -247,7 +247,7 @@ class vCing(Lister):
         Slave thread code should always send a log file (to log2) to the master back if trying a
         token. See getLogFileName for encoding of it.
         """
-        NTmessage("Now starting runSlaveThread")
+        nTmessage("Now starting runSlaveThread")
         if False:
             time.sleep(self.max_time_to_wait)
         p = Process(max_time_to_wait_kill=self.max_time_to_wait)
@@ -264,26 +264,26 @@ class vCing(Lister):
             time.sleep(2)
             exitCode, token, tokenLock = self.nextTokenWithLock(self.lockTimeOut)
             if exitCode:
-                NTmessage("Nothing returned by self.nextTokenWithLock(). Sleeping for 5 minutes and trying again.")
+                nTmessage("Nothing returned by self.nextTokenWithLock(). Sleeping for 5 minutes and trying again.")
                 time.sleep(self.time_sleep_when_no_token)
                 continue
             time.sleep(2)
             pid = p.process_fork(self.keepLockFresh, [tokenLock, self.lockTimeOut])
-            NTdebug("Created a background process [%s] keeping the lock" % pid)
+            nTdebug("Created a background process [%s] keeping the lock" % pid)
             time.sleep(2)
             tokenContent = self.getToken(token)
             if tokenContent == None:
                 tokenContent = self.NO_TOKEN_CONTENT_STR
                 msg = "Failed to get token content. Deleting token."
-                NTerror(msg)
+                nTerror(msg)
                 self.slaveEndAndLog(self.LEVEL_ERROR_STR, token, tokenContent, msg)
                 continue
             # end if
             tokensTried += 1
-            NTmessage("In %d/%d/%d (finished/total/iterations) got token %s with lock: %s" % (tokensFinished, tokensTried, iterationsTried, token, tokenLock))
+            nTmessage("In %d/%d/%d (finished/total/iterations) got token %s with lock: %s" % (tokensFinished, tokensTried, iterationsTried, token, tokenLock))
 
             # The script needs itself to send the results all included.
-            NTmessage("Found tokenContent: %s" % tokenContent)
+            nTmessage("Found tokenContent: %s" % tokenContent)
             tokenPartList = tokenContent.split()
             cmdToken = tokenPartList[0]
             parTokenListStr = ' '.join(tokenPartList[1:])
@@ -294,7 +294,7 @@ class vCing(Lister):
             log_file_name = self.getLogFileName(token, tokenContent)
 #            cmdProgram = ExecuteProgram(cmdReal, rootPath=cingDirTmp, redirectOutputToFile=log_file_name)
             cmdProgram = 'cd %s; %s %s > %s 2>&1' % (cingDirTmp, cmdReal, parTokenListStr, log_file_name)
-            NTmessage("Running payload %s" % cmdProgram)
+            nTmessage("Running payload %s" % cmdProgram)
             job = (do_cmd, (cmdProgram,))
             job_list = [ job ]
             f = ForkOff(max_time_to_wait=self.max_time_to_wait_per_job)
@@ -304,14 +304,14 @@ class vCing(Lister):
                 cmdExitCode = 0
 
             fs = os.path.getsize(log_file_name)
-            NTmessage("Payload returned with status: %s and log file size %s" % (cmdExitCode, fs))
+            nTmessage("Payload returned with status: %s and log file size %s" % (cmdExitCode, fs))
             targetUrl = '/'.join([self.MASTER_TARGET_URL, self.MASTER_TARGET_LOG])
             if putFileBySsh(log_file_name, targetUrl):
-                NTerror("In runSlaveThread failed putFileBySsh")
+                nTerror("In runSlaveThread failed putFileBySsh")
             if cmdExitCode:
-                NTerror("Failed payload")
+                nTerror("Failed payload")
                 if self.deleteLock(tokenLock):
-                    NTerror("Failed to delete lock %s" % tokenLock)
+                    nTerror("Failed to delete lock %s" % tokenLock)
                 # end if
                 self.slaveEndAndLog(self.LEVEL_ERROR_STR, token, tokenContent, self.COMMAND_FAILED_STR)
                 continue
@@ -327,8 +327,8 @@ class vCing(Lister):
     #    continue
     #  fi
 
-        NTdebug("Should never get here.")
-        NTerror("Code runSlaveThread should never stop in vCingSlave except when interrupted by user.")
+        nTdebug("Should never get here.")
+        nTerror("Code runSlaveThread should never stop in vCingSlave except when interrupted by user.")
     # end def
 
     def runSlave(self):
@@ -342,13 +342,13 @@ class vCing(Lister):
         """
 
         if os.chdir(cingDirTmp):
-            NTerror("Failed to change to directory for temporary test files: %s" % cingDirTmp)
+            nTerror("Failed to change to directory for temporary test files: %s" % cingDirTmp)
             return True
 
         _status, date_string = commands.getstatusoutput('date "+%Y-%m-%d_%H-%M-%S"') # gives only seconds.
         _status, epoch_string = commands.getstatusoutput('java Wattos.Utils.Programs.GetEpochTime')
         time_string = '%s_%s' % (date_string, epoch_string)
-        NTmessage("In runSlave time is: %s" % time_string)
+        nTmessage("In runSlave time is: %s" % time_string)
 
 
         job_list = []
@@ -357,7 +357,7 @@ class vCing(Lister):
             ncpus = 1
         for i in range(ncpus):
             date_stamp = getDateTimeStampForFileName()
-            base_name = NTpath(__file__)[1]
+            base_name = nTpath(__file__)[1]
             # Might be important to run in real separate process.
             cmd = '%s runSlaveThread > %s_%s_%s.log 2>&1 ' % (
                 __file__, base_name, date_stamp, i)
@@ -367,56 +367,56 @@ class vCing(Lister):
         delay_between_submitting_jobs = 60
         f = ForkOff(processes_max=ncpus, max_time_to_wait=self.max_time_to_wait)
         done_entry_list = f.forkoff_start(job_list, delay_between_submitting_jobs)
-        NTdebug("In runSlave Should never get here in runSlave.")
+        nTdebug("In runSlave Should never get here in runSlave.")
         done_entry_list.sort()
         not_done_entry_list = range(len(job_list))
         for id in done_entry_list:
             idx = not_done_entry_list.index(id)
             if idx >= 0:
                 del(not_done_entry_list[idx])
-        NTmessage("In runSlave Finished list  : %s" % done_entry_list)
-        NTmessage("In runSlave Unfinished list: %s" % not_done_entry_list)
+        nTmessage("In runSlave Finished list  : %s" % done_entry_list)
+        nTmessage("In runSlave Unfinished list: %s" % not_done_entry_list)
         for id in not_done_entry_list:
             job = job_list[id]
             _do_cmd, cmdTuple = job
             cmd = cmdTuple[0]
-            NTerror("In runSlave Failed forked: %s" % cmd)
+            nTerror("In runSlave Failed forked: %s" % cmd)
     # end def
 
 if __name__ == "__main__":
     cing.verbosity = verbosityDebug
 
-    NTmessage(header)
-    NTmessage(getStartMessage())
+    nTmessage(header)
+    nTmessage(getStartMessage())
 
     vc = vCing(cmdDict=cmdDict)
-    NTmessage("Starting with %r" % vc)
+    nTmessage("Starting with %r" % vc)
 
     destination = sys.argv[1]
     startArgListOther = 2
     argListOther = []
     if len(sys.argv) > startArgListOther:
         argListOther = sys.argv[startArgListOther:]
-    NTmessage('\nGoing to destination: %s with(out) arguments %s' % (destination, str(argListOther)))
+    nTmessage('\nGoing to destination: %s with(out) arguments %s' % (destination, str(argListOther)))
     try:
         if destination == 'runSlaveThread':
             if vc.runSlaveThread():
-                NTerror("Failed to runSlaveThread")
+                nTerror("Failed to runSlaveThread")
         elif destination == 'runSlave':
             if vc.runSlave():
-                NTerror("Failed to vCingSlave")
+                nTerror("Failed to vCingSlave")
         elif destination == 'prepareMaster':
             if vc.prepareMaster():
-                NTerror("Failed to prepareMaster")
+                nTerror("Failed to prepareMaster")
         elif destination == 'cleanMaster':
             if vc.cleanMaster():
-                NTerror("Failed to cleanMaster")
+                nTerror("Failed to cleanMaster")
         elif destination == 'startMaster':
             # Tokens already created by nrgCing.py
             if vc.startMaster(argListOther[0]):
-                NTerror("Failed to startMaster")
+                nTerror("Failed to startMaster")
         else:
-            NTerror("Unknown destination: %s" % destination)
+            nTerror("Unknown destination: %s" % destination)
         # end if
     finally:
-        NTmessage(getStopMessage(cing.starttime))
+        nTmessage(getStopMessage(cing.starttime))

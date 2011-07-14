@@ -109,8 +109,8 @@ class validationExercises(Lister):
         ##No changes required below this line
         ###############################################################################
 
-        NTmessage("Publish results at directory    : " + self.results_dir)
-        NTmessage("Do maximum number of entries    : " + `self.max_entries_todo`)
+        nTmessage("Publish results at directory    : " + self.results_dir)
+        nTmessage("Do maximum number of entries    : " + `self.max_entries_todo`)
 
         os.chdir(self.results_dir)
 
@@ -129,12 +129,12 @@ class validationExercises(Lister):
                 resource = urllib.urlopen(url_links)
                 reader = csv.reader(resource)
             except IOError:
-                NTerror("couldn't open url for reader: " + url_links)
+                nTerror("couldn't open url for reader: " + url_links)
                 return 0
 
             try:
                 _header_read = reader.next()
-#                NTdebug("read header: %s" % header_read)
+#                nTdebug("read header: %s" % header_read)
                 for row in reader:
                     bmrb_code = row[0]
                     pdb_code = row[1]
@@ -148,9 +148,9 @@ class validationExercises(Lister):
                 pass
 
             if url_links == url_many2one:
-                NTmessage("Found %s matches from PDB to BMRB" % len(self.matches_many2one))
+                nTmessage("Found %s matches from PDB to BMRB" % len(self.matches_many2one))
             else:
-                NTmessage("Found %s matches from BMRB to PDB" % len(self.matches_one2many))
+                nTmessage("Found %s matches from BMRB to PDB" % len(self.matches_one2many))
         return 1
 
 
@@ -161,7 +161,7 @@ class validationExercises(Lister):
     Returns one for complete resource.
     """
     def is_complete_resource(self, entry_code):
-        NTdebug("checking is_complete_resource for entry: " + entry_code)
+        nTdebug("checking is_complete_resource for entry: " + entry_code)
         sub_dir = entry_code[1:3]
         indexFileName = os.path.join (self.results_dir, DATA_STR, sub_dir, entry_code, entry_code + ".cing", 'index.html')
         return os.path.isfile(indexFileName)
@@ -169,7 +169,7 @@ class validationExercises(Lister):
 
     def getCingEntriesTriedAndDone(self):
         "Returns list or None for error"
-        NTdebug("From disk get the entries done")
+        nTdebug("From disk get the entries done")
 
         entry_list_tried = []
         entry_list_done = []
@@ -179,7 +179,7 @@ class validationExercises(Lister):
         for subDir in subDirList:
             if len(subDir) != 2:
                 if subDir != DS_STORE_STR:
-                    NTdebug('Skipping subdir with other than 2 chars: [' + subDir + ']')
+                    nTdebug('Skipping subdir with other than 2 chars: [' + subDir + ']')
                 continue
             entryList = os.listdir(os.path.join(DATA_STR,subDir))
             for entryDir in entryList:
@@ -211,23 +211,23 @@ class validationExercises(Lister):
 #        self.match.d[ "1brv" ] = EntryInfo(time=modification_time)
 
         ## following statement is equivalent to a unix command like:
-        NTdebug("Looking for PDB entries from different databases.")
+        nTdebug("Looking for PDB entries from different databases.")
 
         (self.entry_list_tried, self.entry_list_done) = self.getCingEntriesTriedAndDone()
         if not self.entry_list_tried:
-            NTerror("Failed to find entries that CING tried.")
+            nTerror("Failed to find entries that CING tried.")
             return 0
-        NTmessage("Found %s entries that CING tried." % len(self.entry_list_tried))
+        nTmessage("Found %s entries that CING tried." % len(self.entry_list_tried))
 
         if not self.entry_list_done:
-            NTerror("Failed to find entries that CING did.")
+            nTerror("Failed to find entries that CING did.")
             return 0
-        NTmessage("Found %s entries that CING did." % len(self.entry_list_done))
+        nTmessage("Found %s entries that CING did." % len(self.entry_list_done))
 
         if self.updateIndices:
             self.update_index_files()
 
-        NTdebug("premature return until coded completely... TODO:")
+        nTdebug("premature return until coded completely... TODO:")
         return True
 
 
@@ -237,13 +237,13 @@ class validationExercises(Lister):
         Just making the one page specific for an entry
         Returns 0 for success.
         """
-        NTmessage("Making page for entry: " + entry_code)
+        nTmessage("Making page for entry: " + entry_code)
         if self.regenerating_pickle:
             return 0
         ## Check to see if there was all giffie files were actually made
         ## If not then still exit with an error
         if not self.is_complete_resource(entry_code):
-            NTerror("despite checks no gif fie found for entry: " + entry_code)
+            nTerror("despite checks no gif fie found for entry: " + entry_code)
             return 1
 
     def do_analyses_loop(self, processes_max):
@@ -257,7 +257,7 @@ class validationExercises(Lister):
 
         f = forkoff.ForkOff(processes_max=processes_max, max_time_to_wait=self.max_time_to_wait)
         self.done_entry_list = f.forkoff_start(job_list, self.delay_between_submitting_jobs)
-        NTmessage("Finished following list: %s" % self.done_entry_list)
+        nTmessage("Finished following list: %s" % self.done_entry_list)
 
 
     def update_index_files(self):
@@ -274,7 +274,7 @@ class validationExercises(Lister):
 
         csvwriter = csv.writer(file(self.index_pdb_file_name, "w"))
         if not self.entry_list_done:
-            NTwarning("No entries done, skipping creation of indexes")
+            nTwarning("No entries done, skipping creation of indexes")
             return 1
 
         self.entry_list_done.sort()
@@ -286,7 +286,7 @@ class validationExercises(Lister):
         number_of_files = int(number_of_entries_all_present / number_of_entries_per_file)
         if number_of_entries_all_present % number_of_entries_per_file:
             number_of_files += 1
-        NTmessage("Generating %s index html files" % (number_of_files))
+        nTmessage("Generating %s index html files" % (number_of_files))
 
 #        example_str_template = """ <td><a href=""" + self.pdb_link_template + \
 #        """>%S</a><BR><a href=""" + self.bmrb_link_template + ">%b</a>"
@@ -332,7 +332,7 @@ class validationExercises(Lister):
                 begin_entry_count = number_of_entries_per_file * (file_id - 1) + 1
                 end_entry_count = min(number_of_entries_per_file * file_id,
                                            number_of_entries_all_present)
-#                NTdebug("%5d %5d %5d" % (begin_entry_count, end_entry_count, number_of_entries_all_present))
+#                nTdebug("%5d %5d %5d" % (begin_entry_count, end_entry_count, number_of_entries_all_present))
 
                 old_string = r"<!-- INSERT NEW RESULT STRING HERE -->"
                 result_string = "Validation exercises"
@@ -411,18 +411,18 @@ class validationExercises(Lister):
                 t = pdb_entry_code[1:3]
                 startDir = '%s/%s/%s/%s.cing' % ( self.data_dir, t, pdb_entry_code, pdb_entry_code )
                 cmd = 'cd %s; find . -name "mol.gif"' % startDir
-#                NTdebug("Attempting cmd: [%s]" % cmd)
+#                nTdebug("Attempting cmd: [%s]" % cmd)
                 output = get_cmd_output( cmd )
                 if output == None:
-                    NTerror("Failed to find mol.gif")
+                    nTerror("Failed to find mol.gif")
                     x = 'Molecularsystem' # but not always.
                 else:
                     try:
                         x = output.split('/')[1] # ./Molecularsystem/HTML/mol.gif
                     except:
-                        NTerror("Failed to find molecular system name for %s from output: [%s]" % (pdb_entry_code,output))
+                        nTerror("Failed to find molecular system name for %s from output: [%s]" % (pdb_entry_code,output))
                         x = 'Molecularsystem' # but not always.
-#                NTdebug("found molecular system name: %s" % x)
+#                nTdebug("found molecular system name: %s" % x)
 
                 tmp_string = string.replace(example_str_template, r"%S", string.upper(pdb_entry_code))
                 tmp_string = string.replace(tmp_string, r"%s", pdb_entry_code)
@@ -447,17 +447,17 @@ class validationExercises(Lister):
         index_file_first = 'index_1.html'
         index_file = os.path.join(indexDir, 'index.html')
         ## Assume that a link that is already present is valid and will do the job
-#        NTmessage('Symlinking: %s %s' % (index_file_first, index_file))
+#        nTmessage('Symlinking: %s %s' % (index_file_first, index_file))
         symlink(index_file_first, index_file)
 
 #        ## Make a sym link from the index_bmrb.html file to the index.html file
 #        index_file_first = 'index_pdb.html'
 #        index_file_first = index_file_first
 #        index_file = os.path.join(self.results_dir + "/index", 'index.html')
-#        NTdebug('Symlinking (B): %s %s' % (index_file_first, index_file))
+#        nTdebug('Symlinking (B): %s %s' % (index_file_first, index_file))
 #        symlink(index_file_first, index_file)
 
-#        NTmessage("Copy the adjusted php script")
+#        nTmessage("Copy the adjusted php script")
 #        org_file = os.path.join(self.base_dir, self.data_dir_local, 'redirect.php')
 #        new_file = os.path.join(self.results_dir, 'redirect.php')
 #        file_content = open(org_file, 'r').read()
@@ -465,7 +465,7 @@ class validationExercises(Lister):
 #        file_content = string.replace(file_content, old_string, self.results_url)
 #        open(new_file, 'w').write(file_content)
 
-        NTmessage("Copy the adjusted html redirect")
+        nTmessage("Copy the adjusted html redirect")
         org_file = os.path.join(self.base_dir, self.data_dir_local, 'redirect.html')
         new_file = os.path.join(self.results_dir, 'index.html')
 #        file_content = open(org_file, 'r').read()
@@ -482,16 +482,16 @@ class validationExercises(Lister):
 
     def update(self, new_hits_entry_list=None):
         if not m.get_bmrb_links():
-            NTerror("can't get bmrb links")
+            nTerror("can't get bmrb links")
             os._exit(1)
 
         ## Searches and matches
 #        if new_hits_entry_list:
 #            m.new_hits_entry_list = new_hits_entry_list
-#            NTmessage("Doing list of new entries: %s" % new_hits_entry_list)
+#            nTmessage("Doing list of new entries: %s" % new_hits_entry_list)
 #        else:
         if not m.search_matching_entries():
-            NTerror("can't search matching entries")
+            nTerror("can't search matching entries")
             os._exit(1)
 
         ## Make the individual and overall web pages including
@@ -499,7 +499,7 @@ class validationExercises(Lister):
         m.do_analyses_loop(processes_max=processors)
 
         if not m.update_index_files():
-            NTerror("can't update index files")
+            nTerror("can't update index files")
 
 if __name__ == '__main__':
     cing.verbosity = cing.verbosityDebug
@@ -519,4 +519,4 @@ if __name__ == '__main__':
                 isProduction=isProduction)
 #    m.getCingEntriesTriedAndDone()
     m.update(new_hits_entry_list)
-    NTmessage("Finished creating the indices")
+    nTmessage("Finished creating the indices")

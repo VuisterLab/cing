@@ -1,3 +1,5 @@
+'Gumbo stuff. Its what is in the soup today'
+# pylint: disable=C0302
 from cing import issueListUrl
 from cing.Libs import PyMMLib
 from cing.Libs.AwkLike import AwkLikeS
@@ -6,8 +8,11 @@ from cing.Libs.NTplot import ssIdxToType
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.Libs.PyMMLib import ATOM
 from cing.Libs.PyMMLib import HETATM
-from cing.Libs.PyMMLib import PDBFile
-from cing.Libs.cython.superpose import * #@UnresolvedImport @UnusedWildImport
+from cing.Libs.PyMMLib import PDBFile 
+from cing.Libs.cython.superpose import NTcMatrix
+from cing.Libs.cython.superpose import NTcVector
+from cing.Libs.cython.superpose import calculateRMSD
+from cing.Libs.cython.superpose import superposeVectors
 from cing.Libs.html import addPreTagLines
 from cing.Libs.html import hPlot
 from cing.PluginCode.required.reqDssp import * #@UnusedWildImport
@@ -16,8 +21,11 @@ from cing.PluginCode.required.reqVasco import * #@UnusedWildImport
 from cing.core.classes2 import * #@UnusedWildImport
 from cing.core.constants import * #@UnusedWildImport
 from cing.core.database import AtomDef
-from numpy import * #@UnusedWildImport overwrites such common functions as sum, max etc.
+from numpy import convolve
 from numpy import linalg as LA
+from numpy import mat
+from numpy import multiply
+from numpy import ones
 from operator import attrgetter
 from parameters   import plotParameters
 import database
@@ -85,7 +93,7 @@ def countDsspSecStructConsensus(resList):
             countC += 1
     return countA, countB, countC
 
-def chothiaClass(resList):
+def getChothiaClass(resList):
     """Determine if molecule has at least one of alpha or beta protein regions.
     Molecule may contain other types of macromolecules than protein.
     Return None if DSSP wasn't run or no amino acids are present.
@@ -113,7 +121,7 @@ def getAssignedAtomListForResList(resList, isAssigned = True, resonanceListIdx=R
     If resonanceListIdx is   then any resonance list assignment will be good.
     """
     assignmentCountMap = AssignmentCountMap() # Just for checking against its keys.
-#    NTdebug("Now in getAssignedAtomListForResList starting with assignmentCountMap: %s" % assignmentCountMap.__str__(showEmptyElements=1))
+#    nTdebug("Now in getAssignedAtomListForResList starting with assignmentCountMap: %s" % assignmentCountMap.__str__(showEmptyElements=1))
 
     atmList = NTlist()
     resultAtmList = NTlist()
@@ -123,37 +131,37 @@ def getAssignedAtomListForResList(resList, isAssigned = True, resonanceListIdx=R
         atmIsAssigned = atm.isAssigned(resonanceListIdx=resonanceListIdx)
         # spintype is not available for pseudos etc. perhaps
         spinType = getDeepByKeys(atm, DB_STR, SPINTYPE_STR)
-#        NTdebug("atm, spinType, atmIsAssigned, isAssigned: %s %s %s %s" % (atm, spinType, atmIsAssigned, isAssigned))
+#        nTdebug("atm, spinType, atmIsAssigned, isAssigned: %s %s %s %s" % (atm, spinType, atmIsAssigned, isAssigned))
         if not spinType:
-#            NTdebug("Failed to find spinType for atom: %s" % atm)
+#            nTdebug("Failed to find spinType for atom: %s" % atm)
             continue
         if not assignmentCountMap.has_key(spinType):
-#            NTdebug("Failed to find spinType in assignmentCountMap: %s for atm %s" % (spinType, atm))
+#            nTdebug("Failed to find spinType in assignmentCountMap: %s for atm %s" % (spinType, atm))
             continue
         # Only count the methyl pseudo atom e.g. Ala MB
         if atm.isMethylProton() and not atm.isPseudoAtom():
-#            NTdebug("Skipping isMethylProton and not atm.isPseudoAtom() %s" % atm)
+#            nTdebug("Skipping isMethylProton and not atm.isPseudoAtom() %s" % atm)
             continue
         if atm.isPseudoAtom() and not atm.isMethyl():
-#            NTdebug("Skipping atm.isPseudoAtom() and not atm.isMethyl() %s" % atm)
+#            nTdebug("Skipping atm.isPseudoAtom() and not atm.isMethyl() %s" % atm)
             continue
         # Get rid of counts for terminii which usually are absent.
         if atm.isTerminal():
-#            NTdebug("Skipping isTerminal %s" % atm)
+#            nTdebug("Skipping isTerminal %s" % atm)
             continue
 
         if isAssigned:
             if not atmIsAssigned:
-#                NTdebug("%s skipped because requesting assigned and this atom was not for : " % atm)
+#                nTdebug("%s skipped because requesting assigned and this atom was not for : " % atm)
                 continue
         else:
             if atmIsAssigned:
-#                NTdebug("%s skipped because requesting -unassigned- and this atoms was for: " % atm)
+#                nTdebug("%s skipped because requesting -unassigned- and this atoms was for: " % atm)
                 continue
-#        NTmessage("Including atm: %s " % atm)
+#        nTmessage("Including atm: %s " % atm)
         resultAtmList.append(atm)
     # end for
-#    NTdebug("In getAssignedAtomListForResList for isAssigned: %s found %s" % (isAssigned, resultAtmList))
+#    nTdebug("In getAssignedAtomListForResList for isAssigned: %s found %s" % (isAssigned, resultAtmList))
     return resultAtmList
 
 def getAssignmentCountMapForResList(resList, isAssigned = True, resonanceListIdx = RESONANCE_LIST_IDX_ANY ):
@@ -174,19 +182,19 @@ def getAssignmentCountMapForResList(resList, isAssigned = True, resonanceListIdx
 
     Uses the routine getAssignedAtomListForResList.
     """
-#    NTdebug("Now in getAssignmentCountMapForResList with resonanceListIdx: %s" % resonanceListIdx)
+#    nTdebug("Now in getAssignmentCountMapForResList with resonanceListIdx: %s" % resonanceListIdx)
 
     assignmentCountMap = AssignmentCountMap()
 
     if not resList:
-        NTerror("Failed getAssignmentCountMapForResList because no resList; returning empty")
+        nTerror("Failed getAssignmentCountMapForResList because no resList; returning empty")
         return assignmentCountMap
 
     resonanceListIdxList = [ resonanceListIdx ]
     if resonanceListIdx == RESONANCE_LIST_IDX_ANY:
         resonanceCount = len(resList[0].chain.molecule.resonanceSources)
         resonanceListIdxList = range(resonanceCount)
-#        NTdebug("Set resonanceListIdxList to: %s because resonanceCount is %s" % (str(resonanceListIdxList), resonanceCount))
+#        nTdebug("Set resonanceListIdxList to: %s because resonanceCount is %s" % (str(resonanceListIdxList), resonanceCount))
     # end if
     for resonanceListIdx in resonanceListIdxList:
         atmList = getAssignedAtomListForResList(resList, isAssigned = isAssigned, resonanceListIdx = resonanceListIdx)
@@ -195,7 +203,7 @@ def getAssignmentCountMapForResList(resList, isAssigned = True, resonanceListIdx
             assignmentCountMap[spinType] += 1
         # end for
     # end for
-#    NTdebug("For isAssigned: %s found %s" % (isAssigned, assignmentCountMap))
+#    nTdebug("For isAssigned: %s found %s" % (isAssigned, assignmentCountMap))
     return assignmentCountMap
 
 
@@ -204,7 +212,7 @@ def allResiduesWithCoordinates(resList):
     result = NTlist()
     for res in resList:
         hasCoor = res.hasCoordinates()
-#        NTdebug("Res %s has coordinates: %s" % ( res, hasCoor ))
+#        nTdebug("Res %s has coordinates: %s" % ( res, hasCoor ))
         if hasCoor:
             result.add(res)
     return result
@@ -226,13 +234,13 @@ def selectFitAtoms( fitResidues, backboneOnly=True, includeProtons = False ):
     """
 
     if not fitResidues:
-        NTerror("In %s failed to get any residue in fitResidues" % getCallerName())
+        nTerror("In %s failed to get any residue in fitResidues" % getCallerName())
         return NoneObject
     #end if
     
     r0 = fitResidues[0]
-    c0 = r0._parent
-    m0 = c0._parent
+    c0 = r0.getParent()
+    m0 = c0.getParent()
     modelCount = m0.modelCount
     if modelCount <= 0:
         return NoneObject
@@ -260,7 +268,7 @@ def selectFitAtoms( fitResidues, backboneOnly=True, includeProtons = False ):
             #end if
         #end for
     #end for
-#    NTdebug("Atom list to be fitted (len:%s):\n%s" % (len(fitted), fitted))
+#    nTdebug("Atom list to be fitted (len:%s):\n%s" % (len(fitted), fitted))
     return fitted
 #end def
 
@@ -275,17 +283,17 @@ class ResidueList(SMLhandled):
         SMLhandled.__init__(self)
     def allResidues(self):
         'convenience method'
-        NTcodeerror("In %s the sub class needs to overide this method." % getCallerName())
+        nTcodeerror("In %s the sub class needs to overide this method." % getCallerName())
         return None
     def countDsspSecStructConsensus(self):
         'convenience method'
         return countDsspSecStructConsensus(self.allResidues())
-    def chothiaClass(self):
+    def getChothiaClass(self):
         'convenience method'
-        return chothiaClass(self.allResidues())
+        return getChothiaClass(self.allResidues())
     def chothiaClassInt(self):
         'convenience method'
-        return chothiaClassInt(chothiaClass(self.allResidues()))
+        return chothiaClassInt(getChothiaClass(self.allResidues()))
     def getAssignmentCountMap(self,isAssigned=True):
         'convenience method'
         return getAssignmentCountMapForResList(self.allResidues(), isAssigned=isAssigned)
@@ -301,7 +309,7 @@ class ResidueList(SMLhandled):
     # end def    
 # end class
 
-#==============================================================================
+
 class Molecule( NTtree, ResidueList ):
     """
     Molecule class: defines the holder for molecule items.
@@ -345,7 +353,8 @@ class Molecule( NTtree, ResidueList ):
 
     def __init__( self, name, **kwds ):
         NTtree.__init__(self, name, __CLASS__='Molecule', **kwds )
-
+        ResidueList.__init__(self)
+        
         self.chains       = self._children
 
         # These will be set on the fly
@@ -499,17 +508,17 @@ class Molecule( NTtree, ResidueList ):
         redCount = len( self[COLOR_RED] )
         oraCount = len( self[COLOR_ORANGE] ) # just included for completeness.
         greCount = len( self[COLOR_GREEN] )
-#        NTdebug("Found red/orange/green %s/%s/%s" % (redCount, oraCount, greCount))
+#        nTdebug("Found red/orange/green %s/%s/%s" % (redCount, oraCount, greCount))
         residueCount = redCount + oraCount + greCount
         # First do some sanity checks.
         residueCount2 = len(self.allResidues())
         if not residueCount:
-            NTcodeerror("Got zero residues counted with rog score whereas there are residues in the molecule. " +
+            nTcodeerror("Got zero residues counted with rog score whereas there are residues in the molecule. " +
                         "Keeping default molecule rog score")
             return None
         # end if
         if residueCount2 != residueCount:
-            NTcodeerror("CING fails to do basic arithmics. residueCount2 != residueCount as in %s != %s" % (
+            nTcodeerror("CING fails to do basic arithmics. residueCount2 != residueCount as in %s != %s" % (
                         residueCount2, residueCount))
             return None
         # end if
@@ -519,7 +528,7 @@ class Molecule( NTtree, ResidueList ):
         grePerCutoffRed    = redPer - 20
         grePerCutoffOrange = redPer + 20
         msg = 'Residue perc. ROG (red/orange/green: %.0f/%.0f/%.0f).' % (redPer,oraPer,grePer) #@UnusedVariable
-#        NTdebug(msg)
+#        nTdebug(msg)
         if grePer < grePerCutoffRed:
             return COLOR_RED
         if grePer < grePerCutoffOrange:
@@ -535,7 +544,7 @@ class Molecule( NTtree, ResidueList ):
         msg = "CING exhausted the available %d chain identifiers; see issue %d here:\n" % (
             len(Chain.DEFAULT_ChainNamesByAlphabet), issueId)
         msg += issueListUrl+repr(issueId)
-        NTcodeerror(msg)
+        nTcodeerror(msg)
 
     def keepSelectedModels(self, modelListStr):
 
@@ -543,27 +552,27 @@ class Molecule( NTtree, ResidueList ):
             selectedModels = self.models2list(modelListStr)
             selectedModelCount = len(selectedModels)
             if not selectedModelCount:
-                NTerror("No models selected to keep which must be a bug; please check input string: [" + modelListStr + "]")
+                nTerror("No models selected to keep which must be a bug; please check input string: [" + modelListStr + "]")
                 return
             if selectedModelCount == self.modelCount:
-                NTwarning("No models to delete from ensemble sticking with: [" + modelListStr + "]")
+                nTwarning("No models to delete from ensemble sticking with: [" + modelListStr + "]")
                 return
             lastModelIdx = selectedModels[ - 1]
             if lastModelIdx >= self.modelCount:
-                NTwarning("Last selected model index (%r) is not in ensemble; please check input string: [%s]" % (lastModelIdx,modelListStr))
+                nTwarning("Last selected model index (%r) not in ensemble; please check input string: [%s]" % (lastModelIdx,modelListStr))
                 return
 
-    #        NTdebug("Truncating ensemble to: [" + modelListStr +"]")
-    #        NTdebug("verify this is the same as: [" + `selectedModels` +"]")
+    #        nTdebug("Truncating ensemble to: [" + modelListStr +"]")
+    #        nTdebug("verify this is the same as: [" + `selectedModels` +"]")
 
             modelToRemoveList = []
-            l = range(self.modelCount)
-            l.reverse()
-            for m in l:
+            myList = range(self.modelCount)
+            myList.reverse()
+            for m in myList:
                 if m not in selectedModels:
                     modelToRemoveList.append(m)
-            NTmessage("Keeping   %s models : [%r]" % ( len(selectedModels), modelListStr))
-            NTmessage("Removing  %s models : [%r]" % ( len(modelToRemoveList), modelToRemoveList))
+            nTmessage("Keeping   %s models : [%r]" % ( len(selectedModels), modelListStr))
+            nTmessage("Removing  %s models : [%r]" % ( len(modelToRemoveList), modelToRemoveList))
 
             for atm in self.allAtoms():
                 atmCoordCount = len(atm.coordinates) # some atoms have no coordinates or just some
@@ -574,9 +583,9 @@ class Molecule( NTtree, ResidueList ):
 
             self.modelCount = selectedModelCount
             self.updateAll() # needed otherwise the dihedral.baddies get thru.
-#            NTdebug('After keepSelectedModels: %s' % self)
+#            nTdebug('After keepSelectedModels: %s' % self)
         except:
-            NTerror("Failed keepSelectedModels; please check the input string [" + modelListStr + "]")
+            nTerror("Failed keepSelectedModels; please check the input string [" + modelListStr + "]")
 
     def addChain( self, name=None, **kwds ):
         """
@@ -590,7 +599,7 @@ class Molecule( NTtree, ResidueList ):
         if name==None:
             name = self.getChainIdForChainCount()
         if name in self:
-            NTwarning( 'Molecule.addChain: chain "%s" already present' % name )
+            nTwarning( 'Molecule.addChain: chain "%s" already present' % name )
             name = None
         if not isValidChainId( name ): # Catch ccpn ' ' etc.
             name = None
@@ -598,15 +607,15 @@ class Molecule( NTtree, ResidueList ):
         if name==None:
             newName = self.getNextAvailableChainId()
             if not newName:
-                NTerror('Molecule.addChain: failed getNextAvailableChainId; skipping add.')
+                nTerror('Molecule.addChain: failed getNextAvailableChainId; skipping add.')
                 return None # Note the bug that this statement was leftshifted before revision 778.
-            NTdebug( 'Molecule.addChain: got next available one: %s' % newName)
+            nTdebug( 'Molecule.addChain: got next available one: %s' % newName)
             name = newName
 
 #            return None
         #end if
         chain = Chain( name=name, **kwds )
-        self._addChild( chain )
+        self.addChild2( chain )
         chain.molecule = self
         #self[chain]    = chain
         self.chainCount += 1
@@ -619,7 +628,7 @@ class Molecule( NTtree, ResidueList ):
         @param chain:
         '''
         if not chain in self._children:
-            NTerror( '%s: chain "%s" not present in molecule %s', getCallerName(), chain, self )
+            nTerror( '%s: chain "%s" not present in molecule %s', getCallerName(), chain, self )
             return None
         #end if
 
@@ -627,11 +636,11 @@ class Molecule( NTtree, ResidueList ):
         self.chainCount -= 1
         ch = self.removeChild( chain )
         if ch == None:
-            NTerror('%s: error removing %s from %s', getCallerName(), ch, self)
+            nTerror('%s: error removing %s from %s', getCallerName(), ch, self)
             return None
         else:
             ch.molecule = None
-            NTmessage('==> Removed chain %s from %s', ch, self )
+            nTmessage('==> Removed chain %s from %s', ch, self )
             return ch
         #end if
     #end def
@@ -669,7 +678,7 @@ class Molecule( NTtree, ResidueList ):
             statements within can be enabled from code.
 
          """
-#        NTdebug("Now in decodeNameTuple for : "  + `nameTuple`)
+#        nTdebug("Now in decodeNameTuple for : "  + `nameTuple`)
         if nameTuple == None:
             return None
 
@@ -684,7 +693,8 @@ class Molecule( NTtree, ResidueList ):
         else:
             moleculeName, chainName, resNum, atomName, model, resonanceIndex, convention = nameTuple
 
-        if moleculeName != self.name: return None
+        if moleculeName != self.name: 
+            return None
 
 #        if not fromCYANA2CING:
         if chainName == None:
@@ -692,7 +702,7 @@ class Molecule( NTtree, ResidueList ):
 
         # has_key is faster perhaps as "in" iterates whereas has_key uses true dictionary lookup.
         if not self.has_key(chainName):
-#            NTdebug( 'in molecule decodeNameTuple: in molecule ['+self.name+'] no chain Name: ['+chainName+']')
+#            nTdebug( 'in molecule decodeNameTuple: in molecule ['+self.name+'] no chain Name: ['+chainName+']')
             return None
 
         chain = self[chainName]
@@ -702,7 +712,7 @@ class Molecule( NTtree, ResidueList ):
             return chain
 
         if not chain.has_key(resNum):
-#            NTdebug( 'in molecule decodeNameTuple: in chain ['+`chain`+'] no residue number: ['+`resNum`+']')
+#            nTdebug( 'in molecule decodeNameTuple: in chain ['+`chain`+'] no residue number: ['+`resNum`+']')
             return None
         res = chain[resNum]
 
@@ -714,14 +724,14 @@ class Molecule( NTtree, ResidueList ):
 #        an = translateAtomName( convention, resTranslated, atomName, INTERNAL )
 ##        if (not an or (an not in res)): return None
 #        if not an:
-##            NTdebug("in Molecule.decodeNameTuple failed to translateAtomName for res: " + `resTranslated` + " and atom: " + `atomName`)
+##            nTdebug("in Molecule.decodeNameTuple failed to translateAtomName for res: " + `resTranslated` + " and atom: " + `atomName`)
 #            return None
 #            # JFD adds. This makes no sense. The residue itself by number is known. Just get it's residue type
 #            # and look up the atom translation. This can of course be fixed in the db too.
 #
 #
 #        if not res.has_key(an):
-##            NTdebug("in Molecule.decodeNameTuple atom not in residue: [%s]" % `an`)
+##            nTdebug("in Molecule.decodeNameTuple atom not in residue: [%s]" % `an`)
 #            return None
 
 
@@ -749,7 +759,7 @@ class Molecule( NTtree, ResidueList ):
 
 #        else: # fromCYANA2CING
 #            if chainName != None:
-#                NTerror('Expected a None for chainName in Molecule.decodeNameTuple but got: [%s]' % chainName)
+#                nTerror('Expected a None for chainName in Molecule.decodeNameTuple but got: [%s]' % chainName)
 #                return None
 #
 #            for chain in self.allChains():
@@ -757,7 +767,7 @@ class Molecule( NTtree, ResidueList ):
 #                    return chain
 #
 #                if not chain.has_key(resNum):
-##                    NTdebug( 'in molecule decodeNameTuple: in chain ['+`chain`+'] no residue number: ['+`resNum`+']')
+##                    nTdebug( 'in molecule decodeNameTuple: in chain ['+`chain`+'] no residue number: ['+`resNum`+']')
 #                    continue # perhaps in other chain?
 #                res = chain[resNum]
 #
@@ -768,14 +778,14 @@ class Molecule( NTtree, ResidueList ):
 #                an = translateAtomName( convention, resTranslated, atomName, INTERNAL )
 #
 #                if not an:
-#                    NTdebug("in Molecule.decodeNameTuple failed to translateAtomName for res: " + resTranslated + " and atom: " + atomName)
+#                    nTdebug("in Molecule.decodeNameTuple failed to translateAtomName for res: " + resTranslated + " and atom: " + atomName)
 #                    return None
 #
 #                if not res.has_key(an):
-#                    NTdebug("in Molecule.decodeNameTuple atom not in residue: [%s]" % `an`)
+#                    nTdebug("in Molecule.decodeNameTuple atom not in residue: [%s]" % `an`)
 #                    return None
 #                return res[an]
-#            NTdebug("in Molecule.decodeNameTuple residue number [%s] not in any chain " % `resNum`)
+#            nTdebug("in Molecule.decodeNameTuple residue number [%s] not in any chain " % `resNum`)
 #            return None
 #        # end else
     #end def
@@ -816,7 +826,7 @@ class Molecule( NTtree, ResidueList ):
         resNumDict = dict()
         for res in self.allResidues():
             if resNumDict.has_key(res.resNum):
-                NTerror('Molecule.getResNumDict: multiple mapped residues (%s,%s)',
+                nTerror('Molecule.getResNumDict: multiple mapped residues (%s,%s)',
                         res, resNumDict[res,res.resNum]
                        )
             resNumDict[res.resNum] = res
@@ -865,7 +875,7 @@ class Molecule( NTtree, ResidueList ):
         rangesNew = ''
         residueList2StartStopList = self.ranges2StartStopList(ranges)
         if residueList2StartStopList == None:
-            NTerror("Failed ranges2StartStopList for ranges: %s" % ranges)
+            nTerror("Failed ranges2StartStopList for ranges: %s" % ranges)
             return None
 
 #        residueLoL = self._getResidueLoL()
@@ -879,12 +889,12 @@ class Molecule( NTtree, ResidueList ):
                 residue = residueList2StartStopList[i]
                 residueNewTuple = getDeepByKeysOrAttributes( residueHash2LoL, residue)
                 if residueNewTuple == None:
-                    NTerror("Failed to find residue in residueHash2LoL.")
+                    nTerror("Failed to find residue in residueHash2LoL.")
                     return None
                 residueNewNumberPair[r] = str(residueNewTuple[1] + 1) # Plus one 'cause indices start at zero and mmCIF starts at one.
-#                NTdebug("Mapping %s %s to residueNewNumberPair %s" % (r,residue,residueNewNumberPair[r]))
+#                nTdebug("Mapping %s %s to residueNewNumberPair %s" % (r,residue,residueNewNumberPair[r]))
                 if residueNewNumberPair[r] < 1:
-                    NTerror("In %s tried to map to mmCIF invalid residue number: %s" % ( getCallerName(), residueNewNumberPair[r] ))
+                    nTerror("In %s tried to map to mmCIF invalid residue number: %s" % ( getCallerName(), residueNewNumberPair[r] ))
                     return None
             # end for
             if p:
@@ -895,30 +905,31 @@ class Molecule( NTtree, ResidueList ):
             else:
                 rangesNew += residueNewNumberPair[0]
         # end for
-#        NTdebug("Mapped ranges %s to %s" % (ranges,rangesNew))
+#        nTdebug("Mapped ranges %s to %s" % (ranges,rangesNew))
         return rangesNew
 
 
-    def _getAtomDictWithchain(self, convention=INTERNAL):
+    def _getAtomDictWithchain(self, convention=INTERNAL): # pylint: disable=W0613
         """
         Return a dict instance with (chainId, resNum, atomName), Atom mappings.
         NB. atomName according to convention
         For decoding usage with CYANA/XEASY, and SHIFTX routines
         """
-        NTcodeerror("Need to code dict in _getAtomDictWithchain")
+        nTcodeerror("Need to code dict in _getAtomDictWithchain")
         return None
 
-    def getAtomDict(self, convention=INTERNAL, ChainId = _DEFAULT_CHAIN_ID): # would like to have said Chain.defaultChainId but isn't known yet.
+    # would like to have said Chain.defaultChainId but isn't known yet.
+    def getAtomDict(self, convention=INTERNAL, ChainId = _DEFAULT_CHAIN_ID):         
         """
         Return a dict instance with (resNum, atomName), Atom mappings.
         NB. atomName according to convention
         For decoding usage with CYANA/XEASY, and SHIFTX routines
         """
-#        NTdebug("Creating mapping from (residue number, atom name) to atom object for chain: [%s]" % ChainId)
+#        nTdebug("Creating mapping from (residue number, atom name) to atom object for chain: [%s]" % ChainId)
         atomDict = NTdict()
         for chain in self.allChains():
             if chain.name != ChainId:
-#                NTdebug("Skipping add of different chain [%s] than requested [%s]" % (chain.name,ChainId ))
+#                nTdebug("Skipping add of different chain [%s] than requested [%s]" % (chain.name,ChainId ))
                 continue
             for atm in chain.allAtoms():
                 aname = atm.translate(convention)
@@ -928,7 +939,7 @@ class Molecule( NTtree, ResidueList ):
                         # GV needs to check if this still needs to be an error or as is, down graded to warning level.
                         # see example in H2_2Ca_53 with test_shiftx routine. FIXME:
                         # GV, Yes maintain, but  test for aname should reduce warnings
-#                        NTwarning('In Molecule.getAtomDict found multiple mapped atoms (new key, old key): (%-20s,%-20s)',
+#                        nTwarning('In Molecule.getAtomDict found multiple mapped atoms (new key, old key): (%-20s,%-20s)',
 #                                    atm, atomDict[t])
                         pass
                     else:
@@ -948,11 +959,11 @@ class Molecule( NTtree, ResidueList ):
         self.ranges = ranges # will be picked up by setResiduesFromRanges called next
         residueList = self.setResiduesFromRanges()
         if residueList == None:
-            NTerror("In setRanges failed to setResiduesFromRanges from ranges: [%s]" % ranges)
+            nTerror("In setRanges failed to setResiduesFromRanges from ranges: [%s]" % ranges)
             return True
         rangesReset = self.residueList2Ranges(residueList)
         if rangesReset != ranges:
-            NTmessage("==> Ranges reset from: %s to %s" % ( ranges, rangesReset ))
+            nTmessage("==> Ranges reset from: %s to %s" % ( ranges, rangesReset ))
             self.ranges = rangesReset
 
     def setResiduesFromRanges(self, ranges=None, autoLimit=LIMIT_RANGES):
@@ -981,23 +992,23 @@ class Molecule( NTtree, ResidueList ):
         if ranges == None:
             ranges = self.ranges
 
-#        NTdebug("In setResiduesFromRanges using ranges: %s" % ranges)
+#        nTdebug("In setResiduesFromRanges using ranges: %s" % ranges)
 
 
         if ranges == CV_RANGES_STR:
             rangesReset = self.rangesByCv()
             if rangesReset == None:
-                NTerror("Failed rangesByCv in setResiduesFromRanges")
+                nTerror("Failed rangesByCv in setResiduesFromRanges")
                 return None
-#            NTdebug("In setResiduesFromRanges used: cv to get ranges: %s" % rangesReset)
+#            nTdebug("In setResiduesFromRanges used: cv to get ranges: %s" % rangesReset)
             selectedResidues = self.ranges2list(rangesReset)
             if selectedResidues == None:
-                NTerror("Failed ranges2list (A) in setResiduesFromRanges")
+                nTerror("Failed ranges2list (A) in setResiduesFromRanges")
                 return None
         elif ranges == AUTO_RANGES_STR:
             selectedResidues = self._autoRanges( autoLimit )
             if selectedResidues == None:
-                NTerror("Failed _autoRanges in setResiduesFromRanges")
+                nTerror("Failed _autoRanges in setResiduesFromRanges")
                 return None
         elif ranges == ALL_RANGES_STR:
             selectedResidues = self.allResidues()
@@ -1008,17 +1019,17 @@ class Molecule( NTtree, ResidueList ):
         else:
             selectedResidues = self.ranges2list( ranges )
             if selectedResidues == None:
-                NTerror("Failed ranges2list (B) in setResiduesFromRanges")
+                nTerror("Failed ranges2list (B) in setResiduesFromRanges")
                 return None
             # end if
         # end else
 
         if selectedResidues == None:
-            NTerror("In setResiduesFromRanges failed to get selection of residues for ranges: [%s]" % ranges)
+            nTerror("In setResiduesFromRanges failed to get selection of residues for ranges: [%s]" % ranges)
             return None
         
         if not isinstance(selectedResidues, list):
-            NTerror("In setResiduesFromRanges failed to setResiduesFromRanges because result is not a list; not propagating this error.")
+            nTerror("In setResiduesFromRanges failed to setResiduesFromRanges because result is not a list; not propagating this error.")
             return None
 
         self.selectedResidues = selectedResidues
@@ -1036,18 +1047,18 @@ class Molecule( NTtree, ResidueList ):
         '''
         result = ''
         if residueList == None:
-            NTerror("In residueList2Ranges no input residueList.")
+            nTerror("In residueList2Ranges no input residueList.")
             return None
         if len(residueList) == 0:
-            NTdebug("In residueList2Ranges empty residueList.")
+            nTdebug("In residueList2Ranges empty residueList.")
             return EMPTY_RANGES_STR
         startStopList = self.ranges2StartStopList(residueList)
-#        NTdebug( 'startStopList (just the inclusive boundaries): %s' % startStopList)
+#        nTdebug( 'startStopList (just the inclusive boundaries): %s' % startStopList)
         if startStopList == None:
-            NTerror("In residueList2Ranges failed to find startStopList.")
+            nTerror("In residueList2Ranges failed to find startStopList.")
             return
         if len(startStopList) == 0:
-#            NTdebug("In residueList2Ranges found empty startStopList.")
+#            nTdebug("In residueList2Ranges found empty startStopList.")
             return EMPTY_RANGES_STR
         useChainIds = len(self.allChains()) > 1
         for i in range(0, len(startStopList), 2):
@@ -1068,7 +1079,7 @@ class Molecule( NTtree, ResidueList ):
             else:
                 result += '-'.join(strList)
         # end for
-#        NTdebug( "In residueList2Ranges ranges: %s" % result)
+#        nTdebug( "In residueList2Ranges ranges: %s" % result)
         return result
     # end def
 
@@ -1085,9 +1096,9 @@ class Molecule( NTtree, ResidueList ):
         if ranges == None:
             ranges = self.ranges
         selectedResidues = self.setResiduesFromRanges(ranges)
-#        NTdebug( 'In Molecule#ranges2StartStopList selectedResidues: %s' % selectedResidues)
+#        nTdebug( 'In Molecule#ranges2StartStopList selectedResidues: %s' % selectedResidues)
         if not selectedResidues:
-            NTwarning("In Molecule#ranges2StartStopList, no residues selected from ranges: %s" % ranges)
+            nTwarning("In Molecule#ranges2StartStopList, no residues selected from ranges: %s" % ranges)
             return
 
         rangeResidueList = [ selectedResidues[0] ]
@@ -1101,9 +1112,10 @@ class Molecule( NTtree, ResidueList ):
         rangeResidueList.append(selectedResidues[-1])
 
         if len(rangeResidueList) % 2:
-            NTcodeerror("Expected to have an even number of residues in the start stop list but found %s residues."  % len(rangeResidueList) )
+            nTcodeerror("Expected to have an even number of residues in the start stop list but found %s residues."  % 
+                        len(rangeResidueList) )
             return None
-#        NTdebug( 'rangeResidueList (just the inclusive boundaries): %s' % rangeResidueList)
+#        nTdebug( 'rangeResidueList (just the inclusive boundaries): %s' % rangeResidueList)
         return rangeResidueList
 
 
@@ -1116,21 +1128,21 @@ class Molecule( NTtree, ResidueList ):
         """
 
         if startStopList == None:
-            NTerror("Input to startStopList2ranges is None")
+            nTerror("Input to startStopList2ranges is None")
             return None
 
         useChainIds = False
         if self.allChains() > 1:
             useChainIds = True
 
-#        NTdebug( 'startStopList2ranges working on startStopList: %s' % str(startStopList))
+#        nTdebug( 'startStopList2ranges working on startStopList: %s' % str(startStopList))
 
         ranges = ''
         for i in range(0, len(startStopList), 2):
-#            NTdebug( 'startStopList2ranges working on i: %s' % i)
+#            nTdebug( 'startStopList2ranges working on i: %s' % i)
             resStrList = [None,None]
             for j,r in enumerate( [startStopList[i], startStopList[i+1]] ):
-#                NTdebug( 'working on j: %s' % j)
+#                nTdebug( 'working on j: %s' % j)
                 if useChainIds and j == 0:
                     resStrList[j] = '%s.%s' % (r.chain.name,r.resNum,)
                 else:
@@ -1140,7 +1152,7 @@ class Molecule( NTtree, ResidueList ):
                 ranges += ','
             ranges += '-'.join(resStrList)
         # end for
-#        NTdebug( 'startStopList2ranges returning: %s' % ranges)
+#        nTdebug( 'startStopList2ranges returning: %s' % ranges)
         return ranges
 
 
@@ -1153,13 +1165,13 @@ class Molecule( NTtree, ResidueList ):
             return True
         residueList = self.ranges2list(ranges)
         if residueList == None:
-            NTerror("Failed ranges2list in rangesIsAll for ranges: %s" % ranges)
+            nTerror("Failed ranges2list in rangesIsAll for ranges: %s" % ranges)
             return False
         allResidueList = self.allResidues()
         nAll = len(allResidueList)
         nRanges = len(residueList)
         result = (nAll == nRanges)
-#        NTdebug("In rangesIsAll nAll %s, nRanges %s so result: %s" % (nAll,nRanges, result))
+#        nTdebug("In rangesIsAll nAll %s, nRanges %s so result: %s" % (nAll,nRanges, result))
         return result
 
     def useRanges(self, ranges=None):
@@ -1174,14 +1186,14 @@ class Molecule( NTtree, ResidueList ):
         """
         residueList = self.ranges2list(ranges)
         if residueList == None:
-            NTerror("Failed ranges2list in rangesToExpandedRanges for ranges: %s" % ranges)
+            nTerror("Failed ranges2list in rangesToExpandedRanges for ranges: %s" % ranges)
             return None
         rangesNew = self.residueList2Ranges(residueList)
         if rangesNew == None:
-            NTerror("Failed residueList2Ranges in rangesToExpandedRanges for ranges: %s" % ranges)
+            nTerror("Failed residueList2Ranges in rangesToExpandedRanges for ranges: %s" % ranges)
             return None
         if rangesNew != ranges:
-#            NTdebug("Expanded ranges %s to %s" % (ranges,rangesNew))
+#            nTdebug("Expanded ranges %s to %s" % (ranges,rangesNew))
             pass
         return rangesNew
 
@@ -1191,10 +1203,11 @@ class Molecule( NTtree, ResidueList ):
         See unit test in test_molecule.py
         """
         if type(ranges) != str:
-            NTerror('Error Molecule._rangesStr2list: ranges type [%s] should have been a string' % type(ranges) )
+            nTerror('Error Molecule._rangesStr2list: ranges type [%s] should have been a string' % type(ranges) )
             return None
 
-        if ranges == CV_RANGES_STR: # needs to be on top because it rewrites the ranges string to something like 'all' that might still need to be expanded.
+        # needs to be on top because it rewrites the ranges string to something like 'all' that might still need to be expanded.
+        if ranges == CV_RANGES_STR: 
             ranges = self.rangesByCv()
         if ranges == EMPTY_RANGES_STR:
             return NTlist()
@@ -1203,10 +1216,10 @@ class Molecule( NTtree, ResidueList ):
         if ranges == AUTO_RANGES_STR:
             result = self._autoRanges()
             if result == None:
-                NTerror('In _rangesStr2list failed _autoRanges got None result')
+                nTerror('In _rangesStr2list failed _autoRanges got None result')
                 return None
             if not isinstance( result, list ):
-                NTerror('In _rangesStr2list failed _autoRanges because result is not a list')
+                nTerror('In _rangesStr2list failed _autoRanges because result is not a list')
                 return None
             return result
 
@@ -1219,7 +1232,7 @@ class Molecule( NTtree, ResidueList ):
         for res in self.allResidues():
             resNumDict.setdefault(res.resNum, [])
             resNumDict[res.resNum].append(res)
-#        NTdebug("Residue dict: %s" % resNumDict.items())
+#        nTdebug("Residue dict: %s" % resNumDict.items())
 
         for rangeStr in rangeStrList:
             rangeStrClean = rangeStr
@@ -1230,16 +1243,16 @@ class Molecule( NTtree, ResidueList ):
                     return None
                 rangeStrClean = rangeStr[2:]
                 chainId = rangeStr[0]
-#            NTdebug("rangeStrClean: [%s] chainId [%s]" % (rangeStrClean, chainId))
+#            nTdebug("rangeStrClean: [%s] chainId [%s]" % (rangeStrClean, chainId))
             rangeIntList = asci2list(rangeStrClean)
             if not rangeIntList:
-                NTwarning("Failed to asci2list in Molecule._rangesStr2list for rangeStrClean: %s" % rangeStrClean)
+                nTwarning("Failed to asci2list in Molecule._rangesStr2list for rangeStrClean: %s" % rangeStrClean)
                 continue
             for resNum in rangeIntList:
                 if resNumDict.has_key(resNum):
                     for r in resNumDict[resNum]:
                         if (chainId == None) or (r.chain.name == chainId):
-#                            NTdebug("r: [%s] chainId [%s]" % (r, chainId))
+#                            nTdebug("r: [%s] chainId [%s]" % (r, chainId))
                             result.append(r)
         result.removeDuplicates()
         # Actually I would have preferred to define the natural ordering of residues in the class as cmp but
@@ -1253,7 +1266,7 @@ class Molecule( NTtree, ResidueList ):
         "Return None on error"
         residueList = self.ranges2list(ranges)
         if residueList == None:
-            NTerror("Failed to ranges2list in ranges2resCount")
+            nTerror("Failed to ranges2list in ranges2resCount")
             return None
         return len(residueList)
 
@@ -1300,18 +1313,18 @@ class Molecule( NTtree, ResidueList ):
                     if resnumDict.has_key(item):
                         resNumValue = resnumDict[item]
                         if not isinstance(resNumValue, Residue):
-                            NTerror("resNumValue is not an Residue but [%s]." % str(resNumValue))
+                            nTerror("resNumValue is not an Residue but [%s]." % str(resNumValue))
                             return None
                         result.append( resNumValue )
                     else:
-                        NTerror('Error Molecule.ranges2list: invalid residue number item [%d]\n', item )
+                        nTerror('Error Molecule.ranges2list: invalid residue number item [%d]\n', item )
                 elif isinstance( item, Residue ):
                     result.append( item )
                 else:
-                    NTerror('Error Molecule.ranges2list: invalid item [%s] in ranges list\n', item )
+                    nTerror('Error Molecule.ranges2list: invalid item [%s] in ranges list\n', item )
             return result
 
-        NTerror('Error Molecule.ranges2list: undefined ranges type [%s]\n', type(ranges) )
+        nTerror('Error Molecule.ranges2list: undefined ranges type [%s]\n', type(ranges) )
         return None
 
     def getFixedRangeList( self, max_length_range = 50, ranges=None ):
@@ -1365,10 +1378,10 @@ class Molecule( NTtree, ResidueList ):
             result = NTlist()
             for model in models:
                 if model < 0:
-                    NTerror('Molecule.models2list: invalid model number %d ( < 0 )', model )
+                    nTerror('Molecule.models2list: invalid model number %d ( < 0 )', model )
                     return None
                 if model >= self.modelCount:
-                    NTerror('Molecule.models2list: invalid model number %d ( >=  modelCount: %d)',
+                    nTerror('Molecule.models2list: invalid model number %d ( >=  modelCount: %d)',
                              model, self.modelCount
                            )
                     return None
@@ -1382,19 +1395,19 @@ class Molecule( NTtree, ResidueList ):
             result = NTlist()
             for model in models:
                 if not isinstance( model, int):
-                    NTerror('Error Molecule.models2list: invalid model "%s" in models list\n', model )
+                    nTerror('Error Molecule.models2list: invalid model "%s" in models list\n', model )
                     return None
                 if model < 0:
-                    NTerror('Error Molecule.models2list: Invalid model number %d (below zero)\n', model )
+                    nTerror('Error Molecule.models2list: Invalid model number %d (below zero)\n', model )
                     return None
                 if model >= self.modelCount:
-                    NTerror('Error Molecule.models2list: Invalid model number %d (larger than modelCount: %d)\n',
+                    nTerror('Error Molecule.models2list: Invalid model number %d (larger than modelCount: %d)\n',
                                 (model, self.modelCount ))
                     return None
                 result.append(model)
             #end for
             return result
-        NTerror('Error Molecule.models2list: undefined models type %s\n', type(models) )
+        nTerror('Error Molecule.models2list: undefined models type %s\n', type(models) )
         return None
     #end def
 
@@ -1403,7 +1416,8 @@ class Molecule( NTtree, ResidueList ):
 
            gwv 13 Jun 08: Return self or None on error
         """
-        if not path: path = self.name + '.NTmol'
+        if not path: 
+            path = self.name + '.NTmol'
 
         content = NTdict( name = self.name, convention = INTERNAL )
         content.update( NTmolParameters )
@@ -1411,7 +1425,7 @@ class Molecule( NTtree, ResidueList ):
         content.keysformat()
         xmlfile = os.path.join( path, NTmolParameters.contentFile )
         if (obj2XML( content, path=xmlfile ) != content):
-            NTerror('Molecule.save: writing xml file "%s" failed', xmlfile)
+            nTerror('Molecule.save: writing xml file "%s" failed', xmlfile)
             return None
         #end if
         self.content = content
@@ -1419,8 +1433,8 @@ class Molecule( NTtree, ResidueList ):
         self._saveResonances(  os.path.join( path, NTmolParameters.resonanceFile  ) )
         self._saveStereoAssignments( os.path.join( path, NTmolParameters.stereoFile ) )
         self._saveCoordinates( os.path.join( path, NTmolParameters.coordinateFile ) )
-#        NTdetail('==> Saved %s to "%s"', self, smlFile) # smlFile was undefined.
-        NTdetail('==> Saved %s to "%s"', self )
+#        nTdetail('==> Saved %s to "%s"', self, smlFile) # smlFile was undefined.
+        nTdetail('==> Saved %s to "%s"', self )
         return self
     #end def
 
@@ -1429,9 +1443,10 @@ class Molecule( NTtree, ResidueList ):
            Save sequence, resonances, stereo assignments and coordinates.
            Return self or None on error
         """
-        if not path: path = self.objectPath
+        if not path: 
+            path = self.objectPath
         if not path:
-            NTerror('Molecule.save: undefined path')
+            nTerror('Molecule.save: undefined path')
         if os.path.exists(path):
             removedir(path)
         os.makedirs(path)
@@ -1449,11 +1464,11 @@ class Molecule( NTtree, ResidueList ):
 
         fpath = os.path.join(path,'molecule.sml')
         if self.SMLhandler.toFile(self, fpath) != self:
-            NTerror('Molecule.save: failed creating "%s"', path)
+            nTerror('Molecule.save: failed creating "%s"', path)
             return None
         #end if
 
-        NTdetail('==> Saved %s to "%s"', self, path)
+        nTdetail('==> Saved %s to "%s"', self, path)
         return self
     #end def
 
@@ -1462,7 +1477,7 @@ class Molecule( NTtree, ResidueList ):
            returns Molecule instance or None on error
         """
         if (not os.path.exists( path )):
-            NTerror('Molecule.open: path "%s" not found\n', path)
+            nTerror('Molecule.open: path "%s" not found\n', path)
             return None
         #end if
 
@@ -1471,20 +1486,20 @@ class Molecule( NTtree, ResidueList ):
 
         fpath = os.path.join(path,'molecule.sml')
         if (not os.path.exists( fpath )):
-            NTerror('Molecule.open: smlFile "%s" not found\n', fpath)
+            nTerror('Molecule.open: smlFile "%s" not found\n', fpath)
             return None
         #end if
 
-        mol = Molecule.SMLhandler.fromFile(fpath)
+        mol = Molecule.SMLhandler.fromFile(fpath) # pylint: disable=E1101
         if not mol:
-            NTerror('Molecule.open: open from "%s" failed', path)
+            nTerror('Molecule.open: open from "%s" failed', path)
             return None
         #end if
 
         mol._check()
         mol.updateAll()
 
-        NTdetail('%s', mol.format())
+        nTdetail('%s', mol.format())
 
         return mol
     #end def
@@ -1497,20 +1512,20 @@ class Molecule( NTtree, ResidueList ):
         #print '*** Opening using Molecule.openMol_094'
 
         if (not os.path.exists( path )):
-            NTerror('Molecule.open: smlFile "%s" not found\n', path)
+            nTerror('Molecule.open: smlFile "%s" not found\n', path)
             return None
         #end if
 
-        mol = Molecule.SMLhandler.fromFile(path)
+        mol = Molecule.SMLhandler.fromFile(path)  # pylint: disable=E1101
         if not mol:
-            NTerror('Molecule.open: open from "%s" failed', path)
+            nTerror('Molecule.open: open from "%s" failed', path)
             return None
         #end if
 
         mol._check()
         mol.updateAll()
 
-        NTdetail('%s', mol.format())
+        nTdetail('%s', mol.format())
 
         return mol
     #end def
@@ -1522,26 +1537,26 @@ class Molecule( NTtree, ResidueList ):
            returns Molecule instance or None on error
         """
         # old format
-        NTdetail('Molecule.openMol_075: opening from old format "%s"', path)
+        nTdetail('Molecule.openMol_075: opening from old format "%s"', path)
 
         if (not os.path.exists( path )):
-            NTerror('Molecule.openMol_075: path "%s" not found\n', path)
+            nTerror('Molecule.openMol_075: path "%s" not found\n', path)
             return None
         #end if
 
-        content = XML2obj( path=os.path.join( path, NTmolParameters.contentFile ) )
+        content = xML2obj( path=os.path.join( path, NTmolParameters.contentFile ) )
         if not content:
-            NTerror('Molecule.openMol_075: error reading xml file "%s"\n',
+            nTerror('Molecule.openMol_075: error reading xml file "%s"\n',
                      os.path.join( path, NTmolParameters.contentFile )
                    )
             return None
         #end if
         content.keysformat()
-#        NTdebug('content from xml-file: %s', content.format())
+#        nTdebug('content from xml-file: %s', content.format())
 
         mol = Molecule( name = content.name )
         if not mol:
-            NTerror('Molecule.openMol_075: initializing molecule\n')
+            nTerror('Molecule.openMol_075: initializing molecule\n')
             return None
         #end if
 
@@ -1557,7 +1572,7 @@ class Molecule( NTtree, ResidueList ):
         mol._check()
         mol.updateAll()
 
-#        NTdebug('%s', mol.format())
+#        nTdebug('%s', mol.format())
 
         return mol
     #end def
@@ -1575,11 +1590,11 @@ class Molecule( NTtree, ResidueList ):
                     r.error = NaN
                 #end if
             #end for
-            l = len(atm.resonances)
-            if l < resonanceCount:
-                NTdebug('Molecule._check: atom %s has only %d resonances; expected %d; repairing now',
-                          atm, l, resonanceCount)
-                for _i in range(l,resonanceCount):
+            n = len(atm.resonances)
+            if n < resonanceCount:
+                nTdebug('Molecule._check: atom %s has only %d resonances; expected %d; repairing now',
+                          atm, n, resonanceCount)
+                for _i in range(n,resonanceCount):
                     atm.addResonance()
                 #end for
             #end if
@@ -1601,7 +1616,7 @@ class Molecule( NTtree, ResidueList ):
                            )
         #end for
         if obj2XML( sequence, path=fileName ) != sequence:
-            NTerror('Molecule._saveSequence: writing xml sequence file "%s"', fileName)
+            nTerror('Molecule._saveSequence: writing xml sequence file "%s"', fileName)
             return None
         #end if
         return self
@@ -1612,28 +1627,28 @@ class Molecule( NTtree, ResidueList ):
         Return self or None on error.
         """
         if (not os.path.exists( sequenceFile ) ):
-            NTerror('Molecule.restoreSequence: sequenceFile "%s" not found\n',
+            nTerror('Molecule.restoreSequence: sequenceFile "%s" not found\n',
                      sequenceFile
                    )
             return None
         #end if
         # compatibility
         if self.content.version < 0.92:
-            file = open(sequenceFile, 'r')
-            for line in file:
+            fileObject = open(sequenceFile, 'r')
+            for line in fileObject:
                 exec(line)
             #end for
-            file.close()
+            fileObject.close()
         else:
-            sequence = XML2obj( sequenceFile )
+            sequence = xML2obj( sequenceFile )
             if sequence == None:
-                NTerror('Molecule._restoreSequence: error parsing xml-file "%s"', sequenceFile)
+                nTerror('Molecule._restoreSequence: error parsing xml-file "%s"', sequenceFile)
                 return None
             for chainId, resName, resNum, convention in sequence:
                 self.addResidue( chainId, resName, resNum, convention )
             #end for
         #end if
-        #NTdebug('Molecule._restoreSequence: %s', sequenceFile)
+        #nTdebug('Molecule._restoreSequence: %s', sequenceFile)
         return self
     #end def
 
@@ -1651,7 +1666,7 @@ class Molecule( NTtree, ResidueList ):
             #end for
         #end for
         fp.close()
-        #NTdebug('Molecule.saveResonances: %s', fileName)
+        #nTdebug('Molecule.saveResonances: %s', fileName)
     #end def
 
     def _restoreResonances( self, fileName, append = True ):
@@ -1660,7 +1675,7 @@ class Molecule( NTtree, ResidueList ):
            Return resonanceCount or -1 on error
         """
         if not os.path.exists( fileName ):
-            NTerror('Error Molecule._restoreResonances: file "%s" not found\n', fileName )
+            nTerror('Error Molecule._restoreResonances: file "%s" not found\n', fileName )
             return -1
         #end if
         if not append:
@@ -1676,7 +1691,7 @@ class Molecule( NTtree, ResidueList ):
         file.close()
 
         resonanceCount = len(self.resonanceSources)
-        #NTdebug('Molecule.restoreResonances: %s (%d)', fileName, resonanceCount)
+        #nTdebug('Molecule.restoreResonances: %s (%d)', fileName, resonanceCount)
         return resonanceCount
     #end def
 
@@ -1685,16 +1700,16 @@ class Molecule( NTtree, ResidueList ):
         Return True on error.
         """
         msg = "In %s with sMLfileVersion %s" % ( getCallerName(), sMLfileVersion )
-#        NTdebug(msg)
+#        nTdebug(msg)
         if not isinstance( self.resonanceSources, NTlist):
-            NTerror( msg + " expected to have already restored an NTlist" )
+            nTerror( msg + " expected to have already restored an NTlist" )
             return True
         if len( self.resonanceSources ) == 0:
-#            NTdebug(msg + " and no resonance list found")
+#            nTdebug(msg + " and no resonance list found")
             return
         for i, resonanceSource in enumerate(self.resonanceSources):
             if not isinstance( resonanceSource, str):
-                NTerror(msg + " expected string but found: %s" % resonanceSource)
+                nTerror(msg + " expected string but found: %s" % resonanceSource)
                 return True
             self.resonanceSources[i] = ResonanceList(resonanceSource)
         #end for
@@ -1709,7 +1724,7 @@ class Molecule( NTtree, ResidueList ):
             sourceName = getUniqueName(self.resonanceSources, 'source' )
             source = ResonanceList(sourceName)
         if not isinstance(source, ResonanceList):
-            NTerror("In %s expected ResonanceList source but found %s" % (getCallerName(), source))
+            nTerror("In %s expected ResonanceList source but found %s" % (getCallerName(), source))
             return None
         if not skipAtomResonanceCreation:
             for atom in self.allAtoms():
@@ -1726,7 +1741,7 @@ class Molecule( NTtree, ResidueList ):
         #end for
 #        self.resonanceCount = 0
         self.resonanceSources = NTlist()
-        #NTmessage("==> Initialized resonances")
+        #nTmessage("==> Initialized resonances")
         #end if
     #end def
 
@@ -1740,12 +1755,12 @@ class Molecule( NTtree, ResidueList ):
         """
         resonanceCount = len(self.resonanceSources)
         if not resonanceCount:
-            NTmessage("Skipping molecule.mergeResonances because there are no resonances")
+            nTmessage("Skipping molecule.mergeResonances because there are no resonances")
             return
 
         for atom in self.allAtoms():
             if len(atom.resonances) != resonanceCount:
-                NTerror('Molecule.mergeResonances %s: length resonance list (%d) does not match resonanceCount (%d)',
+                nTerror('Molecule.mergeResonances %s: length resonance list (%d) does not match resonanceCount (%d)',
                          atom, len(atom.resonances), resonanceCount)
                 return
             #end if
@@ -1762,7 +1777,7 @@ class Molecule( NTtree, ResidueList ):
             if matchedResonance:
                 atom.resonances.append(matchedResonance)
             else:
-#                NTdebug("For atom no matched resonance yet so let's take the first")
+#                nTdebug("For atom no matched resonance yet so let's take the first")
                 matchedResonance = atom.resonances[0]
                 atom.resonances.append(matchedResonance)
             #end if
@@ -1776,14 +1791,14 @@ class Molecule( NTtree, ResidueList ):
         """
         Return True on error
         """
-#        NTdebug("Doing %s on %s." % (getCallerName(), resonanceList))
+#        nTdebug("Doing %s on %s." % (getCallerName(), resonanceList))
         if resonanceList.vascoResults:
-            NTmessage("==> Reseting existing non-empty Vasco results")
+            nTmessage("==> Reseting existing non-empty Vasco results")
         resonanceList.vascoResults.clear()
         for atomKey in vascoAtomIdLoL:
             rerefValue, rerefError = rerefInfo[atomKey]
             if rerefValue == None:
-#                NTdebug("Skipping atomKey: %s" % str(atomKey))
+#                nTdebug("Skipping atomKey: %s" % str(atomKey))
                 continue
             atomId = "_".join([atomKey[0], str(atomKey[1])]) # strings can be stored in SML. atomId will be e.g. "H,None" or "C,3"
             rerefNTvalue = NTvalue(rerefValue, rerefError, fmt = '%.3f (+- %.3f)') # can also be sml-ed.
@@ -1793,16 +1808,16 @@ class Molecule( NTtree, ResidueList ):
     #end def
 
 
-    """
-    Set doRevert to undo previously applied corrections.
-    The corrections should first be made part of the CING project molecule.vascoResults
-    using setVascoChemicalShiftCorrections
-    If resonanceList is None then do all present.
-    Return True on error
-    """
     def applyVascoChemicalShiftCorrections(self, doRevert = False, resonanceList = None):
+        """
+        Set doRevert to undo previously applied corrections.
+        The corrections should first be made part of the CING project molecule.vascoResults
+        using setVascoChemicalShiftCorrections
+        If resonanceList is None then do all present.
+        Return True on error
+        """
         func_name = getCallerName()
-#        NTdebug("Doing applyVascoChemicalShiftCorrections with doRevert %s on %s" % (doRevert, resonanceList))
+#        nTdebug("Doing applyVascoChemicalShiftCorrections with doRevert %s on %s" % (doRevert, resonanceList))
 #        resonanceCount = len(self.resonanceSources)
         resonanceLoL = [resonanceList]
         if resonanceList == None:
@@ -1811,52 +1826,52 @@ class Molecule( NTtree, ResidueList ):
 #            resonanceListIdx = getListIdx(self.resonanceSources, resonanceList)
             resonanceListIdx = self.resonanceSources.index(resonanceList)
             if resonanceListIdx < 0:
-                NTwarning("No resonanceListIdx in %s" % func_name)
+                nTwarning("No resonanceListIdx in %s" % func_name)
                 return
             if resonanceList.vascoResults == None:
-                NTwarning("No even empty Vasco results")
+                nTwarning("No even empty Vasco results")
                 return
     #        if ( not self.vascoApplied and doRevert) or ( self.vascoApplied and not doRevert):
             if resonanceList.vascoApplied ^ doRevert: # boolean xor is equivalent of the above line.
                 if 1: # DEFAULT 1
-                    NTerror("Vasco results were applied is: %s but doRevert is %s. Aborting." % (resonanceList.vascoApplied, doRevert ))
-                    NTerror("Consider reverting previous correction first.") # should we build that in already?
+                    nTerror("Vasco results were applied is: %s but doRevert is %s. Aborting." % (resonanceList.vascoApplied, doRevert ))
+                    nTerror("Consider reverting previous correction first.") # should we build that in already?
                     return True
 
             resList = self.allCommonAaResidues()
             if not resList:
-                NTmessage("Skipping applyVascoChemicalShiftCorrections because there are no common amino acids.")
+                nTmessage("Skipping applyVascoChemicalShiftCorrections because there are no common amino acids.")
                 return
             atomListAll = getAssignedAtomListForResList(resList, resonanceListIdx = resonanceListIdx)
             if not atomListAll:
-                NTerror("Failed to find any assigned atom in a common amino acid but Vasco did produce results for them.")
+                nTerror("Failed to find any assigned atom in a common amino acid but Vasco did produce results for them.")
                 return True
             atomListDone = NTlist() # watch out for double corrections.
             for atomKey in vascoAtomIdLoL:
                 atomId = "_".join([atomKey[0], str(atomKey[1])])
                 rerefNTvalue = getDeepByKeysOrAttributes(resonanceList.vascoResults, atomId)
                 if rerefNTvalue == None:
-#                    NTdebug("Skipping atomId: %s" % str(atomId))
+#                    nTdebug("Skipping atomId: %s" % str(atomId))
                     continue
                 rerefValue = rerefNTvalue.value
                 rerefError = rerefNTvalue.error
                 if isNoneorNaN( rerefValue ):
-                    NTerror("Found rerefValue of NaN for rerefNTvalue: %s", rerefNTvalue)
+                    nTerror("Found rerefValue of NaN for rerefNTvalue: %s", rerefNTvalue)
                     continue
                 if isNoneorNaN( rerefError ):
-                    NTerror("Found rerefError of NaN for atomId: %s", rerefNTvalue)
+                    nTerror("Found rerefError of NaN for atomId: %s", rerefNTvalue)
                     continue
                 useCorrection = math.fabs(rerefValue) >= VASCO_CERTAINTY_FACTOR_CUTOFF * rerefError # Sync with resonanceList check
                 if not useCorrection:
-#                    NTdebug("Skipping uncertain correction for %10s of rerefNTvalue %s" % (atomId, str(rerefNTvalue)))
+#                    nTdebug("Skipping uncertain correction for %10s of rerefNTvalue %s" % (atomId, str(rerefNTvalue)))
                     continue
-#                NTmessage("Correcting %s with %s" % (str(atomTuple), str(rerefTuple)))
+#                nTmessage("Correcting %s with %s" % (str(atomTuple), str(rerefTuple)))
 
                 atomList = self.getAtomsWithCsInVascoClass(atomListAll, atomKey)
                 atomListAlreadyDone = atomListDone.intersection(atomList)
                 if atomListAlreadyDone:
-                    NTerror("Found overlapping atoms in CING for Vasco corrections: %s" % str(atomListAlreadyDone))
-                    NTerror("Skipping all atoms and giving up")
+                    nTerror("Found overlapping atoms in CING for Vasco corrections: %s" % str(atomListAlreadyDone))
+                    nTerror("Skipping all atoms and giving up")
                     return True
                 msg = '==> Applying '
                 if doRevert:
@@ -1866,14 +1881,15 @@ class Molecule( NTtree, ResidueList ):
                 if atomClassId == None:
                     atomClassId = atomId
 
-                NTmessage(msg + " Vasco correction for %s with %8.3f to %d resonances in %s" % (atomClassId, rerefValue, len(atomList), resonanceList.name))
+                nTmessage(msg + " Vasco correction for %s with %8.3f to %d resonances in %s" % (atomClassId, rerefValue, 
+                                                                                                len(atomList), resonanceList.name))
 #                for i,atm in enumerate(atomList):
                 for atm in atomList:
                     r = atm.resonances[resonanceListIdx]
 #                    if i < 2: # just show a couple for debugging.
-#                        NTdebug("Correcting %3d atom %s resonance %s with %s" % ( i, atm, r, rerefValue))
+#                        nTdebug("Correcting %3d atom %s resonance %s with %s" % ( i, atm, r, rerefValue))
                     if isNoneorNaN(r.value):
-                        NTdebug("Skipping invalid resonance: %s" % r)
+                        nTdebug("Skipping invalid resonance: %s" % r)
                     else:
                         r += rerefValue
                 atomListDone.addList(atomList)
@@ -1890,30 +1906,29 @@ class Molecule( NTtree, ResidueList ):
         return False
     # end def
 
-    """
-    Input e.g. 'C', 3 with the second parameter
-    Return False on error.
-
-- where to get the selection groups for
-    hydrogen all, including aromatic and amides?
-    nitrogen all,
-    carbon "only aliphatic". In CING we use the atom type: 'C_ALI'. Ie. not aromatic.
-        Does this include e.g.
-            Gly C, Asn CG, Arg CZ ? No because all have some other than C,H bound.
-            high ppm, proton attached
-
-('C', 1) (None, None)                                           Group 1 (high ppm, no proton)
-('C', 2) (None, None)                                           Group 2 aromaten (high ppm, proton attached)
-('C', 3) (-1.6413276878937664, 0.058340678594975978)            Group 3 aliphatic (all but the other groups)
-('C', 4) (None, None)                                           Group 4 carbonylen
-('H', None) (-0.015514588071506744, 0.0091816571211084108)
-('N', None) (-0.3314271261198754, 0.24086810646836765)
-    """
-
     def getAtomsWithCsInVascoClass(self, atomListAll, atomKey):
+        """
+        Input e.g. 'C', 3 with the second parameter
+        Return False on error.
+    
+            - where to get the selection groups for
+                hydrogen all, including aromatic and amides?
+                nitrogen all,
+                carbon "only aliphatic". In CING we use the atom type: 'C_ALI'. Ie. not aromatic.
+                    Does this include e.g.
+                        Gly C, Asn CG, Arg CZ ? No because all have some other than C,H bound.
+                        high ppm, proton attached
+    
+        ('C', 1) (None, None)                                           Group 1 (high ppm, no proton)
+        ('C', 2) (None, None)                                           Group 2 aromaten (high ppm, proton attached)
+        ('C', 3) (-1.6413276878937664, 0.058340678594975978)            Group 3 aliphatic (all but the other groups)
+        ('C', 4) (None, None)                                           Group 4 carbonylen
+        ('H', None) (-0.015514588071506744, 0.0091816571211084108)
+        ('N', None) (-0.3314271261198754, 0.24086810646836765)
+        """
         element = atomKey[0]
         if element not in vascoAtomTypeList:
-            NTerror("atomType %s not in vascoAtomTypeList: %s" % ( element, str(vascoAtomTypeList)))
+            nTerror("atomType %s not in vascoAtomTypeList: %s" % ( element, str(vascoAtomTypeList)))
             return
         spinType = elementToSpintypeMap[ element ]
         atomListBySpintype = atomListAll.selectByItems(DB_STR, SPINTYPE_STR, spinType)
@@ -1921,7 +1936,7 @@ class Molecule( NTtree, ResidueList ):
         if group == None:
             return atomListBySpintype
         if not ( group == 3 and element == C_STR ): # easy to extend.
-            NTerror("Unknown atomKey %s in getAtomsWithCsInVascoClass" % str( atomKey ))
+            nTerror("Unknown atomKey %s in getAtomsWithCsInVascoClass" % str( atomKey ))
             return
         # aliphatics
         atomListBySpintypeAndType = atomListBySpintype.selectByItems(DB_STR, TYPE_STR, C_ALI_STR)
@@ -1938,32 +1953,32 @@ class Molecule( NTtree, ResidueList ):
         lAllChains = len(allChains)
         result = [ SYMMETRY_C1_STR, None, None ]
         if not lAllChains:
-            NTwarning("No chains; yet?")
+            nTwarning("No chains; yet?")
             return result
         if lAllChains == 1:
-#            NTdebug("Single chains.")
+#            nTdebug("Single chains.")
             return result
         chain0 = allChains[0]
         chain1 = allChains[1]
         if lAllChains == 2:
-            NTdebug("Double chains.")
+            nTdebug("Double chains.")
             hasSameSequence = chain0.hasSameSequence(chain1)
-            NTdebug("hasSameSequence %s" % hasSameSequence)
+            nTdebug("hasSameSequence %s" % hasSameSequence)
             if hasSameSequence == None:
-                NTerror("In %s hasSameSequence Failed" % getCallerName())
+                nTerror("In %s hasSameSequence Failed" % getCallerName())
                 return result
             if not hasSameSequence:
                 return result
             ncsSymmetry = chain0.calculateRmsd( chain1, modelIdx = 0 ) # Only for first model
             drSymmetry = chain0.getSymmetryDR( chain1, modelIdx = 0 )
 
-            NTdebug("ncsSymmetry %.2f" % ncsSymmetry)
-            NTdebug("drSymmetry  %.2f" % drSymmetry)
+            nTdebug("ncsSymmetry %.2f" % ncsSymmetry)
+            nTdebug("drSymmetry  %.2f" % drSymmetry)
             if ncsSymmetry == None:
-                NTerror("In %s getNcsSymmetryPerResidue Failed" % getCallerName())
+                nTerror("In %s getNcsSymmetryPerResidue Failed" % getCallerName())
                 return None                
             if drSymmetry == None:
-                NTerror("In %s getSymmetryDR Failed" % getCallerName())
+                nTerror("In %s getSymmetryDR Failed" % getCallerName())
                 return None                
             result[1] = ncsSymmetry
             result[2] = drSymmetry
@@ -1971,7 +1986,7 @@ class Molecule( NTtree, ResidueList ):
                 result[0] = SYMMETRY_C2_STR
             return result
         # end if
-        NTdebug("Ignoring multimers with 3 or more chains for now.")
+        nTdebug("Ignoring multimers with 3 or more chains for now.")
         return result
 
 
@@ -1987,11 +2002,11 @@ class Molecule( NTtree, ResidueList ):
             #endif
         #end for
         if obj2XML(stereo, path=stereoFileName) != stereo:
-            NTerror('Molecule._saveStereoAssignments: write xml-file "%s" failed', stereoFileName)
+            nTerror('Molecule._saveStereoAssignments: write xml-file "%s" failed', stereoFileName)
             return None
         #end if
 
-        #NTdebug('Molecule.saveStereoAssignments: saved %d stereo assignments to "%s', len(stereo), stereoFileName)
+        #nTdebug('Molecule.saveStereoAssignments: saved %d stereo assignments to "%s', len(stereo), stereoFileName)
         return self
     #end def
 
@@ -2003,9 +2018,9 @@ class Molecule( NTtree, ResidueList ):
         if not os.path.exists( stereoFileName ):
             return -1
 
-        stereo = XML2obj(stereoFileName)
+        stereo = xML2obj(stereoFileName)
         if stereo == None:
-            NTerror('Molecule._restoreStereoAssignment: parsing xml-file "s"', stereoFileName)
+            nTerror('Molecule._restoreStereoAssignment: parsing xml-file "s"', stereoFileName)
             return -1
         #end if
 
@@ -2013,14 +2028,14 @@ class Molecule( NTtree, ResidueList ):
         for nameTuple in stereo:
             atm = self.decodeNameTuple( nameTuple )
             if atm == None:
-                NTerror('Molecule._restoreStereoAssignment: invalid atom nameTuple (%s)', nameTuple)
+                nTerror('Molecule._restoreStereoAssignment: invalid atom nameTuple (%s)', nameTuple)
             else:
                 atm.stereoAssigned = True
                 count += 1
             #end if
         #end for
 
-        #NTdebug('Molecule.restoreStereoAssignments: restored %d stereo assignments from "%s\n',count, stereoFileName)
+        #nTdebug('Molecule.restoreStereoAssignments: restored %d stereo assignments from "%s\n',count, stereoFileName)
         return count
     #end def
 
@@ -2033,7 +2048,7 @@ class Molecule( NTtree, ResidueList ):
                 fprintf( fp, 'self%s.addCoordinate( %r, %r, %r, Bfac=%r )\n',
                               atm.cName2( 2 ), c[0], c[1], c[2], c.Bfac)
         fp.close()
-        #NTdebug('Molecule.saveCoordinates: %s', fileName)
+        #nTdebug('Molecule.saveCoordinates: %s', fileName)
 
     def _restoreCoordinates( self, fileName, append = True ):
         """Restore coordinates from fileName
@@ -2041,7 +2056,7 @@ class Molecule( NTtree, ResidueList ):
            Return self or None on error
         """
         if not os.path.exists( fileName ):
-            NTerror('Error Molecule._restoreCoordinates: file "%s" not found\n', fileName )
+            nTerror('Error Molecule._restoreCoordinates: file "%s" not found\n', fileName )
             return None
         #end if
         if not append:
@@ -2056,7 +2071,7 @@ class Molecule( NTtree, ResidueList ):
             exec(line)
         #end for
         file.close()
-        #NTdebug('Molecule.restoreCoordinates: %s (%d)', fileName, self.modelCount)
+        #nTdebug('Molecule.restoreCoordinates: %s (%d)', fileName, self.modelCount)
         return self
     #end def
 
@@ -2078,7 +2093,7 @@ class Molecule( NTtree, ResidueList ):
     def updateTopology( self)   :
         """Define the _topology key for all atoms.
         """
-#        NTdebug('Defining topology')
+#        nTdebug('Defining topology')
         for residue in self.allResidues():
             for atm in residue:
                 atm._topology = NTlist()
@@ -2104,7 +2119,7 @@ class Molecule( NTtree, ResidueList ):
                     #end for
                 else:
                     pass
-#                    NTdebug('Molecule.updateTopolgy: atm %s: odd db==None', atm)
+#                    nTdebug('Molecule.updateTopolgy: atm %s: odd db==None', atm)
                 #end if
             #end for
         #end for
@@ -2114,7 +2129,7 @@ class Molecule( NTtree, ResidueList ):
         """Calculate the dihedral angles for all residues
         Return True on error.
         """
-#        NTdebug('Calculating dihedral angles')
+#        nTdebug('Calculating dihedral angles')
         if residueList == None:
             residueList = self.allResidues()
         for res in residueList:
@@ -2126,7 +2141,7 @@ class Molecule( NTtree, ResidueList ):
         #end for
 
         if not isinstance(residueList, list):
-            NTcodeerror("In updateDihedrals the residueList is not of a class list")
+            nTcodeerror("In updateDihedrals the residueList is not of a class list")
             return True
         if not isinstance(residueList, NTlist):
             residueList = NTlist( *residueList )
@@ -2134,14 +2149,14 @@ class Molecule( NTtree, ResidueList ):
         for cvType in [ CV_BACKBONE_STR, CV_SIDECHAIN_STR ]:
             cvList = residueList.zap(cvType)
             av = cvList.average()
-#            NTdebug("Set %s to average %s" % ( cvType, av))
+#            nTdebug("Set %s to average %s" % ( cvType, av))
             self[cvType] = av[0]
     #end def
 
     def updateMean( self):
         """Calculate mean coordinates for all atoms
         """
-#        NTdebug('modelCount: %d; Calculating mean coordinates', self.modelCount)
+#        nTdebug('modelCount: %d; Calculating mean coordinates', self.modelCount)
         for atm in self.allAtoms():
             atm.calculateMeanCoordinate()
 
@@ -2162,16 +2177,17 @@ class Molecule( NTtree, ResidueList ):
         CUTOFF_SCORE_MAYBE = 0.3 # Default is 0.3
 
         if self.modelCount == 0:
-            NTwarning('idDisulfides: no models for "%s"', self)
+            nTwarning('idDisulfides: no models for "%s"', self)
             return pairList
         #end if
 
         cys=self.residuesWithProperties('CYS') # Called cysteine if thiol sidechain is not oxidized.
-        cyssTmp=self.residuesWithProperties('CYSS') # It might actually have been read correctly as a cystine (lacks an 'e' in the name and an 'H' in the structure as it is reduced.
+        # It might actually have been read correctly as a cystine (lacks an 'e' in the name and an 'H' in the structure as it is reduced.
+        cyssTmp=self.residuesWithProperties('CYSS') 
         for c in cyssTmp:
             if c not in cys:
                 cys.append(c)
-#        NTdebug('Identify the disulfide bonds between cysteines/cystines: %s' % cys)
+#        nTdebug('Identify the disulfide bonds between cysteines/cystines: %s' % cys)
 
         iList = range(len(cys))
         iList.reverse()
@@ -2180,10 +2196,10 @@ class Molecule( NTtree, ResidueList ):
             c = cys[i]
             coordinatesRetrieved = getDeepByKeysOrAttributes(c, 'CA', 'coordinates')
             if not coordinatesRetrieved:
-#                NTdebug("No coordinates for CA even set, skipping residue: %s" % c)
+#                nTdebug("No coordinates for CA even set, skipping residue: %s" % c)
                 del( cys[i] )
             elif not len(coordinatesRetrieved): # model count see entry 1abt and issue 137
-#                NTdebug("No coordinates for CA, skipping residue: %s" % c)
+#                nTdebug("No coordinates for CA, skipping residue: %s" % c)
                 del( cys[i] )
         disulfides = [] # same as pairList but with scoreList.
         cyssDict2Pair = {}
@@ -2194,7 +2210,7 @@ class Molecule( NTtree, ResidueList ):
                 c2 = cys[j]
                 scoreList = disulfideScore( c1, c2)
                 if not scoreList:
-                    NTdebug("Failed to get disulfideScore")
+                    nTdebug("Failed to get disulfideScore")
                     continue
 
                 if False:
@@ -2202,13 +2218,13 @@ class Molecule( NTtree, ResidueList ):
                     db = c1.CB.distance( c2.CB )
                     dg = c1.SG.distance( c2.SG )
                     chi3SS( db[0] )
-                    NTdebug( 'Considering pair : %s with %s' % (c1, c2))
-                    NTdebug( 'Ca-Ca            : %s', da)
-                    NTdebug( 'Cb-Cb            : %s', db)
-                    NTdebug( 'Sg-Sg            : %s', dg)
-                    NTdebug( 'chi3             : %s', chi3SS( db[0] ))
-                    NTdebug( 'scores           : %s', disulfideScore( c1, c2))
-                    NTdebug( '\n\n' )
+                    nTdebug( 'Considering pair : %s with %s' % (c1, c2))
+                    nTdebug( 'Ca-Ca            : %s', da)
+                    nTdebug( 'Cb-Cb            : %s', db)
+                    nTdebug( 'Sg-Sg            : %s', dg)
+                    nTdebug( 'chi3             : %s', chi3SS( db[0] ))
+                    nTdebug( 'scores           : %s', disulfideScore( c1, c2))
+                    nTdebug( '\n\n' )
                 if scoreList[3] >= CUTOFF_SCORE:
                     toAdd = True
                     for c in ( c1, c2 ):
@@ -2220,7 +2236,7 @@ class Molecule( NTtree, ResidueList ):
                             c_partner_found = c1
                             if c_partner_found == c:
                                 c_partner_found = c2
-#                            NTdebug('%s was id-ed before with %s so not pairing with %s (no effort will be done to optimize)' % (
+#                            nTdebug('%s was id-ed before with %s so not pairing with %s (no effort will be done to optimize)' % (
 #                                  c, c_partner_found_before, c_partner_found ))
                     if toAdd:
                         pair = (c1, c2)
@@ -2231,11 +2247,11 @@ class Molecule( NTtree, ResidueList ):
         # end for
         if False: # debug info really.
             if pairList:
-                NTdebug( '==> Molecule %s: Potential disulfide bridges: %d. applying bonds: %s' %( self.name, len(pairList), applyBonds))
+                nTdebug( '==> Molecule %s: Potential disulfide bridges: %d. applying bonds: %s' %( self.name, len(pairList), applyBonds))
     #            for pair in pairList:
-    #                NTdebug( '%s %s' % (pair[0], pair[1] ))
+    #                nTdebug( '%s %s' % (pair[0], pair[1] ))
             else:
-                NTdebug( '==> Molecule %s: No potential disulfide bridged residues found', self.name )
+                nTdebug( '==> Molecule %s: No potential disulfide bridged residues found', self.name )
         # end if
 
         if toFile:
@@ -2251,21 +2267,21 @@ class Molecule( NTtree, ResidueList ):
                 else:
                     fprintf(f,'\n')
             #end for
-            NTmessage('==> Disulfide analysis, output to %s', path)
+            nTmessage('==> Disulfide analysis, output to %s', path)
 #        else:
-#            NTmessage('==> Disulfide analysis, no output requested to file')
+#            nTmessage('==> Disulfide analysis, no output requested to file')
         #end if
 
         if applyBonds:
-#            NTdebug('Applying %d disulfide bonds' % len(disulfides))
+#            nTdebug('Applying %d disulfide bonds' % len(disulfides))
             for c1,c2,scoreList in disulfides:
-#                NTdebug('%s %s: scores dCa, dCb, S-S dihedral: %s ' %( c1,c2,scoreList))
+#                nTdebug('%s %s: scores dCa, dCb, S-S dihedral: %s ' %( c1,c2,scoreList))
                 if scoreList[3] < CUTOFF_SCORE:
-#                    NTdebug("Skipping potential disulfide")
+#                    nTdebug("Skipping potential disulfide")
                     continue
                 for c in (c1, c2):
                     if c.hasProperties('CYSS'):
-#                        NTdebug("Skipping %s that is already a CYSS" % c)
+#                        nTdebug("Skipping %s that is already a CYSS" % c)
                         continue
                     c.mutate('CYSS') # this looses connections to ccpn in residue and atom objects.
         #end if
@@ -2285,24 +2301,24 @@ class Molecule( NTtree, ResidueList ):
             # The pseudos above handled and the atoms for which normally there are no coordinates
             # will be saved.
             if actualCoordinateListLength == 0:
-#                NTdebug("Skipping %s without any coordinate." % atom)
+#                nTdebug("Skipping %s without any coordinate." % atom)
                 continue
             if actualCoordinateListLength == n:
-#                NTdebug("Skipping atoms with coordinates for all models.")
+#                nTdebug("Skipping atoms with coordinates for all models.")
                 continue
             atomListToSyncToSink.append(atom)
 
         if not atomListToSyncToSink:
-#            NTdebug("All atoms are sync-ed between models.")
+#            nTdebug("All atoms are sync-ed between models.")
             return
 
         unmatchedAtomByResDict = {}
         for i, atom in enumerate(atomListToSyncToSink): #@UnusedVariable
 #            if i <= 10:
-#                NTdebug("Sink [%s] %s with %s coordinates whereas modelcount is %s." % (i, atom, len(atom.coordinates), self.modelCount))
+#                nTdebug("Sink [%s] %s with %s coordinates whereas modelcount is %s." % (i, atom, len(atom.coordinates), self.modelCount))
             res = atom._parent
             if not res.removeAtom(atom.name):
-                NTcodeerror("Failed to delete atom %s from residue %s" % ( atom, res ))
+                nTcodeerror("Failed to delete atom %s from residue %s" % ( atom, res ))
             # JFD: Report all together now.
             if not unmatchedAtomByResDict.has_key(res.resName):
                 unmatchedAtomByResDict[ res.resName ] = ([],[])
@@ -2316,7 +2332,7 @@ class Molecule( NTtree, ResidueList ):
         if unmatchedAtomByResDict:
             msg = "Molecule#syncModels Removed atoms that differ over the different models:\n"
             msg += unmatchedAtomByResDictToString(unmatchedAtomByResDict)
-            NTwarning(msg)
+            nTwarning(msg)
 
 
     def updateAll( self)   :
@@ -2346,7 +2362,7 @@ class Molecule( NTtree, ResidueList ):
                 if res.has_key('OMEGA') and res.OMEGA.isWithinLimits( -90.0, 90.0):
                     # Cis omega; change to cPRO
                     _tmp,new=res.mutate('cPRO')
-                    NTmessage('Mutated %s to %s', res.shortName, new.shortName )
+                    nTmessage('Mutated %s to %s', res.shortName, new.shortName )
 #                    res.addDihedralsAll(msgHol=msgHol) # Needed when testing with 1bus.A.cPRO13
                     mutantList.append(res)
                 #end if
@@ -2357,7 +2373,7 @@ class Molecule( NTtree, ResidueList ):
             self.ensemble = Ensemble( self )
 #            self.atomList = AtomList( self )
 #            if not self.atomList:
-#                NTcodeerror("Failed to generate AtomList in molecule#updateAll")
+#                nTcodeerror("Failed to generate AtomList in molecule#updateAll")
             self.idDisulfides()
 #            if not self.has_key('ranges'): # JFD: now in init.
 #                self.ranges = None
@@ -2366,10 +2382,10 @@ class Molecule( NTtree, ResidueList ):
         # Atom list is needed even when no coordinates are present.
         self.atomList = AtomList( self )
         if self.atomList == None:
-            NTcodeerror("Failed to generate AtomList in molecule#updateAll")
+            nTcodeerror("Failed to generate AtomList in molecule#updateAll")
             return True
         if len(self.atomList) == 0:
-            NTwarning("Empty AtomList in molecule#updateAll")
+            nTwarning("Empty AtomList in molecule#updateAll")
 
         self.updateTopology()
     #end def
@@ -2392,7 +2408,7 @@ Return an Molecule instance or None on error
         sequenceS = ''
         if path:
             if (not os.path.exists( path )):
-                NTerror('Molecule.initialize: File "%s" not found\n', path)
+                nTerror('Molecule.initialize: File "%s" not found\n', path)
                 return None
             #end if
             f = open( path, mode = 'r' )
@@ -2432,7 +2448,7 @@ Return an Molecule instance or None on error
                 molecule.addResidue( chainId, resName, resNum, convention, Nterminal=Nterminal, Cterminal=Cterminal )
             #end if
         #end for
-        NTmessage("%s", molecule.format())
+        nTmessage("%s", molecule.format())
         return molecule
     #end def
     initialize = staticmethod( initialize )
@@ -2446,7 +2462,7 @@ Return an Molecule instance or None on error
         """
 #        rn = translateResidueName( convention, resName, INTERNAL )
 #        if (rn == None):
-#            NTerror('Molecule.addResidue: chain %s, residue "%s" not valid for convention "%s"',
+#            nTerror('Molecule.addResidue: chain %s, residue "%s" not valid for convention "%s"',
 #                     chainId, resName, convention
 #                   )
 #            return None
@@ -2480,14 +2496,16 @@ Return an Molecule instance or None on error
         else:
             chain = self[chainId]
         #end if
-        if not chain: return None
+        if not chain: 
+            return None
 
         # Add the residue if not present
         if resNum in chain:
             return chain[resNum]
         #end if
         residue = chain.addResidue( resName, resNum, convention=convention, Nterminal=Nterminal, Cterminal=Cterminal )
-        if not residue: return None
+        if not residue: 
+            return None
 
         # Use database to add atoms
         residue.addAllAtoms()
@@ -2517,7 +2535,8 @@ Return an Molecule instance or None on error
         """
         result = NTlist()
 
-        if len(properties) == 0: return result
+        if len(properties) == 0: 
+            return result
         for atm in self.allAtoms():
             if atm.hasProperties(*properties):
                 result.append(atm)
@@ -2563,7 +2582,7 @@ Return an Molecule instance or None on error
         Return a list of residues
         """
         if getDeepByKeysOrAttributes(self.project, 'status', TALOSPLUS_STR, 'completed'):
-#            NTdebug("Deriving auto ranges from talos plus")
+#            nTdebug("Deriving auto ranges from talos plus")
 #        if self.project.status.has_key('talosPlus') and self.project.status.talosPlus.completed:
             # we will do two passes:
             # First: select all residues that have S2> autoLimit
@@ -2595,20 +2614,20 @@ Return an Molecule instance or None on error
             #end for
             if len(r) > 0:
                 return r
-            NTwarning(' Molecule._autoRanges: empty list by Talos. Considering other criteria.')
+            nTwarning(' Molecule._autoRanges: empty list by Talos. Considering other criteria.')
         # end if
-#        NTdebug(' Molecule._autoRanges: no talos+ data')
+#        nTdebug(' Molecule._autoRanges: no talos+ data')
         if self.modelCount > 1:
-#            NTdebug(' Molecule._autoRanges: using cv to auto determine ranges')
+#            nTdebug(' Molecule._autoRanges: using cv to auto determine ranges')
             rangesStr = self.rangesByCv()
             if rangesStr == None:
-                NTerror(' Molecule.rangesByCv failed: returning all residues')
+                nTerror(' Molecule.rangesByCv failed: returning all residues')
                 return self.allResidues()
             # end def
             return self.ranges2list(rangesStr) # Potentially cyclic; watch out.
         # end def
             
-#        NTdebug(' Molecule._autoRanges: returning all residues')
+#        nTdebug(' Molecule._autoRanges: returning all residues')
         return self.allResidues()
     #end def
 
@@ -2635,7 +2654,8 @@ Return an Molecule instance or None on error
 
         if self.modelCount < 2:
             if debugRoutine:
-                NTdebug("Without multiple models the cv can not be used for determining the ranges in rangesByCv. Currently %s model(s)" % self.modelCount)
+                nTdebug("Without multiple models the cv can not be used for determining the ranges in rangesByCv. Currently %s model(s)" % 
+                        self.modelCount)
             return ALL_RANGES_STR
 
         residueList = NTlist()
@@ -2646,7 +2666,7 @@ Return an Molecule instance or None on error
             proteinResidues = ch.residuesWithProperties('protein' )
             if len(proteinResidues) == 0:
                 if debugRoutine:
-                    NTdebug("Adding all residues of non-protein chain: %s" % ch)
+                    nTdebug("Adding all residues of non-protein chain: %s" % ch)
                 residueList.addList( ch.allResidues() )
             resList = ch.allResidues()
             n = len(resList)
@@ -2661,7 +2681,7 @@ Return an Molecule instance or None on error
                 max_cv = max( max_cv, cv)
 
             if debugRoutine:
-                NTdebug("Found cvList list: %s" % ' '.join([ "%5.2f" % x for x in cvList ]))
+                nTdebug("Found cvList list: %s" % ' '.join([ "%5.2f" % x for x in cvList ]))
             cvListWindowAveraged = cvList
             # Do window averaging by numpy
             if False: # convolve will return a wrong sized array if cvList is smaller
@@ -2669,36 +2689,36 @@ Return an Molecule instance or None on error
                 w=ones(cvWindowSize,'d')
                 cvListWindowAveraged=convolve(w/w.sum(),cvList,mode='same')
                 if debugRoutine:
-                    NTdebug("data: %s" % str(cvList))
+                    nTdebug("data: %s" % str(cvList))
                 cvListWindowAveraged[0] = cvList[0] # Preserves up to the first derivative.
                 cvListWindowAveraged[n-1] = cvList[n-1]
 
                 # above works fine except for terminii.
                 if debugRoutine:
-                    NTdebug("Filtd cvList list: %s" % ' '.join([ "%5.2f" % x for x in cvListWindowAveraged ]))
+                    nTdebug("Filtd cvList list: %s" % ' '.join([ "%5.2f" % x for x in cvListWindowAveraged ]))
             for i,r in enumerate(resList): # can be optimized by NTlist method
                 if cvListWindowAveraged[i] <= cvCutoff:
                     residueList.append(r)
             # end for
         if not residueList:
-            NTwarning("No residues left in rangesByCv; max cvList of any residue: %s. Return all residues." % max_cv)
+            nTwarning("No residues left in rangesByCv; max cvList of any residue: %s. Return all residues." % max_cv)
             return ALL_RANGES_STR
 #        if max_cv < 0.2:
-#            NTdebug("No residues with cv above 0.2 which is weird. Max cv is: %s" % max_cv)
+#            nTdebug("No residues with cv above 0.2 which is weird. Max cv is: %s" % max_cv)
         if debugRoutine:
-            NTdebug("In rangesByCv; max cvList of any residue: %s" % max_cv)
+            nTdebug("In rangesByCv; max cvList of any residue: %s" % max_cv)
 
         ranges = self.residueList2Ranges(residueList)
         if ranges == None:
-            NTerror("Failed to get residueList2Ranges in rangesByCv")
+            nTerror("Failed to get residueList2Ranges in rangesByCv")
             return None
 
         if includeGapSize:
             if debugRoutine:
-                NTdebug("Starting includeGapSize with ranges: %s" % ranges)
+                nTdebug("Starting includeGapSize with ranges: %s" % ranges)
             startStopList = self.ranges2StartStopList(ranges)
             if startStopList == None:
-                NTerror("Failed to get ranges2StartStopList in rangesByCv")
+                nTerror("Failed to get ranges2StartStopList in rangesByCv")
                 return None
             i = len(startStopList) - 2 # start of last segment
             while i >= 2:
@@ -2707,58 +2727,60 @@ Return an Molecule instance or None on error
                 res2 = startStopList[i] # start
                 resDifCount = residueNumberDifference( res1, res2 )
                 if debugRoutine:
-                    NTdebug("Trying to join 2 ranges [j=%s,i=%s] to a larger one by including residues between: %s %s diff %s" % (j,i, res1,res2, resDifCount))
+                    nTdebug("Trying to join 2 ranges [j=%s,i=%s] to a larger one by including residues between: %s %s diff %s" % (
+                        j,i, res1,res2, resDifCount))
                 if resDifCount == None:
                     if debugRoutine:
-                        NTdebug("Failed to get residueNumberDifference in rangesByCv for residues[%s %s]" % (res1,res2))
+                        nTdebug("Failed to get residueNumberDifference in rangesByCv for residues[%s %s]" % (res1,res2))
                     i -= 2
                     continue
                 if resDifCount > (includeGapSize+1):
                     if debugRoutine:
-                        NTdebug("Skipping gap between: %s %s diff %s includeGapSize %s" % (res1,res2, resDifCount, includeGapSize))
+                        nTdebug("Skipping gap between: %s %s diff %s includeGapSize %s" % (res1,res2, resDifCount, includeGapSize))
                     i -= 2
                     continue
                 # This routine can be use to join adjacent ranges. by virtue of condition "resDifCount == 1"
                 if debugRoutine:
-                    NTdebug("By includeGapSize, joining 2 ranges (j-1,j) (%s,%s) to a larger one by including residues between" % (j-1,j))
+                    nTdebug("By includeGapSize, joining 2 ranges (j-1,j) (%s,%s) to a larger one by including residues between" % (j-1,j))
                 startStopList[i-1] = startStopList[i+1] # stop last segment
                 del startStopList[i+1] # delete stop in a way that deletes can't bite each other.
                 del startStopList[i] # delete start
                 if debugRoutine:
-                    NTdebug("By includeGapSize, ranges modified to: %s" % self.startStopList2ranges(startStopList))
+                    nTdebug("By includeGapSize, ranges modified to: %s" % self.startStopList2ranges(startStopList))
                 i -= 2
             # end while
             ranges = self.startStopList2ranges(startStopList)
             if ranges == None:
-                NTerror("Failed to get startStopList2ranges in rangesByCv for startStopList %s" % str(startStopList))
+                nTerror("Failed to get startStopList2ranges in rangesByCv for startStopList %s" % str(startStopList))
                 return None
             if debugRoutine:
-                NTdebug("Finishing includeGapSize with ranges: %s" % ranges)
+                nTdebug("Finishing includeGapSize with ranges: %s" % ranges)
         # end if
 
         if excludeFragmentSize:
             if debugRoutine:
-                NTdebug("Starting excludeFragmentSize with ranges: %s" % ranges)
+                nTdebug("Starting excludeFragmentSize with ranges: %s" % ranges)
             rangeListNew = []
             for rangeStr in ranges.split(','):
                 if debugRoutine:
-                    NTdebug("In excludeFragmentSize looking at range: %s" % rangeStr)
+                    nTdebug("In excludeFragmentSize looking at range: %s" % rangeStr)
                 residueListSingleRange = self.ranges2list(rangeStr)
                 if residueListSingleRange == None:
-                    NTerror("Failed to get ranges2list in rangesByCv for single range: [%s] in rangesByCv" % rangeStr)
+                    nTerror("Failed to get ranges2list in rangesByCv for single range: [%s] in rangesByCv" % rangeStr)
                     return None
                 if len(residueListSingleRange) <= excludeFragmentSize:
                     if debugRoutine:
-                        NTdebug("Short fragment will be ignored in rangesByCv: [%s]" % rangeStr)
+                        nTdebug("Short fragment will be ignored in rangesByCv: [%s]" % rangeStr)
                     continue
                 rangeListNew.append(rangeStr)
             # end for
             if not rangeListNew:
-                NTwarning("No residues left in rangesByCv for ranges: [%s] in rangesByCv after sub selecting for excludeFragmentSize. Returning all residues." % ranges)
+                nTwarning("No residues left in rangesByCv for ranges: [%s] in rangesByCv after sub selecting for excludeFragmentSize. "+
+                          "Returning all residues." % ranges)
                 return ALL_RANGES_STR
             ranges = ','.join(rangeListNew)
             if debugRoutine:
-                NTdebug("Finishing excludeFragmentSize with ranges: %s" % ranges)
+                nTdebug("Finishing excludeFragmentSize with ranges: %s" % ranges)
             return ranges # No need to construct this again. It wouldn't simplify the string.
         # end if
 
@@ -2771,7 +2793,7 @@ Return an Molecule instance or None on error
         returns ensemble or NoneObject on error
         """
 
-#        NTdebug("Now in superpose")
+#        nTdebug("Now in superpose")
         if self.modelCount <= 0:
             return NoneObject
         #end if
@@ -2781,15 +2803,15 @@ Return an Molecule instance or None on error
 
         fitted = self.selectFitAtoms( selectedResidues, backboneOnly=backboneOnly, includeProtons = includeProtons )
 
-        NTmessage("==> Superposing: fitted %s on %d atoms (residues=%s, backboneOnly=%s, includeProtons=%s)",
+        nTmessage("==> Superposing: fitted %s on %d atoms (residues=%s, backboneOnly=%s, includeProtons=%s)",
                       self, len(fitted), ranges, backboneOnly, includeProtons
                  )
         self.ensemble.superpose( fitted, iterations=iterations )
-#        NTdebug("... rmsd's: [ %s] average: %.2f +- %.2f",
+#        nTdebug("... rmsd's: [ %s] average: %.2f +- %.2f",
 #                self.ensemble.rmsd.format('%.2f '), self.ensemble.rmsd.av, self.ensemble.rmsd.sd
 #               )
         r = self.calculateRMSDs(ranges=ranges) #@UnusedVariable
-#        NTdetail( r.format() )
+#        nTdetail( r.format() )
         return self.ensemble
     #end def
 
@@ -2802,10 +2824,10 @@ Return an Molecule instance or None on error
         When no models are present return NaN.
         """
 
-#        NTdebug("Now in calculateRMSDs")
+#        nTdebug("Now in calculateRMSDs")
 
         if self.modelCount == 0:
-            NTwarning('Molecule.calculateRMSDs: no coordinates for %s', self)
+            nTwarning('Molecule.calculateRMSDs: no coordinates for %s', self)
             return NaN
         #end if
 
@@ -2817,10 +2839,10 @@ Return an Molecule instance or None on error
 
         selectedResidues = self.setResiduesFromRanges( ranges )
         if selectedResidues == None:
-            NTwarning('Molecule.calculateRMSDs: error in getting selected residues for ranges %s' % ranges)
+            nTwarning('Molecule.calculateRMSDs: error in getting selected residues for ranges %s' % ranges)
             return NaN
         if len(selectedResidues) == 0:
-            NTwarning('Molecule.calculateRMSDs: no selected residues for ranges %s' % ranges)
+            nTwarning('Molecule.calculateRMSDs: no selected residues for ranges %s' % ranges)
             return NaN
 
         allResiduesWithCoord = self.allResiduesWithCoordinates()
@@ -2828,7 +2850,7 @@ Return an Molecule instance or None on error
         ranges = self.residueList2Ranges(selectedResiduesWithCoord)
         selectedModels = self.models2list( models )
 
-        NTdetail("==> Calculating rmsd's (ranges: %s, models: %s)", ranges, models)
+        nTdetail("==> Calculating rmsd's (ranges: %s, models: %s)", ranges, models)
 
         comment = 'Ranges %s' % ranges
         self.rmsd = RmsdResult( selectedModels, selectedResiduesWithCoord, comment=comment )
@@ -2871,7 +2893,7 @@ Return an Molecule instance or None on error
                             Vbb.append(atm.coordinates[model].e)
                         else:
                             Vbb.append(atm.coordinates[0].e)
-                            NTcodeerror("TODO: fix Residue#removeAtom.")
+                            nTcodeerror("TODO: fix Residue#removeAtom.")
                     #end for
                     res.rmsd.backbone[i] = calculateRMSD(Vbb,Vmean)
 
@@ -2893,7 +2915,7 @@ Return an Molecule instance or None on error
                             Vhv.append(atm.coordinates[model].e)
                         else:
                             Vhv.append(atm.coordinates[0].e)
-                            NTcodeerror("TODO: fix Residue#removeAtom.")
+                            nTcodeerror("TODO: fix Residue#removeAtom.")
                     #end for
                     res.rmsd.heavyAtoms[i] = calculateRMSD(Vhv,Vmean)
 
@@ -2930,17 +2952,17 @@ Return an Molecule instance or None on error
         """
 
         if self.modelCount == 0:
-            NTerror("modelCount is zero in Molecule instance: %r" % self)
+            nTerror("modelCount is zero in Molecule instance: %r" % self)
             return None
 
         if model==None:
             models = NTlist(*range( self.modelCount ))
         else:
             if model<0:
-                NTerror("model number is below zero in Molecule instance: %r and model number: %s" % (self,  model))
+                nTerror("model number is below zero in Molecule instance: %r and model number: %s" % (self,  model))
                 return None
             if model >= self.modelCount:
-                NTerror("model number is larger than modelCount in Molecule instance: %r" % self)
+                nTerror("model number is larger than modelCount in Molecule instance: %r" % self)
                 return None
             models = NTlist(model)
 
@@ -2951,13 +2973,13 @@ Return an Molecule instance or None on error
         useRanges = ranges and not self.rangesIsAll(ranges)
         rangesStr = '' #@UnusedVariable
         resHashSelection = NTdict() # use for speed
-#        NTdebug("In toPDB ranges: %s useRanges %s" % (ranges, useRanges))
+#        nTdebug("In toPDB ranges: %s useRanges %s" % (ranges, useRanges))
         if useRanges:
             rangesStr = ', ranges: %s' % ranges #@UnusedVariable
             resListSelection = self.ranges2list(ranges)
             resHashSelection.appendFromList(resListSelection)
-#        NTdebug("In toPDB resHashSelection.keys: %s" % str(resHashSelection.keys()))
-#        NTdebug("==> Exporting to PDB file (%s convention, models: %d-%d%s) ... ",
+#        nTdebug("In toPDB resHashSelection.keys: %s" % str(resHashSelection.keys()))
+#        nTdebug("==> Exporting to PDB file (%s convention, models: %d-%d%s) ... ",
 #                   convention, models[0], models.last(), rangesStr                 )
 
         pdbFile = PDBFile()
@@ -2976,14 +2998,14 @@ Return an Molecule instance or None on error
             atmCount = 1
             for chain in self.allChains():
                 if chainName and chain.name != chainName:
-#                    NTdebug("Skipping chain %s in %s" % (chain.name, getCallerName()))
+#                    nTdebug("Skipping chain %s in %s" % (chain.name, getCallerName()))
                     continue
                 lastAtm = None
                 for res in chain.allResidues():
                     inSelection = resHashSelection.has_key(res)
-#                    NTdebug("In toPDB inSelection %s for residue: %s" % (inSelection,res))
+#                    nTdebug("In toPDB inSelection %s for residue: %s" % (inSelection,res))
                     if useRanges and (not inSelection) and (not useRangesForLoweringOccupancy):
-#                        NTdebug("In toPDB skipping residue: %s" % res)
+#                        nTdebug("In toPDB skipping residue: %s" % res)
                         continue
                     for atm in res.allAtoms():
                         atm.setdefault('pdbSkipRecord',False)
@@ -2993,13 +3015,13 @@ Return an Molecule instance or None on error
                         if not record:
                             # this happens for all Q and even for like Cys HG which aren't always present in actual structure
                             # but are defined in db.
-    #                        NTwarning("Failed to get PDB atom record for atom: " + `atm`)
+    #                        nTwarning("Failed to get PDB atom record for atom: " + `atm`)
                             continue
                         if useRangesForLoweringOccupancy:
                             if useRanges and (not inSelection) and atm.isBackbone() and (
                                 atm.name == 'CA' or atm.name == "P" ):
                                 record.occupancy = 0.49 # special meaning in Whatif for ignoring the residue in Structure Z-scores.
-#                                NTdebug("In toPDB lowering occ. to below half for atom: %s" % atm)
+#                                nTdebug("In toPDB lowering occ. to below half for atom: %s" % atm)
                         pdbFile.append( record )
                         atmCount += 1
                         lastAtm = atm
@@ -3008,7 +3030,7 @@ Return an Molecule instance or None on error
                 if lastAtm and convention != XPLOR:
                     record = lastAtm.toPDBTER( pdbIndex=atmCount, convention=convention )
                     if not record:
-#                        NTdebug("Failed to create a PDB file terminating record; ignoring for now.") # TODO check if this matters.
+#                        nTdebug("Failed to create a PDB file terminating record; ignoring for now.") # TODO check if this matters.
                         continue
                     pdbFile.append( record )
                     atmCount += 1
@@ -3023,7 +3045,7 @@ Return an Molecule instance or None on error
         #end for
         
         if not atmCount:
-            NTerror("No atoms counted for write in %s", getCallerName())
+            nTerror("No atoms counted for write in %s", getCallerName())
             return None
         
         record = PyMMLib.END()
@@ -3033,10 +3055,10 @@ Return an Molecule instance or None on error
             pdbFile.save(fileName)
             # Can't test the above for success so let's try this:
             if not os.path.exists(fileName):
-                NTerror("Failed to find pdb file %s or has zero size." % fileName)
+                nTerror("Failed to find pdb file %s or has zero size." % fileName)
                 return None
             if os.path.getsize(fileName) == 0:
-                NTerror("Found pdb file %s with zero size." % fileName)
+                nTerror("Found pdb file %s with zero size." % fileName)
                 return None
         # end if
         return pdbFile
@@ -3044,9 +3066,9 @@ Return an Molecule instance or None on error
 
     def toSML(self, stream=sys.stdout ):
         if hasattr(Molecule,'SMLhandler'):
-            Molecule.SMLhandler.toSML( self, stream )
+            Molecule.SMLhandler.toSML( self, stream )  # pylint: disable=E1101
         else:
-            NTerror('Molecule.toSML: no SMLhandler defined')
+            nTerror('Molecule.toSML: no SMLhandler defined')
         #end if
     #end def
 
@@ -3265,10 +3287,10 @@ class Model( NTcMatrix ):
         """
         v1 = self.fitCoordinates.zap( 'e' )
         v2 = other.fitCoordinates.zap( 'e' )
-#        NTdebug("v1[:10]: %s" % str(v1[:10]))
-#        NTdebug("v2[:10]: %s" % str(v2[:10]))
+#        nTdebug("v1[:10]: %s" % str(v1[:10]))
+#        nTdebug("v2[:10]: %s" % str(v2[:10]))
         if len(v1) != len(v2):
-            NTerror("Model.superpose: unequal length fitCoordinates (%s and %s)", self, other)
+            nTerror("Model.superpose: unequal length fitCoordinates (%s and %s)", self, other)
             return NaN
         #end if
         
@@ -3291,7 +3313,7 @@ class Model( NTcMatrix ):
         v1 = self.fitCoordinates.zap( 'e' )
         v2 = other.fitCoordinates.zap( 'e' )
         if len(v1) != len(v2):
-            NTerror("Model.calculateRMSD: unequal length fitCoordinates (%s and %s)", self, other)
+            nTerror("Model.calculateRMSD: unequal length fitCoordinates (%s and %s)", self, other)
             return -1.0
         #end if
         self.rmsd = calculateRMSD( v1, v2 )
@@ -3305,18 +3327,18 @@ class Model( NTcMatrix ):
          ''' 
         cornerCoordinatePair = self.getEnclosingBoxCorners()
         if not cornerCoordinatePair:
-            NTwarning("Failed to getEnclosingBoxCorners for %s" % self)
+            nTwarning("Failed to getEnclosingBoxCorners for %s" % self)
             return None
         distance = cornerCoordinatePair[0].distance( cornerCoordinatePair[1] )
         radius =  distance / 2
-        return radius;
+        return radius
     #end def
         
     def center(self):
         '''Will return None if not at least one atom contain coordinates.
          '''
         if not self.coordinates:
-            NTwarning("Failed to get center of coordinate-less %s" % self)
+            nTwarning("Failed to get center of coordinate-less %s" % self)
             return
         
         center = Coordinate()
@@ -3330,7 +3352,7 @@ class Model( NTcMatrix ):
         '''Will return None if not at least one atom contain coordinates.
          '''
         if not self.coordinates:
-            NTwarning("Failed to get center of coordinate-less %s" % self)
+            nTwarning("Failed to get center of coordinate-less %s" % self)
             return
         
         center = self.center()
@@ -3348,11 +3370,11 @@ class Model( NTcMatrix ):
           Returns two opposite corners of the box or None on error.
         """
         if not self.coordinates:
-            NTwarning("Failed to find any coordinates in %s" % self)
+            nTwarning("Failed to find any coordinates in %s" % self)
             return None        
         minCoordinate = self.coordinates[0].copy()
         maxCoordinate = self.coordinates[0].copy()
-#        NTdebug("Looping in getEnclosingBoxCorners for %s" % self)
+#        nTdebug("Looping in getEnclosingBoxCorners for %s" % self)
         for coordinate in self.coordinates:
             minCoordinate.setToMin( coordinate )
             maxCoordinate.setToMax( coordinate )
@@ -3362,9 +3384,9 @@ class Model( NTcMatrix ):
     
             
     def transform( self ):
-        # Transform all coordinates according to rotation/translation matrix
+        'Transform all coordinates according to rotation/translation matrix'
         for c in self.coordinates:
-            self.transformVector( c.e )
+            self.transformVector( c.e ) # pylint: disable=E1101
         #end for
     #end def
 
@@ -3377,7 +3399,7 @@ class Model( NTcMatrix ):
     #end def
 
     def format( self ):
-        # generate a string representation
+        'Generate a string representation.'
         s = sprintf('%s %s %s\n', dots, str(self), dots)
         s = s + "rmsd:  %10.3f\n" %  (self.rmsd, )
         s = s + "matrix:\n%s\n" % (NTcMatrix.__str__(self), )
@@ -3393,11 +3415,11 @@ class RmsdResult( NTdict ):
         NTdict.__init__( self,
                          __CLASS__       = 'RmsdResult',
                        )
-        self.backbone        = NTfill(0.0, len(modelList)) # needs to match BACKBONE_STR
+        self.backbone        = nTfill(0.0, len(modelList)) # needs to match BACKBONE_STR
         self.backboneCount   = 0
         self.backboneAverage = NTvalue( NaN, NaN, fmt='%4.2f +- %4.2f', fmt2='%4.2f' )
 
-        self.heavyAtoms      = NTfill(0.0, len(modelList)) # needs to match HEAVY_ATOMS_STR
+        self.heavyAtoms      = nTfill(0.0, len(modelList)) # needs to match HEAVY_ATOMS_STR
         self.heavyAtomsCount = 0
         self.heavyAtomsAverage = NTvalue( NaN, NaN, fmt='%4.2f +- %4.2f', fmt2='%4.2f'  )
 
@@ -3523,12 +3545,13 @@ Chain class: defines chain properties and methods
     """
 
     DEFAULT_ChainNamesByAlphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ^01234567890abcdefghijklmnopqrstuvwxyz'
-#    validChainIdListBesidesTheAlphabet = '^' # last 1 chars of above.; JFD removed pound and underscore because they have a special meaning in STAR files.
+#    validChainIdListBesidesTheAlphabet = '^' 
+# last 1 chars of above.; JFD removed pound and underscore because they have a special meaning in STAR files.
     'Nothing that is a special character in Python, or tcsh.'
     defaultChainId = _DEFAULT_CHAIN_ID
     'See documentation: molecule#ensureValidChainId'
 
-    NULL_VALUE = 'CHAIN_CODE_NULL_VALUE' # can not be a valid chain code but needs to be able to be passed on commandline
+    NULL_VALUE = 'CHAIN_CODE_NULL_VALUE' # can not be a valid chain code but needs to be able to be passed on command line
     # like in: Scripts/getPhiPsiWrapper.py
 
     def __init__( self, name, **kwds ):
@@ -3547,18 +3570,21 @@ Chain class: defines chain properties and methods
     isNullValue = staticmethod( isNullValue )
 
 
-    def addResidue( self, resName, resNum, convention=INTERNAL, Nterminal=False, Cterminal=False, FiveTerminal=False, ThreeTerminal=False, **kwds ):
+    def addResidue( self, resName, resNum, convention=INTERNAL, 
+                    Nterminal=False, Cterminal=False, 
+                    FiveTerminal=False, ThreeTerminal=False, **kwds ):
         if self.has_key(resNum):
-            NTwarning( 'Chain.addResidue: residue number "%s" already present in %s perhaps there is a insertion code? Skipping residue', resNum, self )
-            NTwarning("See also issue: %s%d" % (issueListUrl, 226))
+            nTwarning( 'Chain.addResidue: residue number "%s" already present in %s perhaps there is a insertion code? Skipping residue', 
+                       resNum, self )
+            nTwarning("See also issue: %s%d" % (issueListUrl, 226))
             return None
         #end if
         res = Residue( resName=resName, resNum=resNum, convention=convention, Nterminal=Nterminal, Cterminal=Cterminal, **kwds )
         if res.name in self:
-            NTwarning( 'Chain.addResidue: residue "%s" already present in %s; skipping residue', res.name, self.name )
+            nTwarning( 'Chain.addResidue: residue "%s" already present in %s; skipping residue', res.name, self.name )
             return None
         #end if
-        self._addChild( res )
+        self.addChild2( res )
         res.chain = self
         self[resNum] = res
         self[res.shortName] = res
@@ -3569,7 +3595,7 @@ Chain class: defines chain properties and methods
 
     def removeResidue( self, residue)   :
         if not residue in self._children:
-            NTerror( 'Chain.removeResidue: residue "%s" not present in chain %s',
+            nTerror( 'Chain.removeResidue: residue "%s" not present in chain %s',
                      residue, self
                    )
             return None
@@ -3585,11 +3611,11 @@ Chain class: defines chain properties and methods
 
         res = self.removeChild( residue )
         if res == None:
-            NTerror('Chain.removeResidue: error removing %s from %s', residue, self)
+            nTerror('Chain.removeResidue: error removing %s from %s', residue, self)
             return None
         else:
             res.chain = None
-            NTmessage('==> Removed residue %s from %s', residue, self )
+            nTmessage('==> Removed residue %s from %s', residue, self )
             return res
         #end if
     #end def
@@ -3597,7 +3623,7 @@ Chain class: defines chain properties and methods
     def hasSameSequence(self, other):
         seq0 = self.toSequence()
         seq1 = other.toSequence()
-        NTdebug("Comparing sequences: \n%s\n%s" % (seq0, seq1))
+        nTdebug("Comparing sequences: \n%s\n%s" % (seq0, seq1))
         return seq0 == seq1
     #end def
             
@@ -3609,7 +3635,7 @@ Chain class: defines chain properties and methods
         The routine will not change the actual coordinates.
         """
         if modelIdx != 0:
-            NTerror("Code only able to do first model right now but found request for model: %s" % modelIdx)
+            nTerror("Code only able to do first model right now but found request for model: %s" % modelIdx)
             return None
         ensemble = Ensemble()
         fittedL = NTlist()
@@ -3617,7 +3643,7 @@ Chain class: defines chain properties and methods
         for idx, chain in enumerate(chainList):
             fitAtoms = chain.selectFitAtoms( chain.allResidues(), backboneOnly=backboneOnly, includeProtons = includeProtons )
             if not fitAtoms:
-                NTerror( "In %s failed to selectFitAtoms for %s" % ( getCallerName(), chain))
+                nTerror( "In %s failed to selectFitAtoms for %s" % ( getCallerName(), chain))
                 return None                
             fittedL.append( fitAtoms )       
                  
@@ -3628,11 +3654,11 @@ Chain class: defines chain properties and methods
                 model.coordinates.append( c )
                 model.fitCoordinates.append( c )
             ensemble.append(model)
-#            NTdebug("Appended %s to %s" % (model, ensemble))
+#            nTdebug("Appended %s to %s" % (model, ensemble))
         # end for            
         rmsd = ensemble[1].superpose(ensemble[0])
         if rmsd  == None:
-            NTerror("Failed to %s" % getCallerName())
+            nTerror("Failed to %s" % getCallerName())
         return rmsd
     #end def
 
@@ -3644,19 +3670,19 @@ Chain class: defines chain properties and methods
         The average over the whole ensemble will be used.
         """
         atomList = self.getRepresentingAtomListsPerResidue( other )
-#        NTdebug("atomList: %s" % str(atomList))
+#        nTdebug("atomList: %s" % str(atomList))
         
         if atomList == None:
-            NTwarning("In %s failed to getRepresentingAtomListsPerResidue" % getCallerName())
+            nTwarning("In %s failed to getRepresentingAtomListsPerResidue" % getCallerName())
             return None            
         a0List, a1List = atomList
         a0Size = len(a0List)
         a1Size = len(a1List)
         if a0Size != a1Size:
-            NTwarning("In %s failed to get same size for representing atom lists %s and %s" % (getCallerName(), a0Size, a1Size))
+            nTwarning("In %s failed to get same size for representing atom lists %s and %s" % (getCallerName(), a0Size, a1Size))
             return None
         a0PairCount = a0Size / 2
-        NTdebug("In %s analyzing %s pairs" % (getCallerName(), a0PairCount))
+        nTdebug("In %s analyzing %s pairs" % (getCallerName(), a0PairCount))
         if a0PairCount == 0:
             return 0.0
               
@@ -3668,8 +3694,8 @@ Chain class: defines chain properties and methods
             atomB1 = a1List[i]
             dA = atomA0.distance( atomA1, modelIdx = modelIdx )[0] # (av,sd,minv,maxv)
             dB = atomB0.distance( atomB1, modelIdx = modelIdx )[0]
-            sumDd += fabs(dA-dB)
-#            NTdebug("pair %3d %s %s %s %s %.2f %.2f sumDd: %.2f" % (i, atomA0, atomA1, atomB0, atomB1, dA, dB, sumDd))
+            sumDd += math.fabs(dA-dB)
+#            nTdebug("pair %3d %s %s %s %s %.2f %.2f sumDd: %.2f" % (i, atomA0, atomA1, atomB0, atomB1, dA, dB, sumDd))
         # end for
         result =  sumDd / a0PairCount
         return result
@@ -3681,7 +3707,7 @@ Chain class: defines chain properties and methods
         seq0 = self.toSequence(withCoordinate=True)
         seq1 = other.toSequence(withCoordinate=True)
         if seq0 != seq1:
-            NTwarning("In %s sequences don't match between\n%s and \n%s" % (getCallerName(), seq0, seq1))
+            nTwarning("In %s sequences don't match between\n%s and \n%s" % (getCallerName(), seq0, seq1))
             return None
         r0List = self.allResiduesWithCoordinates()
         r1List = other.allResiduesWithCoordinates()
@@ -3693,12 +3719,12 @@ Chain class: defines chain properties and methods
             r0CommonName = getDeepByKeysOrAttributes(r0, DB_STR, COMMON_NAME_STR )
             r1CommonName = getDeepByKeysOrAttributes(r1, DB_STR, COMMON_NAME_STR )
             if r0CommonName != r1CommonName: # allow both to be unknown.
-                NTerror("In %s residue common names don't match between\n%s and \n%s" % (getCallerName(), r0, r1))
+                nTerror("In %s residue common names don't match between\n%s and \n%s" % (getCallerName(), r0, r1))
                 return None
             comparisonAtom0 = getDeepByKeysOrAttributes(r0, ATOMS_STR, 0)
             comparisonAtom1 = getDeepByKeysOrAttributes(r1, ATOMS_STR, 0)
             if comparisonAtom0 == None or comparisonAtom1 == None:
-                NTerror("In %s residue %s or %s has no atoms" % (getCallerName(), r0, r1))
+                nTerror("In %s residue %s or %s has no atoms" % (getCallerName(), r0, r1))
                 return None
             if getDeepByKeysOrAttributes( r0, CA_STR ):
                 comparisonAtom0 = getDeepByKeysOrAttributes(r0, CA_STR)
@@ -3709,7 +3735,8 @@ Chain class: defines chain properties and methods
 #            c0 = getDeepByKeysOrAttributes(comparisonAtom0, COORDINATES_STR, 0)
 #            c1 = getDeepByKeysOrAttributes(comparisonAtom1, COORDINATES_STR, 0)
 #            if c0 == None or c1 == None:
-#                NTdebug("In %s atom %s or %s has no coordinate in first model. Skipping residue/atom" % (getCallerName(), comparisonAtom0, comparisonAtom1))
+#                nTdebug("In %s atom %s or %s has no coordinate in first model. Skipping residue/atom" % (
+#                    getCallerName(), comparisonAtom0, comparisonAtom1))
 #                continue
             a0List.append(comparisonAtom0)
             a1List.append(comparisonAtom1)
@@ -3745,7 +3772,8 @@ Chain class: defines chain properties and methods
         """
         result = NTlist()
 
-        if len(properties) == 0: return result
+        if len(properties) == 0: 
+            return result
         for res in self.allResidues():
             if res.hasProperties(*properties):
                 result.append(res)
@@ -3761,14 +3789,14 @@ Chain class: defines chain properties and methods
         TODO: finish
         """
 
-        NTdebug("Now in superposeToOtherChainFirstModel")
+        nTdebug("Now in superposeToOtherChainFirstModel")
         if self._parent.modelCount <= 0:
             return NoneObject
         #end if
         selectedResidues = self.allResiduesWithCoordinates()
         fitted = self.selectFitAtoms( selectedResidues, backboneOnly=backboneOnly, includeProtons = includeProtons )
 
-        NTmessage("==> Superposing: fitted %s on %d atoms (backboneOnly=%s, includeProtons=%s)",
+        nTmessage("==> Superposing: fitted %s on %d atoms (backboneOnly=%s, includeProtons=%s)",
                       self, len(fitted), backboneOnly, includeProtons )
         
 #        for i in range(1):
@@ -3792,11 +3820,11 @@ Chain class: defines chain properties and methods
 #        #end for
 #        
 #        self.ensemble.superpose( fitted, iterations=iterations )
-##        NTdebug("... rmsd's: [ %s] average: %.2f +- %.2f",
+##        nTdebug("... rmsd's: [ %s] average: %.2f +- %.2f",
 ##                self.ensemble.rmsd.format('%.2f '), self.ensemble.rmsd.av, self.ensemble.rmsd.sd
 ##               )
 #        r = self.calculateRMSDs(ranges=ranges) #@UnusedVariable
-##        NTdetail( r.format() )
+##        nTdetail( r.format() )
 #        return self.ensemble
     #end def
 
@@ -3825,7 +3853,8 @@ Chain class: defines chain properties and methods
         """
         result = NTlist()
 
-        if len(properties) == 0: return result
+        if len(properties) == 0: 
+            return result
         for atm in self.allAtoms():
             if atm.hasProperties(*properties):
                 result.append(atm)
@@ -3845,14 +3874,14 @@ Chain class: defines chain properties and methods
         for r in rList:
             oneLetter = getDeepByKeysOrDefault(r, FASTA_UNCOMMON_RESIDUE_STR, 'db', 'shortName')
             if len(oneLetter) != 1:
-                NTwarning("Failed to get oneLetter for residue type of %s reset to %s" % (r, FASTA_UNCOMMON_RESIDUE_STR))
+                nTwarning("Failed to get oneLetter for residue type of %s reset to %s" % (r, FASTA_UNCOMMON_RESIDUE_STR))
                 oneLetter = FASTA_UNCOMMON_RESIDUE_STR
             result += oneLetter
         return result
     #end def
         
     def toMolecule(self):
-        NTerror('In %s create a new instance of a molecule. UNTESTED' % getCallerName())        
+        nTerror('In %s create a new instance of a molecule. UNTESTED' % getCallerName())        
         newMolecule = deepcopy(self._parent)
         newMolecule.project = None # Try to not damage original project.
         
@@ -3860,7 +3889,7 @@ Chain class: defines chain properties and methods
             if chain.name == self.name:
                 continue
             if newMolecule.removeChain( chain ) == None:
-                NTerror("Failed to remove surplus chain from new Molecule instance.")
+                nTerror("Failed to remove surplus chain from new Molecule instance.")
                 return None
         # end for
         return newMolecule
@@ -3868,9 +3897,9 @@ Chain class: defines chain properties and methods
     
     def toSML(self, stream=sys.stdout ):
         if hasattr(Chain,'SMLhandler'):
-            Chain.SMLhandler.toSML( self, stream )
+            Chain.SMLhandler.toSML( self, stream )  # pylint: disable=E1101
         else:
-            NTerror('Chain.toSML: no SMLhandler defined')
+            nTerror('Chain.toSML: no SMLhandler defined')
         #end if
     #end def
 
@@ -3904,7 +3933,7 @@ Chain class: defines chain properties and methods
 ##register this handler
 #Chain.XMLhandler = XMLChainHandler()
 
-class Residue( NTtree ):
+class Residue( NTtree, SMLhandled ):
     """
 -------------------------------------------------------------------------------
 Residue class: Defines residue properties
@@ -3932,6 +3961,7 @@ Residue class: Defines residue properties
                               Cterminal = Cterminal,         # defines the residue to be C-terminus
                               **kwds
                        )
+        SMLhandled.__init__(self)
         self._nameResidue( resName, resNum, convention=convention ) # sets all naming and links correctly
 
         self.atoms     = self._children
@@ -3990,14 +4020,15 @@ Residue class: Defines residue properties
         # find the database entry in database.NTdb (which is of type MolDef)
         db = database.NTdb.getResidueDefByName( resName, convention )
         if not db:
-#            NTdebug('Residue._nameResidue: residue "%s" not defined in database by convention [%s]. Adding non-standard one now.' %( resName, convention))
+#            nTdebug('Residue._nameResidue: residue "%s" not defined in database by convention [%s]. Adding non-standard one now.' % ( 
+#                    resName, convention))
             database.NTdb.appendResidueDef( name=resName, shortName = '_', commonName = resName,
                                             nameDict = {INTERNAL_0:resName, INTERNAL_1:resName, INTERNAL:resName, convention:resName},
                                             comment = 'Non-standard residue'
                                           )
             db = database.NTdb.getResidueDefByName( resName, convention ) # checking if things went ok1
             if not db:
-                NTcodeerror("Residue._nameResidue: Added residue '%s' but failed to find it again", resName)
+                nTcodeerror("Residue._nameResidue: Added residue '%s' but failed to find it again", resName)
         #end if
         self.resNum   = resNum
         self.db        = db
@@ -4015,12 +4046,12 @@ Residue class: Defines residue properties
            Return self or None on error
         """
         if newResNum in self._parent:
-            NTerror( 'ERROR Residue.renumber: residue  number "%s" already present\n', newResNum )
+            nTerror( 'ERROR Residue.renumber: residue  number "%s" already present\n', newResNum )
             return None
         #end if
         newName = self.db.commonName + str(newResNum)
         if newName in self._parent:
-            NTerror( 'ERROR Residue.renumber: residue "%s" already present\n', newName )
+            nTerror( 'ERROR Residue.renumber: residue "%s" already present\n', newName )
             return None
         #end if
 
@@ -4061,16 +4092,16 @@ Residue class: Defines residue properties
         # find the database entry
         if resName not in database.NTdb:
             #self.db = database.NTdb[self.resName]
-            NTerror('Residue.mutate: residue "%s" not defined in database', resName )
+            nTerror('Residue.mutate: residue "%s" not defined in database', resName )
             return None
         #end if
         newRes  = Residue( resName, self.resNum )
         if not newRes:
-            NTerror('Residue.mutate: error defining residue "%s"', resName )
+            nTerror('Residue.mutate: error defining residue "%s"', resName )
             return None
         #end if
 
-#        NTdetail('==> Mutating %s to %s', self.cName(-1), resName )
+#        nTdetail('==> Mutating %s to %s', self.cName(-1), resName )
 
         # remove old name references
         del( self._parent[self.name] )
@@ -4105,7 +4136,7 @@ Residue class: Defines residue properties
                 #add the atom to newRes
                 atm.residue = newRes
                 atm.db = atmDef
-                newRes._addChild( atm )
+                newRes.addChild2( atm )
                 newRes.atomCount += 1
                 newRes.chain.molecule.atomCount += 1
                 for alias in atm.db.aliases:
@@ -4148,7 +4179,7 @@ Residue class: Defines residue properties
            return Atom instance
         """
         atm = Atom( resName=self.db.translate(convention), atomName=name, convention=convention, **kwds )
-        self._addChild( atm )
+        self.addChild2( atm )
         atm.residue = self
         self._parent._parent.atomCount += 1
         self.atomCount += 1
@@ -4344,7 +4375,7 @@ Residue class: Defines residue properties
         Returns False if all atoms have no coordinates.
         Returns True if any atom has a coordinate.
         """
-#        NTdebug("Checking residue.hasCoordinates for %s" % self)
+#        nTdebug("Checking residue.hasCoordinates for %s" % self)
         for atom in self.allAtoms():
             if atom.hasCoordinates():
                 return True
@@ -4358,7 +4389,8 @@ Residue class: Defines residue properties
         """
         result = NTlist()
 
-        if len(properties) == 0: return result
+        if len(properties) == 0: 
+            return result
         for res in self.allResidues():
             if res.hasProperties(*properties):
                 result.append(res)
@@ -4373,7 +4405,8 @@ Residue class: Defines residue properties
         """
         result = NTlist()
 
-        if len(properties) == 0: return result
+        if len(properties) == 0: 
+            return result
         for atm in self.allAtoms():
             if atm.hasProperties(*properties):
                 result.append(atm)
@@ -4384,27 +4417,27 @@ Residue class: Defines residue properties
 
     def setCvBackboneSidechain(self):
 #        if not self.hasProperties('protein'):
-#            NTdebug("Skipping setCvBackboneSidechain for non-protein residue: %s" % self.name)
+#            nTdebug("Skipping setCvBackboneSidechain for non-protein residue: %s" % self.name)
 #            return
         # CING doesn't use IUPAC nomenclature for chi beyond 1. E.g. the IUPAC Chi2,1 in Ile is simply named Chi2.
         # This is incorrect but does make the code very simple here.
         # Optimized for speed so no loop setups.
         cv1 = getDeepByKeysOrAttributes(self, PHI_STR, CV_STR)
         cv2 = getDeepByKeysOrAttributes(self, PSI_STR, CV_STR)
-        self.cv_backbone = NTcVarianceAverage( (cv1, cv2) )
+        self.cv_backbone = nTcVarianceAverage( (cv1, cv2) )
         # This still fails by issue
 #        if 'PRO' in self.resName:
-#            NTdebug("Pro cv phi,psi,avg %s %s %s %s" % (cv1, cv2, self.cv_backbone, self.name))
+#            nTdebug("Pro cv phi,psi,avg %s %s %s %s" % (cv1, cv2, self.cv_backbone, self.name))
         if False:
             fmt = '%8.3f'
             count = 8
-            NTdebug('%20s phi/psi/avg: %s %s %s' % (self,
+            nTdebug('%20s phi/psi/avg: %s %s %s' % (self,
                 val2Str(cv1, fmt, count),
                 val2Str(cv2, fmt, count),
                 val2Str(self.cv_backbone, fmt, count)))
         cv1 = getDeepByKeysOrAttributes(self, CHI1_STR, CV_STR)
         cv2 = getDeepByKeysOrAttributes(self, CHI2_STR, CV_STR)
-        self.cv_sidechain = NTcVarianceAverage( (cv1, cv2) )
+        self.cv_sidechain = nTcVarianceAverage( (cv1, cv2) )
 
     def addDihedralD1(self,msgHol=None):
         """Calculates and adds the Cb4N dihedral to this residue and the same dihedral as
@@ -4423,9 +4456,10 @@ Residue class: Defines residue properties
 
         if None in doublet:
             if not self.isNterminal():
-                msg = 'Residue.addDihedralD1: skipping non N-terminal residue without doublet %s (missing preceding neighbor but not N-terminal)' % self
+                msg = 'Residue.addDihedralD1: skipping non N-terminal residue without doublet ' + str(self) +\
+                        ' (missing preceding neighbor but not N-terminal)'
                 if msgHol == None:
-                    NTdebug(msg)
+                    nTdebug(msg)
                 else:
                     msgHol.appendDebug(msg)
             return
@@ -4434,7 +4468,7 @@ Residue class: Defines residue properties
         for doubletResidue in doublet:
             resTypeSimple = getDeepByKeys(doubletResidue.db.nameDict, IUPAC)
             if resTypeSimple not in commonAAList:
-#                NTdebug( "Skipping doublet %s with uncommon residue: %s" % (doublet, doubletResidue))
+#                nTdebug( "Skipping doublet %s with uncommon residue: %s" % (doublet, doubletResidue))
                 continue
 
 #            CB_atm = None
@@ -4443,7 +4477,8 @@ Residue class: Defines residue properties
 #            elif doubletResidue.has_key(GLY_HA3_NAME_CING):
 #                CB_atm = doubletResidue[GLY_HA3_NAME_CING]
 #            else:
-#                NTerror( 'Molecule.addDihedralD1: skipping for absent CB/%s in doubletResidue %s of doublet %s' % ( GLY_HA3_NAME_CING, doubletResidue, doublet ))
+#                nTerror( 'Molecule.addDihedralD1: skipping for absent CB/%s in doubletResidue %s of doublet %s' % ( 
+#                            GLY_HA3_NAME_CING, doubletResidue, doublet ))
 #                continue
 
             # Use the API!
@@ -4452,9 +4487,10 @@ Residue class: Defines residue properties
             else:
                 CB_atm = doubletResidue.getAtom('CB',IUPAC)
             if not CB_atm:
-                msg = 'Residue.addDihedralD1: skipping for absent CB/%s in doubletResidue %s of doublet %s' % ( GLY_HA3_NAME_CING, doubletResidue, doublet )
+#                msg = 'Residue.addDihedralD1: skipping for absent CB/%s in doubletResidue %s of doublet %s' % ( 
+#                        GLY_HA3_NAME_CING, doubletResidue, doublet )
                 if msgHol == None:
-                    NTerror(msg)
+                    nTerror(msg)
                 else:
                     msgHol.appendError(msg)
                 continue
@@ -4462,7 +4498,7 @@ Residue class: Defines residue properties
             CB_atms.append(CB_atm)
 #                print res, triplet, CA_atms, CB_atms
         if len(CB_atms) != len(doublet): # skip for preceding or trailing uncommon residues for now.
-#            NTdebug( '"CB" (or %s) missing in triplet %s' % (GLY_HA3_NAME_CING, doublet ))
+#            nTdebug( '"CB" (or %s) missing in triplet %s' % (GLY_HA3_NAME_CING, doublet ))
             return
         prevRes = doublet[0]
         d1 = Dihedral( self, DIHEDRAL_NAME_Cb4N, range=range0_360)
@@ -4481,7 +4517,7 @@ Residue class: Defines residue properties
                 msg = 'Residue.addDihedralD1: skipping residue %s because of missing atoms' % self
                 # wrap this call so that not all get printed; very common in X-ray structures like 2uva
                 if msgHol == None:
-                    NTdebug(msg)
+                    nTdebug(msg)
                 else:
                     msgHol.appendDebug(msg)
             return
@@ -4518,7 +4554,7 @@ Residue class: Defines residue properties
                 triplet.append( self.sibling(i) )
 
             if None in triplet:
-    #            NTdebug( 'Skipping residue without triplet %s' % self)
+    #            nTdebug( 'Skipping residue without triplet %s' % self)
                 return []
 
 #        resTypePrev = getDeepByKeys(triplet[-1].db.nameDict, IUPAC) # bug 4 fixed on June 4, 2010
@@ -4533,11 +4569,13 @@ Residue class: Defines residue properties
 
 
     def toSML(self, stream=sys.stdout ):
-        if hasattr(Residue,'SMLhandler'):
-            Residue.SMLhandler.toSML( self, stream )
-        else:
-            NTerror('Residue.toSML: no SMLhandler defined')
-        #end if
+        'Covenience method.'
+        Residue.SMLhandler.toSML( self, stream )  # pylint: disable=E1101
+#        if hasattr(Residue,'SMLhandler'):
+#            Residue.SMLhandler.toSML( self, stream )
+#        else:
+#            nTerror('Residue.toSML: no SMLhandler defined')
+#        #end if
     #end def
 
     def validateChemicalShiftLeu( self, resultList ):
@@ -4568,7 +4606,7 @@ Residue class: Defines residue properties
         CUTOFF_LOL_CSD_LEU_CD = [[ -4, 4 ], [ -3, 3 ]] # ERROR/WARNING LIMITS
         cvCutOffList = [ 0.2, 0.2 ]
         if not self.hasProperties('LEU'):
-            NTerror("Can not validateChemicalShiftLeu for non Leu: %s" % self)
+            nTerror("Can not validateChemicalShiftLeu for non Leu: %s" % self)
             return True
         # Allready generalize for VAL application TODO:
         atomC1 = self.CD1
@@ -4577,27 +4615,27 @@ Residue class: Defines residue properties
         c2Shift = atomC2.shift()
         chi = getDeepByKeysOrAttributes( self, CHI2_STR )
         if chi == None:
-#            NTdebug("Skipping %s for missing dihedral" % self)
+#            nTdebug("Skipping %s for missing dihedral" % self)
             return
 
         if isNaN( c1Shift ) or isNaN( c2Shift ):
-#            NTdebug("CS unavailabe for both Cs for %s" % self)
+#            nTdebug("CS unavailabe for both Cs for %s" % self)
             return
 
         shiftDifference = c1Shift - c2Shift
         if math.fabs(shiftDifference) < 0.01:
-#            NTdebug("shiftDifference zero so assuming they were not ssa" % self)
+#            nTdebug("shiftDifference zero so assuming they were not ssa" % self)
             return
 
         if not atomC1.isStereoAssigned():
-#            NTdebug("%s is not ssa" % atomC1)
+#            nTdebug("%s is not ssa" % atomC1)
             return
 
 #        shiftDifference = -5. + 10.*Pt
         Pt = (shiftDifference + 5.)/10.
         PtLimited = limitToRange(Pt, 0., 1.)
         if Pt != PtLimited:
-            NTwarning("CS difference for C in %s exceed expected range of [-5,5] being at %s" % (self, shiftDifference))
+            nTwarning("CS difference for C in %s exceed expected range of [-5,5] being at %s" % (self, shiftDifference))
             Pt = PtLimited
 
 #        for i,color in enumerate( [ COLOR_RED, COLOR_ORANGE ]):
@@ -4615,17 +4653,18 @@ Residue class: Defines residue properties
 
             # Determine CV indication
             if getDeepByKeysOrAttributes(chi, CV_STR) == None:
-                NTerror("Failed to get chi cv of %s" % self)
+                nTerror("Failed to get chi cv of %s" % self)
                 return True
 
             cvIndicatesAveraging = chi.cv >= cvCutOffList[ i ]
             dihedralIndicatesSingleConformer = chi.getRotamerState()
             if dihedralIndicatesSingleConformer == None:
-                NTerror("Failed to get rotameric state of %s" % self)
+                nTerror("Failed to get rotameric state of %s" % self)
                 return True
-#            NTdebug("res shiftDifference, csIndicatesAveraging, csIndicatesSingleConformer, cvIndicatesAveraging, dihedralIndicatesSingleConformer: %10s %8.3f %s %s %s %s" % (
-#                   self, shiftDifference, csIndicatesAveraging, csIndicatesSingleConformer, cvIndicatesAveraging, dihedralIndicatesSingleConformer ))
-
+#            nTdebug("res shiftDifference, csIndicatesAveraging, csIndicatesSingleConformer, cvIndicatesAveraging, " +\
+#                    "dihedralIndicatesSingleConformer: %10s %8.3f %s %s %s %s" % (
+#                   self, shiftDifference, csIndicatesAveraging, csIndicatesSingleConformer, cvIndicatesAveraging, 
+#                   dihedralIndicatesSingleConformer ))
             if dihedralIndicatesSingleConformer == DIHEDRAL_300_STR:
                 str = 'Conformer %s chi impossible regardless of csd value [%.3f]' % (dihedralIndicatesSingleConformer, shiftDifference)
                 # will be flagged by other software as well so eliminate here?
@@ -4643,13 +4682,13 @@ Residue class: Defines residue properties
                         # cs and dihedral agree on single conformer. Now do they match?
                         if csIndicatesSingleConformer == dihedralIndicatesSingleConformer:
                             continue
-                        str = 'csd [%.3f]: %s but found %s' % ( shiftDifference, csIndicatesSingleConformer, dihedralIndicatesSingleConformer)
+                        str = 'csd [%.3f]: %s but found %s' % (shiftDifference,csIndicatesSingleConformer,dihedralIndicatesSingleConformer)
                     # end if
                 # end if
             # end if
             if not str:
                 continue
-#            NTdebug("critque: %s %s" % ( color, str))
+#            nTdebug("critque: %s %s" % ( color, str))
             resultList.append( atomC1 ) # Just do this once.
 #            atomC1.validateAssignment.append(str)
             atomC1.rogScore.setMaxColor( color, comment = str )
@@ -4679,7 +4718,7 @@ Residue class: Defines residue properties
         """
 
         if not ( self.hasProperties('PRO') or self.hasProperties('cPRO')):
-            NTerror("Can not validateChemicalShiftProPeptide for non Pro: %s" % self)
+            nTerror("Can not validateChemicalShiftProPeptide for non Pro: %s" % self)
             return True
         atomCb = self.CB
         atomCg = self.CG
@@ -4687,13 +4726,14 @@ Residue class: Defines residue properties
         cgShift = atomCg.shift()
 
         if isNaN( cbShift ) or isNaN( cgShift ):
-#            NTdebug("CS unavailabe for CB and/or CG for %s" % self)
+#            nTdebug("CS unavailabe for CB and/or CG for %s" % self)
             return
 
         shiftDifference = cbShift - cgShift
         if shiftDifference < 0.:
-            str = sprintf('For %s the difference of cb %8.3f minus cg  %8.3f: was not expected to be negative but is %8.3f.' % (self, cbShift,cgShift,shiftDifference))
-            NTdebug(str)
+            str = sprintf('For %s the difference of cb %8.3f minus cg  %8.3f: was not expected to be negative but is %8.3f.' % (
+                                    self, cbShift,cgShift,shiftDifference))
+            nTdebug(str)
             resultList.append( atomCb ) # Just do this once.
             atomCb.validateAssignment.append(str)
             return
@@ -4701,12 +4741,12 @@ Residue class: Defines residue properties
         omega = getDeepByKeysOrAttributes( self, OMEGA_STR)
         if omega == None:
             # Happens for CGR26AUtrecht2
-            NTwarning("Failed to find the omega dihedral angle for: %s" % self)
+            nTwarning("Failed to find the omega dihedral angle for: %s" % self)
             return
 
         isTrans = omega.isWithinLimits(90.,270.,checkMore=True)
         if isTrans == None: # in case of absent coordinates.
-            NTdebug("Failed to find peptide configuration for %s" % self)
+            nTdebug("Failed to find peptide configuration for %s" % self)
             return
 
         color = COLOR_GREEN
@@ -4728,7 +4768,7 @@ Residue class: Defines residue properties
 
         resultList.append( atomCb ) # Just do this for one atom of the residue..
         atomCb.validateAssignment.append(str)
-        NTdebug("For %s found %s" % (self, str))
+        nTdebug("For %s found %s" % (self, str))
         if color == COLOR_RED:
             atomCb.rogScore.setMaxColor( COLOR_RED, atomCb.validateAssignment )
         # end if
@@ -4740,21 +4780,21 @@ Residue class: Defines residue properties
         for i in range(modelCount):
             model = Model(self.name, i)
             result.append(model)
-#            NTdebug("Working on %s" % str(model))            
+#            nTdebug("Working on %s" % str(model))            
             for atom in self.atoms:
-#                NTdebug("Working on %s" % atom)            
+#                nTdebug("Working on %s" % atom)            
                 coordinate = getDeepByKeysOrAttributes(atom.coordinates, i)
                 if not coordinate:
                     continue
-#                NTdebug("Working on %s" % coordinate)            
+#                nTdebug("Working on %s" % coordinate)            
                 model.coordinates.append(coordinate)
             # end for
-#            NTdebug("Created: %s" % model)
+#            nTdebug("Created: %s" % model)
             if not model.coordinates:
-                NTwarning("Failed to find any coordinates in model %s for %s" % (i, self ))
+                nTwarning("Failed to find any coordinates in model %s for %s" % (i, self ))
                 break
         # end for
-#        NTdebug("Created: %s" % str(result))
+#        nTdebug("Created: %s" % str(result))
         return result
     # end def
         
@@ -4883,16 +4923,16 @@ class Dihedral( NTlist ):
         """Calculate the dihedral values: return cav, cv tuple or NaN,NaN on error
         """
         # Check if all atoms have the same number of coordinates
-        l = len( self.atoms[0].coordinates)
+        n = len( self.atoms[0].coordinates)
         for a in self.atoms[1:]:
-            if len(a.coordinates) != l:
+            if len(a.coordinates) != n:
                 return NaN,NaN
             #end if
         #end for
 
         del(self[:]) # initialize
 
-        for i in range(0,l):
+        for i in range(0,n):
             self.append( NTdihedralOpt(
                                        self.atoms[0].coordinates[i],
                                        self.atoms[1].coordinates[i],
@@ -5040,7 +5080,7 @@ e.g.
                       )
     def __eq__(self, other):
         'Just consider the xyz for now'
-#        NTdebug("In %s checking equivalence between %s and %s" % (getCallerName(), self, other))
+#        nTdebug("In %s checking equivalence between %s and %s" % (getCallerName(), self, other))
         if other == None: # This may make a sort instable?
             return False
         return self.__cmp__(other) == 0
@@ -5048,7 +5088,7 @@ e.g.
     
     def __cmp__(self, other):
         'Just consider the xyz for now'
-#        NTdebug("In %s comparing %s and %s" % (getCallerName(), self, other))
+#        nTdebug("In %s comparing %s and %s" % (getCallerName(), self, other))
         if other == None: # This may make a sort instable?
             return -1
         distance = self.distance(other)
@@ -5063,7 +5103,8 @@ e.g.
         """Return the 7-element name tuple:
            (moleculeName, chainName, resNum, atomName, modelIndex, resonanceIndex, convention)
         """
-        if not self.atom: return (None, None, None,None,self.model,None,convention)
+        if not self.atom: 
+            return (None, None, None,None,self.model,None,convention)
         else:
             return (self.atom.residue.chain.molecule.name,
                     self.atom.residue.chain.name,
@@ -5144,7 +5185,7 @@ Atom class: Defines object for storing atom properties
             db = None
             if rdef and rdef.canBeModified:
                 #print '****', rdef, atomName
-#                NTdebug("Atom.__init__: adding non-standard '%s' to database %s", atomName, rdef)
+#                nTdebug("Atom.__init__: adding non-standard '%s' to database %s", atomName, rdef)
                 db=rdef.appendAtomDef( atomName, **patches )
             #end if
             #print '***', db
@@ -5170,15 +5211,16 @@ coordinates: %s"""  , dots, self, dots
         #end def
 
     def criticize(self):
-#        NTdebug( '%s' % self )
+#        nTdebug( '%s' % self )
         if not self.hasCoordinates():
-#            NTdebug('Setting atom to max orange [crit.1] because it has no coordinates')
+#            nTdebug('Setting atom to max orange [crit.1] because it has no coordinates')
             self.rogScore.setMaxColor( COLOR_ORANGE, comment=ROGscore.ROG_COMMENT_NO_COOR)
 
     def toString(self, showChainId=True, showResidueType=True):
         res = self._parent
         if not res:
-#            NTwarning("Failed to get parent residue for atom with name: %s" % self.name) # serious but tends to get too verbose a messaging.
+#            nTwarning("Failed to get parent residue for atom with name: %s" % self.name) 
+            # serious but tends to get too verbose a messaging.
             return None
 
         if showChainId:
@@ -5213,7 +5255,7 @@ coordinates: %s"""  , dots, self, dots
         In the case of this atom being a pseudo atom we'll check all real atoms
         and by default return True if any one of them has coordinates.
         """
-#        NTdebug("Checking atom.hasCoordinates for %s" % self)
+#        nTdebug("Checking atom.hasCoordinates for %s" % self)
         if len(self.coordinates):
             return True
         if not self.isPseudoAtom():
@@ -5252,14 +5294,14 @@ coordinates: %s"""  , dots, self, dots
 #        return self.residue.chain.molecule.modelCount
         modelCount = getDeepByKeys(self, 'residue', 'chain', 'molecule', 'modelCount' )
 #        if modelCount == None:
-#            NTdebug("Failed to get modelCount for atom")
+#            nTdebug("Failed to get modelCount for atom")
         return modelCount
     #end def
 
     def getMolecule(self):
         mol = self.getParent(level=3) # TODO : test.
 #        if mol == None:
-#            NTdebug("Failed to get molecule for atom")
+#            nTdebug("Failed to get molecule for atom")
 #        return self.residue.chain.molecule
         return mol
 
@@ -5421,10 +5463,10 @@ coordinates: %s"""  , dots, self, dots
     def isBondedTo(self, other):
         topology = self.topology() # nicely self caching.
         if topology == None:
-            NTerror("Failed to get topology; assuming atoms are not bonded.")
+            nTerror("Failed to get topology; assuming atoms are not bonded.")
             return False
         bonded = other in topology
-#        NTdebug("Found atoms %20s/%20s are %s bonded." % ( self, other, bonded))
+#        nTdebug("Found atoms %20s/%20s are %s bonded." % ( self, other, bonded))
         return bonded
     #end def
     
@@ -5448,7 +5490,7 @@ coordinates: %s"""  , dots, self, dots
         else:
             resonance = getDeepByKeysOrAttributes( self.resonances, resonanceListIdx )
             if resonance == None:
-                NTcodeerror("Failed to find resonance for idx: %s" % resonanceListIdx)
+                nTcodeerror("Failed to find resonance for idx: %s" % resonanceListIdx)
                 return False
         if resonance == None:
             return False
@@ -5504,7 +5546,7 @@ coordinates: %s"""  , dots, self, dots
         Return stereoAssigned flag to True or if ssa == False set it to False.
         """
         if not self.isProChiral():
-            NTerror('Atom.setStereoAssigned: %s is not prochiral', self)
+            nTerror('Atom.setStereoAssigned: %s is not prochiral', self)
         self.stereoAssigned = ssa
     #end def
 
@@ -5574,15 +5616,16 @@ coordinates: %s"""  , dots, self, dots
 
         pseudoAtom = self.pseudoAtom()
         if not pseudoAtom:
-#            NTdebug("There is no pseudo defined for %s" % self)
+#            nTdebug("There is no pseudo defined for %s" % self)
             return None
 
         realAtomList = pseudoAtom.realAtoms()
         if len(realAtomList) > 2:
-#            NTwarning("This routine wasn't meant to be used for atoms that are part of a group of more than 2; please improve code") # happens in AtT13Paris for I guess isopropyl groups or alike.
+#            nTwarning("This routine wasn't meant to be used for atoms that are part of a group of more than 2; please improve code") 
+# happens in AtT13Paris for I guess isopropyl groups or alike.
             return None
         if len(realAtomList) < 2:
-#            NTdebug("This routine wasn't meant to be used when the pseudo atom has no (or not all) real atoms present.")
+#            nTdebug("This routine wasn't meant to be used when the pseudo atom has no (or not all) real atoms present.")
             return None
 
         if self == realAtomList[0]:
@@ -5595,7 +5638,7 @@ coordinates: %s"""  , dots, self, dots
 
         res = self._parent
         resName = res.resName # use shorthand.
-#        NTdebug(" my name %s, parent residue: %s" % ( self.name, res))
+#        nTdebug(" my name %s, parent residue: %s" % ( self.name, res))
 
         if resName == 'LEU' and self.name.startswith('QD'):
             return res.QQD
@@ -5621,10 +5664,10 @@ coordinates: %s"""  , dots, self, dots
             return None
         topology = self.topology()
         if topology == None:
-            NTwarning("Failed to get topology for heavy atom routine: %s" % self)
+            nTwarning("Failed to get topology for heavy atom routine: %s" % self)
             return None
         if len(topology) < 1:
-            NTwarning("Failed to get any atom in topology for heavy atom routine: %s" % self)
+            nTwarning("Failed to get any atom in topology for heavy atom routine: %s" % self)
             return None
         return self.topology()[0]
     #end def
@@ -5768,7 +5811,8 @@ coordinates: %s"""  , dots, self, dots
         Returns True if Atom has properties, expand with db properties for atom
         False otherwise
         """
-        if len(properties) == 0: return False
+        if len(properties) == 0: 
+            return False
 
         props = NTlist(*self.db.properties)
 
@@ -5799,7 +5843,8 @@ coordinates: %s"""  , dots, self, dots
         """
         result = NTlist()
 
-        if len(properties) == 0: return result
+        if len(properties) == 0: 
+            return result
         for atm in self.allAtoms():
             if atm.hasProperties(*properties):
                 result.append(atm)
@@ -5818,7 +5863,8 @@ coordinates: %s"""  , dots, self, dots
            (moleculeName, chainName, resNum, atomName, modelIndex, resonanceIndex, convention)
         """
         an = self.translate( convention )
-        if not an: return (None,None,None,None,None,None,convention)
+        if not an: 
+            return (None,None,None,None,None,None,convention)
 
         return (self.residue.chain.molecule.name,
                 self.residue.chain.name,
@@ -5882,7 +5928,7 @@ coordinates: %s"""  , dots, self, dots
         """
         inputLength = len(atomList)
         if inputLength <= 1:
-#            NTwarning("Trying to getRepresentativePseudoAtom for atomList: %s" % atomList )
+#            nTwarning("Trying to getRepresentativePseudoAtom for atomList: %s" % atomList )
             return None
 
         pseudoAtom = self.pseudoAtom()
@@ -5891,17 +5937,18 @@ coordinates: %s"""  , dots, self, dots
         realAtomList = pseudoAtom.realAtoms()
         realAtomListLength = len(realAtomList)
         if inputLength == 1:
-            NTwarning("Found pseudo with single real atom [%s] (itself?) for atomList: %s" % (realAtomList[0], atomList ))
+            nTwarning("Found pseudo with single real atom [%s] (itself?) for atomList: %s" % (realAtomList[0], atomList ))
             return None
 
         # efficiency in my mind
         if inputLength != realAtomListLength:
-#            NTdebug("Found unrepresentative pseudo [%s] for atomList: [%s] and realAtomListLength: [%s]" % (pseudoAtom, atomList, realAtomListLength ))
+#            nTdebug("Found unrepresentative pseudo [%s] for atomList: [%s] and realAtomListLength: [%s]" % (
+#                pseudoAtom, atomList, realAtomListLength ))
             return None
 
         for atom in atomList:
             if atom not in realAtomList:
-#                NTdebug("Found atom [%s] in atomList: %s unrepresented by pseudo %s" % (atom, atomList, pseudoAtom))
+#                nTdebug("Found atom [%s] in atomList: %s unrepresented by pseudo %s" % (atom, atomList, pseudoAtom))
                 return None
         return pseudoAtom
 
@@ -5984,20 +6031,20 @@ coordinates: %s"""  , dots, self, dots
         if model >= len(self.coordinates):
             # this happens for all pseudos and atoms like Cys HG which aren't always present
             # but are defined in the db.
-#            NTdebug("Trying to Atom.atomToPDB for model: " + `model`)
-#            NTdebug("but only found coordinates length: " + `len(self.coordinates)`)
+#            nTdebug("Trying to Atom.atomToPDB for model: " + `model`)
+#            nTdebug("but only found coordinates length: " + `len(self.coordinates)`)
             return None
         if model < 0:
-            NTcodeerror("In Atom.atomToPDB found model to be <0: %r" % model)
+            nTcodeerror("In Atom.atomToPDB found model to be <0: %r" % model)
             return None
 #        modelId = model - 1
 
         pdbAtmName = self.translate( convention )
-#        NTdebug("Translated self: %s to name %s", self, pdbAtmName)
+#        nTdebug("Translated self: %s to name %s", self, pdbAtmName)
         if not pdbAtmName:
             if self.name.startswith('Q'):
                 return None
-#            NTdebug("Failed to translate from CING to convention: %s atom: %-20s returning CING atom name" % (convention, self))
+#            nTdebug("Failed to translate from CING to convention: %s atom: %-20s returning CING atom name" % (convention, self))
             pdbAtmName = self.name
 #        if convention == XPLOR and self.residue.isCterminal():
 #            if  self.name == 'O':
@@ -6008,9 +6055,10 @@ coordinates: %s"""  , dots, self, dots
 #        # end if
 
         pdbResName = self.residue.translate( convention )
-#        NTdebug("Translated res: %s to name %s", self.residue, pdbResName)
+#        nTdebug("Translated res: %s to name %s", self.residue, pdbResName)
         if not pdbResName:
-#            NTdebug("Failed to translate from CING to convention: %s residue: %-20s returning CING residue name" % ( convention, self.residue ))
+#            nTdebug("Failed to translate from CING to convention: %s residue: %-20s returning CING residue name" % ( 
+                #convention, self.residue ))
             pdbResName = self.residue.name
 #            return None
 
@@ -6023,7 +6071,7 @@ coordinates: %s"""  , dots, self, dots
 
         chainId = self.residue.chain.name
         if len(chainId) > 1:
-            NTerror("chain id was longer than allowed 1 character: [%s]" % chainId)
+            nTerror("chain id was longer than allowed 1 character: [%s]" % chainId)
             return None
         record.serial     = pdbIndex
         record.name       = pdbAtmName
@@ -6067,9 +6115,9 @@ coordinates: %s"""  , dots, self, dots
 
     def toSML(self, stream=sys.stdout ):
         if hasattr(Atom,'SMLhandler'):
-            Atom.SMLhandler.toSML( self, stream )
+            Atom.SMLhandler.toSML( self, stream )  # pylint: disable=E1101
         else:
-            NTerror('Atom.toSML: no SMLhandler defined')
+            nTerror('Atom.toSML: no SMLhandler defined')
         #end if
     #end def
 #end class
@@ -6125,9 +6173,9 @@ class AtomList( NTlist ):
 #            atom.criticize()
             self.rogScore.setMaxColor( atom.rogScore.colorLabel, comment='Cascaded from: %s' %atom.toString() )
 
-    def append( self, o ):
-        o.id = self.currentId
-        NTlist.append( self, o )
+    def append( self, obj ):
+        obj.id = self.currentId
+        NTlist.append( self, obj )
         self.currentId += 1
 
     def appendFromMolecule( self, molecule ):
@@ -6225,7 +6273,8 @@ def NTdihedral( c1, c2, c3, c4, radians=False ):
     angle = u.angle( v, radians=radians )
     # determine sign of angle
     try:
-        if cb.angle( w, radians=True ) > 0.001: angle *= -1.0
+        if cb.angle( w, radians=True ) > 0.001: 
+            angle *= -1.0
     except ZeroDivisionError:
         # dihedral=pi or 0
         pass
@@ -6332,9 +6381,11 @@ class Resonance( NTvalue  ):
         """Return probability of matching between self and other
         """
         sigma1 = self.error
-        if sigma1 == 0.0: sigma1 = 1.0
+        if sigma1 == 0.0: 
+            sigma1 = 1.0
         sigma2 = other.error
-        if sigma2 == 0.0: sigma2 = 1.0
+        if sigma2 == 0.0: 
+            sigma2 = 1.0
 
         return math.exp( -(self.value-other.value )**2 / (sigma1*sigma2*2) )
     #end def
@@ -6344,7 +6395,8 @@ class Resonance( NTvalue  ):
            (moleculeName, chainName, resNum, atomName, modelIndex, resonanceIndex, convention)
 
         """
-        if not self.atom: return (None, None, None,None,None,self.resonanceIndex,convention)
+        if not self.atom: 
+            return (None, None, None,None,None,self.resonanceIndex,convention)
         else:
             return (self.atom.residue.chain.molecule.name,
                     self.atom.residue.chain.name,
@@ -6401,7 +6453,7 @@ class AssignmentCountMap(NTdict):
     def overallCount(self):
         r = sum([self[key] for key in self.keys()]) # numpy.int64 type because sum is from numpy.
         r = int(r)
-#        NTdebug("type of overall count %s: %s" % ( r, r.__class__))
+#        nTdebug("type of overall count %s: %s" % ( r, r.__class__))
         return r
 #end class
 
@@ -6453,17 +6505,21 @@ def mapMolecules( mol1, mol2, molMap=None ):
         res1 = mol1.allResidues()
         res2 = mol2.allResidues()
         if len(res1) != len(res2):
-            NTerror('mapMolecules: unequal %s and %s have unequal number of residues', mol1, mol2)
+            nTerror('mapMolecules: unequal %s and %s have unequal number of residues', mol1, mol2)
             return
         #end if
         molMap = zip(res1,res2)
     #end if
 
     # Initialize (should not be neccessary! but alas)
-    for res in mol1.allResidues(): res.map = None
-    for res in mol2.allResidues(): res.map = None
-    for atm in mol1.allAtoms(): atm.map = None
-    for atm in mol2.allAtoms(): atm.map = None
+    for res in mol1.allResidues(): 
+        res.map = None
+    for res in mol2.allResidues(): 
+        res.map = None
+    for atm in mol1.allAtoms(): 
+        atm.map = None
+    for atm in mol2.allAtoms(): 
+        atm.map = None
 
     for i1,i2 in molMap:
         res1 = mol1.getResidue( i1 )
@@ -6509,7 +6565,7 @@ def updateResonancesFromPeaks( peaks, axes = None)   :
             if (peak.resonances[i] != None):
                 peak.resonances[i].value = peak.positions[i]
                 if peak.resonances[i].atom != None:
-                    NTmessage("Updating resonance %s", peak.resonances[i].atom)
+                    nTmessage("Updating resonance %s", peak.resonances[i].atom)
                 #end if
             #end if
         #end for
@@ -6525,13 +6581,13 @@ def updateResonancesFromPeaks( peaks, axes = None)   :
 #    #end if
 #
 #    if (molecule == None):
-#        NTerror("saveMolecule: molecule not defined")
+#        nTerror("saveMolecule: molecule not defined")
 #        return
 #    #end if
 #
 #    obj2XML( molecule, path=fileName )
 #
-#    NTmessage( '==> saveMolecule: saved to %s', fileName )
+#    nTmessage( '==> saveMolecule: saved to %s', fileName )
 #    #end if
 #end def
 
@@ -6539,12 +6595,12 @@ def updateResonancesFromPeaks( peaks, axes = None)   :
 #def restoreMolecule( fileName)   :
 #    """restore from fileName, return Molecule instance """
 #
-#    mol = XML2obj( path=fileName )
+#    mol = xML2obj( path=fileName )
 #    if (mol == None): return None
 #
 #    mol.source = fileName
 #
-#    NTmessage( '==> restoreMolecule: restored %s', mol.format())
+#    nTmessage( '==> restoreMolecule: restored %s', mol.format())
 #    #end if
 #
 #    return mol
@@ -6576,7 +6632,7 @@ def chi3SS( dCbCb ):
     Page 684, eq. 9
     """
     try:
-        val = acos( 1.0 - (dCbCb*dCbCb - 8.555625) / 6.160 ) * 180.0/math.pi
+        val = math.acos( 1.0 - (dCbCb*dCbCb - 8.555625) / 6.160 ) * 180.0/math.pi
     except:
         val = NaN
     return val
@@ -6606,7 +6662,7 @@ def disulfideScore( cys1, cys2 ):
     """
     mc = len(cys1.CA.coordinates) # model count
     if not mc: # see entry 1abt
-        NTwarning("No coordinates for CA of residue: %s" % cys1)
+        nTwarning("No coordinates for CA of residue: %s" % cys1)
         return None
 
     # For C alpha only models
@@ -6614,7 +6670,7 @@ def disulfideScore( cys1, cys2 ):
         for atomName in [ 'CA', 'CB', 'SG' ]:
             atom = cysResidue[atomName]
             if not len(atom.coordinates):
-                NTdebug("Skipping disulfideScore between %s and %s for there are no coordinates for atom: %s" % (cys1, cys2, atom))
+                nTdebug("Skipping disulfideScore between %s and %s for there are no coordinates for atom: %s" % (cys1, cys2, atom))
                 return None # The white space on this line was screwed up with Eclipse svn finding a diff. It has been in for over a year.
 
     score = NTlist(0., 0., 0., 0.)
@@ -6661,7 +6717,7 @@ def ensureValidChainId( chainId ):
     if isValidChainId( chainId ):
         return chainId
     if chainId and len(chainId) > 1:
-        NTerror("Truncating chainId [%s] to first char only" % chainId)
+        nTerror("Truncating chainId [%s] to first char only" % chainId)
         chainId = chainId[0]
     if isValidChainId( chainId ):
         return chainId
@@ -6670,7 +6726,7 @@ def ensureValidChainId( chainId ):
 
 
 def getNextAvailableChainId(chainIdListAlreadyUsed = []):
-#    NTdebug("chainIdListAlreadyUsed: %s" % chainIdListAlreadyUsed)
+#    nTdebug("chainIdListAlreadyUsed: %s" % chainIdListAlreadyUsed)
     for chainId in Chain.DEFAULT_ChainNamesByAlphabet:
         if not( chainId in chainIdListAlreadyUsed ):
             return chainId
@@ -6678,7 +6734,7 @@ def getNextAvailableChainId(chainIdListAlreadyUsed = []):
     msg = "CING exhausted the available %d chain identifiers; see issue %d here:\n" % (
         len(Chain.DEFAULT_ChainNamesByAlphabet), issueId)
     msg += issueListUrl+repr(issueId)
-    NTcodeerror(msg)
+    nTcodeerror(msg)
 # end def
 
 
@@ -6702,7 +6758,8 @@ def unmatchedAtomByResDictToString(unmatchedAtomByResDict):
             msg += '\n'
     return msg
 
-def getTripletHistogramList(resTypeListBySequenceOrder, doOnlyOverall = False, ssTypeRequested = None, doNormalize = False, normalizeSeparatelyToZ = False):
+def getTripletHistogramList(resTypeListBySequenceOrder, doOnlyOverall = False, ssTypeRequested = None, 
+                            doNormalize = False, normalizeSeparatelyToZ = False):
     """Returns a list of convoluted 1d by 1d -> 2d histo over 3 residues (a triplet) or
     an empty array when it could not be constructed.
 
@@ -6727,16 +6784,17 @@ def getTripletHistogramList(resTypeListBySequenceOrder, doOnlyOverall = False, s
     """
 
     if not resTypeListBySequenceOrder:
-        NTerror( 'getTripletHistogramList was given an empty sequence: %s' % str(resTypeListBySequenceOrder))
+        nTerror( 'getTripletHistogramList was given an empty sequence: %s' % str(resTypeListBySequenceOrder))
         return None
 
     if None in resTypeListBySequenceOrder:
-#        NTerror( 'getTripletHistogramList has a None residue type in sequence: %s' % str(resTypeListBySequenceOrder))
+#        nTerror( 'getTripletHistogramList has a None residue type in sequence: %s' % str(resTypeListBySequenceOrder))
         return None
 
     if doNormalize or normalizeSeparatelyToZ:
         if ssTypeRequested != None:
-            NTerror( 'getTripletHistogramList was called with normalizing for specific ssType [%s] or with normalizeSeparately which is impossible.' % ssTypeRequested)
+            nTerror( 'getTripletHistogramList was called with normalizing for specific ssType [%s] or with normalizeSeparately ' +
+                     'which is impossible.' % ssTypeRequested)
             return
 
     resTypePrev, resType, resTypeNext = resTypeListBySequenceOrder
@@ -6749,14 +6807,15 @@ def getTripletHistogramList(resTypeListBySequenceOrder, doOnlyOverall = False, s
     else:
         ssTypeList = hPlot.histd1BySs0AndResTypes.keys()
         ssTypeList.sort() # in place sort to: space, H, S
-#        NTdebug("ssTypeList: %s" % ssTypeList)
+#        nTdebug("ssTypeList: %s" % ssTypeList)
         for ssType in ssTypeList:
             if ssTypeRequested and ssType != ssTypeRequested:
-#                    NTdebug("Skipping ssType %s because only requested: %s" % (ssType, ssTypeRequested) )
+#                    nTdebug("Skipping ssType %s because only requested: %s" % (ssType, ssTypeRequested) )
                 continue
-#                NTdebug("Processing ssType: %s" % ssType)
+#                nTdebug("Processing ssType: %s" % ssType)
             hist1 = getDeepByKeys(hPlot.histd1BySs0AndResTypes, ssType, resType, resTypePrev) # x-axis
-            hist2 = getDeepByKeys(hPlot.histd1BySs1AndResTypes, ssType, resTypeNext, resType) # y-axis; this was a bug see convertD1D2_2Db2.py
+            # y-axis; this was a bug see convertD1D2_2Db2.py
+            hist2 = getDeepByKeys(hPlot.histd1BySs1AndResTypes, ssType, resTypeNext, resType) 
             histListTuple.append((hist1,hist2))
         # end for
     # end if
@@ -6765,14 +6824,14 @@ def getTripletHistogramList(resTypeListBySequenceOrder, doOnlyOverall = False, s
     for histTuple in histListTuple:
         hist1, hist2 = histTuple
         if hist1 == None:
-#                    NTdebug('skipping for hist1 is empty for [%s] [%s] [%s]' % (ssType, resTypePrev, resType))
+#                    nTdebug('skipping for hist1 is empty for [%s] [%s] [%s]' % (ssType, resTypePrev, resType))
             continue
         if hist2 == None:
-#                    NTdebug('skipping for hist2 is empty for [%s] [%s] [%s]' % (ssType, resType, resTypeNext))
+#                    nTdebug('skipping for hist2 is empty for [%s] [%s] [%s]' % (ssType, resType, resTypeNext))
             continue
         m1 = mat(hist1,dtype='float')
         m2 = mat(hist2,dtype='float')
-        m2 = m2.transpose()
+        m2 = m2.transpose() # pylint: disable=E1101
         hist = multiply(m1,m2)
         histList.append(hist)
 
@@ -6781,7 +6840,7 @@ def getTripletHistogramList(resTypeListBySequenceOrder, doOnlyOverall = False, s
         return histList
 
     if len(histList) != 3:
-        NTcodeerror("Expected 3 hist for resTypeListBySequenceOrder " + str(resTypeListBySequenceOrder))
+        nTcodeerror("Expected 3 hist for resTypeListBySequenceOrder " + str(resTypeListBySequenceOrder))
         return None
 
     for hist in histList:
@@ -6789,10 +6848,10 @@ def getTripletHistogramList(resTypeListBySequenceOrder, doOnlyOverall = False, s
         factor = 3 * histSum / 100.0
         hist /= factor # normalize the new sum to be 33.
         histSumNew = sum(hist)
-#            NTdebug("Normalized histogram with sum %10.3f by dividing by factor %10.3f to have 33.333 and found %10.3f" % (
+#            nTdebug("Normalized histogram with sum %10.3f by dividing by factor %10.3f to have 33.333 and found %10.3f" % (
 #                histSum, factor, histSumNew))
         if math.fabs( 33.333 - histSumNew) > 0.1:
-            NTcodeerror("Failed to normalize histogram with sum %10.3f by dividing by factor %10.3f to have 33.333 instead found %10.3f" % (
+            nTcodeerror("Failed to normalize histogram with sum %10.3f by dividing by factor %10.3f to have 33.333 instead found %10.3f" % (
                 histSum, factor, histSumNew))
             return None
 
@@ -6803,54 +6862,54 @@ def getTripletHistogramList(resTypeListBySequenceOrder, doOnlyOverall = False, s
         return histList
 
     # NB this is now in percentage as they have been normalized.
-    Ctuple = getEnsembleAverageAndSigmaFromHistogram( histOverall )
+    Ctuple = getEnsembleAverageAndSigmaHis( histOverall )
     (c_av, c_sd, hisMin, hisMax) = Ctuple
     zMin = (hisMin - c_av) / c_sd
     zMax = (hisMax - c_av) / c_sd
 
-    NTmessage("       SS R1  R2  R3         c_av         c_sd       hisMin       hisMax         zMin         zMax")
+    nTmessage("       SS R1  R2  R3         c_av         c_sd       hisMin       hisMax         zMin         zMax")
     # A for all
     msg = '%s %s %s %s %12.3f %12.3f %12.3f %12.3f %12.3f %12.3f' % ('A', resTypePrev, resType, resTypeNext,
         c_av, c_sd, hisMin, hisMax, zMin, zMax)
     if hisMax < c_av:
-        NTerror(msg + " maxHist < c_av")
+        nTerror(msg + " maxHist < c_av")
     else:
-        NTmessage("       " + msg)
+        nTmessage("       " + msg)
 
 #        histOverall *= 3.    # to get it's sum back to 100%
     histOverall -= c_av
     histOverall /= c_sd
-    CtupleA = getArithmeticAverageAndSigmaFromHistogram(histOverall)
+    CtupleA = getArithmeticAverageAndSigmaHis(histOverall)
     (c_avA, c_sdA, hisMinA, hisMaxA) = CtupleA
     msg = '%s %s %s %s %12.3f %12.3f %12.3f %12.3f' % ('A', resTypePrev, resType, resTypeNext,
         c_avA, c_sdA, hisMinA, hisMaxA)
     if hisMaxA < c_avA:
-        NTerror(msg + " maxHistA < c_avA")
+        nTerror(msg + " maxHistA < c_avA")
     else:
-        NTmessage("       " + msg)
+        nTmessage("       " + msg)
 
     for i,hist in enumerate(histList):
         hist *= 3.    # to get it's sum back to 100%
         hist -= c_av
         hist /= c_sd
-#            CtupleSS = getEnsembleAverageAndSigmaFromHistogram( hist )
-        CtupleSS = getArithmeticAverageAndSigmaFromHistogram(hist)
-#            NTdebug("CtupleSS: [%s]" % str(CtupleSS))
+#            CtupleSS = getEnsembleAverageAndSigmaHis( hist )
+        CtupleSS = getArithmeticAverageAndSigmaHis(hist)
+#            nTdebug("CtupleSS: [%s]" % str(CtupleSS))
         (c_avSS, c_sdSS, hisMinSS, hisMaxSS) = CtupleSS
         mySsType = ssIdxToType(i)
         msg = '%s %s %s %s %12.3f %12.3f %12.3f %12.3f' % (mySsType, resTypePrev, resType, resTypeNext,
             c_avSS, c_sdSS, hisMinSS, hisMaxSS)
         if hisMaxSS < c_avSS:
-            NTerror(msg + " maxHistSS < c_avSS")
+            nTerror(msg + " maxHistSS < c_avSS")
         else:
-            NTmessage("       " + msg)
+            nTmessage("       " + msg)
     return histList
 # end def
 
 def residueNumberDifference(res1, res2):
     "Returns res2.resNum - res1.resNum. Ignoring gaps in sequence."
     if res1._parent != res2._parent:
-#        NTdebug("In Chain.residueCountDifference residues aren't in same chain so result is pointless; returning None")
+#        nTdebug("In Chain.residueCountDifference residues aren't in same chain so result is pointless; returning None")
         return None
     return res2.resNum - res1.resNum
 # end def

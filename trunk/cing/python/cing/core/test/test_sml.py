@@ -16,7 +16,7 @@ class SMLTestObjectHandler( SMLNTdictHandler ):
         SMLhandler.__init__( self, name = 'TestObject' )
     #end def
     def handle(self, line, fp, project=None):
-#        NTdebug("Now in SMLTestObjectHandler#handle at line: %s" % str(line))
+#        nTdebug("Now in SMLTestObjectHandler#handle at line: %s" % str(line))
         return SMLNTdictHandler.handle(self, line, fp, project)
 #    end def
 #    def toSML(self, rl, fp):
@@ -90,7 +90,7 @@ class AllChecks(TestCase):
         testObject = TestObject()
         obj2SML( testObject, fn)
         c = SML2obj( fn)
-#        NTdebug("Restored to: %r" % c)
+#        nTdebug("Restored to: %r" % c)
         self.failIf( len(c.keys()) != 1 )
         self.failIf( getDeepByKeysOrAttributes(c, 'a') != 0 )
 #        self.failIf( len(c.dd.keys()) != 2 )
@@ -109,9 +109,9 @@ class AllChecks(TestCase):
             os.unlink(fn)
         savedObject = obj2SML( molecule, fn)
         self.failIf( savedObject == None)
-        NTdebug("Written to: %r" % fn)
+        nTdebug("Written to: %r" % fn)
         testObjectRead = SML2obj( fn )
-        NTdebug("Restored to: %s" % str(testObjectRead))
+        nTdebug("Restored to: %s" % str(testObjectRead))
 #        self.failIf( len(testObjectRead) != 0 )
         self.failIf( getDeepByKeysOrAttributes(testObjectRead, RESONANCE_SOURCES_STR, 0, VASCO_APPLIED_STR) != True )
     # end def

@@ -15,7 +15,7 @@ class AllChecks(TestCase):
     os.chdir(cingDirTmpTest)
 
 
-    def tttest_jfd_1(self):
+    def _test_jfd_1(self):
         r,c = ogrid[ 0:10:5j, 0:1:5j ]
         # r is the row and
         # c is the column
@@ -35,22 +35,22 @@ class AllChecks(TestCase):
                     [ 5.0, 0.5, 5.5], # center
                     ]
         for testTuple in testList:
-            NTdebug("testTuple: %s" % testTuple)
+            nTdebug("testTuple: %s" % testTuple)
             qr, qc, resultExpected = testTuple
             tx = ogrid[ qr:qr:1j, qc:qc:1j ]
     #        tx = ( (-0.9), (-0.9) ) # single point interpolation
             interpolatedValueSection = interpn_linear( z, tx, bins )
             interpolatedValue = interpolatedValueSection[ 0,0 ] # need to use comma to separate
             # the rows and columns in numpy matrixes.
-    #        NTdebug(" r: \n%s" % r)
-    #        NTdebug(" c: \n%s" % c)
-#            NTdebug(" z: \n%s" % z)
-#            NTdebug(" tx: \n%s" % tx)
-#            NTdebug(" interpolatedValueSection: \n%s" % interpolatedValueSection)
-            NTdebug(" interpolatedValue: %s" % interpolatedValue)
+    #        nTdebug(" r: \n%s" % r)
+    #        nTdebug(" c: \n%s" % c)
+#            nTdebug(" z: \n%s" % z)
+#            nTdebug(" tx: \n%s" % tx)
+#            nTdebug(" interpolatedValueSection: \n%s" % interpolatedValueSection)
+            nTdebug(" interpolatedValue: %s" % interpolatedValue)
             self.assertAlmostEquals( resultExpected, interpolatedValue, 8)
 
-    def tttest_jfd_2(self):
+    def _test_jfd_2(self):
         r,c = ogrid[ 0:360:37j, 0:360:37j ]
         z = r + 2.0 * c
         bins = (r,c)
@@ -69,7 +69,7 @@ class AllChecks(TestCase):
             interpolatedValue = interpolatedValueSection[ 0,0 ] # need to use comma to separate
             self.assertAlmostEquals( resultExpected, interpolatedValue, 8)
 
-    def ttttest_jfd_2b(self):
+    def _test_jfd_2b(self):
         r,c = ogrid[ -180:180:37j, -180:180:37j ]
         z = r + 2.0 * c
         bins = (r,c)
@@ -90,7 +90,7 @@ class AllChecks(TestCase):
             interpolatedValue = interpolatedValueSection[ 0,0 ] # need to use comma to separate
             self.assertAlmostEquals( resultExpected, interpolatedValue, 8)
 
-    def tttest_jfd_3(self):
+    def _test_jfd_3(self):
         r,c = ogrid[ -180:180:10, -180:180:10 ]
         if hPlot.histRamaBySsAndCombinedResType == None:
             hPlot.initHist()
@@ -115,7 +115,7 @@ class AllChecks(TestCase):
         for i, interpolationTypeIsNearest in enumerate( [True, False] ):
             testList = testLoL[i]
             for testTuple in testList:
-                NTdebug( 'testing (interpolationTypeIsNearest %s) %s' % (interpolationTypeIsNearest, `testTuple`))
+                nTdebug( 'testing (interpolationTypeIsNearest %s) %s' % (interpolationTypeIsNearest, `testTuple`))
                 qr, qc, resultExpected = testTuple
                 tx = ogrid[ qr:qr:1j, qc:qc:1j ]
                 f = interpn_linear
@@ -153,7 +153,7 @@ class AllChecks(TestCase):
             q = circularlizeMatrix(p)
             self.assertTrue((q==qExpected).all())
 
-    def tttest_ExtendingMatrix2(self):
+    def _test_ExtendingMatrix2(self):
         binCount = 36
         p = numpy.arange(binCount*binCount).reshape(binCount,binCount)
         _q = circularlizeMatrix(p)

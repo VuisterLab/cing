@@ -1,16 +1,17 @@
 #!/usr/bin/env python
 
-# Run e.g.:
-#$CINGROOT/python/cing/Scripts/vCing/topos/toposcmd.py --realm https://topos.grid.sara.nl/4.1 --pool vCing --timeout 30 get-token-url
-#$CINGROOT/python/cing/Scripts/vCing/topos/toposcmd.py --realm https://topos.grid.sara.nl/4.1 --pool vCing --timeout 30 get-num-tokens
-
+"""
+Run e.g.:
+$CINGROOT/python/cing/Scripts/vCing/topos/toposcmd.py --realm https://topos.grid.sara.nl/4.1 --pool vCing --timeout 30 get-token-url
+$CINGROOT/python/cing/Scripts/vCing/topos/toposcmd.py --realm https://topos.grid.sara.nl/4.1 --pool vCing --timeout 30 get-num-tokens
+"""
 from cing.Libs.NTutils import * #@UnusedWildImport
 import StringIO
 import getopt
 import pycurl
 
 def usage():
-  NTerror( """usage:
+  nTerror( """usage:
   toposcmd --url <url> create-realm
   toposcmd --realm <realm> --pool <pool> create-tokens <token1> <token2> ...
   toposcmd --realm <realm> --pool <pool> get-token-url
@@ -46,7 +47,7 @@ class toposcmd:
         self.curl.setopt(pycurl.WRITEFUNCTION, self.curl.result.write)
 
     def show(self):
-        NTmessage("""
+        nTmessage("""
 realm:     %s
 pool:      %s
 timeout:   %s
@@ -58,7 +59,7 @@ args:      %s""" % (self.realm, self.pool,self.timeout,self.token,self.url,self.
         'Return True on error'
         if x:
             return False
-        NTerror(" not defined:"+s)
+        nTerror(" not defined:"+s)
         return True
 
 #    def getrealm(self):
@@ -72,7 +73,9 @@ args:      %s""" % (self.realm, self.pool,self.timeout,self.token,self.url,self.
             return
         if realm :
             if not self.realm:
-                self.realm = self.getrealm()
+                print "ERROR: Failed to find realm and previous method disappeared."
+                return
+#                self.realm = self.getrealm()
             self.check(self.realm,"realm")
             self.url = self.realm
         if pool :
@@ -83,7 +86,7 @@ args:      %s""" % (self.realm, self.pool,self.timeout,self.token,self.url,self.
             self.url = self.url + "/tokens/" + token
         if self.cmd:
             self.url = self.url + "/" + self.cmd
-        NTerror("wwvv url: %s" % self.url)
+        nTerror("wwvv url: %s" % self.url)
 
 
     def proceed(self):
@@ -110,17 +113,17 @@ args:      %s""" % (self.realm, self.pool,self.timeout,self.token,self.url,self.
         elif self.args[0] == "get-num-tokens" :
             self.get_num_tokens()
         else:
-            NTerror("Invalid command: '"+self.args[0]+"'")
+            nTerror("Invalid command: '"+self.args[0]+"'")
             sys.exit(2)
 
     def handle_default(self):
         self.curl.setopt(pycurl.URL,self.url)
-        NTdebug( "Curling %s with request: %s" % (self.url, pycurl.CUSTOMREQUEST))
+        nTdebug( "Curling %s with request: %s" % (self.url, pycurl.CUSTOMREQUEST))
         try:
             self.curl.perform()
         except:
             return
-        NTmessage( self.curl.result.getvalue() )
+        nTmessage( self.curl.result.getvalue() )
         self.curl.result.seek(0)
 
     def create_realm(self):   # niet gecontroleerd
@@ -148,7 +151,7 @@ args:      %s""" % (self.realm, self.pool,self.timeout,self.token,self.url,self.
             self.curl.setopt(pycurl.UPLOAD,1)
             self.curl.setopt(pycurl.URL,self.url)
             self.curl.perform()
-            NTmessage( self.curl.result.getvalue() )
+            nTmessage( self.curl.result.getvalue() )
             self.curl.result.seek(0)
 
     def get_token_url(self):
@@ -163,15 +166,15 @@ args:      %s""" % (self.realm, self.pool,self.timeout,self.token,self.url,self.
             self.check(self.realm,"realm")
             self.check(self.pool,"pool")
             self.url  = self.realm+"/pools/"+self.pool+"/nextToken"
-        NTmessage("url: %s" % self.url)
+        nTmessage("url: %s" % self.url)
         self.curl.setopt(pycurl.URL,self.url)
         try:
             self.curl.perform()
         except:
             NTtracebackError()
-            NTmessage( "exception was caught in toposcmd.get_token()" )
+            nTmessage( "exception was caught in toposcmd.get_token()" )
             return
-        NTmessage( self.curl.result.getvalue().split("/")[-1] )
+        nTmessage( self.curl.result.getvalue().split("/")[-1] )
         self.curl.result.seek(0)
 
     def get_token_content(self):
@@ -190,14 +193,14 @@ args:      %s""" % (self.realm, self.pool,self.timeout,self.token,self.url,self.
 #            self.check(self.realm,"realm")
 #            self.check(self.pool,"pool")
 #            self.url = self.realm+"/pools"
-#        NTmessage("url: %s" % self.url)
+#        nTmessage("url: %s" % self.url)
 #        self.curl.setopt(pycurl.FOLLOWLOCATION,1)
 #        self.curl.setopt(pycurl.URL,self.url)
 #        try:
 #            self.curl.perform()
 #        except:
 #            NTtracebackError()
-#            NTmessage( "exception was caught in toposcmd.get_num_tokens()" )
+#            nTmessage( "exception was caught in toposcmd.get_num_tokens()" )
 #            return
 #        self.curl.result.seek(0)
 #        for line in self.curl.result:

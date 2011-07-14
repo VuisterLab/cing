@@ -74,13 +74,13 @@ def main():
         if isNaN(chi1) or isNaN(chi2):
             continue
         if not inRange(chi1):
-            NTerror("chi1 not in range for row: %s" % repr(row))
+            nTerror("chi1 not in range for row: %s" % repr(row))
             return
         if not inRange(chi2):
-            NTerror("chi2 not in range for row: %s" % repr(row))
+            nTerror("chi2 not in range for row: %s" % repr(row))
             return
         if not common20AADict.has_key(resType):
-            NTdebug("Residue not in common 20 for row: %s" % repr(row))
+            nTdebug("Residue not in common 20 for row: %s" % repr(row))
             rowCount -= 1
             continue
 
@@ -88,8 +88,8 @@ def main():
         appendDeepByKeys(valuesByEntrySsAndResType, chi1, entryId, ssType, resType, 'chi1')
         appendDeepByKeys(valuesBySsAndResType, chi2, ssType, resType, 'chi2')
         appendDeepByKeys(valuesByEntrySsAndResType, chi2, entryId, ssType, resType, 'chi2')
-#        NTdebug('resType,ssType,chi1: %4s %1s %s' % (resType,ssType,floatFormat(chi1, "%6.1f")))
-#        NTdebug('resType,ssType,chi2: %4s %1s %s' % (resType,ssType,floatFormat(chi2, "%6.1f")))
+#        nTdebug('resType,ssType,chi1: %4s %1s %s' % (resType,ssType,floatFormat(chi1, "%6.1f")))
+#        nTdebug('resType,ssType,chi2: %4s %1s %s' % (resType,ssType,floatFormat(chi2, "%6.1f")))
     del(reader) # closes the file handles
     os.unlink(cvs_file_abs_name)
 
@@ -103,15 +103,16 @@ def main():
                     bins=binCount,
                     range=hrange)
                 setDeepByKeys(histJaninBySsAndResType, hist2d, ssType, resType)
-                cTuple = getEnsembleAverageAndSigmaFromHistogram(hist2d)
+                cTuple = getEnsembleAverageAndSigmaHis(hist2d)
                 (c_av, c_sd, hisMin, hisMax) = cTuple
                 cTuple += tuple([str([ssType, resType])]) # append the hash keys as a way of id.
-                NTdebug("For ssType %s residue type %s found (av/sd/min/max) %8.0f %8.0f %8.0f %8.0f" % (ssType, resType, c_av, c_sd, hisMin, hisMax))
+                nTdebug("For ssType %s residue type %s found (av/sd/min/max) %8.0f %8.0f %8.0f %8.0f" % (
+                    ssType, resType, c_av, c_sd, hisMin, hisMax))
                 if c_sd == None:
-                    NTdebug('Failed to get c_sd when testing not all residues are present in smaller sets.')
+                    nTdebug('Failed to get c_sd when testing not all residues are present in smaller sets.')
                     continue
                 if c_sd == 0.:
-                    NTdebug('Got zero c_sd, ignoring histogram. This should only occur in smaller sets. Not setting values.')
+                    nTdebug('Got zero c_sd, ignoring histogram. This should only occur in smaller sets. Not setting values.')
                     continue
                 setDeepByKeys(histJaninCtupleBySsAndResType, cTuple, ssType, resType)
 

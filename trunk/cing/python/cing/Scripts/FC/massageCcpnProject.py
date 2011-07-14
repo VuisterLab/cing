@@ -33,16 +33,16 @@ def convert(projectName, inputDir, projectNameNew):
     ccpnProject = loadProject(ccpnPath)
 
     ccpnMolSystem = ccpnProject.findFirstMolSystem()
-    NTmessage( 'found ccpnMolSystem: %s' % ccpnMolSystem )
+    nTmessage( 'found ccpnMolSystem: %s' % ccpnMolSystem )
 #    print 'status: %s' % ccpnMolSystem.setCode(projectName) # impossible; reported to ccpn team.
 
     if removeOriginalStructureEnsemble:
         structureEnsemble = ccpnProject.findFirstStructureEnsemble()
         if structureEnsemble:
-            NTmessage("Removing first found structureEnsemble -A-")
+            nTmessage("Removing first found structureEnsemble -A-")
             structureEnsemble.delete()
         else:
-            NTwarning("No structureEnsemble found; can't remove it.")
+            nTwarning("No structureEnsemble found; can't remove it.")
 
     if addStructureEnsemble:
         structureGeneration = ccpnProject.newStructureGeneration()
@@ -51,10 +51,10 @@ def convert(projectName, inputDir, projectNameNew):
 
         globPattern = inputDir + '/*.pdb'
         fileList = glob(globPattern)
-        NTdebug("From %s will read files: %s" % (globPattern,fileList))
+        nTdebug("From %s will read files: %s" % (globPattern,fileList))
         format.readCoordinates(fileList, strucGen = structureGeneration, minimalPrompts = 1, linkAtoms = 0)
 
-    NTmessage(  'saving to new path if all checks are valid' )
+    nTmessage(  'saving to new path if all checks are valid' )
     # the newPath basename will be taken according to ccpn code doc.
     ccpnPathNew = os.path.join(inputDir, projectNameNew)
     saveProject(ccpnProject, checkValid=True, newPath=ccpnPathNew, removeExisting=True)
@@ -95,7 +95,7 @@ def replaceCoordinates():
             globPattern = inputAuthorDir + '/*.pdb'
             pdbFileList = glob(globPattern)
             if not pdbFileList:
-                NTmessage("Skipping because there is no PDB file in: " + os.getcwd())
+                nTmessage("Skipping because there is no PDB file in: " + os.getcwd())
                 continue
 
             if not os.path.exists(inputAuthorDir):
@@ -115,26 +115,26 @@ def replaceCoordinates():
                 ccpnProject = loadProject(entryCode)
                 nmrProject = ccpnProject.currentNmrProject
                 ccpnMolSystem = ccpnProject.findFirstMolSystem()
-                NTmessage( 'found ccpnMolSystem: %s' % ccpnMolSystem )
+                nTmessage( 'found ccpnMolSystem: %s' % ccpnMolSystem )
             #    print 'status: %s' % ccpnMolSystem.setCode(projectName) # impossible; reported to ccpn team.
 
                 if removeOriginalStructureEnsemble:
                     structureEnsemble = ccpnProject.findFirstStructureEnsemble()
                     if structureEnsemble:
-                        NTmessage("Removing first found structureEnsemble")
+                        nTmessage("Removing first found structureEnsemble")
                         structureEnsemble.delete()
                     else:
-                        NTwarning("No structureEnsemble found; can't remove it.")
+                        nTwarning("No structureEnsemble found; can't remove it.")
 
                 if addStructureEnsemble:
                     structureGeneration = nmrProject.newStructureGeneration()
                     fileList = None
-                    NTdebug("From %s will read files: %s" % (globPattern,fileList))
+                    nTdebug("From %s will read files: %s" % (globPattern,fileList))
                     guiRoot = Tkinter.Tk()
                     format = PseudoPdbFormat(ccpnProject, guiRoot, verbose = 1)
                     format.readCoordinates(fileList, strucGen = structureGeneration, minimalPrompts = 1, linkAtoms = 0)
 
-                NTmessage(  'saving to new path if all checks are valid' )
+                nTmessage(  'saving to new path if all checks are valid' )
                 # the newPath basename will be taken according to ccpn code doc.
                 saveProject(ccpnProject, checkValid=True, newPath=entryCodeNew, removeExisting=True)
 

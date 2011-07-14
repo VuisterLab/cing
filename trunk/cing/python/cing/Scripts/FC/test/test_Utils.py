@@ -28,7 +28,7 @@ class AllChecks(TestCase):
         expectedMedianListOldMatplotlib = [ 1.2, 2.0, 2.0] # matplotlib 0.99.3
         for i,floatList in enumerate(lol):
             ml = mlab.prctile(floatList,[50])
-            NTdebug("Found: %s and expected (by new matplotlib): %s" % (ml[0], expectedMedianList[i]))
+            nTdebug("Found: %s and expected (by new matplotlib): %s" % (ml[0], expectedMedianList[i]))
             if ml[0] != expectedMedianList[i]:
                 self.assertEqual(ml[0], expectedMedianListOldMatplotlib[i])
         # end for
@@ -46,7 +46,7 @@ class AllChecks(TestCase):
         ]
 
         for bmrb_id, pdb_id, expected in expectedLoL:
-            NTmessage("Looking at %s %s" % (bmrb_id, pdb_id))
+            nTmessage("Looking at %s %s" % (bmrb_id, pdb_id))
             inputStarFile = os.path.join( cingDirTestsData, 'bmrb','2.1.1','bmr%s.str' )
             if useVersion == '3':
                 inputStarFile = os.path.join( cingDirTestsData, 'bmrb','3.0.8.34','bmr%s.str' )

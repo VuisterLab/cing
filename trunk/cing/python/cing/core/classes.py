@@ -238,7 +238,8 @@ Project: Top level Cing project class
         self.saveXML('version',
                       'name', 'created',
                       'moleculeNames',
-                      'peakListNames', 'distanceListNames', 'dihedralListNames', 'rdcListNames', 'coplanarListNames', 'dihedralByProjectListNames', 'dihedralByResidue',
+                      'peakListNames', 'distanceListNames', 'dihedralListNames', 'rdcListNames', 
+                      'coplanarListNames', 'dihedralByProjectListNames', 'dihedralByResidue',
                       'storedInCcpnFormat',
                       'reports',
                       'history',
@@ -254,16 +255,16 @@ Project: Top level Cing project class
         """
 
         validationConfigurationFile = os.path.join(cingPythonCingDir, VAL_SETS_CFG_DEFAULT_FILENAME)
-#        NTdebug("Using system validation configuration file: " + validationConfigurationFile)
+#        nTdebug("Using system validation configuration file: " + validationConfigurationFile)
         self._readValidationSettingsFromfile(validationConfigurationFile)
         validationConfigurationFile = None
 
         if fn:
             validationConfigurationFile = fn
-#            NTdebug("Using validation configuration file: " + validationConfigurationFile)
+#            nTdebug("Using validation configuration file: " + validationConfigurationFile)
         elif os.path.exists(VAL_SETS_CFG_DEFAULT_FILENAME):
             validationConfigurationFile = VAL_SETS_CFG_DEFAULT_FILENAME
-#            NTdebug("Using local validation configuration file: " + validationConfigurationFile)
+#            nTdebug("Using local validation configuration file: " + validationConfigurationFile)
         if validationConfigurationFile:
             self._readValidationSettingsFromfile(validationConfigurationFile)
 
@@ -272,14 +273,14 @@ Project: Top level Cing project class
     def _readValidationSettingsFromfile(self, fn):
         """Return True on error.   """
         if not fn:
-            NTcodeerror("No input filename given at: _readValidationSettingsFromfile")
+            nTcodeerror("No input filename given at: _readValidationSettingsFromfile")
             return True
 
         if not os.path.exists(fn):
-            NTcodeerror("Input file does not exist at: " + fn)
+            nTcodeerror("Input file does not exist at: " + fn)
             return True
 
-#        NTdebug("Reading validation file: " + fn)
+#        nTdebug("Reading validation file: " + fn)
         config = ConfigParser()
         config.readfp(open(fn))
         for item in config.items('DEFAULT'):
@@ -299,9 +300,9 @@ Project: Top level Cing project class
                 valueFromStr = repr(self.valSets[key])
                 if valueStr == valueFromStr:
                     continue  # no print
-#                NTdebug("Replacing value for key " + key + " from " + valueFromStr + " with " + valueStr)
+#                nTdebug("Replacing value for key " + key + " from " + valueFromStr + " with " + valueStr)
             else:
-#                NTdebug("Adding              key " + key + " with value: " + valueStr)
+#                nTdebug("Adding              key " + key + " with value: " + valueStr)
                 pass
             self.valSets[key] = value # name value pairs.
         #end for
@@ -338,17 +339,17 @@ Project: Top level Cing project class
         GWV  6 Dec 2007: to allow for relative paths.
         JFD 17 Apr 2008: fixed bugs caused by returning 2 values.
         """
-        root, name, ext = NTpath(pathName)
+        root, name, ext = nTpath(pathName)
         if name == '' or name == 'project': # indicate we had a full path
-            root, name, ext = NTpath(root)
+            root, name, ext = nTpath(root)
         #end if
         if (len(ext) > 0 and ext != '.cing'):
-            NTerror('FATAL: unable to parse "%s"; invalid extention "%s"\n', pathName, ext)
+            nTerror('FATAL: unable to parse "%s"; invalid extention "%s"\n', pathName, ext)
 #            exit(1) # no more hard exits for we might call this from GUI or so wrappers
             return None, None
 
         rootp = os.path.join(root, name + '.cing')
-#        NTdebug("rootp, name: [%s] [%s]" % (rootp, name))
+#        nTdebug("rootp, name: [%s] [%s]" % (rootp, name))
         return rootp, name
     #end def
     rootPath = staticmethod(rootPath)
@@ -360,7 +361,7 @@ Project: Top level Cing project class
         """
         d = self.path(*args)
         if not os.path.exists(d):
-#            NTdebug( "project.mkdir: %s" % d )
+#            nTdebug( "project.mkdir: %s" % d )
             os.makedirs(d)
         return d
     #end def
@@ -373,7 +374,7 @@ Project: Top level Cing project class
             return None
         if subdir == None:
             return self.path(self.molecule.name)
-#        NTdebug("moleculePath: subdir, moleculeDirectories[subdir] %s %s" % (subdir, moleculeDirectories[subdir]))
+#        nTdebug("moleculePath: subdir, moleculeDirectories[subdir] %s %s" % (subdir, moleculeDirectories[subdir]))
         return self.path(self.molecule.name, moleculeDirectories[subdir], *args)
     #end def
 
@@ -465,7 +466,7 @@ Project: Top level Cing project class
             pr.addHistory('New project')
             # Save the project data
             obj2XML(pr, path = pr.objectPath)
-#            NTdebug('New project %s', pr)
+#            nTdebug('New project %s', pr)
 
         elif (status == 'create'):
             root, dummy = Project.rootPath(name)
@@ -481,39 +482,39 @@ Project: Top level Cing project class
             possibleTgz = name + ".cing.tgz"
             possibleProjectDir = name + '.cing'
             if os.path.exists(possibleTgz) and not os.path.exists(possibleProjectDir):
-#                NTdebug("Unpacking possibleTgz: " + possibleTgz)
+#                nTdebug("Unpacking possibleTgz: " + possibleTgz)
                 tar = tarfile.open(possibleTgz, "r:gz")
                 for itar in tar:
                     tar.extract(itar.name, '.') # itar is a TarInfo object
-#                    NTdebug("extracted: " + itar.name)
+#                    nTdebug("extracted: " + itar.name)
                 tar.close()
                 if not os.path.exists(possibleProjectDir):
-                    NTerror('Project.open: Failed to find project in .tgz file. Unable to open Project "%s"', name)
+                    nTerror('Project.open: Failed to find project in .tgz file. Unable to open Project "%s"', name)
                     return None
 #            else:
 #                if not os.path.exists(possibleTgz):
-#                    NTdebug("No " + possibleTgz + " found.")
-#                    NTdebug("Skipping .tgz because there's already a .cing")
+#                    nTdebug("No " + possibleTgz + " found.")
+#                    nTdebug("Skipping .tgz because there's already a .cing")
 #                else:
 
             root, newName = Project.rootPath(name)
             if not root:
-                NTerror('Project.open: unable to open Project "%s" because root is [%s].', name, root)
+                nTerror('Project.open: unable to open Project "%s" because root is [%s].', name, root)
                 return None
             if not os.path.exists(root):
-                NTerror('Project.open: unable to open Project "%s" because root [%s] was not found.', name, root)
+                nTerror('Project.open: unable to open Project "%s" because root [%s] was not found.', name, root)
                 return None
             #end if
 
             # Restore Project info from xml-file
             pfile = os.path.join(root, cingPaths.project)
             if not os.path.exists(pfile):
-                NTerror('Project.open: missing Project file "%s"', pfile)
+                nTerror('Project.open: missing Project file "%s"', pfile)
                 return None
             #end if
-            pr = XML2obj(pfile)
+            pr = xML2obj(pfile)
             if pr == None:
-                NTerror('Project.open: error parsing Project file "%s"', pfile)
+                nTerror('Project.open: error parsing Project file "%s"', pfile)
                 return None
             #end if
             # This allows renaming/relative addressing at the shell level
@@ -532,8 +533,8 @@ Project: Top level Cing project class
                 pass
 
             if pr.version <= 0.75:
-                NTmessage('Project.Open: converting from CING version %s', pr.version)
-#                NTdebug('Project.open: conversion: old project settings\n%s', pr.format())
+                nTmessage('Project.Open: converting from CING version %s', pr.version)
+#                nTdebug('Project.open: conversion: old project settings\n%s', pr.format())
 
                 # 0.75 version had moleculeNames stored in molecules attribute
                 # >=0.76 version molecules is a ProjectList instance
@@ -544,11 +545,11 @@ Project: Top level Cing project class
 
                 # store the xmlFile and reopen to have correct settings
                 if obj2XML(pr, path = pfile) != pr:
-                    NTerror('Project.Open: conversion from version %s failed on write', pr.version)
+                    nTerror('Project.Open: conversion from version %s failed on write', pr.version)
                     return None
-                pr = XML2obj(pfile)
+                pr = xML2obj(pfile)
                 if pr == None:
-                    NTerror('Project.Open: conversion from version %s failed on read', pr.version)
+                    nTerror('Project.Open: conversion from version %s failed on read', pr.version)
                     return None
 
                 for molName in pr.moleculeNames:
@@ -556,13 +557,13 @@ Project: Top level Cing project class
                     if pr.version <= 0.48:
                         pathName = pr.path('Molecules', molName) # old reference
                     # end if
-#                    NTdebug('Project.open: trying molecule conversion from %s', pathName)
+#                    nTdebug('Project.open: trying molecule conversion from %s', pathName)
                     if not os.path.exists(pathName):
-                        NTerror('Project.open: old molecule pathName "%s" does not exist.', pathName)
+                        nTerror('Project.open: old molecule pathName "%s" does not exist.', pathName)
                         return None
                     mol = Molecule.openMol_075(pathName)
                     if not mol:
-                        NTerror('Project.Open: conversion from version %s failed on molecule %s', pr.version, molName)
+                        nTerror('Project.Open: conversion from version %s failed on molecule %s', pr.version, molName)
                         return None
                     removedir(pathName)
                     # Save molecule to new format
@@ -592,9 +593,9 @@ Project: Top level Cing project class
             if restore and not pr.contentIsRestored:
                 pr.restore()
             #end if
-            NTmessage('Finished restoring project %s', pr)
+            nTmessage('Finished restoring project %s', pr)
         else:
-            NTerror('ERROR Project.open: invalid status option "%s"', status)
+            nTerror('ERROR Project.open: invalid status option "%s"', status)
             return None
         #end if
 
@@ -604,7 +605,7 @@ Project: Top level Cing project class
         if os.path.exists(tmpdir) and cing.verbosity != cing.verbosityDebug:
             removedir(tmpdir)
         for d in directories.values():            
-#            NTdebug('dir: %r' % d)
+#            nTdebug('dir: %r' % d)
             pr.mkdir(d)
         #end for
 
@@ -646,12 +647,12 @@ Project: Top level Cing project class
         """
 
         if not self.molecule:
-            NTerror('Project.superpose: undefined molecule')
+            nTerror('Project.superpose: undefined molecule')
             return None
         #end if
 
         if self.molecule.modelCount == 0:
-            NTerror('Project.superpose: no coordinates for %s\n', self.molecule)
+            nTerror('Project.superpose: no coordinates for %s\n', self.molecule)
             return None
         #end if
 
@@ -670,8 +671,8 @@ Project: Top level Cing project class
 
         Return True on success.
         """
-        NTmessage('' + dots * 5 + '')
-        NTmessage('==> Saving %s', self)
+        nTmessage('' + dots * 5 + '')
+        nTmessage('==> Saving %s', self)
 
         # Save the molecules
         for mol in self.molecules:
@@ -690,10 +691,10 @@ Project: Top level Cing project class
         for p in self.plugins.values():
             if (not p) or (not hasattr(p, 'saves')) or (not p.saves):
                 pass
-#                NTdebug("Skipping save for disabled plugin: %s" % p)
+#                nTdebug("Skipping save for disabled plugin: %s" % p)
             else:
                 for f, obj in p.saves:
-#                    NTdebug("Save for plugin: %s with %s on object %s" % (p,f,obj))
+#                    nTdebug("Save for plugin: %s with %s on object %s" % (p,f,obj))
                     f(self, obj)
             #end for
         #end for
@@ -702,7 +703,7 @@ Project: Top level Cing project class
         self.version = cingVersion
         # Save the project data to xml file
         if obj2XML(self, path = self.objectPath) != self:
-            NTerror('Project.save: writing Project file "%s" failed', self.objectPath)
+            nTerror('Project.save: writing Project file "%s" failed', self.objectPath)
         #end if
 
         self.addHistory('Saved project')
@@ -714,10 +715,10 @@ Project: Top level Cing project class
         Restore the project: molecules and lists
         """
         if self.contentIsRestored:
-            NTerror("Project.restore: content was already restored")
+            nTerror("Project.restore: content was already restored")
             return
 
-        NTmessage('==> Restoring %s ... ', self)
+        nTmessage('==> Restoring %s ... ', self)
 
         # Molecules
         for molName in self.moleculeNames:
@@ -744,13 +745,13 @@ Project: Top level Cing project class
         # Plugin registered functions
         for p in self.plugins.values():
             if p.isInstalled:
-                for f, o in p.restores:
-#                    NTdebug("Restoring object [%s] with function [%s]" % (f,o))
-                    f(self, o)
+                for f, obj in p.restores:
+#                    nTdebug("Restoring object [%s] with function [%s]" % (f,o))
+                    f(self, obj)
                 #end for
             #end if
         #end for
-        #NTdebug("In classes#restore() doing runCingChecks without output generation.")
+        #nTdebug("In classes#restore() doing runCingChecks without output generation.")
         self.runCingChecks(toFile=False)
         self.contentIsRestored = True
         self.updateProject()
@@ -762,7 +763,7 @@ Project: Top level Cing project class
         try:
             self.removeRecursivelyAttribute(attributeToRemove)
         except:
-            NTerror("Failed removeCcpnReferences")
+            nTerror("Failed removeCcpnReferences")
 
     def getSaveFrameAssign(self):
         """
@@ -770,22 +771,22 @@ Project: Top level Cing project class
         Return None on error.
         """
         if not len(self.distances):
-#            NTdebug("self.project.distances is empty.")
+#            nTdebug("self.project.distances is empty.")
             return
         star_text = getDeepByKeysOrAttributes( self.distances, STEREO_ASSIGNMENT_CORRECTIONS_STAR_STR)
         if not star_text:
-#            NTdebug("No SSA info embedded.")
+#            nTdebug("No SSA info embedded.")
             return
         starFile = File()
         if starFile.parse(text=star_text):
-            NTerror( "In %s reading STAR text by STAR api" % getCallerName() )
+            nTerror( "In %s reading STAR text by STAR api" % getCallerName() )
             return
         if starFile.check_integrity():
-            NTerror( "In %s STAR text failed integrity check." % getCallerName() )
+            nTerror( "In %s STAR text failed integrity check." % getCallerName() )
             return
         sfList = starFile.getSaveFrames(category = "stereo_assignments")
         if not sfList or len(sfList) != 1:
-            NTerror("In %s failed to get single saveframe but got list of: [%s]" % ( getCallerName(), sfList))
+            nTerror("In %s failed to get single saveframe but got list of: [%s]" % ( getCallerName(), sfList))
             return
         saveFrameAssign = sfList[0]
         return saveFrameAssign
@@ -797,7 +798,7 @@ Project: Top level Cing project class
         """
         saveFrameAssign = self.getSaveFrameAssign()
         if not saveFrameAssign:
-#            NTdebug("No SSA saveframe embedded.")
+#            nTdebug("No SSA saveframe embedded.")
             return
         tagTableAssignHeader = saveFrameAssign.tagtables[0]
         gI = tagTableAssignHeader.getInt
@@ -811,12 +812,12 @@ Project: Top level Cing project class
     def export(self):
         """Call export routines from the plugins to export the project
         """
-        NTmessage('' + dots * 5 + '')
-        NTmessage('==> Exporting %s', self)
+        nTmessage('' + dots * 5 + '')
+        nTmessage('==> Exporting %s', self)
 
         for p in self.plugins.values():
-            for f, o in p.exports:
-                f(self, o)
+            for f, obj in p.exports:
+                f(self, obj)
             #end for
         #end for
     #end def
@@ -835,7 +836,8 @@ Project: Top level Cing project class
         """Append molecule to project.molecules; generate required internal directories.
         Return molecule or None on error.
         """
-        if not molecule: return None
+        if not molecule: 
+            return None
 
         # Store names and references and append
         self.molecule = molecule
@@ -894,18 +896,18 @@ Project: Top level Cing project class
         """ Merge resonances for all the atoms
         """
         if not self.molecule:
-            NTerror('Project.mergeResonances: No molecule defined\n')
+            nTerror('Project.mergeResonances: No molecule defined\n')
             return
         #end if
         self.molecule.mergeResonances(order = order, selection = selection, append = append)
-        NTdetail("==> Merged resonances")
+        nTdetail("==> Merged resonances")
     #end def
 
     def initResonances(self):
         """ Initialize resonances for all the atoms
         """
         if not self.molecule:
-            NTerror('Project.initResonances: No molecule defined\n')
+            nTerror('Project.initResonances: No molecule defined\n')
             return
         self.molecule.initResonances()
     #end def
@@ -926,11 +928,11 @@ Project: Top level Cing project class
         logsPattern = self.path(directories.logs, '*.txt')
         logFileList = glob(logsPattern)
         if not logFileList:
-            NTmessage("No log files found")
+            nTmessage("No log files found")
             return
         logFileList.sort()
         for logFile in logFileList[:-1]:
-            NTdebug("Removing older log file %s" % logFile)
+            nTdebug("Removing older log file %s" % logFile)
             os.unlink(logFile)
     #end def
 
@@ -942,22 +944,22 @@ Project: Top level Cing project class
         fn = "%s_%s.txt" % (self.name, date_stamp )
         logFilePath = self.path(directories.logs, fn)
         stream2 = open(logFilePath, 'w')
-#        NTdebug("Opening %s" % logFilePath )
-        addStreamNTmessageList(stream2)
+#        nTdebug("Opening %s" % logFilePath )
+        addStreamnTmessageList(stream2)
         fprintf(stream2,header+'\n')
         fprintf(stream2,getStartMessage()+'\n')
-#        NTdebug("Opened %s (should now show up in log too)" % logFilePath )
+#        nTdebug("Opened %s (should now show up in log too)" % logFilePath )
     #end def
 
     def closeLog(self):
-#        NTdebug("Closing log" )
-        if NTdebug.stream2 == None:
-            NTdebug("Strange in project.removeLog stream2 was already closed.")
+#        nTdebug("Closing log" )
+        if nTdebug.stream2 == None:
+            nTdebug("Strange in project.removeLog stream2 was already closed.")
             return
-        stream2 = NTdebug.stream2
+        stream2 = nTdebug.stream2
         fprintf(stream2, getStopMessage(cing.starttime)+'\n')
-        removeStreamNTmessageList()
-#        NTdebug("Closed stream2 (should now NOT show up in log too)" )
+        removeStreamnTmessageList()
+#        nTdebug("Closed stream2 (should now NOT show up in log too)" )
     #end def
 
     def getLogFileNameList(self, latestListedFirst = True):
@@ -974,7 +976,7 @@ Project: Top level Cing project class
             # end if
         # end if
 #        l = len(logFileList)
-#        NTdebug("Found %d logs: %s" % (l, str(logFileList)))
+#        nTdebug("Found %d logs: %s" % (l, str(logFileList)))
         return logFileList
 #    def newPeakList( self, name, status='keep'):
 #        """Dummy for compatibility
@@ -992,7 +994,7 @@ Project: Top level Cing project class
     def analyzeRestraints(self):
         """Call analyze method for all restraint lists
         """
-        NTdetail('==> Analyzing restraints')
+        nTdetail('==> Analyzing restraints')
         for drl in self.allRestraintLists():
             drl.analyze()
     #end def
@@ -1089,17 +1091,18 @@ Project: Top level Cing project class
         before exiting."""
         pathString, _name = self.rootPath(self.name)
         if not os.path.exists(pathString):
-#            NTdebug("No cing project is found at: " + pathString)
+#            nTdebug("No cing project is found at: " + pathString)
             return None
-        NTmessage('Removing existing cing project "%s"', self)
+        nTmessage('Removing existing cing project "%s"', self)
         if rmtree(pathString):
-            NTerror("Failed to remove existing cing project")
+            nTerror("Failed to remove existing cing project")
             return True
 
     # Convenience methods calls to validate.py.
     def initPDB(self, pdbFile, convention = IUPAC, name = None, nmodels = None, update = True, allowNonStandardResidue = True):
         """Initializes from a pdb file."""
-        return initPDB(self, pdbFile, convention = convention, name = name, nmodels = nmodels, update = update, allowNonStandardResidue = allowNonStandardResidue)
+        return initPDB(self, pdbFile, convention = convention, name = name, nmodels = nmodels, update = update, 
+                       allowNonStandardResidue = allowNonStandardResidue)
 
     def importPDB(self, pdbFile, convention = IUPAC, nmodels = None):
         """Initializes from a pdb file."""
@@ -1178,67 +1181,67 @@ Project: Top level Cing project class
     def filterHighRestraintViol(self, restraintLoL = None, cutoff=2.0, maxRemove=3, toFile=True,
                                 fileName = DISTANCE_RESTRAINT_LIST_HIGH_VIOLATIONS_FILTERED_STR):
 #        cutoff= 0.10 # DEFAULT: disabled
-        NTmessage( "==> Doing filterHighDistanceViol with arguments: cutoff %s maxRemove %s" % ( cutoff, maxRemove))
+        nTmessage( "==> Doing filterHighDistanceViol with arguments: cutoff %s maxRemove %s" % ( cutoff, maxRemove))
 
         if restraintLoL == None:
             restraintLoL = self.distances
 
         if not restraintLoL:
-            NTdebug("No restraint list in filterHighDistanceViol.")
+            nTdebug("No restraint list in filterHighDistanceViol.")
             return 1
         # end if
         # Get instance of DistanceRestraintList
         restraintList = self.allRestraints() # defaults to DRs
-#        NTdebug("restraintList: %s" % restraintList)
+#        nTdebug("restraintList: %s" % restraintList)
         todoCount = len(restraintList)
         if not todoCount:
-            NTdebug("No restraints in filterHighDistanceViol.")
+            nTdebug("No restraints in filterHighDistanceViol.")
             return 1
         # end if
 
         if not restraintList.analyze():
-            NTerror("Failed to do restraintList.analyze()");
+            nTerror("Failed to do restraintList.analyze()")
             return
         # end if
-#        NTdebug("restraintList still: %s" % restraintList)
+#        nTdebug("restraintList still: %s" % restraintList)
         restraintList.sort(byItem='violMax') # in place by default
         restraintList.reverse()
-#        NTdebug("restraintList 3: %s" % restraintList)
+#        nTdebug("restraintList 3: %s" % restraintList)
         maxViol = restraintList[0].violMax
-#        NTdebug("Highest violation is %.3f. (should be same as %.3f from list.)" % (maxViol, restraintList.violMax))
+#        nTdebug("Highest violation is %.3f. (should be same as %.3f from list.)" % (maxViol, restraintList.violMax))
         toRemoveCount = min(maxRemove, todoCount)
 #        restraintListToRemove = restraintList[:toRemoveCount] # slicing changes the data type from DistanceRestraintList to NTlist
         del restraintList[toRemoveCount:]
-#        NTdebug("restraintListToRemove still: %s" % restraintList)
+#        nTdebug("restraintListToRemove still: %s" % restraintList)
 
-#        NTdebug("Checking %s restraints to remove." % toRemoveCount)
+#        nTdebug("Checking %s restraints to remove." % toRemoveCount)
 
         toRemoveCount = 0
         for idx, r in enumerate( restraintList ):
-#            NTdebug("Checking %s %s" % ( idx, r))
+#            nTdebug("Checking %s %s" % ( idx, r))
             if r.violMax >= cutoff:
-#                NTdebug("toRemoveCount %s" % toRemoveCount)
+#                nTdebug("toRemoveCount %s" % toRemoveCount)
                 toRemoveCount = idx + 1 # First restraint to be maintained.
             else:
                 break
         # end for
 
         if toRemoveCount == len(restraintList):
-#            NTdebug("All restraints are high violating")
+#            nTdebug("All restraints are high violating")
             pass
         else:
-#            NTdebug("Restraints high violating found: %s" % toRemoveCount)
+#            nTdebug("Restraints high violating found: %s" % toRemoveCount)
 #            restraintListToRemove = restraintListToRemove[:toRemoveCount] # slice fails
             del restraintList[toRemoveCount:]
         if not toRemoveCount:
             if maxViol >= cutoff:
-                NTerror('code bug in filterHighDistanceViol')
+                nTerror('code bug in filterHighDistanceViol')
                 return
-            NTmessage("==> Nice, no restraints with violations above: %.3f (highest is: %.3f)" % (cutoff, maxViol))
+            nTmessage("==> Nice, no restraints with violations above: %.3f (highest is: %.3f)" % (cutoff, maxViol))
             return 1
 
         if not restraintList.analyze():
-            NTerror("Failed to do restraintList.analyze()");
+            nTerror("Failed to do restraintList.analyze()")
             return
         # end if
 
@@ -1251,21 +1254,21 @@ Project: Top level Cing project class
                 affectedRestraintLoL.append(rL)
         for rL in affectedRestraintLoL:
             if not rL.analyze():
-                NTerror("Failed to do restraintList.analyze()");
+                nTerror("Failed to do restraintList.analyze()")
                 return
             # end if
-#            NTdebug("Left with: %s" % rL)
+#            nTdebug("Left with: %s" % rL)
         #end for
 
         txt = restraintList.format(showAll=True)
         if toFile:
             fileName = self.path(self.molecule.name, self.moleculeDirectories.analysis, fileName)
-            NTmessage( '==> %s, removed %s restraints and written to %s' % ( getCallerName(), len(restraintList), fileName))
+            nTmessage( '==> %s, removed %s restraints and written to %s' % ( getCallerName(), len(restraintList), fileName))
             writeTextToFile(fileName, txt)
         else:
-            NTmessage( "Removed distance restraints:\n" + txt)
+            nTmessage( "Removed distance restraints:\n" + txt)
         #end if
-#        NTmessage("Finished filterHighDistanceViol")
+#        nTmessage("Finished filterHighDistanceViol")
         return True # success
     # end def
 # end class
@@ -1279,7 +1282,8 @@ class XMLProjectHandler(XMLhandler):
 
     def handle(self, node):
         attrs = self.handleDictElements(node)
-        if attrs == None: return None
+        if attrs == None: 
+            return None
         result = Project(name = attrs['name'])
 
         # update the attrs values
@@ -1291,20 +1295,6 @@ class XMLProjectHandler(XMLhandler):
 
 #register this handler
 projecthandler = XMLProjectHandler()
-
-class ProjectListMember():
-    """An element of ProjectList always has certain attributes to add.
-    """
-    def __init__(self):
-        """
-        Just add some properties.
-        """
-        self.project = None
-        self.objectPath = None
-        self.projectList = None
-    # end def
-# end class
-
 
 class ProjectList(NTlist):
     """Generic Project list class: the list of lists of the project; e.g. molecules, peaks, ...
@@ -1351,7 +1341,7 @@ class ProjectList(NTlist):
         self.append (instance)
         s = sprintf('New "%s" instance named "%s"', self.className(), uname)
         self.project.history(s)
-#        NTdebug( s )
+#        nTdebug( s )
         #end if
         return instance
     #end def
@@ -1366,12 +1356,12 @@ class ProjectList(NTlist):
         Return a list of names
         """
         saved = NTlist()
-        for l in self:
-#            NTdebug('l is %s' % l)
-            if l.status == 'keep':
-                NTdetail('==> Saving %s to %s', l, l.objectPath)
-                if self.classDef.SMLhandler.toFile(l, l.objectPath) == l:
-                    saved.append(l.name)
+        for myList in self:
+#            nTdebug('myList is %s' % myList)
+            if myList.status == 'keep':
+                nTdetail('==> Saving %s to %s', myList, myList.objectPath)
+                if self.classDef.SMLhandler.toFile(myList, myList.objectPath) == myList:
+                    saved.append(myList.name)
             #end if
         #end for
         self.project[self.nameListKey] = saved
@@ -1392,10 +1382,10 @@ class ProjectList(NTlist):
             names = self.project[self.nameListKey]
         for name in names:
             path = self.path(name)
-            l = self.classDef.SMLhandler.fromFile(path, self.project) # Lists get append to project by SML routines
-            if l != None:
-                NTdetail('==> Restored %s from %s', l, path)
-                l.objectPath = path
+            myList = self.classDef.SMLhandler.fromFile(path, self.project) # Lists get append to project by SML routines
+            if myList != None:
+                nTdetail('==> Restored %s from %s', myList, path)
+                myList.objectPath = path
             #end if
         #end for
     #end def
@@ -1403,13 +1393,13 @@ class ProjectList(NTlist):
     def names(self, *patterns):
         "Return a list of names of self, optionally screen using pattern"
         names = NTlist()
-        for l in self:
+        for myList in self:
             if len(patterns) == 0:
-                names.append(l.name)
+                names.append(myList.name)
             else:
                 for p in patterns:
-                    if matchString(l.name, p):
-                        names.append(l.name)
+                    if matchString(myList.name, p):
+                        names.append(myList.name)
                         break
                     #end if
                 #end for
@@ -1425,9 +1415,9 @@ class ProjectList(NTlist):
             return
         return self[idx]
 
-    def getListIdx(self, l):
+    def getListIdx(self, myList):
         "Return list by name or False"
-        name = l.name
+        name = myList.name
         names = self.names()
         return names.index(name)
 
@@ -1437,19 +1427,19 @@ class ProjectList(NTlist):
         return the listitem of None on error
         """
         if not oldName in self.names():
-            NTerror('ProjectList.rename: old name "%s" not found', oldName)
+            nTerror('ProjectList.rename: old name "%s" not found', oldName)
             return None
         #end if
         if newName in self.project:
-            NTerror('ProjectList.rename: new name "%s" already exists in %s', oldName, self.project)
+            nTerror('ProjectList.rename: new name "%s" already exists in %s', oldName, self.project)
             return None
         #end if
-        l = self.project[oldName]
+        myList = self.project[oldName]
         del(self.project[oldName])
-        l.name = newName
-        self.project[newName] = l
-        l.objectPath = self.path(l.name)
-        return l
+        myList.name = newName
+        self.project[newName] = myList
+        myList.objectPath = self.path(myList.name)
+        return myList
     #end def
 
     def getNextValidName(self, prefix = 'projectList_'):
@@ -1459,7 +1449,7 @@ class ProjectList(NTlist):
             if not posName in self.names():
                 return posName
             i += 1
-        NTerror("Failed to return ProjectList.getNextValidName")
+        nTerror("Failed to return ProjectList.getNextValidName")
 
     def delete(self, name):
         """
@@ -1467,17 +1457,17 @@ class ProjectList(NTlist):
         return the listitem of None on error
         """
         if not name in self.names():
-            NTerror('ProjectList.delete: name "%s" not found', name)
+            nTerror('ProjectList.delete: name "%s" not found', name)
             return None
         #end if
 
         s = sprintf('Deleted instance named "%s"' % name)
         self.project.history(s)
 
-        l = self.project[name]
+        myList = self.project[name]
         del(self.project[name])
-        NTlist.remove(self, l)
-        return l
+        NTlist.remove(self, myList)
+        return myList
     #end def
 
     def className(self):
@@ -1515,7 +1505,7 @@ class ProjectTree( NTtree ):
         if not project:
             return
         #self.entries.append(project)
-        self._addChild(project)
+        self.addChild2(project)
         project.id = self.next_id
         self.next_id += 1
 
@@ -1531,7 +1521,7 @@ class ProjectTree( NTtree ):
         """
         project = Project.open( path, status=status)
         if not project:
-            NTerror('ProjectTree.open: aborting')
+            nTerror('ProjectTree.open: aborting')
             sys.exit(1)
 
         self.append( project )
@@ -1549,21 +1539,21 @@ for i,g in enumerate(groups):
     groupDefs[g] = NTdict( id = i, color = colors[g], name=g, __FORMAT__ = 'Group %(name)-10s (%(id)2d), color %(color)s' )
         """
         if not self.groups:
-            NTerror("Failed to find instance variable groups.")
+            nTerror("Failed to find instance variable groups.")
 
         if not self.groupDefs:
-            NTdebug("Will skip setting group defs.")
+            nTdebug("Will skip setting group defs.")
 
         for group in self.groups:
             entryId = self.name + group
             path = os.path.join(DATA_STR, entryId[1:3],  entryId, entryId + '.cing')
-            NTdebug('opening %s', path)
+            nTdebug('opening %s', path)
             p = self.openProject( path )
             if not p:
-                NTerror('Strange: no project, aborting')
+                nTerror('Strange: no project, aborting')
                 return True
             if p.molecule == None:
-                NTerror('Strange: no molecule, aborting')
+                nTerror('Strange: no molecule, aborting')
                 return True
             p.target = self.name
             p.group  = group
@@ -1583,7 +1573,7 @@ for i,g in enumerate(groups):
             ctuple2 = tuple(ctuple2)
             c2 = p2.decodeNameTuple(ctuple2)
             if c2==None:
-                NTerror('ProjectTree._mapIt: error mapping %s to %s (derived from %s)', ctuple2, p2, p1)
+                nTerror('ProjectTree._mapIt: error mapping %s to %s (derived from %s)', ctuple2, p2, p1)
 
             self.moleculeMap.setdefault(c1, NTdict())
             self.moleculeMap[c1][(p1.name,p1.molecule.name)] = c1
@@ -1626,7 +1616,7 @@ for i,g in enumerate(groups):
         """
         path = self.path(*args)
         if not os.path.exists(path):
-#            NTdebug( "project.mkdir: %s" % dir )
+#            nTdebug( "project.mkdir: %s" % dir )
             os.makedirs(path)
         return path
     #end def
@@ -1668,21 +1658,21 @@ ranges:  %s
         l1 = len(models1)
         l2 = len(models2)
         if l1 == 0 or len(models1[0]) == 0 or l2 == 0 or len(models2[0]) == 0:
-            NTdebug(">calculatePairWisePhiPsiRmsd> returning None, %s %s %s", l1, l2, ranges)
+            nTdebug(">calculatePairWisePhiPsiRmsd> returning None, %s %s %s", l1, l2, ranges)
             return None, None, None, None
 
         models = models1 + models2
 
         result = NTlistOfLists(len(models), len(models), 0.0)
 
-        #NTmessage( '==> Calculating dihedral pairwise rmsds' )
+        #nTmessage( '==> Calculating dihedral pairwise rmsds' )
 
         for i in range(len(models)):
             for j in range(i+1, len(models)):
                 #print '>>', i,j
                 r = models[i].calculateRMSD( models[j] )
                 if r == None:
-                    NTdebug('calculatePairWisePhiPsiRmsd: error for %s and %s', models[i], models[j])
+                    nTdebug('calculatePairWisePhiPsiRmsd: error for %s and %s', models[i], models[j])
                     return None, None, None, None
                 else:
                     result[i][j] = r
@@ -1719,11 +1709,11 @@ ranges:  %s
 
     def calcPhiPsiRmsds( self, ranges='auto', relative = True ):
 
-        l = len(self)
+        n = len(self)
 
-        rmsds = NTlistOfLists( l, l, NTvalue(NaN, NaN, fmt='%6.2f +- %5.2f' ) )
-        for i in range(l):
-            for j in range(i+1,l):
+        rmsds = NTlistOfLists( n, n, NTvalue(NaN, NaN, fmt='%6.2f +- %5.2f' ) )
+        for i in range(n):
+            for j in range(i+1,n):
                 #print self[i].group, self[j].group
                 rmsds[i].group = self[i].group
                 rmsds[j].group = self[j].group
@@ -1769,7 +1759,7 @@ ranges:  %s
             or l2 == 0 or len(mol2.ensemble[0].fitCoordinates) == 0
             or len(mol1.ensemble[0].fitCoordinates) != len(mol2.ensemble[0].fitCoordinates)
         ):
-            NTdebug( ">calculatePairWiseRmsd> returning None, %s %s %s" , l1, l2, ranges)
+            nTdebug( ">calculatePairWiseRmsd> returning None, %s %s %s" , l1, l2, ranges)
             return None, None, None, None
 
 
@@ -1777,7 +1767,7 @@ ranges:  %s
 
         result = NTlistOfLists(len(models), len(models), 0.0)
 
-        NTmessage('==> Calculating pairwise rmsds %s %s', mol1, mol2)
+        nTmessage('==> Calculating pairwise rmsds %s %s', mol1, mol2)
 
         for i in range(len(models)):
             for j in range(i+1, len(models)):
@@ -1805,17 +1795,19 @@ ranges:  %s
 
     #            print '12>', i,j
     #    print len(pairwise1), len(pairwise2), len(pairwise12)
-        return result, pairwise1.average2(fmt='%6.2f +- %5.2f'),pairwise2.average2(fmt='%6.2f +- %5.2f'),pairwise12.average2(fmt='%6.2f +- %5.2f')
+        return (result, pairwise1.average2( fmt='%6.2f +- %5.2f'),
+                        pairwise2.average2( fmt='%6.2f +- %5.2f'),
+                        pairwise12.average2(fmt='%6.2f +- %5.2f') )
     #end def
 
 
     def calcRmsds( self, ranges='auto' ):
 
-        l = len(self)
+        n = len(self)
 
-        rmsds = NTlistOfLists( l, l, NTvalue(NaN, NaN, fmt='%6.2f +- %5.2f' ) )
-        for i in range(l):
-            for j in range(i+1,l):
+        rmsds = NTlistOfLists( n, n, NTvalue(NaN, NaN, fmt='%6.2f +- %5.2f' ) )
+        for i in range(n):
+            for j in range(i+1,n):
                 #print self[i].group, self[j].group
                 rmsds[i].group = self[i].group
                 rmsds[j].group = self[j].group
@@ -1832,41 +1824,41 @@ ranges:  %s
         return rmsds
     #end def
 
-
     def printTitle(self, title, length, stream=sys.stdout ):
         line = '-'*length
         fprintf( stream, '%s\n  %s\n%s\n', line, title, line )
     #end def
 
     def printRmsds( self, title, rmsds, stream=sys.stdout ):
-        l = len(rmsds)
-        self.printTitle(title, 20*(l+1), stream)
+        n = len(rmsds)
+        self.printTitle(title, 20*(n+1), stream)
         fprintf( stream, '%-20s%s\n','', rmsds.zap('group').format('  %-16s  '))
         for row in rmsds:
             fprintf( stream, '%-20s%s\n',  row.group, row.format('%-18s  '))
-        fprintf( stream, '%s\n', '_'*20*(l+1))
+        fprintf( stream, '%s\n', '_'*20*(n+1))
     #end def
 
     def printScore( self, name, rogScore ):
         clist = rogScore.colorCommentList.zap(1)
-        if len(clist) == 0: clist.append('---')
+        if len(clist) == 0: 
+            clist.append('---')
         printf('%-20s%-10s %s\n', name, rogScore, clist[0])
         for c in clist[1:]:
             printf('%-20s%-10s %s\n', '', '', c)
     #end def
 
     def printOverallScores( self, stream = sys.stdout ):
-        # Overall scores
+        'Overall scores'
 
-        l = len(self)
-        if l == 0:
+        n = len(self)
+        if n == 0:
             return
 
         for p in self:
            p.cingSummary = p.getCingSummaryDict()
 
-        self.printTitle('Overall scores target '+self.name, 20*(l+1), stream)
-    #    line = dots20*(l+1)
+        self.printTitle('Overall scores target '+self.name, 20*(n+1), stream)
+    #    line = dots20*(n+1)
     #   fprintf( stream, '%s\n    Overall scores %s\n%s\n\n', line, self.name, line )
         fprintf( stream, '%-20s%s\n\n', 'Parameter', self.entries.zap('group').format('%-20s'))
 
@@ -1892,7 +1884,7 @@ ranges:  %s
 #            key = 'WI_'+self[0].molecule.runWhatif.cingCheckId(checkId)
             key = getDeepByKeysOrAttributes( self,0,'molecule','runWhatif', 'cingCheckId', 'checkId')
             if not key:
-                NTmessage("Skipping values for unspecified checkId: %s" % checkId)
+                nTmessage("Skipping values for unspecified checkId: %s" % checkId)
                 continue
             key = 'WI_'+ key
             fprintf( stream, '%-20s', key)
@@ -1905,13 +1897,13 @@ ranges:  %s
 
     def printRestraintScores( self, stream=sys.stdout ):
 
-        l = len(self)
-        if l == 0:
+        n = len(self)
+        if n == 0:
             return
 
-    #    print dots20*(l+1)
+    #    print dots20*(n+1)
     #    print ' Restraints target', self[0].target
-    #    print dots20*(l+1)
+    #    print dots20*(n+1)
     #    print
 
         hlen=40
@@ -1961,11 +1953,11 @@ ranges:  %s
 
     def printResidueScores( self ):
 
-        l = len(self)
+        n = len(self)
 
-        print dots20*(l+1)
-        print '    Residues'
-        print dots20*(l+1)
+        nTmessage( dots20*(n+1) )
+        nTmessage( '    Residues' )
+        nTmessage( dots20*(n+1) )
         p0 = self[0]
         for res in p0.molecule.allResidues():
             printf('%s %s %s\n',  '-'*5, res, '-'*5 )
@@ -1982,7 +1974,7 @@ ranges:  %s
                     printf('%-20s%-10s\n', p.name, 'Not found')
                 #end if
             #end for
-            print
+            nTmessage('')
         #end for
     #end def
 
@@ -1999,7 +1991,7 @@ ranges:  %s
             for p in self.entries[1:]:
                 val = getDeepByKeysOrAttributes(self, 'moleculeMap', res, p.name)
                 if val == None:
-                    NTerror('Setting phipsiRmsds residue %s project %s (mapping not found)', res.name, p)
+                    nTerror('Setting phipsiRmsds residue %s project %s (mapping not found)', res.name, p)
                     continue
                 val.phipsiRmsds = rmsds3
             #end for
@@ -2117,7 +2109,7 @@ ranges:  %s
                                 minValue = 0.0, maxValue = 1.0, reverseColorScheme = False,
                                 path = None ):
 
-        NTdebug('mkYasaraByResidueMacro: keys: %s, minValue: %s maxValue: %s', keys, minValue, maxValue)
+        nTdebug('mkYasaraByResidueMacro: keys: %s, minValue: %s maxValue: %s', keys, minValue, maxValue)
         if path==None:
             stream = sys.stdout
         else:
@@ -2217,9 +2209,11 @@ ranges:  %s
                 psi.cAverage()
 
                 use1 = 0
-                if (2.0 - res.PHI.cv - res.PSI.cv > cutoff): use1 = 1
+                if (2.0 - res.PHI.cv - res.PSI.cv > cutoff): 
+                    use1 = 1
                 use2 = 0
-                if (2.0 - phi.cv - psi.cv > cutoff): use2 = 1
+                if (2.0 - phi.cv - psi.cv > cutoff): 
+                    use2 = 1
                 #printf('%-35s %-35s  %6.2f  %1d     %6.2f %6.2f   %6.2f  %1d     %2d\n',
                 #       res.PHI, res.PSI, 2.0 - res.PHI.cv - res.PSI.cv, use1,
                  #      phi.cv, psi.cv, 2.0 - phi.cv - psi.cv, use2, use1-use2
@@ -2240,12 +2234,12 @@ class CircularVector( NTvector ):
     Circular Distance vector class
     """
     def distanceSquared( self, other, period=360.0 ):
-        l = len(self)
-        if l != len(other):
+        n = len(self)
+        if n != len(other):
             return None
 
         d = 0.0
-        for i in range(l):
+        for i in range(n):
             delta = self[i]-other[i]
             fdelta = math.fabs( delta )
 
@@ -2282,15 +2276,15 @@ class PhiPsiModelList( NTlist ):
     #end def
 
     def calculateRMSD( self, other ):
-        l = len(self)
-        if l != len(other) or l==0:
+        n = len(self)
+        if n != len(other) or n==0:
             return -1.0
 
         rmsd = 0.0
-        for i in range(l):
+        for i in range(n):
             rmsd += self[i].distanceSquared(other[i], period=360.0)
             #print '>',i, self[i].residue, other[i].residue, rmsd
-        return math.sqrt( rmsd/l )
+        return math.sqrt( rmsd/n )
     #end def
 
     def __str__(self):
@@ -2380,13 +2374,13 @@ class Peak(NTdict, Lister):
         if resonances:
             self.resonances = NTlist(*resonances)
         else:
-            self.resonances = NTfill(None, dimension)
+            self.resonances = nTfill(None, dimension)
         #end if
 
         if positions:
             self.positions = NTlist(*positions)
         else:
-            self.positions = NTfill(NaN, dimension)
+            self.positions = nTfill(NaN, dimension)
         #end if
 
         self.height = NTvalue(height, heightError, Peak.HEIGHT_VOLUME_FORMAT, Peak.HEIGHT_VOLUME_FORMAT2)
@@ -2513,11 +2507,11 @@ class PeakList(NTlist, ProjectListMember):
         if not path: 
             path = self.objectPath
         if self.SMLhandler.toFile(self, path) != self:
-            NTerror('PeakList.save: failed creating "%s"', path)
+            nTerror('PeakList.save: failed creating "%s"', path)
             return None
         #end if
 
-        NTdetail('==> Saved %s to "%s"', self, path)
+        nTdetail('==> Saved %s to "%s"', self, path)
         return self
     #end def
 
@@ -2570,6 +2564,9 @@ class Restraint(NTdict):
 #            lAtom  = len(self.atomPairs)
             for atompair in self.atomPairs:
                 for atom in atompair:
+                    if not isinstance(atom, Atom):
+                        nTerror("Failed to get atom in atom pair in %s for %s" % (getCallerName(), self))
+                        return None
                     modelCount = atom.getModelCount()
                     if modelCount != None:
                         return modelCount
@@ -2579,13 +2576,13 @@ class Restraint(NTdict):
                 modelCount = atom.getModelCount()
                 if modelCount != None:
                     return modelCount
-#        NTwarning("%s.getModelCount returned None for all %d atom(pair)s; giving up." % (self.__CLASS__, lAtom))
+#        nTwarning("%s.getModelCount returned None for all %d atom(pair)s; giving up." % (self.__CLASS__, lAtom))
         return None
     #end def
 
     def isValidForAquaExport(self):
         """Determine if the restraint can be exported to Aqua."""
-        NTerror("Restraint.isValidForAquaExport needs to be overriden.")
+        nTerror("Restraint.isValidForAquaExport needs to be overriden.")
     #end def
 
     def listViolatingModels(self, cutoff = 0.3):
@@ -2639,7 +2636,7 @@ class DistanceRestraint(Restraint):
 
         for pair in atomPairs:
             if self.appendPair(pair):
-#                NTdebug('resetting self.isValid')
+#                nTdebug('resetting self.isValid')
                 self.isValid = False
                 return
         #end for
@@ -2654,19 +2651,19 @@ class DistanceRestraint(Restraint):
           [ HA ] [ HD ] ]
         """
         if not self.atomPairs:
-#            NTdebug("Failed to find any atom pair in %s" % self)
+#            nTdebug("Failed to find any atom pair in %s" % self)
             return False
         for i, atomPair in enumerate(self.atomPairs): #@UnusedVariable
             if not atomPair: # eg [ HA ] [ HB,HC ]
-#                NTdebug("Failed to find any atomList (should always be 2 present) in atompair %d of:\n%s" % (i,self))
+#                nTdebug("Failed to find any atomList (should always be 2 present) in atompair %d of:\n%s" % (i,self))
                 return False
             for j, atomList in enumerate(atomPair): #@UnusedVariable
                 if not atomList: # eg [ HB,HC ]
-#                    NTdebug("Failed to find any atom in atomList (%d,%d) of %s" % (i,j,self))
+#                    nTdebug("Failed to find any atom in atomList (%d,%d) of %s" % (i,j,self))
                     return False
                 for k, atom in enumerate(atomList): #@UnusedVariable
                     if not atom: # eg HB
-#                        NTdebug("Failed to find atom in atomList (%d,%d,%d) of %s" % (i,j,k,self))
+#                        nTdebug("Failed to find atom in atomList (%d,%d,%d) of %s" % (i,j,k,self))
                         return False
         return True
     #end def
@@ -2676,34 +2673,34 @@ class DistanceRestraint(Restraint):
         """Only the self violations,violMax and violSd needs to be set before calling this routine"""
 
         self.rogScore.reset()
-#        NTdebug( '%s' % self )
+#        nTdebug( '%s' % self )
         if (project.valSets.DR_MAXALL_BAD != None) and (self.violMax >= project.valSets.DR_MAXALL_BAD):
             comment = 'violMax: %7.2f' % self.violMax
-#            NTdebug(comment)
+#            nTdebug(comment)
             self.rogScore.setMaxColor(COLOR_RED, comment)
         elif (project.valSets.DR_MAXALL_POOR != None) and (self.violMax >= project.valSets.DR_MAXALL_POOR):
             comment = 'violMax: %7.2f' % self.violMax
-#            NTdebug(comment)
+#            nTdebug(comment)
             self.rogScore.setMaxColor(COLOR_ORANGE, comment)
         if (project.valSets.DR_THRESHOLD_OVER_POOR != None) and (project.valSets.DR_THRESHOLD_FRAC_POOR != None):
             fractionAbove = getFractionAbove(self.violations, project.valSets.DR_THRESHOLD_OVER_POOR)
             if fractionAbove >= project.valSets.DR_THRESHOLD_FRAC_POOR:
                 comment = 'fractionAbove: %7.2f' % fractionAbove
-    #            NTdebug(comment)
+    #            nTdebug(comment)
                 self.rogScore.setMaxColor(COLOR_ORANGE, comment)
         if (project.valSets.DR_THRESHOLD_OVER_BAD != None) and (project.valSets.DR_THRESHOLD_FRAC_BAD != None):
             fractionAbove = getFractionAbove(self.violations, project.valSets.DR_THRESHOLD_OVER_BAD)
             if fractionAbove >= project.valSets.DR_THRESHOLD_FRAC_BAD:
                 comment = 'fractionAbove: %7.2f' % fractionAbove
-    #            NTdebug(comment)
+    #            nTdebug(comment)
                 self.rogScore.setMaxColor(COLOR_RED, comment)
         if (project.valSets.DR_RMSALL_BAD != None) and (self.violSd >= project.valSets.DR_RMSALL_BAD):
             comment = 'violSd: %7.2f' % self.violSd
-#            NTdebug(comment)
+#            nTdebug(comment)
             self.rogScore.setMaxColor(COLOR_RED, comment)
         elif (project.valSets.DR_RMSALL_POOR != None) and (self.violSd >= project.valSets.DR_RMSALL_POOR):
             comment = 'violSd: %7.2f' % self.violSd
-#            NTdebug(comment)
+#            nTdebug(comment)
             self.rogScore.setMaxColor(COLOR_ORANGE, comment)
 
 
@@ -2719,7 +2716,7 @@ class DistanceRestraint(Restraint):
                                                  # incompleteness
                     #if len(a.coordinates) < modelCount:
                         msg = "Missing coordinates (%s)" % a.toString()
-#                        NTdebug(msg)
+#                        nTdebug(msg)
                         self.rogScore.setMaxColor(COLOR_RED, msg)
                     #end if
                 #end for
@@ -2738,23 +2735,23 @@ class DistanceRestraint(Restraint):
             status = self.simplifyForFc()
             if status == self.STATUS_SIMPLIFIED:
                 statusOverall = status
-#                NTdebug("simplified restraint %s" % self)
+#                nTdebug("simplified restraint %s" % self)
             elif status == self.STATUS_NOT_SIMPLIFIED:
                 pass
-#                NTdebug("not simplified restraint %s" % self)
+#                nTdebug("not simplified restraint %s" % self)
             else:
-                NTerror("Encountered an error simplifying restraint %s" % self)
+                nTerror("Encountered an error simplifying restraint %s" % self)
                 return True
             # end if
         # end while
 
         if self.removeDuplicateAtomPairs():
-            NTerror("Encountered an error in removeDuplicateAtomPairs restraint %s" % self)
+            nTerror("Encountered an error in removeDuplicateAtomPairs restraint %s" % self)
             return True
         # end if
         while self.removeDuplicateAtomPairs2() == self.STATUS_REMOVED_DUPLICATE:
             pass
-#            NTdebug("Removed duplicate")
+#            nTdebug("Removed duplicate")
         # end if
         return statusOverall
     #end def
@@ -2772,7 +2769,7 @@ class DistanceRestraint(Restraint):
         STATUS_NOT_DEASSIGNED = 'not deassigned'
         """
 
-        NTdebug('Starting 123 deassignStereospecificity for %s' % ( self ) )
+        nTdebug('Starting 123 deassignStereospecificity for %s' % ( self ) )
         isDeassigned = False
 
         for atomPairIdx in range(len(self.atomPairs)):
@@ -2790,7 +2787,7 @@ class DistanceRestraint(Restraint):
                 atomPair = newTuple
                 self.atomPairs[atomPairIdx] = atomPair
                 isDeassigned = True
-                NTdebug('Replaced %s by %s' % ( atomOrg, atomPair[atomIdx] ) )
+                nTdebug('Replaced %s by %s' % ( atomOrg, atomPair[atomIdx] ) )
         if isDeassigned:
             return self.STATUS_DEASSIGNED
         return self.STATUS_NOT_DEASSIGNED
@@ -2810,7 +2807,7 @@ class DistanceRestraint(Restraint):
         i stands for the index of the atomPair of the inner loop that is compared to and that might be modified to include atoms from atomPair j.
         """
 
-#        NTdebug('Starting simplifyForFc for\n:%r' % ( self ) )
+#        nTdebug('Starting simplifyForFc for\n:%r' % ( self ) )
         atomPairIdxJ = len(self.atomPairs) # starting from the end.
         while atomPairIdxJ > 1:
             atomPairIdxJ -= 1
@@ -2819,27 +2816,27 @@ class DistanceRestraint(Restraint):
             atom0J = atomPairJ[0]
             atom1J = atomPairJ[1]
 
-#            NTdebug('For atomPairIdxJ %d using atoms J %s and %s' % ( atomPairIdxJ, atom0J, atom1J) )
+#            nTdebug('For atomPairIdxJ %d using atoms J %s and %s' % ( atomPairIdxJ, atom0J, atom1J) )
             # speed up check on J as an early abort clause.
             if not (atom0J.hasPseudoAtom() or atom1J.hasPseudoAtom()):
                 if not (atom0J.getPseudoOfPseudoAtom() or atom1J.getPseudoOfPseudoAtom()):
-#                    NTdebug('Skipping restraint without pseudo representing J atoms')
+#                    nTdebug('Skipping restraint without pseudo representing J atoms')
                     continue
 
             for atomPairIdxI in range(atomPairIdxJ): # Compare only with the previous atom pairs
                 atomPairI = self.atomPairs[atomPairIdxI]
                 atom0I = atomPairI[0] #@UnusedVariable
                 atom1I = atomPairI[1] #@UnusedVariable
-#                NTdebug('    Using atoms I %s and %s' % ( atom0I, atom1I) )
+#                nTdebug('    Using atoms I %s and %s' % ( atom0I, atom1I) )
                 atomPairIset = set(atomPairI)
                 atomPairIntersection = atomPairIset.intersection(atomPairJset)
                 if not atomPairIntersection:
-#                    NTdebug('    No intersection')
+#                    nTdebug('    No intersection')
                     continue
 
 #                 At this point it is certain that there is an intersection of at least one atom between the two pairs.
                 if len(atomPairIntersection) != 1:
-#                    NTdebug('More than one atom in atom set intersection: %s' % atomPairIntersection)
+#                    nTdebug('More than one atom in atom set intersection: %s' % atomPairIntersection)
                     continue
 
                 atomInCommon = atomPairIntersection.pop() # get arbitrary element of set.
@@ -2855,7 +2852,7 @@ class DistanceRestraint(Restraint):
                     atomJtoMergeIdx = 0
 
                 # Now we know which atoms are in common and consequently the others should be tried to merge.
-#                NTdebug('    atominCommonIdx I %d and J %d for %s' % ( atomIinCommonIdx, atomJinCommonIdx, atomInCommon) )
+#                nTdebug('    atominCommonIdx I %d and J %d for %s' % ( atomIinCommonIdx, atomJinCommonIdx, atomInCommon) )
 
                 atomItoMerge = atomPairI[atomItoMergeIdx]
                 atomJtoMerge = atomPairJ[atomJtoMergeIdx]
@@ -2863,42 +2860,42 @@ class DistanceRestraint(Restraint):
                 atomIinCommon = atomPairI[atomIinCommonIdx]
                 atomJinCommon = atomPairJ[atomJinCommonIdx]
 
-#                NTdebug('    atomIinCommon %s == atomJinCommon %s' % ( atomIinCommon, atomJinCommon ))
+#                nTdebug('    atomIinCommon %s == atomJinCommon %s' % ( atomIinCommon, atomJinCommon ))
                 if atomIinCommon != atomJinCommon:
-                    NTcodeerror('    atoms toMerge I %s and J %s differ.' % ( atomItoMerge, atomJtoMerge) )
+                    nTcodeerror('    atoms toMerge I %s and J %s differ.' % ( atomItoMerge, atomJtoMerge) )
                     continue
                 # end if
 
                 if atomItoMerge.getSterospecificallyRelatedPartner() != atomJtoMerge:
-#                    NTdebug('    atoms toMerge I %s and J %s have different parent if at all related.' % ( atomItoMerge, atomJtoMerge) ) # boring.
+#                    nTdebug('    atoms toMerge I %s and J %s have different parent if at all related.' % ( atomItoMerge, atomJtoMerge) )
                     continue
                 # end if
 
                 pseudoOfAtom = atomItoMerge.pseudoAtom()
                 if not pseudoOfAtom:
-#                    NTdebug('    no pseudo for this atom %s' % atomItoMerge)
+#                    nTdebug('    no pseudo for this atom %s' % atomItoMerge)
                     pseudoOfAtom = atomItoMerge.getPseudoOfPseudoAtom()
                     if not pseudoOfAtom:
-                        NTerror('    no pseudo of pseudoatom %s' % atomItoMerge) # happens in 1y0j for <Atom A.VAL205.CG1>
+                        nTerror('    no pseudo of pseudoatom %s' % atomItoMerge) # happens in 1y0j for <Atom A.VAL205.CG1>
                         continue
                     # end if
                 # end if
 
-#                NTdebug( "    New pop atom: %s" % pseudoOfAtom)
+#                nTdebug( "    New pop atom: %s" % pseudoOfAtom)
                 # Change I maintaining order
                 atomPairINewList = list(atomPairI)
                 atomPairINewList[atomItoMergeIdx] = pseudoOfAtom
                 self.atomPairs[atomPairIdxI] = tuple(atomPairINewList)
-#                NTdebug("Now self.atomPairs[atomPairIdxI]: %s" % str(self.atomPairs[atomPairIdxI]))
+#                nTdebug("Now self.atomPairs[atomPairIdxI]: %s" % str(self.atomPairs[atomPairIdxI]))
                 # Remove J
-#                NTdebug("Removing self.atomPairs[atomPairIdxJ]: %s" % str(self.atomPairs[atomPairIdxJ]))
+#                nTdebug("Removing self.atomPairs[atomPairIdxJ]: %s" % str(self.atomPairs[atomPairIdxJ]))
                 del self.atomPairs[atomPairIdxJ]
                 # Return quickly to keep code to the left (keep it simple).
-#                NTdebug('Simplified.')
+#                nTdebug('Simplified.')
                 return self.STATUS_SIMPLIFIED
             # end for
         # end while
-#        NTdebug('Not simplified.')
+#        nTdebug('Not simplified.')
         return self.STATUS_NOT_SIMPLIFIED
     # end def
 
@@ -2915,7 +2912,7 @@ class DistanceRestraint(Restraint):
         i stands for the index of the atomPair of the inner loop that is compared to.
         """
 
-#        NTdebug('Starting %s for %s' % ( getCallerName(), self ) )
+#        nTdebug('Starting %s for %s' % ( getCallerName(), self ) )
         atomPairIdxJ = len(self.atomPairs) # starting from the end.
         while atomPairIdxJ > 1:
             atomPairIdxJ -= 1
@@ -2924,22 +2921,22 @@ class DistanceRestraint(Restraint):
             atom0J = atomPairJ[0] #@UnusedVariable
             atom1J = atomPairJ[1] #@UnusedVariable
 
-#            NTdebug('For atomPairIdxJ %d using atoms J %s and %s' % ( atomPairIdxJ, atom0J, atom1J) )
+#            nTdebug('For atomPairIdxJ %d using atoms J %s and %s' % ( atomPairIdxJ, atom0J, atom1J) )
 
             for atomPairIdxI in range(atomPairIdxJ): # Compare only with the previous atom pairs
                 atomPairI = self.atomPairs[atomPairIdxI]
                 atom0I = atomPairI[0] #@UnusedVariable
                 atom1I = atomPairI[1] #@UnusedVariable
-#                NTdebug('    Using atoms I %s and %s' % ( atom0I, atom1I) )
+#                nTdebug('    Using atoms I %s and %s' % ( atom0I, atom1I) )
                 atomPairIset = set(atomPairI)
                 atomPairIntersection = atomPairIset.intersection(atomPairJset)
                 if not atomPairIntersection:
-#                    NTdebug('    No intersection')
+#                    nTdebug('    No intersection')
                     continue
                 if len(atomPairIntersection) != 2:
-#                    NTdebug('Only one atom in atom set intersection: %s' % atomPairIntersection)
+#                    nTdebug('Only one atom in atom set intersection: %s' % atomPairIntersection)
                     continue
-#                NTdebug("Removing self.atomPairs[atomPairIdxJ]: %s" % str(self.atomPairs[atomPairIdxJ]))
+#                nTdebug("Removing self.atomPairs[atomPairIdxJ]: %s" % str(self.atomPairs[atomPairIdxJ]))
                 del self.atomPairs[atomPairIdxJ]
             # end for
         # end while
@@ -2999,7 +2996,7 @@ class DistanceRestraint(Restraint):
         i stands for the index of the atomPair of the inner loop that is compared to.
         """
 
-#        NTdebug('Starting %s for %s' % ( getCallerName(), self ) )
+#        nTdebug('Starting %s for %s' % ( getCallerName(), self ) )
 
         n = len(self.atomPairs)
         for atomPairIdxJ in range(n-1):
@@ -3010,26 +3007,26 @@ class DistanceRestraint(Restraint):
             atomset0J = set( atom0J.realAtoms() )
             atomset1J = set( atom1J.realAtoms() )
 
-#            NTdebug('For atomPairIdxJ %d using atoms J %s and %s' % ( atomPairIdxJ, atom0J, atom1J) )
+#            nTdebug('For atomPairIdxJ %d using atoms J %s and %s' % ( atomPairIdxJ, atom0J, atom1J) )
 
             for atomPairIdxI in range(atomPairIdxJ+1,n): # Compare only with the next atom pairs
                 atomPairI = self.atomPairs[atomPairIdxI]
                 atom0I = atomPairI[0] #@UnusedVariable
                 atom1I = atomPairI[1] #@UnusedVariable
-#                NTdebug('    Using atoms I %s and %s' % ( atom0I, atom1I) )
+#                nTdebug('    Using atoms I %s and %s' % ( atom0I, atom1I) )
 
                 atomset0I = set( atom0I.realAtoms() )
                 atomset1I = set( atom1I.realAtoms() )
                 if(
                    ( atomset0I.issuperset(atomset0J) and atomset1I.issuperset(atomset1J)) or
                    ( atomset0I.issuperset(atomset1J) and atomset1I.issuperset(atomset0J))    ):
-#                    NTdebug("Removing self.atomPairs[atomPairIdxJ]: %s" % str(self.atomPairs[atomPairIdxJ]))
+#                    nTdebug("Removing self.atomPairs[atomPairIdxJ]: %s" % str(self.atomPairs[atomPairIdxJ]))
                     del self.atomPairs[ atomPairIdxJ ]
                     return self.STATUS_REMOVED_DUPLICATE
                 elif(
                    ( atomset0J.issuperset(atomset0I) and atomset1J.issuperset(atomset1I)) or
                    ( atomset0J.issuperset(atomset1I) and atomset1J.issuperset(atomset0I))    ):
-#                    NTdebug("Removing self.atomPairs[atomPairIdxI]: %s" % str(self.atomPairs[atomPairIdxI]))
+#                    nTdebug("Removing self.atomPairs[atomPairIdxI]: %s" % str(self.atomPairs[atomPairIdxI]))
                     del self.atomPairs[ atomPairIdxI ]
                     return self.STATUS_REMOVED_DUPLICATE
                 # end if
@@ -3050,14 +3047,14 @@ class DistanceRestraint(Restraint):
 
 
         if pair[0] == None or pair[1] == None:
-            NTerror('DistanceRestraint.appendPair: invalid pair %s', str(pair))
+            nTerror('DistanceRestraint.appendPair: invalid pair %s', str(pair))
             return True
         #end if
 
 #        missesId = False
         for atom in pair:
             if not hasattr(atom, 'id'): # happens for 1f8h and LdCof (imported from CYANA data).
-#                NTwarning('DistanceRestraint.appendPair: invalid pair %s for atom missing id: %s' % (str(pair), str(atom)))
+#                nTwarning('DistanceRestraint.appendPair: invalid pair %s for atom missing id: %s' % (str(pair), str(atom)))
 #                missesId = True
                 return True
         #end if
@@ -3120,12 +3117,12 @@ class DistanceRestraint(Restraint):
         In that case the s.d. may remain None to indicate undefined.
         """
 
-#        NTdebug('calculateAverage: %s' % self)
+#        nTdebug('calculateAverage: %s' % self)
         self.error = False    # Indicates if an error was encountered when analyzing restraint
 
         modelCount = self.getModelCount()
         if not modelCount:
-#            NTdebug('DistanceRestraint.calculateAverage: No structure models (%s)', self)
+#            nTdebug('DistanceRestraint.calculateAverage: No structure models (%s)', self)
             self.error = True
             return (None, None, None, None)
         #end if
@@ -3146,7 +3143,7 @@ class DistanceRestraint(Restraint):
         self.violAv = 0.0      # Average violation
         self.violSd = None     # Sd of violations
         self.violSum = 0.0      # Sum of violations
-        self.distances = NTfill(0.0, modelCount) #list with actual effective distances
+        self.distances = nTfill(0.0, modelCount) #list with actual effective distances
 
         models = range(modelCount)
         i = 0
@@ -3163,11 +3160,11 @@ class DistanceRestraint(Restraint):
             #expand pseudoatoms
             atms1 = atm1.realAtoms()
             if atms1 == None:
-                #NTdebug('DistanceRestraint.calculateAverage: %s.realAtoms() None (%s)', atm1, self)
+                #nTdebug('DistanceRestraint.calculateAverage: %s.realAtoms() None (%s)', atm1, self)
                 continue
             atms2 = atm2.realAtoms()
             if atms2 == None:
-                #NTdebug('DistanceRestraint.calculateAverage: %s.realAtoms() None (%s)', atm2, self)
+                #nTdebug('DistanceRestraint.calculateAverage: %s.realAtoms() None (%s)', atm2, self)
                 continue
             for a1 in atms1:
                 #print '>>>', a1.format()
@@ -3196,7 +3193,7 @@ class DistanceRestraint(Restraint):
         #end for
         if self.error:
             msg = "AtomPair (%s,%s) model %d without coordinates" % (atm1.toString(), atm2.toString(), i)
-#            NTdebug(msg)
+#            nTdebug(msg)
             self.rogScore.setMaxColor(COLOR_RED, msg)
             return (None, None, None, None)
         #end if
@@ -3208,7 +3205,7 @@ class DistanceRestraint(Restraint):
             #end if
         #end for
 
-        self.av, self.sd, self.n = NTaverage(self.distances)
+        self.av, self.sd, self.n = nTaverage(self.distances)
         self.min = min(self.distances)
         self.max = max(self.distances)
 
@@ -3239,7 +3236,7 @@ class DistanceRestraint(Restraint):
         #end for
         if self.violations:
             vAbs = map(math.fabs, self.violations)
-            self.violAv, self.violSd, _n = NTaverage(vAbs)
+            self.violAv, self.violSd, _n = nTaverage(vAbs)
             self.violMax = max(vAbs)
             self.violSum = sum(vAbs)
             self.violUpperMax = max(self.violations)
@@ -3322,7 +3319,7 @@ class DistanceRestraintList(RestraintList):
         """
         Criticize restraints of this list; infer own ROG score from individual restraints.
         """
-#        NTdebug('DistanceRestraintList.criticize %s', self)
+#        nTdebug('DistanceRestraintList.criticize %s', self)
 
         self.rogScore.reset()
 
@@ -3337,7 +3334,7 @@ class DistanceRestraintList(RestraintList):
                 fprintf(f, '%s\n', dr.format())
             #end for
             f.close()
-            NTdetail('==> Analyzing %s, output to %s', self, path)
+            nTdetail('==> Analyzing %s, output to %s', self, path)
         #end if
     #end def
 
@@ -3366,24 +3363,24 @@ class DistanceRestraintList(RestraintList):
         or (None, None, None, None, None) on error
         """
 
-#        NTdebug('DistanceRestraintList.analyze: %s', self)
+#        nTdebug('DistanceRestraintList.analyze: %s', self)
 
         if (len(self) == 0):
             # happens for entry 2k0e imported from CCPN. Has unlinked restraints.
-#            NTdebug('DistanceRestraintList.analyze: "%s" empty list'% self.name )
+#            nTdebug('DistanceRestraintList.analyze: "%s" empty list'% self.name )
             return (None, None, None, None, None)
         #end if
 
         modelCount = self.getModelCount()
         if not modelCount:
-            NTerror('DistanceRestraintList.analyze: "%s" modelCount %s' % (self.name, modelCount))
+            nTerror('DistanceRestraintList.analyze: "%s" modelCount %s' % (self.name, modelCount))
             return (None, None, None, None, None)
         #end if
 
         # check for duplicate
         self.findDuplicates()
 
-        self.rmsd = NTfill(0.0, modelCount)
+        self.rmsd = nTfill(0.0, modelCount)
         self.violCount1 = 0
         self.violCount3 = 0
         self.violCount5 = 0
@@ -3423,14 +3420,15 @@ class DistanceRestraintList(RestraintList):
             elif c == 3:
                 self.longRange.append(dr)
             #end if
-            if dr.isAmbiguous(): self.ambiguous.append(dr)
+            if dr.isAmbiguous(): 
+                self.ambiguous.append(dr)
         #end for
 
         #Set max violations
         for p in ['violMax', 'violUpperMax', 'violLowerMax']:
-            l = self.zap(p)
-            l.sort()
-            setattr(self, p, l[-1])
+            myList = self.zap(p)
+            myList.sort()
+            setattr(self, p, myList[-1])
         #end for
 
         for i in range(0, modelCount):
@@ -3442,7 +3440,7 @@ class DistanceRestraintList(RestraintList):
                 #end if
             #end if
         #end for
-        self.rmsdAv, self.rmsdSd, _n = NTaverage(self.rmsd)
+        self.rmsdAv, self.rmsdSd, _n = nTaverage(self.rmsd)
         return (self.rmsdAv, self.rmsdSd, self.violCount1, self.violCount3, self.violCount5)
     #end def
 
@@ -3569,52 +3567,52 @@ class DihedralRestraint(Restraint):
         Simplified to checking if there are 4 real atoms.
         """
         if not self.atoms:
-#            NTdebug("Failed to find any atom in %s" % self)
+#            nTdebug("Failed to find any atom in %s" % self)
             return False
-        l = len(self.atoms)
-        if l != 4:
-#            NTdebug("Expected four atoms but found %d in:\n%s" % (l,self))
+        n = len(self.atoms)
+        if n != 4:
+#            nTdebug("Expected four atoms but found %d in:\n%s" % (n,self))
             return False
         for i, atom in enumerate(self.atoms): #@UnusedVariable
             if not atom:
-#                NTdebug("Failed to find valid atom in:\n%s" % (i,self))
+#                nTdebug("Failed to find valid atom in:\n%s" % (i,self))
                 return False
         return True
     #end def
 
     def criticize(self, project):
         """Only the self violations,violMax and violSd needs to be set before calling this routine"""
-#        NTdebug( '%s (dih)' % self )
+#        nTdebug( '%s (dih)' % self )
         if (project.valSets.AC_MAXALL_BAD != None) and (self.violMax >= project.valSets.AC_MAXALL_BAD):
             comment = 'violMax: %7.2f' % self.violMax
-#            NTdebug(comment)
+#            nTdebug(comment)
             self.rogScore.setMaxColor(COLOR_RED, comment)
         elif (project.valSets.AC_MAXALL_POOR != None) and (self.violMax >= project.valSets.AC_MAXALL_POOR):
             comment = 'violMax: %7.2f' % self.violMax
-#            NTdebug(comment)
+#            nTdebug(comment)
             self.rogScore.setMaxColor(COLOR_ORANGE, comment)
 
         if (project.valSets.AC_THRESHOLD_OVER_POOR != None) and (project.valSets.AC_THRESHOLD_FRAC_POOR != None):
             fractionAbove = getFractionAbove(self.violations, project.valSets.AC_THRESHOLD_OVER_POOR)
             if fractionAbove >= project.valSets.AC_THRESHOLD_FRAC_POOR:
                 comment = 'fractionAbove: %7.2f' % fractionAbove
-    #            NTdebug(comment)
+    #            nTdebug(comment)
                 self.rogScore.setMaxColor(COLOR_ORANGE, comment)
 
         if (project.valSets.AC_THRESHOLD_OVER_BAD != None) and (project.valSets.AC_THRESHOLD_FRAC_BAD != None):
             fractionAbove = getFractionAbove(self.violations, project.valSets.AC_THRESHOLD_OVER_BAD)
             if fractionAbove >= project.valSets.AC_THRESHOLD_FRAC_BAD:
                 comment = 'fractionAbove: %7.2f' % fractionAbove
-    #            NTdebug(comment)
+    #            nTdebug(comment)
                 self.rogScore.setMaxColor(COLOR_RED, comment)
 
         if (project.valSets.AC_RMSALL_BAD != None) and (self.violSd >= project.valSets.AC_RMSALL_BAD):
             comment = 'violSd: %7.2f' % self.violSd
-#            NTdebug(comment)
+#            nTdebug(comment)
             self.rogScore.setMaxColor(COLOR_RED, comment)
         elif (project.valSets.AC_RMSALL_POOR != None) and (self.violSd >= project.valSets.AC_RMSALL_POOR):
             comment = 'violSd: %7.2f' % self.violSd
-#            NTdebug(comment)
+#            nTdebug(comment)
             self.rogScore.setMaxColor(COLOR_ORANGE, comment)
 
         if project.valSets.FLAG_MISSING_COOR:
@@ -3629,7 +3627,7 @@ class DihedralRestraint(Restraint):
                                              # can crash when reading back NRG dataset because of their
                                              # incompleteness
                     msg = "Missing coordinates in dihedral (%s)" % a.toString()
-#                    NTdebug(msg)
+#                    nTdebug(msg)
                     self.rogScore.setMaxColor(COLOR_RED, msg)
     #end def
 
@@ -3650,29 +3648,29 @@ class DihedralRestraint(Restraint):
         """
         errorExit = (None, None)
         if len(self.atoms) != 4 or (None in self.atoms):
-            NTerror('DihedralRestraint: invalid dihedral definition %s', self.atoms)
+            nTerror('DihedralRestraint: invalid dihedral definition %s', self.atoms)
             return errorExit
         #end if
 
         if None in self.atoms.zap('meanCoordinate'):
-            NTerror('DihedralRestraint: atom(s) without coordinates %s', self.atoms)
+            nTerror('DihedralRestraint: atom(s) without coordinates %s', self.atoms)
             return errorExit
         #end if
 
 #        coorList = self.atoms.zap('coordinates')
 #        if len( coorList ) == 0:
-#            NTerror('DihedralRestraint: atom(s) without any coordinates %s', self.atoms)
+#            nTerror('DihedralRestraint: atom(s) without any coordinates %s', self.atoms)
 #            return (None, None)
 #        #end if
 
         modelCount = self.getModelCount()
         if modelCount == 0:
-            NTerror('DihedralRestraint: no structure models')
+            nTerror('DihedralRestraint: no structure models')
             return errorExit
         #end if
 #        lenCoorListExpected = 4 * modelCount
 #        if len( coorList ) != lenCoorListExpected:
-#            NTerror('DihedralRestraint: atom(s) without all coordinates %s', self.atoms)
+#            nTerror('DihedralRestraint: atom(s) without all coordinates %s', self.atoms)
 #            return (None, None)
 #        #end if
 
@@ -3701,11 +3699,11 @@ class DihedralRestraint(Restraint):
                 ssaPartner = lastAtom._parent.CD2
             except:
                 pass
-#            NTdebug("ssaPartner: %s" % ssaPartner)
+#            nTdebug("ssaPartner: %s" % ssaPartner)
             if ssaPartner != None:
                 considerSymmetry = True
             else:
-                NTwarning("DihedralRestraint: no lastAtom's ssa for %s so ignoring symmetry on violation." % self)
+                nTwarning("DihedralRestraint: no lastAtom's ssa for %s so ignoring symmetry on violation." % self)
                 considerSymmetry = False
 
         if considerSymmetry:
@@ -3720,21 +3718,21 @@ class DihedralRestraint(Restraint):
                 dList = []
                 vList = []
                 for _j1, lastAtom2 in enumerate(jLoopList):
-#                    NTdebug('i, _j1, lastAtom2, considerSymmetry: %s %s %s %s' % (i,_j1,lastAtom2, considerSymmetry))
+#                    nTdebug('i, _j1, lastAtom2, considerSymmetry: %s %s %s %s' % (i,_j1,lastAtom2, considerSymmetry))
                     atomList = [self.atoms[k] for k in range(3)]
                     atomList.append( lastAtom2 )
                     coorList = [ atom.coordinates[i] for atom in atomList]
                     d = NTdihedralOpt( *coorList )
                     if d == None:
-#                        NTdebug("Failed to calculate an angle; which can happen if a coordinate is missing.")
+#                        nTdebug("Failed to calculate an angle; which can happen if a coordinate is missing.")
                         continue
                     dList.append( d )
                 # end for _j1
-                NTlimit(dList, plotpars.min, plotpars.max)
+                nTlimit(dList, plotpars.min, plotpars.max)
                 for _j2 in range(len(dList)):
                     v = violationAngle(value = dList[_j2], lowerBound = self.lower, upperBound = self.upper)
                     if v == None:
-                        NTwarning("Failed to calculate a violation angle.")
+                        nTwarning("Failed to calculate a violation angle.")
                         return errorExit
                     vList.append( v )
                 # end for _j2
@@ -3744,27 +3742,30 @@ class DihedralRestraint(Restraint):
                     if len(fvList) == 2:
                         if fvList[1] < fvList[0]:
                             jSelected = 1
-#                    NTdebug("Comparing fviolations for %s %s" % ( self, fvList))
+#                    nTdebug("Comparing fviolations for %s %s" % ( self, fvList))
                 # end if
-#                NTdebug("Comparing distances for %s %s" % ( self, dList))
-#                NTdebug("Comparing violations for %s %s" % ( self, vList))
-#                NTdebug("jSelected %s" % jSelected)
+#                nTdebug("Comparing distances for %s %s" % ( self, dList))
+#                nTdebug("Comparing violations for %s %s" % ( self, vList))
+#                nTdebug("jSelected %s" % jSelected)
                 self.dihedrals.append(dList[jSelected])
                 self.violations.append(vList[jSelected])
-#                NTdebug("self.dihedrals %s" % self.dihedrals)
-#                NTdebug("self.violations %s" % self.violations)
+#                nTdebug("self.dihedrals %s" % self.dihedrals)
+#                nTdebug("self.violations %s" % self.violations)
 
                 fv = math.fabs(vList[jSelected])
-                if fv > 1.0: self.violCount1 += 1
-                if fv > 3.0: self.violCount3 += 1
-                if fv > 5.0: self.violCount5 += 1
+                if fv > 1.0: 
+                    self.violCount1 += 1
+                if fv > 3.0: 
+                    self.violCount3 += 1
+                if fv > 5.0: 
+                    self.violCount5 += 1
                 if fv > self.violMax:
                     self.violMax = fv
                 #end if
             #end for all models
         except:
 #            NTtracebackError() # DEFAULT this is disabled.
-#            NTdebug("Ignoring violations for %s" % self.format() )
+#            nTdebug("Ignoring violations for %s" % self.format() )
             pass # ignore missing coordinates. They're reported by criticize()
 
         self.violAv, self.violSd, _n = self.violations.average()
@@ -3838,17 +3839,19 @@ class DihedralRestraint(Restraint):
 
 
 class DihedralRestraintList(RestraintList):
-
+    'List of dihedral angle restraints.'
+#    export2cyana = exportDihedralRestraint2cyana
+    
     def __init__(self, name, status = 'keep'):
         RestraintList.__init__(self, name, status = status)
         self.__CLASS__ = ACL_LEVEL
-    #end def
+    #end def    
 
     def criticize(self, project, toFile = True):
         """
         Criticize restraints of this list; infer own ROG score from individual restraints.
         """
-#        NTdebug('DihedralRestraintList.criticize %s', self)
+#        nTdebug('DihedralRestraintList.criticize %s', self)
 
         self.rogScore.reset()
 
@@ -3863,7 +3866,7 @@ class DihedralRestraintList(RestraintList):
                 fprintf(f, '%s\n', dr.format())
             #end for
             f.close()
-            NTdetail('==> Analyzing %s, output to %s', self, path)
+            nTdetail('==> Analyzing %s, output to %s', self, path)
         #end if
     #end def
 
@@ -3874,20 +3877,20 @@ class DihedralRestraintList(RestraintList):
         or (None, None, None, None, None) on error
         """
         errorResult = (None, None, None, None, None)
-#        NTdebug('DihedralRestraintList.analyze: %s', self)
+#        nTdebug('DihedralRestraintList.analyze: %s', self)
 
         if not len(self):
-            NTwarning('DihedralRestraintList.analyze: "%s" empty list', self.name)
+            nTwarning('DihedralRestraintList.analyze: "%s" empty list', self.name)
             return errorResult
         #end if
 
         modelCount = self.getModelCount()
         if not modelCount:
-            NTerror('DihedralRestraintList.analyze: "%s" modelCount 0', self.name)
+            nTerror('DihedralRestraintList.analyze: "%s" modelCount 0', self.name)
             return errorResult
         #end if
 
-        self.rmsd = NTfill(0.0, modelCount)
+        self.rmsd = nTfill(0.0, modelCount)
         self.violCount1 = 0
         self.violCount3 = 0
         self.violCount5 = 0
@@ -3895,7 +3898,7 @@ class DihedralRestraintList(RestraintList):
             if calculateFirst:
                 (cav, _cv) = dr.calculateAverage()
                 if cav == None:
-#                    NTdebug("Failed to calculate average for: " + self.format())
+#                    nTdebug("Failed to calculate average for: " + self.format())
                     continue # skipping dihedral with a missing coordinate or so.
             self.violCount1 += dr.violCount1
             self.violCount3 += dr.violCount3
@@ -3903,7 +3906,7 @@ class DihedralRestraintList(RestraintList):
 
             countDrViolations = len(dr.violations)
             if countDrViolations > modelCount:
-                NTcodeerror("Found more violations (%s) for this restraint (%s) than models (%s)" % ( countDrViolations, dr, modelCount))
+                nTcodeerror("Found more violations (%s) for this restraint (%s) than models (%s)" % ( countDrViolations, dr, modelCount))
                 return errorResult
 
             for i in range(countDrViolations): # happened in entry 1bn0 that violations were not defined.
@@ -3917,7 +3920,7 @@ class DihedralRestraintList(RestraintList):
             self.rmsd[i] = math.sqrt(self.rmsd[i] / len(self))
         #end for
 
-        self.rmsdAv, self.rmsdSd, _n = NTaverage(self.rmsd)
+        self.rmsdAv, self.rmsdSd, _n = nTaverage(self.rmsd)
         return (self.rmsdAv, self.rmsdSd, self.violCount1, self.violCount3, self.violCount5)
     #end def
 
@@ -4002,28 +4005,28 @@ class RDCRestraint(DistanceRestraint):
 
         modelCount = self.getModelCount()
         if not modelCount:
-            NTerror('Error RDCRestraint: no structure models\n')
+            nTerror('Error RDCRestraint: no structure models\n')
             return (None, None)
         #end if
 
 #TODO needs work
 #        if len(self.atoms) != 2 or None in self.atoms:
-#            NTerror('Error RDCRestraint: invalid rdc definition %s\n', self.atoms )
+#            nTerror('Error RDCRestraint: invalid rdc definition %s\n', self.atoms )
 #            return (None,None)
 #        #end if
 #
 #        if None in self.atoms.zap('meanCoordinate'):
-#            NTerror('Error RDCRestraint: atom without coordinates %s\n', self.atoms )
+#            nTerror('Error RDCRestraint: atom without coordinates %s\n', self.atoms )
 #            return (None,None)
 #        #end if
 
         #set the default values; do not remove or it will crash upon restoring RDC lists
-        self.rdcs = NTfill(0.0, modelCount) # list with dihedral values for each model
+        self.rdcs = nTfill(0.0, modelCount) # list with dihedral values for each model
         self.cav = NaN      # Average dihedral value
         self.cv = NaN      # cv on dihedral
 #        self.min        = 0.0      # Minimum dihedral
 #        self.max        = 0.0      # Max dihedral
-        self.violations = NTfill(0.0, modelCount) # list with violations for each model
+        self.violations = nTfill(0.0, modelCount) # list with violations for each model
         self.violCount1 = 0        # Number of violations over 1 degree
         self.violCount3 = 0        # Number of violations over 3 degrees
         self.violCount5 = 0        # Number of violations over 5 degrees
@@ -4075,29 +4078,29 @@ class RDCRestraintList(RestraintList):
 
         """
 
-#        NTdebug('RDCRestraintList.analyze: %s', self)
+#        nTdebug('RDCRestraintList.analyze: %s', self)
 
         if len(self) == 0:
-            NTerror('RDCRestraintList.analyze: "%s" empty list', self.name)
+            nTerror('RDCRestraintList.analyze: "%s" empty list', self.name)
             return (None, None, None, None, None)
         #end if
 
         modelCount = 0
         firstRestraint = self[0]
         if not hasattr(firstRestraint, "atoms"):
-            NTwarning("Failed to get the model count for no atoms are available in the first RDC restraint.")
-            NTwarning("See also issue: %s%d" % (issueListUrl, 133))
+            nTwarning("Failed to get the model count for no atoms are available in the first RDC restraint.")
+            nTwarning("See also issue: %s%d" % (issueListUrl, 133))
         else:
             if len(self[0].atomPairs):
                 modelCount = self[0].atomPairs[0][0].residue.chain.molecule.modelCount
         #end if
 
         if not modelCount: # JFD notes eg reading $CINGROOT/Tests/data/ccpn/2hgh.tgz
-            NTerror('RDCRestraintList.analyze: "%s" modelCount 0', self.name)
+            nTerror('RDCRestraintList.analyze: "%s" modelCount 0', self.name)
             return (None, None, None, None, None)
         #end if
 
-        self.rmsd = NTfill(0.0, modelCount)
+        self.rmsd = nTfill(0.0, modelCount)
         self.violCount1 = 0
         self.violCount3 = 0
         self.violCount5 = 0
@@ -4105,7 +4108,7 @@ class RDCRestraintList(RestraintList):
             if calculateFirst:
                 dr.calculateAverage()
             if dr.rdcs == None or dr.violations == None:
-                NTerror('RDCRestraintList.analyze: skipping restraint %s', dr)
+                nTerror('RDCRestraintList.analyze: skipping restraint %s', dr)
             else:
                 self.violCount1 += dr.violCount1
                 self.violCount3 += dr.violCount3
@@ -4120,7 +4123,7 @@ class RDCRestraintList(RestraintList):
             self.rmsd[i] = math.sqrt(self.rmsd[i] / len(self))
         #end for
 
-        self.rmsdAv, self.rmsdSd, dummy_n = NTaverage(self.rmsd)
+        self.rmsdAv, self.rmsdSd, dummy_n = nTaverage(self.rmsd)
         return (self.rmsdAv, self.rmsdSd, self.violCount1, self.violCount3, self.violCount5)
     #end def
 
@@ -4131,7 +4134,7 @@ class RDCRestraintList(RestraintList):
         Need implementation
         """
 
-#        NTdebug('RDCRestraintList.criticize %s', self)
+#        nTdebug('RDCRestraintList.criticize %s', self)
 
         self.rogScore.reset()
 
@@ -4146,7 +4149,7 @@ class RDCRestraintList(RestraintList):
 #                fprintf(f, '%s\n', dr.format())
 #            #end for
 #            f.close()
-#            NTdetail('Distance restraint analysis %s, output to %s', self, path)
+#            nTdetail('Distance restraint analysis %s, output to %s', self, path)
 #        #end if
     #end def
 
@@ -4236,14 +4239,14 @@ class History(NTlist):
     format = __str__
 
     def toXML(self, depth = 0, stream = sys.stdout, indent = '\t', lineEnd = '\n'):
-        NTindent(depth, stream, indent)
+        nTindent(depth, stream, indent)
         fprintf(stream, "<History>")
         fprintf(stream, lineEnd)
 
         for a in self:
-            NTtoXML(a, depth + 1, stream, indent, lineEnd)
+            nTtoXML(a, depth + 1, stream, indent, lineEnd)
         #end for
-        NTindent(depth, stream, indent)
+        nTindent(depth, stream, indent)
         fprintf(stream, "</History>")
         fprintf(stream, lineEnd)
     #end def
@@ -4258,7 +4261,8 @@ class XMLHistoryHandler(XMLhandler):
 
     def handle(self, node):
         items = self.handleMultipleElements(node)
-        if items == None: return None
+        if items == None: 
+            return None
         result = History()
         for item in items:
             result.append(item)

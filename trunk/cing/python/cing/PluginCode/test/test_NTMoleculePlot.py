@@ -62,7 +62,7 @@ class AllChecks(TestCase):
         cyanaDirectory = os.path.join(cingDirTestsData, "cyana", entryId)
 #        pdbFileName = entryId + ".pdb"
 #        pdbFilePath = os.path.join(cyanaDirectory, pdbFileName)
-        NTdebug("Reading files from directory: " + cyanaDirectory)
+        nTdebug("Reading files from directory: " + cyanaDirectory)
 
         kwds = {}
         kwds['pdbFile'] = entryId
@@ -109,7 +109,7 @@ class AllChecks(TestCase):
                 for res in resList:
                     resNumb += 1
 
-        #            NTdebug(`res`)
+        #            nTdebug(`res`)
 
         #            if random() < 0.2: # Skip a 10%
         #                continue
@@ -157,7 +157,7 @@ class AllChecks(TestCase):
                             else:
                                 valueList = d.getDeepByKeys(checkID)
                             if showValues:
-                                NTdebug("%10s valueList: %-80s" % (checkID, valueList))
+                                nTdebug("%10s valueList: %-80s" % (checkID, valueList))
         #end if actuallyRunWhatif:
 
         # The following object will be responsible for creating a (png/pdf) file with
@@ -230,12 +230,12 @@ class AllChecks(TestCase):
 #HEAVY_ATOMS_STR = 'heavyAtoms'
 #PROTONS_STR = 'protons'
 
-        NTdebug("Instantiating moleculePlotSet")
+        nTdebug("Instantiating moleculePlotSet")
         moleculePlotSet = MoleculePlotSet(project=project, keyLoLoL=keyLoLoL)
         pdfPath = '%s/test_NTMoleculePlot.pdf' % self.cingDirTmpTest
         moleculePlotSet.renderMoleculePlotSet(pdfPath, createPngCopyToo=True)
 
-    def ttttestDihedralComboPlot(self):
+    def _testDihedralComboPlot(self):
         ps = NTplotSet() # closes any previous plots
         ps.hardcopySize = (image2DdihedralWidth, image2Ddihedralheight)
         dihedralName1 = 'PHI'

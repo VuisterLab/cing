@@ -23,7 +23,7 @@ def storeCING2dbLoop(archive_id, entryList=None, expectPdbEntryList = True):
     elif archive_id == ARCHIVE_PDB_ID:
         startDir = os.path.join(dDir,'PDB-CING')
     else:
-        NTerror("Expected valid archive_id argument but got: %s" % archive_id)
+        nTerror("Expected valid archive_id argument but got: %s" % archive_id)
         return True
 
 

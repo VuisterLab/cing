@@ -59,7 +59,7 @@ class AllChecks(TestCase):
             t.nextColumn()
             t(None, rStr)
             t.nextColumn()
-            t('a', rStr + "." + str(2), href='ttt')
+            t('a', rStr + "." + str(2), href='someRefHere')
             t.nextColumn()  # empty one
             t.nextColumn()
             t(None, rStr + "." + str(4))
@@ -71,5 +71,5 @@ class AllChecks(TestCase):
 
 if __name__ == "__main__":
     cing.verbosity = verbosityDebug
-#    NTdebug("Starting...")
+#    nTdebug("Starting...")
     unittest.main()

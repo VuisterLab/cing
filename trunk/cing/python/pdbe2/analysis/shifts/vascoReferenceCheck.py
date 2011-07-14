@@ -1,3 +1,4 @@
+#@PydevCodeAnalysisIgnore # pylint: disable-all
 # TODO: Necessary or can get from stats?
 #from pdbe.analysis.shifts.reref import make_selection, make_sel3
 

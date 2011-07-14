@@ -97,8 +97,8 @@ if options.verbosity >= 0 and options.verbosity <= 9:
 #        print "In main, setting verbosity to:", options.verbosity
     cing.verbosity = options.verbosity
 else:
-    NTerror("set verbosity is outside range [0-9] at: " + options.verbosity)
-    NTerror("Ignoring setting")
+    nTerror("set verbosity is outside range [0-9] at: " + options.verbosity)
+    nTerror("Ignoring setting")
 #end if
 
 
@@ -132,25 +132,25 @@ else:
 
 #if (len(args) >= 1):
 if not args:
-    NTerror('no arguments found')
+    nTerror('no arguments found')
     sys.exit(1)
 
 if not os.path.exists( args[0] ):
-    NTerror('directory "%s" not found\n', args[0] )
+    nTerror('directory "%s" not found\n', args[0] )
     sys.exit(1)
 
 if Project.exists( args[0] ) and not options.overwrite:
-    NTerror('Cing project "%s" already exists; Use -o or --overwrite to overwrite\n', args[0] )
+    nTerror('Cing project "%s" already exists; Use -o or --overwrite to overwrite\n', args[0] )
     sys.exit(1)
 
 #=====================================================================================
 # Done checking arguments, lets have some action
 #=====================================================================================
-NTmessage( header )
+nTmessage( header )
 
 project = Project.open(args[0], 'new')
 if not project:
-    NTwarning("No project generated. Aborting further execution.")
+    nTwarning("No project generated. Aborting further execution.")
     sys.exit(0)
 #end if
 
@@ -176,7 +176,7 @@ if options.export:
 
 project.close()
 
-#NTdebug("Doing a hard system exit")
+#nTdebug("Doing a hard system exit")
 #sys.exit(0)
 
 

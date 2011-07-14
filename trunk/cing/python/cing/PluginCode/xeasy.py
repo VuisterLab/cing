@@ -43,7 +43,7 @@ class Xeasy( NTdict ):
                     pass
 
                 elif (not NTdb.isValidResidueName( f.dollar[1], convention ) ):
-                    NTerror( 'Xeasy: residue "%s" invalid for convention "%s" in "%s:%d"',
+                    nTerror( 'Xeasy: residue "%s" invalid for convention "%s" in "%s:%d"',
                              f.dollar[1], convention, seqFile, f.NR
                            )
                     self.error = 1
@@ -74,13 +74,13 @@ class Xeasy( NTdict ):
                 atomName  = f.dollar[4]
                 resNum    = f.int( 5 )
                 if resNum not in self.seq:
-                    NTwarning( 'Xeasy: undefined residue number %d in "%s:%d" (%s)' % (
+                    nTwarning( 'Xeasy: undefined residue number %d in "%s:%d" (%s)' % (
                              resNum, protFile, f.NR, f.dollar[0]))
                     self.error = 1
                 else:
                     resName   = self.seq[resNum]
                     if not NTdb.isValidAtomName( resName, atomName, convention):
-                        NTwarning('Xeasy parsing "%s:%d": invalid atom "%s" for residue %s%d' %(
+                        nTwarning('Xeasy parsing "%s:%d": invalid atom "%s" for residue %s%d' %(
                                    protFile, f.NR,  atomName, resName, resNum))
                         self.error = 1
                     else:
@@ -100,7 +100,7 @@ class Xeasy( NTdict ):
         #end for
 
         self.protFile = protFile
-        NTmessage('Xeasy.__init__: parsed %d residues, %d atoms from %s, %s',
+        nTmessage('Xeasy.__init__: parsed %d residues, %d atoms from %s, %s',
                       self.resCount, self.protCount, self.seqFile,self.protFile)
         #end if
     #end def
@@ -108,14 +108,14 @@ class Xeasy( NTdict ):
     def map2molecule( self, molecule ):
         """map entries of the prot-dict onto an atom of molecule
         """
-#        NTdebug('Xeasy.map2molecule: %s', molecule)
+#        nTdebug('Xeasy.map2molecule: %s', molecule)
         resNumDict = molecule.getResNumDict()
         maxToReport = 100 # no need to fill screen.
         errCount = 0
         for p in self.prot.itervalues():
             if not p.resNum in resNumDict:
                 if errCount <= maxToReport:
-                    NTerror('Xeasy.map2molecule: residue "%s %d" for atom %-4s not defined in %s'%(
+                    nTerror('Xeasy.map2molecule: residue "%s %d" for atom %-4s not defined in %s'%(
                              p.resName, p.resNum, p.atomName, molecule.name ))
                 errCount += 1
                 continue
@@ -127,13 +127,13 @@ class Xeasy( NTdict ):
                 continue
 
             if errCount <= maxToReport:
-                NTerror('Xeasy.map2molecule: Xeasy atom "%s" not mapped on "%s"'%(
+                nTerror('Xeasy.map2molecule: Xeasy atom "%s" not mapped on "%s"'%(
                          p.atomName, res))
             errCount += 1
         if errCount > maxToReport:
-            NTerror('Xeasy.map2molecule: and so on...')
+            nTerror('Xeasy.map2molecule: and so on...')
         if errCount:
-            NTerror('Total number of errors: %d', errCount)
+            nTerror('Total number of errors: %d', errCount)
     #end def
 
 
@@ -143,7 +143,7 @@ class Xeasy( NTdict ):
         self.map2molecule( molecule )
 
         # first set NONE shift for all atoms
-        _root,file,ext = NTpath(self.protFile)
+        _root,file,ext = nTpath(self.protFile)
         rl = molecule.newResonances()
         rl.name = file+ext
 #        TODO: finish recoding
@@ -156,7 +156,7 @@ class Xeasy( NTdict ):
             #end if
         #end for
 
-#        NTdebug('Xeasy.appendShifts: appended shifts to molecule %s'% molecule )
+#        nTdebug('Xeasy.appendShifts: appended shifts to molecule %s'% molecule )
         #end if
 
     #end def
@@ -180,7 +180,7 @@ class Xeasy( NTdict ):
 
         self.map2molecule( molecule )
 
-        _path,name,_ext = NTpath( peakFile )
+        _path,name,_ext = nTpath( peakFile )
         peaks = PeakList( name=name, status=status )
 
 
@@ -196,13 +196,13 @@ class Xeasy( NTdict ):
 #                 elif (f.NF == 13 or f.NF == 14 or (f.NF>):
 #                     dimension = 3
 #                 else:
-#                     NTerror('Xeasy.importPeaks: invalid number of fields (%d) in file "%s" on line %d (%s)',
+#                     nTerror('Xeasy.importPeaks: invalid number of fields (%d) in file "%s" on line %d (%s)',
 #                              f.NF, peakFile, f.NR, f.dollar[0]
 #                            )
 #                     return None
 #                 #end if
                 if not dimension:
-                    NTerror('Xeasy.importPeaks: invalid dimensionality in file "%s" (line %d, "%s")'%(
+                    nTerror('Xeasy.importPeaks: invalid dimensionality in file "%s" (line %d, "%s")'%(
                              peakFile, f.NR, f.dollar[0]))
                     return None
                 #end if
@@ -211,23 +211,27 @@ class Xeasy( NTdict ):
 
                 # preserve the Xeasy peak id
                 peakId = f.int( cur )
-                if (peakId == None): return None
+                if (peakId == None): 
+                    return None
                 cur += 1
 
                 peakpos = []
                 for _i in range(X_AXIS, dimension):
                     p = f.float( cur )
-                    if (p == None): return None
+                    if (p == None): 
+                        return None
                     peakpos.append( p )
                     cur += 1
                 #end if
 
                 cur += 2 # skip two fields
                 height = f.float( cur )
-                if height == None: return None
+                if height == None: 
+                    return None
                 cur += 1
                 heightError = f.float( cur )
-                if heightError == None: return None
+                if heightError == None: 
+                    return None
                 cur += 1
 
                 resonances = []
@@ -235,14 +239,15 @@ class Xeasy( NTdict ):
                 cur += 2 # skip two fields
                 for _i in range(X_AXIS, dimension):
                     aIndex = f.int( cur )
-                    if aIndex == None: return None
+                    if aIndex == None: 
+                        return None
                     cur += 1
                     # 0 means unassigned according to Xeasy convention
                     if aIndex == 0:
                         resonances.append( None )
                     else:
                         if not aIndex in self.prot:
-                            NTerror('Xeasy.importPeaks: invalid atom id %d on line %d (%s)',
+                            nTerror('Xeasy.importPeaks: invalid atom id %d on line %d (%s)',
                                      aIndex, f.NR, f.dollar[0]
                                    )
                             error = 1
@@ -270,7 +275,7 @@ class Xeasy( NTdict ):
             #end if
         #end for
 
-        NTmessage('Xeasy.importPeaks: extracted %d peaks from %s', len(peaks), peakFile )
+        nTmessage('Xeasy.importPeaks: extracted %d peaks from %s', len(peaks), peakFile )
         #end if
 
         return peaks
@@ -302,7 +307,7 @@ def exportShifts2Xeasy( molecule, seqFile, protFile, convention)   :
 
     """
     if not molecule:
-        NTerror( 'Error exportShifts2Xeasy: undefined molecule' )
+        nTerror( 'Error exportShifts2Xeasy: undefined molecule' )
         return
     #end if
 
@@ -332,7 +337,7 @@ def exportShifts2Xeasy( molecule, seqFile, protFile, convention)   :
     #end for
     fout.close()
 
-    NTmessage( '==> Exported %s in %s format to "%s" and "%s"', molecule, convention, seqFile, protFile )
+    nTmessage( '==> Exported %s in %s format to "%s" and "%s"', molecule, convention, seqFile, protFile )
     #end if
 #end def
 
@@ -351,11 +356,11 @@ def exportPeaks2Xeasy( peakList, peakFile)   :
        xeasyIndex: for peak
     """
     if peakList==None:
-        NTerror('exportPeaks2Xeasy: undefined peak list' )
+        nTerror('exportPeaks2Xeasy: undefined peak list' )
         return
     #end if
     if len(peakList) == 0:
-        NTerror('exportPeaks2Xeasy: zero-length peak list' )
+        nTerror('exportPeaks2Xeasy: zero-length peak list' )
         return
     #end if
 
@@ -413,7 +418,7 @@ def exportPeaks2Xeasy( peakList, peakFile)   :
 
     fout.close()
 
-    NTmessage( '==> Exported %s to "%s"', peakList, peakFile )
+    nTmessage( '==> Exported %s to "%s"', peakList, peakFile )
     #end if
 
 #end def
@@ -424,25 +429,25 @@ def importXeasy( project, seqFile, protFile, convention ):
         return the 'slot' (i.e position in the list) of these resonances or None on error
         """
         if seqFile == None:
-            NTerror('importXeasy: undefined seqFile' )
+            nTerror('importXeasy: undefined seqFile' )
             return None
         #end if
         if protFile == None:
-            NTerror('importXeasy: undefined protFile' )
+            nTerror('importXeasy: undefined protFile' )
             return None
         #end if
 
         if not os.path.exists( seqFile ):
-            NTerror('importXeasy: seqFile "%s" not found', seqFile )
+            nTerror('importXeasy: seqFile "%s" not found', seqFile )
             return None
         #end if
         if not os.path.exists( protFile ):
-            NTerror('importXeasy: protFile "%s" not found', protFile )
+            nTerror('importXeasy: protFile "%s" not found', protFile )
             return None
         #end if
 
         if not project.molecule:
-            NTerror('importXeasy: No molecule defined' )
+            nTerror('importXeasy: No molecule defined' )
             return None
         #end if
 
@@ -456,11 +461,11 @@ def importXeasy( project, seqFile, protFile, convention ):
         if project.xeasy.error:
             # GWV please check. Did you mean to show an error here?
             # I just kept it to the message level and changed the token error to problem.
-            NTmessage( '==> importXeasy: problem(s) appending resonances from "%s"', protFile )
+            nTmessage( '==> importXeasy: problem(s) appending resonances from "%s"', protFile )
         else:
-            NTmessage( '==> importXeasy: appended resonances from "%s"', protFile )
+            nTmessage( '==> importXeasy: appended resonances from "%s"', protFile )
         #end if
-#            NTmessage( '%s', project.molecule.format() )
+#            nTmessage( '%s', project.molecule.format() )
         return len(project.molecule.resonanceSources)-1
 #end def
 
@@ -469,32 +474,32 @@ def importXeasyPeaks( project, seqFile, protFile, peakFile, convention ):
         return PeakList instance or None on error
         """
         if seqFile == None:
-            NTerror('importXeasyPeaks: undefined seqFile' )
+            nTerror('importXeasyPeaks: undefined seqFile' )
             return None
         #end if
         if protFile == None:
-            NTerror('importXeasyPeaks: undefined protFile' )
+            nTerror('importXeasyPeaks: undefined protFile' )
             return None
         #end if
         if peakFile == None:
-            NTerror('importXeasyPeaks: undefined peakFile' )
+            nTerror('importXeasyPeaks: undefined peakFile' )
             return None
         #end if
         if not os.path.exists( seqFile ):
-            NTerror('importXeasyPeaks: seqFile "%s" not found', seqFile )
+            nTerror('importXeasyPeaks: seqFile "%s" not found', seqFile )
             return None
         #end if
         if not os.path.exists( protFile ):
-            NTerror('importXeasyPeaks: protFile "%s" not found', protFile )
+            nTerror('importXeasyPeaks: protFile "%s" not found', protFile )
             return None
         #end if
         if not os.path.exists( peakFile ):
-            NTerror('importXeasyPeaks: peakFile "%s" not found', peakFile )
+            nTerror('importXeasyPeaks: peakFile "%s" not found', peakFile )
             return None
         #end if
 
         if not project.molecule:
-            NTerror('importXeasyPeaks: No molecule defined' )
+            nTerror('importXeasyPeaks: No molecule defined' )
             return None
         #end if
 
@@ -508,9 +513,9 @@ def importXeasyPeaks( project, seqFile, protFile, peakFile, convention ):
         project.addHistory( sprintf('Imported Xeasy peaks from "%s"', peakFile ) )
 
         if project.xeasy.error:
-            NTmessage( '==> importXeasyPeaks: new %s from "%s" completed with error(s)', peaks, peakFile )
+            nTmessage( '==> importXeasyPeaks: new %s from "%s" completed with error(s)', peaks, peakFile )
         else:
-            NTmessage( '==> importXeasyPeaks: new %s from "%s"', peaks, peakFile )
+            nTmessage( '==> importXeasyPeaks: new %s from "%s"', peaks, peakFile )
         #end if
         return peaks
 #end def
@@ -547,7 +552,8 @@ def export2Xeasy( project, tmp=None ):
                     peak.xeasyIndex = idx
                     idx += 1
                 #end for
-                while (idx%10000): idx += 1
+                while (idx%10000):
+                    idx += 1
 
                 #Xeasy/Cyana 1.x format
                 peakFile = project.path( project.directories.xeasy, pl.name+'.peaks' )

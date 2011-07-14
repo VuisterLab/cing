@@ -46,12 +46,12 @@ def convertStar2Ccpn(projectName, rootDir, inputDir="XPLOR", outputDir="CCPN"):
     The in and out paths are relative to the rootDir.
             """
 
-    NTerror("This routine is untested and shouldn't be used without.")
+    nTerror("This routine is untested and shouldn't be used without.")
     inputDir = os.path.join(rootDir, inputDir)
     outputDir = os.path.join(rootDir, outputDir)
 
     if not os.path.exists(inputDir):
-        NTerror("Failed to find")
+        nTerror("Failed to find")
     if os.path.exists(outputDir):
         shutil.rmtree(outputDir)
 
@@ -80,11 +80,11 @@ def importFullStarProjects(starFileName, projectName, inputDir='.', outputDir='.
     '''
 
     if not os.path.exists(inputDir):
-        NTerror("Failed to find inputDir: %s" % inputDir)
+        nTerror("Failed to find inputDir: %s" % inputDir)
         return False
     starFileNameFull = os.path.join(inputDir, starFileName)
     if not os.path.exists(starFileNameFull):
-        NTerror("Failed to find starFileNameFull: %s" % starFileNameFull)
+        nTerror("Failed to find starFileNameFull: %s" % starFileNameFull)
         return False
     if not os.path.exists(outputDir):
         os.mkdir(outputDir)
@@ -118,14 +118,14 @@ def importFullStarProjects(starFileName, projectName, inputDir='.', outputDir='.
         ccpnProject.checkAllValid()
     except ApiError:
         NTtracebackError()
-        NTerror("Failed ccpnProject.checkAllValid")
-        NTerror("See issue: %s%d" % (issueListUrl, 266))
+        nTerror("Failed ccpnProject.checkAllValid")
+        nTerror("See issue: %s%d" % (issueListUrl, 266))
         return False
 
     ccpnProject.saveModified()
 
     if not os.path.exists(ccpnProjectPath):
-        NTerror("Failed to find new CCPN project directory: %s" % ccpnProjectPath)
+        nTerror("Failed to find new CCPN project directory: %s" % ccpnProjectPath)
         return False
     tgzFileName = projectName + ".tgz"
     cmd = "tar -czf %s %s" % (tgzFileName, projectName)
@@ -145,13 +145,13 @@ def importStarChemicalShifts(ccpnProject, inputDir, guiRoot, allowPopups=1, mini
     # Actually just one but this is less time to code;-)
     globPattern = inputDir + '/*_21.str'
     fileList = glob(globPattern)
-    NTdebug("From %s will read files: %s" % (globPattern, fileList))
+    nTdebug("From %s will read files: %s" % (globPattern, fileList))
 
     for fn in fileList:
         fnBaseName = os.path.basename(fn).split('.')[0]
         shiftList = formatNmrStarFormat.readShifts(fn, minimalPrompts=minimalPrompts, verbose=verbose)
         if not shiftList:
-            NTerror("Failed to read")
+            nTerror("Failed to read")
             return True
         shiftList.setName(fnBaseName)
         ccpnShiftListOfList.append(shiftList)
@@ -162,13 +162,13 @@ def importStarChemicalShifts(ccpnProject, inputDir, guiRoot, allowPopups=1, mini
 
     keywds = getDeepByKeysOrDefault(presets, {}, READ_SHIFTS, KEYWORDS)
     if keywds:
-      NTmessage("In importStarChemicalShifts using keywds...")
-      NTdebug(str(keywds))
+      nTmessage("In importStarChemicalShifts using keywds...")
+      nTdebug(str(keywds))
 
     shiftList = getDeepByKeys(ccpnShiftListOfList, 0) # no need to repeat
-    NTdebug("First shiftList: %s" % shiftList)
+    nTdebug("First shiftList: %s" % shiftList)
     if shiftList == None:
-        NTerror("Failed to get shiftList again.")
+        nTerror("Failed to get shiftList again.")
         return True
 
 #    nmrConstraintStore = shiftList.nmrConstraintStore
@@ -192,6 +192,6 @@ if __name__ == '__main__':
         status = True
 
     if status:
-        NTerror("Failed to importFullStarProjects")
+        nTerror("Failed to importFullStarProjects")
         sys.exit(1)
 

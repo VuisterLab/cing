@@ -36,6 +36,7 @@ class AllChecks(TestCase):
             "Failed to change to test directory for files: " + cingDirTmpTest)
 
         for entryId in entryList:
+            nTmessage('Doing %s' % entryId)
             if useNrgArchive: # default is False
 #                inputArchiveDir = os.path.join('/Library/WebServer/Documents/NRG-CING/recoordSync', entryId)
                 # Mounted from nmr.cmbi.ru.nl
@@ -49,7 +50,7 @@ class AllChecks(TestCase):
 
             cingDirNew = os.path.join(cingDirTmp, entryId + ".cing")
             if os.path.exists(cingDirNew):
-                NTmessage("Removing old cing project directory: " + cingDirNew )
+                nTmessage("Removing old cing project directory: " + cingDirNew )
                 shutil.rmtree( cingDirNew )
 
             shutil.copy(cingFile, cingDirTmpTest)

@@ -78,7 +78,7 @@ class File (Lister):
     def read (self, nmrView_type = 0):
 
         if not self.filename:
-            NTerror(' no filename in STARFile with title: %s' % self.title)
+            nTerror(' no filename in STARFile with title: %s' % self.title)
             return 1
 #        print "DEBUG: Current directory", os.listdir(os.curdir)
         text = open(self.filename, 'r').read()
@@ -97,7 +97,7 @@ class File (Lister):
     def parse (self, text='', nmrView_type = 0):
 
         if self.verbosity > 2:
-            NTdebug('Parsing STAR file: %s' % self.filename)
+            nTdebug('Parsing STAR file: %s' % self.filename)
 
         """
         '"Begin at the beginning," the King said, gravely,
@@ -164,7 +164,7 @@ class File (Lister):
 
             ## Just checking
             if not (next_sf_begin or next_sf_end or next_free_tt or next_loop_tt):
-                NTerror(' No new item found in data_nodes_parse.')
+                nTerror(' No new item found in data_nodes_parse.')
                 print 'Items looked for are a begin or end of a saveframe, or'
                 print 'a begin of a tagtable(free or looped).'
                 print
@@ -221,14 +221,14 @@ class File (Lister):
                 next_free_tt    = None
             else: # next_loop_tt must be true as this was checked before
                 if not next_loop_tt:
-                    NTerror(' code bug in File.parse()')
+                    nTerror(' code bug in File.parse()')
                     return None
                 free            = None
                 next_loop_tt    = None
 
                 match_tagtable_loop = pattern_tagtable_loop.search(text, pos)
                 if not match_tagtable_loop:
-                    NTerror(' Code error, no second match on tagtable_loop')
+                    nTerror(' Code error, no second match on tagtable_loop')
                     return None
                 if match_tagtable_loop.start() != pos:
                     print "ERROR: Code error (wrong second match on tagtable_loop)"
@@ -274,13 +274,13 @@ class File (Lister):
     """
     def write (self):
         if not self.filename:
-            NTerror(' no filename in STARFile with title: %s' % self.title)
+            nTerror(' no filename in STARFile with title: %s' % self.title)
             return 1
         f = open(self.filename, 'w')
         f.write(self.star_text())
         f.close()
         if self.verbosity > 2:
-            NTdebug('Written STAR file:', self.filename)
+            nTdebug('Written STAR file:', self.filename)
 
     """
     Reads only the top part of a file up to but excluding the line
@@ -317,7 +317,7 @@ class File (Lister):
         output.writelines(L)
         output.close()
         if not os.path.exists(outputFN):
-            NTwarning('failed to materialize file: %s' % outputFN)
+            nTwarning('failed to materialize file: %s' % outputFN)
             return 1
         return None
 
@@ -351,7 +351,7 @@ class File (Lister):
             print "Attempting to reformat STAR file using external program if available"
 
         if os.name != 'posix':
-            NTwarning('No external program available on non-posix systems for reformatting STAR files')
+            nTwarning('No external program available on non-posix systems for reformatting STAR files')
             return 1
 
         ##  Try command and check for non-zero exit status
@@ -375,12 +375,12 @@ class File (Lister):
             try:
                 open(self.filename, 'w').write(output)
             except IOError:
-                NTerror(' Could not open the file for writing %s' % self.filename)
+                nTerror(' Could not open the file for writing %s' % self.filename)
                 return 1
             if self.verbosity >= 9:
                 print "Reformatted STAR file:", self.filename
             return 0
         else:
             if self.verbosity :
-                NTwarning('Not pretty printing STAR file' % self.filename)
+                nTwarning('Not pretty printing STAR file' % self.filename)
             return 1

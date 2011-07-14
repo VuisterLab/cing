@@ -1,12 +1,3 @@
-from cing import Project
-from cing.Libs.NTutils import * #@UnusedWildImport
-from cing.Libs.disk import copydir
-from cing.core.constants import * #@UnusedWildImport
-from cing.core.molecule import Ensemble
-from numpy import linalg as LA
-import numpy as np
-
-#print \
 """
 ==================================================================================================================
 USE THE CLASS IN cing.core.classes.ProjectTree INSTEAD OF THIS ONE!!!
@@ -15,6 +6,13 @@ USE THE CLASS IN cing.core.classes.ProjectTree INSTEAD OF THIS ONE!!!
 TOBE REMOVED
 Routines to compare different Project instances
 """
+from cing import Project
+from cing.Libs.NTutils import * #@UnusedWildImport
+from cing.Libs.disk import copydir
+from cing.core.constants import * #@UnusedWildImport
+from cing.core.molecule import Ensemble
+from numpy import linalg as LA
+import numpy as np
 
 class Projects( NTtree ):
     """
@@ -37,7 +35,7 @@ class Projects( NTtree ):
         if not project:
             return
         #self.entries.append(project)
-        self._addChild(project)
+        self.addChild2(project)
         project.id = self.next_id
         self.next_id += 1
 
@@ -53,7 +51,7 @@ class Projects( NTtree ):
         """
         project = Project.open( path, status=status)
         if not project:
-            NTerror('Projects.open: aborting')
+            nTerror('Projects.open: aborting')
             sys.exit(1)
 
         self.append( project )
@@ -70,7 +68,7 @@ class Projects( NTtree ):
             ctuple2 = tuple(ctuple2)
             c2 = p2.decodeNameTuple(ctuple2)
             if c2==None:
-                NTerror('Projects._mapIt: error mapping %s to %s (derived from %s)', ctuple2, p2, p1)
+                nTerror('Projects._mapIt: error mapping %s to %s (derived from %s)', ctuple2, p2, p1)
 
             self.moleculeMap.setdefault(c1, NTdict())
             self.moleculeMap[c1][(p1.name,p1.molecule.name)] = c1
@@ -114,7 +112,7 @@ class Projects( NTtree ):
         """
         path = self.path(*args)
         if not os.path.exists(path):
-#            NTdebug( "project.mkdir: %s" % dir )
+#            nTdebug( "project.mkdir: %s" % dir )
             os.makedirs(path)
         return path
     #end def
@@ -249,21 +247,21 @@ def calculatePairWisePhiPsiRmsd( mol1, mol2, ranges='auto' ):
     l1 = len(models1)
     l2 = len(models2)
     if l1 == 0 or len(models1[0]) == 0 or l2 == 0 or len(models2[0]) == 0:
-        NTdebug(">calculatePairWisePhiPsiRmsd> returning None, %s %s %s", l1, l2, ranges)
+        nTdebug(">calculatePairWisePhiPsiRmsd> returning None, %s %s %s", l1, l2, ranges)
         return None, None, None, None
 
     models = models1 + models2
 
     result = NTlistOfLists(len(models), len(models), 0.0)
 
-    #NTmessage( '==> Calculating dihedral pairwise rmsds' )
+    #nTmessage( '==> Calculating dihedral pairwise rmsds' )
 
     for i in range(len(models)):
         for j in range(i+1, len(models)):
             #print '>>', i,j
             r = models[i].calculateRMSD( models[j] )
             if r == None:
-                NTdebug('calculatePairWisePhiPsiRmsd: error for %s and %s', models[i], models[j])
+                nTdebug('calculatePairWisePhiPsiRmsd: error for %s and %s', models[i], models[j])
                 return None, None, None, None
             else:
                 result[i][j] = r
@@ -345,7 +343,7 @@ def calculatePairWiseRmsd( mol1, mol2, ranges=None ):
         or l2 == 0 or len(mol2.ensemble[0].fitCoordinates) == 0
         or len(mol1.ensemble[0].fitCoordinates) != len(mol2.ensemble[0].fitCoordinates)
     ):
-        NTdebug( ">calculatePairWiseRmsd> returning None, %s %s %s" , l1, l2, ranges)
+        nTdebug( ">calculatePairWiseRmsd> returning None, %s %s %s" , l1, l2, ranges)
         return None, None, None, None
 
 
@@ -353,7 +351,7 @@ def calculatePairWiseRmsd( mol1, mol2, ranges=None ):
 
     result = NTlistOfLists(len(models), len(models), 0.0)
 
-    NTmessage('==> Calculating pairwise rmsds %s %s', mol1, mol2)
+    nTmessage('==> Calculating pairwise rmsds %s %s', mol1, mol2)
 
     for i in range(len(models)):
         for j in range(i+1, len(models)):
@@ -574,7 +572,7 @@ def test( projects, stream=sys.stdout ):
         for p in projects.entries[1:]:
             val = getDeepByKeysOrAttributes(projects, 'moleculeMap', res, p.name)
             if val == None:
-                NTerror('Setting phipsiRmsds residue %s project %s (mapping not found)', res.name, p)
+                nTerror('Setting phipsiRmsds residue %s project %s (mapping not found)', res.name, p)
                 continue
             val.phipsiRmsds = rmsds3
         #end for
@@ -682,7 +680,7 @@ def ROGmacro( projects ):
             if res in selectedResidues:
                 pass
             else:
-                cmd = fprintf(stream, 'ColorRes object %d residue %d, %s\n', p.id+1, res.resNum, YasaraColorDict[res.rogScore.colorLabel]) #@UnusedVariable
+                fprintf(stream, 'ColorRes object %d residue %d, %s\n', p.id+1, res.resNum, YasaraColorDict[res.rogScore.colorLabel])
     #end for
     fprintf(stream, 'Console on\n')
 #end def
@@ -692,7 +690,7 @@ def mkYasaraByResidueMacro(projects, keys,
                             path = None
                            ):
 
-#    NTdebug('mkYasaraByResidueMacro: keys: %s, minValue: %s maxValue: %s', keys, minValue, maxValue)
+#    nTdebug('mkYasaraByResidueMacro: keys: %s, minValue: %s maxValue: %s', keys, minValue, maxValue)
 
     if path==None:
         stream = sys.stdout

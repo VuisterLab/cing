@@ -1,3 +1,4 @@
+#@PydevCodeAnalysisIgnore # pylint: disable-all
 # This module handles input and output of PDB files.
 #
 # Written by Konrad Hinsen <hinsen@cnrs-orleans.fr>

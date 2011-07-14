@@ -15,11 +15,11 @@ if True: # block
     useModule = True
 #    if not cingPaths.dssp:
     if cingPaths.dssp == None or cingPaths.dssp == PLEASE_ADD_EXECUTABLE_HERE:
-        NTdebug("Missing dssp which is an optional dep")
+        nTdebug("Missing dssp which is an optional dep")
         useModule = False
     if not useModule:
         raise ImportWarning('dssp')
-#    NTmessage('Using dssp')
+#    nTmessage('Using dssp')
 
 class Dssp:
     """
@@ -56,17 +56,17 @@ class Dssp:
     # Return True on error ( None on success; Python default)
     def run(self, export = True):
         if self.project.molecule.modelCount == 0:
-            NTwarning('dssp: no models for "%s"', self.project.molecule)
+            nTwarning('dssp: no models for "%s"', self.project.molecule)
             return None
         if export:
             if not self.project.molecule.hasAminoAcid():
-                NTmessage('==> Skipping Dssp because no amino acids are present.')
+                nTmessage('==> Skipping Dssp because no amino acids are present.')
                 return
 
             for res in self.project.molecule.allResidues():
                 if not res.hasProperties('protein'):
                     pass
-#                    NTwarning('Dssp.run: non-protein residue %s found and will be written out for Dssp' % `res`)
+#                    nTwarning('Dssp.run: non-protein residue %s found and will be written out for Dssp' % `res`)
 
             models = NTlist(*range(self.project.molecule.modelCount))
             # Can't use IUPAC here because aqua doesn't understand difference between
@@ -74,28 +74,28 @@ class Dssp:
             for model in models:
                 fullname = os.path.join(self.rootPath, 'model_%03d.pdb' % model)
                 # DSSP prefers what?
-#                NTdebug('==> Materializing model '+`model`+" to disk" )
+#                nTdebug('==> Materializing model '+`model`+" to disk" )
                 pdbFile = self.project.molecule.toPDB(model = model, convention = IUPAC)
                 if not pdbFile:
-                    NTerror("Dssp.run: Failed to write a temporary file with a model's coordinate")
+                    nTerror("Dssp.run: Failed to write a temporary file with a model's coordinate")
                     return True
                 pdbFile.save(fullname)
             #end for
         #end if
 
-        NTmessage('==> Calculating secondary structure by DSSP')
+        nTmessage('==> Calculating secondary structure by DSSP')
         now = time.time()
         for model in models:
             fullname = 'model_%03d.pdb' % model
             fullnameOut = 'model_%03d.dssp' % model
             cmd = fullname + ' ' + fullnameOut
             if self.dssp(cmd):
-                NTerror("Dssp.run: Failed to run DSSP; please consult the log file (.log etc). in the molecules dssp directory.")
+                nTerror("Dssp.run: Failed to run DSSP; please consult the log file (.log etc). in the molecules dssp directory.")
                 return True
             #end if
         #end for
         _taken = time.time() - now
-#        NTdebug("Finished dssp successfully in %8.1f seconds", _taken)
+#        nTdebug("Finished dssp successfully in %8.1f seconds", _taken)
 
 #        self.project.dsspStatus.completed = True
         self.project.status.dssp.completed = True
@@ -128,16 +128,16 @@ class Dssp:
         Return True on error.
         """
         modelCount = self.molecule.modelCount
-#        NTdebug("Parse dssp files and store result in each residue for " + `modelCount` + " model(s)")
+#        nTdebug("Parse dssp files and store result in each residue for " + `modelCount` + " model(s)")
 
         for model in range(modelCount):
             fullnameOut = 'model_%03d.dssp' % model
             path = os.path.join(self.rootPath, fullnameOut)
             if not os.path.exists(path):
-                NTerror('Dssp.parseResult: file "%s" not found', path)
+                nTerror('Dssp.parseResult: file "%s" not found', path)
                 return True
 
-#            NTmessage("Parsing " + path)
+#            nTmessage("Parsing " + path)
             isDataStarted = False
             for line in AwkLike(path):
                 if line.dollar[0].find("RESIDUE AA STRUCTURE BP1 BP2") >= 0:
@@ -145,34 +145,34 @@ class Dssp:
                     continue
                 if not isDataStarted:
                     continue
-#                NTdebug("working on line: %s" % line.dollar[0])
+#                nTdebug("working on line: %s" % line.dollar[0])
                 if not len(line.dollar[0][6:10].strip()):
-#                    NTdebug('Skipping line without residue number')
+#                    nTdebug('Skipping line without residue number')
                     continue
                 result = self._parseLine(line.dollar[0], self.dsspDefs)
                 if not result:
-                    NTerror("Failed to parse dssp file the below line; giving up.")
-                    NTerror(line.dollar[0])
+                    nTerror("Failed to parse dssp file the below line; giving up.")
+                    nTerror(line.dollar[0])
                     return True
                 chain = result['chain']
                 resNum = result['resNum']
                 residue = self.molecule.decodeNameTuple((None, chain, resNum, None))
                 if not residue:
-                    NTerror('in Dssp.parseResult: residue not found (%s,%d); giving up.' % (chain, resNum))
+                    nTerror('in Dssp.parseResult: residue not found (%s,%d); giving up.' % (chain, resNum))
                     return True
                 # For first model reset the dssp dictionary in the residue
                 if model == 0 and residue.has_key('dssp'):
                     del(residue['dssp'])
                 residue.setdefault('dssp', NTdict())
 
-#                NTdebug("working on residue %s" % residue)
+#                nTdebug("working on residue %s" % residue)
                 for field, value in result.iteritems():
                     if not self.dsspDefs[field][3]: # Checking store parameter.
                         continue
                     # Insert for key: "field" if missing an empty  NTlist.
                     residue.dssp.setdefault(field, NTlist())
                     residue.dssp[field].append(value)
-#                    NTdebug("field %s has values: %s" % ( field, residue.dssp[field]))
+#                    nTdebug("field %s has values: %s" % ( field, residue.dssp[field]))
                 #end for
             #end for
         #end for
@@ -193,7 +193,7 @@ class Dssp:
 #            if res.has_key( item ):
 #                itemList = res[ item ]
 #                c = itemList.setConsensus()
-#                NTdebug('consensus: %s', c)
+#                nTdebug('consensus: %s', c)
 
 #end class
 
@@ -218,16 +218,16 @@ def runDssp(project, parseOnly=False)   :
     """
     # check if dssp is present
     if cingPaths.dssp == None or cingPaths.dssp == PLEASE_ADD_EXECUTABLE_HERE:
-        NTmessage("runDssp: No whatif installed so skipping runDssp")
+        nTmessage("runDssp: No whatif installed so skipping runDssp")
         return
 
     if not project:
-        NTerror('runDssp: no project defined')
+        nTerror('runDssp: no project defined')
         return None
     #end if
 
     if not project.molecule:
-        NTerror('runDssp: no molecule defined')
+        nTerror('runDssp: no molecule defined')
         return None
     #end if
 
@@ -248,7 +248,7 @@ def runDssp(project, parseOnly=False)   :
 
     dcheck = Dssp(project)
     if not dcheck:
-        NTerror("runDssp: Failed to get dssp instance of project")
+        nTerror("runDssp: Failed to get dssp instance of project")
         return None
 
     dcheck.run()
@@ -266,7 +266,7 @@ def restoreDssp(project, tmp = None):
     Return True on error
     """
     if not project:
-        NTerror('restoreDssp: no project defined')
+        nTerror('restoreDssp: no project defined')
         return True
     #end if
 
@@ -296,18 +296,18 @@ def restoreDssp(project, tmp = None):
 
     dcheck = Dssp(project)
     if not dcheck:
-        NTerror("restoreDssp: Failed to get dssp instance of project")
+        nTerror("restoreDssp: Failed to get dssp instance of project")
         return True
 
-    NTmessage('==> Restoring DSSP results')
+    nTmessage('==> Restoring DSSP results')
     dcheck.parseResult()
-#    NTdetail('==> Restored dssp results')
+#    nTdetail('==> Restored dssp results')
     project.molecule.dssp = dcheck
 #end def
 
 def removeTempFiles( todoDir ):
 #    whatifDir        = project.mkdir( project.molecule.name, project.moleculeDirectories.whatif  )
-    NTdebug("Removing temporary files generated by Dssp")
+    nTdebug("Removing temporary files generated by Dssp")
     try:
 #        removeListLocal = ["DSSPOUT", "TOPOLOGY.FIL", "PDBFILE.PDB", "PDBFILE", "pdbout.tex", "pdbout.txt", 'fort.79']
         removeList = []
@@ -319,12 +319,12 @@ def removeTempFiles( todoDir ):
                 removeList.append(fn)
         for fn in removeList:
             if not os.path.exists(fn):
-                NTdebug("dssp.removeTempFiles: Expected to find a file to be removed but it doesn't exist: " + fn )
+                nTdebug("dssp.removeTempFiles: Expected to find a file to be removed but it doesn't exist: " + fn )
                 continue
-#            NTdebug("Removing: " + fn)
+#            nTdebug("Removing: " + fn)
             os.unlink(fn)
     except:
-        NTdebug("dssp.removeTempFiles: Failed to remove all temporary what if files that were expected")
+        nTdebug("dssp.removeTempFiles: Failed to remove all temporary what if files that were expected")
 #end def
 
 

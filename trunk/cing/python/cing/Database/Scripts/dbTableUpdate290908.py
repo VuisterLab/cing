@@ -70,7 +70,7 @@ for adef in NTdb.allAtomDefs():
 
     # just a check; should not happen
     if adef.nameDict['INTERNAL_1'] == None:
-        NTerror('INTERNAL_1 def of %s undefined', adef)
+        nTerror('INTERNAL_1 def of %s undefined', adef)
         exit(1)
     #end if
 #end for

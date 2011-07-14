@@ -37,9 +37,9 @@ nameDefs = [
     (MINPP_STR    , None, 'minor groove phosphorus-phosphorus', 'minor/major PP (A)'),
     (MAJPP_STR    , None, 'major minor groove phosphorus-phosphorus', 'majPP'),
 ]
-cingNameDict = NTdict(zip(NTzap(nameDefs, 0), NTzap(nameDefs, 1)))
-nameDict = NTdict(zip(NTzap(nameDefs, 0), NTzap(nameDefs, 2)))
-shortNameDict = NTdict(zip(NTzap(nameDefs, 0), NTzap(nameDefs, 3)))
+cingNameDict = NTdict(zip(nTzap(nameDefs, 0), nTzap(nameDefs, 1)))
+nameDict = NTdict(zip(nTzap(nameDefs, 0), nTzap(nameDefs, 2)))
+shortNameDict = NTdict(zip(nTzap(nameDefs, 0), nTzap(nameDefs, 3)))
 cingNameDict.keysformat()
 nameDict.keysformat()
 shortNameDict.keysformat()

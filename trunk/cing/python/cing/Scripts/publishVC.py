@@ -47,12 +47,12 @@ doLink = True
 os.chdir(localDir)
 #VCsecret = os.getenv('VCsecret') # unsafe
 if not VCsecret:
-    NTerror("Failed to find VCsecret env variable.")
+    nTerror("Failed to find VCsecret env variable.")
     sys.exit(1)
 
 remoteDir = os.path.join(remoteDirBase,VCsecret)
 if not os.path.exists(remoteDir):
-    NTerror("Failed to find remote directory (was it mounted?): %s" % remoteDir)
+    nTerror("Failed to find remote directory (was it mounted?): %s" % remoteDir)
     sys.exit(1)
 
 dstFile = '%s.tgz' % (vmName)
@@ -65,33 +65,33 @@ if doSend:
     if os.path.exists(remoteFile):
         if True:
             os.unlink(remoteFile)
-            NTmessage("Removing existing file.")
+            nTmessage("Removing existing file.")
         else:
-            NTerror("Failed because found remote file: %s" % remoteFile)
+            nTerror("Failed because found remote file: %s" % remoteFile)
             sys.exit(1)
 
     tarring = ExecuteProgram('tar', rootPath=localDir, redirectOutputToFile = remoteFile)
     tar_cmd = '-cpBf - %s.vmwarevm | gzip --fast' % vmName
-    NTmessage("Running tar with options: %s" % tar_cmd)
+    nTmessage("Running tar with options: %s" % tar_cmd)
     if tarring( tar_cmd ):
-        NTerror("Failed to run tar with options: " + tar_cmd)
+        nTerror("Failed to run tar with options: " + tar_cmd)
         sys.exit(1)
 
 if doLink:
     local_cmd = "'cd %s/%s; ln -f %s %s'" % ( dDir, VCsecret, fileName, dstFile )
     if workLocally:
         if do_cmd(local_cmd):
-            NTerror("Failed to link locally: " + local_cmd)
+            nTerror("Failed to link locally: " + local_cmd)
             sys.exit(1)
     else:
         sshing = ExecuteProgram('ssh', redirectOutput = False)
         ssh_cmd = ' jd@nmr.cmbi.umcn.nl %s' % local_cmd
-        NTmessage("Running ssh with options: %s" % ssh_cmd)
+        nTmessage("Running ssh with options: %s" % ssh_cmd)
         if sshing( ssh_cmd ):
-            NTerror("Failed to run ssh with options: " + ssh_cmd)
+            nTerror("Failed to run ssh with options: " + ssh_cmd)
             sys.exit(1)
 else:
-    NTmessage("No linking done yet, do manually.")
+    nTmessage("No linking done yet, do manually.")
 
 
 

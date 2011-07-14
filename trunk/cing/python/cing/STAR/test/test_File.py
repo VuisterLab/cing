@@ -19,7 +19,7 @@ class AllChecks(TestCase):
         mkdirs( cingDirTmpTest )
         os.chdir(cingDirTmpTest)
 
-        def testParse(self):
+        def test_Parse(self):
             text = """data_no_comments_here
 
 save_comment
@@ -63,7 +63,7 @@ save_comment   _Saveframe_category  comment   loop_
 """
             self.assertTrue(Utils.equalIgnoringWhiteSpace(exp, st))
 
-        def testReadFile(self):
+        def test_ReadFile(self):
             testEntry('1edp')
 
 """
@@ -71,7 +71,7 @@ Extra Test Routine going over some entries in the NMR Restraints Grid
 """
 def testEntry(entry):
     # Put a check in for internet availability.
-    NTmessage("Testing Entry")
+    nTmessage("Testing Entry")
     strf = File()
     # Freely available on the web so not included in package.
     stage = "2-parsed"
@@ -86,7 +86,7 @@ def testEntry(entry):
         urllib.urlretrieve(urlLocation, fnamezip)
     except:
         # not a real error since there might not be a network connection.
-        NTwarning("Failed to get; " + urlLocation)
+        nTwarning("Failed to get; " + urlLocation)
         return
 #    print "DEBUG: opening local zip file:", fnamezip
     zfobj = zipfile.ZipFile(fnamezip)
@@ -111,34 +111,34 @@ def testEntry(entry):
     strf.filename = pystarlibWrittenFile
     strf.write()
 
-    NTmessage("Most likely the below diff will fail because it depends on diff being installed")
+    nTmessage("Most likely the below diff will fail because it depends on diff being installed")
     cmd = "diff --ignore-all-space --ignore-blank-lines %s %s > %s" % (orgWattosWrittenFile, pystarlibWrittenFile, diffOrgPystarFile)
     os.system(cmd)
     if not os.path.exists(diffOrgPystarFile):
-        NTwarning("failed to diff files: " + orgWattosWrittenFile + ", " + pystarlibWrittenFile)
+        nTwarning("failed to diff files: " + orgWattosWrittenFile + ", " + pystarlibWrittenFile)
 
-    NTdebug("Most likely the below check will fail because it depends on Wattos being installed")
-    NTdebug("rewrite to Java formating for comparison")
+    nTdebug("Most likely the below check will fail because it depends on Wattos being installed")
+    nTdebug("rewrite to Java formating for comparison")
     cmd = "java -Xmx256m Wattos.Star.STARFilter %s %s ." % (pystarlibWrittenFile, wattosWrittenFile)
     logFileName = "wattos_STARFilter.log"
     wattosProgram = ExecuteProgram(cmd, redirectOutputToFile = logFileName)
     wattosExitCode = wattosProgram()
     if wattosExitCode:
-        NTwarning("failed to execute Wattos")
+        nTwarning("failed to execute Wattos")
         return
 
     if not os.path.exists(wattosWrittenFile):
-        NTerror("failed to rewrite file: " + pystarlibWrittenFile)
+        nTerror("failed to rewrite file: " + pystarlibWrittenFile)
         return
 
     cmd = "diff --ignore-all-space --ignore-blank-lines %s %s > %s" % (pystarlibWrittenFile, wattosWrittenFile, diffPystarWattosFile)
     os.system(cmd)
     if not os.path.exists(diffPystarWattosFile):
-        NTwarning("failed to diff file: " + pystarlibWrittenFile + ", " + wattosWrittenFile)
+        nTwarning("failed to diff file: " + pystarlibWrittenFile + ", " + wattosWrittenFile)
     cmd = "diff --ignore-all-space --ignore-blank-lines %s %s > %s" % (orgWattosWrittenFile, wattosWrittenFile, diffOrgWattosWattosFile)
     os.system(cmd)
     if not os.path.exists(diffOrgWattosWattosFile):
-        NTwarning("failed to diff file: ", orgWattosWrittenFile + ", " + wattosWrittenFile)
+        nTwarning("failed to diff file: ", orgWattosWrittenFile + ", " + wattosWrittenFile)
 
     if 1:
         try:
@@ -156,10 +156,10 @@ Extra Test Routine going over some entries in the NMR Restraints Grid
 def testSingleFile(filename):
     strf = File()
     strf.filename = filename
-    NTdebug("reading file ", strf.filename)
+    nTdebug("reading file ", strf.filename)
     strf.read()
     strf.filename = strf.filename + "_new.str"
-    NTdebug("writing file ", strf.filename)
+    nTdebug("writing file ", strf.filename)
     strf.write()
 
 

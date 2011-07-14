@@ -24,10 +24,10 @@ def violationAngle(value, lowerBound, upperBound):
 #        value      -= .0
         "Return None on error"
         if lowerBound == None: # See entry 1bn0
-            NTwarning("Lower bound is None; skipping this angle for this model.")
+            nTwarning("Lower bound is None; skipping this angle for this model.")
             return
         if upperBound == None: # See entry 1bn0
-            NTwarning("Upper bound is None; skipping this angle for this model.")
+            nTwarning("Upper bound is None; skipping this angle for this model.")
             return
         lowerBound -= .0 # only one needed because see below.
 #        upperBound -= .0

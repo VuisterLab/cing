@@ -1,5 +1,7 @@
-# Executed from iCingServlet.java#processRun:
-# String cing_options = "--name " + projectName + " --script doValidateiCing.py " + possibleInit;
+"""
+Executed from iCingServlet.java#processRun:
+String cing_options = "--name " + projectName + " --script doValidateiCing.py " + possibleInit;
+"""
 from cing.Libs.NTutils import * #@UnusedWildImport
 
 # Run and parse/Only parse the results
@@ -19,19 +21,21 @@ if fastestTest:
     doWattos = False
     doTalos = False
 
+# pylint: disable=E0601
 project = project #@UndefinedVariable for Pydev extensions.
+# pylint: disable=E0601
 options = options #@UndefinedVariable
 
 #==================================================
 # Check for molecule
 #==================================================
 if project.molecule == None:
-    NTerror('script doValidateiCing.py: no molecule defined')
+    nTerror('script doValidateiCing.py: no molecule defined')
     exit(1)
 #end if
 
 project.validate( ranges=options.ranges, parseOnly=parseOnly,  htmlOnly=htmlOnly,
                   doProcheck = doProcheck, doWhatif=doWhatif, doWattos=doWattos, doTalos=doTalos)
 
-NTmessage("Done with overall validation")
+nTmessage("Done with overall validation")
 

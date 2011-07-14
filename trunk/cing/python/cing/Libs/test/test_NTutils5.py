@@ -27,7 +27,7 @@ class AllChecks(TestCase):
 ]
         for testTuple in testList:
             testList, minFraction, useLargest, testResult = testTuple
-#            NTdebug("Testing %s" % `testTuple`)
+#            nTdebug("Testing %s" % `testTuple`)
             testListNT = NTlist()
             testListNT += testList
             self.assertEquals(testListNT.getConsensus(minFraction=minFraction,useLargest=useLargest),testResult)
@@ -48,7 +48,7 @@ class AllChecks(TestCase):
             angleList = NTlist()
             angleList.append(cv1)
             angleList.append(cv2)
-            circularVariance = NTcVarianceAverage(angleList)
+            circularVariance = nTcVarianceAverage(angleList)
             self.assertAlmostEqual(circularVariance, cav, places = 3)
 
     def testGetEnsembleAverageAndSigmaFromHistogram(self):
@@ -64,10 +64,10 @@ class AllChecks(TestCase):
 # [ 0.,  0.,  0.,  0.,  1.,  0.],
 # [ 0.,  0.,  0.,  0.,  0.,  0.],
 # [ 0.,  0.,  1.,  0.,  0.,  0.]]
-        c_av, c_sd, hisMin, hisMax = getEnsembleAverageAndSigmaFromHistogram(m) #@UnusedVariable
+        c_av, c_sd, hisMin, hisMax = getEnsembleAverageAndSigmaHis(m) #@UnusedVariable
         self.assertEqual( c_av, x) # weird average
 
-        c_av, c_sd, hisMin, hisMax = getArithmeticAverageAndSigmaFromHistogram(m) #@UnusedVariable
+        c_av, c_sd, hisMin, hisMax = getArithmeticAverageAndSigmaHis(m) #@UnusedVariable
         self.assertEqual( c_av, x/nn) # huge difference.
 
 
@@ -104,9 +104,9 @@ class AllChecks(TestCase):
             self.assertEquals(timedelta2HoursMinutesAndSeconds(t), tExpected[i])
     def testNTlist(self):
         ntList = NTlist([7,8,9])
-#        NTdebug("ntList: " + str(ntList) +"  length: %s" % len(ntList))
+#        nTdebug("ntList: " + str(ntList) +"  length: %s" % len(ntList))
         ntList.clear()
-#        NTdebug("ntList: " + str(ntList) +"  length: %s" % len(ntList))
+#        nTdebug("ntList: " + str(ntList) +"  length: %s" % len(ntList))
 
     def testTruth(self):
         inputList = """t True  y yes 1 2 -1
@@ -115,7 +115,7 @@ class AllChecks(TestCase):
         resultList = [1,1,1,1,1,1,1,
                       0,0,0,0,0,0,0]
         for i, inputStr in enumerate(inputList):
-#            NTdebug("Test: %d" % i)
+#            nTdebug("Test: %d" % i)
             self.assertEquals( stringMeansBooleanTrue(inputStr), resultList[i]==1)
 
     def testAsci2list(self):
@@ -149,7 +149,7 @@ class AllChecks(TestCase):
                       '[-20, -19, -2, -1, 3, 4]',
                      ]
         for i, inputStr in enumerate(inputList):
-            NTdebug("testAsci2list: %d" % i)
+            nTdebug("testAsci2list: %d" % i)
             resultStr = str(asci2list(inputStr))
             self.assertEquals( resultStr, resultLoL[i])
         saveVerbosity = cing.verbosity
@@ -164,8 +164,8 @@ class AllChecks(TestCase):
         lastFile = globLast(globPattern)
         dateTimeObject = getDateTimeFromFileName(lastFile)
 #        dateTimeString = getDateTimeStampForFileName(lastFile)
-#        NTdebug('lastFile: %s dateTimeObject %s' % (lastFile, dateTimeObject))
-#        NTdebug('lastFile: %s dateTimeString %s' % (lastFile, dateTimeString))
+#        nTdebug('lastFile: %s dateTimeObject %s' % (lastFile, dateTimeObject))
+#        nTdebug('lastFile: %s dateTimeString %s' % (lastFile, dateTimeString))
         self.assertTrue(dateTimeObject)
         self.assertTrue(dateTimeObject.year >= 2009)
 #        self.assertEquals(extension, '.txt')
@@ -177,10 +177,10 @@ class AllChecks(TestCase):
         byItems = ( 'type', 'C_VIN' )
         vadl = NTdb.allAtomDefs().selectByItems( *byItems )
 #       vadl = adl.
-        NTdebug("%s in db: %s" % (byItems[1], str(vadl)))
+        nTdebug("%s in db: %s" % (byItems[1], str(vadl)))
         self.assertTrue( len(vadl) >= 11 ) # allow growth but not shrinkage.
 #        for ad in vadl:
-#            NTdebug(str(ad))
+#            nTdebug(str(ad))
 
 if __name__ == "__main__":
     cing.verbosity = cing.verbosityDebug

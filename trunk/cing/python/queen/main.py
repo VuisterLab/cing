@@ -69,7 +69,7 @@ def initFromCING( queenProject, cingProject ):
        Generate the templates.
     """
     if not cingProject:
-        NTerror('initFromCING: Please supply a valid CING project argument.')
+        nTerror('initFromCING: Please supply a valid CING project argument.')
         exit(1)
     #end if
 
@@ -115,14 +115,14 @@ def initFromCING( queenProject, cingProject ):
                )
     # end for
     fp.close()
-    NTmessage('==> Dataset file: %s', setfile)
+    nTmessage('==> Dataset file: %s', setfile)
 
     # Generate templates by writing pdbfile and calling qn_pdb2all
     if not cingProject.molecule:
-        NTerror('initFromCING: no molecule defined, skipping template generation')
+        nTerror('initFromCING: no molecule defined, skipping template generation')
         return
     #end if
-    NTmessage('==> Generating templates ...')
+    nTmessage('==> Generating templates ...')
     pdbfile = os.path.join(queenProject.pdb, cingProject.molecule.name.replace(' ','_')+'.pdb')
     #print '>', pdbfile
     cingProject.molecule.toPDBfile( pdbfile, model=0 ) # save first model to pdbfile
@@ -3392,7 +3392,7 @@ class xplor_script:
     self.errorfunc=errorfunc
     self.logfiles = logfiles
     self.clear()
-    NTdebug("Writting to scriptpath: %s\n and log path %s" % (self.scriptpath, self.logpath))
+    nTdebug("Writting to scriptpath: %s\n and log path %s" % (self.scriptpath, self.logpath))
   # RAISE AN ERROR
   # ==============
   # CALLS THE ERRORFUNCTION PROVIDED BY THE USER WITH THE GIVEN STRING
@@ -3418,18 +3418,18 @@ class xplor_script:
   # =============
   def submit(self):
       if self.error:
-        NTerror("Found error when starting xplor submit")
+        nTerror("Found error when starting xplor submit")
         return
       # CLOSE THE SCRIPT
       self.write("stop")
       self.script.close()
-      NTdebug("RUN XPLOR WITH THE SCRIPT")
+      nTdebug("RUN XPLOR WITH THE SCRIPT")
     #      log = os.popen("%s < %s"%(self.xplor,self.scriptpath))
       # TODO: rewrite so that it always writes to disk.
       cmd = "%s < %s"%(self.xplor,self.scriptpath)
       log = Popen(cmd, shell=True, stdout=PIPE).stdout
 
-      NTdebug("CHECK FOR ERRORS in %s" % self.logpath)
+      nTdebug("CHECK FOR ERRORS in %s" % self.logpath)
       xplorlog = log.read()
       exitstatus = log.close()
       writeTextToFile(self.logpath, xplorlog)
@@ -3437,16 +3437,16 @@ class xplor_script:
       skiperrors = string.count(xplorlog,"POWELL-ERR")
       resultList = []
       if not grep(self.logpath, "ERR", resultList = resultList):
-          NTerror("Found errors in xplor log.")
+          nTerror("Found errors in xplor log.")
       errors = len(resultList)
 #      errors = string.count(xplorlog,"ERR") #@UnusedVariable
       warnings = string.count(xplorlog,"WRN")
-      NTdebug("TAKE CARE OF ERRORS")
+      nTdebug("TAKE CARE OF ERRORS")
       if errors-skiperrors:
-          NTerror("Found errors in XPLOR log: %s" % resultList)
+          nTerror("Found errors in XPLOR log: %s" % resultList)
           self.raiseerror("%s generated %i errors.\nLogfile: %s"%(self.progstr,errors-skiperrors,self.logpath))
           return
-      NTdebug("TAKE CARE OF WARNINGS")
+      nTdebug("TAKE CARE OF WARNINGS")
       if warnings:
         print "%s generated %i warnings. Please investigate!\nLogfile: %s"%(self.progstr,warnings,self.logpath)
       if (exitstatus): self.raiseerror("XPLOR returned error %d"%exitstatus)
@@ -3454,7 +3454,7 @@ class xplor_script:
         os.remove(self.scriptpath)
       elif self.logfiles=='keep':
         print "%s executed without serious problems."%self.progstr
-      NTdebug("Done in submit")
+      nTdebug("Done in submit")
       return
 
 #  ======================================================================
@@ -4187,23 +4187,23 @@ class queenbase:
     os.remove(self.dmtx)
 
   def calcmtx(self,xplr,restraints,averaging='sum'):
-    NTdebug("Now in calcmtx using xplr")
+    nTdebug("Now in calcmtx using xplr")
     self.dmtx = os.path.join(self.logpath,'d_%i.mtx'%os.getpid())
-    NTdebug("INITIALIZE XPLOR")
+    nTdebug("INITIALIZE XPLOR")
     xplrs = xplor_script(xplr.path,self.logpath)
-    NTdebug("BUILD SCRIPT")
+    nTdebug("BUILD SCRIPT")
     xplrs.write("structure\n @%s\nend"%xplr.psf)
     xplrs.write("evaluate ($par_nonbonded=PROLSQ)")
     xplrs.write("parameter\n @%s\nend"%xplr.parameter)
     # ECHO CAN BE HANDY FOR DEBUGGING, BUT LET'S
     # LEAVE IT OFF FOR NOW
     xplrs.write("set echo on message on end")
-    NTdebug("FORMAT THE RESTRAINT FILE")
+    nTdebug("FORMAT THE RESTRAINT FILE")
     if type(restraints)==types.DictType:
       xplrs.write(xplor_formatdict(restraints,averaging))
     elif type(restraints)==types.ListType:
       xplrs.write(xplor_formatlist(restraints,averaging))
-    NTdebug("READ TEMPLATE FOR PSEUDOATOM CORRECTIONS")
+    nTdebug("READ TEMPLATE FOR PSEUDOATOM CORRECTIONS")
     xplrs.write("coord disp=refe @%s"%xplr.template)
     # SET FLAGE
     xplrs.write("flags")
@@ -4215,26 +4215,26 @@ class queenbase:
     xplrs.write("  shortest-path-algorithm=auto")
     xplrs.write("  writebounds=%s"%self.dmtx)
     xplrs.write("end")
-    NTdebug("Submitting xplor script")
+    nTdebug("Submitting xplor script")
     xplrs.submit()
 
   def calcunc(self):
-    NTdebug("READ MATRIX USING NMV MODULE")
+    nTdebug("READ MATRIX USING NMV MODULE")
     nmv.xplor_read(self.dmtx)
-    NTdebug("CALCULATE UNCERTAINTY USING NMV MODULE")
+    nTdebug("CALCULATE UNCERTAINTY USING NMV MODULE")
     unc = nmv.total_uncertainty()
     self.errorflag = eflag
-    NTdebug("Returning unc")
+    nTdebug("Returning unc")
     return unc
 
   def uncertainty(self,xplr,restraints):
-    NTdebug("CALCULATE MATRIX")
+    nTdebug("CALCULATE MATRIX")
     self.calcmtx(xplr,restraints)
-    NTdebug("CALCULATE UNCERTAINTY")
+    nTdebug("CALCULATE UNCERTAINTY")
     unc = self.calcunc()
-    NTdebug("CLEAR MEMORY")
+    nTdebug("CLEAR MEMORY")
     self.clear()
-    NTdebug("RETURN UNCERTAINTY")
+    nTdebug("RETURN UNCERTAINTY")
     return unc
 
   def rmsde(self,xplr,restraints):
@@ -4281,7 +4281,7 @@ class CingBasedQueen( queenbase ):
 
         cingProject = Project.open( cingProjectName, status='old', restore=False)
         if cingProject == None:
-            NTerror('CingBasedQueen: Opening project "%s"\n', cingProjectName )
+            nTerror('CingBasedQueen: Opening project "%s"\n', cingProjectName )
             exit(1)
         #end if
 
@@ -4299,7 +4299,7 @@ class CingBasedQueen( queenbase ):
            Generate the templates.
         """
         if not self.cingProject:
-            NTerror('CingBasedQueen.exportFromCING: Please supply a valid CING project argument.')
+            nTerror('CingBasedQueen.exportFromCING: Please supply a valid CING project argument.')
             exit(1)
         #end if
 
@@ -4339,14 +4339,14 @@ class CingBasedQueen( queenbase ):
                    )
         # end for
         fp.close()
-        NTmessage('==> Dataset file: %s', setfile)
+        nTmessage('==> Dataset file: %s', setfile)
 
         # Generate templates by writing pdbfile and calling qn_pdb2all
         if not self.cingProject.molecule:
-            NTerror('CingBasedQueen.exportFromCING: no molecule defined, skipping template generation')
+            nTerror('CingBasedQueen.exportFromCING: no molecule defined, skipping template generation')
             return
         #end if
-        NTmessage('==> Generating templates ...')
+        nTmessage('==> Generating templates ...')
         pdbfile = os.path.join(self.pdb, self.cingProject.molecule.name.replace(' ','_')+'.pdb')
         #print '>', pdbfile
         self.cingProject.molecule.toPDB( pdbfile, model=0 ) # save first model to pdbfile
@@ -4523,7 +4523,7 @@ if __name__ == '__main__':
 #
 #        cingProject = Project.open( options.projectName, status='old', restore=False)
 #        if cingProject == None:
-#            NTerror('initFromCING: Opening project "%s"\n', options.projectName )
+#            nTerror('initFromCING: Opening project "%s"\n', options.projectName )
 #            exit(1)
 #        #end if
 #
@@ -4542,7 +4542,7 @@ if __name__ == '__main__':
             error("Please supply the --project argument; type queen --help for more help")
             exit(1)
         #end if
-#        NTwarning("JFD assumes nmrconf = nmvconf")
+#        nTwarning("JFD assumes nmrconf = nmvconf")
         nmrconf = nmvconf
         queen = qn_setup(nmrconf, options.projectName, myid, numproc)
         xplr  = qn_setupxplor(nmvconf,options.projectName)

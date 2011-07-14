@@ -34,16 +34,16 @@ nrgPlusDir = os.path.join(results_dir, 'nrgPlus')
 
 def annotateEntry(entry_code, bmrb_id, *extraArgList):
     'Return True on error'
-    NTmessage(header)
-    NTmessage(getStartMessage())
+    nTmessage(header)
+    nTmessage(getStartMessage())
 
     expectedArgumentList = []
     expectedNumberOfArguments = len(expectedArgumentList)
     if len(extraArgList) != expectedNumberOfArguments:
-        NTerror("Got arguments: " + `extraArgList`)
-        NTerror("Failed to get expected number of arguments: %d got %d" % (
+        nTerror("Got arguments: " + `extraArgList`)
+        nTerror("Failed to get expected number of arguments: %d got %d" % (
             expectedNumberOfArguments, len(extraArgList)))
-        NTerror("Expected arguments: %s" % expectedArgumentList)
+        nTerror("Expected arguments: %s" % expectedArgumentList)
         return True
 #    entry_code, city = entryCodePlusCity.split('_')
 
@@ -86,9 +86,9 @@ def annotateEntry(entry_code, bmrb_id, *extraArgList):
     dataOrgEntryDir = os.path.join(results_dir, 'recoordSync', entry_code)
     ccpnFile = os.path.join(dataOrgEntryDir, entry_code + ".tgz")
     if not os.path.exists(ccpnFile):
-        NTerror("Input file not found: %s" % ccpnFile)
+        nTerror("Input file not found: %s" % ccpnFile)
         return True
-    NTdebug("Looking at %s" % entry_code)
+    nTdebug("Looking at %s" % entry_code)
 #                continue # TODO disable premature stop.
 
     bmrb_code = 'bmr'+bmrb_id
@@ -96,11 +96,11 @@ def annotateEntry(entry_code, bmrb_id, *extraArgList):
     digits12 ="%02d" % ( bmrb_id % 100 )
     inputStarDir = os.path.join(bmrbDir, digits12)
     if not os.path.exists(inputStarDir):
-        NTerror("Input star dir not found: %s" % inputStarDir)
+        nTerror("Input star dir not found: %s" % inputStarDir)
         return True
     inputStarFile = os.path.join(inputStarDir, '%s.str'%bmrb_code)
     if not os.path.exists(inputStarFile):
-        NTerror("inputStarFile not found: %s" % inputStarFile)
+        nTerror("inputStarFile not found: %s" % inputStarFile)
         return True
 
     dataDividedXDir = os.path.join(nrgPlusDir, ch23)
@@ -112,34 +112,34 @@ def annotateEntry(entry_code, bmrb_id, *extraArgList):
 
     presets = getDeepByKeysOrDefault(presetDict, {}, bmrb_code)
     if presets:
-      NTmessage("In annotateLoop using preset values...")
-      NTdebug(str(presets))
+      nTmessage("In annotateLoop using preset values...")
+      nTdebug(str(presets))
 
     if os.path.exists(entry_code):
-        NTmessage("Removing previous directory: %s" % entry_code)
+        nTmessage("Removing previous directory: %s" % entry_code)
         rmtree(entry_code)
     do_cmd("tar -xzf " + ccpnFile)
     if os.path.exists('linkNmrStarData'):
-        NTmessage("Renaming standard directory linkNmrStarData to entry: %s" % entry_code)
+        nTmessage("Renaming standard directory linkNmrStarData to entry: %s" % entry_code)
         os.rename('linkNmrStarData', entry_code)
 
     if checkOrgProject:
         # By reading the ccpn tgz into cing it is also untarred/tested.
         project = Project.open(entry_code, status='new')
         if not project.initCcpn(ccpnFolder=ccpnFile, modelCount=1):
-            NTerror("Failed check of original project")
+            nTerror("Failed check of original project")
             return True
         project.removeFromDisk()
         project.close(save=False)
 
     ccpnProject = loadProject(entry_code)
     if not ccpnProject:
-        NTerror("Failed to read project: %s" % entry_code)
+        nTerror("Failed to read project: %s" % entry_code)
         return True
 
 #            nmrProject = ccpnProject.currentNmrProject
 #            ccpnMolSystem = ccpnProject.findFirstMolSystem()
-#            NTmessage('found ccpnMolSystem: %s' % ccpnMolSystem)
+#            nTmessage('found ccpnMolSystem: %s' % ccpnMolSystem)
 #    print 'status: %s' % ccpnMolSystem.setCode(projectName) # impossible; reported to ccpn team.
 
     importStarChemicalShifts(ccpnProject, inputStarDir, guiRoot, allowPopups=allowPopups, minimalPrompts=minimalPrompts, verbose=verbose, **presets)
@@ -153,20 +153,20 @@ def annotateEntry(entry_code, bmrb_id, *extraArgList):
             if structureEnsemble:
                 swapCheck(nmrConstraintStore, structureEnsemble, numSwapCheckRuns)
             else:
-                NTmessage("Failed to find structureEnsemble; skipping swapCheck")
+                nTmessage("Failed to find structureEnsemble; skipping swapCheck")
         else:
-            NTmessage("Failed to find nmrConstraintStore; skipping swapCheck")
+            nTmessage("Failed to find nmrConstraintStore; skipping swapCheck")
 #        constraintsHandler.swapCheck(nmrConstraintStore, structureEnsemble, numSwapCheckRuns)
 
     if doSaveProject:
-#        NTmessage('Checking validity and saving to new path')
-        NTmessage('Saving to new path')
+#        nTmessage('Checking validity and saving to new path')
+        nTmessage('Saving to new path')
 #        checkValid=True,
         saveProject(ccpnProject, newPath=entry_code, removeExisting=True)
     if doExport:
         tarPath = os.path.join(entryDir, entry_code + ".tgz")
         if os.path.exists(tarPath):
-            NTmessage("Overwriting: " + tarPath)
+            nTmessage("Overwriting: " + tarPath)
         myTar = tarfile.open(tarPath, mode='w:gz') # overwrites
         myTar.add(entry_code)
         myTar.close()
@@ -213,9 +213,9 @@ def runAbunch():
             NTtracebackError()
             status = True
         finally:
-            NTmessage(getStopMessage(cing.starttime))
+            nTmessage(getStopMessage(cing.starttime))
             if status:
-                NTerror("Failed to annotateEntry for arguments: %s" % str( sys.argv))
+                nTerror("Failed to annotateEntry for arguments: %s" % str( sys.argv))
 
 if __name__ == "__main__":
     cing.verbosity = cing.verbosityDebug
@@ -226,8 +226,8 @@ if __name__ == "__main__":
 #        NTtracebackError()
 #        status = True
 #    finally:
-#        NTmessage(getStopMessage(cing.starttime))
+#        nTmessage(getStopMessage(cing.starttime))
 #        if status:
-#            NTerror("Failed to annotateEntry for arguments: %s" % str( sys.argv))
+#            nTerror("Failed to annotateEntry for arguments: %s" % str( sys.argv))
 #            sys.exit(1)
     runAbunch()

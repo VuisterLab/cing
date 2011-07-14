@@ -134,8 +134,8 @@ class caspNmrCing(Lister):
         ##No changes required below this line
         ###############################################################################
 
-        NTmessage("Publish results at directory    : " + self.results_dir)
-        NTmessage("Do maximum number of entries    : " + `self.max_entries_todo`)
+        nTmessage("Publish results at directory    : " + self.results_dir)
+        nTmessage("Do maximum number of entries    : " + `self.max_entries_todo`)
 
         os.chdir(self.results_dir)
 
@@ -155,7 +155,7 @@ class caspNmrCing(Lister):
     Returns one for complete resource.
     """
     def is_complete_resource(self, entry_code):
-        NTdebug("checking is_complete_resource for entry: " + entry_code)
+        nTdebug("checking is_complete_resource for entry: " + entry_code)
         sub_dir = entry_code[1:3]
         indexFileName = os.path.join (self.results_dir, DATA_STR, sub_dir, entry_code, entry_code + ".cing", 'index.html')
         return os.path.isfile(indexFileName)
@@ -163,18 +163,18 @@ class caspNmrCing(Lister):
 
     def getCingEntriesTriedAndDone(self):
         "Returns list or None for error"
-        NTdebug("From disk get the entries done in CASP-NMR-CING")
+        nTdebug("From disk get the entries done in CASP-NMR-CING")
 
         entry_list_tried = []
         entry_list_done = []
         entry_list_crashed = []
 
-        NTdebug("Now in: " + os.getcwd())
+        nTdebug("Now in: " + os.getcwd())
         subDirList = os.listdir(DATA_STR)
         for subDir in subDirList:
             if len(subDir) != 2:
                 if subDir != DS_STORE_STR:
-                    NTdebug('Skipping subdir with other than 2 chars: [' + subDir + ']')
+                    nTdebug('Skipping subdir with other than 2 chars: [' + subDir + ']')
                 continue
             entryList = os.listdir(os.path.join(DATA_STR,subDir))
             for entryDir in entryList:
@@ -192,7 +192,7 @@ class caspNmrCing(Lister):
                     # Look for last log file
                     logList = glob(entrySubDir + '/%s/*.log' % logFile)
                     if not logList:
-                        NTmessage("Failed to find any log file in subdirectory of: %s" % entrySubDir)
+                        nTmessage("Failed to find any log file in subdirectory of: %s" % entrySubDir)
                         continue
                     # .cing directory and .log file present so it was tried to start but might not have finished
     #                self.entry_anno_list_tried.append(entry_code)
@@ -205,29 +205,29 @@ class caspNmrCing(Lister):
                     for r in AwkLike(logLastFile):
                         line = r.dollar[0]
                         if line.startswith('CING took       :'):
-    #                        NTdebug("Matched line: %s" % line)
+    #                        nTdebug("Matched line: %s" % line)
                             timeTakenStr = r.dollar[r.NF - 1]
                             self.timeTakenDict[entry_code] = float(timeTakenStr)
-    #                        NTdebug("Found time: %s" % self.timeTakenDict[entry_code])
+    #                        nTdebug("Found time: %s" % self.timeTakenDict[entry_code])
                         if line.startswith('Traceback (most recent call last)'):
-    #                        NTdebug("Matched line: %s" % line)
+    #                        nTdebug("Matched line: %s" % line)
                             if entry_code in entry_list_crashed:
-                                NTwarning("%s was already found before; not adding again." % entry_code)
+                                nTwarning("%s was already found before; not adding again." % entry_code)
                             else:
                                 entry_list_crashed.append(entry_code)
                                 entryCrashed = True
                         if line.count('ERROR:'):
-                            NTerror("Matched line: %s" % line)
+                            nTerror("Matched line: %s" % line)
                             entryWithErrorMessage = True
                         if line.count('Aborting'):
-                            NTdebug("Matched line: %s" % line)
+                            nTdebug("Matched line: %s" % line)
                             entryCrashed = True
                             if entry_code in entry_list_crashed:
-                                NTwarning("%s was already found before; not adding again." % entry_code)
+                                nTwarning("%s was already found before; not adding again." % entry_code)
                             else:
                                 entry_list_crashed.append(entry_code)
                     if entryWithErrorMessage:
-                        NTerror("Above for entry: %s" % entry_code)
+                        nTerror("Above for entry: %s" % entry_code)
                     if entryCrashed:
                         continue # don't mark it as stopped anymore.
 
@@ -250,7 +250,7 @@ class caspNmrCing(Lister):
         MAX_CHAIN_MAPPING_ERRORS = 1
         MAX_ANY_ERRORS = 2 * MAX_LINK_ERRORS + MAX_CHAIN_MAPPING_ERRORS
 
-        NTmessage("Get the entries tried, todo, crashed, and stopped from file system.")
+        nTmessage("Get the entries tried, todo, crashed, and stopped from file system.")
 
         self.entry_anno_list_obsolete = NTlist()
         self.entry_anno_list_tried = NTlist()
@@ -266,43 +266,43 @@ class caspNmrCing(Lister):
         for subDir in subDirList:
             if len(subDir) != 2:
                 if subDir != DS_STORE_STR:
-                    NTdebug('Skipping subdir with other than 2 chars: [' + subDir + ']')
+                    nTdebug('Skipping subdir with other than 2 chars: [' + subDir + ']')
                 continue
             entryList = os.listdir(os.path.join(DATA_STR, subDir))
             for entryDir in entryList:
                 entry_code = entryDir
                 if entry_code.startswith( "."):
-#                    NTdebug('Skipping hidden file: [' + entry_code + ']')
+#                    nTdebug('Skipping hidden file: [' + entry_code + ']')
                     continue
                 if entry_code.endswith( "Org") or entry_code.endswith( "Test"):
-#                    NTdebug('Skipping original entry: [' + entry_code + ']')
+#                    nTdebug('Skipping original entry: [' + entry_code + ']')
                     continue
                 entrySubDir = os.path.join(DATA_STR, subDir, entry_code)
 #                if not entry_code in self.entry_list_nrg_docr:
-#                    NTwarning("Found entry %s in NRG-CING but not in NRG. Will be obsoleted in NRG-CING too" % entry_code)
+#                    nTwarning("Found entry %s in NRG-CING but not in NRG. Will be obsoleted in NRG-CING too" % entry_code)
 #                    if len(self.entry_list_obsolete) < self.ENTRY_DELETED_COUNT_MAX:
 #                        rmdir(entrySubDir)
 #                        self.entry_list_obsolete.append(entry_code)
 #                    else:
-#                        NTerror("Entry %s in NRG-CING not obsoleted since there were already removed: %s" % (
+#                        nTerror("Entry %s in NRG-CING not obsoleted since there were already removed: %s" % (
 #                            entry_code, self.ENTRY_DELETED_COUNT_MAX))
                 # end if
 
 #                cingDirEntry = os.path.join(entrySubDir, entry_code + ".cing")
 #                if not os.path.exists(cingDirEntry):
-#                    NTmessage("Failed to find directory: %s" % cingDirEntry)
+#                    nTmessage("Failed to find directory: %s" % cingDirEntry)
 #                    continue
 
                 # Look for last log file
                 logList = glob(entrySubDir + '/log_doAnno*/*.log')
                 if not logList:
-                    NTmessage("Failed to find any log file in directory: %s" % entrySubDir)
+                    nTmessage("Failed to find any log file in directory: %s" % entrySubDir)
                     continue
                 # .cing directory and .log file present so it was tried to start but might not have finished
                 self.entry_anno_list_tried.append(entry_code)
 
                 logLastFile = logList[-1]
-#                NTdebug("Found logLastFile %s" % logLastFile)
+#                nTdebug("Found logLastFile %s" % logLastFile)
 #                set timeTaken = (` grep 'CING took       :' $logFile | gawk '{print $(NF-1)}' `)
 #                text = readTextFromFile(logLastFile)
                 entryCrashed = False
@@ -313,19 +313,19 @@ class caspNmrCing(Lister):
                 for r in AwkLike(logLastFile):
                     line = r.dollar[0]
                     if line.startswith('CING took       :'):
-#                        NTdebug("Matched line: %s" % line)
+#                        nTdebug("Matched line: %s" % line)
                         timeTakenStr = r.dollar[r.NF - 1]
                         self.timeTakenDict[entry_code] = float(timeTakenStr)
-#                        NTdebug("Found time: %s" % self.timeTakenDict[entry_code])
+#                        nTdebug("Found time: %s" % self.timeTakenDict[entry_code])
                     if line.startswith('Traceback (most recent call last)'):
-#                        NTdebug("Matched line: %s" % line)
+#                        nTdebug("Matched line: %s" % line)
                         if entry_code in self.entry_anno_list_crashed:
-                            NTwarning("%s was already found before; not adding again." % entry_code)
+                            nTwarning("%s was already found before; not adding again." % entry_code)
                         else:
                             self.entry_anno_list_crashed.append(entry_code)
                             entryCrashed = True
                     if line.count('ERROR:'):
-                        NTerror("Matched line: %s" % line)
+                        nTerror("Matched line: %s" % line)
 
                     hasPseudoErrorListed = line.count(" .Q") # ignore the errors for pseudos e.g. in CGR26ALyon Hopefully this is unique enough; tested well.
                     if line.count("Error: Not linking atom"):
@@ -341,10 +341,10 @@ class caspNmrCing(Lister):
                             anyErrorList.append(line)
 
                     if line.count('Aborting'):
-                        NTdebug("Matched line: %s" % line)
+                        nTdebug("Matched line: %s" % line)
                         entryCrashed = True
                         if entry_code in self.entry_anno_list_crashed:
-                            NTwarning("%s was already found before; not adding again." % entry_code)
+                            nTwarning("%s was already found before; not adding again." % entry_code)
                         else:
                             self.entry_anno_list_crashed.append(entry_code)
                 if entryCrashed:
@@ -352,15 +352,15 @@ class caspNmrCing(Lister):
 
                 linkErrorListCount = len(linkErrorList)
                 if linkErrorListCount > MAX_LINK_ERRORS:
-                    NTerror("%-25s has more than %s link errors;          %s" % (entry_code,MAX_LINK_ERRORS,linkErrorListCount))
+                    nTerror("%-25s has more than %s link errors;          %s" % (entry_code,MAX_LINK_ERRORS,linkErrorListCount))
                     entryCrashed = True
                 chainMappingListCount = len(chainMappingErrorList)
                 if chainMappingListCount > MAX_CHAIN_MAPPING_ERRORS:
-                    NTerror("%-25s has more than %s chain mapping errors; %s" % (entry_code,MAX_CHAIN_MAPPING_ERRORS,chainMappingListCount))
+                    nTerror("%-25s has more than %s chain mapping errors; %s" % (entry_code,MAX_CHAIN_MAPPING_ERRORS,chainMappingListCount))
                     entryCrashed = True
                 anyErrorListCount = len(anyErrorList)
                 if anyErrorListCount > MAX_ANY_ERRORS:
-                    NTerror("%-25s has more than %s any errors;           %s" % (entry_code,MAX_ANY_ERRORS,anyErrorListCount))
+                    nTerror("%-25s has more than %s any errors;           %s" % (entry_code,MAX_ANY_ERRORS,anyErrorListCount))
                     entryCrashed = True
 
                 if entryCrashed:
@@ -368,14 +368,14 @@ class caspNmrCing(Lister):
 
                 if not self.timeTakenDict.has_key(entry_code):
                     # was stopped by time out or by user or by system (any other type of stop but stack trace)
-                    NTmessage("%s Since CING end message was not found assumed to have stopped" % entry_code)
+                    nTmessage("%s Since CING end message was not found assumed to have stopped" % entry_code)
                     self.entry_anno_list_stopped.append(entry_code)
                     continue
 
                 # Look for end statement from CING which shows it wasn't killed before it finished.
                 ccpnFileEntry = os.path.join(entrySubDir, "%s.tgz"%entry_code)
                 if not os.path.exists(ccpnFileEntry):
-                    NTmessage("%s Since ccpn file %s was not found assumed to have stopped" % (entry_code, ccpnFileEntry))
+                    nTmessage("%s Since ccpn file %s was not found assumed to have stopped" % (entry_code, ccpnFileEntry))
                     self.entry_anno_list_stopped.append(entry_code)
                     continue
 
@@ -384,24 +384,24 @@ class caspNmrCing(Lister):
         # end for subDir
         timeTakenList = NTlist() # local variable.
         timeTakenList.addList(self.timeTakenDict.values())
-        NTmessage("Time taken by CING by statistics\n%s" % timeTakenList.statsFloat())
+        nTmessage("Time taken by CING by statistics\n%s" % timeTakenList.statsFloat())
 
         if not self.entry_anno_list_tried:
-            NTerror("Failed to find entries that CING tried.")
+            nTerror("Failed to find entries that CING tried.")
 
         self.entry_anno_list_todo.addList(self.entry_anno_list_all)
         self.entry_anno_list_todo = self.entry_anno_list_todo.difference(self.entry_anno_list_done)
 
-        NTmessage("Found %s entries overall for annotation." % len(self.entry_anno_list_all))
-        NTmessage("Found %s entries that CING tried (T)." % len(self.entry_anno_list_tried))
-        NTmessage("Found %s entries that CING crashed/failed (C)." % len(self.entry_anno_list_crashed))
-        NTmessage("Found %s entries that CING stopped (S)." % len(self.entry_anno_list_stopped))
+        nTmessage("Found %s entries overall for annotation." % len(self.entry_anno_list_all))
+        nTmessage("Found %s entries that CING tried (T)." % len(self.entry_anno_list_tried))
+        nTmessage("Found %s entries that CING crashed/failed (C)." % len(self.entry_anno_list_crashed))
+        nTmessage("Found %s entries that CING stopped (S)." % len(self.entry_anno_list_stopped))
         if not self.entry_anno_list_done:
-            NTerror("Failed to find entries that CING did.")
-        NTmessage("Found %s entries that CING did (B=A-C-S)." % len(self.entry_anno_list_done))
-        NTmessage("Found %s entries todo (A-B)." % len(self.entry_anno_list_todo))
-        NTmessage("Found %s entries obsolete (not removed yet)." % len(self.entry_anno_list_obsolete))
-        NTmessage("Found entries todo:\n%s" % self.entry_anno_list_todo)
+            nTerror("Failed to find entries that CING did.")
+        nTmessage("Found %s entries that CING did (B=A-C-S)." % len(self.entry_anno_list_done))
+        nTmessage("Found %s entries todo (A-B)." % len(self.entry_anno_list_todo))
+        nTmessage("Found %s entries obsolete (not removed yet)." % len(self.entry_anno_list_obsolete))
+        nTmessage("Found entries todo:\n%s" % self.entry_anno_list_todo)
         os.chdir(cwdCache)
     # end def
 
@@ -416,20 +416,20 @@ class caspNmrCing(Lister):
 #        self.match.d[ "1brv" ] = EntryInfo(time=modification_time)
 
         ## following statement is equivalent to a unix command like:
-        NTdebug("Looking for PDB entries from different databases.")
+        nTdebug("Looking for PDB entries from different databases.")
 
         (self.entry_list_tried, self.entry_list_done, self.entry_list_crashed) = \
             self.getCingEntriesTriedAndDone()
         if not self.entry_list_tried:
-            NTwarning("Failed to find entries that CING tried.")
+            nTwarning("Failed to find entries that CING tried.")
 #            return 0
-        NTmessage("Found %s entries that CING tried." % len(self.entry_list_tried))
-        NTmessage("Found %s entries that crashed CING." % len(self.entry_list_crashed))
+        nTmessage("Found %s entries that CING tried." % len(self.entry_list_tried))
+        nTmessage("Found %s entries that crashed CING." % len(self.entry_list_crashed))
 
         if not self.entry_list_done:
-            NTwarning("Failed to find entries that CING did.")
+            nTwarning("Failed to find entries that CING did.")
 #            return 0
-        NTmessage("Found %s entries that CING did." % len(self.entry_list_done))
+        nTmessage("Found %s entries that CING did." % len(self.entry_list_done))
 
         self.entry_list_all.addList( self.entry_anno_list_all )
 #        for entry in entryList:
@@ -438,14 +438,14 @@ class caspNmrCing(Lister):
         self.entry_list_todo.addList(self.entry_list_all)
         self.entry_list_todo = self.entry_list_todo.difference(self.entry_list_done)
 
-        NTmessage("Found entries overall: %s" % len(self.entry_list_all))
-        NTmessage("Found entries todo:    %s" % len(self.entry_list_todo))
-        NTmessage("Found entries todo:    \n%s" % self.entry_list_todo)
+        nTmessage("Found entries overall: %s" % len(self.entry_list_all))
+        nTmessage("Found entries todo:    %s" % len(self.entry_list_todo))
+        nTmessage("Found entries todo:    \n%s" % self.entry_list_todo)
 
         if self.updateIndices:
             self.update_index_files()
 
-#        NTdebug("premature return until coded completely... TODO:")
+#        nTdebug("premature return until coded completely... TODO:")
         return True
 
 
@@ -455,13 +455,13 @@ class caspNmrCing(Lister):
         Just making the one page specific for an entry
         Returns 0 for success.
         """
-        NTmessage("Making page for entry: " + entry_code)
+        nTmessage("Making page for entry: " + entry_code)
         if self.regenerating_pickle:
             return 0
         ## Check to see if there was all giffie files were actually made
         ## If not then still exit with an error
         if not self.is_complete_resource(entry_code):
-            NTerror("despite checks no gif fie found for entry: " + entry_code)
+            nTerror("despite checks no gif fie found for entry: " + entry_code)
             return 1
 
     def do_analyses_loop(self, processes_max):
@@ -475,7 +475,7 @@ class caspNmrCing(Lister):
 
         f = forkoff.ForkOff(processes_max=processes_max, max_time_to_wait=self.max_time_to_wait)
         self.done_entry_list = f.forkoff_start(job_list, self.delay_between_submitting_jobs)
-        NTmessage("Finished following list: %s" % self.done_entry_list)
+        nTmessage("Finished following list: %s" % self.done_entry_list)
 
 
     def update_index_files(self):
@@ -492,7 +492,7 @@ class caspNmrCing(Lister):
 
         csvwriter = csv.writer(file(self.index_pdb_file_name, "w"))
         if not self.entry_list_done:
-            NTwarning("No entries done, skipping creation of indexes")
+            nTwarning("No entries done, skipping creation of indexes")
             return 1
 
         self.entry_list_done.sort()
@@ -504,7 +504,7 @@ class caspNmrCing(Lister):
         number_of_files = int(number_of_entries_all_present / number_of_entries_per_file)
         if number_of_entries_all_present % number_of_entries_per_file:
             number_of_files += 1
-        NTmessage("Generating %s index html files" % (number_of_files))
+        nTmessage("Generating %s index html files" % (number_of_files))
 
 #        example_str_template = """ <td><a href=""" + self.pdb_link_template + \
 #        """>%S</a><BR><a href=""" + self.bmrb_link_template + ">%b</a>"
@@ -550,7 +550,7 @@ class caspNmrCing(Lister):
                 begin_entry_count = number_of_entries_per_file * (file_id - 1) + 1
                 end_entry_count = min(number_of_entries_per_file * file_id,
                                            number_of_entries_all_present)
-#                NTdebug("%5d %5d %5d" % (begin_entry_count, end_entry_count, number_of_entries_all_present))
+#                nTdebug("%5d %5d %5d" % (begin_entry_count, end_entry_count, number_of_entries_all_present))
 
                 old_string = r"<!-- INSERT NEW RESULT STRING HERE -->"
                 result_string = "CASP-NMR data sets"
@@ -631,19 +631,19 @@ class caspNmrCing(Lister):
                 t = pdb_entry_code[1:3]
                 startDir = '%s/%s/%s/%s.cing' % ( self.data_dir, t, pdb_entry_code, pdb_entry_code )
                 cmd = 'cd %s; find . -name "mol.gif"' % startDir
-#                NTdebug("Attempting cmd: [%s]" % cmd)
+#                nTdebug("Attempting cmd: [%s]" % cmd)
                 output = get_cmd_output( cmd )
                 if output == None:
-                    NTerror("Failed to find mol.gif")
+                    nTerror("Failed to find mol.gif")
                     x = 'Molecularsystem' # but not always.
                 else:
                     try:
                         x = output.split('/')[1] # ./Molecularsystem/HTML/mol.gif
                     except:
 #                        TODO: enable again for this is a valid check it just ruins my output on development.
-                        NTwarning("Failed to find molecular system name for %s from output listing of mol image: [%s]" % (pdb_entry_code,output))
+                        nTwarning("Failed to find molecular system name for %s from output listing of mol image: [%s]" % (pdb_entry_code,output))
                         x = 'Molecularsystem' # but not always.
-#                NTdebug("found molecular system name: %s" % x)
+#                nTdebug("found molecular system name: %s" % x)
 
                 tmp_string = string.replace(example_str_template, r"%S", string.upper(pdb_entry_code)) # does nothing because %S was omitted.
                 tmp_string = string.replace(tmp_string, r"%s", pdb_entry_code)
@@ -668,17 +668,17 @@ class caspNmrCing(Lister):
         index_file_first = 'index_1.html'
         index_file = os.path.join(indexDir, 'index.html')
         ## Assume that a link that is already present is valid and will do the job
-#        NTmessage('Symlinking: %s %s' % (index_file_first, index_file))
+#        nTmessage('Symlinking: %s %s' % (index_file_first, index_file))
         symlink(index_file_first, index_file)
 
 #        ## Make a sym link from the index_bmrb.html file to the index.html file
 #        index_file_first = 'index_pdb.html'
 #        index_file_first = index_file_first
 #        index_file = os.path.join(self.results_dir + "/index", 'index.html')
-#        NTdebug('Symlinking (B): %s %s' % (index_file_first, index_file))
+#        nTdebug('Symlinking (B): %s %s' % (index_file_first, index_file))
 #        symlink(index_file_first, index_file)
 
-#        NTmessage("Copy the adjusted php script")
+#        nTmessage("Copy the adjusted php script")
 #        org_file = os.path.join(self.base_dir, self.data_dir_local, 'redirect.php')
 #        new_file = os.path.join(self.results_dir, 'redirect.php')
 #        file_content = open(org_file, 'r').read()
@@ -686,7 +686,7 @@ class caspNmrCing(Lister):
 #        file_content = string.replace(file_content, old_string, self.results_url)
 #        open(new_file, 'w').write(file_content)
 
-        NTmessage("Copy the adjusted html redirect")
+        nTmessage("Copy the adjusted html redirect")
         org_file = os.path.join(self.base_dir, self.data_dir_local, 'redirect.html')
         new_file = os.path.join(self.results_dir, 'index.html')
 #        file_content = open(org_file, 'r').read()
@@ -711,10 +711,10 @@ class caspNmrCing(Lister):
         ## Searches and matches
         if new_hits_entry_list:
             m.new_hits_entry_list = new_hits_entry_list
-            NTmessage("Doing list of new entries: %s" % new_hits_entry_list)
+            nTmessage("Doing list of new entries: %s" % new_hits_entry_list)
 #        else:
         if not m.search_matching_entries():
-            NTerror("can't search matching entries")
+            nTerror("can't search matching entries")
             os._exit(1)
 
         ## Make the individual and overall web pages including
@@ -723,7 +723,7 @@ class caspNmrCing(Lister):
 
 #        Disable for now TODO: enable again.
 #        if not m.update_index_files():
-#            NTerror("can't update index files")
+#            nTerror("can't update index files")
 
 if __name__ == '__main__':
     cing.verbosity = cing.verbosityDebug
@@ -745,4 +745,4 @@ if __name__ == '__main__':
                 isProduction=isProduction)
 #    m.getCingEntriesTriedAndDone()
     m.update(new_hits_entry_list,doCheckAnnotation=doCheckAnnotation)
-    NTmessage("Finished creating the CASP-NMR CING indices")
+    nTmessage("Finished creating the CASP-NMR CING indices")

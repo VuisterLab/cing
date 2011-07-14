@@ -36,7 +36,7 @@ class AllChecks(TestCase):
 
         m = project.molecule
         ranges = 'A.173-178'
-        NTdebug("m: %s" % m)
+        nTdebug("m: %s" % m)
         self.assertTrue( m.toPDB('m001.pdb', model=0, ranges=ranges, convention='XPLOR'))
         m.initCoordinates()
         m.importFromPDB('m001.pdb',convention='XPLOR')
@@ -44,7 +44,7 @@ class AllChecks(TestCase):
         self.assertFalse(project.mkMacros())
 #       self.assertFalse(project.validate(htmlOnly=False, doWhatif = False, doProcheck = False))
 
-    def tttestPrintSequenceFromPdbFile(self):
+    def _testPrintSequenceFromPdbFile(self):
         entryId = "1brv" # Small much studied PDB NMR entry
 #        entryId = "1hy8" # small, single model, very low scoring entry
 

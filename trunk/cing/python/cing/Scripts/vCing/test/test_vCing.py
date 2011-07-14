@@ -31,17 +31,17 @@ class AllChecks(TestCase):
     def _testvCingMaster(self):
         exitCode, token, tokenLock = vc.nextTokenWithLock(lockTimeOut)
         if exitCode:
-            NTdebug("Failed to vc.nextTokenWithLock(). Was the token deleted?")
-        NTdebug("Got exitCode, token, tokenLock: %s %s %s" % (exitCode, token, tokenLock))
+            nTdebug("Failed to vc.nextTokenWithLock(). Was the token deleted?")
+        nTdebug("Got exitCode, token, tokenLock: %s %s %s" % (exitCode, token, tokenLock))
 #        vc.refreshLock(tokenLock, lockTimeOut)
         tokenContent = vc.getToken(token)
-        NTdebug("Got tokenContent: %s" % tokenContent)
+        nTdebug("Got tokenContent: %s" % tokenContent)
         # Just temporary.
         self.assertFalse(vc.deleteLock(tokenLock))
         exitCode, token, tokenLock = vc.nextTokenWithLock(lockTimeOut)
 
         pid = p.process_fork( vc.keepLockFresh, [tokenLock, lockTimeOut] )
-        NTdebug("Create a background process [%s] keeping the lock" % pid)
+        nTdebug("Create a background process [%s] keeping the lock" % pid)
         time.sleep(sleepTimeSimulatingWork)
         self.assertFalse(vc.deleteToken(token)) # this should end the background process pid
 

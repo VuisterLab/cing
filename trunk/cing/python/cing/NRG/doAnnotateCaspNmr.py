@@ -18,16 +18,16 @@ import tarfile
 dataDir = os.path.join(baseDir,DATA_STR)
 
 def annotateEntry(entryCodeNew, *extraArgList):
-    NTmessage(header)
-    NTmessage(getStartMessage())
+    nTmessage(header)
+    nTmessage(getStartMessage())
 
     expectedArgumentList = []
     expectedNumberOfArguments = len(expectedArgumentList)
     if len(extraArgList) != expectedNumberOfArguments:
-        NTerror("Got arguments: " + `extraArgList`)
-        NTerror("Failed to get expected number of arguments: %d got %d" % (
+        nTerror("Got arguments: " + `extraArgList`)
+        nTerror("Failed to get expected number of arguments: %d got %d" % (
             expectedNumberOfArguments, len(extraArgList)))
-        NTerror("Expected arguments: %s" % expectedArgumentList)
+        nTerror("Expected arguments: %s" % expectedArgumentList)
         return True
 #    entryCode, city = entryCodePlusCity.split('_')
 
@@ -91,15 +91,15 @@ def annotateEntry(entryCodeNew, *extraArgList):
     presetDict = {}
     presets = getDeepByKeysOrDefault(presetDict, {}, entryCodeNew)
     if presets:
-      NTmessage("In annotateLoop using preset values...")
+      nTmessage("In annotateLoop using preset values...")
 
     if sourceIsOrgProject:
         if os.path.exists(entryCodeOrg):
-            NTmessage("Removing previous Org directory: %s" % entryCodeOrg)
+            nTmessage("Removing previous Org directory: %s" % entryCodeOrg)
             rmtree(entryCodeOrg)
         do_cmd("tar -xzf " + ccpnFile)
         if os.path.exists(entryCodeNew):
-            NTmessage("Removing previous directory: %s" % entryCodeNew)
+            nTmessage("Removing previous directory: %s" % entryCodeNew)
             rmtree(entryCodeNew)
         copytree(entryCodeOrg, entryCodeNew)
 
@@ -107,19 +107,19 @@ def annotateEntry(entryCodeNew, *extraArgList):
         # By reading the ccpn tgz into cing it is also untarred/tested.
         project = Project.open(entryCodeOrg, status='new')
         if not project.initCcpn(ccpnFolder=ccpnFile, modelCount=1):
-            NTerror("Failed check of original project")
+            nTerror("Failed check of original project")
             return
         project.removeFromDisk()
         project.close(save=False)
 
     ccpnProject = loadProject(entryCodeNew)
     if not ccpnProject:
-        NTerror("Failed to read project: %s" % entryCodeNew)
+        nTerror("Failed to read project: %s" % entryCodeNew)
         return
 
 #            nmrProject = ccpnProject.currentNmrProject
 #            ccpnMolSystem = ccpnProject.findFirstMolSystem()
-#            NTmessage('found ccpnMolSystem: %s' % ccpnMolSystem)
+#            nTmessage('found ccpnMolSystem: %s' % ccpnMolSystem)
 #    print 'status: %s' % ccpnMolSystem.setCode(projectName) # impossible; reported to ccpn team.
 
     if replaceCoordinates or replaceRestraints:
@@ -134,20 +134,20 @@ def annotateEntry(entryCodeNew, *extraArgList):
             if structureEnsemble:
                 swapCheck(nmrConstraintStore, structureEnsemble, numSwapCheckRuns)
             else:
-                NTmessage("Failed to find structureEnsemble; skipping swapCheck")
+                nTmessage("Failed to find structureEnsemble; skipping swapCheck")
         else:
-            NTmessage("Failed to find nmrConstraintStore; skipping swapCheck")
+            nTmessage("Failed to find nmrConstraintStore; skipping swapCheck")
 #        constraintsHandler.swapCheck(nmrConstraintStore, structureEnsemble, numSwapCheckRuns)
 
     if doSaveProject:
-#        NTmessage('Checking validity and saving to new path')
-        NTmessage('Saving to new path')
+#        nTmessage('Checking validity and saving to new path')
+        nTmessage('Saving to new path')
 #        checkValid=True,
         saveProject(ccpnProject, newPath=entryCodeNew, removeExisting=True)
     if doExport:
         tarPath = os.path.join(entryDir, entryCodeNew + ".tgz")
         if os.path.exists(tarPath):
-            NTmessage("Overwriting: " + tarPath)
+            nTmessage("Overwriting: " + tarPath)
         myTar = tarfile.open(tarPath, mode='w:gz') # overwrites
         myTar.add(entryCodeNew)
         myTar.close()
@@ -160,4 +160,4 @@ if __name__ == "__main__":
     try:
         status = annotateEntry(*sys.argv[1:])
     finally:
-        NTmessage(getStopMessage(cing.starttime))
+        nTmessage(getStopMessage(cing.starttime))

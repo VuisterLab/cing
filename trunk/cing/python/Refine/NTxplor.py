@@ -199,7 +199,7 @@ parameters = refineParameters(
     #end def
 
     def toFile( self, path ):
-#        NTdebug("Writing parameters to %s" % path)
+#        nTdebug("Writing parameters to %s" % path)
         f = open( path, 'w' )
         fprintf( f, '%s', self )
         f.close()
@@ -291,7 +291,7 @@ class Xplor( refineParameters ):
 
 #        self.project = None # Must be set in specific job. It's used for a tighter integration.
         if not self.project: # will throw an exception.
-            NTerror("Need a CING project access in Xplor class.")
+            nTerror("Need a CING project access in Xplor class.")
             return
         #end if
 
@@ -332,12 +332,12 @@ class Xplor( refineParameters ):
         """
         path = self.joinPath( *args )
         if not os.path.exists( path ):
-            NTerror('path "%s" does not exist', path )
+            nTerror('path "%s" does not exist', path )
             sys.exit(1)
         #end if
         pathStripped = path.strip()
         if path != pathStripped:
-            NTwarning("In NTxplor#checkPath: why was stripping needed for [%s]" % path)
+            nTwarning("In NTxplor#checkPath: why was stripping needed for [%s]" % path)
             path = pathStripped
         return path
     #end def
@@ -353,7 +353,7 @@ class Xplor( refineParameters ):
             if self.overwrite:
                 os.remove( path )
             else:
-                NTerror('path "%s" already exists; use --overwrite', path )
+                nTerror('path "%s" already exists; use --overwrite', path )
                 sys.exit(1)
             #end if
         #end if
@@ -364,7 +364,7 @@ class Xplor( refineParameters ):
     def setupPTcode( self ):
         """Return code for setup of parameters, topology and structure files"""
 
-#        NTdebug("Now in %s" % getCallerName())
+#        nTdebug("Now in %s" % getCallerName())
 
         code = '''
 {*==========================================================================*}
@@ -392,7 +392,7 @@ end"""
     def readMolCode( self, useCoordinates = True ):
         """Return code for setup of molecular files"""
 
-#        NTdebug("Now in %s" % getCallerName())
+#        nTdebug("Now in %s" % getCallerName())
 
         code = """
 {*==========================================================================*}
@@ -410,7 +410,7 @@ end"""
     def getPdbFilePath(self):
         'Return None on error'
         if not self.molecules:
-            NTerror("Failed to find self.molecules with mol")
+            nTerror("Failed to find self.molecules with mol")
             return
         mol = self.molecules[0]
         return self.newPath( self.outPath, mol.pdbFile )
@@ -522,7 +522,7 @@ evaluate ( $rms.noe = $result )
             for noe in self.noeRestraints:
 #                maxlength = 20 - len('viol.noe.')
                 if len(noe.name) > MAX_SIZE_XPLOR_RESTRAINT_LIST_NAME:
-                    NTerror("NOE list name is over %s chars and xplor wouldn't be able to handle it: [%s]" % (MAX_SIZE_XPLOR_RESTRAINT_LIST_NAME, noe.name))
+                    nTerror("NOE list name is over %s chars and xplor wouldn't be able to handle it: [%s]" % (MAX_SIZE_XPLOR_RESTRAINT_LIST_NAME, noe.name))
                     return False
                 noe.setdefault( 'averaging', 'sum' )
                 noe.setdefault( 'scale',      50 )
@@ -553,7 +553,7 @@ evaluate ( $viol.noe.total = $violations + $viol.noe.total )
         for dihed in self.dihedralRestraints:
 #            maxlength = 20 - len('viol.cdih.')
             if len(dihed.name) > MAX_SIZE_XPLOR_RESTRAINT_LIST_NAME:
-                NTerror("Dihedral angle list name is over %s chars and xplor wouldn't be able to handle it: [%s]" % (MAX_SIZE_XPLOR_RESTRAINT_LIST_NAME, dihed.name))
+                nTerror("Dihedral angle list name is over %s chars and xplor wouldn't be able to handle it: [%s]" % (MAX_SIZE_XPLOR_RESTRAINT_LIST_NAME, dihed.name))
                 return False
             code = code + """
 restraints dihedral reset
@@ -603,7 +603,7 @@ end if
         scriptFile = open( scriptFileName, 'w' )
         self.printScript( scriptFile )
         scriptFile.close()
-#        NTdebug('==> Created script "%s"',  scriptFileName)
+#        nTdebug('==> Created script "%s"',  scriptFileName)
 
         # Create job/log file
         jobFileName = self.joinPath(self.directories.jobs, self.jobName + '.csh')
@@ -621,22 +621,22 @@ end if
         jobFile.close()
 
         os.system('/bin/chmod +x %r' % jobFileName)
-#        NTdebug('==> Starting XPLOR job "%s"', jobFileName)
+#        nTdebug('==> Starting XPLOR job "%s"', jobFileName)
 
         if self.useCluster:
-            NTmessage( 'Sending job to the queue %s', self.queu_cluster )
+            nTmessage( 'Sending job to the queue %s', self.queu_cluster )
             os.system( '%s %s &' % (self.queu_cluster, jobFileName) )
             time.sleep(5)
         else:
             if do_cmd(jobFileName, bufferedOutput=0):
-                NTerror("Failed to run job from: %s" % jobFileName)
+                nTerror("Failed to run job from: %s" % jobFileName)
                 return True
             # end if
         # end if
 
         if cing.verbosity < cing.verbosityDebug:
 #        if 1: # DEFAULT: 1 to remove temporary files
-            NTmessage("Removing job and script files")
+            nTmessage("Removing job and script files")
             os.unlink(jobFileName)
             os.unlink(scriptFileName)
         # end if
@@ -644,9 +644,9 @@ end if
         if self.resultFile:
             if os.path.exists(self.resultFile):
                 pass
-#                NTdebug("Found result file: %s" % self.resultFile)
+#                nTdebug("Found result file: %s" % self.resultFile)
             else:
-                NTerror("Failed to find resulting file: %s" % self.resultFile)
+                nTerror("Failed to find resulting file: %s" % self.resultFile)
                 return True
             # end if
         # end if
@@ -654,12 +654,12 @@ end if
 
         # When reporting always show log file name because output to stderr easily gets mingled.
         if entryCrashed:
-            NTerror("Script crashed according to log file: %s" % logFileName)
+            nTerror("Script crashed according to log file: %s" % logFileName)
             return True
         if not timeTaken:
-            NTwarning("Failed to find the time taken from log file: %s" % logFileName)
+            nTwarning("Failed to find the time taken from log file: %s" % logFileName)
         if nr_error > self.allowedErrors:
-            NTerror("Script produced %s errors according to log file: %s which is more than the allowed %s" % (nr_error, logFileName, self.allowedErrors))
+            nTerror("Script produced %s errors according to log file: %s which is more than the allowed %s" % (nr_error, logFileName, self.allowedErrors))
             return True
     # end def
 
@@ -680,7 +680,7 @@ class WaterRefine( Xplor ):
 
         Xplor.__init__( self, config, *args, **kwds )
         #self.keysformat()
-#        NTmessage('%s\n', self.format())
+#        nTmessage('%s\n', self.format())
     #end def
 
     #------------------------------------------------------------------------
@@ -692,7 +692,7 @@ class WaterRefine( Xplor ):
 
         restraintsAnalysisCode = self.restraintsAnalysisCode()
         if None in [ restraintsAnalysisCode ]:
-            NTerror("In WaterRefine#createScript: Failed to generate code for at least one part.")
+            nTerror("In WaterRefine#createScript: Failed to generate code for at least one part.")
             return True
 
 
@@ -973,7 +973,7 @@ class Anneal( Xplor ):
     def __init__( self, config, *args, **kwds ):
         Xplor.__init__( self, config, *args, **kwds )
         #self.keysformat()
-#        NTmessage('%s\n', self.format())
+#        nTmessage('%s\n', self.format())
         self.pdbFile = self.checkPath( self.inPath, self.templateFile ) # NB input PDB file.
         self.resultFile = self.getPdbFilePath() # Expected output PDB file
     #end if
@@ -988,7 +988,7 @@ class Anneal( Xplor ):
             cool_steps /= 10
         restraintsAnalysisCode = self.restraintsAnalysisCode()
         if None in [ restraintsAnalysisCode ]:
-            NTerror("In WaterRefine#createScript: Failed to generate code for at least one part.")
+            nTerror("In WaterRefine#createScript: Failed to generate code for at least one part.")
             return True
 
 
@@ -1188,7 +1188,7 @@ class Analyze( Xplor ):
         self.resultFile = self.getPdbFilePath() # Expected output PDB file
 
         #self.keysformat()
-#        NTmessage('%s\n', self.format())
+#        nTmessage('%s\n', self.format())
     #end def
 
     #------------------------------------------------------------------------
@@ -1197,7 +1197,7 @@ class Analyze( Xplor ):
 
         restraintsAnalysisCode = self.restraintsAnalysisCode()
         if False in [ restraintsAnalysisCode ]:
-            NTerror("In Analyze#createScript: Failed to generate code for at least one part.")
+            nTerror("In Analyze#createScript: Failed to generate code for at least one part.")
             return True
 
         self.script = """
@@ -1315,7 +1315,7 @@ class GeneratePSF( Xplor ):
         self.psfFile = self.newPath( self.directories.psf, self.psfFile )
         self.resultFile = self.psfFile
         self.allowedErrors = 0
-#        NTmessage('%s\n', self.format())
+#        nTmessage('%s\n', self.format())
     #endif
 
     #------------------------------------------------------------------------
@@ -1383,7 +1383,7 @@ class GenerateTemplate( Xplor ):
         self.resultFile = self.getPdbFilePath()
 #        self.outPath = self.directories.template
         #self.keysformat()
-#        NTmessage('%s\n', self.format())
+#        nTmessage('%s\n', self.format())
     #endif
 
     #------------------------------------------------------------------------

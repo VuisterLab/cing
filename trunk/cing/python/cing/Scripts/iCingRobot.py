@@ -37,7 +37,7 @@ rpcUrl=DEFAULT_URL+"/icing/serv/iCingServlet"
 #    rpcUrl=DEFAULT_URL+DEFAULT_RPC_PORT+'/'+DEFAULT_URL_PATH+"/serv/iCingServlet" # TODO make this line working and not the below line!
 #    rpcUrl=DEFAULT_URL+DEFAULT_RPC_PORT+'/'+DEFAULT_URL_PATH+"/iCingServlet"
 
-NTmessage("rpcUrl: " + rpcUrl)
+nTmessage("rpcUrl: " + rpcUrl)
 
 def getResultUrls(credentials, entryId, url=None):
 
@@ -74,7 +74,7 @@ def sendRequest(url, fields, files):
     if result.get(RESPONSE_EXIT_CODE) != RESPONSE_SUCCESS:
         msg  = 'Request not successful. Action was: %s' % fields
         msg += ' Response was: %s' % jsonTxt
-        NTwarning('Failure %s' % msg)
+        nTwarning('Failure %s' % msg)
         return
 
     return result
@@ -99,7 +99,7 @@ def urlOpen(request):
         else:
             msg = 'Server totally barfed with no reason or fail code'
 
-        NTwarning('Failure %s'% msg)
+        nTwarning('Failure %s'% msg)
         return
 
     return response
@@ -174,8 +174,8 @@ def encodeForm(fields, files=None, lineSep='\r\n',
 
 
 def iCingRobot():
-#    NTwarning("Expect errors without a server up and running.")
-    NTmessage("Firing up the iCing robot; aka example interface to CING")
+#    nTwarning("Expect errors without a server up and running.")
+    nTmessage("Firing up the iCing robot; aka example interface to CING")
 
     ## queries possible; do one at a time going down the list.
     ## After the run is started the status will let you know if the run is finished
@@ -223,7 +223,7 @@ def iCingRobot():
 
         result = sendRequest(rpcUrl, data, files)
         if not result:
-            NTerror("Failed to save file to server")
+            nTerror("Failed to save file to server")
         else:
             print "result of save request: %s" % result
             urls = getResultUrls(credentials, entryId, DEFAULT_URL)

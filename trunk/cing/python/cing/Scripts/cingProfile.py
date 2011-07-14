@@ -9,7 +9,7 @@ import pstats
 def run():
     print "hello"
     cing.verbosity = verbosityDebug
-    NTdebug( "hello again" )
+    nTdebug( "hello again" )
 
 if True:
     # Commented out because profiling isn't part of unit testing.

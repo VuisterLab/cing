@@ -78,7 +78,7 @@ class AllChecks(TestCase):
         for _c in range(n):
             chainId = molecule.getNextAvailableChainId()
             self.assertTrue( molecule.addChain(chainId))
-        NTdebug("Added %d chains to: %s" % (n, format(molecule)))
+        nTdebug("Added %d chains to: %s" % (n, format(molecule)))
         self.assertEqual( len(molecule.allChains()), n)
 
     def test_AddResidue_Standard(self):
@@ -108,7 +108,7 @@ class AllChecks(TestCase):
 
         mol.updateAll()
 
-        NTmessage( mol.format() )
+        nTmessage( mol.format() )
 
     def test_RangeSelection(self):
         entryId = 'testEntry'
@@ -135,12 +135,12 @@ class AllChecks(TestCase):
                     Cterminal = True
                 r = c.addResidue(rName, rNumber, Nterminal = Nterminal, Cterminal = Cterminal)
                 if r:
-#                    NTdebug("Adding atoms to residue: %s" % r)
+#                    nTdebug("Adding atoms to residue: %s" % r)
                     r.addAllAtoms()
                     for atom in r.allAtoms():
                         atom.addCoordinate(0.0, 1.0, 2.0, 40.0)
 #                else:
-#                    NTdebug("Skipping atoms for residue: %s" % r)
+#                    nTdebug("Skipping atoms for residue: %s" % r)
                 # end if
             # end for
         # end for chain
@@ -160,16 +160,16 @@ class AllChecks(TestCase):
                     Cterminal = True
                 r = c.addResidue(rName, rNumber, Nterminal = Nterminal, Cterminal = Cterminal)
                 if r:
-#                    NTdebug("Adding atoms to residue: %s" % r)
+#                    nTdebug("Adding atoms to residue: %s" % r)
                     r.addAllAtoms()
 #                else:
-#                    NTdebug("Skipping atoms for residue: %s" % r)
+#                    nTdebug("Skipping atoms for residue: %s" % r)
                 # end if
             # end for
         # end for chain
-        NTdebug("Done creating simple fake molecule")
+        nTdebug("Done creating simple fake molecule")
         self.assertFalse( mol.updateAll() )
-        NTmessage( mol.format() )
+        nTmessage( mol.format() )
 
         # Nada
         selectedResidueList = mol.ranges2list('')
@@ -178,34 +178,34 @@ class AllChecks(TestCase):
         # Single residue
         selectedResidueList = mol.ranges2list('A.'+str(offset1))
         self.assertEquals( len(selectedResidueList), 1)
-        NTdebug("Selected residues: %s" % str(selectedResidueList))
+        nTdebug("Selected residues: %s" % str(selectedResidueList))
 
         # Two residues
         selectedResidueList = mol.ranges2list(str(offset1))
         self.assertEquals( len(selectedResidueList), 2)
-        NTdebug("Selected residues: %s" % str(selectedResidueList))
+        nTdebug("Selected residues: %s" % str(selectedResidueList))
 
         # Four residues in ranges
         selectedResidueList = mol.ranges2list('1-2')
         self.assertEquals( len(selectedResidueList), 4)
-        NTdebug("Selected residues: %s" % str(selectedResidueList))
+        nTdebug("Selected residues: %s" % str(selectedResidueList))
 
         # Eight residues in negative crossing ranges
         selectedResidueList = mol.ranges2list('-1-2')
         self.assertEquals( len(selectedResidueList), 8)
-        NTdebug("Selected residues: %s" % str(selectedResidueList))
+        nTdebug("Selected residues: %s" % str(selectedResidueList))
 
 
         selectedResidueList = mol.ranges2list('A.-5--2')
         self.assertEquals( len(selectedResidueList), 4)
-        NTdebug("Selected residues: %s" % str(selectedResidueList))
+        nTdebug("Selected residues: %s" % str(selectedResidueList))
 
         selectedResidueList = mol.ranges2list('-999-999')
-        NTdebug("Selected residues: %s" % str(selectedResidueList))
+        nTdebug("Selected residues: %s" % str(selectedResidueList))
         self.assertEquals( len(selectedResidueList), 2*len(chainList)*seqL)
 
         residueList2StartStopList = mol.ranges2StartStopList('-999-999')
-        NTdebug('residueList2StartStopList: %s' % str(residueList2StartStopList))
+        nTdebug('residueList2StartStopList: %s' % str(residueList2StartStopList))
         self.assertEquals( len(residueList2StartStopList), 8 )
 
 #        """
@@ -224,11 +224,11 @@ class AllChecks(TestCase):
                       A.-3
                     """.split()
         for i, ranges in enumerate(inputList):
-            NTdebug("test_RangeSelection: %d %s" % (i, ranges))
+            nTdebug("test_RangeSelection: %d %s" % (i, ranges))
             residueList = mol.setResiduesFromRanges(ranges)
-#            NTdebug('residueList: [%s]' % residueList)
+#            nTdebug('residueList: [%s]' % residueList)
             rangesRecycled = mol.residueList2Ranges(residueList)
-#            NTdebug('rangesRecycled: [%s]' % rangesRecycled)
+#            nTdebug('rangesRecycled: [%s]' % rangesRecycled)
             self.assertEquals( ranges, rangesRecycled )
 
         res1, res2 = mol.ranges2list('A.1,A.3')
@@ -249,7 +249,7 @@ class AllChecks(TestCase):
         chain0 = mol.allChains()[0]
         chain1 = mol.allChains()[1]
         atomList = chain0.getRepresentingAtomListsPerResidue(chain1)
-        NTdebug("atomList: %s" % str(atomList))
+        nTdebug("atomList: %s" % str(atomList))
         self.assertEquals( len(atomList[0]), 4)
 
 if __name__ == "__main__":

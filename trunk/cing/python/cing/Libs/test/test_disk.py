@@ -27,15 +27,15 @@ class AllChecks(TestCase):
     def testGlobLast(self):
         globPattern = os.path.join(cingRoot, '*.txt')
         lastFile = globLast(globPattern)
-        NTdebug('lastFile: %s' % lastFile)
-        d, _basename, extension = NTpath(lastFile)
+        nTdebug('lastFile: %s' % lastFile)
+        d, _basename, extension = nTpath(lastFile)
         self.assertTrue(lastFile)
         self.assertEquals(d, cingRoot)
         self.assertEquals(extension, '.txt')
 
         globPattern = os.path.join(cingRoot, '*.xyz')
         lastFile = globLast(globPattern)
-        NTdebug('lastFile 2: %s' % lastFile)
+        nTdebug('lastFile 2: %s' % lastFile)
         self.assertFalse(lastFile)
 
 if __name__ == "__main__":

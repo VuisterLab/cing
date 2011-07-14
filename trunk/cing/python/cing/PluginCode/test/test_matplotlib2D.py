@@ -32,7 +32,7 @@ class AllChecks(TestCase):
         savefig('backendPlot.pdf')
         close()
 
-    def tttestNumpyInterpolation(self):
+    def _testNumpyInterpolation(self):
         x,y = ogrid[ -1:1:10j, -1:1:10j ]
         z = sin( x**2 + y**2 )
         vmin = -1.
@@ -58,21 +58,23 @@ class AllChecks(TestCase):
         palette  = gray_inv # from white to black
         # Testing defaults should be the same when set or not set.
         for doSet in ( False, True):
-            NTdebug("doSet: %s" % doSet)
+            nTdebug("doSet: %s" % doSet)
             if doSet:
                 palette.set_under(color = 'w', alpha = 1.0 )
                 palette.set_over(color = 'k', alpha = 1.0 )
                 palette.set_bad(color = 'k', alpha = 0.0 )
-            NTdebug("under: %s"   % str(palette._rgba_under))
-            NTdebug("over : %s"   % str(palette._rgba_over))
-            NTdebug("bad  : %s\n" % str(palette._rgba_bad))
+            nTdebug("under: %s"   % str(palette._rgba_under))
+            nTdebug("over : %s"   % str(palette._rgba_over))
+            nTdebug("bad  : %s\n" % str(palette._rgba_bad))
             self.assertEqual(palette(0.0)[0],1.0) # low end is white with alpha 1
             self.assertEqual(palette(0.0)[3],1.0)
             self.assertEqual(palette(1.0)[0],0.0) # hi end is white with alpha 1
             self.assertEqual(palette(1.0)[3],1.0) #
-            self.assertEqual(      palette(-1.0  )[0],1.0)   # under should be white with alpha 0 should actually be true, alpha needs to be zero for under.
+            # under should be white with alpha 0 should actually be true, alpha needs to be zero for under.
+            self.assertEqual(      palette(-1.0  )[0],1.0)   
             self.assertEqual(      palette(-1.0  )[3],1.0)
-            self.assertEqual(      palette( 9.0  )[0],0.0)   # over should be black with alpha 1 should actually be true, alpha needs to be zero for under.
+            # over should be black with alpha 1 should actually be true, alpha needs to be zero for under.
+            self.assertEqual(      palette( 9.0  )[0],0.0)   
             self.assertEqual(      palette( 9.0  )[3],1.0)
 
     def testMatplotlibColorSegmented3(self):
@@ -85,7 +87,7 @@ class AllChecks(TestCase):
                        ],
         #               alpha=0)
         ))
-        NTdebug( paletteStr )
+        nTdebug( paletteStr )
 
 if __name__ == "__main__":
     cing.verbosity = verbosityDebug

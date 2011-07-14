@@ -41,7 +41,7 @@ class AllChecks(TestCase):
         mTableHash = mTable.getHash()
         rowList = mTableHash['2rop']
         self.assertEqual(11041,rowList[1])
-        NTdebug('\n'+str(mTable))
+        nTdebug('\n'+str(mTable))
 
     def testAddColumnHeaderRowToCsvFile(self):
         adit_fn = 'adit_nmr_matched_pdb_bmrb_entry_ids.csv' # already contains one header row but let's add another one.
@@ -59,7 +59,7 @@ class AllChecks(TestCase):
             ('Alan',    'Clark',    1804),
             )
         for row in sort_table(mytable, (1,0)):
-            NTmessage( str(row) )
+            nTmessage( str(row) )
 
     def testSortCsvFile(self):
         fn = 'adit_nmr_matched_pdb_bmrb_entry_ids.csv' # already contains one header row but let's add another one.

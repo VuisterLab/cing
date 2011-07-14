@@ -18,10 +18,10 @@ def analyzeCingLog(logFile):
     """
     result = [ None, None, 0, 0, 0, 0 ]
     if not logFile:
-        NTerror("logFile %s was not specified." % logFile)
+        nTerror("logFile %s was not specified." % logFile)
         return None
     if not os.path.exists(logFile):
-        NTerror("logFile %s was not found." % logFile)
+        nTerror("logFile %s was not found." % logFile)
         return None
 
     for r in AwkLike(logFile):
@@ -35,12 +35,12 @@ def analyzeCingLog(logFile):
         else:
             result[4] += 1
             if line.startswith('CING took       :'):
-    #            NTdebug("Matched line: %s" % line)
+    #            nTdebug("Matched line: %s" % line)
                 timeTakenStr = r.dollar[r.NF - 1]
                 result[0] = float(timeTakenStr)
-    #            NTdebug("Found time: %s" % self.timeTakenDict[entry_code])
+    #            nTdebug("Found time: %s" % self.timeTakenDict[entry_code])
             elif line.startswith('Traceback (most recent call last)'):
-    #            NTdebug("Matched line: %s" % line)
+    #            nTdebug("Matched line: %s" % line)
                 result[1] = True
         # end else
     return result
@@ -56,10 +56,10 @@ def analyzeFcLog(logFile):
     """
     result = [ None, None, 0, 0, 0, 0 ]
     if not logFile:
-        NTerror("logFile %s was not specified." % logFile)
+        nTerror("logFile %s was not specified." % logFile)
         return None
     if not os.path.exists(logFile):
-        NTerror("logFile %s was not found." % logFile)
+        nTerror("logFile %s was not found." % logFile)
         return None
 
     for r in AwkLike(logFile):
@@ -74,12 +74,12 @@ def analyzeFcLog(logFile):
         else:
             result[4] += 1
 #            if line.startswith('CING took       :'):
-#    #            NTdebug("Matched line: %s" % line)
+#    #            nTdebug("Matched line: %s" % line)
 #                timeTakenStr = r.dollar[r.NF - 1]
 #                result[0] = float(timeTakenStr)
-#    #            NTdebug("Found time: %s" % self.timeTakenDict[entry_code])
+#    #            nTdebug("Found time: %s" % self.timeTakenDict[entry_code])
             if line.startswith('traceback (most recent call last)'): # watch out this needs to be lowercase here.
-    #            NTdebug("Matched line: %s" % line)
+    #            nTdebug("Matched line: %s" % line)
                 result[1] = True
         # end else
     return result
@@ -97,10 +97,10 @@ def analyzeWattosLog(logFile):
     """
     result = [ None, None, 0, 0, 0, 0 ]
     if not logFile:
-        NTerror("logFile %s was not specified." % logFile)
+        nTerror("logFile %s was not specified." % logFile)
         return None
     if not os.path.exists(logFile):
-        NTerror("logFile %s was not found." % logFile)
+        nTerror("logFile %s was not found." % logFile)
         return None
 
     for r in AwkLike(logFile):
@@ -115,14 +115,14 @@ def analyzeWattosLog(logFile):
             result[4] += 1
             # Wattos took (#ms): 2332
             if line.startswith('Wattos took'): # TODO: check.
-                NTdebug("Matched line: %s" % line)
+                nTdebug("Matched line: %s" % line)
                 timeTakenStr = r.dollar[r.NF - 1]
                 result[0] = float(timeTakenStr)
                 if result[0]:
                     result[0] /= 1000. # get seconds
-                NTdebug("Found time: %s" % timeTakenStr)
+                nTdebug("Found time: %s" % timeTakenStr)
             elif line.startswith('Exception in thread'): # TODO: check.
-                NTdebug("Matched line: %s" % line)
+                nTdebug("Matched line: %s" % line)
                 result[1] = True
         # end else
     return result
@@ -154,10 +154,10 @@ def analyzeXplorLog(logFile, extraIgnoreLineList=[], extraIgnoreCountList = []):
     '''
     result = [ None, None, 0, 0, 0, 0 ]
     if not logFile:
-        NTerror("logFile %s was not specified." % logFile)
+        nTerror("logFile %s was not specified." % logFile)
         return None
     if not os.path.exists(logFile):
-        NTerror("logFile %s was not found." % logFile)
+        nTerror("logFile %s was not found." % logFile)
         return None
 
     for r in AwkLike(logFile):
@@ -168,7 +168,7 @@ def analyzeXplorLog(logFile, extraIgnoreLineList=[], extraIgnoreCountList = []):
             for ignoreLine in ignoreLineXplorList:
                 ignoreLineLower = ignoreLine.lower()
                 if lineLower.count(ignoreLineLower):
-#                    NTdebug("Ignoring line for error count: %s" % line)
+#                    nTdebug("Ignoring line for error count: %s" % line)
                     toIgnore = True
                     break # finding one is enough
                 # end if
@@ -176,23 +176,23 @@ def analyzeXplorLog(logFile, extraIgnoreLineList=[], extraIgnoreCountList = []):
             if toIgnore:
                 result[4] += 1
                 continue
-            NTwarning("Found eeeeeeror in line: %s" % line)
+            nTwarning("Found eeeeeeror in line: %s" % line)
             result[2] += 1
         elif line.startswith(' %') and line.count('WRN'):
-            NTdebug("Found warning in line: %s" % line)
+            nTdebug("Found warning in line: %s" % line)
             result[3] += 1
         elif line.startswith(prefixDebug):
-            NTdebug("Found debug in line: %s" % line)
+            nTdebug("Found debug in line: %s" % line)
             result[5] += 1
         else:
             result[4] += 1
             if line.count('total CPU time='):
-#                NTdebug("Matched time in line: %s" % line)
+#                nTdebug("Matched time in line: %s" % line)
                 timeTakenStr = r.dollar[r.NF - 1]
                 result[0] = float(timeTakenStr)
-    #            NTdebug("Found time: %s" % self.timeTakenDict[entry_code])
+    #            nTdebug("Found time: %s" % self.timeTakenDict[entry_code])
             elif line.count('Program execution will be terminated'):
-                NTdebug("Matched termination on line: %s" % line)
+                nTdebug("Matched termination on line: %s" % line)
                 result[1] = True
             # end elif
         # end else

@@ -4,7 +4,7 @@ Settings for the NRG-CING
 Test by:
 python $CINGROOT/python/cing/NRG/settings.py
 """
-from cing.Libs.NTutils import NTdebug
+from cing.Libs.NTutils import nTdebug
 import os
 
 # If on production machine then
@@ -24,9 +24,9 @@ VCsecret            = 'a/b/c' # Overriden locally. @UnusedVariable Only used in 
 
 try:
     from localConstants import * #@UnusedWildImport
-    NTdebug("Loaded NRG localConstants.py.")
+    nTdebug("Loaded NRG localConstants.py.")
 except:
-    NTdebug("Consider creating a localConstants.py file with a different 'user' location.")
+    nTdebug("Consider creating a localConstants.py file with a different 'user' location.")
 
 platform_dir    = os.path.join(UJ,'wattosTestingPlatform')  # For BMRB, and PDB and mmCIF formatted entries data. @UnusedVariable
 pdbbase_dir     = os.path.join(platform_dir,'pdb')          # For PDB and mmCIF formatted entries data. @UnusedVariable

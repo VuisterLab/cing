@@ -55,10 +55,10 @@ def doStoreCING2db( entry_code, archive_id, project = None):
     if archive_id in  [ ARCHIVE_NRG_ID, ARCHIVE_DEV_NRG_ID, ARCHIVE_PDB_ID, ARCHIVE_NMR_REDO_ID]:
         pdb_id = entry_code
         if pdb_id == None:
-            NTerror("Expected pdb_id argument")
+            nTerror("Expected pdb_id argument")
             return True
         if not is_pdb_code(pdb_id):
-            NTerror("Expected pdb_id argument and [%s] isn't recognized as such." % pdb_id)
+            nTerror("Expected pdb_id argument and [%s] isn't recognized as such." % pdb_id)
             return True
         if archive_id == ARCHIVE_NRG_ID:
             schema = NRG_DB_NAME
@@ -70,7 +70,7 @@ def doStoreCING2db( entry_code, archive_id, project = None):
     elif archive_id in [ ARCHIVE_CASD_ID, ARCHIVE_CASP_ID]:
         casd_id = entry_code
         if casd_id == None:
-            NTerror("Expected casd_id argument")
+            nTerror("Expected casd_id argument")
             return True
         entry_code = casd_id
         schema = CASD_DB_NAME
@@ -78,18 +78,18 @@ def doStoreCING2db( entry_code, archive_id, project = None):
             schema = CASP_DB_NAME
         # end if
     else:
-        NTerror("Expected valid archive_id argument but got: %s" % archive_id)
+        nTerror("Expected valid archive_id argument but got: %s" % archive_id)
         return True
     # end if
 
 
-    NTdebug("Starting doStoreCING2db using:")
-    NTdebug("entry_code:           %s" % entry_code)
-    NTdebug("archive_id:           %s" % archive_id)
-    NTdebug("user_name:            %s" % user_name)
-    NTdebug("db_name:              %s" % db_name)
-    NTdebug("schema:               %s" % schema)
-    NTdebug("doReadProject:        %s" % doReadProject)
+    nTdebug("Starting doStoreCING2db using:")
+    nTdebug("entry_code:           %s" % entry_code)
+    nTdebug("archive_id:           %s" % archive_id)
+    nTdebug("user_name:            %s" % user_name)
+    nTdebug("db_name:              %s" % db_name)
+    nTdebug("schema:               %s" % schema)
+    nTdebug("doReadProject:        %s" % doReadProject)
 
 
 #    csql = CsqlAlchemy(user=archive_user, db=archive_db, echo=False)
@@ -98,7 +98,7 @@ def doStoreCING2db( entry_code, archive_id, project = None):
     csql = CsqlAlchemy(user=user_name, db=db_name,schema=schema, echo=echo)
 
     if csql.connect():
-        NTerror("Failed to connect to DB")
+        nTerror("Failed to connect to DB")
         return True
     csql.autoload()
 
@@ -114,13 +114,13 @@ def doStoreCING2db( entry_code, archive_id, project = None):
         # presume the directory still needs to be created.
         cingEntryDir = entry_code + ".cing"
         if not os.path.isdir(cingEntryDir):
-            NTerror("Failed to find input directory: %s" % cingEntryDir)
+            nTerror("Failed to find input directory: %s" % cingEntryDir)
             return
         # end if.
         # Needs to be copied because the open method doesn't take a directory argument..
         project = Project.open(entry_code, status='old')
         if not project:
-            NTerror("Failed to init old project")
+            nTerror("Failed to init old project")
             return True
         # end if.
     # end if project
@@ -140,12 +140,12 @@ def doStoreCING2db( entry_code, archive_id, project = None):
 
     if result.rowcount:
         if result.rowcount != 1:
-            NTdebug("Removed original entries numbering: %s" % result.rowcount)
+            nTdebug("Removed original entries numbering: %s" % result.rowcount)
         if result.rowcount > 1:
-            NTerror("Removed more than the expected ONE entry; this could be serious.")
+            nTerror("Removed more than the expected ONE entry; this could be serious.")
             return True
 #    else:
-#        NTdebug("No original entry present yet.")
+#        nTdebug("No original entry present yet.")
 
     logFileNameList = project.getLogFileNameList(latestListedFirst = False) #sorted chronologically with latest latest.
     rev_first = None
@@ -154,7 +154,7 @@ def doStoreCING2db( entry_code, archive_id, project = None):
     timestamp_last = datetime.datetime.now()
 
     if not logFileNameList:
-        NTerror("Failed to get log file name list; aborting.")
+        nTerror("Failed to get log file name list; aborting.")
         return True
 
     firstIdx = 0
@@ -165,7 +165,7 @@ def doStoreCING2db( entry_code, archive_id, project = None):
         logFilePath = os.path.join( project.path(directories.logs), logFileName)
         result = getRevisionAndDateTimeFromCingLog( logFilePath )
         if not result:
-            NTerror("In %s failed to getRevisionAndDateTimeFromCingLog for: %s" % (getCallerName(), logFilePath))
+            nTerror("In %s failed to getRevisionAndDateTimeFromCingLog for: %s" % (getCallerName(), logFilePath))
             continue # with next log.
         # end if
         rev, datetime_seen = result
@@ -174,10 +174,10 @@ def doStoreCING2db( entry_code, archive_id, project = None):
             timestamp_first = datetime_seen
         else:
             if rev_last != rev:
-                NTcodeerror("Mismatching rev %s with rev extracted from self log: %s" % ( rev_last, rev))
+                nTcodeerror("Mismatching rev %s with rev extracted from self log: %s" % ( rev_last, rev))
             # should be pretty close to now datetime set above.
             timestamp_last = datetime_seen # Better to use the start date of log than now time.
-#            NTdebug("Modifying timestamp_last %s to %s" % (timestamp_last, datetime_seen) )
+#            nTdebug("Modifying timestamp_last %s to %s" % (timestamp_last, datetime_seen) )
         # end if
     # end for
 
@@ -210,7 +210,7 @@ def doStoreCING2db( entry_code, archive_id, project = None):
     if p_distance_count != lenRestraintList:
         msg = ( "Expected the same numbers for project.distances.lenRecursive(max_depth = 1) " +
             "and the size of project.allRestraints() but found: %s and %s") % ( p_distance_count, len(restraintList))
-        NTcodeerror(msg)
+        nTcodeerror(msg)
         p_distance_count = len(restraintList)
     # end if
     if p_distance_count:
@@ -221,10 +221,10 @@ def doStoreCING2db( entry_code, archive_id, project = None):
             p_distance_count_long_range      =  len(restraintList.longRange)
             p_distance_count_ambiguous       =  len(restraintList.ambiguous)
         else:
-            NTerror("Failed to do restraintList.analyze()")
+            nTerror("Failed to do restraintList.analyze()")
         # end if
 #    else:
-#        NTdebug("No restraints in %s" % getCallerName())
+#        nTdebug("No restraints in %s" % getCallerName())
     # end if
 
 #    p_dihedral_count = project.dihedrals.lenRecursive() # Note Talos derived would be counted this way.
@@ -275,11 +275,11 @@ def doStoreCING2db( entry_code, archive_id, project = None):
             v = r.getDeepByKeys(rdbItemName)
             if v != None:                
                 rdbItemList[i] += v
-#    NTdebug("rdbItemList: %s (before potential nilling)" % str(rdbItemList))
+#    nTdebug("rdbItemList: %s (before potential nilling)" % str(rdbItemList))
     if rdbItemList[0] < 0.001:
         rdbItemList = [None, None, None]
     # end if
-#    NTdebug("rdbItemList: %s" % str(rdbItemList))
+#    nTdebug("rdbItemList: %s" % str(rdbItemList))
     p_queen_information, p_queen_uncertainty1, p_queen_uncertainty2 = rdbItemList
     
     # WI
@@ -422,20 +422,20 @@ def doStoreCING2db( entry_code, archive_id, project = None):
     else:
         entry_id_list = execute(select([centry.c.entry_id]).where(centry.c.pdb_id==pdb_id)).fetchall()
     if not entry_id_list:
-        NTerror("Failed to get the id of the inserted entry but got: %s" % entry_id_list)
+        nTerror("Failed to get the id of the inserted entry but got: %s" % entry_id_list)
         return True
     if len( entry_id_list ) != 1:
-        NTerror("Failed to get ONE id of the inserted entry but got: %s" % entry_id_list)
+        nTerror("Failed to get ONE id of the inserted entry but got: %s" % entry_id_list)
         return True
     entry_id = entry_id_list[0][0] # NB this is an integer and different from entry_code which is a string.
-#    NTdebug("Inserted entry id %s" % entry_id)
+#    nTdebug("Inserted entry id %s" % entry_id)
 
 
 #    for residue in csql.session.query(cresidue):
-#        NTdebug("New residue number %s" % residue.number)
+#        nTdebug("New residue number %s" % residue.number)
 #
 #    for instance in csql.session.query(centry):
-#        NTdebug( "Retrieved entry instance: %s" % instance.entry_id )
+#        nTdebug( "Retrieved entry instance: %s" % instance.entry_id )
 
     for resonanceList in project.molecule.resonanceSources:
         nameResoL = resonanceList.name # Name has got to be key
@@ -467,9 +467,9 @@ def doStoreCING2db( entry_code, archive_id, project = None):
                             cresonancelistperatomclass.c.atomclass == atomId,
                             ))
 #            cingresonancelistperatomclass_id = execute(s).fetchall()[0][0]
-#            NTdebug("Inserted cingresonancelistperatomclass_id %s" % cingresonancelistperatomclass_id)
+#            nTdebug("Inserted cingresonancelistperatomclass_id %s" % cingresonancelistperatomclass_id)
         # end for
-#        NTdebug("Inserted resonancelist_id %s with name %s and atoms %s" % (
+#        nTdebug("Inserted resonancelist_id %s with name %s and atoms %s" % (
 #            resonancelist_id, nameResoL, str(resonanceList.vascoResults.keys())))
     # end for
 
@@ -489,14 +489,14 @@ def doStoreCING2db( entry_code, archive_id, project = None):
         )
         s = select([cchain.c.chain_id],and_(cchain.c.entry_id == entry_id, cchain.c.name == nameC))
         chain_id = execute(s).fetchall()[0][0]
-#        NTdebug("Inserted chain id %s" % chain_id)
+#        nTdebug("Inserted chain id %s" % chain_id)
         chainCommittedCount += 1
         for residue in chain.allResidues():
 
             if residue.hasProperties('water'):
                 continue
 
-#            NTmessage("Residue: %s" % residue)
+#            nTmessage("Residue: %s" % residue)
 
             # CING
     #        print m.C.ASN46.distanceRestraints
@@ -523,7 +523,7 @@ def doStoreCING2db( entry_code, archive_id, project = None):
             r_dihedral_count = residue.dihedralRestraints.lenRecursive(max_depth = 1)
             r_rdc_count = residue.rdcRestraints.lenRecursive(max_depth = 1)
 
-#            NTdebug("r_distance_count r_dihedral_count r_rdc_count %d %d %d" % (r_distance_count, r_dihedral_count, r_rdc_count))
+#            nTdebug("r_distance_count r_dihedral_count r_rdc_count %d %d %d" % (r_distance_count, r_dihedral_count, r_rdc_count))
             # TODO: test with cs present
             r_assignmentCountMap = getAssignmentCountMapForResList([residue])
             r_cs_count = r_assignmentCountMap.overallCount()
@@ -710,7 +710,7 @@ def doStoreCING2db( entry_code, archive_id, project = None):
                   ))
             residue_id = execute(s).fetchall()[0][0]
             residueCommittedCount += 1
-#            NTdebug("Inserted residue %s" % residue_id)
+#            nTdebug("Inserted residue %s" % residue_id)
             if True:
                 for atom in residue.allAtoms():
                     a_name = atom.name
@@ -753,14 +753,14 @@ def doStoreCING2db( entry_code, archive_id, project = None):
                     hasUsefulColumn = False
                     for _i,column in enumerate(useFulColumns):
                         if column != None:
-#                            NTdebug("Found useful column: %s %s" % ( i, column))
+#                            nTdebug("Found useful column: %s %s" % ( i, column))
                             hasUsefulColumn = True
                     if not hasUsefulColumn:
                         continue
                     a_rog = atom.rogScore.rogInt()
                     atomInfoList = [entry_id,chain_id,residue_id,
                         a_name,a_wi_chichk,a_wi_dunchk,a_wi_hndchk, a_wi_pl2chk, a_wi_wgtchk, a_cs,a_cs_err,a_cs_ssa,a_rog]
-#                    NTdebug("Inserting atom: " + str(atomInfoList))
+#                    nTdebug("Inserting atom: " + str(atomInfoList))
                     try:
                         result = execute(catom.insert().values(
                             entry_id=entry_id,
@@ -791,21 +791,21 @@ def doStoreCING2db( entry_code, archive_id, project = None):
                               catom.c.name == a_name
                               ))
     #                    atom_id = execute(s).fetchall()[0][0]
-    #                    NTdebug("Inserted atom %s %s" % (atom_id, atom))
+    #                    nTdebug("Inserted atom %s %s" % (atom_id, atom))
                         atomCommittedCount += 1
                     except:
                         NTtracebackError()
-                        NTerror("Failed to insert atom [%s] with info: %s" % ( atom, str(atomInfoList)))
+                        nTerror("Failed to insert atom [%s] with info: %s" % ( atom, str(atomInfoList)))
                         continue
                 # end for atom
             # end if atom
         # end for residue
     # end for chain
-    NTmessage("Committed %d chains %d residues %d atoms" % (chainCommittedCount,residueCommittedCount,atomCommittedCount))
+    nTmessage("Committed %d chains %d residues %d atoms" % (chainCommittedCount,residueCommittedCount,atomCommittedCount))
 #    project.close(save=False) # needed ???
 
     # Needed for the above hasn't been auto-committed.
-#    NTdebug("Committing changes")
+#    nTdebug("Committing changes")
     csql.session.commit()
 # end def
 
@@ -813,11 +813,11 @@ if __name__ == "__main__":
     cing.verbosity = verbosityDebug
 
     # Assume CING didn't already printed this.
-    NTmessage(header)
-    NTmessage(getStartMessage())
+    nTmessage(header)
+    nTmessage(getStartMessage())
     try:
         status = doStoreCING2db(*sys.argv[1:])
         if status:
-            NTerror("Failed script: storeCING2db.py")
+            nTerror("Failed script: storeCING2db.py")
     finally:
-        NTmessage(getStopMessage(cing.starttime))
+        nTmessage(getStopMessage(cing.starttime))

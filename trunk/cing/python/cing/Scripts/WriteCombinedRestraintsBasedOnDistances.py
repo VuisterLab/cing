@@ -36,7 +36,7 @@ def addDihRestr(proj,lower,upper,leuNumberList):
         atoms=[r.CA,r.CB,r.CG,r.CD1]
         dihedralrestraint=DihedralRestraint(atoms=atoms,lower=lower,upper=upper)
         dihrestrlist.append(dihedralrestraint)
-        NTmessage('CHI2 restraint appended for %s'%r.name)
+        nTmessage('CHI2 restraint appended for %s'%r.name)
     #end for
     proj.dihedrals.append(dihrestrlist)
     proj.partitionRestraints()
@@ -47,7 +47,7 @@ def checkDoubleRestraints(proj,leu):
     After deassignment, some atomPairs occur twice in the distance restraint list. 
     This script will delete the one with the highest upperbound.
     '''
-    NTmessage('Checking for double restraints after deassignment')
+    nTmessage('Checking for double restraints after deassignment')
     delList=[]
     drlist=leu.distanceRestraints
     for i in range(len(drlist)):
@@ -68,7 +68,7 @@ def checkDoubleRestraints(proj,leu):
 
 def checkRestraintsExistance(restraintlist,proj):
     '''After deleting halve of the double restraints, this script will check whether the other halve is still there.'''
-    NTmessage('Project contains still following restraints:')#Just a check
+    nTmessage('Project contains still following restraints:')#Just a check
     aplist=[]#list with unique atompairs in restraintlist
     count=0
     for dr in restraintlist:
@@ -77,15 +77,15 @@ def checkRestraintsExistance(restraintlist,proj):
         for dr in proj.distances[0]:
             if ap==dr.atomPairs[0]:
                 count+=1
-                NTmessage('%s,id=%s'%(str(ap),str(dr.id)))
+                nTmessage('%s,id=%s'%(str(ap),str(dr.id)))
     if count==0:
-        NTerror('No restraints found')
+        nTerror('No restraints found')
     return()
 #end def
 
 def deassignHB(proj,leu):
     '''Deassignes HBs in specified leucines. It will replace the old restraint, in order to delete all the other information.'''
-    NTmessage('Following restraint pairs with HBs of %s are deassigned:'%leu.name)
+    nTmessage('Following restraint pairs with HBs of %s are deassigned:'%leu.name)
     deassHBaplist=[]
     atomIndexes=[0,1]
     for dr in leu.distanceRestraints: #restraints in proj.distances[0] are automatically deassigned.
@@ -105,7 +105,7 @@ def deassignHB(proj,leu):
             newList=NTlist()
             deassHBaplist.append((atom1,atom2))
             newList.append((atom1,atom2))
-            NTmessage('%s -> %s'%(str(dr.atomPairs),str(newList)))
+            nTmessage('%s -> %s'%(str(dr.atomPairs),str(newList)))
             dr.atomPairs=newList
             break
         #endfor
@@ -121,7 +121,7 @@ def checkDeasrHB(n,deassHBaplist):
     deassHBaplist is the list which is already deassigned
     and n is the list of restraints, which violate in trans and gauche+, which should be deassigned.
     '''
-    NTmessage('checkDeasrHB is running')
+    nTmessage('checkDeasrHB is running')
     atomIndexes=[0,1]
     delList=[]
     #l=len(deassHBaplist)
@@ -132,9 +132,9 @@ def checkDeasrHB(n,deassHBaplist):
                 delList.append(dr)
     for dr in delList:
         n.remove(dr)
-        NTmessage('%s will not be removed.'%str(dr))
+        nTmessage('%s will not be removed.'%str(dr))
     #if ln-len(n)==len(delList): #just a check,used while debugging.
-    #    NTmessage('%s restraints with a QB will not be deleted.'%len(delList))
+    #    nTmessage('%s restraints with a QB will not be deleted.'%len(delList))
     return n
 
 def classifyRestraints(prl,leu,treshold):
@@ -154,7 +154,7 @@ def classifyRestraints(prl,leu,treshold):
     trind=range(halfModelCount) #trans index
     gpind=range(halfModelCount,modelCount,1) #gauche+ index
     #leu=prl.molecules[0].residuesWithProperties('LEU')[leunumber] #leucine g
-    NTmessage('Divide restraints into classes for %s'%leu.name)
+    nTmessage('Divide restraints into classes for %s'%leu.name)
     drlleu=leu.distanceRestraints #distance restraints of leucine g
     for k in range(len(drlleu)):
         found=0
@@ -209,7 +209,7 @@ def classifyRestraints(prl,leu,treshold):
     namelist=['trans','gauche+','both','none']
     for i in range(4):
         if tmplist[i]:
-            NTmessage('list violated in %s for %s contains %s restraints'%(namelist[i],leu.name,len(tmplist[i])))
+            nTmessage('list violated in %s for %s contains %s restraints'%(namelist[i],leu.name,len(tmplist[i])))
     return(n,u,trdict,gpdict)
 
 def renameDicts(trdict,gpdict):
@@ -242,10 +242,10 @@ def reverseDict(vdict):
         rdict[jj].append(ii)
     return rdict
 
-def tablePrint(table,length):
+def tablePrint(table,ln):
     'Just a handy script to print tables while debugging. Length is the number of characters per element in table'
     string=''
-    fmt='%-'+str(length)+'.2f' #to be able to print the table alligned, this value has to depend on the length of an element in the table
+    fmt='%-'+str(ln)+'.2f' #to be able to print the table alligned, this value has to depend on the len of an element in the table
     for r in table:
         for c in r:
             string+=fmt %c
@@ -264,7 +264,7 @@ def makeDifferenceTable(drlColumns,drlRows,lenDrlColumns,lenDrlRows):
             diff=drlColumns[c][0]-drlRows[r][0]
             table[r][c]=abs(diff)
     #stringTable=tablePrint(table,5)
-    #NTmessage('Difference table is:\n%s'%stringTable)
+    #nTmessage('Difference table is:\n%s'%stringTable)
     return(table)
 
 def makeAllowedTable(table,drlColumns,drlRows,lenDrlColumns,lenDrlRows):
@@ -297,7 +297,7 @@ def makeAllowedTable(table,drlColumns,drlRows,lenDrlColumns,lenDrlRows):
         #endfor
     #endfor
     #stringTable=tableprint(allowedTable,15)
-    #NTmessage('Allowed table is:\n%s'%stringTable)
+    #nTmessage('Allowed table is:\n%s'%stringTable)
     return(allowedTable,maxi)
 
 def checkAllowedTable(allowedTable,table,maxi,n,lenDrlColumns,lenDrlRows,drlColumns,drlRows,invdrlColumnsdict,invdrlRowsdict):
@@ -306,7 +306,7 @@ def checkAllowedTable(allowedTable,table,maxi,n,lenDrlColumns,lenDrlRows,drlColu
     violate both in tr as in g+, because these restraints also have to be deassigned or deleted.
     This check happens before calculating the best combination, because the deletion of these columns/rows will lead to
     better combinations and less computation time.'''
-    NTmessage('Checks allowedTable')
+    nTmessage('Checks allowedTable')
     delListrows=[]
     delListcolumns=[]
     for r in range(lenDrlRows):
@@ -333,7 +333,7 @@ def checkAllowedTable(allowedTable,table,maxi,n,lenDrlColumns,lenDrlRows,drlColu
     if newAllowedTable==[]:
         lenDrlRows=0
         lenDrlColumns=0
-        NTmessage('Cannot make combinations according to allowedTable.')
+        nTmessage('Cannot make combinations according to allowedTable.')
         newAllowedTable=[[]]
     else:
         lenDrlRows=len(newAllowedTable)
@@ -361,12 +361,12 @@ def transposeTable(table):
 
 def calculateIndexes(allowedTable,lenDrlColumns,lenDrlRows):
     '''Calculates ideal combination of restraints, based on the allowedTable. It returns the indexes of the table.'''
-    NTmessage('Calculating optimal indexes')
+    nTmessage('Calculating optimal indexes')
     totalValueNew='INF'
     if not lenDrlRows!=lenDrlColumns:
         nCr=calcnCr(lenDrlRows,lenDrlColumns)
         if nCr>30000: #to reduce the amount of calculation time. If nCr>30000 a faster but less optimal algorithm will be used.
-            NTmessage('nCr = %s. It will take too long to calculate all possibilities first.\nCombinations may be not optimal'%nCr)
+            nTmessage('nCr = %s. It will take too long to calculate all possibilities first.\nCombinations may be not optimal'%nCr)
             indexes=munkIndexes(allowedTable)
         else:
             combs=calculateCombs(lenDrlColumns,lenDrlRows)
@@ -396,7 +396,7 @@ def munkIndexes(table):
 
 def calcnCr(n,k):
     '''Calculates nCr; the amount of combinations when you take r out of n.'''
-    NTmessage('Calculates %s nCr %s'%(n,k))
+    nTmessage('Calculates %s nCr %s'%(n,k))
     if n>=k and k>=0:
         facn=fac(n)
         fack=fac(k)
@@ -411,7 +411,7 @@ def calcnCr(n,k):
 def fac(n):
     '''Calculates n! n must be a positive integer.'''
     if type(n)!=int:
-        NTmessage('%s is not an integer, %s! will be calculated instead'%(n,int(n)))
+        nTmessage('%s is not an integer, %s! will be calculated instead'%(n,int(n)))
         n=int(n)
     if n==1 or n==0:
         return 1
@@ -500,7 +500,7 @@ def checkIndexes(indexes,allowedTable,table,maxi,deassignList,invdrlColumnsdict,
     for row, column in indexes:
         value=allowedTable[row][column]
         if value ==maxi: #checks if combination is possible
-            NTmessage('Warning: index combination (%s,%s)->%s is not allowed. Needs to be deassigned.'%(row,column,table[row][column]))
+            nTmessage('Warning: index combination (%s,%s)->%s is not allowed. Needs to be deassigned.'%(row,column,table[row][column]))
             ncolumnlist,newrow,newvalue=checkColumn(lenDrlRows,allowedTable,column,maxi,ncolumnlist)
             if not newrow:
                 continue
@@ -516,9 +516,9 @@ def checkIndexes(indexes,allowedTable,table,maxi,deassignList,invdrlColumnsdict,
     for i in ncolumnlist:
         deassignList.append(invdrlColumnsdict[drlColumns[i]][0])
     rows,columns,values,deassignList=checkRow(lenDrlRows,drlRows,invdrlRowsdict,allowedTable,maxi,rows,columns,values,deassignList)
-    NTmessage('Table indexes are:\n\n%-7s  %-7s  %-7s'%('row:','column:','value:'))
+    nTmessage('Table indexes are:\n\n%-7s  %-7s  %-7s'%('row:','column:','value:'))
     for i in range(len(rows)):
-        NTmessage('%-7s  %-7s  %-7s'%(rows[i],columns[i],float(values[i])/1000))
+        nTmessage('%-7s  %-7s  %-7s'%(rows[i],columns[i],float(values[i])/1000))
     return(deassignList,rows,columns,values)
 
 def checkColumn(lenDrlRows,allowedTable,column,maxi,ncolumnlist):
@@ -540,7 +540,7 @@ def checkColumn(lenDrlRows,allowedTable,column,maxi,ncolumnlist):
                 continue
             newrow=i
             newvalue=mini
-            NTmessage('check data for column %s, row %s and value %s.' %(str(i),str(column),str(mini))) #I haven't seen an example yet.
+            nTmessage('check data for column %s, row %s and value %s.' %(str(i),str(column),str(mini))) #I haven't seen an example yet.
         #endfor
     #endif
     return(ncolumnlist,newrow,newvalue)
@@ -614,12 +614,12 @@ def makeDisRList(restraintPairDict,proj):
             disRList.append(disr)
         else: #if the atompair can't be matched between the two projects. I don't expect this will happen
             if ap1:
-                NTerror('only first atompair found')
+                nTerror('only first atompair found')
             elif ap2:
-                NTerror('only second atompair found')
+                nTerror('only second atompair found')
             else:
-                NTerror('No corresponding atom pair found in project')
-            NTerror('atom pair = %s'%str(i))
+                nTerror('No corresponding atom pair found in project')
+            nTerror('atom pair = %s'%str(i))
             #endif
         #endif
     #endfor
@@ -628,12 +628,12 @@ def makeDisRList(restraintPairDict,proj):
 def deleteRestraints(delList,proj):
     '''Deletes the restraints in delList in project proj.'''
     delList=list(set(delList)) #sort delList and remove double elements
-    NTmessage('Following restraint pairs are removed:')
+    nTmessage('Following restraint pairs are removed:')
     for i in delList:
         for j in proj.distances[0]:
             if j==i:
                 proj.distances[0].remove(i)
-                NTmessage('%s,id=%s'%(str(i.atomPairs),str(i.id)))
+                nTmessage('%s,id=%s'%(str(i.atomPairs),str(i.id)))
             #endif
         #endfor
     #endfor
@@ -642,17 +642,17 @@ def deleteRestraints(delList,proj):
 
 def appendRestraints(disRList,proj):
     '''Appends restraint in disRList to proj.'''
-    NTmessage('Following restraint pairs are written:')
+    nTmessage('Following restraint pairs are written:')
     for i in disRList:
         proj.distances[0].append(i)
-        NTmessage('%s,id=%s'%(str(i.atomPairs),str(i.id)))
+        nTmessage('%s,id=%s'%(str(i.atomPairs),str(i.id)))
     proj.partitionRestraints()
     return proj
 
 def deassignRestraints(deassignList,proj,leu,delDeassRestr):
     '''deassigns restraints in deassignList. If they cannot be deassigned, they will be removed
     if delDeassRestr=True.'''
-    NTmessage('Following restraint pairs are deassigned:')
+    nTmessage('Following restraint pairs are deassigned:')
     atomIndexes=[0,1]
     for ap in deassignList: #deassign restraints in deassignList
         delRestr=0
@@ -678,18 +678,18 @@ def deassignRestraints(deassignList,proj,leu,delDeassRestr):
             #endfor
             if delRestr==1: #The restraint cannot be deassigned.
                 if delDeassRestr==True: #if restraint cannot be deassigned it will be deleted.
-                    NTmessage('no pseudoatoms for %s. Restraint will be removed.' %str(dr.atomPairs[0]))
+                    nTmessage('no pseudoatoms for %s. Restraint will be removed.' %str(dr.atomPairs[0]))
                     proj=deleteRestraints([dr],proj)
                     if ap!=deassignList[-1]:#if this is not the last restraint which will be deassigned
-                        NTmessage('Following restraint pairs are deassigned:')
+                        nTmessage('Following restraint pairs are deassigned:')
                     break
                 else:
-                    NTmessage('Restraint %s cannot be deassigned.'%str(dr.atomPairs[0]))
+                    nTmessage('Restraint %s cannot be deassigned.'%str(dr.atomPairs[0]))
                 #endif
             else:
                 newList=NTlist()
                 newList.append((atom1,atom2))
-                NTmessage('%s -> %s'%(str(dr.atomPairs),str(newList)))
+                nTmessage('%s -> %s'%(str(dr.atomPairs),str(newList)))
                 dr.atomPairs=newList #replace the atomPairs.
                 break
             #endif
@@ -700,14 +700,16 @@ def deassignRestraints(deassignList,proj,leu,delDeassRestr):
     return(proj)
 
 def writeRestraintsForLeu(prl,proj,prlleu,projleu,treshold,deasHB):
-    '''This is an overall script which coordinates through all other functions.
+    '''
+    This is an overall script which coordinates through all other functions.
     prl=project created in rotateLeucines.py
     proj=project you want to change
     prlleu and projleu are the leucineobjects in cing. They need to have the same residuenumber.
     treshold is the treshold for the violations
-    if deasHB=True, all HB's of the specified leucine will be deassigned.'''
+    if deasHB=True, all HB's of the specified leucine will be deassigned.
+    '''
     if prlleu.resNum!=projleu.resNum:
-        NTerror('Residuenumbers %s and %s are not the same.'%(prlleu.resNum,projleu.resNum))
+        nTerror('Residuenumbers %s and %s are not the same.'%(prlleu.resNum,projleu.resNum))
     if deasHB==True: #if HB's needs to be deassigned
         proj,_deassHBaplistproj=deassignHB(proj,projleu)
         prl,_deassHBaplistprl=deassignHB(prl,prlleu)#just to be able to compare the two projects later on
@@ -727,9 +729,9 @@ def writeRestraintsForLeu(prl,proj,prlleu,projleu,treshold,deasHB):
         table=transposeTable(table)
         allowedTable=transposeTable(allowedTable)
     stringTable=tablePrint(table,5)
-    NTmessage('Difference table is:\n%s'%stringTable)
+    nTmessage('Difference table is:\n%s'%stringTable)
     stringAllowedTable=tablePrint(allowedTable,15)
-    NTmessage('Allowed table is:\n%s'%stringAllowedTable)
+    nTmessage('Allowed table is:\n%s'%stringAllowedTable)
     if False: #this is the old version of the algorithm; works faster, but gives less optimal results.
         munk = Munkres() #algorithm to make combinations of lowest costs
         _indexes = munk.compute(allowedTable)
@@ -747,7 +749,7 @@ def writeRestraintsForLeu(prl,proj,prlleu,projleu,treshold,deasHB):
         n,rows,columns,_values=checkIndexes(indexes,allowedTable,table,maxi,n,invdrlColumnsdict,
                                             invdrlRowsdict,drlColumns,drlRows,lenDrlRows)
         if totalValueNew!='INF':
-            NTmessage('total sum of differences between upperbounds of combined restraints is %.2f A.'%(float(totalValueNew)/1000))
+            nTmessage('total sum of differences between upperbounds of combined restraints is %.2f A.'%(float(totalValueNew)/1000))
         #n=checkDeasrHB(n,deassHBaplistproj) Not necessary anymore since distances are recalculated after deassignment HB's.
         restraintPairDict=makeRestraintPairDict(invdrlRowsdict,invdrlColumnsdict,drlRows,drlColumns,rows,columns)
         disRList,delList=makeDisRList(restraintPairDict,proj)
@@ -770,15 +772,17 @@ def alterRestraintsForLeus(leuNumberList,proj,prl,treshold,deasHB,dihrCHI2):
     for i in leuNumberList:
         prlleu=prl.molecules[0].residuesWithProperties('LEU')[i]
         projleu=proj.molecules[0].residuesWithProperties('LEU')[i]
-        NTmessage('\nStart calculations for %s:'%prlleu.name)
+        nTmessage('\nStart calculations for %s:'%prlleu.name)
         proj=writeRestraintsForLeu(prl,proj,prlleu,projleu,treshold,deasHB)
     if dihrCHI2==True:
         upper=245
         lower=0
         addDihRestr(proj,lower,upper,leuNumberList)
     return proj
+# end def        
 
-if __name__ == '__main__':
+def runScript():
+    'Main entry point of this script.'
 #    proj_path='/Users/jd/workspace/'
     proj_path='/home/i/tmp/karenVCdir'
     proj_name='H2_2Ca_64_100'
@@ -794,3 +798,7 @@ if __name__ == '__main__':
     proj=alterRestraintsForLeus(leuNumberList,proj,prl,treshold,deasHB,dihrCHI2)
     if True:
         proj.save()
+# end def        
+
+if __name__ == '__main__':
+    runScript()

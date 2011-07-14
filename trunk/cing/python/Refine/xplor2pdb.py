@@ -88,7 +88,7 @@ verbose = 1
 #=======================================================================
 
 pdbFile = open( options.outFile, 'w' )
-NTmessage("==> Opened %s", options.outFile )
+nTmessage("==> Opened %s", options.outFile )
 
 xplorCount = 0
 for fName in files:
@@ -132,10 +132,10 @@ for fName in files:
                     fprintf( pdbFile, "%s\n", record )
                     lastRecord = record
                 else:
-                    NTerror('WARNING: cannot translate record to %s (%s)\n', convention, record )
+                    nTerror('WARNING: cannot translate record to %s (%s)\n', convention, record )
                 #end if
             else:
-                NTerror('WARNING: %s incompatible record (%s)\n', convention, record )
+                nTerror('WARNING: %s incompatible record (%s)\n', convention, record )
             #end if
         pass
     pass
@@ -156,7 +156,7 @@ fprintf( pdbFile, "END\n" )
 
 pdbFile.close()
 
-NTmessage("==> Converted %d xplor files to %s (%s format)\n", xplorCount, options.outFile, convention )
+nTmessage("==> Converted %d xplor files to %s (%s format)\n", xplorCount, options.outFile, convention )
 
 
 

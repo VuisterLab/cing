@@ -19,9 +19,9 @@ from shutil import copy
 from string import upper
 
 #if cingPaths.whatif == None or cingPaths.whatif == PLEASE_ADD_EXECUTABLE_HERE:
-#    NTdebug("No whatif installed.")
+#    nTdebug("No whatif installed.")
 #    raise ImportWarning(WHATIF_STR)
-#NTmessage('Using Whatif')
+#nTmessage('Using Whatif')
 
 scriptFileName = "whatif.script"
 
@@ -40,7 +40,7 @@ class WhatifResult( NTdict ):
         if cingNameDict.has_key(checkID):
             self.alternate = cingNameDict[checkID]
         for c  in  [ VALUE_LIST_STR, QUAL_LIST_STR]:
-            self[c] = NTfill( None, modelCount)
+            self[c] = nTfill( None, modelCount)
 
         #self.keysformat()
     #end def
@@ -49,7 +49,7 @@ class WhatifResult( NTdict ):
         """Return average of valueList as NTvalue object
         """
         theList = self[VALUE_LIST_STR]
-        return NTaverage2(theList, fmt=fmt)
+        return nTaverage2(theList, fmt=fmt)
 
     def __str__(self):
         return '<WhatifResult %(checkID)s>' % self
@@ -198,7 +198,7 @@ end y
         self.residues              = None
         self.atoms                 = None
         if not molecule:
-            NTerror('Whatif.__init__: no molecule defined')
+            nTerror('Whatif.__init__: no molecule defined')
         self.molecule              = molecule
         self.rootPath              = rootPath
         self.ranges                = ranges
@@ -318,7 +318,7 @@ end y
            Return None on success or True on error.
            """
         if not os.path.exists(fileName):
-            NTerror('Whatif._processWhatifSummary: file "%s" not found.', fileName)
+            nTerror('Whatif._processWhatifSummary: file "%s" not found.', fileName)
             return True
 
         self.molecule[WHATIF_STR] = NTdict()
@@ -329,12 +329,12 @@ end y
             l = line.dollar[0]
             if len(l) < 2: # to prevent recursion bug in AwkLike code.
                 continue
-#            NTdebug("Read line: "+l)
-#            NTdebug("DEBUG: read line dollar 1: [%s]" % line.dollar[1])
-#            NTdebug("DEBUG: read line dollar 2: [%s]" % line.dollar[2])
+#            nTdebug("Read line: "+l)
+#            nTdebug("DEBUG: read line dollar 1: [%s]" % line.dollar[1])
+#            nTdebug("DEBUG: read line dollar 2: [%s]" % line.dollar[2])
 
             if l.find( 'Summary report for users of a structure') > 0:
-#                NTdebug('Found summary report and increasing model idx: %d' % modelIdx)
+#                nTdebug('Found summary report and increasing model idx: %d' % modelIdx)
                 modelIdx += 1
                 continue
 
@@ -364,10 +364,10 @@ end y
                 checkId = INOCHK_STR
 
             if not checkId:
-#                NTdebug("Failed to find any specific check, continuing to look")
+#                nTdebug("Failed to find any specific check, continuing to look")
                 continue
 
-#            NTdebug("Processing checkId %s" % checkId)
+#            nTdebug("Processing checkId %s" % checkId)
 
             # if needed add WhatifResult instance
             # Do not use setdefault() as it generate too much overhead this way
@@ -381,15 +381,15 @@ end y
             # Happens for entry 2kqu line:
             #   Bond angles           STOP Normal end of WHAT IF.
             if len(line.dollar) < 3:
-                NTerror("Failed to find at least two elements after splitting the line on a colon;  ")
-                NTmessage("See also issue: %s%d" % (issueListUrl, 242))
+                nTerror("Failed to find at least two elements after splitting the line on a colon;  ")
+                nTmessage("See also issue: %s%d" % (issueListUrl, 242))
                 return True
 
 
             valueStringList  = line.dollar[2].strip().split()
-#            NTdebug("valueStringList: %s" % valueStringList)
+#            nTdebug("valueStringList: %s" % valueStringList)
             if not valueStringList:
-                NTerror("Failed to get valueStringList for check [%s] from line: [%s]" % (checkId, line))
+                nTerror("Failed to get valueStringList for check [%s] from line: [%s]" % (checkId, line))
                 return True
 
             # Very rarely it happens that the end-message of whatif gets intermingled with the values parsed here:
@@ -399,16 +399,16 @@ end y
             try:
                 value = float(valueStringList[0])
             except:
-                NTerror("Failed to parse value as a float for check [%s] for line [%s] from What If string [%s]; setting value to a None" % (
+                nTerror("Failed to parse value as a float for check [%s] for line [%s] from What If string [%s]; setting value to a None" % (
                     checkId,line,valueStringList[0]))
-                NTmessage("See also issue: %s%d" % (issueListUrl, 242))
+                nTmessage("See also issue: %s%d" % (issueListUrl, 242))
                 value = None
 
-#            NTdebug('modelIdx: %d' % modelIdx)
+#            nTdebug('modelIdx: %d' % modelIdx)
             if modelIdx < 0:
                 # This is expected for when What If wasn't offered any protein residues.
 #TODO: only report useful info.
-#                NTmessage('Failed to have increased model idx at least once for checkId %s' % checkId)
+#                nTmessage('Failed to have increased model idx at least once for checkId %s' % checkId)
                 continue
 
             ensembleValueList = getDeepByKeysOrAttributes( self.molecule, WHATIF_STR, checkId, VALUE_LIST_STR )            
@@ -433,14 +433,14 @@ end y
             if not ensembleValueList:
                 msg = "empty ensembleValueList for checkId %s" % checkId
                 if checkId in summaryCheckIdMandatoryList:
-                    NTwarning(msg)
+                    nTwarning(msg)
 #                else:
-#                    NTdebug(msg)
+#                    nTdebug(msg)
                 ensembleValueList = NTlist()
             # end if
             ensembleValueList.average()
             valueList.append(ensembleValueList)
-#            NTdebug('ensembleValueList found: %s' % valueList[-1])
+#            nTdebug('ensembleValueList found: %s' % valueList[-1])
 
             q = self._characterizeEnsembleScore(checkId, ensembleValueList.av, None)
             if q != None:
@@ -538,13 +538,13 @@ RMS Z-scores, should be close to 1.0:
             self.checks = NTlist()
 
         if not os.path.exists(modelCheckDbFileName):
-            NTerror('Whatif._parseCheckdb: file "%s" not found.', modelCheckDbFileName)
+            nTerror('Whatif._parseCheckdb: file "%s" not found.', modelCheckDbFileName)
             return True
 
         for line in AwkLike( modelCheckDbFileName, minNF = 3 ):
-#            NTdebug("DEBUG: read: "+line.dollar[0])
+#            nTdebug("DEBUG: read: "+line.dollar[0])
             if line.dollar[2] != ':':
-                NTwarning('Whatif._parseCheckdb: The line:\n   "%s"\nwas unexpectedly not parsed, expected second field to be a semicolon.',
+                nTwarning('Whatif._parseCheckdb: The line:\n   "%s"\nwas unexpectedly not parsed, expected second field to be a semicolon.',
                           line.dollar[0]
                          )
                 continue
@@ -560,12 +560,12 @@ RMS Z-scores, should be close to 1.0:
             if key == 'CheckID':
                 curCheck = None
                 checkID = value # local var within this 'if' statement.
-#                NTdebug("found check ID: " + checkID)
+#                nTdebug("found check ID: " + checkID)
                 if not nameDict.has_key( checkID ):
-                    NTwarning("Whatif._parseCheckdb: Skipping an unknown CheckID: "+checkID)
+                    nTwarning("Whatif._parseCheckdb: Skipping an unknown CheckID: "+checkID)
                     continue
 #                if self.debugCheck != checkID:
-##                    NTdebug("Skipping a check not to be debugged: "+checkID)
+##                    nTdebug("Skipping a check not to be debugged: "+checkID)
 #                    continue
                 isTypeFloat = False
 
@@ -576,14 +576,14 @@ RMS Z-scores, should be close to 1.0:
                     self.checks.append( curCheck )
                     curCheck[CHECK_ID_STR] = checkID
                     self[ checkID ] = curCheck
-#                    NTdebug("Appended check: "+checkID)
+#                    nTdebug("Appended check: "+checkID)
                 # Set the curLocDic in case of the first time otherwise get.
                 curLocDic = curCheck.setdefault(LOC_ID_STR, NTdict())
                 continue
             if not curCheck: # First pick up a check.
                 continue
 
-#            NTdebug("found key, value: [" + key + "] , [" + value + "]")
+#            nTdebug("found key, value: [" + key + "] , [" + value + "]")
             if key == "Text":
                 curCheck[TEXT_STR] = value
                 continue
@@ -614,27 +614,27 @@ RMS Z-scores, should be close to 1.0:
             elif  key == "Qual":
                 keyWord = QUAL_LIST_STR
             else:
-                NTerror( "Whatif._parseCheckdb: Expected key to be Value or Qual but found key, value pair: [%s] [%s]" % ( key, value ))
+                nTerror( "Whatif._parseCheckdb: Expected key to be Value or Qual but found key, value pair: [%s] [%s]" % ( key, value ))
                 return None
 
             if curListDic==None or not curListDic.has_key( keyWord ):
-                NTerror( "Whatif._parseCheckdb, line %d: Expected key %s for WhatifResult dict %s", line.NR, keyWord, curListDic)
+                nTerror( "Whatif._parseCheckdb, line %d: Expected key %s for WhatifResult dict %s", line.NR, keyWord, curListDic)
 
             else:
                 itemNTlist = curListDic[ keyWord ]
-#            NTdebug("a itemNTlist: "+`itemNTlist` )
+#            nTdebug("a itemNTlist: "+`itemNTlist` )
 
             if isTypeFloat:
                 itemNTlist[curModelId] = float(value)
             else:
                 itemNTlist[curModelId] = value
-#            NTdebug("c itemNTlist: "+`itemNTlist` )
-#            NTdebug("For key       : "+key)
-#            NTdebug("For modelID   : "+`model`)
-#            NTdebug("For value     : "+value)
-#            NTdebug("For check     : "+`curCheck`)
-#            NTdebug("For keyed list: "+`curCheck[key]`)
-#            NTdebug("For stored key: "+`curCheck[key][modelId]`)
+#            nTdebug("c itemNTlist: "+`itemNTlist` )
+#            nTdebug("For key       : "+key)
+#            nTdebug("For modelID   : "+`model`)
+#            nTdebug("For value     : "+value)
+#            nTdebug("For check     : "+`curCheck`)
+#            nTdebug("For keyed list: "+`curCheck[key]`)
+#            nTdebug("For stored key: "+`curCheck[key][modelId]`)
         #end for each line.
 
     def _processCheckdb( self   ):
@@ -654,7 +654,7 @@ RMS Z-scores, should be close to 1.0:
 
         """
 
-#        NTdetail("==> Processing the WHATIF results into CING data model")
+#        nTdetail("==> Processing the WHATIF results into CING data model")
         # Assemble the atom, residue and molecule specific checks
         # set the formats of each check easy printing
 #        self.molecule.setAllChildrenByKey( WHATIF_STR, None)
@@ -673,24 +673,24 @@ RMS Z-scores, should be close to 1.0:
         selfLevels      = [ self.residues, self.atoms ]
         selfLevelChecks = [ self.residueSpecificChecks, self.atomSpecificChecks ]
         # sorting on mols, residues, and atoms
-#        NTmessage("  for self.checks: " + `self.checks`)
-#        NTdebug("  for self.checks count: " + `len(self.checks)`)
+#        nTmessage("  for self.checks: " + `self.checks`)
+#        nTdebug("  for self.checks count: " + `len(self.checks)`)
 
 #        msgBadWiDescriptor = "See also %s%s" % (issueListUrl,10)
 #        msgBadWiDescriptor += "\n or %s%s" % (issueListUrl,4)
 
         for check in self.checks:
             if LEVEL_STR not in check:
-                NTerror("Whatif._processCheckdb: no level attribute in check dictionary: "+check[CHECK_ID_STR])
-                NTerror("check dictionary: "+`check`)
+                nTerror("Whatif._processCheckdb: no level attribute in check dictionary: "+check[CHECK_ID_STR])
+                nTerror("check dictionary: "+`check`)
                 return True
-#            NTdebug("attaching check: "+check[CHECK_ID_STR]+" of type: "+check[TYPE_STR] + " to level: "+check[LEVEL_STR])
+#            nTdebug("attaching check: "+check[CHECK_ID_STR]+" of type: "+check[TYPE_STR] + " to level: "+check[LEVEL_STR])
             if check[LEVEL_STR] == 'MOLECULE':
-#                NTdebug("Skipping any check related to this level for now; for now only the check labeled FATAL")
+#                nTdebug("Skipping any check related to this level for now; for now only the check labeled FATAL")
                 continue
             idx = levelIdList.index( check[LEVEL_STR] )
             if idx < 0:
-                NTerror("Whatif._processCheckdb: Unknown Level ["+check[LEVEL_STR]+"] in check:"+check[CHECK_ID_STR]+' '+check[TEXT_STR])
+                nTerror("Whatif._processCheckdb: Unknown Level ["+check[LEVEL_STR]+"] in check:"+check[CHECK_ID_STR]+' '+check[TEXT_STR])
                 return True
             selfLevelChecks[idx].append( check )
             check.keysformat()
@@ -699,37 +699,37 @@ RMS Z-scores, should be close to 1.0:
         checkIter = iter(selfLevelChecks)
         for _levelEntity in selfLevels:
             levelCheck = checkIter.next()
-#            NTdebug("working on levelEntity: " + levelEntity.MyName +"levelCheck: " + `levelCheck`[:80])
+#            nTdebug("working on levelEntity: " + levelEntity.MyName +"levelCheck: " + `levelCheck`[:80])
             for check in levelCheck:
 #                checkId = check[CHECK_ID_STR]
-#                NTdebug( 'check        : ' + `check`)
-#                NTdebug( 'check[CHECK_ID_STR]: ' + checkId)
+#                nTdebug( 'check        : ' + `check`)
+#                nTdebug( 'check[CHECK_ID_STR]: ' + checkId)
                 if not check.has_key(LOC_ID_STR):
-#                    NTdebug("Whatif._processCheckdb: There is no %s attribute, skipping check: [%s]" % ( LOC_ID_STR, check ))
-#                    NTdebug("  check: "+ `check`)
+#                    nTdebug("Whatif._processCheckdb: There is no %s attribute, skipping check: [%s]" % ( LOC_ID_STR, check ))
+#                    nTdebug("  check: "+ `check`)
                     continue
                 curLocDic = check[LOC_ID_STR]
                 if not curLocDic:
-#                    NTdebug("Skipping empty locationsDic")
+#                    nTdebug("Skipping empty locationsDic")
                     continue
 
                 for curLocId in curLocDic.keys():
                     curListDic = curLocDic[curLocId]
-#                    NTdebug("Working on curLocId:   " + `curLocId`)
-#                    NTdebug("Working on curListDic: " + `curListDic`)
+#                    nTdebug("Working on curLocId:   " + `curLocId`)
+#                    nTdebug("Working on curListDic: " + `curListDic`)
 
                     nameTuple = self.translateResAtmString( curLocId )
                     if not nameTuple:
-#                        NTwarning(msgBadWiDescriptor+'\nWhatif._processCheckdb: parsing entity "%s" what if descriptor' % curLocId)
-                        NTwarning('Whatif._processCheckdb: parsing entity "%s" what if descriptor' % curLocId)
+#                        nTwarning(msgBadWiDescriptor+'\nWhatif._processCheckdb: parsing entity "%s" what if descriptor' % curLocId)
+                        nTwarning('Whatif._processCheckdb: parsing entity "%s" what if descriptor' % curLocId)
                         continue
                     entity = self.molecule.decodeNameTuple( nameTuple ) # can be a chain, residue or atom level object
                     if not entity:
-                        NTdebug('Whatif._processCheckdb: mapping entity "%s" descriptor, tuple %s', curLocId, nameTuple)
+                        nTdebug('Whatif._processCheckdb: mapping entity "%s" descriptor, tuple %s', curLocId, nameTuple)
                         continue
-                    #NTdebug("adding to entity: " + `entity`)
+                    #nTdebug("adding to entity: " + `entity`)
                     entityWhatifDic = entity.setdefault(WHATIF_STR, NTdict())
-                    #NTdebug("adding to entityWhatifDic: " + `entityWhatifDic`)
+                    #nTdebug("adding to entityWhatifDic: " + `entityWhatifDic`)
 
                     # GV direct linking using the WhatifResult object
                     entityWhatifDic[curListDic.checkID] = curListDic
@@ -811,7 +811,7 @@ def createHtmlWhatif(project, ranges=None):
     """ Read out wiPlotList to see what get's created. """
 
     if not getDeepByKeysOrAttributes(plugins, MATPLIB_STR, IS_INSTALLED_STR):
-        NTdebug('Skipping createHtmlWattos because no matplib installed.')
+        nTdebug('Skipping createHtmlWattos because no matplib installed.')
         return
     from cing.PluginCode.matplib import MoleculePlotSet #@UnresolvedImport
 
@@ -954,26 +954,26 @@ def runWhatif( project, ranges=None, parseOnly=False ):
     """
 
     if cingPaths.whatif == None or cingPaths.whatif == PLEASE_ADD_EXECUTABLE_HERE:
-        NTmessage("No whatif installed so skipping this step")
+        nTmessage("No whatif installed so skipping this step")
         return
 
     if not project.molecule:
-        NTerror("runWhatif: no molecule defined")
+        nTerror("runWhatif: no molecule defined")
         return True
     mol = project.molecule
     if mol.modelCount == 0:
-        NTwarning('runWhatif: no models for "%s"', mol)
+        nTwarning('runWhatif: no models for "%s"', mol)
         return
 
     path = project.moleculePath( 'whatif' )
     if not os.path.exists( path ):
-        NTerror('runWhatif: path "%s" does not exist', path)
+        nTerror('runWhatif: path "%s" does not exist', path)
         return True
 
     #Specific Whatif requirement : no spaces in path because it will crash
     absPath = os.path.abspath(path)
     if len(absPath.split()) > 1:
-        NTerror('runWhatif: absolute path "%s" contains spaces. This will crash Whatif.', absPath)
+        nTerror('runWhatif: absolute path "%s" contains spaces. This will crash Whatif.', absPath)
         return True
 
     if ranges == None:
@@ -983,24 +983,24 @@ def runWhatif( project, ranges=None, parseOnly=False ):
     mol.runWhatif = whatif
     del ranges # only use whatif.ranges now.
     useRanges = mol.useRanges(whatif.ranges)
-#    NTdebug("In runWhatif ranges: %s useRanges %s" % (whatif.ranges, useRanges))
+#    nTdebug("In runWhatif ranges: %s useRanges %s" % (whatif.ranges, useRanges))
 
     residueList = mol.allResidues()
     if useRanges:
         residueList = mol.ranges2list(whatif.ranges)
         if residueList == None:
-            NTerror("Failed ranges2list in Whatif")
+            nTerror("Failed ranges2list in Whatif")
             return True
         if not residueList:
-            NTerror("Empty list of residues in Whatif")
+            nTerror("Empty list of residues in Whatif")
             return True
         whatif.ranges = mol.rangesToExpandedRanges(whatif.ranges)
         if mol.rangesIsAll(whatif.ranges):
-            NTerror("Non fatal code error but ranges can't be all if they are to be 'used'; don't worry code will still function fine.")
+            nTerror("Non fatal code error but ranges can't be all if they are to be 'used'; don't worry code will still function fine.")
 
     numberOfResidues = len(residueList)
     if numberOfResidues == 0:
-        NTerror("No residues to run Whatif on")
+        nTerror("No residues to run Whatif on")
         return True
 
     models = NTlist(*range( mol.modelCount ))
@@ -1027,7 +1027,7 @@ def runWhatif( project, ranges=None, parseOnly=False ):
         for res in residueList:
             if not (res.hasProperties('protein') or res.hasProperties('nucleic')):
                 if not res.hasProperties('HOH'): # don't report waters
-                    NTmessage('runWhatif: non-standard residue %s found and will be written out for What If' % `res`)
+                    nTmessage('runWhatif: non-standard residue %s found and will be written out for What If' % `res`)
                 whatifStatus.nonStandardResidues.append(repr(res))
         #end for
 
@@ -1036,11 +1036,11 @@ def runWhatif( project, ranges=None, parseOnly=False ):
         for model in models:
             fullname =  os.path.join( whatifDir, sprintf('model_%03d.pdb', model) )
             # WI prefers IUPAC like PDB now. In CING the closest is IUPAC?
-#            NTdebug('==> Materializing model '+`model`+" to disk" )
+#            nTdebug('==> Materializing model '+`model`+" to disk" )
             pdbFile = mol.toPDB( fullname, model=model, ranges=whatif.ranges, convention = IUPAC)
 #                                 useRangesForLoweringOccupancy=useRanges )
             if not pdbFile:
-                NTerror("runWhatif: Failed to write a temporary file with a model's coordinate")
+                nTerror("runWhatif: Failed to write a temporary file with a model's coordinate")
                 return True
 
         scriptComplete = Whatif.scriptBegin
@@ -1061,9 +1061,9 @@ def runWhatif( project, ranges=None, parseOnly=False ):
         msg = '==> Running What If checks on %s residues, %s model(s) for an estimated (%s residues/s):' % (
               numberOfResidues, mol.modelCount, Whatif.NUMBER_RESIDUES_PER_SECONDS)
         msg += ' %s hours, %s minutes and %s seconds; please wait' % timeRunEstimatedList
-        NTmessage(msg)
+        nTmessage(msg)
 #        if totalNumberOfResidues < 100:
-#            NTmessage("It takes much longer per residue for a small molecule/ensemble")
+#            nTmessage("It takes much longer per residue for a small molecule/ensemble")
 
         scriptFullFileName =  os.path.join( whatifDir, scriptFileName )
         open(scriptFullFileName,"w").write(scriptComplete)
@@ -1073,25 +1073,25 @@ def runWhatif( project, ranges=None, parseOnly=False ):
         # thinking it's running interactively.
         now = time.time()
         whatifExitCode = whatifProgram("script", scriptFileName )
-#        NTdebug("Took number of seconds: " + sprintf("%8.1f", time.time() - now))
+#        nTdebug("Took number of seconds: " + sprintf("%8.1f", time.time() - now))
         whatifStatus.exitCode  = whatifExitCode
         whatifStatus.time      = sprintf("%.1f", time.time() - now)
-#        NTdebug('runWhatif: exitCode %s,  time: %s', whatifStatus.exitCode, whatifStatus.time)
+#        nTdebug('runWhatif: exitCode %s,  time: %s', whatifStatus.exitCode, whatifStatus.time)
         whatifStatus.keysformat()
 
         if whatifExitCode:
-            NTerror("runWhatif: Failed whatif checks with exit code: " + `whatifExitCode`)
+            nTerror("runWhatif: Failed whatif checks with exit code: " + `whatifExitCode`)
             return True
 
         whatifStatus.completed = True
-#        NTdebug("Setting what if status completed to %s" % whatifStatus.completed)
+#        nTdebug("Setting what if status completed to %s" % whatifStatus.completed)
     else:
-#        NTdebug("Skipping actual whatif execution")
+#        nTdebug("Skipping actual whatif execution")
         whatifExitCode = 0
     #end if
 
 
-#    NTdebug('Parsing whatif checks ')
+#    nTdebug('Parsing whatif checks ')
 
     # clear the whatif data structure
     if mol.has_key(WHATIF_STR):
@@ -1113,32 +1113,32 @@ def runWhatif( project, ranges=None, parseOnly=False ):
 #        fullname =  os.path.join( whatifDir, sprintf('model_%03d.pdb', model) )
 #        os.unlink( fullname )
         modelCheckDbFileName = "check_"+modelNumberString+".db"
-#        NTmessageNoEOL('.')
+#        nTmessageNoEOL('.')
         modelCheckDbFullFileName =  os.path.join( whatifDir, modelCheckDbFileName )
 
         if whatif._parseCheckdb( modelCheckDbFullFileName, model ):
-            NTerror("runWhatif: Failed to parse check db %s", modelCheckDbFileName)
+            nTerror("runWhatif: Failed to parse check db %s", modelCheckDbFileName)
             return True
         #end if
     #end for
 
     if whatif._processCheckdb():
-        NTerror("runWhatif: Failed to process check db")
+        nTerror("runWhatif: Failed to process check db")
         return True
 
 #    pathPdbOut = os.path.join(path, 'pdbout.txt' ) has only one model!
     pathPdbOut = os.path.join(path, 'DO_WHATIF.out0' )
     if not os.path.exists(pathPdbOut): # Happened for 1ao2 on production machine; not on development...
-        NTerror("Path does not exist: %s" % (pathPdbOut))
+        nTerror("Path does not exist: %s" % (pathPdbOut))
         return True
 
     try:
         if whatif._processWhatifSummary(pathPdbOut):
-            NTerror("runWhatif: Failed to process WHATIF summary file")
+            nTerror("runWhatif: Failed to process WHATIF summary file")
             return True
     except:
         NTtracebackError()
-        NTerror("Skipping restore of whatif summary.") 
+        nTerror("Skipping restore of whatif summary.") 
         return True
     whatif._makeSummary()
 
@@ -1193,7 +1193,7 @@ def runWhatif( project, ranges=None, parseOnly=False ):
 def removeTempFiles( whatifDir ):
     removeEmptyFiles( whatifDir )
 #    whatifDir        = project.mkdir( mol.name, molDirectories.whatif  )
-#    NTdebug("Removing temporary files generated by What If")
+#    nTdebug("Removing temporary files generated by What If")
     try:
         # do NOT remove pdbout.txt.
         # Now pdbout.txt is no longer parsed, it may be removed I guess unless we want it again for fixing an issue
@@ -1208,12 +1208,12 @@ def removeTempFiles( whatifDir ):
                 removeList.append(fn)
         for fn in removeList:
             if not os.path.exists(fn):
-#                NTdebug("Whatif.removeTempFiles: Expected to find a file to be removed but it doesn't exist: " + fn )
+#                nTdebug("Whatif.removeTempFiles: Expected to find a file to be removed but it doesn't exist: " + fn )
                 continue
-#            NTdebug("Removing: " + fn)
+#            nTdebug("Removing: " + fn)
             os.unlink(fn)
     except:
-        NTdebug("Whatif.removeTempFiles: Failed to remove all temporary what if files that were expected")
+        nTdebug("Whatif.removeTempFiles: Failed to remove all temporary what if files that were expected")
 
 #end def
 
@@ -1223,7 +1223,7 @@ def restoreWhatif( project, tmp=None ):
     Optionally restore whatif results
     """
     if project.whatifStatus.completed:
-        NTmessage('==> Restoring whatif results')
+        nTmessage('==> Restoring whatif results')
         project.runWhatif(parseOnly=True)
 #end def
 

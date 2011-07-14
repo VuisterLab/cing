@@ -95,14 +95,14 @@ class pdbParser:
         self.matchGame = MatchGame(convention=convention, patchAtomNames = patchAtomNames, skipWaters = skipWaters, allowNonStandardResidue = allowNonStandardResidue)
 
         if not os.path.exists(pdbFile):
-            NTerror('pdbParser: missing PDB-file "%s"', pdbFile)
+            nTerror('pdbParser: missing PDB-file "%s"', pdbFile)
             return None
 
-        NTmessage('==> Parsing pdbFile "%s" ... ', pdbFile)
+        nTmessage('==> Parsing pdbFile "%s" ... ', pdbFile)
 
         self.pdbRecords = PyMMLib.PDBFile(pdbFile)
         if not self.pdbRecords:
-            NTerror('pdbParser: parsing PDB-file "%s"', pdbFile)
+            nTerror('pdbParser: parsing PDB-file "%s"', pdbFile)
             return None
         #end if
 
@@ -115,7 +115,7 @@ class pdbParser:
     def _records2tree(self):
         """Convert the pdbRecords in a tree-structure. Really a HoHoH; Hash of...
         """
-#        NTdebug("Now in _records2tree")
+#        nTdebug("Now in _records2tree")
         self.tree = NTtree('tree') # Tree like structure of pdbFile
         chn = None
         res = None
@@ -130,7 +130,7 @@ class pdbParser:
         foundModel = False
         for i,record in enumerate(self.pdbRecords): #@UnusedVariable
 #            if i >= 459:
-#                NTdebug("Working on record: %s" % record)
+#                nTdebug("Working on record: %s" % record)
             recordName = record._name.strip()
             if recordName == "MODEL":
                 foundModel = True
@@ -173,14 +173,14 @@ class pdbParser:
                     if not self.tree.has_key(chainId):
                         chn = self.tree.addChild(name = chainId)
                         if chainId in chainIdListAlreadyUsed:
-                            NTcodeerror("list out of sync in _records2tree")
+                            nTcodeerror("list out of sync in _records2tree")
                         else:
                             chainIdListAlreadyUsed.append(chainId) # simpler object for getNextAvailableChainId
                     else:
                         chn = self.tree[chainId]
                     #end if
                     if not chn:
-                        NTwarning('pdbParser._records2tree: strange, we should not have a None for chain; record %s', record)
+                        nTwarning('pdbParser._records2tree: strange, we should not have a None for chain; record %s', record)
                         continue
                     #end if
 
@@ -190,7 +190,7 @@ class pdbParser:
                         res = chn[fullResName]
                     #end if
                     if not res:
-                        NTwarning('pdbParser._records2tree: strange, we should not have a None for residue; record %s', record)
+                        nTwarning('pdbParser._records2tree: strange, we should not have a None for residue; record %s', record)
                         continue
                     #end if
 
@@ -200,7 +200,7 @@ class pdbParser:
                         atm = res[atmName]
                     #end if
                     if not atm:
-                        NTwarning('pdbParser._records2tree: strange, we should not have a None for atom; record %s', record)
+                        nTwarning('pdbParser._records2tree: strange, we should not have a None for atom; record %s', record)
                         continue
                     #end if
                     atomDict[t] = atm
@@ -215,14 +215,14 @@ class pdbParser:
         if not foundModel: # X-rays do not have MODEL record
             self.modelCount = 1
 
-#        NTdebug('end pdbParser._records2tree: parsed %d pdb records, %d models', atmCount, self.modelCount)
+#        nTdebug('end pdbParser._records2tree: parsed %d pdb records, %d models', atmCount, self.modelCount)
     #end def
 
     def _matchResiduesAndAtoms(self):
         """
         Match residues and Atoms in the tree to CING db using self.convention
         """
-#        NTdebug("Now in _matchResiduesAndAtoms")
+#        nTdebug("Now in _matchResiduesAndAtoms")
         unmatchedAtomByResDict = {}
 #        unmatchedResDict = {}
         for res in self.tree.subNodes(depth = 2):
@@ -245,7 +245,7 @@ class pdbParser:
 #                   aName = moveFirstDigitToEnd(atm.name) # worry about this?
                     atm.db = res.db.appendAtomDef(atm.name)
                     if not atm.db:
-#                        NTwarning("Should have been possible to add a non-standard atom %s to the residue %s" % (atm.name, res.resName))
+#                        nTwarning("Should have been possible to add a non-standard atom %s to the residue %s" % (atm.name, res.resName))
                         continue
 
         msg = "==> Non-standard (residues and their) atoms"
@@ -257,9 +257,9 @@ class pdbParser:
         if unmatchedAtomByResDict:
             msg += unmatchedAtomByResDictToString(unmatchedAtomByResDict)
             if self.allowNonStandardResidue:
-                NTmessage(msg)
+                nTmessage(msg)
             else:
-                NTerror(msg)
+                nTerror(msg)
     #end def
 
     def initMolecule(self, moleculeName):
@@ -276,13 +276,13 @@ class pdbParser:
                 if not res.skip and res.db != None:
                     residue = chain.addResidue(res.db.name, res.resNum)
                     if residue == None:
-                        NTerror("Not adding residue: %s" % res)
+                        nTerror("Not adding residue: %s" % res)
                         continue
                     residue.addAllAtoms()
                 #end if
             #end for
         #end for
-#        NTdebug('pdbParser.initMolecule: %s', mol)
+#        nTdebug('pdbParser.initMolecule: %s', mol)
         self.map2molecule(mol)
         return mol
     #end for
@@ -296,14 +296,14 @@ class pdbParser:
 
         for chn in self.tree:
             for res in chn:
-#                NTdebug("map2molecule res: %s" % res)
+#                nTdebug("map2molecule res: %s" % res)
                 if res.skip or (not res.db):
                     continue
                 for atm in res:
                     atm.atom = None
                     if atm.skip or (not atm.db):
-#                        NTerror("pdbParser#map2molecule was flagged before right?")
-#                        NTdebug( '>> %s' % atm )
+#                        nTerror("pdbParser#map2molecule was flagged before right?")
+#                        nTdebug( '>> %s' % atm )
                         continue
                     #t = (IUPAC, chn.name, res.resNum, atm.db.name)
                     # GV the atm.db.name is BY DEFINITION in INTERNAL format!
@@ -312,7 +312,7 @@ class pdbParser:
                     t = (INTERNAL, chn.name, res.resNum, atm.db.name)
                     atm.atom = molecule.decodeNameTuple(t)
 #                    if res.resNum==83:
-#                        NTdebug(  '>> %s %s %s', atm.name, t, atm.atom )
+#                        nTdebug(  '>> %s %s %s', atm.name, t, atm.atom )
 #                    if not atm.atom: # for the non-standard residues and atoms.
 #                        t = (INTERNAL, chn.name, res.resNum, atm.db.name)
 #                        atm.atom = molecule.decodeNameTuple(t)
@@ -336,7 +336,7 @@ class pdbParser:
         if unmatchedAtomByResDict:
             msg = "pdbParser.map2molecule: Strange! Warning mapping atom for:\n"
             msg += unmatchedAtomByResDictToString(unmatchedAtomByResDict)
-            NTwarning(msg)
+            nTwarning(msg)
     #end def
 
     def importCoordinates(self, nmodels = None, update = True):
@@ -350,7 +350,7 @@ class pdbParser:
         """
 
         if not self.molecule:
-            NTerror('pdbParser.importCoordinates: undefined molecule')
+            nTerror('pdbParser.importCoordinates: undefined molecule')
             return True
         #end if
 
@@ -359,7 +359,7 @@ class pdbParser:
         #end if
 
         if nmodels > self.modelCount:
-            NTerror('pdbParser.importCoordinates: requesting %d models; only %d present', nmodels, self.modelCount)
+            nTerror('pdbParser.importCoordinates: requesting %d models; only %d present', nmodels, self.modelCount)
             return True
         #end if
         msgHol = MsgHoL()
@@ -369,7 +369,7 @@ class pdbParser:
             recordName = record._name.strip()
             if recordName == "MODEL":
                 foundModel = True
-#                NTdebug('pdbParser.importCoordinates: importing as MODEL %d', model)
+#                nTdebug('pdbParser.importCoordinates: importing as MODEL %d', model)
                 continue
 
             elif recordName == "ENDMDL":
@@ -381,7 +381,7 @@ class pdbParser:
 #                if (not record.atm.skip) and (record.atm.atom != None):
                 if not record.atm:
                     continue
-#                NTdebug("record.atm: %s" % record.atm)
+#                nTdebug("record.atm: %s" % record.atm)
                 if record.atm.skip:
                     continue
                 if not record.atm.atom:
@@ -406,7 +406,7 @@ class pdbParser:
         if update:
             self.molecule.updateAll()
 
-#        NTdebug('pdbParser.importCoordinates: %s', self.molecule)
+#        nTdebug('pdbParser.importCoordinates: %s', self.molecule)
         return False
     #end def
 #end class
@@ -433,7 +433,7 @@ class MatchGame:
             HA2, CD1, ...
         """
 
-#        NTdebug("Now in _matchResidue2Cing: %s" % res)
+#        nTdebug("Now in _matchResidue2Cing: %s" % res)
 
         res.db = None
         res.skip = False
@@ -512,14 +512,14 @@ class MatchGame:
 #        insert new residue.
         res.db = NTdb.appendResidueDef(name = res.resName, shortName = '_', comment='From parsing PDB file')
         if not res.db:
-            NTcodeerror("Adding a non-standard residue should have been possible.")
+            nTcodeerror("Adding a non-standard residue should have been possible.")
             return None
         res.db.nameDict[self.convention] = res.resName
 
         # Just a check, disable for speed.
         _x = NTdb.getResidueDefByName(res.resName)
         if not _x:
-            NTcodeerror("Added residue but failed to find it again in pdbParser#_matchResidue2Cing")
+            nTcodeerror("Added residue but failed to find it again in pdbParser#_matchResidue2Cing")
 
         return res.db
     #end def
@@ -541,10 +541,10 @@ class MatchGame:
             name
         """
 
-#        NTdebug("Now in _matchAtom2Cing: %s" % atm)
+#        nTdebug("Now in _matchAtom2Cing: %s" % atm)
 
         if not atm:
-            NTerror('pdbParser._matchAtom: undefined atom')
+            nTerror('pdbParser._matchAtom: undefined atom')
             return None
         #end if
 
@@ -553,7 +553,7 @@ class MatchGame:
         res = atm._parent
 
         if not res:
-            NTerror('pdbParser._matchAtom: undefined parent residue, atom %s, convention %s, not matched',
+            nTerror('pdbParser._matchAtom: undefined parent residue, atom %s, convention %s, not matched',
                     atm.name, self.convention)
             return None
         #end if
@@ -566,7 +566,7 @@ class MatchGame:
         #end if
 
         if not res.db:
-            NTerror('_matchAtom2Cing: undefined parent residue DB'),
+            nTerror('_matchAtom2Cing: undefined parent residue DB'),
             return None
         #end if
 
@@ -607,7 +607,7 @@ class MatchGame:
                 atm.db = res.db.getAtomDefByName(bName, convention = self.convention)
             #end if
 #            if atm.db:
-#                NTdebug('pdbParser._matchAtom: patched atom %s, residue %s %s, convention %s',
+#                nTdebug('pdbParser._matchAtom: patched atom %s, residue %s %s, convention %s',
 #                           atm.name, res.resName, res.resNum, self.convention                     )
         #end if
         if atm.db:
@@ -638,22 +638,22 @@ def initPDB(project, pdbFile, convention = IUPAC, name = None, nmodels = None, u
        returns molecule instance or None on error
     """
     if not os.path.exists(pdbFile):
-        NTerror('Project.initPDB: missing PDB-file "%s"', pdbFile)
+        nTerror('Project.initPDB: missing PDB-file "%s"', pdbFile)
         return None
 
-#    NTmessage('==> initializing from PDB file "%s"', pdbFile) # repeated in the parser.
+#    nTmessage('==> initializing from PDB file "%s"', pdbFile) # repeated in the parser.
 
     if not name:
-        _path, name, _ext = NTpath(pdbFile)
+        _path, name, _ext = nTpath(pdbFile)
     parser = pdbParser(pdbFile, convention = convention, allowNonStandardResidue = allowNonStandardResidue)
     if not parser:
-        NTerror('No pdbParser found in initPDB.')
+        nTerror('No pdbParser found in initPDB.')
         return None
     molecule = parser.initMolecule(name)
     if not molecule:
         return None
     if not molecule:
-        NTerror('Project.initPDB: failed parsing PDB-file "%s"', pdbFile)
+        nTerror('Project.initPDB: failed parsing PDB-file "%s"', pdbFile)
         return None
     parser.importCoordinates(nmodels = nmodels, update = update)
     project.appendMolecule(molecule)
@@ -671,14 +671,14 @@ def importPDB(project, pdbFile, convention = IUPAC, nmodels = None):
         return pdbFile or None on error
     """
     if not project.molecule:
-        NTerror("importPDB: no molecule defined")
+        nTerror("importPDB: no molecule defined")
         return None
     if not importFromPDB(project.molecule, pdbFile, convention, nmodels = nmodels):
         return None
 
     project.addHistory(sprintf('importPDB from "%s"', pdbFile))
     project.updateProject()
-    NTmessage('%s', project.molecule.format())
+    nTmessage('%s', project.molecule.format())
     #end if
     return pdbFile
 #end def
@@ -691,7 +691,7 @@ def export2PDB(project, tmp = None):
     for mol in project.molecules:
         if mol.modelCount > 0:
             fname = project.path(project.directories.PDB, mol.name + '.pdb')
-            NTdetail('==> Exporting to PDB file "%s"', fname)
+            nTdetail('==> Exporting to PDB file "%s"', fname)
             pdbFile = mol.toPDB(fileName = fname, convention = IUPAC)
 #            pdbFile.save(fname)
             del(pdbFile)

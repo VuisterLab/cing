@@ -15,7 +15,7 @@ dateNumMin = date2num(dateMin)
 dateNumMax = date2num(dateMax)
 dateNumSpan = dateNumMax - dateNumMin
 halfBinSize = datetime.timedelta(365*yearBinSize/2.)
-NTmessage("Date number min/max: %s %s" % (dateNumMin, dateNumMax))
+nTmessage("Date number min/max: %s %s" % (dateNumMin, dateNumMax))
 
 nr = 100 # number of records
 x = np.random.random(nr) * dateNumSpan + dateNumMin
@@ -35,9 +35,9 @@ for i,bin in enumerate(numBins):
 
     aspread = asarray(spread)
     dataAll.append(spread)
-    NTdebug("aspread: %s" % aspread)
+    nTdebug("aspread: %s" % aspread)
 # end for
-NTdebug("numBins: %s" % numBins)
+nTdebug("numBins: %s" % numBins)
 wiskLoL = boxplot(dataAll, positions=bins, widths=widths, sym='b+')
 #scatter(x, y, s=0.1) # Plot of the data and the fit
 xlim(xmin=dateMin, xmax=dateMax)

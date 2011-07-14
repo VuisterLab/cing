@@ -1,12 +1,12 @@
 '''
 Created on Jun 25, 2010
 
-run -i '/Users/jd/workspace35/cing/python/cing/Scripts/interactive/contactDifference.py'
+run -i '$C/python/cing/Scripts/interactive/contactDifference.py'
 
-@author: jd
-For Sanne Nabuurs.
+for Sanne Nabuurs.
 '''
-from cing.Libs import NTplot
+
+from cing.PluginCode.matplib import NTplot
 from cing.PluginCode.matplib import NTplotSet
 from cing.core.classes import Project
 from cing.core.constants import * #@UnusedWildImport
@@ -48,7 +48,7 @@ for pairIdx in range(4): # p for pairs use 4 pairs for final
                 for idx2, r2 in enumerate(resList[:n]):
     #                if idx2 <= idx1:
     #                    continue # only do one part of the matrix.
-        #            NTdebug("Looking at model %s between %s and %s" % (k, r1, r2))
+        #            nTdebug("Looking at model %s between %s and %s" % (k, r1, r2))
                     atom1 = r1.CA
                     atom2 = r2.CA
                     caDistMatrix[idx1,idx2] = NTdistanceOpt(atom1.coordinates[k], atom2.coordinates[k])

@@ -52,15 +52,15 @@ def getBmrbLinks():
     matchBmrbPdbDataDirLocal = matchBmrbPdbDir
     dbms.readCsvRelationList([ matchBmrbPdbTable ], matchBmrbPdbDataDirLocal)
     mTable = dbms.tables[matchBmrbPdbTable]
-#    NTmessage("mTable:\n%s" % mTable.__str__(show_rows=False))
+#    nTmessage("mTable:\n%s" % mTable.__str__(show_rows=False))
     matches_many2one = mTable.getHash(useSingleValueOfColumn=1) # hashes by first column to the next by default already.
-#    NTmessage("Found %s matches from PDB to BMRB" % len(matches_many2one))
+#    nTmessage("Found %s matches from PDB to BMRB" % len(matches_many2one))
     return matches_many2one
 
 def getBmrbNmrGridEntries():
   result = []
   urlLocation = urlDB2 + "/entry.txt"
-#  NTdebug("Loading from %s" % urlLocation)
+#  nTdebug("Loading from %s" % urlLocation)
 ##4583    \N    108d    \N    \N
 ##4584    \N    149d    \N    \N
   r1 = urllib.urlopen(urlLocation)
@@ -123,9 +123,9 @@ def getBmrbNmrGridEntriesDOCRDone():
 def writeEntryListToFile(fileName, entryList):
     "Returns True on failure"
     csvText = toCsv(entryList)
-    NTdebug("entryList: [%s]" % entryList)
+    nTdebug("entryList: [%s]" % entryList)
     if not csvText:
-        NTerror("Failed to get CSV for %s" % entryList)
+        nTerror("Failed to get CSV for %s" % entryList)
         return True
     writeTextToFile(fileName, csvText)
 
@@ -136,7 +136,7 @@ def readEntryListFromFile(fileName, headerCount=0):
     """
     txt = readTextFromFile(fileName)
     if not txt:
-        NTerror("Failed to readLinesFromFile %s" % fileName)
+        nTerror("Failed to readLinesFromFile %s" % fileName)
         return None
     result = []
     for line in txt.split('\n'):
@@ -149,9 +149,10 @@ def readEntryListFromFile(fileName, headerCount=0):
     if headerCount:
         result = result[headerCount:]
     return result
-
+# end def
 
 def getBmrbEntries():
+    'Return None on error.'
     r1 = urllib.urlopen(bmrbUrl)
     data = r1.read()
     fileNameGz = getFileName(bmrbUrl)
@@ -159,11 +160,15 @@ def getBmrbEntries():
     fileName = fileNameGz[:-3] # remove .gz
     gunzip(fileNameGz, outputFileName=fileName, removeOriginal=True)
     bmrbDepRelation = getRelationFromCsvFile( fileName, containsHeaderRow=0 )
+    if not bmrbDepRelation:
+        nTerror('No relation read from CSV file: %s' % fileName )
+        return None
     bmrbDateList = bmrbDepRelation.getColumnByIdx(0)
     bmrbIdList = [ int(bmrbData[5:]) for bmrbData in bmrbDateList ]
-    NTmessage("Read %s BMRB entries from DB dump" % len(bmrbIdList))
+    nTmessage("Read %s BMRB entries from DB dump" % len(bmrbIdList))
     bmrbIdList.sort()
     return bmrbIdList
+# end def
 
 def getPdbEntries(onlyNmr=False, mustHaveExperimentalNmrData=False, onlySolidState=False):
     """Includes solution and solid state NMR if onlyNMR is chosen
@@ -182,28 +187,28 @@ def getPdbEntries(onlyNmr=False, mustHaveExperimentalNmrData=False, onlySolidSta
     else:
         if mustHaveExperimentalNmrData:
             inputFile = os.path.join(dir_name, 'RESTqueryPDB_exp.xml')
-#            NTcodeerror("Can't query for onlyNmr = True AND mustHaveExperimentalNmrData = True")
+#            nTcodeerror("Can't query for onlyNmr = True AND mustHaveExperimentalNmrData = True")
 #            return
         else:
             inputFile = os.path.join(dir_name, 'RESTqueryPDB.xml')
 
     rpcUrl = 'http://www.rcsb.org/pdb/rest/search'
     queryText = open(inputFile, 'r').read()
-#    NTdebug("queryText:\n%s" % queryText)
-#    NTdebug("querying...")
+#    nTdebug("queryText:\n%s" % queryText)
+#    nTdebug("querying...")
     req = urllib2.Request(url=rpcUrl, data=queryText)
     f = urllib2.urlopen(req)
     result = []
     for i, record in enumerate(f.readlines()): #@UnusedVariable
         entry_code = record.rstrip().lower()
         if not is_pdb_code(entry_code):
-#            NTwarning("In %s found an invalid entry code: %s from record (%s) '%s'" % (getCallerName(), str(entry_code), i, record)) # Reported to Wolfgang on April 24, 2011.
+#            nTwarning("In %s found an invalid entry code: %s from record (%s) '%s'" % (getCallerName(), str(entry_code), i, record)) # Reported to Wolfgang on April 24, 2011.
             continue
         result.append( entry_code )
     if not result:
-        NTerror("Failed to read file from server")
+        nTerror("Failed to read file from server")
         return
-#    NTdebug("Done successfully.")
+#    nTdebug("Done successfully.")
     return result
 
 
@@ -249,7 +254,7 @@ def getBmrbCsCounts():
     bmrbCountTable.convertColumn(0) # default is integer data type converting the read strings
     bmrbCountTable.convertColumn(2)
     bmrbCountTableProper = bmrbCountTable.toTable()
-#        NTdebug("Found table: %r" % bmrbCountTableProper)
+#        nTdebug("Found table: %r" % bmrbCountTableProper)
     bmrbCountMap = NTdict()
 #        idxColumnKeyList = [0, 1, 2]
     idxColumnKeyList = []

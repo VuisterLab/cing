@@ -53,9 +53,9 @@ class AllChecks(TestCase):
         project.initPDB( pdbFile=pdbFilePath, convention = IUPAC )
 
         m = project.molecule
-        NTdebug("m: %s" % m)
+        nTdebug("m: %s" % m)
         resList = m.ranges2list(ranges)
-        NTdebug("resList: %s" % resList)
+        nTdebug("resList: %s" % resList)
         self.assertTrue(resList)
         
         if doCompletenessCheck:

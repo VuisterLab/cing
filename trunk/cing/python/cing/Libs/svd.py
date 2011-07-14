@@ -80,7 +80,7 @@ class SVDfit:
 
             f=function(self.xList[i], self.m)
             if f==None:
-                NTerror('SVDfit: function returns None, check implementation')
+                nTerror('SVDfit: function returns None, check implementation')
                 return
             for j in range(m):
                 self.A[i,j] = f[j]/self.sigma[i]    # check/correct i/j, n/m conventions
@@ -222,7 +222,7 @@ class SVDfitPoly( SVDfit ):
     """
     def __init__(self, x, sigma, order ):
         if order < 0:
-            NTwarning('SVDfitPoly.__init__: order < 0, setting to 0')
+            nTwarning('SVDfitPoly.__init__: order < 0, setting to 0')
             order = 0
         #end if
         SVDfit.__init__( self, x, sigma, self.poly, order+1 )
@@ -249,7 +249,7 @@ class SVDfitCosSin( SVDfit ):
     """
     def __init__(self, x, sigma, order ):
         if order < 0:
-            NTwarning('SVDfitPoly.__init__: order < 0, setting to 0')
+            nTwarning('SVDfitPoly.__init__: order < 0, setting to 0')
             order = 0
         #end if
         SVDfit.__init__( self, x, sigma, self.cossin, 2*order+1 )

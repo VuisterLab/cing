@@ -24,7 +24,7 @@ if True: # for easy blocking of data, preventing the code to be resorted with im
         raise SkipTest(ANALYSIS_STR)        
     finally: # finally fails in python below 2.5
         switchOutput(True)
-#    NTdebug('Imported plugin Analysis version %s' % version)
+#    nTdebug('Imported plugin Analysis version %s' % version)
 
 class Analysis:
     """
@@ -41,12 +41,12 @@ class Analysis:
         try:
             self.app = AnalysisApp(64) # Number is an arbitrary cache size
             if not self.app:
-                NTerror("Analysis failed to start the non-GUI version.")
+                nTerror("Analysis failed to start the non-GUI version.")
                 return True
             self.app.initProject(self.project)
         except:
-            NTexception(format_exc())
-            NTerror("Analysis crashed when starting the non-GUI version")
+            nTexception(format_exc())
+            nTerror("Analysis crashed when starting the non-GUI version")
             return True
 
     def runRpf(self,
@@ -62,34 +62,34 @@ class Analysis:
         If pyRpf crashes the exception will be propagated up from here.
         """
 
-        NTmessage("Starting cing.PluginCode.Analysis#runRpf")
+        nTmessage("Starting cing.PluginCode.Analysis#runRpf")
 
         if not hasattr(self.project, CCPN_LOWERCASE_STR):
-            NTdebug("Failed to find ccpn attribute project. Happens when no CCPN project was read first.") # TODO: change when cing to ccpn code works.
+            nTdebug("Failed to find ccpn attribute project. Happens when no CCPN project was read first.") # TODO: change when cing to ccpn code works.
             return
 
         self.ccpnProject = self.project[ CCPN_LOWERCASE_STR ]
         ccpnProject = self.ccpnProject
         if not ccpnProject:
-            NTmessage("Failed to find ccpn project.")
+            nTmessage("Failed to find ccpn project.")
             return
 
         # Find and print this peakList in the CCPN data model.
         peakLists = getThroughSpacePeakLists(ccpnProject)
         if not peakLists:
-            NTwarning("No peak list found; skipping runRpf")
+            nTwarning("No peak list found; skipping runRpf")
             return
-        NTmessage( 'Peaklists: [%s]' % peakLists )
+        nTmessage( 'Peaklists: [%s]' % peakLists )
 
 #        peakLists = [pl for pl in self.peakListTable.objectList if pl.rpfUse]
 #        ensembles = [e for e in self.ensembleTable.objectList if e.rpfUse]
         ensembles = getEnsembles(ccpnProject)
         if not ensembles:
-            NTwarning("No ensemble found; skipping runRpf")
+            nTwarning("No ensemble found; skipping runRpf")
             return
 
         for ensemble in ensembles:
-            NTdebug("Using ensemble: %s " % str(ensemble))
+            nTdebug("Using ensemble: %s " % str(ensemble))
             ensemble.rpfUse = True # set the selection automatically.
         # end for
 
@@ -98,13 +98,13 @@ class Analysis:
             try:
                 tolerance = getNoeTolerances(peakList)
             except:
-                NTexception(format_exc())
-                NTerror("Analysis: Crashed on getNoeTolerances and unknown how to be taking default tolerances.")
+                nTexception(format_exc())
+                nTerror("Analysis: Crashed on getNoeTolerances and unknown how to be taking default tolerances.")
                 return
 
 
             tolerances.append(tolerance)
-            NTdebug("Using peakList.dataSource.name: %s with tolerance: %s" % (peakList.dataSource.name,str(tolerance)))
+            nTdebug("Using peakList.dataSource.name: %s with tolerance: %s" % (peakList.dataSource.name,str(tolerance)))
 #            peakList[RPF_USE] = True # set the selection automatically.
             peakList.rpfUse = True # set the selection automatically.
         # end for
@@ -118,7 +118,7 @@ class Analysis:
                                   doAlised,
                                   verbose=cing.verbosity==cing.verbosityDebug)
 #            self.updateResultsTable()
-        NTdebug("validResultStores: %s" % str(validResultStores))
+        nTdebug("validResultStores: %s" % str(validResultStores))
         return validResultStores
     # end def
 # end class
@@ -141,11 +141,11 @@ def runRpf(project,
                    prochiralExclusion=prochiralExclusion,
                    diagonalExclusion=diagonalExclusion
                                ):
-            NTerror("Analysis: Failed runRpf")
+            nTerror("Analysis: Failed runRpf")
             return None
     except:
-        NTexception(format_exc())
-        NTerror("Analysis: Crashed on runRpf")
+        nTexception(format_exc())
+        nTerror("Analysis: Crashed on runRpf")
         return None
     return project
 

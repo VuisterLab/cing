@@ -1,5 +1,5 @@
-#@PydevCodeAnalysisIgnore
 #!/usr/bin/env python
+#@PydevCodeAnalysisIgnore # pylint: disable-all
 
 import string,os,sys,cPickle,math,socket,time,shutil,copy,random,glob,fnmatch,smtplib,types,base64
 

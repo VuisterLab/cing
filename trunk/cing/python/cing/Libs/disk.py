@@ -13,6 +13,7 @@ import sys
 import time
 import zipfile
 
+
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation; either version 2 of the License, or
@@ -50,7 +51,8 @@ def copy(srcfilename,dstfilename,timespreserved=1,mod=None):
         # copy2 CAN FAIL ON FAT PARTITIONS
         try:
             shutil.copy2(srcfilename,dstfilename)
-        except: timespreserved=0
+        except: 
+            timespreserved=0
     if not timespreserved:
         try:
             shutil.copy(srcfilename,dstfilename)
@@ -71,7 +73,8 @@ def copydir(srcpath,dstpath,mod=None):
     for srcfilename in filelist:
         dstfilename=os.path.join(dstpath,os.path.basename(srcfilename))
         copy(srcfilename,dstfilename)
-        if (mod!=None): chmod(dstfilename,mod)
+        if (mod!=None): 
+            chmod(dstfilename,mod)
 
 # GET ALL FILES MATCHING A PATH+WILDCARD
 # ======================================
@@ -79,9 +82,12 @@ def matchfilelist(path):
     path=os.path.split(path)
     wildcard=path[1]
     path=path[0]
-    if (path==""): path="."
-    try: files=os.listdir(path)
-    except: return(None)
+    if (path==""): 
+        path="."
+    try: 
+        files=os.listdir(path)
+    except: 
+        return(None)
     matchfilelist=[]
     # CYCLE THROUGH ALL THE FILES
     for name in files:
@@ -103,21 +109,26 @@ def replace(srcfilename,dstfilename,mod):
 # GET SIZE OF FILE
 # ================
 def filesize(filename):
-    if (not os.path.exists(filename)): return(0)
+    if (not os.path.exists(filename)): 
+        return(0)
     return(os.stat(filename)[6])
 
 # INCREASE FILE NAME
 # ==================
 def incfilename(filename):
     i=len(filename)-1
-    while (i>0 and filename[i] not in digits): i=i-1
+    while (i>0 and filename[i] not in digits): 
+        i=i-1
     while (i>=0):
         num=ord(filename[i])
-        if (num<48 or num>57): break
+        if (num<48 or num>57): 
+            break
         num=num+1
-        if (num==58): num=48
+        if (num==58): 
+            num=48
         filename=filename[:i]+chr(num)+filename[i+1:]
-        if (num!=48): break
+        if (num!=48): 
+            break
         i=i-1
     return(filename)
 
@@ -132,22 +143,26 @@ def makedirs(path,permissions=0755):
 # GET THE MODIFICATION TIME OF A FILE
 # ===================================
 def modtime(filename):
-    if (not os.path.exists(filename)): return(0)
-    else: return(os.path.getmtime(filename))
+    if (not os.path.exists(filename)): 
+        return(0)
+    else: 
+        return(os.path.getmtime(filename))
 
 # GET ALL MODIFICATION TIMES FOR A LIST OF FILES
 # ==============================================
 def modtimes(filelist):
     timelist=[]
     for filename in filelist:
-        if (not os.path.exists(filename)): timelist.append(0)
+        if (not os.path.exists(filename)): 
+            timelist.append(0)
         else: timelist.append(os.path.getmtime(filename))
     return(timelist)
 
 # CHECK IF TWO FILES ARE THE SAME
 # ===============================
 def havesamecontent(filename1,filename2):
-    if (not os.path.exists(filename1) or not os.path.exists(filename2)): return(0)
+    if (not os.path.exists(filename1) or not os.path.exists(filename2)): 
+        return(0)
     content1=open(filename1,"r").read()
     content2=open(filename2,"r").read()
     return (content1==content2)
@@ -157,7 +172,8 @@ def havesamecontent(filename1,filename2):
 def tmpfilename(filename):
     dotpos=filename.rfind(".")
     slashpos=filename.rfind(os.sep)
-    if (dotpos==-1 or dotpos<slashpos): dotpos=len(filename)
+    if (dotpos==-1 or dotpos<slashpos): 
+        dotpos=len(filename)
     filename=filename[:dotpos]+"_tmp%d"%os.getpid()+filename[dotpos:]
     return(filename)
 
@@ -170,14 +186,18 @@ def pathexists(path):
     path=os.path.split(path)
     wildcard=path[1]
     path=path[0]
-    if (path==""): path="."
-    try: files=os.listdir(path)
-    except: return(0)
+    if (path==""): 
+        path="."
+    try: 
+        files=os.listdir(path)
+    except: 
+        return(0)
     # DELETE ALL LIST ENTRIES THAT DO NOT MATCH THE WILDCARD GIVEN IN PATH
     for name in files:
         # CHECK IF FILENAME MATCHES WILDCARD
         #   INCLUDING A POSSIBLE _MOD APPENDIX (LIKE EMBL DSSP FILES)
-        if (fnmatch.fnmatch(name,wildcard)): return(1)
+        if (fnmatch.fnmatch(name,wildcard)): 
+            return(1)
     return(0)
 
 # CREATE DIRECTORY LISTING INCLUDING FULL PATH NAMES
@@ -190,9 +210,12 @@ def dirlist(path,all=0):
     path=os.path.normpath(os.path.normcase(path))
     # CREATE LIST OF ALL THE FILENAMES IN THE DIRECTORY SPECIFIED BY PATH
     (path,wildcard)=os.path.split(path)
-    if (path==""): path="."
-    try: filelist=os.listdir(path)
-    except: return([])
+    if (path==""): 
+        path="."
+    try: 
+        filelist=os.listdir(path)
+    except: 
+        return([])
     # CYCLE THROUGH ALL FILES AND CHECK IF THEY MATCH WILDCARD
     i=0
     while (i<len(filelist)):
@@ -217,9 +240,12 @@ def recursivedirlist(path):
     pathlist=[]
     # CREATE LIST OF ALL THE FILENAMES IN THE DIRECTORY SPECIFIED BY PATH
     (dir,wildcard)=os.path.split(path)
-    if (dir==""): dir="."
-    try: filenamelist=os.listdir(dir)
-    except: return([])
+    if (dir==""): 
+        dir="."
+    try: 
+        filenamelist=os.listdir(dir)
+    except: 
+        return([])
     # CYCLE THROUGH ALL FILES AND CHECK IF THEY MATCH WILDCARD
     for filename in filenamelist:
         path=os.path.join(dir,filename)
@@ -242,9 +268,11 @@ def recursivedirlist(path):
 # =============
 def remove(filename):
     if (type(filename)==type([])):
-        for filename2 in filename: remove(filename2)
+        for filename2 in filename: 
+            remove(filename2)
     else:
-        if (filename!=None and os.path.exists(filename)): os.remove(filename)
+        if (filename!=None and os.path.exists(filename)): 
+            os.remove(filename)
 
 # RENAME A FILE
 # =============
@@ -256,7 +284,8 @@ def rename(filenamesrc,filenamedst):
 # =========================
 def removematch(path):
     if (type(path)==type([])):
-        for pathname in path: removematch(pathname)
+        for pathname in path: 
+            removematch(pathname)
     else:
         # NORMALIZE PATH, IMPORTANT TO CONVERT UNIX FORWARD TO WINDOWS BACKWARD SLASHES
         path=os.path.normpath(os.path.normcase(path))
@@ -264,14 +293,18 @@ def removematch(path):
         path=os.path.split(path)
         wildcard=path[1]
         dir=path[0]
-        if (dir==""): dir="."
-        try: files=os.listdir(dir)
-        except: return(0)
+        if (dir==""): 
+            dir="."
+        try: 
+            files=os.listdir(dir)
+        except: 
+            return(0)
         # DELETE ALL LIST ENTRIES THAT DO NOT MATCH THE WILDCARD GIVEN IN PATH
         for name in files:
             # CHECK IF FILENAME MATCHES WILDCARD
             #   INCLUDING A POSSIBLE _MOD APPENDIX (LIKE EMBL DSSP FILES)
-            if (fnmatch.fnmatch(name,wildcard)): remove(os.path.join(dir,name))
+            if (fnmatch.fnmatch(name,wildcard)): 
+                remove(os.path.join(dir,name))
     return(0)
 
 # SET MODIFICATION TIME
@@ -288,28 +321,34 @@ def copymodtime(srcfilename,dstfilename):
 # ============
 def chmod(path,mods):
     if (type(path)==type([])):
-        for pathname in path: chmod(pathname,mods)
+        for pathname in path: 
+            chmod(pathname,mods)
     else:
-        try: os.chmod(path,mods)
-        except: print "Could not change permissions for ",path
+        try: 
+            os.chmod(path,mods)
+        except: 
+            print "Could not change permissions for ",path
 
 # DELETE AN ENTIRE DIRECTORY INCLUDING ALL THE FILES
 # ==================================================
 def rmdir(path):
-    if (os.path.exists(path)): shutil.rmtree(path,1)
+    if (os.path.exists(path)): 
+        shutil.rmtree(path,1)
 
 # REMOVE FILE EXTENSION
 # =====================
 def rmext(filename):
     dotpos=filename.rfind(".")
-    if (dotpos!=-1): filename=filename[:dotpos]
+    if (dotpos!=-1): 
+        filename=filename[:dotpos]
     return(filename)
 
 # GET FILE EXTENSION
 # ==================
 def ext(filename):
     dotpos=filename.rfind(".")
-    if (dotpos!=-1): return(filename[dotpos+1:])
+    if (dotpos!=-1): 
+        return(filename[dotpos+1:])
     return("")
 
 # COUNT NUMBER OF FILENAMES PRESENT
@@ -317,7 +356,8 @@ def ext(filename):
 def countpresent(filenamelist):
     count=0
     for filename in filenamelist:
-        if (os.path.exists(filename)): count=count+1
+        if (os.path.exists(filename)): 
+            count=count+1
     return(count)
 
 # UPDATE DIRECTORY
@@ -325,7 +365,8 @@ def countpresent(filenamelist):
 # - srcpath IS A WILDCARD MATCHING THE FILES TO UPDATE
 # - dstdir IS THE NAME OF THE DESTINATION DIRECTORY
 def updatedir(srcpath,dstdir,contentchecked=1,recursive=0,obsoleted=0,mod=None,excludelist=[]):
-    if (os.path.isdir(srcpath)): srcpath=os.path.join(srcpath,"*")
+    if (os.path.isdir(srcpath)): 
+        srcpath=os.path.join(srcpath,"*")
     srcfilelist=dirlist(srcpath,recursive)
     srcbaselist=[]
     for srcfilename in srcfilelist:
@@ -345,7 +386,8 @@ def updatedir(srcpath,dstdir,contentchecked=1,recursive=0,obsoleted=0,mod=None,e
         dstfilelist=dirlist(os.path.join(dstdir,os.path.basename(srcpath)))
         for dstfilename in dstfilelist:
             dstbasename=os.path.basename(dstfilename)
-            if (dstbasename not in srcbaselist): remove(dstfilename)
+            if (dstbasename not in srcbaselist): 
+                remove(dstfilename)
 
 # ZIP A FILE
 # ==========
@@ -734,3 +776,4 @@ def globLast( pattern ):
     if not fnList:
         return False
     return getNewestFileFromList( fnList )
+

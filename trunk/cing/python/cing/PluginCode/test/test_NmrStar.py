@@ -16,7 +16,7 @@ import unittest
 
 class AllChecks(TestCase):
 
-    def tttestNmrStar(self):
+    def _testNmrStar(self):
         "Testing conversion from CCPN to NMR-STAR using Wim Vranken's FC. Disabled test because only JFD uses it."
         # failing entries: 1ai0, 1kr8 (same for 2hgh)
         entryList = "1a4d".split()

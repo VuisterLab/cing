@@ -11,6 +11,7 @@ from UtilsAnalysis.Utils import getPeakLists
 from ccp.api.nmr.Nmr import Peak
 from ccp.api.nmr.Nmr import PeakIntensity
 
+# pylint: disable=E0601
 top = top #@UndefinedVariable
 p = top.getProject()
 

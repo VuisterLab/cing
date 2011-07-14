@@ -77,7 +77,7 @@ def getCASD_NMR_DBMS():
     relationNames = glob1(csvFileDir, "*.csv")
     relationNames = [ relationName[:-4] for relationName in relationNames]
     if not relationNames:
-        NTerror('Failed to read any relation from %s' % baseDir)
+        nTerror('Failed to read any relation from %s' % baseDir)
     dbms = DBMS()
     dbms.readCsvRelationList(relationNames, csvFileDir)
     return dbms
@@ -105,13 +105,13 @@ def copyFromCasdNmr2CcpnArchive():
             entryCodeNew = entryCode + city
             programId = getDeepByKeys(programHoH, entryCode, city)
             if not (city == 'Test' or programId):
-#                NTdebug("Skipping %s" % entryCodeNew)
+#                nTdebug("Skipping %s" % entryCodeNew)
                 continue
 #            else:
-#                NTdebug("Looking at %s" % entryCodeNew)
+#                nTdebug("Looking at %s" % entryCodeNew)
 #                continue # TODO disable premature stop.
 
-            NTmessage("Working on: %s" % entryCodeNew)
+            nTmessage("Working on: %s" % entryCodeNew)
 
             inputEntryDir = os.path.join(inputDir, ch23, entryCodeNew)
             outputEntryDir = os.path.join(dataDir, ch23, entryCodeNew)
@@ -127,10 +127,10 @@ def copyFromCasdNmr2CcpnArchive():
             fnList = globMultiplePatterns(inputEntryDir, patternList)
             for fn in fnList:
                 orgFn = os.path.join(inputEntryDir, fn)
-#                NTmessage("Copying from %s" % fn)
+#                nTmessage("Copying from %s" % fn)
 #                fnBaseName = os.path.basename(fn)
                 dstFn = os.path.join(inputAuthorDir, fn)
-                NTmessage("Copying from %s to %s" % (orgFn, dstFn))
+                nTmessage("Copying from %s to %s" % (orgFn, dstFn))
                 copy(orgFn, dstFn)
 
 
@@ -143,8 +143,8 @@ def redoLayOutArchiveWim():
         entryCodeNew = entryCode + "Org"
         entryDir = os.path.join(dataDir, ch23, entryCodeNew)
         tarPath = os.path.join(entryDir, entryCodeNew + ".tgz")
-#        NTmessage("Tarring from %s to %s" % (entryCodeNew,tarPath))
-        NTmessage("Creating %s" % tarPath)
+#        nTmessage("Tarring from %s to %s" % (entryCodeNew,tarPath))
+        nTmessage("Creating %s" % tarPath)
         if not os.path.exists(entryDir):
             mkdirs(entryDir)
         if not os.path.exists(entryCodeNew):
@@ -175,7 +175,7 @@ def createTodoList(entryList, cityList, programHoH):
 
 def getRangesForTarget(target):
     if target not in entryList:
-        NTerror("Failed to find entryOrg [%s] in entryList %s" % (target, `entryList`))
+        nTerror("Failed to find entryOrg [%s] in entryList %s" % (target, `entryList`))
         return None
     index = entryList.index(target)
     return rangesPsvsList[index]
@@ -192,7 +192,7 @@ def getTargetForFullEntryName(fullEntryCode):
         if char.isupper():
             idxLastCapital = idx
     if idxLastCapital < 0:
-        NTerror("Failed to find idxLastCapital in [%s]" % fullEntryCode)
+        nTerror("Failed to find idxLastCapital in [%s]" % fullEntryCode)
         return None
     target = fullEntryCode[:idxLastCapital]
     return target
@@ -206,7 +206,7 @@ def getFullEntryNameListForTarget(target, programHoH):
     targetList.sort()
     print targetList
     if target not in targetList:
-        NTerror("Failed to find target %s in list %s" % (target, str(targetList)))
+        nTerror("Failed to find target %s in list %s" % (target, str(targetList)))
         return None
 
     mapByLab = programHoH[target]
@@ -252,7 +252,7 @@ entryList = targetTable.getColumnByIdx(0)
 rangesPsvsList = targetTable.getColumnByIdx(6)
 programHoH = convertToProgram(participationTable)
 mapEntrycodeNew2EntrycodeAndCity = getMapEntrycodeNew2EntrycodeAndCity(entryList, cityList)
-NTdebug("Read dbms with tables: %s" % dbms.tables.keys())
+nTdebug("Read dbms with tables: %s" % dbms.tables.keys())
 #print labList
 #print programHoH
 #print getRangesForTarget('ET109Ared')
@@ -268,8 +268,8 @@ if __name__ == '__main__':
 #    copyFromCasdNmr2CcpnArchive()
 #    annotateLoop()
 #    redoLayOutArchiveWim()
-#    NTmessage("entryList: %s" % str(entryList))
+#    nTmessage("entryList: %s" % str(entryList))
     target = 'CGR26A'
     result = getFullEntryNameListForTarget(target, programHoH)
-    NTmessage("result: %s" % str(result))
+    nTmessage("result: %s" % str(result))
 

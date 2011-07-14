@@ -1,4 +1,16 @@
 #!/usr/bin/env python
+
+"""
+Regular use: from nmr_redo.
+
+Execute like:
+cd /Library/WebServer/Documents/NMR_REDO/data/br/1brv
+python -u /Users/jd/workspace35/cing/python/cing/Scripts/refineEntry.py 1brv 9 \
+file:///Library/WebServer/Documents/NRG-CING/data \
+       /Library/WebServer/Documents/NMR_REDO \
+. . BY_CH23_BY_ENTRY CING 1 auto 0 0
+"""
+
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.Libs.network import * #@UnusedWildImport
 from cing.NRG import * #@UnusedWildImport
@@ -7,18 +19,8 @@ from cing.Scripts.validateEntry import * #@UnusedWildImport
 from cing.core.constants import * #@UnusedWildImport
 
 
-# -1- Regular use: from nmr_redo.
 
-# Execute like:
-# cd /Library/WebServer/Documents/NMR_REDO/data/br/1brv
-# python -u /Users/jd/workspace35/cing/python/cing/Scripts/refineEntry.py 1brv 9 \
-# file:///Library/WebServer/Documents/NRG-CING/data \
-#        /Library/WebServer/Documents/NMR_REDO \
-# . . BY_CH23_BY_ENTRY CING 1 auto 0 0
-
-#x = ARCHIVE_TYPE_BY_CH23_BY_ENTRY
-
-def main(entryId, *extraArgList):
+def mainRefineEntry(entryId, *extraArgList):
     """inputDir may be a directory or a url. A url needs to start with http://.
     """
 
@@ -49,8 +51,8 @@ def main(entryId, *extraArgList):
     FORCE_RETRIEVE_INPUT = True
 
 
-    NTmessage(header)
-    NTmessage(getStartMessage())
+    nTmessage(header)
+    nTmessage(getStartMessage())
 
     # Sync below code with nrgCing#createToposTokens
     expectedArgumentList = """
@@ -61,12 +63,12 @@ def main(entryId, *extraArgList):
     """.split()
     expectedNumberOfArguments = len(expectedArgumentList)
     if len(extraArgList) != expectedNumberOfArguments:
-        NTmessage("consider updating code to include all sequential parameters: %s" % str(expectedArgumentList))
+        nTmessage("consider updating code to include all sequential parameters: %s" % str(expectedArgumentList))
         if len(extraArgList) > expectedNumberOfArguments:
-            NTerror("Got arguments: " + `extraArgList`)
-            NTerror("Failed to get expected number of arguments: %d got %d" % (
+            nTerror("Got arguments: " + `extraArgList`)
+            nTerror("Failed to get expected number of arguments: %d got %d" % (
                 expectedNumberOfArguments, len(extraArgList)))
-            NTerror("Expected arguments: %s" % expectedArgumentList)
+            nTerror("Expected arguments: %s" % expectedArgumentList)
             return True
         # end if
     # end if
@@ -104,24 +106,24 @@ def main(entryId, *extraArgList):
         isRemoteOutputDir = True
 #    vc = vCing('.') # argument is a fake master_ssh_url not needed here.
 
-    NTdebug("Using program arguments:")
-    NTdebug("inputDir:             %s" % inputDir)
-    NTdebug("outputDir:            %s" % outputDir)
-    NTdebug("pdbConvention:        %s" % pdbConvention)
-    NTdebug("restraintsConvention: %s" % restraintsConvention)
-    NTdebug("archiveType:          %s" % archiveType)
-    NTdebug("projectType:          %s" % projectType)
-    NTdebug("storeCING2db:         %s" % storeCING2db)
-    NTdebug("ranges:               %s" % ranges)
-    NTdebug("filterTopViolations:  %s" % filterTopViolations)
-    NTdebug("filterVasco:          %s" % filterVasco)
-    NTdebug("singleCoreOperation:  %s" % singleCoreOperation)
-    NTdebug("")
-    NTdebug("Using derived settings:")
-    NTdebug("modelCountAnneal:     %s" % modelCountAnneal)
-    NTdebug("bestAnneal:           %s" % bestAnneal)
-    NTdebug("best:                 %s" % best)
-    NTdebug("isRemoteOutputDir:    %s" % isRemoteOutputDir)
+    nTdebug("Using program arguments:")
+    nTdebug("inputDir:             %s" % inputDir)
+    nTdebug("outputDir:            %s" % outputDir)
+    nTdebug("pdbConvention:        %s" % pdbConvention)
+    nTdebug("restraintsConvention: %s" % restraintsConvention)
+    nTdebug("archiveType:          %s" % archiveType)
+    nTdebug("projectType:          %s" % projectType)
+    nTdebug("storeCING2db:         %s" % storeCING2db)
+    nTdebug("ranges:               %s" % ranges)
+    nTdebug("filterTopViolations:  %s" % filterTopViolations)
+    nTdebug("filterVasco:          %s" % filterVasco)
+    nTdebug("singleCoreOperation:  %s" % singleCoreOperation)
+    nTdebug("")
+    nTdebug("Using derived settings:")
+    nTdebug("modelCountAnneal:     %s" % modelCountAnneal)
+    nTdebug("bestAnneal:           %s" % bestAnneal)
+    nTdebug("best:                 %s" % best)
+    nTdebug("isRemoteOutputDir:    %s" % isRemoteOutputDir)
     
     # For NMR_REDO required as most efficient.
     if singleCoreOperation: 
@@ -133,15 +135,15 @@ def main(entryId, *extraArgList):
 
     if os.path.isdir(cingEntryDir):
         if FORCE_REDO:
-            NTmessage("Enforcing a redo")
+            nTmessage("Enforcing a redo")
             rmtree(cingEntryDir)
         else:
             mainIndexFile = os.path.join(cingEntryDir, "index.html")
             isDone = os.path.isfile(mainIndexFile)
             if isDone:
-                NTmessage("SKIPPING ENTRY ALREADY DONE")
+                nTmessage("SKIPPING ENTRY ALREADY DONE")
                 return
-            NTmessage("REDOING BECAUSE VALIDATION CONSIDERED NOT DONE.")
+            nTmessage("REDOING BECAUSE VALIDATION CONSIDERED NOT DONE.")
             rmtree(cingEntryDir)
         # end if.
     # end if.
@@ -154,7 +156,7 @@ def main(entryId, *extraArgList):
 
     project = Project(entryId)
     if project.removeFromDisk():
-        NTerror("Failed to remove existing project (if present)")
+        nTerror("Failed to remove existing project (if present)")
         return True
     # end if.
 
@@ -165,7 +167,7 @@ def main(entryId, *extraArgList):
         formatFileName = 'pdb%s.ent.gz'
     fileNameTgz = formatFileName % entryId
 
-#    NTdebug("fileNameTgz: %s" % fileNameTgz)
+#    nTdebug("fileNameTgz: %s" % fileNameTgz)
     allowedInputProtocolList = 'http file ssh'.split()
     inputProtocal = string.split( inputDir, ':' )[0]
     if inputProtocal in allowedInputProtocolList:
@@ -182,11 +184,11 @@ def main(entryId, *extraArgList):
              retrieveTgzFromUrl(entryId, inputDir, archiveType=archiveType, formatFileName=formatFileName)
         # end if
         if not os.path.exists(fileNameTgz):
-            NTerror("Tgz should already have been present skipping entry")
+            nTerror("Tgz should already have been present skipping entry")
             return
         # end if
     else:
-        NTdebug("Entry not retrieved which might be normal in some situations.")
+        nTdebug("Entry not retrieved which might be normal in some situations.")
     # end if.
 
     if projectType == PROJECT_TYPE_CING:
@@ -195,17 +197,17 @@ def main(entryId, *extraArgList):
 #        shutil.copy(fullFileNameTgz, '.')
         project = Project.open(entryId, status='old')
         if not project:
-            NTerror("Failed to init old project")
+            nTerror("Failed to init old project")
             return True
     else:
-        NTerror("Expected a CING project.")
+        nTerror("Expected a CING project.")
         return True
         # end if
     # end if
 
 ####> MAIN UTILITY HERE
     if project.fullRedo(modelCountAnneal = modelCountAnneal, bestAnneal = bestAnneal, best = best):  
-        NTerror("Failed fullAnnealAndRefine.")
+        nTerror("Failed fullAnnealAndRefine.")
         return True
     
           
@@ -218,7 +220,7 @@ def main(entryId, *extraArgList):
         project.save()
     if project.validate(htmlOnly=htmlOnly, ranges=ranges, doProcheck=doProcheck, doWhatif=doWhatif,
             doWattos=doWattos, doQueeny = doQueeny, doTalos=doTalos, filterVasco = filterVasco ):
-        NTerror("Failed to validate project read")
+        nTerror("Failed to validate project read")
         return True
     # end if filterVasco
 
@@ -233,32 +235,32 @@ def main(entryId, *extraArgList):
 #            archive_id = ARCHIVE_NRG_ID
         try:
             if doStoreCING2db( entryId, archive_id, project=project):
-                NTerror("Failed to store CING project's data to DB but continuing.")
+                nTerror("Failed to store CING project's data to DB but continuing.")
         except:
             NTtracebackError()
-            NTerror("Failed to store CING project's data due to above traceback error.")
+            nTerror("Failed to store CING project's data due to above traceback error.")
 
     if tgzCing:
         directoryNameCing = entryId + ".cing"
         tgzFileNameCing = directoryNameCing + ".tgz"
         if os.path.exists(tgzFileNameCing):
-            NTwarning("Overwriting: " + tgzFileNameCing)
+            nTwarning("Overwriting: " + tgzFileNameCing)
         cmd = "tar -czf %s %s" % (tgzFileNameCing, directoryNameCing)
-        NTdebug("cmd: %s" % cmd)
+        nTdebug("cmd: %s" % cmd)
 #        do_cmd(cmd)
         status, result = commands.getstatusoutput(cmd)
         if status:
-            NTerror("Failed to tar status: %s with result %s" % (status, result))
+            nTerror("Failed to tar status: %s with result %s" % (status, result))
             return True
         if isRemoteOutputDir:
             if putFileBySsh(tgzFileNameCing, outputDir, ntriesMax = 2):
-                NTerror("Failed to send File By Scp status: %s with result %s" % (status, result))
-                NTerror("Maintaining results.")
+                nTerror("Failed to send File By Scp status: %s with result %s" % (status, result))
+                nTerror("Maintaining results.")
                 return True
             # end if
-            NTmessage("Removing tgz result: %s" % tgzFileNameCing)
+            nTmessage("Removing tgz result: %s" % tgzFileNameCing)
             os.remove(tgzFileNameCing)
-            NTmessage("Removing cing dir itself: %s" % directoryNameCing)
+            nTmessage("Removing cing dir itself: %s" % directoryNameCing)
             rmdir(directoryNameCing)
         else: # do NOT remove local copy
             pass
@@ -270,6 +272,6 @@ if __name__ == "__main__":
     cing.verbosity = verbosityDebug
 #        sys.exit(1) # can't be used in forkoff api
     try:
-        status = main(*sys.argv[1:])
+        status = mainRefineEntry(*sys.argv[1:])
     finally:
-        NTmessage(getStopMessage(cing.starttime))
+        nTmessage(getStopMessage(cing.starttime))

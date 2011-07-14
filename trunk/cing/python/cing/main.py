@@ -45,6 +45,7 @@ Options:
   --molecule=MOLECULENAME
                         Restore Molecule MOLECULENAME as active molecule
   --script=SCRIPTFILE   Run script from SCRIPTFILE
+  --pylint=PYLINTFILE   Test the CING code base with pylint. Write messages to PYLINTFILE
   -i --ipython          Start ipython interpreter
   --validate            Validate.
   --validateFastest     Fastest possible checks by CING only and without imagery.
@@ -137,6 +138,7 @@ from cing import cingVersion
 from cing import header
 from cing import starttime
 from cing.Libs.NTutils import * #@UnusedWildImport
+from cing.Libs.disk import rmdir
 from cing.Libs.forkoff import ForkOff
 from cing.Libs.helper import * #@UnusedWildImport
 from cing.core.classes import Project
@@ -144,53 +146,56 @@ from cing.core.molecule import Molecule
 from cing.core.parameters import cingPaths
 from cing.core.parameters import osType
 from cing.core.parameters import plugins
+from cing.core.sml import SMLversion
 from nose.plugins.skip import SkipTest # Dependency on nose can be removed in python 2.7 or later when UnitTest has similar functionality.
 import commands
 import unittest
+import webbrowser
 
 #------------------------------------------------------------------------------------
 # Support routines
 #------------------------------------------------------------------------------------
 
-def pformat( object ):
+def pformat( obj ):
+    'Convenience method.'
 #$%^%^&&*(()
 #
 # JURGEN: do NOT touch this routine! Only for interactive usage
 #
 #%%^$&*$($()
-#    print '>>', object
-    if hasattr(object,'format'):
-        print object.format()
+#    print '>>', obj
+    if hasattr(obj,'format'):
+        print obj.format()
     else:
-        print object
+        print obj
     #end if
 #end def
 
-def pformatall( object, *args, **kwds ):
+def pformatall( obj, *args, **kwds ):
+    'Convenience method.'
 #$%^%^&&*(()
 #
 # JURGEN: do NOT touch this routine! Only for interactive usage
 #
 #%%^$&*$($()
-#    print '>>', object
-    if hasattr(object,'formatAll'):
-        print object.formatAll(*args, **kwds)
+#    print '>>', obj
+    if hasattr(obj,'formatAll'):
+        print obj.formatAll(*args, **kwds)
     else:
-        print formatall(object)
+        print formatall(obj)
     #end if
 #end def
 
-def format(object):
+def format(obj): # pylint: disable=W0622
     """Returns the formatted object representation"""
-#    print '>>', object
-    if hasattr(object, 'format'):
-        return object.format()
-    return  "%s" % object
+#    print '>>', obj
+    if hasattr(obj, 'format'):
+        return obj.format()
+    return  "%s" % obj
 #end def
 
 def getInfoMessage():
-
-    from cing.core.sml import SMLversion
+    'Returns information about CING internals. Depreciated: use start message instead.'
     return sprintf(
 """
 Version:           %.3f
@@ -216,42 +221,41 @@ def verbosity(value):
     try:
         cing.verbosity = int(value)
     except:
-        NTerror('verbosity: value should be integer in the interval [0-9] (%s)', value)
+        nTerror('verbosity: value should be integer in the interval [0-9] (%s)', value)
 #end def
 
 
-def formatall(object):
-    """Returns the formatted object representation"""
+def formatall(obj):
+    """Returns the formatted obj representation"""
     result = ""
-    if isinstance(object, list):
-        i = 0
-        for obj in object:
+    if isinstance(obj, list):
+#        i = 0
+        for obj in obj:
             #printf(">>> [%d] >>> ", i)
             result += format(obj)
             result += "\n"
-            i += 1
+#            i += 1
         return result
-    if isinstance(object, dict):
-        for key, value in object.items():
+    if isinstance(obj, dict):
+        for key, value in obj.items():
             result += "%-15s : " % key
             result += format(value)
             result += "\n"
         return result
-    return format(object)
+    return format(obj)
 #end def
 
 args = []
 kwds = {}
 
 def scriptPath(scriptFile):
-    # get path to scriptFile
-
+    'get path to scriptFile'
     if not os.path.exists(scriptFile):
-#        NTwarning('Missed in current working directory the script file: %s' % scriptFile)
+#        nTwarning('Missed in current working directory the script file: %s' % scriptFile)
         scriptsDir = os.path.join(cingPythonCingDir, cingPaths.scripts)
         scriptFileAbs = os.path.join(scriptsDir, scriptFile)
         if not os.path.exists(scriptFileAbs):
-            NTerror('Missed in current working directory and Scripts directory\n' +
+            nTerror('Missed in current working directory and Scripts directory\n' +
                     '[%s] the script file [%s]' % (scriptsDir, scriptFile))
             return None
         return scriptFileAbs
@@ -260,15 +264,18 @@ def scriptPath(scriptFile):
 #end def
 
 def script(scriptFile, *a, **k):
+    'Execute given script and arguments/keywords.'
     # Hack to get arguments to routine as global variables to use in script
-    global args
-    global kwds
+    # pylint: disable=W0603
+    global args # pylint: disable=W0621
+    # pylint: disable=W0603
+    global kwds # pylint: disable=W0621
     args = a
     kwds = k
 
     path = scriptPath(scriptFile)
     if path:
-        NTmessage('==> Executing script "%s"', path)
+        nTmessage('==> Executing script "%s"', path)
         execfile(path, globals())
     #end if
 #end def
@@ -278,39 +285,92 @@ def testQuiet():
     'Return True on error'
     cing.verbosity = cing.verbosityOutput
     fn = 'cingTest.log'
-    NTmessage("\nStarting quiet test in %s logged to %s\n" % (cingDirTmp, fn))
+    nTmessage("\nStarting quiet test in %s logged to %s\n" % (cingDirTmp, fn))
     os.chdir(cingDirTmp)
 
     cmdCingTest = 'python -u $CINGROOT/python/cing/main.py --test -c %d -v 0 > %s 2>&1' % ( cing.ncpus, fn )
-#    NTmessage("In cing.main doing [%s]" % cmdCingTest)
+#    nTmessage("In cing.main doing [%s]" % cmdCingTest)
     status, content = commands.getstatusoutput(cmdCingTest)
     if status:
-        NTerror("Failed to finish CING test")
+        nTerror("Failed to finish CING test")
     else:
-        NTmessage("Finished CING test\n")
+        nTmessage("Finished CING test\n")
     if content:
-        NTerror("Unexpected output: [%s]" % content)
+        nTerror("Unexpected output: [%s]" % content)
     resultList = []
     status = grep(fn, 'error', resultList=resultList, caseSensitive=False)
     if status == 0:
-        NTerror("Found %d errors, please check the errors below and full log %s" % ( len(resultList), os.path.join(cingDirTmp,fn)))
-        NTerror("Errors:\n%s" % '\n'.join(resultList))
+        nTerror("Found %d errors, please check the errors below and full log %s" % ( len(resultList), os.path.join(cingDirTmp,fn)))
+        nTerror("Errors:\n%s" % '\n'.join(resultList))
     else:
-        NTmessage("No problems were found")
+        nTmessage("No problems were found")
     resultTestFileList = []
     status = grep(fn, 'tests in', resultList=resultTestFileList)
-    NTmessage("Ran %d test files" % len(resultTestFileList))
+    nTmessage("Ran %d test files" % len(resultTestFileList))
     resultList = []
     status = grep(fn, '... ok', resultList=resultList)
     if status == 0:
-        NTmessage("Ran %d tests ok\n" % len(resultList))
+        nTmessage("Ran %d tests ok\n" % len(resultList))
     else:
-        NTerror("Failed to do a single test ok")
+        nTerror("Failed to do a single test ok")
         return True
 #end def
 
+def pylintOverall(pylintOverallOutputFileName='pylint.txt'):
+    "Add the ones you don't want to pylint (perhaps you know they don't work yet)"
+    namepattern = "*.py"
+    pylintDir = os.path.join( cingDirTmp, 'pylint' )
+#    pylintOverallOutputFileName = os.path.join( pylintDir, 'pylint.log')
+    if os.path.exists( pylintDir ):
+        rmdir( pylintDir )
+    mkdirs( pylintDir )
+    if os.path.exists( pylintOverallOutputFileName ):
+        os.unlink(pylintOverallOutputFileName)
+    excludedModuleList = [ 
+                           cingPythonDir + "/cing/Database/CCPN*",
+                           cingPythonDir + "/cyana2cing*",
+                           cingPythonDir + "/pdbe2*",
+                           cingPythonDir + "/queen*",
+                           cingPythonDir + "/Refine*",
+                           cingPythonDir + "/UtilsAnalysis*",
+                           cingPythonDir + "/xplorcing*"
+                          ]
+    startdir = cingPythonDir
+    nameList = findFiles(namepattern, startdir, exclude=excludedModuleList)
+    # enable next line(s) to do a couple of checks only.
+#    nameList = ['/Users/jd/workspace35/cing/python/cing/PluginCode/test/test_NmrStar.py',
+#                '/Users/jd/workspace35/cing/python/cing/PluginCode/test/test_ccpn.py',
+#                '/Users/jd/workspace35/cing/python/cing/PluginCode/test/test_ccpn_2.py']
+    nTdebug('Will unit check: ' + repr(nameList))
+    f = ForkOff(
+            processes_max=cing.ncpus,
+            max_time_to_wait=600, # on a very slow setup
+            verbosity=2            
+            )
+    job_list = []
+    for name in nameList:
+        job_list.append( (pylintByName, (name, excludedModuleList)) )
+    done_list = f.forkoff_start(job_list, 0)
+    nTmessage("Finished ids: %s", done_list)
+
+    for name in nameList:
+        mod_name = pathToModuleName( name )
+        if mod_name in excludedModuleList:
+            print "Skipping module:  " + mod_name
+            return
+        pylintOutputFileName = os.path.join( pylintDir, mod_name + '.log')        
+        if not os.path.exists( pylintDir ):
+            nTerror("Failed to find pylint output: " + pylintOutputFileName)
+            continue
+        if appendTextFileToFile( pylintOutputFileName, pylintOverallOutputFileName):
+            nTerror("Failed to appendTextFileToFile")
+        nTmessage("Done appending from: %s" % pylintOutputFileName)
+    # end for        
+    nTmessage("Done with pylint")
+# end def
+
 def testOverall(namepattern):
-    # Use silent testing from top level.
+    'Use silent testing from top level.'
 #    cing.verbosity = verbosityError
     # Add the ones you don't want to test (perhaps you know they don't work yet)
     excludedModuleList = [ 
@@ -329,7 +389,7 @@ def testOverall(namepattern):
 #                '/Users/jd/workspace35/cing/python/cing/PluginCode/test/test_NmrStar.py',
 #                '/Users/jd/workspace35/cing/python/cing/PluginCode/test/test_ccpn.py'
 #                ]
-    NTdebug('Will unit check: ' + repr(nameList))
+    nTdebug('Will unit check: ' + repr(nameList))
 #    nameList = nameList[0:5]
 #    namepattern = "*Test.py"
 #    nameList2 = findFiles(namepattern, startdir)
@@ -348,16 +408,18 @@ def testOverall(namepattern):
     for name in nameList:
         job_list.append( (testByName, (name, excludedModuleList)) )
     done_list = f.forkoff_start(job_list, 0)
-    NTmessage("Finished ids: %s", done_list)
+    nTmessage("Finished ids: %s", done_list)
 
     # Exit with timer info anywho. After this CING should exit so the tweak shouldn't break anything.
     if cing.verbosity <= cing.verbosityError:
         cing.verbosity = cing.verbosityOutput
+# end def
 
 def testByName(name, excludedModuleList):
+    'Test an individual module. Return True on error.'
     lenCingPythonDirStr = len(cingPythonDir)
     tailPathStr = name[lenCingPythonDirStr + 1: - 3]
-    mod_name = join(tailPathStr.split('/'), '.')
+    mod_name = '.'.join(tailPathStr.split('/'))
     if mod_name in excludedModuleList:
         print "Skipping module:  " + mod_name
         return
@@ -367,22 +429,52 @@ def testByName(name, excludedModuleList):
         exec("suite = unittest.defaultTestLoader.loadTestsFromModule(%s)" % (mod_name))
         testVerbosity = 2
         unittest.TextTestRunner(verbosity=testVerbosity).run(suite) #@UndefinedVariable
-        NTmessage('\n\n\n')
+        nTmessage('\n\n\n')
     except ImportWarning, extraInfo:
-        NTmessage("Skipping test report of an optional compound (please recode to use SkipTest): %s" % extraInfo)
+        nTmessage("Skipping test report of an optional compound (please recode to use SkipTest): %s" % extraInfo)
     except SkipTest, extraInfo:
-        NTmessage("Skipping test report of an optional compound: %s" % extraInfo)    
+        nTmessage("Skipping test report of an optional compound: %s" % extraInfo)    
     except ImportError, extraInfo:
-        NTmessage("Skipping test report of an optional module: %s" % mod_name)
+        nTmessage("Skipping test report of an optional module: %s" % mod_name)
 
     # Exit with timer info anywho. After this CING should exit so the tweak shouldn't break anything.
     if cing.verbosity <= cing.verbosityError:
         cing.verbosity = cing.verbosityOutput
+# end def
+
+def pathToModuleName( name ):
+    "Convert full filename to module name assuming it's in this project"
+    lenCingPythonDirStr = len(cingPythonDir)
+    tailPathStr = name[lenCingPythonDirStr + 1: - 3]
+    mod_name = '.'.join(tailPathStr.split('/'))
+    return mod_name
+# end def
+
+def pylintByName(name, excludedModuleList):
+    'Code check an individual module, return True on error or None for success.'
+    mod_name = pathToModuleName( name )
+    if mod_name in excludedModuleList:
+        print "Skipping module:  " + mod_name
+        return
+    cmd = ' --rcfile ../.pylintrc --report=no ' + mod_name
+    pylintDir = os.path.join( cingDirTmp, 'pylint' )
+    pylintOutputFileName = os.path.join( pylintDir, mod_name + '.log')
+    nTmessage("Writing to " + pylintOutputFileName)
+    if os.path.exists(pylintOutputFileName):
+        os.unlink( pylintOutputFileName )
+    pylint = ExecuteProgram('pylint', rootPath=cingPythonDir, redirectOutputToFile=pylintOutputFileName)
+    if pylint( cmd ):
+        nTdebug("Pylint found some flaws or crashed for " + mod_name)
+    else:
+        nTdebug("pylint was flawless for " + mod_name) 
+    if not os.path.exists(pylintOutputFileName):
+        # Will be created even if pylint found messages or crashed.
+        nTerror("Failed to find pylint result file: " + pylintOutputFileName)
+        return True        
+# end def
 
 def getParser():
-    #------------------------------------------------------------------------------------
-    # Options
-    #------------------------------------------------------------------------------------
+    'Return instance of OptionParser'
     usage = "usage: cing [options]       use -h or --help for listing"
 
     parser = OptionParser(usage=usage, version=str(cingVersion))
@@ -496,6 +588,11 @@ def getParser():
                       help="Run script from SCRIPTFILE",
                       metavar="SCRIPTFILE"
                      )
+    parser.add_option("--pylint",
+                      dest="pylint", default=None,                      
+                      help="Do code analysis using pylint on those matching *.py excluding some.",
+                      metavar="PYLINTFILE"
+                     )
     parser.add_option('-i', "--ipython",
                       action="store_true",
                       dest="ipython",
@@ -534,7 +631,8 @@ def getParser():
                      )
     parser.add_option("--ensemble",
                       dest="ensemble", default=None,
-                      help="Models of the ensemble to use for superpose, procheck, validate etc; e.g. 0,3-8,10,20. Note that model numbers start at zero.",
+                      help="Models of the ensemble to use for superpose, procheck, validate etc; "+
+                      "e.g. 0,3-8,10,20. Note that model numbers start at zero.",
                       metavar="ENSEMBLE"
                      )
     parser.add_option("--superpose",
@@ -542,9 +640,8 @@ def getParser():
                       dest="superpose",
                       help="Do superposition; optionally uses RANGES"
                      )
-    """Next option enables us to reuse CING wrapper code like in CingWrapper.csh for using scripts
-    like: cing/NRG/weeklyUpdatePdbjMine.py
-    """
+    _doc = """Next option enables us to reuse CING wrapper code like in CingWrapper.csh for using scripts
+    like: cing/NRG/weeklyUpdatePdbjMine.py"""
     parser.add_option("--nosave",
                       action="store_true",
                       dest="nosave",
@@ -576,23 +673,25 @@ def getParser():
 
 project = None # after running main it will be filled (unless options.noProject was set)
 
+# pylint: disable=W0612
 def yasara( project ):
-    from cing.PluginCode.yasaraPlugin import yasaraShell
+    'Fire up a yasara shell from within CING'
+    from cing.PluginCode.yasaraPlugin import yasaraShell # pylint: disable=W0404
     yasaraShell( project )
 #end def
 
-
 def main():
-
+    'Main entry point for all CING functionality. Use --help for a list of all options.'
     if not ( osType == OS_TYPE_MAC or
              osType == OS_TYPE_LINUX ):
-        NTerror("CING only runs on mac or linux.")
+        nTerror("CING only runs on mac or linux.")
         sys.exit(1)
 
-    global project
-    global options
+    global project # pylint: disable=W0603
+    # pylint: disable=W0601
+    global options # pylint: disable=W0603
 
-    _root, file, _ext = NTpath(__file__)
+#    _root, file, _ext = nTpath(__file__)
 
     parser = getParser()
     (options, _args) = parser.parse_args()
@@ -600,21 +699,21 @@ def main():
     if options.verbosity >= 0 and options.verbosity <= 9:
         cing.verbosity = options.verbosity
     else:
-        NTerror("set verbosity is outside range [0-9] at: " + options.verbosity)
-        NTerror("Ignoring setting")
+        nTerror("set verbosity is outside range [0-9] at: " + options.verbosity)
+        nTerror("Ignoring setting")
     # From this point on code may be executed that will go through the appropriate verbosity filtering
 
     if options.ncpus > 0:
         cing.ncpus = options.ncpus
-        NTdebug("Set the number of threads for cing to: %d" % cing.ncpus)
+        nTdebug("Set the number of threads for cing to: %d" % cing.ncpus)
 
-    NTmessage(header)
-    NTmessage(getStartMessage(ncpus=cing.ncpus))
+    nTmessage(header)
+    nTmessage(getStartMessage(ncpus=cing.ncpus))
 
-    NTdebug(getInfoMessage())
+    nTdebug(getInfoMessage())
 
-    NTdebug('options: %s', options)
-    NTdebug('args: %s', _args)
+    nTdebug('options: %s', options)
+    nTdebug('args: %s', _args)
 
     # The weird location of this import is because we want it to be verbose.
 #    from cing.core.importPlugin import importPlugin # This imports all plugins    @UnusedImport
@@ -626,14 +725,22 @@ def main():
             sys.exit(1)
         # end if
         sys.exit(0)
+    # end if
     if options.test2:
         if testOverall(namepattern="test2_*.py"):
             sys.exit(1)
         # end if
         sys.exit(0)
-
+    # end if
     if options.testQ:
         if testQuiet():
+            sys.exit(1)
+        # end if
+        sys.exit(0)
+    # end if
+    if options.pylint:
+        if pylintOverall(options.pylint):
+#        testOverall(namepattern="test_NTutils*.py")
             sys.exit(1)
         # end if
         sys.exit(0)
@@ -650,16 +757,15 @@ def main():
     #end if
 
     if options.pydoc:
-        import webbrowser
-        NTmessage('==> Serving documentation at http://localhost:9999')
-        NTmessage('    Type <control-c> to quit')
+        nTmessage('==> Serving documentation at http://localhost:9999')
+        nTmessage('    Type <control-c> to quit')
         webbrowser.open('http://localhost:9999/cing.html')
         pydoc.serve(port=9999)
         sys.exit(0)
     #end if
 
     if options.info:
-        NTmessage(getInfoMessage())
+        nTmessage(getInfoMessage())
         sys.exit(0)
     #end if
 
@@ -673,7 +779,7 @@ def main():
 
         print Project.__doc__
         for p in plugins.values():
-            NTmessage('-------------------------------------------------------------------------------' +
+            nTmessage('-------------------------------------------------------------------------------' +
                        'Plugin %s\n' +
                        '-------------------------------------------------------------------------------\n%s\n',
                         p.module.__file__, p.module.__doc__
@@ -751,11 +857,11 @@ def main():
             project = Project.open(options.name, status='create')
 
         if not project:
-            NTdebug("No project, doing a hard system exit")
+            nTdebug("No project, doing a hard system exit")
             sys.exit(2)
         #end if
         if not options.noProject and not project.molecule:
-            NTdebug("No project.molecule, doing a hard system exit")
+            nTdebug("No project.molecule, doing a hard system exit")
             project.close()
             sys.exit(2)
 
@@ -773,23 +879,23 @@ def main():
         if options.ranges:
             project.molecule.setRanges(options.ranges)
 
-        NTmessage(project.format())
+        nTmessage(project.format())
 
         # shortcuts
         p = project
-        mol = project.molecule #@UnusedVariable
-        m = project.molecule #@UnusedVariable
+        mol = project.molecule #@UnusedVariable # pylint: disable=W0612        
+        m = project.molecule #@UnusedVariable # pylint: disable=W0612
 
-#        NTdebug("p.molecule.ranges: %s" % p.molecule.ranges)
+#        nTdebug("p.molecule.ranges: %s" % p.molecule.ranges)
      #   pr = print
-        f = pformat #@UnusedVariable
-        fa = pformatall #@UnusedVariable
+        f = pformat #@UnusedVariable # pylint: disable=W0612
+        fa = pformatall #@UnusedVariable # pylint: disable=W0612
 
         if options.ensemble:
-    #        NTdebug( "Truncating the ensemble because ensemble option was set to: [" +options.ensemble+"]" )
+    #        nTdebug( "Truncating the ensemble because ensemble option was set to: [" +options.ensemble+"]" )
             mol.keepSelectedModels( options.ensemble )
     #    else:
-    #        NTdebug( "ensemble option was not found." )
+    #        nTdebug( "ensemble option was not found." )
 
         #------------------------------------------------------------------------------------
         # Import xeasy protFile
@@ -797,7 +903,7 @@ def main():
         if options.xeasy:
             xeasy = options.xeasy.split(',')
             if (len(xeasy) != 3):
-                NTerror("--xeasy=SEQFILE,PROTFILE,CONVENTION arguments required")
+                nTerror("--xeasy=SEQFILE,PROTFILE,CONVENTION arguments required")
             else:
                 project.importXeasy(seqFile=xeasy[0], protFile=xeasy[1], convention=xeasy[2])
 
@@ -807,7 +913,7 @@ def main():
         if options.xeasyPeaks:
             xeasy = options.xeasyPeaks.split(',')
             if len(xeasy) != 4:
-                NTerror("--xeasyPeaks=SEQFILE,PROTFILE,PEAKFILE,CONVENTION arguments required")
+                nTerror("--xeasyPeaks=SEQFILE,PROTFILE,PEAKFILE,CONVENTION arguments required")
             else:
                 project.importXeasyPeaks(seqFile=xeasy[0], protFile=xeasy[1], peakFile=xeasy[2], convention=xeasy[3])
 
@@ -824,9 +930,9 @@ def main():
         if options.generatePeaks:
             gp = options.generatePeaks.split(',')
             if len(gp) != 2:
-                NTerror("--generatePeaks: EXP_NAME,AXIS_ORDER arguments required")
+                nTerror("--generatePeaks: EXP_NAME,AXIS_ORDER arguments required")
             else:
-                peaks = project.generatePeaks(experimentName=gp[0], axisOrder=gp[1]) #@UnusedVariable
+                peaks = project.generatePeaks(experimentName=gp[0], axisOrder=gp[1]) #@UnusedVariable # pylint: disable=W0612
             #end if
         #end if
 
@@ -846,7 +952,8 @@ def main():
         # Validate
         #------------------------------------------------------------------------------------
         if options.validate or options.validateFastest or options.validateCingOnly or options.validateImageLess:
-            project.validate(validateFastest = options.validateFastest, validateCingOnly = options.validateCingOnly, validateImageLess = options.validateImageLess)
+            project.validate(validateFastest = options.validateFastest, validateCingOnly = options.validateCingOnly, 
+                             validateImageLess = options.validateImageLess)
         #end if
     # end if noProject
 
@@ -856,46 +963,34 @@ def main():
     if options.script:
         scriptFile = scriptPath(options.script)
         if scriptFile:
-            NTmessage('==> Executing script "%s"', scriptFile)
+            nTmessage('==> Executing script "%s"', scriptFile)
             execfile(scriptFile, globals() )
         #end if
     #end if
-
-    #------------------------------------------------------------------------------------
-    # ipython
-    #------------------------------------------------------------------------------------
     if options.ipython:
-        from IPython.Shell import IPShellEmbed
+        # pylint: disable=W0404 
+        from IPython.Shell import IPShellEmbed # optional module; not required for CING proper.
         ipshell = IPShellEmbed(['-prompt_in1','CING \#> '],
                                 banner='--------Dropping to IPython--------',
                                 exit_msg='--------Leaving IPython--------'
                               )
         ipshell()
     #end if
-
-    #------------------------------------------------------------------------------------
-    # yasara ipython
-    #------------------------------------------------------------------------------------
     if project:
         if options.yasara:
             yasara(project)
-        #end if
+    #end if
 
-    #------------------------------------------------------------------------------------
-    # Optionally export project
-    #------------------------------------------------------------------------------------
     if project and  options.export:
         project.export()
-
-    #------------------------------------------------------------------------------------
-    # CLose and optionally not save project
-    #------------------------------------------------------------------------------------
+    #end if
     if project:
         project.close(save=not options.nosave)
-    #------------------------------------------------------------------------------------
+    #end if
+# end def
 
 if __name__ == '__main__':
     try:
         main()
     finally:
-        NTmessage(getStopMessage(starttime))
+        nTmessage(getStopMessage(starttime))

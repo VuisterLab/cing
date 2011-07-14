@@ -47,12 +47,12 @@ class CingSummary( NTdict ):
                          rdcs               = NTlist(),
 
                         # single line format
-                         __FORMAT__ = '%(name)-10s   ' +\
-                                      'RESIDUES: tot %(totalResidueCount)3d  prot %(proteinResidueCount)3d  nucl %(nucleicResidueCount)3d   ' +\
-                                      'ROG(%%): %(CING_red)5.1f %(CING_orange)5.1f %(CING_green)5.1f    ' +\
-                                      'PROCHECK(%%): %(PC_core)5.1f %(PC_allowed)5.1f %(PC_generous)5.1f %(PC_disallowed)5.1f  gf: %(PC_gf)-15s  ' +\
-                                      'WHATIF: rama %(WI_ramachandran)-15s bb %(WI_bbNormality)-15s rotamer %(WI_rotamer)-15s '
-
+                         __FORMAT__ = \
+          '%(name)-10s   ' +\
+          'RESIDUES: tot %(totalResidueCount)3d  prot %(proteinResidueCount)3d  nucl %(nucleicResidueCount)3d   ' +\
+          'ROG(%%): %(CING_red)5.1f %(CING_orange)5.1f %(CING_green)5.1f    ' +\
+          'PROCHECK(%%): %(PC_core)5.1f %(PC_allowed)5.1f %(PC_generous)5.1f %(PC_disallowed)5.1f  gf: %(PC_gf)-15s  ' +\
+          'WHATIF: rama %(WI_ramachandran)-15s bb %(WI_bbNormality)-15s rotamer %(WI_rotamer)-15s '
                     )
         if getDeepByKeysOrAttributes( plugins, WHATIF_STR, IS_INSTALLED_STR):
 #            from cing.PluginCode.Whatif import Whatif # JFD: This breaks the plugin concept somewhat.
@@ -73,7 +73,7 @@ class CingSummary( NTdict ):
 
         self.name = project.name
         if project.molecule == None:
-            NTwarning("No molecule found in project in getSummaryFromProject")
+            nTwarning("No molecule found in project in getSummaryFromProject")
             return self
 
         # Residue counts (total, protein, nucleic)
@@ -102,7 +102,8 @@ class CingSummary( NTdict ):
             self.CING_residueROG.append( (residue.cName(-1), residue.rogScore) )
         #end for
         total = reduce(lambda x, y: x+y+0.0, rog) # total expressed as a float because of 0.0
-        for i, _x in enumerate(rog): rog[i] = rog[i]*100.0/total
+        for i, _x in enumerate(rog): 
+            rog[i] = rog[i]*100.0/total
         self.CING_red    = round(rog[0],1)
         self.CING_orange = round(rog[1],1)
         self.CING_green  = round(rog[2],1)
@@ -110,15 +111,15 @@ class CingSummary( NTdict ):
         # Procheck (core, allowed,  generous, disallowed) (%), average g_factor
         pcSummary = getDeepByKeysOrAttributes(project.molecule, PROCHECK_STR, SUMMARY_STR)
         if (self.proteinResidueCount > 0 and pcSummary):
-#            NTdebug("Going to add procheck results to summary.")
-#            NTmessage("E.g.: project.molecule.procheck.summary.core: [%8.3f]" % project.molecule.procheck.summary.core)
+#            nTdebug("Going to add procheck results to summary.")
+#            nTmessage("E.g.: project.molecule.procheck.summary.core: [%8.3f]" % project.molecule.procheck.summary.core)
             self.PC_core       = pcSummary.core
             self.PC_allowed    = pcSummary.allowed
             self.PC_generous   = pcSummary.generous
             self.PC_disallowed = pcSummary.disallowed
             self.PC_gf  = proteinResidues.zap('procheck','gf').average2(fmt='%6.3f +/- %5.3f')
 #        else:
-#            NTmessage("Skipping adding procheck results since no results available or no protein residues or...")
+#            nTmessage("Skipping adding procheck results since no results available or no protein residues or...")
         #end if
 
         # Whatif
@@ -145,7 +146,8 @@ class CingSummary( NTdict ):
         """
         return (drl.name, drl.status,
                 len(drl), len(drl.intraResidual), len(drl.sequential),len(drl.mediumRange),len(drl.longRange),len(drl.ambiguous),
-                NTvalue(drl.rmsdAv, drl.rmsdSd, fmt='%.4f +/ %.4f'), drl.violCountLower, drl.violCount1, drl.violCount3, drl.violCount5, str(drl.rogScore)
+                NTvalue(drl.rmsdAv, drl.rmsdSd, fmt='%.4f +/ %.4f'), drl.violCountLower, 
+                drl.violCount1, drl.violCount3, drl.violCount5, str(drl.rogScore)
                )
     #end def
 
@@ -164,21 +166,21 @@ class CingSummary( NTdict ):
         """
         result = obj2XML( self, path=path )
         if result == None:
-            NTerror('CingSummary.save: saving to "%s"', path)
+            nTerror('CingSummary.save: saving to "%s"', path)
             return True
         #end if
     #end def
 
-    def restore( path ): #@NoSelf
+    def restore( path ): #@NoSelf # pylint: disable=E0213
         """
         Static method to restore CingSummary object from XML-file path.
         Return None on error.
         """
         if not os.path.exists( path ):
-            NTerror('CingSummary.restore: path "%s" does not exist', path)
+            nTerror('CingSummary.restore: path "%s" does not exist', path)
             return True
         #end if
-        return XML2obj(path = path)
+        return xML2obj(path = path)
     #end def
 #end class
 
@@ -190,12 +192,14 @@ class XMLCingSummaryHandler( XMLhandler ):
 
     def handle(self, node):
         attrs = self.handleDictElements(node)
-        if attrs == None: return None
+        if attrs == None: 
+            return None
         result = CingSummary()
         result.update(attrs)
         return result
     #end def
 #end class
+
 
 # Initiate an instance
 xmlcingsummarydicthandler = XMLCingSummaryHandler()

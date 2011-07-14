@@ -263,7 +263,6 @@ def structLoopAction(loopInfo):
                           initVelocities=1,
                           finalTime=20,
                           printInterval=100)
-
     dyn.setETolerance( bath/100 )  #used to det. stepsize. default: bath/1000
     dyn.run()
 

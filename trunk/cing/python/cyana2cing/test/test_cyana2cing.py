@@ -26,7 +26,7 @@ class AllChecks(TestCase):
         projectRootPath = os.path.join( cingDirTmp, projectId )
         projectRoot = Project.rootPath( projectRootPath )[0] # xeasy_project.cing in /tmp
         if os.path.exists( projectRoot ):
-            NTwarning('Output directory "%s" already exists. It will now be removed.' % projectRoot )
+            nTwarning('Output directory "%s" already exists. It will now be removed.' % projectRoot )
             self.failIf( shutil.rmtree(projectRoot), "Failed to remove old project directory." )
 
         project = Project.open(projectRootPath, 'new')
@@ -40,7 +40,7 @@ class AllChecks(TestCase):
         )
 
         if not project:
-            NTwarning("No project generated. Aborting further execution.")
+            nTwarning("No project generated. Aborting further execution.")
             sys.exit(0)
         project.save()
 

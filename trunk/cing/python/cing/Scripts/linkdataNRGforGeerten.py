@@ -86,7 +86,7 @@ def linkdataNRG():
             if not (n<(ltext-3) and text[n+4]=='/'):
                 pdbid=text[n+3:n+7]
                 if not is_pdb_code(pdbid): #at the end of the file an empty pdbid is selected. I haven't removed it yet, so you'll see an error.
-                    NTerror('[%s] is not a pdb localpdbid.'%pdbid)
+                    nTerror('[%s] is not a pdb localpdbid.'%pdbid)
                     #os._exit(1)
                 pdbidlist0.append(pdbid)
                 i=1
@@ -122,13 +122,13 @@ def linkdataNRG():
 
     #The ROG percentages are load from the database and put in a dictionary.
     s5 = select([e1.c.pdb_id, r1.c.rog, 100.0 * func.count(r1.c.rog) / e1.c.res_count], from_obj=[e1.join(r1)]).group_by(e1.c.pdb_id, r1.c.rog, e1.c.res_count)
-    NTdebug("SQL: %s" % s5)
+    nTdebug("SQL: %s" % s5)
     result=execute(s5).fetchall()
-    #NTdebug("ROG percentage per entry: %s" % result)
+    #nTdebug("ROG percentage per entry: %s" % result)
     for row in result:
         k = str(row[0])
         if not perEntryRogdict.has_key(k):
-            perEntryRogdict[k] = NTfill(0.0, 3)
+            perEntryRogdict[k] = nTfill(0.0, 3)
         perEntryRogdict[k][int(row[1])] = float(row[2])
     for d in range(len(pdbidlisttotal)):
         if not perEntryRogdict.has_key(str(pdbidlisttotal[d])):

@@ -29,14 +29,14 @@ if True: # for easy blocking of data, preventing the code to be resorted with im
         versionTuple = sqlalchemy.__version__.split('.')
         if not (versionTuple[0] > '0' or versionTuple[1] >= '5'):
             switchOutput(True)
-            NTerror("Need to have at least version 0.5.x of sqlalchemy installed")
+            nTerror("Need to have at least version 0.5.x of sqlalchemy installed")
             raise ImportWarning(SQL_STR)
     except:
         switchOutput(True)
         raise ImportWarning(SQL_STR)
     finally:
         switchOutput(True)
-#    NTdebug('Using SqlAlchemy')
+#    nTdebug('Using SqlAlchemy')
 # end if
 
 class CgenericSql(NTdict): # pylint: disable=R0902
@@ -44,7 +44,7 @@ class CgenericSql(NTdict): # pylint: disable=R0902
     def __init__(self, db_type=DB_TYPE_DEFAULT, host='localhost', user='nobody@noaddress.no', passwd='', 
                  unix_socket='/tmp/mysql.sock', db="", schema=None, echo=False):
         NTdict.__init__(self)
-#        NTdebug("Initializing CgenericSql with user/db: %s/%s" % (user,db))
+#        nTdebug("Initializing CgenericSql with user/db: %s/%s" % (user,db))
         self.host = host
         self.user = user
         self.passwd = passwd
@@ -95,7 +95,7 @@ class CgenericSql(NTdict): # pylint: disable=R0902
              self.host,
              self.db
         )
-#        NTdebug("Using connectionString %s" % connectionString)
+#        nTdebug("Using connectionString %s" % connectionString)
         self.engine = create_engine(connectionString, echo=self.echo)
         if True:
             self.conn = self.engine.connect()
@@ -104,27 +104,27 @@ class CgenericSql(NTdict): # pylint: disable=R0902
                 self.conn = self.engine.connect()
             except:
                 if cing.verbosity >= verbosityWarning:
-                    NTexception("Failed to connect to engine")
+                    nTexception("Failed to connect to engine")
                 return True
         if not self.conn:
-            NTerror("DB connection failed")
+            nTerror("DB connection failed")
             return True
 
         self.metadata.bind = self.engine
         self.sessionUpperCase = sessionmaker(bind=self.engine)
         self.session = self.sessionUpperCase() # instantiation.
         if not self.session:
-            NTerror("DB connection failed because session was not retrieved.")
+            nTerror("DB connection failed because session was not retrieved.")
             return True
 
         self.dBversion = self.session.execute(func.version()).fetchone()[0]
-#        NTmessage("Now connected on host %s to database %s schema %s by user %s" % (self.host, self.db, self.schema, self.user))
-        NTmessage("Connection CgenericSql: %20s %10s %10s %10s" % (self.host, self.db, self.schema, self.user))
+#        nTmessage("Now connected on host %s to database %s schema %s by user %s" % (self.host, self.db, self.schema, self.user))
+        nTmessage("Connection CgenericSql: %20s %10s %10s %10s" % (self.host, self.db, self.schema, self.user))
         if self.db_type == DB_TYPE_MYSQL:
             dBversionTuple = self.dBversion.split('.')
             dBversionFloat = float(dBversionTuple[0] + '.' + dBversionTuple[1])
             if dBversionFloat < 5.1:
-                NTerror("Need to have at least version 5.1.x of MySql installed")
+                nTerror("Need to have at least version 5.1.x of MySql installed")
                 return True
             # end if
         # end if
@@ -141,11 +141,11 @@ class CgenericSql(NTdict): # pylint: disable=R0902
     def autoload(self):
         """Return True on error"""
         for tableName in self.tableNameList:
-#            NTdebug("Loading table %s" % tableName)
+#            nTdebug("Loading table %s" % tableName)
             self[tableName] = Table(tableName, self.metadata, autoload=True, schema=self.schema)
 #            table = self[tableName]
 #            columnNameList = [c.name for c in table.columns]
-#            NTdebug("Loaded table %s with columns %s" % (tableName, columnNameList))
+#            nTdebug("Loaded table %s with columns %s" % (tableName, columnNameList))
         #The MetaData object supports some handy methods, such as getting a list of Tables in the order (or reverse) of their dependency:
 #        with warnings.catch_warnings(): 
 # can't use the python 2.5 feature since it's not always enabled. Update when no longer supporting 2.5
@@ -153,7 +153,7 @@ class CgenericSql(NTdict): # pylint: disable=R0902
             warnings.simplefilter("ignore")
 #            for _t in self.metadata.table_iterator(reverse=False): # obsoleted
             for t in self.metadata.sorted_tables:
-                NTdebug("Table: %s" % t.name)
+                nTdebug("Table: %s" % t.name)
             warnings.simplefilter("default") # reset to default warning behavior.
 #            warnings.warn("depreciated 123", DeprecationWarning)
         # end if
@@ -164,7 +164,7 @@ class CsqlAlchemy(CgenericSql): # pylint: disable=R0902
     """AKA the Queen's English"""
     def __init__(self, db_type=DB_TYPE_DEFAULT, host='localhost', user='nrgcing1', passwd='4I4KMS', 
                     unix_socket='/tmp/mysql.sock', db="nrgcing", schema=None, echo=False):
-#        NTdebug("Initializing CsqlAlchemy with user/db: %s/%s" % (user,db))
+#        nTdebug("Initializing CsqlAlchemy with user/db: %s/%s" % (user,db))
         CgenericSql.__init__(self, db_type=db_type, host=host, user=user, passwd=passwd, 
                     unix_socket=unix_socket, db=db, schema=schema, echo=echo)
         # be explicit here to take advantage of code analysis.
@@ -189,11 +189,11 @@ class CsqlAlchemy(CgenericSql): # pylint: disable=R0902
         """Return True on error"""
         CgenericSql.autoload(self)
         if self.cingentry == None:
-            NTerror("Failed to retrieve the cingentry table")
+            nTerror("Failed to retrieve the cingentry table")
             return True
         # end if
         if self.entry_list_selection == None:
-            NTerror("Failed to retrieve the entry_list_selection table")
+            nTerror("Failed to retrieve the entry_list_selection table")
             return True
         # end if
     # end def
@@ -204,7 +204,7 @@ def printResult(result):
     if result.rowcount < 1:
         return
     for row in result:
-        NTmessage(str(row))
+        nTmessage(str(row))
     # end for
 # end def
 

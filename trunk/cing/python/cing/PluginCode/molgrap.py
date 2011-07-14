@@ -20,21 +20,21 @@ from glob import glob
 if True: # block
     useModule = True
     if not cingPaths.convert:
-        NTdebug("Missing convert which is a dep for Molgrap")
+        nTdebug("Missing convert which is a dep for Molgrap")
         useModule = False
     if not cingPaths.ghostscript:
-        NTdebug("Missing ghostscript which is a dep for Molgrap")
+        nTdebug("Missing ghostscript which is a dep for Molgrap")
         useModule = False
     if not cingPaths.molmol:
-        NTdebug("Missing molmol which is a dep for Molgrap")
+        nTdebug("Missing molmol which is a dep for Molgrap")
         useModule = False
     if not cingPaths.povray:
-        NTdebug("Missing povray which is a dep for Molgrap")
+        nTdebug("Missing povray which is a dep for Molgrap")
         useModule = False
 
     if not useModule:
         raise ImportWarning('Molgrap')
-#    NTmessage('Using Molgrap')
+#    nTmessage('Using Molgrap')
 
 class Molgrap(NTdict):
     def __init__(self, backcolor = 'cing_turqoise', project = None):
@@ -46,8 +46,8 @@ class Molgrap(NTdict):
         self.projectDirTmp = cingDirTmp
         if project:
             self.projectDirTmp = os.path.abspath(project.path(directories.tmp))
-#            NTdebug("Resetting Molgrap.projectDirTmp from %s to %s" % (cingDirTmp, self.projectDirTmp))
-#        NTdebug('Using self.projectDirTmp: ' + self.projectDirTmp)
+#            nTdebug("Resetting Molgrap.projectDirTmp from %s to %s" % (cingDirTmp, self.projectDirTmp))
+#        nTdebug('Using self.projectDirTmp: ' + self.projectDirTmp)
 
     """Creates a large gif to path for the given molecule.
     Return True on error and False on success.
@@ -55,37 +55,37 @@ class Molgrap(NTdict):
     def run(self, molecule, path, export = True):
 
         if molecule.modelCount == 0:
-            NTwarning('runMolgrap: no models for "%s"', molecule)
+            nTwarning('runMolgrap: no models for "%s"', molecule)
             return
 
         if not os.environ.has_key('MOLMOLHOME'):
-            NTmessage('MOLMOLHOME not defined by user, using a temporary one')
+            nTmessage('MOLMOLHOME not defined by user, using a temporary one')
             os.putenv('MOLMOLHOME', self.projectDirTmp)
 
         apath = os.path.abspath(path)
         if apath != path:
-#            NTdebug("Using the absolute path ["+apath+"] from relative path: [" +path+"]")
+#            nTdebug("Using the absolute path ["+apath+"] from relative path: [" +path+"]")
             path = apath
-        root, file, _ext = NTpath(path)
+        root, file, _ext = nTpath(path)
         entry_code = file
 
 
         if root and not os.path.exists(root):
-            NTerror("Molgrap.run: Given path root is absent; not creating.")
+            nTerror("Molgrap.run: Given path root is absent; not creating.")
             return True
 
         pdb_first_file_name = os.path.join(self.projectDirTmp, file + "_001.pdb")
         pov_file_name = os.path.join(self.projectDirTmp, file + ".pov")
         pov_cor_file_name = os.path.join(self.projectDirTmp, file + "_cor.pov")
 
-#        NTdebug( "pdb_first_file_name: "+ pdb_first_file_name)
+#        nTdebug( "pdb_first_file_name: "+ pdb_first_file_name)
 
         if not os.path.exists(pdb_first_file_name):
             export = True
 
         if export:
-#            NTdebug("First looking for atoms that should not be fed to molmol")
-#            NTdebug("Just as a side note once a Calcium in an xeasy project example screwed up the image generation.")
+#            nTdebug("First looking for atoms that should not be fed to molmol")
+#            nTdebug("Just as a side note once a Calcium in an xeasy project example screwed up the image generation.")
 
 #            skippedAtoms = [] # Keep a list of skipped atoms for later
 #            skippedResidues = []
@@ -99,7 +99,7 @@ class Molgrap(NTdict):
 #                        atm.pdbSkipRecord = True
 #                        skippedAtoms.append( atm )
 #            if skippedResidues:
-#                NTwarning('Molgrap.run: non-protein residues will be skipped:' + `skippedResidues`)
+#                nTwarning('Molgrap.run: non-protein residues will be skipped:' + `skippedResidues`)
             # Molmol speaks Dyana which is close to cyana but residue names need to be translated to
             # was CYANA
             molecule.toPDB(pdb_first_file_name, convention = IUPAC, model = 0)
@@ -108,10 +108,10 @@ class Molgrap(NTdict):
 #                atm.pdbSkipRecord = False
 
         if not os.path.exists(pdb_first_file_name):
-            NTerror("Molgrap.run: Failed to materialize first model PDB file")
+            nTerror("Molgrap.run: Failed to materialize first model PDB file")
             return True
 
-#        NTdebug("Doing molmol on: "+ entry_code)
+#        nTdebug("Doing molmol on: "+ entry_code)
 
         status = self._make_molmol_pov_file(
             pdb_first_file_name,
@@ -120,11 +120,11 @@ class Molgrap(NTdict):
         )
 
         if status:
-            NTerror("Molgrap.run: while doing molmol for: " + entry_code)
+            nTerror("Molgrap.run: while doing molmol for: " + entry_code)
             return True
 
         if not os.path.isfile(pov_file_name):
-            NTerror('Molgrap.run: failed to generate povray file "%s" for %s', pov_file_name, entry_code)
+            nTerror('Molgrap.run: failed to generate povray file "%s" for %s', pov_file_name, entry_code)
             return True
 
         status = self._substitute_nans(
@@ -132,11 +132,11 @@ class Molgrap(NTdict):
                 pov_cor_file_name
             )
         if status:
-            NTerror("Molgrap.run: Doing molmol_povray_substitute._substitute_nans for: " + entry_code)
+            nTerror("Molgrap.run: Doing molmol_povray_substitute._substitute_nans for: " + entry_code)
             return True
 
         if not os.path.isfile(pov_cor_file_name):
-            NTerror("Molgrap.run: no corrected pov ray file generated for: " + entry_code)
+            nTerror("Molgrap.run: no corrected pov ray file generated for: " + entry_code)
             return True
 
 #        print "DEBUG: Doing render/convert", entry_code
@@ -147,7 +147,7 @@ class Molgrap(NTdict):
             results_dir = root,
             )
         if status:
-            NTmessage( "Molgrap.run: rendered/converted entry: %s" % entry_code)
+            nTmessage( "Molgrap.run: rendered/converted entry: %s" % entry_code)
             return True
 
 #        ## Remove temporary files if successful and possible
@@ -159,11 +159,11 @@ class Molgrap(NTdict):
             pass
 
 
-    """
-    Makes molmol images using a csh script. Note that these commands are only valid
-    on Unix.
-    """
     def _make_molmol_pov_file(self, pdb_file_name, id, backcolor):
+        """
+        Makes molmol images using a csh script. Note that these commands are only valid
+        on Unix.
+        """
         script_file_name = os.path.join (self.projectDirTmp, id + "_molmol.csh")
         log_file_name = os.path.join (self.projectDirTmp, id + "_molmol_python.log")
         script_file = open(script_file_name, 'w')
@@ -182,7 +182,7 @@ class Molgrap(NTdict):
         os.chmod(script_file_name, 0755)
         program = ExecuteProgram(script_file_name, rootPath = self.projectDirTmp, redirectOutputToFile = log_file_name)
         if program(""):
-            NTerror("Failed shell command: " + script_file_name)
+            nTerror("Failed shell command: " + script_file_name)
             return True
 #        try:
 #            os.unlink(script_file_name)
@@ -215,12 +215,12 @@ class Molgrap(NTdict):
 
         program = ExecuteProgram(script_file_name, rootPath = self.projectDirTmp, redirectOutputToFile = log_file_name)
         if program(""):
-            NTerror("Failed shell command: " + script_file_name)
-            NTerror("Suggestion 1: Have you installed povray-includes or similar?")
-            NTerror("              For some Linuxes the file 'colors.inc' doesn't come with povray")
-            NTerror("Suggestion 2: Are the file permissions in povray.conf lenient enough? See e.g. [File I/O Security] in:")
-            NTerror("                /opt/local/etc/povray/3.6/povray.conf AND ~/.povray/3.6/povray.conf")
-            NTerror("Suggestion 3: Complex X-ray topology then consider looking at %s%s" % (issueListUrl,233))
+            nTerror("Failed shell command: " + script_file_name)
+            nTerror("Suggestion 1: Have you installed povray-includes or similar?")
+            nTerror("              For some Linuxes the file 'colors.inc' doesn't come with povray")
+            nTerror("Suggestion 2: Are the file permissions in povray.conf lenient enough? See e.g. [File I/O Security] in:")
+            nTerror("                /opt/local/etc/povray/3.6/povray.conf AND ~/.povray/3.6/povray.conf")
+            nTerror("Suggestion 3: Complex X-ray topology then consider looking at %s%s" % (issueListUrl,233))
             return True
 #        try:
 #            os.unlink(script_file_name)
@@ -263,7 +263,7 @@ def export2gif(molecule, path, project = None):
     check_string(path)
     if project:
         check_type(project, 'Project')
-#    NTdebug("Now in cing.Plugincode.molgrap#export2gif")
+#    nTdebug("Now in cing.Plugincode.molgrap#export2gif")
     m = Molgrap(project = project)
     m.run(molecule, path)
 #    if os.path.exists(path):
@@ -271,7 +271,7 @@ def export2gif(molecule, path, project = None):
         src =  os.path.join( cingPythonCingDir, 'PluginCode', DATA_STR, 'UnknownImage.gif' )
 #        if os.path.exists(path): # disable when done testing.
 #            os.unlink(path)
-        NTmessage("copying default image from %s to %s" % (src, path))
+        nTmessage("copying default image from %s to %s" % (src, path))
 #        os.link(src, path) # us a real copy JFD: fails between 2 filesystems
         disk.copy(src, path) # us a real copy
 #        os.symlink(src, path) # funny, the extension on mac fails to show up for this file only; other extensions are shown ok...
@@ -283,7 +283,7 @@ Molecule.export2gif = export2gif
 
 def removeTempFiles( todoDir ):
 #    whatifDir        = project.mkdir( project.molecule.name, project.moleculeDirectories.whatif  )
-    NTdebug("Removing temporary files generated by molgrap")
+    nTdebug("Removing temporary files generated by molgrap")
     try:
 #        removeListLocal = ["prodata", "ps.number", "aqua.cmm", "resdefs.dat", "mplot.in", '.log' ]
         removeList = []
@@ -295,12 +295,12 @@ def removeTempFiles( todoDir ):
                 removeList.append(fn)
         for fn in removeList:
             if not os.path.exists(fn):
-                NTdebug("molgrap.removeTempFiles: Expected to find a file to be removed but it doesn't exist: " + fn )
+                nTdebug("molgrap.removeTempFiles: Expected to find a file to be removed but it doesn't exist: " + fn )
                 continue
-#            NTdebug("Removing: " + fn)
+#            nTdebug("Removing: " + fn)
             os.unlink(fn)
     except:
-        NTdebug("molgrap.removeTempFiles: Failed to remove all temporary files that were expected")
+        nTdebug("molgrap.removeTempFiles: Failed to remove all temporary files that were expected")
 #end def
 
 # register the functions

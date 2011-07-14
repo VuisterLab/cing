@@ -39,6 +39,7 @@ xplor -py $CINGROOT/python/cing/Scripts/XplorNIH/anneal2.py
 pname = 'H2_2Ca'
 
 print "Starting cing.Scrips.XplorNIH/anneal2 on project: %s" % pname
+# pylint: disable=E0601
 xplor = xplor #@UndefinedVariable
 xplor.requireVersion("2.24")
 
@@ -330,7 +331,7 @@ def calcOneStructure(loopInfo):
                           finalTime=100,   # stops at 800ps or 8000 steps
                           numSteps=1000,   # whichever comes first
                           printInterval=100)
-
+    # pylint: disable=E1101
     dyn.setETolerance( init_t/100 )  #used to det. stepsize. default: t/1000
     dyn.run()
 

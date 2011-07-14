@@ -19,7 +19,7 @@ class AllChecks(TestCase):
 
         m = nrgCingRdb(host='localhost')
         l = m.getPdbIdList()
-        NTdebug("pdbIdList length: %d %s" % (len(l), l))
+        nTdebug("pdbIdList length: %d %s" % (len(l), l))
         self.assertTrue(l)
         if 0 and l: # DEFAULT 0 watch out!
             lToRemove = '1sae 1sah 1saj 1sak 1sal 1y0j 2k0a 2kiu 2ku2 2kx7 2ky5 2l0l 2l0m 2l0n 2l0o 2l2f 2l2x 2l3r 2l8m 2rqf 3sak'.split()

@@ -15,7 +15,7 @@ from cing.core.parameters import validationSubDirectories
 useModule = True
 if osType == OS_TYPE_MAC: # only installed for mac os currently.
     if not os.path.exists(cingPaths.x3dna): # cingPaths.x3dna gets set in __init__ for MAC.
-        NTdebug("Missing x3dna directory which is a dep for x3dna; currently only tested for mac and disabled for other os")
+        nTdebug("Missing x3dna directory which is a dep for x3dna; currently only tested for mac and disabled for other os")
         useModule = False
 else:
     useModule = False
@@ -181,14 +181,14 @@ class X3dna(NTdict):
         Return None on error and True on success.
         """
         if not self.molecule:
-            NTerror('X3dna: no molecule defined')
+            nTerror('X3dna: no molecule defined')
             return
 
         root = self.project.mkdir(self.project.molecule.name, self.project.moleculeDirectories.x3dna)
         rootPath = root
         #    if not project.molecule.hasDNA():
         if not self.project.molecule.hasNucleicAcid():
-            NTdebug("Not running x3dna for molecule has no DNA")
+            nTdebug("Not running x3dna for molecule has no DNA")
             return True # return true to notify caller that there is no error
 
         x3dnascript = os.path.join(cingPaths.x3dna, 'x3dna.csh')
@@ -234,7 +234,7 @@ class X3dna(NTdict):
             #end for
         #end for
         if skippedResidues:
-            NTmessage('x3dna: non-nucleotides %s will be skipped.', skippedResidues)
+            nTmessage('x3dna: non-nucleotides %s will be skipped.', skippedResidues)
 
 
 
@@ -247,18 +247,18 @@ class X3dna(NTdict):
             self.coplanars.append(CoplanarList('x3dna-made'))
 
         for modelNum in NTprogressIndicator(range(nModels)):
-            NTmessage('Running X3DNA on modelNum %i of %s' % (modelNum, name))
+            nTmessage('Running X3DNA on modelNum %i of %s' % (modelNum, name))
             baseName = '%s_model_%i' % (name, modelNum)
             pdbFilePath = os.path.join(rootPath, baseName + '.pdb')
             self.project.molecule.toPDB(pdbFilePath, model = modelNum)
             status = x3dna(rootPath, baseName)
             if status:
-                NTerror("Failed to run x3dna for modelNum %d" % modelNum)
+                nTerror("Failed to run x3dna for modelNum %d" % modelNum)
                 return None
 
             fileNameOut = os.path.join(rootPath, baseName + '.out')
             if self.parseX3dnaOutput(fileNameOut, modelNum):
-                NTerror("Failed to parseX3dnaOutput for model id %d" % modelNum)
+                nTerror("Failed to parseX3dnaOutput for model id %d" % modelNum)
                 return None
         # end for models
 
@@ -288,11 +288,11 @@ class X3dna(NTdict):
             # Parse the block
             results = self.parseX3dnaParameterBlock(parameterBlock, modelNum)
             if results == None: # may be an empty dictionary.
-                NTerror("Failed to parseX3dnaParameterBlock(parameterBlock) for %s" % parameterBlock)
+                nTerror("Failed to parseX3dnaParameterBlock(parameterBlock) for %s" % parameterBlock)
                 return True
 
             if self.storeX3dnaParameterBlock(results, modelNum):
-                NTerror("Failed to parseX3dnaOutput for model id %d" % modelNum)
+                nTerror("Failed to parseX3dnaOutput for model id %d" % modelNum)
                 return None
 
         return None
@@ -334,7 +334,7 @@ class X3dna(NTdict):
         coplanarIdList.sort()
 
         for coplanarIdStr in coplanarIdList:
-#            NTdebug("Working on coplanarIdStr: %s" % coplanarIdStr)
+#            nTdebug("Working on coplanarIdStr: %s" % coplanarIdStr)
             coplanarId = int(coplanarIdStr) - 1 # should start at zero.
 
             # NB This code assumes that the x3dna analysis is done first and will create the coplanars
@@ -346,17 +346,17 @@ class X3dna(NTdict):
                 # TODO: Fix this.
                 bogusResidueToLinkForNow = self.molecule.allResidues()[coplanarId]
                 bogusResidueToLinkForNow[X3DNA_STR] = x3dnaCoplanar
-                NTdebug("Added coplanar to bogus residue TODO")
+                nTdebug("Added coplanar to bogus residue TODO")
                 coplanarList.append(coplanar)
             # end if
 
             # take a short cut name.
             x3dnaCoplanar = getDeepByKeys(coplanarList, coplanarId, X3DNA_STR)
             for entity in results[coplanarIdStr].keys():
-#                NTdebug("Working on entity: %s" % entity)
-                valueList = getDeepByKeysOrDefault(x3dnaCoplanar, NTfill(None, self.modelCount), entity)
+#                nTdebug("Working on entity: %s" % entity)
+                valueList = getDeepByKeysOrDefault(x3dnaCoplanar, nTfill(None, self.modelCount), entity)
                 valueList[modelNum] = results[coplanarIdStr][entity]
-#                NTdebug("Set value for coplanarIdStr %s entity %s modelNum: %s to be: %s" % (coplanarIdStr, entity, modelNum, valueList[modelNum]))
+#                nTdebug("Set value for coplanarIdStr %s entity %s modelNum: %s to be: %s" % (coplanarIdStr, entity, modelNum, valueList[modelNum]))
             # end for entity
         # end for coplanar
         return
@@ -463,7 +463,7 @@ class X3dna(NTdict):
                 elif parseLine == True:
 #                    line = line.replace('---', '-0') # watch out these are not zero but NAN
                     wordList = line.split()
-#                    NTdebug('wordList %r' % wordList)
+#                    nTdebug('wordList %r' % wordList)
                     step = int(wordList[0])
                     bp = step
                     step_str = wordList[1]
@@ -590,9 +590,9 @@ class X3dna(NTdict):
     # end def
 
     def parseX3dnaFloat(self, str):
-#        NTdebug("Found X3dnaFloat wannabe: %s" % str)
+#        nTdebug("Found X3dnaFloat wannabe: %s" % str)
         if str.startswith(X3DNA_NAN_START):
-#            NTdebug("Parsed X3dnaFloat as NAN")
+#            nTdebug("Parsed X3dnaFloat as NAN")
             return NaN
         return float(str)
 # end class
@@ -601,7 +601,7 @@ def createHtmlX3dna(project, ranges = None):
     """ Read out wiPlotList to see what get's created. """
 
     if not getDeepByKeysOrAttributes(plugins, MATPLIB_STR, IS_INSTALLED_STR):
-        NTdebug('Skipping createHtmlWattos because no matplib installed.')
+        nTdebug('Skipping createHtmlWattos because no matplib installed.')
         return
     from cing.PluginCode.matplib import MoleculePlotSet #@UnresolvedImport
 

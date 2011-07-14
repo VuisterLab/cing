@@ -3,13 +3,13 @@ from cing.core.parameters import cingPaths
 
 def convertImageMagick(inputPath,outputPath,options,extraOptions=None):
     if not cingPaths.convert:
-        NTerror("No cingPaths.convert in convertImageMagick")
+        nTerror("No cingPaths.convert in convertImageMagick")
         return True
     if inputPath == None: # happened for entry 2k1n after convert failed.
-        NTerror("In convertImageMagick: got None for inputPath")
+        nTerror("In convertImageMagick: got None for inputPath")
         return True
     if outputPath == None:
-        NTerror("In convertImageMagick: got None for outputPath")
+        nTerror("In convertImageMagick: got None for outputPath")
         return True
     convert = ExecuteProgram(cingPaths.convert, redirectOutput=False) # No output expected
     cmd = options
@@ -17,20 +17,20 @@ def convertImageMagick(inputPath,outputPath,options,extraOptions=None):
         cmd += " " + extraOptions
     cmd += " " + inputPath + " " + outputPath
     if convert( cmd ):
-        NTerror("Failed to run convert from ImageMagick with command: " + cmd)
+        nTerror("Failed to run convert from ImageMagick with command: " + cmd)
         return True
 
 def montageImageMagick(inputPath,outputPath,options,extraOptions=None):
     if not cingPaths.montage:
-        NTerror("No cingPaths.montage in montageImageMagick")
+        nTerror("No cingPaths.montage in montageImageMagick")
         return True
     if not cingPaths.montage:
         return True
     if inputPath == None:
-        NTerror("In montageImageMagick: got None for inputPath")
+        nTerror("In montageImageMagick: got None for inputPath")
         return True
     if outputPath == None:
-        NTerror("In montageImageMagick: got None for outputPath")
+        nTerror("In montageImageMagick: got None for outputPath")
         return True
 
     convert = ExecuteProgram(cingPaths.montage, redirectOutput=False) # No output expected
@@ -39,7 +39,7 @@ def montageImageMagick(inputPath,outputPath,options,extraOptions=None):
         cmd += " " + extraOptions
     cmd += " " + inputPath + " " + outputPath
     if convert( cmd ):
-        NTerror("Failed to run montage from ImageMagick with command: " + cmd)
+        nTerror("Failed to run montage from ImageMagick with command: " + cmd)
         return True
 
 
@@ -47,10 +47,10 @@ def convertGhostScript(inputPath,options,extraOptions=None):
     # GS has rather verbose output
     # just to make sure we report back on on error let's have caller check results.
     if not cingPaths.ghostscript:
-        NTerror("No cingPaths.ghostscript in montageImageMagick")
+        nTerror("No cingPaths.ghostscript in montageImageMagick")
         return True
     if inputPath == None:
-        NTerror("In convertGhostScript: got None for inputPath")
+        nTerror("In convertGhostScript: got None for inputPath")
         return True
     gs = ExecuteProgram(cingPaths.ghostscript, redirectOutputToFile='/dev/null')
     cmd = options
@@ -58,18 +58,18 @@ def convertGhostScript(inputPath,options,extraOptions=None):
         cmd += " " + extraOptions
     cmd += " " + inputPath
     if gs( cmd ):
-        NTerror("Failed to run convertGhostScript: " + cmd)
+        nTerror("Failed to run convertGhostScript: " + cmd)
         return True
 
 def convertPs2Pdf(inputPath,outputPath,options,extraOptions=None):
     if not cingPaths.ps2pdf:
-        NTerror("No cingPaths.ps2pdf in convertPs2Pdf")
+        nTerror("No cingPaths.ps2pdf in convertPs2Pdf")
         return True
     if inputPath == None: # happened for entry 2k1n after convert failed.
-        NTerror("In convertPs2Pdf: got None for inputPath")
+        nTerror("In convertPs2Pdf: got None for inputPath")
         return True
     if outputPath == None:
-        NTerror("In convertPs2Pdf: got None for outputPath")
+        nTerror("In convertPs2Pdf: got None for outputPath")
         return True
 
     convert = ExecuteProgram(cingPaths.ps2pdf, redirectOutput=False) # No output expected
@@ -78,7 +78,7 @@ def convertPs2Pdf(inputPath,outputPath,options,extraOptions=None):
         cmd += " " + extraOptions
     cmd += " " + inputPath + " " + outputPath
     if convert( cmd ):
-        NTerror("Failed to run conversion: " + cmd)
+        nTerror("Failed to run conversion: " + cmd)
         return True
 
 def joinPdfPagesByConvert( inputFileList, outputPath):
@@ -86,7 +86,7 @@ def joinPdfPagesByConvert( inputFileList, outputPath):
     # convert -adjoin -delay 200 residuePlotSet001.png residuePlotSet002.png residuePlotSetAll.gif
     options = '-adjoin -delay 200'
     if convertImageMagick(' '.join(inputFileList), outputPath, options):
-        NTerror("Failed to joinPdfPagesByConvert to output: " + outputPath)
+        nTerror("Failed to joinPdfPagesByConvert to output: " + outputPath)
         return True
 
 def joinPdfPagesByGhostScript( inputFileList, outputPath):
@@ -94,11 +94,11 @@ def joinPdfPagesByGhostScript( inputFileList, outputPath):
     options = '-dNOPAUSE -sDEVICE=pdfwrite -sOUTPUTFILE=%s -dBATCH ' % \
         outputPath
     if convertGhostScript(' '.join(inputFileList), options):
-        NTerror("Failed to joinPdfPagesByGhostScript to output: " + outputPath)
+        nTerror("Failed to joinPdfPagesByGhostScript to output: " + outputPath)
         return True
     if not os.path.isfile(outputPath):
         # just to make sure we report back on on error let's have caller check results.
-        NTerror("Failed joinPdfPagesByGhostScript because no output: " + outputPath)
+        nTerror("Failed joinPdfPagesByGhostScript because no output: " + outputPath)
         return True
 # Perhaps configurable to convert
 #joinPdfPages = joinPdfPagesByConvert
@@ -127,13 +127,13 @@ def convert2Web(path, outputDir=None, doFull=True, doPrint=True, doMontage=False
             residuePlotSetAll.gif and residuePlotSetAll_pin.gif output.
     """
     if not cingPaths.montage:
-        NTerror("No cingPaths.montage in convert2Web")
+        nTerror("No cingPaths.montage in convert2Web")
         return True
     if not cingPaths.convert:
-        NTerror("No cingPaths.convert in convert2Web")
+        nTerror("No cingPaths.convert in convert2Web")
         return True
     if not cingPaths.ghostscript:
-        NTerror("No cingPaths.ghostscript in convert2Web")
+        nTerror("No cingPaths.ghostscript in convert2Web")
         return True
 
 
@@ -145,18 +145,18 @@ def convert2Web(path, outputDir=None, doFull=True, doPrint=True, doMontage=False
 
     if isinstance(path, list):
         if path == None or len(path) == 0:
-            NTerror("Failed to find valid input path list")
+            nTerror("Failed to find valid input path list")
             return True
         for p in path:
             if not os.path.exists(p):
-                NTerror("Failed to find input path: " + p)
+                nTerror("Failed to find input path: " + p)
                 return True
         pathStr = ' '.join(path)
         pathFirst = path[0]
 
     else:
         if not os.path.exists(path):
-            NTerror("Failed to find input: " + path)
+            nTerror("Failed to find input: " + path)
             return True
         pathStr = path
         pathFirst = pathStr
@@ -173,15 +173,15 @@ def convert2Web(path, outputDir=None, doFull=True, doPrint=True, doMontage=False
         if os.path.exists(outputDir) and os.path.isdir(outputDir):
             head = outputDir
         else:
-            NTerror("Given output directory: " + outputDir + " is absent or is not a dir")
+            nTerror("Given output directory: " + outputDir + " is absent or is not a dir")
             return None
 
     if extension == ".pdf":
-#        NTdebug("Will skip generating printable version as input is also a pdf")
+#        nTdebug("Will skip generating printable version as input is also a pdf")
         doPrint = False
 
     if extension == ".gif":
-#        NTdebug("Will skip generating full size gif version as input is also a gif")
+#        nTdebug("Will skip generating full size gif version as input is also a gif")
         doFull = False
 
     pinupPath = None
@@ -199,14 +199,14 @@ def convert2Web(path, outputDir=None, doFull=True, doPrint=True, doMontage=False
     if doPrint:
         printPath = os.path.join( head, root+".pdf")
         if convertPs2Pdf( pathStr, printPath, optionsPrint):
-            NTerror("Failed to generate print")
+            nTerror("Failed to generate print")
             printPath = None # failed for 2k1n_11_rstraints.ps
         pathStr = pathFirst = printPath
 
     if doPinUp and pathStr:
         pinupPath = os.path.join( head, root+"_pin.gif")
         if convertImageMagick(pathStr+"'[0-8]'", pinupPath, optionsPinUp): # Use only first 9 pages for pinup.
-            NTerror("Failed to generate pinup")
+            nTerror("Failed to generate pinup")
             pinupPath = None
 
     if doFull and pathStr and pathFirst:
@@ -214,12 +214,12 @@ def convert2Web(path, outputDir=None, doFull=True, doPrint=True, doMontage=False
             # Just do the first 9 as this runs out of memory with 1vnd
             fullPath  = os.path.join( head, root+".png")
             if montage(pathFirst+"'[0-8]'", fullPath, extraOptions = "-density 144" ):
-                NTerror('Failed to montage from %s to: %s' % ( pathFirst, fullPath ))
+                nTerror('Failed to montage from %s to: %s' % ( pathFirst, fullPath ))
                 return True
         else:
             fullPath  = os.path.join( head, root+".gif")
             if convertImageMagick(pathStr+"'[0-8]'", fullPath, optionsFull):
-                NTerror("Failed to generated full gif")
+                nTerror("Failed to generated full gif")
                 fullPath = None
 
     result = ( pinupPath, fullPath, printPath )
@@ -241,7 +241,7 @@ def montage(pathList, outputFileName, extraOptions = None ):
        The input pathList may also be a single file such as a multiple page .ps.
     """
     if not cingPaths.montage:
-        NTerror("No cingPaths.montage in montageImageMagick")
+        nTerror("No cingPaths.montage in montageImageMagick")
         return True
 #    backgroundColor = '#ede8e2' # default in cing.css
 #    optionsPinUp = "-label %f -frame 15 -background %s -geometry +10+10 -geometry 102" % ( backgroundColor )
@@ -257,4 +257,4 @@ def montage(pathList, outputFileName, extraOptions = None ):
         pathStr = pathList
 
     if montageImageMagick(pathStr, outputFileName, optionsFull):
-        NTerror("Failed to generated full html")
+        nTerror("Failed to generated full html")

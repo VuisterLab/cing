@@ -164,7 +164,7 @@ class CingResult( NTdict ):
 #            self.alternate = Whatif.cingNameDict[checkID]
 #        for c  in  [ VALUE_LIST_STR, QUAL_LIST_STR]:
         for c  in  [ VALUE_LIST_STR ]:
-            self[c] = NTfill( None, modelCount)
+            self[c] = nTfill( None, modelCount)
 
         #self.keysformat()
     #end def
@@ -173,7 +173,7 @@ class CingResult( NTdict ):
         """Return average of valueList as NTvalue object
         """
         theList = self[VALUE_LIST_STR]
-        return NTaverage2(theList, fmt=fmt)
+        return nTaverage2(theList, fmt=fmt)
 
     def __str__(self):
         return '<CingResult %(checkID)s>' % self

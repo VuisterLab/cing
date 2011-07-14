@@ -56,10 +56,10 @@ class AllChecks(TestCase):
             self.assertTrue(runWattos(project))
             mol = project.molecule
             completenessMol = mol.getDeepByKeys( WATTOS_STR, COMPLCHK_STR, VALUE_LIST_STR)
-            NTdebug("completenessMol: %s" % completenessMol)
+            nTdebug("completenessMol: %s" % completenessMol)
             for res in mol.allResidues():
                 completenessRes = res.getDeepByKeys( WATTOS_STR, COMPLCHK_STR, VALUE_LIST_STR)
-                NTdebug("%s: %s" % (res, completenessRes))
+                nTdebug("%s: %s" % (res, completenessRes))
             # end for
 
             self.assertTrue(completenessMol)

@@ -39,7 +39,7 @@ if True: # for easy blocking of data, preventing the code to be resorted with im
         raise ImportWarning(CCPN_STR)
     finally: # finally fails in python below 2.5
         switchOutput(True)
-#    NTmessage('Using Ccpn')
+#    nTmessage('Using Ccpn')
 
 class Ccpn:
     """
@@ -54,7 +54,7 @@ class Ccpn:
         The allowNonStandardResidue determines if the non-standard residues and atoms are read. If so they will be shown as
         a regular message. Otherwise they will be shown as a warning. Just like MolMol does; the unknown atoms per residue.
     """
-#    NTdebug("Using CCPN version %s" % currentModelVersion)
+#    nTdebug("Using CCPN version %s" % currentModelVersion)
 
     SMALL_FLOAT_FOR_DIHEDRAL_ANGLES = 1.e-9
 
@@ -150,7 +150,7 @@ class Ccpn:
         for ccpnRestraintList in allCcpnConstraintLists:
             className = getDeepByKeysOrAttributes(ccpnRestraintList, self.CCPN_CLASSNAME_STR)
             if className == None:
-                NTwarning("Failed to find className for ccpnRestraintList: %s. Skipping import of it." % str(ccpnRestraintList))
+                nTwarning("Failed to find className for ccpnRestraintList: %s. Skipping import of it." % str(ccpnRestraintList))
                 continue
             if className in classNames:
                 ccpnRestraintLists.append(ccpnRestraintList)
@@ -159,7 +159,7 @@ class Ccpn:
     def readCcpnFolder(self):
         """Return ccpnProject on success or None on failure"""
         if not self.project.ccpnFolder:
-            NTerror("No ccpnFolder")
+            nTerror("No ccpnFolder")
             return None
 
         if os.path.exists(self.project.ccpnFolder) and os.path.isfile(self.project.ccpnFolder) and (\
@@ -180,13 +180,13 @@ class Ccpn:
             tar = tarfile.open(self.project.ccpnFolder, "r:gz")
             tarFileNames = []
             for itar in tar:
-#                NTdebug("working on: " + itar.name)
+#                nTdebug("working on: " + itar.name)
                 if os.path.exists(itar.name):
-                    NTerror("Will not untar %s by overwriting current copy" % itar.name)
+                    nTerror("Will not untar %s by overwriting current copy" % itar.name)
                     return None
                 # Omit files like AR3436A/._ccp from projects obtained from Wim.
                 if itar.name.count('._'):
-#                    NTdebug("Skipping special hidden file: " + itar.name)
+#                    nTdebug("Skipping special hidden file: " + itar.name)
                     continue
                 tar.extract(itar.name, '.') # itar is a TarInfo object
                 # Try to match: BASP/memops/Implementation/BASP.xml
@@ -195,7 +195,7 @@ class Ccpn:
                     if isRootDirectory(itar.name):
                         ccpnRootDirectory = itar.name.replace("/", '')
                         if not ccpnRootDirectory:
-                            NTerror("Skipping potential ccpnRootDirectory")
+                            nTerror("Skipping potential ccpnRootDirectory")
             tar.close()
             if not ccpnRootDirectory:
                 # in python 2.6 tarfile class doesn't append '/' in root dir anymore
@@ -203,19 +203,19 @@ class Ccpn:
                 tarFileNames.sort()
                 ccpnRootDirectory = tarFileNames[0]
                 if not os.path.isdir(ccpnRootDirectory):
-                    NTerror("No ccpnRootDirectory found in gzipped tar file: %s" % self.project.ccpnFolder)
-                    NTerror("First listed directory after sorting: %s" % ccpnRootDirectory)
+                    nTerror("No ccpnRootDirectory found in gzipped tar file: %s" % self.project.ccpnFolder)
+                    nTerror("First listed directory after sorting: %s" % ccpnRootDirectory)
                     return None
 
             if ccpnRootDirectory != self.project.name:
-                NTmessage("Moving CCPN directory from [%s] to [%s]" % (ccpnRootDirectory, self.project.name))
+                nTmessage("Moving CCPN directory from [%s] to [%s]" % (ccpnRootDirectory, self.project.name))
                 move(ccpnRootDirectory, self.project.name)
             ccpnFolder = self.project.name # Now it is a folder.
         else:
             ccpnFolder = self.project.ccpnFolder
 
         if (not ccpnFolder) or (not os.path.exists(ccpnFolder)):
-            NTerror("ccpnFolder '%s' not found", ccpnFolder)
+            nTerror("ccpnFolder '%s' not found", ccpnFolder)
             return None
         # end if
 
@@ -225,7 +225,7 @@ class Ccpn:
         self.ccpnProject = loadProject(ccpnFolder)
         switchOutput(True)
         if not self.ccpnProject:
-            NTerror(" ccpn project from folder '%s' not loaded", ccpnFolder)
+            nTerror(" ccpn project from folder '%s' not loaded", ccpnFolder)
             return None
 
         # Make mutual linkages between Ccpn and Cing objects
@@ -264,7 +264,7 @@ class Ccpn:
 #              ccpnMolSystem = structureData.structureEnsemble.molSystem # Fails for Ulrich Schwartz's project that has no attribute molSystem
                 ccpnMolSystem = getDeepByKeysOrAttributes(structureData, 'structureEnsemble', 'molSystem')
                 if not ccpnMolSystem:
-                    NTwarning("Found the unusual case of having structureData but no molSystem in structureData.structureEnsemble")
+                    nTwarning("Found the unusual case of having structureData but no molSystem in structureData.structureEnsemble")
                 #end if
             #end if
         #end if
@@ -274,7 +274,7 @@ class Ccpn:
                 msg = " Clash between specified molecule name (%s) and molecular"
                 msg += " system specified in CCPN calculation object (%s)."
                 msg += " Remove either specification or make them consistent."
-                NTerror(msg, moleculeName, ccpnMolSystem.code)
+                nTerror(msg, moleculeName, ccpnMolSystem.code)
                 return None
             ccpnMolSystemList = [ccpnMolSystem, ]
         elif ccpnMolSystem:
@@ -286,7 +286,7 @@ class Ccpn:
 
 
         if not ccpnMolSystemList:
-            NTerror("No molecular systems found in CCPN project")
+            nTerror("No molecular systems found in CCPN project")
             return None
 
         self.ccpnMolSystemList = ccpnMolSystemList
@@ -317,48 +317,48 @@ class Ccpn:
         '''
 
         if not self.readCcpnFolder():
-            NTerror("Failed readCcpnFolder")
+            nTerror("Failed readCcpnFolder")
             return None
 
-        NTmessage('==> Importing data from Ccpn project "%s"', self.ccpnProject.name)
+        nTmessage('==> Importing data from Ccpn project "%s"', self.ccpnProject.name)
 
         if not self.importFromCcpnMolecule(modelCount = modelCount):
-            NTerror("Failed to importFromCcpnMolecule")
+            nTerror("Failed to importFromCcpnMolecule")
             return None
 
 
         if self.importFromCcpnPeakAndShift():
-#            NTdebug('Finished importFromCcpnPeakAndShift')
+#            nTdebug('Finished importFromCcpnPeakAndShift')
             pass
         else:
-            NTerror("Failed to importFromCcpnPeakAndShift")
+            nTerror("Failed to importFromCcpnPeakAndShift")
             return None
         if self.importFromCcpnDistanceRestraint():
-#            NTdebug('Finished importFromCcpnDistanceRestraint')
+#            nTdebug('Finished importFromCcpnDistanceRestraint')
             pass
         else:
-            NTerror("Failed to importFromCcpnDistanceRestraint")
+            nTerror("Failed to importFromCcpnDistanceRestraint")
             return None
         if not self.importFromCcpnDistanceRestraintMetaData():
-#            NTdebug('Finished importFromCcpnDistanceRestraintMetaData')
+#            nTdebug('Finished importFromCcpnDistanceRestraintMetaData')
             pass
         else:
-            NTerror("Failed to importFromCcpnDistanceRestraintMetaData")
+            nTerror("Failed to importFromCcpnDistanceRestraintMetaData")
             return None
         if self.importFromCcpnDihedralRestraint():
-#            NTdebug('Finished importFromCcpnDihedralRestraint')
+#            nTdebug('Finished importFromCcpnDihedralRestraint')
             pass
         else:
-            NTerror("Failed to importFromCcpnDihedralRestraint")
+            nTerror("Failed to importFromCcpnDihedralRestraint")
             return None
         if self.importFromCcpnRdcRestraint():
-#            NTdebug('Finished importFromCcpnRdcRestraint')
+#            nTdebug('Finished importFromCcpnRdcRestraint')
             pass
         else:
-            NTerror("Failed to importFromCcpnRdcRestraint")
+            nTerror("Failed to importFromCcpnRdcRestraint")
             return None
 
-        NTmessage('==> Ccpn project imported')
+        nTmessage('==> Ccpn project imported')
 
         self.project.addHistory(sprintf('Imported CCPN project'))
         self.project.updateProject()
@@ -397,17 +397,17 @@ class Ccpn:
 
             if run:
                 runText = '%s:%s' % (nmrCalcStore.name, run.serial)
-                NTmessage('==> Using run specification "%s" from CCPN project', runText)
+                nTmessage('==> Using run specification "%s" from CCPN project', runText)
         else:
             self.ccpnCingRun = ccpnCalc = None
 
 
         if not self._getCcpnMolSystemList():
-            NTerror("Failed to _getCcpnMolSystemList")
+            nTerror("Failed to _getCcpnMolSystemList")
             return None
 
         if not self._getCcpnNmrProject():
-            NTerror("Failed to _getCcpnNmrProject")
+            nTerror("Failed to _getCcpnNmrProject")
             return None
 
         # Get the appropriate NMR constraint lists
@@ -429,7 +429,7 @@ class Ccpn:
                     if self.ccpnNmrConstraintStore == None:
                         self.ccpnNmrConstraintStore = constraintStore # just use one for now
                     else:
-                        NTwarning("Skipping additional nmrConstraintStore %s, just maintaining first." % constraintStore)
+                        nTwarning("Skipping additional nmrConstraintStore %s, just maintaining first." % constraintStore)
                     # end if
                 # end if
             # end for
@@ -439,9 +439,9 @@ class Ccpn:
 
         for ccpnMolSys in self.ccpnMolSystemList:
             moleculeName = self._ensureValidName(ccpnMolSys.code)
-#            NTdebug("Working on ccpnMolSys.code: %s became moleculeName: %s" % (ccpnMolSys.code,moleculeName))
+#            nTdebug("Working on ccpnMolSys.code: %s became moleculeName: %s" % (ccpnMolSys.code,moleculeName))
             if self.isNonDescriptiveMolSysDefault(moleculeName):
-#                NTdebug("Swapping out non-descriptive molecule name %s for %s" % (moleculeName, self.project.name))
+#                nTdebug("Swapping out non-descriptive molecule name %s for %s" % (moleculeName, self.project.name))
                 moleculeName = self.project.name
             moleculeName = self.project.uniqueKey(moleculeName)
 
@@ -453,15 +453,15 @@ class Ccpn:
 
 
             if not len(ccpnMolSys.structureEnsembles):
-                NTmessage("There are no coordinates for molecule %s", self.molecule.name)
+                nTmessage("There are no coordinates for molecule %s", self.molecule.name)
 
             # stuff molecule with chains, residues and atoms and coords
             if not self._match2Cing(modelCount = modelCount):
-                NTerror("Failed to _match2Cing")
+                nTerror("Failed to _match2Cing")
                 return None
 
             self.project.molecule.updateAll()
-            NTmessage("==> Ccpn molecule '%s' imported", moleculeName)
+            nTmessage("==> Ccpn molecule '%s' imported", moleculeName)
         # end for
         self.project.updateProject()
 
@@ -503,14 +503,14 @@ class Ccpn:
                 # CCPN mol system must have a structure
                 # otherwise no point in continuing
                 msg = 'CCPN mol system %s has no structures'
-                NTerror(msg % ccpnMolSys.code)
+                nTerror(msg % ccpnMolSys.code)
 
 #        if False: # Block for debug.
 #            try:
 #                ensembleName = ccpnStructureEnsemble.structureGeneration.name
 #            except AttributeError:
 #                ensembleName = 'ensemble_name'
-#            NTdebug("Using CCPN Structure Ensemble '%s'", ensembleName)
+#            nTdebug("Using CCPN Structure Ensemble '%s'", ensembleName)
 
         ccpnMolCoordList = []
         maxModelCount = 0
@@ -519,7 +519,7 @@ class Ccpn:
             if modelCount:
                 if maxModelCount > modelCount:
                     maxModelCount = modelCount
-                    NTmessage("Limiting the number of imported models to: %d" % maxModelCount)
+                    nTmessage("Limiting the number of imported models to: %d" % maxModelCount)
             self.molecule.modelCount += maxModelCount
             ccpnMolCoordList = [ccpnStructureEnsemble]
 
@@ -528,10 +528,10 @@ class Ccpn:
         for ccpnChain in ccpnMolSys.sortedChains():
             pdbOneLetterCode = ccpnChain.pdbOneLetterCode
 #            pdbOneLetterCode = ensureValidChainId(ccpnChain.pdbOneLetterCode)
-#            NTdebug("Chain id from CCPN %s to CING %s" % (ccpnChain.pdbOneLetterCode, pdbOneLetterCode))
+#            nTdebug("Chain id from CCPN %s to CING %s" % (ccpnChain.pdbOneLetterCode, pdbOneLetterCode))
 #            if pdbOneLetterCode != ccpnChain.pdbOneLetterCode:
-#                NTmessage("Changed chain id from CCPN [%s] to CING [%s]" % (ccpnChain.pdbOneLetterCode, pdbOneLetterCode))
-#                NTdebug("Find out if this leads to inconsistencies in CING")
+#                nTmessage("Changed chain id from CCPN [%s] to CING [%s]" % (ccpnChain.pdbOneLetterCode, pdbOneLetterCode))
+#                nTdebug("Find out if this leads to inconsistencies in CING")
                 # In example from Wim there is a chain without a chain ID so disabling the above error message.
                 # This isn't a problem if CCPN uses the same chain id's i.e. no spaces or special chars.
                 # From CCPN doc:
@@ -579,10 +579,10 @@ class Ccpn:
 
             chain = self.molecule.addChain(pdbOneLetterCode) # updated to catch invalid code such as a ' '.
             if chain == None:
-                NTerror("Failed to molecule.addChain(pdbOneLetterCode) for pdbOneLetterCode [%s]" % pdbOneLetterCode)
+                nTerror("Failed to molecule.addChain(pdbOneLetterCode) for pdbOneLetterCode [%s]" % pdbOneLetterCode)
                 msg = "See also %s%s" % (issueListUrl,244)
                 msg += "\n or %s%s" % (issueListUrl,223)
-                NTwarning(msg)
+                nTwarning(msg)
                 return
             # Make mutual linkages between Ccpn and Cing instances
             chain.ccpn = ccpnChain
@@ -611,12 +611,12 @@ class Ccpn:
                 ccpnResDescriptorPatched = patchCcpnResDescriptor(ccpnResDescriptor, ccpnMolType, ccpnLinking)
                 if not ccpnResName3Letter:
                     if not ccpnResCode:
-                        NTcodeerror("found a ccpn residue without a ccpnResCode for residue: %s; skipping" % ccpnResidue)
+                        nTcodeerror("found a ccpn residue without a ccpnResCode for residue: %s; skipping" % ccpnResidue)
                         continue
                     ccpnResName3Letter = ccpnResCode
 #    nameDict = {'CCPN': 'DNA A deprot:H1'..
                 ccpnResNameInCingDb = "%s %s %s" % (ccpnResidue.molType, ccpnResCode, ccpnResDescriptorPatched)
-#                NTdebug("Name3Letter, Code, Descriptor, DescriptorPatched NameInCingDb %s, %s, %s, %s, %s" % (
+#                nTdebug("Name3Letter, Code, Descriptor, DescriptorPatched NameInCingDb %s, %s, %s, %s, %s" % (
 #                          ccpnResName3Letter, ccpnResCode, ccpnResDescriptor, ccpnResDescriptorPatched, ccpnResNameInCingDb))
 
 #See bottom of this file for CCPN residue name mappings in CING db.
@@ -630,20 +630,20 @@ class Ccpn:
                 matchingConvention = CCPN
                 if NTdb.isValidResidueName(ccpnResNameInCingDb, convention = matchingConvention):
                     pass
-#                    NTdebug("Residue '%s' identified in CING DB as %s." % (ccpnResNameInCingDb, matchingConvention))
+#                    nTdebug("Residue '%s' identified in CING DB as %s." % (ccpnResNameInCingDb, matchingConvention))
                 else:
                     # Happens for every terminal residue
-#                    NTdebug("Residue '%s' not identified in CING DB as %s." % (ccpnResNameInCingDb, matchingConvention))
+#                    nTdebug("Residue '%s' not identified in CING DB as %s." % (ccpnResNameInCingDb, matchingConvention))
                     matchingConvention = INTERNAL
                     if NTdb.isValidResidueName(ccpnResName3Letter):
-#                        NTdebug("Residue '%s' identified in CING DB as %s." % (ccpnResName3Letter, matchingConvention))
+#                        nTdebug("Residue '%s' identified in CING DB as %s." % (ccpnResName3Letter, matchingConvention))
                         pass
                     else:
                         if self.allowNonStandardResidue:
-#                            NTdebug("Residue '%s' will be a new residue in convention %s." % (ccpnResName3Letter, matchingConvention))
+#                            nTdebug("Residue '%s' will be a new residue in convention %s." % (ccpnResName3Letter, matchingConvention))
                             pass
                         else:
-                            NTmessage("Residue '%s' will be skipped as it is non-standard in convention: %s." % (ccpnResName3Letter, matchingConvention))
+                            nTmessage("Residue '%s' will be skipped as it is non-standard in convention: %s." % (ccpnResName3Letter, matchingConvention))
                             addResidue = False
                             addingNonStandardResidue = True
 #                        if not unmatchedAtomByResDict.has_key(ccpnResName3Letter):
@@ -666,11 +666,11 @@ class Ccpn:
                     resNameCing = ccpnResName3Letter
 
                 if not resNameCing:
-                    NTcodeerror("Failed to get a resNameCing for ccpnResidue: [" + ccpnResidue + ']')
+                    nTcodeerror("Failed to get a resNameCing for ccpnResidue: [" + ccpnResidue + ']')
                     continue
                 residue = chain.addResidue(resNameCing, resNumber, convention = matchingConvention, Nterminal = Nterminal, Cterminal = Cterminal)
                 if not residue:
-                    NTwarning("Failed to add residue: [" + resNameCing + ']')
+                    nTwarning("Failed to add residue: [" + resNameCing + ']')
                     continue
 
                 # Make mutual linkages between Ccpn and Cing objects
@@ -695,15 +695,15 @@ class Ccpn:
                     atom = self.molecule.decodeNameTuple(cingNameTuple)
 
                     if not atom:
-#                        NTdebug('Creating non-standard atom %s' % `cingNameTuple`)
+#                        nTdebug('Creating non-standard atom %s' % `cingNameTuple`)
                         cingResNameTuple = (INTERNAL, chain.name, resNumber, None)
                         res = self.molecule.decodeNameTuple(cingResNameTuple)
                         if not res:
-                            NTcodeerror('No residue found in CING for tuple %s. Skipping creating non-standard atoms' % cingResNameTuple)
+                            nTcodeerror('No residue found in CING for tuple %s. Skipping creating non-standard atoms' % cingResNameTuple)
                             continue
                         atom = res.addAtom(atomName)
                         if not atom:
-                            NTdebug('Failed to add atom to residue for tuple %s' % repr(cingNameTuple))
+                            nTdebug('Failed to add atom to residue for tuple %s' % repr(cingNameTuple))
                             continue
                         if not unmatchedAtomByResDict.has_key(ccpnResName3Letter):
                             unmatchedAtomByResDict[ ccpnResName3Letter ] = ([], [])
@@ -725,7 +725,7 @@ class Ccpn:
                         if not ccpnCoordAtom:
                             # GV says: do not know why we would have this error, as we have matched the atom objects
                             #TODO: issue 128 or 129 JFD: It usually happens for H in N-term, which CING is not mapping yet. GV will fix.
-#                            NTdebug('CING %s not found in CCPN: %s', atom, ccpnAtom)
+#                            nTdebug('CING %s not found in CCPN: %s', atom, ccpnAtom)
                             continue
                         # end if
 
@@ -735,11 +735,11 @@ class Ccpn:
                                 i += 1
                                 # at this point i will be zero for the first model.
                                 if i >= maxModelCount:
-#                                    NTdebug("Not adding model idx %d and more." % i)
+#                                    nTdebug("Not adding model idx %d and more." % i)
                                     break
                                 ccpnCoord = ccpnCoordAtom.findFirstCoord(model = ccpnModel)
                                 if not ccpnCoord: # as in entry 1agg GLU1.H2 and 3.
-#                                    NTwarning("Skipping coordinate for CING failed to find coordinate for model %d for atom %s" % (i, atom)) # happens for 2xfm  <Atom A.VAL280.HG11> and many others.
+#                                    nTwarning("Skipping coordinate for CING failed to find coordinate for model %d for atom %s" % (i, atom)) # happens for 2xfm  <Atom A.VAL280.HG11> and many others.
                                     continue
                                 atom.addCoordinate(ccpnCoord.x, ccpnCoord.y, ccpnCoord.z, ccpnCoord.bFactor, ocuppancy = ccpnCoord.occupancy)
                             # end for
@@ -757,9 +757,9 @@ class Ccpn:
         if unmatchedAtomByResDict:
             msg += unmatchedAtomByResDictToString(unmatchedAtomByResDict)
             if self.allowNonStandardResidue:
-                NTmessage(msg)
+                nTmessage(msg)
             else:
-                NTerror(msg)
+                nTerror(msg)
 
         return self.molecule
     # end def _match2Cing
@@ -770,11 +770,11 @@ class Ccpn:
         Return list or None on Error.
         """
 
-#        NTdebug("    ccpnAtomSet = %s" % ccpnAtomSet)
+#        nTdebug("    ccpnAtomSet = %s" % ccpnAtomSet)
 
         ccpnAtomList = ccpnAtomSet.sortedAtoms()
         if not ccpnAtomList:
-            NTerror("No ccpnAtomList: %s", ccpnAtomList)
+            nTerror("No ccpnAtomList: %s", ccpnAtomList)
             return None
 
 
@@ -782,16 +782,16 @@ class Ccpn:
         if len(ccpnAtomList) == 1:
             ccpnAtom = ccpnAtomList[0]
             if not hasattr(ccpnAtom, self.CCPN_CING_ATR):
-                NTerror("No Cing atom obj equivalent for Ccpn atom: %s", ccpnAtom)
+                nTerror("No Cing atom obj equivalent for Ccpn atom: %s", ccpnAtom)
                 return None
             return ccpnAtom.cing
 
         cingAtomList = []
         atomSeenLast = None
         for ccpnAtom in ccpnAtomList:
-#            NTdebug("      ccpn atom: %s" % ccpnAtom)
+#            nTdebug("      ccpn atom: %s" % ccpnAtom)
             if not hasattr(ccpnAtom, self.CCPN_CING_ATR):
-                NTerror("No Cing atom obj equivalent for Ccpn atom: %s", ccpnAtom)
+                nTerror("No Cing atom obj equivalent for Ccpn atom: %s", ccpnAtom)
                 return None
             atomSeenLast = ccpnAtom.cing
             cingAtomList.append(ccpnAtom.cing)
@@ -800,7 +800,7 @@ class Ccpn:
             return atomSeenLast
 
         if not atomSeenLast:
-            NTerror("Failed to find single CING atom for ccpnAtomList %s" % ccpnAtomList)
+            nTerror("Failed to find single CING atom for ccpnAtomList %s" % ccpnAtomList)
             return None
 
         cingPseudoAtom = atomSeenLast.getRepresentativePseudoAtom(cingAtomList)
@@ -820,24 +820,24 @@ class Ccpn:
 
            NB CING data model has no CS list entity but rather stores the info at the atom & resonances level.
         """
-#        NTdebug("Now in %s", getCallerName())
+#        nTdebug("Now in %s", getCallerName())
         shiftMapping = self._getShiftAtomNameMapping(ccpnShiftList, ccpnMolSystem)
         if not len(shiftMapping):
-            NTmessage("Skipping empty CS list.")
+            nTmessage("Skipping empty CS list.")
             return True
 #        if not self.molecule.hasResonances():
 #            self.molecule.newResonances() # do only once per import now. TODO: enable multiple resonances per atom per CCPN project.
 
         resonanceListName = getDeepByKeysOrAttributes( ccpnShiftList, NAME_STR ) # may be absent according to api.
         if resonanceListName == None:
-            NTwarning("Failed to get resonanceListName from CCPN which will not allow CING to match later on for e.g. Vasco. Continuing.")
+            nTwarning("Failed to get resonanceListName from CCPN which will not allow CING to match later on for e.g. Vasco. Continuing.")
             resonanceListName = 'source'
         resonanceListName = getUniqueName( self.molecule.resonanceSources, resonanceListName)
         resonanceList = self.molecule.newResonances()
         if not isinstance( resonanceList, ResonanceList ):
-            NTerror("Failed to create a new resonance list to the project.")
+            nTerror("Failed to create a new resonance list to the project.")
             return True
-#        NTdebug("Renaming resonance list from: %s to: %s" % ( resonanceList.name, resonanceListName) )
+#        nTdebug("Renaming resonance list from: %s to: %s" % ( resonanceList.name, resonanceListName) )
         resonanceList.rename(resonanceListName)
         knownTroubleResidues = {} # To avoid repeating the same messages over
         atomsTouched = {} # Use a hash to prevent double counting.
@@ -855,56 +855,56 @@ class Ccpn:
             resonanceSetDoneMap[ ccpnResonanceSet ] += 1
             resonanceSetDoneCount = resonanceSetDoneMap[ ccpnResonanceSet ]
             if resonanceSetDoneCount > 1:
-#                NTdebug("Ignoring ccpnShift %s because count is %s which is over the 0/1 expected" % (ccpnShift, resonanceSetDoneCount))
+#                nTdebug("Ignoring ccpnShift %s because count is %s which is over the 0/1 expected" % (ccpnShift, resonanceSetDoneCount))
                 continue
             if not shiftMapping.has_key( ccpnShift ) :
-#                NTdebug("Skipping shift outside molecular system or without atoms.")
+#                nTdebug("Skipping shift outside molecular system or without atoms.")
                 continue
             ccpnResidue, _ccpnAtoms = shiftMapping[ccpnShift]
-#            NTdebug("Looking %s with %s and %s" % ( ccpnShift, ccpnResonanceSet, resonanceSetDoneCount ))
+#            nTdebug("Looking %s with %s and %s" % ( ccpnShift, ccpnResonanceSet, resonanceSetDoneCount ))
 
             if knownTroubleResidues.get(ccpnResidue):
-                NTdebug("Skipping known trouble residue: %s" % ccpnResidue )
+                nTdebug("Skipping known trouble residue: %s" % ccpnResidue )
                 continue
 
             if not hasattr(ccpnResidue, 'cing'):
                 msg = "%s:CCPN residue %d %s skipped - no Cing link"
-                NTwarning(msg, getCallerName(), ccpnResidue.seqCode, ccpnResidue.ccpCode)
+                nTwarning(msg, getCallerName(), ccpnResidue.seqCode, ccpnResidue.ccpCode)
                 knownTroubleResidues[ccpnResidue] = True
                 continue
 
             ccpnAtomSetList = ccpnResonanceSet.sortedAtomSets()
             isStereo = len(ccpnAtomSetList) == 1
             if resonanceSetDoneCount >= len(ccpnAtomSetList):
-#                NTdebug("Ignoring ccpnShift %s because resonanceSetDoneCount is %s which is over length of ccpnAtomSetList %s" % (ccpnShift, len(ccpnAtomSetList)))
+#                nTdebug("Ignoring ccpnShift %s because resonanceSetDoneCount is %s which is over length of ccpnAtomSetList %s" % (ccpnShift, len(ccpnAtomSetList)))
                 continue
             ccpnAtomSet = ccpnAtomSetList[resonanceSetDoneCount]
 #            for ccpnAtom in ccpnAtoms:
             ccpnAtom = list(ccpnAtomSet.atoms)[0] # Picking only the first hydrogen of say a methyl group. What sorting is used?
-#            NTdebug("Looking at first ccpnAtom %s out of ccpnAtomSet %s" % ( ccpnAtom, ccpnAtomSet))
+#            nTdebug("Looking at first ccpnAtom %s out of ccpnAtomSet %s" % ( ccpnAtom, ccpnAtomSet))
             try:
                 a = ccpnAtom.cing
-#                NTdebug("Looking at atom %s" % a)
+#                nTdebug("Looking at atom %s" % a)
                 # Since we don't show methyls in the assignment list any more; they appear lost; this fixes issue 192.
                 if a.isMethylProton() and a.pseudoAtom():
                     a = a.pseudoAtom() #
 
                 index = len(a.resonances) - 1
-#                NTdebug("Looking at atom %s resonanceSetDoneCount: %s isStereo %s" % (a, resonanceSetDoneCount, isStereo))
+#                nTdebug("Looking at atom %s resonanceSetDoneCount: %s isStereo %s" % (a, resonanceSetDoneCount, isStereo))
                 lastAtomResonance = a.resonances[index] # last existing resonance of atom.
                 lastAtomResonance.value = shiftValue
                 lastAtomResonance.error = shiftError
                 if a.isProChiral(): # only mark those that need marking.
                     if isStereo:
                         otherAtom = a.getSterospecificallyRelatedPartner()
-#                        NTdebug("For stereo looking at otherAtom: %s" % ( otherAtom))
+#                        nTdebug("For stereo looking at otherAtom: %s" % ( otherAtom))
                         if otherAtom != None:
                             shiftValueOther = otherAtom.resonances[index].value
                             if math.fabs( shiftValueOther -  shiftValue ) < 0.01:
                                 isStereo = False
                                 otherAtom.setStereoAssigned(False)
 #                        else:
-#                            NTdebug("Failed to getSterospecificallyRelatedPartner from %s" % a)
+#                            nTdebug("Failed to getSterospecificallyRelatedPartner from %s" % a)
                     a.setStereoAssigned(isStereo)
                 # end if prochiral
                 # Make mutual linkages between CCPN and Cing objects
@@ -914,14 +914,14 @@ class Ccpn:
 #                resonanceList.append( lastAtomResonance )
             except:
                 msg = "%s: %s, shift CCPN atom %s skipped"
-                NTwarning(msg, getCallerName(), ccpnResidue.cing, ccpnAtom.name)
+                nTwarning(msg, getCallerName(), ccpnResidue.cing, ccpnAtom.name)
             # end try
         # end for.over shifts.
 
-#        NTdebug("==> CCPN ShiftList '%s' imported from CCPN Nmr project '%s' with %s items", ccpnShiftList.name, ccpnShiftList.parent.name, len(resonanceList))
-#        NTmessage("==> Count of (pseudo-)atom with resonances updated %s" % len(atomsTouched.keys()))
-#        NTdebug(  "==> Count of resonances in list added %s (should be the same)" % len(resonanceList))
-#        NTmessage("==> Count of resonanceSetDone %s (<= above count)" % len(resonanceSetDoneMap.keys()))
+#        nTdebug("==> CCPN ShiftList '%s' imported from CCPN Nmr project '%s' with %s items", ccpnShiftList.name, ccpnShiftList.parent.name, len(resonanceList))
+#        nTmessage("==> Count of (pseudo-)atom with resonances updated %s" % len(atomsTouched.keys()))
+#        nTdebug(  "==> Count of resonances in list added %s (should be the same)" % len(resonanceList))
+#        nTmessage("==> Count of resonanceSetDone %s (<= above count)" % len(resonanceSetDoneMap.keys()))
 
         return True
 
@@ -938,7 +938,7 @@ class Ccpn:
         doneSetShifts = False
         ccpnCalc = self.ccpnCingRun
         if ccpnCalc:
-            NTdebug("Using ccpnCalc object")
+            nTdebug("Using ccpnCalc object")
             ccpnMolSys = self.molecule.ccpn
             for measurementData in ccpnCalc.findAllData(className = self.CCPN_RUN_MEASUREMENT,
                                                         ioRole = 'input'):
@@ -948,7 +948,7 @@ class Ccpn:
 
         # No ccpCalc or ccpnCalc is empty
         if not doneSetShifts:
-#            NTdebug("Not using ccpnCalc object")
+#            nTdebug("Not using ccpnCalc object")
             ccpnShiftLoL = []
             ccpnPeakLoL = self._getCcpnPeakLoL()
 
@@ -957,43 +957,43 @@ class Ccpn:
 
                 if ccpnExperiment.shiftList not in ccpnShiftLoL:
                     if ccpnExperiment.shiftList:
-#                        NTdebug("Adding CCPN shiftList (%s) from CCPN experiment (%s)" % ( ccpnExperiment.shiftList, ccpnExperiment))
+#                        nTdebug("Adding CCPN shiftList (%s) from CCPN experiment (%s)" % ( ccpnExperiment.shiftList, ccpnExperiment))
                         ccpnShiftLoL.append(ccpnExperiment.shiftList)
                     else:
                         pass
-#                        NTdebug("Skipping because None, CCPN shiftList (%s) from CCPN experiment (%s)" % ( ccpnExperiment.shiftList, ccpnExperiment))
+#                        nTdebug("Skipping because None, CCPN shiftList (%s) from CCPN experiment (%s)" % ( ccpnExperiment.shiftList, ccpnExperiment))
                 else:
-#                    NTdebug("Skipping already found CCPN shiftList (%s) from CCPN experiment (%s)" % (ccpnExperiment.shiftList, ccpnExperiment))
+#                    nTdebug("Skipping already found CCPN shiftList (%s) from CCPN experiment (%s)" % (ccpnExperiment.shiftList, ccpnExperiment))
                     pass
 
 
             if not ccpnShiftLoL:
-#                NTdebug("There are no shift lists at this point, CCPN will most likely only find one in the CCPN project")
+#                nTdebug("There are no shift lists at this point, CCPN will most likely only find one in the CCPN project")
 #                ccpnShiftLoL = self.ccpnNmrProject.findAllMeasurementLists(className = 'ShiftList') # not sorted
                 # Use sorting by CCPN.
 #                ccpnShiftLoL = filterListByObjectClassName( self.ccpnNmrProject.sortedMeasurementLists(), self.CCPN_CS_LIST )
                 # or as per Rasmus' suggestion:
                 l = self.ccpnNmrProject.sortedMeasurementLists()
                 ccpnShiftLoL = [x for x in l if x.className == self.CCPN_CS_LIST]
-#                NTdebug("There are shift lists: %s" % str(ccpnShiftLoL))
+#                nTdebug("There are shift lists: %s" % str(ccpnShiftLoL))
             if ccpnPeakLoL and (not ccpnShiftLoL):
-                NTwarning('CCPN project has no shift lists linked to experiments. Using any/all available shift lists')
+                nTwarning('CCPN project has no shift lists linked to experiments. Using any/all available shift lists')
 
-#            NTdebug("Shift lists %r" % ccpnShiftLoL)
+#            nTdebug("Shift lists %r" % ccpnShiftLoL)
 
             if not ccpnShiftLoL:
-#                NTdebug('CCPN project contains no shift lists')
+#                nTdebug('CCPN project contains no shift lists')
                 return True
 
             for ccpnMolSystem in self.ccpnMolSystemList:
                 for ccpnShiftList in ccpnShiftLoL:
                     if not ccpnShiftList:
-                        NTerror("Observed ccpnShiftList (%s) in non-empty ccpnShiftLoL; happens in example data but JFD doesn't know why"
+                        nTerror("Observed ccpnShiftList (%s) in non-empty ccpnShiftLoL; happens in example data but JFD doesn't know why"
                                 % ccpnShiftList)
                         continue
                     doneSetShifts = self._getCcpnShiftList(ccpnMolSystem, ccpnShiftList)
                     if not doneSetShifts:
-                        NTerror("Import of CCPN chemical shifts failed")
+                        nTerror("Import of CCPN chemical shifts failed")
                         return False
                     # end if
                 # end for
@@ -1001,7 +1001,7 @@ class Ccpn:
         # end if
 
         if not self._getCcpnPeakList():
-            NTerror("Failed _getCcpnPeakList")
+            nTerror("Failed _getCcpnPeakList")
             return False
 
         return True
@@ -1031,10 +1031,10 @@ class Ccpn:
                     shiftList = self.ccpnNmrProject.findFirstMeasurementList(className='ShiftList')
 #                    shiftList = shiftLists[0] # no indexing allowed on sets so we repeat the search above.
                 else:
-                    NTwarning("Skipping simply getting the first shift list as there are more than one lists")
+                    nTwarning("Skipping simply getting the first shift list as there are more than one lists")
 
             if not shiftList:
-                NTwarning("No shift list found for CCPN Experiment '%s'", ccpnExperiment.name)
+                nTwarning("No shift list found for CCPN Experiment '%s'", ccpnExperiment.name)
                 continue
 
             # Setup peak list name
@@ -1078,7 +1078,7 @@ class Ccpn:
                     hValue = NaN
 
                 if isNaN(vValue) and isNaN(hValue):
-#                    NTwarning("CCPN peak '%s' missing both volume and height" % ccpnPeak)
+#                    nTwarning("CCPN peak '%s' missing both volume and height" % ccpnPeak)
                     msgHol.appendWarning("CCPN peak '%s' missing both volume and height" % ccpnPeak)
 
                 resonances = []
@@ -1089,7 +1089,7 @@ class Ccpn:
                             cingResonance = contrib.resonance.findFirstShift(parentList = shiftList).cing
                             resonancesDim.append(cingResonance)
                         except:
-#                            NTdebug('==== contrib out %s', contrib)
+#                            nTdebug('==== contrib out %s', contrib)
                             pass
 
                     if resonancesDim:
@@ -1112,7 +1112,7 @@ class Ccpn:
             # end for peak
             msgHol.showMessage(MAX_WARNINGS=2)
 
-            NTdetail("==> PeakList '%s' imported from CCPN Nmr project '%s'", peakListName, self.ccpnNmrProject.name)
+            nTdetail("==> PeakList '%s' imported from CCPN Nmr project '%s'", peakListName, self.ccpnNmrProject.name)
         return True
 
     def _getCcpnPeakLoL(self):
@@ -1127,25 +1127,25 @@ class Ccpn:
 
         ccpnCalc = self.ccpnCingRun
         if ccpnCalc:
-#            NTdebug("In %s using ccpnCalc" % getCallerName())
+#            nTdebug("In %s using ccpnCalc" % getCallerName())
             for peakData in ccpnCalc.findAllData(className = self.CCPN_RUN_PEAK, ioRole = 'input'):
-#                NTdebug("Using peakData %s" % peakData)
+#                nTdebug("Using peakData %s" % peakData)
                 peakList = peakData.peakList
                 if peakList: # Technically possible that it may have been deleted
-#                    NTdebug("Using peakList %s" % peakList)
+#                    nTdebug("Using peakList %s" % peakList)
                     peakLists.append(peakList)
         # No ccpnCalc or ccpnCalc is empty
         if not peakLists:
-#            NTdebug("In %s no peakLists yet" % getCallerName())
+#            nTdebug("In %s no peakLists yet" % getCallerName())
             for experiment in self.ccpnNmrProject.sortedExperiments():
-#                NTdebug("Using experiment %s" % experiment)
+#                nTdebug("Using experiment %s" % experiment)
                 for spectrum in experiment.sortedDataSources():
-#                    NTdebug("Using spectrum %s" % spectrum)
+#                    nTdebug("Using spectrum %s" % spectrum)
                     for peakList in spectrum.peakLists:
-#                        NTdebug("Using peakList %s" % peakList)
+#                        nTdebug("Using peakList %s" % peakList)
                         peakLists.append(peakList)
 
-#        NTdebug("In %s return peakLists %s" % (getCallerName(), str(peakLists)))
+#        nTdebug("In %s return peakLists %s" % (getCallerName(), str(peakLists)))
         return peakLists
 
     def _getShiftAtomNameMapping(self, ccpnShiftList, ccpnMolSystem):
@@ -1159,46 +1159,46 @@ class Ccpn:
            http://www.ccpn.ac.uk/ccpn/data-model/python-api-v2-examples/assignment
         """
 
-#        NTdebug("Now in _getShiftAtomNameMapping for ccpnShiftList (%r)" % ccpnShiftList)
+#        nTdebug("Now in _getShiftAtomNameMapping for ccpnShiftList (%r)" % ccpnShiftList)
         ccpnResonanceList = []
         ccpnResonanceToShiftMap = {}
         ccpnShiftMappingResult = {}
 
         measurementList = ccpnShiftList.sortedMeasurements()
         if not len(measurementList):
-            NTwarning("Ccpn Shift List has no members; it is empty")
+            nTwarning("Ccpn Shift List has no members; it is empty")
             return ccpnShiftMappingResult
 
         for ccpnShift in measurementList:
             ccpnResonance = ccpnShift.resonance
             ccpnResonanceList.append(ccpnResonance)
             ccpnResonanceToShiftMap[ccpnResonance] = ccpnShift
-#            NTdebug("Mapped CCPN resonance %s to CCPN shift %s" % (ccpnResonance, ccpnShift))
+#            nTdebug("Mapped CCPN resonance %s to CCPN shift %s" % (ccpnResonance, ccpnShift))
 
         for ccpnResonance in ccpnResonanceList:
             if not ccpnResonance.resonanceSet: # i.e atom assigned
-#                NTdebug("Skipping unassigned CCPN resonance %s" % ccpnResonance)
+#                nTdebug("Skipping unassigned CCPN resonance %s" % ccpnResonance)
                 continue
             ccpnAtomSetList = list(ccpnResonance.resonanceSet.atomSets)
             ccpnResidue = ccpnAtomSetList[0].findFirstAtom().residue
             if ccpnResidue.chain.molSystem is not ccpnMolSystem:
-                NTdebug("Skipping resonance %s because CCPN residue falls outside the expected CCPN molSystem" % ccpnResonance)
+                nTdebug("Skipping resonance %s because CCPN residue falls outside the expected CCPN molSystem" % ccpnResonance)
                 continue
             atomList = []
             if not ccpnAtomSetList:
-                NTdebug("Skipping resonance %s because empty ccpnAtomSetList was created" % ccpnResonance)
+                nTdebug("Skipping resonance %s because empty ccpnAtomSetList was created" % ccpnResonance)
                 continue
             for ccpnAtomSet in ccpnAtomSetList:
-#                NTdebug("Working on ccpnAtomSet: %r" % ccpnAtomSet)
+#                nTdebug("Working on ccpnAtomSet: %r" % ccpnAtomSet)
                 for ccpnAtom in ccpnAtomSet.atoms:
-#                    NTdebug("Working on %s %s %r" % (ccpnResonance, ccpnAtomSet, ccpnAtom))
+#                    nTdebug("Working on %s %s %r" % (ccpnResonance, ccpnAtomSet, ccpnAtom))
                     atomList.append(ccpnAtom)
             ccpnShift = ccpnResonanceToShiftMap[ccpnResonance]
             ccpnShiftMappingResult[ccpnShift] = [ccpnResidue, tuple(atomList) ]
         matchCount = len(ccpnShiftMappingResult)
-#        NTdebug("_getShiftAtomNameMapping found %d elements in mapping." % matchCount)
+#        nTdebug("_getShiftAtomNameMapping found %d elements in mapping." % matchCount)
         if matchCount == 0:
-            NTwarning("All resonances in this list %r are unassigned" % ccpnShiftList)
+            nTwarning("All resonances in this list %r are unassigned" % ccpnShiftList)
         return ccpnShiftMappingResult
 
 
@@ -1229,12 +1229,12 @@ class Ccpn:
 #                    atom.resonances[index].ccpn = ccpnShift
 #                    ccpnShift.cing = atom.resonances[index]
 #                except:
-#                    NTwarning("_setShift: %s, shift CCPN atom %s skipped", ccpnResidue.cing, ccpnAtom.name)
+#                    nTwarning("_setShift: %s, shift CCPN atom %s skipped", ccpnResidue.cing, ccpnAtom.name)
 #                # end try
 #            # end for
 #        # end for
 #
-#        NTdetail("==> CCPN ShiftList '%s' imported from Ccpn Nmr project '%s'",
+#        nTdetail("==> CCPN ShiftList '%s' imported from Ccpn Nmr project '%s'",
 #                       ccpnShiftList.name, ccpnShiftList.parent.name)
 #        return True
 #    # end def _setShift
@@ -1250,7 +1250,7 @@ class Ccpn:
         for ccpnExperiment in self.ccpnNmrProject.experiments:
             shiftList = ccpnExperiment.shiftList
             if not shiftList:
-                NTwarning(" no shift list found for Ccpn.Experiment '%s'", ccpnExperiment.name)
+                nTwarning(" no shift list found for Ccpn.Experiment '%s'", ccpnExperiment.name)
 
             # sampled data dimensions?
             for ccpnDataSource in ccpnExperiment.dataSources:
@@ -1297,7 +1297,7 @@ class Ccpn:
                         # end if
 
                         if not (ccpnVolume or ccpnHeight):
-                            NTwarning(" peak '%s' missing both volume and height", ccpnPeak)
+                            nTwarning(" peak '%s' missing both volume and height", ccpnPeak)
 
                         resonances = []
                         for peakDim in ccpnPeakDims:
@@ -1310,7 +1310,7 @@ class Ccpn:
                                     resonancesDim.append(cingResonance)
                                 except:
                                     pass
-#                                    NTdebug('==== contrib out %s', contrib)
+#                                    nTdebug('==== contrib out %s', contrib)
                                 # end try
                             # end for
                             if resonancesDim:
@@ -1340,7 +1340,7 @@ class Ccpn:
                         pl.append(peak)
                     # end for
 
-                    NTdetail("==> PeakList '%s' imported from Ccpn Nmr project '%s'",
+                    nTdetail("==> PeakList '%s' imported from Ccpn Nmr project '%s'",
                                   peakListName, self.ccpnNmrProject.name)
                     done = True
                 # end for
@@ -1373,7 +1373,7 @@ class Ccpn:
         classNameList = (self.CCPN_DISTANCE_CONSTRAINT_LIST, self.CCPN_HBOND_CONSTRAINT_LIST)
         ccpnConstraintLoL = self._getCcpnRestraintLoL(self.ccpnConstraintLists, classNameList)
         if not ccpnConstraintLoL:
-#            NTdebug("No ccpnDistanceLoL which can be normal.")
+#            nTdebug("No ccpnDistanceLoL which can be normal.")
             return True
 
         for ccpnDistanceList in ccpnConstraintLoL:
@@ -1401,7 +1401,7 @@ class Ccpn:
                 # end if
 
                 distanceRestraint = DistanceRestraint(atomPairList, lower, upper)
-#                NTdebug('distanceRestraint.isValid: %s' % distanceRestraint.isValid)
+#                nTdebug('distanceRestraint.isValid: %s' % distanceRestraint.isValid)
 
                 if not (distanceRestraint and distanceRestraint.isValid): # happened for entry 1f8h and 2xfm
                     # restraints that will not be imported
@@ -1414,9 +1414,9 @@ class Ccpn:
 
                 distanceRestraintList.append(distanceRestraint)
             if distanceRestraintList.simplify():
-                NTerror("Failed to simplify the distanceRestraintList")
+                nTerror("Failed to simplify the distanceRestraintList")
             if len(distanceRestraintList) == 0:
-                NTdetail("Ccpn distance restraint list remained empty and will be removed")
+                nTdetail("Ccpn distance restraint list remained empty and will be removed")
                 self.project.distances.delete(ccpnDistanceListName)
 
 
@@ -1430,40 +1430,40 @@ class Ccpn:
            Output: True on error.
         '''
         if self.ccpnNmrConstraintStore == None:
-#            NTdebug("Ignoring meta data because no self.ccpnNmrConstraintStore ")
+#            nTdebug("Ignoring meta data because no self.ccpnNmrConstraintStore ")
             return
 
         if not hasattr(self.ccpnNmrConstraintStore, 'findAllApplicationData'):
-#            NTdebug("Ignoring meta data because no self.ccpnNmrConstraintStore.findAllApplicationData")
+#            nTdebug("Ignoring meta data because no self.ccpnNmrConstraintStore.findAllApplicationData")
             return
 
         appDataList = self.ccpnNmrConstraintStore.findAllApplicationData(application='FormatConverter', keyword='stereoAssignmentCorrectionsFile')
         if len(appDataList) == 0:
-#            NTdebug("No FC meta data on SSA")
+#            nTdebug("No FC meta data on SSA")
             return
 
         if len(appDataList) > 1:
-            NTdebug("Ignoring FC meta data beyond the first element.")
+            nTdebug("Ignoring FC meta data beyond the first element.")
         appDataString = appDataList[0]
 
         if not isinstance(appDataString, AppDataString):
-            NTerror("FC meta data isn't a AppDataString")
+            nTerror("FC meta data isn't a AppDataString")
             return True
 
         star_text = appDataString.value
         if not isinstance(star_text, str):
-            NTerror("FC meta data value isn't a String")
+            nTerror("FC meta data value isn't a String")
             return True
 
         if len(star_text) < 100:
-            NTerror("FC meta data value isn't long enough to be valid")
+            nTerror("FC meta data value isn't long enough to be valid")
             return True
 
-#        NTdebug("Got meta data on SSA")
+#        nTdebug("Got meta data on SSA")
 #                 + star_text[:30])
         projectDistList = self.project.distances
         if not len(projectDistList):
-            NTwarning("self.project.distances is empty but FC meta data will still be added.")
+            nTwarning("self.project.distances is empty but FC meta data will still be added.")
         projectDistList.__setattr__(STEREO_ASSIGNMENT_CORRECTIONS_STAR_STR, star_text)
     # end def importFromCcpnDistanceRestraintMetaData
 
@@ -1487,7 +1487,7 @@ class Ccpn:
         classNameList = (self.CCPN_DIHEDRAL_CONSTRAINT_LIST)
         ccpnConstraintLoL = self._getCcpnRestraintLoL(self.ccpnConstraintLists, classNameList)
         if not ccpnConstraintLoL:
-#            NTdebug("No ccpnDihedralLoL which can be normal.")
+#            nTdebug("No ccpnDihedralLoL which can be normal.")
             return True
 
         for ccpnDihedralList in ccpnConstraintLoL:
@@ -1505,7 +1505,7 @@ class Ccpn:
                 result = getRestraintBoundList(dihConsItem, self.RESTRAINT_IDX_DIHEDRAL, msgHoL)
 #                [None, None] evaluates to True
                 if not result:
-                    NTdetail("Ccpn dihedral restraint '%s' with bad values imported." % ccpnDihedralConstraint)
+                    nTdetail("Ccpn dihedral restraint '%s' with bad values imported." % ccpnDihedralConstraint)
                     result = (None, None)
 
                 lower, upper = result
@@ -1527,7 +1527,7 @@ class Ccpn:
                 ccpnDihedralConstraint.cing = dihedralRestraint
             # end for ccpnDihedralConstraint
             if len(dihedralRestraintList) == 0:
-                NTdetail("Ccpn dihedral restraint list remained empty and will be removed")
+                nTdetail("Ccpn dihedral restraint list remained empty and will be removed")
                 self.project.dihedrals.delete(ccpnDihedralListName)
         # end for
         msgHoL.showMessage()
@@ -1547,7 +1547,7 @@ class Ccpn:
         classNameList = (self.CCPN_RDC_CONSTRAINT_LIST)
         ccpnConstraintLoL = self._getCcpnRestraintLoL(self.ccpnConstraintLists, classNameList)
         if not ccpnConstraintLoL:
-#            NTdebug("No ccpnRDCLoL which can be normal.")
+#            nTdebug("No ccpnRDCLoL which can be normal.")
             return True
         for ccpnRdcList in ccpnConstraintLoL:
             ccpnRdcListName = self._ensureValidName(ccpnRdcList.name, RDC_LEVEL)
@@ -1560,7 +1560,7 @@ class Ccpn:
             for ccpnRdcConstraint in ccpnRdcList.sortedConstraints():
                 result = getRestraintBoundList(ccpnRdcConstraint, self.RESTRAINT_IDX_RDC, msgHoL)
                 if not result:
-                    NTdetail("Ccpn RDC restraint '%s' with bad values imported." %
+                    nTdetail("Ccpn RDC restraint '%s' with bad values imported." %
                               ccpnRdcConstraint)
                     result = (None, None)
                 lower, upper = result
@@ -1569,7 +1569,7 @@ class Ccpn:
 
                 if not atomPairList:
                     # restraints that will not be imported
-                    NTdetail("Ccpn RDC restraint '%s' without atom pairs will be skipped" % ccpnRdcConstraint)
+                    nTdetail("Ccpn RDC restraint '%s' without atom pairs will be skipped" % ccpnRdcConstraint)
                     continue
                 # end if
 
@@ -1581,7 +1581,7 @@ class Ccpn:
                 rdcRestraintList.append(rdcRestraint)
             # end for
             if len(rdcRestraintList) == 0:
-                NTdetail("Ccpn distance restraint list remained empty and will be removed")
+                nTdetail("Ccpn distance restraint list remained empty and will be removed")
                 self.project.rdcs.delete(ccpnRdcListName)
 
         # end for
@@ -1617,7 +1617,7 @@ class Ccpn:
             resonanceListLength = len(resonanceList)
             assert(resonanceListLength == 2) # During a regular run (not with -O option given to python interpreter) this might cause a exception being thrown.
             if resonanceListLength != 2:
-                NTcodeerror("expected a pair but found number: %d for ccpnConstraint %s" % (resonanceListLength, ccpnConstraint))
+                nTcodeerror("expected a pair but found number: %d for ccpnConstraint %s" % (resonanceListLength, ccpnConstraint))
                 return None
             for resonance in resonanceList:
                 resAtomList = []
@@ -1629,7 +1629,7 @@ class Ccpn:
                             resAtomList.append('%d.%s' % (
                                 atom.residue.seqCode, atom.name))
                 else:
-                    NTwarning("No resonanceSet (means unassigned) for ccpnConstraint %s" % ccpnConstraint)
+                    nTwarning("No resonanceSet (means unassigned) for ccpnConstraint %s" % ccpnConstraint)
                 resAtomList.sort()
                 resAtomString = ','.join(resAtomList)
                 atomList.append(resAtomString)
@@ -1676,8 +1676,8 @@ Note that this doesn't happen with other pseudos. Perhaps CCPN does not have the
 #        # Example code from Wim is a nice demonstration.
         if 0:
             for constItem in ccpnConstraint.sortedItems():
-                NTdebug( 'ccpn restraint: %s' % self.ccpnDistanceRestraintToString(ccpnConstraint))
-#            NTdebug('')
+                nTdebug( 'ccpn restraint: %s' % self.ccpnDistanceRestraintToString(ccpnConstraint))
+#            nTdebug('')
 
         # Now the real code.
         atomPairList = []
@@ -1688,67 +1688,67 @@ Note that this doesn't happen with other pseudos. Perhaps CCPN does not have the
             # JFD from WV. Tries to use sorted items where available.
             fixedResonanceLoL.append(getResonancesFromPairwiseConstraintItem(constItem))
 
-#        NTdebug("fixedResonanceLoL: %s" % fixedResonanceLoL)
+#        nTdebug("fixedResonanceLoL: %s" % fixedResonanceLoL)
         for fixedResonanceList in fixedResonanceLoL:
-#            NTdebug("  fixedResonanceList: %s" % fixedResonanceList)
+#            nTdebug("  fixedResonanceList: %s" % fixedResonanceList)
             # JFD Normally would use less levels of loops here but just to figure out how it's done it's nicer to spell it out.
             fixedResonanceSetLeft = fixedResonanceList[0].resonanceSet
             fixedResonanceSetRight = fixedResonanceList[1].resonanceSet
             if not fixedResonanceSetLeft:
-#                NTdebug("Failed to find fixedResonanceSet Left for ccpnConstraint %s" % ccpnConstraint)
+#                nTdebug("Failed to find fixedResonanceSet Left for ccpnConstraint %s" % ccpnConstraint)
                 return None
             if not fixedResonanceSetRight:
-#                NTdebug("Failed to find fixedResonanceSet Right for ccpnConstraint %s" % ccpnConstraint)
+#                nTdebug("Failed to find fixedResonanceSet Right for ccpnConstraint %s" % ccpnConstraint)
                 return None
             fixedAtomSetListLeft = fixedResonanceSetLeft.sortedAtomSets()
             fixedAtomSetListRight = fixedResonanceSetRight.sortedAtomSets()
-#            NTdebug("    fixedAtomSetListLeft  = %s" % fixedAtomSetListLeft)
-#            NTdebug("    fixedAtomSetListRight = %s" % fixedAtomSetListRight)
+#            nTdebug("    fixedAtomSetListLeft  = %s" % fixedAtomSetListLeft)
+#            nTdebug("    fixedAtomSetListRight = %s" % fixedAtomSetListRight)
             for fixedAtomSetLeft in fixedAtomSetListLeft:
-#                NTdebug("      fixedAtomSetLeft: %s" % fixedAtomSetLeft)
+#                nTdebug("      fixedAtomSetLeft: %s" % fixedAtomSetLeft)
                 atomListLeft = []
                 for ccpnAtomLeft in fixedAtomSetLeft.sortedAtoms():
-#                    NTdebug("        ccpnAtom Left: %s" % ccpnAtomLeft)
+#                    nTdebug("        ccpnAtom Left: %s" % ccpnAtomLeft)
                     if not hasattr(ccpnAtomLeft, self.CCPN_CING_ATR):
-                        NTerror("No Cing ccpnAtomLeft obj equivalent for Ccpn atom: %s", ccpnAtomLeft)
+                        nTerror("No Cing ccpnAtomLeft obj equivalent for Ccpn atom: %s", ccpnAtomLeft)
                         return None
                     atomLeft = ccpnAtomLeft.cing
                     atomListLeft.append(atomLeft)
                 if not atomLeft:
-                    NTerror("Failed to find at least one atomLeft for ccpnConstraint %s" % ccpnConstraint)
+                    nTerror("Failed to find at least one atomLeft for ccpnConstraint %s" % ccpnConstraint)
                     return None
                 pseudoAtomLeft = atomLeft.getRepresentativePseudoAtom(atomListLeft)
                 if pseudoAtomLeft: # use just the pseudo representative.
                     atomListLeft = [ pseudoAtomLeft ]
-#                NTdebug("      atomListLeft: %s" % atomListLeft)
+#                nTdebug("      atomListLeft: %s" % atomListLeft)
                 for atomLeft in atomListLeft:
-#                    NTdebug("        atomLeft: %s" % atomLeft)
+#                    nTdebug("        atomLeft: %s" % atomLeft)
                     for fixedAtomSetRight in fixedAtomSetListRight:
-#                        NTdebug("          fixedAtomSetRight: %s" % fixedAtomSetRight)
+#                        nTdebug("          fixedAtomSetRight: %s" % fixedAtomSetRight)
                         atomListRight = []
                         for ccpnAtomRight in fixedAtomSetRight.sortedAtoms():
-#                            NTdebug("                ccpnAtom Right: %s" % ccpnAtomRight)
+#                            nTdebug("                ccpnAtom Right: %s" % ccpnAtomRight)
                             if not hasattr(ccpnAtomRight, self.CCPN_CING_ATR):
-                                NTerror("No Cing ccpnAtomRight obj equivalent for Ccpn atom: %s", ccpnAtomRight)
+                                nTerror("No Cing ccpnAtomRight obj equivalent for Ccpn atom: %s", ccpnAtomRight)
                                 return None
                             atomRight = ccpnAtomRight.cing
                             atomListRight.append(atomRight)
                         if not atomRight:
-                            NTerror("Failed to find at least one atomRight for ccpnConstraint %s" % ccpnConstraint)
+                            nTerror("Failed to find at least one atomRight for ccpnConstraint %s" % ccpnConstraint)
                             return None
                         pseudoAtomRight = atomRight.getRepresentativePseudoAtom(atomListRight)
                         if pseudoAtomRight: # use just the pseudo representative.
                             atomListRight = [ pseudoAtomRight ]
-#                        NTdebug("          atomListRight: %s" % atomListRight)
+#                        nTdebug("          atomListRight: %s" % atomListRight)
                         for atomRight in atomListRight:
                             atomPair = (atomLeft, atomRight)
-#                            NTdebug("            atomPair: %s %s" % atomPair)
+#                            nTdebug("            atomPair: %s %s" % atomPair)
                             if atomPair in atomPairSet:
-#                                NTdebug("Skipping pair already represented.")
+#                                nTdebug("Skipping pair already represented.")
                                 continue
                             atomPairSet.add(atomPair)
                             atomPairList.append(atomPair)
-#        NTdebug("_getConstraintAtomPairList: %s" % atomPairList)
+#        nTdebug("_getConstraintAtomPairList: %s" % atomPairList)
         return atomPairList
 
     def _getConstraintAtomList(self, ccpnConstraint):
@@ -1766,7 +1766,7 @@ Note that this doesn't happen with other pseudos. Perhaps CCPN does not have the
         elif className == self.CCPN_CS_CONSTRAINT:
             fixedResonances.append([ccpnConstraint.resonance, ])
         else:
-            NTcodeerror("Routine _getConstraintAtomList should only be called for %s and %s" % (
+            nTcodeerror("Routine _getConstraintAtomList should only be called for %s and %s" % (
                self.CCPN_DIHEDRAL_CONSTRAINT, self.CCPN_CS_CONSTRAINT))
             return None
 
@@ -1782,7 +1782,7 @@ Note that this doesn't happen with other pseudos. Perhaps CCPN does not have the
                         for atom in fixedAtomSet.atoms:
                             equivAtoms[atom] = True
                             if not hasattr(atom, self.CCPN_CING_ATR):
-#                                NTdebug("No Cing atom obj equivalent for Ccpn atom: %s", atom.name)
+#                                nTdebug("No Cing atom obj equivalent for Ccpn atom: %s", atom.name)
                                 pass
                     atomList.append(equivAtoms.keys())
 
@@ -1790,7 +1790,7 @@ Note that this doesn't happen with other pseudos. Perhaps CCPN does not have the
                 try:
                     atoms = [ x[0].cing for x in atomList ]
                 except:
-#                    NTdebug("No Cing atom obj equivalent for Ccpn atom list %s" % atomList)
+#                    nTdebug("No Cing atom obj equivalent for Ccpn atom list %s" % atomList)
                     pass
         return list(atoms)
     # end def
@@ -1832,11 +1832,11 @@ Note that this doesn't happen with other pseudos. Perhaps CCPN does not have the
         """
 
         if not self.project:
-            NTerror("Undefined CING project")
+            nTerror("Undefined CING project")
             return None
 
         if not isinstance(self.project, Project):
-            NTerror("Input object is not a CING project - %s", self.project)
+            nTerror("Input object is not a CING project - %s", self.project)
             return None
 
         return True
@@ -1849,15 +1849,15 @@ Note that this doesn't happen with other pseudos. Perhaps CCPN does not have the
         """
 
         if self.ccpnProject:
-            NTerror("ccpnProject already present")
+            nTerror("ccpnProject already present")
             return None
 
         name = self.project.name
         if os.path.exists(name):
-            NTmessage("Removing directory with assumed CCPN project: %s" % name)
+            nTmessage("Removing directory with assumed CCPN project: %s" % name)
             shutil.rmtree(name)
 
-        NTmessage("==> Creating new CCPN project '%s' ", name)
+        nTmessage("==> Creating new CCPN project '%s' ", name)
 
         self.ccpnProject = MemopsRoot(name = name)
         self.project.ccpn = self.ccpnProject
@@ -1872,22 +1872,22 @@ Note that this doesn't happen with other pseudos. Perhaps CCPN does not have the
         """
         self.ccpnProject = None # removing it.
         if not self.createCcpnProject():
-            NTerror(" Failed createCcpnProject")
+            nTerror(" Failed createCcpnProject")
             return None
         if not self.createCcpnMolSystem():
-            NTerror("Failed to createCcpnMolSystem")
+            nTerror("Failed to createCcpnMolSystem")
             return None
 #        if not self.ccpnNmrProject:
 #            self.ccpnNmrProject = self.ccpnProject.newNmrProject(name = self.ccpnProject.name)
 #            if not self.ccpnNmrProject:
-#                NTerror("Failed ccpnProject.newNmrProject")
+#                nTerror("Failed ccpnProject.newNmrProject")
 #                return None
 
 #        if not self.createCcpnStructures():
-#            NTerror("Failed to createCcpnStructures")
+#            nTerror("Failed to createCcpnStructures")
 #            return None
 #        if not self.createCcpnRestraints():
-#            NTerror("Failed to createCcpnRestraints")
+#            nTerror("Failed to createCcpnRestraints")
 #            return None
         # TODO: Peaks, Shift CS & restraint Lists
         return True
@@ -1920,21 +1920,21 @@ Note that this doesn't happen with other pseudos. Perhaps CCPN does not have the
         unmatchedAtomByResDict = {}
 
         if not self.project.moleculeNames:
-            NTerror("No molecule present")
+            nTerror("No molecule present")
             return
 
         moleculeName = self.project.moleculeNames[0]
         molecule = self.project[moleculeName]
 
-        NTdebug("Doing create CCPN mol system (%s)", moleculeName)
+        nTdebug("Doing create CCPN mol system (%s)", moleculeName)
         if hasattr(molecule, self.CING_CCPN_ATR):
-            NTerror("createCcpnMolSystem tried for molecule (%s) with existing link. Giving up.", moleculeName)
+            nTerror("createCcpnMolSystem tried for molecule (%s) with existing link. Giving up.", moleculeName)
             return
 
-#        NTdebug("self.ccpnProject.molSystems: %s" % self.ccpnProject.molSystems)
+#        nTdebug("self.ccpnProject.molSystems: %s" % self.ccpnProject.molSystems)
         ccpnMolSystem = self.ccpnProject.findFirstMolSystem()
         if ccpnMolSystem:
-            NTerror("Found prexisting ccpnMolSystem in ccpnProject. Giving up on recreating.")
+            nTerror("Found prexisting ccpnMolSystem in ccpnProject. Giving up on recreating.")
             return
         ccpnMolSystem = self.ccpnProject.newMolSystem(code = moleculeName, name = moleculeName)
 
@@ -1949,21 +1949,21 @@ Note that this doesn't happen with other pseudos. Perhaps CCPN does not have the
 #            moleculeChainName = moleculeName + '_' + chain.name
             firstRes = residues[0]
             molType = 'other'
-#            NTdebug("Residue props: %s" % (firstRes.db.properties))
+#            nTdebug("Residue props: %s" % (firstRes.db.properties))
             if firstRes.hasProperties('protein'):
                 molType = 'protein'
             elif firstRes.hasProperties('nucleic'):
                 if firstRes.hasProperties('deoxy'):
                     molType = 'DNA'
                 else:
-#                    NTdebug("Assumed to be RNA in CCPN when no deoxy property set in CING nucleotide for: %s." % firstRes)
+#                    nTdebug("Assumed to be RNA in CCPN when no deoxy property set in CING nucleotide for: %s." % firstRes)
                     molType = 'RNA'
                 # end if
             elif firstRes.hasProperties('water'):
                 molType = 'water'
             else:
-                NTwarning("Found chain with first residue: %s of unknown chain type. No problem if names in CING and CCPN match." % firstRes)
-#            NTdebug("molType: %s" % molType)
+                nTwarning("Found chain with first residue: %s of unknown chain type. No problem if names in CING and CCPN match." % firstRes)
+#            nTdebug("molType: %s" % molType)
 
             sequence = []
             resSkippedList = []
@@ -1971,17 +1971,17 @@ Note that this doesn't happen with other pseudos. Perhaps CCPN does not have the
             for res in chain:
                 resNameCcpnFull = res.db.translate(CCPN)
                 if not resNameCcpnFull:
-                    NTerror("Failed to get CCPN residue name for %s" % res)
+                    nTerror("Failed to get CCPN residue name for %s" % res)
                     resSkippedList.append(res)
                     continue
                 # Actually gives: 'DNA G prot:H1;deprot:H7' or 'protein Val neutral'
 #                    resNameCcpn = upperCaseFirstCharOnly(res.resName)
                 resNameCcpnList = resNameCcpnFull.split(' ')
-#                NTdebug("resNameCcpnList %s" % resNameCcpnList)
+#                nTdebug("resNameCcpnList %s" % resNameCcpnList)
                 if len(resNameCcpnList) != 3:
-                    NTwarning("JFD thought the full ccpn residue name is always of length 3; found: %d %s" % (
+                    nTwarning("JFD thought the full ccpn residue name is always of length 3; found: %d %s" % (
                      len(resNameCcpnList), resNameCcpnList))
-                    NTwarning("JFD thought the full ccpn residue name always included a moltype, 3-letter name, and a descriptor even if it's just 'neutral'")
+                    nTwarning("JFD thought the full ccpn residue name always included a moltype, 3-letter name, and a descriptor even if it's just 'neutral'")
                     resSkippedList.append(res)
                     continue
                 resNameCcpn = resNameCcpnList[1]
@@ -1989,9 +1989,9 @@ Note that this doesn't happen with other pseudos. Perhaps CCPN does not have the
                 ccpnResDescriptor = resNameCcpnList[2]
                 ccpnResDescriptorList.append(ccpnResDescriptor)
             if resSkippedList:
-                NTerror("Skipping chain with residue names that failed to be translated to CCPN: %s" % resSkippedList)
+                nTerror("Skipping chain with residue names that failed to be translated to CCPN: %s" % resSkippedList)
                 continue
-#            NTdebug("sequence for CCPN: %s" % sequence)
+#            nTdebug("sequence for CCPN: %s" % sequence)
 
             ccpnMolecule = makeMolecule(self.ccpnProject, molType, isCyclic = False, startNum = firstRes.resNum,
                                         molName = chain.name, sequence = sequence)
@@ -2011,63 +2011,63 @@ Note that this doesn't happen with other pseudos. Perhaps CCPN does not have the
                 try:
                     ccpnResidue.checkValid()
                 except:
-                    NTerror("Failed ccpnResidue.checkValid() first try")
+                    nTerror("Failed ccpnResidue.checkValid() first try")
                     return None
 
                 ccpnResDescriptorOrg = ccpnResDescriptorList[i]
                 ccpnResDescriptor = modifyResidueDescriptorForTerminii( ccpnResDescriptorOrg, i, seqLength, molType)
-#                NTdebug("Looking at CING residue [%s] with ccpnResDescriptor, ccpnResidue.linking [%s] [%s]" % (r, ccpnResDescriptor, ccpnResidue.linking))
+#                nTdebug("Looking at CING residue [%s] with ccpnResDescriptor, ccpnResidue.linking [%s] [%s]" % (r, ccpnResDescriptor, ccpnResidue.linking))
 
                 chemCompVarNew = None
                 # check if patching is needed. E.g. for nucleic acids it is not and the code below wouldn't even work.
                 # TODO: debug this mechanism so it also works for Nucleic Acid structures.
                 if molType == 'protein':
-#                    NTdebug("Modifying residue %s variant from %s to %s" % ( r, ccpnResDescriptorOrg, ccpnResDescriptor ))
+#                    nTdebug("Modifying residue %s variant from %s to %s" % ( r, ccpnResDescriptorOrg, ccpnResDescriptor ))
                     # block of code adapted from ccp.util.Molecule#setMolResidueCcpCode
                     chemComp = ccpnResidue.root.findFirstChemComp(ccpCode = ccpnResidue.ccpCode, molType = molType)
                     if not chemComp:
-                        NTcodeerror("Failed to find chemComp for CING residue: %s." % r)
+                        nTcodeerror("Failed to find chemComp for CING residue: %s." % r)
                         return
                     chemCompVar = ccpnResidue.getChemCompVar()
-#                    NTdebug("Found chemCompVar: %s" % chemCompVar)
+#                    nTdebug("Found chemCompVar: %s" % chemCompVar)
                     chemCompVarNew = chemComp.findFirstChemCompVar( descriptor = ccpnResDescriptor, linking = ccpnResidue.linking)
                     if chemCompVarNew:
-#                        NTdebug("Found chemCompVarNew: %s" % chemCompVarNew)
+#                        nTdebug("Found chemCompVarNew: %s" % chemCompVarNew)
                         if chemCompVarNew != chemCompVar:
-#                            NTdebug("chemCompVar is not chemCompVarNew, need to update.")
+#                            nTdebug("chemCompVar is not chemCompVarNew, need to update.")
 #                            ccpnResidueOrg = ccpnResidue
                             ccpnMolResidueOrg = ccpnResidue.molResidue
                             # TODO; JFD: the below line fails and I don't know why.
                             setMolResidueChemCompVar(ccpnMolResidueOrg, chemCompVarNew)
 #                            if ccpnMolResidueNew is ccpnMolResidueOrg:
-#                                NTerror("ccpnMolResidueNew is ccpnMolResidueOrg after it should have been replaced")
+#                                nTerror("ccpnMolResidueNew is ccpnMolResidueOrg after it should have been replaced")
 #                            ccpnResidue = ccpnChain.findFirstResidue(molResidue = ccpnMolResidueNew)
                             ccpnResidue = ccpnChain.findFirstResidue(seqId = ccpnResidueSeqId)
-#                            NTdebug("Found %s %s" % (ccpnResidueOrg, ccpnResidue))
-#                            NTdebug("Found %s %s" % (ccpnMolResidueOrg, ccpnMolResidueNew))
+#                            nTdebug("Found %s %s" % (ccpnResidueOrg, ccpnResidue))
+#                            nTdebug("Found %s %s" % (ccpnMolResidueOrg, ccpnMolResidueNew))
                             if not ccpnResidue:
-                                NTerror("Failed to get ccpnResidue from api back while working on %s" % ccpnResidueList[i])
+                                nTerror("Failed to get ccpnResidue from api back while working on %s" % ccpnResidueList[i])
                                 return
 #                            if ccpnResidue is ccpnResidueOrg:
-#                                NTerror("ccpnResidue is ccpnResidueOrg after it should have been replaced")
-    #                        NTdebug("Replacing ccpnMolResidue %s with %s" % (ccpnMolResidueOrg, ccpnMolResidue))
-#                            NTdebug("Confirming ccpnResidue.chemCompVar %s TODO: this line reports bad ccv but in fact it's done correctly." % ccpnResidue.getChemCompVar())
+#                                nTerror("ccpnResidue is ccpnResidueOrg after it should have been replaced")
+    #                        nTdebug("Replacing ccpnMolResidue %s with %s" % (ccpnMolResidueOrg, ccpnMolResidue))
+#                            nTdebug("Confirming ccpnResidue.chemCompVar %s TODO: this line reports bad ccv but in fact it's done correctly." % ccpnResidue.getChemCompVar())
                         else:
-#                            NTdebug("chemCompVar is same as chemCompVarNew")
+#                            nTdebug("chemCompVar is same as chemCompVarNew")
                             pass
                     else:
-                        NTwarning("Failed to find CCPN chemCompVarNew for chemComp [%s]/chemCompVar [%s] with descriptor [%s] and linking [%s]." % (
+                        nTwarning("Failed to find CCPN chemCompVarNew for chemComp [%s]/chemCompVar [%s] with descriptor [%s] and linking [%s]." % (
                                chemComp, chemCompVar, ccpnResDescriptor, ccpnResidue.linking))
 #                        for ccv in chemComp.chemCompVars:
-#                            NTdebug("Available molType, ccpCode, linking, descriptor,default: %s %s %s %s %s" % ( chemComp.molType, chemComp.ccpCode, ccv.linking, ccv.descriptor, ccv.isDefaultVar))
+#                            nTdebug("Available molType, ccpCode, linking, descriptor,default: %s %s %s %s %s" % ( chemComp.molType, chemComp.ccpCode, ccv.linking, ccv.descriptor, ccv.isDefaultVar))
                     # end if chemCompVarNew
                 # end if patch needed.
 
-#                NTdebug("Now with ccpnResDescriptor, ccpnResidue.linking [%s] [%s]" % (ccpnResDescriptor, ccpnResidue.linking))
+#                nTdebug("Now with ccpnResDescriptor, ccpnResidue.linking [%s] [%s]" % (ccpnResDescriptor, ccpnResidue.linking))
                 try:
                     ccpnResidue.checkValid()
                 except:
-                    NTerror("Failed ccpnResidue.checkValid() second try")
+                    nTerror("Failed ccpnResidue.checkValid() second try")
                     return None
 
                 ccpnResidue.cing = r
@@ -2077,45 +2077,45 @@ Note that this doesn't happen with other pseudos. Perhaps CCPN does not have the
                 if chemCompVarNew:
                     ccpnAtomList = []
                     chemAtomList = chemCompVarNew.sortedChemAtoms()
-                    NTmessageNoEOL("DEBUG: %-80s  " % ccpnResidue )
+                    nTmessageNoEOL("DEBUG: %-80s  " % ccpnResidue )
                     for chemAtom in chemAtomList:
                         if chemAtom.name.startswith('prev_') or chemAtom.name.startswith('next_'):
                             continue
-                        NTmessageNoEOL("%-4s  " % chemAtom.name )
+                        nTmessageNoEOL("%-4s  " % chemAtom.name )
 #                        if chemAtom.name == 'HE2':
-#                            NTdebug('at breakpoint')
+#                            nTdebug('at breakpoint')
                         ccpnAtom = ccpnResidue.findFirstAtom( name = chemAtom.name )
                         if not ccpnAtom:
                             msgHol.appendError("Failed to find %-4s in %-80s; skipping atom" % (chemAtom.name, ccpnResidue))
                             continue
                         ccpnAtomList.append(ccpnAtom)
-                    NTmessage('')
+                    nTmessage('')
                 else:
                     ccpnAtomList = ccpnResidue.sortedAtoms()
 
 
-#                NTdebug("Setting info for ccpn atoms: %s " % ccpnAtomList)
+#                nTdebug("Setting info for ccpn atoms: %s " % ccpnAtomList)
                 for ccpnAtom in ccpnAtomList:
-#                    NTmessageNoEOL("%s " % ccpnAtom.name )
+#                    nTmessageNoEOL("%s " % ccpnAtom.name )
                     atom = None # cing atom
 
                     ccpnAtomName = ccpnAtom.getName()
                     if not ccpnAtomName:
-#                        NTdebug("Failed to lookup ccpnAtomName in ccpnAtom: %s; skipping." % ccpnAtom)
+#                        nTdebug("Failed to lookup ccpnAtomName in ccpnAtom: %s; skipping." % ccpnAtom)
                         continue
 #                    ccpnChemAtom = ccpnAtom.getChemAtom()
 #                    try:
 #                        ccpnChemAtom = ccpnAtom.chemAtom # code bug in CCPN ccp.api.molecule.MolSystem.Atom#getChemAtom?
 #                    except:
 #                        pass
-#                        NTdebug("Failed to lookup cpnChemAtom in ccpnAtom: %s; skipping." % ccpnAtom)
+#                        nTdebug("Failed to lookup cpnChemAtom in ccpnAtom: %s; skipping." % ccpnAtom)
 
 #                    ccpnAtomName = ccpnAtom.name
 #                    if ccpnChemAtom:
 #                        ccpnAtomName = ccpnChemAtom.name
 #                    else:
 #                        pass
-#                        NTdebug("Found name of ccpnAtom.name (only directly): %s" % ccpnAtomName)
+#                        nTdebug("Found name of ccpnAtom.name (only directly): %s" % ccpnAtomName)
 
                     nameTuple = (matchingConvention, r.chain.name, resNum, ccpnAtomName)
                     atom = self.molecule.decodeNameTuple(nameTuple)
@@ -2137,14 +2137,14 @@ Note that this doesn't happen with other pseudos. Perhaps CCPN does not have the
                     atom.ccpn = ccpnAtom
                     ccpnAtom.cing = atom
                 # end for loop over atom
-#                NTmessage('')
+#                nTmessage('')
             # end for loop over residue
             try:
                 ccpnMolecule.checkAllValid(complete=True)
             except:
-                NTerror("Failed ccpnMolecule.checkAllValid; ")
+                nTerror("Failed ccpnMolecule.checkAllValid; ")
                 return None
-            NTmessage("Cing.Chain '%s' of Cing.Molecule '%s' exported to Ccpn.Project", chain.name, moleculeName)
+            nTmessage("Cing.Chain '%s' of Cing.Molecule '%s' exported to Ccpn.Project", chain.name, moleculeName)
         # end for for loop over chain
 
         msg = "Non-standard (residues and their) atoms (CING residue type name and CCPN atom name)"
@@ -2157,7 +2157,7 @@ Note that this doesn't happen with other pseudos. Perhaps CCPN does not have the
         if unmatchedAtomByResDict:
             msg += unmatchedAtomByResDictToString(unmatchedAtomByResDict)
             if self.allowNonStandardResidue:
-                NTmessage(msg)
+                nTmessage(msg)
 
         return True
 
@@ -2176,7 +2176,7 @@ Note that this doesn't happen with other pseudos. Perhaps CCPN does not have the
         if moleculeName:
             listMolecules = [self.project[moleculeName]]
             if not listMolecules:
-                NTerror("molecule '%s' not found in Cing.Project", moleculeName)
+                nTerror("molecule '%s' not found in Cing.Project", moleculeName)
                 return None
         else:
             listMolecules = [ self.project[mol] for mol in self.project.moleculeNames ]
@@ -2212,13 +2212,13 @@ Note that this doesn't happen with other pseudos. Perhaps CCPN does not have the
                         if not atom.coordinates:
                             if not atom.isPseudoAtom():
                                 if atom.name not in ATOM_LIST_TO_IGNORE_REPORTING:
-                                    NTwarning("Skipping %s because no coordinates were found", atom)
-    #                        NTwarning('atom: '+atom.format())
+                                    nTwarning("Skipping %s because no coordinates were found", atom)
+    #                        nTwarning('atom: '+atom.format())
                             continue
                         # end if
                         if not atom.has_key('ccpn'):
-                            NTwarning("Skipping %s because no ccpn attribute was found to be set", atom)
-    #                        NTwarning('atom: '+atom.format())
+                            nTwarning("Skipping %s because no ccpn attribute was found to be set", atom)
+    #                        nTwarning('atom: '+atom.format())
                             continue
                         # end if
                         ccpnAtom = atom.ccpn
@@ -2248,7 +2248,7 @@ Note that this doesn't happen with other pseudos. Perhaps CCPN does not have the
            Output: CCPN NmrConstraint.NmrConstraintStore or None
         """
 
-        NTcodeerror("This code is a first setup but is NOT functional yet; see the TODOs below.")
+        nTcodeerror("This code is a first setup but is NOT functional yet; see the TODOs below.")
 
         ccpnConstraintStore = self.ccpnProject.newNmrConstraintStore(nmrProject = self.ccpnNmrProject)
 
@@ -2324,11 +2324,11 @@ def getRestraintBoundList(constraint, restraintTypeIdx, msgHoL):
         msgHoL.appendWarning("Restraint in CCPN was None")
         return None
 
-#    NTdebug(" CCPN: constraint.targetValue    %8s" % constraint.targetValue)
-#    NTdebug(" CCPN: constraint.lowerLimit     %8s" % constraint.lowerLimit)
-#    NTdebug(" CCPN: constraint.upperLimit     %8s" % constraint.upperLimit)
-#    NTdebug(" CCPN: constraint.error          %8s" % constraint.error)
-#    NTdebug(" CCPN: restraintTypeIdx          %8s" % restraintTypeIdx)
+#    nTdebug(" CCPN: constraint.targetValue    %8s" % constraint.targetValue)
+#    nTdebug(" CCPN: constraint.lowerLimit     %8s" % constraint.lowerLimit)
+#    nTdebug(" CCPN: constraint.upperLimit     %8s" % constraint.upperLimit)
+#    nTdebug(" CCPN: constraint.error          %8s" % constraint.error)
+#    nTdebug(" CCPN: restraintTypeIdx          %8s" % restraintTypeIdx)
 # wrong lowerbound in the following valid case.
 #constraint.targetValue         5.5
 #constraint.lowerLimit          0.0
@@ -2369,7 +2369,7 @@ def getRestraintBoundList(constraint, restraintTypeIdx, msgHoL):
 
     if (lower != None) and (upper != None):
         pass
-#        NTdebug("Simplest case first for speed reasons.")
+#        nTdebug("Simplest case first for speed reasons.")
     else:
         if constraint.targetValue == None:
             pass
@@ -2416,8 +2416,8 @@ def getRestraintBoundList(constraint, restraintTypeIdx, msgHoL):
 
     # Unfortunately, sometimes it would be nice to preserve the info on the range but can't be here.
     if restraintTypeIdx == Ccpn.RESTRAINT_IDX_DIHEDRAL:
-        lower = NTlimitSingleValue(lower, - 180., 180.) # routine is ok with None input.
-        upper = NTlimitSingleValue(upper, - 180., 180.)
+        lower = nTlimitSingleValue(lower, - 180., 180.) # routine is ok with None input.
+        upper = nTlimitSingleValue(upper, - 180., 180.)
 
     return (lower, upper)
 
@@ -2428,7 +2428,7 @@ def removeCcpnReferences(self):
     try:
         removeRecursivelyAttribute(self, attributeToRemove)
     except:
-        NTerror("Failed removeCcpnReferences")
+        nTerror("Failed removeCcpnReferences")
 
 def initCcpn(project, ccpnFolder, modelCount = None):
     '''Descrn: Adds to the Cing Project instance from a Ccpn folder project.
@@ -2438,11 +2438,11 @@ def initCcpn(project, ccpnFolder, modelCount = None):
     '''
     # work horse class.
     if not os.path.exists( ccpnFolder ):
-        NTerror('initCcpn: ccpnFolder "%s" does not exist', ccpnFolder)
+        nTerror('initCcpn: ccpnFolder "%s" does not exist', ccpnFolder)
         return None
     ccpn = Ccpn(project = project, ccpnFolder = ccpnFolder )
     if not ccpn.importFromCcpn(modelCount = modelCount):
-        NTerror("initCcpn: Failed importFromCcpn")
+        nTerror("initCcpn: Failed importFromCcpn")
         return None
     return project
 
@@ -2454,13 +2454,13 @@ def saveCcpn(project, ccpnFolder, ccpnTgzFile = None):
     '''
     if project.has_key('ccpn'):
         ccpnProject = project.ccpn
-        NTmessage('saveCcpn: Saving any changes to original CCPN project')
+        nTmessage('saveCcpn: Saving any changes to original CCPN project')
     else:
-        NTmessage('saveCcpn: Creating new CCPN project')
+        nTmessage('saveCcpn: Creating new CCPN project')
         # work horse class.
         ccpn = Ccpn(project = project, ccpnFolder = ccpnFolder)
         if not ccpn.createCcpn():
-            NTerror("Failed ccpn.createCcpn")
+            nTerror("Failed ccpn.createCcpn")
             return None
         ccpnProject = ccpn.ccpnProject
     # end if
@@ -2469,17 +2469,17 @@ def saveCcpn(project, ccpnFolder, ccpnTgzFile = None):
     status = ccpnProject.saveModified() # TODO: can't change from original ccpnFolder
     switchOutput(True)
     if status:
-        NTerror("Failed ccpnProject.saveModified in " + getCallerName())
+        nTerror("Failed ccpnProject.saveModified in " + getCallerName())
         return None
 
-    NTmessage("Saved ccpn project to folder: %s" % ccpnFolder)
+    nTmessage("Saved ccpn project to folder: %s" % ccpnFolder)
 
     if ccpnTgzFile:
         cmd = "tar -czf %s %s" % (ccpnTgzFile, ccpnFolder)
         if do_cmd(cmd):
-            NTerror("Failed tar")
+            nTerror("Failed tar")
             return None
-        NTmessage("Saved ccpn project to tgz: %s" % ccpnTgzFile)
+        nTmessage("Saved ccpn project to tgz: %s" % ccpnTgzFile)
     # end if
     return ccpnProject
 # end def
@@ -2491,25 +2491,25 @@ def exportValidation2ccpn(project):
     Return Project or None on error.
     """
     if not project.has_key('ccpn'):
-        NTerror('exportValidation2ccpn: No open CCPN project present')
+        nTerror('exportValidation2ccpn: No open CCPN project present')
         return None
 
     ccpnMolSystem = project.molecule.ccpn
     ccpnEnsemble = ccpnMolSystem.findFirstStructureEnsemble()
 
     if not ccpnEnsemble:
-        NTmessage("Failing to exportValidation2ccpn, perhaps because there is no ensemble")
+        nTmessage("Failing to exportValidation2ccpn, perhaps because there is no ensemble")
         return project
 
-    NTmessage('==> Exporting to Ccpn')
+    nTmessage('==> Exporting to Ccpn')
     for residue in project.molecule.allResidues():
         valObj = storeResidueValidationInCcpn(project, residue)
         if not valObj:
             # Happens for all residues without coordinates.
-            NTmessage('exportValidation2ccpn: no export of validation done for residue %s', residue)
+            nTmessage('exportValidation2ccpn: no export of validation done for residue %s', residue)
         else:
             pass
-#            NTdebug('exportValidation2ccpn: residue %s, valObj: %s', residue, valObj)
+#            nTdebug('exportValidation2ccpn: residue %s, valObj: %s', residue, valObj)
     #end for
     if cing.verbosity < cing.verbosityDebug:
         switchOutput(False) # disable standard out.
@@ -2570,7 +2570,7 @@ def storeResidueValidationInCcpn(project, residue, context = 'CING'):
     ccpnEnsemble = ccpnMolSystem.findFirstStructureEnsemble()
 
     if not ccpnEnsemble:
-        NTerror("Failing to storeResidueValidationInCcpn, perhaps because there is no ensemble")
+        nTerror("Failing to storeResidueValidationInCcpn, perhaps because there is no ensemble")
         return None
     if not project.has_key('ccpnValidationStore'):
         project.ccpnValidationStore = getEnsembleValidationStore(ensemble = ccpnEnsemble,
@@ -2656,7 +2656,7 @@ def patchCcpnResDescriptor(ccpnResDescriptor, ccpnMolType, ccpnLinking):
     # CING db has only non-terminal CCPN descriptors in DB so CING can be more concise.
     ccpnResDescriptorList = NTlist()
     ccpnResDescriptorList.addList(ccpnResDescriptor.split(';'))
-#    NTdebug("ccpnResDescriptorList: %s " % ccpnResDescriptorList)
+#    nTdebug("ccpnResDescriptorList: %s " % ccpnResDescriptorList)
     if ccpnLinking == Ccpn.CCPN_START:
         if ccpnMolType == Ccpn.CCPN_PROTEIN:
             ccpnResDescriptorList.removeIfPresent(Ccpn.CCPN_PROT_H3)
@@ -2672,7 +2672,7 @@ def patchCcpnResDescriptor(ccpnResDescriptor, ccpnMolType, ccpnLinking):
 
     if not len(ccpnResDescriptorList):
         ccpnResDescriptorList.add(Ccpn.CCPN_NEUTRAL)
-#    NTdebug("ccpnResDescriptorList: %s " % ccpnResDescriptorList)
+#    nTdebug("ccpnResDescriptorList: %s " % ccpnResDescriptorList)
     ccpnResDescriptorPatched = string.join(ccpnResDescriptorList, ';')
     return ccpnResDescriptorPatched
 
@@ -2687,33 +2687,33 @@ def upperCaseFirstCharOnly(inputStr):
 
 def getProjectNameInFileName(fileName):
     regExpProjectNameInFileName = re.compile(".*/memops/Implementation/(.*).xml")
-#    NTdebug("Matching fileName [%s]"%fileName)
+#    nTdebug("Matching fileName [%s]"%fileName)
     m = regExpProjectNameInFileName.match(fileName, 1)
     if not m:
-#        NTdebug("No match")
+#        nTdebug("No match")
         return None
     g = m.groups()
     if not g:
-#        NTdebug("No groups")
+#        nTdebug("No groups")
         return None
     projectName = g[0]
-#    NTdebug("projectName: [%s]" % projectName)
+#    nTdebug("projectName: [%s]" % projectName)
     return projectName
 
 def isRootDirectory(f):
     """ Algorithm for finding just the root dir.
     See unit test for examples.
     """
-#    NTdebug("Checking _isRootDirectory on : ["+f+"]")
+#    nTdebug("Checking _isRootDirectory on : ["+f+"]")
     idxSlash = f.find("/")
     if idxSlash < 0:
         # Happens for every toplevel file. E.g. 1brv_aria.xml in issue 146 for 1brv_ccpngrid.tgz
-#        NTdebug("Found no forward slash in entry in tar file.")
+#        nTdebug("Found no forward slash in entry in tar file.")
         return None
 
     idxLastChar = len(f) - 1
     if idxSlash == idxLastChar or idxSlash == (idxLastChar - 1):
-#        NTdebug("If the first slash is the last or second last BINGO: ["+f+"]")
+#        nTdebug("If the first slash is the last or second last BINGO: ["+f+"]")
         return True
     return False
 # end def
@@ -2761,11 +2761,11 @@ stereochemistry is cna be seen by examining the atom network.
 
     ccpnResDescriptorItemSaveList = [] # maintain the same order as found to fulfill validTags order requirement.
     for ccpnResDescriptorItem in ccpnResDescriptorList:
-#        NTdebug("Working on ccpnResDescriptorItem: " + ccpnResDescriptorItem)
+#        nTdebug("Working on ccpnResDescriptorItem: " + ccpnResDescriptorItem)
         if ccpnResDescriptorItem.startswith('prot:'):
             li = ccpnResDescriptorItem[5:].split(',' )
             for j in li:
-#                NTdebug("Working on j " + j)
+#                nTdebug("Working on j " + j)
                 protList[j] = None
         elif ccpnResDescriptorItem.startswith('deprot:'):
             li = ccpnResDescriptorItem[7:].split(',' )
@@ -2780,14 +2780,14 @@ stereochemistry is cna be seen by examining the atom network.
         elif i == (seqLength-1):
             deprotList["H''"] = None
         else:
-            NTcodeerror("modifyResidueDescriptorForTerminii for protein")
+            nTcodeerror("modifyResidueDescriptorForTerminii for protein")
 #    elif molType == 'DNA' or molType == 'RNA':
 #        if i == 0:
 #            protList["H3"] = None
 #        elif i == seqLength:
 #            deprotList["H''"] = None
 #        else:
-#            NTcodeerror("1 in modifyResidueDescriptorForTerminii for an NA")
+#            nTcodeerror("1 in modifyResidueDescriptorForTerminii for an NA")
     ccpnResDescriptorNew = ''
     if protList:
         keyList = protList.keys()
@@ -2804,7 +2804,7 @@ stereochemistry is cna be seen by examining the atom network.
             ccpnResDescriptorNew += ';'
         ccpnResDescriptorNew += ','.join(ccpnResDescriptorItemSaveList)
 #    if ccpnResDescriptor != ccpnResDescriptorNew:
-#        NTdebug("Changed from %s to %s" % (ccpnResDescriptor,ccpnResDescriptorNew))
+#        nTdebug("Changed from %s to %s" % (ccpnResDescriptor,ccpnResDescriptorNew))
     return ccpnResDescriptorNew
 # end def
 
@@ -2815,10 +2815,10 @@ def restoreCcpn(project, tmp=None):
 
     Return True on error
     """
-#    NTdebug("Now in " + getCallerName())
+#    nTdebug("Now in " + getCallerName())
 
     if not project:
-        NTerror('%s: no project defined' % getCallerName())
+        nTerror('%s: no project defined' % getCallerName())
         return True
     #end if
     if not project.molecule:
@@ -2827,16 +2827,16 @@ def restoreCcpn(project, tmp=None):
     rootPath = project.moleculePath( CCPN_LOWERCASE_STR )
     fileName = os.path.join(rootPath, STEREO_ASSIGN_FILENAME_STR)
     if not os.path.exists(fileName):
-#        NTdebug("No stereo assign meta data from ccpn because no file named: " + fileName)
+#        nTdebug("No stereo assign meta data from ccpn because no file named: " + fileName)
         return
     star_text = readTextFromFile(fileName)
 
     projectDistList = project.distances
     if not len(projectDistList):
-        NTwarning("self.project.distances is empty but FC meta data will still be added.")
+        nTwarning("self.project.distances is empty but FC meta data will still be added.")
     projectDistList.__setattr__(STEREO_ASSIGNMENT_CORRECTIONS_STAR_STR, star_text)
 
-#    NTmessage('==> Restored CCPN meta data')
+#    nTmessage('==> Restored CCPN meta data')
 #end def
 
 def saveCcpnMetaData(project, tmp = None):
@@ -2846,9 +2846,9 @@ def saveCcpnMetaData(project, tmp = None):
 
     Return True on error
     """
-#    NTdebug("Now in " + getCallerName())
+#    nTdebug("Now in " + getCallerName())
     if not project:
-        NTerror('%s: no project defined' % getCallerName())
+        nTerror('%s: no project defined' % getCallerName())
         return True
     #end if
     if not project.molecule:
@@ -2857,20 +2857,20 @@ def saveCcpnMetaData(project, tmp = None):
     projectDistList = project.distances
     if not len(projectDistList):
         pass
-#        NTdebug("self.project.distances is empty but FC meta data will still be looked for.")
+#        nTdebug("self.project.distances is empty but FC meta data will still be looked for.")
     star_text = getDeepByKeysOrAttributes(projectDistList, STEREO_ASSIGNMENT_CORRECTIONS_STAR_STR)
     if not star_text:
-#        NTdebug("No star_text")
+#        nTdebug("No star_text")
         return
     rootPath = project.moleculePath( CCPN_LOWERCASE_STR )
     fileName = os.path.join(rootPath, STEREO_ASSIGN_FILENAME_STR)
     if not os.path.exists(rootPath):
-#        NTdebug("No rootPath named: " + rootPath)
+#        nTdebug("No rootPath named: " + rootPath)
         return
     if writeTextToFile(fileName, star_text):
-        NTdebug("writeTextToFile failed to file: " + fileName)
+        nTdebug("writeTextToFile failed to file: " + fileName)
         return True
-#    NTdebug('Stored CCPN meta data (only SSA for now)')
+#    nTdebug('Stored CCPN meta data (only SSA for now)')
 #end def
 
 # register the function

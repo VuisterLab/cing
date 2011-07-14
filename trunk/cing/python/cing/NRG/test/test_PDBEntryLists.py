@@ -15,7 +15,7 @@ class AllChecks(TestCase):
     def _test_PDBEntryLists(self):
 
         if not cing.internetConnected:
-            NTdebug("Skipping checks for there is no internet connection detected")
+            nTdebug("Skipping checks for there is no internet connection detected")
             return
 
         cingDirTmpTest = os.path.join( cingDirTmp, getCallerName() )
@@ -25,16 +25,16 @@ class AllChecks(TestCase):
 
         if False:
             status = isInternetConnected()
-            NTdebug("isInternetConnected: %s" % status)
+            nTdebug("isInternetConnected: %s" % status)
             self.assertTrue(status)
 
         if False:
             l = getBmrbNmrGridEntriesDOCRDone()
-            NTdebug("getBmrbNmrGridEntriesDOCRDone NMR: %d %s" % (len(l), l))
+            nTdebug("getBmrbNmrGridEntriesDOCRDone NMR: %d %s" % (len(l), l))
             self.assertTrue(l)
         if False:
             l = getBmrbNmrGridEntries()
-            NTdebug("getBmrbNmrGridEntries NMR            : %d %s" % (len(l), l))
+            nTdebug("getBmrbNmrGridEntries NMR            : %d %s" % (len(l), l))
             self.assertTrue(l)
             self.assertTrue(len(l) > 5000) # Fails if NRG is down or corrupted.
 
@@ -43,22 +43,22 @@ class AllChecks(TestCase):
             nmrSolidExpList = getPdbEntries(onlySolidState = True)
             self.assertTrue(nmrSolidExpList)
             self.assertTrue(len(nmrSolidExpList) >= 35)  # November 10, 2009
-            NTdebug("getPdbEntries NMR solid: %d" % (len(nmrSolidExpList)))
+            nTdebug("getPdbEntries NMR solid: %d" % (len(nmrSolidExpList)))
 
         if False:
             nmrExpList = getPdbEntries(onlyNmr = True, mustHaveExperimentalNmrData = True)
             self.assertTrue(nmrExpList)
             self.assertTrue(len(nmrExpList) >= 5385)  # November 10, 2009
-            NTdebug("getPdbEntries NMR exp: %d" % (len(nmrExpList)))
+            nTdebug("getPdbEntries NMR exp: %d" % (len(nmrExpList)))
 
         if 0:
             nmrList = getPdbEntries(onlyNmr = True)
             self.assertTrue(nmrList)
-            NTdebug("getPdbEntries NMR: %d" % (len(nmrList)))
-            NTdebug("getPdbEntries NMR: %s" % str(nmrList))
+            nTdebug("getPdbEntries NMR: %d" % (len(nmrList)))
+            nTdebug("getPdbEntries NMR: %s" % str(nmrList))
             for entry_code in nmrList:
                 if len(entry_code) != 4:
-                    NTerror("No entry code: %s" % str(entry_code))
+                    nTerror("No entry code: %s" % str(entry_code))
             self.assertTrue(len(nmrList) >= 8800)
             # end for
 
@@ -66,14 +66,14 @@ class AllChecks(TestCase):
             pdbList = getPdbEntries(onlyNmr = False)
             self.assertTrue(pdbList)
             self.assertTrue(len(pdbList) >= 61248)
-            NTdebug("getPdbEntries ALL: %d" % (len(pdbList)))
+            nTdebug("getPdbEntries ALL: %d" % (len(pdbList)))
 
         if False:
             pdbList = getPdbEntries(mustHaveExperimentalNmrData = True)
             self.assertTrue(pdbList)
             self.assertTrue(len(pdbList) >= 1)
-            NTdebug("getPdbEntries exp: %d" % (len(pdbList)))
-#            NTdebug("%s" % pdbList)
+            nTdebug("getPdbEntries exp: %d" % (len(pdbList)))
+#            nTdebug("%s" % pdbList)
 
         if True:
             matches_many2one = getBmrbLinks()

@@ -101,14 +101,14 @@ Example file:
         Returns listObj or None on error.
         """
         line = SMLhandler.readline( fp )
-        while (line):
-            l = len(line)
-            if l > 0 and line[1] == self.endTag:
+        while line:
+            n = len(line)
+            if n > 0 and line[1] == self.endTag:
                 return self.endHandler( listObj, obj )
-            elif l > 0 and SMLstarthandlers.has_key(line[1]):
+            elif n > 0 and SMLstarthandlers.has_key(line[1]):
                 listObj.append( SMLstarthandlers[line[1]].handle( line, fp, obj ) )
-            elif l > 0 and SMLendhandlers.has_key(line[1]):
-                NTerror('SMLhandler.listHandler: line %d, skipping invalid closing tag "%s"', fp.NR, line[1])
+            elif n > 0 and SMLendhandlers.has_key(line[1]):
+                nTerror('SMLhandler.listHandler: line %d, skipping invalid closing tag "%s"', fp.NR, line[1])
                 self.jumpToEndTag( fp )
                 return self.endHandler( listObj, obj )
             else:
@@ -118,7 +118,7 @@ Example file:
         #end while
 
         # we should not be here
-        NTerror('SMLhandler.listHandler: unterminated list')
+        nTerror('SMLhandler.listHandler: unterminated list')
         return None
     #end def
 
@@ -131,26 +131,26 @@ Example file:
         """
         line = SMLhandler.readline( fp )
         while (line):
-            l = len(line)
-            if l > 0 and line[1]==self.endTag:
+            n = len(line)
+            if n > 0 and line[1]==self.endTag:
                 return self.endHandler( dictObj, obj )
             # version 0.2: implement recursion
-            elif l > 3 and SMLstarthandlers.has_key(line[3]):
+            elif n > 3 and SMLstarthandlers.has_key(line[3]):
                 dictObj[line[1]] = SMLstarthandlers[line[3]].handle( [' '.join(line[3:])] + line[3:], fp, obj )
-            elif l > 0 and SMLendhandlers.has_key(line[1]):
-                NTerror('SMLhandler.dictHandler: line %d, skipping invalid closing tag "%s"', fp.NR, line[1])
+            elif n > 0 and SMLendhandlers.has_key(line[1]):
+                nTerror('SMLhandler.dictHandler: line %d, skipping invalid closing tag "%s"', fp.NR, line[1])
                 self.jumpToEndTag( fp )
                 return self.endHandler( dictObj, obj )
-            elif l > 3:
+            elif n > 3:
                 dictObj[line[1]] = eval(' '.join(line[3:]))
             else:
-                NTerror('SMLhandler.dictHandler: line %d, incomplete "%s"', fp.NR, line[0])
+                nTerror('SMLhandler.dictHandler: line %d, incomplete "%s"', fp.NR, line[0])
             #end if
             line = SMLhandler.readline( fp )
         #end while
 
         # we should not be here
-        NTerror('SMLhandler.dictHandler: unterminated dict')
+        nTerror('SMLhandler.dictHandler: unterminated dict')
         return None
     #end def
 
@@ -174,24 +174,24 @@ Example file:
 
         newObj  = None
         line = SMLhandler.readline( fp )
-        l = len(line)
+        n = len(line)
         while (line):
-            if l > 0 and line[1]==self.endTag:
+            if n > 0 and line[1]==self.endTag:
                 return self.endHandler( newObj, obj )
-            elif l > 0 and SMLstarthandlers.has_key(line[1]):
+            elif n > 0 and SMLstarthandlers.has_key(line[1]):
                 handler = SMLstarthandlers[line[1]]
                 newObj  = handler.handle( line, fp, obj )
-            elif l > 0 and SMLendhandlers.has_key(line[1]):
-                NTerror('SMLhandler.handle: line %d, skipping invalid closing tag "%s"', fp.NR, line[1])
+            elif n > 0 and SMLendhandlers.has_key(line[1]):
+                nTerror('SMLhandler.handle: line %d, skipping invalid closing tag "%s"', fp.NR, line[1])
                 self.jumpToEndTag( fp )
                 return self.endHandler( newObj, obj )
             else:
-                NTerror('SMLhandler.handle: line %d incomplete: "%s"', fp.NR, line[0])
+                nTerror('SMLhandler.handle: line %d incomplete: "%s"', fp.NR, line[0])
             #end if
             line = SMLhandler.readline( fp )
         #end while
         # we should not be here
-        NTerror('SMLhandler.handle: unterminated %s', self)
+        nTerror('SMLhandler.handle: unterminated %s', self)
         return None
     #end def
 
@@ -213,7 +213,7 @@ Example file:
                 return
             line = self.readline(fp)
         #end while
-        NTerror('SMLhandler.jumpToEndTag: line %d, endTag "%s" not found', fp.NR, self.endTag)
+        nTerror('SMLhandler.jumpToEndTag: line %d, endTag "%s" not found', fp.NR, self.endTag)
         return
     #end def
 
@@ -247,7 +247,8 @@ Example file:
         return an list instance with line and split line
         """
         line = fp.readline()
-        if len(line) == 0: return None
+        if len(line) == 0: 
+            return None
         line = line[0:-1]
 #        result = NTlist(line, *line.split())
         #print '>', result, '<'
@@ -255,7 +256,7 @@ Example file:
         if SMLhandler.debug: 
 #            s = sprintf('%s l:%d> %s\n', SMLfileVersion, fp.NR, [line]+line.split())
             s = sprintf('%s l:%d> %s', SMLfileVersion, fp.NR, line)
-            NTmessage(s)
+            nTmessage(s)
         return [line]+line.split()
     #end def
     readline = staticmethod( readline )
@@ -267,9 +268,9 @@ Example file:
 
         Returns newObj or None on error.
         """
-#        NTdebug("--> fromFile")        
+#        nTdebug("--> fromFile")        
         if not os.path.exists( fileName ):
-            NTerror('Error SMLhandler.fromFile: file "%s" does not exist\n', fileName )
+            nTerror('Error SMLhandler.fromFile: file "%s" does not exist\n', fileName )
             return None
         #end if
         fp   = smlFile( fileName, 'r' )
@@ -278,10 +279,10 @@ Example file:
             handler = SMLstarthandlers[line[1]]
             newObj  = handler.handle( line, fp, obj, **kwds )
         else:
-            NTerror('SMLhandler.fromFile: invalid SML file line %d "%s"', fp.NR, line[0])
+            nTerror('SMLhandler.fromFile: invalid SML file line %d "%s"', fp.NR, line[0])
 #        newObj  = smlhandler.handle( None, fp, obj )
         fp.close()
-#        NTdebug('Restored %s from "%s"', newObj, fileName )
+#        nTdebug('Restored %s from "%s"', newObj, fileName )
         return newObj
     #end def
     fromFile = staticmethod( fromFile )
@@ -293,20 +294,20 @@ Example file:
         """
         fp = open( fileName, 'w' )
         if not fp:
-            NTerror('SMLhandle.toFile: opening "%s"\n', fileName)
+            nTerror('SMLhandle.toFile: opening "%s"\n', fileName)
             return None
         #end if
         fprintf( fp, '%s %s\n', smlhandler.startTag, SMLversion )
 
         if not hasattr(object,'SMLhandler'):
-            NTerror('SMLHandler.toFile: object "%s" without SMLhandler method', object)
+            nTerror('SMLHandler.toFile: object "%s" without SMLhandler method', object)
             fp.close()
             return None
 
         object.SMLhandler.toSML( object, fp, **kwds )
         fprintf( fp, '%s\n', smlhandler.endTag )
 
-#        NTdebug('saved %s to "%s"', object, fileName ) # JFD adds; it's a duplicate of the NTdetail message.
+#        nTdebug('saved %s to "%s"', object, fileName ) # JFD adds; it's a duplicate of the nTdetail message.
         #end if
         return object
     #end def
@@ -355,7 +356,7 @@ class SMLNTdictHandler( SMLhandler ):
     #end def
 
     def handle(self, line, fp, obj=None):
-#        NTdebug("Now in SMLNTdictHandler#handle at line: %s" % str(line))
+#        nTdebug("Now in SMLNTdictHandler#handle at line: %s" % str(line))
         dictObj = NTdict()
         return self.dictHandler(dictObj, fp, obj)
     #end def
@@ -390,7 +391,7 @@ class SMLNTvalueHandler( SMLhandler ):
     #end def
 
     def handle(self, line, fp, obj=None):
-        NTdebug("Now in %s#handle at line: %s" % (getCallerName(), str(line)))
+        nTdebug("Now in %s#handle at line: %s" % (getCallerName(), str(line)))
         dictObj = NTvalue(NaN)
         return self.dictHandler(dictObj, fp, obj)
     #end def
@@ -431,17 +432,21 @@ class SMLMoleculeHandler( SMLhandler ):
         nameTuple = eval(' '.join(line[2:]))
         mol = Molecule( nameTuple[0] )
         if not mol:
-            NTerror('SMLMoleculeHandler.handle: invalid line "%s"', line[0])
+            nTerror('SMLMoleculeHandler.handle: invalid line "%s"', line[0])
             return None
         #end if
 
-        line = SMLhandler.readline( fp )
-        l = len(line)
-        while (line):
-            if l > 0 and line[1]==self.endTag:
+        line = SMLhandler.readline( fp ) # Array of line plus words
+        while line:
+            n = len(line) # Number of words plus one.
+            if n == 0:
+                nTerror('SMLMoleculeHandler.handle: empty line')            
+#            nTdebug("Line length (+1): %s and line: %s" % (n,line))
+            key = line[1]
+            if key==self.endTag:
                 return self.endHandler( mol, None )
             # version 0.2: implement recursion
-            elif l > 3 and line[1]=='_sequence'  and SMLstarthandlers.has_key(line[3]):
+            if n > 3 and key=='_sequence'  and SMLstarthandlers.has_key(line[3]):
                 _sequence = SMLstarthandlers[line[3]].handle( [' '.join(line[3:])] + line[3:], fp, mol )
                 # Restore the sequence
                 #print '>>', _sequence
@@ -456,32 +461,31 @@ class SMLMoleculeHandler( SMLhandler ):
                         mol.addResidue( chain, resName, resNum, convention, Nterminal, Cterminal )
                     #end for
                 #end if
-            elif l > 3 and SMLstarthandlers.has_key(line[3]):
-                mol[line[1]] = SMLstarthandlers[line[3]].handle( [' '.join(line[3:])] + line[3:], fp, mol )
-            elif l > 0 and SMLendhandlers.has_key(line[1]):
-                NTerror('SMLMoleculeHandler.handle: skipping invalid closing tag "%s"', line[1])
-            elif l > 3:
-                mol[line[1]] = eval(' '.join(line[3:]))
+            elif n > 3 and SMLstarthandlers.has_key(line[3]):
+                mol[key] = SMLstarthandlers[line[3]].handle( [' '.join(line[3:])] + line[3:], fp, mol )
+            elif SMLendhandlers.has_key(key):
+                nTerror('SMLMoleculeHandler.handle: skipping invalid closing tag "%s"', key)
+            elif n > 3:
+                mol[key] = eval(' '.join(line[3:]))
             else:
-                NTerror('SMLMoleculeHandler.handle: incomplete line "%s"', line[0])
+                nTerror('SMLMoleculeHandler.handle: incomplete line "%s"', line[0])
             #end if
             line = SMLhandler.readline( fp )
-
         #end while
         # we should not be here
-        NTerror('SMLMoleculeHandler.handle: unterminated %s', self)
+        nTerror('SMLMoleculeHandler.handle: unterminated %s', self)
         return None
     #end def
 
     def endHandler(self, mol, _tmp=None):
-#        NTdebug("In %s with SMLfileVersion %s" % ( getCallerName(), SMLfileVersion ))
+#        nTdebug("In %s with SMLfileVersion %s" % ( getCallerName(), SMLfileVersion ))
         # Restore linkage
         mol.chains = mol._children
         mol._check()
         
         if SMLfileVersion < 0.25:
             if mol._convertResonanceSources(SMLfileVersion):
-                NTerror("Failed SMLMoleculeHandler#" + getCallerName())
+                nTerror("Failed SMLMoleculeHandler#" + getCallerName())
             # end if
         # end if            
         return mol
@@ -538,14 +542,15 @@ class SMLChainHandler( SMLhandler ):
         # The handle restores the attributes of chain
         # Needs a valid molecule
         #print 'Chain.handle>', line, len(line)
-        if molecule == None: return None
+        if molecule == None: 
+            return None
 
         nameTuple = eval(' '.join(line[2:]))
         #print '>>', nameTuple, len(nameTuple)
 
         chain = molecule.decodeNameTuple(nameTuple)
         if chain == None:
-            NTerror('SMLChainHandler.handle: invalid nameTuple %s, ==> Skipped chain', nameTuple)
+            nTerror('SMLChainHandler.handle: invalid nameTuple %s, ==> Skipped chain', nameTuple)
             self.jumpToEndTag(fp)
             return None
         #end if
@@ -588,12 +593,13 @@ class SMLResidueHandler( SMLhandler ):
     def handle(self, line, fp, molecule=None):
         # The handle restores the attributes of residue
         # Needs a valid molecule
-        if molecule == None: return None
+        if molecule == None: 
+            return None
 
         nameTuple = eval(' '.join(line[2:]))
         res = molecule.decodeNameTuple(nameTuple)
         if res == None:
-            NTwarning('SMLResidueHandler.handle: line %d, skipping nameTuple %s', fp.NR, str(nameTuple))
+            nTwarning('SMLResidueHandler.handle: line %d, skipping nameTuple %s', fp.NR, str(nameTuple))
             self.jumpToEndTag(fp)
             return None
         #end if
@@ -642,13 +648,13 @@ class SMLAtomHandler( SMLhandler ):
         atm = molecule.decodeNameTuple(nameTuple)
         if atm == None: # TODO: check this code.
             # Could not find anything: to maintain compatibility of all Jurgen's old stuff; try to add it on the fly.
-#            NTdebug('SMLAtomHandler.handle: line %d, could not properly decode nameTuple %s', fp.NR, str(nameTuple))
+#            nTdebug('SMLAtomHandler.handle: line %d, could not properly decode nameTuple %s', fp.NR, str(nameTuple))
             resTuple = list(nameTuple)
             resTuple[3] = None
             resTuple = tuple(resTuple)
             res = molecule.decodeNameTuple(resTuple)
             if not res:
-                NTwarning('SMLAtomHandler.handle: line %d, could not get residue, skipping nameTuple %s', fp.NR, str(nameTuple))
+                nTwarning('SMLAtomHandler.handle: line %d, could not get residue, skipping nameTuple %s', fp.NR, str(nameTuple))
                 self.jumpToEndTag(fp)
                 return None
 
@@ -659,14 +665,14 @@ class SMLAtomHandler( SMLhandler ):
                     or (res.Nterminal and aDef.translate(INTERNAL_0) == 'HN')
                     or (not res.Cterminal and isCterminalAtom(aDef))
                    ):
-#                    NTdebug('SMLAtomHandler.handle: line %d, skipping terminal atom: %s', fp.NR, str(nameTuple))
+#                    nTdebug('SMLAtomHandler.handle: line %d, skipping terminal atom: %s', fp.NR, str(nameTuple))
                     self.jumpToEndTag(fp)
                     return None
             #end if
 
             atm = res.addAtom(nameTuple[3], convention=nameTuple[6])
             if not atm:
-                NTwarning('Failed to add atom in SMLAtomHandler to residue for tuple %s' % str(nameTuple))
+                nTwarning('Failed to add atom in SMLAtomHandler to residue for tuple %s' % str(nameTuple))
                 self.jumpToEndTag(fp)
                 return None
             #end if
@@ -738,7 +744,7 @@ Atom.SMLhandler = SMLAtomHandler()
 #            return c
 #        #end if
 #        # We should not be here
-#        NTerror('SMLCoordinateHandler.handle: missing Coordinate endTag')
+#        nTerror('SMLCoordinateHandler.handle: missing Coordinate endTag')
 #        return None
 #    #end def
 #
@@ -747,7 +753,7 @@ Atom.SMLhandler = SMLAtomHandler()
 #        if obj == None: return None
 #        atm = molecule.decodeNameTuple(c.atomNameTuple)
 #        if atm == None:
-#            NTerror('SMLCoordinateHandler.endHandler: invalid atomNameTuple (%s)', c.atomNameTuple)
+#            nTerror('SMLCoordinateHandler.endHandler: invalid atomNameTuple (%s)', c.atomNameTuple)
 #            return None
 #        #end if
 #        c.atom = atm
@@ -802,16 +808,16 @@ class SMLPeakHandler( SMLhandler ):
 
     def endHandler(self, pk, project):
         if project == None:
-            NTerror('Error SMLPeakHandler.endHandler: Undefined project\n')
+            nTerror('Error SMLPeakHandler.endHandler: Undefined project\n')
             return None
         #end if
         if project.molecule == None:
-            NTerror('Error SMLPeakHandler.endHandler: Undefined molecule\n')
+            nTerror('Error SMLPeakHandler.endHandler: Undefined molecule\n')
             return None
         #end if
 
         if SMLfileVersion <= 0.21:
-            pk.resonances = NTfill(None,pk.dimension)
+            pk.resonances = nTfill(None,pk.dimension)
             pk.positions  = NTlist(*pk.positions)
             del(pk['hasHeight'])
             del(pk['hasVolume'])
@@ -874,8 +880,10 @@ class SMLPeakListHandler( SMLhandler ):
 
     def handle(self, line, fp, project=None):
         pl = PeakList( *line[2:] )
-        if not self.listHandler(pl, fp, project): return None
-        if project: project.peaks.append( pl )
+        if not self.listHandler(pl, fp, project): 
+            return None
+        if project: 
+            project.peaks.append( pl )
         return pl
     #end def
 
@@ -908,8 +916,10 @@ class SMLDistanceRestraintHandler( SMLhandler ):
                 dr.appendPair( (p0, p1) )
                 continue
             #end if
-            if not p0: NTerror('SMLDistanceRestraintHandler.endHandler: error p0 decoding %s', ap[0])
-            if not p1: NTerror('SMLDistanceRestraintHandler.endHandler: error p1 decoding %s', ap[1])
+            if not p0: 
+                nTerror('SMLDistanceRestraintHandler.endHandler: error p0 decoding %s', ap[0])
+            if not p1: 
+                nTerror('SMLDistanceRestraintHandler.endHandler: error p1 decoding %s', ap[1])
         #end for
         return dr
     #end def
@@ -942,7 +952,8 @@ class SMLDistanceRestraintListHandler( SMLhandler ):
 
     def handle(self, line, fp, project=None):
         drl = DistanceRestraintList( *line[2:] )
-        if not self.listHandler(drl, fp, project): return None
+        if not self.listHandler(drl, fp, project): 
+            return None
         project.distances.append( drl )
         return drl
     #end def
@@ -969,7 +980,7 @@ class SMLDihedralRestraintHandler( SMLhandler ):
         # Parse the atoms nameTuples, map to molecule
         dr.atoms = decode( dr.atoms, project )
         if dr.atoms == None or None in dr.atoms:
-            NTerror('SMLDihedralRestraintHandler.endHandler: invalid atom(s) %s', dr.atoms)
+            nTerror('SMLDihedralRestraintHandler.endHandler: invalid atom(s) %s', dr.atoms)
         return dr
     #end def
 
@@ -995,7 +1006,8 @@ class SMLDihedralRestraintListHandler( SMLhandler ):
 
     def handle(self, line, fp, project=None):
         drl = DihedralRestraintList( *line[2:] )
-        if not self.listHandler(drl, fp, project): return None
+        if not self.listHandler(drl, fp, project): 
+            return None
         project.dihedrals.append( drl )
         return drl
     #end def
@@ -1020,7 +1032,8 @@ class SMLRDCRestraintHandler( SMLhandler ):
 
     def endHandler(self, dr, project):
         # Parse the atoms nameTuples, map to molecule
-        if project == None or project.molecule == None: return dr
+        if project == None or project.molecule == None: 
+            return dr
         aps = dr.atomPairs
         dr.atomPairs = NTlist()
         for ap in aps:
@@ -1029,8 +1042,10 @@ class SMLRDCRestraintHandler( SMLhandler ):
             if p0 and p1:
                 dr.appendPair( (p0, p1) )
             else:
-                if not p0: NTerror('SMLRDCRestraintHandler.endHandler: error decoding %s', ap[0])
-                if not p1: NTerror('SMLRDCRestraintHandler.endHandler: error decoding %s', ap[1])
+                if not p0: 
+                    nTerror('SMLRDCRestraintHandler.endHandler: error decoding %s', ap[0])
+                if not p1: 
+                    nTerror('SMLRDCRestraintHandler.endHandler: error decoding %s', ap[1])
             #end if
         #end for
         return dr
@@ -1064,7 +1079,8 @@ class SMLRDCRestraintListHandler( SMLhandler ):
 
     def handle(self, line, fp, project=None):
         drl = RDCRestraintList( *line[2:] )
-        if not self.listHandler(drl, fp, project): return None
+        if not self.listHandler(drl, fp, project): 
+            return None
         project.rdcs.append( drl )
         return drl
     #end def
@@ -1111,29 +1127,30 @@ class SMLNTListWithAttrHandler( SMLhandler ):
     SML_SAVE_ATTRIBUTE_LIST = None # overwritten by individual class instance to be saved.
     
     def handle(self, line, fp, obj=None):
-#        NTdebug("Now in SMLNTListWithAttrHandler#handle at line: %s" % str(line))
+#        nTdebug("Now in SMLNTListWithAttrHandler#handle at line: %s" % str(line))
         rlTop = NTdict()
         rlTop = self.dictHandler(rlTop, fp)        
         if rlTop == None:
-            NTerror("Failed to read resonance list top object.") 
+            nTerror("Failed to read resonance list top object.") 
             return None
         if not obj:
-            NTerror("In SMLNTListWithAttrHandler#endHandler no obj initialized")
+            nTerror("In SMLNTListWithAttrHandler#endHandler no obj initialized")
             return
         # Skip the actual resonance creation because that is already done by molecule's handle.
-        rl = obj.newResonances(skipAtomResonanceCreation = True ) # obj is molecule This line is the only ResonanceList specific action to generalize further. 
+        # obj is molecule This line is the only ResonanceList specific action to generalize further. 
+        rl = obj.newResonances(skipAtomResonanceCreation = True ) 
         for key in self.SML_SAVE_ATTRIBUTE_LIST:
             if not hasattr( rlTop, key ):
-                NTerror("Failed to read expected attribute in top object: %s" % key)
+                nTerror("Failed to read expected attribute in top object: %s" % key)
                 return
             setattr(rl, key, getattr(rlTop,key))
 #        rl.addList(rlTop.theList) # not done yet.
-#        NTmessage("==> Restored %s" % rl)
+#        nTmessage("==> Restored %s" % rl)
         return rl
     #end def
     
 #    def endHandler(self, rl, project):
-#        NTdebug("Now in SMLNTListWithAttrHandler#endHandler doing nothing")
+#        nTdebug("Now in SMLNTListWithAttrHandler#endHandler doing nothing")
 #        pass
     #end def
         
@@ -1145,7 +1162,7 @@ class SMLNTListWithAttrHandler( SMLhandler ):
         theDict = NTdict()
         for key in self.SML_SAVE_ATTRIBUTE_LIST:
             if not hasattr( rl, key ):
-                NTcodeerror("%s failed to see attribute in top object: %s" % (rl, key))
+                nTcodeerror("%s failed to see attribute in top object: %s" % (rl, key))
                 return
             theDict[key] = getattr(rl, key)
         theDict.theList = NTlist()
@@ -1227,25 +1244,26 @@ class SMLResidueDefHandler( SMLhandler ):
 
     def handle(self, line, fp, molDef=None):
         if molDef == None:
-            NTerror('SMLResidueDefHandler.handle: file "%s" line %d, undefined molDef', fp.name, fp.NR)
+            nTerror('SMLResidueDefHandler.handle: file "%s" line %d, undefined molDef', fp.name, fp.NR)
             self.jumpToEndTag(fp)
             return None
         #end if
         if SMLfileVersion < 0.24:
             if len(line) < 5:
-                NTerror('SMLResidueDefHandler.handle: file "%s" line %d, incomplete ResidueDef syntax "%s"', fp.name, fp.NR, line)
+                nTerror('SMLResidueDefHandler.handle: file "%s" line %d, incomplete ResidueDef syntax "%s"', fp.name, fp.NR, line)
                 self.jumpToEndTag(fp)
                 return None
             #end if
 #            if line[4] != INTERNAL:
-#                NTerror('SMLResidueDefHandler.handle: file "%s" line %d, convention "%s" differs from current (%s)', fp.name, fp.NR, line[4], INTERNAL)
+#                nTerror('SMLResidueDefHandler.handle: file "%s" line %d, convention "%s" differs from current (%s)', 
+#                        fp.name, fp.NR, line[4], INTERNAL)
 #                self.jumpToEndTag(fp)
 #                return None
 #            #end if
             resDef = molDef.appendResidueDef(line[2], shortName=line[3])
         else:
             if len(line) < 4:
-                NTerror('SMLResidueDefHandler.handle: file "%s" line %d, incomplete ResidueDef syntax "%s"', fp.name, fp.NR, line)
+                nTerror('SMLResidueDefHandler.handle: file "%s" line %d, incomplete ResidueDef syntax "%s"', fp.name, fp.NR, line)
                 self.jumpToEndTag(fp)
                 return None
             #end if
@@ -1253,7 +1271,7 @@ class SMLResidueDefHandler( SMLhandler ):
         #endif
 
         if not resDef:
-            NTerror('SMLResidueDefHandler.handle: file "%s" line %d, error initiating ResidueDef instance "%s"', fp.name, fp.NR, line[2])
+            nTerror('SMLResidueDefHandler.handle: file "%s" line %d, error initiating ResidueDef instance "%s"', fp.name, fp.NR, line[2])
             self.jumpToEndTag(fp)
             return None
         #end if
@@ -1312,12 +1330,12 @@ class SMLDihedralDefHandler( SMLhandler ):
 
     def handle(self, line, fp, resDef=None):
         if resDef == None:
-            NTerror('DihedralDef.handle: line %d, undefined resDef', fp.NR)
+            nTerror('DihedralDef.handle: line %d, undefined resDef', fp.NR)
             self.jumpToEndTag(fp)
             return None
         #end if
         if len(line) < 3:
-            NTerror('DihedralDef.handle: line %d, incomplete DihedralDef syntax "%s"', fp.NR, line)
+            nTerror('DihedralDef.handle: line %d, incomplete DihedralDef syntax "%s"', fp.NR, line)
             self.jumpToEndTag(fp)
             return None
         #end if
@@ -1345,10 +1363,10 @@ class SMLDihedralDefHandler( SMLhandler ):
             atms = []
             for resId,atmName in dihedDef.atoms:
                 if resId != 0:
-                    NTwarning('DihedralDef.exportDef: %s topology (%d,%s) skipped translation', dihedDef, resId, atmName)
+                    nTwarning('DihedralDef.exportDef: %s topology (%d,%s) skipped translation', dihedDef, resId, atmName)
                     atms.append( (resId,atmName) )
                 elif not atmName in dihedDef.residueDef:
-                    NTerror('DihedralDef.exportDef: %s topology (%d,%s) not decoded', dihedDef, resId, atmName)
+                    nTerror('DihedralDef.exportDef: %s topology (%d,%s) not decoded', dihedDef, resId, atmName)
                     atms.append( (resId,atmName) )
                 else:
                     atm = dihedDef.residueDef[atmName]
@@ -1376,12 +1394,12 @@ class SMLAtomDefHandler( SMLhandler ):
 
     def handle(self, line, fp, resDef=None):
         if resDef == None:
-            NTerror('AtomDef.handle: line %d, undefined resDef', fp.NR)
+            nTerror('AtomDef.handle: line %d, undefined resDef', fp.NR)
             self.jumpToEndTag(fp)
             return None
         #end if
         if len(line) < 3:
-            NTerror('AtomDef.handle: line %d, incomplete AtomDef syntax "%s"', fp.NR, line)
+            nTerror('AtomDef.handle: line %d, incomplete AtomDef syntax "%s"', fp.NR, line)
             self.jumpToEndTag(fp)
             return None
         #end if
@@ -1410,10 +1428,10 @@ class SMLAtomDefHandler( SMLhandler ):
             top2 = []
             for resId,atmName in atmDef.topology:
                 if resId != 0:
-                    NTwarning('AtomDef.exportDef: %s topology (%d,%s) skipped translation', atmDef, resId, atmName)
+                    nTwarning('AtomDef.exportDef: %s topology (%d,%s) skipped translation', atmDef, resId, atmName)
                     top2.append( (resId,atmName) )
                 elif not atmName in atmDef.residueDef:
-                    NTerror('AtomDef.exportDef: %s topology (%d,%s) not decoded', atmDef, resId, atmName)
+                    nTerror('AtomDef.exportDef: %s topology (%d,%s) not decoded', atmDef, resId, atmName)
                     top2.append( (resId,atmName) )
                 else:
                     atm = atmDef.residueDef[atmName]
@@ -1432,7 +1450,7 @@ class SMLAtomDefHandler( SMLhandler ):
             for a in atmDef.real:
                 adef = atmDef.residueDef.getAtomDefByName( a )
                 if adef == None:
-                    NTerror('AtomDef.exportDef: %s real atom "%s" not decoded', atmDef, a)
+                    nTerror('AtomDef.exportDef: %s real atom "%s" not decoded', atmDef, a)
                 else:
                     real2.append( adef.translate( convention ) )
                 #end if
@@ -1447,7 +1465,7 @@ class SMLAtomDefHandler( SMLhandler ):
             pseudo2 = None
             adef = atmDef.residueDef.getAtomDefByName( atmDef.pseudo )
             if adef == None:
-                NTerror('AtomDef.exportDef: %s pseudo atom "%s" not decoded', atmDef, atmDef.pseudo)
+                nTerror('AtomDef.exportDef: %s pseudo atom "%s" not decoded', atmDef, atmDef.pseudo)
             else:
                 pseudo2 = adef.translate( convention )
             #end for
@@ -1490,7 +1508,7 @@ def SML2obj( smlFile, externalObject=None ):
     """
     Generate obj from smlFile
     """
-#    NTdebug("--> SML2obj")
+#    nTdebug("--> SML2obj")
     obj = smlhandler.fromFile(smlFile, externalObject)
     return obj
 #end def

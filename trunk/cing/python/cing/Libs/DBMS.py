@@ -5,6 +5,7 @@ This class thinks of a bunch of CSV files (such as created by Mac Numbers in iWo
 much like the code in Wattos.Database.DBMS.
 @author: jd
 '''
+
 from StringIO import StringIO
 from cing.Libs.NTutils import * #@UnusedWildImport
 import csv
@@ -65,10 +66,10 @@ class Relation():
     def getColumnByIdx(self, idx):
         'Return None on error'
         if idx < 0:
-           NTerror("Found negative idx %s in getColumnByIdx" % idx)
+           nTerror("Found negative idx %s in getColumnByIdx" % idx)
            return None
         if idx >= self.sizeColumns():
-           NTerror("Found idx %s in getColumnByIdx which is equal or larger than self.sizeColumns(): %s" % (idx, self.sizeColumns()))
+           nTerror("Found idx %s in getColumnByIdx which is equal or larger than self.sizeColumns(): %s" % (idx, self.sizeColumns()))
            return None
         label = self.columnOrder[idx]
         return self.attr[label]
@@ -84,7 +85,7 @@ class Relation():
 
     def renameColumn(self, idx, label):
         oldLabel = self.columnOrder[idx]
-#        NTdebug("Renaming column %s at idx %s to %s" % (oldLabel, idx, label))
+#        nTdebug("Renaming column %s at idx %s to %s" % (oldLabel, idx, label))
         col = self.getColumn(oldLabel)
         del self.attr[oldLabel]
         self.attr[label] = col
@@ -93,7 +94,7 @@ class Relation():
 
     def getColumn(self, label):
         if label not in self.columnOrder:
-            NTerror("Requested column label is absent in table: %s" % self.name)
+            nTerror("Requested column label is absent in table: %s" % self.name)
             return None
         return self.attr[label]
 
@@ -119,20 +120,20 @@ class Relation():
 #        //General.showDebug(" and dtd             : " + dtd_file_name);
 
         url_links = 'file://' + file_name
-#        NTdebug("Reading from %s" % (url_links))
+#        nTdebug("Reading from %s" % (url_links))
         try:
             resource = urllib.urlopen(url_links)
             reader = csv.reader(resource)
         except IOError:
             NTtracebackError()
-            NTerror("Couldn't open url for reader: " + url_links)
+            nTerror("Couldn't open url for reader: " + url_links)
             return True
 
         ncols = -1
         try:
             if containsHeaderRow:
                 row = reader.next()
-#                NTdebug("read header: %s" % row)
+#                nTdebug("read header: %s" % row)
                 ncols = len(row)
                 for c in range(ncols):
                     self.insertColumn(label=row[c])
@@ -142,16 +143,16 @@ class Relation():
                     for c in range(ncols):
                         self.insertColumn()
                 if len(row) != ncols:
-                    NTerror("Failed to read correct number of columns on line: %s" % row)
+                    nTerror("Failed to read correct number of columns on line: %s" % row)
                     return True
                 for c in range(ncols):
                     label = self.columnOrder[c]
-                    l = self.attr[label]
-                    l.append(row[c])
+                    myList = self.attr[label]
+                    myList.append(row[c])
         # Never know when the connection is finally empty.
         except IOError:
             pass
-#        NTdebug("Read %8d rows %2d cols to relation %s" % (self.sizeRows(), self.sizeColumns(), self.name))
+#        nTdebug("Read %8d rows %2d cols to relation %s" % (self.sizeRows(), self.sizeColumns(), self.name))
     # end def
 
 
@@ -178,16 +179,16 @@ class Relation():
                 colStrList.append( str(dataAsMatrix[c][r]) )
             # end for c
             rowStr = ','.join(colStrList)
-#            NTdebug("Adding rowStr: %s" % rowStr)
+#            nTdebug("Adding rowStr: %s" % rowStr)
             rowStrList.append( rowStr )
         # end for r
         resultStr = txt + '\n'.join(rowStrList)
 
         if not file_name:
             file_name = self.name + '.csv'
-        NTmessage("Will write %s nrows and %s ncols to %s" % (nrows,ncols,file_name))
+        nTmessage("Will write %s nrows and %s ncols to %s" % (nrows,ncols,file_name))
         if writeTextToFile(file_name, resultStr):
-            NTerror("Failed to write string to file: %s" % file_name)
+            nTerror("Failed to write string to file: %s" % file_name)
             return True
 
     def getHash(self, keyColumnLabel = None, ignoreDuplicateKeyWithoutWarning = False, useSingleValueOfColumn = -1):
@@ -225,9 +226,9 @@ class Relation():
 
         if duplicateKeyFound:
             if ignoreDuplicateKeyWithoutWarning:
-                NTdebug(duplicateKeyFound)
+                nTdebug(duplicateKeyFound)
             else:
-                NTwarning(duplicateKeyFound)
+                nTwarning(duplicateKeyFound)
         return dic
 
     def isValidColumnIdx( self, columnIdx ):
@@ -239,7 +240,7 @@ class Relation():
     def getColumnLabel( self, index ):
         'Return False on error'
         if not self.isValidColumnIdx(index):
-            NTerror("in getColumnLabel: given index is not valid for columns: %s" % index);
+            nTerror("in getColumnLabel: given index is not valid for columns: %s" % index);
             return
         label = self.columnOrder[index]
         return label
@@ -342,7 +343,7 @@ class Relation():
             for r in range(sizeRows):
                 rowString = self.toStringRow( r )
                 if rowString == None:
-                    NTerror("Failed to get row as a string for row %s from relation %s" % (r,self.name))
+                    nTerror("Failed to get row as a string for row %s from relation %s" % (r,self.name))
                     return None
                 file_str.write( rowString ) # Get the row representation.
                 file_str.write('\n')
@@ -378,7 +379,7 @@ class Relation():
         for c in range(sizeColumns):
             valueString = self.getValueString(row,c)
             if valueString == None:
-                NTerror("Failed to get value as a string for row %s, column %s from relation %s" % (row,c,self.name))
+                nTerror("Failed to get value as a string for row %s, column %s from relation %s" % (row,c,self.name))
                 return None
             file_str.write( self.getValueString(row,c) )
             if c < sizeColumnsMinusOne:
@@ -412,13 +413,13 @@ class Relation():
         label = self.getColumnLabel(columnIdx);
 #        // Sanity checks
         if label == False:
-            NTerror("Failed to Relation.getValue for columnIdx idx %s. Existing columnIdx labels:" % (
+            nTerror("Failed to Relation.getValue for columnIdx idx %s. Existing columnIdx labels: %s" % (
                 columnIdx, str(self.columnOrder)))
             return None
         columnIdx = self.getColumnByIdx(columnIdx)
         sizeRows = self.sizeRows()
         if rowIdx < 0 or rowIdx >= self.sizeRows():
-            NTerror("Failed to Relation.getValue for rowIdx idx %s is not in range of (0,%s) for columnIdx %s." % (
+            nTerror("Failed to Relation.getValue for rowIdx idx %s is not in range of (0,%s) for columnIdx %s." % (
                 rowIdx, label, sizeRows))
             return None
 
@@ -445,7 +446,7 @@ class Relation():
         result = []
         for _i in range(sizeRows):
             result.append([None] * sizeColumns)
-#        NTdebug("result:\n%s" % result)
+#        nTdebug("result:\n%s" % result)
         for colIdx in range(sizeColumns):
             column = self.getColumnByIdx(colIdx)
             for rowIdx in range(sizeRows):
@@ -476,11 +477,11 @@ class Relation():
         return True on error
         """
         table = self.toLol()
-#        NTdebug("Table setup:\n%s" % table)
+#        nTdebug("Table setup:\n%s" % table)
         tableNew = sort_table(table, columnList)
-#        NTdebug("tableNew:\n%s" % tableNew)
+#        nTdebug("tableNew:\n%s" % tableNew)
         if self.fromLol(tableNew):
-            NTerror("Failed " + getCallerName())
+            nTerror("Failed " + getCallerName())
             return True
     # end def
 # end class
@@ -495,8 +496,9 @@ class DBMS():
         'return True on error'
         csvFilesRead = len(relationNames)
         for i in range(csvFilesRead):
-            if self.readCsvRelation( relationNames[i], csvFileDir=csvFileDir, csvDtdFileDir=csvDtdFileDir, checkConsistency=checkConsistency, showChecks=showChecks, containsHeaderRow=containsHeaderRow):
-                NTerror("Failed to read relation: " + relationNames[i])
+            if self.readCsvRelation( relationNames[i], csvFileDir=csvFileDir, csvDtdFileDir=csvDtdFileDir, 
+                                     checkConsistency=checkConsistency, showChecks=showChecks, containsHeaderRow=containsHeaderRow):
+                nTerror("Failed to read relation: " + relationNames[i])
                 return True
 
     def readCsvRelation(self, relationName, csvFileDir='.',
@@ -504,59 +506,59 @@ class DBMS():
         'return True on error'
         relation = Relation(relationName, self)
         if showMessages:
-            NTmessage("Reading relation : " + relation.name)
+            nTmessage("Reading relation : " + relation.name)
         csvFileDir = os.path.abspath(csvFileDir)
         csv_fileName = os.path.join(csvFileDir, relation.name + ".csv")
         if relation.readCsvFile(csv_fileName, containsHeaderRow):
-            NTerror("Failed to read csv file: " + csv_fileName)
+            nTerror("Failed to read csv file: " + csv_fileName)
             return True
     # end def
 
 # Convenience method
 def getRelationFromCsvFile( csvPath, containsHeaderRow=True):
-    'Return True on error'
+    'Return None on error'
     dbms = DBMS()
-    (directory, relationName, _extension) = NTpath(csvPath)
+    (directory, relationName, _extension) = nTpath(csvPath)
     if dbms.readCsvRelation( relationName, csvFileDir=directory, containsHeaderRow=containsHeaderRow ):
-        NTerror("Failed to getRelationFromCsvFile")
-        return True
+        nTerror("Failed to getRelationFromCsvFile")
+        return
     return dbms.tables[relationName]
 # end def
 
 def addColumnHeaderRowToCsvFile( csvPath, columnOrder ):
     'Return True on error.'
-    r = getRelationFromCsvFile(csvPath, False)
-    if r == True:
-        NTerror("Failed to read file in " + getCallerName())
+    relation = getRelationFromCsvFile(csvPath, False)
+    if not relation:
+        nTerror("Failed to read file in " + getCallerName())
         return True
-    lread = r.sizeColumns()
+    lread = relation.sizeColumns()
     lnew = len(columnOrder)
     if lread != lnew:
-        NTerror("Read %s columns but got number of names for them: %s" % (lread, lnew))
+        nTerror("Read %s columns but got number of names for them: %s" % (lread, lnew))
         return True
-#    NTdebug("Read %s" % r)
+#    nTdebug("Read %s" % r)
     for idx in range(lnew):
-        r.renameColumn(idx, columnOrder[idx])
-    r.writeCsvFile()
+        relation.renameColumn(idx, columnOrder[idx])
+    relation.writeCsvFile()
 # end def
 
 def sortRelationByColumnListFromCsvFile( csvPath, columnList=None, containsHeaderRow=True):
     'Return True on error'
     dbms = DBMS()
-    (directory, relationName, _extension) = NTpath(csvPath)
+    (directory, relationName, _extension) = nTpath(csvPath)
     if dbms.readCsvRelation( relationName, csvFileDir=directory, containsHeaderRow=containsHeaderRow ):
-        NTerror("Failed to getRelationFromCsvFile")
+        nTerror("Failed to readCsvRelation")
         return True
     r = dbms.tables[relationName]
     if columnList == None:
         columnList = [0]
-#    NTdebug("Relation read:\n%s" % r)
+#    nTdebug("Relation read:\n%s" % r)
     if r.sortRelationByColumnIdx(columnList):
-        NTerror("Failed to sortRelationByColumnIdx")
+        nTerror("Failed to sortRelationByColumnIdx")
         return True
-#    NTdebug("Relation sorted:\n%s" % r)
+#    nTdebug("Relation sorted:\n%s" % r)
     if r.writeCsvFile():
-        NTerror("Failed to writeCsvFile")
+        nTerror("Failed to writeCsvFile")
         return True
 # end def
 

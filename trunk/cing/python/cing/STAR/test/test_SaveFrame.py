@@ -22,16 +22,16 @@ class AllChecks(TestCase):
     tT.tagvalues=[['file_characteristics']]
     sf.tagtables.append(tT)
 
-    def testcheck_integrity(self):
+    def test_check_integrity(self):
         self.assertFalse(self.sf.check_integrity())
 
-    def testSTARrepresentation(self):
+    def test_STARrepresentation(self):
         starTextExpected = """\nsave_general_sf_title\n   loop_\n      _File_characteristics.Sf_category\n\nfile_characteristics\n\n   stop_\n\nsave_\n"""
 #        starTextExpected.replac(' \n', new)
         starText = self.sf.star_text()
         self.assertEqual(starText, starTextExpected)
         
-    def testgetSaveFrameCategory(self):
+    def test_getSaveFrameCategory(self):
         sfCategory = "file_characteristics"
         self.assertEqual(self.sf.getSaveFrameCategory(), sfCategory)
 

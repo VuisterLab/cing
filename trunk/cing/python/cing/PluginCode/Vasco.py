@@ -8,7 +8,7 @@ from glob import glob
 
 if True: # block
     if not getDeepByKeysOrAttributes(plugins, CCPN_STR, IS_INSTALLED_STR):
-        NTdebug("For %s missing required plugin or not installed: %s" % ( VASCO_STR, CCPN_STR))
+        nTdebug("For %s missing required plugin or not installed: %s" % ( VASCO_STR, CCPN_STR))
         raise ImportWarning(VASCO_STR)
     switchOutput(False)
     # CCPN part
@@ -34,7 +34,7 @@ if True: # block
         raise ImportWarning(VASCO_STR)
     finally: # finally fails in python below 2.5
         switchOutput(True)
-    NTdebug('Using Vasco')
+    nTdebug('Using Vasco')
 
 
 class Vasco(NTdict):
@@ -61,43 +61,43 @@ class Vasco(NTdict):
 
         # Project checks
         if not self.project.molecule:
-            NTerror('Vasco: no molecule defined')
+            nTerror('Vasco: no molecule defined')
             return True
         #end if
         if self.project.molecule.modelCount == 0:
-            NTwarning('Vasco: no models for "%s"', self.project.molecule)
+            nTwarning('Vasco: no models for "%s"', self.project.molecule)
             return
 
         if not self.project.molecule.hasAminoAcid():
-           NTwarning("Skipping Vasco as there is no protein in the current molecule")
+           nTwarning("Skipping Vasco as there is no protein in the current molecule")
            return
 
         # WI checks
         wiSummary = getDeepByKeys(mol, WHATIF_STR, 'summary')
         if not wiSummary:
-            NTmessage("Skipping Vasco because no What If summary")
+            nTmessage("Skipping Vasco because no What If summary")
             return
         whatifDir = self.project.path( mol.name, self.project.moleculeDirectories.whatif  )
         fileNames = glob(os.path.join(whatifDir,"wsvacc*.log"))
         if not fileNames:
-            NTmessage("Skipping Vasco because no What If accessibility files found.")
+            nTmessage("Skipping Vasco because no What If accessibility files found.")
             return
 
         # DSSP checks
         wiSummary = getDeepByKeys(mol, WHATIF_STR, 'summary')
         if not wiSummary:
-            NTmessage("Skipping Vasco because no What If summary")
+            nTmessage("Skipping Vasco because no What If summary")
             return
         whatifDir = self.project.path( mol.name, self.project.moleculeDirectories.whatif  )
         fileNames = glob(os.path.join(whatifDir,"wsvacc*.log"))
         if not fileNames:
-            NTmessage("Skipping Vasco because no What If accessibility files found.")
+            nTmessage("Skipping Vasco because no What If accessibility files found.")
             return
 
         dsspDir = self.project.path( mol.name, self.project.moleculeDirectories.dssp  )
         fileNames = glob(os.path.join(dsspDir,"model_*.dssp"))
         if not fileNames:
-            NTmessage("Skipping Vasco because no Dssp result files found.")
+            nTmessage("Skipping Vasco because no Dssp result files found.")
             return
 
 
@@ -105,11 +105,11 @@ class Vasco(NTdict):
         proteinResidues = mol.residuesWithProperties('protein' )
         proteinResidueCount = len( proteinResidues )
         if not proteinResidueCount:
-            NTerror("Found no amino acids whereas this was checked before")
+            nTerror("Found no amino acids whereas this was checked before")
             return True
         assignmentCountMap = getAssignmentCountMapForResList(proteinResidues)
         if not assignmentCountMap.overallCount():
-            NTmessage("Skipping Vasco because there is no chemical shift assignment.")
+            nTmessage("Skipping Vasco because there is no chemical shift assignment.")
             return
 
         # Try the CING based check
@@ -131,10 +131,10 @@ def runVasco(project, ccpnFolder = None):
     try:
         vasco = Vasco(project = project, ccpnFolder = ccpnFolder)
         if vasco._runVasco():
-            NTerror("runVasco: Failed _runVasco")
+            nTerror("runVasco: Failed _runVasco")
             return True
     except:
-        NTerror("Failed runVasco by throwable below.")
+        nTerror("Failed runVasco by throwable below.")
         NTtracebackError()
         return True
     return project
@@ -145,10 +145,10 @@ def restoreVasco( project, tmp=None ):
     Optionally restore Vasco results
     """
     if project.vascoStatus.completed:
-        NTmessage('==> Restoring Vasco results')
+        nTmessage('==> Restoring Vasco results')
         project.runVasco(parseOnly=True)
 #    else:
-#        NTdebug("In restoreVasco: project.vascoStatus.completed: %s" % project.vascoStatus.completed)
+#        nTdebug("In restoreVasco: project.vascoStatus.completed: %s" % project.vascoStatus.completed)
 #end def
 
 # register the functions

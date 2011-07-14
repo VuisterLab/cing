@@ -56,14 +56,14 @@ class dmElement():
     #end def
 #end class
 
-class Queeny( odict ):
+class Queeny( Odict ):
     """
     Class to run a queen-like analysis
 
     """
 
     def __init__(self, project ):
-        odict.__init__( self )
+        Odict.__init__( self )
         self.project  = project
         self.molecule = project.molecule
         for atm in self.molecule.allAtoms():
@@ -73,19 +73,19 @@ class Queeny( odict ):
     def __setitem__(self, key, value):
         if key[0] > key[1]:
             key = (key[1],key[0])
-        odict.__setitem__(self, key, value)
+        Odict.__setitem__(self, key, value)
     #end def
 
     def __getitem__(self, key):
         if key[0] > key[1]:
             key = (key[1],key[0])
-        return odict.__getitem__(self, key)
+        return Odict.__getitem__(self, key)
     #end def
 
     def setdefault(self, key, defaultValue):
         if key[0] > key[1]:
             key = (key[1],key[0])
-        return odict.setdefault( self, key, defaultValue)
+        return Odict.setdefault( self, key, defaultValue)
     #end def
 
     def has_key(self, key):
@@ -130,7 +130,7 @@ class Queeny( odict ):
     #end def
 
     def initTopology(self):
-#        NTdebug('Queeny.initTopology: initializing topology')
+#        nTdebug('Queeny.initTopology: initializing topology')
         for atm in self.molecule.allAtoms():
             for atmN in atm.topology():
 
@@ -242,12 +242,12 @@ class Queeny( odict ):
         """
 
 
-#        NTdebug('Queeny._calculateAverage: %s')
+#        nTdebug('Queeny._calculateAverage: %s')
         error = False    # Indicates if an error was encountered when analyzing restraint @UnusedVariable
 
         modelCount = dr.getModelCount()
         if not modelCount:
-#            NTdebug('DistanceRestraint.calculateAverage: No structure models (%s)', self)
+#            nTdebug('DistanceRestraint.calculateAverage: No structure models (%s)', self)
             return None
         #end if
 
@@ -257,7 +257,7 @@ class Queeny( odict ):
 
         models = range(modelCount)
         pair = 0
-        Rm6distances = NTfill(0.0, len(dr.atomPairs))
+        Rm6distances = nTfill(0.0, len(dr.atomPairs))
 
         for atm1, atm2 in dr.atomPairs:
 
@@ -272,11 +272,11 @@ class Queeny( odict ):
             #expand pseudoatoms
             atms1 = atm1.realAtoms()
             if atms1 == None:
-                #NTdebug('DistanceRestraint.calculateAverage: %s.realAtoms() None (%s)', atm1, self)
+                #nTdebug('DistanceRestraint.calculateAverage: %s.realAtoms() None (%s)', atm1, self)
                 continue
             atms2 = atm2.realAtoms()
             if atms2 == None:
-                #NTdebug('DistanceRestraint.calculateAverage: %s.realAtoms() None (%s)', atm2, self)
+                #nTdebug('DistanceRestraint.calculateAverage: %s.realAtoms() None (%s)', atm2, self)
                 continue
             for a1 in atms1:
                 #print '>>>', a1.format()
@@ -317,7 +317,7 @@ class Queeny( odict ):
         Only distances for now
         """
 
-        NTmessage('==> Queeny adding restraints (# elements = %d)', len(self))
+        nTmessage('==> Queeny adding restraints (# elements = %d)', len(self))
 
         for dme in self.itervalues():
             dme.upperChange = 0.0
@@ -341,7 +341,7 @@ class Queeny( odict ):
                     # ambiguous restraints
                     Rm6distances = self._calculateAverage( dr )
                     if Rm6distances == None:
-                        NTwarning('Queeny.initRestraints: failure to analyze %s', dr)
+                        nTwarning('Queeny.initRestraints: failure to analyze %s', dr)
                         break
                     #endif
 
@@ -369,7 +369,7 @@ class Queeny( odict ):
             #end for
         #end for
 
-#        NTdebug('Queeny.initRestraints: %d restraints added (# elements = %d)', count, len(self))
+#        nTdebug('Queeny.initRestraints: %d restraints added (# elements = %d)', count, len(self))
 
         self.setNeighbors(nkeys) # update the neighbors for newly added
         #print '>>',len(self)
@@ -427,7 +427,7 @@ class Queeny( odict ):
 
     def triangulateAll(self, cutoff=0.1, maxDepth=4):
 
-#        NTdebug('Queeny.triangulateAll: starting')
+#        nTdebug('Queeny.triangulateAll: starting')
         count = 1
         depth = 0
 
@@ -445,12 +445,12 @@ class Queeny( odict ):
                 dme12 = self(key)
 
 #                if key%100==0:
-#                    NTdebug('Queeny.triangulateAll: depth: %d nkeys %4d  key %4d  len %6d  count %4d %7.3f',
+#                    nTdebug('Queeny.triangulateAll: depth: %d nkeys %4d  key %4d  len %6d  count %4d %7.3f',
 #                            depth, nkeys, key, len(self), count, dme12.upperChange)
 
 
                 if dme12.upperChange < cutoff:
-#                    NTdebug('Queeny.triangulateAll: depth: %d nkeys %4d  key %4d  len %6d  count %4d %7.3f  BREAK',
+#                    nTdebug('Queeny.triangulateAll: depth: %d nkeys %4d  key %4d  len %6d  count %4d %7.3f  BREAK',
 #                            depth, nkeys, key, len(self), count, dme12.upperChange)
                     break
                 #end if
@@ -469,7 +469,7 @@ class Queeny( odict ):
             #end while
             self.setNeighbors(nkeys) # Update neighbor lists for newly added elements (starting at nkeys)
 
-#            NTdebug('Queeny.triangulateAll: depth: %d nkeys %4d  key %4d  len %6d  count %4d', depth, nkeys, key, len(self), count)
+#            nTdebug('Queeny.triangulateAll: depth: %d nkeys %4d  key %4d  len %6d  count %4d', depth, nkeys, key, len(self), count)
             depth += 1
         #end while
     #end def
@@ -479,25 +479,25 @@ class Queeny( odict ):
         - each atom[key] of molecule
         - each residue[key] of molecule
         """
-#        NTdebug('Queeny.setUncertainty: starting')
+#        nTdebug('Queeny.setUncertainty: starting')
 
         for dme in self.itervalues():
             if dme.upper > dme.lower:
                 dme.uncertainty = max(dmElement.uncertaintyMinvalue, math.log(dme.upper-dme.lower))
             else:
-                NTdebug('Queeny.setUncertainty: problem with %s', dme.format())
+                nTdebug('Queeny.setUncertainty: problem with %s', dme.format())
                 dme.uncertainty = dmElement.uncertaintyMinvalue
         #end for
 
         atms = self.molecule.allAtoms()
-        l = len(atms)
+        n = len(atms)
 
         for atm in atms:
             atm[key] = 0.0
 
-        for i in range(l):
+        for i in range(n):
             atm1 = atms[i]
-            for j in range(i+1,l):
+            for j in range(i+1,n):
                 atm2 = atms[j]
                 if self.has_key((atm1.atomIndex,atm2.atomIndex)):
                     dme = self[(atm1.atomIndex,atm2.atomIndex)]
@@ -509,7 +509,7 @@ class Queeny( odict ):
                 #end if
             #end for
         #end for
-        fls = float(l-1)
+        fls = float(n-1)
         for atm in atms:
             atm[key] /= fls
 
@@ -531,7 +531,7 @@ class Queeny( odict ):
         - each residue of molecule
         using key1 and key2
         """
-#        NTdebug('Queeny.setInformation: starting')
+#        nTdebug('Queeny.setInformation: starting')
         for atm in self.molecule.allAtoms():
             if atm.has_key(key1) and atm.has_key(key2):
                 atm[informationKey] = atm[key1]-atm[key2]
@@ -553,14 +553,14 @@ class Queeny( odict ):
     #end def
 
     def zap(self, byItem):
-        return NTzap(self.values(), byItem)
+        return nTzap(self.values(), byItem)
 
     def sortKeys(self):
         'Sorts the dme list by upperChange'
-        a = zip(self._keys,NTzap(self.values(),'upperChange'))
+        a = zip(self._keys,nTzap(self.values(),'upperChange'))
         NTsort(a, 1, inplace=True)
         a.reverse()
-        self._keys = NTzap(a,0)
+        self._keys = nTzap(a,0)
     #end def
 
 #end class
@@ -580,7 +580,7 @@ def runQueeny( project, tmp=None ):
     try: # Fixes 2l4g
         return _runQueeny( project, tmp=tmp )
     except:
-        NTerror("Queeny failed as per below.")
+        nTerror("Queeny failed as per below.")
         NTtracebackError()
         return True
 
@@ -590,17 +590,17 @@ def _runQueeny( project, tmp=None ):
     Returns True on error.
     Returns False when all is fine.
     """
-    NTmessage("==> Calculating restraint information by Queeny")
+    nTmessage("==> Calculating restraint information by Queeny")
     if project == None:
-        NTerror("runQueeny: No project defined")
+        nTerror("runQueeny: No project defined")
         return True
 
     if project.molecule == None:
-        NTerror("runQueeny: No molecule defined")
+        nTerror("runQueeny: No molecule defined")
         return True
 
     if len(project.distances) == 0:
-        NTmessage("==> runQueeny: No distance restraints defined.")
+        nTmessage("==> runQueeny: No distance restraints defined.")
         return True
 
     project.status.queeny = queenyDefaults()
@@ -610,7 +610,7 @@ def _runQueeny( project, tmp=None ):
 
     path = project.validationPath( queenyDefs.directory )
     if not path:
-        NTmessage("==> runQueeny: error creating '%s'", path)
+        nTmessage("==> runQueeny: error creating '%s'", path)
         return True
 
     q = Queeny( project )
@@ -632,37 +632,37 @@ def saveQueeny( project, tmp=None ):
     Returns False on success.
     """
     if project == None:
-        NTmessage("saveQueeny: No project defined")
+        nTmessage("saveQueeny: No project defined")
         return True
 
     if QUEENY_STR not in project.status:
-#        NTdebug("saveQueeny: No talos+ was run")
+#        nTdebug("saveQueeny: No talos+ was run")
         return False # just no data, not an error
 
     queenyDefs = project.status.queeny
 
     path = project.validationPath( queenyDefs.directory )
     if not path:
-        NTerror('saveQueeny: directory "%s" with talosPlus data not found', path)
+        nTerror('saveQueeny: directory "%s" with talosPlus data not found', path)
         return True
 
     if project.molecule == None:
-        NTmessage("saveQueeny: No molecule defined")
+        nTmessage("saveQueeny: No molecule defined")
         return True
 
-    l = NTlist()
+    myList = NTlist()
     for res in project.molecule.allResidues():
         for storedProp in storedPropList:
             if res.has_key(storedProp):
-                l.append( (res.nameTuple(), storedProp, res[storedProp]))
+                myList.append( (res.nameTuple(), storedProp, res[storedProp]))
             for atm in res:
                 if atm.has_key(storedProp):
-                    l.append( (atm.nameTuple(), storedProp, atm[storedProp]))
+                    myList.append( (atm.nameTuple(), storedProp, atm[storedProp]))
         #end for
     #end for
     smlFile = os.path.join(path, queenyDefs.smlFile )
-    obj2SML( l, smlFile)
-#    NTdebug('==> Saved queeny results to "%s"', smlFile)
+    obj2SML( myList, smlFile)
+#    nTdebug('==> Saved queeny results to "%s"', smlFile)
     return False
 #end def
 
@@ -674,7 +674,7 @@ def restoreQueeny( project, tmp=None ):
     Return True on error
     """
     if project == None:
-        NTmessage("restoreQueeny: No project defined")
+        nTmessage("restoreQueeny: No project defined")
         return True
 
     if project.molecule == None:
@@ -694,22 +694,22 @@ def restoreQueeny( project, tmp=None ):
     queenyDefs = project.status.queeny # short cur for less typing
     path = project.validationPath( queenyDefs.directory)
     if not path:
-        NTerror('restoreQueeny: directory "%s" with queeny data not found', path)
+        nTerror('restoreQueeny: directory "%s" with queeny data not found', path)
         return True
 
     smlFile = os.path.join(path, queenyDefs.smlFile )
     if not os.path.exists(smlFile):
-        NTerror('restoreQueeny: file "%s" with queeny data not found', path)
+        nTerror('restoreQueeny: file "%s" with queeny data not found', path)
         return True
 
    # Restore the data
-    NTmessage('==> Restoring queeny results')
-    l=SML2obj( smlFile, project.molecule)
-    if l==None:
+    nTmessage('==> Restoring queeny results')
+    myList=SML2obj( smlFile, project.molecule)
+    if myList==None:
         return True
 
     try:
-        for tupleInfo in l:
+        for tupleInfo in myList:
             if len(tupleInfo) == 3: # Version with multiple data items
                 nameTuple,storedProp,info = tupleInfo
             else: # Old version with multiple data items
@@ -719,12 +719,13 @@ def restoreQueeny( project, tmp=None ):
             if not obj:
                 atomName = nameTuple[3]
                 if not (atomName in ATOM_LIST_TO_IGNORE_REPORTING):
-                    NTerror('restoreQueeny: error decoding "%s"', nameTuple) # Was reporting terminal atoms eg. in "('1buq', 'A', 39, 'H2', None, None, 'INTERNAL_1')"
+                    nTerror('restoreQueeny: error decoding "%s"', nameTuple) 
+                    # Was reporting terminal atoms eg. in "('1buq', 'A', 39, 'H2', None, None, 'INTERNAL_1')"
             else:
                 obj[storedProp] = info
     except:
         NTtracebackError()
-        NTerror("Failed to restore Queeny results.")
+        nTerror("Failed to restore Queeny results.")
         return True
     return False
 #end def

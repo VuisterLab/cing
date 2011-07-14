@@ -77,7 +77,7 @@ class AllChecks(TestCase):
 
         project.molecule.setRanges(ranges)
 
-        NTdebug("Reading files from directory: " + cyanaDirectory)
+        nTdebug("Reading files from directory: " + cyanaDirectory)
         kwds = {'uplFiles': [ entryId ],
                 'acoFiles': [ entryId ]
                   }
@@ -101,7 +101,7 @@ class AllChecks(TestCase):
 
         if showProcheckResults:
             for res in project.molecule.allResidues():
-                NTdebug(`res` +" "+ `res.procheck.secStruct`)
+                nTdebug(`res` +" "+ `res.procheck.secStruct`)
 
 if __name__ == "__main__":
     cing.verbosity = verbosityDebug

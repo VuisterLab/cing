@@ -50,11 +50,11 @@ def getLocalPdbFileWithChain(entryCode, chainCode ):
     pdbFileName = os.path.join(pdbz_dir, char23, 'pdb'+entryCode+'.ent')
     pdbFileNameZipped = pdbFileName+'.gz'
     if not os.path.exists(pdbFileNameZipped):
-        NTerror("%4s Skipping because no pdb file: %s" % ( entryCode, pdbFileNameZipped ))
+        nTerror("%4s Skipping because no pdb file: %s" % ( entryCode, pdbFileNameZipped ))
         return True
 
     if Chain.isNullValue(chainCode):
-        NTerror("didn't expect null value for chain")
+        nTerror("didn't expect null value for chain")
         return True
 
     gunzip(pdbFileNameZipped)
@@ -73,7 +73,7 @@ def doYasaraAddHydrogens( entryCode, chainCode ):
 
     yasara.info.mode = 'txt'
     yasara.Console('off')
-    NTmessage('Using Yasara on %s' % entryCode)
+    nTmessage('Using Yasara on %s' % entryCode)
 
     # Add hydrogens using Yasara
     obj = yasara.LoadPDB(localPdbFileName, center = 'No', correct = 'No', model=1)
@@ -101,7 +101,7 @@ def doYasaraRewritePdb( entryCode ):
 
     yasara.info.mode = 'txt'
     yasara.Console('off')
-    NTmessage('Using Yasara on %s' % entryCode)
+    nTmessage('Using Yasara on %s' % entryCode)
 
     # Read all models.
 #    obj = yasara.LoadPDB(localPdbFileName, center = 'No', correct = 'No', model=1)
@@ -125,7 +125,7 @@ def doEntry( entryCode, chainCode ):
 
     project = Project.open( entryCode+chainCode, status='new' )
     if project.removeFromDisk():
-        NTerror("Failed to remove project from disk for entry: ", entryCode+chainCode)
+        nTerror("Failed to remove project from disk for entry: ", entryCode+chainCode)
         return True
 
     project = Project.open( entryCode+chainCode, status='new' )
@@ -143,7 +143,7 @@ def doEntry( entryCode, chainCode ):
         os.unlink(pdbFileName)
     project.runDssp()
 
-    NTdebug('Doing entry %s chain code: %s' % (entryCode,chainCode) )
+    nTdebug('Doing entry %s chain code: %s' % (entryCode,chainCode) )
 
     lineList = []
     idx = -1
@@ -151,31 +151,31 @@ def doEntry( entryCode, chainCode ):
 
     for chain in project.molecule.allChains():
         if chain.name != chainCode:
-            NTdebug('Skipping chain in: entry %s for chain code: %s' % (entryCode,chain.name) )
+            nTdebug('Skipping chain in: entry %s for chain code: %s' % (entryCode,chain.name) )
             continue
 
         resList = chain.allResidues()
         for res in resList:
             if res.resName not in commonAAList:
-#                NTdebug( "Skipping uncommon residue: %s" % res)
+#                nTdebug( "Skipping uncommon residue: %s" % res)
                 continue
 
             if dihedralComboTodo == Ramachandran:
                 if not (res.has_key(DIHEDRAL_NAME_1) and res.has_key(DIHEDRAL_NAME_2)):
-                    NTdebug('Skipping residue without backbone angles complete in entry %s for chain code %s residue %s' % (entryCode,chainCode,res))
+                    nTdebug('Skipping residue without backbone angles complete in entry %s for chain code %s residue %s' % (entryCode,chainCode,res))
                     continue
             elif dihedralComboTodo == Janin:
                 if not (res.has_key(DIHEDRAL_NAME_1) or res.has_key(DIHEDRAL_NAME_2)):
-                    NTdebug('Skipping residue without any of the requested angles complete in entry %s for chain code %s residue %s' % (entryCode,chainCode,res))
+                    nTdebug('Skipping residue without any of the requested angles complete in entry %s for chain code %s residue %s' % (entryCode,chainCode,res))
                     continue
             elif dihedralComboTodo == d1d2:
                 if not res.has_key(DIHEDRAL_NAME_1):
-                    NTdebug('Skipping residue because no first requested angle in entry %s for chain code %s residue %s' % (entryCode,chainCode,res))
+                    nTdebug('Skipping residue because no first requested angle in entry %s for chain code %s residue %s' % (entryCode,chainCode,res))
                     continue
 
             secStruct = res.getDeepByKeys( DSSP_STR, SECSTRUCT_STR)
             if secStruct == None:
-                NTdebug('Skipping because no dssp secStruct in entry %s for chain code %s residue %s' % (entryCode,chainCode,res))
+                nTdebug('Skipping because no dssp secStruct in entry %s for chain code %s residue %s' % (entryCode,chainCode,res))
                 continue
             secStruct = secStruct[0]
             # Make sure we always have something to hold onto.
@@ -191,27 +191,27 @@ def doEntry( entryCode, chainCode ):
 
             dihedral1 = res[DIHEDRAL_NAME_1]
             atomList = dihedral1.atoms
-            coordinatesList = NTzap(atomList, 'coordinates')
+            coordinatesList = nTzap(atomList, 'coordinates')
             # reshape resulting: NTlist(NTlist(Coordinate(
 #            flatList = map( lambda c: c, flatten(coordinatesList) ) # works but next is nicer
             flatList = [c for c in flatten(coordinatesList)]
 
-            bfactorList = NTzap(flatList,'Bfac')
+            bfactorList = nTzap(flatList,'Bfac')
             max_bfactor = max(bfactorList)
             idx += 1 # starts at 0 when inserted.
             lineItem = ( entryCode, chain.name, res.resName, res.resNum, secStruct, d1_value_str, d2_value_str, max_bfactor )
             lineList.append(lineItem)
             str = "%s,%s,%-4s,%4d,%1s,%6s,%6s,%6.1f\n" % lineItem
-            NTmessageNoEOL(str)
+            nTmessageNoEOL(str)
             strSum += str # expensive
 
     if doSave:
         if not project.save():
-            NTerror("Failed to save project to disk for entry: " + entryCode)
+            nTerror("Failed to save project to disk for entry: " + entryCode)
             return True
     else:
         if project.removeFromDisk():
-            NTerror("Failed to remove project from disk for entry: ", entryCode)
+            nTerror("Failed to remove project from disk for entry: ", entryCode)
             return True
 
     file_name_base = (DIHEDRAL_NAME_1+DIHEDRAL_NAME_2).lower()
@@ -219,7 +219,7 @@ def doEntry( entryCode, chainCode ):
     resultsFile = file(resultsFileName, 'w')
     resultsFile.flush()
     resultsFile.write(strSum)
-#    NTdebug( '\n'+strSum )
+#    nTdebug( '\n'+strSum )
     resultsFile.flush()
     resultsFile.close() # otherwise too many open files error.
 

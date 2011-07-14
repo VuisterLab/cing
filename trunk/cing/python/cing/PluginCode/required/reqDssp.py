@@ -43,7 +43,7 @@ def getDsspSecStructConsensus( res ):
         secStructList = to3StateDssp( secStructList )
 #        result = secStructList.getConsensus(CONSENSUS_SEC_STRUCT_FRACTION) # will set it if not present yet.
         result = secStructList.getConsensus(useLargest=True) # will set it if not present yet.
-#    NTdebug('secStruct res: %s %s %s', res, secStructList, secStruct)
+#    nTdebug('secStruct res: %s %s %s', res, secStructList, secStruct)
     return result
 
 def getDsspSecStructConsensusId( res ):

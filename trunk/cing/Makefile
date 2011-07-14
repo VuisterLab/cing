@@ -28,8 +28,13 @@ sloccount:
 	-/bin/rm -f sloccount.sc
 	-sloccount --duplicates --wide --details python src > sloccount.sc
 
-# Next fails in recursion with old version of pylint 0.20.0 but works fine with version 0.23.0
 pylint:
+	# CING will run pylint on individual files as not to exceed open file limit.
+	# A huge disadvantage is the time this takes is 9 minutes on an 8 core processor, so 1+ hour on single.
+	-cd python; python -u cing/main.py --pylint pylint.txt
+	
+# Next fails in recursion with old version of pylint 0.20.0 but works fine with version 0.23.0
+pylint_old:
 	-/bin/rm -f python/pylint.txt
 	-cd python; pylint --rcfile ../.pylintrc --report=no cing.core                                          > pylint.txt || exit 0
 	-cd python; pylint --rcfile ../.pylintrc --report=no cing.Database                                     >> pylint.txt || exit 0

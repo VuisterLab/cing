@@ -22,24 +22,25 @@ class AllChecks(TestCase):
     mkdirs( cingDirTmpTest )
     os.chdir(cingDirTmpTest)
 
-    def tttttestAll(self): ###  TODO: fails in current setup.
+    def _testAll(self): ###  TODO: fails in current setup.
 #        exitCode, token, tokenLock = vcMaster.nextTokenWithLock(lockTimeOut)
 #        if exitCode:
-#            NTdebug("Failed to vcMaster.nextTokenWithLock(). Was the token deleted?")
-#        NTdebug("Got exitCode, token, tokenLock: %s %s %s" % (exitCode, token, tokenLock))
+#            nTdebug("Failed to vcMaster.nextTokenWithLock(). Was the token deleted?")
+#        nTdebug("Got exitCode, token, tokenLock: %s %s %s" % (exitCode, token, tokenLock))
 #        vcMaster.toposCmd.token = token
 #        pid = p.process_fork( vcMaster.refreshLock, [tokenLock, lockTimeOut] )
-#        NTdebug("create a background process [%s] keeping the lock" % pid)
+#        nTdebug("create a background process [%s] keeping the lock" % pid)
 #        time.sleep(sleepTimeSimulatingWork)
-        NTdebug("get_num_tokens:")
-        vc.toposCmd.get_num_tokens()
-        NTdebug("get_token:")
-        vc.toposCmd.get_token()
+#        nTdebug("get_num_tokens:")
+#        vc.toposCmd.get_num_tokens()
+#        nTdebug("get_token:")
+#        vc.toposCmd.get_token()
 
 #        vcMaster.toposCmd.token = token
 #        vcMaster.toposCmd.remove_token()
 
 #        p.process_kill( pid )
+        pass
 
 if __name__ == "__main__":
     cing.verbosity = verbosityDebug

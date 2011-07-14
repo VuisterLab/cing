@@ -20,19 +20,19 @@ def mkSubDirStructure(startDir, entryCodeList, pythonScriptFileNameRoot):
         entryCodeChar2and3 = entry_code[1:3]
         dataDir = os.path.join( startDir, DATA_STR )
         if not os.path.exists(dataDir):
-#            NTmessage("Creating dir: " + dataDir)
+#            nTmessage("Creating dir: " + dataDir)
             os.mkdir(dataDir)
         subDir = os.path.join( dataDir, entryCodeChar2and3 )
         if not os.path.exists(subDir):
-#            NTmessage("Creating dir: " + subDir)
+#            nTmessage("Creating dir: " + subDir)
             os.mkdir(subDir)
         entryDir = os.path.join( subDir, entry_code )
         if not os.path.exists(entryDir):
-#            NTmessage("Creating dir: " + entryDir)
+#            nTmessage("Creating dir: " + entryDir)
             os.mkdir(entryDir)
         logDir = os.path.join( entryDir, 'log_'+pythonScriptFileNameRoot )
         if not os.path.exists(logDir):
-#            NTmessage("Creating dir: " + logDir)
+#            nTmessage("Creating dir: " + logDir)
             os.mkdir(logDir)
 
 def doScriptOnEntryList(pythonScriptFileName,
@@ -77,7 +77,7 @@ def doScriptOnEntryList(pythonScriptFileName,
         if expectPdbEntryList:
             if len(line) > 4:
                 chainCode = line[4].upper()
-#        NTdebug('Using chainCode: [%s]' % chainCode )
+#        nTdebug('Using chainCode: [%s]' % chainCode )
         chainCodeList.append(chainCode)
     entryListFile.close()
 
@@ -85,7 +85,7 @@ def doScriptOnEntryList(pythonScriptFileName,
     # lastEntryId is id of last entry excluding the entry itself.
     lastEntryId = min(len(entryCodeList), START_ENTRY_ID+MAX_ENTRIES_TODO)
     if shuffleBeforeSelecting:
-        NTmessage("Shuffling entry list before selecting entries.")
+        nTmessage("Shuffling entry list before selecting entries.")
         entryCodeListCopy = entryCodeList[:]
         shuffle(entryCodeListCopy)
         entryCodeList = entryCodeListCopy[START_ENTRY_ID:lastEntryId] # no sense in starting at zero here; they're random.
@@ -94,15 +94,15 @@ def doScriptOnEntryList(pythonScriptFileName,
     entryCodeList.sort()
     chainCodeList = chainCodeList[START_ENTRY_ID:lastEntryId]
 
-    NTmessage('Read      %05d entries    ' % entryCountTotal)
-    NTmessage('Selected  %05d entries    ' % entryCountSelected)
-    NTmessage('Sliced    %05d entries: %s' % (len(entryCodeList), entryCodeList ))
-#    NTmessage('Sliced    %05d chains:  %s' % (len(chainCodeList), chainCodeList ))
+    nTmessage('Read      %05d entries    ' % entryCountTotal)
+    nTmessage('Selected  %05d entries    ' % entryCountSelected)
+    nTmessage('Sliced    %05d entries: %s' % (len(entryCodeList), entryCodeList ))
+#    nTmessage('Sliced    %05d chains:  %s' % (len(chainCodeList), chainCodeList ))
 
 
     useAnyCmd = False
     if pythonScriptFileName.endswith('.py'):
-        (_directory, pythonScriptFileNameRoot, _ext) = NTpath(pythonScriptFileName)
+        (_directory, pythonScriptFileNameRoot, _ext) = nTpath(pythonScriptFileName)
     else:
         useAnyCmd = True
         pythonScriptFileNameRoot = pythonScriptFileName.split()[0] # get first word of eg.
@@ -150,7 +150,7 @@ def doScriptOnEntryList(pythonScriptFileName,
                 date_stamp
                  )
         job = ( do_cmd, (cmd,) )
-#        NTdebug("Will schedule job cmd: %s" % cmd)
+#        nTdebug("Will schedule job cmd: %s" % cmd)
         job_list.append( job )
 
     f = ForkOff( processes_max       = processes_max, max_time_to_wait    = max_time_to_wait)
@@ -161,13 +161,13 @@ def doScriptOnEntryList(pythonScriptFileName,
         idx = not_done_entry_list.index(id)
         if idx >= 0:
             del(not_done_entry_list[idx])
-    NTmessage("In doScriptOnEntryList Finished list  : %s" % done_entry_list)
-    NTmessage("In doScriptOnEntryList Unfinished list: %s" % not_done_entry_list)
+    nTmessage("In doScriptOnEntryList Finished list  : %s" % done_entry_list)
+    nTmessage("In doScriptOnEntryList Unfinished list: %s" % not_done_entry_list)
     for id in not_done_entry_list:
         job = job_list[id]
         _do_cmd, cmdTuple = job
         cmd = cmdTuple[0]
-        NTerror("In doScriptOnEntryList failed forked: %s" % cmd)
+        nTerror("In doScriptOnEntryList failed forked: %s" % cmd)
 
 if __name__ == '__main__':
     entryCodeList = '1brv 1bus'.split()

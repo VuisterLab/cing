@@ -56,7 +56,7 @@ class TagTable (Lister):
         elif flavor == 'mmCIF':
             loop_ident_size     = 0
         else:
-            NTerror('Unknown flavor of STAR given %s' % flavor)
+            nTerror('Unknown flavor of STAR given %s' % flavor)
             return 1
 
         free_ident_size         = loop_ident_size
@@ -149,7 +149,7 @@ class TagTable (Lister):
     def getStringListByColumnName(self, columnName):
         """Return a list of values or None for Error"""
         if columnName not in self.tagnames:
-            NTmessage("columnName %s not in self.tagnames: %s" % (columnName, self.tagnames))
+            nTmessage("columnName %s not in self.tagnames: %s" % (columnName, self.tagnames))
             return None
         idx = self.tagnames.index(columnName)
         if idx < 0:
@@ -169,7 +169,7 @@ class TagTable (Lister):
             result = int(value)
         except:
     #        NTtracebackError() # disable this verbose messaging after done debugging.
-            NTerror('getInt: failed to convert to int for construct "%s"' % value)
+            nTerror('getInt: failed to convert to int for construct "%s"' % value)
             return None
         return result
 
@@ -177,11 +177,11 @@ class TagTable (Lister):
         """Convenience function."""
         col = self.getSpecificListByColumnName( columnName, float, "float")
         if col == None:
-            NTerror("Failed to TagTable.getFloat for column %s and rowIdx %s" % (columnName, rowIdx) )
+            nTerror("Failed to TagTable.getFloat for column %s and rowIdx %s" % (columnName, rowIdx) )
             return None
         n = len(col)
         if rowIdx < 0 or rowIdx >= n:
-            NTerror("Failed to TagTable.getFloat for column %s and out of bounds rowIdx %s" % (columnName, rowIdx) )
+            nTerror("Failed to TagTable.getFloat for column %s and out of bounds rowIdx %s" % (columnName, rowIdx) )
             return None
         value = col[rowIdx]
         result = None
@@ -191,7 +191,7 @@ class TagTable (Lister):
             result = float(value)
         except:
     #        NTtracebackError() # disable this verbose messaging after done debugging.
-            NTerror('getFloat: failed to convert to float for construct "%s"' % value)
+            nTerror('getFloat: failed to convert to float for construct "%s"' % value)
         return result
 
     def getColCount(self):
@@ -208,27 +208,27 @@ class TagTable (Lister):
         """
         if columnName == None:
             if rowIdx < 0:
-                NTerror("rowIdx < 0")
+                nTerror("rowIdx < 0")
                 return
             if colIdx < 0:
-                NTerror("colIdx < 0")
+                nTerror("colIdx < 0")
                 return
             nr = self.getRowCount()
             nc = self.getColCount()
             if rowIdx >= nr:
-                NTerror("rowIdx (%s) >= nr (%s)" % ( rowIdx, nr))
+                nTerror("rowIdx (%s) >= nr (%s)" % ( rowIdx, nr))
                 return
             if colIdx >= nc:
-                NTerror("colIdx (%s) >= nc (%s)" % ( colIdx, nc))
+                nTerror("colIdx (%s) >= nc (%s)" % ( colIdx, nc))
                 return
             return self.tagvalues[colIdx][rowIdx]
         col = self.getSpecificListByColumnName( columnName, str, "string")
         if col == None:
-            NTerror("Failed to TagTable.getString for column %s and rowIdx %s" % (columnName, rowIdx) )
+            nTerror("Failed to TagTable.getString for column %s and rowIdx %s" % (columnName, rowIdx) )
             return None
         n = len(col)
         if rowIdx < 0 or rowIdx >= n:
-            NTerror("Failed to TagTable.getString for column %s and out of bounds rowIdx %s" % (columnName, rowIdx) )
+            nTerror("Failed to TagTable.getString for column %s and out of bounds rowIdx %s" % (columnName, rowIdx) )
             return None
         value = str(col[rowIdx])
         return value
@@ -251,7 +251,7 @@ class TagTable (Lister):
                 try:
                     result.append( function(row) )
                 except:
-                    NTerror("Value on row %d: [%s] is not an %s" % ( i, row, dataType))
+                    nTerror("Value on row %d: [%s] is not an %s" % ( i, row, dataType))
                     return None
         return result
 
@@ -489,7 +489,7 @@ class TagTable (Lister):
         while pos < pos_end:
             if self.verbosity > 2:
                 if pos - count > count_hash:
-                    NTmessage('##### %s chars processed ######' % count_hash)
+                    nTmessage('##### %s chars processed ######' % count_hash)
                     count = pos
             ## 1 char search; ', ", or ; at beginning of line
             match_quoted = pattern_quoted.search( text, pos, pos_end )
@@ -498,10 +498,10 @@ class TagTable (Lister):
                     ## Quoted at pos
                     value, pos = tag_value_quoted_parse( text, pos )
                     if pos ==  None:
-                        NTerror('got error in parse (1)')
+                        nTerror('got error in parse (1)')
                         return 1
                     if pos > pos_end:
-                        NTerror('found a quoted value that was not wholly within boundaries (1)')
+                        nTerror('found a quoted value that was not wholly within boundaries (1)')
                         return 1
                     self.tagvalues[ tag_id ].append( value )
                     tag_id += 1
@@ -535,10 +535,10 @@ class TagTable (Lister):
                         pos = tempendpos
                         value, pos = tag_value_quoted_parse( text, pos )
                         if pos ==  None:
-                            NTerror('got error in parse (2)')
+                            nTerror('got error in parse (2)')
                             return 1
                         if pos > pos_end:
-                            NTerror('found a quoted value that was not wholly within boundaries (2)')
+                            nTerror('found a quoted value that was not wholly within boundaries (2)')
                             return 1
                         self.tagvalues[ tag_id ].append( value )
                         tag_id += 1

@@ -1,3 +1,4 @@
+#@PydevCodeAnalysisIgnore # pylint: disable-all
 import os
 
 #

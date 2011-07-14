@@ -132,22 +132,22 @@ def circularlizeMatrix(p):
     """
 
     if p == None:
-        NTerror("Got None for hist in circularlizeMatrix")
+        nTerror("Got None for hist in circularlizeMatrix")
         return
 
     if not isinstance(p,numpy.ndarray):
-        NTerror("Got hist that is not an instance of ndarray but a: [%s]" % `p.__class__`)
+        nTerror("Got hist that is not an instance of ndarray but a: [%s]" % `p.__class__`)
         return
 
 
     binCount = p.shape[0]
-#    NTdebug("binCounts p: %s" % `p.shape`)
-#    NTdebug(`p`)
+#    nTdebug("binCounts p: %s" % `p.shape`)
+#    nTdebug(`p`)
     binCountP = binCount + 2
     binCountM = binCount - 1
     binCountPM = binCountP - 1
     q = numpy.zeros(binCountP * binCountP).reshape(binCountP, binCountP)
-#    NTdebug("binCounts q: %s" % `q.shape`)
+#    nTdebug("binCounts q: %s" % `q.shape`)
     # Corners
     q[0,0] = 0.0 # for debugging.
 #    v = p[binCountM][binCountM]
@@ -166,6 +166,6 @@ def circularlizeMatrix(p):
          # Inside
          for j in range(binCount):
              q[iP,j + 1] = p[i,j]
-#    NTdebug(`q`)
+#    nTdebug(`q`)
     return q
 

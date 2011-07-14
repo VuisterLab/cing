@@ -29,7 +29,7 @@ for fn in fileList[0:10]:
     #fn = 'x.pdb'
     entryCode = fn[:-2]
     fnFull = os.path.join(cwd,fn)
-    NTmessage('Add hydrogens using Yasara on %s' % fnFull)
+    nTmessage('Add hydrogens using Yasara on %s' % fnFull)
     obj = yasara.LoadPDB(fnFull, center = 'No', correct = 'No', model=1)
     #    yasara.CleanAll() # needed for OptHydObj
     #    yasara.OptHydObj(obj,method='Yasara')
