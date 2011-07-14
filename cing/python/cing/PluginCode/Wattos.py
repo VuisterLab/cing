@@ -10,17 +10,17 @@ from cing.core.parameters import plugins
 if True: # block
     # TODO: use more advanced tests.
     if not cingPaths.classpath:
-#        NTdebug("Missing java classpath which is an optional dependency for Wattos")
+#        nTdebug("Missing java classpath which is an optional dependency for Wattos")
         raise ImportWarning(WATTOS_STR)
 #    if not (('/Users/jd/workspace35/wattos/lib/Wattos.jar' in cingPaths.classpath) or (# development classes.
 #             '/Users/jd/workspace35/wattos/build' in cingPaths.classpath) or
 #             ('/Users/alan/workspace/Wattos/lib/Wattos.jar' in cingPaths.classpath)):
     classpathCombinedAgain = ':'.join(cingPaths.classpath)
     if not (('/lib/Wattos.jar' in classpathCombinedAgain) or ('/build' in classpathCombinedAgain)):
-#        NTdebug("Missing Wattos jar in java classpath [%s] which is an optional dep for Wattos" % classpathCombinedAgain)
+#        nTdebug("Missing Wattos jar in java classpath [%s] which is an optional dep for Wattos" % classpathCombinedAgain)
         raise ImportWarning(WATTOS_STR)
 
-#    NTmessage('Using Wattos')
+#    nTmessage('Using Wattos')
 #if True: # for easy blocking of data, preventing the code to be resorted with imports above.
 #    from cing.PluginCode.required.reqCcpn import CCPN_STR
 #    switchOutput(False)
@@ -34,7 +34,7 @@ if True: # block
 #        raise ImportWarning(WATTOS_STR)
 #    finally: # finally fails in python below 2.5
 #        switchOutput(True)
-##    NTmessage('Using Ccpn')
+##    nTmessage('Using Ccpn')
 
 
 class Wattos(NTdict):
@@ -179,15 +179,15 @@ Quit
 """
         self.residueLoL = self.molecule._getResidueLoL()
         if not self.residueLoL:
-            NTerror("Failed to get residue LoL")
+            nTerror("Failed to get residue LoL")
 
     def locateWattosResidue(self, entityAssemblyId, compIndexId, compId):
         residue = getDeepByKeys(self.residueLoL, int(entityAssemblyId) - 1, int(compIndexId) - 1)
         strTuple = "entityAssemblyId, compIndexId, compId %s %s %s" % (entityAssemblyId, compIndexId, compId)
         if not residue:
-            NTerror("Failed to get residue in locateWattosResidue for " + strTuple)
+            nTerror("Failed to get residue in locateWattosResidue for " + strTuple)
             return None
-#        NTdebug("Retrieved %s for Wattos %s" % (residue, strTuple))
+#        nTdebug("Retrieved %s for Wattos %s" % (residue, strTuple))
         return residue
 
     def _processComplCheck(self, fullName):
@@ -204,7 +204,7 @@ Quit
                     "valeList": [ 0.009, 0.100 ],
                     }}
                     """
-        NTdetail("==> Processing the Wattos results into CING data model")
+        nTdetail("==> Processing the Wattos results into CING data model")
         # Assemble the atom, residue and molecule specific checks
         # set the formats of each check easy printing
 #        self.molecule.setAllChildrenByKey( WHATIF_STR, None)
@@ -212,18 +212,18 @@ Quit
 
 
         # sorting on mols, residues, and atoms
-#        NTmessage("  for self.checks: " + `self.checks`)
-#        NTdebug("  for self.checks count: %s" % len(self.checks))
+#        nTmessage("  for self.checks: " + `self.checks`)
+#        nTdebug("  for self.checks count: %s" % len(self.checks))
 
         starFile = File()
         starFile.filename = fullName
         if starFile.read():
-           NTerror("Failed to read star file: %s" % fullName)
+           nTerror("Failed to read star file: %s" % fullName)
            return True
 
         sfList = starFile.getSaveFrames(category = "NOE_completeness_statistics")
         if not sfList or len(sfList) != 1:
-            NTerror("Failed to get single saveframe but got list of: [%s]" % sfList)
+            nTerror("Failed to get single saveframe but got list of: [%s]" % sfList)
             return True
 
         saveFrameCompl = sfList[0]
@@ -266,7 +266,7 @@ Quit
             wattosTuple = (entityAssemblyId, compIndexId, compId)
             residue = self.locateWattosResidue(*wattosTuple)
             if not residue:
-                NTerror("Failed to find Wattos residue in CING: %s %s %s" % (wattosTuple))
+                nTerror("Failed to find Wattos residue in CING: %s %s %s" % (wattosTuple))
                 return True
 
             residueWattosDic = residue.setdefault(WATTOS_STR, NTdict())
@@ -281,14 +281,14 @@ Quit
             residueWattosDic.setDeepByKeys(expCount, EXP_COUNT_STR, VALUE_LIST_STR)
             residueWattosDic.setDeepByKeys(matCount, MAT_COUNT_STR, VALUE_LIST_STR)
         # end for
-#        NTdebug('done with _processComplCheck')
+#        nTdebug('done with _processComplCheck')
     #end def
 
 def runWattos(project, ranges=None, tmp = None, parseOnly=False):
     try:
         return _runWattos(project, ranges=ranges, tmp = tmp, parseOnly=parseOnly)
     except:
-        NTerror("Failed runWattos by throwable below.")
+        nTerror("Failed runWattos by throwable below.")
         NTtracebackError()
         return True
 
@@ -302,15 +302,15 @@ def _runWattos(project, ranges=None, tmp = None, parseOnly=False):
     """
 
     if not project.molecule:
-        NTerror("runWattos: no molecule defined")
+        nTerror("runWattos: no molecule defined")
         return True
 
     mol = project.molecule
     if not mol:
-        NTerror("No project molecule in runWattos")
+        nTerror("No project molecule in runWattos")
         return None
     if mol.modelCount == 0:
-        NTwarning('runWattos: no models for "%s"', mol)
+        nTwarning('runWattos: no models for "%s"', mol)
         return
 
 
@@ -332,11 +332,11 @@ def _runWattos(project, ranges=None, tmp = None, parseOnly=False):
     del ranges # only use wattos.ranges now.
     useRanges = mol.useRanges(wattos.ranges)
     if mol == None:
-        NTerror('runWattos: no mol defined')
+        nTerror('runWattos: no mol defined')
         return None
 
     if mol.modelCount == 0:
-        NTwarning('runWattos: no models for "%s"', mol)
+        nTwarning('runWattos: no models for "%s"', mol)
         return None
 
     wattosDir = project.mkdir(mol.name, project.moleculeDirectories.wattos)
@@ -355,22 +355,22 @@ def _runWattos(project, ranges=None, tmp = None, parseOnly=False):
 
         if os.path.exists(fullname):
             if not os.unlink(fullname):
-                NTmessage("Removing existing file: %s" % fullname)
+                nTmessage("Removing existing file: %s" % fullname)
             else:
-                NTerror("Failed to remove existing file: %s" % fullname)
+                nTerror("Failed to remove existing file: %s" % fullname)
                 return None
 
         nmrStar = NmrStar(project)
         if not nmrStar:
-            NTerror("Failed to create NmrStar(project)")
+            nTerror("Failed to create NmrStar(project)")
             return None
 
         if not nmrStar.toNmrStarFile(fullname):
-            NTmessage("Failed to nmrStar.toNmrStarFile (fine if there wasn't a CCPN project to start with)")
+            nTmessage("Failed to nmrStar.toNmrStarFile (fine if there wasn't a CCPN project to start with)")
             return None
 
         if not os.path.exists(fullname):
-            NTerror("Failed to create file [%s] in nmrStar.toNmrStarFile" % fullname)
+            nTerror("Failed to create file [%s] in nmrStar.toNmrStarFile" % fullname)
             return None
 
         scriptComplete = wattos.scriptTemplate
@@ -383,14 +383,14 @@ def _runWattos(project, ranges=None, tmp = None, parseOnly=False):
         if rangesTxtWattos == None:
             rangesTxtWattos = ALL_RANGES_STR
         if rangesTxt != rangesTxtWattos:
-            NTmessage("==> Translating ranges %s to mmCIF numbering scheme: %s" % (rangesTxt, rangesTxtWattos ))
+            nTmessage("==> Translating ranges %s to mmCIF numbering scheme: %s" % (rangesTxt, rangesTxtWattos ))
         scriptComplete = scriptComplete.replace("RANGES", rangesTxtWattos)
         # Let's ask the user to be nice and not kill us
         # estimate to do **0.5 residues per minutes as with entry 1bus on dual core intel Mac.
         timeRunEstimatedInSeconds = 0.025 * mol.modelCount * len(mol.allResidues())
         timeRunEstimatedInSeconds *= 60
         timeRunEstimatedList = timedelta2HoursMinutesAndSeconds(timeRunEstimatedInSeconds)
-        NTmessage('==> Running Wattos for an estimated (5,000 atoms/s): %s hours, %s minutes and %s seconds; please wait' % timeRunEstimatedList)
+        nTmessage('==> Running Wattos for an estimated (5,000 atoms/s): %s hours, %s minutes and %s seconds; please wait' % timeRunEstimatedList)
         scriptFileName = "wattos.script"
         scriptFullFileName = os.path.join(wattosDir, scriptFileName)
         open(scriptFullFileName, "w").write(scriptComplete)
@@ -405,14 +405,14 @@ def _runWattos(project, ranges=None, tmp = None, parseOnly=False):
         now = time.time()
         wattosExitCode = wattosProgram()
 
-#        NTdebug("Took number of seconds: " + sprintf("%8.1f", time.time() - now))
+#        nTdebug("Took number of seconds: " + sprintf("%8.1f", time.time() - now))
 
         wattosStatus.exitCode  = wattosExitCode
         wattosStatus.time      = sprintf("%.1f", time.time() - now)
         wattosStatus.keysformat()
 
         if wattosExitCode:
-            NTerror("Failed wattos checks with exit code: " + `wattosExitCode`)
+            nTerror("Failed wattos checks with exit code: " + `wattosExitCode`)
             return None
         wattosStatus.completed = True
     # endif not parseOnly
@@ -422,57 +422,57 @@ def _runWattos(project, ranges=None, tmp = None, parseOnly=False):
 
     fullname = os.path.join(wattosDir, wattos.COMPLETENESS_CHECK_FILE_NAME)
     if not os.path.exists(fullname):
-        NTwarning("Failed to find wattos completeness check result file: %s" % fullname)
+        nTwarning("Failed to find wattos completeness check result file: %s" % fullname)
         return None
-#    NTmessage('==> Parsing checks')
+#    nTmessage('==> Parsing checks')
 
     if wattos._processComplCheck(fullname):
-        NTerror("\nrunWattos Failed to parse check %s", fullname)
+        nTerror("\nrunWattos Failed to parse check %s", fullname)
         return None
 
 
     pathOutSurplus = os.path.join(path, wattos.SURPLUS_CHECK_FILE_NAME_BASE + '_summary.txt')
     if not os.path.exists(pathOutSurplus): # Happened for 1ao2 on production machine; not on development...
-        NTerror("Path does not exist: %s" % (pathOutSurplus))
+        nTerror("Path does not exist: %s" % (pathOutSurplus))
         return True
-#    NTdebug('> parsing ' + pathOutSurplus)
+#    nTdebug('> parsing ' + pathOutSurplus)
     fullTextSurplus = open(pathOutSurplus, 'r').read()
     if not fullTextSurplus:
-        NTerror('Failed to parse Wattos surplus summary file')
+        nTerror('Failed to parse Wattos surplus summary file')
         return True
 
 
     startString = 'SUMMARY:'
     surplusSummary = getTextBetween(fullTextSurplus, startString, endString = None, startIncl = False, endIncl = False)
     if not surplusSummary:
-        NTerror("Failed to find surplusSummary in surplusSummary[:80]: [%s]" % surplusSummary[:80])
+        nTerror("Failed to find surplusSummary in surplusSummary[:80]: [%s]" % surplusSummary[:80])
         return True
     surplusSummary = "Wattos Surplus Analysis Summary\n\n" + surplusSummary.strip()
 
-#    NTdebug('got surplusSummary: \n' + surplusSummary)
+#    nTdebug('got surplusSummary: \n' + surplusSummary)
 
 #    pathOutCompleteness = os.path.join(path, 'wattos_completeness_chk.str')
 #    if not os.path.exists(pathOutCompleteness): # Happened for 1ao2 on production machine; not on development...
-#        NTerror("Path does not exist: %s" % (pathOutCompleteness))
+#        nTerror("Path does not exist: %s" % (pathOutCompleteness))
 #        return True
-#    NTdebug('> parsing ' + pathOutCompleteness)
+#    nTdebug('> parsing ' + pathOutCompleteness)
 #    fullTextCompleteness = open(pathOutCompleteness, 'r').read()
 #    if not fullTextCompleteness:
-#        NTerror('Failed to parse Wattos completeness summary file')
+#        nTerror('Failed to parse Wattos completeness summary file')
 #        return True
 #
 #    startString = '_NOE_completeness_shell.Type'
 #    endString = 'stop_'
 #    completenessSummary = getTextBetween(fullTextCompleteness, startString, endString, endIncl = False)
 #    if not completenessSummary:
-#        NTerror("Failed to find completenessSummary in fullText[:80]: [%s]" % fullTextCompleteness[:80])
+#        nTerror("Failed to find completenessSummary in fullText[:80]: [%s]" % fullTextCompleteness[:80])
 #        return True
 #    completenessSummary = '\n'.join([HTML_TAG_PRE,
 #                                completenessSummary.strip(),
 #                                '---------------------------------------------',
 #                                HTML_TAG_PRE2])
 #
-#    NTdebug('got completenessSummary: \n' + completenessSummary)
+#    nTdebug('got completenessSummary: \n' + completenessSummary)
 
 #    intro = '----------- Wattos summary -----------'
     completenessMolStr = NaNstring
@@ -483,11 +483,11 @@ def _runWattos(project, ranges=None, tmp = None, parseOnly=False):
 
     summary = '\n\n'.join([surplusSummary, complStatement])
     if setDeepByKeys(mol, summary, WATTOS_SUMMARY_STR):
-        NTerror('Failed to set Wattos summary')
+        nTerror('Failed to set Wattos summary')
         return True
 
     wattosStatus.parsed = True
-#    NTdebug("In runWattos: project.wattosStatus.completed: %s" % project.wattosStatus.completed)
+#    nTdebug("In runWattos: project.wattosStatus.completed: %s" % project.wattosStatus.completed)
 
     return wattos # Success
 #end def
@@ -496,7 +496,7 @@ def createHtmlWattos(project, ranges = None):
     """ Read out wiPlotList to see what get's created. """
 
     if not getDeepByKeysOrAttributes(plugins, MATPLIB_STR, IS_INSTALLED_STR):
-#        NTdebug('Skipping createHtmlWattos because no matplib installed.')
+#        nTdebug('Skipping createHtmlWattos because no matplib installed.')
         return
     from cing.PluginCode.matplib import MoleculePlotSet #@UnresolvedImport
 
@@ -535,10 +535,10 @@ def restoreWattos( project, tmp=None ):
     Optionally restore Wattos results
     """
     if project.wattosStatus.completed:
-        NTmessage('==> Restoring Wattos results')
+        nTmessage('==> Restoring Wattos results')
         project.runWattos(parseOnly=True)
 #    else:
-#        NTdebug("In restoreWattos: project.wattosStatus.completed: %s" % project.wattosStatus.completed)
+#        nTdebug("In restoreWattos: project.wattosStatus.completed: %s" % project.wattosStatus.completed)
 #end def
 
 # register the functions

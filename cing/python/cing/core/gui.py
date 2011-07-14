@@ -21,7 +21,7 @@ from memops.gui.ScrolledText    import Text #@UnresolvedImport
 from memops.editor.BasePopup    import BasePopup #@UnresolvedImport
 from memops.editor.Util         import createDismissHelpButtonList #@UnusedImport @UnresolvedImport
 
-from cing.Libs.NTutils          import NTpath, NTerror, NTmessage, sprintf
+from cing.Libs.NTutils          import nTpath, nTerror, nTmessage, sprintf
 
 
 largeFont = 'Helvetica 14 bold'
@@ -604,7 +604,7 @@ class CingGui(BasePopup):
             self.pdbEntry.configure(state='normal')
             self.pdbEntry.set(fileName)
             # Put text into name widget
-            dir,name,dummy = NTpath( fileName )
+            dir,name,dummy = nTpath( fileName )
             self.nameEntry.configure(state='normal')
             self.nameEntry.set(name)
             # choose the correct radiobutton
@@ -629,7 +629,7 @@ class CingGui(BasePopup):
             self.pdbEntry.set(fileName)
             self.projOptionsSelect.setIndex(1)
 
-            dir,name,dummy = NTpath( fileName )
+            dir,name,dummy = nTpath( fileName )
             self.nameEntry.set(name)
         #end if
         self.ccpnEntry.set(fileName)
@@ -697,7 +697,7 @@ class CingGui(BasePopup):
         """
         fName = self.projEntry.get()
         if not os.path.exists( fName ):
-            NTerror('Error: file "%s" does not exist\n', fName)
+            nTerror('Error: file "%s" does not exist\n', fName)
         #end if
 
         if self.project: self.closeProject()
@@ -711,7 +711,7 @@ class CingGui(BasePopup):
         """
         fName = self.pdbEntry.get()
         if not os.path.exists( fName ):
-            NTerror('Error: file "%s" does not exist\n', fName)
+            nTerror('Error: file "%s" does not exist\n', fName)
         #end if
         self.project = cing.Project.open( self.nameEntry.get(), status='new' )
         self.project.initPDB( pdbFile=fName, convention = 'PDB' )
@@ -807,13 +807,13 @@ class CingGui(BasePopup):
 
         pipe = TextPipe(self.outputTextBox.text_area)
         sys.stdout = pipe
-        NTmessage.stream = pipe
+        nTmessage.stream = pipe
     # end def redirectConsole
 #    sys.stderr = pipe
 
     def resetConsole(self):
         #sys.stdin   = stdin
-        NTmessage.stream = stdout
+        nTmessage.stream = stdout
         sys.stdout  = stdout
         sys.stderr  = stderr
     # end def resetConsole

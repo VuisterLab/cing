@@ -25,25 +25,25 @@ resonances =[ (0,'HN'),(0,'N'),( 0,'CA'),(0,'CB'),( -1,'CA'), (-1,'CB')]
 #===========================================================================
 # No need to edit below here (I think)
 #===========================================================================
-NTmessage('%-8s  ',  ' ')
+nTmessage('%-8s  ',  ' ')
 for index,name in resonances:
-    NTmessage('%-8s  ', name+'i'+str(index) )
+    nTmessage('%-8s  ', name+'i'+str(index) )
 #end for
-NTmessage('')
+nTmessage('')
 
 # Generate peaks for all residues
 for residue in project.molecule.allResidues(): #@UndefinedVariable
     atoms = translateTopology( residue, resonances )
-    NTmessage('%-8s  ', residue.name)
+    nTmessage('%-8s  ', residue.name)
     for atm in atoms:
         if not atm:
-            NTmessage('%-8s  ', '-X-')
+            nTmessage('%-8s  ', '-X-')
         elif atm.isAssigned(resonanceListIdx=RESONANCE_LIST_IDX_ANY):
-            NTmessage('%-8.3f  ', atm.shift() )
+            nTmessage('%-8.3f  ', atm.shift() )
         else:
-            NTmessage('%-8s  ', '-?-' )
+            nTmessage('%-8s  ', '-?-' )
         #end if
     #end for
-    NTmessage('')
+    nTmessage('')
 #end for
 

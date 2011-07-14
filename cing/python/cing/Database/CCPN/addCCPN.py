@@ -8,6 +8,7 @@ Adjust sourceFile where needed
 
 from cing import * #@UnusedWildImport
 
+
 sourceFile = 'CcpnResAtomNomenclature_081103.txt'
 
 resdef = None
@@ -17,13 +18,17 @@ for line in AwkLike(sourceFile, commentString = '#'):
     if d[1] == 'RESIDUE':
         ccpnName = ' '.join(d[13:])
         iupacName = d[9]
-        if iupacName == '-': iupacName = None
+        if iupacName == '-': 
+            iupacName = None
         cyanaName = d[5]
-        if cyanaName == '-': cyanaName = None
+        if cyanaName == '-': 
+            cyanaName = None
         dyanaName = d[7]
-        if dyanaName == '-': dyanaName = None
+        if dyanaName == '-': 
+            dyanaName = None
         cingName  = d[3]
-        if cingName == '-': cingName = None
+        if cingName == '-': 
+            cingName = None
 
         resdef = NTdb.getResidueDefByName(cingName, 'INTERNAL_0')
         if resdef:
@@ -31,13 +36,13 @@ for line in AwkLike(sourceFile, commentString = '#'):
 
             # check  names in CING database
             if resdef.translate(CYANA2) != cyanaName:
-                NTwarning('line %d %s: CYANA2 nomenclature CING database "%s" vrs CCPN database "%s"', line.NR, resdef,
+                nTwarning('line %d %s: CYANA2 nomenclature CING database "%s" vrs CCPN database "%s"', line.NR, resdef,
                           resdef.translate(CYANA2), cyanaName)
             if resdef.translate(DYANA) != dyanaName:
-                NTwarning('line %d %s: DYANA nomenclature CING database "%s" vrs CCPN database "%s"',  line.NR, resdef,
+                nTwarning('line %d %s: DYANA nomenclature CING database "%s" vrs CCPN database "%s"',  line.NR, resdef,
                           resdef.translate(DYANA), dyanaName)
             if resdef.translate(IUPAC) != iupacName:
-                NTwarning('line %d %s: IUPAC nomenclature CING database "%s" vrs CCPN database "%s"',  line.NR, resdef,
+                nTwarning('line %d %s: IUPAC nomenclature CING database "%s" vrs CCPN database "%s"',  line.NR, resdef,
                           resdef.translate(IUPAC), iupacName)
             #end if
             print ''
@@ -88,18 +93,18 @@ for line in AwkLike(sourceFile, commentString = '#'):
             pass
 
         elif not atomdef:
-            NTerror('line %d: %s undefined atom in CING; ccpn names DIANA: "%s" IUPAC: "%s" CCPN "%s"',
+            nTerror('line %d: %s undefined atom in CING; ccpn names DIANA: "%s" IUPAC: "%s" CCPN "%s"',
                      line.NR, resdef, dianaName, iupacName, ccpnName)
         else:
 #            atomdef = resdef[dianaName]
 
             # check  names in CING database
             if atomdef.translate(CYANA2) != cyanaName:
-                NTwarning('line %d %s: CYANA2 nomenclature CING database "%s" vrs CCPN database "%s"', line.NR, atomdef,
+                nTwarning('line %d %s: CYANA2 nomenclature CING database "%s" vrs CCPN database "%s"', line.NR, atomdef,
                           atomdef.translate(CYANA2), cyanaName)
             #end if
             if atomdef.translate(IUPAC) != iupacName:
-                NTwarning('line %d %s: IUPAC nomenclature CING database "%s" vrs CCPN database "%s"', line.NR, atomdef,
+                nTwarning('line %d %s: IUPAC nomenclature CING database "%s" vrs CCPN database "%s"', line.NR, atomdef,
                           atomdef.translate(IUPAC), iupacName)
             #end if
 

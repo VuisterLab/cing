@@ -80,5 +80,5 @@ if __name__ == '__main__':
             continue
         whyNotEntry.comment = FAILED_TO_BE_VALIDATED_CING
     whyNotStr = '%s' % whyNot
-    NTdebug("whyNotStr: ["+ whyNotStr +"]")
+    nTdebug("whyNotStr: ["+ whyNotStr +"]")
     writeTextToFile("NRG-CING.txt", whyNotStr)

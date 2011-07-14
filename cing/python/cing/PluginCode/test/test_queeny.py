@@ -82,7 +82,8 @@ class AllChecks(TestCase):
                         information = getDeepByKeysOrAttributes(res, QUEENY_INFORMATION_STR )
                         uncertainty1 = getDeepByKeysOrAttributes(res, QUEENY_UNCERTAINTY1_STR )
                         uncertainty2 = getDeepByKeysOrAttributes(res, QUEENY_UNCERTAINTY2_STR )
-                        NTdebug("Comparing expected versus inf/unc1/unc2 for %20s with %8.3f %8.3f %8.3f %8.3f" % (res, expected, information, uncertainty1, uncertainty2))
+                        nTdebug("Comparing expected versus inf/unc1/unc2 for %20s with %8.3f %8.3f %8.3f %8.3f" % (
+                                    res, expected, information, uncertainty1, uncertainty2))
 #                        self.assertAlmostEqual(expected,information,3)
             if doStoreCheck:
 #                # Does require:
@@ -90,9 +91,9 @@ class AllChecks(TestCase):
                     from cing.PluginCode.sqlAlchemy import CsqlAlchemy #@UnusedImport
                     pdbEntryId = entryId[0:4]
                     if doStoreCING2db( pdbEntryId, ARCHIVE_DEV_NRG_ID, project=project):
-                        NTerror("Failed to store CING project's data to DB but continuing.")
+                        nTerror("Failed to store CING project's data to DB but continuing.")
                 except:
-                    NTwarning("Failed to doStoreCING2db from test_queeny.py")
+                    nTwarning("Failed to doStoreCING2db from test_queeny.py")
         # end for
     # end def test
 

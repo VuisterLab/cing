@@ -49,11 +49,11 @@ class MatchBmrbPdb(Lister):
             rmdir(matchBmrbPdbDir)
         if not os.path.exists(matchBmrbPdbDir):
             csvFileDir = os.path.join(cingRoot, matchBmrbPdbDataDir)
-            NTmessage("Recreating data dir %s from SVN %s" % (matchBmrbPdbDir, csvFileDir))
+            nTmessage("Recreating data dir %s from SVN %s" % (matchBmrbPdbDir, csvFileDir))
 #            mkdirs( matchBmrbPdbDir )
             copytree(csvFileDir, matchBmrbPdbDir)
         else:
-            NTmessage("Reusing existing data dir " + matchBmrbPdbDir)
+            nTmessage("Reusing existing data dir " + matchBmrbPdbDir)
         os.chdir(matchBmrbPdbDir)
         if 1: # DEFAULT: 1
             if os.path.exists(self.adit_fn):
@@ -61,20 +61,20 @@ class MatchBmrbPdb(Lister):
             wgetProgram = ExecuteProgram('wget --no-verbose %s' % self.adit_url, redirectOutputToFile ='getAdit.log' )
             exitCode = wgetProgram()
             if exitCode:
-                NTerror("Failed to download file %s" % self.adit_url)
+                nTerror("Failed to download file %s" % self.adit_url)
                 return True
             if not os.path.exists(self.adit_fn):
-                NTerror("Failed to find downloaded file %s" % self.adit_url)
+                nTerror("Failed to find downloaded file %s" % self.adit_url)
                 return True
             columnOrder = 'bmrb_id pdb_id'.split()
             if addColumnHeaderRowToCsvFile(self.adit_fn, columnOrder):
-                NTerror("Failed to add header row to " + self.adit_fn)
+                nTerror("Failed to add header row to " + self.adit_fn)
                 return True
         if 1: # DEFAULT: 1
             bmrbFileList = findFiles("bmr*_21.str", bmrbDir)
             bmrbIdList = []
             for bmrbFile in bmrbFileList:
-                _directory, basename, _extension = NTpath(bmrbFile)
+                _directory, basename, _extension = nTpath(bmrbFile)
                 bmrbId = int(basename[3:-3]) # bmr970_21 -> 970
                 bmrbIdList.append(bmrbId)
             bmrbIdList.sort()
@@ -83,12 +83,12 @@ class MatchBmrbPdb(Lister):
             bmrbId2NTList = NTlist(*bmrbId2List)
             bmrbIdNTmissingList = bmrbIdNTList.difference(bmrbId2NTList)
             if bmrbIdNTmissingList:
-                NTmessage("Found %d entries on file but not in DB: %s" % (len(bmrbIdNTmissingList), str(bmrbIdNTmissingList)))
+                nTmessage("Found %d entries on file but not in DB: %s" % (len(bmrbIdNTmissingList), str(bmrbIdNTmissingList)))
             bmrbId2NTmissingList = bmrbId2NTList.difference(bmrbIdNTList)
             if bmrbId2NTmissingList:
-                NTmessage("Found %d entries in DB but not on file: %s" % (len(bmrbId2NTmissingList), str(bmrbId2NTmissingList)))
+                nTmessage("Found %d entries in DB but not on file: %s" % (len(bmrbId2NTmissingList), str(bmrbId2NTmissingList)))
             if len( bmrbIdNTmissingList + bmrbId2NTmissingList ) > 40: # was 18 + 3=21 on April 11, 2011.
-                NTwarning("More than one hundred inconsistencies between BMRB DB and on file.")
+                nTwarning("More than one hundred inconsistencies between BMRB DB and on file.")
             bmrbIdStrList = ['bmrb_id']  + [ str(x) for x in bmrbIdList] # add header for CSV reader.
             fileName = os.path.join( matchBmrbPdbDir, 'bmrb.csv')
             txt = '\n'.join(bmrbIdStrList)
@@ -106,7 +106,7 @@ class MatchBmrbPdb(Lister):
 
     def run(self):
         if self.prepare():
-            NTerrorT("Failed to prepare")
+            nTerrorT("Failed to prepare")
             return True
 #        return
 
@@ -168,9 +168,9 @@ class MatchBmrbPdb(Lister):
             pdbIdNewMany2OneList.append(pdb_id)
 
         l1 = len(pdbIdNewMany2OneList)
-        NTmessage("Skipped: %s obsolete PDB entries from score_many2one %s" % (len(pdbIdListAbsent),str(pdbIdListAbsent)))
-        NTmessage("Skipped: %s obsolete BMRB entries from score_many2one %s" % (len(bmrbIdListAbsent),str(bmrbIdListAbsent)))
-        NTmessage("Accepted from old list %s matches" % l1)
+        nTmessage("Skipped: %s obsolete PDB entries from score_many2one %s" % (len(pdbIdListAbsent),str(pdbIdListAbsent)))
+        nTmessage("Skipped: %s obsolete BMRB entries from score_many2one %s" % (len(bmrbIdListAbsent),str(bmrbIdListAbsent)))
+        nTmessage("Accepted from old list %s matches" % l1)
 
 
 
@@ -215,19 +215,19 @@ class MatchBmrbPdb(Lister):
         for idx, pdb_id in enumerate(pdbIdManualList):
             bmrb_id = bmrbIdManualList[idx]
             if not pdbIdPdbNmrHash.has_key(pdb_id):
-                NTerror("Failed to find %s in PDB; update the manual list." % pdb_id)
+                nTerror("Failed to find %s in PDB; update the manual list." % pdb_id)
                 continue
             if not bmrbIdHash.has_key(bmrb_id):
-                NTerror("Failed to find %s in BMRB; update the manual list." % bmrb_id)
+                nTerror("Failed to find %s in BMRB; update the manual list." % bmrb_id)
                 continue
             if pdb_id in pdbIdNewMany2OneList:
                 idx = pdbIdNewMany2OneList.index(pdb_id)
                 bmrb_id_current = bmrbIdNewMany2OneList[idx]
                 if bmrb_id_current == bmrb_id:
-                    NTmessage("Already found %s in PDB with BMRB %s in manual and current list; consider updating the manual list." % (pdb_id, bmrb_id))
+                    nTmessage("Already found %s in PDB with BMRB %s in manual and current list; consider updating the manual list." % (pdb_id, bmrb_id))
                     continue
-                NTmessage("Using manual mapping of %s in PDB with BMRB %s in manual list instead of BMRB %s in current list." % (pdb_id, bmrb_id, bmrb_id_current))
-                NTmessage("First removing match at idx %s in current list." % idx)
+                nTmessage("Using manual mapping of %s in PDB with BMRB %s in manual list instead of BMRB %s in current list." % (pdb_id, bmrb_id, bmrb_id_current))
+                nTmessage("First removing match at idx %s in current list." % idx)
                 del bmrbIdNewMany2OneList[idx]
                 del pdbIdNewMany2OneList[idx]
         #    if bmrb_id in bmrbIdNewMany2OneList: allow this.
@@ -243,30 +243,30 @@ class MatchBmrbPdb(Lister):
         uniquePdbCount = len(pdbIdNewHash)
         uniqueBmrbCount = len(bmrbIdNewHash)
 
-        NTmessage("Skipped: %s double entries from pdbIdAditList %s" % (len(pdbIdListDouble),str(pdbIdListDouble)))
+        nTmessage("Skipped: %s double entries from pdbIdAditList %s" % (len(pdbIdListDouble),str(pdbIdListDouble)))
         for aditIdx in range(nadit):
             pdbIdLoLObsolete[aditIdx].sort()
             bmrbIdLoLObsolete[aditIdx].sort()
-            NTmessage("Skipped: %s obsolete  PDB entries from adit%s %s" % (len( pdbIdLoLObsolete[aditIdx]), aditIdx,  str(pdbIdLoLObsolete[aditIdx])))
-            NTmessage("Skipped: %s obsolete BMRB entries from adit%s %s" % (len(bmrbIdLoLObsolete[aditIdx]), aditIdx, str(bmrbIdLoLObsolete[aditIdx])))
-            NTmessage("Accepted from adit%s %s for a total of %s matches" %(aditIdx, l2[aditIdx], ltotal1[aditIdx]))
-        NTmessage("Accepted from manual list %s for a total of %s matches" %( l3, ltotal2))
-        NTmessage("Accepted unique %d PDB and %d BMRB entries" %( uniquePdbCount, uniqueBmrbCount))
+            nTmessage("Skipped: %s obsolete  PDB entries from adit%s %s" % (len( pdbIdLoLObsolete[aditIdx]), aditIdx,  str(pdbIdLoLObsolete[aditIdx])))
+            nTmessage("Skipped: %s obsolete BMRB entries from adit%s %s" % (len(bmrbIdLoLObsolete[aditIdx]), aditIdx, str(bmrbIdLoLObsolete[aditIdx])))
+            nTmessage("Accepted from adit%s %s for a total of %s matches" %(aditIdx, l2[aditIdx], ltotal1[aditIdx]))
+        nTmessage("Accepted from manual list %s for a total of %s matches" %( l3, ltotal2))
+        nTmessage("Accepted unique %d PDB and %d BMRB entries" %( uniquePdbCount, uniqueBmrbCount))
 
         pdbIdNewMany2OneNTList = NTlist(*pdbIdNewMany2OneList)
         pdbIdDuplicateList = pdbIdNewMany2OneNTList.removeDuplicates()
         if pdbIdDuplicateList:
-            NTerror("Got %s duplicate PDB entries in result: %s" % (len(pdbIdDuplicateList), str(pdbIdDuplicateList) ))
+            nTerror("Got %s duplicate PDB entries in result: %s" % (len(pdbIdDuplicateList), str(pdbIdDuplicateList) ))
             return True
 
         bmrbIdNewMany2OneNTList = NTlist(*bmrbIdNewMany2OneList)
         bmrbIdDuplicateList = bmrbIdNewMany2OneNTList.removeDuplicates()
         bmrbIdDuplicateList = bmrbIdDuplicateList.removeDuplicates()
         if bmrbIdDuplicateList:
-            NTmessage("Using %s BMRB entries that match two or more PDB entries." % len(bmrbIdDuplicateList) )
+            nTmessage("Using %s BMRB entries that match two or more PDB entries." % len(bmrbIdDuplicateList) )
 
         if newMany2OneTable.sortRelationByColumnIdx([0,1]):
-            NTerror("Failed to sort table: %s")
+            nTerror("Failed to sort table: %s")
             return True
         newMany2OneTable.writeCsvFile()
 
@@ -275,5 +275,5 @@ if __name__ == '__main__':
     cing.verbosity = cing.verbosityDebug
     m = MatchBmrbPdb()
     if m.run():
-        NTerrorT("Failed to match BMRB to PDB")
+        nTerrorT("Failed to match BMRB to PDB")
         sys.exit(1)

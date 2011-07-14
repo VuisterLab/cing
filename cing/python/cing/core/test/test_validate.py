@@ -55,11 +55,11 @@ class AllChecks(TestCase):
             "Failed to change to test directory for files: " + cingDirTmpTest)
         project = Project.open(entryId, status = 'new')
         if not project:
-            NTerror('Failed opening project %s', entryId)
+            nTerror('Failed opening project %s', entryId)
             exit(1)
 
         cyanaDirectory = os.path.join(cingDirTestsData, "cyana", entryId)
-        NTdebug("Reading files from directory: " + cyanaDirectory)
+        nTdebug("Reading files from directory: " + cyanaDirectory)
 
         # Import of the raw data; different formats for each entry. Sometimes
         # the default is acceptable.

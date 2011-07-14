@@ -12,7 +12,7 @@ class AllChecks(TestCase):
 
     def testVector0(self):
         v = NTcVector(0.0,1.0,2.0)
-        NTdebug("v: %r or %s" % (v,v) )
+        nTdebug("v: %r or %s" % (v,v) )
 
     def testVector(self):
         n = 10 * 1000
@@ -25,7 +25,7 @@ class AllChecks(TestCase):
             cList.append(c)
         for _i in range(n):
             _d = NTdihedralOpt(cList[0], cList[1], cList[2], cList[3])
-#            NTdebug("d: %8.3f" % d )
+#            nTdebug("d: %8.3f" % d )
 
     def testSuperposeChains(self):
         pass

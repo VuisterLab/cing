@@ -63,15 +63,15 @@ def sendRequest(url, fields, files=None):
                   'Content-Length': str(len(bodyData))
                   }
 
-#    NTdebug( "contentType: [%s]" % contentType )
-#    NTdebug( "headerDict: [%s]" % headerDict )
-#    NTdebug( "bodyData: [%s]" % bodyData )
+#    nTdebug( "contentType: [%s]" % contentType )
+#    nTdebug( "headerDict: [%s]" % headerDict )
+#    nTdebug( "bodyData: [%s]" % bodyData )
 
     #enterRequest = urllib2.Request(url)
     #print urllib2.urlopen(enterRequest).read()
     #time.sleep(2)
 
-#    NTdebug("Requesting form to url: [" + url + "]")
+#    nTdebug("Requesting form to url: [" + url + "]")
     request = urllib2.Request(url, bodyData, headerDict)
 
     try:
@@ -84,7 +84,7 @@ def sendRequest(url, fields, files=None):
             msg = 'Server request failed and returned code:\n%s' % e.code
         else:
             msg = 'Server totally barfed with no reason of fail code'
-        NTwarning('Failure', msg)
+        nTwarning('Failure', msg)
         return
 
     return response.read()
@@ -94,7 +94,7 @@ def putFileBySsh( fileName, targetUrl, ensureDirIsPresent = True, rsyncOptions =
     "Returns True on error"
 
     if not os.path.exists(fileName):
-        NTerror("Failed to %s because of missing input file %s." % (getCallerName(), fileName))
+        nTerror("Failed to %s because of missing input file %s." % (getCallerName(), fileName))
         return True
 
     if targetUrl.startswith('ssh://'):
@@ -104,13 +104,13 @@ def putFileBySsh( fileName, targetUrl, ensureDirIsPresent = True, rsyncOptions =
     userNameAtDomain, targetDir = targetUrl.split(':')
     if ensureDirIsPresent:
         cmd = 'ssh %s mkdir -p %s' % (userNameAtDomain, targetDir)
-        NTdebug("cmd: %s" % cmd)
+        nTdebug("cmd: %s" % cmd)
         status, result = commands.getstatusoutput(cmd)
         if status:
             if 'File exists' in result:
                 pass # this is ok
             else:
-                NTerror("Failed to create remote directory %s by ssh to %s. Status: %s with result %s" % (userNameAtDomain, targetDir, status, result))
+                nTerror("Failed to create remote directory %s by ssh to %s. Status: %s with result %s" % (userNameAtDomain, targetDir, status, result))
                 return True
             # end if
         # end if
@@ -118,19 +118,19 @@ def putFileBySsh( fileName, targetUrl, ensureDirIsPresent = True, rsyncOptions =
     # -l units are kbit/s
 #    cmd = 'scp %s %s' % (fileName, targetUrl)
     cmd = 'rsync %s -ave ssh %s %s/' % (rsyncOptions, fileName, targetUrl)
-    NTdebug("cmd: %s" % cmd)
+    nTdebug("cmd: %s" % cmd)
     for tryCount in range(ntriesMax):
-#        NTdebug("Try count: %s" % tryCount)
+#        nTdebug("Try count: %s" % tryCount)
         if tryCount:
-            NTwarning("Retrying count: %s" % tryCount)
+            nTwarning("Retrying count: %s" % tryCount)
         status, result = commands.getstatusoutput(cmd)
         if not status:
-#            NTdebug("Succeeded putFileBySsh by command: %s" % cmd)
+#            nTdebug("Succeeded putFileBySsh by command: %s" % cmd)
             return
         # end if
-        NTerror("Failed to putFileBySsh status: %s with result %s" % (status, result))
+        nTerror("Failed to putFileBySsh status: %s with result %s" % (status, result))
     # end for
-    NTerror("Failed to putFileBySsh after all %s tries." % ntriesMax)
+    nTerror("Failed to putFileBySsh after all %s tries." % ntriesMax)
     return True
 # end def
 
@@ -142,22 +142,22 @@ def getFileBySsh( sourceUrl, targetUrl, rsyncOptions = '', ntriesMax = 1):
         sshUrlLength = len('ssh://')
 #        sourceUrlOrg = sourceUrl
         sourceUrl = sourceUrl[sshUrlLength:]
-#        NTdebug("Rewrote sourceUrl %s to: %s" % ( sourceUrlOrg, sourceUrl))
+#        nTdebug("Rewrote sourceUrl %s to: %s" % ( sourceUrlOrg, sourceUrl))
     # end if
     cmd = 'rsync %s -ave ssh %s %s' % (rsyncOptions, sourceUrl, targetUrl)
-#    NTdebug("cmd: %s" % cmd)
+#    nTdebug("cmd: %s" % cmd)
     for tryCount in range(ntriesMax):
-#        NTdebug("Try count: %s" % tryCount)
+#        nTdebug("Try count: %s" % tryCount)
         if tryCount:
-            NTwarning("Retrying count: %s" % tryCount)
+            nTwarning("Retrying count: %s" % tryCount)
         status, result = commands.getstatusoutput(cmd)
         if not status:
-#            NTdebug("Succeeded %s by command: %s" % (getCallerName(), cmd))
+#            nTdebug("Succeeded %s by command: %s" % (getCallerName(), cmd))
             return
         # end if
-        NTerror("Failed to %s status: %s with result %s" % ((getCallerName(), status, result)))
+        nTerror("Failed to %s status: %s with result %s" % ((getCallerName(), status, result)))
     # end for
-    NTerror("Failed to %s after all %s tries." % ((getCallerName(), ntriesMax)))
+    nTerror("Failed to %s after all %s tries." % ((getCallerName(), ntriesMax)))
     return True
 # end def
 

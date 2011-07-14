@@ -77,7 +77,7 @@ class AllChecks(TestCase):
     #        self.assertEqual( r, expectedResults[i] )
             self.assertEquals(r, expectedResults[i])
 
-#    def ttttestQuoteForJson(self):
+#    def _testQuoteForJson(self):
 #        inList = [ "a", "a b", "a'b" ]
 #        expectedResults= [ 'a', "'a b'" , 'a"b'  ]
 #        i = 0
@@ -86,16 +86,15 @@ class AllChecks(TestCase):
 #            self.assertEquals(r,expectedResults[i])
 #            i += 1
 
-
     def testNTpath(self):
-        NTmessage("Now in " + getCallerName())
+        nTmessage("Now in " + getCallerName())
         # First item changed perhaps. used to be put in extension.
         pathList = [            '/Users/jd/.cshrc', '/Users/jd/workspace35', '/Users/jd/workspace35/', '1brv.pdb', '.cshrc' ]
         expectedDirectory = [   '/Users/jd',        '/Users/jd',             '/Users/jd/workspace35',  '.',        '.' ]
         expectedBasename = [    '.cshrc',           'workspace35',           '',                       '1brv',     '.cshrc' ]
         expectedExtension = [   '',                 '',                      '',                       '.pdb',     '' ]
         for i in range(len(pathList)):
-            (directory, basename, extension) = NTpath(pathList[i])
+            (directory, basename, extension) = nTpath(pathList[i])
             self.assertEquals(directory, expectedDirectory[i])
             self.assertEquals(basename, expectedBasename[i])
             self.assertEquals(extension, expectedExtension[i])
@@ -109,10 +108,10 @@ class AllChecks(TestCase):
 
     def testCSV(self):
         input = ['1brv', '9pcy' ]
-        NTdebug("csv: [" + toCsv(input) + "]")
+        nTdebug("csv: [" + toCsv(input) + "]")
 
     def testGetDateTimeStampForFileName(self):
-        NTdebug("getDateTimeStampForFileName: [" + getDateTimeStampForFileName() + "]")
+        nTdebug("getDateTimeStampForFileName: [" + getDateTimeStampForFileName() + "]")
 
 
 if __name__ == "__main__":

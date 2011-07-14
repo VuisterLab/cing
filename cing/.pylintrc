@@ -39,20 +39,21 @@ load-plugins=
 #C0323 Operator not followed by a space
 #C0324 Comma not followed by a space
 #F0401 Unable to import. Pydev
+#I0011 Locally disabling certain class of messages.
+#I0013 Ignoring entire file
 #R0911 File.parse] Too many return statements (14/6)   File.py /pystarlib/src/STAR line 87 PyLint Problem
 #R0912 File.parse] Too many branches (37/12)   File.py /pystarlib/src/STAR line 87 PyLint Problem
 #R0913 File.__init__] Too many arguments (6/5) File.py /pystarlib/src/STAR line 28 PyLint Problem
 #R0914 File.parse] Too many local variables (22/15)    File.py /pystarlib/src/STAR line 87 PyLint Problem
 #R0915 File.parse] Too many statements (112/50)    File.py /pystarlib/src/STAR line 87 PyLint Problem
+#W0122  Use of the exec statement runAll.py   /pystarlib/src/STAR/test    line 14 PyLint Problem
+#W0142 NTlist.selectByItems: Used * or ** magic   NTutils.py  /cing/python/cing/Libs  line 310    PyLint Problem
 #W0401 Wildcard import STAR.Text   File.py /pystarlib/src/STAR line 8  PyLint Problem
 #W0402 Uses of a deprecated module 'string'
 #W0611 Unused import. Pydev
 #W0614 Unused import
+#   W0621 Redefining name 'x' from outer scope 
 #W0702 No exception type(s) specified
-#I0013 Ignoring entire file
-#W0122  Use of the exec statement runAll.py   /pystarlib/src/STAR/test    line 14 PyLint Problem
-#I0011 Locally disabling certain class of messages.
-#W0142 NTlist.selectByItems: Used * or ** magic   NTutils.py  /cing/python/cing/Libs  line 310    PyLint Problem
 disable=C0322,C0323,C0324,E0602,F0401,I0011,I0013,W0122,W0142,W0401,W0402,W0511,W0611,W0614,W0702,R0911,R0912,R0913,R0914,R0915
 
 

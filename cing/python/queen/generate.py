@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-#@PydevCodeAnalysisIgnore
+#@PydevCodeAnalysisIgnore # pylint: disable-all
 
 # ADD QUEEN SOURCE TO SYSTEM PATH
 import sys,os

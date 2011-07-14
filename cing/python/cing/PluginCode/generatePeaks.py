@@ -102,7 +102,7 @@ class ExperimentDef( dict ):
             self.axisOrder = []
             for a in axis:
                 if (a not in self):
-                    NTerror('ERROR: axis "%s" not defined for experiment "%s"\n%s, using default\n',
+                    nTerror('ERROR: axis "%s" not defined for experiment "%s"\n%s, using default\n',
                              a, self.name, str(self)
                            )
                     self.axisOrder = range( self.dimension )
@@ -370,9 +370,9 @@ def listPredefinedExperiments( project, *expNames ):
     for expName in expNames:
         expName = expName.strip().upper()
         if expName in expDict:
-            NTmessage('%s', ExperimentDef.describe( expDict[expName] ) )
+            nTmessage('%s', ExperimentDef.describe( expDict[expName] ) )
         else:
-            NTerror('listPredefinedExperiments: no such experiment "%s"\n',
+            nTerror('listPredefinedExperiments: no such experiment "%s"\n',
                      expName
                    )
         #end if
@@ -387,7 +387,7 @@ def generatePeaks( project, experimentName, axisOrder=None, onlyAssigned  = True
     """
     expName = experimentName.strip().upper()
     if expName not in expDict:
-        NTerror('generatePeaks: experiment "%s" not defined\n\n', experimentName )
+        nTerror('generatePeaks: experiment "%s" not defined\n\n', experimentName )
         project.listPredefinedExperiments()
         return None
     #end if
@@ -406,7 +406,7 @@ def generatePeaks( project, experimentName, axisOrder=None, onlyAssigned  = True
             #end for
         #end if
     #end for
-    NTmessage('... Appended %d peaks', len( peakList ) )
+    nTmessage('... Appended %d peaks', len( peakList ) )
 
     return peakList
 #end def

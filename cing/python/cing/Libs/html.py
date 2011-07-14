@@ -69,7 +69,7 @@ def createHtmlCing(project, ranges=None):
     """ Read out cingPlotList to see what get's created. """
 
     if not getDeepByKeysOrAttributes(plugins, MATPLIB_STR, IS_INSTALLED_STR):
-#        NTdebug('Skipping createHtmlCing because no matplib installed.')
+#        nTdebug('Skipping createHtmlCing because no matplib installed.')
         return
     from cing.PluginCode.matplib import MoleculePlotSet #@UnresolvedImport
 
@@ -192,9 +192,11 @@ def createHtmlCing(project, ranges=None):
 #end def
 
 class HistogramsForPlotting():
-    """Class for enabling load on demand
-Funny doesn't seem to speed booting up. And it really doesn't get loaded.
     """
+    Class for enabling load on demand
+    Funny doesn't seem to speed booting up. And it really doesn't get loaded.
+    """
+    
     def __init__(self):
         self.histRamaCombined                = None
         self.histRamaBySsAndResType          = None
@@ -202,7 +204,7 @@ Funny doesn't seem to speed booting up. And it really doesn't get loaded.
         self.histRamaBySsAndCombinedResType  = None
         self.histJaninBySsAndResType         = None
         self.histJaninCtupleBySsAndResType   = None
-        self.histJaninBySsAndCombinedResType = None
+        self.histJaninBySsAndCombinedResType = None             
         self.histd1BySs0AndResTypes           = None # Note the plural s in ResTypes it is hashed by not one but two residue types.
         self.histd1BySs1AndResTypes           = None # This one is hashed by the Ss of the preceding residue type.
         # NB hasing is: ssType, resType, resTypePrev, resTypeNext (just adding resTypeNext wrt histd1BySsAndResTypes
@@ -217,10 +219,10 @@ Funny doesn't seem to speed booting up. And it really doesn't get loaded.
 
     def initHist(self):
         if hPlot.histRamaBySsAndCombinedResType != None:
-            NTdebug("Doing HistogramsForPlotting#initHist even though it was done before.")
+            nTdebug("Doing HistogramsForPlotting#initHist even though it was done before.")
 
         if True:
-#            NTdebug("Loading Ramachandran histograms")
+#            nTdebug("Loading Ramachandran histograms")
             dbase_file_abs_name =  os.path.join( self.histDir, 'phipsi_wi_db.dat' )
             #dbaseTemp = shelve.open( dbase_file_abs_name )
             dbase_file = open(dbase_file_abs_name, 'rb') # read binary
@@ -234,12 +236,12 @@ Funny doesn't seem to speed booting up. And it really doesn't get loaded.
             dbase_file.close()
             #dbaseTemp.close()
 #            sumHist = core.sum(self.histRamaCombined, axis=None)
-#            NTdebug("Rama          sum: %d" % sumHist)
+#            nTdebug("Rama          sum: %d" % sumHist)
 #            sumHist = core.sum(self.histRamaBySsAndResType['H']['HIS'])
-#            NTdebug("Rama [H][HIS] sum: %d" % sumHist)
+#            nTdebug("Rama [H][HIS] sum: %d" % sumHist)
 
         if True:
-#            NTdebug("Loading Janin histograms")
+#            nTdebug("Loading Janin histograms")
             dbase_file_abs_name = os.path.join( self.histDir, 'chi1chi2_wi_db.dat' )
             dbase_file = open(dbase_file_abs_name, 'rb') # read binary
             dbaseTemp = cPickle.load(dbase_file)
@@ -248,10 +250,10 @@ Funny doesn't seem to speed booting up. And it really doesn't get loaded.
             self.histJaninBySsAndCombinedResType    = dbaseTemp[ 'histJaninBySsAndCombinedResType' ]
             dbase_file.close()
 #            sumHist = core.sum(self.histJaninBySsAndResType['H']['HIS'])
-#            NTdebug("Janin [H][HIS] sum: %d" % sumHist)
+#            nTdebug("Janin [H][HIS] sum: %d" % sumHist)
 
         if True:
-#            NTdebug("Loading D1D2 histograms")
+#            nTdebug("Loading D1D2 histograms")
             dbase_file_abs_name = os.path.join( self.histDir, 'cb4ncb4c_wi_db.dat' )
             dbase_file = open(dbase_file_abs_name, 'rb') # read binary
             dbaseTemp = cPickle.load(dbase_file)
@@ -264,9 +266,9 @@ Funny doesn't seem to speed booting up. And it really doesn't get loaded.
             self.histd1                             = dbaseTemp[ 'histd1' ]
             dbase_file.close()
 #            sumHist = core.sum(self.histd1)
-#            NTdebug("D1D2               sum: %d" % sumHist)
+#            nTdebug("D1D2               sum: %d" % sumHist)
 #            sumHist = core.sum(self.histd1BySsAndResTypes['H']['HIS']['HIS'])
-#            NTdebug("D1D2 [H][HIS][HIS] sum: %d" % sumHist)
+#            nTdebug("D1D2 [H][HIS][HIS] sum: %d" % sumHist)
 # end class
 
 hPlot = HistogramsForPlotting()
@@ -287,14 +289,14 @@ def makeDihedralPlot( project, residueList, dihedralName1, dihedralName2,
     '''
 
     if not project:
-        NTerror( 'in makeDihedralPlot called without project' )
+        nTerror( 'in makeDihedralPlot called without project' )
         return None
     if not residueList:
-        NTerror( 'makeDihedralPlot called without residues in list' )
+        nTerror( 'makeDihedralPlot called without residues in list' )
         return None
 
     if not getDeepByKeysOrAttributes(plugins, MATPLIB_STR, IS_INSTALLED_STR):
-        NTdebug('Skipping plots in html#makeDihedralPlot() because no matplib installed.')
+        nTdebug('Skipping plots in html#makeDihedralPlot() because no matplib installed.')
         return None
 
     from cing.PluginCode.matplib import NTplot #@UnresolvedImport
@@ -313,11 +315,11 @@ def makeDihedralPlot( project, residueList, dihedralName1, dihedralName2,
 #            allSameResType = False
 #            break
     if dihedralName1 not in residue or residue[dihedralName1] == None:
-#        NTdebug( 'in makeDihedralPlot not in residue dihedral 1: '+dihedralName1 )
+#        nTdebug( 'in makeDihedralPlot not in residue dihedral 1: '+dihedralName1 )
         return None
 
     if dihedralName2 not in residue or residue[dihedralName2] == None:
-#        NTdebug( 'in makeDihedralPlot not in residue dihedral 2: '+dihedralName2 )
+#        nTdebug( 'in makeDihedralPlot not in residue dihedral 2: '+dihedralName2 )
         return None
     if htmlOnly:
         return True # indicating success
@@ -331,7 +333,7 @@ def makeDihedralPlot( project, residueList, dihedralName1, dihedralName2,
             plotTitle = '%d residues'
 
 
-#    NTdebug("Creating a 2D dihedral angle plot for plotItem: %s %s %s", residue, dihedralName1, dihedralName2)
+#    nTdebug("Creating a 2D dihedral angle plot for plotItem: %s %s %s", residue, dihedralName1, dihedralName2)
 
     plotparams1 = project.plotParameters.getdefault(dihedralName1,'dihedralDefault')
     plotparams2 = project.plotParameters.getdefault(dihedralName2,'dihedralDefault')
@@ -371,7 +373,7 @@ def makeDihedralPlot( project, residueList, dihedralName1, dihedralName2,
             scaleBy = SCALE_BY_Z
         doingNewD1D2plot = True
     else:
-        NTcodeerror("makeDihedralPlot called for non Rama/Janin/d1d2")
+        nTcodeerror("makeDihedralPlot called for non Rama/Janin/d1d2")
         return None
 
     histList = []
@@ -381,16 +383,16 @@ def makeDihedralPlot( project, residueList, dihedralName1, dihedralName2,
     resName = getDeepByKeysOrDefault(residue, residue.resName, 'nameDict', PDB)
     if len( resName ) > 3: # The above line doesn't work. Manual correction works 95% of the time.
         resName = resName[:3]  # .pdb files have a max of 3 chars in their residue name.
-#    NTdebug('Looked up residue.resName %s to resName %s' % ( residue.resName,resName ))
+#    nTdebug('Looked up residue.resName %s to resName %s' % ( residue.resName,resName ))
 
     if doingNewD1D2plot:
         # depending on doOnlyOverall it will actually return an array of myHist.
         myHistList = residue.getTripletHistogramList( doOnlyOverall = False, doNormalize = False )
         if myHistList == None:
-            NTdebug("Failed to get the d1d2 hist for %s" % residue)
+            nTdebug("Failed to get the d1d2 hist for %s" % residue)
             return None
         if len(myHistList) == 0:
-#            NTdebug("Found no histogram for %s" % residue)
+#            nTdebug("Found no histogram for %s" % residue)
             return None
         histList += myHistList # extend the list.
     else:
@@ -400,12 +402,12 @@ def makeDihedralPlot( project, residueList, dihedralName1, dihedralName2,
             else:
                 myHist = getDeepByKeys(histBySsAndCombinedResType,ssType)
             if myHist == None:
-#                NTdebug("Failed to get the non-d1d2 hist for %s" % residue) # happens for 1bus cPro
+#                nTdebug("Failed to get the non-d1d2 hist for %s" % residue) # happens for 1bus cPro
                 return None
-        #            NTdebug('Appending for ssType %s and resName %s' % ( ssType,resName ))
+        #            nTdebug('Appending for ssType %s and resName %s' % ( ssType,resName ))
             histList.append(myHist)
     if histList:
-#        NTdebug('Will do dihedralComboPlot')
+#        nTdebug('Will do dihedralComboPlot')
         plot.dihedralComboPlot(histList, minPercentage =  minPercentage, maxPercentage = maxPercentage, scaleBy = scaleBy)
 
 
@@ -415,7 +417,7 @@ def makeDihedralPlot( project, residueList, dihedralName1, dihedralName2,
         if isSingleResiduePlot:
             # res is equal to residue
             for useTalos in ( False, True ):
-#                NTdebug("Plotting with useTalos %s" % useTalos)
+#                nTdebug("Plotting with useTalos %s" % useTalos)
                 dr1 = _matchDihedrals(res, dihedralName1,useTalos=useTalos)
                 dr2 = _matchDihedrals(res, dihedralName2,useTalos=useTalos)
 
@@ -443,14 +445,15 @@ def makeDihedralPlot( project, residueList, dihedralName1, dihedralName2,
                                 dev2 = NUMBER_OF_SD_TALOS * psi.error
                                 lower2 = psi.value - dev2
                                 upper2 = psi.value + dev2
-#                                NTdebug("Plotting TALOSPLUS for %s" % res)
-                                plot.plotDihedralRestraintRanges2D(lower1, upper1,lower2, upper2, fill = False, fillColor='red') # fill is important to change
+#                                nTdebug("Plotting TALOSPLUS for %s" % res)
+                                # fill is important to change
+                                plot.plotDihedralRestraintRanges2D(lower1, upper1,lower2, upper2, fill = False, fillColor='red') 
                             # end if classification
                         else:
-                            NTcodeerror("Expected dihedrals to be present and to be phi/psi if useTalos is on")
+                            nTcodeerror("Expected dihedrals to be present and to be phi/psi if useTalos is on")
                         # end check on Rama
                     else:
-#                        NTdebug("Plotting regular dihedral for %s" % res)
+#                        nTdebug("Plotting regular dihedral for %s" % res)
                         plot.plotDihedralRestraintRanges2D(lower1, upper1,lower2, upper2)
                     # end else
                 # end if
@@ -460,10 +463,10 @@ def makeDihedralPlot( project, residueList, dihedralName1, dihedralName2,
         d2 = res[dihedralName2]
 
         if not len(d1):
-#            NTdebug( 'in makeDihedralPlot dihedrals had no defining atoms for 1: %s or', dihedralName1 ) # happens in 1bus for cPro13.
+#            nTdebug( 'in makeDihedralPlot dihedrals had no defining atoms for 1: %s or', dihedralName1 ) # happens in 1bus for cPro13.
             return None
         if not len(d2):
-#            NTdebug( 'in makeDihedralPlot dihedrals had no defining atoms for 2: %s'   , dihedralName2 )
+#            nTdebug( 'in makeDihedralPlot dihedrals had no defining atoms for 2: %s'   , dihedralName2 )
             return None
         d1cav = d1.cav
         d2cav = d2.cav
@@ -489,7 +492,7 @@ def makeDihedralPlot( project, residueList, dihedralName1, dihedralName2,
 #                    myPoint.pointColor='blue'
 #                else:
 #                    bb = bbList[i]
-##                    NTdebug('BBCCHK %f' % bb)
+##                    nTdebug('BBCCHK %f' % bb)
 #                    if bb > BBCCHK_CUTOFF:
 #                        myPoint.pointColor='red'
 #                    else:
@@ -523,15 +526,15 @@ def _matchDihedrals(residue, dihedralName, useTalos=False):
     for dih in residue.dihedralRestraints:
         if dih.angle == '%s_%i' % (dihedralName, residue.resNum):
             if useTalos == None:
-#                NTdebug("Returning dihedral regardless of useTalos: %s" % dih)
+#                nTdebug("Returning dihedral regardless of useTalos: %s" % dih)
                 return dih
 
             isFromTalos = dih.parent.isFromTalos()
             if useTalos == True and isFromTalos:
-#                NTdebug("Returning dihedral because is from Talos: %s" % dih)
+#                nTdebug("Returning dihedral because is from Talos: %s" % dih)
                 return dih
             if useTalos == False and not isFromTalos:
-#                NTdebug("Returning dihedral because is NOT from Talos: %s" % dih)
+#                nTdebug("Returning dihedral because is NOT from Talos: %s" % dih)
                 return dih
     return None
 #end def
@@ -546,11 +549,11 @@ def setupHtml(project):
     '''
 
     if not project.molecule:
-        NTerror('setupHtml: no molecule defined')
+        nTerror('setupHtml: no molecule defined')
         return True
     #end if
 
-    NTmessage('==> Initializing HTML objects')
+    nTmessage('==> Initializing HTML objects')
     HTMLfile.killHtmlObjects()
 
     molecule = project.molecule
@@ -573,12 +576,12 @@ def setupHtml(project):
         AtomsHTMLfile( project, molecule.atomList )
     else:
         # reduced verbosity here because gets tested in test_NTutils3.py.
-        NTwarning("Failed to create AtomsHTMLfile because no molecule.atomList")
+        nTwarning("Failed to create AtomsHTMLfile because no molecule.atomList")
 
     if hasattr(molecule, 'ensemble'):
         EnsembleHTMLfile( project, molecule.ensemble )
 #    else:
-#        NTdebug("Not creating EnsembleHTMLfile because no ensemble")
+#        nTdebug("Not creating EnsembleHTMLfile because no ensemble")
 
     for restraintList in project.allRestraintLists():
         RestraintListHTMLfile( project, restraintList )
@@ -594,38 +597,38 @@ def generateHtml( project, htmlOnly=False ):
     Generate all CING html output
     """
     if not project.molecule:
-        NTerror('generateHtml: no molecule defined')
+        nTerror('generateHtml: no molecule defined')
         return True
     #end if
 
-    NTmessageNoEOL('==> Generating CING HTML code')
+    nTmessageNoEOL('==> Generating CING HTML code')
     if htmlOnly:
-        NTmessage('.')
+        nTmessage('.')
     else:
-        NTmessage(' and images.')
+        nTmessage(' and images.')
 
     project.html.generateHtml(htmlOnly=htmlOnly)
     project.molecule.html.generateHtml(htmlOnly=htmlOnly)
     for chain in project.molecule.allChains():
         chain.html.generateHtml(htmlOnly=htmlOnly)
-        NTmessage("Html for chain %s and its residues", chain.name)
+        nTmessage("Html for chain %s and its residues", chain.name)
         for res in NTprogressIndicator(chain.allResidues(), CHARS_PER_LINE_OF_PROGRESS):
             res.html.generateHtml(htmlOnly=htmlOnly)
     #end for
 
-    NTmessage("Html for dihedrals by Project and Residue")
+    nTmessage("Html for dihedrals by Project and Residue")
     project.dihedralByProjectList.html.generateHtml(htmlOnly=htmlOnly)
 
-    NTmessage("Html for atoms and models")
+    nTmessage("Html for atoms and models")
     if hasattr(project.molecule, 'atomList'):
         project.molecule.atomList.html.generateHtml(htmlOnly=htmlOnly)
     if hasattr(project.molecule, 'ensemble'):
         project.molecule.ensemble.html.generateHtml(htmlOnly=htmlOnly)
 
-    NTmessage('Html for peaks and restraints')
-    for l in NTprogressIndicator(project.peaks+project.allRestraintLists(), CHARS_PER_LINE_OF_PROGRESS):
-        if hasattr(l,'html'):
-            l.html.generateHtml(htmlOnly=htmlOnly)
+    nTmessage('Html for peaks and restraints')
+    for myList in NTprogressIndicator(project.peaks+project.allRestraintLists(), CHARS_PER_LINE_OF_PROGRESS):
+        if hasattr(myList,'html'):
+            myList.html.generateHtml(htmlOnly=htmlOnly)
     #end for
 #end def
 
@@ -635,7 +638,7 @@ def renderHtml(project):
        Inputs: a Cing.Molecule, Cing.Chain, Cing.Residue or Cing.Atom.
        Output: return None for success is standard.
     '''
-    NTmessage('==> Rendering HTML pages')
+    nTmessage('==> Rendering HTML pages')
     for htmlObj in htmlObjects:
         htmlObj.render()
     #end for
@@ -716,7 +719,8 @@ class MakeHtmlTable:
         Which also starts the table tag!
         """
 #        print 'iter>', self._rows, self._iter
-        if self._rows == None: return None
+        if self._rows == None: 
+            return None
 
         self._iter = 0
         self._len  = len(self._rows)
@@ -800,7 +804,7 @@ class MakeHtmlTable:
         """Make column headers NEED TO BE DEFINED
         TODO: add foot functionality.
         """
-        headers = NTzap(self.columnFormats, 0)
+        headers = nTzap(self.columnFormats, 0)
         #print "headers>", headers
 #        doHeaders = False
 #        for h in headers:
@@ -809,7 +813,7 @@ class MakeHtmlTable:
 #                break
 #        #end for
 #        if not doHeaders:
-#            NTerror("in MakeHtmlTable#_mkColumnHeaders Headers are now mandatory")
+#            nTerror("in MakeHtmlTable#_mkColumnHeaders Headers are now mandatory")
 #            return True
 
         tagId = 'thead'
@@ -857,7 +861,7 @@ def _makeDihedralByProjectTableHtml( obj, residues, text=None, ncols=10, picture
 #    if text:
 #        main('h1',text)
     if not residues:
-        NTerror("Failed to _makeResidueTableHtml")
+        nTerror("Failed to _makeResidueTableHtml")
         return True
 
     r0 = residues[0]
@@ -944,14 +948,14 @@ def _makeDihedralByResidueTableHtml( obj, residues, text=None, #ncols=10, pictur
 #    if text:
 #        main('h1',text)
     if not residues:
-        NTerror("Failed to _makeAllDihedralTableHtml because there are no residues given.")
+        nTerror("Failed to _makeAllDihedralTableHtml because there are no residues given.")
         return True
 
     project = obj.html.project
     dihedralColumnNameHash = {} # use hash for speed.
     for res in residues:
         if not (res.hasProperties('protein') or res.hasProperties('nucleic')):
-#            NTdebug("Skipping non-standard residue")
+#            nTdebug("Skipping non-standard residue")
             continue
         if res.hasProperties('protein'):
             dihedralList = dihedralListAA
@@ -962,9 +966,9 @@ def _makeDihedralByResidueTableHtml( obj, residues, text=None, #ncols=10, pictur
                 continue
             tailLink = os.path.join( htmlDirectories.molecule, res.chain.name, res.name,  dihedralName + ".png" )
             absLink = os.path.join( project.moleculePath(), moleculeDirectories.html, tailLink )
-#            NTdebug( "tailLink, absLink %s %s" %(tailLink, absLink))
+#            nTdebug( "tailLink, absLink %s %s" %(tailLink, absLink))
             if os.path.exists(absLink):
-#                NTdebug("Adding %s" % dihedralName)
+#                nTdebug("Adding %s" % dihedralName)
                 dihedralColumnNameHash[dihedralName] = None
 #            else:
 #                dihedralColumnNameHash[dihedralName] = None # Disable when done debugging.
@@ -977,7 +981,7 @@ def _makeDihedralByResidueTableHtml( obj, residues, text=None, #ncols=10, pictur
         dihedralColumnNameList.append(dihedralName)
 
     if not dihedralColumnNameList:
-#        NTdebug("Failed to find any dihedral plot on file")
+#        nTdebug("Failed to find any dihedral plot on file")
         main('h2', "No plots available")
         return
 
@@ -993,10 +997,10 @@ def _makeDihedralByResidueTableHtml( obj, residues, text=None, #ncols=10, pictur
 
     for res in residues:
         if not (res.hasProperties('protein') or res.hasProperties('nucleic')):
-#            NTdebug("Skipping non-standard residue such as water.")
+#            nTdebug("Skipping non-standard residue such as water.")
             continue
         if not res.hasCoordinates():
-#            NTdebug("Skipping residue without any coordinates for any of it's atoms.")
+#            nTdebug("Skipping residue without any coordinates for any of it's atoms.")
             continue
 
         # Start to writ the residue on one row.
@@ -1008,7 +1012,7 @@ def _makeDihedralByResidueTableHtml( obj, residues, text=None, #ncols=10, pictur
             tailLink = os.path.join( htmlDirectories.molecule, res.chain.name, res.name,  dihedralName + ".png" )
             relLink = os.path.join('../', tailLink)
             absLink = os.path.join( project.moleculePath(), moleculeDirectories.html, tailLink )
-#            NTdebug( "tailLink, relLink, absLink %s %s %s" %(tailLink, relLink, absLink))
+#            nTdebug( "tailLink, relLink, absLink %s %s %s" %(tailLink, relLink, absLink))
             if os.path.exists(absLink): # enable check when done debuging.
 #            if True:
                 main('a',   "",         href = relLink, closeTag=False )
@@ -1050,8 +1054,8 @@ class HTMLfile:
            GV Not any longer as I do not see the need: The file is immediately tested by a quick open for writing and closing.
         '''
 
-        self.fileName = NTmkdir( fileName )
-#        self.rootPath, _tmp, _tmp = NTpath( fileName )
+        self.fileName = nTmkdir( fileName )
+#        self.rootPath, _tmp, _tmp = nTpath( fileName )
 #        self.stream = open( self.fileName, 'w' )
 #        self.stream.close()
 
@@ -1223,7 +1227,7 @@ class HTMLfile:
         '''
 
         self.stream = open( self.fileName, 'w' )
-#        NTdebug('writing to file: %s' % self.fileName)
+#        nTdebug('writing to file: %s' % self.fileName)
         self.indent = 0
         # JFD proposes to drop the below tags because they hinder javascript beyond my knowledge.
         # AWSS updated it: it should work fine with javascript
@@ -1264,7 +1268,7 @@ class HTMLfile:
 
         for js in importJsListStr.split():
             js = os.path.join(relativePath, js)
-#            NTdebug("Working on %s" % js)
+#            nTdebug("Working on %s" % js)
             self.stream.write(self._generateTag( 'script',
                 src=js, type="text/javascript"))
 
@@ -1321,10 +1325,10 @@ class HTMLfile:
         self._appendTag( defaultFooter, None, sprintf( ' %s version %s ', programName, cingVersion) )
 
 #        if not cingRevision:
-#            NTdebug("Trying to get CING revision; again...")
+#            nTdebug("Trying to get CING revision; again...")
 #            cingRevision = getSvnRevision()
 
-#        NTdebug("CING revision [%s]" % cingRevision)
+#        nTdebug("CING revision [%s]" % cingRevision)
         if cingRevision:
             cingRevisionUrlStr = cingRevisionUrl + `cingRevision`
             self._appendTag( defaultFooter, None, '(' , closeTag=False)
@@ -1353,7 +1357,7 @@ class HTMLfile:
         # Text has to be right before the closing body tag.
         # Othersise JFD would have customized footer of subclass ProjectHTMLfile
         if isinstance(self, ProjectHTMLfile):
-#            NTdebug("Writing google spy to project html footer")
+#            nTdebug("Writing google spy to project html footer")
             self.stream.write(GOOGLE_ANALYTICS_TEMPLATE)
 
         self.stream.write(self.closeTag('body'))
@@ -1419,13 +1423,13 @@ class HTMLfile:
         pardirSep = '../' #pardir + sep # '../' is standard for html, no matter if Windows OS.
         upSep   = fileName.count(sep)
         htmlPath = self.project.htmlPath()
-#        NTdebug("htmlPath: ["+htmlPath+"]" )
+#        nTdebug("htmlPath: ["+htmlPath+"]" )
         downSep = htmlPath.count(sep)
         return (upSep-downSep-1) * pardirSep
 
 #    def findHtmlLocationResidueIndex(self, source, destinationResidue, id=None ):
 #        if not hasattr(source,'htmlLocation'):
-#            NTerror('findHtmlLocationResidue: No htmlLocation attribute associated to object %s', source)
+#            nTerror('findHtmlLocationResidue: No htmlLocation attribute associated to object %s', source)
 #            return None
 
     def findHtmlLocation(self, source, destination, id=None ):
@@ -1441,7 +1445,7 @@ class HTMLfile:
         # Destination is the target.
         for item in [source, destination]:
             if not hasattr(item,'htmlLocation'):
-#                NTerror('HTMLfile.findHtmlLocation: No htmlLocation attribute associated to object %s', item)
+#                nTerror('HTMLfile.findHtmlLocation: No htmlLocation attribute associated to object %s', item)
                 return None
 
         # Strip leading dot for rest of algorithm.
@@ -1513,23 +1517,23 @@ class HTMLfile:
         '''
 
         if not section:
-            NTerror("No HTML section defined here")
+            nTerror("No HTML section defined here")
             return None
 
         if not source:
             # Happens for 2k0e
-            NTdebug("No Cing object source in insertHtmlLink( self, section, source, destination, text=None, id=None, **kwds ):")
-            NTdebug("[%s, %s, %s, %s, %s, %s, %s]" % ( self, section, source, destination, text, id, kwds ))
+            nTdebug("No Cing object source in insertHtmlLink( self, section, source, destination, text=None, id=None, **kwds ):")
+            nTdebug("[%s, %s, %s, %s, %s, %s, %s]" % ( self, section, source, destination, text, id, kwds ))
             return None
 
         if not destination:
             # Happens for 2k0e and all projects with missing topology
-#            NTdebug("No Cing object destination in insertHtmlLink( self, section, source, destination, text=None, id=None, **kwds ):")
-#            NTdebug("[%s, %s, %s, %s, %s, %s, %s]" % ( self, section, source, destination, text, id, kwds ))
+#            nTdebug("No Cing object destination in insertHtmlLink( self, section, source, destination, text=None, id=None, **kwds ):")
+#            nTdebug("[%s, %s, %s, %s, %s, %s, %s]" % ( self, section, source, destination, text, id, kwds ))
             return None
 
         link = self.findHtmlLocation( source, destination, id )
-#        NTdebug('From source: %s to destination: %s, id=%s using relative link: %s' ,
+#        nTdebug('From source: %s to destination: %s, id=%s using relative link: %s' ,
 #                 source.htmlLocation, destination.htmlLocation, id,link)
 
         kw = {'href':link}
@@ -1592,28 +1596,28 @@ class ProjectHTMLfile( HTMLfile ):
         #css and javascript now in HTML dir
         htmlPath = os.path.join(cingRoot,cingPaths.html) # copy needed css and other files/directories.
 
-#        NTdebug("Listing: [%s]" % htmlPath )
+#        nTdebug("Listing: [%s]" % htmlPath )
         for f in os.listdir( htmlPath ):
-#            NTdebug("Listing item: [%s]" % f)
+#            nTdebug("Listing item: [%s]" % f)
             htmlFile = os.path.join(htmlPath,f)
             if os.path.isfile(htmlFile):
                 shutil.copy( htmlFile, project.htmlPath() )
             elif os.path.isdir(htmlFile):
-#                NTdebug("Listing dir: [%s]" % f)
+#                nTdebug("Listing dir: [%s]" % f)
                 if f.find('.svn') >= 0:
                     continue
                 dst = os.path.join( project.htmlPath(), f)
-#                NTdebug("Copying dir: [%s] to [%s]" % (htmlFile, dst))
+#                nTdebug("Copying dir: [%s] to [%s]" % (htmlFile, dst))
                 if os.path.exists(dst):
-#                    NTdebug("Removing directory: %s" % dst)
+#                    nTdebug("Removing directory: %s" % dst)
                     shutil.rmtree(dst)
                 shutil.copytree(htmlFile,  dst )
                 # TODO: exclude .svn items within subdir
                 svnDirectoryList = find2(".svn", startdir=dst) # don't use the one from pylab.
                 for f2 in svnDirectoryList:
-#                    NTdebug("Considering removing directory: %s" % (f2))
+#                    nTdebug("Considering removing directory: %s" % (f2))
                     if os.path.exists(f2):
-#                        NTdebug("Removing directory: %s" % f2)
+#                        nTdebug("Removing directory: %s" % f2)
                         shutil.rmtree(f2)
 
             # end elif
@@ -1663,24 +1667,24 @@ class ProjectHTMLfile( HTMLfile ):
         summaryLineCount = len(s)
         i = 0
         while i < summaryLineCount:
-            l = s[i]
-            if l[0:5] == '-----':
-                html.main('h3', l )
-            elif l.startswith('<PRE>'): # should occur alone on line!
+            line = s[i]
+            if line[0:5] == '-----':
+                html.main('h3', line )
+            elif line.startswith('<PRE>'): # should occur alone on line!
                 preLineList = []
                 while True:
                     i += 1
                     if i >= summaryLineCount:
-                        NTcodeerror("Failed to find </PRE> all the way to the end")
+                        nTcodeerror("Failed to find </PRE> all the way to the end")
                         break
-                    l = s[i]
-                    if l.startswith('</PRE>'): # should occur alone on line!
+                    line = s[i]
+                    if line.startswith('</PRE>'): # should occur alone on line!
                         break
-                    preLineList.append( l )
+                    preLineList.append( line )
                 subStr = '\n'.join(preLineList)
                 html.main('pre', subStr)
             else:
-                html.main('br', l )
+                html.main('br', line )
             i += 1
         #end while
         html.render()
@@ -1724,9 +1728,9 @@ class ProjectHTMLfile( HTMLfile ):
         if logFileList:
             logFileList.sort()
             logFileList.reverse() # Important to have latest on top because they might get long. Use p.removeOlderLogs() then.
-        l = len(logFileList)
+        n = len(logFileList)
         for i, logFile in enumerate(logFileList):
-            idx = l - i
+            idx = n - i
             # Create a link to the actual HTML log file.
             html.main('p', str(idx), closeTag=0)
             html.main('a', logFile, href="../../Logs/%s" % logFile)
@@ -1802,7 +1806,7 @@ class ProjectHTMLfile( HTMLfile ):
             htmlMain('ul', closeTag=False)
             for pl in self.project.peaks:
                 if hasattr(pl,'html'):
-#                    NTdebug("Doing peaks [%s] " % (pl.name))
+#                    nTdebug("Doing peaks [%s] " % (pl.name))
                     self.insertHtmlLinkInTag( 'li', htmlMain, self.project, pl, text=pl.name)
             htmlMain('ul', openTag=False)
         #end if
@@ -1829,10 +1833,10 @@ class ProjectHTMLfile( HTMLfile ):
         pathMolGif     = self.project.htmlPath(molGifFileName)
         if not htmlOnly:
             if hasattr(plugins, MOLGRAP_STR) and plugins[ MOLGRAP_STR ].isInstalled:
-#                NTdebug("ProjectHtmlFile.generateHtml: trying to create : " + pathMolGif)
+#                nTdebug("ProjectHtmlFile.generateHtml: trying to create : " + pathMolGif)
                 self.project.molecule.export2gif(pathMolGif, project=self.project)
 #            else:
-#                NTdebug("Skipping self.project.molecule.export2gif because Molgrap Module is not available.")
+#                nTdebug("Skipping self.project.molecule.export2gif because Molgrap Module is not available.")
 
         #end if
         if os.path.exists( pathMolGif ):
@@ -1858,13 +1862,13 @@ class DihedralByProjectHTMLfile( HTMLfile ):
         # Create the HTML directory for this dihedral
         fileName = project.htmlPath( htmlDirectories.dihedrals, dihedralByProject.name + '.html' )
         dihedralByProject.htmlLocation = ( fileName, HTMLfile.top )
-#        NTdebug("dihedralByProject.htmlLocation[0]: %s" % dihedralByProject.htmlLocation[0])
+#        nTdebug("dihedralByProject.htmlLocation[0]: %s" % dihedralByProject.htmlLocation[0])
         HTMLfile.__init__(self, fileName, title='Dihedral by Project' , project=project)
         if hasattr(dihedralByProject, 'html'):
             del(dihedralByProject.html)
         dihedralByProject.html = self
         self.dihedralByProject = dihedralByProject
-#        NTdebug("self.dihedralByProject.htmlLocation[0]: %s" % self.dihedralByProject.htmlLocation[0])
+#        nTdebug("self.dihedralByProject.htmlLocation[0]: %s" % self.dihedralByProject.htmlLocation[0])
     #end def
 
     def generateHtml(self, htmlOnly=False):
@@ -1901,7 +1905,7 @@ class DihedralByResidueHTMLfile( HTMLfile ):
         # Create the HTML directory for this dihedral
         fileName = project.htmlPath( htmlDirectories.dihedrals, dihedralByResidue.name + '.html' )
         dihedralByResidue.htmlLocation = ( fileName, HTMLfile.top )
-#        NTdebug("dihedralByResidue.htmlLocation[0]: %s" % dihedralByResidue.htmlLocation[0])
+#        nTdebug("dihedralByResidue.htmlLocation[0]: %s" % dihedralByResidue.htmlLocation[0])
         HTMLfile.__init__(self, fileName, title="Dihedral plots by Residue", project=project)
         if hasattr(dihedralByResidue, 'html'):
             del(dihedralByResidue.html)
@@ -1945,7 +1949,7 @@ class DihedralByProjectListHTMLfile( HTMLfile ):
         fileName = project.htmlPath( htmlDirectories.dihedrals, 'index.html' )
         dihedralByProjectList = project.dihedralByProjectList
         dihedralByProjectList.htmlLocation = ( fileName, HTMLfile.top )
-#        NTdebug("dihedralByProject.htmlLocation[0]: %s" % dihedralByProject.htmlLocation[0])
+#        nTdebug("dihedralByProject.htmlLocation[0]: %s" % dihedralByProject.htmlLocation[0])
         HTMLfile.__init__(self, fileName, project, title=title)
         if hasattr(dihedralByProjectList, 'html'):
 #            del(dihedralByProject.html) #GV thinks this was an error as it throws an error when regenerating html
@@ -1954,7 +1958,7 @@ class DihedralByProjectListHTMLfile( HTMLfile ):
         self.dihedralByProjectList = dihedralByProjectList
         self.title=title
         self.molecule = project.molecule
-#        NTdebug("self.dihedralByProject.htmlLocation[0]: %s" % self.dihedralByProject.htmlLocation[0])
+#        nTdebug("self.dihedralByProject.htmlLocation[0]: %s" % self.dihedralByProject.htmlLocation[0])
         self.dihedralByResidueHTMLfile = DihedralByResidueHTMLfile(self.project, self.project.dihedralByResidue)
 
     #end def
@@ -1974,9 +1978,9 @@ class DihedralByProjectListHTMLfile( HTMLfile ):
         molecule = self.molecule
 
 #        if not htmlOnly:
-#            NTmessage("Creating dihedrals combined for all residues html")
+#            nTmessage("Creating dihedrals combined for all residues html")
 #                if project.createHtmlWhatif():
-#                    NTerror('Failed to createHtmlWhatif')
+#                    nTerror('Failed to createHtmlWhatif')
 #                    return True
 
         BOGUS_DIHEDRAL_ID = 'BOGUS'
@@ -1995,11 +1999,11 @@ class DihedralByProjectListHTMLfile( HTMLfile ):
         dihedralPresentMap = {}
         moleculeDir = os.path.join(self.project.moleculePath(), moleculeDirectories.html, htmlDirectories.molecule)
         for residue in molecule.allResidues():
-#            NTdebug("_generateDihedralByProjectHtml for %s" % residue)
+#            nTdebug("_generateDihedralByProjectHtml for %s" % residue)
             resDir =  os.path.join(moleculeDir, residue.chain.name, residue.name )
-#            NTdebug("resDir: %s" % resDir)
+#            nTdebug("resDir: %s" % resDir)
             if not os.path.exists(resDir):
-                NTerror("Failed to find resDir: %s" % resDir)
+                nTerror("Failed to find resDir: %s" % resDir)
             for dihed in dihedralList:
                 tmpPath = os.path.join(resDir, dihed + '.png') #@UnusedVariable
 #                print 'tmpPath:', tmpPath, os.path.exists(tmpPath)
@@ -2011,7 +2015,8 @@ class DihedralByProjectListHTMLfile( HTMLfile ):
 
 
         self.dihedralByResidueHTMLfile.generateHtml(htmlOnly) # delay until full list is created.
-        self.insertHtmlLink( self.header, self.dihedralByProjectList, self.project.dihedralByResidue, text = 'Dihedrals by Residue') # only now available.
+        # only now available.
+        self.insertHtmlLink( self.header, self.dihedralByProjectList, self.project.dihedralByResidue, text = 'Dihedrals by Residue') 
         self.header('a', 'Help', href = self.relativePath()+HTMLfile.help_html, title='goto page with help')
 
 
@@ -2070,7 +2075,8 @@ class MoleculeHTMLfile( HTMLfile ):
     def __init__(self, project, molecule ):
         # Create the HTML directory for this molecule
         fileName = project.htmlPath( htmlDirectories.molecule, 'index.html')
-        HTMLfile.__init__(self, fileName, title='Molecule ' + molecule.name, molecule=molecule, project=project)
+        HTMLfile.__init__(self, fileName, project, title='Molecule ' + molecule.name)
+        self.molecule = molecule        
         molecule.htmlLocation = ( fileName, HTMLfile.top )
 
         if molecule.has_key('html'):
@@ -2090,7 +2096,7 @@ class MoleculeHTMLfile( HTMLfile ):
         project = self.project
         molecule = self.molecule
 
-        NTmessage("Creating Procheck html")
+        nTmessage("Creating Procheck html")
         main('h1','Procheck_NMR')
         anyProcheckPlotsGenerated = False
         pcPlotList = [
@@ -2121,12 +2127,12 @@ class MoleculeHTMLfile( HTMLfile ):
                         project.moleculeDirectories.procheck, molecule.name + p + ".ps")
             procheckLinkReal = os.path.join( project.rootPath( project.name )[0], molecule.name,
                         project.moleculeDirectories.procheck, molecule.name + p + ".ps")
-#            NTdebug('procheck real path: ' + procheckLinkReal)
+#            nTdebug('procheck real path: ' + procheckLinkReal)
             if not os.path.exists( procheckLinkReal ):
                 continue # Skip their inclusion.
 
             if not htmlOnly and not convert2Web( procheckLinkReal, doMontage=True ):
-                NTerror( "Failed to convert2Web input file: " + procheckLinkReal)
+                nTerror( "Failed to convert2Web input file: " + procheckLinkReal)
                 continue
 
 #            _pinupPath, _fullPath, _printPath = fileList
@@ -2170,9 +2176,9 @@ class MoleculeHTMLfile( HTMLfile ):
         molecule = self.molecule
 
         if not htmlOnly:
-            NTmessage("Creating CING html")
+            nTmessage("Creating CING html")
             if createHtmlCing(project):
-                NTerror('Failed to createHtmlCing')
+                nTerror('Failed to createHtmlCing')
                 return True
             #end if
         #end if
@@ -2188,9 +2194,9 @@ class MoleculeHTMLfile( HTMLfile ):
             cingLinkReal = os.path.join( project.rootPath( project.name )[0], molecule.name,
                         project.moleculeDirectories.analysis, molecule.name + p + ".pdf")
 
-#            NTdebug('cingLinkReal: ' + cingLinkReal)
+#            nTdebug('cingLinkReal: ' + cingLinkReal)
             if not os.path.exists( cingLinkReal ):
-#                NTwarning('Failed to find expected cingLinkReal: ' + cingLinkReal) # normal when whatif wasn't run.
+#                nTwarning('Failed to find expected cingLinkReal: ' + cingLinkReal) # normal when whatif wasn't run.
                 continue # Skip their inclusion.
 
             pinupLink = os.path.join('../..',
@@ -2228,10 +2234,10 @@ class MoleculeHTMLfile( HTMLfile ):
         molecule = self.molecule
 
         if not htmlOnly:
-            NTmessage("Creating Whatif html")
+            nTmessage("Creating Whatif html")
             if hasattr(plugins, WHATIF_STR) and plugins[ WHATIF_STR ].isInstalled:
                 if project.createHtmlWhatif():
-                    NTerror('Failed to createHtmlWhatif')
+                    nTerror('Failed to createHtmlWhatif')
                     return True
                 #end if
             #end if
@@ -2248,9 +2254,9 @@ class MoleculeHTMLfile( HTMLfile ):
                         project.moleculeDirectories.whatif, molecule.name + p + ".pdf")
             wiLinkReal = os.path.join( project.rootPath( project.name )[0], molecule.name,
                         project.moleculeDirectories.whatif, molecule.name + p + ".pdf")
-#            NTdebug('wiLinkReal: ' + wiLinkReal)
+#            nTdebug('wiLinkReal: ' + wiLinkReal)
             if not os.path.exists( wiLinkReal ):
-#                NTwarning('Failed to find expected wiLinkReal: ' + wiLinkReal) # normal when whatif wasn't run.
+#                nTwarning('Failed to find expected wiLinkReal: ' + wiLinkReal) # normal when whatif wasn't run.
                 continue # Skip their inclusion.
 
             pinupLink = os.path.join('../..',
@@ -2287,11 +2293,11 @@ class MoleculeHTMLfile( HTMLfile ):
         project = self.project
         molecule = self.molecule
 
-        NTmessage("Creating Wattos html")
+        nTmessage("Creating Wattos html")
         if not htmlOnly:
             if hasattr(plugins, WATTOS_STR) and plugins[ WATTOS_STR ].isInstalled:
                 if project.createHtmlWattos():
-                    NTerror('Failed to createHtmlWattos')
+                    nTerror('Failed to createHtmlWattos')
                     return True
                 #end if
             #end if
@@ -2309,9 +2315,9 @@ class MoleculeHTMLfile( HTMLfile ):
                         project.moleculeDirectories.wattos, molecule.name + p + ".pdf")
             wattosLinkReal = os.path.join( project.rootPath( project.name )[0], molecule.name,
                         project.moleculeDirectories.wattos, molecule.name + p + ".pdf")
-#            NTdebug('wiLinkReal: ' + wiLinkReal)
+#            nTdebug('wiLinkReal: ' + wiLinkReal)
             if not os.path.exists( wattosLinkReal ):
-#                NTwarning('Failed to find expected wiLinkReal: ' + wiLinkReal) # normal when whatif wasn't run.
+#                nTwarning('Failed to find expected wiLinkReal: ' + wiLinkReal) # normal when whatif wasn't run.
                 continue # Skip their inclusion.
 
             pinupLink = os.path.join('../..',
@@ -2347,11 +2353,11 @@ class MoleculeHTMLfile( HTMLfile ):
         project = self.project
         molecule = self.molecule
 
-        NTmessage("Creating X3dna html")
+        nTmessage("Creating X3dna html")
         if not htmlOnly:
             if hasattr(plugins, X3DNA_STR) and plugins[ X3DNA_STR ].isInstalled:
                 if project.createHtmlX3dna():
-                    NTerror('Failed to createHtmlX3dna')
+                    nTerror('Failed to createHtmlX3dna')
                     return True
                 #end if
             #end if
@@ -2445,7 +2451,8 @@ class ChainHTMLfile( HTMLfile ):
     def __init__(self, project, chain ):
         # Create the HTML directory for this residue
         fileName = project.htmlPath(htmlDirectories.molecule, chain.name, 'index.html')
-        HTMLfile.__init__(self, fileName, title=chain.name, chain=chain, project=project)
+        HTMLfile.__init__(self, fileName, project, title=chain.name)
+        self.chain = chain        
         chain.htmlLocation = ( fileName, HTMLfile.top )
 
         if chain.has_key('html'):
@@ -2483,7 +2490,9 @@ class ResidueHTMLfile( HTMLfile ):
     def __init__(self, project, residue ):
         # Create the HTML directory for this residue
         fileName = project.htmlPath(htmlDirectories.molecule, residue.chain.name, residue.name, 'index.html')
-        HTMLfile.__init__(self, fileName, title=residue.name, residue=residue, project=project)
+        HTMLfile.__init__(self, fileName, project, title=residue.name)
+        self.residue = residue
+
         residue.htmlLocation = ( fileName, HTMLfile.top )
 
         if residue.has_key('html'):
@@ -2514,7 +2523,7 @@ class ResidueHTMLfile( HTMLfile ):
         residue = self.residue
         project = self.project
 #        resNum  = residue.resNum
-        resdir, _tmp, _tmp = NTpath( self.fileName )
+        resdir, _tmp, _tmp = nTpath( self.fileName )
 
         # Reset CING content
         self._resetCingContent()
@@ -2539,19 +2548,19 @@ class ResidueHTMLfile( HTMLfile ):
 
         graphicsFormatExtension = 'png'
         plottedList = []
-#        NTdebug("in generateHtml htmlOnly: %s",htmlOnly)
+#        nTdebug("in generateHtml htmlOnly: %s",htmlOnly)
 #        if not htmlOnly:
-#            NTdebug("Residue %s: generating dihedral plots", self.residue )
+#            nTdebug("Residue %s: generating dihedral plots", self.residue )
 
         if not getDeepByKeysOrAttributes(plugins, MATPLIB_STR, IS_INSTALLED_STR):
-#            NTdebug('Skipping actual plots in html#generateHtml() because no matplib installed.')
+#            nTdebug('Skipping actual plots in html#generateHtml() because no matplib installed.')
             pass
         else:
             from cing.PluginCode.matplib import NTplotSet #@UnresolvedImport
             from cing.PluginCode.matplib import makeDihedralHistogramPlot #@UnresolvedImport
 
             for plotDihedralName1,plotDihedralName2,plotDihedralComboName,_keyLoL in plotDihedral2dList:
-    #                NTdebug("Residue %s: generating %s plot", self.residue, plotDihedralComboName)
+    #                nTdebug("Residue %s: generating %s plot", self.residue, plotDihedralComboName)
                 ps = makeDihedralPlot( project, [residue], plotDihedralName1, plotDihedralName2, htmlOnly=htmlOnly)
                 if ps: # Can be None for error, True for success (will create on next pass if not htmlOnly)
                     plottedList.append(plotDihedralComboName)
@@ -2564,7 +2573,7 @@ class ResidueHTMLfile( HTMLfile ):
             for dihed in residue.db.dihedrals.zap('name'):
                 if dihed in residue and residue[dihed]:
                     d = residue[dihed] # List of values with outliers etc attached.
-    #                    NTdebug("Residue %s: generating dihedral %s plot", self.residue, dihed )
+    #                    nTdebug("Residue %s: generating dihedral %s plot", self.residue, dihed )
                     ps = makeDihedralHistogramPlot( project, residue, dihed, htmlOnly=htmlOnly )
                     tmpPath = os.path.join(resdir,dihed + '.' + graphicsFormatExtension)
                     if ps:
@@ -2640,14 +2649,14 @@ class ResidueHTMLfile( HTMLfile ):
             if dihed in residue and residue[dihed]:
                 if not dihed in plottedList: # failed on first attempt already. No sense in trying again.
                     continue
-    #                            NTdebug( '------>>>>> ' + dihed + `res` + `res[dihed]` )
+    #                            nTdebug( '------>>>>> ' + dihed + `res` + `res[dihed]` )
                 d = residue[dihed] # List of values with outliers etc attached.
 
                 # summarize the results
                 lenOutliers = '.' # JFD adds: Indicating None
                 outlierList = '.'
                 if d.__dict__.has_key('outliers'):
-    #                            NTwarning("Found no outliers; code wasn't prepared to deal with that or is JFD wrong?")
+    #                            nTwarning("Found no outliers; code wasn't prepared to deal with that or is JFD wrong?")
                     lenOutliers = `len(d.outliers)`
                     outlierList = d.outliers.zap(0)
     #                            -180.1 is longest: 6.1f
@@ -2694,7 +2703,7 @@ class ResidueHTMLfile( HTMLfile ):
                             ('viol'   ,     {'title':'Violation averagee and standard deviation over ensemble,'}),
                             ('max' ,        {'title':'Maximum violation in ensemble'}),
 
-                            ('c3'    ,      {'title':'Column that the table is initially sorted on. Count of violations above threshold of 0.3 Ang.'}),
+                            ('c3'    ,      {'title':'Column for initially sorting. Count of violations above threshold of 0.3 Ang.'}),
                             ('Critique'  ,  {'title':'Any number of remarks to consider.'})
                         ]
         t = MakeHtmlTable( self.right, columnFormats=columnFormats, classId="display", id="dataTables-resDRList" , **self.tableKwds )
@@ -2724,8 +2733,10 @@ class ResidueHTMLfile( HTMLfile ):
                     if residue == self.residue:
                         self.right( 'i', residue.name )
                     else:
-                        self.insertHtmlLink( self.right, self.residue, residue, text = residue.name, title = sprintf('goto residue %s', residue.cName(-1)) )
-                    self.insertHtmlLink( self.right, self.residue, atom,    text = atom.name,    title = sprintf('goto atom %s', atom.cName(-1)) )
+                        self.insertHtmlLink( self.right, self.residue, residue, text = residue.name, 
+                                             title = sprintf('goto residue %s', residue.cName(-1)) )
+                    self.insertHtmlLink( self.right, self.residue, atom,    text = atom.name,    title = 
+                                         sprintf('goto atom %s', atom.cName(-1)) )
                 # end for
                 if isAmbi:
                     t(None,'etc.')
@@ -2764,7 +2775,7 @@ class ResidueHTMLfile( HTMLfile ):
                             ('vSd'   ,     {'title':'Violation standard deviation over ensemble,'}),
                             ('max' ,        {'title':'Maximum violation in ensemble'}),
 
-                            ('c3'    ,      {'title':'Column that the table is initially sorted on. Count of violations above threshold of 3 degrees.'}),
+                            ('c3'    ,      {'title':'Column for initially sorting. Count of violations above threshold of 3 degrees.'}),
                             ('Critique'  ,  {'title':'Any number of remarks to consider.'})
                     ]
         t = MakeHtmlTable( self.right, columnFormats=columnFormats, classId="display", id="dataTables-resACList" , **self.tableKwds )
@@ -2815,7 +2826,8 @@ class ResidueHTMLfile( HTMLfile ):
             return
         #end if
 
-        if len(restraintList) == 0: return
+        if len(restraintList) == 0: 
+            return
 
         resRight = residue.html.right
         resRight('h2','%s Restraints' % type)
@@ -2887,9 +2899,9 @@ class DihedralByProjectList( NTlist ):
         self.currentId  = 0           # Id for each element of list
     #end def
 
-    def append( self, o ):
-        o.id = self.currentId
-        NTlist.append( self, o )
+    def append( self, obj ):
+        obj.id = self.currentId
+        NTlist.append( self, obj )
         self.currentId += 1
 
     def __str__( self ):
@@ -2921,7 +2933,7 @@ class AtomsHTMLfile( HTMLfile ):
         atomListTitlePostFix = self._getAtomListTitlePostFix(resonanceListIdx)
         fileName = self.project.htmlPath( htmlDirectories.molecule, fname)
 
-#        NTdebug("Now initing AtomsHTMLfile %s %s %s", resonanceListIdx, fname, atomListTitlePostFix )
+#        nTdebug("Now initing AtomsHTMLfile %s %s %s", resonanceListIdx, fname, atomListTitlePostFix )
         HTMLfile.__init__( self, fileName, title = 'Atom List ' + atomListTitlePostFix, project=project )
 
         if resonanceListIdx == None:
@@ -2987,15 +2999,16 @@ class AtomsHTMLfile( HTMLfile ):
         value   = None
         error   = None
 
-#        NTdebug('resonances: %s' % str(atom.resonances))
+#        nTdebug('resonances: %s' % str(atom.resonances))
         atomResonanceCollapsed = self._getResonanceCollapsed(atom)
         if atomResonanceCollapsed != None:
             value   = atomResonanceCollapsed.value
             error   = atomResonanceCollapsed.error
 
-#        NTdebug("Looking at the resonances: %s using last: %s" % (atom.resonances, atomResonanceCollapsed))
+#        nTdebug("Looking at the resonances: %s using last: %s" % (atom.resonances, atomResonanceCollapsed))
         if self.resonanceListIdx != None and isNoneorNaN(value):
-            NTcodeerror("Found 'empty' resonance value for specific resonance list %s. This should have been checked before" % self.resonanceListIdx)
+            nTcodeerror("Found 'empty' resonance value for specific resonance list %s. This should have been checked before" % 
+                        self.resonanceListIdx)
             return
 
         if atom.has_key('shiftx') and len(atom.shiftx):
@@ -3046,7 +3059,8 @@ class AtomsHTMLfile( HTMLfile ):
         table.nextColumn(`residue.resNum`)
 
         table.nextColumn()
-        self.insertHtmlLink( self.main, self.atomList, residue, text = residue.resName, title = sprintf('goto residue %s', residue.cName(-1)) )
+        self.insertHtmlLink( self.main, self.atomList, residue, text = residue.resName, title = 
+                             sprintf('goto residue %s', residue.cName(-1)) )
 
         table.nextColumn(atom.name)
         spinTypeStr = getDeepByKeys(atom, 'db', 'spinType')
@@ -3211,14 +3225,14 @@ class AtomsHTMLfile( HTMLfile ):
 
     def showAtom(self, atom):
         if atom.isSulfur() or atom.isOxygen() or atom.isMethylProtonButNotPseudo():
-#                        NTdebug("Skipping sulfur, oxygen or methylProtonButNotPseudo: %s" % atom)
+#                        nTdebug("Skipping sulfur, oxygen or methylProtonButNotPseudo: %s" % atom)
             return False
         if atom.isIsopropylOrGuanidinium():
-#                        NTdebug("Skipping isIsopropylOrGuanidinium: %s" % atom)
+#                        nTdebug("Skipping isIsopropylOrGuanidinium: %s" % atom)
             return False
         aName = atom.name
         if aName == 'H1' or aName == 'H2' or aName == 'H3':
-#                        NTdebug("Skipping N terminal proton: %s" % atom)
+#                        nTdebug("Skipping N terminal proton: %s" % atom)
             return False
         return True
 
@@ -3288,7 +3302,7 @@ class RestraintListHTMLfile( HTMLfile ):
         elif restraintList.__CLASS__ == 'RDCRestraintList':
             pass
         else:
-            NTerror('RestraintListHTMLfile.generateHtml: invalid restraint list class')
+            nTerror('RestraintListHTMLfile.generateHtml: invalid restraint list class')
         #end if
 
         self.render()
@@ -3313,10 +3327,10 @@ class RestraintListHTMLfile( HTMLfile ):
 #        restraint.rogScore.createHtmlColorForString(self.main, restraintRowStr)
 
         atomPair = restraint.atomPairs[idx]
-#        NTdebug("Working on restraint.idx: "+restraintRowStr)
+#        nTdebug("Working on restraint.idx: "+restraintRowStr)
 
         if len(atomPair) == 0:
-#            NTdebug("Found a restraint without any content in atomPair")
+#            nTdebug("Found a restraint without any content in atomPair")
             for _i in range(4*2):
                 table.nextColumn()
         else:
@@ -3340,7 +3354,8 @@ class RestraintListHTMLfile( HTMLfile ):
                 self.insertHtmlLink( self.main, self.restraintList, chain,   text =       chName,   title = titleStr)
                 table.nextColumn(`residue.resNum`)
                 table.nextColumn()
-                self.insertHtmlLink( self.main, self.restraintList, residue, text = residue.resName, title = sprintf('goto residue %s', residue.cName(-1)) )
+                self.insertHtmlLink( self.main, self.restraintList, residue, text = residue.resName, title = 
+                                     sprintf('goto residue %s', residue.cName(-1)) )
                 table.nextColumn()
                 self.insertHtmlLink( self.main, self.restraintList, atom,    text = atom.name)
                 i += 1
@@ -3393,11 +3408,11 @@ class RestraintListHTMLfile( HTMLfile ):
         # Would have like to color code it but then the html isn't numerically sortable.
 #        restraint.rogScore.createHtmlColorForString(self.main, restraintRowStr)
 
-#        NTdebug("Working on restraint.idx: %s" % restraint.id)
+#        nTdebug("Working on restraint.idx: %s" % restraint.id)
 
         # Set chn, resi, resn for first atom if preesent.
         if len(restraint.atoms) == 0:
-#            NTdebug("Found a restraint without any atoms")
+#            nTdebug("Found a restraint without any atoms")
             for _i in range(3):
                 table.nextColumn('.')
         else:
@@ -3418,7 +3433,8 @@ class RestraintListHTMLfile( HTMLfile ):
             self.insertHtmlLink( self.main, self.restraintList, chain,   text =       chName,   title = titleStr)
             table.nextColumn(`residue.resNum`)
             table.nextColumn()
-            self.insertHtmlLink( self.main, self.restraintList, residue, text = residue.resName, title = sprintf('goto residue %s', residue.cName(-1)) )
+            self.insertHtmlLink( self.main, self.restraintList, residue, text = residue.resName, title = 
+                                 sprintf('goto residue %s', residue.cName(-1)) )
         # end if
 
         nameStr = restraint.getDihedralName()
@@ -3476,7 +3492,7 @@ class RestraintListHTMLfile( HTMLfile ):
         self.main("div", closeTag=False, id=k1, style=styleDisplayStr)
         txt = readTextFromFile(fileName)
         if not txt:
-            NTerror("Failed to read: " + fileName)
+            nTerror("Failed to read: " + fileName)
             return True
         self.main("pre", txt)
         self.main("div", openTag=False)
@@ -3489,7 +3505,7 @@ class RestraintListHTMLfile( HTMLfile ):
         """
         saveFrameAssign = self.project.getSaveFrameAssign()
         if not saveFrameAssign:
-#            NTdebug("No SSA saveframe embedded.")
+#            nTdebug("No SSA saveframe embedded.")
             return
         tagTableAssignHeader = saveFrameAssign.tagtables[0]
         gS = tagTableAssignHeader.getString
@@ -3517,7 +3533,8 @@ class RestraintListHTMLfile( HTMLfile ):
 #        styleDisplayStr =  'display:' # Means item will be shown.
         styleDisplayStr =  'display:none'
         self.main("div", closeTag=False, id=k1, style=styleDisplayStr)
-#        tableHeader = MakeHtmlTable( self.main, showHeader=False, columnFormats=columnFormatsHeader, classId="display", id="dataTables-DRSsaHeader", **tableKwdsHeader )
+#        tableHeader = MakeHtmlTable( self.main, showHeader=False, columnFormats=columnFormatsHeader, classId="display", 
+#            id="dataTables-DRSsaHeader", **tableKwdsHeader )
         tableHeader = MakeHtmlTable( self.main, showHeader=False, columnFormats=columnFormatsHeader)
         for rowIdx in tableHeader.rows(range(tagNameListSize)): # count the abov
             humanTagName = getHumanTagName(tagNameListSsaHeader[rowIdx])
@@ -3526,24 +3543,25 @@ class RestraintListHTMLfile( HTMLfile ):
             tableHeader.nextColumn(str(valueList[rowIdx]))
         # end for
 
-        columnFormats = [   ('#',                       {'title':'Triplet number. Only ambiguous restraints show a dot'} ),
-                            ('ch',                      {'title':'Chain identifier'} ),
-                            ('ri',                      {'title':'Residue number'} ),
-                            ('rn',                      {'title':'Residue name'} ),
-                            ('at',                      {'title':'Name of pseudoatom representing the triplet'} ),
-                            ('Num',                     {'title':'Ordinal number of assignment (1 is assigned first)'} ),
-                            ('Swapped',                 {'title':'yes; if assignment state is swapped with respect to restraint file'} ),
-                            ('Mdls Fav %',              {'title':'Percentage of models in which the assignment with the lowest overall energy is favored'} ),
-                            ('Nrg Dif %',               {'title':'Percentage of difference between lowest and highest overall energy with respect to the highest overall energy'} ),
-                            ('Nrg Dif',                 {'title':'Difference between lowest and highest overall energy ensemble averaged'} ),
-                            ('Nrg +',                   {'title':'Energy of the highest overall energy state (Ang.**2) ensemble averaged'} ),
-                            ('Nrg -',                   {'title':'Energy of the lowest overall energy state (Ang.**2) ensemble averaged'} ),
-                            ('Cnstr #',                 {'title':'Number of restraints involved with the triplet. The highest ranking triplet on this number, is assigned first (optional)'} ),
-                            ('Cnstr Amb #',             {'title':'Number of restraints involved with the triplet that are ambiguous besides the ambiguity from this triplet'} ),
-                            ('Deass',                   {'title':'yes; if restraints included in this triplet are deassigned'} ),
-                            ('Viol Max',                {'title':'Maximum unaveraged violation before deassignment (Ang.)'} ),
-                            ('Sngl Crit #',             {'title':'Number of violated restraints above threshold for a single model before deassignment (given by Single_mdl_crit_count)'} ),
-                            ('Mlt Crit #',              {'title':'Number of violated restraints above threshold for a multiple models before deassignment (given by Multi_mdl_crit_count)'} ),
+        columnFormats = [   
+('#',           {'title':'Triplet number. Only ambiguous restraints show a dot'} ),
+('ch',          {'title':'Chain identifier'} ),
+('ri',          {'title':'Residue number'} ),
+('rn',          {'title':'Residue name'} ),
+('at',          {'title':'Name of pseudoatom representing the triplet'} ),
+('Num',         {'title':'Ordinal number of assignment (1 is assigned first)'} ),
+('Swapped',     {'title':'yes; if assignment state is swapped with respect to restraint file'} ),
+('Mdls Fav %',  {'title':'Percentage of models in which the assignment with the lowest overall energy is favored'} ),
+('Nrg Dif %',   {'title':'Percentage of difference between lowest and highest overall energy with respect to the highest overall energy'} ),
+('Nrg Dif',     {'title':'Difference between lowest and highest overall energy ensemble averaged'} ),
+('Nrg +',       {'title':'Energy of the highest overall energy state (Ang.**2) ensemble averaged'} ),
+('Nrg -',       {'title':'Energy of the lowest overall energy state (Ang.**2) ensemble averaged'} ),
+('Cnstr #',     {'title':'Number of restraints for this triplet. The highest ranking triplet on this number is assigned first (optional)'}),
+('Cnstr Amb #', {'title':'Number of restraints for this triplet that are ambiguous besides the ambiguity from this triplet'} ),
+('Deass',       {'title':'yes; if restraints included in this triplet are deassigned'} ),
+('Viol Max',    {'title':'Maximum unaveraged violation before deassignment (Ang.)'} ),
+('Sngl Crit #', {'title':'Number of violations above threshold for a single model before deassignment (given by Single_mdl_crit_count)'} ),
+('Mlt Crit #',  {'title':'Number of violations above threshold for a multiple models before deassignment (given by Multi_mdl_crit_count)'}),
                        ]
         tableKwds = {"cellpadding":"0", "cellspacing":"0", "border":"0"}
 #        self.main("h3", "Info per atom group %s" % time.asctime())
@@ -3555,7 +3573,7 @@ class RestraintListHTMLfile( HTMLfile ):
         rowCount = tagTableAssign.getRowCount()
         colCount2 = tagTableAssign.getColCount()
         if colCount2 != (colCount-1):
-            NTerror("Failed to get correct columns %s but found %s from tagtable" % ( colCount, (colCount+1)))
+            nTerror("Failed to get correct columns %s but found %s from tagtable" % ( colCount, (colCount+1)))
             return True
         for rowIdx in table.rows(range(rowCount)): # count the above
             atom = None
@@ -3566,7 +3584,7 @@ class RestraintListHTMLfile( HTMLfile ):
                 nameTuple = ( IUPAC, chainName, resNum, pseudoAtomName )
                 for item in nameTuple:
                     if item == None:
-                        NTdebug("Failed to get valid item from nameTuple: " + str(nameTuple))
+                        nTdebug("Failed to get valid item from nameTuple: " + str(nameTuple))
                         nameTuple = None
                         continue
                     # end if
@@ -3574,7 +3592,7 @@ class RestraintListHTMLfile( HTMLfile ):
                 atom = self.project.molecule.decodeNameTuple( nameTuple ) # may be None input and output.
                 if not atom:
                     pass
-    #                NTdebug('In %s failed to map nameTuple %s', getCallerName(), str(nameTuple))
+    #                nTdebug('In %s failed to map nameTuple %s', getCallerName(), str(nameTuple))
 
             table.nextColumn(str(rowIdx+1))
             startIdxDefaults = 1
@@ -3592,7 +3610,8 @@ class RestraintListHTMLfile( HTMLfile ):
                 self.insertHtmlLink( self.main, self.restraintList, chain,   text =       chName,   title = titleStr)
                 table.nextColumn(`residue.resNum`)
                 table.nextColumn()
-                self.insertHtmlLink( self.main, self.restraintList, residue, text = residue.resName, title = sprintf('goto residue %s', residue.cName(-1)) )
+                self.insertHtmlLink( self.main, self.restraintList, residue, text = residue.resName, title = 
+                                     sprintf('goto residue %s', residue.cName(-1)) )
                 table.nextColumn()
                 self.insertHtmlLink( self.main, self.restraintList, atom,    text = atom.name)
             # end if
@@ -3667,12 +3686,12 @@ class RestraintListHTMLfile( HTMLfile ):
         Checkbox will toggle between showing either first or second division.
         """
         if self._generateDistanceRestraintMetaHtml():
-            NTerror("Failed _generateDistanceRestraintMetaHtml")
+            nTerror("Failed _generateDistanceRestraintMetaHtml")
 
         if self._generateDistanceRestraintSsaCorrectionsHtml(htmlOnly=htmlOnly):
-            NTerror("Failed _generateDistanceRestraintSsaCorrectionsHtml")
+            nTerror("Failed _generateDistanceRestraintSsaCorrectionsHtml")
         if self._generateDistanceRestraintFilterHighViolationCorrectionsHtml(htmlOnly=htmlOnly):
-            NTerror("Failed _generateDistanceRestraintFilterHighViolationCorrectionsHtml")
+            nTerror("Failed _generateDistanceRestraintFilterHighViolationCorrectionsHtml")
         columnFormats = [   ('#', {'title':'Restraint number. Only ambiguous restraints show a dot'} ),
 
                             ('ch1', {'title':'Chain identifier of first atom'} ),
@@ -3924,7 +3943,8 @@ class PeakListHTMLfile( HTMLfile ):
             self.insertHtmlLink( self.main, self.peakList, chain,   text =       chName,   title = titleStr)
             table.nextColumn(`residue.resNum`)
             table.nextColumn()
-            self.insertHtmlLink( self.main, self.peakList, residue, text = residue.resName, title = sprintf('goto residue %s', residue.cName(-1)) )
+            self.insertHtmlLink( self.main, self.peakList, residue, text = residue.resName, title = 
+                                 sprintf('goto residue %s', residue.cName(-1)) )
             table.nextColumn()
             self.insertHtmlLink( self.main, self.peakList, atom,    text = atom.name
                                  , title = sprintf('goto atom %s', atom.cName(-1)))
@@ -3953,12 +3973,14 @@ class PeakListHTMLfile( HTMLfile ):
             try:
                 previous = self.project.peaks[index-1]
                 self.insertHtmlLink( self.header, self.peakList, previous, text = previous.name)
-            except: pass
+            except: 
+                pass
         self.insertHtmlLink( self.header, self.peakList, self.project, text = 'UP')
         try:
             next = self.project.peaks[index+1]
             self.insertHtmlLink( self.header, self.peakList, next, text = next.name)
-        except: pass
+        except: 
+            pass
 
         ordinalNameList = [ "first", "second", "third", "fourth", "fifth", "sixth", "seventh" ]
         columnFormats = [   ('#', {'title':'Peak number'}  ) ]
@@ -4060,12 +4082,12 @@ class EnsembleHTMLfile( HTMLfile ):
         self.insertHtmlLink( self.header, self.ensemble, self.project, text = 'Home' )
 
         self.main('h3',closeTag=False)
-        for l in self.project.molecule.rmsd.format().split('\n')[:-1]:
-            self.main('br', l )
+        for line in self.project.molecule.rmsd.format().split('\n')[:-1]:
+            self.main('br', line )
         self.main('h3',openTag=False)
 
         if not getDeepByKeysOrAttributes(plugins, MATPLIB_STR, IS_INSTALLED_STR):
-            NTdebug('Skipping plots in html#makeDihedralPlot() because no matplib installed.')
+            nTdebug('Skipping plots in html#makeDihedralPlot() because no matplib installed.')
         else:
             from cing.PluginCode.matplib import NTplot #@UnresolvedImport
             from cing.PluginCode.matplib import NTplotSet #@UnresolvedImport
@@ -4082,7 +4104,7 @@ class EnsembleHTMLfile( HTMLfile ):
         #        self.project.models[i] holds the number of outliers for model i.
         #        models is a NTdict containing per model a list of outliers.
                 outliers = [self.project.models[i] for i in range(len(self.ensemble))]
-    #            NTdebug( '>> Number of outliers per model: ' + `outliers`)
+    #            nTdebug( '>> Number of outliers per model: ' + `outliers`)
                 plot.barChart( self.project.models.items(), 0.05, 0.95,
                                attributes = boxAttributes( fillColor='green' )
                              )
@@ -4102,10 +4124,10 @@ def removePreTagLines(msg):
     """Removes lines that start with a pre tag"""
     resultList = []
     msgList = msg.split('\n')
-    for l in msgList:
-        if l.startswith(HTML_TAG_PRE) or l.startswith(HTML_TAG_PRE2):
+    for line in msgList:
+        if line.startswith(HTML_TAG_PRE) or line.startswith(HTML_TAG_PRE2):
             continue
-        resultList.append(l)
+        resultList.append(line)
     result = '\n'.join(resultList)
     return result
 

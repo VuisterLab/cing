@@ -71,25 +71,25 @@ def main():
         phi = float(phi)
         psi = float(psi)
         if not (inRange(phi, isRange360=isRange360) and inRange(psi, isRange360=isRange360)):
-            NTerror("phi and/or psi not in range for row: %s" % repr(row))
+            nTerror("phi and/or psi not in range for row: %s" % repr(row))
             return
         if not common20AADict.has_key(resType):
-            NTdebug("Residue not in common 20 for row: %s" % repr(row))
+            nTdebug("Residue not in common 20 for row: %s" % repr(row))
             rowCount -= 1
             continue
 
         appendDeepByKeys(valuesBySsAndResType, phi, ssType, resType, 'phi')
         appendDeepByKeys(valuesBySsAndResType, psi, ssType, resType, 'psi')
-#        NTdebug('resType,ssType,phi,psi: %4s %1s %8.3f %8.3f' % (resType,ssType,phi,psi))
+#        nTdebug('resType,ssType,phi,psi: %4s %1s %8.3f %8.3f' % (resType,ssType,phi,psi))
         appendDeepByKeys(valuesByEntrySsAndResType, phi, entryId, ssType, resType, 'phi')
         appendDeepByKeys(valuesByEntrySsAndResType, psi, entryId, ssType, resType, 'psi')
     del(reader) # closes the file handles
     os.unlink(cvs_file_abs_name)
-    NTdebug('Total number of included residues including PRO/GLY: %d' % rowCount)
-#    NTdebug('valuesByEntrySsAndResType:\n%s'%valuesByEntrySsAndResType)
+    nTdebug('Total number of included residues including PRO/GLY: %d' % rowCount)
+#    nTdebug('valuesByEntrySsAndResType:\n%s'%valuesByEntrySsAndResType)
 #    (Cav, Csd, _Cn) = getRescaling(valuesByEntrySsAndResType)
     (Cav, Csd) = (1.0, 1.0)
-    NTdebug("Overall found av,sd: %r %r" % (Cav, Csd))
+    nTdebug("Overall found av,sd: %r %r" % (Cav, Csd))
 
     for ssType in valuesBySsAndResType.keys():
         for resType in valuesBySsAndResType[ssType].keys():
@@ -100,18 +100,19 @@ def main():
                 range=hrange)
 #            hist2d = zscaleHist( hist2d, Cav, Csd )
             setDeepByKeys(histRamaBySsAndResType, hist2d, ssType, resType)
-#            NTdebug('hist2d ssType, resType: %s %s\n%s' % (ssType, resType, hist2d))
-            cTuple = getEnsembleAverageAndSigmaFromHistogram(hist2d)
+#            nTdebug('hist2d ssType, resType: %s %s\n%s' % (ssType, resType, hist2d))
+            cTuple = getEnsembleAverageAndSigmaHis(hist2d)
             (c_av, c_sd, hisMin, hisMax) = cTuple
             cTuple += tuple([str([ssType, resType])]) # append the hash keys as a way of id.
-            NTdebug("For ssType %s residue type %s found (av/sd/min/max) %8.0f %8.0f %8.0f %8.0f" % (ssType, resType, c_av, c_sd, hisMin, hisMax))
-#            NTdebug("xedges %s" % `xedges`)
+            nTdebug("For ssType %s residue type %s found (av/sd/min/max) %8.0f %8.0f %8.0f %8.0f" % (
+                ssType, resType, c_av, c_sd, hisMin, hisMax))
+#            nTdebug("xedges %s" % `xedges`)
 #            sys.exit(1)
             if c_sd == None:
-                NTdebug('Failed to get c_sd when testing not all residues are present in smaller sets.')
+                nTdebug('Failed to get c_sd when testing not all residues are present in smaller sets.')
                 continue
             if c_sd == 0.:
-                NTdebug('Got zero c_sd, ignoring histogram. This should only occur in smaller sets. Not setting values.')
+                nTdebug('Got zero c_sd, ignoring histogram. This should only occur in smaller sets. Not setting values.')
                 continue
             setDeepByKeys(histRamaCtupleBySsAndResType, cTuple, ssType, resType)
 
@@ -140,7 +141,7 @@ def main():
             phi += valuesBySsAndResType[ssType][resType]['phi']
             psi += valuesBySsAndResType[ssType][resType]['psi']
 
-    NTdebug('Total number of residues without PRO/GLY: %d' % len(psi))
+    nTdebug('Total number of residues without PRO/GLY: %d' % len(psi))
     hist2d, _xedges, _yedges = histogram2d(
         psi, # Note that the x is the psi for some stupid reason,
         phi, # otherwise the imagery but also the [row][column] notation is screwed.
@@ -148,11 +149,11 @@ def main():
         range=hrange)
 #    sumHistCombined = sum( hist2d )
 #    sumsumHistCombined = sum( sumHistCombined )
-    NTdebug('hist2d         : \n%s' % hist2d)
-#    NTdebug('sumHistCombined   : %s' % `sumHistCombined`)
-#    NTdebug('sumsumHistCombined: %.0f' % sumsumHistCombined)
+    nTdebug('hist2d         : \n%s' % hist2d)
+#    nTdebug('sumHistCombined   : %s' % `sumHistCombined`)
+#    nTdebug('sumsumHistCombined: %.0f' % sumsumHistCombined)
 #    hist2d = zscaleHist( hist2d, Cav, Csd )
-#    NTdebug('hist2d scaled  : \n%s' % hist2d)
+#    nTdebug('hist2d scaled  : \n%s' % hist2d)
 
     if os.path.exists(dbase_file_abs_name):
         os.unlink(dbase_file_abs_name)

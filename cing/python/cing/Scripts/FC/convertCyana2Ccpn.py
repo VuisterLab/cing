@@ -40,7 +40,7 @@ def importCyanaCoordinatesAndRestraints(ccpnProject, inputDir, guiRoot, replaceC
     if replaceCoordinates:
         status = importPseudoPdb(ccpnProject, inputDir, guiRoot, allowPopups=allowPopups, minimalPrompts=minimalPrompts, verbose=verbose, **presets)
         if status:
-            NTerror("Failed importCyanaCoordinatesAndRestraints")
+            nTerror("Failed importCyanaCoordinatesAndRestraints")
             return True
     if not replaceRestraints:
         return
@@ -50,7 +50,7 @@ def importCyanaCoordinatesAndRestraints(ccpnProject, inputDir, guiRoot, replaceC
 
     globPattern = inputDir + '/*.upl'
     fileList = glob(globPattern)
-    NTdebug("From %s will read files: %s" % (globPattern, fileList))
+    nTdebug("From %s will read files: %s" % (globPattern, fileList))
     for fn in fileList:
         fnBaseName = os.path.basename(fn).split('.')[0]
         ccpnConstraintList = formatCyana.readDistanceConstraints(fn, minimalPrompts=minimalPrompts, verbose=verbose)
@@ -60,7 +60,7 @@ def importCyanaCoordinatesAndRestraints(ccpnProject, inputDir, guiRoot, replaceC
 
     globPattern = inputDir + '/*.aco'
     fileList = glob(globPattern)
-    NTdebug("From %s will read in total files: %s" % (globPattern, fileList))
+    nTdebug("From %s will read in total files: %s" % (globPattern, fileList))
     for fn in fileList:
         fnBaseName = os.path.basename(fn).split('.')[0]
         ccpnConstraintList = formatCyana.readDihedralConstraints(fn, minimalPrompts=minimalPrompts, allowPopups=allowPopups, verbose=verbose)
@@ -69,7 +69,7 @@ def importCyanaCoordinatesAndRestraints(ccpnProject, inputDir, guiRoot, replaceC
 
 
     ccpnConstraintList = getDeepByKeys(ccpnConstraintListOfList, 0) # no need to repeat
-    NTdebug("ccpnConstraintList: %s" % ccpnConstraintList)
+    nTdebug("ccpnConstraintList: %s" % ccpnConstraintList)
     if ccpnConstraintList:
         nmrConstraintStore = ccpnConstraintList.nmrConstraintStore
         structureGeneration = nmrConstraintStore.findFirstStructureGeneration()

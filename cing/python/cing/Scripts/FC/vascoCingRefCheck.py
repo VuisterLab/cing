@@ -31,7 +31,7 @@ class VascoCingReferenceCheck(VascoReferenceCheck):
     
     vascoRefDataPath = os.path.join(cingDirScripts, 'FC', 'vascoRefData')
     if not os.path.exists(vascoRefDataPath):
-        NTerror("In CING using vascoRefDataPath %s but is absent" % vascoRefDataPath)            
+        nTerror("In CING using vascoRefDataPath %s but is absent" % vascoRefDataPath)            
 
     def setupDirectories(self, cingProject, ccpnDir=None):
         self.cingProject = cingProject
@@ -51,7 +51,7 @@ class VascoCingReferenceCheck(VascoReferenceCheck):
 
     def createSsInfo(self):
 
-#        NTdebug("Fetching DSSP secondary structure info...")
+#        nTdebug("Fetching DSSP secondary structure info...")
 
         fileNames = glob.glob(os.path.join(self.dsspDataDir, "model_*.dssp"))
 
@@ -109,7 +109,7 @@ class VascoCingReferenceCheck(VascoReferenceCheck):
                 if len(seqCodeStr) < 1:
                     # happens for PDB entry 1cjg for 2 residues
                     # and for 2k6q for 2 residues.
-                    NTdebug("Skipping line with empty seqCode string: " + line.strip()) 
+                    nTdebug("Skipping line with empty seqCode string: " + line.strip()) 
                     continue                
                 seqCode = returnInt(seqCodeStr)
                 chainCode = line[11:12]
@@ -129,14 +129,14 @@ class VascoCingReferenceCheck(VascoReferenceCheck):
     def createAsaInfo(self):
         'Return True on error.'
         if self.showMessages:
-            NTdebug( "Fetching WHATIF per-atom surface accessibility info..." )
+            nTdebug( "Fetching WHATIF per-atom surface accessibility info..." )
 
         fileNames = glob.glob(os.path.join(self.whatIfDataDir, "wsvacc*.log"))
 
         self.allWhatIfInfo = {'chains': {}}
         for fileName in fileNames:
             if self.readWhatIfAsaInfoFile(fileName): # fills self.allWhatIfInfo
-                NTerror("Failed %s when reading file." % (getCallerName()))
+                nTerror("Failed %s when reading file." % (getCallerName()))
                 return True
         # end for
         
@@ -156,7 +156,7 @@ class VascoCingReferenceCheck(VascoReferenceCheck):
 #                    medianIndex = int((len(asaList) / 2.0) + 0.5) # fails with round off on single element lists.
                     ml = mlab.prctile(asaList,[50])                    
 #                    if medianIndex < 0 or medianIndex >= len(asaList):
-#                        NTerror("Found improper median index %s for %s" % (medianIndex, str(asaList)))
+#                        nTerror("Found improper median index %s for %s" % (medianIndex, str(asaList)))
 #                        return True
 #                    d[chainCode][seqKey]['atoms'][atomName] = [asaList[medianIndex]] # Resetting list to only include median
                     d[chainCode][seqKey]['atoms'][atomName] = [ml[0]] # Reseting array because JFD is not sure it's a regular array from mlab.
@@ -168,7 +168,7 @@ class VascoCingReferenceCheck(VascoReferenceCheck):
     def readWhatIfAsaInfoFile(self, fileName):
         'Return True on error.'
 
-#        NTdebug('Now in ' + getCallerName() + ' for ' + fileName)
+#        nTdebug('Now in ' + getCallerName() + ' for ' + fileName)
         fin = open(fileName)
         lines = fin.readlines()
         fin.close()
@@ -178,7 +178,7 @@ class VascoCingReferenceCheck(VascoReferenceCheck):
         dataLine = False #@UnusedVariable
         for line in lines:
             line = line.strip()
-#            NTdebug('Line: ' + line)
+#            nTdebug('Line: ' + line)
             if line[0] == '*' or not line:
                 continue
 
@@ -202,15 +202,15 @@ class VascoCingReferenceCheck(VascoReferenceCheck):
             seqKey = (returnInt(seqId), insertionCode)
 
             if not (accessibility[0] == '|' and accessibility[-1] == '|'):
-                NTerror("Skipping line without valid format for accessibility: " + line)
+                nTerror("Skipping line without valid format for accessibility: " + line)
                 continue
             if len(accessibility) < 3:
-                NTerror("Skipping line with too short accessibility string: " + line)
+                nTerror("Skipping line with too short accessibility string: " + line)
                 continue
             accessibilityStr = accessibility[1:-1]
             accessibilityStr = accessibilityStr.strip()
             if len(accessibilityStr) < 1:
-                NTerror("Skipping line with empty accessibility string: " + line) # happens for PDB entry 1cjg for 2 residues
+                nTerror("Skipping line with empty accessibility string: " + line) # happens for PDB entry 1cjg for 2 residues
                 continue         
             accessibility = returnFloat(accessibilityStr)
             d = self.allWhatIfInfo['chains']
@@ -224,11 +224,11 @@ class VascoCingReferenceCheck(VascoReferenceCheck):
             d[chainCode][seqKey]['atoms'][atomName].append(accessibility)
             atomsRead += 1
         # end for
-#        NTdebug("Read %s atoms" % atomsRead)
-#        NTdebug("Skipped %s hydrogen" % hydrogensSkipped)
-#        NTdebug("Seen %s atoms" % (atomsRead + hydrogensSkipped))
+#        nTdebug("Read %s atoms" % atomsRead)
+#        nTdebug("Skipped %s hydrogen" % hydrogensSkipped)
+#        nTdebug("Seen %s atoms" % (atomsRead + hydrogensSkipped))
         if not atomsRead:
-            NTerror("Failed to read any atom")
+            nTerror("Failed to read any atom")
             return True
         # end if
     # end def
@@ -249,17 +249,17 @@ class VascoCingReferenceCheck(VascoReferenceCheck):
             print 'switching messaging on again.'
             switchOutput(True)
         if ccpnProject == None:
-            NTerror("Failed to load CCPN project from: %s" % self.ccpnDir)
+            nTerror("Failed to load CCPN project from: %s" % self.ccpnDir)
             return True
         
 #        shiftLoL = ccpnProject.currentNmrProject.findAllMeasurementLists(className='ShiftList')
         # Use sorting by CCPN.
         shiftLoL = filterListByObjectClassName( ccpnProject.currentNmrProject.sortedMeasurementLists(), Ccpn.CCPN_CS_LIST )
-#        NTdebug("Working on shiftLoL %s", str(shiftLoL))
+#        nTdebug("Working on shiftLoL %s", str(shiftLoL))
         
         for i,shiftList in enumerate(shiftLoL):
             shiftListSerial=shiftList.serial
-#            NTdebug("Working on shiftListSerial %s", shiftListSerial)
+#            nTdebug("Working on shiftListSerial %s", shiftListSerial)
             self.checkProject(ccpnProject=ccpnProject, shiftListSerial=shiftListSerial)
             self.tagProject()
             if self.tagCingProject(shiftList, i):
@@ -277,7 +277,7 @@ class VascoCingReferenceCheck(VascoReferenceCheck):
                 appData2 = Implementation.AppDataFloat(value=rerefError, application='VASCO', keyword='correctionError_%s' % atomType)
                 self.shiftList.addApplicationData(appData1)
                 self.shiftList.addApplicationData(appData2)
-#        NTdebug("%s" % self.shiftList.findAllApplicationData(application='VASCO'))
+#        nTdebug("%s" % self.shiftList.findAllApplicationData(application='VASCO'))
     # end def
 
     def tagCingProject(self, ccpnShiftList, i):
@@ -290,37 +290,37 @@ class VascoCingReferenceCheck(VascoReferenceCheck):
         mol = self.cingProject.molecule
 #        resonanceListName = getDeepByKeysOrAttributes( ccpnShiftList, NAME_STR )
 #        if resonanceListName == None:
-#            NTerror("Failed to get resonanceListName from CCPN which will not allow CING to match later on for e.g. Vasco. Continuing.")
+#            nTerror("Failed to get resonanceListName from CCPN which will not allow CING to match later on for e.g. Vasco. Continuing.")
 #            resonanceListName = 'source'
 #        idx = getObjectIdxByName( mol.resonanceSources, resonanceListName ) 
 #        if i < 0:
-#            NTerror("Failed to get idx for resonanceListName %s" % resonanceListName )
+#            nTerror("Failed to get idx for resonanceListName %s" % resonanceListName )
 #            return True
 #        resonanceListName = mol.resonanceSources[idx]
 #        if resonanceListName == None:
-#            NTerror("Failed to get resonanceListName from CCPN which will not allow CING to match later on for e.g. Vasco. Continuing.")
+#            nTerror("Failed to get resonanceListName from CCPN which will not allow CING to match later on for e.g. Vasco. Continuing.")
 #            return True
         
         resonanceList = getDeepByKeysOrAttributes( mol.resonanceSources, i)
         if not isinstance(resonanceList, ResonanceList):
-            NTerror("Failed to get resonanceList by idx: %s" % i)
-            NTerror("mol.resonanceSources: %s" % str(mol.resonanceSources))
+            nTerror("Failed to get resonanceList by idx: %s" % i)
+            nTerror("mol.resonanceSources: %s" % str(mol.resonanceSources))
             return True
-        NTmessage("==> Tagging CING project with Vasco results for resonanceList: %s" % resonanceList)        
+        nTmessage("==> Tagging CING project with Vasco results for resonanceList: %s" % resonanceList)        
         
         if resonanceList.vascoApplied: # boolean xor is equivalent of the above line.
-#            NTdebug("CS were rereferenced before so first undoing previous application.")
+#            nTdebug("CS were rereferenced before so first undoing previous application.")
             if mol.applyVascoChemicalShiftCorrections( resonanceList = resonanceList, doRevert = True ):
-                NTerror("Failed to undo Vasco rereferencing for: %s" % resonanceList)
+                nTerror("Failed to undo Vasco rereferencing for: %s" % resonanceList)
                 return True
             # end def
         # end def
             
         if mol.setVascoChemicalShiftCorrections(self.rerefInfo, resonanceList ):
-            NTerror("Failed to setVascoChemicalShiftCorrections for: %s" % resonanceList)
+            nTerror("Failed to setVascoChemicalShiftCorrections for: %s" % resonanceList)
             return True         
         if mol.applyVascoChemicalShiftCorrections( resonanceList = resonanceList ):
-            NTerror("Failed to applyVascoChemicalShiftCorrections for: %s" % resonanceList)
+            nTerror("Failed to applyVascoChemicalShiftCorrections for: %s" % resonanceList)
             return True
         # end def
     # end def

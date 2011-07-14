@@ -17,16 +17,16 @@ class lostInTranslation():
         "Relative to the self.i18nDir"
         absPathGwtDir = os.path.join(cing.cingRoot, self.i18nDir )
         if os.chdir(absPathGwtDir):
-            NTerror("Failed to change to directory: "+absPathGwtDir)
+            nTerror("Failed to change to directory: "+absPathGwtDir)
             sys.exit(1)
 
     def findPhrases(self):
 #        CINGROOT = os.getenv("CINGROOT", "/Users/jd/workspace35/cing") # default value should not be used...
         propList  = glob( 'iCingConstants_*.properties')
-        NTmessage("Found propList [" + `len(propList)` + "] "  + `propList`)
+        nTmessage("Found propList [" + `len(propList)` + "] "  + `propList`)
         propBaseFile = os.path.join( 'iCingConstants.properties' )
         propBaseMap = self.getPropMap( propBaseFile )
-        NTmessage ( `propBaseMap` )
+        nTmessage ( `propBaseMap` )
         for propFile in propList:
             n = len(propFile)
 #            iCingConstants_XX.properties
@@ -35,9 +35,9 @@ class lostInTranslation():
             fileTodo = 'iCingConstants-%2s-todo.properties' %  countryCode
             fileTodo = os.path.join( self.lostInTranslationDir, fileTodo )
             nf = codecs.open( fileTodo, "w", "utf-8" )
-            NTmessage("Writing to file: " + fileTodo)
+            nTmessage("Writing to file: " + fileTodo)
             propMap = self.getPropMap( propFile )
-            NTmessage("Found propBase [" + `len(propMap)` + "] "  + `propMap`)
+            nTmessage("Found propBase [" + `len(propMap)` + "] "  + `propMap`)
             keyList = propBaseMap.keys()
             keyList.sort()
             for key in keyList:
@@ -48,7 +48,7 @@ class lostInTranslation():
                 nf.write( u"%-20s = " % key )
                 nf.write( value ) # might be utf-8
                 nf.write( u"\n" ) # might be utf-8
-#                NTmessage("Lost: " + key)
+#                nTmessage("Lost: " + key)
             nf.close()
 
     def getPropMap( self, propBaseFile ):
@@ -60,11 +60,11 @@ class lostInTranslation():
             lineNo += 1
             if line == "":
                 continue
-#            NTdebug("line: " + line)
+#            nTdebug("line: " + line)
             try:
                 (key,value) = line.split('=')
             except :
-                NTerror("In file [%s] on line [%d]: [%s]" % (propBaseFile, lineNo, line))
+                nTerror("In file [%s] on line [%d]: [%s]" % (propBaseFile, lineNo, line))
                 raise # re-raise the current exception (new in 1.5)
 
             key = key.strip()

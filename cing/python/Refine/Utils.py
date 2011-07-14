@@ -10,7 +10,7 @@ from cing.Libs.NTutils import * #@UnusedWildImport
 def getParameters( basePath, extraModuleName):
     paramfile = os.path.join(basePath, '%s.py' % extraModuleName)
     if not os.path.exists(paramfile):
-        NTerror("Failed to find: %s" % paramfile)
+        nTerror("Failed to find: %s" % paramfile)
         return
 
     if 0:
@@ -19,16 +19,16 @@ def getParameters( basePath, extraModuleName):
     #    parameters = refineParameters()
     #    del parameters
         if basePath in sys.path:
-            NTdebug("Skipping add since path is already present.")
+            nTdebug("Skipping add since path is already present.")
         else:
             sys.path.insert(0, basePath)
         # end if
-    #    NTmessage('sys.path:\n%s' % str(sys.path))
-    #    NTmessage('==> Reading user parameters %s', paramfile)
+    #    nTmessage('sys.path:\n%s' % str(sys.path))
+    #    nTmessage('==> Reading user parameters %s', paramfile)
     #    g = globals()
-    #    NTmessage("g: %s" % g)
+    #    nTmessage("g: %s" % g)
     #    l = locals()
-    #    NTmessage("l: %s" % l)
+    #    nTmessage("l: %s" % l)
     #    parameters  = refineParameters #@UnusedVariable
     #    _temp = __import__(extraModuleName, globals(), locals(), [], -1)
 #        _temp = __import__(extraModuleName, globals())
@@ -38,14 +38,14 @@ def getParameters( basePath, extraModuleName):
     # end if
 
     if not 'parameters' in locals():
-        NTerror("Failed sanity check: The variable name 'parameters' should exist in the local scope.")
+        nTerror("Failed sanity check: The variable name 'parameters' should exist in the local scope.")
         return
 
     if not hasattr( parameters, 'ncpus'): #@UndefinedVariable
-        NTerror("Failed sanity check: parameters should have a 'ncpus' attribute.")
+        nTerror("Failed sanity check: parameters should have a 'ncpus' attribute.")
         return
 
-#    NTdebug('==> parameters\n%s\n', str(parameters))
+#    nTdebug('==> parameters\n%s\n', str(parameters))
     return parameters
 
 def getRefineParser():

@@ -12,7 +12,7 @@ class AllChecks(TestCase):
     os.chdir(cingDirTmpTest)
 
 
-    def testcheck_integrity(self):
+    def test_check_integrity(self):
 
         text = """_A a b c d e"""
         free = None
@@ -54,9 +54,9 @@ e
    stop_
 """
 #        self.assertEqual(exp,tt.star_text())
-        NTdebug("column %s: %s" % ( "_A", tt.getStringListByColumnName("_A") ))
+        nTdebug("column %s: %s" % ( "_A", tt.getStringListByColumnName("_A") ))
 
-    def testcheck_integrity_2(self):
+    def test_check_integrity_2(self):
 
         text = """_A _B a b c d e f"""
         tt = TagTable(  free      = None,
@@ -69,7 +69,7 @@ e
         self.assertEqual(tt.getColCount(), 2)
 
 
-    def testGetValueListIntByColumnName(self):
+    def test_GetValueListIntByColumnName(self):
 
         text = """_A 1 2 . 3 4 5"""
         tt = TagTable(  free      = None,
@@ -80,7 +80,7 @@ e
         self.assertEqual(pos,len(text))
         self.assertEqual(tt.getRowCount(), 6)
         self.assertEqual(tt.getColCount(), 1)
-        NTdebug("column %s: %s" % ( "_A", tt.getIntListByColumnName("_A") ))
+        nTdebug("column %s: %s" % ( "_A", tt.getIntListByColumnName("_A") ))
 
         text = """_A 1.0 2.0 . 3.0 4 5.0"""
         tt = TagTable(  free      = None,
@@ -90,7 +90,7 @@ e
         pos = tt.parse( text = text, pos = 0)
         self.assertEqual(pos,len(text))
 
-        NTdebug("column %s: %s" % ( "_A", tt.getFloatListByColumnName("_A") ))
+        nTdebug("column %s: %s" % ( "_A", tt.getFloatListByColumnName("_A") ))
 
 if __name__ == "__main__":
     cing.verbosity = verbosityDebug

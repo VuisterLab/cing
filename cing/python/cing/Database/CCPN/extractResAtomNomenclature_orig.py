@@ -1,5 +1,4 @@
-
-
+#@PydevCodeAnalysisIgnore # pylint: disable-all
 from memops.api import Implementation
 
 memopsRoot = Implementation.MemopsRoot(name='TestOnly')
@@ -36,19 +35,19 @@ for chemComp in memopsRoot.chemComps:
 
         if namingSystem:
           sysName = chemCompVar.findFirstSpecificSysName(namingSystem=namingSystem) \
-        	    or chemCompVar.findFirstChemCompSysName(namingSystem=namingSystem) \
-		    or namingSystem.mainChemCompSysName \
-        	    or namingSystem.findFirstChemCompSysName()
+                or chemCompVar.findFirstChemCompSysName(namingSystem=namingSystem) \
+            or namingSystem.mainChemCompSysName \
+                or namingSystem.findFirstChemCompSysName()
 
           if sysName:
             resCode = sysName.sysName
 
           for chemAtom in chemAtomAndSets:
             atomSysName = namingSystem.findFirstAtomSysName(atomName=chemAtom.name,
-	                                                    atomSubType=chemAtom.subType)
+                                                        atomSubType=chemAtom.subType)
             #print chemAtom.name, [a.atomName for a in namingSystem.atomSysNames]
             if atomSysName:
-	      #print chemAtom.name, name
+          #print chemAtom.name, name
               atomDict[chemAtom.name][name] = atomSysName.sysName
 
         resText += ' %s %-4s' % (name, resCode)

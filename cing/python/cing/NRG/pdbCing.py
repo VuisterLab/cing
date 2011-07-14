@@ -55,12 +55,12 @@ def run():
     m = pdbCing(max_entries_todo = max_entries_todo, max_time_to_wait = max_time_to_wait, writeWhyNot = writeWhyNot,
                 updateIndices = updateIndices, isProduction = isProduction, processes_max = processes_max)
 
-    NTdebug("Publish results at directory    : " + m.results_dir)
-    NTdebug("Do maximum number of entries    : " + `m.max_entries_todo`)
+    nTdebug("Publish results at directory    : " + m.results_dir)
+    nTdebug("Do maximum number of entries    : " + `m.max_entries_todo`)
 
     # Get the PDB info to see which entries can/should be done.
     if m.searchPdbEntries():
-        NTerror("Failed to searchPdbEntries")
+        nTerror("Failed to searchPdbEntries")
         return True
 
     if new_hits_entry_list:
@@ -68,41 +68,41 @@ def run():
     elif getTodoList:
         # Get todo list and some others.
         if m.getCingEntryInfo():
-            NTerror("Failed to getCingEntryInfo (first time).")
+            nTerror("Failed to getCingEntryInfo (first time).")
             return True
 
-    NTmessage("Entries to skip if requested: %s" % str(skipList))
+    nTmessage("Entries to skip if requested: %s" % str(skipList))
     lengthOrg = len(m.entry_list_todo)
     m.entry_list_todo = m.entry_list_todo.difference(skipList)
     lengthNew = len(m.entry_list_todo)
     if lengthOrg != lengthNew:
-        NTwarning("Skipping: number of entries: %d" % (lengthOrg-lengthNew))
+        nTwarning("Skipping: number of entries: %d" % (lengthOrg-lengthNew))
 
     if m.entry_list_todo:
         if m.runCing():
-            NTerror("Failed to runCing")
+            nTerror("Failed to runCing")
             return True
 
     # Do or redo the retrieval of the info from the filesystem on the doneness of PDB-CING.
     if m.getCingEntryInfo():
-        NTerror("Failed to getCingEntryInfo")
+        nTerror("Failed to getCingEntryInfo")
         return True
 
     if m.doWriteEntryLoL():
-        NTerror("Failed to doWriteEntryLoL")
+        nTerror("Failed to doWriteEntryLoL")
         return True
 
     if m.doWriteWhyNot():
-        NTerror("Failed to doWriteWhyNot")
+        nTerror("Failed to doWriteWhyNot")
         return True
 
     # Retrieve the linkages between BMRB and PDB entries.
 #    if m.getBmrbLinks():
-#        NTerror("Failed to get BMRB-PDB links")
+#        nTerror("Failed to get BMRB-PDB links")
 #        return True
 
     if m.updateIndexFiles():
-        NTerror("Failed to update index files.")
+        nTerror("Failed to update index files.")
         return True
 # end def run
 
@@ -199,12 +199,12 @@ class pdbCing(Lister):
                 resource = urllib.urlopen(url_links)
                 reader = csv.reader(resource)
             except IOError:
-                NTerror("couldn't open url for reader: " + url_links)
+                nTerror("couldn't open url for reader: " + url_links)
                 return True
 
             try:
                 _header_read = reader.next()
-#                NTdebug("read header: %s" % header_read)
+#                nTdebug("read header: %s" % header_read)
                 for row in reader:
                     bmrb_code = row[0]
                     pdb_code = row[1]
@@ -218,9 +218,9 @@ class pdbCing(Lister):
                 pass
 
             if url_links == url_many2one:
-                NTmessage("Found %s matches from PDB to BMRB" % len(self.matches_many2one))
+                nTmessage("Found %s matches from PDB to BMRB" % len(self.matches_many2one))
             else:
-                NTmessage("Found %s matches from BMRB to PDB" % len(self.matches_one2many))
+                nTmessage("Found %s matches from BMRB to PDB" % len(self.matches_one2many))
 
 
     def getCingEntryInfo(self):
@@ -229,7 +229,7 @@ class pdbCing(Lister):
         every one in a single blow by accident.
         """
 
-        NTmessage("Get the entries tried, todo, crashed, and stopped in PDB-CING from file system.")
+        nTmessage("Get the entries tried, todo, crashed, and stopped in PDB-CING from file system.")
 
         self.entry_list_obsolete = NTlist()
         self.entry_list_tried = NTlist()
@@ -243,59 +243,59 @@ class pdbCing(Lister):
         for subDir in subDirList:
             if len(subDir) != 2:
                 if subDir != DS_STORE_STR:
-                    NTdebug('Skipping subdir with other than 2 chars: [' + subDir + ']')
+                    nTdebug('Skipping subdir with other than 2 chars: [' + subDir + ']')
                 continue
             entryList = os.listdir(os.path.join(DATA_STR, subDir))
             for entryDir in entryList:
                 entry_code = entryDir
                 if not is_pdb_code(entry_code):
                     if entry_code != DS_STORE_STR:
-                        NTerror("String doesn't look like a pdb code: " + entry_code)
+                        nTerror("String doesn't look like a pdb code: " + entry_code)
                     continue
-#                NTdebug("Working on: " + entry_code)
+#                nTdebug("Working on: " + entry_code)
 
                 entrySubDir = os.path.join(DATA_STR, subDir, entry_code)
                 if not entry_code in self.entry_list_pdb:
-                    NTwarning("Found entry %s in PDB-CING-CING but not in PDB. Will be obsoleted in PDB-CING too" % entry_code)
+                    nTwarning("Found entry %s in PDB-CING-CING but not in PDB. Will be obsoleted in PDB-CING too" % entry_code)
                     if len(self.entry_list_obsolete) < self.ENTRY_TO_DELETE_COUNT_MAX:
                         rmdir(entrySubDir)
                         self.entry_list_obsolete.append(entry_code)
                     else:
-                        NTerror("Entry %s in PDB-CING not obsoleted since there were already removed: %s" % (
+                        nTerror("Entry %s in PDB-CING not obsoleted since there were already removed: %s" % (
                             entry_code, self.ENTRY_TO_DELETE_COUNT_MAX))
                 # end if
 
                 cingDirEntry = os.path.join(entrySubDir, entry_code + ".cing")
                 if not os.path.exists(cingDirEntry):
-                    NTmessage("Failed to find directory: %s" % cingDirEntry)
+                    nTmessage("Failed to find directory: %s" % cingDirEntry)
                     continue
 
                 # Look for last log file
                 logList = glob(entrySubDir + '/log_validateEntry/*.log')
                 if not logList:
-                    NTmessage("Failed to find any log file in directory: %s" % entrySubDir)
+                    nTmessage("Failed to find any log file in directory: %s" % entrySubDir)
                     continue
                 # .cing directory and .log file present so it was tried to start but might not have finished
                 self.entry_list_tried.append(entry_code)
 
                 logLastFile = logList[-1]
-#                NTdebug("Found logLastFile %s" % logLastFile)
+#                nTdebug("Found logLastFile %s" % logLastFile)
 #                set timeTaken = (` grep 'CING took       :' $logFile | gawk '{print $(NF-1)}' `)
 #                text = readTextFromFile(logLastFile)
                 entryCrashed = False
                 for r in AwkLike(logLastFile):
                     line = r.dollar[0]
                     if entryCrashed:
-                        NTdebug(line)
+                        nTdebug(line)
                     if line.startswith('CING took       :'):
-#                        NTdebug("Matched line: %s" % line)
+#                        nTdebug("Matched line: %s" % line)
                         timeTakenStr = r.dollar[r.NF - 1]
                         self.timeTakenDict[entry_code] = float(timeTakenStr)
-#                        NTdebug("Found time: %s" % self.timeTakenDict[entry_code])
+#                        nTdebug("Found time: %s" % self.timeTakenDict[entry_code])
                     if line.startswith('Traceback (most recent call last)'):
-                        NTdebug("%s Matched line: %s" % (entry_code, line))
+                        nTdebug("%s Matched line: %s" % (entry_code, line))
                         if entry_code in self.entry_list_crashed:
-                            NTwarning("%s was already found before; not adding again." % entry_code)
+                            nTwarning("%s was already found before; not adding again." % entry_code)
                         else:
                             self.entry_list_crashed.append(entry_code)
                             entryCrashed = True
@@ -305,27 +305,27 @@ class pdbCing(Lister):
                 # end for AwkLike
                 if not self.timeTakenDict.has_key(entry_code):
                     # was stopped by time out or by user or by system (any other type of stop but stack trace)
-                    NTmessage("%s Since CING end message was not found assumed to have stopped" % entry_code)
+                    nTmessage("%s Since CING end message was not found assumed to have stopped" % entry_code)
                     self.entry_list_stopped.append(entry_code)
                     continue
 
                 # Look for end statement from CING which shows it wasn't killed before it finished.
                 indexFileEntry = os.path.join(cingDirEntry, "index.html")
                 if not os.path.exists(indexFileEntry):
-                    NTmessage("%s Since index file %s was not found assumed to have stopped" % (entry_code, indexFileEntry))
+                    nTmessage("%s Since index file %s was not found assumed to have stopped" % (entry_code, indexFileEntry))
                     self.entry_list_stopped.append(entry_code)
                     continue
 
                 projectHtmlFile = os.path.join(cingDirEntry, entry_code, "HTML/index.html")
                 if not os.path.exists(projectHtmlFile):
-                    NTmessage("%s Since project html file %s was not found assumed to have stopped" % (entry_code, projectHtmlFile))
+                    nTmessage("%s Since project html file %s was not found assumed to have stopped" % (entry_code, projectHtmlFile))
                     self.entry_list_stopped.append(entry_code)
                     continue
 
                 if False: # Default is True
                     molGifFile = os.path.join(cingDirEntry, entry_code, "HTML/mol.gif")
                     if not os.path.exists(molGifFile):
-                        NTmessage("%s Since mol.gif file %s was not found assumed to have stopped" % (entry_code, projectHtmlFile))
+                        nTmessage("%s Since mol.gif file %s was not found assumed to have stopped" % (entry_code, projectHtmlFile))
                         self.entry_list_stopped.append(entry_code)
                         continue
 
@@ -334,22 +334,22 @@ class pdbCing(Lister):
         # end for subDir
         timeTakenList = NTlist() # local variable.
         timeTakenList.addList(self.timeTakenDict.values())
-        NTmessage("Time taken by CING by statistics\n%s" % timeTakenList.statsFloat())
+        nTmessage("Time taken by CING by statistics\n%s" % timeTakenList.statsFloat())
 
         if not self.entry_list_tried:
-            NTerror("Failed to find entries that CING tried.")
+            nTerror("Failed to find entries that CING tried.")
 
         self.entry_list_todo.addList(self.entry_list_pdb)
         self.entry_list_todo = self.entry_list_todo.difference(self.entry_list_done)
 
-        NTmessage("Found %s entries that CING tried (T)." % len(self.entry_list_tried))
-        NTmessage("Found %s entries that CING crashed (C)." % len(self.entry_list_crashed))
-        NTmessage("Found %s entries that CING stopped (S)." % len(self.entry_list_stopped))
+        nTmessage("Found %s entries that CING tried (T)." % len(self.entry_list_tried))
+        nTmessage("Found %s entries that CING crashed (C)." % len(self.entry_list_crashed))
+        nTmessage("Found %s entries that CING stopped (S)." % len(self.entry_list_stopped))
         if not self.entry_list_done:
-            NTerror("Failed to find entries that CING did.")
-        NTmessage("Found %s entries that CING did (B=A-C-S)." % len(self.entry_list_done))
-        NTmessage("Found %s entries todo (A-B)." % len(self.entry_list_todo))
-        NTmessage("Found %s entries in PDB-CING made obsolete." % len(self.entry_list_obsolete))
+            nTerror("Failed to find entries that CING did.")
+        nTmessage("Found %s entries that CING did (B=A-C-S)." % len(self.entry_list_done))
+        nTmessage("Found %s entries todo (A-B)." % len(self.entry_list_todo))
+        nTmessage("Found %s entries in PDB-CING made obsolete." % len(self.entry_list_obsolete))
     # end def
 
     def searchPdbEntries(self):
@@ -363,13 +363,13 @@ class pdbCing(Lister):
 #        self.match.d[ "1brv" ] = EntryInfo(time=modification_time)
 
         ## following statement is equivalent to a unix command like:
-        NTdebug("Looking for entries from the PDB database.")
+        nTdebug("Looking for entries from the PDB database.")
 
         self.entry_list_pdb.addList(getPdbEntries())
         if not self.entry_list_pdb:
-            NTerror("No PDB entries found")
+            nTerror("No PDB entries found")
             return True
-        NTmessage("Found %s PDB entries." % len(self.entry_list_pdb))
+        nTmessage("Found %s PDB entries." % len(self.entry_list_pdb))
 
 
 
@@ -387,9 +387,9 @@ class pdbCing(Lister):
     def doWriteWhyNot(self):
         "Write the WHYNOT files"
         if self.writeWhyNot:
-            NTdebug("Create WHY_NOT list")
+            nTdebug("Create WHY_NOT list")
         else:
-            NTmessage("Skipping create WHY_NOT list")
+            nTmessage("Skipping create WHY_NOT list")
             return
 
         whyNot = WhyNot()
@@ -425,13 +425,13 @@ class pdbCing(Lister):
             del(whyNot[entryId])
         # end loop over entries
         whyNotStr = '%s' % whyNot
-#        NTdebug("whyNotStr truncated to 1000 chars: [" + whyNotStr[0:1000] + "]")
+#        nTdebug("whyNotStr truncated to 1000 chars: [" + whyNotStr[0:1000] + "]")
 
         whyNotFileName = "PDB-CING.txt"
         writeTextToFile(whyNotFileName, whyNotStr)
 
         why_not_db_comments_file = os.path.join(self.why_not_db_comments_dir, self.why_not_db_comments_file)
-        NTdebug("Copying to: " + why_not_db_comments_file)
+        nTdebug("Copying to: " + why_not_db_comments_file)
         shutil.copy(whyNotFileName, why_not_db_comments_file)
         if self.writeTheManyFiles:
             for entryId in self.entry_list_done:
@@ -442,7 +442,7 @@ class pdbCing(Lister):
                     os.makedirs(subDir)
                 fileName = os.path.join(subDir, entryId + ".exist")
                 if not os.path.exists(fileName):
-    #                NTdebug("Creating: " + fileName)
+    #                nTdebug("Creating: " + fileName)
                     fp = open(fileName, 'w')
         #            fprintf(fp, ' ')
                     fp.close()
@@ -455,7 +455,7 @@ class pdbCing(Lister):
         if not self.updateIndices:
             return
 
-        NTmessage("Updating index files")
+        nTmessage("Updating index files")
 
         number_of_entries_per_row = 4
         number_of_files_per_column = 4
@@ -468,7 +468,7 @@ class pdbCing(Lister):
 
         csvwriter = csv.writer(file(self.index_pdb_file_name, "w"))
         if not self.entry_list_done:
-            NTwarning("No entries done, skipping creation of indexes")
+            nTwarning("No entries done, skipping creation of indexes")
             return
 
         self.entry_list_done.sort()
@@ -480,7 +480,7 @@ class pdbCing(Lister):
         number_of_files = int(number_of_entries_all_present / number_of_entries_per_file)
         if number_of_entries_all_present % number_of_entries_per_file:
             number_of_files += 1
-        NTmessage("Generating %s index html files" % (number_of_files))
+        nTmessage("Generating %s index html files" % (number_of_files))
 
         example_str_template = """ <td><a href=""" + self.pdb_link_template + \
         """>%S</a><BR><a href=""" + self.bmrb_link_template + ">%b</a>"
@@ -528,7 +528,7 @@ class pdbCing(Lister):
                 begin_entry_count = number_of_entries_per_file * (file_id - 1) + 1
                 end_entry_count = min(number_of_entries_per_file * file_id,
                                            number_of_entries_all_present)
-#                NTdebug("%5d %5d %5d" % (begin_entry_count, end_entry_count, number_of_entries_all_present))
+#                nTdebug("%5d %5d %5d" % (begin_entry_count, end_entry_count, number_of_entries_all_present))
 
                 old_string = r"<!-- INSERT NEW RESULT STRING HERE -->"
                 jump_form_start = '<FORM method="GET" action="%s">' % self.url_redirecter
@@ -636,17 +636,17 @@ class pdbCing(Lister):
         index_file_first = 'index_1.html'
         index_file = os.path.join(indexDir, 'index.html')
         ## Assume that a link that is already present is valid and will do the job
-#        NTmessage('Symlinking: %s %s' % (index_file_first, index_file))
+#        nTmessage('Symlinking: %s %s' % (index_file_first, index_file))
         symlink(index_file_first, index_file)
 
 #        ## Make a sym link from the index_bmrb.html file to the index.html file
 #        index_file_first = 'index_pdb.html'
 #        index_file_first = index_file_first
 #        index_file = os.path.join(self.results_dir + "/index", 'index.html')
-#        NTdebug('Symlinking (B): %s %s' % (index_file_first, index_file))
+#        nTdebug('Symlinking (B): %s %s' % (index_file_first, index_file))
 #        symlink(index_file_first, index_file)
 
-        NTmessage("Copy the adjusted php script")
+        nTmessage("Copy the adjusted php script")
         org_file = os.path.join(self.base_data_dir, 'redirect.php')
         new_file = os.path.join(self.results_dir, 'redirect.php')
         file_content = open(org_file, 'r').read()
@@ -654,7 +654,7 @@ class pdbCing(Lister):
         file_content = string.replace(file_content, old_string, self.results_url)
         open(new_file, 'w').write(file_content)
 
-        NTmessage("Copy the adjusted html redirect")
+        nTmessage("Copy the adjusted html redirect")
         org_file = os.path.join(self.base_data_dir, 'redirect.html')
         new_file = os.path.join(self.results_dir, 'index.html')
 #        file_content = open(org_file, 'r').read()
@@ -693,7 +693,7 @@ class pdbCing(Lister):
                             MAX_ENTRIES_TODO = self.max_entries_todo,
                             extraArgList = extraArgList,
                             shuffleBeforeSelecting = True ):
-            NTerror("Failed to doScriptOnEntryList")
+            nTerror("Failed to doScriptOnEntryList")
             return True
     # end def runCing.
 

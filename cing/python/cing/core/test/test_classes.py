@@ -67,8 +67,8 @@ class AllChecks(TestCase):
         p = Project('1brv')
         self.assertEquals('./1brv.cing', p.rootPath('1brv')[0])
         self.assertEquals('1brv', p.rootPath('1brv')[1])
-        NTmessage("hello")
-        NTdebug(p.root)
+        nTmessage("hello")
+        nTdebug(p.root)
 
     def test_classes(self):
         htmlOnly = True
@@ -77,11 +77,11 @@ class AllChecks(TestCase):
 
         project = Project.open(entryId, status='new')
         if not project:
-            NTerror('Failed opening project %s', entryId)
+            nTerror('Failed opening project %s', entryId)
             exit(1)
 
         cyanaDirectory = os.path.join(cingDirTestsData, "cyana", entryId)
-        NTdebug("Reading files from directory: " + cyanaDirectory)
+        nTdebug("Reading files from directory: " + cyanaDirectory)
 
         kwds = {}
         kwds['pdbFile'] = entryId
@@ -114,13 +114,13 @@ class AllChecks(TestCase):
         # per item always set 2 top level attributes:
         project.htmlLocation = (project.path('index.html'), None)
         project.html = HTMLfile(project.htmlLocation[0], project, title = 'Project')
-        NTdebug("project.htmlLocation[0]: %s" % project.htmlLocation[0])
+        nTdebug("project.htmlLocation[0]: %s" % project.htmlLocation[0])
         #create new folders for Molecule/HTML
         htmlPath = project.htmlPath()
         if os.path.exists(htmlPath):
             removedir(htmlPath)
         os.makedirs(htmlPath)
-        NTdebug("htmlPath: %s" % htmlPath)
+        nTdebug("htmlPath: %s" % htmlPath)
 
         # initialize molecule html page
         for subdir in htmlDirectories.values():
@@ -128,7 +128,7 @@ class AllChecks(TestCase):
 
         # NB project.htmlPath is different from project.path
         molecule.htmlLocation = (project.htmlPath('indexMolecule.html'), None)
-        NTdebug("molecule.htmlLocation[0]: %s" % molecule.htmlLocation[0])
+        nTdebug("molecule.htmlLocation[0]: %s" % molecule.htmlLocation[0])
         molecule.html = HTMLfile(molecule.htmlLocation[0], project,
                                   title = 'Molecule ' + molecule.name)
 

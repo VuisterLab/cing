@@ -54,10 +54,10 @@ def annotateLoop():
             entryCodeNew = entryCode + city
             programId = getDeepByKeys(programHoH, entryCode, city)
             if not (city == 'Test' or programId):
-#                NTdebug("Skipping %s" % entryCodeNew)
+#                nTdebug("Skipping %s" % entryCodeNew)
                 continue
             else:
-                NTdebug("Looking at %s" % entryCodeNew)
+                nTdebug("Looking at %s" % entryCodeNew)
             entryCodePlusCity = entryCode + '_' + city # will be split on
             annotateEntry(entryCodePlusCity)
 # end def

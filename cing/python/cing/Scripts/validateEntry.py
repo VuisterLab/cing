@@ -109,8 +109,8 @@ def main(entryId, *extraArgList):
     forceRedo = True
     forceRetrieveInput = True
 
-    NTmessage(header)
-    NTmessage(getStartMessage())
+    nTmessage(header)
+    nTmessage(getStartMessage())
 
     # Sync below code with nrgCing#createToposTokens
     expectedArgumentList = """
@@ -121,12 +121,12 @@ def main(entryId, *extraArgList):
     """.split()
     expectedNumberOfArguments = len(expectedArgumentList)
     if len(extraArgList) != expectedNumberOfArguments:
-        NTmessage("consider updating code to include all sequential parameters: %s" % str(expectedArgumentList))
+        nTmessage("consider updating code to include all sequential parameters: %s" % str(expectedArgumentList))
         if len(extraArgList) > expectedNumberOfArguments:
-            NTerror("Got arguments: " + str(extraArgList))
-            NTerror("Failed to get expected number of arguments: %d got %d" % (
+            nTerror("Got arguments: " + str(extraArgList))
+            nTerror("Failed to get expected number of arguments: %d got %d" % (
                 expectedNumberOfArguments, len(extraArgList)))
-            NTerror("Expected arguments: %s" % expectedArgumentList)
+            nTerror("Expected arguments: %s" % expectedArgumentList)
             return True
         # end if
     # end if
@@ -164,22 +164,22 @@ def main(entryId, *extraArgList):
         isRemoteOutputDir = True
 #    vc = vCing('.') # argument is a fake master_ssh_url not needed here.
 
-    NTdebug("Using program arguments:")
-    NTdebug("inputDir:             %s" % inputDir)
-    NTdebug("outputDir:            %s" % outputDir)
-    NTdebug("pdbConvention:        %s" % pdbConvention)
-    NTdebug("restraintsConvention: %s" % restraintsConvention)
-    NTdebug("archiveType:          %s" % archiveType)
-    NTdebug("projectType:          %s" % projectType)
-    NTdebug("storeCING2db:         %s" % storeCING2db)
-    NTdebug("ranges:               %s" % ranges)
-    NTdebug("filterTopViolations:  %s" % filterTopViolations)
-    NTdebug("filterVasco:          %s" % filterVasco)
-    NTdebug("singleCoreOperation:  %s" % singleCoreOperation)    
-    NTdebug("")
-    NTdebug("Using derived settings:")
-    NTdebug("modelCount:           %s" % modelCount)
-    NTdebug("isRemoteOutputDir:    %s" % isRemoteOutputDir)
+    nTdebug("Using program arguments:")
+    nTdebug("inputDir:             %s" % inputDir)
+    nTdebug("outputDir:            %s" % outputDir)
+    nTdebug("pdbConvention:        %s" % pdbConvention)
+    nTdebug("restraintsConvention: %s" % restraintsConvention)
+    nTdebug("archiveType:          %s" % archiveType)
+    nTdebug("projectType:          %s" % projectType)
+    nTdebug("storeCING2db:         %s" % storeCING2db)
+    nTdebug("ranges:               %s" % ranges)
+    nTdebug("filterTopViolations:  %s" % filterTopViolations)
+    nTdebug("filterVasco:          %s" % filterVasco)
+    nTdebug("singleCoreOperation:  %s" % singleCoreOperation)    
+    nTdebug("")
+    nTdebug("Using derived settings:")
+    nTdebug("modelCount:           %s" % modelCount)
+    nTdebug("isRemoteOutputDir:    %s" % isRemoteOutputDir)
     
     # For NMR_REDO required as most efficient.
     if singleCoreOperation: 
@@ -190,15 +190,15 @@ def main(entryId, *extraArgList):
 
     if os.path.isdir(cingEntryDir):
         if forceRedo:
-            NTmessage("Enforcing a redo")
+            nTmessage("Enforcing a redo")
             rmtree(cingEntryDir)
         else:
             mainIndexFile = os.path.join(cingEntryDir, "index.html")
             isDone = os.path.isfile(mainIndexFile)
             if isDone:
-                NTmessage("SKIPPING ENTRY ALREADY DONE")
+                nTmessage("SKIPPING ENTRY ALREADY DONE")
                 return
-            NTmessage("REDOING BECAUSE VALIDATION CONSIDERED NOT DONE.")
+            nTmessage("REDOING BECAUSE VALIDATION CONSIDERED NOT DONE.")
             rmtree(cingEntryDir)
         # end if.
     # end if.
@@ -210,7 +210,7 @@ def main(entryId, *extraArgList):
 
     project = Project(entryId)
     if project.removeFromDisk():
-        NTerror("Failed to remove existing project (if present)")
+        nTerror("Failed to remove existing project (if present)")
         return True
     # end if.
 
@@ -221,7 +221,7 @@ def main(entryId, *extraArgList):
         formatFileName = 'pdb%s.ent.gz'
     fileNameTgz = formatFileName % entryId
 
-#    NTdebug("fileNameTgz: %s" % fileNameTgz)
+#    nTdebug("fileNameTgz: %s" % fileNameTgz)
     allowedInputProtocolList = 'http file ssh'.split()
     inputProtocal = string.split( inputDir, ':' )[0]
     if inputProtocal in allowedInputProtocolList:
@@ -238,11 +238,11 @@ def main(entryId, *extraArgList):
             retrieveTgzFromUrl(entryId, inputDir, archiveType=archiveType, formatFileName=formatFileName)
         # end if
         if not os.path.exists(fileNameTgz):
-            NTerror("Tgz should already have been present skipping entry")
+            nTerror("Tgz should already have been present skipping entry")
             return
         # end if
     else:
-        NTdebug("Entry not retrieved which might be normal in some situations.")
+        nTdebug("Entry not retrieved which might be normal in some situations.")
     # end if.
 
     if projectType == PROJECT_TYPE_CING:
@@ -251,12 +251,12 @@ def main(entryId, *extraArgList):
         shutil.copy(fullFileNameTgz, '.')
         project = Project.open(entryId, status='old')
         if not project:
-            NTerror("Failed to init old project")
+            nTerror("Failed to init old project")
             return True
     elif projectType == PROJECT_TYPE_CCPN:
         project = Project.open(entryId, status='new')
         if not project.initCcpn(ccpnFolder=fileNameTgz, modelCount=modelCount):
-            NTerror("Failed to init project from ccpn")
+            nTerror("Failed to init project from ccpn")
             return True
     elif projectType == PROJECT_TYPE_PDB:
         project = Project.open(entryId, status='new')
@@ -265,21 +265,21 @@ def main(entryId, *extraArgList):
         project.initPDB(pdbFile=pdbFilePath, convention=IUPAC, nmodels=modelCount)
 #        if tmpPdbFile:
         if True:
-            NTdebug("Removing tmp: %s" % pdbFilePath)
+            nTdebug("Removing tmp: %s" % pdbFilePath)
             os.unlink(pdbFilePath)
     elif projectType == PROJECT_TYPE_CYANA:
         project = Project.open(entryId, status='new')
         pdbFileName = entryId + ".pdb"
         pdbFilePath = os.path.join(inputDir, pdbFileName)
         project.initPDB(pdbFile=pdbFilePath, convention=IUPAC, nmodels=modelCount)
-        NTdebug("Reading files from directory: " + inputDir)
+        nTdebug("Reading files from directory: " + inputDir)
         kwds = {'uplFiles': [ entryId ], 'acoFiles': [ entryId ] }
         if os.path.exists(os.path.join(inputDir, entryId + ".prot")):
             if os.path.exists(os.path.join(inputDir, entryId + ".seq")):
                 kwds['protFile'] = entryId
                 kwds['seqFile'] = entryId
             else:
-                NTerror("Failed to find the .seq file whereas there was a .prot file.")
+                nTerror("Failed to find the .seq file whereas there was a .prot file.")
         # Skip restraints if absent.
         if os.path.exists(os.path.join(inputDir, entryId + ".upl")):
             project.cyana2cing(cyanaDirectory=inputDir,
@@ -293,13 +293,13 @@ def main(entryId, *extraArgList):
         project.molecule.setRanges(ranges)
     project.molecule.superpose(ranges=ranges)
     if filterTopViolations and not project.filterHighRestraintViol():
-        NTerror("Failed to filterHighRestraintViol")    
+        nTerror("Failed to filterHighRestraintViol")    
 ####> MAIN UTILITY HERE
     if 0: # DEFAULT 0
         project.save()
     if project.validate(htmlOnly=htmlOnly, ranges=ranges, doProcheck=doProcheck, doWhatif=doWhatif,
             doWattos=doWattos, doQueeny = doQueeny, doTalos=doTalos, filterVasco = filterVasco ):
-        NTerror("Failed to validate project read")
+        nTerror("Failed to validate project read")
         return True
     # end if filterVasco
 
@@ -314,10 +314,10 @@ def main(entryId, *extraArgList):
             archive_id = ARCHIVE_NRG_ID
         try:
             if doStoreCING2db( entryId, archive_id, project=project):
-                NTerror("Failed to store CING project's data to DB but continuing.")
+                nTerror("Failed to store CING project's data to DB but continuing.")
         except:
             NTtracebackError()
-            NTerror("Failed to store CING project's data due to above traceback error.")
+            nTerror("Failed to store CING project's data due to above traceback error.")
 
     if projectType == PROJECT_TYPE_CCPN:
 #        fileNameTgz = entryId + '.tgz'
@@ -329,23 +329,23 @@ def main(entryId, *extraArgList):
         directoryNameCing = entryId + ".cing"
         tgzFileNameCing = directoryNameCing + ".tgz"
         if os.path.exists(tgzFileNameCing):
-            NTwarning("Overwriting: " + tgzFileNameCing)
+            nTwarning("Overwriting: " + tgzFileNameCing)
         cmd = "tar -czf %s %s" % (tgzFileNameCing, directoryNameCing)
-        NTdebug("cmd: %s" % cmd)
+        nTdebug("cmd: %s" % cmd)
 #        do_cmd(cmd)
         status, result = commands.getstatusoutput(cmd)
         if status:
-            NTerror("Failed to tar status: %s with result %s" % (status, result))
+            nTerror("Failed to tar status: %s with result %s" % (status, result))
             return True
         if isRemoteOutputDir:
             if putFileBySsh(tgzFileNameCing, outputDir, ntriesMax = 2):
-                NTerror("Failed to send File By Scp status: %s with result %s" % (status, result))
-                NTerror("Maintaining results.")
+                nTerror("Failed to send File By Scp status: %s with result %s" % (status, result))
+                nTerror("Maintaining results.")
                 return True
             # end if
-            NTmessage("Removing tgz result: %s" % tgzFileNameCing)
+            nTmessage("Removing tgz result: %s" % tgzFileNameCing)
             os.remove(tgzFileNameCing)
-            NTmessage("Removing cing dir itself: %s" % directoryNameCing)
+            nTmessage("Removing cing dir itself: %s" % directoryNameCing)
             rmdir(directoryNameCing)
         else: # do NOT remove local copy
             pass
@@ -364,9 +364,9 @@ def retrieveTgzFromUrl(entryId, url, archiveType=ARCHIVE_TYPE_FLAT, formatFileNa
 #    fileNameTgz = entryId + extension
     fileNameTgz = formatFileName % entryId
     if os.path.exists(fileNameTgz):
-        NTmessage("Tgz already present, skipping download")
+        nTmessage("Tgz already present, skipping download")
         return
-#    NTdebug("fileNameTgz: %s" % fileNameTgz)
+#    nTdebug("fileNameTgz: %s" % fileNameTgz)
 
     pathInsert = ''
     # TODO: check
@@ -380,34 +380,34 @@ def retrieveTgzFromUrl(entryId, url, archiveType=ARCHIVE_TYPE_FLAT, formatFileNa
     if url.startswith('file://'):
         pathSource = url.replace('file://', '')
         fullPathSource = "%s%s/%s" % (pathSource, pathInsert, fileNameTgz)
-        NTmessage("copying file: %s to: %s" % (fullPathSource, fileNameTgz))
+        nTmessage("copying file: %s to: %s" % (fullPathSource, fileNameTgz))
         if not os.path.exists(fullPathSource):
-            NTerror("%s does not exist." % (fullPathSource))
+            nTerror("%s does not exist." % (fullPathSource))
             return True
         if not os.path.isfile(fullPathSource):
-            NTerror("%s is not a file" % (fullPathSource))
+            nTerror("%s is not a file" % (fullPathSource))
             return True
         if os.path.exists(fileNameTgz):
-            NTmessage('Removing old copy: %s' % fileNameTgz)
+            nTmessage('Removing old copy: %s' % fileNameTgz)
             os.unlink(fileNameTgz)
         copy(fullPathSource, fileNameTgz)
     elif url.startswith('http://'):
         urlNameTgz = "%s%s/%s" % (url, pathInsert, fileNameTgz)
-        NTmessage("downloading url: %s to: %s" % (urlNameTgz, fileNameTgz))
+        nTmessage("downloading url: %s to: %s" % (urlNameTgz, fileNameTgz))
         urllib.urlretrieve(urlNameTgz, fileNameTgz)
     elif url.startswith('ssh://'):
         urlNameTgz = "%s%s/%s" % (url, pathInsert, fileNameTgz)
-        NTmessage("Retrieving by ssh: %s to: %s" % (urlNameTgz, fileNameTgz))
+        nTmessage("Retrieving by ssh: %s to: %s" % (urlNameTgz, fileNameTgz))
         if getFileBySsh(urlNameTgz, fileNameTgz, ntriesMax = 2):
-            NTerror( "Giving up ")
+            nTerror( "Giving up ")
     else:
-        NTerror("url has to start with http:/ or file:/ but was: %s" % (url))
+        nTerror("url has to start with http:/ or file:/ but was: %s" % (url))
         return True
 
     if os.path.exists(fileNameTgz):
         return
 
-    NTerror("Failed to download: " + urlNameTgz)
+    nTerror("Failed to download: " + urlNameTgz)
     return True
 
 
@@ -417,5 +417,5 @@ if __name__ == "__main__":
     try:
         _status = main(*sys.argv[1:])
     finally:
-        NTmessage(getStopMessage(cing.starttime))
+        nTmessage(getStopMessage(cing.starttime))
 

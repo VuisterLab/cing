@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+#@PydevCodeAnalysisIgnore # pylint: disable-all
 
 from cing.Libs.NTutils import * #@UnusedWildImport
 from queen import nmv
@@ -41,7 +42,7 @@ def nmrinfo_readdatafile(datafile):
   filelist = []
   # READ AND PARSE THE DICTIONARY TYPE FILE
   try: dctfile = open(datafile,"r")
-  except: NTerror("Datasetfile %s could not be read" %datafile)
+  except: nTerror("Datasetfile %s could not be read" %datafile)
   dct = {}
   for line in dctfile.readlines():
     line=string.strip(line)
@@ -52,9 +53,9 @@ def nmrinfo_readdatafile(datafile):
         # IF LINE IS NOT A COMMENT:
         #   CHECK IF DICTIONARY KEY AND ENTRY ARE REALLY PRESENT
         i=string.find(line,"=")
-        if (i==-1):  NTerror("No equals sign found in %s at %s" % (datafile,line))
-        if (i==0):   NTerror("No data found before equals sign in %s at %s" % (datafile,line))
-        if (i==l-1): NTerror("No data found behind equals sign in %s at %s" % (datafile,line))
+        if (i==-1):  nTerror("No equals sign found in %s at %s" % (datafile,line))
+        if (i==0):   nTerror("No data found before equals sign in %s at %s" % (datafile,line))
+        if (i==l-1): nTerror("No data found behind equals sign in %s at %s" % (datafile,line))
         # ADD TO DICTIONARY
         dct[string.strip(line[:i])] = string.strip(line[i+1:])
       # END OF DICT

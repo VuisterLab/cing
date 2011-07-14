@@ -30,13 +30,13 @@ class AllChecks(TestCase):
         db_name = PDBJ_DB_NAME
         user_name = PDBJ_DB_USER_NAME
 
-        NTdebug("Starting doStoreCING2db using:")
-        NTdebug("entry_code:           %s" % entry_code)
-    #    NTdebug("inputDir:             %s" % inputDir)
-        NTdebug("archive_id:           %s" % archive_id)
-        NTdebug("user_name:            %s" % user_name)
-        NTdebug("db_name:              %s" % db_name)
-        NTdebug("schema:               %s" % schema)
+        nTdebug("Starting doStoreCING2db using:")
+        nTdebug("entry_code:           %s" % entry_code)
+    #    nTdebug("inputDir:             %s" % inputDir)
+        nTdebug("archive_id:           %s" % archive_id)
+        nTdebug("user_name:            %s" % user_name)
+        nTdebug("db_name:              %s" % db_name)
+        nTdebug("schema:               %s" % schema)
 
         csql = CsqlAlchemy(user=user_name, db=db_name,schema=schema)
         self.assertFalse( csql.connect(), "Failed to connect to DB")
@@ -48,15 +48,15 @@ class AllChecks(TestCase):
         result = execute(centry.delete().where(centry.c.pdb_id == pdb_id))
 
         if result.rowcount:
-            NTdebug("Removed original entries numbering: %s" % result.rowcount)
+            nTdebug("Removed original entries numbering: %s" % result.rowcount)
             if result.rowcount > 1:
-                NTerror("Removed more than the expected ONE entry; this could be serious.")
+                nTerror("Removed more than the expected ONE entry; this could be serious.")
                 return True
         else:
-            NTdebug("No original entry present yet.")
+            nTdebug("No original entry present yet.")
         # end if
         datetime_first = datetime.datetime(2011, 4, 7, 11, 12, 26)
-        NTdebug("Trying datetime_first %s" % datetime_first)
+        nTdebug("Trying datetime_first %s" % datetime_first)
         result = execute(centry.insert().values(
             pdb_id=pdb_id,
             name=entry_code,

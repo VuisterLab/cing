@@ -25,11 +25,11 @@ from cing.core.sml import obj2SML
 if True: # block
     useModule = True
     if cingPaths.talos == None or cingPaths.talos == PLEASE_ADD_EXECUTABLE_HERE:
-#        NTmessage("Missing talos which is a dep for nih plugin")
+#        nTmessage("Missing talos which is a dep for nih plugin")
         useModule = False
     if not useModule:
         raise ImportWarning(NIH_STR)
-#    NTmessage('Using ' + NIH_STR)
+#    nTmessage('Using ' + NIH_STR)
 # end block
 
 
@@ -494,7 +494,8 @@ NIHheaderDefs = NTdict()
 for l in AwkLikeS( NIHheaderDefinitionString, minNF = 3 ):
     if (l.dollar[1] == '#define'):
         #print '>>', l.dollar[0]
-        if l.NF > 5: comment = ' '.join(l.dollar[5:l.NF])
+        if l.NF > 5: 
+            comment = ' '.join(l.dollar[5:l.NF])
         else: comment = None
         NIHheaderDefs[l.dollar[2]] = int(l.dollar[3])   # store value
 #        NIHheaderDefs['_'+l.dollar[2]] = (l.dollar[2],int(l.dollar[3]), comment) #store definition as _NAME
@@ -825,7 +826,7 @@ nrows:    %d''', self.tabFile, self.columnDefs.zap('name'), self.nrows
         return columnDef, or None on error
         """
         if name in self:
-            NTerror('nmrPipeTable.addColumn: column "%s" already exists\n', name )
+            nTerror('nmrPipeTable.addColumn: column "%s" already exists\n', name )
             return None
         #end if
 
@@ -847,7 +848,8 @@ nrows:    %d''', self.tabFile, self.columnDefs.zap('name'), self.nrows
     def column( self, cName ):
         """Return list of values of column cName or None on error
         """
-        if cName not in self: return None
+        if cName not in self: 
+            return None
 
         col = NTlist()
         for row in self:
@@ -862,7 +864,7 @@ nrows:    %d''', self.tabFile, self.columnDefs.zap('name'), self.nrows
         """
         for c in cNames:
             if not c in self:
-                NTerror('nmrPipeTable.hideColumn: column "%s" not defined\n', c)
+                nTerror('nmrPipeTable.hideColumn: column "%s" not defined\n', c)
             else:
                 self[c].hide = True
             #end if
@@ -875,7 +877,7 @@ nrows:    %d''', self.tabFile, self.columnDefs.zap('name'), self.nrows
         """
         for c in cNames:
             if not c in self:
-                NTerror('nmrPipeTable.showColumn: column "%s" not defined\n', c)
+                nTerror('nmrPipeTable.showColumn: column "%s" not defined\n', c)
             else:
                 self[c].hide = False
             #end if
@@ -886,7 +888,7 @@ nrows:    %d''', self.tabFile, self.columnDefs.zap('name'), self.nrows
         """
         Read table from tabFile
         """
-#        NTmessage('Reading nmrPipe table file %s', tabFile )
+#        nTmessage('Reading nmrPipe table file %s', tabFile )
 
         #end if
 
@@ -949,13 +951,15 @@ nrows:    %d''', self.tabFile, self.columnDefs.zap('name'), self.nrows
 
         fprintf(     stream, 'VARS    ' )
         for c in self.columnDefs:
-            if not c.hide: fprintf( stream, '%s ', c.name )
+            if not c.hide: 
+                fprintf( stream, '%s ', c.name )
         #end for
         fprintf( stream, '\n' )
 
         fprintf(     stream, 'FORMAT  ' )
         for c in self.columnDefs:
-            if not c.hide: fprintf( stream, '%s ', c.fmt )
+            if not c.hide: 
+                fprintf( stream, '%s ', c.fmt )
         #end for
         fprintf( stream, '\n' )
 
@@ -973,11 +977,11 @@ nrows:    %d''', self.tabFile, self.columnDefs.zap('name'), self.nrows
         """
         file = open( tabFile, 'w' )
         if file == None:
-            NTerror('nmrPipeTable.writeFile: error opening "%s"', tabFile)
+            nTerror('nmrPipeTable.writeFile: error opening "%s"', tabFile)
             return True
         self.write( file )
         file.close()
-#        NTdebug('==> Written nmrPipe table file "%s"', tabFile )
+#        nTdebug('==> Written nmrPipe table file "%s"', tabFile )
         return False
     #end def
 
@@ -1071,12 +1075,12 @@ DATA ATOMNAMES HA CA CB C N HN
     #end if
 
     if not project.molecule:
-        NTerror('exportShifts2TalosPlus: no molecule defined')
+        nTerror('exportShifts2TalosPlus: no molecule defined')
         return True
     molecule = project.molecule
     residues = molecule.residuesWithProperties('protein')
     if not residues:
-        NTerror('exportShifts2TalosPlus: no amino acid defined')
+        nTerror('exportShifts2TalosPlus: no amino acid defined')
         return True
 
     table = nmrPipeTable()
@@ -1129,7 +1133,7 @@ DATA ATOMNAMES HA CA CB C N HN
                     if talosDict.has_key(atomName):
                         atomName = talosDict[atomName]
                     else:
-                        NTerror('exportShifts2TalosPlus: strange, we should not be here (ra=%s)', ra)
+                        nTerror('exportShifts2TalosPlus: strange, we should not be here (ra=%s)', ra)
                         continue
                     #end if
 
@@ -1145,7 +1149,7 @@ DATA ATOMNAMES HA CA CB C N HN
     if not fileName:
         fileName = molecule.name + '.tab'
     if not table.writeFile(fileName):
-        NTmessage( '==> exportShifts2TalosPlus:  %-4d shifts   written to "%s"', atmCount, fileName )
+        nTmessage( '==> exportShifts2TalosPlus:  %-4d shifts   written to "%s"', atmCount, fileName )
     if atmCount == 0:
         return True
 #end def
@@ -1157,17 +1161,17 @@ def _importTableFile( tabFile, molecule ):
     """
 
     if not os.path.exists( tabFile ):
-        NTerror('_importTableFile: table file "%s" not found', tabFile)
+        nTerror('_importTableFile: table file "%s" not found', tabFile)
         return None
 
     if molecule==None:
-        NTerror('_importTableFile: no molecule defined')
+        nTerror('_importTableFile: no molecule defined')
         return None
 
     # residues for which we will analyze; same as used in export2talosPlus
     residues = molecule.residuesWithProperties('protein')
     if not residues:
-        NTerror('_importTableFile: no amino acid defined')
+        nTerror('_importTableFile: no amino acid defined')
         return None
 
     table = nmrPipeTable()
@@ -1178,13 +1182,13 @@ def _importTableFile( tabFile, molecule ):
         row.residue = None
 
         if row.RESID > len(residues):
-            NTerror('_importTableFile: invalid RESID %d',  row.RESID)
+            nTerror('_importTableFile: invalid RESID %d',  row.RESID)
             continue
 
         # map back onto CING
         res = residues[row.RESID-1] # RESID started at 1
         if res.db.shortName != row.RESNAME.upper(): # also allow for the 'c'
-            NTerror('_importTableFile: invalid RESNAME %s and CING %s',  row.RESNAME, res)
+            nTerror('_importTableFile: invalid RESNAME %s and CING %s',  row.RESNAME, res)
             continue
 
         row.residue = res
@@ -1202,7 +1206,9 @@ class TalosPlusResult( NTdict ):
 
         NTdict.__init__( self,
                          __CLASS__ = "TalosPlusResult",
-                         __FORMAT__ = '%(residue)-18s  phi= %(phi)-15s  psi= %(psi)-15s  (%(count)2s predictions, classified as "%(classification)-4s")  S2= %(S2)4.2f   Sec.Struct.: %(ss_class)-8s (confidence: %(ss_confidence)4.2f)',
+                         __FORMAT__ = '%(residue)-18s  phi= %(phi)-15s  psi= %(psi)-15s  (%(count)2s predictions, classified as ' +
+                                      '"%(classification)-4s")  S2= %(S2)4.2f   Sec.Struct.: %(ss_class)-8s ' +
+                                      '(confidence: %(ss_confidence)4.2f)',
                          **kwds
                        )
         self.setdefault('residue', None)
@@ -1235,7 +1241,8 @@ class SMLTalosPlusResultHandler( SMLhandler ):
     def handle(self, line, fp, molecule=None):
         # The handle restores the attributes of TalosPlus object
         # Needs a valid molecule
-        if molecule == None: return None
+        if molecule == None: 
+            return None
         tPlus = TalosPlusResult()
         return self.dictHandler(tPlus, fp, molecule)
     #end def
@@ -1243,10 +1250,11 @@ class SMLTalosPlusResultHandler( SMLhandler ):
     def endHandler(self, tPlus, molecule=None):
         # Restore linkage
         # Needs a valid molecule
-        if molecule == None: return None
+        if molecule == None: 
+            return None
         res = molecule.decodeNameTuple(tPlus.residue)
         if res == None:
-            NTerror('SMLTalosPlusResultHandler.endHandler: invalid nameTuple %s, ==> skipped Residue', tPlus.residue)
+            nTerror('SMLTalosPlusResultHandler.endHandler: invalid nameTuple %s, ==> skipped Residue', tPlus.residue)
             return None
         #end if
         tPlus.residue = res
@@ -1285,7 +1293,7 @@ def _importTalosPlus( project, predFile, ssFile=None ):
     #end if
 
     if not project.molecule:
-        NTerror('importTalosPlus: no molecule defined')
+        nTerror('importTalosPlus: no molecule defined')
         return True
     molecule = project.molecule
     for res in molecule.allResidues():
@@ -1356,27 +1364,27 @@ def runTalosPlus(project, tmp=None, parseOnly=False):
     Returns False when talos is absent or when all is fine.
     """
     if project == None:
-        NTerror("RunTalosPlus: No project defined")
+        nTerror("RunTalosPlus: No project defined")
         return True
 
     #tmp: to be entered in setup
 #    cingPaths.talosPlus = 'talos+'
     if project.molecule == None:
-        NTmessage("RunTalosPlus: No molecule defined")
+        nTmessage("RunTalosPlus: No molecule defined")
         return True
     residues = project.molecule.residuesWithProperties('protein')
     if not residues:
-        NTmessage('RunTalosPlus: no amino acid defined')
+        nTmessage('RunTalosPlus: no amino acid defined')
         return False
 
     if len( project.molecule.resonanceSources ) == 0:
-        NTmessage("==> RunTalosPlus: No resonances defined so no sense in running.")
+        nTmessage("==> RunTalosPlus: No resonances defined so no sense in running.")
         # JFD: This doesn't catch all cases.
         return False
 
     if not parseOnly:
         if cingPaths.talos == None or cingPaths.talos == 'PLEASE_ADD_EXECUTABLE_HERE':
-            NTmessage("RunTalosPlus: No talos+ installed so skipping this step")
+            nTmessage("RunTalosPlus: No talos+ installed so skipping this step")
             return False
 
         project.status.talosPlus = talosDefaults()
@@ -1391,28 +1399,28 @@ def runTalosPlus(project, tmp=None, parseOnly=False):
         # Exporting the shifts
         fileName = os.path.join(path, talosDefs.tableFile )
         if exportShifts2TalosPlus(  project, fileName=fileName ):
-            NTwarning("Failed to exportShifts2TalosPlus; this is normal for empty CS list.")
+            nTwarning("Failed to exportShifts2TalosPlus; this is normal for empty CS list.")
             return False
 
         # running TalosPlus
         talosProgram = ExecuteProgram( cingPaths.talos, rootPath = path,
                                        redirectOutput = True
                                      )
-        NTmessageNoEOL('==> Running talos+ ... ')
+        nTmessageNoEOL('==> Running talos+ ... ')
         talosProgram('-in ' + talosDefs.tableFile)
-        NTmessage('Done!')
+        nTmessage('Done!')
         project.status.talosPlus.completed=True
     # end if parse only.
 
     # Importing the results
     if importTalosPlus( project ):
-        NTerror("Failed importTalosPlus")
+        nTerror("Failed importTalosPlus")
         return True
     if talosPlus2restraints( project ):
-        NTerror("Failed talosPlus2restraints")
+        nTerror("Failed talosPlus2restraints")
         return True
     if saveTalosPlus( project ):
-        NTerror("Failed saveTalosPlus")
+        nTerror("Failed saveTalosPlus")
         return True
 
     verb = 'Ran'
@@ -1429,27 +1437,27 @@ def importTalosPlus( project, tmp=None ):
     Return True on error.
     """
     if project == None:
-        NTmessage("importTalosPlus: No project defined")
+        nTmessage("importTalosPlus: No project defined")
         return True
 
     if 'talosPlus' not in project.status:
-        NTmessage("importTalosPlus: No talos+ was run")
+        nTmessage("importTalosPlus: No talos+ was run")
         return True
     talosDefs = project.status.talosPlus
 
     path = project.validationPath( talosDefs.directory )
     if not path:
-        NTerror('importTalosPlus: directory "%s" with talosPlus data not found', path)
+        nTerror('importTalosPlus: directory "%s" with talosPlus data not found', path)
         return True
 
     predFile = os.path.join(path, talosDefs.predFile )
     if not os.path.exists(predFile):
-        NTerror('importTalosPlus: file "%s" with talosPlus predictions not found', predFile)
+        nTerror('importTalosPlus: file "%s" with talosPlus predictions not found', predFile)
         return True
 
     predSSFile = os.path.join(path, talosDefs.predSSFile )
     if not os.path.exists(predSSFile):
-        NTerror('importTalosPlus: file "%s" with talosPlus predictions not found', predSSFile)
+        nTerror('importTalosPlus: file "%s" with talosPlus predictions not found', predSSFile)
         return True
 
     if _importTalosPlus( project, predFile, predSSFile ):
@@ -1466,33 +1474,34 @@ def saveTalosPlus( project, tmp=None ):
     Returns None on success.
     """
     if project == None:
-        NTmessage("saveTalosPlus: No project defined")
+        nTmessage("saveTalosPlus: No project defined")
         return True
 
     if 'talosPlus' not in project.status:
-#        NTdebug("saveTalosPlus: No talos+ was run")
+#        nTdebug("saveTalosPlus: No talos+ was run")
         return True
     talosDefs = project.status.talosPlus
 
     path = project.validationPath( talosDefs.directory )
     if not path:
-        NTerror('saveTalosPlus: directory "%s" with talosPlus data not found', path)
+        nTerror('saveTalosPlus: directory "%s" with talosPlus data not found', path)
         return True
 
     if project.molecule == None:
-        NTmessage("saveTalosPlus: No molecule defined")
+        nTmessage("saveTalosPlus: No molecule defined")
         return True
 
-    l = NTlist()
+    myList = NTlist()
     for res in project.molecule.allResidues():
         if res.has_key('talosPlus') and res.talosPlus != None:
-            l.append(res.talosPlus)
+            myList.append(res.talosPlus)
     #end for
     smlFile = os.path.join(path, talosDefs.smlFile )
-    obj2SML( l, smlFile)
-    NTdetail('==> Saved talos+ results to "%s"', smlFile)
+    obj2SML( myList, smlFile)
+    nTdetail('==> Saved talos+ results to "%s"', smlFile)
 #end def
 
+# pylint: disable=C0102
 def restoreTalosPlus( project, tmp=None ):
     """
     Restore talos+ results from sml file.
@@ -1500,7 +1509,7 @@ def restoreTalosPlus( project, tmp=None ):
     Return True on error
     """
     if project == None:
-        NTmessage("restoreTalosPlus: No project defined")
+        nTmessage("restoreTalosPlus: No project defined")
         return True
 
     if project.molecule == None:
@@ -1519,16 +1528,16 @@ def restoreTalosPlus( project, tmp=None ):
     talosDefs = project.status.talosPlus
     path = project.validationPath( talosDefs.directory)
     if not path:
-        NTerror('restoreTalosPlus: directory "%s" with talosPlus data not found', path)
+        nTerror('restoreTalosPlus: directory "%s" with talosPlus data not found', path)
         return True
 
     smlFile = os.path.join(path, talosDefs.smlFile )
     if not os.path.exists(smlFile):
-        NTerror('restoreTalosPlus: file "%s" with talosPlus data not found', path)
+        nTerror('restoreTalosPlus: file "%s" with talosPlus data not found', path)
         return True
 
    # Restore the data
-    NTmessage('==> Restoring talos+ results')
+    nTmessage('==> Restoring talos+ results')
     l=SML2obj( smlFile, project.molecule)
     if l==None:
         return True
@@ -1541,15 +1550,15 @@ def talosPlus2restraints( project, name=TALOSPLUS_LIST_STR, status='keep', error
     Convert talos+ results to a CING dihedral restraint list
     """
     if project == None:
-        NTmessage("talosPlus2restraints: No project defined")
+        nTmessage("talosPlus2restraints: No project defined")
         return True
 
     if project.molecule == None:
-        NTmessage("talosPlus2restraints: No project defined")
+        nTmessage("talosPlus2restraints: No project defined")
         return True
 
     if not project.status.has_key('talosPlus') or not project.status.talosPlus.completed:
-        NTmessage("talosPlus2restraints: No talos+ data")
+        nTmessage("talosPlus2restraints: No talos+ data")
         return True
 
     if name in project.dihedrals.names():
@@ -1573,7 +1582,7 @@ def talosPlus2restraints( project, name=TALOSPLUS_LIST_STR, status='keep', error
                 dhl.append(d)
         #end if
     #end for
-    NTmessage('==> Created %s', dhl)
+    nTmessage('==> Created %s', dhl)
 #end def
 
 def export2nih( project, tmp=None ):

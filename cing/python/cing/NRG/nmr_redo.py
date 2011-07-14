@@ -61,7 +61,7 @@ class NmrRedo(nrgCing):
             self.entry_list_todo = NTlist() 
             self.entry_list_todo += "1brv 1dum".split()
         if 0: # DEFAULT: 0
-            NTmessage("Going to use specific entry_list_todo in prepare")
+            nTmessage("Going to use specific entry_list_todo in prepare")
 #            self.entry_list_todo = "1a24 1a4d 1afp 1ai0 1b4y 1brv 1bus 1c2n 1cjg 1d3z 1hue 1ieh 1iv6 1jwe 1kr8 2cka 2fws 2hgh 2jmx 2k0e 2kib 2knr 2kz0 2rop".split()
 #            self.entry_list_todo = "1brv".split()
 #            self.entry_list_todo = readLinesFromFile('/Users/jd/NRG/lists/bmrbPdbEntryList.csv')
@@ -115,7 +115,7 @@ class NmrRedo(nrgCing):
                             max_time_to_wait=self.max_time_to_wait,
                             MAX_ENTRIES_TODO=self.max_entries_todo,
                             extraArgList=extraArgList):
-            NTerror("Failed to doScriptOnEntryList")
+            nTerror("Failed to doScriptOnEntryList")
             return True
         # end if
     # end def        

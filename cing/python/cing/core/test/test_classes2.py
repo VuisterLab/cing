@@ -55,7 +55,7 @@ class AllChecks(TestCase):
         for r in mol.allResidues():
             r.addAllAtoms()
         mol.updateAll()
-#        NTmessage( mol.format() )
+#        nTmessage( mol.format() )
 
     def test_simplifyForFcFeature(self):
         'test simplify Specifically For Fc Feature'
@@ -76,18 +76,18 @@ class AllChecks(TestCase):
         if distanceRestraint.isValid:
             _distanceRestraintList.append(distanceRestraint)
         else:
-            NTerror('Failed to initialize DR with %s' % atomPairs)
-#        NTdebug("dr before: %s" % formatall(distanceRestraint))
+            nTerror('Failed to initialize DR with %s' % atomPairs)
+#        nTdebug("dr before: %s" % formatall(distanceRestraint))
 
         # Takes 4 simplification iterations.
         self.assertEqual(distanceRestraint.simplifyForFc(), DistanceRestraint.STATUS_SIMPLIFIED)
-#        NTdebug("dr after 1: %s" % formatall(distanceRestraint))
+#        nTdebug("dr after 1: %s" % formatall(distanceRestraint))
         self.assertEqual(distanceRestraint.simplifyForFc(), DistanceRestraint.STATUS_SIMPLIFIED)
-#        NTdebug("dr after 2: %s" % formatall(distanceRestraint))
+#        nTdebug("dr after 2: %s" % formatall(distanceRestraint))
         self.assertEqual(distanceRestraint.simplifyForFc(), DistanceRestraint.STATUS_SIMPLIFIED)
-#        NTdebug("dr after 3: %s" % formatall(distanceRestraint))
+#        nTdebug("dr after 3: %s" % formatall(distanceRestraint))
         self.assertEqual(distanceRestraint.simplifyForFc(), DistanceRestraint.STATUS_NOT_SIMPLIFIED)
-#        NTdebug("dr after 4: %s" % formatall(distanceRestraint)) # don't print as it contains error token.
+#        nTdebug("dr after 4: %s" % formatall(distanceRestraint)) # don't print as it contains error token.
         _x = "dr after 4: %s" % formatall(distanceRestraint)
 
     def test_simplifyForFcFeature_2(self):
@@ -106,10 +106,10 @@ class AllChecks(TestCase):
 #        atomPairs.append((r2.HN, r2.MG2))
         distanceRestraint = DistanceRestraint(atomPairs, 0.0, 5.0)
         _distanceRestraintList.append(distanceRestraint)
-#        NTdebug("dr before: %s" % formatall(distanceRestraint))
+#        nTdebug("dr before: %s" % formatall(distanceRestraint))
 
         self.assertEqual(distanceRestraint.simplify(), DistanceRestraint.STATUS_SIMPLIFIED)
-#        NTdebug("dr after 1: %s" % formatall(distanceRestraint))
+#        nTdebug("dr after 1: %s" % formatall(distanceRestraint))
 
 
     def test_CombinationToPseudo(self):
@@ -153,9 +153,9 @@ class AllChecks(TestCase):
                            (e.HG2, y.HB3),
                            (e.HG3, y.HB3))
         distanceRestraint = DistanceRestraint(atomPairs, 0.0, 5.0)
-#        NTdebug("before: %r" % distanceRestraint  )
+#        nTdebug("before: %r" % distanceRestraint  )
         self.assertEqual(distanceRestraint.simplify(), DistanceRestraint.STATUS_SIMPLIFIED)
-#        NTdebug("after: %r" % distanceRestraint  )
+#        nTdebug("after: %r" % distanceRestraint  )
 
     def test_CombiToPseudoDouble_2(self):
         'test_CombiToPseudoDouble_2'
@@ -170,9 +170,9 @@ class AllChecks(TestCase):
                            (y.HE1, y.HB3),
                            (y.HE2, y.HB3))
         distanceRestraint = DistanceRestraint(atomPairs, 0.0, 5.0)
-#        NTdebug("before: %r" % distanceRestraint  )
+#        nTdebug("before: %r" % distanceRestraint  )
         self.assertEqual(distanceRestraint.simplify(), DistanceRestraint.STATUS_SIMPLIFIED)
-#        NTdebug("after: %r" % distanceRestraint  )
+#        nTdebug("after: %r" % distanceRestraint  )
 
     def test_CombiToPseudoQuadruple(self):
         ' test combination to Pseudo 4 some.'        
@@ -185,9 +185,9 @@ class AllChecks(TestCase):
                            (y.QD, y.H)
                            )
         distanceRestraint = DistanceRestraint(atomPairs, 0.0, 5.0)
-#        NTdebug("before: %r" % distanceRestraint  )
+#        nTdebug("before: %r" % distanceRestraint  )
         self.assertEqual(distanceRestraint.simplify(), DistanceRestraint.STATUS_NOT_SIMPLIFIED)
-#        NTdebug("after: %r" % distanceRestraint  )
+#        nTdebug("after: %r" % distanceRestraint  )
 
     def test_Simplify(self):
         'test Simplify'
@@ -199,9 +199,9 @@ class AllChecks(TestCase):
                            (y.QE, y.H)
                            )
         distanceRestraint = DistanceRestraint(atomPairs, 0.0, 5.0)
-#        NTdebug("before: %r" % distanceRestraint  )
+#        nTdebug("before: %r" % distanceRestraint  )
         self.assertEqual(distanceRestraint.simplify(), DistanceRestraint.STATUS_NOT_SIMPLIFIED)
-#        NTdebug("after: %r" % distanceRestraint  )
+#        nTdebug("after: %r" % distanceRestraint  )
 
     def test_Simplify2(self):
         'test Simplify2'
@@ -218,9 +218,9 @@ class AllChecks(TestCase):
                            (y.QE, y.H)
                            )
         distanceRestraint = DistanceRestraint(atomPairs, 0.0, 5.0)
-#        NTdebug("before: %r" % distanceRestraint  )
+#        nTdebug("before: %r" % distanceRestraint  )
         self.assertEqual(distanceRestraint.simplify(), DistanceRestraint.STATUS_NOT_SIMPLIFIED)
-#        NTdebug("after: %r" % distanceRestraint  )
+#        nTdebug("after: %r" % distanceRestraint  )
 
     def test_Simplify3(self):
         'test simplify 3'
@@ -237,9 +237,9 @@ class AllChecks(TestCase):
                            (y.MD1, y.H)
                            )
         distanceRestraint = DistanceRestraint(atomPairs, 0.0, 5.0)
-#        NTdebug("before: %r" % distanceRestraint  )
+#        nTdebug("before: %r" % distanceRestraint  )
         self.assertEqual(distanceRestraint.removeDuplicateAtomPairs2(), DistanceRestraint.STATUS_REMOVED_DUPLICATE)
-#        NTdebug("after: %r" % distanceRestraint  )
+#        nTdebug("after: %r" % distanceRestraint  )
 
 
 if __name__ == "__main__":

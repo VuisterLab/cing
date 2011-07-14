@@ -32,35 +32,35 @@ def selectBadLeucineList(proj,cv):
         chi1cav = getDeepByKeysOrAttributes(leu, CHI1_STR, CAV_STR)
         chi2cav = getDeepByKeysOrAttributes(leu, CHI2_STR, CAV_STR)
         if chi1cv == None or chi2cv == None:
-            NTmessage("Skipping Leu residues without both chi: " + str(leu))
+            nTmessage("Skipping Leu residues without both chi: " + str(leu))
             continue
-        NTdebug("Looking at %s chi1/2: cav: %8.3f %8.3f cv: %8.3f %8.3f" % (leu, chi1cav, chi2cav, chi1cv, chi1cv))
+        nTdebug("Looking at %s chi1/2: cav: %8.3f %8.3f cv: %8.3f %8.3f" % (leu, chi1cav, chi2cav, chi1cv, chi1cv))
         if chi1cav < 0 or chi2cav < 0: # JFD adding error checking.
-            NTcodeerror("Code assumed the dihedral circular averages are always positive but exception found for leu: " % str(leu))
+            nTcodeerror("Code assumed the dihedral circular averages are always positive but exception found for leu: " % str(leu))
             return None
         if chi1cav>125 and chi2cav>245 and chi1cv<cv and chi2cv<cv:
 #            leucines.append(str(leu.resNum))
             leuList.append(leu)
         elif proj.name.startswith('1brv'):
-            NTdebug("For testing purposes all 1brv leu are included.")
+            nTdebug("For testing purposes all 1brv leu are included.")
             leuList.append(leu)
         # end if
     # end for
     # WARNING: Special case. For this project also leu618 is taken
     if proj.name.startswith('H2_2Ca'):
-        NTdebug("For initial study purposes leu618 is additionally included.")
+        nTdebug("For initial study purposes leu618 is additionally included.")
         leuList.append(leuSel[4])
 #    leucines.append(str(leuSel[4].resNum))
-    NTmessage('Found wrong leucines: ' + str(leuList))
+    nTmessage('Found wrong leucines: ' + str(leuList))
     return leuList,modelCount
 # end def
 
 def copyProject(proj_path,proj_name,prl_name):
     locIn  = '%s/%s.cing'%(proj_path,proj_name)
     locOut = '%s/%s.cing'%(proj_path,prl_name)
-    NTdebug("Copying project from %s to %s" % (locIn, locOut))
+    nTdebug("Copying project from %s to %s" % (locIn, locOut))
     shutil.copytree(locIn,locOut)
-    NTmessage('Project has been copied')
+    nTmessage('Project has been copied')
 # end def
 
 def rotating(proj_path,prl_name,molec_name,leuList,modelCount):
@@ -71,7 +71,7 @@ def rotating(proj_path,prl_name,molec_name,leuList,modelCount):
     """
     pdb_path='%s/%s.cing/Export/PDB/%s.pdb'%(proj_path,prl_name,molec_name)
     if not os.path.exists(pdb_path):
-        NTerror("Failed to find input for Yasara: %s" % pdb_path)
+        nTerror("Failed to find input for Yasara: %s" % pdb_path)
         return True
     #CHI1=[-60,180]
     #CHI1=[-60,-49,-41,-48,-53,-63,-75,-79,-78,-70,180,-169,-163,-162,-170,180,171,168,166,173]
@@ -85,7 +85,7 @@ def rotating(proj_path,prl_name,molec_name,leuList,modelCount):
     lc=len(CHI1)
     for i in range(lc):#number of different chi1/chi2 combinations
         yasara.LoadPDB(pdb_path)
-    NTmessage('Rotating Leucines with Yasara:')
+    nTmessage('Rotating Leucines with Yasara:')
     for i in range(lc): # ten conformations
         for j in range(len(leuList)): # zero or more leu
             leu = leuList[j]
@@ -120,7 +120,7 @@ def rotateLeucines(proj_path,proj_name,molec_name,leuList,modelCount):
     prl_name='%s_%s_rotleucines'%(proj_name,str(len(leuList)))
     locOut = '%s/%s.cing'%(proj_path,prl_name)
     if os.path.exists(locOut):
-        NTmessage("Removing previously existing directory: %s" % locOut)
+        nTmessage("Removing previously existing directory: %s" % locOut)
         rmdir( locOut )
     copyProject(proj_path,proj_name,prl_name)
     if rotating(proj_path,prl_name,molec_name,leuList,modelCount):
@@ -128,7 +128,7 @@ def rotateLeucines(proj_path,proj_name,molec_name,leuList,modelCount):
     deleteDirs(proj_path,proj_name,molec_name)
     if changeCoordinates(proj_path,prl_name):
         return True
-    NTmessage("Done with rotateLeucines")
+    nTmessage("Done with rotateLeucines")
 # end def
 
 def runRotateLeucines(runDir, inputArchiveDir, entryId, cv = 0.1):
@@ -137,13 +137,13 @@ def runRotateLeucines(runDir, inputArchiveDir, entryId, cv = 0.1):
     os.chdir(runDir)
     cingFile = os.path.join(inputArchiveDir, entryId + ".cing.tgz")
     if not os.path.exists(cingFile):
-        NTerror("The .tgz %s is missing." % cingFile)
+        nTerror("The .tgz %s is missing." % cingFile)
         return True
     # end if
 
     cingDirNew = os.path.join(runDir, entryId + ".cing")
     if os.path.exists(cingDirNew):
-        NTmessage("Removing old cing project directory: " + cingDirNew )
+        nTmessage("Removing old cing project directory: " + cingDirNew )
         shutil.rmtree( cingDirNew )
 
     shutil.copy(cingFile, runDir)
@@ -151,22 +151,22 @@ def runRotateLeucines(runDir, inputArchiveDir, entryId, cv = 0.1):
     molecule = project.molecule
     moleculeName = molecule.name
     if not project:
-        NTerror('Failed opening project: ' + entryId)
+        nTerror('Failed opening project: ' + entryId)
         return True
     # end if
     if not project.export2PDB():
-        NTerror('Failed to export2PDB')
+        nTerror('Failed to export2PDB')
         return True
     # end if
 
     leuList,modelCount = selectBadLeucineList(project,cv)
     if leuList == None:
-        NTerror('Failed to selectBadLeucineList')
+        nTerror('Failed to selectBadLeucineList')
         return True
     # end if
 
     if rotateLeucines(runDir, entryId, moleculeName, leuList,modelCount):
-        NTerror('Failed to rotateLeucines')
+        nTerror('Failed to rotateLeucines')
         return True
     # end if
 # end def
@@ -178,7 +178,7 @@ if __name__ == '__main__':
     entryId = '1brv'
 
     if runRotateLeucines(runDir, inputArchiveDir, entryId):
-        NTerror("Failed runRotateLeucines")
+        nTerror("Failed runRotateLeucines")
         sys.exit(1)
     # end if
 # end if

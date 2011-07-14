@@ -368,7 +368,7 @@ for line in AwkLikeS( shifts ):
             if atm != None:
                 atm.shift = NTdict( average=line.float(7), sd=line.float(8) )
             else:
-                NTmessage( '>>> line %d: %s', line.NR, line.dollar[0] )
+                nTmessage( '>>> line %d: %s', line.NR, line.dollar[0] )
 
 #also get the pseudo shifts
 for res in NTdb:

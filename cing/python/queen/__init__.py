@@ -1,3 +1,4 @@
+#@PydevCodeAnalysisIgnore # pylint: disable-all
 from cing.Libs.NTutils import * #@UnusedWildImport
 from q_utils import dct_read
 

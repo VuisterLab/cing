@@ -59,7 +59,7 @@ def findMissingCsv():
     d1d2Dir = os.path.join(startDir, DATA_STR)
 
     os.chdir(d1d2Dir)
-    NTmessage("Now in %s" % os.getcwd())
+    nTmessage("Now in %s" % os.getcwd())
     entriesList = readLinesFromFile(os.path.join(cingDirScripts, DATA_STR, 'PDB_WI_SELECT_Rfactor0.21_Res2.0_2009-02-28_noObs.LIS'))
 
     count = 0
@@ -72,10 +72,10 @@ def findMissingCsv():
         if not os.path.exists(searchFile):
 #        csvFileList = glob( '%s/%s/*.csv' % ( ch23, entryCode ) )
 #        if not csvFileList:
-            NTerror("Failed to find csv: %s" % searchFile)
+            nTerror("Failed to find csv: %s" % searchFile)
             count += 1
     n = len(entriesList)
-    NTmessage("Found %d from %d" % (n - count, n))
+    nTmessage("Found %d from %d" % (n - count, n))
 
 def allDoYasaraRewritePdb():
     for entry in """
@@ -89,7 +89,7 @@ def allDoYasaraRewritePdb():
 def removeTempFilesAllEntries():
     entry_list_done = readLinesFromFile(os.path.join('/Volumes/tria1/NRG-CING', 'entry_list_done.csv'))
     for entryCode in entry_list_done:
-        NTmessage(entryCode)
+        nTmessage(entryCode)
         removeTempFiles(entryCode)
     # tcsh one-liners:
     # find . -depth 3 -name "*.cing.tgz" -delete -print

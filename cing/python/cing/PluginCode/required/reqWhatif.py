@@ -139,9 +139,9 @@ nameDefs =[
 #            (RES_LEVEL, 'WIOPAC',  None,          'Water packing',                                              'Water packing')
 ]
 
-cingNameDict  = NTdict( zip( NTzap(nameDefs,1), NTzap(nameDefs,2)) )
-nameDict      = NTdict( zip( NTzap(nameDefs,1), NTzap(nameDefs,3)) )
-shortNameDict = NTdict( zip( NTzap(nameDefs,1), NTzap(nameDefs,4)) )
+cingNameDict  = NTdict( zip( nTzap(nameDefs,1), nTzap(nameDefs,2)) )
+nameDict      = NTdict( zip( nTzap(nameDefs,1), nTzap(nameDefs,3)) )
+shortNameDict = NTdict( zip( nTzap(nameDefs,1), nTzap(nameDefs,4)) )
 cingNameDict.keysformat()
 nameDict.keysformat()
 shortNameDict.keysformat()

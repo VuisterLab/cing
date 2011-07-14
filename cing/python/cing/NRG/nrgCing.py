@@ -164,7 +164,7 @@ class nrgCing(Lister): # pylint: disable=C0103
         # Retrieve the linkages between BMRB and PDB entries.
         self.matches_many2one = getBmrbLinks()
         if not self.matches_many2one:
-            NTerror("Failed to get BMRB-PDB links")
+            nTerror("Failed to get BMRB-PDB links")
 
         ## Replace %b in the below for the real link.
         self.bmrb_link_template = 'http://www.bmrb.wisc.edu/cgi-bin/explore.cgi?bmrbId=%b'
@@ -265,7 +265,7 @@ class nrgCing(Lister): # pylint: disable=C0103
             self.entry_list_todo = NTlist() 
             self.entry_list_todo += "1brv 1dum".split()
         if 0: # DEFAULT: 0
-            NTmessage("Going to use specific entry_list_todo in prepare")
+            nTmessage("Going to use specific entry_list_todo in prepare")
 #            self.entry_list_todo = "1brv".split()
 #            self.entry_list_todo = readLinesFromFile('/Users/jd/NRG/lists/bmrbPdbEntryList.csv')
 #            self.entry_list_todo = NTlist( *self.entry_list_todo )
@@ -292,31 +292,31 @@ class nrgCing(Lister): # pylint: disable=C0103
 
         if not self.entry_list_nmr:
             if self.usePreviousPdbEntries and not redo:
-                NTmessage("Using previously found entries from the PDB and NRG databases.")
+                nTmessage("Using previously found entries from the PDB and NRG databases.")
                 self.entry_list_nmr         = getEntryListFromCsvFile('entry_list_nmr.csv')
             else:
                 ## following statement is equivalent to a unix command like:
-    #            NTmessage("Looking for entries from the PDB database.")
+    #            nTmessage("Looking for entries from the PDB database.")
                 self.entry_list_nmr = NTlist()
                 self.entry_list_nmr.addList(getPdbEntries(onlyNmr=True))
                 if not self.entry_list_nmr:
-                    NTerror("No NMR entries found")
+                    nTerror("No NMR entries found")
                     return True
                 # end if
             # end if
         # end if
-        NTmessage("Found %d NMR entries." % len(self.entry_list_nmr) )
-        NTmessage("Subtracting %d NMR entries that are known to fail because of issue(s)." % len(self.entry_list_bad_overall))
+        nTmessage("Found %d NMR entries." % len(self.entry_list_nmr) )
+        nTmessage("Subtracting %d NMR entries that are known to fail because of issue(s)." % len(self.entry_list_bad_overall))
         # List of entries that might be in NRG but are invalid. NRG-CING will start from coordinates only.
         #        self.entry_list_bad_nrg_docr = NTlist() 
         self.entry_list_possible = self.entry_list_nmr.difference( self.entry_list_bad_overall )
-        NTmessage("Keeping %d NMR entries that should be possible." % len(self.entry_list_possible))
+        nTmessage("Keeping %d NMR entries that should be possible." % len(self.entry_list_possible))
         self.entry_list_obsolete_bad = self.entry_list_bad_overall.difference( self.entry_list_nmr )
         if self.entry_list_obsolete_bad:
-            NTmessage("Consider removing from code the list of bad entries which are no longer in PDB: %s" % str(
+            nTmessage("Consider removing from code the list of bad entries which are no longer in PDB: %s" % str(
                 self.entry_list_obsolete_bad))
         else:
-            NTmessage("No bad entries in code that are: %s" % str(self.entry_list_obsolete_bad))
+            nTmessage("No bad entries in code that are: %s" % str(self.entry_list_obsolete_bad))
         
     # end def
     
@@ -342,23 +342,23 @@ class nrgCing(Lister): # pylint: disable=C0103
         
         os.chdir(self.results_dir)
         
-        NTdebug("In updateDerivedResourceSettings (re-)setting:")        
-        NTdebug("results_dir:             %s" % self.results_dir)        
-        NTdebug("data_dir:                %s" % self.data_dir)        
-        NTdebug("tokenListFileName:       %s" % self.tokenListFileName)        
-        NTdebug("index_pdb_file_name:     %s" % self.index_pdb_file_name)        
-        NTdebug("why_not_db_comments_dir: %s" % self.why_not_db_comments_dir)        
-        NTdebug("why_not_db_raw_dir:      %s" % self.why_not_db_raw_dir)        
-        NTdebug("schema_id:               %s" % self.schema_id)        
-        NTdebug("log_dir:                 %s" % self.log_dir)        
+        nTdebug("In updateDerivedResourceSettings (re-)setting:")        
+        nTdebug("results_dir:             %s" % self.results_dir)        
+        nTdebug("data_dir:                %s" % self.data_dir)        
+        nTdebug("tokenListFileName:       %s" % self.tokenListFileName)        
+        nTdebug("index_pdb_file_name:     %s" % self.index_pdb_file_name)        
+        nTdebug("why_not_db_comments_dir: %s" % self.why_not_db_comments_dir)        
+        nTdebug("why_not_db_raw_dir:      %s" % self.why_not_db_raw_dir)        
+        nTdebug("schema_id:               %s" % self.schema_id)        
+        nTdebug("log_dir:                 %s" % self.log_dir)        
     # end def
             
 
     def initVc(self):
         'Initialize the vCing class'
-        NTmessage("Setting up vCing")
+        nTmessage("Setting up vCing")
         self.vc = vCing(max_time_to_wait_per_job=self.max_time_to_wait)
-        NTmessage("Starting with %r" % self.vc)
+        nTmessage("Starting with %r" % self.vc)
     # end def
 
     def updateWeekly(self):
@@ -378,78 +378,78 @@ class nrgCing(Lister): # pylint: disable=C0103
             new_hits_entry_list = readLinesFromFile(entryListFileName)
 #            new_hits_entry_list = new_hits_entry_list[100:110]
 
-        NTmessage("In updateWeekly starting with:\n%r" % self)
+        nTmessage("In updateWeekly starting with:\n%r" % self)
 
         if self.isProduction:
-            NTmessage("Updating matches between BMRB and PDB")
+            nTmessage("Updating matches between BMRB and PDB")
             try:
                 cmd = "%s/python/cing/NRG/matchBmrbPdb.py" % cingRoot
                 redirectOutputToFile = "matchBmrbPdb.log"
                 matchBmrbPdbProgram = ExecuteProgram(cmd, redirectOutputToFile=redirectOutputToFile)
                 exitCode = matchBmrbPdbProgram()
                 if exitCode:
-                    NTerrorT("Failed to %s" % cmd)
+                    nTerrorT("Failed to %s" % cmd)
                 else:
                     self.matches_many2one = getBmrbLinks()
             except:
                 NTtracebackError()
-                NTerror("Failed to update matches between BMRB and PDB from " + getCallerName())
+                nTerror("Failed to update matches between BMRB and PDB from " + getCallerName())
                 return True
             # end try
-            NTmessage("Using %s BMRB-PDB matches" % len(self.matches_many2one.keys()))
+            nTmessage("Using %s BMRB-PDB matches" % len(self.matches_many2one.keys()))
         else:
-            NTmessage("Using previously found %s BMRB-PDB matches" % len(self.matches_many2one.keys()))            
+            nTmessage("Using previously found %s BMRB-PDB matches" % len(self.matches_many2one.keys()))            
         # end if
         if not self.matches_many2one:
-            NTerror("Failed to get BMRB-PDB links")
+            nTerror("Failed to get BMRB-PDB links")
             return True
         # end if
 
         # Get the PDB info to see which entries can/should be done.
         if self.searchPdbEntries():
-            NTerror("Failed to searchPdbEntries")
+            nTerror("Failed to searchPdbEntries")
             return True
         self.entry_list_possible = NTlist(*self.entry_list_nmr)
-        NTmessage("Using all %d NMR entries in PDB as possible entries." % len(self.entry_list_possible))
+        nTmessage("Using all %d NMR entries in PDB as possible entries." % len(self.entry_list_possible))
 
         if new_hits_entry_list:
             self.entry_list_todo = NTlist(*new_hits_entry_list)
         elif self.getTodoList:
             # Get todo list and some others.
             if self.getEntryInfo():
-                NTerror("Failed to getEntryInfo (first time).")
+                nTerror("Failed to getEntryInfo (first time).")
                 return True
 
         if self.entry_list_todo and self.max_entries_todo:
             if self.prepare():
-                NTerror("Failed to prepare")
+                nTerror("Failed to prepare")
                 return True
 
             if self.getEntryInfo(): # need to see which preps failed; they are then excluded from todo list.
-                NTerror("Failed to getEntryInfo (second time in updateWeekly).")
+                nTerror("Failed to getEntryInfo (second time in updateWeekly).")
                 return True
             # WARNING: the above command wipes out the self.entry_list_todo
             if new_hits_entry_list:
                 self.entry_list_todo = NTlist(*new_hits_entry_list)
             self.entry_list_todo = self.entry_list_todo.intersection( self.entry_list_prep_done )
             if self.runCing():
-                NTerror("Failed to runCing")
+                nTerror("Failed to runCing")
                 return True
             # Do or redo the retrieval of the info from the filesystem on the state of NRG-CING.
             if self.getEntryInfo():
-                NTerror("Failed to getEntryInfo")
+                nTerror("Failed to getEntryInfo")
                 return True
 
         if self.writeEntryListOfList():
-            NTerror("Failed to writeEntryListOfList")
+            nTerror("Failed to writeEntryListOfList")
             return True
 
         if self.writeWhyNotEntries():
-            NTerror("Failed to writeWhyNotEntries")
+            nTerror("Failed to writeWhyNotEntries")
             return True
 
         if self.updateIndexFiles():
-            NTerror("Failed to update index files.")
+            nTerror("Failed to update index files.")
             return True
     # end def run
 
@@ -458,12 +458,12 @@ class nrgCing(Lister): # pylint: disable=C0103
         'Report the head and tail of all entries.'
         timeTakenList = NTlist(*timeTakenDict.values())
         if len(timeTakenList) < 1:
-            NTmessage("No entries in reportHeadAndTailEntries")
+            nTmessage("No entries in reportHeadAndTailEntries")
             return
         n = 10 # Number of entries to list
         m = n/2 # on either side
         if len(timeTakenList) < n:
-#            NTdebug("All entries in random order: %s" % str(timeTakenDict.keys())) # useless
+#            nTdebug("All entries in random order: %s" % str(timeTakenDict.keys())) # useless
             return
 
         entryLoL = []
@@ -480,20 +480,20 @@ class nrgCing(Lister): # pylint: disable=C0103
                 entryList.append(timeTakenDictInv[timeTaken])
             # end for
         # end for
-        NTmessage("%s fastest %s and slowest %s" % (m, str(entryLoL[0]), str(entryLoL[1])))
+        nTmessage("%s fastest %s and slowest %s" % (m, str(entryLoL[0]), str(entryLoL[1])))
     # end def
 
 
     def addModTimesFromMmCif(self):
         "Looking at mmCIF input file modification times."
-        NTmessage(self.addModTimesFromMmCif.__doc__)
+        nTmessage(self.addModTimesFromMmCif.__doc__)
         for entry_code in self.entry_list_nmr:
             entryCodeChar2and3 = entry_code[1:3]
             fileName = os.path.join(CIFZ2, entryCodeChar2and3, '%s.cif.gz' % entry_code)
-#            NTdebug("Looking at: " + fileName)
+#            nTdebug("Looking at: " + fileName)
             if not os.path.exists(fileName):
                 if self.isProduction:
-                    NTmessage("Failed to find: " + fileName)
+                    nTmessage("Failed to find: " + fileName)
                 continue
             self.inputModifiedDict[ entry_code ] = os.path.getmtime(fileName)
         # end for
@@ -501,16 +501,16 @@ class nrgCing(Lister): # pylint: disable=C0103
 
     def addModTimesFromNrg(self):
         "Looking at NRG input file modification times."
-        NTmessage(self.addModTimesFromNrg.__doc__)
+        nTmessage(self.addModTimesFromNrg.__doc__)
         for entry_code in self.entry_list_nrg_docr:
             inputDir = os.path.join(self.results_dir, self.recoordSyncDir)
             fileName = os.path.join(inputDir, entry_code, '%s.tgz' % entry_code)
             if not os.path.exists(fileName):
                 if self.isProduction:
-                    NTdebug("Failed to find: " + fileName)
+                    nTdebug("Failed to find: " + fileName)
                 continue
             nrgMod = os.path.getmtime(fileName)
-#            NTdebug("For %s found: %s" % ( fileName, nrgMod))
+#            nTdebug("For %s found: %s" % ( fileName, nrgMod))
             prevMod = getDeepByKeysOrAttributes(self.inputModifiedDict, entry_code)
 
             if prevMod:
@@ -521,19 +521,19 @@ class nrgCing(Lister): # pylint: disable=C0103
             else:
                 self.inputModifiedDict[ entry_code ] = nrgMod # nrg more recent
                 if self.isProduction:
-                    NTwarning("Found no mmCIF file for %s" % entry_code)
+                    nTwarning("Found no mmCIF file for %s" % entry_code)
             # end else
         # end for
     # end def
 
     def getInputModificationTimes(self):
         'Getting the input modification times.'
-        NTmessage(self.getInputModificationTimes.__doc__)
+        nTmessage(self.getInputModificationTimes.__doc__)
         if self.addModTimesFromMmCif():
-            NTerror("Failed to addModTimesFromMmCif aborting")
+            nTerror("Failed to addModTimesFromMmCif aborting")
             return True
         if self.addModTimesFromNrg():
-            NTerror("Failed to addModTimesFromNrg aborting")
+            nTerror("Failed to addModTimesFromNrg aborting")
             return True
 #        self.addInputModificationTimesFromBmrb() # TODO:
     # end def
@@ -552,11 +552,11 @@ class nrgCing(Lister): # pylint: disable=C0103
         In NMR_REDO a prep stage is everything but validation.                    
         """
 
-        NTmessage("Get the entries tried, todo, crashed, and stopped in NRG-CING from file system.")
+        nTmessage("Get the entries tried, todo, crashed, and stopped in NRG-CING from file system.")
 
         if not self.entry_list_possible: # DEFAULT 0 this is done by updateWeekly already.            
             if self.setPossibleEntryList():
-                NTerror("Failed to setPossibleEntryList")
+                nTerror("Failed to setPossibleEntryList")
                 return True
             # end if
         # end if
@@ -582,45 +582,45 @@ class nrgCing(Lister): # pylint: disable=C0103
         self.entry_list_updated = NTlist()
 
         if self.getInputModificationTimes():
-            NTerror("Failed to getInputModificationTimes aborting")
+            nTerror("Failed to getInputModificationTimes aborting")
             return True
 
-        NTmessage("Scanning the prepare logs.")
+        nTmessage("Scanning the prepare logs.")
         self.timeTakenDict = NTdict()
         for entry_code in self.entry_list_possible: # to be expanded to include all NMR entries.        
             entryCodeChar2and3 = entry_code[1:3]
             logDir = os.path.join(self.results_dir, DATA_STR, entryCodeChar2and3, entry_code, self.log_dir )
-#            NTdebug("Looking in log dir: %s" % logDir)
+#            nTdebug("Looking in log dir: %s" % logDir)
             logLastFile = globLast(logDir + '/*.log')
-#            NTdebug("logLastFile: %s" % logLastFile)
+#            nTdebug("logLastFile: %s" % logLastFile)
             if not logLastFile:
                 if self.isProduction and self.assumeAllAreDone:
-                    NTmessage("Failed to find any prep log file in directory: %s" % logDir)
+                    nTmessage("Failed to find any prep log file in directory: %s" % logDir)
                 continue
             self.entry_list_prep_tried.append(entry_code)
             analysisResultTuple = analyzeCingLog(logLastFile)
             if not analysisResultTuple:
-                NTmessage("Failed to analyze log file: %s" % logLastFile)
+                nTmessage("Failed to analyze log file: %s" % logLastFile)
                 self.entry_list_prep_crashed.append(entry_code)
                 continue
             timeTaken, entryCrashed, nr_error, nr_warning, nr_message, nr_debug = analysisResultTuple
             if entryCrashed:
-                NTmessage("Detected a crash: %s" % entry_code, logLastFile)
+                nTmessage("Detected a crash: %s" % entry_code, logLastFile)
                 self.entry_list_prep_crashed.append(entry_code)
                 continue # don't mark it as stopped anymore.
             # end if
             if not timeTaken:
-                NTmessage("Unexpected [%s] for time taken in CING prep log file: %s assumed crashed." % (timeTaken, logLastFile))
+                nTmessage("Unexpected [%s] for time taken in CING prep log file: %s assumed crashed." % (timeTaken, logLastFile))
                 self.entry_list_prep_crashed.append(entry_code)
                 continue # don't mark it as stopped anymore.
             # end if
             statusFailurePrep = grep(logLastFile, FAILURE_PREP_STR, doQuiet=True) # returns 1 if found
             if (not statusFailurePrep) or (nr_error > self.MAX_ERROR_COUNT_CING_LOG):
                 self.entry_list_prep_failed.append(entry_code)
-                NTmessageNoEOL("For %s found %s/%s timeTaken/entryCrashed and %d/%d/%d/%d error,warning,message, and debug lines." % (
+                nTmessageNoEOL("For %s found %s/%s timeTaken/entryCrashed and %d/%d/%d/%d error,warning,message, and debug lines." % (
                     entry_code, timeTaken, entryCrashed, nr_error, nr_warning, nr_message, nr_debug))
-                NTmessage("Please check: " + logLastFile)
-#                NTmessage("%s Found %s errors in prep phase X please check: %s" % (entry_code, nr_error, logLastFile))
+                nTmessage("Please check: " + logLastFile)
+#                nTmessage("%s Found %s errors in prep phase X please check: %s" % (entry_code, nr_error, logLastFile))
                 continue
             # end if
             if self.reportCsConversion:
@@ -628,9 +628,9 @@ class nrgCing(Lister): # pylint: disable=C0103
                 grep(logLastFile, 'Found fraction', resultList)
                 if not resultList:
                     self.entry_list_prep_failed.append(entry_code)
-                    NTerror("%s Failed to get fraction" % entry_code)
+                    nTerror("%s Failed to get fraction" % entry_code)
                     continue
-                NTmessage("%s %s" % (entry_code, resultList[0]))
+                nTmessage("%s %s" % (entry_code, resultList[0]))
             if timeTaken:
                 self.timeTakenDict[entry_code] = timeTaken
             if self.usedCcpnInput: 
@@ -638,50 +638,50 @@ class nrgCing(Lister): # pylint: disable=C0103
                 ccpnInputFilePath = os.path.join(self.results_dir, self.inputDir, entryCodeChar2and3, "%s.tgz" % entry_code)
                 if not os.path.exists(ccpnInputFilePath):
                     self.entry_list_prep_failed.append(entry_code)
-                    NTerror("%s Failed to find ccpn input file: %s" % (entry_code,ccpnInputFilePath))
+                    nTerror("%s Failed to find ccpn input file: %s" % (entry_code,ccpnInputFilePath))
                     continue
             # end if
             self.entry_list_prep_done.append(entry_code)
         # end for
         timeTakenList = NTlist(*self.timeTakenDict.values())
         if self.showTimings:
-            NTmessage("Time taken by prepare statistics\n%s" % timeTakenList.statsFloat())
+            nTmessage("Time taken by prepare statistics\n%s" % timeTakenList.statsFloat())
             self.reportHeadAndTailEntries(self.timeTakenDict)
 
-        NTmessage("\nStarting to scan CING report/log.")
+        nTmessage("\nStarting to scan CING report/log.")
         self.timeTakenDict = NTdict()
         subDirList = os.listdir(DATA_STR)
         for subDir in subDirList:
             if len(subDir) != 2:
                 if subDir != DS_STORE_STR:
-                    NTdebug('Skipping subdir with other than 2 chars: [' + subDir + ']')
+                    nTdebug('Skipping subdir with other than 2 chars: [' + subDir + ']')
                 continue
             entryList = os.listdir(os.path.join(DATA_STR, subDir))
             for entryDir in entryList:
                 entry_code = entryDir
                 if not is_pdb_code(entry_code):
                     if entry_code != DS_STORE_STR:
-                        NTerror("String doesn't look like a pdb code: " + entry_code)
+                        nTerror("String doesn't look like a pdb code: " + entry_code)
                     continue
-#                NTdebug("Working on: " + entry_code)
+#                nTdebug("Working on: " + entry_code)
 
                 entrySubDir = os.path.join(DATA_STR, subDir, entry_code)
                 if not entry_code in self.entry_list_nmr:
-                    NTwarning("Found entry %s in NRG-CING but not in PDB-NMR. Will be obsoleted in NRG-CING too" % entry_code)
+                    nTwarning("Found entry %s in NRG-CING but not in PDB-NMR. Will be obsoleted in NRG-CING too" % entry_code)
                     if len(self.entry_list_obsolete) < self.ENTRY_TO_DELETE_COUNT_MAX:
                         rmdir(entrySubDir)
                         self.entry_list_obsolete.append(entry_code)
                     else:
-                        NTerror("Entry %s in NRG-CING not obsoleted since there were already removed: %s entries." % (
+                        nTerror("Entry %s in NRG-CING not obsoleted since there were already removed: %s entries." % (
                             entry_code, self.ENTRY_TO_DELETE_COUNT_MAX))
                 # end if
                 if not entry_code in self.entry_list_prep_done:
-                    NTwarning("Found entry %s in NRG-CING but no prep done. Will be removed completely from NRG-CING too" % entry_code)
+                    nTwarning("Found entry %s in NRG-CING but no prep done. Will be removed completely from NRG-CING too" % entry_code)
                     if len(self.entry_list_missing_prep) < self.ENTRY_TO_DELETE_COUNT_MAX:
                         rmdir(entrySubDir)
                         self.entry_list_missing_prep.append(entry_code)
                     else:
-                        NTerror("Entry %s in NRG-CING not removed since there were already removed: %s entries." % (
+                        nTerror("Entry %s in NRG-CING not removed since there were already removed: %s entries." % (
                             entry_code, self.ENTRY_TO_DELETE_COUNT_MAX))
                     # end if
                 # end if
@@ -690,45 +690,45 @@ class nrgCing(Lister): # pylint: disable=C0103
                     # Look for last log file
                     logLastFile = globLast(entrySubDir + '/log_validateEntry/*.log')
                     if not logLastFile:
-                        NTmessage("Failed to find any log file in directory: %s" % entrySubDir)
+                        nTmessage("Failed to find any log file in directory: %s" % entrySubDir)
                         continue
                     # .cing directory and .log file present so it was tried to start but might not have finished
                     self.entry_list_tried.append(entry_code)
                     entryCrashed = False
                     timeTaken, entryCrashed, nr_error, nr_warning, nr_message, nr_debug = analyzeCingLog(logLastFile)
                     if entryCrashed:
-                        NTmessage("For %s found %s/%s timeTaken/entryCrashed and %d/%d/%d/%d error,warning,message, and debug lines. Crashed." % ( # pylint: disable=C0301
+                        nTmessage("For %s found %s/%s timeTaken/entryCrashed and %d/%d/%d/%d error,warning,message, and debug lines. Crashed." % ( # pylint: disable=C0301
                             entry_code, timeTaken, entryCrashed, nr_error, nr_warning, nr_message, nr_debug) )
                         self.entry_list_crashed.append(entry_code)
                         continue # don't mark it as stopped anymore.
                     # end if
                     if nr_error > self.MAX_ERROR_COUNT_CING_LOG:
-                        NTmessage("For %s found %s/%s timeTaken/entryCrashed and %d/%d/%d/%d error,warning,message, and debug lines. Could still be ok." % ( # pylint: disable=C0301
+                        nTmessage("For %s found %s/%s timeTaken/entryCrashed and %d/%d/%d/%d error,warning,message, and debug lines. Could still be ok." % ( # pylint: disable=C0301
                             entry_code, timeTaken, entryCrashed, nr_error, nr_warning, nr_message, nr_debug) )
-    #                    NTmessage("Found %s which is over %s please check: %s" % (nr_error, self.MAX_ERROR_COUNT_CING_LOG, entry_code))
+    #                    nTmessage("Found %s which is over %s please check: %s" % (nr_error, self.MAX_ERROR_COUNT_CING_LOG, entry_code))
     
                     if timeTaken:
                         self.timeTakenDict[entry_code] = timeTaken
     #                else:
-    #                    NTmessage("Unexpected [%s] for time taken in CING log for file: %s" % (timeTaken, logLastFile))
+    #                    nTmessage("Unexpected [%s] for time taken in CING log for file: %s" % (timeTaken, logLastFile))
     
                     timeStampLastValidation = getTimeStampFromFileName(logLastFile)
                     if not timeStampLastValidation:
-                        NTdebug("Failed to retrieve timeStampLastValidation from %s" % logLastFile)
+                        nTdebug("Failed to retrieve timeStampLastValidation from %s" % logLastFile)
                     timeStampLastInputMod = getDeepByKeysOrAttributes(self.inputModifiedDict, entry_code)
                     # If the input has been updated then the entry should be redone so don't add it to the done list.
                     if timeStampLastValidation and timeStampLastInputMod:
-    #                    NTdebug("Comparing input to validation time stamps: %s to %s" % (timeStampLastInputMod, timeStampLastValidation))
+    #                    nTdebug("Comparing input to validation time stamps: %s to %s" % (timeStampLastInputMod, timeStampLastValidation))
                         if timeStampLastValidation < timeStampLastInputMod:
                             self.entry_list_updated.append(entry_code)
                             continue
                     else:
-                        NTdebug("Dates for last validation of last input modification not both retrieved for %s." % entry_code)
+                        nTdebug("Dates for last validation of last input modification not both retrieved for %s." % entry_code)
                     # end if
     
                     if not self.timeTakenDict.has_key(entry_code):
                         # was stopped by time out or by user or by system (any other type of stop but stack trace)
-                        NTmessage("%s Since CING end message was not found in %s assumed to have stopped" % (entry_code, logLastFile))
+                        nTmessage("%s Since CING end message was not found in %s assumed to have stopped" % (entry_code, logLastFile))
                         self.entry_list_stopped.append(entry_code)
                         continue
                     # end if
@@ -736,27 +736,27 @@ class nrgCing(Lister): # pylint: disable=C0103
                 
                 cingDirEntry = os.path.join(entrySubDir, entry_code + ".cing")
                 if not os.path.exists(cingDirEntry):
-                    NTmessage("%s Entry stopped because no(t yet a) directory: %s" % (entry_code, cingDirEntry))
+                    nTmessage("%s Entry stopped because no(t yet a) directory: %s" % (entry_code, cingDirEntry))
                     self.entry_list_stopped.append(entry_code)
                     continue
 
                 # Look for end statement from CING which shows it wasn't killed before it finished.
                 indexFileEntry = os.path.join(cingDirEntry, "index.html")
                 if not os.path.exists(indexFileEntry):
-                    NTmessage("%s Since index file %s was not found assumed to have stopped" % (entry_code, indexFileEntry))
+                    nTmessage("%s Since index file %s was not found assumed to have stopped" % (entry_code, indexFileEntry))
                     self.entry_list_stopped.append(entry_code)
                     continue
 
                 projectHtmlFile = os.path.join(cingDirEntry, entry_code, "HTML/index.html")
                 if not os.path.exists(projectHtmlFile):
-                    NTmessage("%s Since project html file %s was not found assumed to have stopped" % (entry_code, projectHtmlFile))
+                    nTmessage("%s Since project html file %s was not found assumed to have stopped" % (entry_code, projectHtmlFile))
                     self.entry_list_stopped.append(entry_code)
                     continue
 
                 if self.isProduction: # Disable for testing.
                     molGifFile = os.path.join(cingDirEntry, entry_code, "HTML/mol.gif")
                     if not os.path.exists(molGifFile):
-                        NTmessage("%s Since mol.gif file %s was not found assumed to have stopped" % (entry_code, projectHtmlFile))
+                        nTmessage("%s Since mol.gif file %s was not found assumed to have stopped" % (entry_code, projectHtmlFile))
                         self.entry_list_stopped.append(entry_code)
                         continue
 
@@ -765,16 +765,16 @@ class nrgCing(Lister): # pylint: disable=C0103
         # end for subDir
         timeTakenList = NTlist(*self.timeTakenDict.values())
         if self.showTimings:
-            NTmessage("Time taken by validation statistics\n%s" % timeTakenList.statsFloat())
+            nTmessage("Time taken by validation statistics\n%s" % timeTakenList.statsFloat())
             self.reportHeadAndTailEntries(self.timeTakenDict)
         # end if
         
         crdb = nrgCingRdb.nrgCingRdb(schema=self.schema_id) # Lazy opening as to not burden system too much. Stupid 
         self.entry_list_store_in_db = crdb.getPdbIdList()
         if not self.entry_list_store_in_db:
-            NTerror("Failed to get any entry from NRG-CING RDB")
+            nTerror("Failed to get any entry from NRG-CING RDB")
             self.entry_list_store_in_db = NTlist()
-        NTmessage("Found %s entries in RDB" % len(self.entry_list_store_in_db))
+        nTmessage("Found %s entries in RDB" % len(self.entry_list_store_in_db))
 
         writeTextToFile("entry_list_nmr_redo.csv",      toCsv(self.entry_list_nmr_redo))
 
@@ -783,68 +783,68 @@ class nrgCing(Lister): # pylint: disable=C0103
         # Remove a few entries in RDB that are not done.
         entry_list_in_db_not_done =  self.entry_list_store_in_db.difference(self.entry_list_done)
         if entry_list_in_db_not_done:
-            NTmessage("There are %s entries in RDB that are not currently done: %s" % (
+            nTmessage("There are %s entries in RDB that are not currently done: %s" % (
                 len(entry_list_in_db_not_done), str(entry_list_in_db_not_done)))
         else:
-            NTdebug("All entries in RDB are also done")
+            nTdebug("All entries in RDB are also done")
         # endif
         entry_list_in_db_to_remove = NTlist( *entry_list_in_db_not_done )
         if len(entry_list_in_db_not_done) > self.ENTRY_TO_DELETE_COUNT_MAX:
             entry_list_in_db_to_remove = entry_list_in_db_not_done[:self.ENTRY_TO_DELETE_COUNT_MAX] # doesn't make it into a NTlist.
             entry_list_in_db_to_remove = NTlist( *entry_list_in_db_to_remove )
         if entry_list_in_db_to_remove:
-            NTmessage("There are %s entries in RDB that will be removed: %s" % (
+            nTmessage("There are %s entries in RDB that will be removed: %s" % (
                     len(entry_list_in_db_to_remove), str(entry_list_in_db_to_remove)))
         else:
-            NTdebug("No entries in RDB need to be removed.")
+            nTdebug("No entries in RDB need to be removed.")
         # end if
         for entry_code in entry_list_in_db_to_remove:
             if crdb.removeEntry( entry_code ):
-                NTerror("Failed to remove %s from RDB" % entry_code )
+                nTerror("Failed to remove %s from RDB" % entry_code )
             # end if
         # end for
         del crdb # Let's see if this throws exceptions already.
 
 
-        NTmessage("Scanning the store logs of entries done.")
+        nTmessage("Scanning the store logs of entries done.")
         self.timeTakenDict = NTdict()
         for entry_code in self.entry_list_done:
             entryCodeChar2and3 = entry_code[1:3]
             logDir = os.path.join(self.results_dir, DATA_STR, entryCodeChar2and3, entry_code, LOG_STORE_CING2DB )
-            logLastFile = globLast(logDir + '/*.log')#            NTdebug("logLastFile: %s" % logLastFile)
+            logLastFile = globLast(logDir + '/*.log')#            nTdebug("logLastFile: %s" % logLastFile)
             if not logLastFile:
                 # DEFAULT: 0 or 1 when assumed all are done by store instead of validate. This is not always the case!
                 if self.isProduction and self.assumeAllAreDone: 
-                    NTmessage("Failed to find any store log file in directory: %s" % logDir)
+                    nTmessage("Failed to find any store log file in directory: %s" % logDir)
                 continue
             self.entry_list_store_tried.append(entry_code)
             analysisResultTuple = analyzeCingLog(logLastFile)
             if not analysisResultTuple:
-                NTmessage("Failed to analyze log file: %s" % logLastFile)
+                nTmessage("Failed to analyze log file: %s" % logLastFile)
                 self.entry_list_store_crashed.append(entry_code)
                 continue
             timeTaken, entryCrashed, nr_error, nr_warning, nr_message, nr_debug = analysisResultTuple
             if entryCrashed:
-                NTmessage("For CING store log file: %s assumed crashed on basis of analyzeCingLog." % logLastFile)
+                nTmessage("For CING store log file: %s assumed crashed on basis of analyzeCingLog." % logLastFile)
                 self.entry_list_store_crashed.append(entry_code)
                 continue # don't mark it as stopped anymore.
             # end if
             if not entry_dict_store_in_db.has_key(entry_code):
-#                NTmessage("%s not in db." % entry_code)
+#                nTmessage("%s not in db." % entry_code)
                 self.entry_list_store_not_in_db.append(entry_code)
                 continue # don't mark it as stopped anymore.
             # end if
             if nr_error > self.MAX_ERROR_COUNT_CING_LOG:
                 self.entry_list_store_failed.append(entry_code)
-                NTmessage("For %s found %s/%s timeTaken/entryCrashed and %d/%d/%d/%d error,warning,message, and debug lines. Please check: %s" % ( # pylint: disable=C0301
+                nTmessage("For %s found %s/%s timeTaken/entryCrashed and %d/%d/%d/%d error,warning,message, and debug lines. Please check: %s" % ( # pylint: disable=C0301
                     entry_code, timeTaken, entryCrashed, nr_error, nr_warning, nr_message, nr_debug, logLastFile) )
-#                NTmessage("%s Found %s errors in storing please check: %s" % (entry_code, nr_error, logLastFile))
+#                nTmessage("%s Found %s errors in storing please check: %s" % (entry_code, nr_error, logLastFile))
                 continue
             # end if
             if timeTaken:
                 self.timeTakenDict[entry_code] = timeTaken
 #            else:
-#                NTmessage("Unexpected [%s] for time taken in CING log for file: %s" % (timeTaken, logLastFile))
+#                nTmessage("Unexpected [%s] for time taken in CING log for file: %s" % (timeTaken, logLastFile))
             self.entry_list_store_done.append(entry_code)
         # end for
 
@@ -856,53 +856,53 @@ class nrgCing(Lister): # pylint: disable=C0103
         elif self.archive_id == ARCHIVE_NMR_REDO_ID:
             self.entry_list_nmr_redo = self.entry_list_done
         else:
-            NTerror("No list to set for archive id %s for entry_list_done" % self.archive_id)
+            nTerror("No list to set for archive id %s for entry_list_done" % self.archive_id)
         # end if
 
         timeTakenList = NTlist(*self.timeTakenDict.values())
         if self.showTimings:
-            NTmessage("Time taken by storeCING2db statistics\n%s" % timeTakenList.statsFloat())
+            nTmessage("Time taken by storeCING2db statistics\n%s" % timeTakenList.statsFloat())
             self.reportHeadAndTailEntries(self.timeTakenDict)
 
         if not self.entry_list_tried:
-            NTerror("Failed to find entries that CING tried.")
+            nTerror("Failed to find entries that CING tried.")
 
         self.entry_list_todo = NTlist(*self.entry_list_nmr)
         self.entry_list_todo = self.entry_list_todo.difference(self.entry_list_done)
         self.entry_list_untried = NTlist(*self.entry_list_nmr)
         self.entry_list_untried = self.entry_list_untried.difference(self.entry_list_tried)
 
-        NTmessage("Found %4d entries by NMR (A)." % len(self.entry_list_nmr))
+        nTmessage("Found %4d entries by NMR (A)." % len(self.entry_list_nmr))
 
-        NTmessage("Found %4d entries that CING prep tried." % len(self.entry_list_prep_tried))
-        NTmessage("Found %4d entries that CING prep crashed." % len(self.entry_list_prep_crashed))
-        NTmessage("Found %4d entries that CING prep failed." % len(self.entry_list_prep_failed))
-        NTmessage("Found %4d entries that CING prep done." % len(self.entry_list_prep_done))
+        nTmessage("Found %4d entries that CING prep tried." % len(self.entry_list_prep_tried))
+        nTmessage("Found %4d entries that CING prep crashed." % len(self.entry_list_prep_crashed))
+        nTmessage("Found %4d entries that CING prep failed." % len(self.entry_list_prep_failed))
+        nTmessage("Found %4d entries that CING prep done." % len(self.entry_list_prep_done))
 
-        NTmessage("Found %4d entries that CING tried (T)." % len(self.entry_list_tried))
-        NTmessage("Found %4d entries that CING did not try (A-T)." % len(self.entry_list_untried))
-        NTmessage("Found %4d entries that CING crashed (C)." % len(self.entry_list_crashed))
-        NTmessage("Found %4d entries that CING stopped (S)." % len(self.entry_list_stopped))
-        NTmessage("Found %4d entries that CING should update (U)." % len(self.entry_list_updated))
-        NTmessage("Found %4d entries that CING did (B=A-C-S-U)." % len(self.entry_list_done))
-        NTmessage("Found %4d entries todo (A-B)." % len(self.entry_list_todo))
-        NTmessage("Found %4d entries in NRG-CING made obsolete." % len(self.entry_list_obsolete))
-        NTmessage("Found %4d entries in NRG-CING without prep." % len(self.entry_list_missing_prep))
+        nTmessage("Found %4d entries that CING tried (T)." % len(self.entry_list_tried))
+        nTmessage("Found %4d entries that CING did not try (A-T)." % len(self.entry_list_untried))
+        nTmessage("Found %4d entries that CING crashed (C)." % len(self.entry_list_crashed))
+        nTmessage("Found %4d entries that CING stopped (S)." % len(self.entry_list_stopped))
+        nTmessage("Found %4d entries that CING should update (U)." % len(self.entry_list_updated))
+        nTmessage("Found %4d entries that CING did (B=A-C-S-U)." % len(self.entry_list_done))
+        nTmessage("Found %4d entries todo (A-B)." % len(self.entry_list_todo))
+        nTmessage("Found %4d entries in NRG-CING made obsolete." % len(self.entry_list_obsolete))
+        nTmessage("Found %4d entries in NRG-CING without prep." % len(self.entry_list_missing_prep))
 
-        NTmessage("Found %4d entries that CING store tried." % len(self.entry_list_store_tried))
-        NTmessage("Found %4d entries that CING store crashed." % len(self.entry_list_store_crashed))
-        NTmessage("Found %4d entries that CING store failed." % len(self.entry_list_store_failed))
-        NTmessage("Found %4d entries that CING store not in db." % len(self.entry_list_store_not_in_db))
-        NTmessage("Found %4d entries that CING store done." % len(self.entry_list_store_done))
+        nTmessage("Found %4d entries that CING store tried." % len(self.entry_list_store_tried))
+        nTmessage("Found %4d entries that CING store crashed." % len(self.entry_list_store_crashed))
+        nTmessage("Found %4d entries that CING store failed." % len(self.entry_list_store_failed))
+        nTmessage("Found %4d entries that CING store not in db." % len(self.entry_list_store_not_in_db))
+        nTmessage("Found %4d entries that CING store done." % len(self.entry_list_store_done))
 
-        NTmessage("Found %4d entries in NRG-CING." % len(self.entry_list_nrgcing))
-        NTmessage("Found %4d entries in NMR_REDO." % len(self.entry_list_nmr_redo))
+        nTmessage("Found %4d entries in NRG-CING." % len(self.entry_list_nrgcing))
+        nTmessage("Found %4d entries in NMR_REDO." % len(self.entry_list_nmr_redo))
 
 
         if not self.entry_list_done:
-            NTwarning("Failed to find entries that CING did.")
+            nTwarning("Failed to find entries that CING did.")
 
-#        NTmessage("Writing the entry lists already; will likely be overwritten next.")
+#        nTmessage("Writing the entry lists already; will likely be overwritten next.")
         self.writeEntryListOfList()
     # end def
 
@@ -916,14 +916,14 @@ class nrgCing(Lister): # pylint: disable=C0103
 #        modification_time = os.path.getmtime("/Users/jd/.cshrc")
 #        self.match.d[ "1brv" ] = EntryInfo(time=modification_time)
 
-#        NTmessage("Looking for entries in the different preparation stages.")
+#        nTmessage("Looking for entries in the different preparation stages.")
 #        for i, phaseData in enumerate(self.phaseDataList):
 #            entryList = self.phaseList[i]
 #            phaseName, _phaseId = phaseData
 #            l = len(entryList)
-#            NTmessage("Found %d entries in prep stage %s" % (l, phaseName))
+#            nTmessage("Found %d entries in prep stage %s" % (l, phaseName))
         if self.usePreviousPdbEntries and not redo:
-            NTmessage("Using previously found entries from the PDB and NRG databases.")
+            nTmessage("Using previously found entries from the PDB and NRG databases.")
             self.entry_list_pdb         = getEntryListFromCsvFile('entry_list_pdb.csv')
             self.entry_list_nmr         = getEntryListFromCsvFile('entry_list_nmr.csv')
             self.entry_list_nmr_exp     = getEntryListFromCsvFile('entry_list_nmr_exp.csv')
@@ -931,52 +931,52 @@ class nrgCing(Lister): # pylint: disable=C0103
             self.entry_list_nrg_docr    = getEntryListFromCsvFile('entry_list_nrg_docr.csv')
         else:
             ## following statement is equivalent to a unix command like:
-            NTmessage("Looking for entries from the PDB and NRG databases.")
+            nTmessage("Looking for entries from the PDB and NRG databases.")
             self.entry_list_pdb = NTlist()
             self.entry_list_pdb.addList(getPdbEntries())
             if not self.entry_list_pdb:
-                NTerror("No PDB entries found")
+                nTerror("No PDB entries found")
                 return True
             self.entry_list_nmr = NTlist()
             self.entry_list_nmr.addList(getPdbEntries(onlyNmr=True))
             if not self.entry_list_nmr:
-                NTerror("No NMR entries found")
+                nTerror("No NMR entries found")
                 return True
     
             self.entry_list_nmr_exp = NTlist()
             self.entry_list_nmr_exp.addList(getPdbEntries(onlyNmr=True, mustHaveExperimentalNmrData=True))
             if not self.entry_list_nmr_exp:
-                NTerror("No NMR with experimental data entries found")
+                nTerror("No NMR with experimental data entries found")
                 return True
     
             self.entry_list_nrg = NTlist()
             self.entry_list_nrg.addList(getBmrbNmrGridEntries())
             if not self.entry_list_nrg:
-                NTerror("No NRG entries found")
+                nTerror("No NRG entries found")
                 return True
     
             ## The list of all entry_codes for which tgz files have been found
             self.entry_list_nrg_docr = NTlist()
             self.entry_list_nrg_docr.addList(getBmrbNmrGridEntriesDOCRDone())
             if not self.entry_list_nrg_docr:
-                NTerror("No NRG DOCR entries found")
+                nTerror("No NRG DOCR entries found")
                 return True
             if len(self.entry_list_nrg_docr) < 3000:
-                NTerror("watch out less than 3000 entries found [%s] which is suspect; quitting" % len(self.entry_list_nrg_docr))
+                nTerror("watch out less than 3000 entries found [%s] which is suspect; quitting" % len(self.entry_list_nrg_docr))
                 return True
             # end if
         # end if        
-        NTmessage("Found %5d PDB entries." % len(self.entry_list_pdb))
-        NTmessage("Found %5d NMR entries." % len(self.entry_list_nmr))        
-        NTmessage("Found %5d NMR with experimental data entries." % len(self.entry_list_nmr_exp))
-        NTmessage("Found %5d PDB entries in NRG." % len(self.entry_list_nrg))
-        NTmessage("Found %5d NRG DOCR entries. (A)" % len(self.entry_list_nrg_docr))
+        nTmessage("Found %5d PDB entries." % len(self.entry_list_pdb))
+        nTmessage("Found %5d NMR entries." % len(self.entry_list_nmr))        
+        nTmessage("Found %5d NMR with experimental data entries." % len(self.entry_list_nmr_exp))
+        nTmessage("Found %5d PDB entries in NRG." % len(self.entry_list_nrg))
+        nTmessage("Found %5d NRG DOCR entries. (A)" % len(self.entry_list_nrg_docr))
     # end def
 
 
     def writeEntryListOfList(self):
         'Write all entry lists to csv files.'
-#        NTmessage("Writing the entry list of each list to file")
+#        nTmessage("Writing the entry list of each list to file")
 
         writeTextToFile("entry_list_possible.csv",      toCsv(self.entry_list_possible))
         writeTextToFile("entry_list_pdb.csv",           toCsv(self.entry_list_pdb))
@@ -1021,9 +1021,9 @@ class nrgCing(Lister): # pylint: disable=C0103
     def writeWhyNotEntries(self):
         "Write the WHYNOT files"
         if self.writeWhyNot:
-            NTmessage("Create WHY_NOT list")
+            nTmessage("Create WHY_NOT list")
         else:
-            NTmessage("Skipping create WHY_NOT list")
+            nTmessage("Skipping create WHY_NOT list")
             return
 
         whyNot = WhyNot() # stupid why this needs to be fully specified.
@@ -1059,12 +1059,12 @@ class nrgCing(Lister): # pylint: disable=C0103
             del(whyNot[entry_code])
         # end loop over entries
         whyNotStr = '%s' % whyNot
-#        NTdebug("whyNotStr truncated to 1000 chars: [" + whyNotStr[0:1000] + "]")
+#        nTdebug("whyNotStr truncated to 1000 chars: [" + whyNotStr[0:1000] + "]")
 
         writeTextToFile("NRG-CING.txt", whyNotStr)
 
         why_not_db_comments_file = os.path.join(self.why_not_db_comments_dir, self.why_not_db_comments_file)
-#        NTdebug("Copying to: " + why_not_db_comments_file)
+#        nTdebug("Copying to: " + why_not_db_comments_file)
         shutil.copy("NRG-CING.txt", why_not_db_comments_file)
         if self.writeTheManyFiles:
             for entry_code in self.entry_list_done:
@@ -1075,7 +1075,7 @@ class nrgCing(Lister): # pylint: disable=C0103
                     os.makedirs(subDir)
                 fileName = os.path.join(subDir, entry_code + ".exist")
                 if not os.path.exists(fileName):
-    #                NTdebug("Creating: " + fileName)
+    #                nTdebug("Creating: " + fileName)
                     fp = open(fileName, 'w')
         #            fprintf(fp, ' ')
                     fp.close()
@@ -1092,7 +1092,7 @@ class nrgCing(Lister): # pylint: disable=C0103
         if not self.updateIndices:
             return
 
-        NTmessage("Updating index files")
+        nTmessage("Updating index files")
 
         number_of_entries_per_row = 4
         number_of_files_per_column = 4
@@ -1105,7 +1105,7 @@ class nrgCing(Lister): # pylint: disable=C0103
 
         csvwriter = csv.writer(file(self.index_pdb_file_name, "w"))
         if not self.entry_list_done:
-            NTwarning("No entries done, skipping creation of indexes")
+            nTwarning("No entries done, skipping creation of indexes")
             return
 
         self.entry_list_done.sort()
@@ -1117,7 +1117,7 @@ class nrgCing(Lister): # pylint: disable=C0103
         number_of_files = int(number_of_entries_all_present / number_of_entries_per_file)
         if number_of_entries_all_present % number_of_entries_per_file:
             number_of_files += 1
-        NTmessage("Generating %s index html files" % (number_of_files))
+        nTmessage("Generating %s index html files" % (number_of_files))
 
         example_str_template = """ <td><a href=""" + self.pdb_link_template + \
         """>%S</a><BR><a href=""" + self.bmrb_link_template + ">%b</a>"
@@ -1163,7 +1163,7 @@ class nrgCing(Lister): # pylint: disable=C0103
                 begin_entry_count = number_of_entries_per_file * (file_id - 1) + 1
                 end_entry_count = min(number_of_entries_per_file * file_id,
                                            number_of_entries_all_present)
-#                NTdebug("%5d %5d %5d" % (begin_entry_count, end_entry_count, number_of_entries_all_present))
+#                nTdebug("%5d %5d %5d" % (begin_entry_count, end_entry_count, number_of_entries_all_present))
 
                 old_string = r"<!-- INSERT NEW RESULT STRING HERE -->"
                 jump_form_start = '<FORM method="GET" action="%s">' % self.url_redirecter
@@ -1271,29 +1271,29 @@ class nrgCing(Lister): # pylint: disable=C0103
         index_file_first = 'index_1.html'
         index_file = os.path.join(indexDir, 'index.html')
         ## Assume that a link that is already present is valid and will do the job
-#        NTmessage('Symlinking: %s %s' % (index_file_first, index_file))
+#        nTmessage('Symlinking: %s %s' % (index_file_first, index_file))
         symlink(index_file_first, index_file)
 
 #        ## Make a sym link from the index_bmrb.html file to the index.html file
 #        index_file_first = 'index_pdb.html'
 #        index_file_first = index_file_first
 #        index_file = os.path.join(self.results_dir + "/index", 'index.html')
-#        NTdebug('Symlinking (B): %s %s' % (index_file_first, index_file))
+#        nTdebug('Symlinking (B): %s %s' % (index_file_first, index_file))
 #        symlink(index_file_first, index_file)
 
         fileListToCopy = [ 'direct.php', 'redirect.php', 'pdb.php']
-        NTmessage("Copy the php scripts: %s" % fileListToCopy)
+        nTmessage("Copy the php scripts: %s" % fileListToCopy)
         for fileNameToCopy in fileListToCopy:
             org_file = os.path.join(self.base_dir, DATA_STR, fileNameToCopy)
             shutil.copy(org_file, self.results_dir)
 
-        NTmessage("Copy the overall index")
+        nTmessage("Copy the overall index")
         org_file = os.path.join(self.base_dir, DATA_STR, 'redirect.html')
         new_file = os.path.join(self.results_dir, 'index.html')
         shutil.copy(org_file, new_file)
 
         fileListToCopy = [ 'cing.css', 'header_bg.jpg', ]
-        NTmessage("Copy the html files: %s" % fileListToCopy)
+        nTmessage("Copy the html files: %s" % fileListToCopy)
         for fileNameToCopy in fileListToCopy:
             org_file = os.path.join(htmlDir, fileNameToCopy)
             shutil.copy(org_file, indexDir)
@@ -1307,7 +1307,7 @@ class nrgCing(Lister): # pylint: disable=C0103
 
         Returns True on error.
         """
-        NTmessage("Doing postProcessEntryAfterVc on  %s" % entry_code)
+        nTmessage("Doing postProcessEntryAfterVc on  %s" % entry_code)
 
         doRemoves = 0 # DEFAULT 0 enable to clean up.
         doLog = 1 # DEFAULT 1 disable for testing.
@@ -1317,7 +1317,7 @@ class nrgCing(Lister): # pylint: disable=C0103
         entryCodeChar2and3 = entry_code[1:3]
         entryDir = os.path.join(self.data_dir , entryCodeChar2and3, entry_code)
         if not os.path.exists(entryDir):
-            NTerror("Skipping %s because dir %s was not found." % (entry_code, entryDir))
+            nTerror("Skipping %s because dir %s was not found." % (entry_code, entryDir))
             return True
         os.chdir(entryDir)
 
@@ -1326,19 +1326,19 @@ class nrgCing(Lister): # pylint: disable=C0103
                 self.initVc()
             master_target_log_dir = os.path.join(self.vc.MASTER_TARGET_DIR, self.vc.MASTER_TARGET_LOG)
             if not os.path.exists(master_target_log_dir):
-                NTerror("Skipping %s because failed to find master_target_log_dir: %s" % (entry_code, master_target_log_dir))
+                nTerror("Skipping %s because failed to find master_target_log_dir: %s" % (entry_code, master_target_log_dir))
                 return True
             logScriptFileNameRoot = 'validateEntryNrg'
             logFilePattern = '/*%s_%s_*.log' % (logScriptFileNameRoot, entry_code)
             logLastFile = globLast(master_target_log_dir + logFilePattern)
             if not logLastFile:
-                NTerror("Skipping %s because failed to find last log file in directory: %s by pattern %s" % (
+                nTerror("Skipping %s because failed to find last log file in directory: %s by pattern %s" % (
                     entry_code, master_target_log_dir, logFilePattern))
                 return True
 
             date_stamp = getDateTimeStampForFileName(logLastFile)
             if not date_stamp:
-                NTerror("Skipping %s because failed to find date for log file: %s" % (entry_code, logLastFile))
+                nTerror("Skipping %s because failed to find date for log file: %s" % (entry_code, logLastFile))
                 return True
 
             logScriptFileNameRootNew = 'validateEntry' # stick them in next to the locally derived logs.
@@ -1347,7 +1347,7 @@ class nrgCing(Lister): # pylint: disable=C0103
                 os.mkdir(newLogDir)
             logLastFileNew = '%s_%s.log' % (entry_code, date_stamp)
             logLastFileNewFull = os.path.join(newLogDir, logLastFileNew)
-            NTdebug("Copy from %s to %s" % (logLastFile, logLastFileNewFull))
+            nTdebug("Copy from %s to %s" % (logLastFile, logLastFileNewFull))
             copy2(logLastFile, logLastFileNewFull)
             if doRemoves:
                 os.remove(logLastFile)
@@ -1356,26 +1356,26 @@ class nrgCing(Lister): # pylint: disable=C0103
         if doTgz:
             tgzFileNameCing = entry_code + ".cing.tgz"
             if os.path.exists(tgzFileNameCing):
-                NTdebug("Removing local tgz %s" % (tgzFileNameCing))
+                nTdebug("Removing local tgz %s" % (tgzFileNameCing))
                 os.remove(tgzFileNameCing)
             if doCopyTgz:
                 tgzFileNameCingMaster = os.path.join(self.vc.MASTER_D, 'NRG-CING', 'data', entryCodeChar2and3, entry_code, tgzFileNameCing)
                 if not os.path.exists(tgzFileNameCingMaster):
-                    NTerror("Skipping %s because failed to find master's: %s" % (entry_code, tgzFileNameCingMaster))
+                    nTerror("Skipping %s because failed to find master's: %s" % (entry_code, tgzFileNameCingMaster))
                     return True
                 copy2(tgzFileNameCingMaster, '.')
             if not os.path.exists(tgzFileNameCing):
-                NTerror("Skipping %s because local tgz %s not found in: %s" % (entry_code, tgzFileNameCing, os.getcwd()))
+                nTerror("Skipping %s because local tgz %s not found in: %s" % (entry_code, tgzFileNameCing, os.getcwd()))
                 return True
             fileNameCing = entry_code + ".cing"
             if os.path.exists(fileNameCing):
-                NTdebug("Removing local .cing %s" % (fileNameCing))
+                nTdebug("Removing local .cing %s" % (fileNameCing))
                 rmtree(fileNameCing)
             cmd = "tar -xzf %s" % tgzFileNameCing
-            NTdebug("cmd: %s" % cmd)
+            nTdebug("cmd: %s" % cmd)
             status, result = commands.getstatusoutput(cmd)
             if status:
-                NTerror("Failed to untar status: %s with result %s" % (status, result))
+                nTerror("Failed to untar status: %s with result %s" % (status, result))
                 return True
             if doRemoves:
                 os.remove(tgzFileNameCing)
@@ -1404,22 +1404,22 @@ class nrgCing(Lister): # pylint: disable=C0103
                            PHASE_F: os.path.join(dir_F, entryCodeChar2and3, entry_code),
                            }
 
-        NTmessage("interactive            interactive run is fast use zero for production   %s" % doInteractive)
-        NTmessage("")
-        NTmessage("convertMmCifCoor       Start from mmCIF                                  %s" % convertMmCifCoor)
-        NTmessage("convertMrRestraints    Start from DOCR                                   %s" % convertMrRestraints)
-        NTmessage("convertStarCS          Adds STAR CS to Ccpn with FC                      %s" % convertStarCS)
-        NTmessage("filterCcpnAll          Filter CS and restraints with FC                  %s" % filterCcpnAll)
-        NTmessage("Doing                                                                 %4s" % entry_code)
-#        NTdebug("copyToInputDir          Copies the input to the collecting directory                                 %s" % copyToInputDir)
+        nTmessage("interactive            interactive run is fast use zero for production   %s" % doInteractive)
+        nTmessage("")
+        nTmessage("convertMmCifCoor       Start from mmCIF                                  %s" % convertMmCifCoor)
+        nTmessage("convertMrRestraints    Start from DOCR                                   %s" % convertMrRestraints)
+        nTmessage("convertStarCS          Adds STAR CS to Ccpn with FC                      %s" % convertStarCS)
+        nTmessage("filterCcpnAll          Filter CS and restraints with FC                  %s" % filterCcpnAll)
+        nTmessage("Doing                                                                 %4s" % entry_code)
+#        nTdebug("copyToInputDir          Copies the input to the collecting directory                                 %s" % copyToInputDir)
 
 
         if convertMmCifCoor == convertMrRestraints:
-            NTerror("One and one only needs to be True of convertMmCifCoor == convertMrRestraints")
+            nTerror("One and one only needs to be True of convertMmCifCoor == convertMrRestraints")
             return True
 
         if convertMmCifCoor:
-            NTmessage("  mmCIF")
+            nTmessage("  mmCIF")
 
             c_sub_entry_dir = os.path.join(dir_C, entryCodeChar2and3)
             c_entry_dir = os.path.join(c_sub_entry_dir, entry_code)
@@ -1445,7 +1445,7 @@ class nrgCing(Lister): # pylint: disable=C0103
             os.chdir(entry_code)
 
             if not os.path.exists(inputMmCifFile):
-                NTerror("%s No input mmCIF f: %s" % (entry_code, inputMmCifFile))
+                nTerror("%s No input mmCIF f: %s" % (entry_code, inputMmCifFile))
                 return True
 
             maxModels = '999'
@@ -1465,25 +1465,25 @@ class nrgCing(Lister): # pylint: disable=C0103
 #            now = time.time()
             wattosExitCode = wattosProgram()
 #            difTime = time.time() - now #@UnusedVariable
-#            NTdebug("Wattos reading the mmCIF took %8.1f seconds" % difTime)
+#            nTdebug("Wattos reading the mmCIF took %8.1f seconds" % difTime)
             if wattosExitCode:
-                NTerror("%s Failed wattos script %s with exit code: %s" % (entry_code, script_file_new, str(wattosExitCode)))
+                nTerror("%s Failed wattos script %s with exit code: %s" % (entry_code, script_file_new, str(wattosExitCode)))
                 return True
 
             resultList =[]
             status = grep(log_file, 'ERROR', resultList=resultList, doQuiet=True)
             if status == 0:
-                NTerror("%s found %s errors in Wattos log f; aborting." % ( entry_code, len(resultList)))
-                NTerror('\n' +'\n'.join(resultList))
+                nTerror("%s found %s errors in Wattos log f; aborting." % ( entry_code, len(resultList)))
+                nTerror('\n' +'\n'.join(resultList))
                 return True
             os.unlink(script_file_new)
             if not os.path.exists(outputStarFile):
-                NTerror("%s found no output star f %s" % (entry_code, outputStarFile))
+                nTerror("%s found no output star f %s" % (entry_code, outputStarFile))
                 return True
             # end if
 
 
-            NTmessage("  star2Ccpn")
+            nTmessage("  star2Ccpn")
             log_file = "%s_star2Ccpn.log" % entry_code
             inputStarFile = "%s_C_wattos.str" % entry_code
             inputStarFileFull = os.path.join(c_entry_dir, inputStarFile)
@@ -1491,45 +1491,45 @@ class nrgCing(Lister): # pylint: disable=C0103
             fcScript = os.path.join(cingDirScripts, 'FC', 'convertStar2Ccpn.py')
 
             if not os.path.exists(inputStarFileFull):
-                NTerror("%s previous step produced no star f." % entry_code)
+                nTerror("%s previous step produced no star f." % entry_code)
                 return True
 
             # Will save a copy to disk as well.
             convertProgram = ExecuteProgram("python -u %s" % fcScript, redirectOutputToFile=log_file)
-#            NTmessage("==> Running Wim Vranken's FormatConverter from script %s" % fcScript)
+#            nTmessage("==> Running Wim Vranken's FormatConverter from script %s" % fcScript)
             exitCode = convertProgram("%s %s %s" % (inputStarFile, entry_code, c_entry_dir))
             if exitCode:
-                NTerror("Failed convertProgram with exit code: %s" % str(exitCode))
+                nTerror("Failed convertProgram with exit code: %s" % str(exitCode))
                 return True
             analysisResultTuple = analyzeFcLog(log_file)
             if not analysisResultTuple:
-                NTerror("Failed to analyze log f: %s" % log_file)
+                nTerror("Failed to analyze log f: %s" % log_file)
                 return True
             timeTaken, entryCrashed, nr_error, nr_warning, nr_message, nr_debug = analysisResultTuple
             if entryCrashed or (nr_error > self.MAX_ERROR_COUNT_FC_LOG):
-                NTmessage("Found %s/%s timeTaken/entryCrashed and %d/%d/%d/%d error,warning,message, and debug lines." % (
+                nTmessage("Found %s/%s timeTaken/entryCrashed and %d/%d/%d/%d error,warning,message, and debug lines." % (
                     timeTaken, entryCrashed, nr_error, nr_warning, nr_message, nr_debug) )
-                NTmessage("Found %s errors in prep phase C please check: %s" % (nr_error, entry_code))
+                nTmessage("Found %s errors in prep phase C please check: %s" % (nr_error, entry_code))
                 resultList = []
                 status = grep(log_file, 'ERROR', resultList=resultList, doQuiet=True, caseSensitive=False)
                 if status == 0:
-                    NTerror("%s found errors in log f; aborting." % entry_code)
-                    NTmessage('\n'.join(resultList))
+                    nTerror("%s found errors in log f; aborting." % entry_code)
+                    nTmessage('\n'.join(resultList))
                     return True
             if not os.path.exists(outputCcpnFile):
-                NTerror("%s found no output ccpn f %s" % (entry_code, outputCcpnFile))
+                nTerror("%s found no output ccpn f %s" % (entry_code, outputCcpnFile))
                 return True
 
             finalPhaseId = PHASE_C
         # end if convertMmCifCoor
 
         if convertMrRestraints:
-            NTmessage("  DOCR CCPN")
+            nTmessage("  DOCR CCPN")
             finalPhaseId = PHASE_R
             # Nothing else needed really.
 
         if convertStarCS:
-            NTmessage("  star CS")
+            nTmessage("  star CS")
 
             s_sub_entry_dir = os.path.join(dir_S, entryCodeChar2and3)
             s_entry_dir = os.path.join(s_sub_entry_dir, entry_code)
@@ -1548,13 +1548,13 @@ class nrgCing(Lister): # pylint: disable=C0103
 
             inputDir = getDeepByKeysOrAttributes(inputDirByPhase, finalPhaseId)
             if not inputDir:
-                NTerror("Failed to get prep stage dir for phase: [%s]" % finalPhaseId)
+                nTerror("Failed to get prep stage dir for phase: [%s]" % finalPhaseId)
                 return True
             fn = "%s.tgz" % entry_code
             inputCcpnFile = os.path.join(inputDir, fn)
             outputCcpnFile = fn
             if not os.path.exists( inputCcpnFile):
-                NTerror("Failed to find input: %s" % inputCcpnFile)
+                nTerror("Failed to find input: %s" % inputCcpnFile)
                 return True
             inputLocalCcpnFile = "%s_input.tgz" % entry_code
             shutil.copy( inputCcpnFile, inputLocalCcpnFile )
@@ -1563,7 +1563,7 @@ class nrgCing(Lister): # pylint: disable=C0103
             log_file = "%s_starCS2Ccpn.log" % entry_code
 
             if not self.matches_many2one.has_key(entry_code):
-                NTerror("No BMRB entry for PDB entry: %s" % entry_code)
+                nTerror("No BMRB entry for PDB entry: %s" % entry_code)
                 return True
             bmrb_id = self.matches_many2one[entry_code]
             bmrb_code = 'bmr%s' % bmrb_id
@@ -1572,48 +1572,48 @@ class nrgCing(Lister): # pylint: disable=C0103
 #            inputStarDir = os.path.join(bmrbDir, digits12)
             inputStarDir = os.path.join(bmrbDir, bmrb_code)
             if not os.path.exists(inputStarDir):
-                NTerror("Input star dir not found: %s" % inputStarDir)
+                nTerror("Input star dir not found: %s" % inputStarDir)
                 return True
             inputStarFile = os.path.join(inputStarDir, '%s_21.str'%bmrb_code)
             if not os.path.exists(inputStarFile):
-                NTerror("inputStarFile not found: %s" % inputStarFile)
+                nTerror("inputStarFile not found: %s" % inputStarFile)
                 return True
 
             fcScript = os.path.join(cingDirScripts, 'FC', 'mergeNrgBmrbShifts.py')
 
             # Will save a copy to disk as well.
             convertProgram = ExecuteProgram("python -u %s" % fcScript, redirectOutputToFile=log_file)
-#            NTmessage("==> Running Wim Vranken's FormatConverter from script %s" % fcScript)
+#            nTmessage("==> Running Wim Vranken's FormatConverter from script %s" % fcScript)
             exitCode = convertProgram("%s -bmrbCodes %s -raise -force -noGui" % (entry_code, bmrb_code))
             if exitCode:
-                NTerror("Failed convertProgram with exit code: %s" % str(exitCode))
+                nTerror("Failed convertProgram with exit code: %s" % str(exitCode))
                 return True
             analysisResultTuple = analyzeFcLog(log_file)
             if not analysisResultTuple:
-                NTerror("Failed to analyze log f: %s" % log_file)
+                nTerror("Failed to analyze log f: %s" % log_file)
                 return True
             timeTaken, entryCrashed, nr_error, nr_warning, nr_message, nr_debug = analysisResultTuple
             if entryCrashed or (nr_error > self.MAX_ERROR_COUNT_FC_LOG):
-                NTmessage("Found %s/%s timeTaken/entryCrashed and %d/%d/%d/%d error,warning,message, and debug lines." % (
+                nTmessage("Found %s/%s timeTaken/entryCrashed and %d/%d/%d/%d error,warning,message, and debug lines." % (
                     timeTaken, entryCrashed, nr_error, nr_warning, nr_message, nr_debug) )
-                NTmessage("Found %s errors in prep phase S please check: %s" % (nr_error, entry_code))
+                nTmessage("Found %s errors in prep phase S please check: %s" % (nr_error, entry_code))
                 resultList = []
                 status = grep(log_file, 'ERROR', resultList=resultList, doQuiet=True, caseSensitive=False)
                 if status == 0:
-                    NTerror("%s found errors in log f; aborting." % entry_code)
-                    NTmessage('\n'.join(resultList))
+                    nTerror("%s found errors in log f; aborting." % entry_code)
+                    nTmessage('\n'.join(resultList))
                 return True
             if not os.path.exists(outputCcpnFile):
-                NTerror("%s found no output ccpn f %s" % (entry_code, outputCcpnFile))
+                nTerror("%s found no output ccpn f %s" % (entry_code, outputCcpnFile))
                 return True
             if True:
-                NTmessage("Testing completeness of FC merge by comparing input STAR with output CING counts" )
+                nTmessage("Testing completeness of FC merge by comparing input STAR with output CING counts" )
                 conversionCsSucces = True
                 nucleiToCheckList = '1H 13C 15N 31P'.split()
 #                bmrbCountMap = getBmrbCsCounts()
 #                bmrbCsMap = getDeepByKeysOrAttributes( bmrbCountMap, bmrb_id )
                 bmrbCsMap = getBmrbCsCountsFromFile(inputStarFile)
-                NTmessage("BMRB %r" % bmrbCsMap)
+                nTmessage("BMRB %r" % bmrbCsMap)
 
                 project = Project.open(entry_code, status = 'new')
                 project.initCcpn(ccpnFolder = outputCcpnFile)
@@ -1623,12 +1623,12 @@ class nrgCing(Lister): # pylint: disable=C0103
                 for nucleusId in nucleiToCheckList:
                     star_count = getDeepByKeysOrAttributes( bmrbCsMap, nucleusId )
                     cing_count = getDeepByKeysOrAttributes( assignmentCountMap, nucleusId )
-#                    NTdebug("nucleus: %s input: %s project: %s" % ( nucleusId, star_count, cing_count ) )
+#                    nTdebug("nucleus: %s input: %s project: %s" % ( nucleusId, star_count, cing_count ) )
                     if star_count == None or star_count == 0:
-#                        NTmessage("No nucleus: %s in input" % nucleusId)
+#                        nTmessage("No nucleus: %s in input" % nucleusId)
                         continue
                     if cing_count == None:
-                        NTerror("No nucleus: %s in project" % nucleusId)
+                        nTerror("No nucleus: %s in project" % nucleusId)
                         continue
                     star_count_total += star_count
                     cing_count_total += cing_count
@@ -1641,10 +1641,10 @@ class nrgCing(Lister): # pylint: disable=C0103
 
                 # Use same number of field to facilitate computer readability.
                 if f < self.FRACTION_CS_CONVERSION_REQUIRED:
-                    NTmessage("Found fraction less than the cutoff %.2f but %.2f overall (STAR/CING: %s/%s)" % resultTuple)
+                    nTmessage("Found fraction less than the cutoff %.2f but %.2f overall (STAR/CING: %s/%s)" % resultTuple)
                     conversionCsSucces = False
                 else:
-                    NTmessage("Found fraction of at least   cutoff %.2f at %.2f  overall (STAR/CING: %s/%s)" % resultTuple)
+                    nTmessage("Found fraction of at least   cutoff %.2f at %.2f  overall (STAR/CING: %s/%s)" % resultTuple)
                 del project
             # end CS count check.
 
@@ -1663,7 +1663,7 @@ class nrgCing(Lister): # pylint: disable=C0103
         # end if CS
 
         if filterCcpnAll and convertMrRestraints: # Makes no sense to do when there are no restraints at all.
-            NTmessage("  filter")
+            nTmessage("  filter")
 
             f_sub_entry_dir = os.path.join(dir_F, entryCodeChar2and3)
             f_entry_dir = os.path.join(f_sub_entry_dir, entry_code)
@@ -1682,15 +1682,15 @@ class nrgCing(Lister): # pylint: disable=C0103
 
             inputDir = getDeepByKeysOrAttributes(inputDirByPhase, finalPhaseId)
             if not inputDir:
-                NTerror("Failed to get prep stage dir for phase: [%s]" % finalPhaseId)
+                nTerror("Failed to get prep stage dir for phase: [%s]" % finalPhaseId)
                 return True
             fn = "%s.tgz" % entry_code
             inputCcpnFile = os.path.join(inputDir, fn)
             if not os.path.exists( inputCcpnFile):
-                NTerror("Failed to find input: %s" % inputCcpnFile)
+                nTerror("Failed to find input: %s" % inputCcpnFile)
                 return True
 
-            NTmessage("         -1- assign")
+            nTmessage("         -1- assign")
             filterAssignSucces = 1
             log_file = "%s_FC_assign.log" % entry_code
             fcScript = os.path.join(cingDirScripts, 'FC', 'utils.py')
@@ -1698,44 +1698,44 @@ class nrgCing(Lister): # pylint: disable=C0103
 
             # Will save a copy to disk as well.
             convertProgram = ExecuteProgram("python -u %s" % fcScript, redirectOutputToFile=log_file)
-#                NTmessage("==> Running Wim Vranken's FormatConverter from script %s" % fcScript)
+#                nTmessage("==> Running Wim Vranken's FormatConverter from script %s" % fcScript)
             exitCode = convertProgram("%s fcProcessEntry %s %s swapCheck" % (entry_code, inputCcpnFile, outputCcpnFile))
             if exitCode:
-                NTerror("Failed convertProgram with exit code: %s" % str(exitCode))
+                nTerror("Failed convertProgram with exit code: %s" % str(exitCode))
                 return True
             analysisResultTuple = analyzeCingLog(log_file)
             if not analysisResultTuple:
-                NTerror("Failed to analyze log file: %s" % log_file)
+                nTerror("Failed to analyze log file: %s" % log_file)
                 return True
             timeTaken, entryCrashed, nr_error, nr_warning, nr_message, nr_debug = analysisResultTuple
             if entryCrashed or (nr_error > self.MAX_ERROR_COUNT_FC_LOG):
-                NTmessage("Found %s/%s timeTaken/entryCrashed and %d/%d/%d/%d error,warning,message, and debug lines." % (
+                nTmessage("Found %s/%s timeTaken/entryCrashed and %d/%d/%d/%d error,warning,message, and debug lines." % (
                     timeTaken, entryCrashed, nr_error, nr_warning, nr_message, nr_debug) )
-                NTmessage("Found %s errors in prep phase F -1- assign please check: %s" % (nr_error, entry_code))
+                nTmessage("Found %s errors in prep phase F -1- assign please check: %s" % (nr_error, entry_code))
                 resultList = []
                 status = grep(log_file, 'ERROR', resultList=resultList, doQuiet=True, caseSensitive=False)
                 if status == 0:
-                    NTerror("%s found errors in log file; aborting." % entry_code)
-                    NTmessage('\n'.join(resultList))
+                    nTerror("%s found errors in log file; aborting." % entry_code)
+                    nTmessage('\n'.join(resultList))
                 filterAssignSucces = 0
             if not os.path.exists(outputCcpnFile):
-                NTerror("%s found no output ccpn file %s" % (entry_code, outputCcpnFile))
+                nTerror("%s found no output ccpn file %s" % (entry_code, outputCcpnFile))
                 filterAssignSucces = 0
             if filterAssignSucces: # Only use filtering if successful but do continue if failed just skip this.
                 finalPhaseId = PHASE_F
             # end if
         # end filterCcpnAll
-        NTmessage("Before copyToInputDir")
+        nTmessage("Before copyToInputDir")
         if copyToInputDir:
             if not finalPhaseId:
-                NTerror("Failed to finish any prep stage.")
+                nTerror("Failed to finish any prep stage.")
                 return True
             if finalPhaseId not in self.phaseIdList:
-                NTerror("Failed to finish valid prep stage: [%s]" % finalPhaseId)
+                nTerror("Failed to finish valid prep stage: [%s]" % finalPhaseId)
                 return True
             finalInputDir = getDeepByKeysOrAttributes(inputDirByPhase, finalPhaseId)
             if not finalInputDir:
-                NTerror("Failed to get prep stage dir: [%s]" % finalInputDir)
+                nTerror("Failed to get prep stage dir: [%s]" % finalInputDir)
                 return True
             fn = "%s.tgz" % entry_code
             fnDst = fn
@@ -1743,7 +1743,7 @@ class nrgCing(Lister): # pylint: disable=C0103
                 fn = "%s_assign.tgz" % entry_code
             finalInputTgz = os.path.join(finalInputDir, fn)
             if not os.path.exists(finalInputTgz):
-                NTerror("final input tgz missing: %s" % finalInputTgz)
+                nTerror("final input tgz missing: %s" % finalInputTgz)
                 return True
             dst = os.path.join(self.results_dir, self.inputDir, entryCodeChar2and3)
             if not os.path.exists(dst):
@@ -1753,14 +1753,14 @@ class nrgCing(Lister): # pylint: disable=C0103
                 os.remove(fullDst)
 #            os.link(finalInputTgz, fullDst) # Will use less resources but will be expanded when copied between resources.
             disk.copy(finalInputTgz, fullDst)
-            NTmessage("Copied input %s to: %s" % (finalInputTgz, fullDst)) # should be a debug statement.
+            nTmessage("Copied input %s to: %s" % (finalInputTgz, fullDst)) # should be a debug statement.
         else:
-            NTwarning("Did not copy input %s" % finalInputTgz)
+            nTwarning("Did not copy input %s" % finalInputTgz)
         # end else
         if 0: # DEFAULT: 0
             self.entry_list_todo = [ entry_code ]
             self.runCing()
-        NTmessage("Done prepareEntry with %s" % entry_code)
+        nTmessage("Done prepareEntry with %s" % entry_code)
     # end def
 
 
@@ -1769,15 +1769,15 @@ class nrgCing(Lister): # pylint: disable=C0103
         Return True on error.
         """
 
-        NTmessage("Starting runCing")
+        nTmessage("Starting runCing")
         if 0: # DEFAULT 0
-            NTmessage("Going to use non-default entry_list_todo in runCing")
+            nTmessage("Going to use non-default entry_list_todo in runCing")
 #            self.entry_list_todo = readLinesFromFile('/Users/jd/NRG/lists/bmrbPdbEntryList.csv')
             self.entry_list_todo = "1brv 1hkt 1mo7 1mo8 1ozi 1p9j 1pd7 1qjt 1vj6 1y7n 2fws 2fwu 2jsx".split()
             self.entry_list_todo = NTlist( *self.entry_list_todo )
 
             if self.searchPdbEntries():
-                NTerror("Failed to searchPdbEntries")
+                nTerror("Failed to searchPdbEntries")
                 return True
 
         entryListFileName = "entry_list_todo.csv"
@@ -1807,7 +1807,7 @@ class nrgCing(Lister): # pylint: disable=C0103
                             max_time_to_wait=self.max_time_to_wait,
                             MAX_ENTRIES_TODO=self.max_entries_todo,
                             extraArgList=extraArgList):
-            NTerror("Failed to doScriptOnEntryList")
+            nTerror("Failed to doScriptOnEntryList")
             return True
         # end if
     # end def runCing.
@@ -1817,25 +1817,25 @@ class nrgCing(Lister): # pylint: disable=C0103
         TODO: embed.
         """
 
-        NTmessage("Starting postProcessAfterVc")
+        nTmessage("Starting postProcessAfterVc")
         self.entry_list_nmr = readLinesFromFile(os.path.join(self.results_dir, 'entry_list_nmr.csv'))
         self.entry_list_done = readLinesFromFile(os.path.join(self.results_dir, 'entry_list_done.csv'))
         self.entry_list_todo = NTlist()
         self.entry_list_todo.addList(self.entry_list_nmr)
         self.entry_list_todo = self.entry_list_todo.difference(self.entry_list_done)
         if 1: # Default 1 for now.
-            NTmessage("Going to use non-default entry_list_todo in postProcessAfterVc")
+            nTmessage("Going to use non-default entry_list_todo in postProcessAfterVc")
             self.entry_list_todo = readLinesFromFile(os.path.join(self.results_dir, 'entry_list_good_tgz_after_7.csv'))
 #            self.entry_list_todo = '1brv 9pcy'.split()
             self.entry_list_todo = NTlist( *self.entry_list_todo )
 
-        NTmessage("Found entries in NMR          : %d" % len(self.entry_list_nmr))
-        NTmessage("Found entries in NRG-CING done: %d" % len(self.entry_list_done))
-        NTmessage("Found entries in NRG-CING todo: %d" % len(self.entry_list_todo))
+        nTmessage("Found entries in NMR          : %d" % len(self.entry_list_nmr))
+        nTmessage("Found entries in NRG-CING done: %d" % len(self.entry_list_done))
+        nTmessage("Found entries in NRG-CING todo: %d" % len(self.entry_list_todo))
 
         for entry_code in self.entry_list_todo:
             self.postProcessEntryAfterVc(entry_code)
-        NTmessage("Done")
+        nTmessage("Done")
     # end def
 
 
@@ -1866,7 +1866,7 @@ class nrgCing(Lister): # pylint: disable=C0103
                 storeCING2db, ranges, filterTopViolations, filterVasco )
         extraArgListStr = ' '.join( extraArgListTxt.split())
 
-        NTmessage("Starting createToposTokens with extra params: [%s]" % extraArgListStr)
+        nTmessage("Starting createToposTokens with extra params: [%s]" % extraArgListStr)
         self.entry_list_nmr = readLinesFromFile(os.path.join(self.results_dir, 'entry_list_nmr.csv'))
         self.entry_list_done = readLinesFromFile(os.path.join(self.results_dir, 'entry_list_done.csv'))
         self.entry_list_todo = NTlist()
@@ -1880,11 +1880,11 @@ class nrgCing(Lister): # pylint: disable=C0103
             self.entry_list_todo = NTlist( *self.entry_list_todo )
 
 
-        NTmessage("Found entries in NMR          : %d" % len(self.entry_list_nmr))
-        NTmessage("Found entries in NRG-CING done: %d" % len(self.entry_list_done))
-        NTmessage("Found entries in NRG-CING todo: %d" % len(self.entry_list_todo))
+        nTmessage("Found entries in NMR          : %d" % len(self.entry_list_nmr))
+        nTmessage("Found entries in NRG-CING done: %d" % len(self.entry_list_done))
+        nTmessage("Found entries in NRG-CING todo: %d" % len(self.entry_list_todo))
 
-#        NTdebug("Quitting for now.")
+#        nTdebug("Quitting for now.")
 #        return True
 
         tokenList = []
@@ -1892,7 +1892,7 @@ class nrgCing(Lister): # pylint: disable=C0103
             tokenStr = ' '.join([jobId, entry_code, extraArgListStr])
             tokenList.append(tokenStr)
         tokenListStr = '\n'.join(tokenList)
-        NTmessage("Writing tokens to: [%s]" % self.tokenListFileName)
+        nTmessage("Writing tokens to: [%s]" % self.tokenListFileName)
         writeTextToFile(self.tokenListFileName, tokenListStr)
     # end def
 
@@ -1905,7 +1905,7 @@ class nrgCing(Lister): # pylint: disable=C0103
                 ):
         "Return True on error."
 
-        NTmessage("Starting prepare using self.entry_list_todo")
+        nTmessage("Starting prepare using self.entry_list_todo")
 
         permutationArgumentList = NTdict() # per permutation hold the entry list.
 
@@ -1926,7 +1926,7 @@ class nrgCing(Lister): # pylint: disable=C0103
                 if convertMrRestraints: # Filter when there are restraints
                     filterCcpnAll = 1
             if not (convertMmCifCoor or convertMrRestraints):
-                NTerror("not (convertMmCifCoor or convertMrRestraints) in prepare. Skipping entry: %s" % entry_code)
+                nTerror("not (convertMmCifCoor or convertMrRestraints) in prepare. Skipping entry: %s" % entry_code)
                 continue
             argList = [convertMmCifCoor, convertMrRestraints, convertStarCS, filterCcpnAll]
             argStringList = [ str(x) for x in argList ]
@@ -1935,19 +1935,19 @@ class nrgCing(Lister): # pylint: disable=C0103
                 permutationArgumentList[permutationKey] = NTlist()
             permutationArgumentList[permutationKey].append(entry_code)
 #
-#        NTmessage("Found entries in NMR          : %d" %  len(self.entry_list_nmr))
-#        NTmessage("Found entries in NRG-CING done: %d" %  len(self.entry_list_done))
-        NTmessage("Found entries in NRG-CING todo: %d" % len(self.entry_list_todo))
+#        nTmessage("Found entries in NMR          : %d" %  len(self.entry_list_nmr))
+#        nTmessage("Found entries in NRG-CING done: %d" %  len(self.entry_list_done))
+        nTmessage("Found entries in NRG-CING todo: %d" % len(self.entry_list_todo))
         for permutationKey in permutationArgumentList.keys(): # strings
 #            permutationKeyForFileName = re.compile('[ ,\[\]]').sub('', permutationKey)
             permutationKeyForFileName = permutationKey.replace(' ', '')
             extraArgList = permutationKey.split()
             convertMmCifCoor, convertMrRestraints, convertStarCS, filterCcpnAll = extraArgList
-            NTmessage("Keys: %s split to: %s %s %s %s with number of entries %d" % (
+            nTmessage("Keys: %s split to: %s %s %s %s with number of entries %d" % (
                     permutationKey, convertMmCifCoor, convertMrRestraints, convertStarCS, 
                     filterCcpnAll, len(permutationArgumentList[permutationKey])))
 
-#            NTdebug("Quitting for now.")
+#            nTdebug("Quitting for now.")
 #            continue
 
             entryListFileName = "entry_list_todo_prep_perm_%s.csv" % permutationKeyForFileName
@@ -1964,31 +1964,31 @@ class nrgCing(Lister): # pylint: disable=C0103
                                 MAX_ENTRIES_TODO=self.max_entries_todo,
     #                            MAX_ENTRIES_TODO=self.max_entries_todo # DEFAULT
                                 ):
-                NTerror("In nrgCing#prepare Failed to doScriptOnEntryList")
+                nTerror("In nrgCing#prepare Failed to doScriptOnEntryList")
                 return True
             # end if
         # end for
-        NTmessage("Done with prepare.")
+        nTmessage("Done with prepare.")
     # end def
 
     def storeCING2db(self):
         "Return True on error."
 
-        NTmessage("Starting storeCING2db using self.entry_list_todo.")
+        nTmessage("Starting storeCING2db using self.entry_list_todo.")
 
 #        self.searchPdbEntries()
 #        self.getEntryInfo()
 
 
         if 0: # DEFAULT: False
-            NTmessage("Going to use non-default entry_list_todo in storeCING2db")
+            nTmessage("Going to use non-default entry_list_todo in storeCING2db")
             self.entry_list_todo = '1brv'.split()
 #            self.entry_list_todo = readLinesFromFile('/Users/jd/NRG/lists/entry_list_vuisterlab.csv')
 #            self.entry_list_todo = readLinesFromFile(os.path.join(self.results_dir, 'entry_list_todo_nmr_all.csv'))
             self.entry_list_todo = readLinesFromFile(os.path.join('/Users/jd', 'entry_list_to_store.csv'))
             self.entry_list_todo = NTlist( *self.entry_list_todo )
 
-        NTmessage("Found entries in NRG-CING todo: %d" % len(self.entry_list_todo))
+        nTmessage("Found entries in NRG-CING todo: %d" % len(self.entry_list_todo))
 
         # parameters for doScriptOnEntryList
         cingDirNRG = os.path.join(cingPythonDir, 'cing', 'NRG' )
@@ -2010,7 +2010,7 @@ class nrgCing(Lister): # pylint: disable=C0103
                             MAX_ENTRIES_TODO = self.max_entries_todo,
                             expectPdbEntryList = True,
                             extraArgList = extraArgList)
-        NTmessage("Done with storeCING2db.")
+        nTmessage("Done with storeCING2db.")
     # end def
     
     def refine(self):  # pylint: disable=R0201
@@ -2034,8 +2034,8 @@ def runNrgCing( useClass = nrgCing ):
     useTopos = 0           # DEFAULT: 0
     processes_max = None # Default None to be determined by os.
 
-    NTmessage(header)
-    NTmessage(getStartMessage())
+    nTmessage(header)
+    nTmessage(getStartMessage())
     ## Initialize the project
     uClass = useClass( max_entries_todo=max_entries_todo, useTopos=useTopos, processes_max = processes_max )
 
@@ -2058,12 +2058,12 @@ def runNrgCing( useClass = nrgCing ):
     argListOther = []
     if len(sys.argv) > startArgListOther:
         argListOther = sys.argv[startArgListOther:]
-    NTmessage('\nGoing to destination: %s with(out) entry_code %s with extra arguments %s' % (destination, entry_code, str(argListOther)))
+    nTmessage('\nGoing to destination: %s with(out) entry_code %s with extra arguments %s' % (destination, entry_code, str(argListOther)))
 
     try:
         if destination == 'updateWeekly':
             if uClass.updateWeekly():
-                NTerror("Failed to updateWeekly")
+                nTerror("Failed to updateWeekly")
         elif destination == 'prepare':
             convertMmCifCoor = 1 # always present so nicest fall back.
             convertMrRestraints = 0
@@ -2081,40 +2081,40 @@ def runNrgCing( useClass = nrgCing ):
             if uClass.prepareEntry(entry_code, doInteractive=doInteractive, 
                                    convertMmCifCoor=convertMmCifCoor, convertMrRestraints=convertMrRestraints, 
                                    convertStarCS=convertStarCS, filterCcpnAll=filterCcpnAll):
-                NTerror(FAILURE_PREP_STR)
+                nTerror(FAILURE_PREP_STR)
         elif destination == 'runCing':
             if uClass.runCing():
-                NTerror("Failed to runCing")
+                nTerror("Failed to runCing")
         elif destination == 'postProcessAfterVc':
             if uClass.postProcessAfterVc():
-                NTerror("Failed to postProcessAfterVc")
+                nTerror("Failed to postProcessAfterVc")
         elif destination == 'postProcessEntryAfterVc':
             if uClass.postProcessEntryAfterVc(entry_code):
-                NTerror("Failed to postProcessEntryAfterVc")
+                nTerror("Failed to postProcessEntryAfterVc")
         elif destination == 'createToposTokens':
             if uClass.createToposTokens(jobId=VALIDATE_ENTRY_NRG_STR):
 #            if uClass.createToposTokens():
-                NTerror("Failed to createToposTokens")
+                nTerror("Failed to createToposTokens")
         elif destination == 'storeCING2db':
             if uClass.storeCING2db():
-                NTerror("Failed to storeCING2db")
+                nTerror("Failed to storeCING2db")
         elif destination == 'getEntryInfo':
             if uClass.getEntryInfo():
-                NTerror("Failed to getEntryInfo")                
+                nTerror("Failed to getEntryInfo")                
         elif destination == 'searchPdbEntries':
             if uClass.searchPdbEntries():
-                NTerror("Failed to searchPdbEntries")                
+                nTerror("Failed to searchPdbEntries")                
         # NMR_REDO specific
         elif destination == 'refine':
             if uClass.refine(): # in nmr_redo
-                NTerror("Failed to refine")
+                nTerror("Failed to refine")
         else:
-            NTerror("Unknown destination: %s" % destination)
+            nTerror("Unknown destination: %s" % destination)
         # end if
     except:
         NTtracebackError()
     finally:
-        NTmessage(getStopMessage(cing.starttime))
+        nTmessage(getStopMessage(cing.starttime))
     # end try
 # end def    
 

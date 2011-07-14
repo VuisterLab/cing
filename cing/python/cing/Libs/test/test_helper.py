@@ -8,12 +8,12 @@ class AllChecks(TestCase):
 
     def test_GetSvnRevision(self):
         x = getSvnRevision()
-        NTdebug("x: %s" % val2Str(x,"%d"))
+        nTdebug("x: %s" % val2Str(x,"%d"))
 #        self.assertTrue(x>500) # no need to complain.
 
     def test_detectCPUs(self):
         x = detectCPUs()
-        NTdebug("detectCPUs: %s" % x)
+        nTdebug("detectCPUs: %s" % x)
         self.assertTrue(x)
 
 if __name__ == "__main__":

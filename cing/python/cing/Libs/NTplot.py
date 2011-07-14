@@ -27,15 +27,6 @@ NT_MOLECULE_PLOT_IDX_X_VALUE = 0
 NT_MOLECULE_PLOT_IDX_VALUE_LIST = 1
 NT_MOLECULE_PLOT_IDX_ROG_COLOR = 2
 
-#-----------------------------------------------------------------------------
-# Classes
-#-----------------------------------------------------------------------------
-
-#-----------------------------------------------------------------------------
-# Plotting attributes
-#-----------------------------------------------------------------------------
-
-
 def NTplotAttributes( **kwds ):
     a = NTdict()
 
@@ -200,7 +191,7 @@ def removeNulls(serie):
     result = []
     for point in serie:
         if point[1] == None:
-            NTdebug("Kicking point with None y at x: %s", point[0] )
+            nTdebug("Kicking point with None y at x: %s", point[0] )
             continue
         result.append( point )
     return result
@@ -228,7 +219,7 @@ def cmapWithAlphaGlidingScale(Z,palette,minAlpha=.5, maxAlpha=1., underAlpha=0.,
             else:
                 alpha = minAlpha + v * diffAlpha
             tmp[i,j][3] = alpha
-#            NTdebug('v: %5.2f alpha %5.2f' % (v,alpha))
+#            nTdebug('v: %5.2f alpha %5.2f' % (v,alpha))
     return tmp
 
 def ssTypeToIdx(ssType):

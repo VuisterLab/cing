@@ -12,7 +12,7 @@ def createStarUserLib():
     if 0:
         for resDef in NTdb:
             for dihedral in resDef.dihedrals:
-                NTmessage('%-4s %-10s' % (resDef.name, dihedral.name))
+                nTmessage('%-4s %-10s' % (resDef.name, dihedral.name))
     # end if
     
     # For completeness lib.
@@ -20,11 +20,11 @@ def createStarUserLib():
         for resDef in NTdb:
             for atomDef in resDef.atoms:
                 msg = '%-4s %-10s' % (resDef.name, atomDef.name)
-    #            NTdebug("Looking at: " + msg)
+    #            nTdebug("Looking at: " + msg)
                 if not isHeavy(atomDef):
-    #                NTdebug("Skipping: " + msg)      
+    #                nTdebug("Skipping: " + msg)      
                     continue  
-                NTmessage(msg)
+                nTmessage(msg)
             # end for
         # end for
     # end if

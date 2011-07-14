@@ -6,9 +6,16 @@ Simple class that doesn't import NTutils or sml in order to avoid cyclic behavio
 from cing.core.constants import * #@UnusedWildImport
 #from cing.core.sml import SMLhandler
 
+#class GumboObject(): # pylint: disable=R0903
 class SMLhandled(): # pylint: disable=R0903
-    'The subclass has an SMLhandler. For example NTlist'
+    '''
+    Place holder for any attributes that were dynamically added.
+    Gumbo stands for soup and soup stands for any 3D object like an atom 
+    or collections thereof.     
+    '''
     def __init__(self):
+        # pylint: disable=C0103
+#        self.SMLhandler = None
 #        self.SMLhandler = SMLhandler(DEFAULT_SML_HANDLER_STRING) # Just to make it official.
         if not hasattr(self, 'SMLhandler'): # it might already be initialize in which case nothing is done here.
             self.SMLhandler = None
@@ -22,7 +29,7 @@ class Formatted(): # pylint: disable=R0903
     # end def
 # end class
 
-class Lister(Formatted):
+class Lister(Formatted): # pylint: disable=R0903
     """Example from 'Learning Python from O'Reilly publisher'"""
     MAX_LINE_SIZE_VALUE = 80 # who wants to see long lines of gibberish
     
@@ -34,6 +41,7 @@ class Lister(Formatted):
            (self.__class__.__name__, id(self), self.attrnames()))
 
     def attrnames(self):
+        'Get the attribute names.'
         result=''
         keys = self.__dict__.keys()
         keys.sort()
@@ -48,3 +56,6 @@ class Lister(Formatted):
         return result
     #end def
 #end class
+
+def passThru():
+    pass

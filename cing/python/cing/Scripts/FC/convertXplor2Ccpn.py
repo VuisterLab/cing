@@ -44,7 +44,7 @@ def convertXplor2Ccpn(projectName, rootDir, inputDir="XPLOR", outputDir="CCPN"):
     outputDir = os.path.join(rootDir, outputDir)
 
     if not os.path.exists(inputDir):
-        NTerror("Failed to find")
+        nTerror("Failed to find")
     if os.path.exists(outputDir):
         shutil.rmtree(outputDir)
 
@@ -71,7 +71,7 @@ def importXplorCoordinatesAndRestraints(ccpnProject, inputDir, guiRoot, replaceC
     if replaceCoordinates:
         status = importPseudoPdb(ccpnProject, inputDir, guiRoot, allowPopups=allowPopups, minimalPrompts=minimalPrompts, verbose=verbose, **presets)
         if status:
-            NTerror("Failed importXplorCoordinatesAndRestraints")
+            nTerror("Failed importXplorCoordinatesAndRestraints")
             return True
 
     if not replaceRestraints:
@@ -83,7 +83,7 @@ def importXplorCoordinatesAndRestraints(ccpnProject, inputDir, guiRoot, replaceC
     # Will overwrite the settings given to formatCns.linkResonances(  below
     globPattern = inputDir + '/*_noe.tbl'
     fileList = glob(globPattern)
-    NTdebug("From %s will read files: %s" % (globPattern, fileList))
+    nTdebug("From %s will read files: %s" % (globPattern, fileList))
 
 #    for fn in fileList[0:1]: # TODO:
     for fn in fileList:
@@ -92,13 +92,13 @@ def importXplorCoordinatesAndRestraints(ccpnProject, inputDir, guiRoot, replaceC
         ccpnConstraintList.setName(fnBaseName)
         ccpnConstraintListOfList.append(ccpnConstraintList)
         if not ccpnConstraintList:
-            NTerror("Failed to read")
+            nTerror("Failed to read")
             return True
 
 #    globPattern = inputDir + '/*_hbond.tblXXXX' # TODO:
     globPattern = inputDir + '/*_hbond.tbl'
     fileList = glob(globPattern)
-    NTdebug("From %s will read in files: %s" % (globPattern, fileList))
+    nTdebug("From %s will read in files: %s" % (globPattern, fileList))
     for fn in fileList:
         fnBaseName = os.path.basename(fn).split('.')[0]
         ccpnConstraintList = formatCns.readDistanceConstraints(fn, minimalPrompts=minimalPrompts, verbose=verbose)
@@ -108,7 +108,7 @@ def importXplorCoordinatesAndRestraints(ccpnProject, inputDir, guiRoot, replaceC
 #    globPattern = inputDir + '/*_dihe.tblXXXX' # TODO:
     globPattern = inputDir + '/*_dihe.tbl'
     fileList = glob(globPattern)
-    NTdebug("From %s will read in total files: %s" % (globPattern, fileList))
+    nTdebug("From %s will read in total files: %s" % (globPattern, fileList))
     for fn in fileList:
         fnBaseName = os.path.basename(fn).split('.')[0]
         ccpnConstraintList = formatCns.readDihedralConstraints(fn, minimalPrompts=minimalPrompts, verbose=verbose)
@@ -116,15 +116,15 @@ def importXplorCoordinatesAndRestraints(ccpnProject, inputDir, guiRoot, replaceC
         ccpnConstraintListOfList.append(ccpnConstraintList)
 
     keywds = getDeepByKeysOrDefault(presets, {}, LINK_RESONANCES, KEYWORDS)
-    NTdebug("From getDeepByKeysOrDefault keywds: %s" % `keywds`)
+    nTdebug("From getDeepByKeysOrDefault keywds: %s" % `keywds`)
 
     ccpnConstraintList = getDeepByKeys(ccpnConstraintListOfList, 0) # no need to repeat
-    NTdebug("First ccpnConstraintList: %s" % ccpnConstraintList)
+    nTdebug("First ccpnConstraintList: %s" % ccpnConstraintList)
     if ccpnConstraintList != None:
 #    for i, ccpnConstraintList in enumerate(ccpnConstraintListOfList):
         keywds = getDeepByKeysOrDefault(presets, {}, LINK_RESONANCES, KEYWORDS)
-        NTdebug("From getDeepByKeysOrDefault keywds: %s" % `keywds`)
-        NTdebug("ccpnConstraintList: %s" % ccpnConstraintList)
+        nTdebug("From getDeepByKeysOrDefault keywds: %s" % `keywds`)
+        nTdebug("ccpnConstraintList: %s" % ccpnConstraintList)
         nmrConstraintStore = ccpnConstraintList.nmrConstraintStore
         structureGeneration = nmrConstraintStore.findFirstStructureGeneration()
         formatCns.linkResonances(
@@ -157,10 +157,10 @@ if __name__ == '__main__':
         inputDirRel = "XPLOR"
         inputDir = os.path.join(rootDir, inputDirRel)
         if os.path.exists(rootDir):
-            NTmessage("Removing original rootDir: %s" % rootDir)
+            nTmessage("Removing original rootDir: %s" % rootDir)
             shutil.rmtree(rootDir)
         os.mkdir(rootDir)
 
-        NTmessage("Copying input from %s to %s" % (testDataEntry, inputDir))
+        nTmessage("Copying input from %s to %s" % (testDataEntry, inputDir))
         shutil.copytree(testDataEntry, inputDir)
         convertXplor2Ccpn(projectName, rootDir)

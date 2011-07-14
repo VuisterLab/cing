@@ -48,7 +48,7 @@ def export2yasara( project, tmp=None ):
     #end for
 
 
-    NTmessage('==> project.export2yasara: exported structure and restraints to "%s"', yasaraPath)
+    nTmessage('==> project.export2yasara: exported structure and restraints to "%s"', yasaraPath)
 #end def
 
 
@@ -120,18 +120,18 @@ class PseudoRotation( SVDfit ):
            and pucker amplitudes, or (None,None,None) on error.
 
         """
-        from cing import printf, NTerror, NTlist
+        from cing import printf, nTerror, NTlist
         from math import atan2
 
         if not residue.hasProperties('nucleic'):
-            NTerror('PseudoRotation.calculate: residue %s is not nucleic acid', residue)
+            nTerror('PseudoRotation.calculate: residue %s is not nucleic acid', residue)
             return (None,None,None)
         #end if
 
         diheds = []
         for J,dihed in self.angleMap:
             if dihed not in residue:
-                NTerror('PseudoRotation.calculate: dihedral "%s" not defined for residue %s', dihed, residue)
+                nTerror('PseudoRotation.calculate: dihedral "%s" not defined for residue %s', dihed, residue)
                 return (None,None,None)
             #end if
             diheds.append( residue[dihed] )
@@ -319,7 +319,7 @@ class gvProcheck:
     #end def
 
     def run(self, ranges=None ):
-        NTmessage('==> Running procheck_nmr, ranges %s, results in "%s" ...', ranges, self.rootPath)
+        nTmessage('==> Running procheck_nmr, ranges %s, results in "%s" ...', ranges, self.rootPath)
 
         # Convert the ranges and translate into procheck_nmr format
         selectedResidues = self.molecule.setResiduesFromRanges( ranges )
@@ -335,7 +335,7 @@ class gvProcheck:
             #end if
         #end for
         self.ranges.append(selectedResidues[-1])
-#        NTdebug( 'Procheck ranges %d', self.ranges )
+#        nTdebug( 'Procheck ranges %d', self.ranges )
         #generate the ranges file
         path = os.path.join( self.rootPath, 'ranges')
         fp = open( path, 'w' )
@@ -395,7 +395,7 @@ class gvProcheck:
         path = os.path.join( self.rootPath, sprintf('%s.sum', self.molecule.name) )
         fp = open( path, 'r' )
         if not fp:
-            NTerror('gvProcheck.parseResult: %s not found', path)
+            nTerror('gvProcheck.parseResult: %s not found', path)
         else:
             self.summary = ''.join(fp.readlines())
             fp.close()
@@ -411,7 +411,7 @@ class gvProcheck:
                 resNum  = result['resNum']
                 residue = self.molecule.decodeNameTuple((cing.PDB,chain,resNum,None))
                 if not residue:
-                    NTerror('Procheck.parseResult: residue not found (%s,%d)', chain, resNum )
+                    nTerror('Procheck.parseResult: residue not found (%s,%d)', chain, resNum )
                 else:
 
                     residue.setdefault( 'procheck', NTstruct() )
@@ -433,7 +433,7 @@ def procheck_old( project, ranges=None ):
     Adds <Procheck> instance to molecule. Run procheck and parse result
     """
     if not project.molecule:
-        NTerror('ERROR procheck: no molecule defined\n')
+        nTerror('ERROR procheck: no molecule defined\n')
         return None
     #end if
 
@@ -457,7 +457,7 @@ def mkJmolMacros( project ):
     Generate the Jmol macros in the moleculeDirectories.Jmol dir.
     """
     if not project.molecule:
-        NTerror('mkJmolMacros: no molecule defined')
+        nTerror('mkJmolMacros: no molecule defined')
         return
     #end if
 
@@ -491,7 +491,7 @@ def mkJmolByResidueROGMacro( project, object=None, path=None, stream=None ):
     #end if
 
     if not stream:
-        NTerror('mkJmolByResidueROGMacro: undefined output stream')
+        nTerror('mkJmolByResidueROGMacro: undefined output stream')
         return
     #endif
 

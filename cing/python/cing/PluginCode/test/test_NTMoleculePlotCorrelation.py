@@ -73,7 +73,7 @@ class AllChecks(TestCase):
                 for res in resList:
                     resNumb += 1
 
-        #            NTdebug(`res`)
+        #            nTdebug(`res`)
                     if resNumb % 2:
                         res.rogScore.setMaxColor(COLOR_RED, "just testing ROG color.")
         #            if random() < 0.2: # Skip a 10%
@@ -122,7 +122,7 @@ class AllChecks(TestCase):
                             else:
                                 valueList = d.getDeepByKeys(checkID)
                             if showValues:
-                                NTdebug("%10s valueList: %-80s" % (checkID, valueList))
+                                nTdebug("%10s valueList: %-80s" % (checkID, valueList))
         #end if actuallyRunWhatif:
 
         # The following object will be responsible for creating a (png/pdf) file with

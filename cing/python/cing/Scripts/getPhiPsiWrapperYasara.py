@@ -61,9 +61,9 @@ def main():
     lastEntryId = min(len(entryCodeList), START_ENTRY_ID+MAX_ENTRIES_TODO)
     entryCodeList = entryCodeList[START_ENTRY_ID:lastEntryId]
 
-    NTmessage('Read      %04d entries    ' % entryCountTotal)
-    NTmessage('Selected  %04d entries    ' % entryCountSelected)
-    NTmessage('Sliced    %04d entries: %s' % (len(entryCodeList), entryCodeList ))
+    nTmessage('Read      %04d entries    ' % entryCountTotal)
+    nTmessage('Selected  %04d entries    ' % entryCountSelected)
+    nTmessage('Sliced    %04d entries: %s' % (len(entryCodeList), entryCodeList ))
 
     for i, entryCode in enumerate(entryCodeList):
         chainCode = chainCodeList[i]

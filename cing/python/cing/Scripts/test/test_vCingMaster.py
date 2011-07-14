@@ -18,8 +18,8 @@ class AllChecks(TestCase):
             "Failed to change to test directory for files: " + cingDirTmpTest)
 
 #        url = 'http://restraintsgrid.bmrb.wisc.edu/servlet_data/NRG_ccpn_tmp'
-    #    NTwarning("Expect errors without a server up and running.")
-        NTmessage("Querying the vCingMaster; aka token server for vCingSlave")
+    #    nTwarning("Expect errors without a server up and running.")
+        nTmessage("Querying the vCingMaster; aka token server for vCingSlave")
 
         ## queries possible; do one at a time going down the list.
         ## After the run is started the status will let you know if the run is finished
@@ -58,9 +58,9 @@ class AllChecks(TestCase):
 
     #    rpcUrl=DEFAULT_URL+"icing/serv/iCingServlet"
         rpcUrl=DEFAULT_URL+DEFAULT_RPC_PORT+'/'+DEFAULT_URL_PATH+"/serv/vCingMasterServlet"
-        NTdebug("Using rpc at: %s" % rpcUrl )
+        nTdebug("Using rpc at: %s" % rpcUrl )
         credentials = [(FORM_USER_ID, user_id), (FORM_ACCESS_KEY, access_key)]
-        NTdebug("With credentials: %s" % credentials )
+        nTdebug("With credentials: %s" % credentials )
 
     ##############################################################################################################
 

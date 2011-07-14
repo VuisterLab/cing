@@ -57,19 +57,19 @@ class SaveFrame (Lister):
         possibleTagNamesSFCategory = [ '_Saveframe_category',  # 2.1
                                        '.Sf_category' ]        # 3
         if not self.tagtables:
-            NTwarning('no tagtable found in Saveframe')
+            nTwarning('no tagtable found in Saveframe')
             return None
 
         tT = self.tagtables[0] # assumed 0
         if not tT.tagvalues[0]: # assumed 0
-            NTwarning('empty tagtable found in Saveframe')
+            nTwarning('empty tagtable found in Saveframe')
             return None
         found = 0
         for possi in possibleTagNamesSFCategory:
             if tT.tagnames[0].endswith(possi):
                 found = 1
         if not found:
-            NTwarning("first tag doesn't look like a Sf_category; taking value anyway")
+            nTwarning("first tag doesn't look like a Sf_category; taking value anyway")
 
         return tT.tagvalues[0][0]
 

@@ -24,7 +24,7 @@ def do_cmd( cmd, bufferedOutput = True ):
     """
     Returns False for success.
     """
-    NTmessage( "Doing command: %s" % cmd )
+    nTmessage( "Doing command: %s" % cmd )
     output = None
     ##  Try command and check for non-zero exit status
 #    pipe = os.popen( cmd )
@@ -34,13 +34,13 @@ def do_cmd( cmd, bufferedOutput = True ):
         output = pipe.read()
         status = pipe.close()
         if output:
-            NTmessage( output )
+            nTmessage( output )
     else:
         p = Popen(cmd, shell=True, stdout=PIPE)
         pipe = p.stdout
         line = p.stdout.readline()        
         while line:
-            NTmessageNoEOL( line )
+            nTmessageNoEOL( line )
             line = p.stdout.readline()
         status = pipe.close()
     ##  The program exit status is available by the following construct
@@ -51,15 +51,15 @@ def do_cmd( cmd, bufferedOutput = True ):
     if status == None:
         return
 
-    NTerror("Failed shell command:")
-    NTerror( cmd )
-#    NTerror("Output: %s" % output)
-    NTerror("Status: %s" % status)
+    nTerror("Failed shell command:")
+    nTerror( cmd )
+#    nTerror("Output: %s" % output)
+    nTerror("Status: %s" % status)
     return True
 # end def
 
 def get_cmd_output( cmd ):
-#    NTdebug( "Doing command: %s" % cmd )
+#    nTdebug( "Doing command: %s" % cmd )
 
     ##  Try command and check for non-zero exit status
 #    pipe = os.popen( cmd )
@@ -73,10 +73,10 @@ def get_cmd_output( cmd ):
 
     ## Success
     if ( status != None ):
-        NTerror("Failed shell command:")
-        NTerror( cmd )
-        NTerror("Output: %s" % output)
-        NTerror("Status: %s" % status)
+        nTerror("Failed shell command:")
+        nTerror( cmd )
+        nTerror("Output: %s" % output)
+        nTerror("Status: %s" % status)
     return output
 
 class ForkOff:
@@ -146,7 +146,7 @@ class ForkOff:
     def forkoff_start( self, job_list, delay_between_submitting_jobs=5 ):
 
         if self.processes_max == None or self.processes_max < 1: # double but just to be clear.
-            NTerror("Can't do jobs without having processes_max; processes_max: %s" % self.processes_max )
+            nTerror("Can't do jobs without having processes_max; processes_max: %s" % self.processes_max )
             return []
 
         ## Check job list for variable type errors
@@ -156,26 +156,26 @@ class ForkOff:
             if len(job) > 1:
                 args = job[1]
             if type(args) != types.TupleType:
-                NTerror("given argument not of type Tuple for job: %s", job)
+                nTerror("given argument not of type Tuple for job: %s", job)
                 return []
             if not ( type(func) == types.FunctionType or
                      type(func) == types.BuiltinFunctionType or
                      type(func) == types.MethodType ) :
-                NTerror("given function not of types:")
-                NTmessage("(Function, BuiltinFunctionType, or MethodType) for job:")
+                nTerror("given function not of types:")
+                nTmessage("(Function, BuiltinFunctionType, or MethodType) for job:")
                 print job
-                NTmessage("In stead type is : %s", type(func))
+                nTmessage("In stead type is : %s", type(func))
                 return []
 
         ## Maximum number of processes to do
         self.processes_todo = len( job_list )
         if self.processes_todo == 0:
             if self.verbosity:
-                NTwarning("No new processes to do so none to start")
+                nTwarning("No new processes to do so none to start")
             return []
 
         if self.verbosity > 1:
-            NTmessage("Doing %s new process(es)" % self.processes_todo)
+            nTmessage("Doing %s new process(es)" % self.processes_todo)
 
         ## Keep making processes until an uncaught Exception occurs
         ## That would be a ctrl-c or so. The ctrl-c is also caught by
@@ -190,8 +190,8 @@ class ForkOff:
             self.do_jobs( job_list, delay_between_submitting_jobs )
         except KeyboardInterrupt:
             if self.verbosity:
-                NTwarning("Caught interrupt in parent.")
-                NTwarning("Trying to finish up by waiting for subprocess(es)")
+                nTwarning("Caught interrupt in parent.")
+                nTwarning("Trying to finish up by waiting for subprocess(es)")
 
         ## Finish waiting for subprocesses
         ## Don't make any new!
@@ -200,9 +200,9 @@ class ForkOff:
             self.do_jobs( job_list, delay_between_submitting_jobs )
         except KeyboardInterrupt:
             if self.verbosity:
-                NTwarning("Again caught interrupt in parent. Will start to kill running jobs.")
+                nTwarning("Again caught interrupt in parent. Will start to kill running jobs.")
                 if self.hard_kill_started_jobs():
-                    NTerror("Failed hard killing running jobs")
+                    nTerror("Failed hard killing running jobs")
             raise KeyboardInterrupt
 
         ## Any subprocesses left
@@ -210,13 +210,13 @@ class ForkOff:
             key_list = self.process_d.keys()
             key_list.sort()
             for pid in key_list:
-                NTerror("subprocesses with fid [%s] was left behind with pid [%d]" \
+                nTerror("subprocesses with fid [%s] was left behind with pid [%d]" \
                       % ( self.process_d[ pid ], pid ))
 
         ## Check all were done
         if self.processes_finished != len( job_list ):
             if self.verbosity > 1:
-                NTwarning("only %s out of %s jobs were started (not all successfully finished perhaps)" \
+                nTwarning("only %s out of %s jobs were started (not all successfully finished perhaps)" \
                       % ( self.processes_finished, len( job_list ) ))
 
         ## Check if all finished correctly
@@ -226,7 +226,7 @@ class ForkOff:
             raise str
 
         if self.verbosity > 1:
-            NTmessage("Finished %s out of the %s processes successfully" \
+            nTmessage("Finished %s out of the %s processes successfully" \
                   % ( len( self.done_jobs_list), self.processes_todo ))
 
         ## List of job numbers that were done.
@@ -237,7 +237,7 @@ class ForkOff:
         Kill kill kill
         """
         keys = self.process_t.keys()
-        NTmessage("Killing jobs: %s" % str(keys))
+        nTmessage("Killing jobs: %s" % str(keys))
         ## Check to see if time's done for any
         for pid in keys:
             ## Pop pid/args from dictionary
@@ -247,8 +247,8 @@ class ForkOff:
             self.processes_open     -= 1
             self.processes_finished += 1
             if self.verbosity:
-                NTwarning("Process pid [%s] and fid [%s] will be killed" % (pid, fid))
-                NTwarning("Process is not considered done")
+                nTwarning("Process pid [%s] and fid [%s] will be killed" % (pid, fid))
+                nTwarning("Process is not considered done")
             _exit_pid, _exit_status = self.p.process_kill( pid )
         # end for
     # end def
@@ -262,7 +262,7 @@ class ForkOff:
         """
 
         if self.processes_max == None or self.processes_max < 1: # double but just to be clear.
-            NTerror("Can't do jobs without having processes_max; processes_max: %s" % self.processes_max )
+            nTerror("Can't do jobs without having processes_max; processes_max: %s" % self.processes_max )
             return True
 
         while ( self.processes_started  < self.processes_todo or
@@ -279,7 +279,7 @@ class ForkOff:
                 self.processes_open     += 1
                 self.processes_started  += 1
                 pid = self.p.process_fork( func, args )
-#                NTmessage("Process with pid [%s] exited with status [%s]" % \
+#                nTmessage("Process with pid [%s] exited with status [%s]" % \
 
                 ## Push pid/fid onto dictionary of things running
                 self.process_d[ pid ] = self.processes_started - 1
@@ -291,7 +291,7 @@ class ForkOff:
                     exit_pid, exit_status = self.p.process_wait( pid, os.WNOHANG )
                     if exit_pid:
                         if self.verbosity > 3:
-                            NTmessage("Process with pid [%s] exited with status [%s]" % \
+                            nTmessage("Process with pid [%s] exited with status [%s]" % \
                               (exit_pid, exit_status))
                         ## Pop pid/args from dictionary
                         fid = self.process_d[ exit_pid ]
@@ -302,10 +302,10 @@ class ForkOff:
                         ## Only consider things done if done correctly
                         if exit_status:
                             if self.verbosity:
-                                NTwarning("Process with fid: [%s] considered NOT done" % fid)
+                                nTwarning("Process with fid: [%s] considered NOT done" % fid)
                         else:
                             if self.verbosity > 3:
-                                NTmessage("Process with fid: [%s] considered done" % fid)
+                                nTmessage("Process with fid: [%s] considered done" % fid)
                             self.done_jobs_list.append( fid )
                 ## Give the cpu 1 second rest in between the checks
                 ## if no process has exited
@@ -323,8 +323,8 @@ class ForkOff:
                     self.processes_open     -= 1
                     self.processes_finished += 1
                     if self.verbosity:
-                        NTwarning("Process with fid [%s] was not done within time limits" % fid)
-                        NTwarning("Process is not considered done")
+                        nTwarning("Process with fid [%s] was not done within time limits" % fid)
+                        nTwarning("Process is not considered done")
                     _exit_pid, _exit_status = self.p.process_kill( pid )
                     ## If a process needed to be killed then
                     ## don't check for others in this iteration.
@@ -368,12 +368,12 @@ class Process:
             ## Parent here
             if self.verbosity > 3:
                 pass
-#                NTmessage("Forked an independent process with pid: %s" % pid)
+#                nTmessage("Forked an independent process with pid: %s" % pid)
             return pid
 
         if pid == None:
-            NTerror("pid is None after fork, unknown error to coder")
-            NTerror("child returns")
+            nTerror("pid is None after fork, unknown error to coder")
+            nTerror("child returns")
             return pid
 
         ## Subprocess here
@@ -384,83 +384,83 @@ class Process:
             str = "ERROR: code error in Fork, process_start, pid =" + `os.getpid()`
             raise str
         if self.verbosity > 2:
-            NTmessage("Starting subprocess with pid: %s" % os.getpid())
+            nTmessage("Starting subprocess with pid: %s" % os.getpid())
 #        if self.verbosity > 8:
-#            NTdebug("Setting gpid from [%s] to current pid" % os.getpgrp())
+#            nTdebug("Setting gpid from [%s] to current pid" % os.getpgrp())
 
         os.setpgid(0,0)
 #        if self.verbosity > 8:
-#            NTdebug("After setgpid: Current gpid: [%s], pid: [%s]" % (
+#            nTdebug("After setgpid: Current gpid: [%s], pid: [%s]" % (
 #                os.getpgrp(), os.getpid() ))
 
         try:
             exit_status = apply( function, arguments )
         except KeyboardInterrupt:
             if self.verbosity:
-                NTwarning("Caught KeyboardInterrupt in subprocess, subprocess will exit(1)")
+                nTwarning("Caught KeyboardInterrupt in subprocess, subprocess will exit(1)")
             os._exit(1)
 ##        except:
-##            NTerror("Caught exception other than KeyboardInterrupt, subprocess will exit(1)"
+##            nTerror("Caught exception other than KeyboardInterrupt, subprocess will exit(1)"
 ##            os._exit(1)
 
         if exit_status:
             if self.verbosity > 1:
-                NTmessage("Subprocess will do error exit with exit code 1")
+                nTmessage("Subprocess will do error exit with exit code 1")
             os._exit(1)
         else:
             if self.verbosity > 2:
-                NTdebug("Subprocess will do normal exit with exit code 0")
+                nTdebug("Subprocess will do normal exit with exit code 0")
             os._exit(0)
 
 
 
     def process_wait( self, pid=0, options=0 ):
 #        if self.verbosity > 8:
-#            NTdebug("Wait for process: [%s] with options: [%s] " % ( pid, options ))
+#            nTdebug("Wait for process: [%s] with options: [%s] " % ( pid, options ))
 
         ## Indicating failure
         exit_pid, exit_status = 0, self.exit_status_failure
 
         if os.getpid() == pid:
             if self.verbosity:
-                NTwarning("given pid is for current process, giving up")
+                nTwarning("given pid is for current process, giving up")
             return exit_pid, exit_status
 
         try:
             exit_pid, exit_status = os.waitpid(pid, options)
         except OSError, info:
             if self.verbosity:
-                NTwarning("caught an OSError with info: %s" % info)
+                nTwarning("caught an OSError with info: %s" % info)
 
         return exit_pid, exit_status
 
 
     def process_signal( self, pid, sig ):
         if self.verbosity > 1:
-            NTmessage("Signal process: [%s] with signal [%s]" % ( pid, sig ))
+            nTmessage("Signal process: [%s] with signal [%s]" % ( pid, sig ))
         if os.getpid() == pid:
             if self.verbosity:
-                NTwarning("given pid is for current process, giving up")
+                nTwarning("given pid is for current process, giving up")
             return 1
 
         try:
             os.kill( pid, sig )
         except OSError, info:
             if self.verbosity:
-                NTwarning("caught an OSError with info: %s" % info)
+                nTwarning("caught an OSError with info: %s" % info)
             return 0
 
 
     def process_kill( self, pid ):
         if self.verbosity > 1:
-            NTmessage("Signaling process: [%s] for a kill" % pid)
+            nTmessage("Signaling process: [%s] for a kill" % pid)
         if os.getpid() == pid:
             if self.verbosity:
-                NTwarning("given pid is for current process, giving up")
+                nTwarning("given pid is for current process, giving up")
             return 0, self.exit_status_failure
 
         if self.verbosity > 2:
-            NTmessage("Process and subprocesses will be signaled by a TERM signal")
+            nTmessage("Process and subprocesses will be signaled by a TERM signal")
         ## On my linux box urchin:
         ## HUP  1    TERM 15
         ## INT  2    KILL  9
@@ -469,27 +469,27 @@ class Process:
         ## Took 2 days to figure out...
         self.process_signal( -pid, signal.SIGTERM )
         if self.verbosity > 2:
-            NTmessage("Sleeping %s" % self.max_time_to_wait_kill)
+            nTmessage("Sleeping %s" % self.max_time_to_wait_kill)
         time.sleep(self.max_time_to_wait_kill)
         exit_pid, exit_status = self.process_wait( pid, os.WNOHANG )
         if exit_pid:
             if self.verbosity > 1:
-                NTmessage("Process with pid [%s] was killed by TERM signal" % exit_pid)
+                nTmessage("Process with pid [%s] was killed by TERM signal" % exit_pid)
         else:
             if self.verbosity > 2:
-                NTmessage("Process was not killed, now it will be signaled a KILL signal")
+                nTmessage("Process was not killed, now it will be signaled a KILL signal")
             self.process_signal( -pid, signal.SIGKILL )
             if self.verbosity > 2:
-                NTdebug("Sleeping %s" % self.max_time_to_wait_kill)
+                nTdebug("Sleeping %s" % self.max_time_to_wait_kill)
             time.sleep(self.max_time_to_wait_kill)
             exit_pid, exit_status = self.process_wait( pid, os.WNOHANG )
             if exit_pid > 1:
-                NTmessage("Process with pid [%s] was killed by KILL signal" % exit_pid)
+                nTmessage("Process with pid [%s] was killed by KILL signal" % exit_pid)
             else:
-                NTerror("  Process could NOT be killed by HUP or KILL signal")
-                NTerror("  Process has turned into zombie")
+                nTerror("  Process could NOT be killed by HUP or KILL signal")
+                nTerror("  Process has turned into zombie")
         if self.verbosity >= 9:
-            NTmessage("Got exit_pid, exit_status: %s, %s" % (exit_pid, exit_status))
+            nTmessage("Got exit_pid, exit_status: %s, %s" % (exit_pid, exit_status))
 
         return exit_pid, exit_status
 

@@ -7,7 +7,7 @@ from unittest import TestCase
 import unittest
 
 def plotTestHistoDihedral():
-    NTdebug("Starting plotTestHistoDihedral")
+    nTdebug("Starting plotTestHistoDihedral")
     ps = NTplotSet() # closes any previous plots
     ps.hardcopySize = (600,369)
 
@@ -25,7 +25,7 @@ def plotTestHistoDihedral():
     angleList.cAverage()
     goodAndOutliers = peirceTest( angleList )
     if not goodAndOutliers:
-        NTerror("No goodAndOutliers in plotTestHistoDihedral")
+        nTerror("No goodAndOutliers in plotTestHistoDihedral")
         return True
     angleList.good, angleList.outliers = goodAndOutliers
 
@@ -37,7 +37,7 @@ def plotTestHistoDihedral():
     angleList.outliers.limit( plotparams.min, plotparams.max, byItem=1 )
 
     xTicks = range(int(plotparams.min), int(plotparams.max+1), plotparams.ticksize)
-#        NTdebug("xTicks: " + `xTicks`)
+#        nTdebug("xTicks: " + `xTicks`)
 #        figWidth  = 600
 #        figHeight = None # Golden which turns out to be 369
 #            figHeight = figWidth * golden_mean
@@ -50,7 +50,7 @@ def plotTestHistoDihedral():
     ps.addPlot(plot)
 
     if not angleList.__dict__.has_key('good'):
-        NTerror("angleList.__dict__.has_key('good')")
+        nTerror("angleList.__dict__.has_key('good')")
         return True
 
     plot.histogram( angleList.good.zap(1),
@@ -80,20 +80,20 @@ def plotTestHistoDihedral():
     if bounds[0] < bounds[1]: # single box
         point = (bounds[0], 0) # lower left corner of only box.
         sizes = (bounds[1]-bounds[0],ylimMax)
-#            NTdebug("point: " + `point`)
-#            NTdebug("sizes: " + `sizes`)
+#            nTdebug("point: " + `point`)
+#            nTdebug("sizes: " + `sizes`)
         plot.box(point, sizes, boxAttributes(fillColor=plotparams.lower, alpha=alpha))
     else: # two boxes
         # right box
         point = (bounds[0], 0) # lower left corner of first box.
         sizes = (plotparams.max-bounds[0],ylimMax)
-#            NTdebug("point: " + `point`)
-#            NTdebug("sizes: " + `sizes`)
+#            nTdebug("point: " + `point`)
+#            nTdebug("sizes: " + `sizes`)
         plot.box(point, sizes, boxAttributes(fillColor=plotparams.lower, alpha=alpha))
         point = (plotparams.min, 0) # lower left corner of second box.
         sizes = (bounds[1]-plotparams.min,ylimMax)
-#            NTdebug("point: " + `point`)
-#            NTdebug("sizes: " + `sizes`)
+#            nTdebug("point: " + `point`)
+#            nTdebug("sizes: " + `sizes`)
         plot.box(point, sizes, boxAttributes(fillColor=plotparams.lower, alpha=alpha))
 
 
@@ -104,8 +104,8 @@ def plotTestHistoDihedral():
 #                   lineAttributes(color=plotparams.upper, width=width) )
 #
     # Always plot the cav line
-    plot.line( (aAv, 0), (aAv, ylimMax),
-               lineAttributes(color=plotparams.average, width=width) )
+    # pylint: disable=E1102    
+    plot.line( (aAv, 0), (aAv, ylimMax), lineAttributes(color=plotparams.average, width=width) )
 #                   dashdotline() )
     fnBase = "testPlotHistoDihedral"
     if True:
@@ -131,14 +131,14 @@ class NTplot2Checks(TestCase):
         plotTestHistoDihedral()
 
 
-    def tttestSelectPointsFromRange( self ):
+    def _testSelectPointsFromRange( self ):
         pointList = [ (-1,9), (0,9), (1,9) ]
         self.assertTrue( len(selectPointsFromRange( pointList, start=-1, length=3))==3)
         self.assertTrue( len(selectPointsFromRange( pointList, start=0, length=1))==1)
         self.assertTrue( len(selectPointsFromRange( pointList, start=1, length=1))==1)
         self.assertTrue( len(selectPointsFromRange( pointList, start=2, length=1))==0)
 
-    def tttestClipOn(self):
+    def _testClipOn(self):
         # Bug reported to sf.net project for matplot
         figure().add_subplot(111)
         text(0.5,0.95, 'matplottext',
@@ -150,11 +150,11 @@ class NTplot2Checks(TestCase):
              )
 #        show()
 
-    def tttestHelix(self):
+    def _testHelix(self):
         # Bug reported and fixed on sf.net project for matlibplot
         version = float(sys.version[:3])
         if version < 2.5:
-            NTdebug('Not checking for a bug does exist in previous python versions below 2.5 and the related matplotlib.')
+            nTdebug('Not checking for a bug does exist in previous python versions below 2.5 and the related matplotlib.')
             return
         figure().add_subplot(111)
         ax = gca()
@@ -171,7 +171,7 @@ class NTplot2Checks(TestCase):
         ax.set_ylim(ymax=10)
 #        show()
 
-    def tttestZaagtand(self):
+    def _testZaagtand(self):
         t = arange( 0.,360.,1.)
         s = triangularList( t )
         plot(t,s)

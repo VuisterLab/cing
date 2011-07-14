@@ -50,8 +50,8 @@ class AllChecks(TestCase):
 
             if showValues:
                 for coplanar in project.coplanars[0]:
-#                    NTdebug(coplanar.format())
-                    NTdebug('%r' % coplanar[X3DNA_STR])
+#                    nTdebug(coplanar.format())
+                    nTdebug('%r' % coplanar[X3DNA_STR])
 
             # Do not leave the old CCPN directory laying around since it might get added to by another test.
             if os.path.exists(entryId):

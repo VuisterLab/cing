@@ -2273,15 +2273,15 @@
 #            for i in range(0, ndihed):
 #                r.next()
 #
-#            NTmessage('\n#-----------------------------------------------------------------------')
-#            NTmessage('#\t%-8s %-8s %-8s %-8s %-8s %-8s %-8s',
+#            nTmessage('\n#-----------------------------------------------------------------------')
+#            nTmessage('#\t%-8s %-8s %-8s %-8s %-8s %-8s %-8s',
 #                   'internal', 'short', BMRB, IUPAC, PDB, CYANA, XPLOR
 #                  )
-#            NTmessage('RESIDUE\t%-8s %-8s %-8s %-8s %-8s %-8s %-8s',
+#            nTmessage('RESIDUE\t%-8s %-8s %-8s %-8s %-8s %-8s %-8s',
 #                    resname, shortName, resname, resname, resname, resname, resname
 #                  )
-#            NTmessage('\n#-----------------------------------------------------------------------')
-#            NTmessage('#\t%-8s          %-8s %-8s %-8s %-8s %-8s',
+#            nTmessage('\n#-----------------------------------------------------------------------')
+#            nTmessage('#\t%-8s          %-8s %-8s %-8s %-8s %-8s',
 #                   'internal', BMRB, IUPAC, PDB, CYANA, XPLOR
 #                  )
 #           # parse data from the atom lines
@@ -2302,11 +2302,11 @@
 #                    nameDefs[CYANA] = r.dollar[2]
 #                    nameDefs[INTERNAL] = r.dollar[2]
 #                                       
-#                    NTmessage( '\t%-8s          ', nameDefs['INTERNAL'] )
+#                    nTmessage( '\t%-8s          ', nameDefs['INTERNAL'] )
 #                    for n in [BMRB, IUPAC, PDB, CYANA, XPLOR]:
-#                        NTmessage( '%-8s ', nameDefs[n] )
-#                    NTmessage('')
-#            NTmessage( 'END_RESIDUE')
+#                        nTmessage( '%-8s ', nameDefs[n] )
+#                    nTmessage('')
+#            nTmessage( 'END_RESIDUE')
 #
 ##-----------------------------------------------------------------------
 ## main

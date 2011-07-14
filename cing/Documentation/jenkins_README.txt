@@ -3,7 +3,9 @@ https://wiki.jenkins-ci.org/display/JENKINS/Running+Jenkins+behind+Apache
 org.jenkins-ci.plist.plist
 
 # Use the .plist from $CINGROOT/scripts/cing for starting/stopping.
-sudo launchctl load /Library/LaunchAgents/org.jenkins-ci.plist
+# Use the -w flag to override the disabled parameter in the plist.
+# Normally jenkins on development is disabled.
+sudo launchctl load -w /Library/LaunchAgents/org.jenkins-ci.plist
 
 
 # Or directly:

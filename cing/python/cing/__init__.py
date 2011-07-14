@@ -97,9 +97,10 @@ cingPythonCingDir = os.path.split(__file__)[0]
 cingPythonDir = os.path.split(cingPythonCingDir)[0]
 # Now a very important variable used through out the code. Even though the
 # environment variable CINGROOT is defined the same this is the preferred
-# source for the info within the CING python code. GWV does not understand why
+# source for the info within the CING python code. GWV does not understand why. JFD: because it is
+# nice to have a cached version instead of having to query the os.
 cingRoot = os.path.split(cingPythonDir)[0]
-#NTdebug("cingRoot        : " + cingRoot)
+#nTdebug("cingRoot        : " + cingRoot)
 ######################################################################################################
 cingDirTests           = os.path.join(cingRoot,         "Tests")
 cingDirMolmolScripts   = os.path.join(cingRoot,         "scripts", "molmol")
@@ -156,7 +157,7 @@ try:
         sys.path.append(os.path.join(yasaradir,'pym'))
         sys.path.append(os.path.join(yasaradir,'plg'))
     else:
-        NTcodeerror('Yasara directory "%s" as defined in yasara.py module not found', yasaradir)
+        nTcodeerror('Yasara directory "%s" as defined in yasara.py module not found', yasaradir)
         exit(1)
 except:
     yasaradir = None

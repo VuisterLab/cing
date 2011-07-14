@@ -367,7 +367,7 @@ def semicolon_block_collapse( text ):
 
     # Original code: can't handle re matches that are too long
     #text, count = pattern_semicolon_block.subn( semicolon_block_replace, text )
-#    NTdebug('Done [%s] subs with semicolon blocks' % count)
+#    nTdebug('Done [%s] subs with semicolon blocks' % count)
     return text
 
 def semicolon_block_expand( text ):
@@ -484,7 +484,7 @@ def comments_strip( text ):
         i += 1
 
 #    if verbosity >= 9:
-#    NTdebug( 'Done [%s] comment subs' % count )
+#    nTdebug( 'Done [%s] comment subs' % count )
     if lines:
         text = "\n".join(lines)
 #    text = lines.join("\n")

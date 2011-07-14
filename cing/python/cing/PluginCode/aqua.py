@@ -47,20 +47,20 @@ def export2aqua(project, tmp=None):
     for drLoL in drLoLoL:
         typeId += 1
         if not drLoL:
-            NTmessage("No %s list to export" % extensionList[typeId])
+            nTmessage("No %s list to export" % extensionList[typeId])
         count = 0
         for drl in drLoL:
             count += len(drl)
         if not count:
-#            NTdebug("Skipping export of empty restraint list")
+#            nTdebug("Skipping export of empty restraint list")
             continue
         # Instead of project.directories.aqua perhaps use project.moleculeDirectories.procheck
         exportPath = project.directories.aqua
         path = project.path(exportPath, project.name + '.' + extensionList[typeId])
-#        NTmessage("Writing to: " + path)
+#        nTmessage("Writing to: " + path)
         fp = open(path, 'w')
         if not fp:
-            NTerror('Unable to open: ' + path)
+            nTerror('Unable to open: ' + path)
             return
         countActual = 0
         restraintListText = []
@@ -85,10 +85,10 @@ def export2aqua(project, tmp=None):
                         lower = MIN_DISTANCE_ANY_ATOM_PAIR
                     if not isinstance(lower, float):
                         # JFD Failed to reproduce the cause of issue 185 so keeping this statement in.
-                        NTcodeerror("What is the lower class: %s" % lower.__class__) 
+                        nTcodeerror("What is the lower class: %s" % lower.__class__) 
                         return True
 
-#                    NTdebug("lower: %s" % lower)
+#                    nTdebug("lower: %s" % lower)
                     fmt = '%8.3f'
                     upperStr = val2Str(upper, fmt)
                     if not upperStr:
@@ -101,7 +101,7 @@ def export2aqua(project, tmp=None):
                                  dr.atomPairs[0][0].export2aqua(),
                                  dr.atomPairs[0][1].export2aqua(),
                                  upperStr, lowerStr)
-#                    NTdebug("result: %s" % result)
+#                    nTdebug("result: %s" % result)
 
                     if len(dr.atomPairs) > 1:
                         msgHol.appendWarning("Ambiguous restraint exported as unambiguous for Aqua  [%r]" % ambiDistanceCount)
@@ -158,9 +158,9 @@ def export2aqua(project, tmp=None):
                 else:
                     msgHol.appendWarning("Skipped restraint")
         if ambiDistanceCount:
-            NTwarning("Ambiguous distance restraint exported as unambiguous for Aqua for count: [%s]" % ambiDistanceCount)
+            nTwarning("Ambiguous distance restraint exported as unambiguous for Aqua for count: [%s]" % ambiDistanceCount)
         if skippedDihedralCount:
-            NTwarning("Dihedral angle restraint not exported                for Aqua for count: [%s]" % skippedDihedralCount)
+            nTwarning("Dihedral angle restraint not exported                for Aqua for count: [%s]" % skippedDihedralCount)
         if countActual:
             # Important to let the join do this as one for optimalization.
             restraintListTextCombined = '\n'.join(restraintListText)
@@ -169,7 +169,7 @@ def export2aqua(project, tmp=None):
             fprintf(fp, restraintListTextCombined)
             fp.close()
         else:
-            NTwarning("Failed to convert a single restraint of this type: " + restraintTypeList[typeId])
+            nTwarning("Failed to convert a single restraint of this type: " + restraintTypeList[typeId])
             encounteredError = True
 
     msgHol.showMessage()

@@ -43,59 +43,59 @@ def printSequenceFromCcpnProject(ccpnProject):
           code1Letter = defaultPrintChainCode
 
         fastaString += code1Letter
-        NTmessageNoEOL('%s%s ' % (res.ccpCode, res.seqCode))
+        nTmessageNoEOL('%s%s ' % (res.ccpCode, res.seqCode))
         if not (res.seqCode % 10):
-            NTmessage('')
-    NTmessage('')
-    NTmessage("Sequence from CCPN project:")
-    NTmessage(fastaString)
+            nTmessage('')
+    nTmessage('')
+    nTmessage("Sequence from CCPN project:")
+    nTmessage(fastaString)
 
 def importPseudoPdb(ccpnProject, inputDir, guiRoot, allowPopups=1, minimalPrompts=0, verbose=1, **presets):
-    NTdebug("Using presets %s" % `presets`)
+    nTdebug("Using presets %s" % `presets`)
     formatPseudoPdb = PseudoPdbFormat(ccpnProject, guiRoot, verbose=verbose, minimalPrompts=minimalPrompts, allowPopups=allowPopups)
     nmrProject = ccpnProject.currentNmrProject
 #        nmrProject = project.newNmrProject(name=project.name)
     structureEnsembleList = ccpnProject.sortedStructureEnsembles()
     if len(structureEnsembleList) != 1:
-        NTerror("Failed to find single structureEnsemble; instead found: %d" % len(structureEnsembleList) )
+        nTerror("Failed to find single structureEnsemble; instead found: %d" % len(structureEnsembleList) )
     structureEnsemble = ccpnProject.findFirstStructureEnsemble()
     if structureEnsemble:
-        NTmessage("In importPseudoPdb, removing first found structureEnsemble")
+        nTmessage("In importPseudoPdb, removing first found structureEnsemble")
         structureEnsemble.delete()
     else:
-        NTwarning("No structureEnsemble found; can't remove it.")
+        nTwarning("No structureEnsemble found; can't remove it.")
 
     structureGenerationList = nmrProject.sortedStructureGenerations()
     if not structureGenerationList:
-        NTdebug("No or empty structureGenerationList; creating a new one.")
+        nTdebug("No or empty structureGenerationList; creating a new one.")
         nmrProject.newStructureGeneration()
         structureGenerationList = nmrProject.sortedStructureGenerations()
 
     if len(structureGenerationList) != 1:
-        NTerror("Failed to find single structureGeneration; instead found: %d" % len(structureGenerationList) )
+        nTerror("Failed to find single structureGeneration; instead found: %d" % len(structureGenerationList) )
 
     structureGeneration = structureGenerationList[0]
 #        structureGeneration = nmrProject.findFirstStructureGeneration()
 #        structureGeneration = nmrProject.newStructureGeneration()
     if not structureGeneration:
-        NTerror("Failed to find or create structureGeneration")
+        nTerror("Failed to find or create structureGeneration")
         return True
 
     globPattern = inputDir + '/*.pdb'
     fileList = glob(globPattern)
-    NTdebug("From %s will read files: %s" % (globPattern, fileList))
+    nTdebug("From %s will read files: %s" % (globPattern, fileList))
     if len(fileList) != 1:
-        NTerror("Failed to find single PDB file; instead found list: %s" % `fileList`)
+        nTerror("Failed to find single PDB file; instead found list: %s" % `fileList`)
         return True
 
     keywds = getDeepByKeysOrDefault(presets, {}, READ_COORDINATES, KEYWORDS)
-    NTdebug("In importPseudoPdb: from getDeepByKeysOrDefault keywds: %s" % `keywds`)
+    nTdebug("In importPseudoPdb: from getDeepByKeysOrDefault keywds: %s" % `keywds`)
     reportDifference(ccpnProject, fileList[0])
 
     status = formatPseudoPdb.readCoordinates(fileList, strucGen=structureGeneration, linkAtoms=0, swapFirstNumberAtom=1,
         minimalPrompts=minimalPrompts, verbose=verbose, **keywds)
     if not status: # can return None or False on error
-        NTerror("Failed to formatPseudoPdb.readCoordinates")
+        nTerror("Failed to formatPseudoPdb.readCoordinates")
         return True # returns True on error
 
 def swapCheck(nmrConstraintStore,structureEnsemble,numSwapCheckRuns=1):
@@ -110,7 +110,7 @@ def swapCheck(nmrConstraintStore,structureEnsemble,numSwapCheckRuns=1):
 
     """
 
-    NTmessage("\n### Checking stereo swaps and deassignment ###")
+    nTmessage("\n### Checking stereo swaps and deassignment ###")
 
 #    swapCheck = StereoAssignmentSwapCheck(nmrConstraintStore,structureEnsemble,verbose = True)
     swapCheck = StereoAssignmentCleanup(nmrConstraintStore,structureEnsemble,verbose = True)
@@ -124,7 +124,7 @@ def swapCheck(nmrConstraintStore,structureEnsemble,numSwapCheckRuns=1):
 #      swapCheck.checkSwapsAndClean(violationCodes = violationCodes)
       swapCheck.checkSwapsAndClean()
 
-    NTmessage("\n")
+    nTmessage("\n")
 # end def
 
 def fcProcessEntry( entry_code, ccpnTgzFile, outputCcpnTgzFile, functionToRun='swapCheck'):
@@ -169,21 +169,21 @@ def fcProcessEntry( entry_code, ccpnTgzFile, outputCcpnTgzFile, functionToRun='s
         guiRoot = Tkinter.Tk()
 
     if not os.path.exists(ccpnTgzFile):
-        NTerror("Input file not found: %s" % ccpnTgzFile)
+        nTerror("Input file not found: %s" % ccpnTgzFile)
         return True
-    NTdebug("Looking at %s" % entry_code)
+    nTdebug("Looking at %s" % entry_code)
 
     if os.path.exists(entry_code):
-        NTmessage("Removing previous directory: %s" % entry_code)
+        nTmessage("Removing previous directory: %s" % entry_code)
         rmtree(entry_code)
     do_cmd("tar -xzf " + ccpnTgzFile) # will unpack to cwd.
     if os.path.exists('linkNmrStarData'):
-        NTmessage("Renaming standard directory linkNmrStarData to entry: %s" % entry_code)
+        nTmessage("Renaming standard directory linkNmrStarData to entry: %s" % entry_code)
         os.rename('linkNmrStarData', entry_code)
 
     ccpnProject = loadProject(entry_code)
     if not ccpnProject:
-        NTerror("Failed to read project: %s" % entry_code)
+        nTerror("Failed to read project: %s" % entry_code)
         return True
 
     if doSwapCheck:
@@ -194,18 +194,18 @@ def fcProcessEntry( entry_code, ccpnTgzFile, outputCcpnTgzFile, functionToRun='s
             if structureEnsemble:
                 swapCheck(nmrConstraintStore, structureEnsemble)
             else:
-                NTmessage("Failed to find structureEnsemble; skipping swapCheck")
+                nTmessage("Failed to find structureEnsemble; skipping swapCheck")
         else:
-            NTmessage("Failed to find nmrConstraintStore; skipping swapCheck")
+            nTmessage("Failed to find nmrConstraintStore; skipping swapCheck")
 #        constraintsHandler.swapCheck(nmrConstraintStore, structureEnsemble, numSwapCheckRuns)
     # end if doSwapCheck
 
     if doSaveProject:
-        NTmessage('Saving to new path: %s' % entry_code)
+        nTmessage('Saving to new path: %s' % entry_code)
         saveProject(ccpnProject, newPath=entry_code, removeExisting=True)
     if doExport:
         if os.path.exists(outputCcpnTgzFile):
-            NTmessage("Overwriting: " + outputCcpnTgzFile)
+            nTmessage("Overwriting: " + outputCcpnTgzFile)
         myTar = tarfile.open(outputCcpnTgzFile, mode='w:gz') # overwrites
         myTar.add(entry_code)
         myTar.close()
@@ -225,37 +225,37 @@ def getBmrbCsCountsFromFile(inputStarFile):
 
     reportedSpinType = []
     for valuesFile in getattr(nmrStarFile, fileType):
-#        NTdebug("getBmrbCsCountsFromFile valuesFile: %s" % valuesFile)
+#        nTdebug("getBmrbCsCountsFromFile valuesFile: %s" % valuesFile)
         valueList = getattr(valuesFile, measurementType)
-#        NTdebug("getBmrbCsCountsFromFile size valueList: %s" % len(valueList))
+#        nTdebug("getBmrbCsCountsFromFile size valueList: %s" % len(valueList))
         for value in valueList:
             # value is a ccp.format.nmrStar.chemShiftsIO.NmrStarChemShift instance
-#            NTdebug("in NmrStar.NmrStarHandler.readNmrStarFile value: %s" % value)
+#            nTdebug("in NmrStar.NmrStarHandler.readNmrStarFile value: %s" % value)
             csAtomType = getDeepByKeysOrAttributes( bmrbAtomType2spinTypeCingMap, value.atomType )
 #            resTypeBMRB = getDeepByKeysOrAttributes(  value, 'resLabel'' )
 #            atomName = getDeepByKeysOrAttributes(  value, 'atomName' )
             if not csAtomType:
                 if csAtomType not in reportedSpinType:
-#                    NTdebug("Skipping CS for less common atom type: %s" %  value.atomType )
+#                    nTdebug("Skipping CS for less common atom type: %s" %  value.atomType )
                     reportedSpinType.append(csAtomType)
                 continue
             if not hasattr( assignmentCountMap, csAtomType ):
                 if csAtomType not in reportedSpinType:
-#                    NTdebug("Skipping CS for atom type unfit for CS: %s" % value)
+#                    nTdebug("Skipping CS for atom type unfit for CS: %s" % value)
                     reportedSpinType.append(csAtomType)
                 continue
             assignmentCountMap[ csAtomType] += 1
         # end for
     # end for
-#    NTdebug("Read: %s" % str(assignmentCountMap))
+#    nTdebug("Read: %s" % str(assignmentCountMap))
     return assignmentCountMap
 # end def
 
 if __name__ == '__main__':
     cing.verbosity = verbosityDebug
 
-    NTmessage(header)
-    NTmessage(getStartMessage())
+    nTmessage(header)
+    nTmessage(getStartMessage())
 
     destination = sys.argv[1]
     hasPdbId = False
@@ -272,7 +272,7 @@ if __name__ == '__main__':
     argListOther = []
     if len(sys.argv) > startArgListOther:
         argListOther = sys.argv[startArgListOther:]
-    NTmessage('\nGoing to destination: %s with(out) on entry_code %s with extra arguments %s' % (destination, entry_code, str(argListOther)))
+    nTmessage('\nGoing to destination: %s with(out) on entry_code %s with extra arguments %s' % (destination, entry_code, str(argListOther)))
 
     try:
         if destination == 'fcProcessEntry':
@@ -280,11 +280,11 @@ if __name__ == '__main__':
             outputCcpnTgzFile = argListOther[1]
             functionToRun = argListOther[2]
             if fcProcessEntry( entry_code, ccpnTgzFile, outputCcpnTgzFile, functionToRun ):
-                NTerror("Failed to fcProcessEntry")
+                nTerror("Failed to fcProcessEntry")
         else:
-            NTerror("Unknown destination: %s" % destination)
+            nTerror("Unknown destination: %s" % destination)
     except:
         NTtracebackError()
     finally:
-        NTmessage(getStopMessage(cing.starttime))
+        nTmessage(getStopMessage(cing.starttime))
 

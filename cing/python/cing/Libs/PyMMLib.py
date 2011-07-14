@@ -1,3 +1,5 @@
+#@PydevCodeAnalysisIgnore # pylint: disable-all
+
 ## Copyright 2002 by PyMMLib Development Group (see AUTHORS file)
 ## This code is part of the PyMMLib distribution and governed by
 ## its license.  Please see the LICENSE file that should have been
@@ -54,7 +56,7 @@ class PDBRecord( NTdict ):
         ln = self._name
 
         for (field, start, end, ftype, just, get_func) in self._field_list:
-#            NTdebug( "field, start, end, ftype, just, get_func: %s %s %s %s %s %s", field, start, end, ftype, just, get_func)
+#            nTdebug( "field, start, end, ftype, just, get_func: %s %s %s %s %s %s", field, start, end, ftype, just, get_func)
             try:
                 assert len(ln) <= (start - 1)
             except AssertionError:
@@ -139,8 +141,8 @@ class PDBRecord( NTdict ):
                     s = int(s)
                 except ValueError:
                     if s.strip() != "":
-                        NTwarning("PDB parser: int(%s) failed on record" % (s))
-                        NTwarning(str(line))
+                        nTwarning("PDB parser: int(%s) failed on record" % (s))
+                        nTwarning(str(line))
                     continue
 
             elif ftype.startswith("float"):
@@ -148,8 +150,8 @@ class PDBRecord( NTdict ):
                     s = float(s)
                 except ValueError:
                     if s.strip() != "":
-                        NTwarning("PDB parser: float(%s) failed on record" % (s))
-                        NTwarning(str(line))
+                        nTwarning("PDB parser: float(%s) failed on record" % (s))
+                        nTwarning(str(line))
                     continue
 
             self[field] = s
@@ -1515,7 +1517,7 @@ class PDBFile(list):
         """
 
         if fileName.endswith('.gz'):
-            fil = GzipFile(fileName, 'rb');
+            fil = GzipFile(fileName, 'rb')
         else:
             fil = OpenFile(fileName, "r")
 
@@ -1558,7 +1560,7 @@ class PDBFile(list):
                 if rname == 'FTNOTE':
                     continue
                 if rname not in ignoreList:
-                    NTmessage("PDB parser: unknown record type: %s"%(rname))
+                    nTmessage("PDB parser: unknown record type: %s"%(rname))
                 continue
 
             ## create/add/parse the record
@@ -1568,7 +1570,7 @@ class PDBFile(list):
                 atomCount += 1
             self.append(pdb_record)
 
-#        NTdebug("PDBFile: read %d records (%d atoms) from %s", len(self), atomCount, fileName )
+#        nTdebug("PDBFile: read %d records (%d atoms) from %s", len(self), atomCount, fileName )
 
     def save_file(self, fil):
         """Saves the PDBFile object in PDB file format to File object fil.
@@ -1587,10 +1589,10 @@ class PDBFile(list):
         i = 0
         for record in self:
             fprintf( fp, '%s\n', record )
-#            NTdebug("now at record: %6d" % i )
+#            nTdebug("now at record: %6d" % i )
             i += 1
         fp.close()
-#        NTdebug("Written %d PDB records to %s", len( self ), path )
+#        nTdebug("Written %d PDB records to %s", len( self ), path )
         #end if
     #end def
     ## end gv adds

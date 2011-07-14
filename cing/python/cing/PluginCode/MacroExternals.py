@@ -11,7 +11,7 @@ try:
     import yasaramodule as yasara #@UnresolvedImport
 except:
     pass
-#    NTdebug("Yasara is not available for interactive work in CING; no problem have a homebrew")
+#    nTdebug("Yasara is not available for interactive work in CING; no problem have a homebrew")
 
 MolmolColorDict = dict(green = '0 1 0', orange = '1 0.647 0', red = '1 0 0')
 
@@ -41,7 +41,7 @@ def mkMacros(project):
     """
     makePdbForMacros(project)
 
-    NTmessage('==> Generating Macros')
+    nTmessage('==> Generating Macros')
     makePyMolMacros(project)
     makeMolmolMacros(project)
     mkYasaraMacros(project)
@@ -52,7 +52,7 @@ def makePdbForMacros(project):
     Other todos
     Link naar macros vanaf de project page. TODO: finish coding.
     """
-#    NTmessage('==> Exporting pdb files with one and all models for macros.')
+#    nTmessage('==> Exporting pdb files with one and all models for macros.')
     pass
 #    pathPdb = project.path( project.directories.PDB )
 #    path = os.path.join( pathPdb, project.molecule.name + '.pdb')
@@ -67,7 +67,7 @@ def makePyMolMacros(project):
     Generate the pyMol macros in the moleculeDirectories.pyMol dir.
     """
     if not project.molecule:
-        NTerror('makeMolmolMacros: no molecule defined')
+        nTerror('makeMolmolMacros: no molecule defined')
         return
     #end if
     makePyMolByResidueMacro(project, ['procheck', 'gf'],
@@ -91,7 +91,7 @@ def makeMolmolMacros(project):
     Generate the Molmol macros in the moleculeDirectories.molmol dir.
     """
     if not project.molecule:
-        NTerror('makeMolmolMacros: no molecule defined')
+        nTerror('makeMolmolMacros: no molecule defined')
         return
     #end if
     makeMolmolByResidueMacro(project, ['procheck', 'gf'],
@@ -114,7 +114,7 @@ def mkYasaraMacros(project):
     Generate the Yasara macros in the moleculeDirectories.yasara dir.
     """
     if not project.molecule:
-        NTerror('mkYasaraMacros: no molecule defined')
+        nTerror('mkYasaraMacros: no molecule defined')
         return
     #end if
     mkYasaraByResidueMacro(project, ['procheck', 'gf'],
@@ -136,7 +136,7 @@ def makePyMolByResidueROGMacro(project, path = None):
     """See doc at:
 http://pymolwiki.org/index.php/Color#Reassigning_B-Factors_and_Coloring
 """
-#    NTdebug('makePyMolByResidueROGMacro')
+#    nTdebug('makePyMolByResidueROGMacro')
 
     _scriptStartupTxt = """#!/usr/bin/env python
 # Or execute: python THIS_FILE
@@ -189,7 +189,7 @@ pymol.finish_launching()
     if path:
         writeTextToFile(path, macroTxt)
     else:
-        NTmessage(macroTxt)
+        nTmessage(macroTxt)
     #end if
 #end def
 
@@ -203,7 +203,7 @@ def makePyMolReadPdbMacro(project, path = None):
     if path:
         writeTextToFile(path, macroTxt)
     else:
-        NTmessage(macroTxt)
+        nTmessage(macroTxt)
 
 
 
@@ -214,7 +214,7 @@ def makePyMolByResidueMacro(project, keys,
     """From http://pymolwiki.org/index.php/Color#Reassigning_B-Factors_and_Coloring
     http://pymolwiki.org/index.php/Command_Line_Options
     """
-#    NTdebug('makePyMolByResidueMacro: keys: %s, minValue: %s maxValue: %s reverseColorScheme: %s', keys, minValue, maxValue, reverseColorScheme)
+#    nTdebug('makePyMolByResidueMacro: keys: %s, minValue: %s maxValue: %s reverseColorScheme: %s', keys, minValue, maxValue, reverseColorScheme)
 
     # Just for testing:
     pdbCode = '1brv'
@@ -267,14 +267,14 @@ spectrum b, %s, selection=all, minimum=minValue, maximum=maxValue
     if path:
         writeTextToFile(path, macroTxt)
     else:
-        NTmessage(macroTxt)
+        nTmessage(macroTxt)
     #end if
 #end def
 
 
 def makeMolmolByResidueROGMacro(project, path = None):
 
-#    NTdebug('makeMolmolByResidueROGMacro')
+#    nTdebug('makeMolmolByResidueROGMacro')
 
     macroTxt = """%s
 
@@ -318,7 +318,7 @@ SelectBond 'prev_sel'
     if path:
         writeTextToFile(path, macroTxt)
     else:
-        NTmessage(macroTxt)
+        nTmessage(macroTxt)
     #end if
 
 #end def
@@ -331,7 +331,7 @@ def mapValueToMolmolColor(value, minValue, maxValue, reverseColorScheme, msgHol=
     if minValue > maxValue:
 #        msg = "mapValueToMolmolColor: minValue > maxValue (%s > %s) which is impossible in algorithm, swapping" % (minValue, maxValue)
 #        if msgHol == None:
-#            NTwarning(msg)
+#            nTwarning(msg)
 #        else:
 #            msgHol.appendWarning(msg)
         swapMemory = minValue
@@ -340,14 +340,14 @@ def mapValueToMolmolColor(value, minValue, maxValue, reverseColorScheme, msgHol=
     if value > maxValue:
 #        msg = "mapValueToMolmolColor: value > maxValue (%s > %s) got limited to bound" % (value, maxValue)
 #        if msgHol == None:
-#            NTwarning(msg)
+#            nTwarning(msg)
 #        else:
 #            msgHol.appendWarning(msg)
         value = maxValue
     if value < minValue:
 #        msg = "mapValueToMolmolColor: value < minValue (%s > %s) got limited to bound" % (value, minValue)
 #        if msgHol == None:
-#            NTwarning(msg)
+#            nTwarning(msg)
 #        else:
 #            msgHol.appendWarning(msg)
         value = minValue
@@ -371,7 +371,7 @@ def mapValueToMolmolColor(value, minValue, maxValue, reverseColorScheme, msgHol=
         colorGreen = 2. * (fractionOnZeroToOne - 0.5)
         colorBlue = 0.
     molmolColor = "%s %s %s" % (colorRed, colorGreen, colorBlue)
-#    NTdebug( "mapValueToMolmolColor fraction %s red, green, blue: %s" %(fractionOnZeroToOne, molmolColor) )
+#    nTdebug( "mapValueToMolmolColor fraction %s red, green, blue: %s" %(fractionOnZeroToOne, molmolColor) )
     return molmolColor
 
 def makeMolmolByResidueMacro(project, keys,
@@ -379,7 +379,7 @@ def makeMolmolByResidueMacro(project, keys,
                             path = None
                            ):
 
-#    NTdebug('makeMolmolByResidueMacro: keys: %s, minValue: %s maxValue: %s reverseColorScheme: %s', keys, minValue, maxValue, reverseColorScheme)
+#    nTdebug('makeMolmolByResidueMacro: keys: %s, minValue: %s maxValue: %s reverseColorScheme: %s', keys, minValue, maxValue, reverseColorScheme)
     macroTxt = \
 """%s
 
@@ -421,7 +421,7 @@ SelectBond 'prev_sel'
     if path:
         writeTextToFile(path, macroTxt)
     else:
-        NTmessage(macroTxt)
+        nTmessage(macroTxt)
     #end if
 #end def
 
@@ -430,7 +430,7 @@ def mkYasaraByResidueMacro(project, keys,
                             path = None
                            ):
 
-#    NTdebug('mkYasaraByResidueMacro: keys: %s, minValue: %s maxValue: %s', keys, minValue, maxValue)
+#    nTdebug('mkYasaraByResidueMacro: keys: %s, minValue: %s maxValue: %s', keys, minValue, maxValue)
 
     if path:
         stream = open(path, 'w')

@@ -2,6 +2,7 @@
 Unit test execute as:
 python $CINGROOT/python/cing/PluginCode/test/test_ccpn_2.py
 """
+
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.PluginCode.Ccpn import Ccpn
 from cing.PluginCode.Ccpn import getProjectNameInFileName
@@ -14,14 +15,14 @@ import unittest
 
 class AllChecks(TestCase):
 
-    def tttestIsRootDirectory(self):
+    def _testIsRootDirectory(self):
         self.assertTrue( isRootDirectory("linkNmrStarData/"))
         self.assertTrue( isRootDirectory("linkNmrStarData//"))
         self.assertFalse( isRootDirectory("linkNmrStarData/ccp/"))
         self.assertFalse( isRootDirectory("linkNmrStarData/ccp//"))
 
 
-    def tttestRestraintsValuesRegular(self):
+    def _testRestraintsValuesRegular(self):
         _alsoSee = """See http://code.google.com/p/cing/issues/detail?id=121"""
 
         msgHoL = MsgHoL()
@@ -41,7 +42,8 @@ class AllChecks(TestCase):
                  (5.0, - 5.0, None, None, Ccpn.RESTRAINT_IDX_DIHEDRAL), # Is a range of 350 degrees.
                  (None, None, - 10.0, 20.0, Ccpn.RESTRAINT_IDX_DIHEDRAL), # Is a range of 20 degrees.
                  (None, None, 350.0, 20.0, Ccpn.RESTRAINT_IDX_DIHEDRAL), # Same.
-                 (None, None, 123.0, 200.0, Ccpn.RESTRAINT_IDX_DIHEDRAL), # Give a reasonable warning and sets to full circle by setting to (0,-SMALL_FLOAT_FOR_DIHEDRAL_ANGLES)
+                 (None, None, 123.0, 200.0, Ccpn.RESTRAINT_IDX_DIHEDRAL), 
+                 # Give a reasonable warning and sets to full circle by setting to (0,-SMALL_FLOAT_FOR_DIHEDRAL_ANGLES)
                    ]
         cingRlist = [
                      (0.0, 3.0),
@@ -82,7 +84,7 @@ class AllChecks(TestCase):
                 self.assertEquals(ci[0], cie[0])
                 self.assertEquals(ci[1], cie[1])
             msgHoL.showMessage(999, 999, 999, 999)
-    def tttestPatchCcpnResDescriptor(self):
+    def _testPatchCcpnResDescriptor(self):
         rList = [ # result, description, ccpnMolType, linking,
                  ['neutral', 'prot:H3', Ccpn.CCPN_PROTEIN, Ccpn.CCPN_START],
                  ['prot:H3', 'prot:H3', Ccpn.CCPN_RNA, Ccpn.CCPN_START], # do not touch!
@@ -93,7 +95,7 @@ class AllChecks(TestCase):
 
         for i in range(len(rList)):
             d = rList[i]
-            NTdebug("d: %s" % d)
+            nTdebug("d: %s" % d)
             self.assertEquals(d[0], patchCcpnResDescriptor(d[1], d[2], d[3]))
     # end def
 
@@ -113,11 +115,11 @@ class AllChecks(TestCase):
 
         for i in range(len(rList)):
             d = rList[i]
-            NTdebug("d: %s" % d)
+            nTdebug("d: %s" % d)
             self.assertEquals(d[1], modifyResidueDescriptorForTerminii( d[0], d[3], seqLength, d[2]))
 
 
-    def tttestCcpnProjectNameFromFileName(self):
+    def _testCcpnProjectNameFromFileName(self):
         inputList = ["BASP/memops/Implementation/BASP.xml",
                      "/X/Y/memops/Implementation/BASP.xml", # base not important.
                      "bla.xml",
@@ -130,7 +132,7 @@ class AllChecks(TestCase):
                         ]
         for i, input in enumerate(inputList):
             result = getProjectNameInFileName(input)
-            NTdebug( "i, input, result, expected: [%s] [%s] [%s] [%s]" % ( i, input, result, expectedList[i]))
+            nTdebug( "i, input, result, expected: [%s] [%s] [%s] [%s]" % ( i, input, result, expectedList[i]))
             self.assertEquals(expectedList[i], result)
 
 

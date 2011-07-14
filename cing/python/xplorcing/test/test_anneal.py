@@ -11,18 +11,19 @@ from unittest import TestCase
 import unittest
 
 class AllChecks(TestCase):
-
+    'Test case'
     entryList = "2fwu".split()
 #    entryList = "protG".split()
 #    entryList = "1brv".split()
     def _test_anneal(self):
+        'Test the anneal'
         cingDirTmpTest = os.path.join( cingDirTmp, getCallerName() )
         mkdirs( cingDirTmpTest )
         self.failIf(os.chdir(cingDirTmpTest), msg =
             "Failed to change to test directory for files: " + cingDirTmpTest)
         inputArchiveDir = os.path.join(cingDirTestsData, "xplor")
-        for i,entryId in enumerate(AllChecks.entryList): #@UnusedVariable
-            NTmessage('Doing entry %s' % entryId)
+        for _i,entryId in enumerate(AllChecks.entryList):
+            nTmessage('Doing entry %s' % entryId)
             cingDirTmpTestEntry = entryId
             mkdirs( cingDirTmpTestEntry )
             self.failIf(os.chdir(cingDirTmpTestEntry), msg =
@@ -30,7 +31,7 @@ class AllChecks(TestCase):
             do_cmd( "rm -f *_extended_*.pdb* >& /dev/null" )
             inputDir = os.path.join(inputArchiveDir, entryId )
             self.failIf( not os.path.exists(inputDir), "Missing input dir " + inputDir)
-            NTmessage('Trying to copy input files' )
+            nTmessage('Trying to copy input files' )
             copydir( os.path.join(inputDir, '*'), '.')
             xplorExecutable = '/Users/jd/workspace/xplor-nih-2.27/bin/xplor'
             xplorScript = '$CINGROOT/python/xplorcing/anneal.py'
@@ -41,9 +42,9 @@ class AllChecks(TestCase):
 #                os.getcwd(), # outputDir
                 )
             if do_cmd( cmd ):
-                NTerror("Failed anneal")
+                nTerror("Failed anneal")
             else:
-                NTmessage("Succeeded anneal")
+                nTmessage("Succeeded anneal")
 
 
 if __name__ == "__main__":

@@ -49,7 +49,7 @@ def exportShifts2Sparky( molecule, fileName=None, onlyAssigned=1)   :
     #end for
     f.close()
 
-    NTmessage('==> exportShifts2Sparky: %-4d shifts   written to "%s"', count, fileName)
+    nTmessage('==> exportShifts2Sparky: %-4d shifts   written to "%s"', count, fileName)
     #end if
 #end def
 
@@ -57,11 +57,11 @@ def exportPeaks2Sparky( peaks, peakFile)   :
     """Export peaks to Sparky fileName
     """
     if (peaks==None):
-        NTerror('exportPeaks2Sparky: undefined peak list\n' )
+        nTerror('exportPeaks2Sparky: undefined peak list\n' )
         return
     #end if
     if (len(peaks) == 0):
-        NTerror('exportPeaks2Sparky: zero-length peak list\n' )
+        nTerror('exportPeaks2Sparky: zero-length peak list\n' )
         return
     #end if
 
@@ -73,7 +73,7 @@ def exportPeaks2Sparky( peaks, peakFile)   :
             atom = peak.resonances[X_AXIS].atom
             atomName = atom.translate( SPARKY )
             if (atomName == None):
-                NTerror('WARNING exportPeaks2Sparky: no translation to "SPARKY" format of atom %s\n', atom)
+                nTerror('WARNING exportPeaks2Sparky: no translation to "SPARKY" format of atom %s\n', atom)
                 atomName = atom.name
             #end if
             assignment = atom._parent.shortName + atomName
@@ -99,7 +99,7 @@ def exportPeaks2Sparky( peaks, peakFile)   :
     #end for
     fout.close()
 
-    NTmessage( '==> exportPeaks2Sparky:  %-4d peaks    written to "%s"', count, peakFile )
+    nTmessage( '==> exportPeaks2Sparky:  %-4d peaks    written to "%s"', count, peakFile )
     #end if
 #end def
 

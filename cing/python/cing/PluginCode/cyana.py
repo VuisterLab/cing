@@ -43,7 +43,7 @@ def exportDihedralRestraint2cyana( dr, convention ):
        return dr or None on error
     """
     if not dr:
-        NTerror('Error exportDihedralRestraint2cyana: undefined restraint\n' )
+        nTerror('Error exportDihedralRestraint2cyana: undefined restraint\n' )
         return None
     #end if
 
@@ -54,7 +54,7 @@ def exportDihedralRestraint2cyana( dr, convention ):
                         angleName, dr.lower, dr.upper
                       )
     else:
-        NTerror('Error exportDihedralRestraint2cyana: cannot export dihedral restraint "%s"\n', str(dr) )
+        nTerror('Error exportDihedralRestraint2cyana: cannot export dihedral restraint "%s"\n', str(dr) )
         return None
     #end if
     return dr
@@ -63,14 +63,14 @@ def exportDihedralRestraint2cyana( dr, convention ):
 DihedralRestraint.export2cyana = exportDihedralRestraint2cyana
 
 
-def exportDihedralRestraintList2cyana( drl, path, convention)   :
+def exportDihedralList2cyana( drl, path, convention)   :
     """Export a dihedralRestraintList (drl) to cyana format:
        convention = CYANA or CYANA2
        return drl or None on error
     """
     fp = open( path, 'w' )
     if not fp:
-        NTerror('exportDihedralRestraintList2cyana: unable to open "%s"\n', path )
+        nTerror('exportDihedralList2cyana: unable to open "%s"\n', path )
         return None
     #end def
     for dr in drl:
@@ -78,12 +78,12 @@ def exportDihedralRestraintList2cyana( drl, path, convention)   :
     #end for
 
     fp.close()
-    NTmessage('==> Exported %s in %s format to "%s"', drl, convention, path)
+    nTmessage('==> Exported %s in %s format to "%s"', drl, convention, path)
     #end if
     return drl
 #end def
 # add as a method to DistanceRestraintList Class
-DihedralRestraintList.export2cyana = exportDihedralRestraintList2cyana
+DihedralRestraintList.export2cyana = exportDihedralList2cyana
 
 
 def importAco( project, acoFile ):
@@ -96,7 +96,7 @@ def importAco( project, acoFile ):
     errorCount = 0
     # check the molecule
     if (not project or not project.molecule ):
-        NTerror("importAco: initialize molecule first")
+        nTerror("importAco: initialize molecule first")
         return None
     #end if
     molecule = project.molecule
@@ -104,15 +104,15 @@ def importAco( project, acoFile ):
 #    chainId = molecule.chains[0].name
 
     if not os.path.exists( acoFile ):
-        NTerror('importAco: file "%s" not found\n', acoFile)
+        nTerror('importAco: file "%s" not found\n', acoFile)
         return None
     #end if
 
-    _dir,name,_ext = NTpath( acoFile )
+    _dir,name,_ext = nTpath( acoFile )
     result     = project.dihedrals.new( name=name, status='keep')
     resNumDict = molecule.getResNumDict()
 
-    NTmessage("Now reading: " + acoFile)
+    nTmessage("Now reading: " + acoFile)
     for line in AwkLike( acoFile, commentString = '#' , minNF = 5):
 
         resNum = line.int(1)
@@ -128,9 +128,9 @@ def importAco( project, acoFile ):
 #            print '>', atoms, res, res.db[angle]
             if None in atoms:
                 if errorCount <= maxErrorCount:
-                    NTerror("Failed to decode all atoms from line:"+ line.dollar[0])
+                    nTerror("Failed to decode all atoms from line:"+ line.dollar[0])
                 if errorCount == (maxErrorCount+1):
-                    NTerror("And so on")
+                    nTerror("And so on")
                 errorCount += 1
                 continue
             else:
@@ -144,9 +144,9 @@ def importAco( project, acoFile ):
     #end for
 
     if errorCount:
-        NTerror("Found number of errors importing upl file: %s" % errorCount)
-#    NTmessage("Imported items: " + `len(result)`)
-    NTmessage('==> importAco: new %s from "%s"', result, acoFile )
+        nTerror("Found number of errors importing upl file: %s" % errorCount)
+#    nTmessage("Imported items: " + `len(result)`)
+    nTmessage('==> importAco: new %s from "%s"', result, acoFile )
     return result
 #end def
 
@@ -156,7 +156,7 @@ def exportDistanceRestraint2cyana( dr, upper=True, convention=CYANA2 ):
     Return a string or None on error
     """
     if convention != CYANA and convention != CYANA2:
-        NTerror('exportDistanceRestraint2cyana: invalid convention "%s"', convention)
+        nTerror('exportDistanceRestraint2cyana: invalid convention "%s"', convention)
         return None
     #end if
 
@@ -167,7 +167,7 @@ def exportDistanceRestraint2cyana( dr, upper=True, convention=CYANA2 ):
         val = dr.lower
     #end if
     if val == None:
-        NTerror("Failed to get lower or upper bound value for %s" % str(dr))
+        nTerror("Failed to get lower or upper bound value for %s" % str(dr))
         return None
 
     if val == 0.0: # this will interfere with Cyana's def for ambiguous restraints
@@ -197,27 +197,27 @@ def exportDistanceRestraint2cyana( dr, upper=True, convention=CYANA2 ):
 #Add as method to DistanceRestraint class
 DistanceRestraint.export2cyana = exportDistanceRestraint2cyana
 
-def exportDistanceRestraintList2cyana( drl, path, convention=CYANA2)   :
+def exportDistancList2cyana( drl, path, convention=CYANA2)   :
     """Export a distanceRestraintList (drl) to cyana format:
        convention = CYANA or CYANA2
        generate both .upl and .lol files from path
        return drl or None on error
     """
     if convention != CYANA and convention != CYANA2:
-        NTerror('exportDistanceRestraintList2cyana: invalid convention "%s"', convention)
+        nTerror('exportDistancList2cyana: invalid convention "%s"', convention)
         return None
     #end if
 
-    root, name, _tmp = NTpath(path)
+    root, name, _tmp = nTpath(path)
     path = os.path.join(root,name)
     uplfile = open( path + '.upl', 'w' )
     if not uplfile:
-        NTerror('exportDihedralRestraintList2cyana: unable to open "%s"\n', path + '.upl' )
+        nTerror('exportDihedralList2cyana: unable to open "%s"\n', path + '.upl' )
         return None
     #end def
     lolfile = open( path + '.lol', 'w' )
     if not lolfile:
-        NTerror('exportDihedralRestraintList2cyana: unable to open "%s"\n', path + '.lol' )
+        nTerror('exportDihedralList2cyana: unable to open "%s"\n', path + '.lol' )
         return None
     #end def
 
@@ -228,12 +228,12 @@ def exportDistanceRestraintList2cyana( drl, path, convention=CYANA2)   :
 
     uplfile.close()
     lolfile.close()
-    NTmessage('==> Exported %s in %s format to "%s" and "%s"', drl, convention, path+'.upl', path+'.lol')
+    nTmessage('==> Exported %s in %s format to "%s" and "%s"', drl, convention, path+'.upl', path+'.lol')
     #end if
     return drl
 #end def
 # add as a method to DistanceRestraintList Class
-DistanceRestraintList.export2cyana = exportDistanceRestraintList2cyana
+DistanceRestraintList.export2cyana = exportDistancList2cyana
 
 
 def importUpl( project, uplFile, convention, lower = 0.0 ):
@@ -245,7 +245,7 @@ def importUpl( project, uplFile, convention, lower = 0.0 ):
 
     # check the molecule
     if not project or not project.molecule:
-        NTerror("importUpl: initialize molecule first")
+        nTerror("importUpl: initialize molecule first")
         return None
     #end if
     molecule = project.molecule
@@ -253,26 +253,26 @@ def importUpl( project, uplFile, convention, lower = 0.0 ):
 #    chainId = molecule.chains[0].name # assumed unkown rite?
 
     if not os.path.exists( uplFile ):
-        NTerror('importUpl: file "%s" not found', uplFile)
+        nTerror('importUpl: file "%s" not found', uplFile)
         return None
     #end if
 
-    _dir,name,_ext = NTpath( uplFile )
+    _dir,name,_ext = nTpath( uplFile )
     result        = project.distances.new( name=name, status='keep')
     atomDict      = molecule.getAtomDict(convention)
 
     for line in AwkLike( uplFile, commentString="#", minNF=7 ):
 #        if line.isComment():
-##            NTdebug("Skipping upl file line with comment: [" + line.dollar[0] +']')
+##            nTdebug("Skipping upl file line with comment: [" + line.dollar[0] +']')
 #            continue
 #        if line.NF < 7:
-##            NTdebug("Skipping upl file line with too few fields: [" + line.dollar[0] +']')
+##            nTdebug("Skipping upl file line with too few fields: [" + line.dollar[0] +']')
 #            continue
         atmIdxList = [[1,3],[4,6]]
         atmList = []
 #        i=0
         for atmIdx in atmIdxList:
-#            NTdebug("Doing atmIdx: " + `atmIdx`)
+#            nTdebug("Doing atmIdx: " + `atmIdx`)
             t = (line.int(atmIdx[0]), line.dollar[atmIdx[1]])
             atm = None
             if atomDict.has_key(t):
@@ -281,9 +281,9 @@ def importUpl( project, uplFile, convention, lower = 0.0 ):
 #                                            fromCYANA2CING=True)
             if not atm:
                 if errorCount <= maxErrorCount:
-                    NTerror('Failed to decode for atom %s; line: %s', t, line.dollar[0] )
+                    nTerror('Failed to decode for atom %s; line: %s', t, line.dollar[0] )
                 if errorCount == maxErrorCount+1:
-                    NTerror("And so on")
+                    nTerror("And so on")
                 errorCount += 1
 #                i+=1
                 continue
@@ -294,11 +294,11 @@ def importUpl( project, uplFile, convention, lower = 0.0 ):
         # Unpack convenience variables.
         atm1 = atmList[0]
         atm2 = atmList[1]
-#        NTdebug("atom 1: " + `atm1`)
-#        NTdebug("atom 2: " + `atm2`)
+#        nTdebug("atom 1: " + `atm1`)
+#        nTdebug("atom 2: " + `atm2`)
         upper = line.float(7)
         if not upper:
-            NTerror("Skipping line without valid upper bound on line: [" + line.dollar[0]+']')
+            nTerror("Skipping line without valid upper bound on line: [" + line.dollar[0]+']')
             continue
 
         # ambiguous restraint, should be append to last one
@@ -318,10 +318,10 @@ def importUpl( project, uplFile, convention, lower = 0.0 ):
             r.QF = line.float( 13 )
     #end for
     if errorCount:
-        NTerror("Found number of errors importing upl file: %s" % errorCount)
+        nTerror("Found number of errors importing upl file: %s" % errorCount)
 
-#    NTmessage("Imported upl items: " + `len(result)`)
-    NTmessage('==> importUpl: new %s from "%s"', result, uplFile )
+#    nTmessage("Imported upl items: " + `len(result)`)
+    nTmessage('==> importUpl: new %s from "%s"', result, uplFile )
     return result
 #end def
 
@@ -358,7 +358,7 @@ atom stereo "HA1  HA2   519"   # GLY
                     atm = atomDict[t]
 #                atm = molecule.decodeNameTuple( (convention, 'A', resnum, line.dollar[i].strip('"')) )
                 if atm == None:
-                    NTerror('importCyanaStereoFile: atom %s; line %d (%s)\n', line.dollar[i], line.NR, line.dollar[0] )
+                    nTerror('importCyanaStereoFile: atom %s; line %d (%s)\n', line.dollar[i], line.NR, line.dollar[0] )
                 else:
                     atm.stereoAssigned = True
                     count += 1
@@ -374,7 +374,7 @@ atom stereo "HA1  HA2   519"   # GLY
             #end for
         #end if
     #end for
-    NTmessage('==> Derived %d stereo assignments from "%s"', count, stereoFileName )
+    nTmessage('==> Derived %d stereo assignments from "%s"', count, stereoFileName )
     return project
 #end def
 
@@ -441,7 +441,7 @@ def cyana2cing( project, cyanaDirectory, convention=CYANA2, copy2sources=True, u
         kwds.setdefault(f,  [])
         if isinstance( kwds[f], str ):
             kwds[f] = kwds[f].split(',')
-#    NTdebug( '>>'+ `kwds` )
+#    nTdebug( '>>'+ `kwds` )
 
     # look for pdb, initiate new Molecule instance.
     # This goes first so that peaks, upls and acos refer to this molecule
@@ -449,10 +449,10 @@ def cyana2cing( project, cyanaDirectory, convention=CYANA2, copy2sources=True, u
         pdbFile = os.path.join( cyanaDirectory, kwds['pdbFile'] + '.pdb')
         mol = project.initPDB( pdbFile, coordinateConvention, nmodels=kwds['nmodels'], update=update )
         if not mol:
-            NTerror('Project.cyana2cing: parsing PDB-file "%s" failed', pdbFile)
+            nTerror('Project.cyana2cing: parsing PDB-file "%s" failed', pdbFile)
             return None
         #end if
-        NTmessage('Parsed PDB file "%s", molecule %s', pdbFile, mol)
+        nTmessage('Parsed PDB file "%s", molecule %s', pdbFile, mol)
         sources.append( pdbFile )
 
     if (kwds['seqFile'] != None and kwds['protFile'] != None):
@@ -491,7 +491,7 @@ def cyana2cing( project, cyanaDirectory, convention=CYANA2, copy2sources=True, u
         #end if
     #end for
 
-#    NTdebug( str(sources) )
+#    nTdebug( str(sources) )
     sources.removeDuplicates()
     if copy2sources:
         for f in sources:
@@ -500,7 +500,7 @@ def cyana2cing( project, cyanaDirectory, convention=CYANA2, copy2sources=True, u
         #end for
     #end if
 
-    NTmessage( 'cyana2cing: %s', project.format())
+    nTmessage( 'cyana2cing: %s', project.format())
     return sources
 #end def
 

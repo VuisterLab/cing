@@ -6,7 +6,6 @@ From: http://www.tylerlesmann.com/2009/apr/27/copying-databases-across-platforms
 Usage: python $CINGROOT/cing/python/Libs/RDBpuller.py -f source_server -t destination_server table [table ...]
     -f, -t = driver://user[:password]@host[:port]/database
 '''
-
 import getopt
 import sys
 from sqlalchemy import create_engine, MetaData, Table
@@ -41,6 +40,7 @@ def pull_data(from_db, to_db, tables):
     destination.commit()
 
 def print_usage():
+    myName = sys.argv[0]
     print """
 Usage: %s -f source_server -t destination_server table [table ...]
     -f, -t = driver://user[:password]@host[:port]/database
@@ -50,7 +50,7 @@ Example: %s -f oracle://someuser:PaSsWd@db1/TSH1 \\
 
 Example: %s -f oracle://someuser:PaSsWd@db1/TSH1 \\
     -t mysql://root@db2:3307/reporting table_one table_two
-    """ % (sys.argv[0], sys.argv[0])
+    """ % (myName, myName, myName)
 
 def quick_mapper(table):
     Base = declarative_base()

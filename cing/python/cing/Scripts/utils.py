@@ -21,12 +21,12 @@ def printSequenceFromPdbFile(fn):
         # db doesn't always exist.
         fastaString += getDeepByKeysOrDefault(res, defaultPrintChainCode, 'db', 'shortName')
     cing.verbosity = verbosityOriginal
-    NTmessage("Sequence from PDB file:")
-    NTmessage(fastaString)
+    nTmessage("Sequence from PDB file:")
+    nTmessage(fastaString)
 
     for res in project.molecule.allResidues():
-        NTmessageNoEOL(res.shortName)
-    NTmessage('')
+        nTmessageNoEOL(res.shortName)
+    nTmessage('')
     cing.verbosity = cing.verbosityError
 
     project.removeFromDisk()

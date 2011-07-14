@@ -27,7 +27,7 @@ class AwkLike:
         if filename:
             self.FILENAME = filename
             if not os.path.exists(filename):
-                NTerror("Failed to find: [%s]" % filename)
+                nTerror("Failed to find: [%s]" % filename)
             else:
                 self.f = open(filename,'r')
         else:
@@ -65,26 +65,26 @@ class AwkLike:
             for f in self.line.split(self.separator):
                 # Skip everything after the comment?
                 if self.commentString and f.startswith(self.commentString):
-#                    NTdebug("Skipping fields after comment on line: [%s]" % self.line)
-#                    NTdebug("   parsed so far: %s" % `self.dollar` )
+#                    nTdebug("Skipping fields after comment on line: [%s]" % self.line)
+#                    nTdebug("   parsed so far: %s" % `self.dollar` )
                     break
-#                NTdebug("Appending to parsed: [%s]" % f)
+#                nTdebug("Appending to parsed: [%s]" % f)
                 self.dollar.append( f )
             self.NF = len(self.dollar)-1
             if self.minLength >= 0:
                 if len(self.dollar[0]) < self.minLength:
-#                    NTdebug("Skipping line with less than required number of characters: [%s]" % self.line)
+#                    nTdebug("Skipping line with less than required number of characters: [%s]" % self.line)
                     return self.next()
             if self.minNF > 0:
                 if self.NF < self.minNF:
-#                    NTdebug("Skipping line with less than required number of fields: [%s]" % self.line)
+#                    nTdebug("Skipping line with less than required number of fields: [%s]" % self.line)
                     return self.next()
             if self.commentString:
                 if self.isComment( self.commentString ):
-#                    NTdebug("Skipping comment line: [%]" % self.line)
+#                    nTdebug("Skipping comment line: [%]" % self.line)
                     return self.next()
             if self.skipHeaderLines >= self.NR:
-#                NTdebug('skipping header line [%d] which is less than or equal to [%s]' % (
+#                nTdebug('skipping header line [%d] which is less than or equal to [%s]' % (
 #                    self.NR, self.skipHeaderLines))
                 return self.next()
             return self
@@ -96,7 +96,7 @@ class AwkLike:
     def close( self ):
         """internal routine"""
         if not self.f:
-            NTerror("Can't close the file because it was not present.")
+            nTerror("Can't close the file because it was not present.")
             return
         self.f.close()
         self.f = None
@@ -106,14 +106,14 @@ class AwkLike:
         try:
             return float( self.dollar[ field ] )
         except ValueError:
-            NTerror('AwkLike: expected float for "%s" (file: %s, line %d: "%s")',
+            nTerror('AwkLike: expected float for "%s" (file: %s, line %d: "%s")',
                     self.dollar[field],
                     self.FILENAME,
                     self.NR,
                     self.dollar[0]
                     )
         except IndexError:
-            NTerror('AwkLike: invalid field number "%d" (file: %s, line %d: "%s")',
+            nTerror('AwkLike: invalid field number "%d" (file: %s, line %d: "%s")',
                     field,
                     self.FILENAME,
                     self.NR,
@@ -124,14 +124,14 @@ class AwkLike:
         try:
             return int( self.dollar[ field ] )
         except ValueError:
-            NTerror('AwkLike: expected integer for "%s" (file: %s, line %d: "%s")',
+            nTerror('AwkLike: expected integer for "%s" (file: %s, line %d: "%s")',
                     self.dollar[field],
                     self.FILENAME,
                     self.NR,
                     self.dollar[0]
                     )
         except IndexError:
-            NTerror('AwkLike: invalid field number "%d" (file: %s, line %d: "%s")',
+            nTerror('AwkLike: invalid field number "%d" (file: %s, line %d: "%s")',
                     field,
                     self.FILENAME,
                     self.NR,
@@ -139,10 +139,10 @@ class AwkLike:
                     )
 
     def printit( self ):
-        NTmessage( '==>%s NR=%d NF=%d' % (self.FILENAME, self.NR, self.NF))
+        nTmessage( '==>%s NR=%d NF=%d' % (self.FILENAME, self.NR, self.NF))
         i=0
         for field in self.dollar:
-            NTmessage( '%3d >%s<' % (i, field) )
+            nTmessage( '%3d >%s<' % (i, field) )
             i += 1
         return 0
 
@@ -233,14 +233,14 @@ class AwkLikeS:
         try:
             return float( self.dollar[ field ] )
         except ValueError:
-            NTerror('AwkLike: expected float for "%s" (file: %s, line %d: "%s")',
+            nTerror('AwkLike: expected float for "%s" (file: %s, line %d: "%s")',
                     self.dollar[field],
                     self.FILENAME,
                     self.NR,
                     self.dollar[0]
                     )
         except IndexError:
-            NTerror('AwkLike: invalid field number "%d" (file: %s, line %d: "%s")',
+            nTerror('AwkLike: invalid field number "%d" (file: %s, line %d: "%s")',
                     field,
                     self.FILENAME,
                     self.NR,
@@ -254,14 +254,14 @@ class AwkLikeS:
         try:
             return int( self.dollar[ field ] )
         except ValueError:
-            NTerror('AwkLike: expected integer for "%s" (file: %s, line %d: "%s")',
+            nTerror('AwkLike: expected integer for "%s" (file: %s, line %d: "%s")',
                     self.dollar[field],
                     self.FILENAME,
                     self.NR,
                     self.dollar[0]
                     )
         except IndexError:
-            NTerror('AwkLike: invalid field number "%d" (file: %s, line %d: "%s")',
+            nTerror('AwkLike: invalid field number "%d" (file: %s, line %d: "%s")',
                     field,
                     self.FILENAME,
                     self.NR,

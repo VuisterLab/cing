@@ -18,11 +18,11 @@ class AllChecks(TestCase):
             "Failed to change to test directory for files: " + cingDirTmpTest)
 
         if not cing.isInternetConnected():
-            NTdebug("Skipping %s because cing is not connected to the internet." % getCallerName())
+            nTdebug("Skipping %s because cing is not connected to the internet." % getCallerName())
             return
 #        url = 'http://restraintsgrid.bmrb.wisc.edu/servlet_data/NRG_ccpn_tmp'
-    #    NTwarning("Expect errors without a server up and running.")
-        NTmessage("Firing up the iCing robot; aka example interface to CING")
+    #    nTwarning("Expect errors without a server up and running.")
+        nTmessage("Firing up the iCing robot; aka example interface to CING")
 
         ## queries possible; do one at a time going down the list.
         ## After the run is started the status will let you know if the run is finished
@@ -61,22 +61,22 @@ class AllChecks(TestCase):
 
     #    rpcUrl=DEFAULT_URL+"icing/serv/iCingServlet"
         rpcUrl=DEFAULT_URL+DEFAULT_RPC_PORT+'/'+DEFAULT_URL_PATH+"/serv/iCingServlet"
-        NTdebug("Using rpc at: %s" % rpcUrl )
+        nTdebug("Using rpc at: %s" % rpcUrl )
         credentials = [(FORM_USER_ID, user_id), (FORM_ACCESS_KEY, access_key)]
-        NTdebug("With credentials: %s" % credentials )
+        nTdebug("With credentials: %s" % credentials )
 
     ##############################################################################################################
 
         if doSave:
             data = credentials + [(FORM_ACTION,FORM_ACTION_SAVE),]
-            NTdebug("Getting file contents from disk")
+            nTdebug("Getting file contents from disk")
             fileObj = open(inputFile, 'rb')
             files = [( FORM_UPLOAD_FILE_BASE, inputFile, fileObj.read() ),]
 
-            NTdebug("Sending contents to rpc")
+            nTdebug("Sending contents to rpc")
             result = sendRequest(rpcUrl, data, files)
             if not result:
-                NTerror("Failed to save file to server")
+                nTerror("Failed to save file to server")
             else:
                 print "result of save request: %s" % result
                 urls = getResultUrls(credentials, entryId, DEFAULT_URL)
@@ -91,23 +91,23 @@ class AllChecks(TestCase):
 
         if doRun:
             data = credentials + [(FORM_ACTION,FORM_ACTION_RUN),]
-            NTmessage( str(sendRequest(rpcUrl, data, files) ))
+            nTmessage( str(sendRequest(rpcUrl, data, files) ))
 
         if doStatus:
             data = credentials + [(FORM_ACTION,FORM_ACTION_STATUS),]
-            NTmessage( str(sendRequest(rpcUrl, data, files) ))
+            nTmessage( str(sendRequest(rpcUrl, data, files) ))
 
         if doLog:
             data = credentials + [(FORM_ACTION,FORM_ACTION_LOG),]
-            NTmessage( str(sendRequest(rpcUrl, data, files) ))
+            nTmessage( str(sendRequest(rpcUrl, data, files) ))
 
         if doPname:
             data = credentials + [(FORM_ACTION,FORM_ACTION_PROJECT_NAME),]
-            NTmessage( str(sendRequest(rpcUrl, data, files) ))
+            nTmessage( str(sendRequest(rpcUrl, data, files) ))
 
         if doPurge:
             data = credentials + [(FORM_ACTION,FORM_ACTION_PURGE),]
-            NTmessage( str(sendRequest(rpcUrl, data, files) ))
+            nTmessage( str(sendRequest(rpcUrl, data, files) ))
 
 if __name__ == "__main__":
     cing.verbosity = verbosityDebug

@@ -11,10 +11,10 @@ from cing.main import getStopMessage
 if __name__ == "__main__":
     cing.verbosity = verbosityDebug
 
-    NTmessage(header)
-    NTmessage(getStartMessage())
+    nTmessage(header)
+    nTmessage(getStartMessage())
 
-    NTmessage("Starting program: %s" % sys.argv[0])
-    NTdebug("Argument retrieved: %s" % str(sys.argv[1:] ))
+    nTmessage("Starting program: %s" % sys.argv[0])
+    nTdebug("Argument retrieved: %s" % str(sys.argv[1:] ))
 
-    NTmessage(getStopMessage(cing.starttime))
+    nTmessage(getStopMessage(cing.starttime))

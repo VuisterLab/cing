@@ -7,7 +7,21 @@ from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.PluginCode.required.reqVasco import * #@UnusedWildImport
 from cing.core.ROGscore import ROGscore
 
-class RestraintList(NTlist):
+class ProjectListMember():
+    """An element of ProjectList always has certain attributes to add.
+    """
+    def __init__(self):
+        """
+        Just add some properties.
+        """
+        self.project = None
+        self.objectPath = None
+        self.projectList = None
+    # end def
+# end class
+
+
+class RestraintList(NTlist, ProjectListMember):
     """
     Super class for DistanceRestraintList etc..
     Moving functionality to here gradually.
@@ -15,6 +29,7 @@ class RestraintList(NTlist):
     # use the same spelling through out.
     def __init__(self, name, status = 'keep'):
         NTlist.__init__(self)
+        ProjectListMember.__init__(self)      # Initialized objectPath  
         self.__CLASS__ = 'RestraintList'
         self.name = name        # Name of the list
         self.status = status    # Status of the list; 'keep' indicates storage required
@@ -32,6 +47,10 @@ class RestraintList(NTlist):
         self.violCount3 = 0       # Total violations over 0.3 A (3 degrees)
         self.violCount5 = 0       # Total violations over 0.5 A (5 degrees)
 
+#        self.export2cyana = passThru # Explicite mention. Defaulting to passthru method.
+#        self.export2xplor = passThru
+#        self.path = None
+        
         self.rogScore = ROGscore()
     #end def
     def __str__(self):
@@ -46,9 +65,9 @@ class RestraintList(NTlist):
     #end def
     def renameToXplorCompatible(self):
         'rename to Xplor Compatible'
-        l = len(self.name)
-        if l < MAX_SIZE_XPLOR_RESTRAINT_LIST_NAME:
-#             NTdebug("Kept the original xplor compatible drl name: %s" % self.name)
+        n = len(self.name)
+        if n < MAX_SIZE_XPLOR_RESTRAINT_LIST_NAME:
+#             nTdebug("Kept the original xplor compatible drl name: %s" % self.name)
             return
         prefix = 'pl'
         if self.__CLASS__ == DRL_LEVEL:
@@ -60,7 +79,7 @@ class RestraintList(NTlist):
         prefix += '_'
         newName = self.projectList.getNextValidName(prefix = prefix)
         if newName == None:
-            NTerror("Failed renameToXplorCompatible for %s" % self)
+            nTerror("Failed renameToXplorCompatible for %s" % self)
             return
         self.rename(newName)
     #end def
@@ -83,10 +102,11 @@ class RestraintList(NTlist):
         # sort the list on id number
         NTsort( self, byItem='id', inplace=True)
 
-        if not path: 
+        if not path:
+            # Should have come from ProjectListMember? TODO: check             
             path = self.objectPath
         if self.SMLhandler.toFile(self, path) != self:
-            NTerror('%s.save: failed creating "%s"' % (self.__CLASS__, self. path))
+            nTerror('%s.save: failed creating "%s"' % (self.__CLASS__, path))
             return None
         #end if
 
@@ -94,7 +114,7 @@ class RestraintList(NTlist):
         if self._byItem:
             NTsort( self, byItem=self._byItem, inplace=True)
 
-        NTdetail('==> Saved %s to "%s"', self, path)
+        nTdetail('==> Saved %s to "%s"', self, path)
         return self
     #end def
 
@@ -110,7 +130,7 @@ class RestraintList(NTlist):
         Returns None on error
         """
         if not self._idDict.has_key(id):
-            NTerror('RestraintList.getId: invalid id (%d)', id)
+            nTerror('RestraintList.getId: invalid id (%d)', id)
             return None
         #end if
         return self._idDict[id]
@@ -128,14 +148,14 @@ class RestraintList(NTlist):
             if modelCount != None:
                 return modelCount
             if i == MAX_RESTRAINTS_TO_TEST:
-#                NTwarning("getModelCount returned None for the first %d restraints; giving up." % i)
+#                nTwarning("getModelCount returned None for the first %d restraints; giving up." % i)
                 return None
-#        NTwarning("getModelCount returned None for all %d restraints; giving up." % len(self))
+#        nTwarning("getModelCount returned None for all %d restraints; giving up." % len(self))
         return None
     #end def
 
     def format(self, showAll = False):
-#        NTdebug("Now in classes2.RestraintList#" + getCallerName())
+#        nTdebug("Now in classes2.RestraintList#" + getCallerName())
         if not showAll:
             return ''
         rTxtList = []
@@ -147,7 +167,7 @@ class RestraintList(NTlist):
     # end def
 # end class
 
-class ResonanceList(NTlist):
+class ResonanceList(NTlist, ProjectListMember):
     """
     Contains ResonanceList meta data.
     NB the name is not necessarily unique within even the molecule.
@@ -159,6 +179,7 @@ class ResonanceList(NTlist):
     # NB the unusual init. Differs in that arguments aren't added to the list.
     def __init__(self, name, status = 'keep'):
         NTlist.__init__(self)
+        ProjectListMember.__init__(self)      # Initialized objectPath  
         self.__CLASS__ = 'ResonanceList'
         self.name = name        # Name of the list
         self.status = status    # Status of the list; 'keep' indicates storage required
@@ -257,7 +278,7 @@ class ResonanceList(NTlist):
         if not path: 
             path = self.objectPath
         if self.SMLhandler.toFile(self, path) != self:
-            NTerror('%s.save: failed creating "%s"' % (self.__CLASS__, self. path))
+            nTerror('%s.save: failed creating "%s"' % (self.__CLASS__, path))
             return None
         #end if
 
@@ -265,7 +286,7 @@ class ResonanceList(NTlist):
         if self._byItem:
             NTsort( self, byItem=self._byItem, inplace=True)
 
-        NTdetail('==> Saved %s to "%s"', self, path)
+        nTdetail('==> Saved %s to "%s"', self, path)
         return self
     #end def
 
@@ -281,7 +302,7 @@ class ResonanceList(NTlist):
         Returns None on error
         """
         if not self._idDict.has_key(id):
-            NTerror('ResonanceList.getId: invalid id (%d)', id)
+            nTerror('ResonanceList.getId: invalid id (%d)', id)
             return None
         #end if
         return self._idDict[id]
@@ -299,14 +320,6 @@ class ResonanceList(NTlist):
     # end def
 # end class
 
-class StereoAssignmentCorrection(NTdict):
-    """
-    Contains meta data on the corrections done for stereospecific assignments such as
-    in stereoAssignmentSwap TODO: finish, just a placeholder for now.
-    """
-
-# end class
-
 def resonanceListGetIndexFirstObjectWithRealValue(resonanceList):
     """
     Return index of resonance that has an actual value or -1 if no such resonance exists in this list.
@@ -319,14 +332,6 @@ def resonanceListGetIndexFirstObjectWithRealValue(resonanceList):
     # end for
     return -1
 # end def
-
-class AtomList( NTlist ):
-    def __init__(self, *args):
-        NTlist.__init__(self, *args)
-        
-    def radius(self):
-        'Get the radius of the sphere that contains all atoms in all models'
-        
         
 class CoordinateList( NTlist ):
     def __init__(self, *args):

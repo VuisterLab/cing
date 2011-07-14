@@ -32,7 +32,7 @@ PROJECT_TYPE_PDB = PDB
 PROJECT_TYPE_DEFAULT = PROJECT_TYPE_CING
 
 def usage():
-    NTmessage("Call from validateNRG.py -> doScriptOnEntryList.py")
+    nTmessage("Call from validateNRG.py -> doScriptOnEntryList.py")
 
 
 def main(entryId, *extraArgList):
@@ -59,16 +59,16 @@ def main(entryId, *extraArgList):
     FORCE_RETRIEVE_INPUT = True
 
 
-    NTmessage(header)
-    NTmessage(getStartMessage())
+    nTmessage(header)
+    nTmessage(getStartMessage())
 
     expectedArgumentList = [ 'inputDir', 'outputDir', 'pdbConvention', 'restraintsConvention', 'archiveType', 'projectType', 'storeCING2db' ]
     expectedNumberOfArguments = len(expectedArgumentList)
     if len(extraArgList) != expectedNumberOfArguments:
-        NTerror("Got arguments: " + `extraArgList`)
-        NTerror("Failed to get expected number of arguments: %d got %d" % (
+        nTerror("Got arguments: " + `extraArgList`)
+        nTerror("Failed to get expected number of arguments: %d got %d" % (
             expectedNumberOfArguments, len(extraArgList)))
-        NTerror("Expected arguments: %s" % expectedArgumentList)
+        nTerror("Expected arguments: %s" % expectedArgumentList)
         return True
 
     entryCodeChar2and3 = entryId[1:3]
@@ -96,38 +96,38 @@ def main(entryId, *extraArgList):
     ranges = None
 #    targetId = getTargetForFullEntryName(entryId)
 #    if not targetId:
-#        NTerror("Failed to getTargetForFullEntryName for entryId: %s" % entryId)
+#        nTerror("Failed to getTargetForFullEntryName for entryId: %s" % entryId)
 #        return True
 #    ranges = getRangesForTarget(targetId)
 #    if ranges == None:
-#        NTerror("Failed to getRangesForTarget for targetId: %s" % targetId)
+#        nTerror("Failed to getRangesForTarget for targetId: %s" % targetId)
 #        return True
 
 
-    NTdebug("Using:")
-    NTdebug("inputDir:             %s" % inputDir)
-    NTdebug("outputDir:            %s" % outputDir)
-    NTdebug("pdbConvention:        %s" % pdbConvention)
-    NTdebug("restraintsConvention: %s" % restraintsConvention)
-    NTdebug("archiveType:          %s" % archiveType)
-    NTdebug("projectType:          %s" % projectType)
-    NTdebug("modelCount:           %s" % modelCount)
-    NTdebug("storeCING2db:         %s" % storeCING2db)
-    NTdebug("ranges:               %s" % ranges)
+    nTdebug("Using:")
+    nTdebug("inputDir:             %s" % inputDir)
+    nTdebug("outputDir:            %s" % outputDir)
+    nTdebug("pdbConvention:        %s" % pdbConvention)
+    nTdebug("restraintsConvention: %s" % restraintsConvention)
+    nTdebug("archiveType:          %s" % archiveType)
+    nTdebug("projectType:          %s" % projectType)
+    nTdebug("modelCount:           %s" % modelCount)
+    nTdebug("storeCING2db:         %s" % storeCING2db)
+    nTdebug("ranges:               %s" % ranges)
     # presume the directory still needs to be created.
     cingEntryDir = entryId + ".cing"
 
     if os.path.isdir(cingEntryDir):
         if FORCE_REDO:
-            NTmessage("Enforcing a redo")
+            nTmessage("Enforcing a redo")
             rmtree(cingEntryDir)
         else:
             mainIndexFile = os.path.join(cingEntryDir, "index.html")
             isDone = os.path.isfile(mainIndexFile)
             if isDone:
-                NTmessage("SKIPPING ENTRY ALREADY DONE")
+                nTmessage("SKIPPING ENTRY ALREADY DONE")
                 return
-            NTmessage("REDOING BECAUSE VALIDATION CONSIDERED NOT DONE.")
+            nTmessage("REDOING BECAUSE VALIDATION CONSIDERED NOT DONE.")
             rmtree(cingEntryDir)
         # end if.
     # end if.
@@ -136,7 +136,7 @@ def main(entryId, *extraArgList):
 
     project = Project(entryId)
     if project.removeFromDisk():
-        NTerror("Failed to remove existing project (if present)")
+        nTerror("Failed to remove existing project (if present)")
         return True
     # end if.
 
@@ -150,7 +150,7 @@ def main(entryId, *extraArgList):
         formatFileName = 'pdb%s.ent.gz'
     fileNameTgz = formatFileName % entryId
 
-#    NTdebug("fileNameTgz: %s" % fileNameTgz)
+#    nTdebug("fileNameTgz: %s" % fileNameTgz)
     # if true will do retrieveTgzFromUrl.
     if inputDir.startswith("http") or inputDir.startswith("file"):
         stillToRetrieve = False
@@ -166,7 +166,7 @@ def main(entryId, *extraArgList):
              retrieveTgzFromUrl(entryId, inputDir, archiveType=archiveType, formatFileName=formatFileName)
         # end if
         if not os.path.exists(fileNameTgz):
-            NTerror("Tgz should already have been present skipping entry")
+            nTerror("Tgz should already have been present skipping entry")
             return
         # end if
     # end if.
@@ -178,12 +178,12 @@ def main(entryId, *extraArgList):
         shutil.copy(fullFileNameTgz, '.')
         project = Project.open(entryId, status='old')
         if not project:
-            NTerror("Failed to init old project")
+            nTerror("Failed to init old project")
             return True
     elif projectType == PROJECT_TYPE_CCPN:
         project = Project.open(entryId, status='new')
         if not project.initCcpn(ccpnFolder=fileNameTgz, modelCount=modelCount):
-            NTerror("Failed to init project from ccpn")
+            nTerror("Failed to init project from ccpn")
             return True
     elif projectType == PROJECT_TYPE_PDB:
         project = Project.open(entryId, status='new')
@@ -204,7 +204,7 @@ def main(entryId, *extraArgList):
         project.initPDB(pdbFile=pdbFilePath, convention=IUPAC, nmodels=modelCount)
 #        if tmpPdbFile:
         if True:
-            NTdebug("Removing tmp: %s" % pdbFilePath)
+            nTdebug("Removing tmp: %s" % pdbFilePath)
             os.unlink(pdbFilePath)
 
 
@@ -223,7 +223,7 @@ def main(entryId, *extraArgList):
             if entryId.startswith("1tgq"):
                 pdbConvention = PDB
         project.initPDB(pdbFile=pdbFilePath, convention=pdbConvention, nmodels=modelCount)
-        NTdebug("Reading files from directory: " + inputDir)
+        nTdebug("Reading files from directory: " + inputDir)
         kwds = {'uplFiles': [ entryId ],
                 'acoFiles': [ entryId ]
                   }
@@ -236,7 +236,7 @@ def main(entryId, *extraArgList):
                 kwds['protFile'] = entryId
                 kwds['seqFile'] = entryId
             else:
-                NTerror("Failed to find the .seq file whereas there was a .prot file.")
+                nTerror("Failed to find the .seq file whereas there was a .prot file.")
 
         # Skip restraints if absent.
         if os.path.exists(os.path.join(inputDir, entryId + ".upl")):
@@ -248,7 +248,7 @@ def main(entryId, *extraArgList):
 
 #    if inputDirOrg == inputDirCASD_NMR:
 #    if True: # Default is False for this is specific to CASD-NMR
-#        NTmessage("Renaming molecule name to entry id: %s" % entryId)
+#        nTmessage("Renaming molecule name to entry id: %s" % entryId)
 #        project.molecule.name = entryId # insufficient since all data is already initialized to disk.
 #        project.updateProject()
 #        project.molecule.rename( entryId )
@@ -259,7 +259,7 @@ def main(entryId, *extraArgList):
     if True:
         if project.validate(htmlOnly=htmlOnly, ranges=ranges, doProcheck=doProcheck, doWhatif=doWhatif,
                 doWattos=doWattos, doTalos=doTalos):
-            NTerror("Failed to validate project read")
+            nTerror("Failed to validate project read")
             return True
 
     if storeCING2db:
@@ -268,10 +268,10 @@ def main(entryId, *extraArgList):
         # and should never crash  run.
         try:
             if doStoreCING2db( entryId, ARCHIVE_CASP_ID, project=project):
-                NTerror("Failed to store CING project's data to DB but continuing.")
+                nTerror("Failed to store CING project's data to DB but continuing.")
         except:
             NTtracebackError()
-            NTerror("Failed to store CING project's data due to above traceback error.")
+            nTerror("Failed to store CING project's data due to above traceback error.")
 
     project.save()
     if projectType == PROJECT_TYPE_CCPN:
@@ -283,7 +283,7 @@ def main(entryId, *extraArgList):
         directoryNameCing = entryId + ".cing"
         tgzFileNameCing = directoryNameCing + ".tgz"
         if os.path.exists(tgzFileNameCing):
-            NTwarning("Overwriting: " + tgzFileNameCing)
+            nTwarning("Overwriting: " + tgzFileNameCing)
         cmd = "tar -czf %s %s" % (tgzFileNameCing, directoryNameCing)
         do_cmd(cmd)
 
@@ -296,4 +296,4 @@ if __name__ == "__main__":
     try:
         status = main(*sys.argv[1:])
     finally:
-        NTmessage(getStopMessage(cing.starttime))
+        nTmessage(getStopMessage(cing.starttime))

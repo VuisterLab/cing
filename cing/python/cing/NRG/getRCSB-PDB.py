@@ -24,7 +24,7 @@ if testing: # testing with smaller set
 else:
     pdbList = getPdbEntries(mustHaveExperimentalNmrData = True)
 
-NTmessage("getPdbEntries exp: %d" % (len(pdbList)))
+nTmessage("getPdbEntries exp: %d" % (len(pdbList)))
 
 writeEntryListToFile('hasExpData.csv', pdbList)
 

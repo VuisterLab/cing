@@ -32,7 +32,7 @@ def convert(projectName, rootDir):
 
     globPattern = authorDir + '/*.pdb'
     fileList = glob(globPattern)
-    NTdebug("From %s will read files: %s" % (globPattern,fileList))
+    nTdebug("From %s will read files: %s" % (globPattern,fileList))
     format.readCoordinates(fileList, strucGen = structureGeneration, minimalPrompts = 1, linkAtoms = 0)
 
     project.saveModified()

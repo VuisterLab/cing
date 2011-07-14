@@ -39,10 +39,10 @@ class Regine(Lister):
             ^ peak volume
  20,5,20,1
 """
-        NTmessage("Reading: %s" % fn)
+        nTmessage("Reading: %s" % fn)
         txt = readTextFromFile(fn)
 
-        _path,name,_ext = NTpath( fn )
+        _path,name,_ext = nTpath( fn )
         peakList = PeakList( name=name, status=status )
 
         splitLineList = txt.splitlines()
@@ -51,7 +51,7 @@ class Regine(Lister):
 
         i = 0
         while i < len(splitLineList):
-#            NTdebug("Working on line %d (line 1 in block)" % i)
+#            nTdebug("Working on line %d (line 1 in block)" % i)
 # 1,1,2,99,1,2,'Jurgen','20-HG1|20-HN'
 #                       ^ assignment info
             line = splitLineList[i]
@@ -74,7 +74,7 @@ class Regine(Lister):
 #                   ^ Chemical shift 2
             i += 1
             line = splitLineList[i]
-#            NTdebug("Working on CS line 2: [%s]" % line)
+#            nTdebug("Working on CS line 2: [%s]" % line)
             wordList = line.split(',')
             peakPosition1 = float(wordList[0])
             peakPosition2 = float(wordList[3])
@@ -85,7 +85,7 @@ class Regine(Lister):
             line = splitLineList[i]
             wordList = line.split(',')
             volume = float(wordList[ -1])
-#            NTdebug("Working on volume [%s] from line 5 (%d) : [%s]" % (volume, i,line))
+#            nTdebug("Working on volume [%s] from line 5 (%d) : [%s]" % (volume, i,line))
 
             peak = Peak(self.dimension,
                   positions = positions,
@@ -94,7 +94,7 @@ class Regine(Lister):
                   resonances = resonances)
 
             # Use the Lister class for a string representation.
-#            NTdebug("Found peak: %r" % peak)
+#            nTdebug("Found peak: %r" % peak)
             peakList.append( peak )
             # skip to next line 1
             i += 2
@@ -106,10 +106,10 @@ class Regine(Lister):
         chainName = self.chainName
         nameTuple = (XPLOR, chainName, resNum, atomName)
         atom = self.project.molecule.decodeNameTuple(nameTuple)
-#        NTdebug("atom = decodeNameTuple(XPLOR, chainName, resNum, atomName): %s = %s %s %s [%s]" % (
+#        nTdebug("atom = decodeNameTuple(XPLOR, chainName, resNum, atomName): %s = %s %s %s [%s]" % (
 #                 atom, XPLOR, chainName, resNum, atomName))
         if not atom:
-#            NTwarning("Failed to find loc: [%s],[%s],[%s]" % (resId, resNum, atomName)) # TODO check; message disabled for improving other debugging.
+#            nTwarning("Failed to find loc: [%s],[%s],[%s]" % (resId, resNum, atomName)) # TODO check; message disabled for improving other debugging.
             return None
         return atom.resonances()
 
@@ -117,7 +117,7 @@ class Regine(Lister):
 def importReginePeakList(project, fn, offSet = 0, status='keep'):
     offSet = 157 # specific to 1brv
     r = Regine(project, offSet = offSet)
-    NTmessage("regine: %r" % r)
+    nTmessage("regine: %r" % r)
     peakList = r.readPeakList(fn)
     project.peaks.append( peakList )
     project.addHistory( 'Imported Xeasy peaks from "%s"' % fn )

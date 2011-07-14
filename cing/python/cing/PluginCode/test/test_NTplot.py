@@ -37,7 +37,7 @@ class AllChecks(TestCase):
         y=[5,2,3,1,7,8,6,3]
         ey=[0.1,0.2,0.5,0,0.2,0.1]
 #
-        p.points(map(None,x,y,NTfill(0.0,len(x)), ey))
+        p.points(map(None,x,y,nTfill(0.0,len(x)), ey))
         p.setMinorTicks(.5)
 
         attr = fontVerticalAttributes()
@@ -51,7 +51,7 @@ class AllChecks(TestCase):
         ps.show()
 
 
-    def tttestPlotModelHisto(self):
+    def _testPlotModelHisto(self):
         ps = NTplotSet() # closes any previous plots
         outliersPerModel = { 0:2, 1:3 }
         valueList = outliersPerModel.values()
@@ -77,13 +77,13 @@ class AllChecks(TestCase):
 
 
 
-    def tttestTo3StateUpper(self):
+    def _testTo3StateUpper(self):
         self.assertEquals(     to3StateDssp(['S','E']), [' ','S'])
         self.assertEquals(     to3StateDssp(['h','H']), [' ','H'])
         self.assertNotEquals(  to3StateDssp([' ','H']), ['H','H'])
         self.assertEquals(     to3StateDssp(['X','H']), [' ','H'])
 
-    def tttestPlotSet(self):
+    def _testPlotSet(self):
 #        hardcopySize = (60,30)
         ps = NTplotSet() # closes any previous plots
         nrows = 3

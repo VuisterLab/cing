@@ -78,7 +78,7 @@ class AllChecks(TestCase):
                     if targetOptionList == '.':
                         targetOptionList = ''
                     cmd = '%s --project %s -n %s --%s %s' % (refineExecPath, entryId, name, target, targetOptionList)
-                    NTmessage('')
+                    nTmessage('')
                     self.assertFalse( do_cmd(cmd,bufferedOutput=0) )
                 # end for target
                 continue
@@ -92,16 +92,16 @@ class AllChecks(TestCase):
 
     def _test_execfile_replacement_(self):
         'succeeds here but when taken in unit check it fails again.'
-#        NTdebug('==> test_execfile_replacement_')
+#        nTdebug('==> test_execfile_replacement_')
         paramfile = os.path.join(refinePath, 'test', DATA_STR, 'parametersToTest.py' )
-#        NTmessage('==> Reading user parameters %s', paramfile)
+#        nTmessage('==> Reading user parameters %s', paramfile)
 #        parameters = None # Defining it here would kill the workings.
         execfile_(paramfile, globals()) # Standard execfile fails anyhow for functions and is obsolete in Python 3
         self.assertEquals(parameters.ncpus, 7777777) #@UndefinedVariable
     # end def
 
     def _test_getParameters(self):
-#        NTdebug('==> test_getParameters')
+#        nTdebug('==> test_getParameters')
         basePath = os.path.join(refinePath, 'test', DATA_STR )
         moduleName = 'parametersToTest'
 #        parameters  = refineParameters

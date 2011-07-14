@@ -16,13 +16,13 @@ class AllChecks(TestCase):
 
 
 #        print x1
-        NTdebug(x1)
+        nTdebug(x1)
         switchOutput(showOutput = False, doStdOut = True)
 #        print x2 # should not show up.and doesn't
-        NTdebug(x2) # TODO: prevent this message from showing up.
+        nTdebug(x2) # TODO: prevent this message from showing up.
         switchOutput(showOutput = True, doStdOut = True)
 #        print x3
-        NTdebug(x3)
+        nTdebug(x3)
 
     # enable next test when the switchOutput can be used.
 #    def testTrace(self):
@@ -30,7 +30,7 @@ class AllChecks(TestCase):
 #            raise ImportError
 #        except:
 #            traceBackString = format_exc()
-#            NTerror(traceBackString)
+#            nTerror(traceBackString)
 
     def testRmsNTlist(self):
         serie = NTlist()
@@ -154,7 +154,7 @@ b
         d = {}
         keyList = 'a b c'.split()
         setDeepByKeys(d, None, *keyList)
-        NTdebug("Simpler object: %r" % d)
+        nTdebug("Simpler object: %r" % d)
 
     def testGetDeepByKeysOrAttributes(self):
 #        cing.verbosity = cing.verbosityDebug
@@ -162,7 +162,7 @@ b
         d = {}
         keyList = 'a b c'.split()
         setDeepByKeys(d, value, *keyList)
-        NTdebug("complex object: %s" % d)
+        nTdebug("complex object: %s" % d)
         valueOut = getDeepByKeysOrAttributes(d,*keyList)
         self.assertEquals(value,valueOut)
         keyList = [ 'a.b', 'c' ]
@@ -181,7 +181,7 @@ b
 #        idxColumnKeyList = [0]
         idxColumnKeyList = [] # indicates all.
         result.appendFromTableGeneric(inputTable, *idxColumnKeyList)
-        NTdebug("Created: %r" % result)
+        nTdebug("Created: %r" % result)
         self.assertTrue( expected.isEquivalent(result ))
 
         # 2D
@@ -190,7 +190,7 @@ b
         result = NTdict()
 #        idxColumnKeyList = [0, 1]
         result.appendFromTableGeneric(inputTable, *idxColumnKeyList)
-        NTdebug("Created: %r" % result)
+        nTdebug("Created: %r" % result)
         self.assertTrue( expected.isEquivalent(result ))
 
 #        # 3D
@@ -199,26 +199,26 @@ b
         result = NTdict()
 #        idxColumnKeyList = [0, 1,2]
         result.appendFromTableGeneric(inputTable, *idxColumnKeyList)
-        NTdebug("Created: %r" % result)
+        nTdebug("Created: %r" % result)
         self.assertTrue( result.isEquivalent(expected ))
 ##        self.failUnlessRaises( AttributeError, expected.isEquivalent(result )) Dont care why this fails....
 
-        NTdebug("3D done but first transposing")
+        nTdebug("3D done but first transposing")
         result = NTdict()
         inputTable = [['a','b'],['foo','bar'],['abba','waterloo'],]
         expected = { 'a':{ 'foo':'abba'}, 'b':{ 'bar': 'waterloo'}}        
         result.appendFromTableGeneric(inputTable, *idxColumnKeyList, invertFirst=True)
-        NTdebug("Created: %r" % result)
+        nTdebug("Created: %r" % result)
         self.assertTrue( result.isEquivalent( expected ))
 ##        self.failUnlessRaises( AttributeError, expected.isEquivalent(result )) Dont care why this fails....
 
-        NTdebug("3D transposing and added column")
+        nTdebug("3D transposing and added column")
         result = NTdict()
         x = 'abba' # Needs to evaluate to True
         inputTable = [['a','b'],['foo','bar']]
         expected = { 'a':{ 'foo':x}, 'b':{ 'bar': x}}        
         result.appendFromTableGeneric(inputTable, *idxColumnKeyList, invertFirst=True, appendBogusColumn=x)
-        NTdebug("Created: %r" % result)
+        nTdebug("Created: %r" % result)
         self.assertTrue( result.isEquivalent( expected ))
 ##        self.failUnlessRaises( AttributeError, expected.isEquivalent(result )) Dont care why this fails....
     # end def

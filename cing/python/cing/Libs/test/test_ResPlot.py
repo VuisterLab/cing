@@ -49,7 +49,7 @@ class AllChecks(TestCase):
         cyanaDirectory = os.path.join(cingDirTestsData,"cyana", entryId)
         pdbFileName = entryId+".pdb"
         pdbFilePath = os.path.join( cyanaDirectory, pdbFileName)
-        NTdebug("Reading files from directory: " + cyanaDirectory)
+        nTdebug("Reading files from directory: " + cyanaDirectory)
         # Fast
         project.initPDB( pdbFile=pdbFilePath, convention = pdbConvention )
         project.runDssp()
@@ -73,7 +73,7 @@ class AllChecks(TestCase):
             for res in resList:
                 resNumb += 1
 
-    #            NTdebug(`res`)
+    #            nTdebug(`res`)
 
     #            if random() < 0.2: # Skip a 10%
     #                continue
@@ -149,16 +149,16 @@ class AllChecks(TestCase):
                         elif checkID == BBCCHK_STR:
                             zScore = valueList.average()[0]
                             pointsBBCCHK.append( (resNumb-.5, zScore) )
-#                            NTdebug("pointsBBCCHK: %s", pointsBBCCHK)
+#                            nTdebug("pointsBBCCHK: %s", pointsBBCCHK)
 
                         if showValues:
-                            NTdebug("%10s valueList: %-80s" % ( checkID, valueList))
+                            nTdebug("%10s valueList: %-80s" % ( checkID, valueList))
         fileNameList =[]
         ps = None
         r = 0
         for resList in rangeList:
             r += 1
-#            NTdebug("resList: %s" % resList)
+#            nTdebug("resList: %s" % resList)
             ps = NTplotSet() # closes any previous plots
             ps.hardcopySize = (600,600)
             nrows = 2
@@ -218,8 +218,8 @@ class AllChecks(TestCase):
             pointsOffsetList2 = [pointsBBCCHKOffset,
                                  pointsC12CHKOffset,
                                  pointsBNDCHKOffset ]
-#            NTdebug("pointsRAMCHKOffset: %s" % pointsRAMCHKOffset)
-#            NTdebug("start:end: %s %s" % (start,end))
+#            nTdebug("pointsRAMCHKOffset: %s" % pointsRAMCHKOffset)
+#            nTdebug("start:end: %s %s" % (start,end))
             for i in range(nrows):
                 if i >= len( pointsOffsetList ):
                     continue

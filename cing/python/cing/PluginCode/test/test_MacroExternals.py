@@ -15,14 +15,14 @@ class AllChecks(TestCase):
         valueList = [ 0., .5, 1. ]
         molmolColorExpectedList = [ '0.0 0.0 1.0', '1.0 0.0 0.0', '1.0 1.0 0.0' ]
         for i,v in enumerate(valueList):
-#            NTdebug("i,v: %s %s" % (i,v))
+#            nTdebug("i,v: %s %s" % (i,v))
             r = mapValueToMolmolColor(v, 0, 1, False)
             self.assertEquals( r, molmolColorExpectedList[i] )
 
         valueList = [ -3., -1., 1. ]
         molmolColorExpectedList = [ '0.0 0.0 1.0', '1.0 0.0 0.0', '1.0 1.0 0.0' ]
         for i,v in enumerate(valueList):
-#            NTdebug("i,v: %s %s" % (i,v))
+#            nTdebug("i,v: %s %s" % (i,v))
             r = mapValueToMolmolColor(v, -3., 1., False)
             self.assertEquals( r, molmolColorExpectedList[i] )
 
@@ -30,7 +30,7 @@ class AllChecks(TestCase):
         valueList = [ 0., .5, 1. ]
         molmolColorExpectedList = [ '1.0 1.0 0.0', '1.0 0.0 0.0', '0.0 0.0 1.0' ]
         for i,v in enumerate(valueList):
-#            NTdebug("i,v: %s %s" % (i,v))
+#            nTdebug("i,v: %s %s" % (i,v))
             r = mapValueToMolmolColor(v, 0, 1, True)
             self.assertEquals( r, molmolColorExpectedList[i] )
 

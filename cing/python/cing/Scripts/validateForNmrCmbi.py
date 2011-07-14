@@ -39,7 +39,7 @@ if doUnzipFirst:
         line = line.strip()
         entryCode = line[0:4].lower()
         entryCodeList.append( entryCode )
-    NTmessage('Found %d entries    ' % len(entryCodeList))
+    nTmessage('Found %d entries    ' % len(entryCodeList))
 
     for entryCode in entryCodeList:
         fileNameZipped = os.path.join( PDBZ2, entryCode[1:3], 'pdb'+entryCode+'.ent.gz' )
@@ -49,17 +49,17 @@ if doUnzipFirst:
         cmd = '/Users/jd/BMRB/PdbArchive/getPdb.csh ' + entryCode
         exit_code = os.system( cmd )
         if exit_code:
-            NTerror('failed to get pdb file')
+            nTerror('failed to get pdb file')
             continue
         if gunzip(fileNameZipped, outputFileName=outputFileName):
-            NTerror('Failed gunzip for entry: ' + entryCode)
+            nTerror('Failed gunzip for entry: ' + entryCode)
         # Unusual path hierarchy by symlink only.
         if not os.path.exists(dstDir):
             os.mkdir(dstDir)
         if os.path.exists(dst):
             os.unlink(dst)
         if os.symlink(outputFileName, dst):
-            NTerror('failed to symlink pdb file')
+            nTerror('failed to symlink pdb file')
             continue
 
 

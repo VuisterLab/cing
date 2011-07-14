@@ -135,15 +135,15 @@ class Peirce:
         # row>=20 and we need delta to get an R value close to 1.
         if y >= x/2:
             # TODO: but let's not focus our attention on it now.
-#            NTdebug("Cing was trying to remove from a set of "+`x`+" values an unexpected high number of outliers: "+`y`+" this is impossible")
+#            nTdebug("Cing was trying to remove from a set of "+`x`+" values an unexpected high number of outliers: "+`y`+" this is impossible")
             return None
 
         lastValue = self.peirce[row][-1]
         maxWidth = x/2
         delta = (lastValue - 1.)/(maxWidth-9) # float semantics needs to be enforced.
         R = lastValue - (y-9)*delta
-#        NTdebug("delta: "+`delta`)
-#        NTdebug("R    : "+`R`)
+#        nTdebug("delta: "+`delta`)
+#        nTdebug("R    : "+`R`)
         return R
 
 
@@ -179,23 +179,23 @@ class Peirce:
         #newValues.average(byItem=1)
 
         for newValuesList in listOfnewValues:
-#            NTdebug(newValuesList)
+#            nTdebug(newValuesList)
             newValuesList.average(byItem=1)
-#            NTdebug("av: " + `newValuesList.av`)
-#            NTdebug("sd: " + `newValuesList.sd`)
+#            nTdebug("av: " + `newValuesList.av`)
+#            nTdebug("sd: " + `newValuesList.sd`)
             newL = len(newValuesList)
             notDone   = True
             nOutliers = 0
             while notDone and nOutliers < len( self.peirce[newL] ):
                 R = self.peirce[newL][nOutliers]
-#                NTdebug("nOutliers: "+ `nOutliers` )
-#                NTdebug("R        : "+ `R`)
+#                nTdebug("nOutliers: "+ `nOutliers` )
+#                nTdebug("R        : "+ `R`)
                 maxDeviation = R * newValuesList.sd
                 n = 0
                 for item in newValuesList:
                     i,v = item
                     if ( math.fabs( v-newValuesList.av ) > maxDeviation ):
-#                        NTdebug("Removing item: " + `i` + ", " + `v`)
+#                        nTdebug("Removing item: " + `i` + ", " + `v`)
                         try:
                             newValues.remove( item )
                             outliers.append( item )
@@ -237,12 +237,12 @@ class Peirce:
         newValues.average(byItem=1)
         sd = newValues.sd # not to be changed until the end.
         av = newValues.av # not to be changed until the end.
-#        NTdebug("av: " + `av`)
-#        NTdebug("sd: " + `sd`)
+#        nTdebug("av: " + `av`)
+#        nTdebug("sd: " + `sd`)
 
         if x<3:
-#            NTdebug("Peirce test called with less than 3 values.")
-#            NTdebug("For less than 3 values no outliers can be identified by this methodology")
+#            nTdebug("Peirce test called with less than 3 values.")
+#            nTdebug("For less than 3 values no outliers can be identified by this methodology")
             return (newValues, outliers)
 
         done = False # At least give it a try.
@@ -250,20 +250,20 @@ class Peirce:
             done = True # Quit if no outliers were identified.
             R = self._getR(x, y)
             if not R:
-#                NTdebug("Failed to get a Peirce constant R; not adding outliers anymore.")
-#                NTdebug('This happened on values:\n%s' % valueList)
+#                nTdebug("Failed to get a Peirce constant R; not adding outliers anymore.")
+#                nTdebug('This happened on values:\n%s' % valueList)
 #                return None
                 break
             maxDeviation = R * sd
-#            NTdebug("R : " + `R`)
-#            NTdebug("md: " + `maxDeviation`)
+#            nTdebug("R : " + `R`)
+#            nTdebug("md: " + `maxDeviation`)
 
             c = len(newValues)-1 # Start at the end of the list because deletions in lists are easiest (optimal) that way.
             while c>=0:
                 item = newValues[c]
                 i,v = item
                 if ( math.fabs( v-av ) > maxDeviation ):
-#                    NTdebug("Removing: " + `i` + "," + `v`)
+#                    nTdebug("Removing: " + `i` + "," + `v`)
                     del newValues[ c ]
                     outliers.append( item )
                     y = len(outliers) # Keep it simple.

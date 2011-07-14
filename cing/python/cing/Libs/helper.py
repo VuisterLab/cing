@@ -30,15 +30,15 @@ def _NTgetoutput( cmd ):
     errStream.close()
     return (output,errors)
 # end def
-def _NTerror(msg):
+def _nTerror(msg):
     'Convenience method'
     print "ERROR:",msg
 # end def
-def _NTwarning(msg):
+def _nTwarning(msg):
     'Convenience method'
     print "WARNING:",msg
 # end def
-def _NTmessage(msg):
+def _nTmessage(msg):
     'Convenience method'
     print msg
 # end def
@@ -49,8 +49,8 @@ def getSvnRevision():
 #    return None
     try:
         cingSvnInfo, err = _NTgetoutput('svn info %s' % os.getenv("CINGROOT"))
-        #_NTmessage("cingSvnInfo: " + cingSvnInfo)
-        #_NTmessage("err: " + err)
+        #_nTmessage("cingSvnInfo: " + cingSvnInfo)
+        #_nTmessage("err: " + err)
         if not err:
             cingSvnInfoList = cingSvnInfo.split('\n')
             for cingSvnInfo in cingSvnInfoList:
@@ -63,7 +63,7 @@ def getSvnRevision():
         # end if
     except:
         pass
-#        _NTwarning("Failed to getSvnRevision()" )
+#        _nTwarning("Failed to getSvnRevision()" )
 # end def
 
 def isInternetConnected():

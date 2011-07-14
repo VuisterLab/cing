@@ -26,7 +26,7 @@ class AllChecks(TestCase):
         values = []        
         for i in range(0,1000):
             values.append(1)        
-#        NTdebug("n="+`len(values)`)
+#        nTdebug("n="+`len(values)`)
         for i in range(0,10):
             values[i] = 2        
         # Will only note first 9 outliers
@@ -51,7 +51,7 @@ class AllChecks(TestCase):
         m = 10    # Only tested with default value 10.
         for i in range(0,n):
             values.append(1)        
-#        NTdebug("n="+`len(values)`)
+#        nTdebug("n="+`len(values)`)
         for i in range(0,m):
             values[i] = 2
                 

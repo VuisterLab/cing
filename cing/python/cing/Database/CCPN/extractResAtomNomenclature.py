@@ -1,4 +1,4 @@
-
+#@PydevCodeAnalysisIgnore # pylint: disable-all
 
 from memops.api import Implementation
 

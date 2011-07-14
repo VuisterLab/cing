@@ -21,31 +21,31 @@ cing.verbosity = verbosityDebug
 Returns True on error.
 """
 
-NTmessage(header)
-NTmessage(getStartMessage())
+nTmessage(header)
+nTmessage(getStartMessage())
 
 pdb_id = '1brv'
 inputDir = '.'
 #    archiveType = extraArgList[1]
 #    projectType = extraArgList[2]
 
-NTdebug("Using:")
-NTdebug("pdb_id:              " + pdb_id)
-NTdebug("inputDir:             " + inputDir)
+nTdebug("Using:")
+nTdebug("pdb_id:              " + pdb_id)
+nTdebug("inputDir:             " + inputDir)
 # presume the directory still needs to be created.
 cingEntryDir = pdb_id + ".cing"
 
-NTmessage("Now in %s" % os.path.curdir)
+nTmessage("Now in %s" % os.path.curdir)
 
 if not os.path.isdir(cingEntryDir):
-    NTerror("Failed to find input directory: %s" % cingEntryDir)
+    nTerror("Failed to find input directory: %s" % cingEntryDir)
     sys.exit(1)
 # end if.
 
 # Needs to be copied because the open method doesn't take a directory argument..
 project = Project.open(pdb_id, status='old')
 if not project:
-    NTerror("Failed to init old project")
+    nTerror("Failed to init old project")
     sys.exit(1)
 
 # shortcuts
@@ -56,7 +56,7 @@ p.validate(parseOnly=True, htmlOnly=True)
 
 csql = CsqlAlchemy()
 if csql.connect():
-    NTerror("Failed to connect to DB")
+    nTerror("Failed to connect to DB")
     sys.exit(1)
 
 csql.autoload()

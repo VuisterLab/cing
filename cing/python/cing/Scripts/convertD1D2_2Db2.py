@@ -101,7 +101,7 @@ def main():
         n = len(lineListSorted)
         bad_count = int(round((n * DEFAULT_BFACTOR_PERCENTAGE_FILTER) / 100.))
         to_remove_count = n-bad_count
-#        NTmessage("Removing at least %d from %d residues" % (bad_count,n))
+#        nTmessage("Removing at least %d from %d residues" % (bad_count,n))
         badIdxList = [lineItem[IDX_COLUMN] for lineItem in lineListSorted[to_remove_count:n]]
         iList = range(n)
         iList.reverse()
@@ -109,17 +109,17 @@ def main():
             lineItem = lineList[i]
             max_bfactor = float(lineItem[BFACTOR_COLUMN])
             if max_bfactor > DEFAULT_MAX_BFACTOR:
-#                NTdebug('Skipping because max bfactor of atoms in dihedral %.3f is above %.3f %s' % (max_bfactor, DEFAULT_MAX_BFACTOR, lineItem))
+#                nTdebug('Skipping because max bfactor in dihedral %.3f is above %.3f %s' % (max_bfactor, DEFAULT_MAX_BFACTOR, lineItem))
                 del lineList[i] # TODO: check if indexing is still right or we shoot in the foot.
                 continue
             if i in badIdxList:
-#                NTdebug('Skipping because bfactor worst %.3f %s' % (max_bfactor, lineItem))
+#                nTdebug('Skipping because bfactor worst %.3f %s' % (max_bfactor, lineItem))
                 del lineList[i]
                 continue
         removed_count = n - len(lineList)
-#        NTdebug("Reduced list by %d" % removed_count)
+#        nTdebug("Reduced list by %d" % removed_count)
         if removed_count < bad_count:
-            NTwarning("Failed to remove at least %d residues" % bad_count)
+            nTwarning("Failed to remove at least %d residues" % bad_count)
 
     for entryId2 in entryIdList:
         prevChainId = None
@@ -136,20 +136,20 @@ def main():
             resType = resType.strip()
             db = NTdb.getResidueDefByName( resType )
             if not db:
-                NTerror("resType not in db: %s" % resType)
+                nTerror("resType not in db: %s" % resType)
                 return
             resType = db.nameDict['IUPAC']
             d1 = d1.strip()
             d1 = floatParse(d1)
             if isNaN(d1):
-#                NTdebug("d1 %s is a NaN on row: %s" % (d1,row))
+#                nTdebug("d1 %s is a NaN on row: %s" % (d1,row))
                 continue
             if not inRange(d1):
-                NTerror("d1 not in range for row: %s" % str(row))
+                nTerror("d1 not in range for row: %s" % str(row))
                 return
 
             if not (resType in common20AAList):
-    #            NTmessage("Skipping uncommon residue: %s" % resType)
+    #            nTmessage("Skipping uncommon residue: %s" % resType)
                 if not ( resType in skippedResTypes):
                     skippedResTypes.append( resType )
                 continue
@@ -167,8 +167,8 @@ def main():
             prevSsType = ssType
 
     os.unlink(cvs_file_abs_name)
-    NTmessage("Skipped skippedResTypes: %r" % skippedResTypes )
-    NTmessage("Got count of values: %r" % len(value) )
+    nTmessage("Skipped skippedResTypes: %r" % skippedResTypes )
+    nTmessage("Got count of values: %r" % len(value) )
     # fill FOUR types of hist.
     # TODO: filter differently for pro/gly
     keyListSorted1 = valueBySs0AndResTypes.keys()
@@ -189,26 +189,26 @@ def main():
     #        for ssTypePrev in keyListSorted1b:
             d1List = valueBySs[ssType]
             if not d1List:
-                NTerror("Expected d1List from valueBySs[%s]" % (ssType))
+                nTerror("Expected d1List from valueBySs[%s]" % (ssType))
                 continue
             hist1d, _bins, _patches = hist(d1List, bins=binCount, range=xRange)
-            NTmessage("Count %6d in valueBySs[%s]" % (sum(hist1d), ssType))
+            nTmessage("Count %6d in valueBySs[%s]" % (sum(hist1d), ssType))
             setDeepByKeys(histd1BySs, hist1d, ssType)
 
             keyListSorted2 = valueBySsAndResTypes[ssType].keys()
             keyListSorted2.sort()
             for resType in keyListSorted2:
-    #            NTmessage("Working on valueBySsAndResTypes for [%s][%s]" % (ssType, resType)) # nice for balancing output verbosity.
+    #            nTmessage("Working on valueBySsAndResTypes for [%s][%s]" % (ssType, resType)) # nice for balancing output verbosity.
                 keyListSorted3 = valueBySsAndResTypes[ssType][resType].keys()
                 keyListSorted3.sort()
                 for prevResType in keyListSorted3:
-    #                NTmessage("Working on valueBySsAndResTypes[%s][%s][%s]" % (ssType, resType, prevResType))
+    #                nTmessage("Working on valueBySsAndResTypes[%s][%s][%s]" % (ssType, resType, prevResType))
                     d1List = valueBySsAndResTypes[ssType][resType][prevResType]
                     if not d1List:
-                        NTerror("Expected d1List from valueBySsAndResTypes[%s][%s][%s]" % (ssType, resType, prevResType))
+                        nTerror("Expected d1List from valueBySsAndResTypes[%s][%s][%s]" % (ssType, resType, prevResType))
                         continue
                     hist1d, _bins, _patches = hist(d1List, bins=binCount, range=xRange)
-    #                NTmessage("Count %6d in valueBySsAndResTypes[%s][%s][%s]" % (sum(hist1d), ssType, resType, prevResType))
+    #                nTmessage("Count %6d in valueBySsAndResTypes[%s][%s][%s]" % (sum(hist1d), ssType, resType, prevResType))
                     setDeepByKeys(histd1BySsAndResTypes, hist1d, ssType, resType, prevResType)
             # Now that they are all in we can redo this.
     # Delete the reference -not- the object.
@@ -219,34 +219,36 @@ def main():
 
     for ssType in keyListSorted1:
         for resType in keyListSorted2:
-#            NTmessage("Working on valueBySsAndResTypes for [%s][%s]" % (ssType, resType)) # nice for balancing output verbosity.
+#            nTmessage("Working on valueBySsAndResTypes for [%s][%s]" % (ssType, resType)) # nice for balancing output verbosity.
             keyListSorted3 = valueBySs0AndResTypes[ssType][resType].keys()
             keyListSorted3.sort()
             for resTypePrev in keyListSorted3:
                 keyListSorted4 = keyListSorted3[:] # take a copy
                 for resTypeNext in keyListSorted4:
                     hist1 = getDeepByKeys(histd1BySs0AndResTypes, ssType, resType, resTypePrev) # x-axis
-                    hist2 = getDeepByKeys(histd1BySs1AndResTypes, ssType, resTypeNext, resType) # This was bug! It needs to be hashed on the ssType of resType -not- on resTypeNext
+                    # This was bug! It needs to be hashed on the ssType of resType -not- on resTypeNext
+                    hist2 = getDeepByKeys(histd1BySs1AndResTypes, ssType, resTypeNext, resType) 
                     if hist1 == None:
-                        NTdebug('skipping for hist1 is empty for [%s] [%s] [%s]' % (ssType, resTypePrev, resType))
+                        nTdebug('skipping for hist1 is empty for [%s] [%s] [%s]' % (ssType, resTypePrev, resType))
                         continue
                     if hist2 == None:
-                        NTdebug('skipping for hist2 is empty for [%s] [%s] [%s]' % (ssType, resType, resTypeNext))
+                        nTdebug('skipping for hist2 is empty for [%s] [%s] [%s]' % (ssType, resType, resTypeNext))
                         continue
                     m1 = mat(hist1,dtype='float')
                     m2 = mat(hist2,dtype='float')
                     m2 = m2.transpose() # pylint: disable=E1101
                     hist2d = multiply(m1,m2)
 
-                    cTuple = getEnsembleAverageAndSigmaFromHistogram( hist2d )
+                    cTuple = getEnsembleAverageAndSigmaHis( hist2d )
                     (c_av, c_sd, hisMin, hisMax) = cTuple #@UnusedVariable
                     cTuple += tuple([str([ssType, resType, resTypePrev, resTypeNext])]) # append the hash keys as a way of id.
-#                    NTdebug("For ssType %s residue types %s %s %s found (av/sd/min/max) %8.0f %8.0f %8.0f %8.0f" % (ssType, resType, resTypePrev, resTypeNext, c_av, c_sd, hisMin, hisMax))
+#                    nTdebug("For ssType %s residue types %s %s %s found (av/sd/min/max) %8.0f %8.0f %8.0f %8.0f" % (
+#                        ssType, resType, resTypePrev, resTypeNext, c_av, c_sd, hisMin, hisMax))
                     if c_sd == None:
-                        NTdebug('Failed to get c_sd when testing not all residues are present in smaller sets.')
+                        nTdebug('Failed to get c_sd when testing not all residues are present in smaller sets.')
                         continue
                     if c_sd == 0.:
-                        NTdebug('Got zero c_sd, ignoring histogram. This should only occur in smaller sets. Not setting values.')
+                        nTdebug('Got zero c_sd, ignoring histogram. This should only occur in smaller sets. Not setting values.')
                         continue
                     setDeepByKeys( histd1CtupleBySsAndResTypes, cTuple, ssType, resType, resTypePrev, resTypeNext)
     # end for isI
@@ -259,14 +261,14 @@ def main():
         for prevResType in keyListSorted2:
             d1List = valueByResTypes[resType][prevResType]
             if not d1List:
-                NTerror("Expected d1List from valueByResTypes[%s][%s]" % (resType, prevResType))
+                nTerror("Expected d1List from valueByResTypes[%s][%s]" % (resType, prevResType))
                 continue
             hist1d, _bins, _patches = hist(d1List, bins=binCount, range=xRange)
-#            NTmessage("Count %6d in valueByResTypes[%s][%s]" % (sum(hist1d), resType, prevResType))
+#            nTmessage("Count %6d in valueByResTypes[%s][%s]" % (sum(hist1d), resType, prevResType))
             setDeepByKeys(histd1ByResTypes, hist1d, resType, prevResType)
 
     histd1, _bins, _patches = hist(value, bins=binCount, range=xRange)
-    NTmessage("Count %6d in value" % sum(histd1))
+    nTmessage("Count %6d in value" % sum(histd1))
 #    setDeepByKeys(histd1, hist1d, resType, prevResType)
 
     if os.path.exists(dbase_file_abs_name):

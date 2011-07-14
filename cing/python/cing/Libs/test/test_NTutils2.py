@@ -1,3 +1,8 @@
+"""
+Unit test execute as:
+python -u $CINGROOT/python/cing/Libs/test/test_NTutils2.py
+"""
+
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.core.molecule import Molecule
 from unittest import TestCase
@@ -7,10 +12,10 @@ class AllChecks(TestCase):
 
     def testNTdict(self):
         a = NTdict( b=NTdict( anItem='there'))
-#        NTdebug( '0 '+ `a` )
-#        NTdebug( '1 '+ `a['b']`)
-#        NTdebug( '2 '+ `a.getDeepByKeys('b')`)
-#        NTdebug( '3 '+ `a.getDeepByKeys(9)`)
+#        nTdebug( '0 '+ `a` )
+#        nTdebug( '1 '+ `a['b']`)
+#        nTdebug( '2 '+ `a.getDeepByKeys('b')`)
+#        nTdebug( '3 '+ `a.getDeepByKeys(9)`)
         # Tests below make sure no throwables are thrown.
         self.assertTrue(a)
         self.assertTrue(a['b'])
@@ -19,12 +24,12 @@ class AllChecks(TestCase):
 
 
         a = NTdict(b=NTdict(c=NTdict(anItem='there')))
-#        NTdebug( '4 '+ `a` )
-#        NTdebug( '5 '+ `a['b']`)
-#        NTdebug( '6 '+ `a.getDeepByKeys('b')`)
-#        NTdebug( '7 '+ `a.getDeepByKeys('b','c')`)
-#        NTdebug( '8 '+ `a.getDeepByKeys('b','9')`)
-#        NTdebug( '9 '+ `a.getDeepByKeys('b','c','d')`)
+#        nTdebug( '4 '+ `a` )
+#        nTdebug( '5 '+ `a['b']`)
+#        nTdebug( '6 '+ `a.getDeepByKeys('b')`)
+#        nTdebug( '7 '+ `a.getDeepByKeys('b','c')`)
+#        nTdebug( '8 '+ `a.getDeepByKeys('b','9')`)
+#        nTdebug( '9 '+ `a.getDeepByKeys('b','c','d')`)
         self.assertTrue(a.getDeepByKeys('b','c','anItem'))
         self.assertFalse(a.getDeepByKeys('b','c',9))
         a.b.c=NTlist(1,2,3)
@@ -48,18 +53,17 @@ class AllChecks(TestCase):
         self.assertEquals(strComplexObject, "{'b': [10, [11, 13], 12]}")
 
 
-    def testNTmessage(self):
+    def testnTmessage(self):
         aStringToBe = 123
-        NTdebug("testing messaging system for debug: "+`aStringToBe`)
+        nTdebug("testing messaging system for debug: "+`aStringToBe`)
         # Next should not be printing anything when verbosityNothing is the setting.
-#        NTerror("testing messaging system for MESSAGE TYPE error (This is not a real error): "+`aStringToBe`)
-        NTdebug("testing messaging system: "+`aStringToBe`)
-        NTdebug("testing messaging system: %s", aStringToBe)
+#        nTerror("testing messaging system for MESSAGE TYPE error (This is not a real error): "+`aStringToBe`)
+        nTdebug("testing messaging system: "+`aStringToBe`)
+        nTdebug("testing messaging system: %s", aStringToBe)
 
     def testNTlistSetConsensus(self):
-        l = NTlist( 4., 9., 9. )
-        self.assertEqual( l.setConsensus(minFraction=0.6), 9)
-        self.assertEqual( l.consensus, 9)
+        myList = NTlist( 4., 9., 9. )
+        self.assertEqual( myList.setConsensus(minFraction=0.6), 9)
 
     def testNTlistIndex(self):
         # speed check

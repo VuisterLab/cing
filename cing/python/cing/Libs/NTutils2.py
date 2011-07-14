@@ -5,35 +5,34 @@ NTutils imports these extensions after it loads it's own code.
 
 Meant to delineate the classes.
 '''
-from cing.Libs.NTutils import NTcodeerror
-from cing.Libs.NTutils import NTcodeerrorT
-from cing.Libs.NTutils import NTdebug
-from cing.Libs.NTutils import NTdebugT
-from cing.Libs.NTutils import NTdetail
-from cing.Libs.NTutils import NTdetailT
+from cing.Libs.NTutils import nTcodeerror
+from cing.Libs.NTutils import nTcodeerrorT
+from cing.Libs.NTutils import nTdebug
+from cing.Libs.NTutils import nTdebugT
+from cing.Libs.NTutils import nTdetail
+from cing.Libs.NTutils import nTdetailT
 from cing.Libs.NTutils import NTdict
-from cing.Libs.NTutils import NTerror
-from cing.Libs.NTutils import NTerrorT
-from cing.Libs.NTutils import NTexception
-from cing.Libs.NTutils import NTexceptionT
-from cing.Libs.NTutils import NTfill
+from cing.Libs.NTutils import nTerror
+from cing.Libs.NTutils import nTerrorT
+from cing.Libs.NTutils import nTexception
+from cing.Libs.NTutils import nTexceptionT
 from cing.Libs.NTutils import NTlist
-from cing.Libs.NTutils import NTmessage
-from cing.Libs.NTutils import NTmessageList
-from cing.Libs.NTutils import NTmessageNoEOL
-from cing.Libs.NTutils import NTmessageNoEOLT
-from cing.Libs.NTutils import NTmessageT
-from cing.Libs.NTutils import NTnothingT
-from cing.Libs.NTutils import NTwarning
-from cing.Libs.NTutils import NTwarningT
+from cing.Libs.NTutils import nTmessage
+from cing.Libs.NTutils import nTmessageList
+from cing.Libs.NTutils import nTmessageNoEOL
+from cing.Libs.NTutils import nTmessageNoEOLT
+from cing.Libs.NTutils import nTmessageT
+from cing.Libs.NTutils import nTnothingT
+from cing.Libs.NTutils import nTwarning
+from cing.Libs.NTutils import nTwarningT
 from cing.Libs.NTutils import getDeepByKeysOrAttributes
+from cing.Libs.NTutils import nTfill
 from cing.Libs.NTutils import readTextFromFile
 from cing.Libs.NTutils import sprintf
 from cing.Libs.fpconst import isNaN
 from cing.core.constants import * #@UnusedWildImport
 from random import randint
 from random import seed
-from string import join
 from traceback import format_exc
 import datetime
 import inspect
@@ -51,7 +50,7 @@ class NTlistOfLists(NTlist):
     def __init__( self, rowSize, colSize, default=None ):
         NTlist.__init__( self )
         for _i in range(rowSize):
-            self.append(NTfill(default, colSize))
+            self.append(nTfill(default, colSize))
         self.rowSize = rowSize
         self.colSize = colSize
     #end def
@@ -78,11 +77,12 @@ class NTlistOfLists(NTlist):
     #end def
 
     def getDiagonal(self):
-        """Get the diagonal of a square NTlistOfLists
+        """
+        Get the diagonal of a square NTlistOfLists
         return NTlist instance or None on error
         """
         if self.rowSize != self.colSize:
-            NTerror('NTlistOflists.getDiagonal: unequal number of rows (%d) and collumns (%d)', self.rowSize, self.colSize)
+            nTerror('NTlistOflists.getDiagonal: unequal number of rows (%d) and collumns (%d)', self.rowSize, self.colSize)
             return None
         result = NTlist()
         for i in range(self.rowSize):
@@ -99,12 +99,12 @@ class NTlistOfLists(NTlist):
     #end def
 #end class
 
-def addStreamNTmessageList(stream):
-    for NTm in NTmessageList:
+def addStreamnTmessageList(stream):
+    for NTm in nTmessageList:
 #        print "EEE: starting addStream to %s" % NTm
         NTm.addStream(stream)
-def removeStreamNTmessageList():
-    for NTm in NTmessageList:
+def removeStreamnTmessageList():
+    for NTm in nTmessageList:
 #        print "EEE: starting removeStream to %s" % NTm
         NTm.removeStream()
 
@@ -119,19 +119,19 @@ def teeToFile(logFile):
     except:
         NTtracebackError()
         return True
-    NTnothingT.stream = stream
-    NTerrorT.stream = stream
-    NTcodeerrorT.stream = stream
-    NTexceptionT.stream = stream
-    NTwarningT.stream = stream
-    NTmessageT.stream = stream
-    NTdetailT.stream = stream
-    NTdebugT.stream = stream
-    NTmessageNoEOLT.stream = stream
-    NTnothingT.stream = stream
+    nTnothingT.stream = stream
+    nTerrorT.stream = stream
+    nTcodeerrorT.stream = stream
+    nTexceptionT.stream = stream
+    nTwarningT.stream = stream
+    nTmessageT.stream = stream
+    nTdetailT.stream = stream
+    nTdebugT.stream = stream
+    nTmessageNoEOLT.stream = stream
+    nTnothingT.stream = stream
 
 
-#class NTmessage2(PrintWrap):
+#class nTmessage2(PrintWrap):
 #    def __init__(self):
 #        PrintWrap.__init__(self, stream, autoFlush, verbose, noEOL, useDate, useProcessId, doubleToStandardStreams, prefix)
 #    def __call__(self):
@@ -142,16 +142,16 @@ def NTtracebackError():
 #    print 'DEBUG: NTtracebackError: [%s]' % traceBackString
     if traceBackString == None:
         traceBackString = 'No traceback error string available.'
-    NTerror(traceBackString)
+    nTerror(traceBackString)
 
-_outOutputStreamContainerList = [ NTmessageNoEOL, NTdebug, NTdetail, NTmessage, NTwarning ]
-_errOutputStreamContainerList = [ NTerror, NTcodeerror, NTexception ]
+_outOutputStreamContainerList = [ nTmessageNoEOL, nTdebug, nTdetail, nTmessage, nTwarning ]
+_errOutputStreamContainerList = [ nTerror, nTcodeerror, nTexception ]
 
-"""To dump some output to never see again"""
+#: To dump some output to never see again
 _bitBucket = open('/dev/null', 'aw')
-"Regular output at the start of the program"
+#: Regular output at the start of the program"
 _returnMyStdOut = sys.stdout
-"Error output at the start of the program"
+#: Error output at the start of the program"
 _returnMyStdErr = sys.stderr
 
 def _setStdOutStreamsTo(stream):
@@ -215,17 +215,17 @@ class MsgHoL(NTdict):
         "Limited printing of errors and the like; might have moved the arguments to the init but let's not waste time."
 
         typeCountList = { ERROR_ID: MAX_ERRORS, WARNING_ID: MAX_WARNINGS, MESSAGE_ID: MAX_MESSAGES, DEBUG_ID: MAX_DEBUGS }
-        typeReportFunctionList = { ERROR_ID: NTerror, WARNING_ID: NTwarning, MESSAGE_ID: NTmessage,  DEBUG_ID: NTdebug }
+        typeReportFunctionList = { ERROR_ID: nTerror, WARNING_ID: nTwarning, MESSAGE_ID: nTmessage,  DEBUG_ID: nTdebug }
 
-        for type in typeCountList:
-            if not self.has_key(type):
+        for t in typeCountList:
+            if not self.has_key(t):
                 continue
 
-            typeCount = typeCountList[ type ]
-            msgList = self[type]
-            typeReportFunction = typeReportFunctionList[ type ]
+            typeCount = typeCountList[ t ]
+            msgList = self[t]
+            typeReportFunction = typeReportFunctionList[ t ]
             msgListLength = len(msgList)
-#            NTdebug("now for typeCount: %d found %d" % (typeCount, msgListLength))
+#            nTdebug("now for typeCount: %d found %d" % (typeCount, msgListLength))
             for i in range(msgListLength):
                 if i >= typeCount:
                     typeReportFunction("and so on for a total of %d messages" % len(msgList))
@@ -253,12 +253,13 @@ def isAlmostEqual( ntList, epsilon):
     return False
 # end def
 
-def toPoundedComment(str):
+def toPoundedComment(msg):
+    ' Return a string with for each line in msg a pound character and space added.'
     result = []
-    for line in str.split('\n'):
-#        NTdebug("Processing line: [%s]" % line)
+    for line in msg.split('\n'):
+#        nTdebug("Processing line: [%s]" % line)
         result.append( '# %s' % line )
-    resultStr = join(result, '\n')
+    resultStr = '\n'.join(result)
     return resultStr
 
 def NTlist2dict(lst):
@@ -281,11 +282,11 @@ def getKeyWithLargestCount(count):
     countMax = -1
     for v in count:
         countV = count[v]
-#        NTdebug("Considering key/value %s/%s" % (v,countV))
+#        nTdebug("Considering key/value %s/%s" % (v,countV))
         if countV > countMax:
             countMax = countV
             vMax = v
-#            NTdebug("Set max key/value %s/%s" % (vMax,countMax))
+#            nTdebug("Set max key/value %s/%s" % (vMax,countMax))
     if countMax < 0: # nothing found
         return None
     return vMax
@@ -306,12 +307,12 @@ def grep(fileName, txt, resultList = None, doQuiet=False, caseSensitive=True):
         if len(line):
             line = line[:-1] # must be at least 1 char long
         else:
-            NTcodeerror("Fix code in grep")
+            nTcodeerror("Fix code in grep")
         lineMod = line
         if not caseSensitive:
             lineMod = lineMod.lower()
         if txt in lineMod:
-#            NTdebug("Matched line in grep: %s" % lineMod)
+#            nTdebug("Matched line in grep: %s" % lineMod)
             if resultList != None:
                 resultList.append(line)
             if doQuiet:
@@ -333,14 +334,14 @@ def timedelta2HoursMinutesAndSeconds( s ):
     result[2] = int(t)
     return tuple(result)
 
-def lenNonZero(l, eps=EPSILON_RESTRAINT_VALUE_FLOAT):
+def lenNonZero(myList, eps=EPSILON_RESTRAINT_VALUE_FLOAT):
     'Counts the non zero eelements when compared to epsilon'
-    if l == None:
+    if myList == None:
         return 0
-#    if len(l) == 0:
+#    if len(myList) == 0:
 #        return 0
     n = 0
-    for item in l:
+    for item in myList:
         if math.fabs(item) > eps:
             n += 1
     return n
@@ -375,7 +376,7 @@ def stringMeansBooleanTrue(inputStr):
     try:
         inputInt = int(inputStr)
     except:
-        NTwarning("Failed to get integer after testing string possibilities")
+        nTwarning("Failed to get integer after testing string possibilities")
         inputInt = 0
 
     if inputInt:
@@ -423,7 +424,7 @@ def getUniqueName(objectListWithNameAttribute, baseName, nameFormat = "%s_%d" ):
     Works on any NTlist that has name attributes in each element.
     """
     nameList = objectListWithNameAttribute.zap( NAME_STR )
-#    NTdebug("Already have names: %s" % str(nameList))
+#    nTdebug("Already have names: %s" % str(nameList))
 
     nameDict = NTlist2dict(nameList)
     if not nameDict.has_key( baseName):
@@ -443,42 +444,42 @@ def getObjectByName(ll, name):
 
     E.g. for ResonanceSources object in which the ResonanceList objects have a name attribute.
     """
-#    NTdebug("Working on ll: %s" % str(ll))
-#    NTdebug("ll[0].name: %s" % ll[0].name)
+#    nTdebug("Working on ll: %s" % str(ll))
+#    nTdebug("ll[0].name: %s" % ll[0].name)
     names = ll.zap('name')
-#    NTdebug("names: %s" % str(names))
+#    nTdebug("names: %s" % str(names))
     idx = names.index(name)
     if idx < 0:
         return
     return ll[idx]
 # end def
 
-def getObjectIdx(ll, l):
+def getObjectIdx(ll, obj):
     """
     Return list by name or False.
     Works on any NTlist that has name attributes in each element.
     """
-    name = l.name
+    name = obj.name
     names = ll.zap('name')
     return names.index(name)
 # end def
 
 
-def filterListByObjectClassName( l, className ):
+def filterListByObjectClassName( myList, className ):
     'Return new list with only those objects that have given class name.'
     result = []
-    if l == None:
+    if myList == None:
         return result
-    if not isinstance(l, list):
-        NTerror('Input is not a list but a %s' % str(l))
+    if not isinstance(myList, list):
+        nTerror('Input is not a list but a %s' % str(myList))
         return result
-#    if len(l) == 0:
+#    if len(myList) == 0:
 #        return result
-    for o in l:
-        oClassName = getDeepByKeysOrAttributes(o, '__class__', '__name__' )
-#        NTdebug("oClassName: %s" % oClassName)
+    for obj in myList:
+        oClassName = getDeepByKeysOrAttributes(obj, '__class__', '__name__' )
+#        nTdebug("oClassName: %s" % oClassName)
         if oClassName == className:
-            result.append(o)
+            result.append(obj)
     return result
 # end def
 
@@ -486,7 +487,7 @@ def getRevisionAndDateTimeFromCingLog( fileName ):
     """Return int revision and date or None on error."""
     txt = readTextFromFile(fileName)
     if txt == None:
-        NTerror("In %s failed to find %s" % ( getCallerName(), fileName))
+        nTerror("In %s failed to find %s" % ( getCallerName(), fileName))
         return None
     # Parse
 ##======================================================================================================
@@ -495,24 +496,24 @@ def getRevisionAndDateTimeFromCingLog( fileName ):
 #User: i          on: vc (linux/32bit/8cores/2.6.4)              at: (10370) Sat Apr 16 14:24:12 2011
     txtLineList = txt.splitlines()
     if len(txtLineList) < 2:
-        NTerror("In %s failed to find at least two lines in %s" % ( getCallerName(), fileName))
+        nTerror("In %s failed to find at least two lines in %s" % ( getCallerName(), fileName))
         return None
     txtLine = txtLineList[1]
     reMatch = re.compile('^.+\(r(\d+)\)') # The number between brackets.
     searchObj = reMatch.search(txtLine)
     if not searchObj:
-        NTerror("In %s failed to find a regular expression match for the revision number in line %s" % ( getCallerName(), txtLine))
+        nTerror("In %s failed to find a regular expression match for the revision number in line %s" % ( getCallerName(), txtLine))
         return None
     rev = int(searchObj.group(1))
 
     if len(txtLineList) < 4:
-        NTerror("In %s failed to find at least four lines in %s" % ( getCallerName(), fileName))
+        nTerror("In %s failed to find at least four lines in %s" % ( getCallerName(), fileName))
         return None
     txtLine = txtLineList[3]
     reMatch = re.compile('^.+\(\d+\) (.+)$') # The 24 character standard notation from time.asctime()
     searchObj = reMatch.search(txtLine)
     if not searchObj:
-        NTerror("In %s failed to find a regular expression match for the start timestamp in line %s" % ( getCallerName(), txtLine))
+        nTerror("In %s failed to find a regular expression match for the start timestamp in line %s" % ( getCallerName(), txtLine))
         return None
     tsStr = searchObj.group(1) #    Sat Apr 16 14:24:12 2011
     try:
@@ -521,7 +522,7 @@ def getRevisionAndDateTimeFromCingLog( fileName ):
 #        dt = datetime.datetime.strptime(tsStr)
     except:
         NTtracebackError()
-        NTerror("Failed to parse datetime from: %s" % tsStr )
+        nTerror("Failed to parse datetime from: %s" % tsStr )
         return None
 
     return rev, dt
@@ -540,14 +541,14 @@ def execfile_(filename, globals_=None, locals_=None):
 def NTflatten(obj):
     'Returns a tuple instead of the more commonly used NTlist or straight up list because this is going to be used for formatted printing.'
     if not isinstance(obj, (list, tuple)):
-        NTerror("Object is not a list or tuple: %s", obj)
+        nTerror("Object is not a list or tuple: %s", obj)
         return None
     result =[]
     for element in obj:
         if isinstance(element, (list, tuple)):
             elementFlattened = NTflatten(element)
             if not isinstance(elementFlattened, (list, tuple)):
-                NTerror("ElementFlattened is not a list or tuple: %s", obj)
+                nTerror("ElementFlattened is not a list or tuple: %s", obj)
                 return None
             result += elementFlattened
         else:
@@ -562,7 +563,8 @@ def transpose(a):
     m = len(a)
     n = len(a[0])
     at = []
-    for i in range(n): at.append([0.0]*m)
+    for i in range(n): 
+        at.append([0.0]*m)
     for i in range(m):
         for j in range(n):
             at[j][i]=a[i][j]
@@ -575,7 +577,7 @@ def lenRecursive(obj, max_depth = 5):
     {a:{b:None, c:None} will give a length of 2
     """
     if not isinstance(obj, (list, tuple, dict)):
-        NTerror("In lenRecursive the input was not a dict or list instance but was a %s" % str(obj))
+        nTerror("In lenRecursive the input was not a dict or list instance but was a %s" % str(obj))
         return None
     count = 0    
     eList = obj
@@ -600,8 +602,8 @@ def lenRecursive(obj, max_depth = 5):
 def setToSingleCoreOperation():
     'Set the cing attribute .ncpus to 1'
     if cing.ncpus > 1:
-        NTmessage("Scaling back to single core operations")
+        nTmessage("Scaling back to single core operations")
         cing.ncpus = 1
         return
-    NTmessage("Maintaining single core operations")
+    nTmessage("Maintaining single core operations")
 # end def

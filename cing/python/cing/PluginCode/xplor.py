@@ -60,7 +60,7 @@ def quoteAtomNameIfNeeded(atomNameXplor):
     @param atomNameXplor:
     '''
     if '"' in  atomNameXplor:
-        NTerror("A double quote may not occur in any xplor name")
+        nTerror("A double quote may not occur in any xplor name")
         return None
     needed = False
 #    for xplorWildCard in xplorWildCardList:
@@ -79,7 +79,7 @@ def quoteAtomNameIfNeeded(atomNameXplor):
     reMatch = re.compile('[-+](\d)$') # The 24 character standard notation from time.asctime()
     searchObj = reMatch.search(atomNameXplor)
     if searchObj:
-#        NTdebug("Special case for ions found: for %s" % atomNameXplor)
+#        nTdebug("Special case for ions found: for %s" % atomNameXplor)
         needed = True
 
     if not needed:
@@ -108,7 +108,7 @@ def exportDistanceRestraint2xplor( distanceRestraint ):
     Return None on error.
     """
     if distanceRestraint.upper == None:
-        NTerror("Skipping restraint because no upper bound: %s", distanceRestraint)
+        nTerror("Skipping restraint because no upper bound: %s", distanceRestraint)
         return
     dminus = distanceRestraint.upper
     if distanceRestraint.lower != None:
@@ -116,7 +116,7 @@ def exportDistanceRestraint2xplor( distanceRestraint ):
     s = sprintf('assi ')
     for i,atmList in enumerate( distanceRestraint.atomPairs ):
         if len(atmList) != 2:
-            NTerror("Skipping restraint because bad number of atom selections. Expected 2 but found: %s in: %s", distanceRestraint, len(atmList))
+            nTerror("Skipping restraint because bad number of atom selections. Expected 2 but found: %s in: %s", distanceRestraint, len(atmList))
             return
         
         if i != 0:
@@ -124,7 +124,7 @@ def exportDistanceRestraint2xplor( distanceRestraint ):
         for atm in atmList:
             atomSelStr = atm.export2xplor()
             if atomSelStr == None:
-                NTerror("Skipping restraint because bad atom selection: %s", distanceRestraint)
+                nTerror("Skipping restraint because bad atom selection: %s", distanceRestraint)
                 return
             s += sprintf( '%-30s ', atomSelStr )
         # end for
@@ -147,7 +147,7 @@ def exportDistanceRestraintList2xplor( drl, path)   :
     msgHol = MsgHoL()    
     fp = open( path, 'w' )
     if not fp:
-        NTerror('exportDistanceRestraintList2xplor: unable to open "%s"\n', path )
+        nTerror('exportDistanceRestraintList2xplor: unable to open "%s"\n', path )
         return None
     #end def
     for dr in drl:
@@ -159,7 +159,7 @@ def exportDistanceRestraintList2xplor( drl, path)   :
     #end for
     fp.close()
     msgHol.showMessage(MAX_MESSAGES=20)
-    NTmessage('==> Exported %s to "%s"', drl, path)
+    nTmessage('==> Exported %s to "%s"', drl, path)
     #end if
     return drl
 #end def
@@ -194,7 +194,7 @@ def exportDihedralRestraintList2xplor( drl, path)   :
     """
     fp = open( path, 'w' )
     if not fp:
-        NTerror('exportDihedralRestraintList2xplor: unable to open "%s"\n', path )
+        nTerror('exportDihedralRestraintList2xplor: unable to open "%s"\n', path )
         return None
     #end def
     for dr in drl:
@@ -202,7 +202,7 @@ def exportDihedralRestraintList2xplor( drl, path)   :
     #end for
 
     fp.close()
-    NTmessage('==> Exported %s to "%s"', drl, path)
+    nTmessage('==> Exported %s to "%s"', drl, path)
     #end if
     return drl
 #end def
@@ -223,7 +223,7 @@ def exportMolecule2xplor( molecule, path, chainName = None, model = None):
     if chainName == ALL_CHAINS_STR:
         for chain in molecule.allChains():
             exportMolecule2xplor( molecule, path, chainName = chain.name)
-#        NTdebug("Finished writing all chains.")
+#        nTdebug("Finished writing all chains.")
         return
     
     modelList = range(molecule.modelCount)
@@ -260,7 +260,7 @@ def newMoleculeFromXplor( project, path, name, models=None ):
        NB model_000.pdb becomes model number 0. Ie model=0
     """
 #    print '>', path, name, models
-#    NTmessage(name,models[0])
+#    nTmessage(name,models[0])
 
     if models == None:
         models = NTlist()
@@ -277,7 +277,7 @@ def newMoleculeFromXplor( project, path, name, models=None ):
     #end if
 
     if len(models) == 0:
-        NTerror('newMoleculeFromXplor: empty models list\n')
+        nTerror('newMoleculeFromXplor: empty models list\n')
         return None
     #end if
 
@@ -285,7 +285,7 @@ def newMoleculeFromXplor( project, path, name, models=None ):
 #    modelId = models[0]
     xplorFile = sprintf( path, models[0] )
     if not os.path.exists(xplorFile):
-        NTerror('newMoleculeFromXplor: file "%s" not found\n', xplorFile)
+        nTerror('newMoleculeFromXplor: file "%s" not found\n', xplorFile)
         return None
     #end if
 #    project.appendMolecule( molecule )
@@ -305,7 +305,7 @@ def newMoleculeFromXplor( project, path, name, models=None ):
 
     project.addHistory( sprintf('New molecule "%s" from XPLOR files %s (%d models)\n', name, path, molecule.modelCount ) )
     project.updateProject()
-    NTdetail( '%s', molecule.format() )
+    nTdetail( '%s', molecule.format() )
 
     return molecule
 
@@ -376,7 +376,7 @@ def getDistanceRestraintFromXplorMemory( project, convention ):
 
     # check the molecule
     if not project or not project.molecule:
-        NTdebug("getDistanceRestraintFromXplorMemory: initialize molecule first")
+        nTdebug("getDistanceRestraintFromXplorMemory: initialize molecule first")
         return None
     #end if
     molecule = project.molecule
@@ -392,16 +392,16 @@ def getDistanceRestraintFromXplorMemory( project, convention ):
         atmList = []
         i=0
         for atmIdx in atmIdxList:
-            NTdebug("Doing atmIdx: " + `atmIdx`)
+            nTdebug("Doing atmIdx: " + `atmIdx`)
             t = ( 'A', 99, 'HA3' ) # TODO: from XPLOR
             atm = None
             if atomDict.has_key(t):
                 atm = atomDict[t]
             if not atm:
                 if errorCount <= maxErrorCount:
-                    NTerror('Failed to decode for atom %s; line: %s', t)
+                    nTerror('Failed to decode for atom %s; line: %s', t)
                 if errorCount == maxErrorCount+1:
-                    NTerror("And so on")
+                    nTerror("And so on")
                 errorCount += 1
                 i+=1
                 continue
@@ -412,11 +412,11 @@ def getDistanceRestraintFromXplorMemory( project, convention ):
         # Unpack convenience variables.
         atm1 = atmList[0]
         atm2 = atmList[1]
-#        NTdebug("atom 1: " + `atm1`)
-#        NTdebug("atom 2: " + `atm2`)
+#        nTdebug("atom 1: " + `atm1`)
+#        nTdebug("atom 2: " + `atm2`)
         upper = 5. # TODO: from XPLOR
         if not upper:
-            NTerror("Skipping line without valid upper bound on line: [" + upper +']')
+            nTerror("Skipping line without valid upper bound on line: [" + upper +']')
             continue
 
         # ambiguous restraint, should be append to last one
@@ -437,20 +437,20 @@ def getDistanceRestraintFromXplorMemory( project, convention ):
 #            r.QF = line.float( 13 )
     #end for
     if errorCount:
-        NTerror("Found number of errors importing upl file: " + `errorCount`)
-    NTmessage('==> importUpl: new %s', result )
+        nTerror("Found number of errors importing upl file: " + `errorCount`)
+    nTmessage('==> importUpl: new %s', result )
     return result
 #end def
 
 def fullRedo(project, modelCountAnneal = 200, bestAnneal = 50, best = 25):
     'Return True on error.'
         
-    NTmessage("==> Recalculating and refining a new enesemble in cing.PluginCode.xplor#%s" % getCallerName())
+    nTmessage("==> Recalculating and refining a new enesemble in cing.PluginCode.xplor#%s" % getCallerName())
     
     if 0: # DEFAULT: 0
         modelCountAnneal, bestAnneal, best = 4,3,2
     if project == None:
-        NTerror("Failed to get a project")
+        nTerror("Failed to get a project")
         return True
     #end if
 
@@ -467,17 +467,17 @@ def fullRedo(project, modelCountAnneal = 200, bestAnneal = 50, best = 25):
     options.overwrite=1
         
     basePath = project.path(project.directories.refine, options.name)
-    NTmessage("basePath: " + basePath)
+    nTmessage("basePath: " + basePath)
     
-    NTmessage("==> Reading configuration")
-    NTmessage('refinePath:     %s', config.refinePath)
-    NTmessage('xplor:          %s', config.XPLOR)
-    NTmessage("parameterFiles: %s", config.parameterFiles)
-    NTmessage("topologyFiles:  %s", config.topologyFiles)
+    nTmessage("==> Reading configuration")
+    nTmessage('refinePath:     %s', config.refinePath)
+    nTmessage('xplor:          %s', config.XPLOR)
+    nTmessage("parameterFiles: %s", config.parameterFiles)
+    nTmessage("topologyFiles:  %s", config.topologyFiles)
 
     parameters = fullAnnealAndRefine( config, project, options)
     if not parameters:
-        NTerror("Failed to do fullAnnealAndRefine")
+        nTerror("Failed to do fullAnnealAndRefine")
         return True
     #end if
 #end def

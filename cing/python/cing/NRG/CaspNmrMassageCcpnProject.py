@@ -72,7 +72,7 @@ def copyFromCasp2CcpnArchive():
         for city in predList:
 #        for city in cityList[0:1]:
             entryCodeNew = entryCode + city
-            NTmessage("Working on: %s" % entryCodeNew)
+            nTmessage("Working on: %s" % entryCodeNew)
 
             inputEntryDir = os.path.join(inputDir, ch23, entryCodeNew)
             outputEntryDir = os.path.join(dataDir, ch23, entryCodeNew)
@@ -88,10 +88,10 @@ def copyFromCasp2CcpnArchive():
             fnList = globMultiplePatterns(inputEntryDir, patternList)
             for fn in fnList:
                 orgFn = os.path.join(inputEntryDir, fn)
-#                NTmessage("Copying from %s" % fn)
+#                nTmessage("Copying from %s" % fn)
 #                fnBaseName = os.path.basename(fn)
                 dstFn = os.path.join(inputAuthorDir, fn)
-                NTmessage("Copying from %s to %s" % (orgFn, dstFn))
+                nTmessage("Copying from %s to %s" % (orgFn, dstFn))
                 copy(orgFn, dstFn)
 
 
@@ -104,8 +104,8 @@ def redoLayOutArchiveWim():
         entryCodeNew = entryCode + "Org"
         entryDir = os.path.join(dataDir, ch23, entryCodeNew)
         tarPath = os.path.join(entryDir, entryCodeNew + ".tgz")
-#        NTmessage("Tarring from %s to %s" % (entryCodeNew,tarPath))
-        NTmessage("Creating %s" % tarPath)
+#        nTmessage("Tarring from %s to %s" % (entryCodeNew,tarPath))
+        nTmessage("Creating %s" % tarPath)
         if not os.path.exists(entryDir):
             mkdirs(entryDir)
         if not os.path.exists(entryCodeNew):
@@ -136,7 +136,7 @@ def createTodoList(entryList, cityList, programHoH):
 
 #def getRangesForTarget(target):
 #    if target not in entryList:
-#        NTerror("Failed to find entryOrg [%s] in entryList %s" % (target, `entryList`))
+#        nTerror("Failed to find entryOrg [%s] in entryList %s" % (target, `entryList`))
 #        return None
 #    index = entryList.index(target)
 #    return rangesPsvsList[index]
@@ -153,7 +153,7 @@ def getTargetForFullEntryName(fullEntryCode):
         if char.isupper():
             idxLastCapital = idx
     if idxLastCapital < 0:
-        NTerror("Failed to find idxLastCapital in [%s]" % fullEntryCode)
+        nTerror("Failed to find idxLastCapital in [%s]" % fullEntryCode)
         return None
     target = fullEntryCode[:idxLastCapital]
     return target
@@ -167,7 +167,7 @@ def getFullEntryNameListForTarget(target, programHoH):
     targetList.sort()
     print targetList
     if target not in targetList:
-        NTerror("Failed to find target %s in list %s" % (target, str(targetList)))
+        nTerror("Failed to find target %s in list %s" % (target, str(targetList)))
         return None
 
     mapByLab = programHoH[target]
@@ -222,7 +222,7 @@ entryListAll = [ 'T0538Org' ] + entryList
 #entryList = targetTable.getColumnByIdx(0)
 #rangesPsvsList = targetTable.getColumnByIdx(6)
 #mapEntrycodeNew2EntrycodeAndCity = getMapEntrycodeNew2EntrycodeAndCity(entryList, cityList)
-#NTdebug("Read dbms with tables: %s" % dbms.tables.keys())
+#nTdebug("Read dbms with tables: %s" % dbms.tables.keys())
 #print labList
 #print programHoH
 #print getRangesForTarget('ET109Ared')
@@ -238,5 +238,5 @@ if __name__ == '__main__':
 #    copyFromCasdNmr2CcpnArchive()
 #    annotateLoop()
 #    redoLayOutArchiveWim()
-#    NTmessage("entryList: %s" % str(entryList))
+#    nTmessage("entryList: %s" % str(entryList))
 

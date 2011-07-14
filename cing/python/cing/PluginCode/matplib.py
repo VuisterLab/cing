@@ -14,9 +14,9 @@ from colorsys import hsv_to_rgb
 try:
     import Image
     haveImage = True
-#    NTdebug("Installed python Image library (pil)")
+#    nTdebug("Installed python Image library (pil)")
 except ImportError:
-    NTdebug("Failed to import python Image library (pil); certain plot options will fail")
+    nTdebug("Failed to import python Image library (pil); certain plot options will fail")
     haveImage = False
 #end try
 
@@ -143,11 +143,11 @@ class FormatResTypesFormatter(Formatter):
                 resProp = resProp[0:1] # truncate A171 to A
 
             self.resPropList.append(resProp.upper())
-#        NTdebug("FormatResTypesFormatter initialized with: %s" % self.resPropList )
+#        nTdebug("FormatResTypesFormatter initialized with: %s" % self.resPropList )
 
     def __call__(self, x, pos=None):
         'Return the one character residue type for tick val x at position pos'
-#        NTdebug('called with x,pos: %s, %s' %(x,pos))
+#        nTdebug('called with x,pos: %s, %s' %(x,pos))
         if pos > 0 and pos < len(self.resPropList):
             return self.resPropList[pos]
         return 'X'
@@ -195,7 +195,7 @@ class NTplot( NTdict ):
         for v in yValueList:
             r = bottom + height * v
             result.append( r )
-#            NTdebug('NTplot.scaleAndMove_yValuesFromAxesToData: %8.3f becomes: %8.3f with bottom,top %8.3f,%8.3f' % (v,r,bottom,top) )
+#            nTdebug('NTplot.scaleAndMove_yValuesFromAxesToData: %8.3f becomes: %8.3f with bottom,top %8.3f,%8.3f' % (v,r,bottom,top) )
         return result
 
     def move( self, point ):
@@ -206,8 +206,8 @@ class NTplot( NTdict ):
             attributes=defaultAttributes
         xdata=(self.currentPoint[0], endPoint[0])
         ydata=(self.currentPoint[1], endPoint[1])
-#        NTdebug("xdata: " + `xdata`)
-#        NTdebug("ydata: " + `ydata`)
+#        nTdebug("xdata: " + `xdata`)
+#        nTdebug("ydata: " + `ydata`)
         line2D = Line2D(xdata, ydata)
         attributesMatLibPlot = self.mapAttributes2MatLibPlotLine2D(attributes)
         line2D.set( **attributesMatLibPlot )
@@ -215,7 +215,8 @@ class NTplot( NTdict ):
         self.currentPoint = endPoint
     #end def
 
-    #pylint: disable=E0202
+    # TODO: check if he knows of an import that overrides this.
+    # pylint: disable=E0202     
     def line( self, startPoint, endPoint, attributes=defaultAttributes):
         if not attributes:
             attributes=defaultAttributes
@@ -275,18 +276,18 @@ class NTplot( NTdict ):
             self.lines( pointList )
 
     def box( self, point, sizes, attributes=None ):
-#        NTdebug("box with point, sizes: %s %s" %( point, sizes))
+#        nTdebug("box with point, sizes: %s %s" %( point, sizes))
         if not attributes:
             attributes=defaultAttributes
 
         attributesMatLibPlot = self.mapAttributes2MatLibPatches(attributes)
-#        NTdebug("Using attributesMatLibPlot: %s" % attributesMatLibPlot)
+#        nTdebug("Using attributesMatLibPlot: %s" % attributesMatLibPlot)
         rectangle = Rectangle(point,
             width=sizes[0],
             height=sizes[1],
             **attributesMatLibPlot )
         self.axis.add_artist(rectangle)
-#            NTdebug("box added to artist")
+#            nTdebug("box added to artist")
     #end def
 
     def mapAttributes2MatLibPlotLine2D(self, attributes=defaultAttributes):
@@ -316,14 +317,14 @@ class NTplot( NTdict ):
 #        ['fill', 'fillColor', 'font', 'fontColor', 'fontSize', 'line', 'lineColor', 'lineType', 'lineWidth',
 #         'pointColor', 'pointSize', 'pointType', 'textAlign']
 
-#        NTdebug("attributes: " + attributes.format())
+#        nTdebug("attributes: " + attributes.format())
         if 'pointType' in keys:
             if attributes.pointType:
                 if mappingPointType2MatLibPlot.has_key(attributes.pointType):
 #                    print "doing pointType"
                     result['marker'] =  mappingPointType2MatLibPlot[attributes.pointType]
                 else:
-                    NTcodeerror("Failed to map point type ["+`attributes.pointType`+"]to mat lib plot's marker id)")
+                    nTcodeerror("Failed to map point type ["+`attributes.pointType`+"]to mat lib plot's marker id)")
                     return True
         if 'pointColor' in keys:
 #            print "doing pointColor"
@@ -343,7 +344,7 @@ class NTplot( NTdict ):
         if 'lineType' in keys:
 #            print "doing lineType (linestyle)"
             if not mappingLineType2MatLibPlot.has_key( attributes.lineType ):
-                NTcodeerror("Failed to set line style [%s] because it is absent in mappingLineType2MatLibPlot %s" %
+                nTcodeerror("Failed to set line style [%s] because it is absent in mappingLineType2MatLibPlot %s" %
                             (attributes.lineType, mappingLineType2MatLibPlot))
             else:
                 result['linestyle']       =  mappingLineType2MatLibPlot[attributes.lineType]
@@ -371,7 +372,7 @@ class NTplot( NTdict ):
         if 'alpha' in keys:
 #            print "doing alpha"
             result['alpha']           =  attributes.alpha
-#        NTdebug("result[attributes: " + `result[)
+#        nTdebug("result[attributes: " + `result[)
         return result
 
     def mapAttributes2MatLibPatches(self, attributes=defaultAttributes):
@@ -399,8 +400,8 @@ class NTplot( NTdict ):
             result['facecolor']           =  attributes.fillColor # is facecolor used if fill is False?
         if 'lineColor' in keys:
             result['edgecolor']           =  attributes.lineColor
-#        NTdebug("input  mapAttributes2MatLibPatches: " + `attributes`)
-#        NTdebug("result mapAttributes2MatLibPatches: " + `result`)
+#        nTdebug("input  mapAttributes2MatLibPatches: " + `attributes`)
+#        nTdebug("result mapAttributes2MatLibPatches: " + `result`)
         return result
 
     def mapAttributes2MatLibText(self, attributes=defaultAttributes):
@@ -445,7 +446,7 @@ class NTplot( NTdict ):
         y = point[1]
         axes(self.axis) # Claim current axis.
         line2D, = plot( [x], [y] )
-#            NTdebug('before getp(line2D):')
+#            nTdebug('before getp(line2D):')
 #            getp(line2D)
         line2D.set( **attributesMatLibPlot)
         xerror=None
@@ -478,7 +479,7 @@ class NTplot( NTdict ):
         """Point needs to be specified in axis coordinate system [0,1]
         """
         kwds = self.mapAttributes2MatLibText(attributes)
-#            NTdebug("In labelAxes using kwds: %s", kwds)
+#            nTdebug("In labelAxes using kwds: %s", kwds)
         self.axis.text( point[0], point[1], text,
             transform=self.axis.transAxes, **kwds)
 
@@ -488,7 +489,7 @@ class NTplot( NTdict ):
         if not attributes:
             attributes=defaultAttributes
         kwds = self.mapAttributes2MatLibText(attributes)
-#        NTdebug("Found kwds: %s" % kwds)
+#        nTdebug("Found kwds: %s" % kwds)
         startPoint=(point[0], point[1])
         axes(self.axis) # Claim current axis.
         pyplot.text(startPoint[0],startPoint[1],txt, **kwds)
@@ -540,7 +541,7 @@ class NTplot( NTdict ):
                 max = v
 
         if min == None or max == None:
-#            NTdebug('Only None values in autoScaleY pointList found')
+#            nTdebug('Only None values in autoScaleY pointList found')
             min = 0.0
             max = 1.0
 
@@ -552,7 +553,7 @@ class NTplot( NTdict ):
         if startAtZero and min >= 0.:
             min = 0.
 
-#        NTdebug('autoScaleY to min,max: %8.3f %8.3f' % (min,max) )
+#        nTdebug('autoScaleY to min,max: %8.3f %8.3f' % (min,max) )
         xlocator = self.axis.xaxis.get_major_locator()
         xlocator.set_bounds( min, max )
         self.axis.autoscale_view( scalex=True, scaley=False)
@@ -572,7 +573,7 @@ class NTplot( NTdict ):
         This guarantees a y range.
         """
 
-#        NTdebug( 'autoScaleY for list: %s' % (pointList) )
+#        nTdebug( 'autoScaleY for list: %s' % (pointList) )
 
         min = None
         max = None
@@ -593,7 +594,7 @@ class NTplot( NTdict ):
                 max = v
 
         if min == None or max == None:
-#            NTdebug('Only None values in autoScaleY pointList found')
+#            nTdebug('Only None values in autoScaleY pointList found')
             min = 0.0
             max = 1.0
 
@@ -605,21 +606,21 @@ class NTplot( NTdict ):
         if startAtZero and min >= 0.:
             min = 0.
 
-#        NTdebug('autoScaleY to min,max: %8.3f %8.3f' % (min,max) )
+#        nTdebug('autoScaleY to min,max: %8.3f %8.3f' % (min,max) )
         if not useVerboseLocator:
             ylocator = self.axis.yaxis.get_major_locator()
         else:
-            NTerror("This part of the code needs to be tested")
+            nTerror("This part of the code needs to be tested")
 #            ylocator = MaxNLocator(nbins=20) # instead of default 10
             ylocator = MultipleLocator(base=0.05) # instead of default 10
 
             self.axis.yaxis.set_major_locator(ylocator)
         ylocator.set_bounds( min, max )
 
-#        NTdebug('get_autoscaley_on: %s' % self.axis.get_autoscaley_on())
+#        nTdebug('get_autoscaley_on: %s' % self.axis.get_autoscaley_on())
         self.axis.autoscale_view( scalex=False, scaley=True)
         self.yRange = self.axis.get_ylim()
-#        NTdebug('yRange set by matplotlib to min,max: ' + `self.yRange` )
+#        nTdebug('yRange set by matplotlib to min,max: ' + `self.yRange` )
         if useIntegerTickLabels:
             formatter = FuncFormatter(integerNumberOnly)
             yaxis = self.axis.yaxis
@@ -627,7 +628,7 @@ class NTplot( NTdict ):
 
 
     def updateSettings( self ):
-#        NTdebug("Now in updateSettings")
+#        nTdebug("Now in updateSettings")
 
         if not self.axis:
             raise "No axis object in NTplot"
@@ -655,10 +656,10 @@ class NTplot( NTdict ):
 
         if self.xRange is not None:
             xlim(self.xRange)
-#                NTdebug("Set the xlim in MatPlotLib to: %s %s" % (self.xRange))
+#                nTdebug("Set the xlim in MatPlotLib to: %s %s" % (self.xRange))
         if self.yRange is not None:
             ylim(self.yRange)
-#                NTmessage("Set the ylim in MatPlotLib")
+#                nTmessage("Set the ylim in MatPlotLib")
         if self.xGrid is not None:
             grid(True)
         else:
@@ -669,35 +670,35 @@ class NTplot( NTdict ):
                    attributes=defaultAttributes, valueIndexPairList=None ):
         if not attributes:
             attributes=defaultAttributes
-#        NTdebug("Creating number of bins: " + `bins`)
-#        NTdebug("theList: " + `theList`)
+#        nTdebug("Creating number of bins: " + `bins`)
+#        nTdebug("theList: " + `theList`)
         if not theList:
-#            NTdebug("empty input not adding histogram")
+#            nTdebug("empty input not adding histogram")
             return # Nothing to add.
-        his = NThistogram( theList, low, high, bins ) # A NTlist
+        his = nThistogram( theList, low, high, bins ) # A NTlist
         self.maxY = max(his)
 
         step = (high-low)/bins
         ind = arange(low,high,step)  # the x locations for the groups
-#            NTdebug("Creating x coor for bins: " + `ind`)
+#            nTdebug("Creating x coor for bins: " + `ind`)
         axes(self.axis) # Claim current axis.
         _patches = bar(ind, his, step,
             color    =attributes.fillColor,
             edgecolor=attributes.fillColor)
 
         if valueIndexPairList: # Were dealing with outliers.
-#                NTdebug("Annotating the outliers with a arrow and string")
+#                nTdebug("Annotating the outliers with a arrow and string")
             tmpValueIndexPairList = deepcopy(valueIndexPairList)
             tmpValueIndexPairList = NTsort(tmpValueIndexPairList, 1)
 
             xlim = self.axis.get_xlim()
             ylim = self.axis.get_ylim()
             _ylim_min, ylim_max = ylim
-#                NTdebug("xlim: " + `xlim`)
-#                NTdebug("ylim: " + `ylim`)
+#                nTdebug("xlim: " + `xlim`)
+#                nTdebug("ylim: " + `ylim`)
             outlierLocHeight = ylim_max # In data coordinate system
             outlierLocHeightMin = ylim_max*.1 # In data coordinate system
-#                NTdebug("tmpValueIndexPairList: " + `tmpValueIndexPairList`)
+#                nTdebug("tmpValueIndexPairList: " + `tmpValueIndexPairList`)
             for item in tmpValueIndexPairList:
                 value = item[1]
                 modelNum = item[0]
@@ -706,8 +707,8 @@ class NTplot( NTdict ):
                 outlierLocHeight -= 0.1*ylim_max # Cascade from top left to bottom right.
                 if outlierLocHeight < outlierLocHeightMin:
                     outlierLocHeight = outlierLocHeightMin
-#                    NTdebug("Setting data point to: " + `value` +", 1")
-#                    NTdebug("Setting text point to: " + `value` +", "+ `outlierLocHeight`)
+#                    nTdebug("Setting data point to: " + `value` +", 1")
+#                    nTdebug("Setting text point to: " + `value` +", "+ `outlierLocHeight`)
                 self.axis.plot([value], [1], 'o',color=attributes.fillColor,markeredgecolor=attributes.fillColor,markersize=3)
                 self.axis.annotate("model "+`modelNum`,
 #                                startPoint=(0.05, 1),                       # in data coordinate system; assuming only one occurrence.
@@ -812,7 +813,7 @@ class NTplot( NTdict ):
 #        colorList= [ 'green',   'blue',   'yellow']
 
         if len(histList) > len(cmapList):
-            NTerror("Found length of histList:%d larger than cmapList's:%d" % ( len(histList),len(cmapList)))
+            nTerror("Found length of histList:%d larger than cmapList's:%d" % ( len(histList),len(cmapList)))
             return True
 
         # chessboard on 60 degree grid to see the blending better
@@ -824,24 +825,24 @@ class NTplot( NTdict ):
         for i,myHist in enumerate(histList):
 #        for i,myHist in enumerate(histList[0:1]):
             if myHist.dtype != 'float64':
-                NTerror("expected a histogram matrix with float values but found type: %s" % myHist.dtype)
+                nTerror("expected a histogram matrix with float values but found type: %s" % myHist.dtype)
                 return True
 
             myHistScaled = deepcopy(myHist) #scaling done in place. Fixes issue 248.
             if scaleBy == SCALE_BY_MAX:
                 maxHist = amax( myHist, axis = None ) # axis parameter should be None by default; just checking if I use the right api.
 #                minHist = amin( myHist )
-#                NTdebug("maxHist: %s" % maxHist)
-#                NTdebug("minHist: %s" % minHist)
+#                nTdebug("maxHist: %s" % maxHist)
+#                nTdebug("minHist: %s" % minHist)
                 factor = 100./maxHist
                 myHistScaled *= factor
             elif scaleBy == SCALE_BY_SUM:
                 sumHist = sum( myHist, axis = None ) # axis parameter should be None by default; just checking if I use the right api.
-#                NTdebug("sumHist: %s" % sumHist)
+#                nTdebug("sumHist: %s" % sumHist)
                 factor = 100./sumHist
                 myHistScaled *= factor
             elif scaleBy == SCALE_BY_Z:
-                Ctuple = getEnsembleAverageAndSigmaFromHistogram( myHist )
+                Ctuple = getEnsembleAverageAndSigmaHis( myHist )
                 (c_av, c_sd, hisMin, hisMax) = Ctuple #@UnusedVariable
                 # Scaled into Z-space.
                 myHistScaled -= c_av
@@ -849,17 +850,17 @@ class NTplot( NTdict ):
             elif scaleBy == SCALE_BY_ONE:
                 pass
             else:
-                NTerror("Parameter for scaleBy [%s] is invalid in dihedralComboPlot" % scaleBy)
+                nTerror("Parameter for scaleBy [%s] is invalid in dihedralComboPlot" % scaleBy)
                 return True
 
             norm = Normalize(vmin = minPercentage, vmax = maxPercentage)
             myHistNormalized = norm(myHistScaled) # alpha in range and above is still all 1.
-#            NTdebug("i %s color %s"% (i,colorList[i]))
+#            nTdebug("i %s color %s"% (i,colorList[i]))
             palette = cmapList[i]
             if ssType:
                 idx = ssTypeToIdx(ssType)
                 if idx == None:
-                    NTcodeerror("Found unknown ssType : [%s]" % ssType)
+                    nTcodeerror("Found unknown ssType : [%s]" % ssType)
                     return True
                 palette = cmapList[idx]
             myHistColored = cmapWithAlphaGlidingScale(myHistNormalized,palette,
@@ -895,11 +896,11 @@ class NTplot( NTdict ):
             bounds1[1] = bounds1[0] + SMALL_ANGLE_DIFF_FOR_PLOT
         if isAlmostEqual( bounds2, SMALL_ANGLE_DIFF_FOR_PLOT ):
             bounds2[1] = bounds2[0] + SMALL_ANGLE_DIFF_FOR_PLOT
-#        NTdebug("bounds1 : %s" % bounds1)
-#        NTdebug("bounds2 : %s" % bounds2)
+#        nTdebug("bounds1 : %s" % bounds1)
+#        nTdebug("bounds2 : %s" % bounds2)
 
         boxAttr = boxAttributes(fill=fill, fillColor=fillColor, alpha=alpha)
-#        NTdebug("boxAttr : %s" % boxAttr)
+#        nTdebug("boxAttr : %s" % boxAttr)
 
         if bounds1[0] < bounds1[1]: # one or two boxes
             if bounds2[0] < bounds2[1]: # single box thank you
@@ -972,7 +973,7 @@ class NTplotSet( NTdict ):
         self.update( kwds ) # Overwrites hardcopySize etc.
         self.graphicsOutputFormat = 'png'
 
-#        NTdebug('Using self.hardcopySize: '+`self.hardcopySize`)=
+#        nTdebug('Using self.hardcopySize: '+`self.hardcopySize`)=
     #end def
 
     def close( self ):
@@ -990,7 +991,7 @@ class NTplotSet( NTdict ):
 
         self.updateSettings()
 #        if not self.plotSet:
-#            NTerror("no elements in NTplotSet")
+#            nTerror("no elements in NTplotSet")
 #            return True
 
         fig_width_pt  = self.hardcopySize[0]
@@ -1017,8 +1018,8 @@ class NTplotSet( NTdict ):
 
     def updateSettings( self ):
 
-#            NTdebug("Getting hardcopySize: "+`self.hardcopySize`)
-#            NTdebug("Setting sizeInches:   "+`fig_size`)
+#            nTdebug("Getting hardcopySize: "+`self.hardcopySize`)
+#            nTdebug("Setting sizeInches:   "+`fig_size`)
 
 
         for plotId in self.plotSet:
@@ -1135,15 +1136,15 @@ y coordinate is in axis coordinates (from 0 to 1) when the renderer asks for the
             lastResNum    = res.resNum
             lastChainName = res.chain.name
 
-            l = res.getDeepByKeys(DSSP_STR,SECSTRUCT_STR)
-#            NTdebug( 'getsecStructElementList l before reduced to 3 states: %s', l )
+            myList = res.getDeepByKeys(DSSP_STR,SECSTRUCT_STR)
+#            nTdebug( 'getsecStructElementList myList before reduced to 3 states: %s', myList )
             secStruct = None
-            if l:
-                l = to3StateDssp( l )
-#                secStruct = l.getConsensus(CONSENSUS_SEC_STRUCT_FRACTION) # will set it if not present yet.
-                secStruct = l.getConsensus(useLargest=True) # will set it if not present yet.
+            if myList:
+                myList = to3StateDssp( myList )
+#                secStruct = myList.getConsensus(CONSENSUS_SEC_STRUCT_FRACTION) # will set it if not present yet.
+                secStruct = myList.getConsensus(useLargest=True) # will set it if not present yet.
 
-#            NTdebug('getsecStructElementList res: %s %s %s', res, l, secStruct)
+#            nTdebug('getsecStructElementList res: %s %s %s', res, myList, secStruct)
             if  secStruct != prevSecStruct:
                 if secStructElement:
                     result.append(secStructElement)
@@ -1153,7 +1154,7 @@ y coordinate is in axis coordinates (from 0 to 1) when the renderer asks for the
 
         if secStructElement:
             result.append(secStructElement)
-#        NTdebug('getsecStructElementList result: %s', result)
+#        nTdebug('getsecStructElementList result: %s', result)
         return result
 
     def setMinorTickerToRes(self):
@@ -1174,7 +1175,7 @@ y coordinate is in axis coordinates (from 0 to 1) when the renderer asks for the
 
         i = 0
         for res in self.resList:
-#            NTdebug("drawResTypes for: %s" % res )
+#            nTdebug("drawResTypes for: %s" % res )
             resChar = 'x'
             if res.shortName:
                 resChar = res.shortName
@@ -1195,9 +1196,9 @@ y coordinate is in axis coordinates (from 0 to 1) when the renderer asks for the
             attributes = fontAttributes()
             attributes.fontColor=res.rogScore.colorLabel
             attributes.horizontalalignment='center'
-#            NTdebug(`attributes`)
+#            nTdebug(`attributes`)
 #            y = 5.0 # for testing
-#            NTdebug("x,y: %s,%s" % (x,y))
+#            nTdebug("x,y: %s,%s" % (x,y))
             self.label( (x,y) , text, attributes )
             i += 1
 
@@ -1252,7 +1253,7 @@ y coordinate is in axis coordinates (from 0 to 1) when the renderer asks for the
         JFD had y-axis coordinates in 'axes' coordindate system before. Now all variables not using data
         coordinate system are named with e.g. Axis as in ySpaceAxis.
         """
-#        NTdebug("In drawResIcons ySpaceAxis is %s" % ySpaceAxis)
+#        nTdebug("In drawResIcons ySpaceAxis is %s" % ySpaceAxis)
         kwargs = {'edgecolor':ResPlot.colorLine, 'facecolor':ResPlot.colorHelixIn, 'clip_on':None}
 
 
@@ -1271,8 +1272,9 @@ y coordinate is in axis coordinates (from 0 to 1) when the renderer asks for the
                 accessibilityZscore = accessibilityZscoreList.average()[0]
             color = mapAccessibilityZscore2Color(accessibilityZscore) # get an rgb tuple
             startPoint = ( iconBoxXstart + i, iconBoxYstart)
-#            NTdebug("RangeIcon: startPoint %s %s" % startPoint)
-            p = RangeIcon( startPoint=startPoint,width=1,height=height, seq=1, axis=self.axis,edgecolor=color, facecolor=color, clip_on=None )
+#            nTdebug("RangeIcon: startPoint %s %s" % startPoint)
+            p = RangeIcon( startPoint=startPoint,width=1,height=height, seq=1, 
+                           axis=self.axis,edgecolor=color, facecolor=color, clip_on=None )
             self.axis.add_patch(p)
             i += 1
 
@@ -1280,7 +1282,7 @@ y coordinate is in axis coordinates (from 0 to 1) when the renderer asks for the
         secStructElementList = self.getsecStructElementList()
         i = 0
         for element in secStructElementList:
-#                NTdebug(`element`)
+#                nTdebug(`element`)
             elementLength = len(element)
             res = element[0]
 #                secStruct = getProcheckSecStructConsensus( res )
@@ -1289,7 +1291,7 @@ y coordinate is in axis coordinates (from 0 to 1) when the renderer asks for the
                 secStruct = None
             if secStruct == ' ':
                 secStruct = None
-#                NTdebug('res: %s, secStruct %s, and length: %d', res, secStruct, elementLength)
+#                nTdebug('res: %s, secStruct %s, and length: %d', res, secStruct, elementLength)
 
             width = elementLength
             startPoint = ( iconBoxXstart + i, iconBoxYstart)
@@ -1297,7 +1299,7 @@ y coordinate is in axis coordinates (from 0 to 1) when the renderer asks for the
             rangeIconList = RangeIconList( axis=self.axis,secStruct=secStruct,seq=elementLength,
                 startPoint=startPoint,width=width,height=height,**kwargs)
             if rangeIconList.addPatches():
-                NTerror("Failed to addPatches for element with residues: %s", element)
+                nTerror("Failed to addPatches for element with residues: %s", element)
                 continue
             for p in rangeIconList.patchList:
                 self.axis.add_patch(p)
@@ -1319,30 +1321,30 @@ class RangeIconList:
         self.axis     = axis
         self.kwargs   = kwargs
         if not self.axis:
-            NTcodeerror('no self.axis in RangeIconList')
+            nTcodeerror('no self.axis in RangeIconList')
             return
 
     def addPatches(self):
         "Return True on error"
-#        NTmessage("Doing addPatches for seq: %d", self.seq)
+#        nTmessage("Doing addPatches for seq: %d", self.seq)
 
 #        self.secStruct='H' #: disable after debugging.
         if self.secStruct=='S':
             p = StrandIcon(seq=self.seq, axis=self.axis, startPoint=self.startPoint,
                            width=self.width, height=self.height,**self.kwargs)
             if not p:
-                NTerror("Failed to create StrandIcon")
+                nTerror("Failed to create StrandIcon")
                 return True
             self.patchList.append( p )
         elif self.secStruct=='H':
             helixIconList = HelixIconList(seq=self.seq, startPoint=self.startPoint,
                 width=self.width, height=self.height,axis=self.axis,**self.kwargs)
             if helixIconList.addPatches():
-                NTerror("Failed to create HelixIconList")
+                nTerror("Failed to create HelixIconList")
                 return True
             plist = helixIconList.patchList
             if not plist:
-                NTerror("Failed to create any HelixIconList")
+                nTerror("Failed to create any HelixIconList")
                 return True
             for p in plist:
                 self.patchList.append( p )
@@ -1351,11 +1353,11 @@ class RangeIconList:
             kwargsLocal = {'edgecolor':ResPlot.colorLine, 'facecolor':ResPlot.colorCoil, 'clip_on':None}
             p = CoilIcon(seq=self.seq, axis=self.axis, startPoint=self.startPoint, width=self.width, height=self.height,**kwargsLocal)
             if not p:
-                NTerror("Failed to create CoilIcon")
+                nTerror("Failed to create CoilIcon")
                 return True
             self.patchList.append( p )
 #        else:
-#            NTerror("Failed to find one of 3 states, doing addPatches for seq: %d and self.secStruct: %s", (self.seq, self.secStruct))
+#            nTerror("Failed to find one of 3 states, doing addPatches for seq: %d and self.secStruct: %s", (self.seq, self.secStruct))
 #            return True
 
 class HelixIconList(RangeIconList):
@@ -1378,15 +1380,15 @@ class HelixIconList(RangeIconList):
 #            v[1] = scaleAndMove_yValuesFromAxesToData(self.axis, [ v[1] ] )[0]          # data coordinates
 
 
-#        NTdebug("Vertices icon: %s" % verts)
-#        NTdebug("self.startPoint[1]: %s in data system" % self.startPoint[1])
-#        NTdebug("self.height: %s in data system" % self.height)
+#        nTdebug("Vertices icon: %s" % verts)
+#        nTdebug("self.startPoint[1]: %s in data system" % self.startPoint[1])
+#        nTdebug("self.height: %s in data system" % self.height)
 
 #        for v in verts:
 #            v[0] += self.startPoint[0]
 #            v[1] *= self.height
 #            v[1] += self.startPoint[1]
-#        NTdebug("Vertices data: %s" % verts)
+#        nTdebug("Vertices data: %s" % verts)
 
     def addPatches(self):
         """Returns True on error.
@@ -1394,7 +1396,7 @@ class HelixIconList(RangeIconList):
         # helix start with opposite phase.
         """
         if self.seq < 2: # keep nagging..
-            NTcodeerror('Number of helical residues in resList needs to be at least two.')
+            nTcodeerror('Number of helical residues in resList needs to be at least two.')
             return True
 
         n = self.seq
@@ -1407,8 +1409,8 @@ class HelixIconList(RangeIconList):
         # 4  2      .etc.
         halfTurnsTotal = (n + 1)/ 2
         hw = HelixIconList.HELIX_HWIDTH / 2.
-#        NTdebug("halfTurnsTotal: %8.3f ", halfTurnsTotal )
-#        NTdebug("hw: %8.3f ", hw )
+#        nTdebug("halfTurnsTotal: %8.3f ", halfTurnsTotal )
+#        nTdebug("hw: %8.3f ", hw )
         # After contemplating for a long time, it seems that the easiest coordinate
         # system to start in is for x [0,360> and on and for y [0,1] due to cyclic
         # nature of the helix.
@@ -1420,11 +1422,11 @@ class HelixIconList(RangeIconList):
         drawnPoly = 0
         while halfTurnsDone < halfTurnsTotal:
             doAtLeastAnotherHalfTurn = (halfTurnsTotal-halfTurnsDone) > 0.5
-#            NTdebug("halfTurnsDone           : %f", halfTurnsDone )
-#            NTdebug("doAtLeastAnotherHalfTurn: %s", doAtLeastAnotherHalfTurn )
+#            nTdebug("halfTurnsDone           : %f", halfTurnsDone )
+#            nTdebug("doAtLeastAnotherHalfTurn: %s", doAtLeastAnotherHalfTurn )
             u = t % 360. # u is in resList [0,360>
             if u == 0 and t != 360.: # v jumps 360 after each turn done (at phase: u=0)
-#                NTdebug("Jumping v a full turn ahead, u: %8.3f", v)
+#                nTdebug("Jumping v a full turn ahead, u: %8.3f", v)
                 v += 360.
             if u == 90 or s == 270:
                 a = [v-hw,        triangularFunction(v)]
@@ -1438,11 +1440,11 @@ class HelixIconList(RangeIconList):
                 i = [v   + 90.,   triangularFunction(hw)]
                 j = [v   +270.,   1.-i[1]]
 
-#            NTdebug("plotting poly %d at s,t,u: %8.3f %8.3f %8.3f ", drawnPoly, s,t,u )
+#            nTdebug("plotting poly %d at s,t,u: %8.3f %8.3f %8.3f ", drawnPoly, s,t,u )
 #            count = 0
             _allPoints = [ a,b,c,d,e,f,g,h,i,j ] # keep code analysis from complaining.
 #            for value in [ a,b,c,d,e,f,g,h,i,j ]:
-##                NTdebug(" %2d   %8.3f %8.3f ", count, value[0], value[1] )
+##                nTdebug(" %2d   %8.3f %8.3f ", count, value[0], value[1] )
 #                count += 1
 #            if False:
 #                verts.append( a,b,c,d,e,f,g,h,i,j ) # keep debugger happy.
@@ -1487,17 +1489,17 @@ class HelixIconList(RangeIconList):
                     t += 90.
                     halfTurnsDone += 0.5
             else:
-                NTerror("in HelixIconList need to improve float comparisons")
+                nTerror("in HelixIconList need to improve float comparisons")
                 return True
 
-#            NTdebug('verts in local system [(s-hw,s-hw+360*n/4,(0,1)]')
-#            NTdebug( vertsToString(verts) )
+#            nTdebug('verts in local system [(s-hw,s-hw+360*n/4,(0,1)]')
+#            nTdebug( vertsToString(verts) )
 
             # Align left.
             xTranslation = - s + hw
             translate(verts, xTranslation, 0)
-#            NTdebug('verts x translated  [(0,360*n/4],(0,1)]')
-#            NTdebug( vertsToString(verts) )
+#            nTdebug('verts x translated  [(0,360*n/4],(0,1)]')
+#            nTdebug( vertsToString(verts) )
             # Expect to see about 4 residues per turn.
             # But we need to compensate for the helix width: HELIX_HWIDTH.
             # E.g. for a full 360 turn we actually will have vertices ranging
@@ -1507,17 +1509,17 @@ class HelixIconList(RangeIconList):
             totalWidthInDegrees = halfTurnsTotal * 180. + HelixIconList.HELIX_HWIDTH
             xScaleFactor = n/totalWidthInDegrees
             scale(    verts, xScaleFactor, 1)
-#            NTdebug('verts almost in icon system  [(0,n),(0,1)]')
-#            NTdebug( vertsToString(verts) )
+#            nTdebug('verts almost in icon system  [(0,n),(0,1)]')
+#            nTdebug( vertsToString(verts) )
 
             yScaleFactor = 111./220
             scaleCentered( verts, 1, yScaleFactor)
-#            NTdebug('verts in icon system  [(0,n),(0,yScaleFactor)]')
-#            NTdebug( vertsToString(verts) )
+#            nTdebug('verts in icon system  [(0,n),(0,yScaleFactor)]')
+#            nTdebug( vertsToString(verts) )
 
             self.transformIconToData(verts)
-#            NTdebug('verts in axes')
-#            NTdebug( vertsToString(verts) )
+#            nTdebug('verts in axes')
+#            nTdebug( vertsToString(verts) )
             p = RangeIconPoly( verts=verts, axis=self.axis, **self.kwargs )
             self.patchList.append(p)
             drawnPoly += 1
@@ -1557,8 +1559,8 @@ class RangeIcon(Polygon):
         self._path = Path(vertsAsArray)
         self.set_closed(True)
 
-#        NTdebug("Created a Rectangle at position %s with width, height: %s, %s" % ( startPoint, width, height ))
-#        NTdebug("While axes have extends: %s %s" % (axis.get_xlim(), axis.get_ylim()))
+#        nTdebug("Created a Rectangle at position %s with width, height: %s, %s" % ( startPoint, width, height ))
+#        nTdebug("While axes have extends: %s %s" % (axis.get_xlim(), axis.get_ylim()))
 
     def transformIconToData( self, verts ):
         """Icon system has a y-axis range of [0,1] and x-axis range of [0,q].
@@ -1567,15 +1569,15 @@ class RangeIcon(Polygon):
 
         In place operation.
         """
-#        NTdebug("Vertices icon: %s" % verts)
-#        NTdebug("self.startPoint[1]: %s in data system" % self.startPoint[1])
-#        NTdebug("self.height: %s in data system" % self.height)
+#        nTdebug("Vertices icon: %s" % verts)
+#        nTdebug("self.startPoint[1]: %s in data system" % self.startPoint[1])
+#        nTdebug("self.height: %s in data system" % self.height)
 
         for v in verts:
             v[0] += self.startPoint[0]
             v[1] *= self.height
             v[1] += self.startPoint[1]
-#        NTdebug("Vertices data: %s" % verts)
+#        nTdebug("Vertices data: %s" % verts)
 
 
 
@@ -1612,7 +1614,7 @@ class CoilIcon(RangeIcon):
         d = [n,0]
 
         verts = [ a,b,c,d ]
-#        NTdebug("Vertices local: %s" % verts)
+#        nTdebug("Vertices local: %s" % verts)
         scaleCentered(verts, 1., CoilIcon.COIL_WIDTH)
         self.transformIconToData(verts)
 
@@ -1660,12 +1662,12 @@ class StrandIcon(RangeIcon):
         if self.seq == 1: # Just the arrow.
             verts = [ f, d, e ]
 
-#        NTdebug('verts in local system [0-n,0-1]: %s', verts)
+#        nTdebug('verts in local system [0-n,0-1]: %s', verts)
         r = 2./3 # from procheck retro engineered
         scaleCentered(verts, 1., r)
-#        NTdebug('verts in icon system  [0-n,0-r]:  %s', verts)
+#        nTdebug('verts in icon system  [0-n,0-r]:  %s', verts)
         self.transformIconToData(verts)
-#        NTdebug('verts in axes                  :  %s', verts)
+#        nTdebug('verts in axes                  :  %s', verts)
 
         vertsAsArray = np.asarray(verts, np.float_) #@UndefinedVariable
         self._path = Path(vertsAsArray)
@@ -1781,7 +1783,7 @@ def scale_yValuesFromAxesToData(axis, yValueList):
         r = height * v
         result.append( r )
     # end for
-#    NTdebug('scale_yValuesFromAxesToData last y value: %8.3f becomes: %8.3f with bottom,top %8.3f' % (v,r,height) )
+#    nTdebug('scale_yValuesFromAxesToData last y value: %8.3f becomes: %8.3f with bottom,top %8.3f' % (v,r,height) )
     return result
 
 def scaleAndMove_yValuesFromAxesToData(axis, yValueList):
@@ -1803,7 +1805,7 @@ def scaleAndMove_yValuesFromAxesToData(axis, yValueList):
         r = bottom + height * v
         result.append( r )
     # end for
-#    NTdebug('scaleAndMove_yValuesFromAxesToData last vertex: %8.3f becomes: %8.3f with bottom,top %8.3f,%8.3f' % (v,r,bottom,top) )
+#    nTdebug('scaleAndMove_yValuesFromAxesToData last vertex: %8.3f becomes: %8.3f with bottom,top %8.3f,%8.3f' % (v,r,bottom,top) )
     return result
 
 
@@ -1847,7 +1849,7 @@ class LocatorResidueMajorTicks(Locator):
                 not res.resNum%10 or
                 (doFives and not res.resNum%5)):
                 self.locs.append(idx)
-#                NTdebug('Adding at resNum %s, idx: %s'%(res.resNum,idx ))
+#                nTdebug('Adding at resNum %s, idx: %s'%(res.resNum,idx ))
 
     def __call__(self):
         return self.locs
@@ -1920,7 +1922,7 @@ class FormatResNumbersFormatter(Formatter):
 
     def __call__(self, x, pos=None):
         'Return the one character residue type for tick val x at position pos'
-#        NTdebug('FormatResNumbersFormatter called with x,pos: %s, %s' %(x,pos))
+#        nTdebug('FormatResNumbersFormatter called with x,pos: %s, %s' %(x,pos))
         xint = int(x+0.5)
         if xint > 0 and xint < len(self.resPropList):
             return self.resPropList[xint]
@@ -1942,7 +1944,7 @@ class MoleculePlotSet:
             max_length_range = ResPlot.MAX_WIDTH_IN_RESIDUES,
             ranges = self.ranges)
         if self.keyLoLoL == None:
-            NTcodeerror("keyLoLoL should not be None in MoleculePlotSet.__init__")
+            nTcodeerror("keyLoLoL should not be None in MoleculePlotSet.__init__")
 
     def renderMoleculePlotSet(self, fileName, createPngCopyToo = True):
         """
@@ -1979,29 +1981,29 @@ class MoleculePlotSet:
                             continue
                         serie = []
                         points.append(serie)
-#        NTdebug('self.keyLoLoL filled: %s' % self.keyLoLoL )
-#        NTdebug('pointsLoLoL init: %s' % pointsLoLoL )
+#        nTdebug('self.keyLoLoL filled: %s' % self.keyLoLoL )
+#        nTdebug('pointsLoLoL init: %s' % pointsLoLoL )
         resNumb = 0
 
         # start a new plot page for each resList
         for resList in self.rangeList:
             for res in resList:
                 resNumb += 1
-#                NTdebug(`res`)
+#                nTdebug(`res`)
                 r = 0 # r for row
                 for row in self.keyLoLoL:
                     pointsLoL = self.pointsLoLoL[r]
                     i = 0 # for each serie; main or alternative.
                     for mainOrAlt in row:
-#                        NTdebug("mainOrAlt: %s" % mainOrAlt)
+#                        nTdebug("mainOrAlt: %s" % mainOrAlt)
                         pointsL = pointsLoL[i]
                         j = 0 # for each
                         for item in mainOrAlt:
-#                            NTdebug("item: %s" % item)
+#                            nTdebug("item: %s" % item)
                             points = pointsL[j]
                             itemDictKeyList = item.keys()
                             itemDictKeyList.sort()
-#                            NTdebug("itemDictKeyList: %s" % itemDictKeyList)
+#                            nTdebug("itemDictKeyList: %s" % itemDictKeyList)
                             color = None
                             if getDeepByKeys( item, USE_ROG_FOR_COLOR_STR):
                                 color = res.rogScore.colorLabel
@@ -2012,11 +2014,13 @@ class MoleculePlotSet:
                                 serie = points[k]
                                 keys = item[keyList]
                                 point = getDeepByKeysOrAttributes(res, *keys)
-#                                NTdebug("Found point %s for keys %s" % (point, keys) )
+#                                nTdebug("Found point %s for keys %s" % (point, keys) )
                                 # Note that for a correlationPlot we keep the residue value as a list for all models.
                                 if isinstance(point, NTlist) and not self.makeCorrelationPlot:
                                     av, _sd, _n = point.average()
-    #                                NTdebug("Found av, sd, n %s %s %s" % (val2Str(av, "%.3f", 8),val2Str(sd, "%.3f", 8),val2Str(n, "%.3f", 8)))
+#                                    nTdebug("Found av, sd, n %s %s %s" % (val2Str(av, "%.3f", 8),
+#                                                                          val2Str(sd, "%.3f", 8),
+#                                                                          val2Str( n, "%.3f", 8)))
                                     point = av
     #                                point = point.average()[0]
                                 serie.append((resNumb - .5, point, color))
@@ -2027,7 +2031,7 @@ class MoleculePlotSet:
                 # end for row
             # end for res
         # end for resList
-#        NTdebug('pointsLoLoL filled: %s' % pointsLoLoL )
+#        nTdebug('pointsLoLoL filled: %s' % pointsLoLoL )
 
         self.fileNameList = []
         self.pathPngList = []
@@ -2040,18 +2044,18 @@ class MoleculePlotSet:
             return True
 
         if joinPdfPages(self.fileNameList, self.fileName):
-            NTerror('Failed to joinPdfPages from %s to: %s' % (self.fileNameList, fileName))
+            nTerror('Failed to joinPdfPages from %s to: %s' % (self.fileNameList, fileName))
             return True
 
         if createPngCopyToo:
             head, _tail = os.path.split(fileName)             # split is on last /
             # Just do the _pin.gif
             if not convert2Web(self.pathPngList, outputDir = head, doPrint = False, doFull = False):
-                NTerror('Failed to convert2Web from %s to: %s' % (self.pathPngList, head))
+                nTerror('Failed to convert2Web from %s to: %s' % (self.pathPngList, head))
                 return True
 
             if montage(self.pathPngList, fileName[: - 4] + ".png"):
-                NTerror('Failed to montage from %s to: %s' % (self.pathPngList, fileName[: - 4] + ".png"))
+                nTerror('Failed to montage from %s to: %s' % (self.pathPngList, fileName[: - 4] + ".png"))
                 return True
 
         # Remove the single pdf files.
@@ -2063,7 +2067,7 @@ class MoleculePlotSet:
         r = 0 # r now for resList
         for resList in self.rangeList:
             r += 1
-#            NTdebug("resList: %s" % resList)
+#            nTdebug("resList: %s" % resList)
             ps = ResPlotSet() # closes any previous plots
             ntPlotList = []
             # create all subplots
@@ -2084,7 +2088,7 @@ class MoleculePlotSet:
                     mainOrAlt = row[m]
                     key = mainOrAlt[0] # take first main first
                     label = key[YLABEL_STR]
-#                    NTdebug( 'row %d Label: %s' % (m,label))
+#                    nTdebug( 'row %d Label: %s' % (m,label))
                     if not m:      # main y-axis?
                         ntPlotList[i].yLabel = label
                     else: # alternative y-axis?
@@ -2110,27 +2114,27 @@ class MoleculePlotSet:
                             pointAttr = plusPoint
                             if j:      # alternative y-axis
                                 pointAttr = circlePoint
-#                            NTdebug("Using lineTypeIdx %d %s"%(lineTypeIdx, cingLineTypeList[lineTypeIdx]))
+#                            nTdebug("Using lineTypeIdx %d %s"%(lineTypeIdx, cingLineTypeList[lineTypeIdx]))
                             pointAttr.lineType = cingLineTypeList[lineTypeIdx]
-    #                        NTdebug( 'plotting row %d pointsLoL %d pointsL %d' % (i, j, k))
+    #                        nTdebug( 'plotting row %d pointsLoL %d pointsL %d' % (i, j, k))
                             ntPlotList[i].lines(pointsOffset, pointAttr)
                             pointsForAutoscaling += pointsOffset
 
-#                NTdebug( 'autoScaleY row %d' % (i))
+#                nTdebug( 'autoScaleY row %d' % (i))
                 useVerboseLocator = getDeepByKeys(self.keyLoLoL, i, 0, 0, USE_VERBOSE_Y_LOCATOR_STR)
                 ntPlotList[i].autoScaleY(pointsForAutoscaling, useVerboseLocator=useVerboseLocator)
                 if getDeepByKeys(self.keyLoLoL, i, 0, 0, USE_ZERO_FOR_MIN_VALUE_STR):
-#                    NTdebug('Setting minimum y value to zero for subplot: %d' % i)
+#                    nTdebug('Setting minimum y value to zero for subplot: %d' % i)
                     ntPlotList[i].setYrange((.0, ntPlotList[i].yRange[1]))
 
                 maxValue = getDeepByKeys(self.keyLoLoL, i, 0, 0, USE_MAX_VALUE_STR)
                 if maxValue != None:
-#                    NTdebug('Setting maximum y value to %s for subplot: %d' % (maxValue,i))
+#                    nTdebug('Setting maximum y value to %s for subplot: %d' % (maxValue,i))
                     ntPlotList[i].setYrange((ntPlotList[i].yRange[0], maxValue))
 
                 minValue = getDeepByKeys(self.keyLoLoL, i, 0, 0, USE_MIN_VALUE_STR)
                 if minValue != None:
-#                    NTdebug('Setting minimum y value to %s for subplot: %d' % (minValue, i))
+#                    nTdebug('Setting minimum y value to %s for subplot: %d' % (minValue, i))
                     ntPlotList[i].setYrange((minValue, ntPlotList[i].yRange[1]))
 
 
@@ -2158,13 +2162,13 @@ class MoleculePlotSet:
             # Actually plot
             self.fileNameList.append('%s%03d.pdf' % (self.fileName[: - 4], r))
             if ps.hardcopy(self.fileNameList[r - 1]):
-                NTerror('Failed to ps.hardcopy to: %s' % self.fileNameList[r - 1])
+                nTerror('Failed to ps.hardcopy to: %s' % self.fileNameList[r - 1])
                 return True
 
             if self.createPngCopyToo:
                 fileNamePng = '%s%03d.png' % (self.fileName[: - 4], r)
                 if ps.hardcopy(fileNamePng):
-                    NTerror('Failed to ps.hardcopy to: %s' % fileNamePng)
+                    nTerror('Failed to ps.hardcopy to: %s' % fileNamePng)
                     return True
                 self.pathPngList.append(fileNamePng)
         # end for resList in rangeList:
@@ -2188,7 +2192,7 @@ class MoleculePlotSet:
                 mainOrAlt = row[m]
                 key = mainOrAlt[0] # take first main first
                 label = key[YLABEL_STR]
-#                    NTdebug( 'row %d Label: %s' % (m,label))
+#                    nTdebug( 'row %d Label: %s' % (m,label))
                 if not m:      # main y-axis?
                     ntPlotList[i].xLabel = key[XLABEL_STR]
                     ntPlotList[i].yLabel = label
@@ -2197,39 +2201,39 @@ class MoleculePlotSet:
 
 
         for i in range(nrows):
-#            NTdebug("i (nrows): %d" % i)
+#            nTdebug("i (nrows): %d" % i)
             pointsLoL = self.pointsLoLoL[i]
             pointsForAutoscalingY = [] # might be done differently in future when alternative axis doesn't have same scale as main axis.
             pointsForAutoscalingX = []
             for j in range(len(pointsLoL)): # j is 0 for main or 1 for alt
                 pointsL = pointsLoL[j]
-#                NTdebug("j: %d pointsL %s" % (j, pointsL))
+#                nTdebug("j: %d pointsL %s" % (j, pointsL))
                 for k in range(len(pointsL)): # k odd is x and k even is y.
                     points = pointsL[k]
-#                    NTdebug("k: %d points %s" % (k, points))
+#                    nTdebug("k: %d points %s" % (k, points))
 #                    x,y,s,c,verts = [],[],[],[],[]
-                    for l in range(len(points)):
+                    for l in range(len(points)): # pylint: disable=C0102
                         point = points[l]
-#                        NTdebug("l: %d point %s" % (l, point))
+#                        nTdebug("l: %d point %s" % (l, point))
                         if not (l % 2):
                             xValueList = point
                             continue
                         yValueList = point
                         for resId, resValueListTupleX in enumerate(xValueList):
                              # skip the residue location; it's not used in this variant of the code.
-#                            NTdebug("resId: %d" % resId)
+#                            nTdebug("resId: %d" % resId)
                             resValueListTupleY = yValueList[resId]
                             resValueListX = resValueListTupleX[NT_MOLECULE_PLOT_IDX_VALUE_LIST]
                             resValueListY = resValueListTupleY[NT_MOLECULE_PLOT_IDX_VALUE_LIST]
                             if not resValueListX:
-#                                NTdebug("No resValueListX")
+#                                nTdebug("No resValueListX")
                                 continue
                             if not resValueListY:
-#                                NTdebug("No resValueListY")
+#                                nTdebug("No resValueListY")
                                 continue
 
-#                            NTdebug("resValueListX: %s" % resValueListX)
-#                            NTdebug("resValueListY: %s" % resValueListY)
+#                            nTdebug("resValueListX: %s" % resValueListX)
+#                            nTdebug("resValueListY: %s" % resValueListY)
                             Xav, Xsd, _n = resValueListX.average()
                             Yav, Ysd, _n = resValueListY.average()
                             if isNaN(Xsd): # No sd for single model ensembles.
@@ -2244,8 +2248,8 @@ class MoleculePlotSet:
                             if False: # while testing since sd are too large to plot then.
                                 width *= 5
                                 height *= 5
-#                            NTdebug("resId: %2d  x %8s width  %8s" % (resId, val2Str(Xav, "%.3f", 8), val2Str(width, "%.3f", 8)))
-#                            NTdebug("           y %8s height %8s" % (val2Str(Yav, "%.3f", 8), val2Str(height, "%.3f", 8)))
+#                            nTdebug("resId: %2d  x %8s width  %8s" % (resId, val2Str(Xav, "%.3f", 8), val2Str(width, "%.3f", 8)))
+#                            nTdebug("           y %8s height %8s" % (val2Str(Yav, "%.3f", 8), val2Str(height, "%.3f", 8)))
 #                            p = (Xav+0.1, Yav) # just for debugging.
 #                            pointAttr = circlePoint
 #                            pointAttr.pointSize = 10
@@ -2288,13 +2292,13 @@ class MoleculePlotSet:
         self.fileNameList.append('%s%03d.pdf' % (self.fileName[: - 4], r))
 #        ps.axis.add_artist(Line2D((0,1), (0,1)))
         if ps.hardcopy(self.fileNameList[r - 1]):
-            NTerror('Failed to ps.hardcopy to: %s' % self.fileNameList[r - 1])
+            nTerror('Failed to ps.hardcopy to: %s' % self.fileNameList[r - 1])
             return True
 
         if self.createPngCopyToo:
             fileNamePng = '%s%03d.png' % (self.fileName[: - 4], r)
             if ps.hardcopy(fileNamePng):
-                NTerror('Failed to ps.hardcopy to: %s' % fileNamePng)
+                nTerror('Failed to ps.hardcopy to: %s' % fileNamePng)
                 return True
             self.pathPngList.append(fileNamePng)
     # end for resList in rangeList:
@@ -2328,7 +2332,7 @@ def selectPointsFromRange(pointList, start = 0, length = None):
     have length one and not two."""
 
     if not length:
-        NTerror('expected a non-zero length in selectPointsFromRange')
+        nTerror('expected a non-zero length in selectPointsFromRange')
         return True
     end = start + length
     result = []
@@ -2363,9 +2367,9 @@ def makeDihedralHistogramPlot( project, residue, dihedralName, binsize = 5, html
 
     bins       = 360/binsize
     plotparams = project.plotParameters.getdefault(dihedralName,'dihedralDefault')
-#    NTdebug( 'residue: '+`residue`)
+#    nTdebug( 'residue: '+`residue`)
     angle = residue[dihedralName] # A NTlist
-#    NTdebug( 'angle: ' + `angle`)
+#    nTdebug( 'angle: ' + `angle`)
     ps = NTplotSet() # closes any previous plots
     ps.hardcopySize = (600,369)
     plot = NTplot( title  = residue.cName(2),
@@ -2378,18 +2382,18 @@ def makeDihedralHistogramPlot( project, residue, dihedralName, binsize = 5, html
 #    Note that the good and outliers come from:
 #    d.good, d.outliers = peirceTest( d )
     if not angle.__dict__.has_key('good'):
-        NTcodeerror("No angle.good plots added. Skipping makeDihedralHistogramPlot for %s %s." % (
+        nTcodeerror("No angle.good plots added. Skipping makeDihedralHistogramPlot for %s %s." % (
                     residue, dihedralName))
         return None
-#    NTdebug( 'angle.good: ' + `angle.good`)
+#    nTdebug( 'angle.good: ' + `angle.good`)
     plot.histogram( angle.good.zap(1),
                     plotparams.min, plotparams.max, bins,
                     attributes = boxAttributes( fillColor=plotparams.color ))
     if not angle.__dict__.has_key('outliers'):
-        NTcodeerror("No angle.outliers plots added. Skipping makeDihedralHistogramPlot for %s %s." % (
+        nTcodeerror("No angle.outliers plots added. Skipping makeDihedralHistogramPlot for %s %s." % (
                     residue, dihedralName))
         return None
-#    NTdebug( 'angle.outliers: ' + `angle.outliers`)
+#    nTdebug( 'angle.outliers: ' + `angle.outliers`)
     plot.histogram( angle.outliers.zap(1),
                 plotparams.min, plotparams.max, bins,
                 attributes = boxAttributes( fillColor=plotparams.outlier )
@@ -2406,13 +2410,13 @@ def makeDihedralHistogramPlot( project, residue, dihedralName, binsize = 5, html
     dr = _matchDihedrals(residue, dihedralName)
     alpha=0.3
     if dr:
-#        NTdebug("dr: " + dr.format())
+#        nTdebug("dr: " + dr.format())
         bounds = NTlist(dr.lower, dr.upper)
         bounds.limit(plotparams.min, plotparams.max)
         hasBounds = True
         for i in range(2):
             if bounds[i] == None: # fails for entry 1bn0
-                NTerror("No bound [%d] found for restraint: %s" % (i,dr) )
+                nTerror("No bound [%d] found for restraint: %s" % (i,dr) )
                 hasBounds = False
         if hasBounds:
             if bounds[0] < bounds[1]: # single box

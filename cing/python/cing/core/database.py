@@ -1,12 +1,7 @@
-from cing import cingPythonCingDir
-from cing.Libs.AwkLike import AwkLike
-from cing.Libs.NTutils import * #@UnusedWildImport
-from cing.core.constants import * #@UnusedWildImport
-
-# NB This routine gets executed before main.py gets a chance to set the verbosity.
-#     If you need to debug this; (getting debug messages) then set verbosity = verbosityDebug in the __init__.py
-
 """
+NB This routine gets executed before main.py gets a chance to set the verbosity.
+    If you need to debug this; (getting debug messages) then set verbosity = verbosityDebug in the __init__.py
+
 __________________________________________________________________________________________________________
 
 NTdb: MolDef instance with database of topology, nomenclature and NMR properties
@@ -89,6 +84,13 @@ Implemented new methods for MolDef class
 Completed the SML implementation
 __________________________________________________________________________________________________________
 """
+
+from cing import cingPythonCingDir
+from cing.Libs.AwkLike import AwkLike
+from cing.Libs.NTutils import * #@UnusedWildImport
+from cing.core.constants import * #@UnusedWildImport
+
+
 DEFAULT_PSEUDO_ATOM_ID_UNDEFINED             = 0 # Not mandatory in dbTable.
 DEFAULT_PSEUDO_ATOM_ID_CH2_OR_NH2            = 1
 DEFAULT_PSEUDO_ATOM_ID_METHYL                = 2
@@ -165,13 +167,13 @@ class MolDef( NTtree ):
         if self.has_key(name):
             oldResDef = self[name]
             if not oldResDef.canBeModified:
-                NTerror('MolDef.appendResidueDef: replacing residueDef "%s" not allowed', oldResDef)
+                nTerror('MolDef.appendResidueDef: replacing residueDef "%s" not allowed', oldResDef)
                 return None
             #end if
-#            NTdebug('MolDef.appendResidueDef: replacing residueDef "%s"', oldResDef)
+#            nTdebug('MolDef.appendResidueDef: replacing residueDef "%s"', oldResDef)
             self.replaceChild( oldResDef, resDef )
         else:
-            self._addChild( resDef )
+            self.addChild2( resDef )
         #end if
         resDef.molDef = self
         resDef.postProcess()
@@ -184,7 +186,7 @@ class MolDef( NTtree ):
         """
         rootPath = os.path.realpath(os.path.join(cingPythonCingDir, 'Database' , convention) )
         if not os.path.exists( rootPath ):
-            NTcodeerror('MolDef._restoreFromSML: rootPath "%s" does not exist; bailing out!', rootPath)
+            nTcodeerror('MolDef._restoreFromSML: rootPath "%s" does not exist; bailing out!', rootPath)
             sys.exit(1)
         #end if
         restoreFromSML( rootPath, self, convention=convention )
@@ -207,7 +209,9 @@ class MolDef( NTtree ):
         Return ResidueDef of None on error.
         """
         # cannot use SML2obj because that would require a circular import
+        # pylint: disable=E1101
         return ResidueDef.SMLhandler.fromFile( SMLfile, self )
+    #end def
 
     def allResidueDefs(self):
         return self.subNodes( depth = 1 )
@@ -251,11 +255,11 @@ class MolDef( NTtree ):
         """return True if resName is a valid for convention, False otherwise
         """
         if not resName:
-#            NTdebug('MolDef.isValidResidueName: undefined residue name')
+#            nTdebug('MolDef.isValidResidueName: undefined residue name')
             return None
         #end if
         if not self.residueDict.has_key(convention):
-#            NTdebug('MolDef.isValidResidueName: convention %s not defined within CING', convention)
+#            nTdebug('MolDef.isValidResidueName: convention %s not defined within CING', convention)
             return False
         #end if
         return (self.getResidueDefByName( resName, convention=convention) != None)
@@ -267,11 +271,11 @@ class MolDef( NTtree ):
         """
 
         if not resName:
-#            NTdebug('MolDef.getResidueDefByName: undefined residue name')
+#            nTdebug('MolDef.getResidueDefByName: undefined residue name')
             return None
         #end if
         if not self.residueDict.has_key(convention):
-#            NTdebug('MolDef.getResidueDefByName: convention %s not defined within CING', convention)
+#            nTdebug('MolDef.getResidueDefByName: convention %s not defined within CING', convention)
             return None
         #end if
         rn = resName.strip()
@@ -286,15 +290,15 @@ class MolDef( NTtree ):
     #  print '>>', resName, atomName
 
         if not resName:
-#            NTdebug('MolDef.isValidAtomName: undefined residue name')
+#            nTdebug('MolDef.isValidAtomName: undefined residue name')
             return None
         #end if
         if not atmName:
-#            NTdebug('MolDef.isValidAtomName: undefined atom name')
+#            nTdebug('MolDef.isValidAtomName: undefined atom name')
             return None
         #end if
         if not self.residueDict.has_key(convention):
-#            NTdebug('MolDef.isValidAtomName: convention %s not defined within CING', convention)
+#            nTdebug('MolDef.isValidAtomName: convention %s not defined within CING', convention)
             return False
         #end if
         return (self.getAtomDefByName( resName, atmName, convention=convention) != None)
@@ -305,15 +309,15 @@ class MolDef( NTtree ):
            or None otherwise
         """
         if not resName:
-#            NTdebug('MolDef.getAtomDefByName: undefined residue name')
+#            nTdebug('MolDef.getAtomDefByName: undefined residue name')
             return None
         #end if
         if not atmName:
-#            NTdebug('MolDef.getAtomDefByName: undefined atom name')
+#            nTdebug('MolDef.getAtomDefByName: undefined atom name')
             return None
         #end if
         if not self.residueDict.has_key(convention):
-#            NTdebug('MolDef.getAtomDefByName: convention %s not defined within CING', convention)
+#            nTdebug('MolDef.getAtomDefByName: convention %s not defined within CING', convention)
             return None
         #end if
         resDef = self.getResidueDefByName( resName, convention=convention )
@@ -326,7 +330,7 @@ class MolDef( NTtree ):
         """
         Call postProcessing routines of all ResidueDefs and atomDefs
         """
-#        NTdebug("==> Creating translation dictionaries ... ")
+#        nTdebug("==> Creating translation dictionaries ... ")
         for rdef in self:
             rdef.postProcess()
             for atm in rdef:
@@ -384,7 +388,7 @@ class ResidueDef( NTtree ):
             self.commonName = self.nameDict[IUPAC]
         # update the defaults with any arguments to the initialization
         self.update( kwds )
-
+        self.properties = []
         #NB atoms is a derived attribute (from _children), no need to save it explicitly
         self.atoms = self._children
 
@@ -395,7 +399,7 @@ class ResidueDef( NTtree ):
                           'atoms:      %(atoms)s\n' +\
                           'dihedrals:  %(dihedrals)s\n' +\
                           'properties: %(properties)s'
-#        NTdebug("XXXXXXXX Adding %r" % self)
+#        nTdebug("XXXXXXXX Adding %r" % self)
     #end def
 
     def appendAtomDef( self, name, **kwds ):
@@ -405,7 +409,7 @@ class ResidueDef( NTtree ):
         return instance or None on error
         """
         if not self.canBeModified:
-#            NTwarning('ResidueDef.appendAtomDef: modifying "%s" is not allowed', self)
+#            nTwarning('ResidueDef.appendAtomDef: modifying "%s" is not allowed', self)
             return None
         #end if
 
@@ -414,13 +418,13 @@ class ResidueDef( NTtree ):
         if self.has_key(name):
             oldAtmDef = self[name]
             if not oldAtmDef.canBeModified:
-#                NTwarning('ResidueDef.appendAtomDef: replacing atomDef "%s" is not allowed', name)
+#                nTwarning('ResidueDef.appendAtomDef: replacing atomDef "%s" is not allowed', name)
                 return None
             #end if
-#            NTdebug('ResidueDef.appendAtomDef: replacing "%s"', oldAtmDef)
+#            nTdebug('ResidueDef.appendAtomDef: replacing "%s"', oldAtmDef)
             self.replaceChild( oldAtmDef, atmDef )
         else:
-            self._addChild( atmDef )
+            self.addChild2( atmDef )
         self.atoms = self._children #GWV: fixes a bug, but do not know why!
         atmDef.residueDef = self
         atmDef.postProcess()
@@ -432,7 +436,7 @@ class ResidueDef( NTtree ):
         """Not used yet; to be used in CCPN reader..."""
         for atomName in nameList:
             _atm = self.appendAtomDef(atomName,**kwds)
-#            NTdebug("Added to residue: %s atom %s" % (self, atm))
+#            nTdebug("Added to residue: %s atom %s" % (self, atm))
     #end def
 
     def appendDihedral( self, name, **kwds ):
@@ -513,7 +517,7 @@ class ResidueDef( NTtree ):
         if newName:
             return newName
 
-        NTwarning('ResidueDef.translate: Failed to find translation to "%s" for residue: %s; Using CING name "%s" instead.', convention, self, self.name )
+        nTwarning('ResidueDef.translate: Failed to find translation to "%s" for residue: %s; Using CING name "%s" instead.', convention, self, self.name )
         return self.name
     #end def
 
@@ -522,7 +526,7 @@ class ResidueDef( NTtree ):
     #  print '>>', resName, atomName
 
         if not self.residueDict.has_key(convention):
-            NTerror('ResidueDef.isValidAtomName: convention %s not defined within CING', convention)
+            nTerror('ResidueDef.isValidAtomName: convention %s not defined within CING', convention)
             return False
         #end if
         return (self.getAtomDefByName( atmName, convention=convention) != None)
@@ -537,12 +541,12 @@ class ResidueDef( NTtree ):
            pdbParser#_matchAtom2Cing
         """
         if not atmName:
-            NTcodeerror('ResidueDef.getAtomDefByName: atmName not defined')
+            nTcodeerror('ResidueDef.getAtomDefByName: atmName not defined')
             return None
         #end if
 
         if not self.atomDict.has_key(convention):
-#            NTdebug('ResidueDef.getAtomDefByName: convention %s not defined within CING', convention)
+#            nTdebug('ResidueDef.getAtomDefByName: convention %s not defined within CING', convention)
             return None
         #end if
 
@@ -559,7 +563,7 @@ class ResidueDef( NTtree ):
         """
         # Add name and shortName; Remove the duplicates;
         props2 =  []
-        for prop in [self.name, self.shortName, self.commonName]+ self.properties:
+        for prop in [self.name, self.shortName, self.commonName] + self.properties:
             if not prop in props2:
                 props2.append(prop)
             #end if
@@ -637,7 +641,7 @@ def isNterminalAtom( atmDef ):
     Needs to be called by valid atmDef or 0 will be returned.
     """
     if atmDef == None or atmDef.residueDef == None: # Fixes 2ksi
-        NTdebug("%s called without atom/residue definition." % getCallerName())
+        nTdebug("%s called without atom/residue definition." % getCallerName())
         return 0
     if atmDef.residueDef.hasProperties('protein'):
         d = NterminalProteinAtomDict
@@ -657,7 +661,7 @@ def isCterminalAtom( atmDef ):
 
 def isTerminal( atmDef ):
     if atmDef == None or atmDef.residueDef == None:
-#        NTdebug("%s called without atom/residue definition." % getCallerName())
+#        nTdebug("%s called without atom/residue definition." % getCallerName())
         return 0
 
     if isNterminalAtom( atmDef ):
@@ -669,7 +673,7 @@ def isAromatic( atmDef ):
        Patched for now, have to store it in database
     """
     if atmDef == None or atmDef.residueDef == None:
-        NTdebug("%s called without atom/residue definition." % getCallerName())
+        nTdebug("%s called without atom/residue definition." % getCallerName())
         return 0
 
     if not atmDef.residueDef.hasProperties('aromatic'): return False
@@ -691,7 +695,7 @@ def isBackbone( atmDef ):
     Return True if it is not a sidechain atom, False otherwise
     """
     if atmDef == None or atmDef.residueDef == None: # Fixes 2ksi
-#        NTdebug("%s called without atom/residue definition." % getCallerName())
+#        nTdebug("%s called without atom/residue definition." % getCallerName())
         return 0
     if atmDef.residueDef.hasProperties('protein'):
         d = backBoneProteinAtomDict
@@ -708,7 +712,7 @@ def isSidechain( atmDef ):
     i.e. not isBackbone, but is protein or nucleic acid; e.g. HOH is not sidechain!
     """
     if atmDef == None or atmDef.residueDef == None:
-#        NTdebug("%s called without atom/residue definition." % getCallerName())
+#        nTdebug("%s called without atom/residue definition." % getCallerName())
         return 0
 
     return not isBackbone( atmDef )
@@ -719,7 +723,7 @@ def isMethyl( atmDef ):
     Return True atm is a methyl (either carbon or proton)
     """
     if atmDef == None or atmDef.residueDef == None:
-#        NTdebug("%s called without atom/residue definition." % getCallerName())
+#        nTdebug("%s called without atom/residue definition." % getCallerName())
         return 0
     if isCarbon(atmDef):
         count = 0
@@ -751,7 +755,7 @@ def isMethylene( atmDef ):
     Return True atm is a methylene (either carbon or proton)
     """
     if atmDef == None or atmDef.residueDef == None:
-        NTdebug("%s called without atom/residue definition." % getCallerName())
+        nTdebug("%s called without atom/residue definition." % getCallerName())
         return 0
 
     if isCarbon(atmDef):
@@ -876,10 +880,9 @@ class AtomDef( NTtree ):
                            spinType    = None,     # NMR spin type; i.e. 1H, 13C ...
                            shift       = None,     # NTdict with average and sd
 
-                           hetatm      = False,    # PDB HETATM type
-
-                           properties  = []        # List with properties
+                           hetatm      = False     # PDB HETATM type
                          )
+        self.properties = []       # List with properties  
         self.update( kwds )
 
         self.__FORMAT__ = '=== %(name)s (%(convention)r) ===\n' +\
@@ -894,7 +897,7 @@ class AtomDef( NTtree ):
 #                     'topology','pseudo','real',
 #                     'type','spinType','shift', 'hetatm','properties'
 #                    )
-#        NTdebug("XXXXXXXX Adding %r" % self)
+#        nTdebug("XXXXXXXX Adding %r" % self)
 
     def __str__(self):
         if self.residueDef:
@@ -924,7 +927,7 @@ class AtomDef( NTtree ):
         newName = self.translate( convention )
         if newName:
             return newName
-        NTwarning('AtomDef.translateWithDefault: Failed to find translation to "%s" for atom: %s; Using CING name "%s" instead.', convention, self, self.name )
+        nTwarning('AtomDef.translateWithDefault: Failed to find translation to "%s" for atom: %s; Using CING name "%s" instead.', convention, self, self.name )
         return self.name
     #end def
 
@@ -1074,10 +1077,10 @@ class AtomDef( NTtree ):
             top2 = []
             for resId,atmName in self.topology:
                 if resId != 0:
-                    NTwarning('AtomDef.exportDef: %s topology (%d,%s) skipped translation', self, resId, atmName)
+                    nTwarning('AtomDef.exportDef: %s topology (%d,%s) skipped translation', self, resId, atmName)
                     top2.append( (resId,atmName) )
                 elif not atmName in self.residueDef:
-                    NTerror('AtomDef.exportDef: %s topology (%d,%s) not decoded', self, resId, atmName)
+                    nTerror('AtomDef.exportDef: %s topology (%d,%s) not decoded', self, resId, atmName)
                     top2.append( (resId,atmName) )
                 else:
                     atm = self.residueDef[atmName]
@@ -1149,10 +1152,10 @@ class DihedralDef( NTtree ):
             atms = []
             for resId,atmName in self.atoms:
                 if resId != 0:
-                    NTwarning('DihedralDef.exportDef: %s topology (%d,%s) skipped translation', self, resId, atmName)
+                    nTwarning('DihedralDef.exportDef: %s topology (%d,%s) skipped translation', self, resId, atmName)
                     atms.append( (resId,atmName) )
                 elif not atmName in self.residueDef:
-                    NTerror('DihedralDef.exportDef: %s topology (%d,%s) not decoded', self, resId, atmName)
+                    nTerror('DihedralDef.exportDef: %s topology (%d,%s) not decoded', self, resId, atmName)
                     atms.append( (resId,atmName) )
                 else:
                     atm = self.residueDef[atmName]
@@ -1185,7 +1188,7 @@ class DihedralDef( NTtree ):
 def importNameDefs( tableFile, name)   :
     "Import residue and atoms name defs from tableFile"
 
-#    NTdebug('==> Importing database file '+ tableFile )
+#    nTdebug('==> Importing database file '+ tableFile )
 
     mol = MolDef( name = 'mol' )
     obj = mol # object point to 'active' object (i.e. mol, residue, dihedral or atom); attributes get appended to obj.
@@ -1209,7 +1212,7 @@ def importNameDefs( tableFile, name)   :
         elif r.dollar[1] == 'END_ATOM':
             obj = res
         elif r.NF > 2:
-#            NTmessage( '=> %s',repr(obj))
+#            nTmessage( '=> %s',repr(obj))
 #             # Get a mol representing constructor
 #              cname = obj._Cname( -1 ).split(".")
 #              result= cname[0]
@@ -1220,14 +1223,14 @@ def importNameDefs( tableFile, name)   :
 #                                    repr(r.dollar[1].strip()),
 #                                    "".join( r.dollar[2:] )
 #                                   )
-# #            NTmessage( ' >%s<',cmd )
+# #            nTmessage( ' >%s<',cmd )
 #
 ##  19 Feb 2007: much simpler
 #             cmd = "obj[%s] = %s " % (repr(r.dollar[1].strip()),
 #                                      " ".join( r.dollar[3:] )
 #                                     )
 #
-#            NTmessage( ' >%s<',cmd )
+#            nTmessage( ' >%s<',cmd )
 #             exec( cmd )
 ##  17 Sep 2007; even simpler
             obj[r.dollar[1]] = eval( " ".join( r.dollar[3:] ) )
@@ -1238,7 +1241,7 @@ def importNameDefs( tableFile, name)   :
     mol.name=name
 
     if mol.convention != INTERNAL:
-        NTerror('Reading databse: current convention setting (%s) does not match database file "%s" (%s)',
+        nTerror('Reading databse: current convention setting (%s) does not match database file "%s" (%s)',
                 INTERNAL, tableFile, mol.convention
                )
         sys.exit(1)
@@ -1287,7 +1290,7 @@ def saveToSML( rDefList, rootPath, convention=INTERNAL ):
         fname = rdef.translate(convention) +'.sml'
         fileList.append(fname)
         path = os.path.join(rootPath, fname)
-#        NTdebug('saveToSML: saving %s to"%s"', rdef, path)
+#        nTdebug('saveToSML: saving %s to"%s"', rdef, path)
         #obj2SML( rdef, path, convention=convention) cannot use, because it will generate circular imports!
         rdef.SMLhandler.toFile( rdef, path, convention=convention )
     #end for
@@ -1300,14 +1303,14 @@ def restoreFromSML( rootPath, mDef, convention=INTERNAL ):
     restore ResidueDefs from SML files in rootPath to a MolDef instance mDef
     """
     path = os.path.join(rootPath, 'content.xml')
-    fileList = XML2obj( path=path )
+    fileList = xML2obj( path=path )
     if fileList == None:
-        NTerror('restoreFromSML: unable to open "%s"', path)
+        nTerror('restoreFromSML: unable to open "%s"', path)
         return None
     #end if
     for rfile in fileList:
         path = os.path.join(rootPath, rfile)
-#        NTdebug('restoreSML: restoring from "%s"', path)
+#        nTdebug('restoreSML: restoring from "%s"', path)
         mDef.appendResidueDefFromSMLfile( path)
     #end for
 #end def

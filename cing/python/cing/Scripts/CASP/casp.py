@@ -89,9 +89,9 @@ header = """
 ======================================================================================================
 """ % (cingVersion)
 
-NTmessage( header )
-#NTmessage( "Targets:         " + str(targets ))
-#NTmessage( "Groups:          " + str(groups ))
+nTmessage( header )
+#nTmessage( "Targets:         " + str(targets ))
+#nTmessage( "Groups:          " + str(groups ))
 #for g in groups:
 #    print  groupDefs[g].format()
 
@@ -121,8 +121,8 @@ if options.verbosity >= 0 and options.verbosity <= 9:
 #        print "In main, setting verbosity to:", options.verbosity
     cing.verbosity = options.verbosity
 else:
-    NTerror("set verbosity is outside range [0-9] at: " + options.verbosity)
-    NTerror("Ignoring setting")
+    nTerror("set verbosity is outside range [0-9] at: " + options.verbosity)
+    nTerror("Ignoring setting")
 #end if
 
 #options.target = 'CGR26A'
@@ -130,17 +130,17 @@ options.target = '1brv'
 
 # Check the targets
 if not options.target:
-    NTerror('No target defined, aborting')
+    nTerror('No target defined, aborting')
     sys.exit(1)
 if not options.target in targets:
-    NTerror('Target "%s" not in %s, aborting', options.target, targets)
+    nTerror('Target "%s" not in %s, aborting', options.target, targets)
     sys.exit(1)
 
 target = options.target
 groupsForTarget = getGroupsForTarget(target, groups)[0:2]
-NTmessage( "Target:          " + target )
-NTmessage( "Ranges target:   " + ranges[target] )
-NTmessage( "Groups target:   " + str( groupsForTarget ))
+nTmessage( "Target:          " + target )
+nTmessage( "Ranges target:   " + ranges[target] )
+nTmessage( "Groups target:   " + str( groupsForTarget ))
 #sys.exit(1)
 
 # Open the project instances.
@@ -151,7 +151,7 @@ p0 = pTree.entries[0] # shortcut
 fp = sys.stdout
 if options.outFile:
     fp = open(pTree.path(options.outFile), 'w')
-    NTmessage('\n==> Starting analysis: Output to %s', pTree.path(options.outFile))
+    nTmessage('\n==> Starting analysis: Output to %s', pTree.path(options.outFile))
 
 fprintf( fp, '%s\n\n', pTree.format() )
 

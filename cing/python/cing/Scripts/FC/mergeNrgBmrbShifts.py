@@ -48,7 +48,7 @@ class MergeNrgBmrbShifts(DataHandler, NmrStarHandler):
         project = Project.open(self.idCode, status='new')
         # Can read tgz files.
         if project.initCcpn(ccpnFolder=ccpnFile, modelCount=modelCount) == None:
-            NTerror("Failed to read: %s" % ccpnFile)
+            nTerror("Failed to read: %s" % ccpnFile)
             return True
 #        self.ccpnProject = loadCcpnTgzProject(os.path.join(self.loadDir, self.idCode, 'linkNmrStarData'))
         self.ccpnProject = project.ccpn
@@ -59,7 +59,7 @@ class MergeNrgBmrbShifts(DataHandler, NmrStarHandler):
         projectDirectory = os.path.join(dir_S, entryCodeChar2and3, self.idCode)
         os.chdir(projectDirectory)
         curDir = os.getcwd() #@UnusedVariable
-        NTdebug("curDir: %s" % curDir)
+        nTdebug("curDir: %s" % curDir)
 #        ccpnDir = self.baseName #@UnusedVariable
 
         # Read the existing CCPN project, set up format object dict
@@ -73,10 +73,10 @@ class MergeNrgBmrbShifts(DataHandler, NmrStarHandler):
 
         bmrbCodesLength = len(self.bmrbCodes)
         if not bmrbCodesLength:
-            NTerror("Not a single BMRB entry presented.")
+            nTerror("Not a single BMRB entry presented.")
             return
         if bmrbCodesLength > 1:
-            NTwarning("Currently NRG-CING only loads a single BMRB entry's CS. Skipping others.")
+            nTwarning("Currently NRG-CING only loads a single BMRB entry's CS. Skipping others.")
 
         # Read the BMRB NMR-STAR file (only chem shift data)
 #        for bmrbCode in self.bmrbCodes:
@@ -88,30 +88,30 @@ class MergeNrgBmrbShifts(DataHandler, NmrStarHandler):
 #        inputStarDir = os.path.join(bmrbDir, digits12)
         inputStarDir = os.path.join(bmrbDir, bmrbCode)
         if not os.path.exists(inputStarDir):
-            NTerror("Input star dir not found: %s" % inputStarDir)
+            nTerror("Input star dir not found: %s" % inputStarDir)
             return True
         inputStarFile = os.path.join(inputStarDir, self.bmrbFileFormat % bmrbCode)
         if not os.path.exists(inputStarFile):
-            NTerror("inputStarFile not found: %s" % inputStarFile)
+            nTerror("inputStarFile not found: %s" % inputStarFile)
             return True
-        NTdebug("Start readNmrStarFile")
+        nTdebug("Start readNmrStarFile")
         self.readNmrStarFile(inputStarFile, components=['measurements'])
         # Try to autoset mapping...
-        NTdebug("Start setBmrbNmrStarMapping")
+        nTdebug("Start setBmrbNmrStarMapping")
         self.setBmrbNmrStarMapping(inputStarFile)
         # Run linkResonances, using custom keywds set above
-        NTdebug("Start runLinkResonances")
+        nTdebug("Start runLinkResonances")
         self.runLinkResonances(resonanceType='nmr')
         # Save project in new location
         newPath = self.baseName
-        NTmessage('Saving to new path: %s in cwd: %s' % (newPath, os.getcwd()))
+        nTmessage('Saving to new path: %s in cwd: %s' % (newPath, os.getcwd()))
         saveProject(self.ccpnProject, removeExisting=True, newPath=newPath, newProjectName=self.baseName)
         ccpnTgzFile = "%s.tgz" % self.idCode
         cmd = "tar -czf %s %s" % (ccpnTgzFile, newPath)
         if do_cmd(cmd):
-            NTerror("Failed tar")
+            nTerror("Failed tar")
             return None
-        NTmessage("Saved ccpn project to tgz: %s" % ccpnTgzFile)
+        nTmessage("Saved ccpn project to tgz: %s" % ccpnTgzFile)
 
     def initShiftPresets(self, bmrbCode):
         if not self.presetDict.has_key(bmrbCode):

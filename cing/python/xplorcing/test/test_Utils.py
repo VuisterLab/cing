@@ -9,8 +9,9 @@ import cing
 import unittest
 
 class AllChecks(TestCase):
-
+    'Test case'
     def test_getRandomSeed(self):
+        'Simply run the getter.'
         self.assertTrue( getRandomSeed()>1 )
 
 if __name__ == "__main__":

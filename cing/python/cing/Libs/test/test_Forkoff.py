@@ -14,14 +14,14 @@ import unittest
 def my_sleep(arg):
     ## Check types
     if type(arg) == types.TupleType:
-        NTerror("Type of args [%s] is tuple" % arg)
-        NTerror("This can happen when supplied with more than 1 argument")
+        nTerror("Type of args [%s] is tuple" % arg)
+        nTerror("This can happen when supplied with more than 1 argument")
         return 1
 
     ## Take first argument
-    NTmessage("Sleeping for %s", arg)
+    nTmessage("Sleeping for %s", arg)
     time.sleep (arg)
-    NTmessage("Going back to caller")
+    nTmessage("Going back to caller")
     return 0
 
 class AllChecks(TestCase):
@@ -56,7 +56,7 @@ class AllChecks(TestCase):
         job_list = [ job_0, job_1, job_2 ]
 
         done_list = f.forkoff_start(job_list, 0)
-        NTmessage("Finished ids: %s", done_list)
+        nTmessage("Finished ids: %s", done_list)
 
     def _testRun2(self):
         ## Initializing f will also initialize an instance of class Process
@@ -77,15 +77,15 @@ class AllChecks(TestCase):
         job_list = [ job_3 ]
 
         done_list = f.forkoff_start(job_list, 0)
-        NTmessage("Finished ids: %s", done_list)
+        nTmessage("Finished ids: %s", done_list)
 
 
 if __name__ == "__main__":
     cing.verbosity = verbosityDebug
-    NTmessage(header)
-    NTmessage(getStartMessage())
+    nTmessage(header)
+    nTmessage(getStartMessage())
     try:
         unittest.main()
     finally:
-        NTmessage(getStopMessage(cing.starttime))
+        nTmessage(getStopMessage(cing.starttime))
 

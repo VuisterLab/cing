@@ -55,7 +55,7 @@ finally: # finally fails in python below 2.5
 def yasaraShell(project):
 
     if not cing.yasaradir:
-        NTcodeerror('yasaraShell: please put a proper yasara.py module on PYTHONPATH first (check yasaradir!)')
+        nTcodeerror('yasaraShell: please put a proper yasara.py module on PYTHONPATH first (check yasaradir!)')
         exit(1)
 
     # shortcuts
@@ -68,7 +68,7 @@ def yasaraShell(project):
                 'getSelectedResidue', 'hud', 'loadPDB', 'screenDump', 'showHtml']
         cmds.sort()
         for c in cmds:
-            NTmessage( c )
+            nTmessage( c )
         #end for
     #end def
 
@@ -77,7 +77,7 @@ def yasaraShell(project):
         Load project.molecule model [0,modelCount-1] or all models if None
         """
         if not project.molecule:
-            NTerror('loadPDB: no molecule defined')
+            nTerror('loadPDB: no molecule defined')
             return True
 
         if model == None or model == 'all':
@@ -88,7 +88,7 @@ def yasaraShell(project):
 
         project.molecule.toPDBfile(path, model = model)
 
-        NTmessage('loadPDB: %s' % path)
+        nTmessage('loadPDB: %s' % path)
         LoadPDB(os.path.abspath(path))
         Style('Ribbon', 'off')
     #end def
@@ -194,7 +194,7 @@ def yasaraShell(project):
         """
         atomId = MarkAtom()[0]
         if int(atomId) == 0:
-            NTerror('getSelectedResidue: nothing selected')
+            nTerror('getSelectedResidue: nothing selected')
             return None
         a = Atom('atom ' + str(atomId))
         fields = str(a).split()
@@ -202,7 +202,7 @@ def yasaraShell(project):
         resName = fields[3]
         chainName = fields[4]
         resNum = int(fields[5])
-        NTmessage( 'Selected:', chainName, resName, resNum, atmName )
+        nTmessage( 'Selected:', chainName, resName, resNum, atmName )
         nameTuple = (project.molecule.name, chainName, resNum, None, None, None, IUPAC)
         #print nameTuple
         res = project.molecule.decodeNameTuple(nameTuple)
@@ -217,10 +217,10 @@ def yasaraShell(project):
         import webbrowser
         res = getSelectedResidue()
         if not res:
-            NTerror('showHtml: invalid residue')
+            nTerror('showHtml: invalid residue')
 
         path = os.path.abspath(project.htmlPath('Molecule', res.chain.name, res.name, 'index.html'))
-        NTmessage( 'showHtml: %s' % path )
+        nTmessage( 'showHtml: %s' % path )
         webbrowser.open('file://' + path)
     #end def
     showhtml = showHtml #@UnusedVariable
@@ -232,7 +232,7 @@ def yasaraShell(project):
         path = project.moleculePath('yasara', fileName)
         if hideHUD:
             hud('off')
-        NTmessage( 'screenDump to: %s' % path )
+        nTmessage( 'screenDump to: %s' % path )
         SaveBmp(path)
         hud('on')
     #end def
