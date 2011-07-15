@@ -13,6 +13,7 @@ handle multimers.
 the restraints in you project. It is not possible to restore them!!
 '''
 
+
 from munkres import Munkres
 from cing.core.classes import * #@UnusedWildImport
 from cing.core.molecule import * #@UnusedWildImport
@@ -22,13 +23,13 @@ from itertools import combinations
 def addDihRestr(proj,lower,upper,leuNumberList):
     '''
     Adding CHI2 dihedral restraints to leucines, specified in leuNumberList. lower and upper are the lower bound and upper bound of the restraint.
-    The restraints will be put in a new restraintlist
+    The restraints will be put in a new restraint list
     '''
-    #molec=proj.molecule.A
+    # molec = proj.molecule.A
     leu=[]
     for r in leuNumberList:
         leu.append(proj.molecules[0].residuesWithProperties('LEU')[r])
-    #leu=[molec.LEU589,molec.LEU596,molec.LEU618]
+    # leu = [molec.LEU589,molec.LEU596,molec.LEU618]
     lower=0
     upper=245
     dihrestrlist=DihedralRestraintList(name='CHI2restr')
@@ -69,7 +70,7 @@ def checkDoubleRestraints(proj,leu):
 def checkRestraintsExistance(restraintlist,proj):
     '''After deleting halve of the double restraints, this script will check whether the other halve is still there.'''
     nTmessage('Project contains still following restraints:')#Just a check
-    aplist=[]#list with unique atompairs in restraintlist
+    aplist=[] #list with unique atompairs in restraint list
     count=0
     for dr in restraintlist:
         aplist.append(dr.atomPairs[0])
@@ -84,7 +85,7 @@ def checkRestraintsExistance(restraintlist,proj):
 #end def
 
 def deassignHB(proj,leu):
-    '''Deassignes HBs in specified leucines. It will replace the old restraint, in order to delete all the other information.'''
+    '''Deassigns HBs in specified leucines. It will replace the old restraint, in order to delete all the other information.'''
     nTmessage('Following restraint pairs with HBs of %s are deassigned:'%leu.name)
     deassHBaplist=[]
 #    atomIndexes=[0,1]
@@ -108,10 +109,13 @@ def deassignHB(proj,leu):
             newList.append((atom1,atom2))
             nTmessage('%s -> %s'%(str(dr.atomPairs),str(newList)))
             dr.atomPairs=newList
-            break
+            if True: # coverage fails to understand the indentation of a break at the end of a loop.
+                break
+            pass # pylint: disable=W0107
         # end for
     # end for
-    proj=checkDoubleRestraints(proj,leu) # this line is causing problems with coverage 3.5. Don't see why though.
+    proj = checkDoubleRestraints(proj,leu)     
+    # this above line is causing problems with coverage 3.5. Don't see why though.
     proj.distances[0].analyze()
     return (proj,deassHBaplist)
 #end def

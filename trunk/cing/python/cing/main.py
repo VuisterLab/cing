@@ -364,7 +364,7 @@ def pylintOverall(pylintOverallOutputFileName='pylint.txt'):
             continue
         if appendTextFileToFile( pylintOutputFileName, pylintOverallOutputFileName):
             nTerror("Failed to appendTextFileToFile")
-        nTmessage("Done appending from: %s" % pylintOutputFileName)
+        nTdebug("Done appending from: %s" % pylintOutputFileName)
     # end for        
     nTmessage("Done with pylint")
 # end def
@@ -459,7 +459,7 @@ def pylintByName(name, excludedModuleList):
     cmd = ' --rcfile ../.pylintrc --report=no ' + mod_name
     pylintDir = os.path.join( cingDirTmp, 'pylint' )
     pylintOutputFileName = os.path.join( pylintDir, mod_name + '.log')
-    nTmessage("Writing to " + pylintOutputFileName)
+    nTdebug("Writing to " + pylintOutputFileName)
     if os.path.exists(pylintOutputFileName):
         os.unlink( pylintOutputFileName )
     pylint = ExecuteProgram('pylint', rootPath=cingPythonDir, redirectOutputToFile=pylintOutputFileName)
