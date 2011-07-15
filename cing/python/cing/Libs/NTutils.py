@@ -5081,6 +5081,47 @@ nTmessageList = ( #@UnusedVariable used in NTutils2
   nTnothingT, nTerrorT , nTcodeerrorT , nTexceptionT , nTwarningT , nTmessageT , nTdetailT , nTdebugT, nTmessageNoEOLT
 )
 
+# Block with depreciated aliases. Please add.
+NTnothing       = nTnothing       
+NTerror         = nTerror         
+NTcodeerror     = nTcodeerror     
+NTexception     = nTexception     
+NTwarning       = nTwarning       
+NTmessage       = nTmessage       
+NTdetail        = nTdetail        
+NTdebug         = nTdebug         
+NTmessageNoEOL  = nTmessageNoEOL  
+# repeat with T
+NTnothingT       = nTnothingT       
+NTerrorT         = nTerrorT       
+NTcodeerrorT     = nTcodeerrorT     
+NTexceptionT     = nTexceptionT     
+NTwarningT       = nTwarningT       
+NTmessageT       = nTmessageT       
+NTdetailT        = nTdetailT        
+NTdebugT         = nTdebugT         
+NTmessageNoEOLT  = nTmessageNoEOLT
+# Other functions
+NTaverage          = nTaverage         
+NTaverage2         = nTaverage2        
+NTcAverage         = nTcAverage        
+NTcVarianceAverage = nTcVarianceAverage
+NTexit             = nTexit            
+NTfill             = nTfill            
+NThandle           = nThandle          
+NThistogram        = nThistogram       
+NTindent           = nTindent          
+NTlimit            = nTlimit           
+NTlimitSingleValue = nTlimitSingleValue
+NTmax              = nTmax             
+NTmin              = nTmin             
+NTmkdir            = nTmkdir           
+NTpath             = nTpath            
+NTsign             = nTsign            
+NTsq               = nTsq              
+NTtoXML            = nTtoXML           
+NTzap              = nTzap             
+
 # Block the import so it stays here.
 if 1:
     from cing.Libs.NTutils2 import * #@UnusedWildImport

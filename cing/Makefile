@@ -50,10 +50,11 @@ nose:
 	# Uses .coveragerc
 	-/bin/rm -f nosetests.xml coverage.xml .coverage
 	-nosetests --with-xunit --with-coverage --verbose --cover-package=cing --where=python/cing
-	# Convert .coverage to coverage.xml. Needs Coverage.py, version 3.4.  http://nedbatchelder.com/code/coverage
+	# Convert .coverage to coverage.xml. 
+	#Needs Coverage.py, version 3.4+.  http://nedbatchelder.com/code/coverage
 	-coverage xml
 	
 test:
 	# This Makefile test -does- need to succeed for the make to be successful.
-	python -u python/cing/main.py --testQ -c 1
+	python -u python/cing/main.py --testQ
 
