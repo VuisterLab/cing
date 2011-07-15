@@ -87,20 +87,21 @@ def deassignHB(proj,leu):
     '''Deassignes HBs in specified leucines. It will replace the old restraint, in order to delete all the other information.'''
     nTmessage('Following restraint pairs with HBs of %s are deassigned:'%leu.name)
     deassHBaplist=[]
-    atomIndexes=[0,1]
+#    atomIndexes=[0,1]
     for dr in leu.distanceRestraints: #restraints in proj.distances[0] are automatically deassigned.
-        atom1=dr.atomPairs[0][atomIndexes[0]]
-        atom2=dr.atomPairs[0][atomIndexes[1]]
-        for ai in atomIndexes:
-            atom=dr.atomPairs[0][ai]
-            if not atom.residue.resNum==leu.resNum:
+        ap = dr.atomPairs[0]
+        atom1=ap[0]
+        atom2=ap[1]
+        for ai in [0,1]:
+            atom=ap[ai]
+            if atom.residue.resNum != leu.resNum:
                 continue
             atomname=atom.name
             if not (atomname=='HB2' or atomname=='HB3'):
-                continue
+                continue            
             if ai==0:
                 atom1=atom.pseudoAtom()
-            elif ai==1:
+            else:
                 atom2=atom.pseudoAtom()
             newList=NTlist()
             deassHBaplist.append((atom1,atom2))
@@ -108,9 +109,9 @@ def deassignHB(proj,leu):
             nTmessage('%s -> %s'%(str(dr.atomPairs),str(newList)))
             dr.atomPairs=newList
             break
-        #endfor
-    #endfor
-    proj=checkDoubleRestraints(proj,leu)
+        # end for
+    # end for
+    proj=checkDoubleRestraints(proj,leu) # this line is causing problems with coverage 3.5. Don't see why though.
     proj.distances[0].analyze()
     return (proj,deassHBaplist)
 #end def

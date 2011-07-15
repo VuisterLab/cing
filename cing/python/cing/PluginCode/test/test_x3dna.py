@@ -6,10 +6,10 @@ Open the ???.r3d files in pymol or so; they're nice.
 """
 from cing import cingDirTestsData
 from cing import cingDirTmp
+from cing import osType
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.PluginCode.Ccpn import Ccpn #@UnusedImport needed to throw a ImportWarning so that the test is handled properly.
-from cing.PluginCode.required.reqX3dna import * #@UnusedWildImport
-from cing.PluginCode.x3dna import createHtmlX3dna
+from cing.PluginCode.required.reqX3dna import X3DNA_STR
 from cing.core.classes import Project
 from unittest import TestCase
 import shutil
@@ -18,6 +18,13 @@ import unittest
 class AllChecks(TestCase):
 
     def test_x3dna(self):
+        if osType != OS_TYPE_MAC: # only installed for mac os currently.
+            return
+        try:
+            from cing.PluginCode.x3dna import createHtmlX3dna
+        except:
+            nTerror("Failed to import x3dna on a mac osx.")
+            return
         entryList = "1b4y".split() # triple helix but it only gets analyzed to a double helix.
 #        entryList = "1cjg".split()
 #        entryList = "2hgh".split()
