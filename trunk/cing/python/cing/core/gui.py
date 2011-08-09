@@ -48,6 +48,7 @@ class LabelFrame(Tkinter.LabelFrame):
     """
 
     def __init__( self, parent, *args, **kw ):
+        Tkinter.LabelFrame.__init__(self)
 
         kw.setdefault( 'bg', 'grey90' )
         kw.setdefault( 'relief', 'groove' )

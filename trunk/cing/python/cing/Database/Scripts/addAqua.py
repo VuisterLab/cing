@@ -1,8 +1,8 @@
+"""
+Copy BMRB to Aqua with mods.
+"""
 from cing import NTdb
 from cing.core.constants import * #@UnusedWildImport
-
-"""Copy BMRB to Aqua with mods.
-"""
 
 nuclList = ('GUA', 'CYT', 'ADE', 'THY', 'URA',
             'RGUA', 'RCYT', 'RADE', 'RTHY', 'RURA',

@@ -18,16 +18,14 @@ from memops.universal.Util import returnInt, returnFloat
 from pdbe2.analysis.shifts.vascoReferenceCheck import VascoReferenceCheck
 import glob
 
-
-"""
-Additional install:
-
-vascoRefData/ files, for statistical info.
-vascoReferenceCheck.py, in pdbe.software (now part of SF CVS)
-
-"""
-
 class VascoCingReferenceCheck(VascoReferenceCheck):
+    """
+    Additional install:
+    
+    vascoRefData/ files, for statistical info.
+    vascoReferenceCheck.py, in pdbe.software (now part of SF CVS)
+    
+    """
     
     vascoRefDataPath = os.path.join(cingDirScripts, 'FC', 'vascoRefData')
     if not os.path.exists(vascoRefDataPath):

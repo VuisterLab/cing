@@ -13,7 +13,9 @@ class TestObject( NTdict ):
 #end class
 class SMLTestObjectHandler( SMLNTdictHandler ):
     def __init__(self):
-        SMLhandler.__init__( self, name = 'TestObject' )
+        SMLNTdictHandler.__init__( self )
+        self.name = 'TestObject'
+        
     #end def
     def handle(self, line, fp, project=None):
 #        nTdebug("Now in SMLTestObjectHandler#handle at line: %s" % str(line))

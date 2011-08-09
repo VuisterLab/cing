@@ -52,9 +52,8 @@ class Vasco(NTdict):
         self.rootPath = rootPath
 
 
-    """Return True on error
-    """
     def _runVasco(self, parseOnly=True):
+        "Return True on error"
         #  pdbCode = '1brv'
 #        pdbCode = self.project.name
 
@@ -124,12 +123,12 @@ class Vasco(NTdict):
 # end class
 
 
-"""
-Adjust the chemical shifts if needed and some certainty warrants the modification.
-Return True on error and
-False on success
-"""
 def runVasco(project, ccpnFolder = None):
+    """
+    Adjust the chemical shifts if needed and some certainty warrants the modification.
+    Return True on error and
+    False on success
+    """
     try:
         vasco = Vasco(project = project, ccpnFolder = ccpnFolder)
         if vasco._runVasco():

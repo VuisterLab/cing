@@ -1,8 +1,8 @@
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.core.constants import * #@UnusedWildImport
 
+#Attribute name in e.g. residue object.
 rogScoreStr = 'rogScore'
-"Attribute name in e.g. residue object."
 
 class ROGscore(NTdict):
     """
@@ -22,8 +22,7 @@ class ROGscore(NTdict):
                        )
         # Explicitly showing instance attributes here in init.
         self.colorLabel = COLOR_GREEN
-        """Elements in this list are tuples of (color, comment).
-        """
+#        Elements in this list are tuples of (color, comment).
         self.colorCommentList = NTlist()
 
 

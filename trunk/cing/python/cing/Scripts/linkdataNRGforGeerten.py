@@ -71,14 +71,13 @@ def linkdataNRG():
     extrainfolist=[]
     m=0 # m indicates a new line.
 
-    '''
-    The following script reads the pdbid's in the text file and put them in four different columns.
-    one for all different pdbids in the first column,
-    one for all pdbid's in the first column,
-    one for pdbids in the second column and
-    one for the extra information. The // between the blocks are
-    deleted in order to make it easier to add some information later.
-    '''
+#    The following script reads the pdbid's in the text file and put them in four different columns.
+#    one for all different pdbids in the first column,
+#    one for all pdbid's in the first column,
+#    one for pdbids in the second column and
+#    one for the extra information. The // between the blocks are
+#    deleted in order to make it easier to add some information later.
+
     pdbidlist0.append(text[0:4]) #the file starts with an pdbid.
     ltext =len(text)
     for n in range(ltext):
