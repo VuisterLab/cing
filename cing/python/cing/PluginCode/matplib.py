@@ -1538,7 +1538,8 @@ class RangeIcon(Polygon):
         a------d
 """
     def __init__(self, seq=1, axis=None, startPoint=None, width=1, height=None, **kwargs):
-        Patch.__init__(self, **kwargs)
+        # pylint: disable=W0231
+        Patch.__init__(self, **kwargs) # pylint: disable=W0233 
         self.seq = seq
         self.axis= axis
         self.startPoint = startPoint
@@ -1581,7 +1582,8 @@ class RangeIcon(Polygon):
 
 class RangeIconPoly(Polygon):
     def __init__(self, verts=None, axis=None, **kwargs):
-        Patch.__init__(self, **kwargs)
+        # pylint: disable=W0231
+        Patch.__init__(self, **kwargs) # pylint: disable=W0233
         self.axis= axis
 
         vertsAsArray = np.asarray(verts, np.float_) #@UndefinedVariable

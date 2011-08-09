@@ -1,8 +1,10 @@
+"""
+Use the CYANA names as a basis and then do some subs.
+"""
+
 from cing import NTdb
 from cing.core.constants import * #@UnusedWildImport
 
-"""Use the CYANA names as a basis and then do some subs.
-"""
 nuclList = ('GUA', 'CYT', 'ADE', 'THY', 'URA',
             'RGUA', 'RCYT', 'RADE', 'RTHY', 'RURA',
             )

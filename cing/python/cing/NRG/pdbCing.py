@@ -118,14 +118,15 @@ class pdbCing(Lister):
                  updateIndices = False,
                  isProduction = False
                 ):
+        Lister.__init__(self)
 
         self.writeWhyNot = writeWhyNot
-        "Write the info for the WhyNot database"
+#        "Write the info for the WhyNot database"
         self.writeTheManyFiles = writeTheManyFiles
-        "Write the info for the WhyNot database in files per entry; too verbose and not used anymore?"
+#        "Write the info for the WhyNot database in files per entry; too verbose and not used anymore?"
         self.updateIndices = updateIndices
         self.isProduction = isProduction
-        "Only during production we do a write to WHY_NOT"
+#        "Only during production we do a write to WHY_NOT"
 
         # Dir as base in which all info and scripts like this one resides
         self.base_dir = os.path.join(cingPythonCingDir, "NRG")

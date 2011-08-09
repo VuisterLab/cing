@@ -1,7 +1,3 @@
-__author__    = "$Author$"
-___revision__ = "$Revision$"
-___date__     = "$Date$"
-
 """
 Goal of these routines are to provide a Python interface to writing, reading,
 analyzing, and modifying NMR-STAR and mmCIF files and objects.

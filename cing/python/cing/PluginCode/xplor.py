@@ -1,15 +1,3 @@
-# get target in DR.
-# Configure amount of data to keep. nothing, 1 mb, 10 mb, 100 mb.
-# nothing is just data in cing.
-# Charles mentioning that except nucleic acids the IUPAC conventions can be generated for CING.
-#from Refine.refine import doSetup # This would be a circular import to avoid
-from Refine.refine import * #@UnusedWildImport
-from cing.Libs.NTutils import * #@UnusedWildImport
-from cing.core.classes import * #@UnusedWildImport
-from cing.core.constants import * #@UnusedWildImport
-from cing.core.molecule import * #@UnusedWildImport
-
-
 """
 Adds export2xplor methods to:
 DistanceRestraint , DistanceRestraintList, DihedralRestraint, DihedralRestraintList,
@@ -42,6 +30,18 @@ Atom, Molecule and Project classes.
 !!NEED to Check periodicity in dihedrals
 
 """
+
+# get target in DR.
+# Configure amount of data to keep. nothing, 1 mb, 10 mb, 100 mb.
+# nothing is just data in cing.
+# Charles mentioning that except nucleic acids the IUPAC conventions can be generated for CING.
+#from Refine.refine import doSetup # This would be a circular import to avoid
+from Refine.refine import * #@UnusedWildImport
+from cing.Libs.NTutils import * #@UnusedWildImport
+from cing.core.classes import * #@UnusedWildImport
+from cing.core.constants import * #@UnusedWildImport
+from cing.core.molecule import * #@UnusedWildImport
+
 
 #==============================================================================
 # XPLOR stuff

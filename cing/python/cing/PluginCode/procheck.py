@@ -14,7 +14,6 @@ Molecule:
 
 Residue
     procheck: NTdict instance with procheck values for this residue
-
 """
 
 from cing import cingPythonCingDir
@@ -287,9 +286,7 @@ B   7 U   999.900 999.900 999.900 999.900 999.900 999.900   0.000   1.932 999.90
 
     def __init__(self, project, **kwds):
         NTdict.__init__( self, __CLASS__ = PROCHECK_STR, **kwds )
-        """
-        Procheck class allows running procheck_nmr and parsing of results
-        """
+#        Procheck class allows running procheck_nmr and parsing of results
         self.project      = project
         self.molecule     = project.molecule
         self.rootPath     = project.mkdir(project.molecule.name, project.moleculeDirectories.procheck)

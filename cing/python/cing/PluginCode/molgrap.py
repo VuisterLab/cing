@@ -38,6 +38,7 @@ if True: # block
 
 class Molgrap(NTdict):
     def __init__(self, backcolor = 'cing_turqoise', project = None):
+        NTdict.__init__(self)
         self.csh_script_dir = cingDirMolmolScripts
         self.backcolor = backcolor # see csh script definitions.
 #        self.backcolor = 'bmrb_yellow' # see csh script definitions.

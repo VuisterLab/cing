@@ -34,29 +34,74 @@ load-plugins=
 # can either give multiple identifier separated by comma (,) or put this option
 # multiple time (only on the command line, not in the configuration file where
 # it should appear only once).
+# Enabled:
+#W0101: Unreachable code
+#W0104: Statement seems to have no effect
+#W0105: String statement has no effect
+#W0107: Unnecessary pass statement
+#W0108: Lambda may not be necessary
+#W0141: Used builtin function %r
+#W0201: Attribute %r defined outside __init__
+#W0211: Static method with %r as first argument
+#W0212: Access to a protected member %s of a client class
+#W0221: Arguments number differs from %s method
+#W0222: Signature differs from %s method
+#W0223: Method %r is abstract in class %r but is not overridden
+#W0231: __init__ method from base class %r is not called
+#W0232: Class has no __init__ method
+#W0233: __init__ method from a non direct base class %r is called
+#W0301: Unnecessary semicolon
+#W0311: Bad indentation. Found %s %s, expected %s
+#W0312: Found indentation with %ss instead of %ss
+#W0331: Use of the <> operator
+#W0332: Use l as long integer identifier
+#W0333: Use of the `` operator
+#W0403: Relative import %r
+#W0404: Reimport %r (imported line %s)
+#W0406: Module import itself
+#W0410: __future__ import is not the first non docstring statement
+#W0511 (warning notes in code comments)
+#W0601: Global variable %r undefined at the module level
+#W0602: Using global for %r but no assigment is done
+#W0603: Using the global statement
+#W0604: Using the global statement at the module level
+#W0612: Unused variable %r
+#W0613: Unused argument %r
+#W0631: Using possibly undefined loop variable %r
+#W0703: Catch "Exception"
+#W0704: Except doesn't do anything
+#W0710: Exception doesn't inherit from standard "Exception" class
+#W1001: Use of "property" on an old style class
+#W1111: Assigning to function call which only returns None
 
-#C0322 pattern_unquoted_find: Operator not preceded by a space    Text.py /pystarlib/src/STAR line 178    PyLint Problem
-#C0323 Operator not followed by a space
-#C0324 Comma not followed by a space
-#F0401 Unable to import. Pydev
-#I0011 Locally disabling certain class of messages.
-#I0013 Ignoring entire file
-#R0911 File.parse] Too many return statements (14/6)   File.py /pystarlib/src/STAR line 87 PyLint Problem
-#R0912 File.parse] Too many branches (37/12)   File.py /pystarlib/src/STAR line 87 PyLint Problem
-#R0913 File.__init__] Too many arguments (6/5) File.py /pystarlib/src/STAR line 28 PyLint Problem
-#R0914 File.parse] Too many local variables (22/15)    File.py /pystarlib/src/STAR line 87 PyLint Problem
-#R0915 File.parse] Too many statements (112/50)    File.py /pystarlib/src/STAR line 87 PyLint Problem
-#W0122  Use of the exec statement runAll.py   /pystarlib/src/STAR/test    line 14 PyLint Problem
-#W0142 NTlist.selectByItems: Used * or ** magic   NTutils.py  /cing/python/cing/Libs  line 310    PyLint Problem
-#W0401 Wildcard import STAR.Text   File.py /pystarlib/src/STAR line 8  PyLint Problem
-#W0402 Uses of a deprecated module 'string'
+# Disabled warning forever
+#W0102 Dangerous default value [] 
+#W0122 Use of the exec statement 
+#W0142 Used * or ** magic   
+#W0401 Wildcard import  
+#W0402 Uses of a deprecated module 'xxx'
 #W0611 Unused import. Pydev
 #W0614 Unused import
-#   W0621 Redefining name 'x' from outer scope 
+#W0621 Redefining name 'xxx' from outer scope
+#W0622 Redefining built-in 'xxx' 
 #W0701 Raising a string exception
 #W0702 No exception type(s) specified
+# Disabled other:
+#C0322 Operator not preceded by a space
+#C0323 Operator not followed by a space
+#C0324 Comma not followed by a space
+#F0401 Unable to import. xxx
+#I0011 Locally disabling certain class of messages.
+#I0013 Ignoring entire file
+#R0911 Too many return statements
+#R0912 Too many branches 
+#R0913 Too many arguments
+#R0914 Too many local variables
+#R0915 Too many statements
 
-disable=C0322,C0323,C0324,E0602,F0401,I0011,I0013,W0122,W0142,W0401,W0402,W0511,W0611,W0614,W0701,W0702,R0911,R0912,R0913,R0914,R0915
+disable=C0322,C0323,C0324,E0602,F0401,I0011,I0013,W0102,W0122,W0142,W0401,W0402,W0511,W0611,W0613,W0614,W0622,W0701,W0702,R0911,R0912,R0913,R0914,R0915
+# JFD likes to enable again:
+#W0613 Unused argument 'xxx'
 
 
 [REPORTS]

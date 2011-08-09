@@ -3547,15 +3547,16 @@ Chain class: defines chain properties and methods
     DEFAULT_ChainNamesByAlphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ^01234567890abcdefghijklmnopqrstuvwxyz'
 #    validChainIdListBesidesTheAlphabet = '^' 
 # last 1 chars of above.; JFD removed pound and underscore because they have a special meaning in STAR files.
-    'Nothing that is a special character in Python, or tcsh.'
+#    Nothing that is a special character in Python, or tcsh.
     defaultChainId = _DEFAULT_CHAIN_ID
-    'See documentation: molecule#ensureValidChainId'
+#    See documentation: molecule#ensureValidChainId
 
     NULL_VALUE = 'CHAIN_CODE_NULL_VALUE' # can not be a valid chain code but needs to be able to be passed on command line
     # like in: Scripts/getPhiPsiWrapper.py
 
     def __init__( self, name, **kwds ):
         NTtree.__init__( self, name=name, __CLASS__='Chain', **kwds )
+        ResidueList.__init__( self )
         self.__FORMAT__ =  self.header() + '\n' +\
                           'residues (%(residueCount)d): %(residues)s\n' +\
                            self.footer()
@@ -6431,8 +6432,8 @@ class Resonance( NTvalue  ):
 #Resonance.XMLhandler = XMLResonanceHandler()
 
 
-"Maps spintype to element id"
 class SpintypeToElementMap(NTdict):
+    "Maps spintype to element id"
     def __init__(self, *args, **kwds):
         d = {'1H': 'H', '13C': 'C', '15N': 'N',  '31P': 'P' }
         NTdict.__init__(self, __CLASS__='SpintypeToElementMap')

@@ -21,6 +21,7 @@ class TagTable (Lister):
                   tagvalues =  None,
                   verbosity = 2
                   ):
+        Lister.__init__(self)
         self.free       = free
         self.title      = title
 

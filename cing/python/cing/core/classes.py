@@ -1167,20 +1167,20 @@ Project: Top level Cing project class
     def generateHtml(self, htmlOnly = False):
         return generateHtml(self, htmlOnly = htmlOnly)
 
-    """
-    Remove the largest violating distance restraints that meet a certain cutoff.
-    Violation are not averaged over models for this purpose.
-    Writes the removed restraints to a file.
-
-    Return False on error.
-
-    restraintLoL   Defaults to p.distances
-    cutoff         Tolerance above which to delete.
-    maxRemov       Maximum number of violations to remove. Largest violations will be removed.
-    fileName       Enter file name (with path) for output of removed constraints.
-    """
     def filterHighRestraintViol(self, restraintLoL = None, cutoff=2.0, maxRemove=3, toFile=True,
                                 fileName = DISTANCE_RESTRAINT_LIST_HIGH_VIOLATIONS_FILTERED_STR):
+        """
+        Remove the largest violating distance restraints that meet a certain cutoff.
+        Violation are not averaged over models for this purpose.
+        Writes the removed restraints to a file.
+    
+        Return False on error.
+    
+        restraintLoL   Defaults to p.distances
+        cutoff         Tolerance above which to delete.
+        maxRemov       Maximum number of violations to remove. Largest violations will be removed.
+        fileName       Enter file name (with path) for output of removed constraints.
+        """
 #        cutoff= 0.10 # DEFAULT: disabled
         nTmessage( "==> Doing filterHighDistanceViol with arguments: cutoff %s maxRemove %s" % ( cutoff, maxRemove))
 
@@ -1481,10 +1481,8 @@ class ProjectList(NTlist):
 
 
 
-"""
-Routines to compare different Project instances this is therefore completely different from the ProjectList
-class where no such relation can be assumed.
-"""
+# Routines to compare different Project instances this is therefore completely different from the ProjectList
+# class where no such relation can be assumed.
 
 class ProjectTree( NTtree ):
     """
@@ -2355,6 +2353,7 @@ class Peak(NTdict, Lister):
                 ):
 
         NTdict.__init__(self, __CLASS__ = 'Peak', **kwds)
+        Lister.__init__(self)
 #       several external programs need an index
         global PeakIndex
         self.peakIndex = PeakIndex

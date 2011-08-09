@@ -21,7 +21,6 @@ WARNING: Trying to finish up by waiting for subprocesses
 WARNING: only 965 out of 1000 jobs were started (not all successfully finished perhaps)
 or similar. The minus of -15 is necessary because it needs to signal it's children.
 """
-
 from cing import cingPythonCingDir
 from cing import cingRoot
 from cing.Libs import forkoff
@@ -41,10 +40,12 @@ import string
 class MyDict(Lister):
     """just a simple dictionary"""
     def __init__(self):
+        Lister.__init__(self)
         self.d = {}
 
 class EntryInfo(Lister):
     def __init__(self, time=None):
+        Lister.__init__(self)
         self.time = time
 
 
@@ -57,10 +58,11 @@ class casdNmrCing(Lister):
                  updateIndices=False,
                  isProduction=False
                 ):
+        Lister.__init__(self)
 
         self.writeWhyNot = writeWhyNot
         self.updateIndices = updateIndices
-        "Only during production we do a write to WHY_NOT"
+#        Only during production we do a write to WHY_NOT
         self.isProduction = isProduction
 
         # Dir as base in which all info and scripts like this one resides
@@ -146,13 +148,13 @@ class casdNmrCing(Lister):
         self.timeTakenDict = NTdict()
 
 
-    """
-    Check the resource dir for existence of all needed items.
-    this is quit i/o intensive but the only way to guarantee it
-    as the pickle might get out of sync with reality
-    Returns one for complete resource.
-    """
     def is_complete_resource(self, entry_code):
+        """
+        Check the resource dir for existence of all needed items.
+        this is quit i/o intensive but the only way to guarantee it
+        as the pickle might get out of sync with reality
+        Returns one for complete resource.
+        """
         nTdebug("checking is_complete_resource for entry: " + entry_code)
         sub_dir = entry_code[1:3]
         indexFileName = os.path.join (self.results_dir, DATA_STR, sub_dir, entry_code, entry_code + ".cing", 'index.html')
@@ -399,12 +401,12 @@ class casdNmrCing(Lister):
         os.chdir(cwdCache)
     # end def
 
-    """
-    Set the list of matched entries and the dictionary holding the
-    number of matches. They need to be defined as globals to this module.
-    Return zero on error.
-    """
     def search_matching_entries(self):
+        """
+        Set the list of matched entries and the dictionary holding the
+        number of matches. They need to be defined as globals to this module.
+        Return zero on error.
+        """
         self.match = MyDict()
 #        modification_time = os.path.getmtime("/Users/jd/.cshrc")
 #        self.match.d[ "1brv" ] = EntryInfo(time=modification_time)

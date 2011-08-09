@@ -35,6 +35,7 @@ class File (Lister):
 #                    preferred_quote         = '"', # Put somewhere else?
                     verbosity   = 2
                   ):
+        Lister.__init__(self)
         self.title      = title
         self.filename   = filename
 

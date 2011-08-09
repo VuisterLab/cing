@@ -2,17 +2,17 @@
 Classes for dealing with STAR syntax
 """
 from cing.Libs.NTutils import * #@UnusedWildImport
-
-"""
-Saveframe class
-"""
 class SaveFrame (Lister):
+    """
+    Saveframe class
+    """
     def __init__( self,
                   title     = 'general_sf_title',
                   tagtables = None,
                   text      = '',
                   verbosity = 2,
                   comment = ''):
+        Lister.__init__(self)
         self.title      = title
 
         # Modified tagtables initialization so list references
@@ -26,10 +26,10 @@ class SaveFrame (Lister):
         self.verbosity  = verbosity
         self.comment = comment          # Comment attribute added to node (Wim 2003/08/05)
 
-    "Returns the STAR text representation"
     def star_text (self,
                    flavor = 'NMR-STAR'
                    ):
+        "Returns the STAR text representation"
         str = "\n"
         str = str + 'save_%s\n' % self.title
 
@@ -39,8 +39,8 @@ class SaveFrame (Lister):
         str = str + '\nsave_\n'
         return str
 
-    "Simple checks on integrity"
     def check_integrity( self,  recursive = 1  ):
+        "Simple checks on integrity"
         if recursive:
             for tagtable in self.tagtables:
                 if tagtable.check_integrity():
@@ -50,10 +50,10 @@ class SaveFrame (Lister):
             print 'Checked integrity of SaveFrame(%2s tagtables, recurs.=%s)  : OK [%s]' % (
                 len(self.tagtables), recursive, self.title )
 
-    """
-    Or print Warning and return None
-    """
     def getSaveFrameCategory(self)   :
+        """
+        Or print Warning and return None
+        """
         possibleTagNamesSFCategory = [ '_Saveframe_category',  # 2.1
                                        '.Sf_category' ]        # 3
         if not self.tagtables:
