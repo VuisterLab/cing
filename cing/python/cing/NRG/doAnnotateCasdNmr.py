@@ -20,7 +20,6 @@ from shutil import rmtree
 import Tkinter
 import tarfile
 
-
 def annotateEntry(entryCodeNew, *extraArgList):
     nTmessage(header)
     nTmessage(getStartMessage())
@@ -28,7 +27,7 @@ def annotateEntry(entryCodeNew, *extraArgList):
     expectedArgumentList = []
     expectedNumberOfArguments = len(expectedArgumentList)
     if len(extraArgList) != expectedNumberOfArguments:
-        nTerror("Got arguments: " + `extraArgList`)
+        nTerror("Got arguments: " + repr(extraArgList))
         nTerror("Failed to get expected number of arguments: %d got %d" % (
             expectedNumberOfArguments, len(extraArgList)))
         nTerror("Expected arguments: %s" % expectedArgumentList)
@@ -103,7 +102,8 @@ def annotateEntry(entryCodeNew, *extraArgList):
 
     presets = getDeepByKeysOrDefault(presetDict, {}, entryCodeNew)
     if presets:
-      nTmessage("In annotateLoop using preset values...")
+        nTmessage("In annotateLoop using preset values...")
+    # end if
 
     if sourceIsOrgProject:
         if os.path.exists(entryCodeOrg):

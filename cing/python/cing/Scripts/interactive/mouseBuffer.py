@@ -17,9 +17,8 @@ from cing.main import getStartMessage
 cing.verbosity = verbosityDebug
 
 
-"""inputDir may be a directory or a url.
-Returns True on error.
-"""
+#inputDir may be a directory or a url.
+#Returns True on error.
 
 nTmessage(header)
 nTmessage(getStartMessage())

@@ -26,7 +26,7 @@ class AllChecks(TestCase):
         values = []        
         for i in range(0,1000):
             values.append(1)        
-#        nTdebug("n="+`len(values)`)
+#        nTdebug("n=",len(values))
         for i in range(0,10):
             values[i] = 2        
         # Will only note first 9 outliers
@@ -51,14 +51,14 @@ class AllChecks(TestCase):
         m = 10    # Only tested with default value 10.
         for i in range(0,n):
             values.append(1)        
-#        nTdebug("n="+`len(values)`)
+#        nTdebug("n=", len(values))
         for i in range(0,m):
             values[i] = 2
                 
         while n > 3:
             values = values[:n]        
             _v,o = peirceTest.peirceTest( values )
-#            print 'number of outliers at size: '+`n`+ ' =',len(o)
+#            print 'number of outliers at size: '+repr(n)+ ' =',len(o)
             self.assertTrue(len(o)<=m)
             n -= 1
                     
@@ -71,7 +71,7 @@ class AllChecks(TestCase):
         result = peirceTest.peirceTest( values )
         self.failUnless(result)
         v,o = result
-#        print 'number of outliers at size: '+`n`+ ' =',len(o)
+#        print 'number of outliers at size: '+repr(n)+ ' =',len(o)
         self.assertTrue(len(v) == n)
         self.assertTrue(len(o) == 0)
         
@@ -81,7 +81,7 @@ class AllChecks(TestCase):
         result = peirceTest.peirceTest( values )
         self.failUnless(result)
         v,o = result
-#        print 'number of outliers at size: '+`n`+ ' =',len(o)
+#        print 'number of outliers at size: '+repr(n)+ ' =',len(o)
         self.assertTrue(len(v) == 10)
         self.assertTrue(len(o) == 10)
 

@@ -37,7 +37,7 @@ def plotTestHistoDihedral():
     angleList.outliers.limit( plotparams.min, plotparams.max, byItem=1 )
 
     xTicks = range(int(plotparams.min), int(plotparams.max+1), plotparams.ticksize)
-#        nTdebug("xTicks: " + `xTicks`)
+#        nTdebug("xTicks: " + repr(xTicks))
 #        figWidth  = 600
 #        figHeight = None # Golden which turns out to be 369
 #            figHeight = figWidth * golden_mean
@@ -80,20 +80,20 @@ def plotTestHistoDihedral():
     if bounds[0] < bounds[1]: # single box
         point = (bounds[0], 0) # lower left corner of only box.
         sizes = (bounds[1]-bounds[0],ylimMax)
-#            nTdebug("point: " + `point`)
-#            nTdebug("sizes: " + `sizes`)
+#            nTdebug("point: " + repr(point))
+#            nTdebug("sizes: " + repr(sizes))
         plot.box(point, sizes, boxAttributes(fillColor=plotparams.lower, alpha=alpha))
     else: # two boxes
         # right box
         point = (bounds[0], 0) # lower left corner of first box.
         sizes = (plotparams.max-bounds[0],ylimMax)
-#            nTdebug("point: " + `point`)
-#            nTdebug("sizes: " + `sizes`)
+#            nTdebug("point: " + repr(point))
+#            nTdebug("sizes: " + repr(sizes))
         plot.box(point, sizes, boxAttributes(fillColor=plotparams.lower, alpha=alpha))
         point = (plotparams.min, 0) # lower left corner of second box.
         sizes = (bounds[1]-plotparams.min,ylimMax)
-#            nTdebug("point: " + `point`)
-#            nTdebug("sizes: " + `sizes`)
+#            nTdebug("point: " + repr(point))
+#            nTdebug("sizes: " + repr(sizes))
         plot.box(point, sizes, boxAttributes(fillColor=plotparams.lower, alpha=alpha))
 
 
@@ -115,7 +115,7 @@ def plotTestHistoDihedral():
         fn = None
         while not fn or os.path.exists(fn):
             i += 1
-            fn = fnBase + '_' + `i` + '.png'
+            fn = fnBase + '_' + str(i) + '.png'
     ps.hardcopy(fn, graphicsFormat)
 #        plot.show()
 

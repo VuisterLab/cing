@@ -35,7 +35,7 @@ def mainCasd(entryId, *extraArgList):
     expectedArgumentList = [ 'inputDir', 'outputDir', 'pdbConvention', 'restraintsConvention', 'archiveType', 'projectType' ]
     expectedNumberOfArguments = len(expectedArgumentList)
     if len(extraArgList) != expectedNumberOfArguments:
-        nTerror("Got arguments: " + `extraArgList`)
+        nTerror("Got arguments: " + repr(extraArgList))
         nTerror("Failed to get expected number of arguments: %d got %d" % (
             expectedNumberOfArguments, len(extraArgList)))
         nTerror("Expected arguments: %s" % expectedArgumentList)
@@ -128,7 +128,7 @@ def mainCasd(entryId, *extraArgList):
             stillToRetrieve = True
         # end if
         if stillToRetrieve:
-             retrieveTgzFromUrl(entryId, inputDir, archiveType=archiveType, formatFileName=formatFileName)
+            retrieveTgzFromUrl(entryId, inputDir, archiveType=archiveType, formatFileName=formatFileName)
         # end if
         if not os.path.exists(fileNameTgz):
             nTerror("Tgz should already have been present skipping entry")

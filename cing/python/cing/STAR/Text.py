@@ -9,14 +9,12 @@ ___revision__ = "$Revision$"
 ___date__     = "$Date$"
 
 
-"""
-Some handy patterns and functions for dealing with text in the STAR syntax.
-Some are complicated because in Python the none-greedy pattern matching
-gets too recursive and will actually bomb on larger strings. Like the
-following code causes a bomb:
-re.search( 'a.*?c', 'a' + 99999*'b' + 'c' )
-Produces: 'RuntimeError: maximum recursion limit exceeded'
-"""
+#Some handy patterns and functions for dealing with text in the STAR syntax.
+#Some are complicated because in Python the none-greedy pattern matching
+#gets too recursive and will actually bomb on larger strings. Like the
+#following code causes a bomb:
+#re.search( 'a.*?c', 'a' + 99999*'b' + 'c' )
+#Produces: 'RuntimeError: maximum recursion limit exceeded'
 
 ## When not sure if text can have a ; at start of line use
 ## this string prepended to each line.
@@ -148,24 +146,24 @@ pattern_nmrView_compress_questionmark = re.compile(r""" \{(\s+\?)\}
 #;"""
 
 
-"""
-Searches for a regular expression in text.
-The text may not be STAR quoted and must have semicolon blocks collapsed
-such that the semicolon starts at the beginning of the line.
-Returns the start position of the match or -1 if it was not found or
-None if there was an error.
-
-The function will search the text from given position onwards
-and checks the chars preceding (up to the line it's in) for quote style.
-
-WARNINGS:
-- Don't call it for a text that has no \n and at least 1 other
-character in it before pos (not fully tested; perhaps possible).
-- I have not put in extra checks because of needed speed.
-- No requirements set on what follows the pattern.
-"""
 
 def pattern_unquoted_find(text, pattern, pos=0):
+    """
+    Searches for a regular expression in text.
+    The text may not be STAR quoted and must have semicolon blocks collapsed
+    such that the semicolon starts at the beginning of the line.
+    Returns the start position of the match or -1 if it was not found or
+    None if there was an error.
+    
+    The function will search the text from given position onwards
+    and checks the chars preceding (up to the line it's in) for quote style.
+    
+    WARNINGS:
+    - Don't call it for a text that has no \n and at least 1 other
+    character in it before pos (not fully tested; perhaps possible).
+    - I have not put in extra checks because of needed speed.
+    - No requirements set on what follows the pattern.
+    """
     while 1:
         match = pattern.search( text, pos)
         if not match:
@@ -228,13 +226,13 @@ def pattern_unquoted_find(text, pattern, pos=0):
         return pos
 
 
-"""
-Parse one quoted tag value beginning from position: pos
-Return the value and the position of the 'cursor' behind the
-value for the first non white space char.
-In case of error the position value of None will signal failure.
-"""
 def tag_value_quoted_parse( text, pos ):
+    """
+    Parse one quoted tag value beginning from position: pos
+    Return the value and the position of the 'cursor' behind the
+    value for the first non white space char.
+    In case of error the position value of None will signal failure.
+    """
 #    print 'text: [%s]' % text[pos:pos+80]
 #    print 'pos:  [%s]' % pos
     if text[ pos ] == '"':
@@ -288,12 +286,12 @@ def tag_value_quoted_parse( text, pos ):
     return None, None
 
 
-"""
-From text on position pos, read a tag value and return the value and
-position of the next non-space char. This is the slow parsing method
-that should only be used for free tags.
-"""
 def tag_value_parse( text, pos):
+    """
+    From text on position pos, read a tag value and return the value and
+    position of the next non-space char. This is the slow parsing method
+    that should only be used for free tags.
+    """
 
     match_quoted = pattern_quoted.search( text, pos )
     if match_quoted:
@@ -316,24 +314,24 @@ def tag_value_parse( text, pos):
 
 
 
-"""
-See function semicolon_block_collapse that calls this one
-"""
 def semicolon_block_replace( matchobj ):
+    """
+    See function semicolon_block_collapse that calls this one
+    """
     #print len(matchobj.group())
     return re.sub(  '\n', eol_string, matchobj.group() )
 
 
-"""
-This function should be called (not semicolon_block_replace)
-Putting all semicolon separated values on one line
-by replacing the eol within with a unique key value
-that is to be remove later on by it's sibling method:
-semicolon_block_expand.
-SPEED:  0.6 cpu seconds for a 5 Mb file with 31 blocks and
-        1.3 "                10 "            64 ".
-"""
 def semicolon_block_collapse( text ):
+    """
+    This function should be called (not semicolon_block_replace)
+    Putting all semicolon separated values on one line
+    by replacing the eol within with a unique key value
+    that is to be remove later on by it's sibling method:
+    semicolon_block_expand.
+    SPEED:  0.6 cpu seconds for a 5 Mb file with 31 blocks and
+            1.3 "                10 "            64 ".
+    """
 
     count = 0
     startpos = 0
@@ -373,18 +371,18 @@ def semicolon_block_collapse( text ):
 def semicolon_block_expand( text ):
     return pattern_eol_string.sub('\n', text )
 
-"""
-Adds semicolons, single quotes or double quotes depending on
-need according to star syntax.
-Does not assume that no quotes exist initially and will strip them if
-present in pairs only.
-
-If the possible_bad_char parameter is set (to 1 or higher) then
-strings that would normally end up in a semicolon delimited blob will
-have a string inserted at the beginning to it. The string can be the 'p'
-argument to this function. [TODO]
-"""
 def quotes_add( text ):
+    """
+    Adds semicolons, single quotes or double quotes depending on
+    need according to star syntax.
+    Does not assume that no quotes exist initially and will strip them if
+    present in pairs only.
+    
+    If the possible_bad_char parameter is set (to 1 or higher) then
+    strings that would normally end up in a semicolon delimited blob will
+    have a string inserted at the beginning to it. The string can be the 'p'
+    argument to this function. [TODO]
+    """
 
     preferred_quote='"' # This info should be in a more central spot
 
@@ -414,9 +412,8 @@ def quotes_add( text ):
     return preferred_quote + text + preferred_quote
 
 
-"Strips quotes in pairs and returns new/old string"
 def quotes_strip( text ):
-
+    "Strips quotes in pairs and returns new/old string"
     ## Can it be containing quotes?
     if len(text) <= 1:
         return text
@@ -427,12 +424,12 @@ def quotes_strip( text ):
     return text
 
 
-"""
-Returns the input with ; delimited, possibly with a string inserted at the beginning.
-The string value should always be ended by a eol, otherwise
-the second semicolon can not be the first char on a line.
-"""
 def semicolons_add( text, possible_bad_char=None ):
+    """
+    Returns the input with ; delimited, possibly with a string inserted at the beginning.
+    The string value should always be ended by a eol, otherwise
+    the second semicolon can not be the first char on a line.
+    """
     if possible_bad_char:
         lines       = text.split('\n')
         text   = ''
@@ -447,10 +444,10 @@ def semicolons_add( text, possible_bad_char=None ):
         text = text + '\n'
     return "\n;\n" + text + ";\n"
 
-"""
-Strip the STAR comments new style
-"""
 def comments_strip( text ):
+    """
+    Strip the STAR comments new style
+    """
     lines = text.split( "\n" )
     i=0
     count = 0
@@ -490,16 +487,16 @@ def comments_strip( text ):
 #    text = lines.join("\n")
     return text
 
-"""
-Strip the STAR comments for a single line.
-"""
 def _comments_strip_line( line ):
+    """
+    Strip the STAR comments for a single line.
+    """
     c=0
     state = FREE # like to start out free which is possible after donning semicolon blocks.
     l = len(line)
     while c < l: # parse range [0,n> where n is length and exclusive.
         ch=line[c]
-#        print "DEBUG: Processing char '"+ch+"' at "+`c`+" in state:", state
+#        print "DEBUG: Processing char '"+ch+"' at "+repr(c)+" in state:", state
         if ( ch == sharp and state == FREE and    # A sharp in FREE state
                 (c==0 or line[c-1].isspace())):   # behind a space or at beginning of a line.
 #            print "DEBUG: Found sharpie"

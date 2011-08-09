@@ -49,11 +49,11 @@ class Molgrap(NTdict):
 #            nTdebug("Resetting Molgrap.projectDirTmp from %s to %s" % (cingDirTmp, self.projectDirTmp))
 #        nTdebug('Using self.projectDirTmp: ' + self.projectDirTmp)
 
-    """Creates a large gif to path for the given molecule.
-    Return True on error and False on success.
-    """
     def run(self, molecule, path, export = True):
-
+        """
+        Creates a large gif to path for the given molecule.
+        Return True on error and False on success.
+        """
         if molecule.modelCount == 0:
             nTwarning('runMolgrap: no models for "%s"', molecule)
             return
@@ -99,7 +99,7 @@ class Molgrap(NTdict):
 #                        atm.pdbSkipRecord = True
 #                        skippedAtoms.append( atm )
 #            if skippedResidues:
-#                nTwarning('Molgrap.run: non-protein residues will be skipped:' + `skippedResidues`)
+#                nTwarning('Molgrap.run: non-protein residues will be skipped:' + repr(skippedResidues))
             # Molmol speaks Dyana which is close to cyana but residue names need to be translated to
             # was CYANA
             molecule.toPDB(pdb_first_file_name, convention = IUPAC, model = 0)
@@ -190,10 +190,10 @@ class Molgrap(NTdict):
 #        except:
 #            pass
         return None # not needed
-    """
-    Render pov ray file and convert output using a csh script.
-    """
     def _render_convert_pov_file(self, pov_file_name, id, results_dir):
+        """
+        Render pov ray file and convert output using a csh script.
+        """
 
         script_file_name = os.path.join (self.projectDirTmp, id + "_render_convert_pov.csh")
         log_file_name = os.path.join (self.projectDirTmp, id + "_render_convert_pov_python.log")
@@ -229,11 +229,11 @@ class Molgrap(NTdict):
 #            pass
         return None # not needed
 
-    """
-    Setup replacement lists
-    Can not use a dictionary as order of replacements matter.
-    """
     def _substitute_nans(self, file_name_in, file_name_out):
+        """
+        Setup replacement lists
+        Can not use a dictionary as order of replacements matter.
+        """
         org = [
             r'<nan, nan, nan>, <nan, nan, nan>, <nan, nan, nan>',
             r'<nan, nan, nan>',
@@ -246,10 +246,10 @@ class Molgrap(NTdict):
             ]
         self._substitute(file_name_in, file_name_out, org, new)
 
-    """
-    Substitute from a dictionary the content of a file writting to another
-    """
     def _substitute(self, file_name_in, file_name_out, org, new):
+        """
+        Substitute from a dictionary the content of a file writting to another
+        """
 
         output_text = open(file_name_in, 'r').read()
         for i in range(len(org)):

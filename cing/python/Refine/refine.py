@@ -546,7 +546,7 @@ def parseOutput(config, project, parameters ):
 #            myComp = CompareDict(parameters.sortField)
 #            results.sort(myComp)
 #        else:
-            NTsort( results, parameters.sortField, inplace=True )            
+        NTsort( results, parameters.sortField, inplace=True )            
     else:
         parameters.sortField = None
     #endif
@@ -807,7 +807,7 @@ def run():
         if options.doSetup:
             nTerror("Setup was done but fullXXX would do it again. Just run fullXXXX again without setup please.")
             sys.exit(1)
-        pass
+        # end if
     else:
         #------------------------------------------------------------------------------
         # read parameters file

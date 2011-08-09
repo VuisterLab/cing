@@ -109,7 +109,7 @@ class AllChecks(TestCase):
                 for res in resList:
                     resNumb += 1
 
-        #            nTdebug(`res`)
+        #            nTdebug(repr(res))
 
         #            if random() < 0.2: # Skip a 10%
         #                continue

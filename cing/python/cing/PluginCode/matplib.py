@@ -112,7 +112,8 @@ mappingPointType2MatLibPlot = {
     'filled circle':    'o',
     'triangle':         '^',
      }
-"""          linestyle or ls: [ '-' | '--' | '-.' | ':' | 'steps' | 'None' | ' ' | '' ] """
+
+#          linestyle or ls: [ '-' | '--' | '-.' | ':' | 'steps' | 'None' | ' ' | '' ]
 
 
 mappingLineType2MatLibPlot = {
@@ -206,8 +207,8 @@ class NTplot( NTdict ):
             attributes=defaultAttributes
         xdata=(self.currentPoint[0], endPoint[0])
         ydata=(self.currentPoint[1], endPoint[1])
-#        nTdebug("xdata: " + `xdata`)
-#        nTdebug("ydata: " + `ydata`)
+#        nTdebug("xdata: " + repr(xdata))
+#        nTdebug("ydata: " + repr(ydata))
         line2D = Line2D(xdata, ydata)
         attributesMatLibPlot = self.mapAttributes2MatLibPlotLine2D(attributes)
         line2D.set( **attributesMatLibPlot )
@@ -324,7 +325,7 @@ class NTplot( NTdict ):
 #                    print "doing pointType"
                     result['marker'] =  mappingPointType2MatLibPlot[attributes.pointType]
                 else:
-                    nTcodeerror("Failed to map point type ["+`attributes.pointType`+"]to mat lib plot's marker id)")
+                    nTcodeerror("Failed to map point type ["+repr(attributes.pointType)+"]to mat lib plot's marker id)")
                     return True
         if 'pointColor' in keys:
 #            print "doing pointColor"
@@ -372,7 +373,6 @@ class NTplot( NTdict ):
         if 'alpha' in keys:
 #            print "doing alpha"
             result['alpha']           =  attributes.alpha
-#        nTdebug("result[attributes: " + `result[)
         return result
 
     def mapAttributes2MatLibPatches(self, attributes=defaultAttributes):
@@ -400,8 +400,8 @@ class NTplot( NTdict ):
             result['facecolor']           =  attributes.fillColor # is facecolor used if fill is False?
         if 'lineColor' in keys:
             result['edgecolor']           =  attributes.lineColor
-#        nTdebug("input  mapAttributes2MatLibPatches: " + `attributes`)
-#        nTdebug("result mapAttributes2MatLibPatches: " + `result`)
+#        nTdebug("input  mapAttributes2MatLibPatches: " + repr(attributes))
+#        nTdebug("result mapAttributes2MatLibPatches: " + repr(result))
         return result
 
     def mapAttributes2MatLibText(self, attributes=defaultAttributes):
@@ -502,10 +502,10 @@ class NTplot( NTdict ):
         self.label( point, text, attributes )
     #end def
 
-    def setYrange(self, range):
-        self.yRange = range
+    def setYrange(self, myRange):
+        self.yRange = myRange
         ylocator = self.axis.yaxis.get_major_locator()
-        ylocator.set_bounds( range[0], range[1] )
+        ylocator.set_bounds( myRange[0], myRange[1] )
 
     def autoScaleYByValueList( self, valueList, startAtZero=False, useIntegerTickLabels=False ):
         pointList = []
@@ -620,7 +620,7 @@ class NTplot( NTdict ):
 #        nTdebug('get_autoscaley_on: %s' % self.axis.get_autoscaley_on())
         self.axis.autoscale_view( scalex=False, scaley=True)
         self.yRange = self.axis.get_ylim()
-#        nTdebug('yRange set by matplotlib to min,max: ' + `self.yRange` )
+#        nTdebug('yRange set by matplotlib to min,max: ' + repr(self.yRange) )
         if useIntegerTickLabels:
             formatter = FuncFormatter(integerNumberOnly)
             yaxis = self.axis.yaxis
@@ -629,7 +629,6 @@ class NTplot( NTdict ):
 
     def updateSettings( self ):
 #        nTdebug("Now in updateSettings")
-
         if not self.axis:
             raise "No axis object in NTplot"
         if not isinstance(self.axis, Axes):
@@ -670,8 +669,8 @@ class NTplot( NTdict ):
                    attributes=defaultAttributes, valueIndexPairList=None ):
         if not attributes:
             attributes=defaultAttributes
-#        nTdebug("Creating number of bins: " + `bins`)
-#        nTdebug("theList: " + `theList`)
+#        nTdebug("Creating number of bins: " + repr(bins))
+#        nTdebug("theList: " + repr(theList))
         if not theList:
 #            nTdebug("empty input not adding histogram")
             return # Nothing to add.
@@ -680,7 +679,7 @@ class NTplot( NTdict ):
 
         step = (high-low)/bins
         ind = arange(low,high,step)  # the x locations for the groups
-#            nTdebug("Creating x coor for bins: " + `ind`)
+#            nTdebug("Creating x coor for bins: " + repr(ind))
         axes(self.axis) # Claim current axis.
         _patches = bar(ind, his, step,
             color    =attributes.fillColor,
@@ -694,11 +693,11 @@ class NTplot( NTdict ):
             xlim = self.axis.get_xlim()
             ylim = self.axis.get_ylim()
             _ylim_min, ylim_max = ylim
-#                nTdebug("xlim: " + `xlim`)
-#                nTdebug("ylim: " + `ylim`)
+#                nTdebug("xlim: " + repr(xlim))
+#                nTdebug("ylim: " + repr(ylim))
             outlierLocHeight = ylim_max # In data coordinate system
             outlierLocHeightMin = ylim_max*.1 # In data coordinate system
-#                nTdebug("tmpValueIndexPairList: " + `tmpValueIndexPairList`)
+#                nTdebug("tmpValueIndexPairList: " + repr(tmpValueIndexPairList))
             for item in tmpValueIndexPairList:
                 value = item[1]
                 modelNum = item[0]
@@ -707,10 +706,10 @@ class NTplot( NTdict ):
                 outlierLocHeight -= 0.1*ylim_max # Cascade from top left to bottom right.
                 if outlierLocHeight < outlierLocHeightMin:
                     outlierLocHeight = outlierLocHeightMin
-#                    nTdebug("Setting data point to: " + `value` +", 1")
-#                    nTdebug("Setting text point to: " + `value` +", "+ `outlierLocHeight`)
+#                    nTdebug("Setting data point to: " + repr(value) +", 1")
+#                    nTdebug("Setting text point to: " + repr(value) +", "+ repr(outlierLocHeight))
                 self.axis.plot([value], [1], 'o',color=attributes.fillColor,markeredgecolor=attributes.fillColor,markersize=3)
-                self.axis.annotate("model "+`modelNum`,
+                self.axis.annotate("model "+repr(modelNum),
 #                                startPoint=(0.05, 1),                       # in data coordinate system; assuming only one occurrence.
                             xy=(value+0.01, 1),                       # in data coordinate system; assuming only one occurrence.
                             xytext=(value, outlierLocHeight),
@@ -965,15 +964,14 @@ class NTplotSet( NTdict ):
         self.close()
         self.__CLASS__    = 'NTplotSet'
         self.plotSet = {}
-        """A collection within which data can be drawn
-        """
+# A collection within which data can be drawn
         self.numRows = 1 # Don't have a meaning without a rectangular grid layout.
         self.numCols = 1 # Perhaps no need to maintain?
         self.hardcopySize = (400,400)
         self.update( kwds ) # Overwrites hardcopySize etc.
         self.graphicsOutputFormat = 'png'
 
-#        nTdebug('Using self.hardcopySize: '+`self.hardcopySize`)=
+#        nTdebug('Using self.hardcopySize: '+repr(self.hardcopySize))=
     #end def
 
     def close( self ):
@@ -1018,8 +1016,8 @@ class NTplotSet( NTdict ):
 
     def updateSettings( self ):
 
-#            nTdebug("Getting hardcopySize: "+`self.hardcopySize`)
-#            nTdebug("Setting sizeInches:   "+`fig_size`)
+#            nTdebug("Getting hardcopySize: "+repr(self.hardcopySize))
+#            nTdebug("Setting sizeInches:   "+repr(fig_size))
 
 
         for plotId in self.plotSet:
@@ -1196,7 +1194,7 @@ y coordinate is in axis coordinates (from 0 to 1) when the renderer asks for the
             attributes = fontAttributes()
             attributes.fontColor=res.rogScore.colorLabel
             attributes.horizontalalignment='center'
-#            nTdebug(`attributes`)
+#            nTdebug(repr(attributes))
 #            y = 5.0 # for testing
 #            nTdebug("x,y: %s,%s" % (x,y))
             self.label( (x,y) , text, attributes )
@@ -1282,7 +1280,7 @@ y coordinate is in axis coordinates (from 0 to 1) when the renderer asks for the
         secStructElementList = self.getsecStructElementList()
         i = 0
         for element in secStructElementList:
-#                nTdebug(`element`)
+#                nTdebug(repr(element))
             elementLength = len(element)
             res = element[0]
 #                secStruct = getProcheckSecStructConsensus( res )
@@ -1472,9 +1470,9 @@ class HelixIconList(RangeIconList):
                     t += 90.
                     halfTurnsDone += 0.5
             elif u == 90.:
-                    verts.append( e,f,j,g )
-                    t += 90.
-                    halfTurnsDone += 0.5
+                verts.append( e,f,j,g )
+                t += 90.
+                halfTurnsDone += 0.5
             elif u == 180.:
                 if doAtLeastAnotherHalfTurn:
                     cplus = translatePoint(c,360.,0)
@@ -1910,15 +1908,15 @@ class MultipleLocatorByOffset(MultipleLocator):
 
 
 class FormatResNumbersFormatter(Formatter):
-    def __init__(self, range):
+    def __init__(self, myRange):
         self.resPropList = ['Z'] # The zero is not supposed to be used.
         prevChainId = None
-        for res in range:
+        for res in myRange:
             if res.chain.name != prevChainId:
                 prevChainId = res.chain.name
-                self.resPropList.append(res.chain.name +`res.resNum`)
+                self.resPropList.append(res.chain.name +str(res.resNum))
             else:
-                self.resPropList.append(                `res.resNum`)
+                self.resPropList.append(                str(res.resNum))
 
     def __call__(self, x, pos=None):
         'Return the one character residue type for tick val x at position pos'
@@ -1989,7 +1987,7 @@ class MoleculePlotSet:
         for resList in self.rangeList:
             for res in resList:
                 resNumb += 1
-#                nTdebug(`res`)
+#                nTdebug(repr(res))
                 r = 0 # r for row
                 for row in self.keyLoLoL:
                     pointsLoL = self.pointsLoLoL[r]
@@ -2367,9 +2365,9 @@ def makeDihedralHistogramPlot( project, residue, dihedralName, binsize = 5, html
 
     bins       = 360/binsize
     plotparams = project.plotParameters.getdefault(dihedralName,'dihedralDefault')
-#    nTdebug( 'residue: '+`residue`)
+#    nTdebug( 'residue: '+repr(residue))
     angle = residue[dihedralName] # A NTlist
-#    nTdebug( 'angle: ' + `angle`)
+#    nTdebug( 'angle: ' + repr(angle))
     ps = NTplotSet() # closes any previous plots
     ps.hardcopySize = (600,369)
     plot = NTplot( title  = residue.cName(2),
@@ -2385,7 +2383,7 @@ def makeDihedralHistogramPlot( project, residue, dihedralName, binsize = 5, html
         nTcodeerror("No angle.good plots added. Skipping makeDihedralHistogramPlot for %s %s." % (
                     residue, dihedralName))
         return None
-#    nTdebug( 'angle.good: ' + `angle.good`)
+#    nTdebug( 'angle.good: ' + repr(angle.good))
     plot.histogram( angle.good.zap(1),
                     plotparams.min, plotparams.max, bins,
                     attributes = boxAttributes( fillColor=plotparams.color ))
@@ -2393,7 +2391,7 @@ def makeDihedralHistogramPlot( project, residue, dihedralName, binsize = 5, html
         nTcodeerror("No angle.outliers plots added. Skipping makeDihedralHistogramPlot for %s %s." % (
                     residue, dihedralName))
         return None
-#    nTdebug( 'angle.outliers: ' + `angle.outliers`)
+#    nTdebug( 'angle.outliers: ' + repr(angle.outliers))
     plot.histogram( angle.outliers.zap(1),
                 plotparams.min, plotparams.max, bins,
                 attributes = boxAttributes( fillColor=plotparams.outlier )

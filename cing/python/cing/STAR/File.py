@@ -21,12 +21,12 @@ ___revision__ = "$Revision$"
 ___date__     = "$Date$"
 
 
-"""
-STAR file
-Only methods for reading and writing are currently implemented.
-datanodes is a list of possibly mixed saveframes and tagtables
-"""
 class File (Lister):
+    """
+    STAR file
+    Only methods for reading and writing are currently implemented.
+    datanodes is a list of possibly mixed saveframes and tagtables
+    """
     def __init__(self,
                     title                   = 'general_star_file_title',
                     filename                = '',
@@ -46,8 +46,8 @@ class File (Lister):
         self.flavor     = flavor
         self.verbosity  = verbosity
 
-    "Simple checks on integrity"
     def check_integrity(self, recursive = 1):
+        "Simple checks on integrity"
         if recursive:
             for datanode in self.datanodes:
                 if datanode.check_integrity(recursive = 1):
@@ -57,8 +57,8 @@ class File (Lister):
             print 'Checked integrity of File    (%2s datanodes,  recurs.=%s)  : OK [%s]' % (
                 len(self.datanodes), recursive, self.title)
 
-    "Returns the STAR text representation"
     def star_text(self, flavor = None):
+        "Returns the STAR text representation"
         if flavor == None:
             flavor = self.flavor
         str = 'data_%s\n' % self.title
@@ -71,11 +71,11 @@ class File (Lister):
         return str
 
 
-    """
-    Reads a NMR-STAR formatted file using
-    the filename attribute.
-    """
     def read (self, nmrView_type = 0):
+        """
+        Reads a NMR-STAR formatted file using
+        the filename attribute.
+        """
 
         if not self.filename:
             nTerror(' no filename in STARFile with title: %s' % self.title)
@@ -89,20 +89,19 @@ class File (Lister):
         return 0
 
 
-    """
-    - Parses text into save frames and tagtables.
-    - Input text should start at position given with non-white space character
-    - Appends a list of datanodes(save frames or tagtables)
-    """
     def parse (self, text='', nmrView_type = 0):
+        """
+        - Parses text into save frames and tagtables.
+        - Input text should start at position given with non-white space character
+        - Appends a list of datanodes(save frames or tagtables)
+        """
 
         if self.verbosity > 2:
             nTdebug('Parsing STAR file: %s' % self.filename)
 
-        """
-        '"Begin at the beginning," the King said, gravely,
-        "and go on till you come to the end; then stop."' (LC)
-        """
+#        '"Begin at the beginning," the King said, gravely,
+#        "and go on till you come to the end; then stop."' (LC)
+
 #        print "DEBUG taking care of EOL variations"
         text = Utils.dos2unix(text)# \r\n -> \n
         text = Utils.mac2unix(text)# \r   -> \n
@@ -185,10 +184,10 @@ class File (Lister):
                     return None
                 match_save_begin = pattern_save_begin.search(text, pos)
                 if not match_save_begin:
-                    print "ERROR: Code error (no second match on sf begin)";
+                    print "ERROR: Code error (no second match on sf begin)"
                     return None
                 if match_save_begin.start() != pos:
-                    print "ERROR: Code error (wrong second match on sf begin)";
+                    print "ERROR: Code error (wrong second match on sf begin)"
                     return None
                 self.datanodes.append(SaveFrame(tagtables    = [])) # Need resetting ?
                 self.datanodes[-1].title = match_save_begin.group(1)
@@ -205,10 +204,10 @@ class File (Lister):
                     return None
                 match_save_end = pattern_save_end.search(text, pos)
                 if not match_save_end:
-                    print "ERROR: Code error (no second match on sf end)";
+                    print "ERROR: Code error (no second match on sf end)"
                     return None
                 if match_save_end.start() != pos:
-                    print "ERROR: Code error (wrong second match on sf end)";
+                    print "ERROR: Code error (wrong second match on sf end)"
                     return None
                 sf_open     = None
                 next_sf_end = None
@@ -268,11 +267,11 @@ class File (Lister):
 
 
 
-    """
-    Writes the object to a STAR formatted file using
-    the filename attribute.
-    """
     def write (self):
+        """
+        Writes the object to a STAR formatted file using
+        the filename attribute.
+        """
         if not self.filename:
             nTerror(' no filename in STARFile with title: %s' % self.title)
             return 1
@@ -282,12 +281,12 @@ class File (Lister):
         if self.verbosity > 2:
             nTdebug('Written STAR file:', self.filename)
 
-    """
-    Reads only the top part of a file up to but excluding the line
-    on which any given regexp matches.
-    Returns None on success.
-    """
     def getHeader( self, matchStrList, inputFN, outputFN ):
+        """
+        Reads only the top part of a file up to but excluding the line
+        on which any given regexp matches.
+        Returns None on success.
+        """
         matchList = []
         for str in matchStrList:
             m = re.compile(str)
@@ -321,11 +320,11 @@ class File (Lister):
             return 1
         return None
 
-    """
-    Returns sfs that match the category, None for error and empty list
-    for no matches.
-    """
     def getSaveFrames(self, category = None):
+        """
+        Returns sfs that match the category, None for error and empty list
+        for no matches.
+        """
         if not category:
             return None
         result = []
@@ -337,15 +336,15 @@ class File (Lister):
 
 
 
-    """
-    Tries to reformat a file on disk with the filename given in the
-    attribute of this object.
-    Running Steve Madings (BMRB) formatNMRSTAR program if available
-    NOTE: this does NOT do anything with the datanodes of this object!
-    """
     def formatNMRSTAR(self,
 #                    comment_file_str_dir    = '/bmrb/lib',
                     ):
+        """
+        Tries to reformat a file on disk with the filename given in the
+        attribute of this object.
+        Running Steve Madings (BMRB) formatNMRSTAR program if available
+        NOTE: this does NOT do anything with the datanodes of this object!
+        """
 
         if self.verbosity >= 9:
             print "Attempting to reformat STAR file using external program if available"

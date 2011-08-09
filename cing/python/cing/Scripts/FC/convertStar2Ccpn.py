@@ -162,8 +162,8 @@ def importStarChemicalShifts(ccpnProject, inputDir, guiRoot, allowPopups=1, mini
 
     keywds = getDeepByKeysOrDefault(presets, {}, READ_SHIFTS, KEYWORDS)
     if keywds:
-      nTmessage("In importStarChemicalShifts using keywds...")
-      nTdebug(str(keywds))
+        nTmessage("In importStarChemicalShifts using keywds...")
+        nTdebug(str(keywds))
 
     shiftList = getDeepByKeys(ccpnShiftListOfList, 0) # no need to repeat
     nTdebug("First shiftList: %s" % shiftList)

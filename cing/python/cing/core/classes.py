@@ -2,6 +2,7 @@
 Implementation of the CING API's main classes.
 Split into 3 for better performance.
 """
+
 from ConfigParser import ConfigParser
 from cing import cingPythonCingDir
 from cing import cingRoot
@@ -1855,8 +1856,9 @@ ranges:  %s
             return
 
         for p in self:
-           p.cingSummary = p.getCingSummaryDict()
-
+            p.cingSummary = p.getCingSummaryDict()
+        # end for
+        
         self.printTitle('Overall scores target '+self.name, 20*(n+1), stream)
     #    line = dots20*(n+1)
     #   fprintf( stream, '%s\n    Overall scores %s\n%s\n\n', line, self.name, line )

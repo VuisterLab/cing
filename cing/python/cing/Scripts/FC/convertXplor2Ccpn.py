@@ -116,14 +116,14 @@ def importXplorCoordinatesAndRestraints(ccpnProject, inputDir, guiRoot, replaceC
         ccpnConstraintListOfList.append(ccpnConstraintList)
 
     keywds = getDeepByKeysOrDefault(presets, {}, LINK_RESONANCES, KEYWORDS)
-    nTdebug("From getDeepByKeysOrDefault keywds: %s" % `keywds`)
+    nTdebug("From getDeepByKeysOrDefault keywds: %s" % repr(keywds))
 
     ccpnConstraintList = getDeepByKeys(ccpnConstraintListOfList, 0) # no need to repeat
     nTdebug("First ccpnConstraintList: %s" % ccpnConstraintList)
     if ccpnConstraintList != None:
 #    for i, ccpnConstraintList in enumerate(ccpnConstraintListOfList):
         keywds = getDeepByKeysOrDefault(presets, {}, LINK_RESONANCES, KEYWORDS)
-        nTdebug("From getDeepByKeysOrDefault keywds: %s" % `keywds`)
+        nTdebug("From getDeepByKeysOrDefault keywds: %s" % repr(keywds))
         nTdebug("ccpnConstraintList: %s" % ccpnConstraintList)
         nmrConstraintStore = ccpnConstraintList.nmrConstraintStore
         structureGeneration = nmrConstraintStore.findFirstStructureGeneration()

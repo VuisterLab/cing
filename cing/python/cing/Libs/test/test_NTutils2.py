@@ -12,10 +12,10 @@ class AllChecks(TestCase):
 
     def testNTdict(self):
         a = NTdict( b=NTdict( anItem='there'))
-#        nTdebug( '0 '+ `a` )
-#        nTdebug( '1 '+ `a['b']`)
-#        nTdebug( '2 '+ `a.getDeepByKeys('b')`)
-#        nTdebug( '3 '+ `a.getDeepByKeys(9)`)
+#        nTdebug( '0 '+ repr(a) )
+#        nTdebug( '1 '+ repr(a['b']))
+#        nTdebug( '2 '+ repr(a.getDeepByKeys('b')))
+#        nTdebug( '3 '+ repr(a.getDeepByKeys(9)))
         # Tests below make sure no throwables are thrown.
         self.assertTrue(a)
         self.assertTrue(a['b'])
@@ -24,12 +24,12 @@ class AllChecks(TestCase):
 
 
         a = NTdict(b=NTdict(c=NTdict(anItem='there')))
-#        nTdebug( '4 '+ `a` )
-#        nTdebug( '5 '+ `a['b']`)
-#        nTdebug( '6 '+ `a.getDeepByKeys('b')`)
-#        nTdebug( '7 '+ `a.getDeepByKeys('b','c')`)
-#        nTdebug( '8 '+ `a.getDeepByKeys('b','9')`)
-#        nTdebug( '9 '+ `a.getDeepByKeys('b','c','d')`)
+#        nTdebug( '4 '+ repr(a) )
+#        nTdebug( '5 '+ repr(a['b']))
+#        nTdebug( '6 '+ repr(a.getDeepByKeys('b')))
+#        nTdebug( '7 '+ repr(a.getDeepByKeys('b','c')))
+#        nTdebug( '8 '+ repr(a.getDeepByKeys('b','9')))
+#        nTdebug( '9 '+ repr(a.getDeepByKeys('b','c','d')))
         self.assertTrue(a.getDeepByKeys('b','c','anItem'))
         self.assertFalse(a.getDeepByKeys('b','c',9))
         a.b.c=NTlist(1,2,3)
@@ -55,10 +55,10 @@ class AllChecks(TestCase):
 
     def testnTmessage(self):
         aStringToBe = 123
-        nTdebug("testing messaging system for debug: "+`aStringToBe`)
+        nTdebug("testing messaging system for debug: " + repr(aStringToBe))
         # Next should not be printing anything when verbosityNothing is the setting.
-#        nTerror("testing messaging system for MESSAGE TYPE error (This is not a real error): "+`aStringToBe`)
-        nTdebug("testing messaging system: "+`aStringToBe`)
+#        nTerror("testing messaging system for MESSAGE TYPE error (This is not a real error): "+repr(aStringToBe))
+        nTdebug("testing messaging system: "+repr(aStringToBe))
         nTdebug("testing messaging system: %s", aStringToBe)
 
     def testNTlistSetConsensus(self):
@@ -87,9 +87,9 @@ class AllChecks(TestCase):
         v = cing.verbosity
         cing.verbosity = verbosityNothing
         for i in range( 1*10):
-            res = top.addResidue( `random()`,i )
+            res = top.addResidue( repr(random()),i )
             for j in range( 5):
-                atom = res.addAtom( `random()`,j )
+                atom = res.addAtom( repr(random()),j )
         cing.verbosity = v
 
         resList = top.allResidues()

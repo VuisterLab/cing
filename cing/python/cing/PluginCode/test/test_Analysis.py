@@ -2,6 +2,7 @@
 Unit test execute as:
 python $CINGROOT/python/cing/PluginCode/test/test_Analysis.py
 """
+
 from cing import cingDirTestsData
 from cing import cingDirTmp
 from cing.Libs.NTutils import * #@UnusedWildImport
@@ -54,9 +55,7 @@ class AllChecks(TestCase):
 
             # If unit testing without output then Analysis needs to be silenced separately.
             if cing.verbosity <= cing.verbosityNothing:
-
-
-                    switchOutput(False)
+                switchOutput(False)
 
             self.assertTrue(analysis.runRpf(
                 doAlised=DEFAULT_CONSIDER_ALIASED_POSITIONS,
@@ -66,7 +65,7 @@ class AllChecks(TestCase):
                 ))
 
             if cing.verbosity <= cing.verbosityNothing:
-                    switchOutput(True)
+                switchOutput(True)
 
             self.assertTrue(project.save())
             del project

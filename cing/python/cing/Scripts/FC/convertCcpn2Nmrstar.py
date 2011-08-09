@@ -55,26 +55,26 @@ def convert(projectName, inputDir, outputFile, excludeSaveFrames = ('general_dis
     except AttributeError: # ccpn trunk fixed misspelled function
         nmrEntry.structureAnalyses = nmrProject.sortedStructureAnalyses()
     if not nmrEntry.structureAnalyses:
-         print "Failed to find nmrEntry.structureAnalyses"
+        print "Failed to find nmrEntry.structureAnalyses"
     nmrEntry.measurementLists = nmrProject.sortedMeasurementLists()
     if not nmrEntry.measurementLists:
-         print "Failed to find nmrEntry.measurementLists"
+        print "Failed to find nmrEntry.measurementLists"
 
     # Hack to hook up coordinates, hopefully correctly (Wim 30/04/2009)
     if nmrEntry.structureGenerations:
-      hasStructureEnsemble = False
-      for strucGen in nmrEntry.structureGenerations:
-        if strucGen.structureEnsemble:
-          hasStructureEnsemble = True
-          break
+        hasStructureEnsemble = False
+        for strucGen in nmrEntry.structureGenerations:
+            if strucGen.structureEnsemble:
+                hasStructureEnsemble = True
+                break
+            # end if
+        # end for
+        print "hasStructureEnsemble: %s" % hasStructureEnsemble
+        # This will only work dependably if there is one structureGeneration, one structureEnsemble...
+        # Take the one that was created last in any case, fingers crossed that they match up!
+        if not hasStructureEnsemble and ccpnProject.structureEnsembles:
+            nmrEntry.sortedStructureGenerations()[-1].structureEnsemble = ccpnProject.sortedStructureEnsembles()[-1]
         # end if
-      # end for
-      print "hasStructureEnsemble: %s" % hasStructureEnsemble
-      # This will only work dependably if there is one structureGeneration, one structureEnsemble...
-      # Take the one that was created last in any case, fingers crossed that they match up!
-      if not hasStructureEnsemble and ccpnProject.structureEnsembles:
-        nmrEntry.sortedStructureGenerations()[-1].structureEnsemble = ccpnProject.sortedStructureEnsembles()[-1]
-      # end if
     # end if
 
     for ne in nmrProject.sortedExperiments(): # will be sortedNmrExperiments

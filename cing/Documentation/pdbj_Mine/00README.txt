@@ -16,16 +16,16 @@ The dump files are available at the FTP site:
 ftp://ftp.pdbj.org/mine
 The contents are the following:
 -  pdbmlplus.dump
-	The dump file of the whole PDBj Mine database.
+    The dump file of the whole PDBj Mine database.
 -  split/pdbmlplus_split.{aa,ab,..}
-	The "pdbmlplus.dump" file split into 100MB chunks.
+    The "pdbmlplus.dump" file split into 100MB chunks.
 -  weekly/pdbmlplus_weekly.yyyy-mm-dd.gz
-	The weekly update of the week of yyyy-mm-dd (e.g., 2010-01-19).
+    The weekly update of the week of yyyy-mm-dd (e.g., 2010-01-19).
 
 - sql-scripts/ (directory)
-	SQL scripts used for defining the PDBj Mine database. These files are
-	not necessarily required for the casual user. But interested users can
-	study the structure of the database by looking into these files.
+    SQL scripts used for defining the PDBj Mine database. These files are
+    not necessarily required for the casual user. But interested users can
+    study the structure of the database by looking into these files.
 
 All files are updated weekly (except for those under the sql directory).
 
@@ -81,6 +81,7 @@ installed in the "template1" database):
 You can populate the database by the "pg_restore" command.
 If you have downloaded the whole database dump, this can be done as:
 
+JFD: NB ===>
 % pg_restore -d pdbmlplus pdbmlplus.dump
 
 Alternatively, if you have downloaded the split dump files, do as:

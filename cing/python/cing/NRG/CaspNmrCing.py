@@ -135,7 +135,7 @@ class caspNmrCing(Lister):
         ###############################################################################
 
         nTmessage("Publish results at directory    : " + self.results_dir)
-        nTmessage("Do maximum number of entries    : " + `self.max_entries_todo`)
+        nTmessage("Do maximum number of entries    : " + repr(self.max_entries_todo))
 
         os.chdir(self.results_dir)
 
@@ -611,7 +611,7 @@ class caspNmrCing(Lister):
 
 
                 ## Make the first index file name still index.html
-                new_file_name = indexDir + '/index_' + `file_id` + '.html'
+                new_file_name = indexDir + '/index_' + repr(file_id) + '.html'
                 if not file_id:
                     new_file_name = indexDir + '/index.html'
                 open(new_file_name, 'w').write(new_file_content)

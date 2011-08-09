@@ -1,4 +1,5 @@
-#@PydevCodeAnalysisIgnore
+#@PydevCodeAnalysisIgnore # pylint: disable-all
+
 import sys
 
 from memops.editor.BasePopup import BasePopup

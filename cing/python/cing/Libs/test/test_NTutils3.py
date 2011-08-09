@@ -32,9 +32,9 @@ class AllChecks(TestCase):
         v = cing.verbosity
         cing.verbosity = verbosityNothing
         for i in range( 1*10):
-            res = top.addResidue( `random()`,i )
+            res = top.addResidue( repr(random()),i )
             for j in range( 5):
-                _atom = res.addAtom( `random()`,j )
+                _atom = res.addAtom( repr(random()),j )
         cing.verbosity = v
 
 

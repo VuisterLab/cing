@@ -7,6 +7,7 @@ from cing.STAR.File import File
 from cing.core.parameters import cingPaths
 from cing.core.parameters import plugins
 
+
 if True: # block
     # TODO: use more advanced tests.
     if not cingPaths.classpath:
@@ -212,14 +213,15 @@ Quit
 
 
         # sorting on mols, residues, and atoms
-#        nTmessage("  for self.checks: " + `self.checks`)
+#        nTmessage("  for self.checks: " + repr(self.checks))
 #        nTdebug("  for self.checks count: %s" % len(self.checks))
 
         starFile = File()
         starFile.filename = fullName
         if starFile.read():
-           nTerror("Failed to read star file: %s" % fullName)
-           return True
+            nTerror("Failed to read star file: %s" % fullName)
+            return True
+        # end if
 
         sfList = starFile.getSaveFrames(category = "NOE_completeness_statistics")
         if not sfList or len(sfList) != 1:
@@ -372,10 +374,10 @@ def _runWattos(project, ranges=None, tmp = None, parseOnly=False):
         if not os.path.exists(fullname):
             nTerror("Failed to create file [%s] in nmrStar.toNmrStarFile" % fullname)
             return None
-
+        
         scriptComplete = wattos.scriptTemplate
         scriptComplete = scriptComplete.replace("INPUT_STR_FILE", fileName)
-        scriptComplete = scriptComplete.replace("VERBOSITY", `cing.verbosity`)
+        scriptComplete = scriptComplete.replace("VERBOSITY", repr(cing.verbosity))
         rangesTxt = wattos.ranges
         if not useRanges: # Wattos can't handle a None this way.
             rangesTxt = ALL_RANGES_STR
@@ -412,7 +414,7 @@ def _runWattos(project, ranges=None, tmp = None, parseOnly=False):
         wattosStatus.keysformat()
 
         if wattosExitCode:
-            nTerror("Failed wattos checks with exit code: " + `wattosExitCode`)
+            nTerror("Failed wattos checks with exit code: " + repr(wattosExitCode))
             return None
         wattosStatus.completed = True
     # endif not parseOnly

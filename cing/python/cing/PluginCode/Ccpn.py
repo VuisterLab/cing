@@ -695,7 +695,7 @@ class Ccpn:
                     atom = self.molecule.decodeNameTuple(cingNameTuple)
 
                     if not atom:
-#                        nTdebug('Creating non-standard atom %s' % `cingNameTuple`)
+#                        nTdebug('Creating non-standard atom %s' % repr(cingNameTuple))
                         cingResNameTuple = (INTERNAL, chain.name, resNumber, None)
                         res = self.molecule.decodeNameTuple(cingResNameTuple)
                         if not res:

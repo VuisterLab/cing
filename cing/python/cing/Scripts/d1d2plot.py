@@ -197,8 +197,8 @@ def plotDihedral2DRama():
             hist = hPlot.histRamaBySsAndResType[ssType][resType]
             histList.append(hist)
         if plot.dihedralComboPlot(histList):
-                nTerror("Failed plot.plotDihedralRestraintRanges2D -b-")
-                sys.exit(1)
+            nTerror("Failed plot.plotDihedralRestraintRanges2D -b-")
+            sys.exit(1)
         if showDataPoints:
             myPoint = plusPoint.copy()
             myPoint.pointColor = 'green'
@@ -221,7 +221,7 @@ def plotDihedral2DRama():
             fn = None
             while not fn or os.path.exists(fn):
                 i += 1
-                fn = fnBase + '_' + `i` + '.png'
+                fn = fnBase + '_' + str(i) + '.png'
         ps.hardcopy(fn, graphicsFormat)
 #        plot.show()
 
@@ -905,7 +905,7 @@ if __name__ == "__main__":
         p.sort_stats('time').print_stats(100)
         p.sort_stats('cumulative').print_stats(100)
     if False:
-            plotDihedral2DRama()
+        plotDihedral2DRama()
 #            plotDihedral2DRamaWrapper()
 #            plotHistoDihedralWrapper()
     if False:

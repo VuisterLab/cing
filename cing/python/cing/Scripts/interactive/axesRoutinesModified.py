@@ -1,4 +1,5 @@
-#@PydevCodeAnalysisIgnore
+#@PydevCodeAnalysisIgnore # pylint: disable-all
+
 # next lines to be indented.
 
 

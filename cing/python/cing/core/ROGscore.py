@@ -140,7 +140,7 @@ class ROGscore(NTdict):
     def getColorCommentText(self):
         resultTxtList = []
         for element in self.colorCommentList:
-            resultTxtList.append(`element`)
+            resultTxtList.append(repr(element))
         return '\n'.join(resultTxtList)
 
     #end def

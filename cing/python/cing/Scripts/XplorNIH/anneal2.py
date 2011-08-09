@@ -25,13 +25,11 @@ import protocol
 # Output coordinate will be in files:
 # $x_SCRIPT_STRUCTURE_sa.pdb
 
-"""
-Execute like:
-alias xplor 'env -i PATH=$PATH HOME=$HOME USER=$USER /Users/jd/workspace/xplor-nih-2.27/bin/xplor'
-set x = 1brv
-cd /Users/jd/tmp/cingTmp/$x
-xplor -py $CINGROOT/python/cing/Scripts/XplorNIH/anneal2.py
-"""
+# Execute like:
+# alias xplor 'env -i PATH=$PATH HOME=$HOME USER=$USER /Users/jd/workspace/xplor-nih-2.27/bin/xplor'
+# set x = 1brv
+# cd /Users/jd/tmp/cingTmp/$x
+# xplor -py $CINGROOT/python/cing/Scripts/XplorNIH/anneal2.py
 
 
 # Block for pydev checking in eclipse under CING environment
@@ -67,9 +65,7 @@ quick=True
 for opt in opts:
     if opt[0]=="quick":  #specify -quick to just test that the script runs
         quick=True
-        pass
-    pass
-
+# end for
 
 # filename for output structures. This string must contain the STRUCTURE
 # literal so that each calculated structure has a unique name. The SCRIPT
@@ -81,7 +77,7 @@ numberOfStructures=20   #usually you want to create at least 20
 
 if quick:
     numberOfStructures=3
-    pass
+# end if
 
 # protocol module has many high-level helper functions.
 #
@@ -375,7 +371,7 @@ def calcOneStructure(loopInfo):
 
     #do analysis and write structure
     loopInfo.writeStructure(potList)
-    pass
+# end def
 
 
 

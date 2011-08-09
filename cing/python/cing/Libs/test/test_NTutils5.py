@@ -27,7 +27,7 @@ class AllChecks(TestCase):
 ]
         for testTuple in testList:
             testList, minFraction, useLargest, testResult = testTuple
-#            nTdebug("Testing %s" % `testTuple`)
+            nTdebug("Testing %s" % repr(testTuple))
             testListNT = NTlist()
             testListNT += testList
             self.assertEquals(testListNT.getConsensus(minFraction=minFraction,useLargest=useLargest),testResult)
@@ -170,10 +170,10 @@ class AllChecks(TestCase):
         self.assertTrue(dateTimeObject.year >= 2009)
 #        self.assertEquals(extension, '.txt')
 
-    """
-       E.g. if adl is the AtomDef NTlist
-    """
     def testSelectByItems(self):
+        """
+        E.g. if adl is the AtomDef NTlist
+        """
         byItems = ( 'type', 'C_VIN' )
         vadl = NTdb.allAtomDefs().selectByItems( *byItems )
 #       vadl = adl.

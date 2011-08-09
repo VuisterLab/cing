@@ -1,15 +1,16 @@
-##############################################
-#   Original Author:  Dan Kulp
-#   Date  :  9/8/2005
-#    MOdified by Jurgen F. Doreleijers
-#    For Hamid Eghbalnia
-#
+"""
 #############################################
-# Call in pymol window like :
-# @/Users/jd/workspace35/cing/python/cing/Scripts/PyMol/CreateSecondaryStructures.py
-# or from Terminal like:
-# pymol -M /Users/jd/workspace35/cing/python/cing/Scripts/PyMol/CreateSecondaryStructures.py
+   Original Author:  Dan Kulp
+   Date  :  9/8/2005
+    MOdified by Jurgen F. Doreleijers
+    For Hamid Eghbalnia
 
+############################################
+ Call in pymol window like :
+ @/Users/jd/workspace35/cing/python/cing/Scripts/PyMol/CreateSecondaryStructures.py
+ or from Terminal like:
+ pymol -M /Users/jd/workspace35/cing/python/cing/Scripts/PyMol/CreateSecondaryStructures.py
+"""
 # Next line is a pymol directive
 #python #@UndefinedVariable
 from pymol import cmd #@UnresolvedImport
@@ -18,7 +19,6 @@ import os
 import pymol #@UnusedImport @UnresolvedImport
 import string
 import urllib
-
 #editor=editor #@UndefinedVariable
 
 # Well I guess one can build a protein with it but the vdw contacts would be horrible.
@@ -35,11 +35,11 @@ def createPeptide(seqInfo):
         resn = i + 1
         print "Adding residue: ", resn,   seqInfo[i][0]
         # Note that the previous residue is numbered i.
-        resi = 'resi '+`i`
+        resi = 'resi '+repr(i)
         createSS(resi, sequence=seqInfo[i][0])
 #        j=0 #unused parameter to test pydev extension abilities
     for i in range( len(seqInfo) ):
-        resi = 'resi '+`i+1`
+        resi = 'resi '+repr(i+1)
 #        print "Setting backbone angles for residue: ", (i+1),   seqInfo[i][0],seqInfo[i][1],seqInfo[i][2]
         set_phipsi(resi,seqInfo[i][1],seqInfo[i][2])
 
@@ -56,7 +56,7 @@ def createSS(sel, sequence='ALA',repeat=1,terminal='C'):
     seq = string.split(sequence,",")
 
     # Get residue numbering .. potential bug here if number is inconsistent.. (Only works at c-terminal)
-    resi = int(cmd.get_model(sel).atom[0].resi) + 1 #@UnusedVariable
+    resi = int(cmd.get_model(sel).atom[0].resi) + 1 #@UnusedVariable # pylint: disable=W0612
     # Loop and build new residues
     for i in range(1,repeat+1):
         for s in seq:
@@ -78,8 +78,9 @@ def set_phipsi(sel,phi,psi):
             # Check for a null chain id (some PDBs contain this)
             unit_select = ""
             if not at.chain == "":
-               unit_select = "chain "+str(at.chain)+" and "
-
+                unit_select = "chain "+str(at.chain)+" and "
+            # end if
+            
             try:
                 # Define residue selections
                 residue_def_prev = unit_select+'resi '+str(int(at.resi)-1)
@@ -107,15 +108,17 @@ def set_phipsi(sel,phi,psi):
                 print "Note skipping set of psi; this is normal for a C terminal residue"
 
 def getTableFromCsvFile(urlLocation):
-  result = []
-  r1 = urllib.urlopen(urlLocation)
-  data = r1.read()
-  r1.close()
-  dataLines = data.split("\n")
-  for dataLine in dataLines:
-    if dataLine:
-        result.append( dataLine.split(',') )
-  return result
+    result = []
+    r1 = urllib.urlopen(urlLocation)
+    data = r1.read()
+    r1.close()
+    dataLines = data.split("\n")
+    for dataLine in dataLines:
+        if dataLine:
+            result.append( dataLine.split(',') )
+        # end if
+    # end for            
+    return result
 
 # next line is a pymol directive. Enable it when executing at pymol gui.
 #python end

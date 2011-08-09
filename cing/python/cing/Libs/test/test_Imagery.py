@@ -32,7 +32,7 @@ class AllChecks(TestCase):
         self.failIf( os.chdir(outputPath), msg=
             "Failed to change to temporary test directory for data: "+outputPath)
         fileList = convert2Web( inputPath, outputDir=outputPath, doMontage=True )
-        nTdebug( "Got back from convert2Web output file names: " + `fileList`)
+        nTdebug( "Got back from convert2Web output file names: " + repr(fileList))
         self.assertNotEqual(fileList,True)
         if fileList != True:
             for file in fileList:

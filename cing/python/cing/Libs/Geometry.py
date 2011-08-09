@@ -1,6 +1,7 @@
 from cing.Libs.NTutils import * #@UnusedWildImport
 TWO_PI = 2. * math.pi
 
+
 #A small angle (in degrees/rads) that is used to determine real differences. */
 ANGLE_EPSILON = 1.e-10
 
@@ -22,34 +23,34 @@ def violationAngle(value, lowerBound, upperBound):
 ###############################################################
         # operate in float space (not integer)
 #        value      -= .0
-        "Return None on error"
-        if lowerBound == None: # See entry 1bn0
-            nTwarning("Lower bound is None; skipping this angle for this model.")
-            return
-        if upperBound == None: # See entry 1bn0
-            nTwarning("Upper bound is None; skipping this angle for this model.")
-            return
-        lowerBound -= .0 # only one needed because see below.
+    "Return None on error"
+    if lowerBound == None: # See entry 1bn0
+        nTwarning("Lower bound is None; skipping this angle for this model.")
+        return
+    if upperBound == None: # See entry 1bn0
+        nTwarning("Upper bound is None; skipping this angle for this model.")
+        return
+    lowerBound -= .0 # only one needed because see below.
 #        upperBound -= .0
 
-        upperBound -= lowerBound
-        value      -= lowerBound
-        upperBound = to_0_360(upperBound)
-        value      = to_0_360(value)
+    upperBound -= lowerBound
+    value      -= lowerBound
+    upperBound = to_0_360(upperBound)
+    value      = to_0_360(value)
 #//        lowerBound = 0; not used
 
 #        // Upperbound violation in range [0,2pi>
-        dU = value-upperBound;
-        if dU <= 0.:
-            return 0.
+    dU = value-upperBound
+    if dU <= 0.:
+        return 0.
 #        // Lowerbound violation in range <0,2pi>
-        dL = 360. - value
+    dL = 360. - value
 
 #        // Here's the funny part, even though dU and dL can be up to 2pi
 #        // the smallest of the 2 is always only up to pi.
 #        // minViol in [0,pi]
-        min_viol = min(dU, dL)
-        return min_viol
+    min_viol = min(dU, dL)
+    return min_viol
 
 
 def to_0_2pi( a ):

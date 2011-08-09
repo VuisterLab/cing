@@ -392,7 +392,7 @@ def getDistanceRestraintFromXplorMemory( project, convention ):
         atmList = []
         i=0
         for atmIdx in atmIdxList:
-            nTdebug("Doing atmIdx: " + `atmIdx`)
+            nTdebug("Doing atmIdx: " + repr(atmIdx))
             t = ( 'A', 99, 'HA3' ) # TODO: from XPLOR
             atm = None
             if atomDict.has_key(t):
@@ -412,8 +412,8 @@ def getDistanceRestraintFromXplorMemory( project, convention ):
         # Unpack convenience variables.
         atm1 = atmList[0]
         atm2 = atmList[1]
-#        nTdebug("atom 1: " + `atm1`)
-#        nTdebug("atom 2: " + `atm2`)
+#        nTdebug("atom 1: " + repr(atm1))
+#        nTdebug("atom 2: " + repr(atm2))
         upper = 5. # TODO: from XPLOR
         if not upper:
             nTerror("Skipping line without valid upper bound on line: [" + upper +']')
@@ -437,7 +437,7 @@ def getDistanceRestraintFromXplorMemory( project, convention ):
 #            r.QF = line.float( 13 )
     #end for
     if errorCount:
-        nTerror("Found number of errors importing upl file: " + `errorCount`)
+        nTerror("Found number of errors importing upl file: " + repr(errorCount))
     nTmessage('==> importUpl: new %s', result )
     return result
 #end def

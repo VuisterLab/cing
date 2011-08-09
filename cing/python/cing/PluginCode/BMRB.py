@@ -130,7 +130,8 @@ def importFromBMRB( project, bmrbFile ):
     if error:
         nTerror( '==> importFromBMRB: completed with error(s)' )
     else:
-        nTmessage( '==> importFromBMRB: successfully parsed %d lines from %s', f.NR, f.FILENAME )
+        nr = getDeepByKeysOrAttributes(f, 'NR') # pylint: disable=W0631
+        nTmessage( '==> importFromBMRB: successfully parsed %d lines from %s', nr, bmrbFile )
     #end if
 
     if error:

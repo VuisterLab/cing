@@ -19,7 +19,6 @@ from cing.Scripts.validateEntry import * #@UnusedWildImport
 from cing.core.constants import * #@UnusedWildImport
 
 
-
 def mainRefineEntry(entryId, *extraArgList):
     """inputDir may be a directory or a url. A url needs to start with http://.
     """
@@ -65,7 +64,7 @@ def mainRefineEntry(entryId, *extraArgList):
     if len(extraArgList) != expectedNumberOfArguments:
         nTmessage("consider updating code to include all sequential parameters: %s" % str(expectedArgumentList))
         if len(extraArgList) > expectedNumberOfArguments:
-            nTerror("Got arguments: " + `extraArgList`)
+            nTerror("Got arguments: " + repr(extraArgList))
             nTerror("Failed to get expected number of arguments: %d got %d" % (
                 expectedNumberOfArguments, len(extraArgList)))
             nTerror("Expected arguments: %s" % expectedArgumentList)
@@ -181,7 +180,7 @@ def mainRefineEntry(entryId, *extraArgList):
             stillToRetrieve = True
         # end if
         if stillToRetrieve:
-             retrieveTgzFromUrl(entryId, inputDir, archiveType=archiveType, formatFileName=formatFileName)
+            retrieveTgzFromUrl(entryId, inputDir, archiveType=archiveType, formatFileName=formatFileName)
         # end if
         if not os.path.exists(fileNameTgz):
             nTerror("Tgz should already have been present skipping entry")

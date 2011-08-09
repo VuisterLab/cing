@@ -66,7 +66,7 @@ class Dssp:
             for res in self.project.molecule.allResidues():
                 if not res.hasProperties('protein'):
                     pass
-#                    nTwarning('Dssp.run: non-protein residue %s found and will be written out for Dssp' % `res`)
+#                    nTwarning('Dssp.run: non-protein residue %s found and will be written out for Dssp' % repr(res))
 
             models = NTlist(*range(self.project.molecule.modelCount))
             # Can't use IUPAC here because aqua doesn't understand difference between
@@ -74,7 +74,7 @@ class Dssp:
             for model in models:
                 fullname = os.path.join(self.rootPath, 'model_%03d.pdb' % model)
                 # DSSP prefers what?
-#                nTdebug('==> Materializing model '+`model`+" to disk" )
+#                nTdebug('==> Materializing model '+repr(model)+" to disk" )
                 pdbFile = self.project.molecule.toPDB(model = model, convention = IUPAC)
                 if not pdbFile:
                     nTerror("Dssp.run: Failed to write a temporary file with a model's coordinate")
@@ -128,7 +128,7 @@ class Dssp:
         Return True on error.
         """
         modelCount = self.molecule.modelCount
-#        nTdebug("Parse dssp files and store result in each residue for " + `modelCount` + " model(s)")
+#        nTdebug("Parse dssp files and store result in each residue for " + repr(modelCount) + " model(s)")
 
         for model in range(modelCount):
             fullnameOut = 'model_%03d.dssp' % model

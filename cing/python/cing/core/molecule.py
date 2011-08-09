@@ -563,7 +563,7 @@ class Molecule( NTtree, ResidueList ):
                 return
 
     #        nTdebug("Truncating ensemble to: [" + modelListStr +"]")
-    #        nTdebug("verify this is the same as: [" + `selectedModels` +"]")
+    #        nTdebug("verify this is the same as: [" + repr(selectedModels) +"]")
 
             modelToRemoveList = []
             myList = range(self.modelCount)
@@ -678,7 +678,7 @@ class Molecule( NTtree, ResidueList ):
             statements within can be enabled from code.
 
          """
-#        nTdebug("Now in decodeNameTuple for : "  + `nameTuple`)
+#        nTdebug("Now in decodeNameTuple for : "  + repr(nameTuple))
         if nameTuple == None:
             return None
 
@@ -712,7 +712,7 @@ class Molecule( NTtree, ResidueList ):
             return chain
 
         if not chain.has_key(resNum):
-#            nTdebug( 'in molecule decodeNameTuple: in chain ['+`chain`+'] no residue number: ['+`resNum`+']')
+#            nTdebug( 'in molecule decodeNameTuple: in chain ['+repr(chain)+'] no residue number: ['+repr(resNum)+']')
             return None
         res = chain[resNum]
 
@@ -724,14 +724,14 @@ class Molecule( NTtree, ResidueList ):
 #        an = translateAtomName( convention, resTranslated, atomName, INTERNAL )
 ##        if (not an or (an not in res)): return None
 #        if not an:
-##            nTdebug("in Molecule.decodeNameTuple failed to translateAtomName for res: " + `resTranslated` + " and atom: " + `atomName`)
+#            nTdebug("in Molecule.decodeNameTuple failed to translateAtomName for res: " + repr(resTranslated) + " and atom: " + repr(atomName))
 #            return None
 #            # JFD adds. This makes no sense. The residue itself by number is known. Just get it's residue type
 #            # and look up the atom translation. This can of course be fixed in the db too.
 #
 #
 #        if not res.has_key(an):
-##            nTdebug("in Molecule.decodeNameTuple atom not in residue: [%s]" % `an`)
+#            nTdebug("in Molecule.decodeNameTuple atom not in residue: [%s]" % repr(an))
 #            return None
 
 
@@ -767,7 +767,7 @@ class Molecule( NTtree, ResidueList ):
 #                    return chain
 #
 #                if not chain.has_key(resNum):
-##                    nTdebug( 'in molecule decodeNameTuple: in chain ['+`chain`+'] no residue number: ['+`resNum`+']')
+#                    nTdebug( 'in molecule decodeNameTuple: in chain ['+repr(chain)+'] no residue number: ['+repr(resNum)+']')
 #                    continue # perhaps in other chain?
 #                res = chain[resNum]
 #
@@ -782,10 +782,10 @@ class Molecule( NTtree, ResidueList ):
 #                    return None
 #
 #                if not res.has_key(an):
-#                    nTdebug("in Molecule.decodeNameTuple atom not in residue: [%s]" % `an`)
+#                    nTdebug("in Molecule.decodeNameTuple atom not in residue: [%s]" % repr(an))
 #                    return None
 #                return res[an]
-#            nTdebug("in Molecule.decodeNameTuple residue number [%s] not in any chain " % `resNum`)
+#            nTdebug("in Molecule.decodeNameTuple residue number [%s] not in any chain " % repr(resNum))
 #            return None
 #        # end else
     #end def
@@ -3015,7 +3015,7 @@ Return an Molecule instance or None on error
                         if not record:
                             # this happens for all Q and even for like Cys HG which aren't always present in actual structure
                             # but are defined in db.
-    #                        nTwarning("Failed to get PDB atom record for atom: " + `atm`)
+    #                        nTwarning("Failed to get PDB atom record for atom: " + repr(atm))
                             continue
                         if useRangesForLoweringOccupancy:
                             if useRanges and (not inSelection) and atm.isBackbone() and (
@@ -4243,7 +4243,7 @@ Residue class: Defines residue properties
                 # if db and aliases, add them; e.g. DNA/RNA DELTA==NU3
                 if dihed.db:
                     for aname in dihed.db.aliases:
-                         self[aname] = dihed
+                        self[aname] = dihed
                     #end for
                 #end if
             #end for
@@ -5375,7 +5375,7 @@ coordinates: %s"""  , dots, self, dots
         #end for
 
         for axis in ['x','y','z']:
-                self.meanCoordinate[axis] /= fn
+            self.meanCoordinate[axis] /= fn
         #end for
 
         for c in self.coordinates:
@@ -6031,8 +6031,8 @@ coordinates: %s"""  , dots, self, dots
         if model >= len(self.coordinates):
             # this happens for all pseudos and atoms like Cys HG which aren't always present
             # but are defined in the db.
-#            nTdebug("Trying to Atom.atomToPDB for model: " + `model`)
-#            nTdebug("but only found coordinates length: " + `len(self.coordinates)`)
+#            nTdebug("Trying to Atom.atomToPDB for model: " + repr(model))
+#            nTdebug("but only found coordinates length: " + repr(len(self.coordinates)))
             return None
         if model < 0:
             nTcodeerror("In Atom.atomToPDB found model to be <0: %r" % model)
@@ -6171,7 +6171,8 @@ class AtomList( NTlist ):
     def criticize(self):
         for atom in self:
 #            atom.criticize()
-            self.rogScore.setMaxColor( atom.rogScore.colorLabel, comment='Cascaded from: %s' %atom.toString() )
+            comment = 'Cascaded from: %s' % atom.toString() 
+            self.rogScore.setMaxColor( atom.rogScore.colorLabel, comment = comment)
 
     def append( self, obj ):
         obj.id = self.currentId

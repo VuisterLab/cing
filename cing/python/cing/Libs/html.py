@@ -1330,9 +1330,9 @@ class HTMLfile:
 
 #        nTdebug("CING revision [%s]" % cingRevision)
         if cingRevision:
-            cingRevisionUrlStr = cingRevisionUrl + `cingRevision`
+            cingRevisionUrlStr = cingRevisionUrl + repr(cingRevision)
             self._appendTag( defaultFooter, None, '(' , closeTag=False)
-            self._appendTag( defaultFooter, 'a', 'r'+`cingRevision`, href=cingRevisionUrlStr)
+            self._appendTag( defaultFooter, 'a', 'r'+repr(cingRevision), href=cingRevisionUrlStr)
             self._appendTag( defaultFooter, None, ')' , openTag=False)
 
         self._appendTag( defaultFooter, None, ' ' )
@@ -1818,7 +1818,7 @@ class ProjectHTMLfile( HTMLfile ):
             htmlMain('ul', closeTag=False)
             for rl in rlists:
                 if hasattr( rl, 'html'):
-                        self.insertHtmlLinkInTag( 'li', htmlMain, self.project, rl, text=rl.name)
+                    self.insertHtmlLinkInTag( 'li', htmlMain, self.project, rl, text=rl.name)
             htmlMain('ul', openTag=False)
         #end if
 
@@ -2649,7 +2649,7 @@ class ResidueHTMLfile( HTMLfile ):
             if dihed in residue and residue[dihed]:
                 if not dihed in plottedList: # failed on first attempt already. No sense in trying again.
                     continue
-    #                            nTdebug( '------>>>>> ' + dihed + `res` + `res[dihed]` )
+    #                            nTdebug( '------>>>>> ' + dihed + repr(res) + repr(res[dihed]) )
                 d = residue[dihed] # List of values with outliers etc attached.
 
                 # summarize the results
@@ -2657,14 +2657,14 @@ class ResidueHTMLfile( HTMLfile ):
                 outlierList = '.'
                 if d.__dict__.has_key('outliers'):
     #                            nTwarning("Found no outliers; code wasn't prepared to deal with that or is JFD wrong?")
-                    lenOutliers = `len(d.outliers)`
+                    lenOutliers = str(len(d.outliers))
                     outlierList = d.outliers.zap(0)
     #                            -180.1 is longest: 6.1f
                 summary = '%-6s: average: %6.1f   cv: %6.3f  ||  outliers: %3s (models %s)' % (
                            dihed, d.cav, d.cv, lenOutliers, outlierList )
                 fprintf( fp, '%s\n', summary )
                 #generate HTML code for plot and text
-                residue.html.left( 'h2', dihed, id=dihed),
+                residue.html.left( 'h2', dihed, id=dihed)
                 plotFileNameDihedral1D = dihed + '.' + graphicsFormatExtension
                 tmpPath1D = os.path.join(resdir, plotFileNameDihedral1D)
                 if os.path.exists(tmpPath1D):
@@ -3056,7 +3056,7 @@ class AtomsHTMLfile( HTMLfile ):
 
         self.insertHtmlLink( self.main, self.atomList, chain,   text =       chName,   title = titleStr)
 
-        table.nextColumn(`residue.resNum`)
+        table.nextColumn(str(residue.resNum))
 
         table.nextColumn()
         self.insertHtmlLink( self.main, self.atomList, residue, text = residue.resName, title = 
@@ -3352,7 +3352,7 @@ class RestraintListHTMLfile( HTMLfile ):
                     chName = chain.name
                     titleStr = sprintf('goto chain %s', chain.cName(-1))
                 self.insertHtmlLink( self.main, self.restraintList, chain,   text =       chName,   title = titleStr)
-                table.nextColumn(`residue.resNum`)
+                table.nextColumn(str(residue.resNum))
                 table.nextColumn()
                 self.insertHtmlLink( self.main, self.restraintList, residue, text = residue.resName, title = 
                                      sprintf('goto residue %s', residue.cName(-1)) )
@@ -3404,7 +3404,7 @@ class RestraintListHTMLfile( HTMLfile ):
 
 
     def _rowAc(self, restraint, table, isSourceForAtom=True):
-        table.nextColumn(`restraint.id`)
+        table.nextColumn(repr(restraint.id))
         # Would have like to color code it but then the html isn't numerically sortable.
 #        restraint.rogScore.createHtmlColorForString(self.main, restraintRowStr)
 
@@ -3431,7 +3431,7 @@ class RestraintListHTMLfile( HTMLfile ):
                 titleStr = sprintf('goto chain %s', chain.cName(-1))
 
             self.insertHtmlLink( self.main, self.restraintList, chain,   text =       chName,   title = titleStr)
-            table.nextColumn(`residue.resNum`)
+            table.nextColumn(str(residue.resNum))
             table.nextColumn()
             self.insertHtmlLink( self.main, self.restraintList, residue, text = residue.resName, title = 
                                  sprintf('goto residue %s', residue.cName(-1)) )
@@ -3608,7 +3608,7 @@ class RestraintListHTMLfile( HTMLfile ):
                     titleStr = sprintf('goto chain %s', chain.cName(-1))
                 table.nextColumn()
                 self.insertHtmlLink( self.main, self.restraintList, chain,   text =       chName,   title = titleStr)
-                table.nextColumn(`residue.resNum`)
+                table.nextColumn(str(residue.resNum))
                 table.nextColumn()
                 self.insertHtmlLink( self.main, self.restraintList, residue, text = residue.resName, title = 
                                      sprintf('goto residue %s', residue.cName(-1)) )
@@ -3894,7 +3894,7 @@ class PeakListHTMLfile( HTMLfile ):
     #end def
 
     def _rowPeak(self, peak, table):
-        table.nextColumn(`peak.peakIndex`)
+        table.nextColumn(str(peak.peakIndex))
 # POSITION
         for i in range(self.dimPeakList):
             if len(peak.positions) <= i: # can be optimized by compiler?
@@ -3941,7 +3941,7 @@ class PeakListHTMLfile( HTMLfile ):
                 titleStr = sprintf('goto chain %s', chain.cName(-1))
 
             self.insertHtmlLink( self.main, self.peakList, chain,   text =       chName,   title = titleStr)
-            table.nextColumn(`residue.resNum`)
+            table.nextColumn(str(residue.resNum))
             table.nextColumn()
             self.insertHtmlLink( self.main, self.peakList, residue, text = residue.resName, title = 
                                  sprintf('goto residue %s', residue.cName(-1)) )
@@ -4104,7 +4104,7 @@ class EnsembleHTMLfile( HTMLfile ):
         #        self.project.models[i] holds the number of outliers for model i.
         #        models is a NTdict containing per model a list of outliers.
                 outliers = [self.project.models[i] for i in range(len(self.ensemble))]
-    #            nTdebug( '>> Number of outliers per model: ' + `outliers`)
+    #            nTdebug( '>> Number of outliers per model: ' + repr(outliers))
                 plot.barChart( self.project.models.items(), 0.05, 0.95,
                                attributes = boxAttributes( fillColor='green' )
                              )

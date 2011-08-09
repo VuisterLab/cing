@@ -1,4 +1,4 @@
-#@PydevCodeAnalysisIgnore
+#@PydevCodeAnalysisIgnore # pylint: disable-all
 from cing.Libs.NTutils import *
 from cing.core.database import ResidueDef
 from cing import NTdb, printf

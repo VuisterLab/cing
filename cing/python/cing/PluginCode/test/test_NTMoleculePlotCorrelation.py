@@ -73,7 +73,7 @@ class AllChecks(TestCase):
                 for res in resList:
                     resNumb += 1
 
-        #            nTdebug(`res`)
+        #            nTdebug(repr(res))
                     if resNumb % 2:
                         res.rogScore.setMaxColor(COLOR_RED, "just testing ROG color.")
         #            if random() < 0.2: # Skip a 10%

@@ -59,14 +59,14 @@ class AwkLike:
 
         self.line = self.f.readline()
         self.dollar = [self.line[:-1]] # -1 for excluding line terminator.
-#        print 'line:        [' + `self.line`  + ']'
+#        print 'line:        [' + repr(self.line)  + ']'
         if len(self.line):
             self.NR += 1
             for f in self.line.split(self.separator):
                 # Skip everything after the comment?
                 if self.commentString and f.startswith(self.commentString):
 #                    nTdebug("Skipping fields after comment on line: [%s]" % self.line)
-#                    nTdebug("   parsed so far: %s" % `self.dollar` )
+#                    nTdebug("   parsed so far: %s" % repr(self.dollar) )
                     break
 #                nTdebug("Appending to parsed: [%s]" % f)
                 self.dollar.append( f )

@@ -13,16 +13,14 @@ import cPickle
 import csv
 
 
-"""
-Takes a file with dihedral angles values and converts them to a python pickle file
-with histograms for (combined) residue and sec. struct. types.
-
-Janin et al. Conformation of amino acid side-chains in proteins. J Mol Biol (1978)
-
-Using "Table 2. Rotamer library used for crystallographic model building with O" from
-Kleywegt et al. Databases in protein crystallography. Acta Crystallogr D Biol
-Crystallogr (1998) vol. 54 (Pt 6 Pt 1) pp. 1119-31
-"""
+#Takes a file with dihedral angles values and converts them to a python pickle file
+#with histograms for (combined) residue and sec. struct. types.
+#
+#Janin et al. Conformation of amino acid side-chains in proteins. J Mol Biol (1978)
+#
+#Using "Table 2. Rotamer library used for crystallographic model building with O" from
+#Kleywegt et al. Databases in protein crystallography. Acta Crystallogr D Biol
+#Crystallogr (1998) vol. 54 (Pt 6 Pt 1) pp. 1119-31
 
 file_name_base = 'chi1chi2_wi_db'
 # .gz extension is appended in the code.

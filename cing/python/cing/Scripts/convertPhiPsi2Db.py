@@ -13,17 +13,15 @@ from numpy.lib.twodim_base import histogram2d
 import cPickle
 import csv
 
-"""
-Takes a file with dihedral angles values and converts them to a python pickle file
-with histograms for (combined) residue and sec. struct. types.
-
-Please note well that the values are per residue and that the value range is much
-smaller than per molecule values. The per-molecule values are scaled by a sigma.
-See formula 8 in Rob Hooft's paper:
-
-Hooft et al. Objectively judging the quality of a protein structure from a
-Ramachandran plot. Comput.Appl.Biosci. (1997) vol. 13 (4) pp. 425-430
-"""
+#Takes a file with dihedral angles values and converts them to a python pickle file
+#with histograms for (combined) residue and sec. struct. types.
+#
+#Please note well that the values are per residue and that the value range is much
+#smaller than per molecule values. The per-molecule values are scaled by a sigma.
+#See formula 8 in Rob Hooft's paper:
+#
+#Hooft et al. Objectively judging the quality of a protein structure from a
+#Ramachandran plot. Comput.Appl.Biosci. (1997) vol. 13 (4) pp. 425-430
 
 file_name_base = 'phipsi_wi_db'
 # .gz extension is appended in the code.
@@ -106,7 +104,7 @@ def main():
             cTuple += tuple([str([ssType, resType])]) # append the hash keys as a way of id.
             nTdebug("For ssType %s residue type %s found (av/sd/min/max) %8.0f %8.0f %8.0f %8.0f" % (
                 ssType, resType, c_av, c_sd, hisMin, hisMax))
-#            nTdebug("xedges %s" % `xedges`)
+#            nTdebug("xedges %s" % repr(xedges))
 #            sys.exit(1)
             if c_sd == None:
                 nTdebug('Failed to get c_sd when testing not all residues are present in smaller sets.')
@@ -150,7 +148,7 @@ def main():
 #    sumHistCombined = sum( hist2d )
 #    sumsumHistCombined = sum( sumHistCombined )
     nTdebug('hist2d         : \n%s' % hist2d)
-#    nTdebug('sumHistCombined   : %s' % `sumHistCombined`)
+#    nTdebug('sumHistCombined   : %s' % repr(sumHistCombined))
 #    nTdebug('sumsumHistCombined: %.0f' % sumsumHistCombined)
 #    hist2d = zscaleHist( hist2d, Cav, Csd )
 #    nTdebug('hist2d scaled  : \n%s' % hist2d)

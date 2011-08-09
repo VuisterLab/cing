@@ -14,13 +14,13 @@ import zipfile
 
 
 class AllChecks(TestCase):
-        strf = File()
-        cingDirTmpTest = os.path.join( cingDirTmp, 'test_File' )
-        mkdirs( cingDirTmpTest )
-        os.chdir(cingDirTmpTest)
+    strf = File()
+    cingDirTmpTest = os.path.join( cingDirTmp, 'test_File' )
+    mkdirs( cingDirTmpTest )
+    os.chdir(cingDirTmpTest)
 
-        def test_Parse(self):
-            text = """data_no_comments_here
+    def test_Parse(self):
+        text = """data_no_comments_here
 
 save_comment
    _Saveframe_category  comment
@@ -42,11 +42,11 @@ save_comment
      stop_
 save_
 """
-            self.assertFalse(self.strf.parse(text = text))
-            st = self.strf.star_text()
+        self.assertFalse(self.strf.parse(text = text))
+        st = self.strf.star_text()
 #            print "unparsed text:[" +st+ "]"
 
-            exp = """data_no_comments_here
+        exp = """data_no_comments_here
 save_comment   _Saveframe_category  comment   loop_
         _comment
         _every_flag
@@ -61,15 +61,15 @@ save_comment   _Saveframe_category  comment   loop_
 
 ;    BOGUS_CATEGORY     stop_ save_
 """
-            self.assertTrue(Utils.equalIgnoringWhiteSpace(exp, st))
+        self.assertTrue(Utils.equalIgnoringWhiteSpace(exp, st))
 
-        def test_ReadFile(self):
-            testEntry('1edp')
+    def test_ReadFile(self):
+        testEntry('1edp')
 
-"""
-Extra Test Routine going over some entries in the NMR Restraints Grid
-"""
 def testEntry(entry):
+    """
+    Extra Test Routine going over some entries in the NMR Restraints Grid
+    """
     # Put a check in for internet availability.
     nTmessage("Testing Entry")
     strf = File()
@@ -150,10 +150,10 @@ def testEntry(entry):
         # end try
     # end if
 
-"""
-Extra Test Routine going over some entries in the NMR Restraints Grid
-"""
 def testSingleFile(filename):
+    """
+    Extra Test Routine going over some entries in the NMR Restraints Grid
+    """
     strf = File()
     strf.filename = filename
     nTdebug("reading file ", strf.filename)

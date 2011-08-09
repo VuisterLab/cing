@@ -11,7 +11,6 @@ from glob import glob
 from math import sqrt
 
 
-
 if True: # block
     useModule = True
     # TODO: test if the binary is actually applicable to the system os.
@@ -180,7 +179,7 @@ def runShiftx( project, parseOnly=False, model=None   ):
 
         pdbFile = project.molecule.toPDB( model=model, convention = IUPAC  )
         if not pdbFile:
-            nTerror("runShiftx: Failed to generate a pdb file for model: " + `model`)
+            nTerror("runShiftx: Failed to generate a pdb file for model: " + repr(model))
             return None
 
         pdbFile.save( model_base_name + '.pdb'   )
@@ -404,10 +403,11 @@ def _calcQshift( atmList ):
     #end for
 
     if sumMeasuredSq >0.0:
-            Qshift=sqrt(sumDeltaSq/sumMeasuredSq)
+        Qshift=sqrt(sumDeltaSq/sumMeasuredSq)
     else:
-            Qshift=NaN
-
+        Qshift=NaN
+    # end if
+    
     return Qshift
 #end def
 

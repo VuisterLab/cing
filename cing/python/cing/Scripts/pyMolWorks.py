@@ -1,6 +1,8 @@
 #!/usr/bin/env python
-# Or execute: python -u $CINGROOT/python/cing/Scripts/pyMolWorks.py
-# From http://pymolwiki.org/index.php/Launching_From_a_Script
+"""
+Or execute: python -u $CINGROOT/python/cing/Scripts/pyMolWorks.py
+From http://pymolwiki.org/index.php/Launching_From_a_Script
+"""
 import __main__
 import sys
 import time
@@ -28,13 +30,13 @@ cmd.set('stereo_angle', 1.0)
 cmd.spectrum()
 
 try:
-   pdbCode = '1brv'
-   pdbFile = urllib2.urlopen('file:///Users/jd/workspace35/cing/Tests/data/pdb/'+
-        pdbCode + '/pdb' +
-        pdbCode + '.ent')
-   cmd.read_pdbstr(pdbFile.read(), pdbCode)
+    pdbCode = '1brv'
+    pdbFile = urllib2.urlopen('file:///Users/jd/workspace35/cing/Tests/data/pdb/'+
+         pdbCode + '/pdb' +
+         pdbCode + '.ent')
+    cmd.read_pdbstr(pdbFile.read(), pdbCode)
 except:
-  print "Unexpected error:", sys.exc_info()[0]
+    print "Unexpected error:", sys.exc_info()[0]
 
 time.sleep(5)
 #cmd.quit()
