@@ -20,7 +20,6 @@ WARNING: Caught interrupt in parent.
 WARNING: Trying to finish up by waiting for subprocesses
 WARNING: only 965 out of 1000 jobs were started (not all successfully finished perhaps)
 or similar. The minus of -15 is necessary because it needs to signal it's children.
-
 """
 
 from cing import cingPythonCingDir

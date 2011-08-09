@@ -20,7 +20,6 @@ WARNING: only 965 out of 1000 jobs were started (not all successfully finished p
 or similar. The minus of -15 is necessary because it needs to signal it's children.
 
 Execute like:
-
 python -u $CINGROOT/python/cing/NRG/CaspNmrCing.py
 """
 
