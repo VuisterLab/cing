@@ -2,7 +2,6 @@
 This script will use "validation Exercises" files to generate CING reports
 
 python -u $CINGROOT/python/cing/NRG/validationExercises.py
-
 """
 from cing import cingPythonCingDir
 from cing import cingRoot

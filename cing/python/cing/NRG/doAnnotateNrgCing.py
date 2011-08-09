@@ -112,8 +112,8 @@ def annotateEntry(entry_code, bmrb_id, *extraArgList):
 
     presets = getDeepByKeysOrDefault(presetDict, {}, bmrb_code)
     if presets:
-      nTmessage("In annotateLoop using preset values...")
-      nTdebug(str(presets))
+        nTmessage("In annotateLoop using preset values...")
+        nTdebug(str(presets))
 
     if os.path.exists(entry_code):
         nTmessage("Removing previous directory: %s" % entry_code)

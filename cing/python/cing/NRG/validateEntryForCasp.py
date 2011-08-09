@@ -18,7 +18,6 @@ import shutil
 #from cing.Scripts.Analysis.PyRPF import DEFAULT_DISTANCE_THRESHOLD
 #from cing.Scripts.Analysis.PyRPF import DEFAULT_PROCHIRAL_EXCLUSION_SHIFT
 
-
 ARCHIVE_TYPE_FLAT = 'FLAT'
 ARCHIVE_TYPE_BY_ENTRY = 'BY_ENTRY'
 ARCHIVE_TYPE_BY_CH23 = 'BY_CH23'
@@ -163,7 +162,7 @@ def main(entryId, *extraArgList):
             stillToRetrieve = True
         # end if
         if stillToRetrieve:
-             retrieveTgzFromUrl(entryId, inputDir, archiveType=archiveType, formatFileName=formatFileName)
+            retrieveTgzFromUrl(entryId, inputDir, archiveType=archiveType, formatFileName=formatFileName)
         # end if
         if not os.path.exists(fileNameTgz):
             nTerror("Tgz should already have been present skipping entry")
