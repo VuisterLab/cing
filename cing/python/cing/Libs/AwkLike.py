@@ -201,7 +201,7 @@ class AwkLikeS:
         """iterations routine"""
         if (not self.lines) or (self.NR >= self.MAX_NR):
             raise StopIteration
-            return None
+#            return None
 
         else:
             self.line = self.lines[self.NR]

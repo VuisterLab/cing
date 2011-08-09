@@ -1196,8 +1196,8 @@ class SMLCoplanarHandler( SMLhandler ):
 
     def handle(self, line, fp, project=None):
         return # ask Geerten for input
-        coplanar = Coplanar()
-        return self.dictHandler(coplanar, fp, project)
+#        coplanar = Coplanar()
+#        return self.dictHandler(coplanar, fp, project)
     #end def
 
     def endHandler(self, coplanar, project):

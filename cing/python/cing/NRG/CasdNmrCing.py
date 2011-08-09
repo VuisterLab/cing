@@ -461,15 +461,15 @@ class casdNmrCing(Lister):
     def do_analyses_loop(self, processes_max):
         ## Setup a job list
         return
-        job_list = []
-
-        for entry_code in self.new_hits_entry_list:
-            job = (self.make_individual_pages, (entry_code,))
-            job_list.append(job)
-
-        f = forkoff.ForkOff(processes_max=processes_max, max_time_to_wait=self.max_time_to_wait)
-        self.done_entry_list = f.forkoff_start(job_list, self.delay_between_submitting_jobs)
-        nTmessage("Finished following list: %s" % self.done_entry_list)
+#        job_list = []
+#
+#        for entry_code in self.new_hits_entry_list:
+#            job = (self.make_individual_pages, (entry_code,))
+#            job_list.append(job)
+#
+#        f = forkoff.ForkOff(processes_max=processes_max, max_time_to_wait=self.max_time_to_wait)
+#        self.done_entry_list = f.forkoff_start(job_list, self.delay_between_submitting_jobs)
+#        nTmessage("Finished following list: %s" % self.done_entry_list)
 
 
     def update_index_files(self):

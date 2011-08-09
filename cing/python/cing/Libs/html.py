@@ -751,8 +751,8 @@ class MakeHtmlTable:
         if self._iter >= self._len:
             self.html('table', openTag=False)
             raise StopIteration
-            return None
-
+#            return None
+        # end if
         self.html('tr', closeTag=False)
         s = self._rows[self._iter]
         self._iter += 1
