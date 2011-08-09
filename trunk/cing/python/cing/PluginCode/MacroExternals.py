@@ -257,9 +257,9 @@ alter all, b=0.0
 spectrum b, %s, selection=all, minimum=minValue, maximum=maxValue
 
 """ % spectrumName
-    macroTxt = macroTxt.replace('minValue', `minValue`)
-    macroTxt = macroTxt.replace('maxValue', `maxValue`)
-    macroTxt = macroTxt.replace('reverseColorScheme', `reverseColorScheme`)
+    macroTxt = macroTxt.replace('minValue', repr(minValue))
+    macroTxt = macroTxt.replace('maxValue', repr(maxValue))
+    macroTxt = macroTxt.replace('reverseColorScheme', repr(reverseColorScheme))
 
     # Make it into a self-contained script for testing.
     macroTxt = scriptPdbLoad + macroTxt
@@ -414,9 +414,9 @@ ColorBond %s
 SelectAtom 'prev_sel'
 SelectBond 'prev_sel'
 """
-    macroTxt = macroTxt.replace('minValue', `minValue`)
-    macroTxt = macroTxt.replace('maxValue', `maxValue`)
-    macroTxt = macroTxt.replace('reverseColorScheme', `reverseColorScheme`)
+    macroTxt = macroTxt.replace('minValue', repr(minValue))
+    macroTxt = macroTxt.replace('maxValue', repr(maxValue))
+    macroTxt = macroTxt.replace('reverseColorScheme', repr(reverseColorScheme))
 
     if path:
         writeTextToFile(path, macroTxt)

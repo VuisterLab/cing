@@ -94,3 +94,8 @@ find . -name "*_21.str" | xargs grep -H "chemical shifts'" > ~/BMRB_CS_counts.tx
 
 find $D/devNRG-CING/data -name "*.log" | xargs grep "DEBUG: nucleus: 1"
 find $D/devNRG-CING/data -name "*.log" | xargs grep "ERROR: "
+
+set archive_id = CASD-NMR-CING
+set archive_id = NRG-CING
+set cmd = ("rsync -av /Volumes/tria3/$archive_id/ /Volumes/tria4/$archive_id")
+$cmd | & mail -s rsync.log jd &

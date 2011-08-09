@@ -41,8 +41,8 @@ extraArgList = ( str(cing.verbosity),
                  outputDir,
                  pdbConvention,
                  restraintsConvention,
-                 `ARCHIVE_TYPE_FLAT`,
-                 `PROJECT_TYPE_CING`,
+                 repr(ARCHIVE_TYPE_FLAT),
+                 repr(PROJECT_TYPE_CING),
                  storeCING2db,      CV_RANGES_STR,               filterTopViolations, filterVasco
                   )
 

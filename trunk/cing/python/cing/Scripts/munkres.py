@@ -188,7 +188,7 @@ Running that program produces::
     (2, 2) -> 4
     total profit=23
 
-The ``munkres`` module provides a convenience method for creating a cost
+The munkres module provides a convenience method for creating a cost
 matrix from a profit matrix. Since it doesn't know whether the matrix contains
 floating point numbers, decimals, or integers, you have to provide the
 conversion function; but the convenience method takes care of the actual
@@ -268,7 +268,7 @@ INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
 CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
-"""
+""" # pylint: disable=W0105
 
 __docformat__ = 'restructuredtext'
 

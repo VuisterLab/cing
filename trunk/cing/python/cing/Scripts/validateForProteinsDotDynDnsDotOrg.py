@@ -41,8 +41,8 @@ extraArgList = ( inputDir,
                  outputDir,
                  pdbConvention,
                  restraintsConvention,
-                 `ARCHIVE_TYPE_BY_ENTRY`,
-                 `PROJECT_TYPE_CYANA`
+                 repr(ARCHIVE_TYPE_BY_ENTRY),
+                 repr(PROJECT_TYPE_CYANA)
                   )
 
 doScriptOnEntryList(pythonScriptFileName,

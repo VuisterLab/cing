@@ -304,7 +304,7 @@ def _writeCingShellFile(isTcsh): # pylint: disable=W0621
         parametersDict['close_if'] = 'fi'
         sourceCommand = '.'
         cname = 'cing.sh'
-#    nTdebug("pars:" + `parametersDict`)
+#    nTdebug("pars:" + repr(parametersDict))
     text = CING_SHELL_TEMPLATE % parametersDict
     if isTcsh:
         text += "\nrehash\n"
@@ -448,7 +448,7 @@ if __name__ == '__main__':
         pass
     # end try
         
-#    nTdebug("time: " + `time`)
+#    nTdebug("time: " + repr(time))
     if wattosRevision < 0: # time at: Mon Dec 10 15:56:33 CET 2007
         _nTmessage("Could not find 'wattos'  (optional)")
 #        _nTmessage("Failed to get epoch time. This was a test of Wattos installation.'")

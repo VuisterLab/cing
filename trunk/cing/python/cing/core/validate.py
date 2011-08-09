@@ -745,7 +745,7 @@ def validateRestraints( project, toFile = True):
         # omit restraints that have a violation less than cut off.  NEW FEATURE REQUEST
         msg += sprintf( '%s Sorted on Violations > 0.3 A %s\n', dots, dots)
         theList = drl[0:min(len(drl),30)]
-#        nTdebug("Found list: " + `theList`)
+#        nTdebug("Found list: " + repr(theList))
         msg += sprintf( '%s\n', formatList( theList ) )
         rL.addList(drl)
     #end for
@@ -766,7 +766,7 @@ def validateRestraints( project, toFile = True):
         rL.addList(drl)
     #end for
     getStatsRestraintNTlist(rL)
-
+    
     # Process the per residue restraints data
     msg += sprintf( '%s Per residue scores %s\n', dots, dots )
     for restraintListAtribute in ( 'distanceRestraints', 'dihedralRestraints'):
@@ -1911,7 +1911,7 @@ def getRescaling(valuesByEntrySsAndResType):
                     nTdebug('when testing not all residues are present in smaller sets.')
                     continue
                 (c_av, c_sd, hisMin, hisMax) = getEnsembleAverageAndSigmaHis( his )
-#                nTdebug("For entry %s ssType %s residue type %s found (c_av, c_sd) %8.3f %s" %(entryId,ssType,resType,c_av,`c_sd`))
+#                nTdebug("For entry %s ssType %s residue type %s found (c_av, c_sd) %8.3f %s" %(entryId,ssType,resType,c_av,repr(c_sd)))
                 if c_sd == None:
                     nTdebug('Failed to get c_sd when testing not all residues are present in smaller sets.')
                     continue

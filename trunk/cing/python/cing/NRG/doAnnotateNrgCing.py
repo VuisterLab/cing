@@ -40,7 +40,7 @@ def annotateEntry(entry_code, bmrb_id, *extraArgList):
     expectedArgumentList = []
     expectedNumberOfArguments = len(expectedArgumentList)
     if len(extraArgList) != expectedNumberOfArguments:
-        nTerror("Got arguments: " + `extraArgList`)
+        nTerror("Got arguments: " + repr(extraArgList))
         nTerror("Failed to get expected number of arguments: %d got %d" % (
             expectedNumberOfArguments, len(extraArgList)))
         nTerror("Expected arguments: %s" % expectedArgumentList)

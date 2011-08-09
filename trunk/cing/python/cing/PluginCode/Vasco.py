@@ -6,6 +6,7 @@ from cing.core.molecule import getAssignmentCountMapForResList
 from cing.core.parameters import plugins
 from glob import glob
 
+
 if True: # block
     if not getDeepByKeysOrAttributes(plugins, CCPN_STR, IS_INSTALLED_STR):
         nTdebug("For %s missing required plugin or not installed: %s" % ( VASCO_STR, CCPN_STR))
@@ -69,8 +70,9 @@ class Vasco(NTdict):
             return
 
         if not self.project.molecule.hasAminoAcid():
-           nTwarning("Skipping Vasco as there is no protein in the current molecule")
-           return
+            nTwarning("Skipping Vasco as there is no protein in the current molecule")
+            return
+        # end if
 
         # WI checks
         wiSummary = getDeepByKeys(mol, WHATIF_STR, 'summary')

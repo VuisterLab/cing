@@ -425,144 +425,147 @@ def exportPeaks2Xeasy( peakList, peakFile)   :
 
 
 def importXeasy( project, seqFile, protFile, convention ):
-        """Import shifts from Xeasy protFile
-        return the 'slot' (i.e position in the list) of these resonances or None on error
-        """
-        if seqFile == None:
-            nTerror('importXeasy: undefined seqFile' )
-            return None
-        #end if
-        if protFile == None:
-            nTerror('importXeasy: undefined protFile' )
-            return None
-        #end if
-
-        if not os.path.exists( seqFile ):
-            nTerror('importXeasy: seqFile "%s" not found', seqFile )
-            return None
-        #end if
-        if not os.path.exists( protFile ):
-            nTerror('importXeasy: protFile "%s" not found', protFile )
-            return None
-        #end if
-
-        if not project.molecule:
-            nTerror('importXeasy: No molecule defined' )
-            return None
-        #end if
-
-#       Parse the seq file and prot file
-        project.xeasy = Xeasy( seqFile, protFile, convention = convention   )
-#       Append the shifts to molecule
-        project.xeasy.appendShifts( project.molecule   )
-
-        project.addHistory( sprintf('Imported Xeasy shifts from "%s"', protFile ) )
-
-        if project.xeasy.error:
-            # GWV please check. Did you mean to show an error here?
-            # I just kept it to the message level and changed the token error to problem.
-            nTmessage( '==> importXeasy: problem(s) appending resonances from "%s"', protFile )
-        else:
-            nTmessage( '==> importXeasy: appended resonances from "%s"', protFile )
-        #end if
-#            nTmessage( '%s', project.molecule.format() )
-        return len(project.molecule.resonanceSources)-1
+    """
+    Import shifts from Xeasy protFile
+    return the 'slot' (i.e position in the list) of these resonances or None on error
+    """
+    if seqFile == None:
+        nTerror('importXeasy: undefined seqFile' )
+        return None
+    #end if
+    if protFile == None:
+        nTerror('importXeasy: undefined protFile' )
+        return None
+    #end if
+    
+    if not os.path.exists( seqFile ):
+        nTerror('importXeasy: seqFile "%s" not found', seqFile )
+        return None
+    #end if
+    if not os.path.exists( protFile ):
+        nTerror('importXeasy: protFile "%s" not found', protFile )
+        return None
+    #end if
+    
+    if not project.molecule:
+        nTerror('importXeasy: No molecule defined' )
+        return None
+    #end if
+    
+    #       Parse the seq file and prot file
+    project.xeasy = Xeasy( seqFile, protFile, convention = convention   )
+    #       Append the shifts to molecule
+    project.xeasy.appendShifts( project.molecule   )
+    
+    project.addHistory( sprintf('Imported Xeasy shifts from "%s"', protFile ) )
+    
+    if project.xeasy.error:
+        # GWV please check. Did you mean to show an error here?
+        # I just kept it to the message level and changed the token error to problem.
+        nTmessage( '==> importXeasy: problem(s) appending resonances from "%s"', protFile )
+    else:
+        nTmessage( '==> importXeasy: appended resonances from "%s"', protFile )
+    #end if
+    #            nTmessage( '%s', project.molecule.format() )
+    return len(project.molecule.resonanceSources)-1
 #end def
 
 def importXeasyPeaks( project, seqFile, protFile, peakFile, convention ):
-        """Import peaks from Xeasy peakFile; requires matching seqFile,protFile
-        return PeakList instance or None on error
-        """
-        if seqFile == None:
-            nTerror('importXeasyPeaks: undefined seqFile' )
-            return None
-        #end if
-        if protFile == None:
-            nTerror('importXeasyPeaks: undefined protFile' )
-            return None
-        #end if
-        if peakFile == None:
-            nTerror('importXeasyPeaks: undefined peakFile' )
-            return None
-        #end if
-        if not os.path.exists( seqFile ):
-            nTerror('importXeasyPeaks: seqFile "%s" not found', seqFile )
-            return None
-        #end if
-        if not os.path.exists( protFile ):
-            nTerror('importXeasyPeaks: protFile "%s" not found', protFile )
-            return None
-        #end if
-        if not os.path.exists( peakFile ):
-            nTerror('importXeasyPeaks: peakFile "%s" not found', peakFile )
-            return None
-        #end if
+    """
+    Import peaks from Xeasy peakFile; requires matching seqFile,protFile
+    return PeakList instance or None on error
+    """
+    if seqFile == None:
+        nTerror('importXeasyPeaks: undefined seqFile' )
+        return None
+    #end if
+    if protFile == None:
+        nTerror('importXeasyPeaks: undefined protFile' )
+        return None
+    #end if
+    if peakFile == None:
+        nTerror('importXeasyPeaks: undefined peakFile' )
+        return None
+    #end if
+    if not os.path.exists( seqFile ):
+        nTerror('importXeasyPeaks: seqFile "%s" not found', seqFile )
+        return None
+    #end if
+    if not os.path.exists( protFile ):
+        nTerror('importXeasyPeaks: protFile "%s" not found', protFile )
+        return None
+    #end if
+    if not os.path.exists( peakFile ):
+        nTerror('importXeasyPeaks: peakFile "%s" not found', peakFile )
+        return None
+    #end if
 
-        if not project.molecule:
-            nTerror('importXeasyPeaks: No molecule defined' )
-            return None
-        #end if
+    if not project.molecule:
+        nTerror('importXeasyPeaks: No molecule defined' )
+        return None
+    #end if
 
 #       Parse the seq file and prot file
-        project.xeasy = Xeasy( seqFile, protFile, convention = convention   )
+    project.xeasy = Xeasy( seqFile, protFile, convention = convention   )
 #       Extract the peaks
-        peaks = project.xeasy.importPeaks( project.molecule, peakFile   )
+    peaks = project.xeasy.importPeaks( project.molecule, peakFile   )
 #       Append to project
-        project.peaks.append( peaks )
+    project.peaks.append( peaks )
 
-        project.addHistory( sprintf('Imported Xeasy peaks from "%s"', peakFile ) )
+    project.addHistory( sprintf('Imported Xeasy peaks from "%s"', peakFile ) )
 
-        if project.xeasy.error:
-            nTmessage( '==> importXeasyPeaks: new %s from "%s" completed with error(s)', peaks, peakFile )
-        else:
-            nTmessage( '==> importXeasyPeaks: new %s from "%s"', peaks, peakFile )
-        #end if
-        return peaks
+    if project.xeasy.error:
+        nTmessage( '==> importXeasyPeaks: new %s from "%s" completed with error(s)', peaks, peakFile )
+    else:
+        nTmessage( '==> importXeasyPeaks: new %s from "%s"', peaks, peakFile )
+    #end if
+    return peaks
 #end def
 
 def export2Xeasy( project, tmp=None ):
-        """Export to shift and peaks to Xeasy in CYANA and CYANA2 formats
-        """
-        for molName in project.moleculeNames:
+    """
+    Export to shift and peaks to Xeasy in CYANA and CYANA2 formats
+    """
+    for molName in project.moleculeNames:
+        #Xeasy/Cyana 1.x format
+        fileName = project.path( project.directories.xeasy, project[molName].name )
+        exportShifts2Xeasy(  project[molName],
+                             seqFile=fileName+'.seq',
+                             protFile=fileName+'.prot',
+                             convention=CYANA,
+
+                          )
+        #Cyana 2.x format
+        fileName = project.path( project.directories.xeasy2, project[molName].name )
+        exportShifts2Xeasy(  project[molName],
+                             seqFile=fileName+'.seq',
+                             protFile=fileName+'.prot',
+                             convention=CYANA2,
+
+                          )
+    #end if
+
+    idx = 1
+    for pl in project.peaks:
+        if (pl.status == 'keep'):
+            #print '>', pl, idx
+            # add xeasyIndex to peak, go in steps of 10000 for succesive
+            # peaklists
+            for peak in pl:
+                peak.xeasyIndex = idx
+                idx += 1
+            #end for
+            while (idx%10000):
+                idx += 1
+
             #Xeasy/Cyana 1.x format
-            fileName = project.path( project.directories.xeasy, project[molName].name )
-            exportShifts2Xeasy(  project[molName],
-                                 seqFile=fileName+'.seq',
-                                 protFile=fileName+'.prot',
-                                 convention=CYANA,
-
-                              )
+            peakFile = project.path( project.directories.xeasy, pl.name+'.peaks' )
+            exportPeaks2Xeasy( pl, peakFile)
             #Cyana 2.x format
-            fileName = project.path( project.directories.xeasy2, project[molName].name )
-            exportShifts2Xeasy(  project[molName],
-                                 seqFile=fileName+'.seq',
-                                 protFile=fileName+'.prot',
-                                 convention=CYANA2,
-
-                              )
+            peakFile = project.path( project.directories.xeasy2, pl.name+'.peaks' )
+            exportPeaks2Xeasy( pl, peakFile)
         #end if
-
-        idx = 1
-        for pl in project.peaks:
-            if (pl.status == 'keep'):
-                #print '>', pl, idx
-                # add xeasyIndex to peak, go in steps of 10000 for succesive
-                # peaklists
-                for peak in pl:
-                    peak.xeasyIndex = idx
-                    idx += 1
-                #end for
-                while (idx%10000):
-                    idx += 1
-
-                #Xeasy/Cyana 1.x format
-                peakFile = project.path( project.directories.xeasy, pl.name+'.peaks' )
-                exportPeaks2Xeasy( pl, peakFile)
-                #Cyana 2.x format
-                peakFile = project.path( project.directories.xeasy2, pl.name+'.peaks' )
-                exportPeaks2Xeasy( pl, peakFile)
-            #end if
-        #end for
+    #end for
 #end def
 
 # register the functions

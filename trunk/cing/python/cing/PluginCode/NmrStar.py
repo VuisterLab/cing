@@ -81,7 +81,7 @@ class NmrStar():
         nTmessage("==> Running Wim Vranken's FormatConverter from script %s" % scriptFileName )
         exitCode = convertProgram("%s %s %s" % (projectName, inputDir, fileName))
         if exitCode:
-            nTerror("Failed convertProgram with exit code: " + `exitCode`)
+            nTerror("Failed convertProgram with exit code: " + repr(exitCode))
             return
         if not os.path.exists(fileName):
             nTerror("Failed to find result file [%s]" % fileName)

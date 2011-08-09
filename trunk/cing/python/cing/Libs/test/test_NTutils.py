@@ -19,10 +19,10 @@ class AllChecks(TestCase):
     def testRemoveRecursivelyAttribute(self):
         testDict = { 0: 1, "ccpn": 77}
         self.assertEqual(len(testDict.keys()), 2)
-        nTdebug(`testDict`)
+        nTdebug(repr(testDict))
         removeRecursivelyAttribute(testDict, "ccpn")
         self.assertEqual(len(testDict.keys()), 1)
-        nTdebug(`testDict`)
+        nTdebug(repr(testDict))
 
 
     def test_NTutils(self):

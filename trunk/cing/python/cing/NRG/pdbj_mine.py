@@ -7,9 +7,9 @@ import csv
 import urllib
 
 STACKTRACE_LENGHT_MIN = 1000
-'Number of characters to constitute a stacktrace'
+# Number of characters to constitute a stacktrace
 STACKTRACE_COMPONENT = 'at mine.SqlServlet.doPost'
-'Mandatory part of stacktrace used to id it.'
+# Mandatory part of stacktrace used to id it.
 
 
 def postQuery(sql_query, saveCsvFile = None, base_url='http://service.pdbj.org/mine/sql'):

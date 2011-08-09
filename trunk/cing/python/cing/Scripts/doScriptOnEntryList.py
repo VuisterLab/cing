@@ -7,11 +7,9 @@ from cing.Libs.forkoff import ForkOff
 from cing.Libs.forkoff import do_cmd
 from random import shuffle
 
-"""
-NB
-- Doing procheck on MacOSX.5.3/MacBook Pro best performance is
-for when using 3 processes.
-"""
+# Doing procheck on MacOSX.5.3/MacBook Pro best performance is
+# for when using 3 processes.
+
 START_ENTRY_ID                 = 0 # default 0
 MAX_ENTRIES_TODO               = 999 # default a ridiculously large number like 999999
 

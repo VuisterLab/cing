@@ -40,7 +40,7 @@ def printSequenceFromCcpnProject(ccpnProject):
     for res in firstChain.sortedResidues():
         code1Letter = res.molResidue.chemComp.code1Letter
         if not code1Letter:
-          code1Letter = defaultPrintChainCode
+            code1Letter = defaultPrintChainCode
 
         fastaString += code1Letter
         nTmessageNoEOL('%s%s ' % (res.ccpCode, res.seqCode))
@@ -51,7 +51,7 @@ def printSequenceFromCcpnProject(ccpnProject):
     nTmessage(fastaString)
 
 def importPseudoPdb(ccpnProject, inputDir, guiRoot, allowPopups=1, minimalPrompts=0, verbose=1, **presets):
-    nTdebug("Using presets %s" % `presets`)
+    nTdebug("Using presets %s" % repr(presets))
     formatPseudoPdb = PseudoPdbFormat(ccpnProject, guiRoot, verbose=verbose, minimalPrompts=minimalPrompts, allowPopups=allowPopups)
     nmrProject = ccpnProject.currentNmrProject
 #        nmrProject = project.newNmrProject(name=project.name)
@@ -85,11 +85,11 @@ def importPseudoPdb(ccpnProject, inputDir, guiRoot, allowPopups=1, minimalPrompt
     fileList = glob(globPattern)
     nTdebug("From %s will read files: %s" % (globPattern, fileList))
     if len(fileList) != 1:
-        nTerror("Failed to find single PDB file; instead found list: %s" % `fileList`)
+        nTerror("Failed to find single PDB file; instead found list: %s" % repr(fileList))
         return True
 
     keywds = getDeepByKeysOrDefault(presets, {}, READ_COORDINATES, KEYWORDS)
-    nTdebug("In importPseudoPdb: from getDeepByKeysOrDefault keywds: %s" % `keywds`)
+    nTdebug("In importPseudoPdb: from getDeepByKeysOrDefault keywds: %s" % repr(keywds))
     reportDifference(ccpnProject, fileList[0])
 
     status = formatPseudoPdb.readCoordinates(fileList, strucGen=structureGeneration, linkAtoms=0, swapFirstNumberAtom=1,
@@ -122,7 +122,7 @@ def swapCheck(nmrConstraintStore,structureEnsemble,numSwapCheckRuns=1):
 
     for _swapCheckRun in range(0,numSwapCheckRuns):
 #      swapCheck.checkSwapsAndClean(violationCodes = violationCodes)
-      swapCheck.checkSwapsAndClean()
+        swapCheck.checkSwapsAndClean()
 
     nTmessage("\n")
 # end def

@@ -6,6 +6,7 @@ from cing.Libs.disk import tail
 from unittest import TestCase
 import unittest
 
+
 class AllChecks(TestCase):
     # important to switch to temp space before starting to generate files for the project.
     cingDirTmpTest = os.path.join( cingDirTmp, 'test_disk' )
@@ -22,7 +23,7 @@ class AllChecks(TestCase):
         lastLineList = tail(f2,1)
         lastLine = lastLineList[0]
         self.assertEquals( "Line 9", lastLine )
-        self.assertEquals( "['Line 9']", `lastLineList` ) # not necessary a test.
+        self.assertEquals( "['Line 9']", repr(lastLineList) ) # not necessary a test.
 
     def testGlobLast(self):
         globPattern = os.path.join(cingRoot, '*.txt')

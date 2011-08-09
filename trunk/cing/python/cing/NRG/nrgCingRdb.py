@@ -32,13 +32,13 @@ PLOT_REGRESSION_LINE = 'plotRegressionLine'
 REGRESSION_LINEAR = 'linear'
 DIVIDE_BY_RESIDUE_COUNT = 'divideByResiduecount'
 ONLY_PROTEIN = 'onlyProtein'
-'Only protein means that no other polymer types than xxx may be present; ligands are fine.'
+#'Only protein means that no other polymer types than xxx may be present; ligands are fine.'
 ONLY_SELECTION = 'onlySelection'
 DO_TRENDING = 'doTrending'
 ENTRY_SET_ID = 'entrySetId'
-'Used to filter for different sets of selected entries.'
+#'Used to filter for different sets of selected entries.'
 ONLY_NON_ZERO = 'onlyNonZero'
-'Filter out entities that have a zero float/int value'
+#'Filter out entities that have a zero float/int value'
 PDBJ_ENTRY_ID_STR = 'pdbid'
 DEPOSITION_DATE_STR = 'deposition_date'
 NO_LEGEND_STR = 'noLegend'
@@ -692,8 +692,8 @@ AND '{2}' <@ S.chain_type; -- contains at least one protein chain.
                     entry_name = entry_name.replace('Piscataway2','')
                     entry_name = entry_name.replace('Piscataway','')
                     if not entry_name_map.has_key(entry_name):
-                         entry_name_map[ entry_name ] = len( entry_name_map.keys())
-                         floatValueLoLoL.append(([],[]))
+                        entry_name_map[ entry_name ] = len( entry_name_map.keys())
+                        floatValueLoLoL.append(([],[]))
                     entryIdx = entry_name_map.get( entry_name )
                     floatValueLoL = floatValueLoLoL[entryIdx]
                     level_idx = floatValueL_x[level_pos]
@@ -1145,12 +1145,6 @@ AND '{2}' <@ S.chain_type; -- contains at least one protein chain.
 
     def plotQualityPcVsColor(self):
         m = self
-        """
-        pc_rama_core                      FLOAT DEFAULT NULL,
-        pc_rama_allow                     FLOAT DEFAULT NULL,
-        pc_rama_gener                     FLOAT DEFAULT NULL,
-        pc_rama_disall                    FLOAT DEFAULT NULL
-        """
         elementNameList = 'pc_rama_core pc_rama_allow pc_rama_gener pc_rama_disall'.split()
         colorNameList = 'green orange red'.split()
 

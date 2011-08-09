@@ -16,6 +16,7 @@ Residue
     procheck: NTdict instance with procheck values for this residue
 
 """
+
 from cing import cingPythonCingDir
 from cing.Libs import disk
 from cing.Libs.AwkLike import AwkLike
@@ -298,7 +299,7 @@ B   7 U   999.900 999.900 999.900 999.900 999.900 999.900   0.000   1.932 999.90
         self.redirectOutput = True
 #        if cing.verbosity >= verbosityDebug: # Done debugging.
 #            self.redirectOutput=False
-#        nTdebug("Will redirect procheck output: " + `self.redirectOutput`)
+#        nTdebug("Will redirect procheck output: " + repr(self.redirectOutput))
         self.procheck  = ExecuteProgram('./' + self.procheckScript,
                                         rootPath = self.rootPath,
                                         redirectOutput= self.redirectOutput
@@ -696,8 +697,9 @@ def runProcheck(project, ranges=None, createPlots=True, runAqua=True, parseOnly 
 
     if not project.molecule.hasAminoAcid():
 #    if len(project.molecule.residuesWithProperties('protein')) == 0:
-           nTmessage("Skipping procheck as there is no protein in the current molecule")
-           return
+        nTmessage("Skipping procheck as there is no protein in the current molecule")
+        return
+    # end if
     if project.molecule.has_key(PROCHECK_STR):
         del(project.molecule[PROCHECK_STR])
     #end if

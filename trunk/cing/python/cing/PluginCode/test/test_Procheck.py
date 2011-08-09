@@ -101,7 +101,7 @@ class AllChecks(TestCase):
 
         if showProcheckResults:
             for res in project.molecule.allResidues():
-                nTdebug(`res` +" "+ `res.procheck.secStruct`)
+                nTdebug(repr(res) +" "+ repr(res.procheck.secStruct))
 
 if __name__ == "__main__":
     cing.verbosity = verbosityDebug

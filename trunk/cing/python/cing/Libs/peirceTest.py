@@ -1,49 +1,49 @@
 from cing.Libs.NTutils import * #@UnusedWildImport
 
 
-"""
-    Perform a Peirce test for outliers.
-    2 < len( valueList ) <= 60
-
-    Based upon:
-        Ross, S.M., "Peirce's criterion for the elimination of suspect
-        experimental data" J. Engineering Technology, 2003
-
-    AWSS: since it's limited to 60 elements, now valueList breaks down in
-        lists of 60 elements (if less, no problem), and if there's remainder
-        from len(valueList) % 60, then a list with the last 60 elements is
-        appended to listOfnewValues. So a pierceTest is done over each list
-        of 60 elements and newValues and outliers list are updated
-        accordingly.
-
-    JFD: I think the previous workaround for the lack of Peirce data beyond
-        the 60th element should be improved. In the previous workaround it
-        could happen that a small sublist gets analyzed and an
-        item would not be identified as a outlier whereas it would if it
-        was considered in the scope of the full list.
-        Since the shape of the items are so monotonous a simple extrapolation
-        was implemented.
-
-        Let the "Number of doubtful observations" be called y and the number of
-        total observations is called x.
-
-        A- R[x][y] is approximately 1 sigma at the right hand side of the table.
-            R[x][y] for when y>9 is simply estimated to be R[x][9] - (y-9)*delta(x).
-            with delta(x) defined such that R[x][x/2]=1.
-            Only extend the table on the right to have x/2 number of columns.
-            x/2 is less wide than the first rows suggest. Extending the table
-            only starts at row 20.
-        B- R[x][y] can be estimated to be R[60][y] for x over 60. This results in
-            only slightly fewer outliers to be identified than when the serie
-            would be correctly expanded.
-            E.g. when x = 10E6 R[10E6][1] is equated to R[60][1] (2.663)
-        C- For calculating the missing values such as R[10E6][10E2] the above
-            is combined.
-
-        Obviously, also this workaround might report less outliers but it will
-        report more than the first workaround as higher R's are used.
-"""
 class Peirce:
+    """
+        Perform a Peirce test for outliers.
+        2 < len( valueList ) <= 60
+    
+        Based upon:
+            Ross, S.M., "Peirce's criterion for the elimination of suspect
+            experimental data" J. Engineering Technology, 2003
+    
+        AWSS: since it's limited to 60 elements, now valueList breaks down in
+            lists of 60 elements (if less, no problem), and if there's remainder
+            from len(valueList) % 60, then a list with the last 60 elements is
+            appended to listOfnewValues. So a pierceTest is done over each list
+            of 60 elements and newValues and outliers list are updated
+            accordingly.
+    
+        JFD: I think the previous workaround for the lack of Peirce data beyond
+            the 60th element should be improved. In the previous workaround it
+            could happen that a small sublist gets analyzed and an
+            item would not be identified as a outlier whereas it would if it
+            was considered in the scope of the full list.
+            Since the shape of the items are so monotonous a simple extrapolation
+            was implemented.
+    
+            Let the "Number of doubtful observations" be called y and the number of
+            total observations is called x.
+    
+            A- R[x][y] is approximately 1 sigma at the right hand side of the table.
+                R[x][y] for when y>9 is simply estimated to be R[x][9] - (y-9)*delta(x).
+                with delta(x) defined such that R[x][x/2]=1.
+                Only extend the table on the right to have x/2 number of columns.
+                x/2 is less wide than the first rows suggest. Extending the table
+                only starts at row 20.
+            B- R[x][y] can be estimated to be R[60][y] for x over 60. This results in
+                only slightly fewer outliers to be identified than when the serie
+                would be correctly expanded.
+                E.g. when x = 10E6 R[10E6][1] is equated to R[60][1] (2.663)
+            C- For calculating the missing values such as R[10E6][10E2] the above
+                is combined.
+    
+            Obviously, also this workaround might report less outliers but it will
+            report more than the first workaround as higher R's are used.
+    """
     def __init__(self):
         #
         # PEIRCE'S CRITERION TABLE, R; ONE MEASURED QUANTITY
@@ -135,15 +135,15 @@ class Peirce:
         # row>=20 and we need delta to get an R value close to 1.
         if y >= x/2:
             # TODO: but let's not focus our attention on it now.
-#            nTdebug("Cing was trying to remove from a set of "+`x`+" values an unexpected high number of outliers: "+`y`+" this is impossible")
+#            nTdebug("Cing was trying to remove from a set of "+repr(x)+" values an unexpected high number of outliers: "+repr(y)+" this is impossible")
             return None
 
         lastValue = self.peirce[row][-1]
         maxWidth = x/2
         delta = (lastValue - 1.)/(maxWidth-9) # float semantics needs to be enforced.
         R = lastValue - (y-9)*delta
-#        nTdebug("delta: "+`delta`)
-#        nTdebug("R    : "+`R`)
+#        nTdebug("delta: "+repr(delta))
+#        nTdebug("R    : "+repr(R))
         return R
 
 
@@ -181,21 +181,21 @@ class Peirce:
         for newValuesList in listOfnewValues:
 #            nTdebug(newValuesList)
             newValuesList.average(byItem=1)
-#            nTdebug("av: " + `newValuesList.av`)
-#            nTdebug("sd: " + `newValuesList.sd`)
+#            nTdebug("av: " + repr(newValuesList.av))
+#            nTdebug("sd: " + repr(newValuesList.sd))
             newL = len(newValuesList)
             notDone   = True
             nOutliers = 0
             while notDone and nOutliers < len( self.peirce[newL] ):
                 R = self.peirce[newL][nOutliers]
-#                nTdebug("nOutliers: "+ `nOutliers` )
-#                nTdebug("R        : "+ `R`)
+#                nTdebug("nOutliers: "+ repr(nOutliers) )
+#                nTdebug("R        : "+ repr(R))
                 maxDeviation = R * newValuesList.sd
                 n = 0
                 for item in newValuesList:
                     i,v = item
                     if ( math.fabs( v-newValuesList.av ) > maxDeviation ):
-#                        nTdebug("Removing item: " + `i` + ", " + `v`)
+#                        nTdebug("Removing item: " + repr(i) + ", " + repr(v))
                         try:
                             newValues.remove( item )
                             outliers.append( item )
@@ -237,8 +237,8 @@ class Peirce:
         newValues.average(byItem=1)
         sd = newValues.sd # not to be changed until the end.
         av = newValues.av # not to be changed until the end.
-#        nTdebug("av: " + `av`)
-#        nTdebug("sd: " + `sd`)
+#        nTdebug("av: " + repr(av))
+#        nTdebug("sd: " + repr(sd))
 
         if x<3:
 #            nTdebug("Peirce test called with less than 3 values.")
@@ -255,15 +255,15 @@ class Peirce:
 #                return None
                 break
             maxDeviation = R * sd
-#            nTdebug("R : " + `R`)
-#            nTdebug("md: " + `maxDeviation`)
+#            nTdebug("R : " + repr(R))
+#            nTdebug("md: " + repr(maxDeviation))
 
             c = len(newValues)-1 # Start at the end of the list because deletions in lists are easiest (optimal) that way.
             while c>=0:
                 item = newValues[c]
                 i,v = item
                 if ( math.fabs( v-av ) > maxDeviation ):
-#                    nTdebug("Removing: " + `i` + "," + `v`)
+#                    nTdebug("Removing: " + repr(i) + "," + repr(v))
                     del newValues[ c ]
                     outliers.append( item )
                     y = len(outliers) # Keep it simple.

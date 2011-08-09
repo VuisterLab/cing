@@ -2,9 +2,6 @@
 Use akin linkNmrStarData.py, so e.g.:
 
 python -u $CINGROOT/python/cing/Scripts/FC/mergeNrgBmrbShifts.py 1ieh -bmrbCodes bmr4969 -raise -force
-
-Input from:
-Output to:
 """
 
 from cing import cingDirTmp
@@ -136,7 +133,7 @@ class MergeNrgBmrbShifts(DataHandler, NmrStarHandler):
                     break
                 self.bmrbCodes.append(sysArgValue)
         if not self.bmrbCodes:
-          raise self.DataHandlerError, "Need to pass in at least one BMRB code with -bmrbCodes flag for this script to work!"
+            raise self.DataHandlerError, "Need to pass in at least one BMRB code with -bmrbCodes flag for this script to work!"
 
 
 if __name__ == "__main__":

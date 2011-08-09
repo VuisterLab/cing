@@ -134,16 +134,16 @@ class ForkOff:
             verbosity               = self.verbosity
             )
 
-    """
-    Main loop
-    job_list should be of a list of tuples. The tuple should contain
-    a function and a tuple with one or more arguments.
-    E.g. [( my_sleep, (990.1,) ), ( my_sleep, (990.1,) )]
-    Returns a list of ids of processes (id is the index of the job in the list
-    of jobs) that were done AND done successfully.
-    Empty lists will be returned if nothing gets done successfully or an error occurs.
-    """
     def forkoff_start( self, job_list, delay_between_submitting_jobs=5 ):
+        """
+        Main loop
+        job_list should be of a list of tuples. The tuple should contain
+        a function and a tuple with one or more arguments.
+        E.g. [( my_sleep, (990.1,) ), ( my_sleep, (990.1,) )]
+        Returns a list of ids of processes (id is the index of the job in the list
+        of jobs) that were done AND done successfully.
+        Empty lists will be returned if nothing gets done successfully or an error occurs.
+        """
 
         if self.processes_max == None or self.processes_max < 1: # double but just to be clear.
             nTerror("Can't do jobs without having processes_max; processes_max: %s" % self.processes_max )
@@ -222,7 +222,7 @@ class ForkOff:
         ## Check if all finished correctly
         if self.processes_finished != self.processes_started:
             str = "ERROR: Number of processes finished and started do not match"
-            str += `self.processes_finished` + " " + `self.processes_started`
+            str += repr(self.processes_finished) + " " + repr(self.processes_started)
             raise str
 
         if self.verbosity > 1:
@@ -381,7 +381,7 @@ class Process:
         exit_status = 1
 
         if pid != 0:
-            str = "ERROR: code error in Fork, process_start, pid =" + `os.getpid()`
+            str = "ERROR: code error in Fork, process_start, pid =" + str(os.getpid())
             raise str
         if self.verbosity > 2:
             nTmessage("Starting subprocess with pid: %s" % os.getpid())

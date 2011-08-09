@@ -60,14 +60,14 @@ def importPlugin( pluginName ):
 
     pluginModule = None
     if isInstalled:
-    #    nTdebug("pluginCodeModulePackage looks like: " + `pluginCodeModulePackage`)
+    #    nTdebug("pluginCodeModulePackage looks like: " + repr(pluginCodeModulePackage))
 #        nTdebug('importPlugin: ' + pluginName )
         if not hasattr(pluginCodeModulePackage, pluginName):
-            nTerror("importPlugin: Expected an attribute pluginName: " + pluginName + " for package: " + `pluginCodeModulePackage`)
+            nTerror("importPlugin: Expected an attribute pluginName: " + pluginName + " for package: " + repr(pluginCodeModulePackage))
             return None
     #     set p to plugin module
         pluginModule = getattr( pluginCodeModulePackage, pluginName )
-    #    nTdebug("pluginModule looks like: " + `pluginModule`)
+    #    nTdebug("pluginModule looks like: " + repr(pluginModule))
 
     plugin = NTdict( module = pluginModule, name = pluginName, isInstalled = isInstalled )
     #end try
@@ -94,7 +94,7 @@ def importPlugin( pluginName ):
 # get all *.py files in plugin directory excluding __init__
 pluginDir = os.path.join(cingPythonCingDir, cingPaths.plugins)
 pluginFileList  = glob.glob( os.path.join(pluginDir, '*.py') )
-#nTdebug("found plugin file list: " + `pluginFileList`)
+#nTdebug("found plugin file list: " + repr(pluginFileList))
 pluginFileList.remove( os.path.join( pluginDir, '__init__.py') )
 
 # Moved control to plugin itself without this scattering dep.

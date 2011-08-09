@@ -118,7 +118,7 @@ class vCing(Lister):
 
 
     def refreshLock(self, lockname, lockTimeOut):
-        cmdTopos = ' '.join([self.toposProg, 'refreshLock', self.toposPool, lockname, `lockTimeOut`])
+        cmdTopos = ' '.join([self.toposProg, 'refreshLock', self.toposPool, lockname, repr(lockTimeOut)])
         nTdebug("In refreshLock doing [%s]" % cmdTopos)
         status, result = commands.getstatusoutput(cmdTopos)
         nTdebug("In refreshLock got status: %s and result (if any) [%s]" % (status, result))
@@ -148,7 +148,7 @@ class vCing(Lister):
 
     def nextTokenWithLock(self, lockTimeOut):
         "Returns status 1 for on error"
-        cmdTopos = ' '.join([self.toposProg, 'nextTokenWithLock', self.toposPool, `lockTimeOut`])
+        cmdTopos = ' '.join([self.toposProg, 'nextTokenWithLock', self.toposPool, repr(lockTimeOut)])
         nTdebug("In nextTokenWithLock doing [%s]" % cmdTopos)
         status, tokeninfo = commands.getstatusoutput(cmdTopos)
         if status:

@@ -6,9 +6,7 @@ from cing.STAR.Text import * #@UnusedWildImport
 import types
 
 
-"""
-Looped and free tags can not be mixed in same object.
-"""
+#Looped and free tags can not be mixed in same object.
 class TagTable (Lister):
     """
     In initializing the class a content has to be given!!!
@@ -45,10 +43,10 @@ class TagTable (Lister):
     def colCount(self):
         return len(self.tagnames)
     
-    "Returns the STAR text representation"
     def star_text ( self,
                     flavor                  = 'NMR-STAR'
                    ):
+        "Returns the STAR text representation"
         ## Info herein can be transferred to a STAR reference file too
         if flavor == None or flavor == 'NMR-STAR':
             # Number of spaces before the loop_ tag. 0 in CIF
@@ -255,11 +253,11 @@ class TagTable (Lister):
                     return None
         return result
 
-    """
-    A title identifying a tagtable by its tagnames
-    simply the space separated concatenation of the tag names
-    """
     def set_title ( self, defaultName = "Bla" ):
+        """
+        A title identifying a tagtable by its tagnames
+        simply the space separated concatenation of the tag names
+        """
         if self.verbosity >= 9:
             print 'Setting title of tagtable'
         self.title = defaultName
@@ -267,12 +265,12 @@ class TagTable (Lister):
             self.title = ''.join(self.tagnames)
 
 
-    """
-    Size and type checks to be extended
-    0 Only fast checks
-    9 Type checks of each element
-    """
     def check_integrity( self, check_type=0 ):
+        """
+        Size and type checks to be extended
+        0 Only fast checks
+        9 Type checks of each element
+        """
 
         names_length    = len(self.tagnames)
         values_length   = len(self.tagvalues)
@@ -311,21 +309,21 @@ class TagTable (Lister):
         return 0
 
 
-    """
-    - Parses text into a tagtable.
-    - Returns the position in the string with the first non-white space
-    character after the tagtable or the length of the text in case all
-    was parsed. Just to be explicit, if the tagtable is ended by a save_
-    then the starting position of the save_ will be returned.
-    - Assumption here is that ;; blocks are collapsed, see Text functions
-    - For speed purposes I scan ahead to see how far I can go before
-    hitting a quoted tag value. I estimate in the large tables only 1 in
-    1000 has a ;; block and only 1 in 5-10 has '' or "" block. For the part
-    that is not quoted the parsing can be really fast.
-    """
     def parse(  self,
                 text      = '',
                 pos       = 0 ):
+        """
+        - Parses text into a tagtable.
+        - Returns the position in the string with the first non-white space
+        character after the tagtable or the length of the text in case all
+        was parsed. Just to be explicit, if the tagtable is ended by a save_
+        then the starting position of the save_ will be returned.
+        - Assumption here is that ;; blocks are collapsed, see Text functions
+        - For speed purposes I scan ahead to see how far I can go before
+        hitting a quoted tag value. I estimate in the large tables only 1 in
+        1000 has a ;; block and only 1 in 5-10 has '' or "" block. For the part
+        that is not quoted the parsing can be really fast.
+        """
         ## Parse free tagtable reading all tag name/value pairs
         if self.free:
             pos = self._tagtable_free_parse( text, pos )
@@ -423,12 +421,11 @@ class TagTable (Lister):
         return pos
 
 
-    """
-    Parse names and values of free tagtable loop from pos
-    returns new position alias status (None for failure)
-    """
     def _tagtable_free_parse( self, text, pos ):
-
+        """
+        Parse names and values of free tagtable loop from pos
+        returns new position alias status (None for failure)
+        """
         text_length = len(text)
 
         while pos < text_length - 1:
@@ -459,11 +456,11 @@ class TagTable (Lister):
         return pos
 
 
-    """
-    Parse values of tagtable loop from pos to pos_end
-    returns status (None for success, 1 for failure)
-    """
     def _tagtable_loop_values_parse( self, text, pos, pos_end):
+        """
+        Parse values of tagtable loop from pos to pos_end
+        returns status (None for success, 1 for failure)
+        """
 
         if self.free:
             print "ERROR: This is a 'free' tagtable, only looped tagtable can be parsed"

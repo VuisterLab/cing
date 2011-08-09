@@ -115,7 +115,7 @@ class AllChecks(TestCase):
         for i, interpolationTypeIsNearest in enumerate( [True, False] ):
             testList = testLoL[i]
             for testTuple in testList:
-                nTdebug( 'testing (interpolationTypeIsNearest %s) %s' % (interpolationTypeIsNearest, `testTuple`))
+                nTdebug( 'testing (interpolationTypeIsNearest %s) %s' % (interpolationTypeIsNearest, repr(testTuple)))
                 qr, qc, resultExpected = testTuple
                 tx = ogrid[ qr:qr:1j, qc:qc:1j ]
                 f = interpn_linear

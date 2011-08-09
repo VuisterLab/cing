@@ -35,12 +35,12 @@ doScriptOnEntryList(pythonScriptFileName,
                     expectPdbEntryList = False,
                     extraArgList = extraArgList)
 
-"""
-Alternatively to the strategy above use a simple loop that
-does not put the log files nicely into separate directories etc.
-NOT USED AFTER MOVED HERE.
-"""
 def annotateLoop():
+    """
+    Alternatively to the strategy above use a simple loop that
+    does not put the log files nicely into separate directories etc.
+    NOT USED AFTER MOVED HERE.
+    """
     maxCities = 100
     maxEntries = 100
     entryList = ['CGR26A']

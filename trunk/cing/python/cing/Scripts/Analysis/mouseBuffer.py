@@ -29,4 +29,4 @@ print firstPeak
 peakI = firstPeak.peakIntensities
 print peakI
 
-firstPeak.details
+print firstPeak.details

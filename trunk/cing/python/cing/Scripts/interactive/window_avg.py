@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+#@PydevCodeAnalysisIgnore # pylint: disable-all
 from cing.Libs.NTutils import nTdebug
 import cing
 import numpy

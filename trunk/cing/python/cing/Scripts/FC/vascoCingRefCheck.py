@@ -215,11 +215,11 @@ class VascoCingReferenceCheck(VascoReferenceCheck):
             accessibility = returnFloat(accessibilityStr)
             d = self.allWhatIfInfo['chains']
             if not d.has_key(chainCode):
-                   d[chainCode] = {}
+                d[chainCode] = {}
             if not d[chainCode].has_key(seqKey):                
-                   d[chainCode][seqKey] = {'hasBadAtoms': False, 'resLabel': resLabel, 'atoms': {}}
+                d[chainCode][seqKey] = {'hasBadAtoms': False, 'resLabel': resLabel, 'atoms': {}}
             if not d[chainCode][seqKey]['atoms'].has_key(atomName):
-                   d[chainCode][seqKey]['atoms'][atomName] = []
+                d[chainCode][seqKey]['atoms'][atomName] = []
 
             d[chainCode][seqKey]['atoms'][atomName].append(accessibility)
             atomsRead += 1

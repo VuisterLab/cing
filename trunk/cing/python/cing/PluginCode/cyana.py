@@ -145,7 +145,7 @@ def importAco( project, acoFile ):
 
     if errorCount:
         nTerror("Found number of errors importing upl file: %s" % errorCount)
-#    nTmessage("Imported items: " + `len(result)`)
+#    nTmessage("Imported items: " + repr(len(result)))
     nTmessage('==> importAco: new %s from "%s"', result, acoFile )
     return result
 #end def
@@ -272,7 +272,7 @@ def importUpl( project, uplFile, convention, lower = 0.0 ):
         atmList = []
 #        i=0
         for atmIdx in atmIdxList:
-#            nTdebug("Doing atmIdx: " + `atmIdx`)
+#            nTdebug("Doing atmIdx: " + repr(atmIdx))
             t = (line.int(atmIdx[0]), line.dollar[atmIdx[1]])
             atm = None
             if atomDict.has_key(t):
@@ -294,8 +294,8 @@ def importUpl( project, uplFile, convention, lower = 0.0 ):
         # Unpack convenience variables.
         atm1 = atmList[0]
         atm2 = atmList[1]
-#        nTdebug("atom 1: " + `atm1`)
-#        nTdebug("atom 2: " + `atm2`)
+#        nTdebug("atom 1: " + repr(atm1))
+#        nTdebug("atom 2: " + repr(atm2))
         upper = line.float(7)
         if not upper:
             nTerror("Skipping line without valid upper bound on line: [" + line.dollar[0]+']')
@@ -320,7 +320,7 @@ def importUpl( project, uplFile, convention, lower = 0.0 ):
     if errorCount:
         nTerror("Found number of errors importing upl file: %s" % errorCount)
 
-#    nTmessage("Imported upl items: " + `len(result)`)
+#    nTmessage("Imported upl items: " + repr(len(result)))
     nTmessage('==> importUpl: new %s from "%s"', result, uplFile )
     return result
 #end def
@@ -441,7 +441,7 @@ def cyana2cing( project, cyanaDirectory, convention=CYANA2, copy2sources=True, u
         kwds.setdefault(f,  [])
         if isinstance( kwds[f], str ):
             kwds[f] = kwds[f].split(',')
-#    nTdebug( '>>'+ `kwds` )
+#    nTdebug( '>>'+ repr(kwds) )
 
     # look for pdb, initiate new Molecule instance.
     # This goes first so that peaks, upls and acos refer to this molecule

@@ -66,7 +66,7 @@ def sendRequest(url, fields, files):
     response = urlOpen(request)
 
     if not response:
-      return
+        return
 
     jsonTxt = response.read()
 
@@ -80,29 +80,26 @@ def sendRequest(url, fields, files):
     return result
 
 def urlOpen(request):
-
     try:
         response = urllib2.urlopen(request)
-
     except urllib2.URLError, e:
         if hasattr(e, 'reason'):
             if isinstance(request, urllib2.Request):
-              url = request.get_full_url()
+                url = request.get_full_url()
             else:
-              url = request
-
+                url = request
+            # end if
             msg = 'Connection to server URL %s failed with reason:\n%s' % (url, e.reason)
-
         elif hasattr(e, 'code'):
             msg =    'Server request failed and returned code:\n%s' % e.code
-
         else:
             msg = 'Server totally barfed with no reason or fail code'
-
+        # end if
         nTwarning('Failure %s'% msg)
         return
-
+    # end try
     return response
+# end def
 
 def _processResponse(text):
     """Convert the strings the iCingServer sends back into Python
@@ -115,15 +112,12 @@ def _processResponse(text):
     dataDict = {}
 
     for pair in text.split('","'):
-      data = pair.split('":"')
-
-      if len(data) == 2:
-        key , value = data
-        dataDict[key] = value
-      else:
-        print "Trouble",  pair
-
-
+        data = pair.split('":"')      
+        if len(data) == 2:
+            key , value = data
+            dataDict[key] = value
+        else:
+            print "Trouble",  pair
     return dataDict
 
 #########################################################################################

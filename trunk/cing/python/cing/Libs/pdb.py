@@ -566,7 +566,7 @@ class MatchGame:
         #end if
 
         if not res.db:
-            nTerror('_matchAtom2Cing: undefined parent residue DB'),
+            nTerror('_matchAtom2Cing: undefined parent residue DB')
             return None
         #end if
 

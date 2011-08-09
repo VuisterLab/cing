@@ -88,16 +88,16 @@ def compareShifts(projectA, projectB):
                     (a1.isCarbon() and math.fabs(a1.delta) >= limits[1]) or
                     (a1.isNitrogen() and math.fabs(a1.delta) >= limits[2])
                    ):
-                   doPrint = True
-                   swapText = sprintf('%7.3f ', a1.delta)
+                    doPrint = True
+                    swapText = sprintf('%7.3f ', a1.delta)
                 #end if
             # check for altered assignment
             if a1.delta and a1.deltaPC and a1.pc.delta and a1.pc.deltaPC:
                 if (math.fabs(a1.deltaPC) + math.fabs(a1.pc.deltaPC) <
                     math.fabs(a1.delta) + math.fabs(a1.pc.delta)
                    ):
-                   doPrint = True
-                   swapText = sprintf("%7.3f >> Potential Swapped assignment %s and %s", a1.deltaPC, a1.map, a1.pc.map)
+                    doPrint = True
+                    swapText = sprintf("%7.3f >> Potential Swapped assignment %s and %s", a1.deltaPC, a1.map, a1.pc.map)
             #end if
             if doPrint:
                 printf('%s  %s    %s    %7.3f  %s\n', identity, printatom(a1), printatom(a2), a1.delta, swapText)

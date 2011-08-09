@@ -11,7 +11,7 @@ import getopt
 import pycurl
 
 def usage():
-  nTerror( """usage:
+    nTerror( """usage:
   toposcmd --url <url> create-realm
   toposcmd --realm <realm> --pool <pool> create-tokens <token1> <token2> ...
   toposcmd --realm <realm> --pool <pool> get-token-url

@@ -528,15 +528,15 @@ Sum                %s""" % (
         # end else
 
         if lk == 1:
-#            nTdebug("value : " + `value`)
+#            nTdebug("value : " + repr(value))
             return value
         if hasattr(value, 'getDeepByKeys'):
 #            nTdebug("Going one level deeper")
             reducedKeyList = keyList[1:]
 #            nTdebug("In NTdict.getDeepByKeys the value is not a NTdict or subclass instance,"+
 #                    " but there still are keys to go for digging deeper")
-#            nTdebug(" for value : [" + `value` +']')
-#            nTdebug(" type value: [" + `type(value)` +']')
+#            nTdebug(" for value : [" + repr(value) +']')
+#            nTdebug(" type value: [" + repr(type(value)) +']')
             return value.getDeepByKeys(*reducedKeyList)
         return None
     # end def
@@ -1734,7 +1734,7 @@ class NTdict(dict):
         Return None on success and True on error.
         """
         lk = len(keyList)
-#        nTdebug("Now in appendDeepByKeys with keyList: %s", `keyList`)
+#        nTdebug("Now in appendDeepByKeys with keyList: %s", repr(keyList))
         if not lk:
             nTerror("Can't appendDeepByKeys without any key")
             return True
@@ -1776,19 +1776,19 @@ class NTdict(dict):
         key = keyList[0]
 
         if not self.has_key(key):
-#          nTdebug("no key: " + `key`)
+#          nTdebug("no key: " + repr(key))
             return None
         value = self[key]
         if lk == 1:
-#          nTdebug("value : " + `value`)
+#          nTdebug("value : " + repr(value))
             return value
         if hasattr(value, 'getDeepByKeys'):
 #          nTdebug("Going one level deeper")
             reducedKeyList = keyList[1:]
             return value.getDeepByKeys(*reducedKeyList)
 #      nTdebug("In NTdict.getDeepByKeys the value is not a NTdict or subclass instance but there still are keys to go for digging deeper")
-#      nTdebug(" for value : [" + `value` +']')
-#      nTdebug(" type value: [" + `type(value)` +']')
+#      nTdebug(" for value : [" + repr(value) +']')
+#      nTdebug(" type value: [" + repr(type(value)) +']')
         return None
 
 
@@ -2513,7 +2513,7 @@ class NTvalue(NTdict):
         if self.value == None or isNaN(self.value):
             return '%s (+- %s)' % (NaNstring, NaNstring)
         if self.error == None or isNaN(self.error):
-#            return `self.value`+' (+- %s)' % (NaNstring)
+#            return repr(self.value)+' (+- %s)' % (NaNstring)
             # The problem here is of course that the whole fmt is lost if only the error is unknonw.
             # Added new parameter to init of this class to cover it.
             r = self.fmt2 % self.value
@@ -3453,7 +3453,7 @@ def xML2obj(path=None, string=None):
         nTerror("xML2obj: no input defined")
         return None
 
-#    nTdebug("Starting to read XML from path: " + `path`+ " or string: " + `string`)
+#    nTdebug("Starting to read XML from path: " + repr(path)+ " or string: " + repr(string))
     if path:
         doc = minidom.parse(path)
     else:
@@ -4101,7 +4101,7 @@ def formatList(theList, fmt = '%s\n'):
     """
     result = []
     for element in theList:
-#        nTdebug("Doing element: " +`element`)
+#        nTdebug("Doing element: " +repr(element))
         result.append(fmt%element.format())
     return ''.join(result)
 #end def
@@ -4196,7 +4196,7 @@ class ExecuteProgram(NTdict):
             code = os.system(cmd)
         else:
             pass
-#        nTdebug( "Got back from system the exit code: " + `code` )
+#        nTdebug( "Got back from system the exit code: " + repr(code) )
         return code
     # end def
 #end class
@@ -4432,7 +4432,7 @@ def appendDeepByKeys(c, value, *keyList):
         return True
 
     lk = len(keyList)
-#  nTdebug("Now in appendDeepByKeys with keyList: %s", `keyList`)
+#  nTdebug("Now in appendDeepByKeys with keyList: %s", repr(keyList))
     if not lk:
         nTerror("Can't appendDeepByKeys without any key")
         return True
@@ -4543,11 +4543,11 @@ def getDeepByKeys(c, *keyList):
 
     if isinstance(c, dict):
         if not c.has_key(key):
-#          nTdebug("no key: " + `key`)
+#          nTdebug("no key: " + repr(key))
             return None
         value = c[key]
         if lk == 1:
-#          nTdebug("value : " + `value`)
+#          nTdebug("value : " + repr(value))
             return value
 #      nTdebug("Going one level deeper")
         reducedKeyList = keyList[1:]
@@ -4558,16 +4558,16 @@ def getDeepByKeys(c, *keyList):
         return None
 
     if not isinstance(key, int):
-#      nTdebug("no int key in getDeepByKeys: " + `key`)
+#      nTdebug("no int key in getDeepByKeys: " + repr(key))
         return None
 
     if key >= len(c):
-#      nTdebug("int key in getDeepByKeys to large for this NTlist: " + `key`)
+#      nTdebug("int key in getDeepByKeys to large for this NTlist: " + repr(key))
         return None
 
     value = c[key]
     if lk == 1:
-#      nTdebug("value : " + `value`)
+#      nTdebug("value : " + repr(value))
         return value
 
 #  nTdebug("Going one level deeper")
@@ -4603,14 +4603,14 @@ def getDeepByKeysOrAttributes(c, *keyList):
 
     lk  = len(keyList)
     key = keyList[0]
-#    nTdebug("Found keyList: "+`keyList`)
+#    nTdebug("Found keyList: "+repr(keyList))
 #    nTdebug("Found key:     %s" % key)
     if isinstance(key, str):
         if key.find('.') > 0:
             keyListTruncated = list(keyList[1:]) # can only concatenate with list not tuple.
-#            nTdebug("Found keyListTruncated: "+`keyListTruncated`)
+#            nTdebug("Found keyListTruncated: "+repr(keyListTruncated))
             keyListTruncated = key.split('.') + keyListTruncated
-#            nTdebug("Found keyListTruncated expanded: "+`keyListTruncated`)
+#            nTdebug("Found keyListTruncated expanded: "+repr(keyListTruncated))
             return getDeepByKeysOrAttributes(c, *keyListTruncated)
     #nTdebug("getDeepByKeysOrAtributes: c:%s  keylist:%s  lk:%d  key: %s", c, keyList, lk, key)
 

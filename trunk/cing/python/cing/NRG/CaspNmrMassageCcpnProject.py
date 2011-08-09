@@ -136,7 +136,7 @@ def createTodoList(entryList, cityList, programHoH):
 
 #def getRangesForTarget(target):
 #    if target not in entryList:
-#        nTerror("Failed to find entryOrg [%s] in entryList %s" % (target, `entryList`))
+#        nTerror("Failed to find entryOrg [%s] in entryList %s" % (target, repr(entryList)))
 #        return None
 #    index = entryList.index(target)
 #    return rangesPsvsList[index]

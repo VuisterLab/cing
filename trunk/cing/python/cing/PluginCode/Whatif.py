@@ -622,19 +622,19 @@ RMS Z-scores, should be close to 1.0:
 
             else:
                 itemNTlist = curListDic[ keyWord ]
-#            nTdebug("a itemNTlist: "+`itemNTlist` )
+#            nTdebug("a itemNTlist: "+repr(itemNTlist) )
 
             if isTypeFloat:
                 itemNTlist[curModelId] = float(value)
             else:
                 itemNTlist[curModelId] = value
-#            nTdebug("c itemNTlist: "+`itemNTlist` )
+#            nTdebug("c itemNTlist: "+repr(itemNTlist) )
 #            nTdebug("For key       : "+key)
-#            nTdebug("For modelID   : "+`model`)
+#            nTdebug("For modelID   : "+repr(model))
 #            nTdebug("For value     : "+value)
-#            nTdebug("For check     : "+`curCheck`)
-#            nTdebug("For keyed list: "+`curCheck[key]`)
-#            nTdebug("For stored key: "+`curCheck[key][modelId]`)
+#            nTdebug("For check     : "+repr(curCheck))
+#            nTdebug("For keyed list: "+repr(curCheck[key]))
+#            nTdebug("For stored key: "+repr(curCheck[key][modelId]))
         #end for each line.
 
     def _processCheckdb( self   ):
@@ -673,8 +673,8 @@ RMS Z-scores, should be close to 1.0:
         selfLevels      = [ self.residues, self.atoms ]
         selfLevelChecks = [ self.residueSpecificChecks, self.atomSpecificChecks ]
         # sorting on mols, residues, and atoms
-#        nTmessage("  for self.checks: " + `self.checks`)
-#        nTdebug("  for self.checks count: " + `len(self.checks)`)
+#        nTmessage("  for self.checks: " + repr(self.checks))
+#        nTdebug("  for self.checks count: " + repr(len(self.checks)))
 
 #        msgBadWiDescriptor = "See also %s%s" % (issueListUrl,10)
 #        msgBadWiDescriptor += "\n or %s%s" % (issueListUrl,4)
@@ -682,7 +682,7 @@ RMS Z-scores, should be close to 1.0:
         for check in self.checks:
             if LEVEL_STR not in check:
                 nTerror("Whatif._processCheckdb: no level attribute in check dictionary: "+check[CHECK_ID_STR])
-                nTerror("check dictionary: "+`check`)
+                nTerror("check dictionary: "+repr(check))
                 return True
 #            nTdebug("attaching check: "+check[CHECK_ID_STR]+" of type: "+check[TYPE_STR] + " to level: "+check[LEVEL_STR])
             if check[LEVEL_STR] == 'MOLECULE':
@@ -699,14 +699,14 @@ RMS Z-scores, should be close to 1.0:
         checkIter = iter(selfLevelChecks)
         for _levelEntity in selfLevels:
             levelCheck = checkIter.next()
-#            nTdebug("working on levelEntity: " + levelEntity.MyName +"levelCheck: " + `levelCheck`[:80])
+#            nTdebug("working on levelEntity: " + levelEntity.MyName +"levelCheck: " + repr(levelCheck)[:80])
             for check in levelCheck:
 #                checkId = check[CHECK_ID_STR]
-#                nTdebug( 'check        : ' + `check`)
+#                nTdebug( 'check        : ' + repr(check))
 #                nTdebug( 'check[CHECK_ID_STR]: ' + checkId)
                 if not check.has_key(LOC_ID_STR):
 #                    nTdebug("Whatif._processCheckdb: There is no %s attribute, skipping check: [%s]" % ( LOC_ID_STR, check ))
-#                    nTdebug("  check: "+ `check`)
+#                    nTdebug("  check: "+ repr(check))
                     continue
                 curLocDic = check[LOC_ID_STR]
                 if not curLocDic:
@@ -715,8 +715,8 @@ RMS Z-scores, should be close to 1.0:
 
                 for curLocId in curLocDic.keys():
                     curListDic = curLocDic[curLocId]
-#                    nTdebug("Working on curLocId:   " + `curLocId`)
-#                    nTdebug("Working on curListDic: " + `curListDic`)
+#                    nTdebug("Working on curLocId:   " + repr(curLocId))
+#                    nTdebug("Working on curListDic: " + repr(curListDic))
 
                     nameTuple = self.translateResAtmString( curLocId )
                     if not nameTuple:
@@ -727,9 +727,9 @@ RMS Z-scores, should be close to 1.0:
                     if not entity:
                         nTdebug('Whatif._processCheckdb: mapping entity "%s" descriptor, tuple %s', curLocId, nameTuple)
                         continue
-                    #nTdebug("adding to entity: " + `entity`)
+                    #nTdebug("adding to entity: " + repr(entity))
                     entityWhatifDic = entity.setdefault(WHATIF_STR, NTdict())
-                    #nTdebug("adding to entityWhatifDic: " + `entityWhatifDic`)
+                    #nTdebug("adding to entityWhatifDic: " + repr(entityWhatifDic))
 
                     # GV direct linking using the WhatifResult object
                     entityWhatifDic[curListDic.checkID] = curListDic
@@ -1027,7 +1027,7 @@ def runWhatif( project, ranges=None, parseOnly=False ):
         for res in residueList:
             if not (res.hasProperties('protein') or res.hasProperties('nucleic')):
                 if not res.hasProperties('HOH'): # don't report waters
-                    nTmessage('runWhatif: non-standard residue %s found and will be written out for What If' % `res`)
+                    nTmessage('runWhatif: non-standard residue %s found and will be written out for What If' % repr(res))
                 whatifStatus.nonStandardResidues.append(repr(res))
         #end for
 
@@ -1036,7 +1036,7 @@ def runWhatif( project, ranges=None, parseOnly=False ):
         for model in models:
             fullname =  os.path.join( whatifDir, sprintf('model_%03d.pdb', model) )
             # WI prefers IUPAC like PDB now. In CING the closest is IUPAC?
-#            nTdebug('==> Materializing model '+`model`+" to disk" )
+#            nTdebug('==> Materializing model '+repr(model)+" to disk" )
             pdbFile = mol.toPDB( fullname, model=model, ranges=whatif.ranges, convention = IUPAC)
 #                                 useRangesForLoweringOccupancy=useRanges )
             if not pdbFile:
@@ -1080,7 +1080,7 @@ def runWhatif( project, ranges=None, parseOnly=False ):
         whatifStatus.keysformat()
 
         if whatifExitCode:
-            nTerror("runWhatif: Failed whatif checks with exit code: " + `whatifExitCode`)
+            nTerror("runWhatif: Failed whatif checks with exit code: " + repr(whatifExitCode))
             return True
 
         whatifStatus.completed = True

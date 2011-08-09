@@ -14,7 +14,7 @@ class lostInTranslation():
 #        self.i18nDir = "java/src/cing/client"
         self.i18nDir = "src/cing/client/i18n"
         self.lostInTranslationDir = "../lostInTranslation"
-        "Relative to the self.i18nDir"
+#        Relative to the self.i18nDir
         absPathGwtDir = os.path.join(cing.cingRoot, self.i18nDir )
         if os.chdir(absPathGwtDir):
             nTerror("Failed to change to directory: "+absPathGwtDir)
@@ -23,10 +23,10 @@ class lostInTranslation():
     def findPhrases(self):
 #        CINGROOT = os.getenv("CINGROOT", "/Users/jd/workspace35/cing") # default value should not be used...
         propList  = glob( 'iCingConstants_*.properties')
-        nTmessage("Found propList [" + `len(propList)` + "] "  + `propList`)
+        nTmessage("Found propList [%s] %s" % ( len(propList), repr(propList)))
         propBaseFile = os.path.join( 'iCingConstants.properties' )
         propBaseMap = self.getPropMap( propBaseFile )
-        nTmessage ( `propBaseMap` )
+        nTmessage ( repr(propBaseMap) )
         for propFile in propList:
             n = len(propFile)
 #            iCingConstants_XX.properties
@@ -37,7 +37,7 @@ class lostInTranslation():
             nf = codecs.open( fileTodo, "w", "utf-8" )
             nTmessage("Writing to file: " + fileTodo)
             propMap = self.getPropMap( propFile )
-            nTmessage("Found propBase [" + `len(propMap)` + "] "  + `propMap`)
+            nTmessage("Found propBase [%s] %s" % ( len(propMap), repr(propMap)))
             keyList = propBaseMap.keys()
             keyList.sort()
             for key in keyList:

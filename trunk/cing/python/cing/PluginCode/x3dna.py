@@ -98,8 +98,8 @@ class X3dna(NTdict):
         (Subtract 5.8 Angstrom from the values to take account of the vdw radii
         of the phosphate groups, and for comparison with FreeHelix and Curves.)
 
-        Ref: M. A. El Hassan and C. R. Calladine (1998). ``Two Distinct Modes of
-         Protein-induced Bending in DNA.'' J. Mol. Biol., v282, pp331-343.
+        Ref: M. A. El Hassan and C. R. Calladine (1998). `Two Distinct Modes of
+         Protein-induced Bending in DNA.' J. Mol. Biol., v282, pp331-343.
         ''',
 
         'globalHelixAxis':

@@ -79,7 +79,7 @@ class AllChecks(TestCase):
         project.save()
         if showValues:
             for res in project.molecule.allResidues():
-                nTdebug(`res`)
+                nTdebug(repr(res))
                 whatifResDict = res.getDeepByKeys(WHATIF_STR)
                 if not whatifResDict:
                     continue

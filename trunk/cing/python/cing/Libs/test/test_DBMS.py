@@ -8,7 +8,7 @@ from cing import cingRoot
 from cing.Libs.DBMS import DBMS
 from cing.Libs.DBMS import Relation
 from cing.Libs.DBMS import addColumnHeaderRowToCsvFile
-from cing.Libs.DBMS import sortRelationByColumnListFromCsvFile
+from cing.Libs.DBMS import sortRelationByColFromCsvFile
 from cing.Libs.DBMS import sort_table
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.NRG.PDBEntryLists import matchBmrbPdbDataDir
@@ -66,7 +66,7 @@ class AllChecks(TestCase):
 #        fn = 'test.csv' # already contains one header row but let's add another one.
         src = os.path.join(cingRoot, matchBmrbPdbDataDir, fn)
         copyfile(src, fn)
-        self.assertFalse( sortRelationByColumnListFromCsvFile( fn, columnList=(1,0), containsHeaderRow=True))
+        self.assertFalse( sortRelationByColFromCsvFile( fn, columnList=(1,0), containsHeaderRow=True))
 
 
 if __name__ == "__main__":

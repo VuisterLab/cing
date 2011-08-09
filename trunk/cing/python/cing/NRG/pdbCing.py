@@ -56,7 +56,7 @@ def run():
                 updateIndices = updateIndices, isProduction = isProduction, processes_max = processes_max)
 
     nTdebug("Publish results at directory    : " + m.results_dir)
-    nTdebug("Do maximum number of entries    : " + `m.max_entries_todo`)
+    nTdebug("Do maximum number of entries    : " + repr(m.max_entries_todo))
 
     # Get the PDB info to see which entries can/should be done.
     if m.searchPdbEntries():
@@ -598,7 +598,7 @@ class pdbCing(Lister):
 
 
                 ## Make the first index file name still index.html
-                new_file_name = indexDir + '/index_' + `file_id` + '.html'
+                new_file_name = indexDir + '/index_' + repr(file_id) + '.html'
                 if not file_id:
                     new_file_name = indexDir + '/index.html'
                 open(new_file_name, 'w').write(new_file_content)

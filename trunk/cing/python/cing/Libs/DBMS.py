@@ -31,7 +31,9 @@ class Relation():
                 self.insertColumn(label=col)
 
 
-    def insertColumn(self, index=-1, label=None, foreignKeyConstr=None):
+    def insertColumn(self, index=-1, label=None, 
+#                     foreignKeyConstr=None
+                     ):
         """Insert a column for a certain variable type; before the given position.
          label Column name; has to be unique.
         """
@@ -50,7 +52,7 @@ class Relation():
         if index == -1:
             index = self.sizeColumns()
         if label == None: # label may be empty string or a zero of some sort except None
-            label = DEFAULT_COLUMN_LABEL + `index`
+            label = DEFAULT_COLUMN_LABEL + repr(index)
 
 
         self.columnOrder.insert(index, label)
@@ -66,11 +68,11 @@ class Relation():
     def getColumnByIdx(self, idx):
         'Return None on error'
         if idx < 0:
-           nTerror("Found negative idx %s in getColumnByIdx" % idx)
-           return None
+            nTerror("Found negative idx %s in getColumnByIdx" % idx)
+            return None
         if idx >= self.sizeColumns():
-           nTerror("Found idx %s in getColumnByIdx which is equal or larger than self.sizeColumns(): %s" % (idx, self.sizeColumns()))
-           return None
+            nTerror("Found idx %s in getColumnByIdx which is equal or larger than self.sizeColumns(): %s" % (idx, self.sizeColumns()))
+            return None
         label = self.columnOrder[idx]
         return self.attr[label]
 
@@ -78,7 +80,7 @@ class Relation():
         'Return True on error'
         column = self.getColumnByIdx(idx)
         if column == None:
-           return True
+            return True
         for i in range(self.sizeRows()):
             column[i] = value
     # end def
@@ -108,7 +110,9 @@ class Relation():
             column[idx] = apply(func,(v,))
         return column
 
-    def readCsvFile(self, file_name, containsHeaderRow, dtd_file_name=None):
+    def readCsvFile(self, file_name, containsHeaderRow, 
+#                    dtd_file_name=None
+                    ):
         """
      *If containsHeaderRow is false then the default labels will be used.
      *dtd file if not existing defaults to all elements being STRING.
@@ -191,7 +195,7 @@ class Relation():
             nTerror("Failed to write string to file: %s" % file_name)
             return True
 
-    def getHash(self, keyColumnLabel = None, ignoreDuplicateKeyWithoutWarning = False, useSingleValueOfColumn = -1):
+    def getHash(self, keyColumnLabel = None, ignoreDuplicateKey = False, useSingleValueOfColumn = -1):
         """Takes a DMBS table and turns it into a hash on the keyColumnLabel with
         values a list of all columns. If return useSingleValueOfColumn is set to a columnId >= 0 then the value will
         not be all columns as an array but simply a single value.
@@ -225,7 +229,7 @@ class Relation():
                 dic[k] = columnValues
 
         if duplicateKeyFound:
-            if ignoreDuplicateKeyWithoutWarning:
+            if ignoreDuplicateKey:
                 nTdebug(duplicateKeyFound)
             else:
                 nTwarning(duplicateKeyFound)
@@ -240,7 +244,7 @@ class Relation():
     def getColumnLabel( self, index ):
         'Return False on error'
         if not self.isValidColumnIdx(index):
-            nTerror("in getColumnLabel: given index is not valid for columns: %s" % index);
+            nTerror("in getColumnLabel: given index is not valid for columns: %s" % index)
             return
         label = self.columnOrder[index]
         return label
@@ -267,11 +271,11 @@ class Relation():
         if show_header:
 #            boolean containsForeignKeyConstraints = false;
 #            boolean containsindices               = false;
-            file_str.write("---  Relation        : " + self.name + " ---\n");
-            file_str.write("---  Column Labels   : ");
+            file_str.write("---  Relation        : " + self.name + " ---\n")
+            file_str.write("---  Column Labels   : ")
             for i in range(sizeColumns):
-                label = self.getColumnLabel(i);
-                file_str.write( label );
+                label = self.getColumnLabel(i)
+                file_str.write( label )
 #                ForeignKeyConstr fkc = dbms.foreignKeyConstrSet.getForeignKeyConstrFrom(name,label);
 #                if ( fkc != null ) {
 #                    containsForeignKeyConstraints = true;
@@ -282,7 +286,7 @@ class Relation():
                 if i < ( sizeColumns - 1 ):
                     file_str.write(",")
                 else:
-                    file_str.write(" ---\n");
+                    file_str.write(" ---\n")
 
 #            // Datatypes
 #            if (show_data_types) {
@@ -337,7 +341,7 @@ class Relation():
 
         if show_rows:
             if sizeRows < 1 :
-                file_str.write("---  Empty Relation (%s columns but no rows) ---\n" % sizeColumns);
+                file_str.write("---  Empty Relation (%s columns but no rows) ---\n" % sizeColumns)
                 return file_str.getvalue()
             # end if
             for r in range(sizeRows):
@@ -349,7 +353,7 @@ class Relation():
                 file_str.write('\n')
             # end
         else:
-            file_str.write("---  Relation contains %s rows ---\n" % sizeRows);
+            file_str.write("---  Relation contains %s rows ---\n" % sizeRows)
         # end if
 
 
@@ -410,7 +414,7 @@ class Relation():
         Returns None on error.
         Returns module variable NULL_STRING for None values. Modify if needed.
         """
-        label = self.getColumnLabel(columnIdx);
+        label = self.getColumnLabel(columnIdx)
 #        // Sanity checks
         if label == False:
             nTerror("Failed to Relation.getValue for columnIdx idx %s. Existing columnIdx labels: %s" % (
@@ -492,17 +496,20 @@ class DBMS():
         self.tables = {}
 
     def readCsvRelationList(self, relationNames, csvFileDir='.',
-            csvDtdFileDir=None, checkConsistency=False, showChecks=False, containsHeaderRow=True):
+#            csvDtdFileDir=None, checkConsistency=False, showChecks=False, 
+            containsHeaderRow=True):
         'return True on error'
         csvFilesRead = len(relationNames)
         for i in range(csvFilesRead):
-            if self.readCsvRelation( relationNames[i], csvFileDir=csvFileDir, csvDtdFileDir=csvDtdFileDir, 
-                                     checkConsistency=checkConsistency, showChecks=showChecks, containsHeaderRow=containsHeaderRow):
+            if self.readCsvRelation( relationNames[i], csvFileDir=csvFileDir, 
+#                                     csvDtdFileDir=csvDtdFileDir, checkConsistency=checkConsistency, showChecks=showChecks, 
+                                     containsHeaderRow=containsHeaderRow):
                 nTerror("Failed to read relation: " + relationNames[i])
                 return True
 
     def readCsvRelation(self, relationName, csvFileDir='.',
-            csvDtdFileDir=None, checkConsistency=False, showChecks=False, containsHeaderRow=True, showMessages=0):
+#            csvDtdFileDir=None, checkConsistency=False, showChecks=False, 
+            containsHeaderRow=True, showMessages=0):
         'return True on error'
         relation = Relation(relationName, self)
         if showMessages:
@@ -542,7 +549,7 @@ def addColumnHeaderRowToCsvFile( csvPath, columnOrder ):
     relation.writeCsvFile()
 # end def
 
-def sortRelationByColumnListFromCsvFile( csvPath, columnList=None, containsHeaderRow=True):
+def sortRelationByColFromCsvFile( csvPath, columnList=None, containsHeaderRow=True):
     'Return True on error'
     dbms = DBMS()
     (directory, relationName, _extension) = nTpath(csvPath)

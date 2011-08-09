@@ -85,7 +85,7 @@ NaNstring = "." # default if not set in localConstants. @UnusedVariable
 osType = getOsType()
 ncpus = detectCPUs() # use all if not specified by -c flag to main cing program.
 
-"""Can be reset later when internet is up again"""
+# Can be reset later when internet is up again
 internetConnected = isInternetConnected()
 #if verbosity >= verbosityOutput:
 #  sys.stdout.write(header)

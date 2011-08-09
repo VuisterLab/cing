@@ -1,3 +1,4 @@
+#@PydevCodeAnalysisIgnore # pylint: disable-all
 """
 
 GVprocheck( ranges=None, verbose = True )
@@ -11,7 +12,6 @@ Residue
 
 
 """
-#@PydevCodeAnalysisIgnore
 from cing.Libs.AwkLike import AwkLike
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.Libs.svd import SVDfit

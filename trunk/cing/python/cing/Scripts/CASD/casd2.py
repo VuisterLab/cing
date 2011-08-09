@@ -1,7 +1,9 @@
-# CASD-NMR analysis
-#
-# Execute like:
-# python -u $CINGROOT/python/cing/Scripts/CASD/casd2.py --target CGR26A
+'''
+CASD-NMR analysis
+
+Execute like:
+python -u $CINGROOT/python/cing/Scripts/CASD/casd2.py --target CGR26A
+'''
 
 from cing import cingVersion
 from cing.Libs.AwkLike import AwkLikeS
@@ -172,7 +174,7 @@ if False:
         #print '>', r
     # Export'
     for p in pTree:
-       p.molecule.toPDBfile( pTree.path(p.name+'.pdb'), model=p.molecule.rmsd.closestToMean)
+        p.molecule.toPDBfile( pTree.path(p.name+'.pdb'), model=p.molecule.rmsd.closestToMean)
 
 #sys.exit(1)
 
