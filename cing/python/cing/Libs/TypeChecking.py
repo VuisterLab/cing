@@ -20,10 +20,6 @@ a warranty of non-infringement.
 
 Distribution of substantively modified versions of this module is
 prohibited without the explicit permission of the copyright holders.
-
-$Author$
-$Revision$
-$Date$
 """
 from numpy.core.numeric import zeros as _zeros
 
@@ -80,7 +76,7 @@ class TypeChecker:
         except:
 
             try:
-                token.__class__
+#                token.__class__
                 return self.is_subclass(token.__class__, name)
             except:
                 pass

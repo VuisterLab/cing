@@ -143,7 +143,7 @@ def main():
     dbase[ 'histJaninBySsAndCombinedResType' ] = histJaninBySsAndCombinedResType
     dbase[ 'histJaninBySsAndResType' ] = histJaninBySsAndResType
     dbase[ 'histJaninCtupleBySsAndResType' ] = histJaninCtupleBySsAndResType
-    histJaninCtupleBySsAndResType
+#    histJaninCtupleBySsAndResType
     cPickle.dump(dbase, output, 2)
     output.close()
 

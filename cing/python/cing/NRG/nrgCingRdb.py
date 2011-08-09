@@ -540,7 +540,7 @@ AND '{2}' <@ S.chain_type; -- contains at least one protein chain.
         '''
         m = self
         try:
-            djaflsjlfjalskdjf #@UndefinedVariable
+            djaflsjlfjalskdjf #@UndefinedVariable # pylint: disable=W0104
             from localPlotList import plotList
         except:
 #            NTtracebackError()
