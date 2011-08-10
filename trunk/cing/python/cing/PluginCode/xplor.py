@@ -346,7 +346,7 @@ def createProjectFromXplorMemory(name="xplorNIH", sim=None):
     if sim==None:
         from simulation import currentSimulation #@UnresolvedImport
         sim= currentSimulation()
-        pass
+#        pass
 
     from tempfile import NamedTemporaryFile
     tmpfile=NamedTemporaryFile(suffix=".pdb")

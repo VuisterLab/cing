@@ -33,15 +33,15 @@ class AllChecks(TestCase):
         vOld,oOld = peirceTest.peirceTestOld( values )
 #        print 'v=',vOld
 #        print vOld.av, vOld.sd
-#        print 'o=',oOld
+#        print 'obj=',oOld
 #        
-        v,o = peirceTest.peirceTest( values )
+        v,obj = peirceTest.peirceTest( values )
 #        print 'v=',v
 #        print v.av, v.sd
-#        print 'o=',o
+#        print 'obj=',obj
     
         self.assertFalse( vOld == v )
-        self.assertFalse( oOld == o )
+        self.assertFalse( oOld == obj )
                 
     def testPeirceTest3(self):
         #Note the difference between array sizes 17 and 18. 
@@ -57,9 +57,9 @@ class AllChecks(TestCase):
                 
         while n > 3:
             values = values[:n]        
-            _v,o = peirceTest.peirceTest( values )
-#            print 'number of outliers at size: '+repr(n)+ ' =',len(o)
-            self.assertTrue(len(o)<=m)
+            _v,obj = peirceTest.peirceTest( values )
+#            print 'number of outliers at size: '+repr(n)+ ' =',len(obj)
+            self.assertTrue(len(obj)<=m)
             n -= 1
                     
     def testPeirceTest4(self):
@@ -70,20 +70,20 @@ class AllChecks(TestCase):
                 
         result = peirceTest.peirceTest( values )
         self.failUnless(result)
-        v,o = result
-#        print 'number of outliers at size: '+repr(n)+ ' =',len(o)
+        v,obj = result
+#        print 'number of outliers at size: '+repr(n)+ ' =',len(obj)
         self.assertTrue(len(v) == n)
-        self.assertTrue(len(o) == 0)
+        self.assertTrue(len(obj) == 0)
         
     def testPeirceTest5(self):
         values = [61.1080599488, 34.876110084, 63.0380528016, -37.3907919689, 55.7742201359, 158.950985878, 152.580838711, 159.962185469, 39.5242231825, 167.478815798, -45.1721895276, 150.966989049, 38.7181950131, 54.4126758063, 62.9191496902, -41.4928983793, 46.5057394648, -36.3803547969, -48.513237809, 61.4695459467]
                 
         result = peirceTest.peirceTest( values )
         self.failUnless(result)
-        v,o = result
-#        print 'number of outliers at size: '+repr(n)+ ' =',len(o)
+        v,obj = result
+#        print 'number of outliers at size: '+repr(n)+ ' =',len(obj)
         self.assertTrue(len(v) == 10)
-        self.assertTrue(len(o) == 10)
+        self.assertTrue(len(obj) == 10)
 
                     
 if __name__ == "__main__":

@@ -2027,8 +2027,48 @@ class NTdict(dict):
             nTerror('NTdict.toSML: no SMLhandler defined')
         #end if
     #end def
-
 #end class
+
+
+class CountMap(NTdict):
+    'A Hash to int map. Superclass to AssignmentCountMap'
+    def __init__(self, *args, **kwds):
+        NTdict.__init__(self, *args, **kwds)
+        if self.__CLASS__ == 'NTdict': # Allow kwds to override class name but set when it just defaulted.
+            self.__CLASS__ = 'CountMap'
+    def __str__(self, showEmptyElements=0):
+        'Default is to have no zero elements. Using trick with different method name to prevent recursion.'
+        return self.__repr__(showEmptyElements=showEmptyElements)
+    def toString(self):
+        'Sorted by key not by value.'
+        lineList = []
+        keyList = self.keys()
+        keyList.sort()
+#        keyList.reverse()
+        for key in keyList:
+            v = self[key] 
+            if v == 0:
+                nTdebug("Skipping item with zero count.")
+                continue
+            lineList.append( "%s: %s" % ( key, v ))
+        # end for
+        lineList.append( "overallCount: %s" % self.overallCount())
+        msg = '\n'.join(lineList)
+        return msg 
+    # end def
+    def increaseCount(self, k, v):
+        if not self.has_key(k):
+            self[k] = 0
+        self[k] += v
+    # end def
+    def overallCount(self):
+        r = sum([self[key] for key in self.keys()]) # numpy.int64 type because sum is from numpy.
+        r = int(r)
+#        nTdebug("type of overall count %s: %s" % ( r, r.__class__))
+        return r
+    # end def    
+#end class
+
 
 class NoneObjectClass(NTdict):
     """

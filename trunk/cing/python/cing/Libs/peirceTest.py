@@ -150,9 +150,10 @@ class Peirce:
 
 
     def peirceTestOld( self, valueList ):
-        l = len( valueList )
+        n = len( valueList )
 
-        if l<3: return (None, None)
+        if n<3: 
+            return (None, None)
 
         newValues = NTlist()
         outliers  = NTlist()
@@ -163,7 +164,7 @@ class Peirce:
             i += 1
         #end for
 
-        ngroups, reminder = l / 60, l % 60
+        ngroups, reminder = n / 60, n % 60
 
         listOfnewValues = []
 

@@ -326,41 +326,41 @@ end y
         modelIdx = -1
 
         for line in AwkLike( fileName, minNF = 1, separator=':' ):
-            l = line.dollar[0]
-            if len(l) < 2: # to prevent recursion bug in AwkLike code.
+            li = line.dollar[0]
+            if len(li) < 2: # to prevent recursion bug in AwkLike code.
                 continue
-#            nTdebug("Read line: "+l)
+#            nTdebug("Read line: "+li)
 #            nTdebug("DEBUG: read line dollar 1: [%s]" % line.dollar[1])
 #            nTdebug("DEBUG: read line dollar 2: [%s]" % line.dollar[2])
 
-            if l.find( 'Summary report for users of a structure') > 0:
+            if li.find( 'Summary report for users of a structure') > 0:
 #                nTdebug('Found summary report and increasing model idx: %d' % modelIdx)
                 modelIdx += 1
                 continue
 
             checkId = None
-            if l.startswith( '  1st generation packing quality'):
+            if li.startswith( '  1st generation packing quality'):
                 checkId = QUACHK_STR
-            if l.startswith( '  2nd generation packing quality'):
+            if li.startswith( '  2nd generation packing quality'):
                 checkId = NQACHK_STR
-            if l.startswith( '  Ramachandran plot appearance'):
+            if li.startswith( '  Ramachandran plot appearance'):
                 checkId = RAMCHK_STR
-            if l.startswith( '  chi-1/chi-2 rotamer normality'):
+            if li.startswith( '  chi-1/chi-2 rotamer normality'):
                 checkId = C12CHK_STR
-            if l.startswith( '  Backbone conformation'):
+            if li.startswith( '  Backbone conformation'):
                 checkId = BBCCHK_STR
 # Second part.
-            if l.startswith( '  Bond lengths'):
+            if li.startswith( '  Bond lengths'):
                 checkId = BNDCHK_STR
-            if l.startswith( '  Bond angles'):
+            if li.startswith( '  Bond angles'):
                 checkId = ANGCHK_STR
-            if l.startswith( '  Omega angle restraints'):
+            if li.startswith( '  Omega angle restraints'):
                 checkId = OMECHK_STR
-            if l.startswith( '  Side chain planarity'):
+            if li.startswith( '  Side chain planarity'):
                 checkId = PLNCHK_STR
-            if l.startswith( '  Improper dihedral distribution'):
+            if li.startswith( '  Improper dihedral distribution'):
                 checkId = HNDCHK_STR
-            if l.startswith( '  Inside/Outside distribution'):
+            if li.startswith( '  Inside/Outside distribution'):
                 checkId = INOCHK_STR
 
             if not checkId:

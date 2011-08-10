@@ -128,25 +128,25 @@ b
 
     def testGetDeepAvgByKeys(self):
         d=NTdict()
-        l = NTlist()
-        d['key'] = l
-        l.append('abc')
-        l.append('abc')
+        a = NTlist()
+        d['key'] = a
+        a.append('abc')
+        a.append('abc')
         x = d.getDeepAvgByKeys('key')
 #        print 'x=', x
         self.assertEquals( x, 'abc')
 
         # Fraction by default needs to be 1.0; complete consensus
-        l.append('def')
+        a.append('def')
         x = d.getDeepAvgByKeys('key')
         self.assertEquals( x, False)
 
         # Should crash on None element
-        l.append(None)
+        a.append(None)
         x = d.getDeepAvgByKeys('key')
         self.assertEquals( x, False)
 
-        x = l.getConsensus(minFraction=0.5)
+        x = a.getConsensus(minFraction=0.5)
         self.assertEquals( x, 'abc')
 
     def testGetDeepByKeysOrAttributesSimple(self):

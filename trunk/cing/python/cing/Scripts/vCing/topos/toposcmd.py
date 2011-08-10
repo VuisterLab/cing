@@ -243,16 +243,16 @@ def main():
         sys.exit(2)
 
     print "DEBUG: opts %s" % opts
-    for o, a in opts:
-        if o == "--realm":
+    for opt, a in opts:
+        if opt == "--realm":
             cmd.realm = a
-        elif o == "--pool" :
+        elif opt == "--pool" :
             cmd.pool = a
-        elif o == "--token" :
+        elif opt == "--token" :
             cmd.token = a
-        elif o == "--timeout":
+        elif opt == "--timeout":
             cmd.timeout = a
-        elif o == "--url":
+        elif opt == "--url":
             cmd.url = a
         else:
             assert False, "invalid option"

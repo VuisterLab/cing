@@ -67,16 +67,16 @@ class AllChecks(TestCase):
 
     def testNTlistIndex(self):
         # speed check
-        l = NTlist()
+        a = NTlist()
         for _i in range( 1*1000):
-            l.append( random() )
+            a.append( random() )
         middleValue = 0.5
-        l.append( middleValue )
+        a.append( middleValue )
         for _i in range( 1*1000):
-            l.append( random() )
+            a.append( random() )
 
         for _i in range( 1*1000):
-            _x = l.index(middleValue)
+            _x = a.index(middleValue)
 #            tree.sibling(1)
 
     def testNTtreeIndex(self):

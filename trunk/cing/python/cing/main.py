@@ -316,17 +316,49 @@ def testQuiet():
         return True
 #end def
 
-def pylintOverall(pylintOverallOutputFileName='pylint.txt'):
+def pylintOverallSummary(pylintFileName='pylint.txt'):
+    'Summarizing which pylint message types occur'
+    nTdebug("Now in " + getCallerName())
+    nTdebug("Will work on " + pylintFileName)
+#    pylintDir = os.path.join( cingDirTmp, 'pylint' ) # Sync with below routine.
+    pylintMsgCountMap = CountMap()
+    lineList = readLinesFromFile(pylintFileName)
+    for line in lineList:
+        # Match the message id with a starting bracket 
+        # an alpha
+        # a 4 digit number 
+        match_msg_id = re.search(r'\[([EWICRF][0-9]{4})', line, 0)
+        if not match_msg_id:
+            nTwarning( "Failed to find message id from line: %s" % line )
+            continue
+        msg_id = match_msg_id.group(1)
+        pylintMsgCountMap.increaseCount(msg_id, 1)
+    # end for        
+    nTmessage("pylint message types counts:\n%s" % (pylintMsgCountMap.toString()))
+#    nTmessage('pylint message types overall count: %s' % len(pylintMsgHash.keys()))
+#end def
+    
+def pylintOverall(pylintFileName='pylint.txt'):
     "Add the ones you don't want to pylint (perhaps you know they don't work yet)"
     namepattern = "*.py"
     pylintDir = os.path.join( cingDirTmp, 'pylint' )
-#    pylintOverallOutputFileName = os.path.join( pylintDir, 'pylint.log')
+#    pylintFileName = os.path.join( pylintDir, 'pylint.log')
     if os.path.exists( pylintDir ):
         rmdir( pylintDir )
     mkdirs( pylintDir )
-    if os.path.exists( pylintOverallOutputFileName ):
-        os.unlink(pylintOverallOutputFileName)
+    if os.path.exists( pylintFileName ):
+        os.unlink(pylintFileName)
     excludedModuleList = [ 
+                            # enable exclusions for quick testing.
+#                           cingPythonDir + "/cing/core*",
+#                           cingPythonDir + "/cing/Database*",
+#                           cingPythonDir + "/cing/Libs*",
+#                           cingPythonDir + "/cing/NRG*",
+#                           cingPythonDir + "/cing/PluginCode*",
+#                           cingPythonDir + "/cing/Scripts*",
+#                           cingPythonDir + "/cing/STAR*",
+#                           cingPythonDir + "/cing/Talos*",
+                           # Normal set:
                            cingPythonDir + "/cing/Database/CCPN*",
                            cingPythonDir + "/cyana2cing*",
                            cingPythonDir + "/pdbe2*",
@@ -362,10 +394,11 @@ def pylintOverall(pylintOverallOutputFileName='pylint.txt'):
         if not os.path.exists( pylintDir ):
             nTerror("Failed to find pylint output: " + pylintOutputFileName)
             continue
-        if appendTextFileToFile( pylintOutputFileName, pylintOverallOutputFileName):
+        if appendTextFileToFile( pylintOutputFileName, pylintFileName):
             nTerror("Failed to appendTextFileToFile")
         nTdebug("Done appending from: %s" % pylintOutputFileName)
-    # end for        
+    # end for
+    pylintOverallSummary(pylintFileName=pylintFileName)
     nTmessage("Done with pylint")
 # end def
 
@@ -593,6 +626,11 @@ def getParser():
                       help="Do code analysis using pylint on those matching *.py excluding some.",
                       metavar="PYLINTFILE"
                      )
+    parser.add_option("--pylintsum",
+                      dest="pylintsum", default=None,                      
+                      help="Do summary code analysis on previous pylint run.",
+                      metavar="PYLINTSUMFILE"
+                     )
     parser.add_option('-i', "--ipython",
                       action="store_true",
                       dest="ipython",
@@ -738,8 +776,17 @@ def main():
         # end if
         sys.exit(0)
     # end if
+    
     if options.pylint:
         if pylintOverall(options.pylint):
+#        testOverall(namepattern="test_NTutils*.py")
+            sys.exit(1)
+        # end if
+        sys.exit(0)
+    # end if
+        
+    if options.pylintsum:
+        if pylintOverallSummary(options.pylintsum):
 #        testOverall(namepattern="test_NTutils*.py")
             sys.exit(1)
         # end if
