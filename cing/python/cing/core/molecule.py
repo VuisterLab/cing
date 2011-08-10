@@ -5158,6 +5158,7 @@ Atom class: Defines object for storing atom properties
         self._topology = None #intially None; defined by the updateTopolgy call of the Molecule class
 
         # several external programs need an index
+        # Using the global statement without assignment pylint: disable=W0603
         global AtomIndex
         self.atomIndex = AtomIndex
         AtomIndex += 1

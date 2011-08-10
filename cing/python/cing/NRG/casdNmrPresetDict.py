@@ -36,18 +36,18 @@ The funny thing is that '   A' needs to be used for xplor's '   A' and not simpl
     },
   },
 
-'PGR122ACheshire': {
-  'comment': """
-Offset should be -416 why doesn't it figure that out?
- """,
-  'readCoordinates': {
-   'keywds': {
-#     'forceChainMappings': [['A', 'DEMO', 1, -416]],
-      'forceDefaultChainMapping': 1, # Use if default chain mapping is correct
-                                      # Only works if one CCPN chain, one format chain present!
-      },
-    },
-  },
+#'PGR122ACheshire': {
+#  'comment': """
+#Offset should be -416 why doesn't it figure that out?
+# """,
+#  'readCoordinates': {
+#   'keywds': {
+##     'forceChainMappings': [['A', 'DEMO', 1, -416]],
+#      'forceDefaultChainMapping': 1, # Use if default chain mapping is correct
+#                                      # Only works if one CCPN chain, one format chain present!
+#      },
+#    },
+#  },
 
 
 'CGR26ACheshire'   : {'readCoordinates': {'keywds': {'forceDefaultChainMapping': 1, }, }, },

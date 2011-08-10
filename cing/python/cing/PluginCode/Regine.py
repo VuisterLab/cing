@@ -21,6 +21,7 @@ from cing.core.constants import * #@UnusedWildImport
 class Regine(Lister):
 
     def __init__(self, project, offSet = 0, dimension = 2 ):
+        Lister.__init__(self)
         self.project = project
         self.offSet = offSet
         self.dimension = dimension
@@ -109,7 +110,8 @@ class Regine(Lister):
 #        nTdebug("atom = decodeNameTuple(XPLOR, chainName, resNum, atomName): %s = %s %s %s [%s]" % (
 #                 atom, XPLOR, chainName, resNum, atomName))
         if not atom:
-#            nTwarning("Failed to find loc: [%s],[%s],[%s]" % (resId, resNum, atomName)) # TODO check; message disabled for improving other debugging.
+#            nTwarning("Failed to find loc: [%s],[%s],[%s]" % (resId, resNum, atomName)) 
+# TODO check; message disabled for improving other debugging.
             return None
         return atom.resonances()
 

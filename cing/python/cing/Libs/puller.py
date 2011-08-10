@@ -53,10 +53,9 @@ Example: %s -f oracle://someuser:PaSsWd@db1/TSH1 \\
     """ % (myName, myName, myName)
 
 def quick_mapper(table):
-    base = declarative_base()
-    # pylint: disable=W0232
+    base = declarative_base()    
     # pylint: disable=R0903
-    class GenericMapper(base):
+    class GenericMapper(base): # pylint: disable=W0232
         __table__ = table
     return GenericMapper
 

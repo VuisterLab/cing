@@ -17,11 +17,11 @@ DEBUG: Read        1 rows  2 cols to manualMatches
 DEBUG: Read     3339 rows  2 cols to newMany2OneTable
 DEBUG: Read     8462 rows  1 cols to pdbNmrTable
 DEBUG: Read     1708 rows  3 cols to score_many2one
-Skipped: 18 obsolete PDB entries from score_many2one ['1lnp', '1bqv', '1bxj', '1ymj', '1ym6', '1ck9', '1cn9', '1cn8', '1ck8', '1ck5', '2new', '1jyp', '1n4t', '1n9d', '1uw2', '1xo9', '1xaq', '1yl2']
+Skipped: 18 obsolete PDB entries from score_many2one ['1lnp', '1bqv', '1bxj', '1ymj', '1ym6', '1ck9', '1cn9', '1cn8', '1ck8', '1ck5', ...
 Skipped: 0 obsolete BMRB entries from score_many2one []
 Accepted from old list 1690 matches
-Skipped: 60 double entries from pdbIdAditList ['1joo', '1a5j', '1cqb', '7hsc', '1cl4', '1g03', '1f6u', '1e91', '1qqy', '1ps2', '1jbh', '1ayg', '1ji8', '1gm1', '1jru', '1uwo', '1bpb', '1qum', '1dxg', '1kka', '1bta', '2pld', '1hrh', '1lud', '1sxd', '1m8b', '1ma2', '5fx2', '1mzk', '1mv1', '1j0t', '1nwb', '1axh', '1k8j', '4ake', '1fgu', '1sap', '1b40', '1qvm', '1qxq', '1unc', '1i04', '1tn3', '1erq', '1adn', '2aiz', '1mmc', '2igz', '2jqr', '2jxy', '2k0k', '2k61', '2k8v', '351c', '2o32', '2jpo', '2k05', '2kcb', '2kh9', '2kmp']
-Skipped: 187 obsolete PDB entries from adit ['1spz', '1alp', '1bqv', '1bxj', '1l2v', '1m4o', '1d5k', '1hzr', '1hzq', '1fio', '1j9d', '1a3k', '1lks', '1omp', '3mbp', '1qot', '1g6l', '1jjl', '1kdd', '1jsb', '1jyp', '1uea', '1k16', '1hg6', '1n4t', '1ezk', '1vie', '2cth', '2end', '1krk', '1kjo', '1pin', '2om4', '1ayf', '1laz', '1z3b', '1hur', '1lsk', '1qaw', '1gaj', '1d8c', '2hnp', '1iya', '1mh1', '1mms', '1b9c', '1f5w', '1h40', '1dki', '1mjf', '1oqj', '1n9d', '1irn', '1bq8', '1n3v', '1nzt', '1k04', '1xyf', '1nvh', '1o0z', '1oob', '1uav', '1aox', '1mu4', '1gyu', '1iwo', '1abj', '1ew4', '1ehk', '1igd', '1ird', '1oun', '1khc', '1ril', '1m2y', '1ass', '1fbt', '1e0r', '1q8e', '1r40', '1yzo', '2aic', '1p67', '1upo', '1h0x', '1x6k', '1b9k', '3paz', '1r83', '1uec', '1emv', '1rp6', '1h70', '1dpj', '1sv7', '2hnm', '1tgq', '1hco', '1uv0', '1sfc', '1vk7', '4azu', '1kil', '1jiw', '1dqe', '1utx', '1xo4', '1xo9', '1xaq', '1e96', '1uiu', '1p38', '1yl2', '2bar', '2f2y', '1ywz', '2a4y', '1zs1', '2b2m', '1zwq', '2a2h', '2b0n', '2p7w', '2auf', '2non', '2fjj', '2gpg', '2di1', '2g8p', '2h33', '2gx3', '2h7u', '1i45', '2hc6', '1plq', '2nyo', '2p60', '2dhw', '1wjh', '1iof', '2rls', '2rnc', '2rn6', '2rof', '2rpg', '2rq3', '2jmt', '1naq', '2kao', '2jp4', '2uz7', '2jrn', '2js8', '2jur', '2jus', '2qkz', '2jsu', '2jth', '2jut', '2juq', '2jux', '2jud', '2jvp', '2jw3', '2jy3', '2jy4', '2jzu', '2k0h', '2k0i', '2kp5', '2k82', '2k83', '2kab', '2kci', '2kpy', '2ki1', '2km7', '2kna', '2knw', '2koo', '2kql', '2ks8', '2ks7', '2ksx', '2kwm', '2kwa', '1jjq']
+Skipped: 60 double entries from pdbIdAditList ['1joo', '1a5j', '1cqb', '7hsc', '1cl4', '1g03', '1f6u', '1e91', '1qqy', '1ps2', '...
+Skipped: 187 obsolete PDB entries from adit ['1spz', '1alp', '1bqv', '1bxj', '1l2v', '1m4o', '1d5k', '1hzr', '1hzq', ...
 Skipped: 0 obsolete BMRB entries from adit []
 Accepted from adit list   1648 for a total of 3338 matches
 Accepted from manual list 1 for a total of 3339 matches
@@ -40,6 +40,7 @@ from shutil import copytree
 
 class MatchBmrbPdb(Lister):
     def __init__(self):
+        Lister.__init__(self)
         self.adit_fn = 'adit_nmr_matched_pdb_bmrb_entry_ids.csv'
         self.adit_url = 'ftp://ftp.bmrb.wisc.edu/pub/bmrb/nmr_pdb_integrated_data/' + self.adit_fn
         self.restartFromScratch = 1
@@ -224,9 +225,11 @@ class MatchBmrbPdb(Lister):
                 idx = pdbIdNewMany2OneList.index(pdb_id)
                 bmrb_id_current = bmrbIdNewMany2OneList[idx]
                 if bmrb_id_current == bmrb_id:
-                    nTmessage("Already found %s in PDB with BMRB %s in manual and current list; consider updating the manual list." % (pdb_id, bmrb_id))
+                    nTmessage("Already found %s in PDB with BMRB %s in manual and current list; consider updating the manual list." % (
+                        pdb_id, bmrb_id))
                     continue
-                nTmessage("Using manual mapping of %s in PDB with BMRB %s in manual list instead of BMRB %s in current list." % (pdb_id, bmrb_id, bmrb_id_current))
+                nTmessage("Using manual mapping of %s in PDB with BMRB %s in manual list instead of BMRB %s in current list." % (
+                        pdb_id, bmrb_id, bmrb_id_current))
                 nTmessage("First removing match at idx %s in current list." % idx)
                 del bmrbIdNewMany2OneList[idx]
                 del pdbIdNewMany2OneList[idx]
@@ -247,8 +250,10 @@ class MatchBmrbPdb(Lister):
         for aditIdx in range(nadit):
             pdbIdLoLObsolete[aditIdx].sort()
             bmrbIdLoLObsolete[aditIdx].sort()
-            nTmessage("Skipped: %s obsolete  PDB entries from adit%s %s" % (len( pdbIdLoLObsolete[aditIdx]), aditIdx,  str(pdbIdLoLObsolete[aditIdx])))
-            nTmessage("Skipped: %s obsolete BMRB entries from adit%s %s" % (len(bmrbIdLoLObsolete[aditIdx]), aditIdx, str(bmrbIdLoLObsolete[aditIdx])))
+            nTmessage("Skipped: %s obsolete  PDB entries from adit%s %s" % (len( pdbIdLoLObsolete[aditIdx]), aditIdx,  
+                                                                            str(pdbIdLoLObsolete[aditIdx])))
+            nTmessage("Skipped: %s obsolete BMRB entries from adit%s %s" % (len(bmrbIdLoLObsolete[aditIdx]), aditIdx, 
+                                                                            str(bmrbIdLoLObsolete[aditIdx])))
             nTmessage("Accepted from adit%s %s for a total of %s matches" %(aditIdx, l2[aditIdx], ltotal1[aditIdx]))
         nTmessage("Accepted from manual list %s for a total of %s matches" %( l3, ltotal2))
         nTmessage("Accepted unique %d PDB and %d BMRB entries" %( uniquePdbCount, uniqueBmrbCount))
