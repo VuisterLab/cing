@@ -703,9 +703,6 @@ class CingGui(BasePopup):
     #end def
 
     def openOldProject(self ):
-        """
-
-        """
         fName = self.projEntry.get()
         if not os.path.exists( fName ):
             nTerror('Error: file "%s" does not exist\n', fName)
@@ -718,9 +715,6 @@ class CingGui(BasePopup):
     #end def
 
     def initPdb(self ):
-        """
-
-        """
         fName = self.pdbEntry.get()
         if not os.path.exists( fName ):
             nTerror('Error: file "%s" does not exist\n', fName)

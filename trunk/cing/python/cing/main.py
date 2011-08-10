@@ -396,7 +396,7 @@ def pylintOverall(pylintFileName='pylint.txt'):
             continue
         if appendTextFileToFile( pylintOutputFileName, pylintFileName):
             nTerror("Failed to appendTextFileToFile")
-        nTdebug("Done appending from: %s" % pylintOutputFileName)
+#        nTdebug("Done appending from: %s" % pylintOutputFileName)
     # end for
     pylintOverallSummary(pylintFileName=pylintFileName)
     nTmessage("Done with pylint")

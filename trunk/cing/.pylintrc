@@ -153,7 +153,7 @@ load-plugins=
 #R0914 Too many local variables
 #R0915 Too many statements
 
-disable=C0111,C0322,C0323,C0324,E0602,F0401,I0011,I0013,W0102,W0122,W0142,W0201,W0401,W0402,W0511,W0611,W0613,W0614,W0621,W0622,W0701,W0702,R0911,R0912,R0913,R0914,R0915
+disable=C0111,C0322,C0323,C0324,E0602,F0401,I0011,I0013,W0102,W0122,W0142,W0201,W0212,W0401,W0402,W0511,W0611,W0613,W0614,W0621,W0622,W0701,W0702,R0201,R0911,R0912,R0913,R0914,R0915
 # JFD likes to enable again:
 #W0201: Attribute %r defined outside __init__
 #W0613 Unused argument 'xxx'
@@ -347,7 +347,7 @@ max-statements=50
 max-parents=7
 
 # Maximum number of attributes for a class (see R0902).
-max-attributes=10
+max-attributes=30
 
 # Minimum number of public methods for a class (see R0903).
 min-public-methods=2

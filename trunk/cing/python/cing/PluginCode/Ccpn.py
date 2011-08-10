@@ -1603,8 +1603,6 @@ class Ccpn:
 
 
     def ccpnDistanceRestraintToString(self, ccpnConstraint):
-        """
-        """
         lowerLimit = None
         upperLimit = None
         if hasattr(ccpnConstraint, 'lowerLimit'):

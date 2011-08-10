@@ -391,8 +391,6 @@ class Relation():
         return file_str.getvalue()
 
     def toTable(self):
-        """
-        """
 #        return [self.attr[label] for label in self.columnOrder ] Too easy.
         result = []
         sizeColumns = self.sizeColumns()

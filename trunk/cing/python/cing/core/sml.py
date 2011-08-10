@@ -76,6 +76,7 @@ Example file:
 </PeakList>
 </SML>
     """
+    # Using the global statement without assignment pylint: disable=W0603
     global SMLstarthandlers, SMLendhandlers
     debug = False
 

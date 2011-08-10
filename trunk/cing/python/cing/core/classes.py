@@ -73,8 +73,8 @@ CRV_NONE = "-999.9"
 #-----------------------------------------------------------------------------
 # Cing classes and routines
 #-----------------------------------------------------------------------------
-
-class Project(NTdict):
+# pylint: disable=R0902
+class Project(NTdict): # pylint: disable=R0904
 
     """
 -------------------------------------------------------------------------------
@@ -451,6 +451,7 @@ Project: Top level Cing project class
 
            Returns Project instance or None on error.
         """
+        # Using the global statement without assignment pylint: disable=W0602
         global projects
 
         #print '>>', name, status
@@ -622,6 +623,7 @@ Project: Top level Cing project class
         Save project data and close project.
         TODO: Call destructor on self and its elements
         """
+        # Using the global statement without assignment pylint: disable=W0602
         global projects
         #self.export()
 
@@ -1484,7 +1486,7 @@ class ProjectList(NTlist):
 # Routines to compare different Project instances this is therefore completely different from the ProjectList
 # class where no such relation can be assumed.
 
-class ProjectTree( NTtree ):
+class ProjectTree( NTtree ): # pylint: disable=R0904
     """
     Class to store multiple project instances
     Bit dirty as we use the NTtree class, but append Project instances (NTdict-derived) as children
@@ -2355,6 +2357,7 @@ class Peak(NTdict, Lister):
         NTdict.__init__(self, __CLASS__ = 'Peak', **kwds)
         Lister.__init__(self)
 #       several external programs need an index
+        # Using the global statement pylint: disable=W0603
         global PeakIndex
         self.peakIndex = PeakIndex
         PeakIndex += 1
@@ -2603,9 +2606,8 @@ class Restraint(NTdict):
 
         return violatingModels
     #end def
-
-
 # end class Restraint
+
 
 class DistanceRestraint(Restraint):
     """DistanceRestraint class:
@@ -3283,7 +3285,7 @@ class DistanceRestraint(Restraint):
     #end def
 #end class
 
-
+# Too many ancestors (8/7) pylint: disable=R0901 
 class DistanceRestraintList(RestraintList):
     """
     Class based on NTlist that holds distanceRestraints.
@@ -3838,7 +3840,7 @@ class DihedralRestraint(Restraint):
     #end def
 #end class
 
-
+# Too many ancestors (8/7) pylint: disable=R0901 
 class DihedralRestraintList(RestraintList):
     'List of dihedral angle restraints.'
 #    export2cyana = exportDihedralRestraint2cyana
@@ -4064,7 +4066,7 @@ class RDCRestraint(DistanceRestraint):
     #end def
 #end class
 
-
+# Too many ancestors (8/7) pylint: disable=R0901 
 class RDCRestraintList(RestraintList):
     """List of RDCRestraint"""
 
