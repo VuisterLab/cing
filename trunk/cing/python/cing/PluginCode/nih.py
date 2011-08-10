@@ -6,7 +6,6 @@ Methods:
 
   export2NIH():
         Export resonances talos format
-
 """
 from cing.Libs.AwkLike import AwkLike
 from cing.Libs.AwkLike import AwkLikeS

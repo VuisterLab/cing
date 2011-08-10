@@ -23,7 +23,6 @@ or similar. The minus of -15 is necessary because it needs to signal it's childr
 """
 from cing import cingPythonCingDir
 from cing import cingRoot
-from cing.Libs import forkoff
 from cing.Libs.AwkLike import AwkLike
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.Libs.forkoff import get_cmd_output
@@ -31,24 +30,14 @@ from cing.Libs.html import GOOGLE_ANALYTICS_TEMPLATE
 from cing.NRG import CASD_NMR_BASE_NAME
 from cing.NRG.CasdNmrMassageCcpnProject import baseDir
 from cing.NRG.CasdNmrMassageCcpnProject import entryList
+from cing.NRG.CaspNmrCing import MyDict
 from glob import glob
 import csv
 import shutil
 import string
 
 
-class MyDict(Lister):
-    """just a simple dictionary"""
-    def __init__(self):
-        Lister.__init__(self)
-        self.d = {}
-
-class EntryInfo(Lister):
-    def __init__(self, time=None):
-        Lister.__init__(self)
-        self.time = time
-
-
+# Too many instance attributes (43/30) # pylint: disable=R0902
 class CasdNmrCing(Lister):
 
     def __init__(self,
