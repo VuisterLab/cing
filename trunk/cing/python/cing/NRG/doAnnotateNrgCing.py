@@ -8,7 +8,7 @@ from cing import header
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.Libs.forkoff import do_cmd
 from cing.NRG.PDBEntryLists import getBmrbLinks
-from cing.NRG.nrgCing import nrgCing
+from cing.NRG.nrgCing import NrgCing
 from cing.NRG.settings import bmrbDir
 from cing.NRG.shiftPresetDict import presetDict
 from cing.Scripts.FC.convertStar2Ccpn import importStarChemicalShifts
@@ -24,7 +24,7 @@ import Tkinter
 import tarfile
 
 
-n = nrgCing()
+n = NrgCing()
 if False:
     getBmrbLinks()
 
@@ -210,7 +210,7 @@ def runAbunch():
         try:
             status = annotateEntry(x,y)
         except:
-            NTtracebackError()
+            nTtracebackError()
             status = True
         finally:
             nTmessage(getStopMessage(cing.starttime))
@@ -223,7 +223,7 @@ if __name__ == "__main__":
 #    try:
 #        status = annotateEntry(*sys.argv[1:])
 #    except:
-#        NTtracebackError()
+#        nTtracebackError()
 #        status = True
 #    finally:
 #        nTmessage(getStopMessage(cing.starttime))

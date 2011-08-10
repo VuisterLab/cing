@@ -691,14 +691,14 @@ def parseNMRPipeHeader( data ):
 
 
 # Python Tablefile implementation
-# Formerly in Talos/nmrPipeTable.py
-class nmrPipeTabRow( NTdict ):
+# Formerly in Talos/NmrPipeTable.py
+class NmrPipeTabRow( NTdict ):
     """
     Class defining a row in a nmrTable file
     """
 
     def __init__( self, table, id, **kwds ):
-        NTdict.__init__( self, __CLASS__  = 'nmrPipeTabRow',
+        NTdict.__init__( self, __CLASS__  = 'NmrPipeTabRow',
                                  table      = table,
                                  id         = id,
                                  name       = 'row'+str(id),
@@ -747,16 +747,16 @@ class nmrPipeTabRow( NTdict ):
     #end def
 #end class
 
-class nmrPipeTable( NTdict ):
+class NmrPipeTable( NTdict ):
     """
-    nmrPipeTable class
+    NmrPipeTable class
     implemented as NTdict of NTdict's, i.e.
 
     element (row-0, INDEX) indexed as
         tab[0].INDEX   or tab[0]['INDEX']
 
-    tab = nmrPipeTable()                # Empty table
-    tab = nmrPipeTable( 'tabFile' )     # table from tabFile
+    tab = NmrPipeTable()                # Empty table
+    tab = NmrPipeTable( 'tabFile' )     # table from tabFile
 
     METHODS:
 
@@ -803,7 +803,7 @@ class nmrPipeTable( NTdict ):
 
     def format(self):
         return sprintf(
-'''=== nmrPipeTable "%s" ===
+'''=== NmrPipeTable "%s" ===
 columns:  %s
 nrows:    %d''', self.tabFile, self.columnDefs.zap('name'), self.nrows
         )
@@ -813,7 +813,7 @@ nrows:    %d''', self.tabFile, self.columnDefs.zap('name'), self.nrows
         """
         Add row to table, optional kwds can be used to set values
         """
-        row = nmrPipeTabRow( table=self, id=self.nrows, **kwds )
+        row = NmrPipeTabRow( table=self, id=self.nrows, **kwds )
         self[ self.nrows ] = row
         self.rows.append( row )
         self.nrows += 1
@@ -826,7 +826,7 @@ nrows:    %d''', self.tabFile, self.columnDefs.zap('name'), self.nrows
         return columnDef, or None on error
         """
         if name in self:
-            nTerror('nmrPipeTable.addColumn: column "%s" already exists\n', name )
+            nTerror('NmrPipeTable.addColumn: column "%s" already exists\n', name )
             return None
         #end if
 
@@ -864,7 +864,7 @@ nrows:    %d''', self.tabFile, self.columnDefs.zap('name'), self.nrows
         """
         for c in cNames:
             if not c in self:
-                nTerror('nmrPipeTable.hideColumn: column "%s" not defined\n', c)
+                nTerror('NmrPipeTable.hideColumn: column "%s" not defined\n', c)
             else:
                 self[c].hide = True
             #end if
@@ -877,7 +877,7 @@ nrows:    %d''', self.tabFile, self.columnDefs.zap('name'), self.nrows
         """
         for c in cNames:
             if not c in self:
-                nTerror('nmrPipeTable.showColumn: column "%s" not defined\n', c)
+                nTerror('NmrPipeTable.showColumn: column "%s" not defined\n', c)
             else:
                 self[c].hide = False
             #end if
@@ -977,7 +977,7 @@ nrows:    %d''', self.tabFile, self.columnDefs.zap('name'), self.nrows
         """
         file = open( tabFile, 'w' )
         if file == None:
-            nTerror('nmrPipeTable.writeFile: error opening "%s"', tabFile)
+            nTerror('NmrPipeTable.writeFile: error opening "%s"', tabFile)
             return True
         self.write( file )
         file.close()
@@ -1083,7 +1083,7 @@ DATA ATOMNAMES HA CA CB C N HN
         nTerror('exportShifts2TalosPlus: no amino acid defined')
         return True
 
-    table = nmrPipeTable()
+    table = NmrPipeTable()
     table.remarks.append( sprintf('shifts from %s', molecule.name ) )
     residueOffset = residues[0].resNum-1 # residue numbering has to start from 1
     table.remarks.append( sprintf('residue numbering offset  %d', residueOffset ) )
@@ -1157,7 +1157,7 @@ DATA ATOMNAMES HA CA CB C N HN
 def _importTableFile( tabFile, molecule ):
     """import a tabFile, match to residue instances of molecule
 
-    Return the nmrPipeTable instance or None on error
+    Return the NmrPipeTable instance or None on error
     """
 
     if not os.path.exists( tabFile ):
@@ -1174,7 +1174,7 @@ def _importTableFile( tabFile, molecule ):
         nTerror('_importTableFile: no amino acid defined')
         return None
 
-    table = nmrPipeTable()
+    table = NmrPipeTable()
     table.readFile(tabFile)
 
     for row in table:

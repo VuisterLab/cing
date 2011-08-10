@@ -12,6 +12,7 @@ reload cing.Scripts.smallScriptCollection
 
 Usually however execution from within Eclipse is still easiest.
 """
+
 #import cing #@UnusedImport
 from cing import cingDirScripts
 from cing import cingDirTmp
@@ -97,9 +98,9 @@ def removeTempFilesAllEntries():
 def removeTempFiles(entryCode):
 #    entryCode = '1brv'
     ch23 = entryCode[1:3]
-    D = '/Library/WebServer/Documents'
+    d = '/Library/WebServer/Documents'
 #    D = '/Volumes/tria3'
-    projectDir = D + '/NRG-CING/data/%s/%s/%s.cing' % (ch23, entryCode, entryCode)
+    projectDir = d + '/NRG-CING/data/%s/%s/%s.cing' % (ch23, entryCode, entryCode)
     molDir = projectDir + '/' + entryCode
     Whatif.removeTempFiles(os.path.join( molDir, moleculeDirectories.whatif ))
     dssp.removeTempFiles(os.path.join( molDir, moleculeDirectories.dssp ))

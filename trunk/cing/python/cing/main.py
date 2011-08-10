@@ -492,14 +492,16 @@ def pylintByName(name, excludedModuleList):
     cmd = ' --rcfile ../.pylintrc --report=no ' + mod_name
     pylintDir = os.path.join( cingDirTmp, 'pylint' )
     pylintOutputFileName = os.path.join( pylintDir, mod_name + '.log')
-    nTdebug("Writing to " + pylintOutputFileName)
+#    nTdebug("Writing to " + pylintOutputFileName)
     if os.path.exists(pylintOutputFileName):
         os.unlink( pylintOutputFileName )
     pylint = ExecuteProgram('pylint', rootPath=cingPythonDir, redirectOutputToFile=pylintOutputFileName)
-    if pylint( cmd ):
-        nTdebug("Pylint found some flaws or crashed for " + mod_name)
+    status = pylint( cmd )
+    if status:
+        nTmessage("Pylint found some flaws or crashed for " + mod_name)
     else:
-        nTdebug("pylint was flawless for " + mod_name) 
+#        nTdebug("pylint was flawless for " + mod_name)
+        pass 
     if not os.path.exists(pylintOutputFileName):
         # Will be created even if pylint found messages or crashed.
         nTerror("Failed to find pylint result file: " + pylintOutputFileName)

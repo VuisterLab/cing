@@ -463,7 +463,7 @@ def parseOutput(config, project, parameters ):
     nTdebug( 'allPreviousModelCount:  %s (int)'     % allPreviousModelCount)
      
     results = NTlist()
-    keys = ['model', 'Etotal', 
+    keys = ['model', 'eTotal', 
             'Enoe', 'NOErmsd', 'NOEnumber', 
             'NOEbound1', 'NOEviol1', 
             'NOEbound2', 'NOEviol2',
@@ -491,7 +491,7 @@ def parseOutput(config, project, parameters ):
             if (not foundEnergy) and find(line.dollar[0], '--------------- cycle=     1 ----------------') >= 0:
                 awkf.next()
 #                nTdebug("Getting total energy from line: %s" % line.dollar[0])
-                data['Etotal'] = float(line.dollar[0][11:22])
+                data['eTotal'] = float(line.dollar[0][11:22])
 
                 awkf.next()
 #                nTdebug("Getting NOE energy from line: %s" % line.dollar[0])
@@ -524,8 +524,8 @@ def parseOutput(config, project, parameters ):
                 foundDIHED = 1
             #endif
         #end for
-        Etotal = getDeepByKeysOrAttributes( data, 'Etotal' )
-        if Etotal == None:
+        eTotal = getDeepByKeysOrAttributes( data, 'eTotal' )
+        if eTotal == None:
             nTwarning("Failed to read energy for model: %s (probably crashed/stopped)." % i)
             continue
         results.append(data)

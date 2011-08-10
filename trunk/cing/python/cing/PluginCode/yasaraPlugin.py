@@ -102,10 +102,10 @@ def yasaraShell(project):
         """
         Console('off')
         ColorRes('object ' + str(object), 'Gray')
-        YasaraColorDict = dict(green = 240, orange = 150, red = 120)
+        yasaraColorDict = dict(green = 240, orange = 150, red = 120)
 
         for res in project.molecule.allResidues():
-            cmd = sprintf('object %s residue %d,%s', object, res.resNum, YasaraColorDict[res.rogScore.colorLabel])
+            cmd = sprintf('object %s residue %d,%s', object, res.resNum, yasaraColorDict[res.rogScore.colorLabel])
             ColorRes(cmd)
         #end for
         Console('on')

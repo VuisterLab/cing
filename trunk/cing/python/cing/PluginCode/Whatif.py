@@ -1056,7 +1056,7 @@ def runWhatif( project, ranges=None, parseOnly=False ):
         totalNumberOfResidues = mol.modelCount * numberOfResidues
         timeRunEstimatedInSeconds    = totalNumberOfResidues / Whatif.NUMBER_RESIDUES_PER_SECONDS
 
-        timeRunEstimatedList = timedelta2HoursMinutesAndSeconds(timeRunEstimatedInSeconds)
+        timeRunEstimatedList = timedelta2Hms(timeRunEstimatedInSeconds)
         # Uncorrected for discarded residues.
         msg = '==> Running What If checks on %s residues, %s model(s) for an estimated (%s residues/s):' % (
               numberOfResidues, mol.modelCount, Whatif.NUMBER_RESIDUES_PER_SECONDS)
@@ -1137,7 +1137,7 @@ def runWhatif( project, ranges=None, parseOnly=False ):
             nTerror("runWhatif: Failed to process WHATIF summary file")
             return True
     except:
-        NTtracebackError()
+        nTtracebackError()
         nTerror("Skipping restore of whatif summary.") 
         return True
     whatif._makeSummary()

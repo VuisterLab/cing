@@ -1536,7 +1536,7 @@ class NTdict(dict):
         try:
             result = format % self
         except: # Happens at H2_2Ca_64_100.cing
-            NTtracebackError()
+            nTtracebackError()
             return ""
         return result
     #end def
@@ -1818,7 +1818,7 @@ class NTdict(dict):
             r = result.average()
         except:
             nTerror("Rare case throws an error on bad ")
-            NTtracebackError()
+            nTtracebackError()
             r = None
 
         if r == None:
@@ -5046,7 +5046,7 @@ def writeTextToFile(fileName, txt, mode='w'):
         fprintf(fp, txt)
         fp.close()
     except:
-        NTtracebackError()
+        nTtracebackError()
         return True
 # end def        
 
@@ -5069,7 +5069,7 @@ def writeDataToFile(fileName, data):
         fp.write(data)
         fp.close()
     except:
-        NTtracebackError()
+        nTtracebackError()
         return True
 # end def
 

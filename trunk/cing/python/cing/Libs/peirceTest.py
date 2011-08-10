@@ -141,10 +141,10 @@ class Peirce:
         lastValue = self.peirce[row][-1]
         maxWidth = x/2
         delta = (lastValue - 1.)/(maxWidth-9) # float semantics needs to be enforced.
-        R = lastValue - (y-9)*delta
+        r = lastValue - (y-9)*delta
 #        nTdebug("delta: "+repr(delta))
-#        nTdebug("R    : "+repr(R))
-        return R
+#        nTdebug("R    : "+repr(r))
+        return r
 
 
 
@@ -188,10 +188,10 @@ class Peirce:
             notDone   = True
             nOutliers = 0
             while notDone and nOutliers < len( self.peirce[newL] ):
-                R = self.peirce[newL][nOutliers]
+                r = self.peirce[newL][nOutliers]
 #                nTdebug("nOutliers: "+ repr(nOutliers) )
-#                nTdebug("R        : "+ repr(R))
-                maxDeviation = R * newValuesList.sd
+#                nTdebug("r        : "+ repr(r))
+                maxDeviation = r * newValuesList.sd
                 n = 0
                 for item in newValuesList:
                     i,v = item
@@ -200,7 +200,8 @@ class Peirce:
                         try:
                             newValues.remove( item )
                             outliers.append( item )
-                        except: pass
+                        except: 
+                            pass
                         #end try
                         nOutliers += 1
                         n += 1
@@ -249,14 +250,14 @@ class Peirce:
         done = False # At least give it a try.
         while not done:
             done = True # Quit if no outliers were identified.
-            R = self._getR(x, y)
-            if not R:
-#                nTdebug("Failed to get a Peirce constant R; not adding outliers anymore.")
+            r = self._getR(x, y)
+            if not r:
+#                nTdebug("Failed to get a Peirce constant r; not adding outliers anymore.")
 #                nTdebug('This happened on values:\n%s' % valueList)
 #                return None
                 break
-            maxDeviation = R * sd
-#            nTdebug("R : " + repr(R))
+            maxDeviation = r * sd
+#            nTdebug("r : " + repr(r))
 #            nTdebug("md: " + repr(maxDeviation))
 
             c = len(newValues)-1 # Start at the end of the list because deletions in lists are easiest (optimal) that way.
@@ -268,7 +269,7 @@ class Peirce:
                     del newValues[ c ]
                     outliers.append( item )
                     y = len(outliers) # Keep it simple.
-                    done = False # Try another R value later.
+                    done = False # Try another r value later.
                 c -= 1
 
         newValues.average(byItem=1)

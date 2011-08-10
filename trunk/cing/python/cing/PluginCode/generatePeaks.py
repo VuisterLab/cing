@@ -151,7 +151,6 @@ class ExperimentDef( dict ):
     describe = staticmethod(describe)
 #end class
 
-
 #===========================================================================
 # Predefined experiments for generating peaks
 #===========================================================================
@@ -313,8 +312,8 @@ class CCONH( ExperimentDef ):
 
         self.peaks = NTlist()
         #Generate all CCONH peaks of carbons
-        for C in carbons:
-            self.peaks.append( [(0,'HN'),(0,'N'),(-1,C.name)] )
+        for c in carbons:
+            self.peaks.append( [(0,'HN'),(0,'N'),(-1,c.name)] )
         #end for
 #        print len(self.peaks)
     #end def

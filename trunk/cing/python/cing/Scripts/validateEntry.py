@@ -315,7 +315,7 @@ def main(entryId, *extraArgList):
             if doStoreCING2db( entryId, archive_id, project=project):
                 nTerror("Failed to store CING project's data to DB but continuing.")
         except:
-            NTtracebackError()
+            nTtracebackError()
             nTerror("Failed to store CING project's data due to above traceback error.")
 
     if projectType == PROJECT_TYPE_CCPN:

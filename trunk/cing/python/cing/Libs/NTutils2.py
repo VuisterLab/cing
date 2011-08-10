@@ -104,9 +104,9 @@ def addStreamnTmessageList(stream):
 #        print "EEE: starting addStream to %s" % nTm
         nTm.addStream(stream)
 def removeStreamnTmessageList():
-    for NTm in nTmessageList:
-#        print "EEE: starting removeStream to %s" % NTm
-        NTm.removeStream()
+    for nTm in nTmessageList:
+#        print "EEE: starting removeStream to %s" % nTm
+        nTm.removeStream()
 
 def teeToFile(logFile):
     '''Starts to tee the different verbosity messages to a possibly existing file
@@ -117,7 +117,7 @@ def teeToFile(logFile):
     try:
         stream = open(logFile, 'a')
     except:
-        NTtracebackError()
+        nTtracebackError()
         return True
     nTnothingT.stream = stream
     nTerrorT.stream = stream
@@ -137,9 +137,9 @@ def teeToFile(logFile):
 #    def __call__(self):
 #
 
-def NTtracebackError():
+def nTtracebackError():
     traceBackString = format_exc()
-#    print 'DEBUG: NTtracebackError: [%s]' % traceBackString
+#    print 'DEBUG: nTtracebackError: [%s]' % traceBackString
     if traceBackString == None:
         traceBackString = 'No traceback error string available.'
     nTerror(traceBackString)
@@ -262,9 +262,8 @@ def toPoundedComment(msg):
     resultStr = '\n'.join(result)
     return resultStr
 
-def NTlist2dict(lst):
+def nTlist2dict(lst):
     """Takes a list of keys and turns it into a dict where the values are counts of how many times the key ocurred."""
-
     dic = {}
     for k in lst:
         if dic.has_key(k):
@@ -272,7 +271,7 @@ def NTlist2dict(lst):
         else:
             dic[k] = 1
     return dic
-list2dict = NTlist2dict
+list2dict = nTlist2dict
 
 def getKeyWithLargestCount(count):
     """Return the key in the hashmap of count for which the value
@@ -323,7 +322,7 @@ def grep(fileName, txt, resultList = None, doQuiet=False, caseSensitive=True):
         return 0
     return 1
 
-def timedelta2HoursMinutesAndSeconds( s ):
+def timedelta2Hms( s ):
     'Returns integer numbers for number of minutes and seconds of given float of seconds; may be negative'
     result = [0, 0, 0]
     t = s
@@ -426,7 +425,7 @@ def getUniqueName(objectListWithNameAttribute, baseName, nameFormat = "%s_%d" ):
     nameList = objectListWithNameAttribute.zap( NAME_STR )
 #    nTdebug("Already have names: %s" % str(nameList))
 
-    nameDict = NTlist2dict(nameList)
+    nameDict = nTlist2dict(nameList)
     if not nameDict.has_key( baseName):
         return baseName
     i = 1
@@ -521,7 +520,7 @@ def getRevDateCingLog( fileName ):
         dt = datetime.datetime(*(time.strptime(tsStr)[0:6]))
 #        dt = datetime.datetime.strptime(tsStr)
     except:
-        NTtracebackError()
+        nTtracebackError()
         nTerror("Failed to parse datetime from: %s" % tsStr )
         return None
 
@@ -538,7 +537,7 @@ def execfile_(filename, globals_=None, locals_=None):
     exec text in globals_, locals_
 # end def
 
-def NTflatten(obj):
+def nTflatten(obj):
     'Returns a tuple instead of the more commonly used NTlist or straight up list because this is going to be used for formatted printing.'
     if not isinstance(obj, (list, tuple)):
         nTerror("Object is not a list or tuple: %s", obj)
@@ -546,7 +545,7 @@ def NTflatten(obj):
     result =[]
     for element in obj:
         if isinstance(element, (list, tuple)):
-            elementFlattened = NTflatten(element)
+            elementFlattened = nTflatten(element)
             if not isinstance(elementFlattened, (list, tuple)):
                 nTerror("ElementFlattened is not a list or tuple: %s", obj)
                 return None

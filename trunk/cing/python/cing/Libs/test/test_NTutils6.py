@@ -74,11 +74,11 @@ class AllChecks(TestCase):
                          ('A', 6, 'A', 9),
                         ]
         for i, obj in enumerate(inputList):
-            self.assertEquals( NTflatten(obj), expectedList[i] )
+            self.assertEquals( nTflatten(obj), expectedList[i] )
         pair = (('A', 6), ('A', 9))
-#        valueList =  NTflatten(pair)        
+#        valueList =  nTflatten(pair)        
 #        nTmessage("valueList: %s" % valueList)
-        _x = "patch DISU  reference=1  =( segi %s and resid %s )  reference=2=( segi %s and resid %s )        end\n" % NTflatten(pair)
+        _x = "patch DISU  reference=1  =( segi %s and resid %s )  reference=2=( segi %s and resid %s )        end\n" % nTflatten(pair)
 #        nTmessage("x: %s" % x)
 
     def test_sort(self):

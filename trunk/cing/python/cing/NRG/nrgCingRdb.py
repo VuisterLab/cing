@@ -56,7 +56,7 @@ if False:
     use('TkAgg') # Instead of agg
     interactive(True)
 
-class nrgCingRdb():
+class NrgCingRdb():
     def __init__(self,host='localhost', user=PDBJ_DB_USER_NAME, db=PDBJ_DB_NAME, schema=NRG_DB_SCHEMA):
         self.schema = schema
         if True: # block the NRG-CING stuff away from other schema
@@ -143,7 +143,7 @@ class nrgCingRdb():
     #        nTdebug("SQL: %s" % s)
             pdbIdTable = self.execute(s).fetchall()
         except:
-            NTtracebackError()
+            nTtracebackError()
             return
 
         if pdbIdTable == None:
@@ -184,7 +184,7 @@ class nrgCingRdb():
     # end def
 
     def populateDepTables(self):
-        nTmessage("Creating temporary tables; disable this step for speedier testing in nrgCingRdb.__init__()")
+        nTmessage("Creating temporary tables; disable this step for speedier testing in NrgCingRdb.__init__()")
 
 
         stmt1 = 'drop table if exists %s.cingsummary cascade' % self.schema
@@ -330,7 +330,7 @@ AND '{2}' <@ S.chain_type; -- contains at least one protein chain.
         #        nTdebug("SQL: %s" % s)
                 pdbIdDateResultTable = m.execute(s).fetchall()
             except:
-                NTtracebackError()
+                nTtracebackError()
                 return
             pdbIdDateResultDict = NTdict() # hash by entry filterId
             pdbIdDateResultDict.appendFromTable(pdbIdDateResultTable, 0, 1)
@@ -348,7 +348,7 @@ AND '{2}' <@ S.chain_type; -- contains at least one protein chain.
 #                nTdebug("SQL:\n%s\n" % s)
                 truthResultTable = m.execute(s).fetchall()
             except:
-                NTtracebackError()
+                nTtracebackError()
                 return
             truthResultDict = NTdict() # hash by entry filterId
             truthResultDict.appendFromTable(truthResultTable)
@@ -371,7 +371,7 @@ AND '{2}' <@ S.chain_type; -- contains at least one protein chain.
                 nTdebug("SQL:\n%s\n" % s)
                 comp1ResultTable = m.execute(s).fetchall()
             except:
-                NTtracebackError()
+                nTtracebackError()
                 return
             comp1ResultDict = NTdict() # hash by entry filterId
             comp1ResultDict.appendFromTable(comp1ResultTable)
@@ -383,7 +383,7 @@ AND '{2}' <@ S.chain_type; -- contains at least one protein chain.
 #                nTdebug("SQL:\n%s\n" % s)
                 comp2ResultTable = m.execute(s).fetchall()
             except:
-                NTtracebackError()
+                nTtracebackError()
                 return
             comp2ResultDict = NTdict() # hash by entry filterId
             comp2ResultDict.appendFromTable(comp2ResultTable)
@@ -396,7 +396,7 @@ AND '{2}' <@ S.chain_type; -- contains at least one protein chain.
     #        nTdebug("SQL: %s" % s)
             entryNameResultTable = m.execute(s).fetchall()
         except:
-            NTtracebackError()
+            nTtracebackError()
             return
         entryIdEntryNameResultDict = NTdict() # hash by entry filterId
         entryIdEntryNameResultDict.appendFromTable(entryNameResultTable, 0, 1)
@@ -431,7 +431,7 @@ AND '{2}' <@ S.chain_type; -- contains at least one protein chain.
 #            nTdebug("SQL:\n%s\n" % s)
             checkResultTable = m.execute(s).fetchall()
         except:
-            NTtracebackError()
+            nTtracebackError()
             return
 
         if doDivideByResidueCount:
@@ -441,7 +441,7 @@ AND '{2}' <@ S.chain_type; -- contains at least one protein chain.
     #            nTdebug("SQL: %s" % s)
                 resCountTable = m.execute(s).fetchall()
             except:
-                NTtracebackError()
+                nTtracebackError()
                 return
     #        nTdebug("Found table: %s" % (resCountTable))
             resCountDict = NTdict()
@@ -457,7 +457,7 @@ AND '{2}' <@ S.chain_type; -- contains at least one protein chain.
     #            nTdebug("SQL: %s" % s)
                 pdbIdSelectionTable = m.execute(s).fetchall()
             except:
-                NTtracebackError()
+                nTtracebackError()
                 return
             pdbidSelectionDict = NTdict()
             pdbidSelectionDict.appendFromTable(pdbIdSelectionTable, 0, 0)
@@ -1017,9 +1017,9 @@ AND '{2}' <@ S.chain_type; -- contains at least one protein chain.
 
         offset = 15
         lineWidth = 10
-        attributes = NTplotAttributes(lineWidth=lineWidth, color='green')
+        attributes = nTplotAttributes(lineWidth=lineWidth, color='green')
         p.line([0,offset],[100 - offset, 100], attributes)
-        attributes = NTplotAttributes(lineWidth=lineWidth, color='red')
+        attributes = nTplotAttributes(lineWidth=lineWidth, color='red')
         p.line([offset, 0], [100, 100 - offset], attributes)
         fn = os.path.join(cingDirTmp, 'nrgcingPlot1.png')
         ps.hardcopySize = (900,900)
@@ -1265,4 +1265,4 @@ if __name__ == '__main__':
     if 1:
         n.showCounts()
 
-    nTmessage("done with nrgCingRdb")
+    nTmessage("done with NrgCingRdb")

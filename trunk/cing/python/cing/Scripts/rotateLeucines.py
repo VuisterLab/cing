@@ -73,17 +73,17 @@ def rotating(proj_path,prl_name,molec_name,leuList,modelCount):
     if not os.path.exists(pdb_path):
         nTerror("Failed to find input for Yasara: %s" % pdb_path)
         return True
-    #CHI1=[-60,180]
-    #CHI1=[-60,-49,-41,-48,-53,-63,-75,-79,-78,-70,180,-169,-163,-162,-170,180,171,168,166,173]
-    CHI1=[-60,-60,-41,-53,-75,-78,180,-169,-162,180,168,173]
-    #CHI2=[180,60]
-    #CHI2=[-165,-173,180,169,161,154,157,167,180,-171,79,75,68,60,53,49,54,60,69,73]
-    CHI2=[180,-165,180,161,157,180,60,75,60,49,60,73]
+    #chi1list=[-60,180]
+    #chi1list=[-60,-49,-41,-48,-53,-63,-75,-79,-78,-70,180,-169,-163,-162,-170,180,171,168,166,173]
+    chi1list=[-60,-60,-41,-53,-75,-78,180,-169,-162,180,168,173]
+    #chi2list=[180,60]
+    #chi2list=[-165,-173,180,169,161,154,157,167,180,-171,79,75,68,60,53,49,54,60,69,73]
+    chi2list=[180,-165,180,161,157,180,60,75,60,49,60,73]
     if prl_name.startswith('1brv'):
-        CHI1=[-60,-53,180,173]
-        CHI2=[180,161,60,73]
-    lc=len(CHI1)
-    for i in range(lc):#number of different chi1/chi2 combinations
+        chi1list=[-60,-53,180,173]
+        chi2list=[180,161,60,73]
+    lc=len(chi1list)
+    for i in range(lc):#number of different chi1list/chi2 combinations
         yasara.LoadPDB(pdb_path)
     nTmessage('Rotating Leucines with Yasara:')
     for i in range(lc): # ten conformations
@@ -92,8 +92,8 @@ def rotating(proj_path,prl_name,molec_name,leuList,modelCount):
             resNumber = leu.resNum
             chainId = leu._parent.name
             res='Res LEU %s Mol %s Obj %s-%s'%(resNumber,chainId,str(modelCount*i+1),str(modelCount*(i+1)))
-            yasara.Dihedral('N  %s'%res,'CA %s'%res,'CB %s'%res,'CG  %s'%res,bound='Yes',set=CHI1[i])
-            yasara.Dihedral('CA %s'%res,'CB %s'%res,'CG %s'%res,'CD1 %s'%res,bound='Yes',set=CHI2[i])
+            yasara.Dihedral('N  %s'%res,'CA %s'%res,'CB %s'%res,'CG  %s'%res,bound='Yes',set=chi1list[i])
+            yasara.Dihedral('CA %s'%res,'CB %s'%res,'CG %s'%res,'CD1 %s'%res,bound='Yes',set=chi2list[i])
     yasara.SavePDB('objects 1-%s'%(lc*modelCount),'%s/%s'%(proj_path,prl_name),format='IUPAC',transform='No')
 # end def
 

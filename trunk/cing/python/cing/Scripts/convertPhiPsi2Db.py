@@ -85,9 +85,9 @@ def main():
     os.unlink(cvs_file_abs_name)
     nTdebug('Total number of included residues including PRO/GLY: %d' % rowCount)
 #    nTdebug('valuesByEntrySsAndResType:\n%s'%valuesByEntrySsAndResType)
-#    (Cav, Csd, _Cn) = getRescaling(valuesByEntrySsAndResType)
-    (Cav, Csd) = (1.0, 1.0)
-    nTdebug("Overall found av,sd: %r %r" % (Cav, Csd))
+#    (cAv, cSd, _Cn) = getRescaling(valuesByEntrySsAndResType)
+    (cAv, cSd) = (1.0, 1.0)
+    nTdebug("Overall found av,sd: %r %r" % (cAv, cSd))
 
     for ssType in valuesBySsAndResType.keys():
         for resType in valuesBySsAndResType[ssType].keys():
@@ -96,7 +96,7 @@ def main():
                 valuesBySsAndResType[ssType][resType]['phi'],
                 bins=binCount,
                 range=hrange)
-#            hist2d = zscaleHist( hist2d, Cav, Csd )
+#            hist2d = zscaleHist( hist2d, cAv, cSd )
             setDeepByKeys(histRamaBySsAndResType, hist2d, ssType, resType)
 #            nTdebug('hist2d ssType, resType: %s %s\n%s' % (ssType, resType, hist2d))
             cTuple = getEnsembleAverageAndSigmaHis(hist2d)
@@ -127,7 +127,7 @@ def main():
             phi, # otherwise the imagery but also the [row][column] notation is screwed.
             bins=binCount,
             range=hrange)
-#        hist2d = zscaleHist( hist2d, Cav, Csd )
+#        hist2d = zscaleHist( hist2d, cAv, cSd )
         setDeepByKeys(histRamaBySsAndCombinedResType, hist2d, ssType)
 
     phi = []
@@ -150,7 +150,7 @@ def main():
     nTdebug('hist2d         : \n%s' % hist2d)
 #    nTdebug('sumHistCombined   : %s' % repr(sumHistCombined))
 #    nTdebug('sumsumHistCombined: %.0f' % sumsumHistCombined)
-#    hist2d = zscaleHist( hist2d, Cav, Csd )
+#    hist2d = zscaleHist( hist2d, cAv, cSd )
 #    nTdebug('hist2d scaled  : \n%s' % hist2d)
 
     if os.path.exists(dbase_file_abs_name):

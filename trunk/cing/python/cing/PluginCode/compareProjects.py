@@ -319,7 +319,7 @@ def calcPhiPsiRmsds( projects, ranges='auto', relative = True ):
             #end if
         #end for
     #end for
-    projects.PhiPsiRmsds = rmsds
+    projects.phiPsiRmsds = rmsds
     return rmsds
 #end def
 
@@ -664,14 +664,14 @@ def colorPDBmacro( projects ):
     fp.close()
 #end def
 
-def ROGmacro( projects ):
+def rogMacro( projects ):
 
     stream = open( projects.path('ROG.mcr' ), 'w')
 
     fprintf(stream, 'Console off\n')
     fprintf(stream, 'ColorRes  All, Gray\n')
 
-    YasaraColorDict = dict(green = 240, orange = 150, red = 120)
+    yasaraColorDict = dict(green = 240, orange = 150, red = 120)
 
     for p in projects:
         selectedResidues = p.molecule.setResiduesFromRanges(projects.ranges)
@@ -679,7 +679,7 @@ def ROGmacro( projects ):
             if res in selectedResidues:
                 pass
             else:
-                fprintf(stream, 'ColorRes object %d residue %d, %s\n', p.id+1, res.resNum, YasaraColorDict[res.rogScore.colorLabel])
+                fprintf(stream, 'ColorRes object %d residue %d, %s\n', p.id+1, res.resNum, yasaraColorDict[res.rogScore.colorLabel])
     #end for
     fprintf(stream, 'Console on\n')
 #end def
@@ -730,7 +730,7 @@ PCgFactorMinValue = - 3.0
 PCgFactorMaxValue = 1.0
 PCgFactorReverseColorScheme = True
 
-def QshiftMacro( projects ):
+def qShiftMacro( projects ):
     mkYasaraByResidueMacro(projects, ['Qshift', 'backbone'],
                            minValue = QshiftMinValue, maxValue = QshiftMaxValue,
                            reverseColorScheme = QshiftReverseColorScheme,

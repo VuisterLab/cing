@@ -794,7 +794,7 @@ def doStoreCING2db( entry_code, archive_id, project = None):
     #                    nTdebug("Inserted atom %s %s" % (atom_id, atom))
                         atomCommittedCount += 1
                     except:
-                        NTtracebackError()
+                        nTtracebackError()
                         nTerror("Failed to insert atom [%s] with info: %s" % ( atom, str(atomInfoList)))
                         continue
                 # end for atom

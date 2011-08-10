@@ -3,6 +3,7 @@ from cing.PluginCode.required.reqProcheck import * #@UnusedWildImport
 from cing.PluginCode.required.reqWhatif import * #@UnusedWildImport
 from cing.core.parameters import plugins
 
+
 class CingSummary( NTdict ):
     """
     Simple class to store CING summary result as a dict for easy retrieval
@@ -50,8 +51,8 @@ class CingSummary( NTdict ):
                          __FORMAT__ = \
           '%(name)-10s   ' +\
           'RESIDUES: tot %(totalResidueCount)3d  prot %(proteinResidueCount)3d  nucl %(nucleicResidueCount)3d   ' +\
-          'ROG(%%): %(CING_red)5.1f %(CING_orange)5.1f %(CING_green)5.1f    ' +\
-          'PROCHECK(%%): %(PC_core)5.1f %(PC_allowed)5.1f %(PC_generous)5.1f %(PC_disallowed)5.1f  gf: %(PC_gf)-15s  ' +\
+          'ROG(%%): %(cing_red)5.1f %(cing_orange)5.1f %(cing_green)5.1f    ' +\
+          'PROCHECK(%%): %(pc_core)5.1f %(pc_allowed)5.1f %(pc_generous)5.1f %(pc_disallowed)5.1f  gf: %(pc_gf)-15s  ' +\
           'WHATIF: rama %(WI_ramachandran)-15s bb %(WI_bbNormality)-15s rotamer %(WI_rotamer)-15s '
                     )
         if getDeepByKeysOrAttributes( plugins, WHATIF_STR, IS_INSTALLED_STR):
@@ -104,20 +105,20 @@ class CingSummary( NTdict ):
         total = reduce(lambda x, y: x+y+0.0, rog) # total expressed as a float because of 0.0
         for i, _x in enumerate(rog): 
             rog[i] = rog[i]*100.0/total
-        self.CING_red    = round(rog[0],1)
-        self.CING_orange = round(rog[1],1)
-        self.CING_green  = round(rog[2],1)
+        self.cing_red    = round(rog[0],1)
+        self.cing_orange = round(rog[1],1)
+        self.cing_green  = round(rog[2],1)
 
         # Procheck (core, allowed,  generous, disallowed) (%), average g_factor
         pcSummary = getDeepByKeysOrAttributes(project.molecule, PROCHECK_STR, SUMMARY_STR)
         if (self.proteinResidueCount > 0 and pcSummary):
 #            nTdebug("Going to add procheck results to summary.")
 #            nTmessage("E.g.: project.molecule.procheck.summary.core: [%8.3f]" % project.molecule.procheck.summary.core)
-            self.PC_core       = pcSummary.core
-            self.PC_allowed    = pcSummary.allowed
-            self.PC_generous   = pcSummary.generous
-            self.PC_disallowed = pcSummary.disallowed
-            self.PC_gf  = proteinResidues.zap('procheck','gf').average2(fmt='%6.3f +/- %5.3f')
+            self.pc_core       = pcSummary.core
+            self.pc_allowed    = pcSummary.allowed
+            self.pc_generous   = pcSummary.generous
+            self.pc_disallowed = pcSummary.disallowed
+            self.pc_gf  = proteinResidues.zap('procheck','gf').average2(fmt='%6.3f +/- %5.3f')
 #        else:
 #            nTmessage("Skipping adding procheck results since no results available or no protein residues or...")
         #end if

@@ -16,11 +16,11 @@ useful for solving the Assignment Problem.
 Assignment Problem
 ==================
 
-Let *C* be an *n*\ x\ *n* matrix representing the costs of each of *n* workers
+Let *c* be an *n*\ x\ *n* matrix representing the costs of each of *n* workers
 to perform any of *n* jobs. The assignment problem is to assign jobs to
 workers in a way that minimizes the total cost. Since each worker can perform
 only one job and each job can be assigned to only one worker the assignments
-represent an independent set of the matrix *C*.
+represent an independent set of the matrix *c*.
 
 One way to generate the optimal set is to create all permutations of
 the indexes necessary to traverse the matrix so that no row and column
@@ -306,12 +306,12 @@ class Munkres:
 
     def __init__(self):
         """Create a new instance"""
-        self.C = None
+        self.c = None
         self.row_covered = []
         self.col_covered = []
         self.n = 0
-        self.Z0_r = 0
-        self.Z0_c = 0
+        self.z0_r = 0
+        self.z0_c = 0
         self.marked = None
         self.path = None
 
@@ -382,14 +382,14 @@ class Munkres:
                  cost path through the matrix
 
         """
-        self.C = self.pad_matrix(cost_matrix)
-        self.n = len(self.C)
+        self.c = self.pad_matrix(cost_matrix)
+        self.n = len(self.c)
         self.original_length = len(cost_matrix)
         self.original_width = len(cost_matrix[0])
         self.row_covered = [False for _i in range(self.n)]
         self.col_covered = [False for i in range(self.n)]
-        self.Z0_r = 0
-        self.Z0_c = 0
+        self.z0_r = 0
+        self.z0_c = 0
         self.path = self.__make_matrix(self.n * 2, 0)
         self.marked = self.__make_matrix(self.n, 0)
 
@@ -435,14 +435,14 @@ class Munkres:
         For each row of the matrix, find the smallest element and
         subtract it from every element in its row. Go to Step 2.
         """
-#        _C = self.C
+#        _C = self.c
         n = self.n
         for i in range(n):
-            minval = min(self.C[i])
+            minval = min(self.c[i])
             # Find the minimum value for this row and subtract that minimum
             # from every element in the row.
             for j in range(n):
-                self.C[i][j] -= minval
+                self.c[i][j] -= minval
 
         return 2
 
@@ -455,7 +455,7 @@ class Munkres:
         n = self.n
         for i in range(n):
             for j in range(n):
-                if (self.C[i][j] == 0) and \
+                if (self.c[i][j] == 0) and \
                    (not self.col_covered[j]) and \
                    (not self.row_covered[i]):
                     self.marked[i][j] = 1
@@ -513,8 +513,8 @@ class Munkres:
                     self.col_covered[col] = False
                 else:
                     done = True
-                    self.Z0_r = row
-                    self.Z0_c = col
+                    self.z0_r = row
+                    self.z0_c = col
                     step = 5
 
         return step
@@ -532,8 +532,8 @@ class Munkres:
         """
         count = 0
         path = self.path
-        path[count][0] = self.Z0_r
-        path[count][1] = self.Z0_c
+        path[count][0] = self.z0_r
+        path[count][1] = self.z0_c
         done = False
         while not done:
             row = self.__find_star_in_col(path[count][1])
@@ -566,9 +566,9 @@ class Munkres:
         for i in range(self.n):
             for j in range(self.n):
                 if self.row_covered[i]:
-                    self.C[i][j] += minval
+                    self.c[i][j] += minval
                 if not self.col_covered[j]:
-                    self.C[i][j] -= minval
+                    self.c[i][j] -= minval
         return 4
 
     def __find_smallest(self):
@@ -577,8 +577,8 @@ class Munkres:
         for i in range(self.n):
             for j in range(self.n):
                 if (not self.row_covered[i]) and (not self.col_covered[j]):
-                    if minval > self.C[i][j]:
-                        minval = self.C[i][j]
+                    if minval > self.c[i][j]:
+                        minval = self.c[i][j]
         return minval
 
     def __find_a_zero(self):
@@ -592,7 +592,7 @@ class Munkres:
         while not done:
             j = 0
             while True:
-                if (self.C[i][j] == 0) and \
+                if (self.c[i][j] == 0) and \
                    (not self.row_covered[i]) and \
                    (not self.col_covered[j]):
                     row = i

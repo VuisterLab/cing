@@ -101,7 +101,7 @@ class AllChecks(TestCase):
         tList = [ 0, 601.1, 136741.0 ]
         tExpected = [ (0,0,0), (0,10,1), (37,59,1) ]
         for i,t in enumerate(tList):
-            self.assertEquals(timedelta2HoursMinutesAndSeconds(t), tExpected[i])
+            self.assertEquals(timedelta2Hms(t), tExpected[i])
     def testNTlist(self):
         ntList = NTlist([7,8,9])
 #        nTdebug("ntList: " + str(ntList) +"  length: %s" % len(ntList))

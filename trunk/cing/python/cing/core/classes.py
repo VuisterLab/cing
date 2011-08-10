@@ -34,8 +34,8 @@ from cing.core.constants import * #@UnusedWildImport
 from cing.core.molecule import Atom
 from cing.core.molecule import Ensemble
 from cing.core.molecule import Molecule
-from cing.core.molecule import NTdihedralOpt
-from cing.core.molecule import NTdistanceOpt #@UnusedImport
+from cing.core.molecule import nTdihedralOpt
+from cing.core.molecule import nTdistanceOpt #@UnusedImport
 from cing.core.parameters import cingPaths
 from cing.core.parameters import directories
 from cing.core.parameters import moleculeDirectories
@@ -1733,7 +1733,7 @@ ranges:  %s
                 #end if
             #end for
         #end for
-        self.PhiPsiRmsds = rmsds
+        self.phiPsiRmsds = rmsds
         return rmsds
     #end def
 
@@ -2092,7 +2092,7 @@ ranges:  %s
         fprintf(stream, 'Console off\n')
         fprintf(stream, 'ColorRes  All, Gray\n')
 
-        YasaraColorDict = dict(green = 240, orange = 150, red = 120)
+        yasaraColorDict = dict(green = 240, orange = 150, red = 120)
 
         for p in self:
             selectedResidues = p.molecule.setResiduesFromRanges(p.molecule.ranges)
@@ -2100,7 +2100,7 @@ ranges:  %s
                 if res in selectedResidues:
                     pass
                 else:
-                    fprintf(stream, 'ColorRes object %d residue %d, %s\n', p.id+1, res.resNum, YasaraColorDict[res.rogScore.colorLabel])
+                    fprintf(stream, 'ColorRes object %d residue %d, %s\n', p.id+1, res.resNum, yasaraColorDict[res.rogScore.colorLabel])
         #end for
         fprintf(stream, 'Console on\n')
     #end def
@@ -3294,7 +3294,7 @@ class DistanceRestraintList(RestraintList):
     def __init__(self, name, status = 'keep'):
         RestraintList.__init__(self, name, status = status)
         self.__CLASS__ = DRL_LEVEL
-        self.Hbond = False       # Hbond: fix to keep information about Hbond restraints from CCPN
+        self.hBond = False       # hBond: fix to keep information about hBond restraints from CCPN 
         self.violCountLower = 0   # Total lower-bound violations over 0.1 A
         self.violCount1 = 0
         self.violCount3 = 0
@@ -3344,7 +3344,7 @@ class DistanceRestraintList(RestraintList):
         for dr in self:
             dr.simplify()
 
-    def deassignStereospecificity(self, MAX_MESSAGES=100):
+    def deassignStereospecificity(self, max_messages=100):
         """Deassign all"""
         msgHol = MsgHoL()
         for dr in self:
@@ -3352,7 +3352,7 @@ class DistanceRestraintList(RestraintList):
             status = dr.deassignStereospecificity()
             if status == DistanceRestraint.STATUS_DEASSIGNED:
                 msgHol.appendMessage("%s deassigned to:%s" % (strDrAtomPairs,str(dr.atomPairs)))
-        msgHol.showMessage(max_messages=MAX_MESSAGES)
+        msgHol.showMessage(max_messages=max_messages)
 
     def analyze(self):
         """
@@ -3723,7 +3723,7 @@ class DihedralRestraint(Restraint):
                     atomList = [self.atoms[k] for k in range(3)]
                     atomList.append( lastAtom2 )
                     coorList = [ atom.coordinates[i] for atom in atomList]
-                    d = NTdihedralOpt( *coorList )
+                    d = nTdihedralOpt( *coorList )
                     if d == None:
 #                        nTdebug("Failed to calculate an angle; which can happen if a coordinate is missing.")
                         continue

@@ -29,7 +29,7 @@ def usage():
   """)
 
 
-class toposcmd:
+class Toposcmd:
     def __init__(self, realm='https://topos.grid.sara.nl/4.1/', pool='vCing', timeout = 300):
         self.realm    = realm
         self.pool     = pool
@@ -171,8 +171,8 @@ args:      %s""" % (self.realm, self.pool,self.timeout,self.token,self.url,self.
         try:
             self.curl.perform()
         except:
-            NTtracebackError()
-            nTmessage( "exception was caught in toposcmd.get_token()" )
+            nTtracebackError()
+            nTmessage( "exception was caught in Toposcmd.get_token()" )
             return
         nTmessage( self.curl.result.getvalue().split("/")[-1] )
         self.curl.result.seek(0)
@@ -199,8 +199,8 @@ args:      %s""" % (self.realm, self.pool,self.timeout,self.token,self.url,self.
 #        try:
 #            self.curl.perform()
 #        except:
-#            NTtracebackError()
-#            nTmessage( "exception was caught in toposcmd.get_num_tokens()" )
+#            nTtracebackError()
+#            nTmessage( "exception was caught in Toposcmd.get_num_tokens()" )
 #            return
 #        self.curl.result.seek(0)
 #        for line in self.curl.result:
@@ -231,7 +231,7 @@ args:      %s""" % (self.realm, self.pool,self.timeout,self.token,self.url,self.
 
 def main():
 
-    cmd = toposcmd()
+    cmd = Toposcmd()
 
     try:
         opts, args = getopt.gnu_getopt(sys.argv[1:], "",

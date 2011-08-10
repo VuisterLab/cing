@@ -18,7 +18,7 @@ try:
 except:
     if cing.verbosity == cing.verbosityDebug:
         if False:
-            NTtracebackError()
+            nTtracebackError()
 # end try
 
 __author__ = cing.__author__ + "Wim Vranken <wim@ebi.ac.uk>"
@@ -117,7 +117,7 @@ def importFullStarProjects(starFileName, projectName, inputDir='.', outputDir='.
     try:
         ccpnProject.checkAllValid()
     except ApiError:
-        NTtracebackError()
+        nTtracebackError()
         nTerror("Failed ccpnProject.checkAllValid")
         nTerror("See issue: %s%d" % (issueListUrl, 266))
         return False
@@ -188,7 +188,7 @@ if __name__ == '__main__':
     try:
         status = not importFullStarProjects(starFileName, projectName, inputDir)
     except:
-        NTtracebackError()
+        nTtracebackError()
         status = True
 
     if status:

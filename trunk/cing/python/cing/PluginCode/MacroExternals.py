@@ -479,10 +479,10 @@ def mkYasaraByResidueROGMacro(project, path = None):
         yasara.ColorRes('All, Gray')
 
 
-    YasaraColorDict = dict(green = 240, orange = 150, red = 120)
+    yasaraColorDict = dict(green = 240, orange = 150, red = 120)
 
     for res in project.molecule.allResidues():
-        cmd = sprintf('residue %d,%s', res.resNum, YasaraColorDict[res.rogScore.colorLabel])
+        cmd = sprintf('residue %d,%s', res.resNum, yasaraColorDict[res.rogScore.colorLabel])
         if path:
             fprintf(stream, 'ColorRes %s\n', cmd)
         else:

@@ -35,7 +35,8 @@ if FAST_FOR_TESTING:
     nstepheat /= 10
     nstephot /= 10
     nstepcool /= 10
-    
+
+# pylint: disable=C0103
 class mdStepParameters( NTdict ): # Use this class to get formatted printing of the time step.
     def __init__(self, **kwds):
         NTdict.__init__( self, __CLASS__ = "mdStepParameters",
@@ -50,6 +51,7 @@ class mdStepParameters( NTdict ): # Use this class to get formatted printing of 
     #end def
 #end class
       
+# pylint: disable=C0103
 class refineParameters( NTdict ):
 
     def __init__(self, **kwds):
@@ -210,6 +212,7 @@ parameters = refineParameters(
     #end def
 #end class
 
+# pylint: disable=C0103
 class refineNoeParameters( NTdict ):
     def __init__( self, name, **kwds ):
         NTdict.__init__( self, __CLASS__ = "refineNoeParameters",
@@ -1346,15 +1349,15 @@ end
 """ % ( chain.name, topScript, pdbFile )
 
         for pair in self.patchDISN:
-            self.script += "patch DISN  reference=1  =( segi %s and resid %s )  reference=2=( segi %s and resid %s )        end\n" % NTflatten(pair)
+            self.script += "patch DISN  reference=1  =( segi %s and resid %s )  reference=2=( segi %s and resid %s )        end\n" % nTflatten(pair)
         for pair in self.patchDISU:
-            self.script += "patch DISU  reference=1  =( segi %s and resid %s )  reference=2=( segi %s and resid %s )        end\n" % NTflatten(pair)
+            self.script += "patch DISU  reference=1  =( segi %s and resid %s )  reference=2=( segi %s and resid %s )        end\n" % nTflatten(pair)
         for resid in self.patchHISD:                    
-            self.script += "patch HISD  reference=nil=( segi %s and resid %s ) end\n" % NTflatten(resid)
+            self.script += "patch HISD  reference=nil=( segi %s and resid %s ) end\n" % nTflatten(resid)
         for resid in self.patchHISE:                    
-            self.script += "patch HISE  reference=nil=( segi %s and resid %s ) end\n" % NTflatten(resid)
+            self.script += "patch HISE  reference=nil=( segi %s and resid %s ) end\n" % nTflatten(resid)
         for resid in self.patchCISP:                    
-            self.script += "patch CISP  reference=nil=( segi %s and resid %s ) end\n" % NTflatten(resid)
+            self.script += "patch CISP  reference=nil=( segi %s and resid %s ) end\n" % nTflatten(resid)
 
         self.script += """
 write psf output=""" + self.psfFile  + """ end

@@ -5,8 +5,8 @@ from cing.NRG.CasdNmrMassageCcpnProject import dataDir
 from cing.NRG.CasdNmrMassageCcpnProject import mapEntrycodeNew2EntrycodeAndCity
 from cing.NRG.CasdNmrMassageCcpnProject import programHoH
 from cing.NRG.casdNmrPresetDict import presetDict
-from cing.Scripts.FC.convertCyana2Ccpn import importCyanaCoordinatesAndRestraints
-from cing.Scripts.FC.convertXplor2Ccpn import importXplorCoordinatesAndRestraints
+from cing.Scripts.FC.convertCyana2Ccpn import importCyanaCoorAndRes
+from cing.Scripts.FC.convertXplor2Ccpn import importXplorCoorAndRes
 from cing.Scripts.FC.utils import importPseudoPdb
 from cing.Scripts.FC.utils import swapCheck
 from cing.core.classes import Project
@@ -136,10 +136,10 @@ def annotateEntry(entryCodeNew, *extraArgList):
 
     if replaceCoordinates or replaceRestraints:
         if programId == CYANA:
-            importCyanaCoordinatesAndRestraints(ccpnProject, inputAuthorDir, guiRoot,
+            importCyanaCoorAndRes(ccpnProject, inputAuthorDir, guiRoot,
                 replaceCoordinates=replaceCoordinates, replaceRestraints=replaceRestraints, allowPopups=allowPopups, minimalPrompts=minimalPrompts, verbose=verbose, **presets)
         elif programId == XPLOR:
-            importXplorCoordinatesAndRestraints(ccpnProject, inputAuthorDir, guiRoot,
+            importXplorCoorAndRes(ccpnProject, inputAuthorDir, guiRoot,
                 replaceCoordinates=replaceCoordinates, replaceRestraints=replaceRestraints, allowPopups=allowPopups, minimalPrompts=minimalPrompts, verbose=verbose, **presets)
         elif programId == PDB:
             importPseudoPdb(ccpnProject, inputAuthorDir, guiRoot,
@@ -184,6 +184,6 @@ if __name__ == "__main__":
     try:
         status = annotateEntry(*sys.argv[1:])
     except:
-        NTtracebackError()
+        nTtracebackError()
     finally:
         nTmessage(getStopMessage(cing.starttime))

@@ -59,7 +59,7 @@ def importFromPDB(molecule, pdbFile, convention = IUPAC, nmodels = None, allowNo
 Molecule.importFromPDB = importFromPDB
 
 
-
+# pylint: disable=C0103
 class pdbParser:
     """
     Class to parse the pdb file and import into molecule instance

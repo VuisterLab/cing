@@ -63,7 +63,7 @@ commonAAList = common20AAList + "ASPH GLUH HISE CYSS".split() # do not put these
 commonNAList = "A T G C U".split()
 commonResidueList = commonAAList + commonNAList
 
-common20AADict = NTlist2dict(common20AAList)
+common20AADict = nTlist2dict(common20AAList)
 
 # GWV: moved to database.py
 #terminalAtomDict = NTdict()
@@ -1787,7 +1787,7 @@ class Molecule( NTtree, ResidueList ):
                 atom.resonances = NTlist( atom.resonances() )
         #end for
 
-    def setVascoChemicalShiftCorrections(self, rerefInfo, resonanceList ):
+    def setVascoCsCorrections(self, rerefInfo, resonanceList ):
         """
         Return True on error
         """
@@ -1808,16 +1808,16 @@ class Molecule( NTtree, ResidueList ):
     #end def
 
 
-    def applyVascoChemicalShiftCorrections(self, doRevert = False, resonanceList = None):
+    def applyVascoCsCorrections(self, doRevert = False, resonanceList = None):
         """
         Set doRevert to undo previously applied corrections.
         The corrections should first be made part of the CING project molecule.vascoResults
-        using setVascoChemicalShiftCorrections
+        using setVascoCsCorrections
         If resonanceList is None then do all present.
         Return True on error
         """
         func_name = getCallerName()
-#        nTdebug("Doing applyVascoChemicalShiftCorrections with doRevert %s on %s" % (doRevert, resonanceList))
+#        nTdebug("Doing applyVascoCsCorrections with doRevert %s on %s" % (doRevert, resonanceList))
 #        resonanceCount = len(self.resonanceSources)
         resonanceLoL = [resonanceList]
         if resonanceList == None:
@@ -1840,7 +1840,7 @@ class Molecule( NTtree, ResidueList ):
 
             resList = self.allCommonAaResidues()
             if not resList:
-                nTmessage("Skipping applyVascoChemicalShiftCorrections because there are no common amino acids.")
+                nTmessage("Skipping applyVascoCsCorrections because there are no common amino acids.")
                 return
             atomListAll = getAssignedAtomListForResList(resList, resonanceListIdx = resonanceListIdx)
             if not atomListAll:
@@ -2163,7 +2163,7 @@ class Molecule( NTtree, ResidueList ):
     def idDisulfides(self, toFile=False, applyBonds=True):
         """Identify the disulfide bonds.
         Takes into account residues with missing coordinates as long as they are all missing.
-        By default the bonds that are determined with a certainty above CUTOFF_SCORE will actually be
+        By default the bonds that are determined with a certainty above cUTOFF_SCORE will actually be
         applied.
         Will consider CYS and CYSS.
 
@@ -2173,8 +2173,8 @@ class Molecule( NTtree, ResidueList ):
         """
         pairList = []
 
-        CUTOFF_SCORE = 0.9 # Default is 0.9
-        CUTOFF_SCORE_MAYBE = 0.3 # Default is 0.3
+        cUTOFF_SCORE = 0.9 # Default is 0.9
+        cUTOFF_SCORE_MAYBE = 0.3 # Default is 0.3
 
         if self.modelCount == 0:
             nTwarning('idDisulfides: no models for "%s"', self)
@@ -2225,7 +2225,7 @@ class Molecule( NTtree, ResidueList ):
                     nTdebug( 'chi3             : %s', chi3SS( db[0] ))
                     nTdebug( 'scores           : %s', disulfideScore( c1, c2))
                     nTdebug( '\n\n' )
-                if scoreList[3] >= CUTOFF_SCORE:
+                if scoreList[3] >= cUTOFF_SCORE:
                     toAdd = True
                     for c in ( c1, c2 ):
                         if cyssDict2Pair.has_key( c ):
@@ -2260,9 +2260,9 @@ class Molecule( NTtree, ResidueList ):
             fprintf(f, '========= Disulfide analysis %s =========\n\n', self)
             for c1,c2,scoreList in disulfides:
                 fprintf(f, '%s %s: scores dCa, dCb, S-S dihedral: %s ', c1,c2,scoreList)
-                if scoreList[3] >= CUTOFF_SCORE:
+                if scoreList[3] >= cUTOFF_SCORE:
                     fprintf(f,' certain disulfide\n')
-                elif scoreList[3] >= CUTOFF_SCORE_MAYBE:
+                elif scoreList[3] >= cUTOFF_SCORE_MAYBE:
                     fprintf(f,' potential disulfide\n')
                 else:
                     fprintf(f,'\n')
@@ -2276,7 +2276,7 @@ class Molecule( NTtree, ResidueList ):
 #            nTdebug('Applying %d disulfide bonds' % len(disulfides))
             for c1,c2,scoreList in disulfides:
 #                nTdebug('%s %s: scores dCa, dCb, S-S dihedral: %s ' %( c1,c2,scoreList))
-                if scoreList[3] < CUTOFF_SCORE:
+                if scoreList[3] < cUTOFF_SCORE:
 #                    nTdebug("Skipping potential disulfide")
                     continue
                 for c in (c1, c2):
@@ -2397,8 +2397,8 @@ class Molecule( NTtree, ResidueList ):
 Static method to initialize a Molecule from path
 Return an Molecule instance or None on error
 
-       fromFile:  File ==  <resName1 [resNum1] [chainId1] [Nterminal|Cterminal]
-                            resName2 [resNum2] [chainId2] [Nterminal|Cterminal]
+       fromFile:  File ==  <resName1 [resNum1] [chainId1] [nTerminal|Cterminal]
+                            resName2 [resNum2] [chainId2] [nTerminal|Cterminal]
                             ...
                            >
         """
@@ -2436,16 +2436,16 @@ Return an Molecule instance or None on error
                 chainId = molecule.ensureValidChainId( chainId )
 
                 if f.NF >= 4 and f.dollar[4] == 'Nterminal':
-                    Nterminal = True
+                    nTerminal = True  
                 else:
-                    Nterminal = False
+                    nTerminal = False
 
                 if f.NF >= 4 and f.dollar[4] == 'Cterminal':
-                    Cterminal = True
+                    cTerminal = True 
                 else:
-                    Cterminal = False
+                    cTerminal = False
 
-                molecule.addResidue( chainId, resName, resNum, convention, Nterminal=Nterminal, Cterminal=Cterminal )
+                molecule.addResidue( chainId, resName, resNum, convention, Nterminal=nTerminal, Cterminal=cTerminal )
             #end if
         #end for
         nTmessage("%s", molecule.format())
@@ -2453,6 +2453,7 @@ Return an Molecule instance or None on error
     #end def
     initialize = staticmethod( initialize )
 
+    # pylint: disable=C0103
     def addResidue( self, chainId, resName, resNum, convention, Nterminal=False, Cterminal=False ):
         """
         Internal routine to add a residue to molecule
@@ -4464,19 +4465,19 @@ Residue class: Defines residue properties
                 else:
                     msgHol.appendDebug(msg)
             return
-        CA_atms = doublet.zap('CA')
-        CB_atms = [] # CB or Gly HA3 (called HA2 in INTERNAL_0) atom list
+        ca_atms = doublet.zap('CA')
+        cb_atms = [] # CB or Gly HA3 (called HA2 in INTERNAL_0) atom list
         for doubletResidue in doublet:
             resTypeSimple = getDeepByKeys(doubletResidue.db.nameDict, IUPAC)
             if resTypeSimple not in commonAAList:
 #                nTdebug( "Skipping doublet %s with uncommon residue: %s" % (doublet, doubletResidue))
                 continue
 
-#            CB_atm = None
+#            cb_atm = None
 #            if doubletResidue.has_key('CB'):
-#                CB_atm = doubletResidue.CB
+#                cb_atm = doubletResidue.CB
 #            elif doubletResidue.has_key(GLY_HA3_NAME_CING):
-#                CB_atm = doubletResidue[GLY_HA3_NAME_CING]
+#                cb_atm = doubletResidue[GLY_HA3_NAME_CING]
 #            else:
 #                nTerror( 'Molecule.addDihedralD1: skipping for absent CB/%s in doubletResidue %s of doublet %s' % ( 
 #                            GLY_HA3_NAME_CING, doubletResidue, doublet ))
@@ -4484,10 +4485,10 @@ Residue class: Defines residue properties
 
             # Use the API!
             if doubletResidue.hasProperties('GLY'):
-                CB_atm = doubletResidue.getAtom('HA3',IUPAC)
+                cb_atm = doubletResidue.getAtom('HA3',IUPAC)
             else:
-                CB_atm = doubletResidue.getAtom('CB',IUPAC)
-            if not CB_atm:
+                cb_atm = doubletResidue.getAtom('CB',IUPAC)
+            if not cb_atm:
 #                msg = 'Residue.addDihedralD1: skipping for absent CB/%s in doubletResidue %s of doublet %s' % ( 
 #                        GLY_HA3_NAME_CING, doubletResidue, doublet )
                 if msgHol == None:
@@ -4496,15 +4497,15 @@ Residue class: Defines residue properties
                     msgHol.appendError(msg)
                 continue
 
-            CB_atms.append(CB_atm)
-#                print res, triplet, CA_atms, CB_atms
-        if len(CB_atms) != len(doublet): # skip for preceding or trailing uncommon residues for now.
+            cb_atms.append(cb_atm)
+#                print res, triplet, ca_atms, cb_atms
+        if len(cb_atms) != len(doublet): # skip for preceding or trailing uncommon residues for now.
 #            nTdebug( '"CB" (or %s) missing in triplet %s' % (GLY_HA3_NAME_CING, doublet ))
             return
         prevRes = doublet[0]
         d1 = Dihedral( self, DIHEDRAL_NAME_Cb4N, range=range0_360)
         d1PrevRes = Dihedral( prevRes, DIHEDRAL_NAME_Cb4C, range=range0_360)
-        d1.atoms = [CB_atms[0], CA_atms[0], CA_atms[1], CB_atms[1]]
+        d1.atoms = [cb_atms[0], ca_atms[0], ca_atms[1], cb_atms[1]]
         d1PrevRes.atoms = d1.atoms
 
         missingCoordinates = False
@@ -4586,13 +4587,13 @@ Residue class: Defines residue properties
         Uses the data in:
         Frans Mulder's Leucine side-chain conformations and dynamics in proteins from 13D NMR chemical shifts. ChemBioChem (2009)
 
-        DELTA delta(13C) = 13CD1-13CD2 = -5 + 10*Pt (Eq.2)
+        DELTA delta(13C) = 13CD1-13CD2 = -5 + 10*pt (Eq.2)
 
-        With Pt is the portion trans (180) for chi2 and assumed Pt = 1 - Pg.
+        With pt is the portion trans (180) for chi2 and assumed pt = 1 - Pg.
         With Pg being gauche+ (60) for chi2
 
         The cutoff for assuming the CS difference indicates multiple rotameric state is set to -4 < csd < 4 which corresponds to
-        0.1 < Pt < 0.9.
+        0.1 < pt < 0.9.
 
         The cutoff for assuming the chi2 dihedral is sampling multiple rotameric states is set to having a cv over 0.2.
 
@@ -4604,7 +4605,7 @@ Residue class: Defines residue properties
             -
         """
 
-        CUTOFF_LOL_CSD_LEU_CD = [[ -4, 4 ], [ -3, 3 ]] # ERROR/WARNING LIMITS
+        cUTOFF_LOL_CSD_LEU_CD = [[ -4, 4 ], [ -3, 3 ]] # ERROR/WARNING LIMITS
         cvCutOffList = [ 0.2, 0.2 ]
         if not self.hasProperties('LEU'):
             nTerror("Can not validateChemicalShiftLeu for non Leu: %s" % self)
@@ -4632,17 +4633,17 @@ Residue class: Defines residue properties
 #            nTdebug("%s is not ssa" % atomC1)
             return
 
-#        shiftDifference = -5. + 10.*Pt
-        Pt = (shiftDifference + 5.)/10.
-        PtLimited = limitToRange(Pt, 0., 1.)
-        if Pt != PtLimited:
+#        shiftDifference = -5. + 10.*pt
+        pt = (shiftDifference + 5.)/10.
+        ptLimited = limitToRange(pt, 0., 1.)
+        if pt != ptLimited:
             nTwarning("CS difference for C in %s exceed expected range of [-5,5] being at %s" % (self, shiftDifference))
-            Pt = PtLimited
+            pt = ptLimited
 
 #        for i,color in enumerate( [ COLOR_RED, COLOR_ORANGE ]):
         for i,color in enumerate( [ COLOR_RED ]):
             str = None
-            rangeListCd = CUTOFF_LOL_CSD_LEU_CD[i]
+            rangeListCd = cUTOFF_LOL_CSD_LEU_CD[i]
             # Determine CS indication
             csIndicatesAveraging = rangeListCd[0] < shiftDifference < rangeListCd[1]
             csIndicatesSingleConformer = None
@@ -4658,16 +4659,16 @@ Residue class: Defines residue properties
                 return True
 
             cvIndicatesAveraging = chi.cv >= cvCutOffList[ i ]
-            dihedralIndicatesSingleConformer = chi.getRotamerState()
-            if dihedralIndicatesSingleConformer == None:
+            dihForSingleConformer = chi.getRotamerState()
+            if dihForSingleConformer == None:
                 nTerror("Failed to get rotameric state of %s" % self)
                 return True
 #            nTdebug("res shiftDifference, csIndicatesAveraging, csIndicatesSingleConformer, cvIndicatesAveraging, " +\
-#                    "dihedralIndicatesSingleConformer: %10s %8.3f %s %s %s %s" % (
+#                    "dihForSingleConformer: %10s %8.3f %s %s %s %s" % (
 #                   self, shiftDifference, csIndicatesAveraging, csIndicatesSingleConformer, cvIndicatesAveraging, 
-#                   dihedralIndicatesSingleConformer ))
-            if dihedralIndicatesSingleConformer == DIHEDRAL_300_STR:
-                str = 'Conformer %s chi impossible regardless of csd value [%.3f]' % (dihedralIndicatesSingleConformer, shiftDifference)
+#                   dihForSingleConformer ))
+            if dihForSingleConformer == DIHEDRAL_300_STR:
+                str = 'Conformer %s chi impossible regardless of csd value [%.3f]' % (dihForSingleConformer, shiftDifference)
                 # will be flagged by other software as well so eliminate here?
             else:
                 if cvIndicatesAveraging:
@@ -4681,9 +4682,9 @@ Residue class: Defines residue properties
                         str = 'csd [%.3f]: averaging but cv [%.3f]' % (shiftDifference, chi.cv)
                     else:
                         # cs and dihedral agree on single conformer. Now do they match?
-                        if csIndicatesSingleConformer == dihedralIndicatesSingleConformer:
+                        if csIndicatesSingleConformer == dihForSingleConformer:
                             continue
-                        str = 'csd [%.3f]: %s but found %s' % (shiftDifference,csIndicatesSingleConformer,dihedralIndicatesSingleConformer)
+                        str = 'csd [%.3f]: %s but found %s' % (shiftDifference,csIndicatesSingleConformer,dihForSingleConformer)
                     # end if
                 # end if
             # end if
@@ -4934,7 +4935,7 @@ class Dihedral( NTlist ):
         del(self[:]) # initialize
 
         for i in range(0,n):
-            self.append( NTdihedralOpt(
+            self.append( nTdihedralOpt(
                                        self.atoms[0].coordinates[i],
                                        self.atoms[1].coordinates[i],
                                        self.atoms[2].coordinates[i],
@@ -5330,7 +5331,7 @@ coordinates: %s"""  , dots, self, dots
         if modelIdx != None:
             modelToDoList = [ modelIdx ] 
         for i in modelToDoList:            
-            self.distances.append( NTdistanceOpt(self.coordinates[i], other.coordinates[i]) )
+            self.distances.append( nTdistanceOpt(self.coordinates[i], other.coordinates[i]) )
         #end for
         av,sd,dummy = self.distances.average()
         minv = min(self.distances)
@@ -5409,7 +5410,7 @@ coordinates: %s"""  , dots, self, dots
 #
 # #            self.rmsd = 0.0
 # #            for c in self.coordinates:
-# #                self.rmsd += NTdistance(c, self.meanCoordinate )
+# #                self.rmsd += nTdistance(c, self.meanCoordinate )
 # #            #end for
 # #            self.rmsd /= fn
 # #        #end if
@@ -5434,7 +5435,7 @@ coordinates: %s"""  , dots, self, dots
         #end if
         self.angles = NTlist()
         for i in range(0, lenSelf):
-            self.angles.append( NTangleOpt(other1.coordinates[i], self.coordinates[i], other2.coordinates[i], radians=radians ) )
+            self.angles.append( nTangleOpt(other1.coordinates[i], self.coordinates[i], other2.coordinates[i], radians=radians ) )
         #end for
         cav,cv,dummy = self.angles.cAverage( minValue=min, maxValue=max, radians= radians )
         return (cav,cv)
@@ -6211,6 +6212,7 @@ Added getter/setters for the non obvious ones.
     """
     DEFAULT_BFACTOR   = 0.0
     DEFAULT_OCCUPANCY = 1.0
+    # pylint: disable=C0103
     def __init__( self, x, y, z, Bfac=DEFAULT_BFACTOR, occupancy=DEFAULT_OCCUPANCY, atom=None ):
         list.__init__( self  )
         self.append( x )
@@ -6236,7 +6238,7 @@ Added getter/setters for the non obvious ones.
         return self
 
 
-def NTdistance( c1, c2 ):
+def nTdistance( c1, c2 ):
     """
     Return distance defined by Coordinate instances c1-c2
     """
@@ -6244,7 +6246,7 @@ def NTdistance( c1, c2 ):
 #end def
 
 
-def NTangle( c1, c2, c3, radians = False ):
+def nTangle( c1, c2, c3, radians = False ):
     """
     Return angle defined by Coordinate instances c1-c2-c3
     """
@@ -6255,7 +6257,7 @@ def NTangle( c1, c2, c3, radians = False ):
     return a.angle( b, radians=radians )
 #end def
 
-def NTdihedral( c1, c2, c3, c4, radians=False ):
+def nTdihedral( c1, c2, c3, c4, radians=False ):
     """
     Return dihedral angle defined by Coordinate instances c1-c2-c3-c4
     Adapted from biopython-1.41
@@ -6284,7 +6286,7 @@ def NTdihedral( c1, c2, c3, c4, radians=False ):
     return angle
 #end def
 
-def NTdistanceOpt( c1, c2 ):
+def nTdistanceOpt( c1, c2 ):
     """
     Return distance defined by Coordinate instances c1-c2
     """
@@ -6294,7 +6296,7 @@ def NTdistanceOpt( c1, c2 ):
     return length3Dopt(d)
 
 
-def NTangleOpt( c1, c2, c3, radians = False ):
+def nTangleOpt( c1, c2, c3, radians = False ):
     """
     Return angle defined by Coordinate instances c1-c2-c3
     """
@@ -6308,7 +6310,7 @@ def NTangleOpt( c1, c2, c3, radians = False ):
 #end def
 
 #end def
-def NTdihedralOpt( c1, c2, c3, c4 ):
+def nTdihedralOpt( c1, c2, c3, c4 ):
     """ To replace unoptimized routine. It's 7 times faster (20.554/2.965s)
     for 100,000 calculations. Since last the performance dropped with
     the coordinate based on CoordinateOld(list) to 3.0 s per 10,000.
@@ -6670,15 +6672,15 @@ def disulfideScore( cys1, cys2 ):
 
     score = NTlist(0., 0., 0., 0.)
     for m in range( mc ):
-        da = NTdistance( cys1.CA.coordinates[m], cys2.CA.coordinates[m] )
+        da = nTdistance( cys1.CA.coordinates[m], cys2.CA.coordinates[m] )
         if da >= 3.72 and da <= 6.77:
             score[0] += 1
 
-        db = NTdistance( cys1.CB.coordinates[m], cys2.CB.coordinates[m] )
+        db = nTdistance( cys1.CB.coordinates[m], cys2.CB.coordinates[m] )
         if db >= 3.18 and db <= 4.78:
             score[1] += 1
 
-        dg = NTdistance( cys1.SG.coordinates[m], cys2.SG.coordinates[m] )
+        dg = nTdistance( cys1.SG.coordinates[m], cys2.SG.coordinates[m] )
         chi3 = chi3SS( db )
         if (dg >= 1.63 and dg <= 2.72) or (chi3 >= 27.0 and chi3 <= 153.0):
             score[2] += 1
@@ -6857,8 +6859,8 @@ def getTripletHistogramList(resTypeListBySequenceOrder, doOnlyOverall = False, s
         return histList
 
     # NB this is now in percentage as they have been normalized.
-    Ctuple = getEnsembleAverageAndSigmaHis( histOverall )
-    (c_av, c_sd, hisMin, hisMax) = Ctuple
+    cTuple = getEnsembleAverageAndSigmaHis( histOverall )
+    (c_av, c_sd, hisMin, hisMax) = cTuple
     zMin = (hisMin - c_av) / c_sd
     zMax = (hisMax - c_av) / c_sd
 
@@ -6874,8 +6876,8 @@ def getTripletHistogramList(resTypeListBySequenceOrder, doOnlyOverall = False, s
 #        histOverall *= 3.    # to get it's sum back to 100%
     histOverall -= c_av
     histOverall /= c_sd
-    CtupleA = getArithmeticAverageAndSigmaHis(histOverall)
-    (c_avA, c_sdA, hisMinA, hisMaxA) = CtupleA
+    cTupleA = getArithmeticAverageAndSigmaHis(histOverall)
+    (c_avA, c_sdA, hisMinA, hisMaxA) = cTupleA
     msg = '%s %s %s %s %12.3f %12.3f %12.3f %12.3f' % ('A', resTypePrev, resType, resTypeNext,
         c_avA, c_sdA, hisMinA, hisMaxA)
     if hisMaxA < c_avA:
@@ -6887,10 +6889,10 @@ def getTripletHistogramList(resTypeListBySequenceOrder, doOnlyOverall = False, s
         hist *= 3.    # to get it's sum back to 100%
         hist -= c_av
         hist /= c_sd
-#            CtupleSS = getEnsembleAverageAndSigmaHis( hist )
-        CtupleSS = getArithmeticAverageAndSigmaHis(hist)
-#            nTdebug("CtupleSS: [%s]" % str(CtupleSS))
-        (c_avSS, c_sdSS, hisMinSS, hisMaxSS) = CtupleSS
+#            cTupleSS = getEnsembleAverageAndSigmaHis( hist )
+        cTupleSS = getArithmeticAverageAndSigmaHis(hist)
+#            nTdebug("cTupleSS: [%s]" % str(cTupleSS))
+        (c_avSS, c_sdSS, hisMinSS, hisMaxSS) = cTupleSS
         mySsType = ssIdxToType(i)
         msg = '%s %s %s %s %12.3f %12.3f %12.3f %12.3f' % (mySsType, resTypePrev, resType, resTypeNext,
             c_avSS, c_sdSS, hisMinSS, hisMaxSS)

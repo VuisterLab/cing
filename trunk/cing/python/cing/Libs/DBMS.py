@@ -129,7 +129,7 @@ class Relation():
             resource = urllib.urlopen(url_links)
             reader = csv.reader(resource)
         except IOError:
-            NTtracebackError()
+            nTtracebackError()
             nTerror("Couldn't open url for reader: " + url_links)
             return True
 

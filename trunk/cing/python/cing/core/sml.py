@@ -25,6 +25,7 @@ SMLfileVersion = None
 class SmlFile(file):
     def __init__(self, *args, **kwds):
         file.__init__(self, *args, **kwds)
+        # pylint: disable=C0103
         self.NR = 0
     #end def
 
@@ -457,9 +458,9 @@ class SMLMoleculeHandler( SMLhandler ):
                         mol.addResidue( chain, resName, resNum, convention )
                     #end for
                 else:
-                # Newer _sequence format with N-, C-terminal defs >= 0.23
-                    for chain, resName, resNum, Nterminal, Cterminal, convention in _sequence:
-                        mol.addResidue( chain, resName, resNum, convention, Nterminal, Cterminal )
+                    # Newer _sequence format with N-, C-terminal defs >= 0.23
+                    for chain, resName, resNum, nTerminal, cTerminal, convention in _sequence:
+                        mol.addResidue( chain, resName, resNum, convention, nTerminal, cTerminal )
                     #end for
                 #end if
             elif n > 3 and SMLstarthandlers.has_key(line[3]):

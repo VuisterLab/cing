@@ -3,6 +3,7 @@ Created on Aug 30, 2010
 
 @author: jd
 '''
+
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.PluginCode.required.reqVasco import * #@UnusedWildImport
 from cing.core.ROGscore import ROGscore
@@ -142,12 +143,12 @@ class RestraintList(NTlist, ProjectListMember):
         Never complain.
         """
         modelCount = None
-        MAX_RESTRAINTS_TO_TEST = 10 # disable feature after testing.
+        mAX_RESTRAINTS_TO_TEST = 10 # disable feature after testing.
         for i, restraint in enumerate(self):
             modelCount = restraint.getModelCount()
             if modelCount != None:
                 return modelCount
-            if i == MAX_RESTRAINTS_TO_TEST:
+            if i == mAX_RESTRAINTS_TO_TEST:
 #                nTwarning("getModelCount returned None for the first %d restraints; giving up." % i)
                 return None
 #        nTwarning("getModelCount returned None for all %d restraints; giving up." % len(self))
@@ -320,7 +321,7 @@ class ResonanceList(NTlist, ProjectListMember):
     # end def
 # end class
 
-def resonanceListGetIndexFirstObjectWithRealValue(resonanceList):
+def getIndexRealResList(resonanceList):
     """
     Return index of resonance that has an actual value or -1 if no such resonance exists in this list.
     Input can be a NTlist or a ResonanceList instance.

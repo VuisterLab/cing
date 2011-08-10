@@ -62,8 +62,8 @@ class Wattos(NTdict):
         self.checks = None
         self.molecule = molecule
         self.rootPath = rootPath
-        self.SURPLUS_CHECK_FILE_NAME_BASE = "wattos_surplus_chk"
-        self.COMPLETENESS_CHECK_FILE_NAME = "wattos_completeness_chk.str"
+        self.surplus_check_file_name_base = "wattos_surplus_chk"
+        self.completeness_check_file_name = "wattos_completeness_chk.str"
         self.ranges                = ranges
 
         self.scriptTemplate = """
@@ -120,7 +120,7 @@ n
 1
 1
 """ + \
-self.SURPLUS_CHECK_FILE_NAME_BASE + \
+self.surplus_check_file_name_base + \
 """
 y
 y
@@ -149,7 +149,7 @@ CheckCompleteness
 n
 ob_standard.str
 """ + \
-self.COMPLETENESS_CHECK_FILE_NAME + \
+self.completeness_check_file_name + \
 """
 n
 wattos_completeness_chk
@@ -291,7 +291,7 @@ def runWattos(project, ranges=None, tmp = None, parseOnly=False):
         return _runWattos(project, ranges=ranges, tmp = tmp, parseOnly=parseOnly)
     except:
         nTerror("Failed runWattos by throwable below.")
-        NTtracebackError()
+        nTtracebackError()
         return True
 
 def _runWattos(project, ranges=None, tmp = None, parseOnly=False):
@@ -391,7 +391,7 @@ def _runWattos(project, ranges=None, tmp = None, parseOnly=False):
         # estimate to do **0.5 residues per minutes as with entry 1bus on dual core intel Mac.
         timeRunEstimatedInSeconds = 0.025 * mol.modelCount * len(mol.allResidues())
         timeRunEstimatedInSeconds *= 60
-        timeRunEstimatedList = timedelta2HoursMinutesAndSeconds(timeRunEstimatedInSeconds)
+        timeRunEstimatedList = timedelta2Hms(timeRunEstimatedInSeconds)
         nTmessage('==> Running Wattos for an estimated (5,000 atoms/s): %s hours, %s minutes and %s seconds; please wait' % timeRunEstimatedList)
         scriptFileName = "wattos.script"
         scriptFullFileName = os.path.join(wattosDir, scriptFileName)
@@ -422,7 +422,7 @@ def _runWattos(project, ranges=None, tmp = None, parseOnly=False):
     if not project.hasDistanceRestraints():
         return wattos
 
-    fullname = os.path.join(wattosDir, wattos.COMPLETENESS_CHECK_FILE_NAME)
+    fullname = os.path.join(wattosDir, wattos.completeness_check_file_name)
     if not os.path.exists(fullname):
         nTwarning("Failed to find wattos completeness check result file: %s" % fullname)
         return None
@@ -433,7 +433,7 @@ def _runWattos(project, ranges=None, tmp = None, parseOnly=False):
         return None
 
 
-    pathOutSurplus = os.path.join(path, wattos.SURPLUS_CHECK_FILE_NAME_BASE + '_summary.txt')
+    pathOutSurplus = os.path.join(path, wattos.surplus_check_file_name_base + '_summary.txt')
     if not os.path.exists(pathOutSurplus): # Happened for 1ao2 on production machine; not on development...
         nTerror("Path does not exist: %s" % (pathOutSurplus))
         return True

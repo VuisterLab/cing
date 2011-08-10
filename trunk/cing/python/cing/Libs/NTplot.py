@@ -27,7 +27,7 @@ NT_MOLECULE_PLOT_IDX_X_VALUE = 0
 NT_MOLECULE_PLOT_IDX_VALUE_LIST = 1
 NT_MOLECULE_PLOT_IDX_ROG_COLOR = 2
 
-def NTplotAttributes( **kwds ):
+def nTplotAttributes( **kwds ):
     a = NTdict()
 
     a.__FORMAT__ =    '=== plotting attributes ===\n' +\
@@ -81,17 +81,17 @@ def NTplotAttributes( **kwds ):
 #end def
 
 def lineAttributes( type='solid', width=1.0, color='black', alpha=1. ):
-    return NTplotAttributes( lineType=type, lineWidth=width, lineColor=color, alpha=alpha )
+    return nTplotAttributes( lineType=type, lineWidth=width, lineColor=color, alpha=alpha )
 #end def
 
 def boxAttributes( fill=True, fillColor='black', line=False, lineColor='black', alpha=1. ):
-    return NTplotAttributes( lineType='solid', lineColor=lineColor, line=line,
+    return nTplotAttributes( lineType='solid', lineColor=lineColor, line=line,
                              fill=fill, fillColor=fillColor, alpha=alpha
                            )
 #end def
 
 def fontAttributes( font='Helvetica', size=DEFAULT_FONT_SIZE, color='black', alpha=1. ):
-    return NTplotAttributes( font=font, fontSize=size, fontColor=color, alpha=alpha )
+    return nTplotAttributes( font=font, fontSize=size, fontColor=color, alpha=alpha )
 #end def
 
 def fontVerticalAttributes( horizontalalignment='left', verticalalignment  = 'center', rotation   = 'vertical', size=DEFAULT_FONT_SIZE ):
@@ -102,11 +102,11 @@ def fontVerticalAttributes( horizontalalignment='left', verticalalignment  = 'ce
     return result
 
 def pointAttributes( type='circle', size=4.0, pointEdgeWidth=2.0, color='black', alpha=1. ):
-    return NTplotAttributes( pointType=type, pointSize=size, pointEdgeWidth=pointEdgeWidth, pointColor=color, alpha=alpha )
+    return nTplotAttributes( pointType=type, pointSize=size, pointEdgeWidth=pointEdgeWidth, pointColor=color, alpha=alpha )
 #end def
 
 # Some default attributes
-defaultAttributes  = NTplotAttributes()
+defaultAttributes  = nTplotAttributes()
 
 SOLID_LINE_TYPE = 'solid'
 DOTTED_LINE_TYPE = 'dotted'
@@ -203,15 +203,15 @@ def integerNumberOnly(x,_dummy):
         return ''
     return '%.0f' % x
 
-def cmapWithAlphaGlidingScale(Z,palette,minAlpha=.5, maxAlpha=1., underAlpha=0., overAlpha=1.):
+def cmapWithAlpha(z,palette,minAlpha=.5, maxAlpha=1., underAlpha=0., overAlpha=1.):
     """Scales the alpha from the given min to max value based on input from 0 to 1."""
 
     diffAlpha = maxAlpha - minAlpha
-    tmp = palette(Z)
-    for i in xrange(Z.shape[0]):
-        for j in xrange(Z.shape[1]):
+    tmp = palette(z)
+    for i in xrange(z.shape[0]):
+        for j in xrange(z.shape[1]):
             # Generate the transparency (alpha mixing)
-            v = Z[i,j]
+            v = z[i,j]
             if v < 0.:
                 alpha = underAlpha
             elif v > 1.:

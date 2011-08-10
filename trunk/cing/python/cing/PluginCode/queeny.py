@@ -581,7 +581,7 @@ def runQueeny( project, tmp=None ):
         return _runQueeny( project, tmp=tmp )
     except:
         nTerror("Queeny failed as per below.")
-        NTtracebackError()
+        nTtracebackError()
         return True
 
 def _runQueeny( project, tmp=None ):
@@ -724,7 +724,7 @@ def restoreQueeny( project, tmp=None ):
             else:
                 obj[storedProp] = info
     except:
-        NTtracebackError()
+        nTtracebackError()
         nTerror("Failed to restore Queeny results.")
         return True
     return False
