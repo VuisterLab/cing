@@ -6441,22 +6441,15 @@ class SpintypeToElementMap(NTdict):
 spintypeToElementMap = SpintypeToElementMap()
 elementToSpintypeMap = spintypeToElementMap.invert()
 
-class AssignmentCountMap(NTdict):
+class AssignmentCountMap(CountMap):
     def __init__(self, *args, **kwds):
+        CountMap.__init__(self, __CLASS__ = 'AssignmentCountMap', *args, **kwds)
+#        self.__CLASS__ = 'AssignmentCountMap'
         d = {'1H': 0, '13C': 0, '15N': 0,  '31P':0} # sync these defs with RDB
         # skipping: O & S that are not observed in BMRB
         # Observed were F in bmr16409, & Cd in bmr4363. None in BMRB and PDB for these 2 nucleii so leave out of code for now.
 #        '19F':0, '113Cd': 0
-        NTdict.__init__(self, __CLASS__='AssignmentCountMap')
         self.update(d)
-    def __str__(self, showEmptyElements=0):
-        'Default is to have no zero elements. Using trick with different method name to prevent recursion.'
-        return self.__repr__(showEmptyElements=showEmptyElements)
-    def overallCount(self):
-        r = sum([self[key] for key in self.keys()]) # numpy.int64 type because sum is from numpy.
-        r = int(r)
-#        nTdebug("type of overall count %s: %s" % ( r, r.__class__))
-        return r
 #end class
 
 #==============================================================================

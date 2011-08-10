@@ -137,12 +137,12 @@ class CircularVector( NTvector ):
     Circular Distance vector class
     """
     def distanceSquared( self, other, period=360.0 ):
-        l = len(self)
-        if l != len(other):
+        n = len(self)
+        if n != len(other):
             return None
 
         d = 0.0
-        for i in range(l):
+        for i in range(n):
             delta = self[i]-other[i]
             fdelta = math.fabs( delta )
 
@@ -179,15 +179,15 @@ class PhiPsiModelList( NTlist ):
     #end def
 
     def calculateRMSD( self, other ):
-        l = len(self)
-        if l != len(other) or l==0:
+        n = len(self)
+        if n != len(other) or n==0:
             return -1.0
 
         rmsd = 0.0
-        for i in range(l):
+        for i in range(n):
             rmsd += self[i].distanceSquared(other[i], period=360.0)
             #print '>',i, self[i].residue, other[i].residue, rmsd
-        return math.sqrt( rmsd/l )
+        return math.sqrt( rmsd/n )
     #end def
 
     def __str__(self):
@@ -294,11 +294,11 @@ def calculatePairWisePhiPsiRmsd( mol1, mol2, ranges='auto' ):
 
 def calcPhiPsiRmsds( projects, ranges='auto', relative = True ):
 
-    l = len(projects)
+    n = len(projects)
 
-    rmsds = NTlistOfLists( l, l, NTvalue(NaN, NaN, fmt='%6.2f +- %5.2f' ) )
-    for i in range(l):
-        for j in range(i+1,l):
+    rmsds = NTlistOfLists( n, n, NTvalue(NaN, NaN, fmt='%6.2f +- %5.2f' ) )
+    for i in range(n):
+        for j in range(i+1,n):
             #print projects[i].group, projects[j].group
             rmsds[i].group = projects[i].group
             rmsds[j].group = projects[j].group
@@ -385,11 +385,11 @@ def calculatePairWiseRmsd( mol1, mol2, ranges=None ):
 
 def calcRmsds( projects, ranges='auto' ):
 
-    l = len(projects)
+    n = len(projects)
 
-    rmsds = NTlistOfLists( l, l, NTvalue(NaN, NaN, fmt='%6.2f +- %5.2f' ) )
-    for i in range(l):
-        for j in range(i+1,l):
+    rmsds = NTlistOfLists( n, n, NTvalue(NaN, NaN, fmt='%6.2f +- %5.2f' ) )
+    for i in range(n):
+        for j in range(i+1,n):
             #print projects[i].group, projects[j].group
             rmsds[i].group = projects[i].group
             rmsds[j].group = projects[j].group
@@ -417,25 +417,24 @@ def printTitle(title, length, stream=sys.stdout ):
     fprintf( stream, '%s\n  %s\n%s\n', line, title, line )
 
 def printRmsds( title, rmsds, stream=sys.stdout ):
-
-    l = len(rmsds)
-    printTitle(title, 20*(l+1), stream)
+    n = len(rmsds)
+    printTitle(title, 20*(n+1), stream)
     fprintf( stream, '%-20s%s\n','', rmsds.zap('group').format('  %-16s  '))
     for row in rmsds:
         fprintf( stream, '%-20s%s\n',  row.group, row.format('%-18s  '))
-    fprintf( stream, '%s\n', '_'*20*(l+1))
+    fprintf( stream, '%s\n', '_'*20*(n+1))
 #end def
 
 
 def printOverallScores( projects, stream = sys.stdout ):
     # Overall scores
 
-    l = len(projects)
-    if l == 0:
+    n = len(projects)
+    if n == 0:
         return
 
-    printTitle('Overall scores target '+projects.name, 20*(l+1), stream)
-#    line = dots20*(l+1)
+    printTitle('Overall scores target '+projects.name, 20*(n+1), stream)
+#    line = dots20*(n+1)
 #   fprintf( stream, '%s\n    Overall scores %s\n%s\n\n', line, projects.name, line )
     fprintf( stream, '%-20s%s\n\n', 'Parameter', projects.entries.zap('group').format('%-20s'))
 
@@ -471,13 +470,13 @@ def saveCingSummaries( projects ):
 
 def printRestraintScores( projects, stream=sys.stdout ):
 
-    l = len(projects)
-    if l == 0:
+    n = len(projects)
+    if n == 0:
         return
 
-#    print dots20*(l+1)
+#    print dots20*(n+1)
 #    print ' Restraints target', projects[0].target
-#    print dots20*(l+1)
+#    print dots20*(n+1)
 #    print
 
     hlen=40
@@ -535,11 +534,11 @@ def printScore( name, rogScore ):
 
 def printResidueScores( projects ):
 
-    l = len(projects)
+    n = len(projects)
 
-    print dots20*(l+1)
+    print dots20*(n+1)
     print '    Residues'
-    print dots20*(l+1)
+    print dots20*(n+1)
     p0 = projects[0]
     for res in p0.molecule.allResidues():
         printf('%s %s %s\n',  '-'*5, res, '-'*5 )

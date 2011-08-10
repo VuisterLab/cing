@@ -973,8 +973,8 @@ class Ccpn:
                 # Use sorting by CCPN.
 #                ccpnShiftLoL = filterListByObjectClassName( self.ccpnNmrProject.sortedMeasurementLists(), self.CCPN_CS_LIST )
                 # or as per Rasmus' suggestion:
-                l = self.ccpnNmrProject.sortedMeasurementLists()
-                ccpnShiftLoL = [x for x in l if x.className == self.CCPN_CS_LIST]
+                a = self.ccpnNmrProject.sortedMeasurementLists()
+                ccpnShiftLoL = [x for x in a if x.className == self.CCPN_CS_LIST]
 #                nTdebug("There are shift lists: %s" % str(ccpnShiftLoL))
             if ccpnPeakLoL and (not ccpnShiftLoL):
                 nTwarning('CCPN project has no shift lists linked to experiments. Using any/all available shift lists')

@@ -667,8 +667,8 @@ B   7 U   999.900 999.900 999.900 999.900 999.900 999.900   0.000   1.932 999.90
         result = NTlist()
         path = os.path.join(self.rootPath, 'postscriptFiles.lis')
         if os.path.exists(path):
-            for l in AwkLike(path, separator=':'):
-                result.append( (l.dollar[2][:-1].strip(), l.dollar[1][:-6].strip()) )
+            for line in AwkLike(path, separator=':'):
+                result.append( (line.dollar[2][:-1].strip(), line.dollar[1][:-6].strip()) )
         else:
             nTwarning("Failed to find %s in getPostscriptFileNames" % path)
         return result

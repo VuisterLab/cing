@@ -34,10 +34,65 @@ load-plugins=
 # can either give multiple identifier separated by comma (,) or put this option
 # multiple time (only on the command line, not in the configuration file where
 # it should appear only once).
+#C0102: Black listed name "%s"
+#C0103: Invalid name "%s" (should match %s)
+#C0111: Missing docstring
+#C0112: Empty docstring
+#C0121: Missing required attribute "%s"
+#C0202: Class method should have "cls" as first argument
+#C0203: Metaclass method should have "mcs" as first argument
+#C0301: Line too long (%s/%s)
+#C0302: Too many lines in module (%s)
+#C0321: More than one statement on a single line
+#C0322: Operator not preceded by a space
+#C0323: Operator not followed by a space
+#C0324: Comma not followed by a space
+#F0001 (error prevented analysis)
+#F0002: %s: %s
+#F0003: ignored builtin module %s
+#F0004: unexpected infered value %s
+#F0202: Unable to check methods signature (%s / %s)
+#F0220: failed to resolve interfaces implemented by %s (%s)
+#F0321: Format detection error in %r
+#F0401: Unable to import %r (%s)
+#I0001: Unable to run raw checkers on built-in module %s
+#I0010: Unable to consider inline option %r
+#I0011: Locally disabling %s
+#I0012: Locally enabling %s
+#I0013: Ignoring entire file
+#R0001: Messages by category
+#R0002: % errors / warnings by module
+#R0003: Messages
+#R0004: Global evaluation
+#R0101: Statistics by type
+#R0201: Method could be a function
+#R0401: Cyclic import (%s)
+#R0401: External dependencies
+#R0402: Modules dependencies graph
+#R0701: Raw metrics
+#R0801: Duplication
+#R0801: Similar lines in %s files
+#R0901: Too many ancestors (%s/%s)
+#R0902: Too many instance attributes (%s/%s)
+#R0903: Too few public methods (%s/%s)
+#R0904: Too many public methods (%s/%s)
+#R0911: Too many return statements (%s/%s)
+#R0912: Too many branches (%s/%s)
+#R0913: Too many arguments (%s/%s)
+#R0914: Too many local variables (%s/%s)
+#R0915: Too many statements (%s/%s)
+#R0921: Abstract class not referenced
+#R0922: Abstract class is only referenced %s times
+#R0923: Interface not implemented
+
+
+
+
 # Enabled:
 #W0101: Unreachable code
 #W0104: Statement seems to have no effect
 #W0105: String statement has no effect
+
 #W0107: Unnecessary pass statement
 #W0108: Lambda may not be necessary
 #W0141: Used builtin function %r
@@ -99,8 +154,9 @@ load-plugins=
 #R0914 Too many local variables
 #R0915 Too many statements
 
-disable=C0322,C0323,C0324,E0602,F0401,I0011,I0013,W0102,W0122,W0142,W0401,W0402,W0511,W0611,W0613,W0614,W0622,W0701,W0702,R0911,R0912,R0913,R0914,R0915
+disable=C0322,C0323,C0324,E0602,F0401,I0011,I0013,W0102,W0122,W0142,W0201,W0401,W0402,W0511,W0611,W0613,W0614,W0622,W0701,W0702,R0911,R0912,R0913,R0914,R0915
 # JFD likes to enable again:
+#W0201: Attribute %r defined outside __init__
 #W0613 Unused argument 'xxx'
 
 

@@ -30,22 +30,22 @@ class AllChecks(TestCase):
         self.assertEqual( getUniqueName(resonanceSources, 'a', nameFormat = '%s---%06d'), 'a---000001')
 
     def testFilterListByObjectClassName(self):
-        l = ['a', 'b', 1.0, 2.0, 3.0, NTdict(), None, None, None, None ]
-        ls = filterListByObjectClassName(l, 'str')
+        a = ['a', 'b', 1.0, 2.0, 3.0, NTdict(), None, None, None, None ]
+        ls = filterListByObjectClassName(a, 'str')
         self.assertEqual( len(ls), 2)
-        lf = filterListByObjectClassName(l, 'float')
+        lf = filterListByObjectClassName(a, 'float')
         self.assertEqual( len(lf), 3)
-        ld = filterListByObjectClassName(l, 'NTdict')
+        ld = filterListByObjectClassName(a, 'NTdict')
         self.assertEqual( len(ld), 1)
-#        ln = filterListByObjectClassName(l, 'NoneType')
-        ln = filterListByObjectClassName(l, None) # NB don't use NoneType for this as the routine isn't that smart.
+#        ln = filterListByObjectClassName(a, 'NoneType')
+        ln = filterListByObjectClassName(a, None) # NB don't use NoneType for this as the routine isn't that smart.
         self.assertEqual( len(ln), 4)
 
     def testgetListByName(self):
         lol = NTlist(ResonanceList('a'), ResonanceList('b'))
-        l = getObjectByName(lol, 'b')
-        self.assertTrue( l != None )
-        self.assertTrue( l.name == 'b' )
+        a = getObjectByName(lol, 'b')
+        self.assertTrue( a != None )
+        self.assertTrue( a.name == 'b' )
 
     def testGetRevisionAndDateTimeFromCingLog(self):
         inputArchiveDir = os.path.join(cingDirTestsData, "cing")

@@ -568,8 +568,8 @@ def plotHistogramOverall():
             savefig(fn)
 
             clf()
-            l = m.reshape(n * n)
-            hist(l, 20)
+            a = m.reshape(n * n)
+            hist(a, 20)
             xlabel('pair count')
             ylabel('number of occurrences')
             title(strTitle)

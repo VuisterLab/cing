@@ -457,8 +457,8 @@ def comments_strip( text ):
 #        print "DEBUG: processing A line: ", i
         line = lines[i]
         # Scan past semi colon blocks.
-        l = len(line)
-        if l < 1:
+        n = len(line)
+        if n < 1:
 #            print "DEBUG: skipping empty line: "
             i += 1
             continue
@@ -474,9 +474,9 @@ def comments_strip( text ):
                                                     # end a semicolon block
         else:
             line = _comments_strip_line(line)
-            if len(line) != l:
+            if len(line) != n:
                 lines[i] = line
-#                print "Changed from lenght",l,"to line: ["+line+"] at:", i
+#                print "Changed from lenght",n,"to line: ["+line+"] at:", i
                 count += 1
         i += 1
 
@@ -493,8 +493,8 @@ def _comments_strip_line( line ):
     """
     c=0
     state = FREE # like to start out free which is possible after donning semicolon blocks.
-    l = len(line)
-    while c < l: # parse range [0,n> where n is length and exclusive.
+    n = len(line)
+    while c < n: # parse range [0,n> where n is length and exclusive.
         ch=line[c]
 #        print "DEBUG: Processing char '"+ch+"' at "+repr(c)+" in state:", state
         if ( ch == sharp and state == FREE and    # A sharp in FREE state
@@ -503,7 +503,7 @@ def _comments_strip_line( line ):
             if c==0:
                 return ''
             return line[0:c] # this is fast.
-        if c==l-1: # c is the last character; leave it alone if it's not a sharpie
+        if c==n-1: # c is the last character; leave it alone if it's not a sharpie
             return line
 
         if ch == doubleq:
