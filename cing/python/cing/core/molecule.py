@@ -18,17 +18,17 @@ from cing.Libs.html import hPlot
 from cing.PluginCode.required.reqDssp import * #@UnusedWildImport
 from cing.PluginCode.required.reqNih import TALOSPLUS_STR
 from cing.PluginCode.required.reqVasco import * #@UnusedWildImport
+from cing.core import database
 from cing.core.classes2 import * #@UnusedWildImport
 from cing.core.constants import * #@UnusedWildImport
 from cing.core.database import AtomDef
+from cing.core.parameters import plotParameters
 from numpy import convolve
 from numpy import linalg as LA
 from numpy import mat
 from numpy import multiply
 from numpy import ones
 from operator import attrgetter
-from parameters   import plotParameters
-import database
 import numpy
 
 

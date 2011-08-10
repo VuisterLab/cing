@@ -76,8 +76,8 @@ Example file:
 </PeakList>
 </SML>
     """
-    # Using the global statement without assignment pylint: disable=W0603
-    global SMLstarthandlers, SMLendhandlers
+    # Using the global statement pylint: disable=W0603
+    global SMLstarthandlers, SMLendhandlers     # Using global without assignment. pylint: disable=W0602
     debug = False
 
     def __init__(self, name):
@@ -809,6 +809,9 @@ class SMLPeakHandler( SMLhandler ):
         return self.dictHandler(pk, fp, project)
     #end def
 
+    # W0221 Arguments number differs from overridden method 
+    # W0222 Signature differs from overridden method 
+    # pylint: disable=W0221,W0222
     def endHandler(self, pk, project):
         if project == None:
             nTerror('Error SMLPeakHandler.endHandler: Undefined project\n')
@@ -906,6 +909,9 @@ class SMLDistanceRestraintHandler( SMLhandler ):
         return self.dictHandler(dr, fp, project)
     #end def
 
+    # W0221 Arguments number differs from overridden method 
+    # W0222 Signature differs from overridden method 
+    # pylint: disable=W0221,W0222
     def endHandler(self, dr, project):
         # Parse the atomPairs tuples, map to molecule
         if project == None or project.molecule == None:
@@ -979,6 +985,9 @@ class SMLDihedralRestraintHandler( SMLhandler ):
         return self.dictHandler(dr, fp, project)
     #end def
 
+    # W0221 Arguments number differs from overridden method 
+    # W0222 Signature differs from overridden method 
+    # pylint: disable=W0221,W0222
     def endHandler(self, dr, project):
         # Parse the atoms nameTuples, map to molecule
         dr.atoms = decode( dr.atoms, project )
@@ -1033,6 +1042,9 @@ class SMLRDCRestraintHandler( SMLhandler ):
         return self.dictHandler(dr, fp, project)
     #end def
 
+    # W0221 Arguments number differs from overridden method 
+    # W0222 Signature differs from overridden method 
+    # pylint: disable=W0221,W0222
     def endHandler(self, dr, project):
         # Parse the atoms nameTuples, map to molecule
         if project == None or project.molecule == None: 
@@ -1202,6 +1214,9 @@ class SMLCoplanarHandler( SMLhandler ):
 #        return self.dictHandler(coplanar, fp, project)
     #end def
 
+    # W0221 Arguments number differs from overridden method 
+    # W0222 Signature differs from overridden method 
+    # pylint: disable=W0221,W0222
     def endHandler(self, coplanar, project):
         return # ask Geerten for input
     #end def
@@ -1286,6 +1301,9 @@ class SMLResidueDefHandler( SMLhandler ):
         return resDef
     #end def
 
+    # W0221 Arguments number differs from overridden method 
+    # W0222 Signature differs from overridden method 
+    # pylint: disable=W0221,W0222
     def toSML(self, resDef, stream = sys.stdout, convention = INTERNAL  ):
         """Store resDef in SML format
         """
@@ -1351,6 +1369,9 @@ class SMLDihedralDefHandler( SMLhandler ):
         return dihedDef
     #end def
 
+    # W0221 Arguments number differs from overridden method 
+    # W0222 Signature differs from overridden method 
+    # pylint: disable=W0221,W0222
     def toSML(self, dihedDef, stream = sys.stdout, convention = INTERNAL  ):
         """Store dihedDef in SML format
         """
@@ -1415,7 +1436,10 @@ class SMLAtomDefHandler( SMLhandler ):
         return atmDef
     #end def
 
-    def toSML(self, atmDef, stream = sys.stdout, convention = INTERNAL  ):
+    # W0221 Arguments number differs from overridden method 
+    # W0222 Signature differs from overridden method 
+    # pylint: disable=W0221,W0222
+    def toSML(self, atmDef, stream = sys.stdout, convention = INTERNAL  ): 
         """Store dihedDef in SML format
         """
         #print '>', convention

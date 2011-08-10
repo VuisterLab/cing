@@ -3150,6 +3150,7 @@ class DistanceRestraint(Restraint):
 
         models = range(modelCount)
         i = 0
+        atm1, atm2 = None, None # helping pylint.
         for atm1, atm2 in self.atomPairs:
 
             # GV says: Check are done to prevent crashes upon rereading

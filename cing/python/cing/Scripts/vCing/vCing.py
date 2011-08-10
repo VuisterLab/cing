@@ -33,7 +33,7 @@ master_ssh_url_local = 'joe@nmr' #@UnusedVariable
 master_d_local = '/Volumes/joe/D' #@UnusedVariable
 pool_postfix_local = 'joe' #@UnusedVariable
 try:
-    from localConstants import * #@UnusedWildImport
+    from cing.Scripts.vCing.localConstants import * #@UnusedWildImport
 except:
     pass
 #    NTtracebackError() # codes below are nonsense.
@@ -102,7 +102,7 @@ class Vcing(Lister):
         Return True on error.
         Moved out of this setup so it can be run with a very limited CING install on gb-ui-kun.els.sara.nl
         """
-        return prepareMaster(MASTER_TARGET_DIR=self.master_target_dir, doClean=doClean)
+        return prepareMaster(master_target_dir=self.master_target_dir, doClean=doClean)
 
 
     def addTokenListToTopos(self, fileName):
