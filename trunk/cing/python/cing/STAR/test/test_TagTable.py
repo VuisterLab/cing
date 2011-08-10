@@ -69,7 +69,7 @@ e
         self.assertEqual(tt.getColCount(), 2)
 
 
-    def test_GetValueListIntByColumnName(self):
+    def test_GetValueListIntByColumn(self):
 
         text = """_A 1 2 . 3 4 5"""
         tt = TagTable(  free      = None,

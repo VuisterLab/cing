@@ -403,12 +403,12 @@ def _calcQshift( atmList ):
     #end for
 
     if sumMeasuredSq >0.0:
-        Qshift=sqrt(sumDeltaSq/sumMeasuredSq)
+        qshift=sqrt(sumDeltaSq/sumMeasuredSq)
     else:
-        Qshift=NaN
+        qshift=NaN
     # end if
     
-    return Qshift
+    return qshift
 #end def
 
 

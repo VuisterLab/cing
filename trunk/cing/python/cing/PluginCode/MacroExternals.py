@@ -408,7 +408,7 @@ ColorAtom %s
 ColorBond %s
 """ % (res.resNum, molmolColor, molmolColor)
     #end for
-    msgHol.showMessage(MAX_WARNINGS=1)
+    msgHol.showMessage(max_warnings=1)
 
     macroTxt += """
 SelectAtom 'prev_sel'

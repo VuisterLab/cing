@@ -166,7 +166,7 @@ except:
 from cing.core.molecule     import *
 from cing.core.importPlugin import importPlugin # This imports all plugins
 from cing.core.sml          import obj2SML      # This also initializes the SMLhandler methods
-from cing.core.sml          import SML2obj      # This also initializes the SMLhandler methods
+from cing.core.sml          import sML2obj      # This also initializes the SMLhandler methods
 
 
 from cing.core.database     import NTdb #@Reimport

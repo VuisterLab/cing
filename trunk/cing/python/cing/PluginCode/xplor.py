@@ -158,7 +158,7 @@ def exportDistanceRestraintList2xplor( drl, path)   :
         fprintf( fp, '%s\n', drStr )
     #end for
     fp.close()
-    msgHol.showMessage(MAX_MESSAGES=20)
+    msgHol.showMessage(max_messages=20)
     nTmessage('==> Exported %s to "%s"', drl, path)
     #end if
     return drl

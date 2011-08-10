@@ -1185,7 +1185,7 @@ class SMLNTListWithAttrHandler( SMLhandler ):
 
 # Generalized
 ResonanceList.SMLhandler = SMLNTListWithAttrHandler(name = 'ResonanceList')
-ResonanceList.SMLhandler.SML_SAVE_ATTRIBUTE_LIST = ResonanceList.SML_SAVE_ATTRIBUTE_LIST 
+ResonanceList.SMLhandler.SML_SAVE_ATTRIBUTE_LIST = ResonanceList.SML_SAVE_ATTRIBUTE_LIST # pylint: disable=C0103
 
 
 class SMLCoplanarHandler( SMLhandler ):
@@ -1505,11 +1505,11 @@ def obj2SML( obj, smlFile, **kwds ):
     return obj
 #end def
 
-def SML2obj( smlFile, externalObject=None ):
+def sML2obj( smlFile, externalObject=None ):
     """
     Generate obj from smlFile
     """
-#    nTdebug("--> SML2obj")
+#    nTdebug("--> sML2obj")
     obj = smlhandler.fromFile(smlFile, externalObject)
     return obj
 #end def

@@ -1796,7 +1796,7 @@ def validateDihedralCombinations(project):
                                                                                     ensembleValueList[modelIdx] ))
         # end for checkIdx
     # end for residue
-    msgHol.showMessage(MAX_MESSAGES=10, MAX_DEBUGS = 10)
+    msgHol.showMessage(max_messages=10, max_debugs = 10)
 #end def
 
 

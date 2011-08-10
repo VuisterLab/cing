@@ -454,7 +454,7 @@ class Molecule( NTtree, ResidueList ):
         return Chain.DEFAULT_ChainNamesByAlphabet[ self.chainCount ]
 
 
-    def ensureValidChainIdForThisMolecule(self, chainId ):
+    def ensureValidChainId(self, chainId ):
         """
         In CING all chains must have one non-space character (chain id) because:
 
@@ -919,17 +919,17 @@ class Molecule( NTtree, ResidueList ):
         return None
 
     # would like to have said Chain.defaultChainId but isn't known yet.
-    def getAtomDict(self, convention=INTERNAL, ChainId = _DEFAULT_CHAIN_ID):         
+    def getAtomDict(self, convention=INTERNAL, chainId = _DEFAULT_CHAIN_ID):         
         """
         Return a dict instance with (resNum, atomName), Atom mappings.
         NB. atomName according to convention
         For decoding usage with CYANA/XEASY, and SHIFTX routines
         """
-#        nTdebug("Creating mapping from (residue number, atom name) to atom object for chain: [%s]" % ChainId)
+#        nTdebug("Creating mapping from (residue number, atom name) to atom object for chain: [%s]" % chainId)
         atomDict = NTdict()
         for chain in self.allChains():
-            if chain.name != ChainId:
-#                nTdebug("Skipping add of different chain [%s] than requested [%s]" % (chain.name,ChainId ))
+            if chain.name != chainId:
+#                nTdebug("Skipping add of different chain [%s] than requested [%s]" % (chain.name,chainId ))
                 continue
             for atm in chain.allAtoms():
                 aname = atm.translate(convention)
@@ -2350,7 +2350,7 @@ class Molecule( NTtree, ResidueList ):
         msgHol = MsgHoL()
         for res in self.allResidues():
             res.addDihedralsAll(msgHol=msgHol)
-        msgHol.showMessage(MAX_MESSAGES=2, MAX_DEBUGS = 2)
+        msgHol.showMessage(max_messages=2, max_debugs = 2)
 
         if self.modelCount > 0:
             self.syncModels()
@@ -2433,7 +2433,7 @@ Return an Molecule instance or None on error
                 chainId = Chain.defaultChainId # recommended to use your own instead of CING making one up.
                 if f.NF >= 3:
                     chainId = f.dollar[3]
-                chainId = molecule.ensureValidChainIdForThisMolecule( chainId )
+                chainId = molecule.ensureValidChainId( chainId )
 
                 if f.NF >= 4 and f.dollar[4] == 'Nterminal':
                     Nterminal = True
@@ -3570,9 +3570,9 @@ Chain class: defines chain properties and methods
         return id == Chain.NULL_VALUE
     isNullValue = staticmethod( isNullValue )
 
-
+    # pylint: disable=C0103
     def addResidue( self, resName, resNum, convention=INTERNAL, 
-                    Nterminal=False, Cterminal=False, 
+                    Nterminal=False, Cterminal=False,                   
                     FiveTerminal=False, ThreeTerminal=False, **kwds ):
         if self.has_key(resNum):
             nTwarning( 'Chain.addResidue: residue number "%s" already present in %s perhaps there is a insertion code? Skipping residue', 
@@ -3580,7 +3580,7 @@ Chain class: defines chain properties and methods
             nTwarning("See also issue: %s%d" % (issueListUrl, 226))
             return None
         #end if
-        res = Residue( resName=resName, resNum=resNum, convention=convention, Nterminal=Nterminal, Cterminal=Cterminal, **kwds )
+        res = Residue( resName=resName, resNum=resNum, convention=convention, Nterminal=Nterminal, Cterminal=Cterminal, **kwds ) 
         if res.name in self:
             nTwarning( 'Chain.addResidue: residue "%s" already present in %s; skipping residue', res.name, self.name )
             return None
@@ -3951,7 +3951,7 @@ Residue class: Defines residue properties
         dihedrals               : NTlist of Dihedral instances
 
     """
-    def __init__( self, resName, resNum, convention=INTERNAL, Nterminal=False, Cterminal=False, **kwds ):
+    def __init__( self, resName, resNum, convention=INTERNAL, Nterminal=False, Cterminal=False, **kwds ): # pylint: disable=C0103
 #        resNum is the author supplied number. This is called the seqCode in CCPN. It's key in CING.
 #        seqId in CCPN is 'Identifier corresponding to the molResidue identifier (self.molResidue.serial)' It's key in CCPN.
         #print '>',resName, resNum
@@ -4968,9 +4968,9 @@ e.g.
     DEFAULT_BFACTOR   = 0.0
     DEFAULT_OCCUPANCY = 1.0
 
-    def __init__( self, x=0.0, y=0.0, z=0.0, Bfac=DEFAULT_BFACTOR, occupancy=DEFAULT_OCCUPANCY, atom = None ):
+    def __init__( self, x=0.0, y=0.0, z=0.0, Bfac=DEFAULT_BFACTOR, occupancy=DEFAULT_OCCUPANCY, atom = None ): # pylint: disable=C0103
         self.e         = NTcVector( x, y, z )
-        self.Bfac      = Bfac
+        self.Bfac      = Bfac # pylint: disable=C0103
         self.occupancy = occupancy
         self.atom      = atom
         self.model     = -1    # index of the model
@@ -5240,7 +5240,7 @@ coordinates: %s"""  , dots, self, dots
 
         return result
 
-    def addCoordinate(self, x, y, z, Bfac, occupancy=Coordinate.DEFAULT_OCCUPANCY, **kwds):
+    def addCoordinate(self, x, y, z, Bfac, occupancy=Coordinate.DEFAULT_OCCUPANCY, **kwds): # pylint: disable=C0103
         """Append coordinate to coordinates list
         Convenience method.
         """
@@ -5602,7 +5602,7 @@ coordinates: %s"""  , dots, self, dots
         return None
     #end def
 
-    def getSterospecificallyRelatedPartner( self ):
+    def getStereoPartner( self ):
         """
         Return prochiral partner Atom instance of self or
         another Atom instance that is related by another stereospecific relation.
@@ -6704,7 +6704,7 @@ def isValidChainId( chainId ):
 #    return True
 
 def ensureValidChainId( chainId ):
-    """See doc Molecule#ensureValidChainIdForThisMolecule
+    """See doc Molecule#ensureValidChainId
     In absence of an existing molecule this routine can only return the default chain id
     if the presented id is not valid.
     """

@@ -2760,7 +2760,7 @@ class DistanceRestraint(Restraint):
 
     def deassignStereospecificity(self):
         """If the restraint involves a stereo specifically assignable atom then expand the list to include all
-        getSterospecificallyRelatedPartner's. Of course if the restraint is between partners then the restraint
+        getStereoPartner's. Of course if the restraint is between partners then the restraint
         becomes useless but will be generated. E.g. Gly HA2 to HA3 will become Gly QA to QA.
 
         LEU MD1 -> QD
@@ -2867,7 +2867,7 @@ class DistanceRestraint(Restraint):
                     continue
                 # end if
 
-                if atomItoMerge.getSterospecificallyRelatedPartner() != atomJtoMerge:
+                if atomItoMerge.getStereoPartner() != atomJtoMerge:
 #                    nTdebug('    atoms toMerge I %s and J %s have different parent if at all related.' % ( atomItoMerge, atomJtoMerge) )
                     continue
                 # end if
@@ -3352,7 +3352,7 @@ class DistanceRestraintList(RestraintList):
             status = dr.deassignStereospecificity()
             if status == DistanceRestraint.STATUS_DEASSIGNED:
                 msgHol.appendMessage("%s deassigned to:%s" % (strDrAtomPairs,str(dr.atomPairs)))
-        msgHol.showMessage(MAX_MESSAGES=MAX_MESSAGES)
+        msgHol.showMessage(max_messages=MAX_MESSAGES)
 
     def analyze(self):
         """
@@ -3695,7 +3695,7 @@ class DihedralRestraint(Restraint):
         lastAtom = self.atoms[3]
         ssaPartner = None
         if considerSymmetry:
-#            ssaPartner = lastAtom.getSterospecificallyRelatedPartner()
+#            ssaPartner = lastAtom.getStereoPartner()
             try:
                 ssaPartner = lastAtom._parent.CD2
             except:

@@ -17,7 +17,7 @@ from cing.core.classes import DihedralRestraint
 from cing.core.constants import * #@UnusedWildImport
 from cing.core.parameters import PLEASE_ADD_EXECUTABLE_HERE
 from cing.core.parameters import cingPaths
-from cing.core.sml import SML2obj
+from cing.core.sml import sML2obj
 from cing.core.sml import SMLhandler
 from cing.core.sml import SMLsaveFormat
 from cing.core.sml import obj2SML
@@ -1320,7 +1320,7 @@ def _importTalosPlus( project, predFile, ssFile=None ):
             talosPlus.phi.error = NaN
             talosPlus.psi.value = NaN
             talosPlus.psi.error = NaN
-            talosPlus.S2 = NaN
+            talosPlus.S2 = NaN # pylint: disable=C0103
         #end if
 
         row.residue.talosPlus = talosPlus
@@ -1538,7 +1538,7 @@ def restoreTalosPlus( project, tmp=None ):
 
    # Restore the data
     nTmessage('==> Restoring talos+ results')
-    l=SML2obj( smlFile, project.molecule)
+    l=sML2obj( smlFile, project.molecule)
     if l==None:
         return True
 
