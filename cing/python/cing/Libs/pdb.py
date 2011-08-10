@@ -92,7 +92,8 @@ class pdbParser:
         self.patchAtomNames = patchAtomNames
         self.skipWaters = skipWaters
         self.allowNonStandardResidue = allowNonStandardResidue
-        self.matchGame = MatchGame(convention=convention, patchAtomNames = patchAtomNames, skipWaters = skipWaters, allowNonStandardResidue = allowNonStandardResidue)
+        self.matchGame = MatchGame(convention=convention, patchAtomNames = patchAtomNames, 
+                                   skipWaters = skipWaters, allowNonStandardResidue = allowNonStandardResidue)
 
         if not os.path.exists(pdbFile):
             nTerror('pdbParser: missing PDB-file "%s"', pdbFile)

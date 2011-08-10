@@ -26,6 +26,7 @@ class AllChecks(TestCase):
         self.assertFalse(self.sf.check_integrity())
 
     def test_STARrepresentation(self):
+        # pylint: disable=C0301
         starTextExpected = """\nsave_general_sf_title\n   loop_\n      _File_characteristics.Sf_category\n\nfile_characteristics\n\n   stop_\n\nsave_\n"""
 #        starTextExpected.replac(' \n', new)
         starText = self.sf.star_text()

@@ -125,7 +125,8 @@ def annotateEntry(entryCodeNew, *extraArgList):
 #    print 'status: %s' % ccpnMolSystem.setCode(projectName) # impossible; reported to ccpn team.
 
     if replaceCoordinates or replaceRestraints:
-        importPseudoPdb(ccpnProject, inputAuthorDir, guiRoot, allowPopups=allowPopups, minimalPrompts=minimalPrompts, verbose=verbose, **presets)
+        importPseudoPdb(ccpnProject, inputAuthorDir, guiRoot, allowPopups=allowPopups, 
+                        minimalPrompts=minimalPrompts, verbose=verbose, **presets)
 
     if doSwapCheck:
 #        constraintsHandler = ConstraintsHandler()

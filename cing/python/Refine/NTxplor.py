@@ -525,7 +525,8 @@ evaluate ( $rms.noe = $result )
             for noe in self.noeRestraints:
 #                maxlength = 20 - len('viol.noe.')
                 if len(noe.name) > MAX_SIZE_XPLOR_RESTRAINT_LIST_NAME:
-                    nTerror("NOE list name is over %s chars and xplor wouldn't be able to handle it: [%s]" % (MAX_SIZE_XPLOR_RESTRAINT_LIST_NAME, noe.name))
+                    nTerror("NOE list name is over %s chars and xplor wouldn't be able to handle it: [%s]" % (
+                        MAX_SIZE_XPLOR_RESTRAINT_LIST_NAME, noe.name))
                     return False
                 noe.setdefault( 'averaging', 'sum' )
                 noe.setdefault( 'scale',      50 )
@@ -556,7 +557,8 @@ evaluate ( $viol.noe.total = $violations + $viol.noe.total )
         for dihed in self.dihedralRestraints:
 #            maxlength = 20 - len('viol.cdih.')
             if len(dihed.name) > MAX_SIZE_XPLOR_RESTRAINT_LIST_NAME:
-                nTerror("Dihedral angle list name is over %s chars and xplor wouldn't be able to handle it: [%s]" % (MAX_SIZE_XPLOR_RESTRAINT_LIST_NAME, dihed.name))
+                nTerror("Dihedral angle list name is over %s chars and xplor wouldn't be able to handle it: [%s]" % (
+                    MAX_SIZE_XPLOR_RESTRAINT_LIST_NAME, dihed.name))
                 return False
             code = code + """
 restraints dihedral reset
@@ -662,7 +664,8 @@ end if
         if not timeTaken:
             nTwarning("Failed to find the time taken from log file: %s" % logFileName)
         if nr_error > self.allowedErrors:
-            nTerror("Script produced %s errors according to log file: %s which is more than the allowed %s" % (nr_error, logFileName, self.allowedErrors))
+            nTerror("Script produced %s errors according to log file: %s which is more than the allowed %s" % (
+                    nr_error, logFileName, self.allowedErrors))
             return True
     # end def
 
@@ -1349,9 +1352,9 @@ end
 """ % ( chain.name, topScript, pdbFile )
 
         for pair in self.patchDISN:
-            self.script += "patch DISN  reference=1  =( segi %s and resid %s )  reference=2=( segi %s and resid %s )        end\n" % nTflatten(pair)
+            self.script += "patch DISN  reference=1  =( segi %s and resid %s )  reference=2=( segi %s and resid %s ) end\n"%nTflatten(pair)
         for pair in self.patchDISU:
-            self.script += "patch DISU  reference=1  =( segi %s and resid %s )  reference=2=( segi %s and resid %s )        end\n" % nTflatten(pair)
+            self.script += "patch DISU  reference=1  =( segi %s and resid %s )  reference=2=( segi %s and resid %s ) end\n"%nTflatten(pair)
         for resid in self.patchHISD:                    
             self.script += "patch HISD  reference=nil=( segi %s and resid %s ) end\n" % nTflatten(resid)
         for resid in self.patchHISE:                    

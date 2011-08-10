@@ -261,7 +261,8 @@ class Ccpn:
             # Mol System is the one associated with chosen structure
             structureData = ccpnCalc.findFirstData(className = self.CCPN_RUN_STRUCTURE, ioRole = 'input')
             if structureData:            
-#              ccpnMolSystem = structureData.structureEnsemble.molSystem # Fails for Ulrich Schwartz's project that has no attribute molSystem
+#              ccpnMolSystem = structureData.structureEnsemble.molSystem 
+# Fails for Ulrich Schwartz's project that has no attribute molSystem
                 ccpnMolSystem = getDeepByKeysOrAttributes(structureData, 'structureEnsemble', 'molSystem')
                 if not ccpnMolSystem:
                     nTwarning("Found the unusual case of having structureData but no molSystem in structureData.structureEnsemble")
@@ -535,7 +536,8 @@ class Ccpn:
                 # In example from Wim there is a chain without a chain ID so disabling the above error message.
                 # This isn't a problem if CCPN uses the same chain id's i.e. no spaces or special chars.
                 # From CCPN doc:
-    #            One letter chain identifier. Will be used by PDB (and programs that use similar conventions). WARNING: having same oneLetterCode for different chains is legal but may cause serious confusion.
+    #            One letter chain identifier. Will be used by PDB (and programs that use similar conventions). 
+#    WARNING: having same oneLetterCode for different chains is legal but may cause serious confusion.
                 # Looking at the complex case of 1ai0 which in the PDB formatted PDB file it has spaces for the chain id
                 # the NRG derived CCPN file has beautiful unique simple chain ids A thru U.
     #    loop_
@@ -599,7 +601,8 @@ class Ccpn:
                 # end if
             # end for
             for ccpnResidue in ccpnChain.sortedResidues():
-                ccpnMolType = ccpnResidue.molType # Can not be taken outside loop because within a chain multiple molTypes might occur in CCPN.
+                ccpnMolType = ccpnResidue.molType 
+                # Can not be taken outside loop because within a chain multiple molTypes might occur in CCPN.
                 resNumber = ccpnResidue.seqCode
                 chemCompVar = ccpnResidue.chemCompVar
                 chemComp = chemCompVar.chemComp
@@ -741,9 +744,11 @@ class Ccpn:
                                     break
                                 ccpnCoord = ccpnCoordAtom.findFirstCoord(model = ccpnModel)
                                 if not ccpnCoord: # as in entry 1agg GLU1.H2 and 3.
-#                                    nTwarning("Skipping coordinate for CING failed to find coordinate for model %d for atom %s" % (i, atom)) # happens for 2xfm  <Atom A.VAL280.HG11> and many others.
+#                                    nTwarning("Skipping coordinate for CING failed to find coordinate for model %d for atom %s" % (
+#i, atom)) 
+# happens for 2xfm  <Atom A.VAL280.HG11> and many others.
                                     continue
-                                atom.addCoordinate(ccpnCoord.x, ccpnCoord.y, ccpnCoord.z, ccpnCoord.bFactor, ocuppancy = ccpnCoord.occupancy)
+                                atom.addCoordinate(ccpnCoord.x, ccpnCoord.y, ccpnCoord.z, ccpnCoord.bFactor, ocuppancy=ccpnCoord.occupancy)
                             # end for
                         # end if
                     # end for
@@ -878,7 +883,8 @@ class Ccpn:
             ccpnAtomSetList = ccpnResonanceSet.sortedAtomSets()
             isStereo = len(ccpnAtomSetList) == 1
             if resonanceSetDoneCount >= len(ccpnAtomSetList):
-#                nTdebug("Ignoring ccpnShift %s because resonanceSetDoneCount is %s which is over length of ccpnAtomSetList %s" % (ccpnShift, len(ccpnAtomSetList)))
+#                nTdebug("Ignoring ccpnShift %s because resonanceSetDoneCount is %s which is over length of ccpnAtomSetList %s" % (
+#                    ccpnShift, len(ccpnAtomSetList)))
                 continue
             ccpnAtomSet = ccpnAtomSetList[resonanceSetDoneCount]
 #            for ccpnAtom in ccpnAtoms:
@@ -920,7 +926,8 @@ class Ccpn:
             # end try
         # end for.over shifts.
 
-#        nTdebug("==> CCPN ShiftList '%s' imported from CCPN Nmr project '%s' with %s items", ccpnShiftList.name, ccpnShiftList.parent.name, len(resonanceList))
+#        nTdebug("==> CCPN ShiftList '%s' imported from CCPN Nmr project '%s' with %s items", 
+#ccpnShiftList.name, ccpnShiftList.parent.name, len(resonanceList))
 #        nTmessage("==> Count of (pseudo-)atom with resonances updated %s" % len(atomsTouched.keys()))
 #        nTdebug(  "==> Count of resonances in list added %s (should be the same)" % len(resonanceList))
 #        nTmessage("==> Count of resonanceSetDone %s (<= above count)" % len(resonanceSetDoneMap.keys()))
@@ -963,9 +970,11 @@ class Ccpn:
                         ccpnShiftLoL.append(ccpnExperiment.shiftList)
                     else:
                         pass
-#                        nTdebug("Skipping because None, CCPN shiftList (%s) from CCPN experiment (%s)" % ( ccpnExperiment.shiftList, ccpnExperiment))
+#                        nTdebug("Skipping because None, CCPN shiftList (%s) from CCPN experiment (%s)" % (
+#ccpnExperiment.shiftList, ccpnExperiment))
                 else:
-#                    nTdebug("Skipping already found CCPN shiftList (%s) from CCPN experiment (%s)" % (ccpnExperiment.shiftList, ccpnExperiment))
+#                    nTdebug("Skipping already found CCPN shiftList (%s) from CCPN experiment (%s)" % (
+#ccpnExperiment.shiftList, ccpnExperiment))
                     pass
 
 
@@ -1439,7 +1448,8 @@ class Ccpn:
 #            nTdebug("Ignoring meta data because no self.ccpnNmrConstraintStore.findAllApplicationData")
             return
 
-        appDataList = self.ccpnNmrConstraintStore.findAllApplicationData(application='FormatConverter', keyword='stereoAssignmentCorrectionsFile')
+        appDataList = self.ccpnNmrConstraintStore.findAllApplicationData(application='FormatConverter', 
+                                                                         keyword='stereoAssignmentCorrectionsFile')
         if len(appDataList) == 0:
 #            nTdebug("No FC meta data on SSA")
             return
@@ -1617,7 +1627,8 @@ class Ccpn:
             # Here, resonanceList should always have 2 resonances.
 
             resonanceListLength = len(resonanceList)
-            assert(resonanceListLength == 2) # During a regular run (not with -O option given to python interpreter) this might cause a exception being thrown.
+            assert(resonanceListLength == 2) 
+            # During a regular run (not with -O option given to python interpreter) this might cause a exception being thrown.
             if resonanceListLength != 2:
                 nTcodeerror("expected a pair but found number: %d for ccpnConstraint %s" % (resonanceListLength, ccpnConstraint))
                 return None
@@ -1626,7 +1637,8 @@ class Ccpn:
                 resonanceSet = resonance.resonanceSet
                 if resonanceSet:
                     for atomSet in resonanceSet.sortedAtomSets():
-                        # atom set is a group of atoms that are in fast exchange and therefore are not assigned to individually (e.g. methyl group).
+                        # atom set is a group of atoms that are in fast exchange and therefore are not assigned to individually 
+#                        (e.g. methyl group).
                         for atom in atomSet.sortedAtoms():
                             resAtomList.append('%d.%s' % (
                                 atom.residue.seqCode, atom.name))
@@ -1964,7 +1976,7 @@ Note that this doesn't happen with other pseudos. Perhaps CCPN does not have the
             elif firstRes.hasProperties('water'):
                 molType = 'water'
             else:
-                nTwarning("Found chain with first residue: %s of unknown chain type. No problem if names in CING and CCPN match." % firstRes)
+                nTwarning("Found chain with first residue: %s of unknown chain type. No problem if names in CING and CCPN match."%firstRes)
 #            nTdebug("molType: %s" % molType)
 
             sequence = []
@@ -1983,7 +1995,8 @@ Note that this doesn't happen with other pseudos. Perhaps CCPN does not have the
                 if len(resNameCcpnList) != 3:
                     nTwarning("JFD thought the full ccpn residue name is always of length 3; found: %d %s" % (
                      len(resNameCcpnList), resNameCcpnList))
-                    nTwarning("JFD thought the full ccpn residue name always included a moltype, 3-letter name, and a descriptor even if it's just 'neutral'")
+                    nTwarning("JFD thought the full ccpn residue name always included a moltype,"+
+                              "3-letter name, and a descriptor even if it's just 'neutral'")
                     resSkippedList.append(res)
                     continue
                 resNameCcpn = resNameCcpnList[1]
@@ -2018,7 +2031,8 @@ Note that this doesn't happen with other pseudos. Perhaps CCPN does not have the
 
                 ccpnResDescriptorOrg = ccpnResDescriptorList[i]
                 ccpnResDescriptor = modResDescriptorForTerminii( ccpnResDescriptorOrg, i, seqLength, molType)
-#                nTdebug("Looking at CING residue [%s] with ccpnResDescriptor, ccpnResidue.linking [%s] [%s]" % (r, ccpnResDescriptor, ccpnResidue.linking))
+#                nTdebug("Looking at CING residue [%s] with ccpnResDescriptor, ccpnResidue.linking [%s] [%s]" % (r, 
+#ccpnResDescriptor, ccpnResidue.linking))
 
                 chemCompVarNew = None
                 # check if patching is needed. E.g. for nucleic acids it is not and the code below wouldn't even work.
@@ -2053,15 +2067,18 @@ Note that this doesn't happen with other pseudos. Perhaps CCPN does not have the
 #                            if ccpnResidue is ccpnResidueOrg:
 #                                nTerror("ccpnResidue is ccpnResidueOrg after it should have been replaced")
     #                        nTdebug("Replacing ccpnMolResidue %s with %s" % (ccpnMolResidueOrg, ccpnMolResidue))
-#                            nTdebug("Confirming ccpnResidue.chemCompVar %s TODO: this line reports bad ccv but in fact it's done correctly." % ccpnResidue.getChemCompVar())
+#                            nTdebug("Confirming ccpnResidue.chemCompVar %s TODO: this line reports bad ccv but it's done correctly." % 
+#ccpnResidue.getChemCompVar())
                         else:
 #                            nTdebug("chemCompVar is same as chemCompVarNew")
                             pass
                     else:
-                        nTwarning("Failed to find CCPN chemCompVarNew for chemComp [%s]/chemCompVar [%s] with descriptor [%s] and linking [%s]." % (
+                        nTwarning( ("Failed to find CCPN chemCompVarNew for chemComp [%s]/chemCompVar" +
+                                    " [%s] with descriptor [%s] and linking [%s].") % (
                                chemComp, chemCompVar, ccpnResDescriptor, ccpnResidue.linking))
 #                        for ccv in chemComp.chemCompVars:
-#                            nTdebug("Available molType, ccpCode, linking, descriptor,default: %s %s %s %s %s" % ( chemComp.molType, chemComp.ccpCode, ccv.linking, ccv.descriptor, ccv.isDefaultVar))
+#                            nTdebug("Available molType, ccpCode, linking, descriptor,default: %s %s %s %s %s" % ( 
+#chemComp.molType, chemComp.ccpCode, ccv.linking, ccv.descriptor, ccv.isDefaultVar))
                     # end if chemCompVarNew
                 # end if patch needed.
 
@@ -2387,7 +2404,8 @@ def getRestraintBoundList(constraint, restraintTypeIdx, msgHoL):
                 error = - error
             if restraintTypeIdx == Ccpn.RESTRAINT_IDX_DIHEDRAL:
                 if error > 180.:
-                    msgHoL.appendWarning("Found dihedral angle restraint error above half circle; which means all's possible; translated well to CING: %r" % error)
+                    msgHoL.appendWarning("Found dihedral angle restraint error above half circle; "+
+                                         "which means all's possible; translated well to CING: %r" % error)
                     return (0.0, - Ccpn.SMALL_FLOAT_FOR_DIHEDRAL_ANGLES)
 
             if lower == None:
@@ -2406,14 +2424,14 @@ def getRestraintBoundList(constraint, restraintTypeIdx, msgHoL):
     if isDistanceOrHBondType(restraintTypeIdx):
         if (lower != None) and (upper != None):
             if lower > upper:
-                msgHoL.appendError("Lower bound is above upper bound: [%s,%s]" % (lower, upper))
-                msgHoL.appendError("Assuming CING prefers upper bound and thus unsetting lower bound as if unexisting; please check your data.")
+                msgHoL.appendError("Lower bound is above upper bound: [%s,%s]" % (lower, upper))                
+                msgHoL.appendError("CING prefers upper bound and thus unsetting lower bound as if unexisting; please check your data.")
                 lower = None
         if (lower != None) and (lower < 0):
-            msgHoL.appendWarning("Lower distance bound is negative assuming CING prefers to unset lower bound as if unexisting; please check your data.")
+            msgHoL.appendWarning("Lower distance bound is negative. CING prefers to unset lower bound as if unexisting; please check data.")
             lower = None
         if (upper != None) and (upper < 0):
-            msgHoL.appendWarning("Upper distance bound is negative assuming CING prefers to unset lower bound as if unexisting; please check your data.")
+            msgHoL.appendWarning("Upper distance bound is negative. CING prefers to unset lower bound as if unexisting; please check data.")
             upper = None
 
     # Unfortunately, sometimes it would be nice to preserve the info on the range but can't be here.
@@ -2615,43 +2633,6 @@ def storeResidueValidationInCcpn(project, residue, context = 'CING'):
 #end def
 
 
-# Obtained by a grep on INTERNAL_0 file.
-#    nameDict = {'BMRBd': 'RADE', 'IUPAC': 'A', 'AQUA': 'A', 'INTERNAL_0': 'RADE', 'INTERNAL_1': 'RADE', 'CYANA': 'RADE', 'CCPN': 'RNA A deprot:H1', 'PDB': 'RADE', 'XPLOR': 'RADE'}
-#    nameDict = {'CCPN': 'DNA A deprot:H1', 'BMRBd': 'ADE', 'IUPAC': 'DA', 'AQUA': 'A', 'INTERNAL_0': 'ADE', 'INTERNAL_1': 'DA', 'CYANA': 'ADE', 'CYANA2': 'ADE', 'PDB': 'ADE', 'XPLOR': 'ADE'}
-#    nameDict = {'CCPN': 'DNA C deprot:H3', 'BMRBd': 'CYT', 'IUPAC': 'DC', 'AQUA': 'C', 'INTERNAL_0': 'CYT', 'INTERNAL_1': 'DC', 'CYANA': 'CYT', 'CYANA2': 'CYT', 'PDB': 'CYT', 'XPLOR': 'CYT'}
-#    nameDict = {'CCPN': 'DNA G prot:H1;deprot:H7', 'BMRBd': 'GUA', 'IUPAC': 'DG', 'AQUA': 'G', 'INTERNAL_0': 'GUA', 'INTERNAL_1': 'DG', 'CYANA': 'GUA', 'CYANA2': 'GUA', 'PDB': 'GUA', 'XPLOR': 'GUA'}
-#    nameDict = {'CCPN': 'DNA T prot:H3', 'BMRBd': 'THY', 'IUPAC': 'DT', 'AQUA': 'T', 'INTERNAL_0': 'THY', 'INTERNAL_1': 'DT', 'CYANA': 'THY', 'CYANA2': 'THY', 'PDB': 'THY', 'XPLOR': 'THY'}
-#    nameDict = {'CCPN': 'RNA C deprot:H3', 'BMRBd': 'RCYT', 'IUPAC': 'C', 'AQUA': 'C', 'INTERNAL_0': 'RCYT', 'INTERNAL_1': 'C', 'CYANA': 'RCYT', 'CYANA2': 'RCYT', 'PDB': 'RCYT', 'XPLOR': 'RCYT'}
-#    nameDict = {'CCPN': 'RNA G prot:H1;deprot:H7', 'BMRBd': 'RGUA', 'IUPAC': 'G', 'AQUA': 'G', 'INTERNAL_0': 'RGUA', 'INTERNAL_1': 'G', 'CYANA': 'RGUA', 'CYANA2': 'RGUA', 'PDB': 'RGUA', 'XPLOR': 'RGUA'}
-#    nameDict = {'CCPN': 'RNA U prot:H3', 'BMRBd': 'URA', 'IUPAC': 'U', 'AQUA': 'U', 'INTERNAL_0': 'URA', 'INTERNAL_1': 'U', 'CYANA': 'URA', 'CYANA2': 'URA', 'PDB': 'U', 'XPLOR': 'URA'}
-#    nameDict = {'CCPN': 'other Hoh neutral', 'BMRBd': 'HOH', 'IUPAC': 'HOH', 'AQUA': 'HOH', 'INTERNAL_0': 'HOH', 'INTERNAL_1': 'HOH', 'CYANA': None, 'CYANA2': None, 'PDB': 'HOH', 'XPLOR': 'HOH'}
-#    nameDict = {'CCPN': 'protein Ala neutral', 'BMRBd': 'ALA', 'IUPAC': 'ALA', 'AQUA': 'ALA', 'INTERNAL_0': 'ALA', 'INTERNAL_1': 'ALA', 'CYANA': 'ALA', 'CYANA2': 'ALA', 'PDB': 'ALA', 'XPLOR': 'ALA'}
-#    nameDict = {'CCPN': 'protein Arg deprot:HH12', 'BMRBd': None, 'IUPAC': 'ARG', 'AQUA': 'ARG', 'INTERNAL_0': 'ARGx', 'INTERNAL_1': 'ARGx', 'CYANA': 'ARG', 'CYANA2': None, 'PDB': None, 'XPLOR': None}
-#    nameDict = {'CCPN': 'protein Arg prot:HH12', 'BMRBd': 'ARG', 'IUPAC': 'ARG', 'AQUA': 'ARG', 'INTERNAL_0': 'ARG', 'INTERNAL_1': 'ARG', 'CYANA': 'ARG+', 'CYANA2': 'ARG', 'PDB': 'ARG', 'XPLOR': 'ARG'}
-#    nameDict = {'CCPN': 'protein Asn neutral', 'BMRBd': 'ASN', 'IUPAC': 'ASN', 'AQUA': 'ASN', 'INTERNAL_0': 'ASN', 'INTERNAL_1': 'ASN', 'CYANA': 'ASN', 'CYANA2': 'ASN', 'PDB': 'ASN', 'XPLOR': 'ASN'}
-#    nameDict = {'CCPN': 'protein Asp deprot:HD2', 'BMRBd': 'ASP', 'IUPAC': 'ASP', 'AQUA': 'ASP', 'INTERNAL_0': 'ASP', 'INTERNAL_1': 'ASP', 'CYANA': 'ASP-', 'CYANA2': 'ASP', 'PDB': 'ASP', 'XPLOR': 'ASP'}
-#    nameDict = {'CCPN': 'protein Asp prot:HD2', 'BMRBd': 'ASP', 'IUPAC': 'ASP', 'AQUA': 'ASP', 'INTERNAL_0': 'ASPH', 'INTERNAL_1': 'ASPH', 'CYANA': 'ASP', 'CYANA2': None, 'PDB': 'ASP', 'XPLOR': None}
-#    nameDict = {'CCPN': 'protein Cys deprot:HG', 'BMRBd': 'CYS', 'IUPAC': 'CYS', 'AQUA': 'CYS', 'INTERNAL_0': 'CYSS', 'INTERNAL_1': 'CYSS', 'CYANA': 'CYSS', 'CYANA2': 'CYSS', 'PDB': 'CYS', 'XPLOR': 'CYS'}
-#    nameDict = {'CCPN': 'protein Cys prot:HG', 'BMRBd': 'CYS', 'IUPAC': 'CYS', 'AQUA': 'CYS', 'INTERNAL_0': 'CYS', 'INTERNAL_1': 'CYS', 'CYANA': 'CYS', 'CYANA2': 'CYS', 'PDB': 'CYS', 'XPLOR': 'CYS'}
-#    nameDict = {'CCPN': 'protein Gln neutral', 'BMRBd': 'GLN', 'IUPAC': 'GLN', 'AQUA': 'GLN', 'INTERNAL_0': 'GLN', 'INTERNAL_1': 'GLN', 'CYANA': 'GLN', 'CYANA2': 'GLN', 'PDB': 'GLN', 'XPLOR': 'GLN'}
-#    nameDict = {'CCPN': 'protein Glu deprot:HE2', 'BMRBd': 'GLU', 'IUPAC': 'GLU', 'AQUA': 'GLU', 'INTERNAL_0': 'GLU', 'INTERNAL_1': 'GLU', 'CYANA': 'GLU-', 'CYANA2': 'GLU', 'PDB': 'GLU', 'XPLOR': 'GLU'}
-#    nameDict = {'CCPN': 'protein Glu prot:HE2', 'BMRBd': 'GLU', 'IUPAC': 'GLU', 'AQUA': 'GLU', 'INTERNAL_0': 'GLUH', 'INTERNAL_1': 'GLUH', 'CYANA': 'GLU', 'CYANA2': None, 'PDB': 'GLU', 'XPLOR': None}
-#    nameDict = {'CCPN': 'protein Gly neutral', 'BMRBd': 'GLY', 'IUPAC': 'GLY', 'AQUA': 'GLY', 'INTERNAL_0': 'GLY', 'INTERNAL_1': 'GLY', 'CYANA': 'GLY', 'CYANA2': 'GLY', 'PDB': 'GLY', 'XPLOR': 'GLY'}
-#    nameDict = {'CCPN': 'protein His prot:HD1,HE2', 'BMRBd': 'HIS', 'IUPAC': 'HIS', 'AQUA': 'HIS', 'INTERNAL_0': 'HISH', 'INTERNAL_1': 'HISH', 'CYANA': 'HIS+', 'CYANA2': 'HIS', 'PDB': 'HIS', 'XPLOR': 'HIS'}
-#    nameDict = {'CCPN': 'protein His prot:HD1;deprot:HE2', 'BMRBd': 'HIS', 'IUPAC': 'HIS', 'AQUA': 'HIS', 'INTERNAL_0': 'HIS', 'INTERNAL_1': 'HIS', 'CYANA': 'HIS', 'CYANA2': 'HIS', 'PDB': 'HIS', 'XPLOR': 'HIS'}
-#    nameDict = {'CCPN': 'protein His prot:HE2;deprot:HD1', 'BMRBd': 'HIS', 'IUPAC': 'HIS', 'AQUA': 'HIS', 'INTERNAL_0': 'HISE', 'INTERNAL_1': 'HISE', 'CYANA': 'HIST', 'CYANA2': 'HIST', 'PDB': 'HIS', 'XPLOR': 'HIS'}
-#    nameDict = {'CCPN': 'protein Ile neutral', 'BMRBd': 'ILE', 'IUPAC': 'ILE', 'AQUA': 'ILE', 'INTERNAL_0': 'ILE', 'INTERNAL_1': 'ILE', 'CYANA': 'ILE', 'CYANA2': 'ILE', 'PDB': 'ILE', 'XPLOR': 'ILE'}
-#    nameDict = {'CCPN': 'protein Leu neutral', 'BMRBd': 'LEU', 'IUPAC': 'LEU', 'AQUA': 'LEU', 'INTERNAL_0': 'LEU', 'INTERNAL_1': 'LEU', 'CYANA': 'LEU', 'CYANA2': 'LEU', 'PDB': 'LEU', 'XPLOR': 'LEU'}
-#    nameDict = {'CCPN': 'protein Lys deprot:HZ3', 'BMRBd': None, 'IUPAC': 'LYS', 'AQUA': 'LYS', 'INTERNAL_0': 'LYSx', 'INTERNAL_1': 'LYSx', 'CYANA': 'LYS', 'CYANA2': None, 'PDB': None, 'XPLOR': None}
-#    nameDict = {'CCPN': 'protein Lys prot:HZ3', 'BMRBd': 'LYS', 'IUPAC': 'LYS', 'AQUA': 'LYS', 'INTERNAL_0': 'LYS', 'INTERNAL_1': 'LYS', 'CYANA': 'LYS+', 'CYANA2': 'LYS', 'PDB': 'LYS', 'XPLOR': 'LYS'}
-#    nameDict = {'CCPN': 'protein Met neutral', 'BMRBd': 'MET', 'IUPAC': 'MET', 'AQUA': 'MET', 'INTERNAL_0': 'MET', 'INTERNAL_1': 'MET', 'CYANA': 'MET', 'CYANA2': 'MET', 'PDB': 'MET', 'XPLOR': 'MET'}
-#    nameDict = {'CCPN': 'protein Phe neutral', 'BMRBd': 'PHE', 'IUPAC': 'PHE', 'AQUA': 'PHE', 'INTERNAL_0': 'PHE', 'INTERNAL_1': 'PHE', 'CYANA': 'PHE', 'CYANA2': 'PHE', 'PDB': 'PHE', 'XPLOR': 'PHE'}
-#    nameDict = {'CCPN': 'protein Pro neutral', 'BMRBd': 'PRO', 'IUPAC': 'PRO', 'AQUA': 'PRO', 'INTERNAL_0': 'PRO', 'INTERNAL_1': 'PRO', 'CYANA': 'PRO', 'CYANA2': 'PRO', 'PDB': 'PRO', 'XPLOR': 'PRO'}
-#    nameDict = {'CCPN': 'protein Ser prot:HG', 'BMRBd': 'SER', 'IUPAC': 'SER', 'AQUA': 'SER', 'INTERNAL_0': 'SER', 'INTERNAL_1': 'SER', 'CYANA': 'SER', 'CYANA2': 'SER', 'PDB': 'SER', 'XPLOR': 'SER'}
-#    nameDict = {'CCPN': 'protein Thr prot:HG1', 'BMRBd': 'THR', 'IUPAC': 'THR', 'AQUA': 'THR', 'INTERNAL_0': 'THR', 'INTERNAL_1': 'THR', 'CYANA': 'THR', 'CYANA2': 'THR', 'PDB': 'THR', 'XPLOR': 'THR'}
-#    nameDict = {'CCPN': 'protein Trp prot:HE1', 'BMRBd': 'TRP', 'IUPAC': 'TRP', 'AQUA': 'TRP', 'INTERNAL_0': 'TRP', 'INTERNAL_1': 'TRP', 'CYANA': 'TRP', 'CYANA2': 'TRP', 'PDB': 'TRP', 'XPLOR': 'TRP'}
-#    nameDict = {'CCPN': 'protein Tyr prot:HH', 'BMRBd': 'TYR', 'IUPAC': 'TYR', 'AQUA': 'TYR', 'INTERNAL_0': 'TYR', 'INTERNAL_1': 'TYR', 'CYANA': 'TYR', 'CYANA2': 'TYR', 'PDB': 'TYR', 'XPLOR': 'TYR'}
-#    nameDict = {'CCPN': 'protein Val neutral', 'BMRBd': 'VAL', 'IUPAC': 'VAL', 'AQUA': 'VAL', 'INTERNAL_0': 'VAL', 'INTERNAL_1': 'VAL', 'CYANA': 'VAL', 'CYANA2': 'VAL', 'PDB': 'VAL', 'XPLOR': 'VAL'}
 
 def patchCcpnResDescriptor(ccpnResDescriptor, ccpnMolType, ccpnLinking):
     """See #modResDescriptorForTerminii for inverse op."""

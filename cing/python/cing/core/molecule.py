@@ -724,7 +724,8 @@ class Molecule( NTtree, ResidueList ):
 #        an = translateAtomName( convention, resTranslated, atomName, INTERNAL )
 ##        if (not an or (an not in res)): return None
 #        if not an:
-#            nTdebug("in Molecule.decodeNameTuple failed to translateAtomName for res: " + repr(resTranslated) + " and atom: " + repr(atomName))
+#            nTdebug("in Molecule.decodeNameTuple failed to translateAtomName for res: " + 
+#repr(resTranslated) + " and atom: " + repr(atomName))
 #            return None
 #            # JFD adds. This makes no sense. The residue itself by number is known. Just get it's residue type
 #            # and look up the atom translation. This can of course be fixed in the db too.

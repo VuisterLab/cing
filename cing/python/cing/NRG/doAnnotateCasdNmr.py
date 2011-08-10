@@ -137,10 +137,12 @@ def annotateEntry(entryCodeNew, *extraArgList):
     if replaceCoordinates or replaceRestraints:
         if programId == CYANA:
             importCyanaCoorAndRes(ccpnProject, inputAuthorDir, guiRoot,
-                replaceCoordinates=replaceCoordinates, replaceRestraints=replaceRestraints, allowPopups=allowPopups, minimalPrompts=minimalPrompts, verbose=verbose, **presets)
+                replaceCoordinates=replaceCoordinates, replaceRestraints=replaceRestraints, 
+                allowPopups=allowPopups, minimalPrompts=minimalPrompts, verbose=verbose, **presets)
         elif programId == XPLOR:
             importXplorCoorAndRes(ccpnProject, inputAuthorDir, guiRoot,
-                replaceCoordinates=replaceCoordinates, replaceRestraints=replaceRestraints, allowPopups=allowPopups, minimalPrompts=minimalPrompts, verbose=verbose, **presets)
+                replaceCoordinates=replaceCoordinates, replaceRestraints=replaceRestraints, 
+                allowPopups=allowPopups, minimalPrompts=minimalPrompts, verbose=verbose, **presets)
         elif programId == PDB:
             importPseudoPdb(ccpnProject, inputAuthorDir, guiRoot,
                 allowPopups=allowPopups, minimalPrompts=minimalPrompts, verbose=verbose, **presets)

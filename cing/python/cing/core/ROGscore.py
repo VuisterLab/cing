@@ -197,7 +197,8 @@ class XMLROGscoreHandler( XMLhandler ):
 
     def handle(self, node):
         attrs = self.handleDictElements(node)
-        if attrs == None: return None
+        if attrs == None: 
+            return None
         result = ROGscore()
         result.update(attrs)
         return result

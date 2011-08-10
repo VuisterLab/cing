@@ -227,7 +227,8 @@ class MolDef( NTtree ):
         """
         result = NTlist()
 
-        if len(properties) == 0: return result
+        if len(properties) == 0: 
+            return result
         for res in self.residues:
             if res.hasProperties(*properties):
                 result.append(res)
@@ -242,7 +243,8 @@ class MolDef( NTtree ):
         """
         result = NTlist()
 
-        if len(properties) == 0: return result
+        if len(properties) == 0: 
+            return result
         for atm in self.allAtomDefs():
             if atm.hasProperties(*properties):
                 result.append(atm)
@@ -377,10 +379,12 @@ class ResidueDef( NTtree ):
                            shortName   = '_',
                            canBeModified = True,      # ResidueDef can be modified; i.e. AtomDefs added;
                                                       # set to False on import for  non-protein and non-nucleic CING definitions
-                           shouldBeSaved = True,      # ResidueDef requires saving with project; set to False on import for default CING definitions
+                           shouldBeSaved = True,      
+                           # ResidueDef requires saving with project; set to False on import for default CING definitions
                            comment     = None,
                            nameDict    = {INTERNAL_0:name, INTERNAL_1:name},
-                           atomDict    = {},          # contains definition of atoms, sorted by convention, dynamically created on initialization
+                           atomDict    = {},          
+                           # contains definition of atoms, sorted by convention, dynamically created on initialization
                            dihedrals   = NTlist(),
                            properties  = []           # list of properties for residue
                        )
@@ -517,7 +521,8 @@ class ResidueDef( NTtree ):
         if newName:
             return newName
 
-        nTwarning('ResidueDef.translate: Failed to find translation to "%s" for residue: %s; Using CING name "%s" instead.', convention, self, self.name )
+        nTwarning('ResidueDef.translate: Failed to find translation to "%s" for residue: %s; Using CING name "%s" instead.', 
+                  convention, self, self.name )
         return self.name
     #end def
 
@@ -573,7 +578,8 @@ class ResidueDef( NTtree ):
         # Set the entry residueDict of molDef to self
         residueDict = self.molDef.residueDict
         residueDict.setdefault( LOOSE, {} )
-        for n in [self.shortName, self.name, self.name.capitalize(), self.name.lower(), self.commonName, self.commonName.capitalize(), self.commonName.lower()]:
+        for n in [self.shortName, self.name, self.name.capitalize(), self.name.lower(), self.commonName, self.commonName.capitalize(), 
+                  self.commonName.lower()]:
             residueDict[LOOSE][n] = self
         #end for
         #different convention definitions
@@ -676,14 +682,16 @@ def isAromatic( atmDef ):
         nTdebug("%s called without atom/residue definition." % getCallerName())
         return 0
 
-    if not atmDef.residueDef.hasProperties('aromatic'): return False
+    if not atmDef.residueDef.hasProperties('aromatic'): 
+        return False
 
     if (isCarbon(atmDef) and atmDef.shift != None and atmDef.shift.average > 100.0):
         return True
     if (isNitrogen(atmDef) and atmDef.shift != None and atmDef.shift.average > 130.0):
         return True
     elif (isProton(atmDef)):
-        if len(atmDef.topology) == 0: return False #bloody CYANA pseudo atomsof some residues like CA2P do not have a topology
+        if len(atmDef.topology) == 0: 
+            return False #bloody CYANA pseudo atomsof some residues like CA2P do not have a topology
         heavy = atmDef.residueDef[atmDef.topology[0][1]]
         return isAromatic( heavy )
     #end if
@@ -735,7 +743,8 @@ def isMethyl( atmDef ):
         return (count == 3) # Methyls have three protons!
     elif isProton(atmDef):
         # should be attached to a heavy atom
-        if len(atmDef.topology) == 0: return False #bloody CYANA pseudo atomsof some residues like CA2P do not have a topology
+        if len(atmDef.topology) == 0: 
+            return False #bloody CYANA pseudo atomsof some residues like CA2P do not have a topology
         heavy = atmDef.residueDef[atmDef.topology[0][1]]
         return isMethyl( heavy )
     else:
@@ -768,7 +777,8 @@ def isMethylene( atmDef ):
         return (count == 2) # Methylene's have two protons!
     elif isProton(atmDef):
         # should be attached to a heavy atom
-        if len(atmDef.topology) == 0: return False #bloody CYANA pseudo atomsof some residues like CA2P do not have a topology
+        if len(atmDef.topology) == 0: 
+            return False #bloody CYANA pseudo atomsof some residues like CA2P do not have a topology
         heavy = atmDef.residueDef[atmDef.topology[0][1]]
         return isMethylene( heavy )
     else:
@@ -927,7 +937,8 @@ class AtomDef( NTtree ):
         newName = self.translate( convention )
         if newName:
             return newName
-        nTwarning('AtomDef.translateWithDefault: Failed to find translation to "%s" for atom: %s; Using CING name "%s" instead.', convention, self, self.name )
+        nTwarning('AtomDef.translateWithDefault: Failed to find translation to "%s" for atom: %s; Using CING name "%s" instead.', 
+                  convention, self, self.name )
         return self.name
     #end def
 
@@ -941,7 +952,8 @@ class AtomDef( NTtree ):
         """
         result = NTlist()
 
-        if len(properties) == 0: return result
+        if len(properties) == 0: 
+            return result
         if self.hasProperties(*properties):
             result.append(self)
         #end if
@@ -952,7 +964,8 @@ class AtomDef( NTtree ):
         """
         Returns True if AtomDef has properties, False otherwise
         """
-        if len(properties) == 0: return False
+        if len(properties) == 0: 
+            return False
 
         for p in properties:
             if not p in self.properties:
@@ -965,7 +978,8 @@ class AtomDef( NTtree ):
     def patchProperties(self):
         """Patch the properties list
         """
-        props = NTlist( self.name, self.residueDef.name, self.residueDef.commonName, self.residueDef.shortName, self.spinType, *self.properties)
+        props = NTlist( self.name, self.residueDef.name, self.residueDef.commonName, self.residueDef.shortName, 
+                        self.spinType, *self.properties)
 
         # Append these defs so we will always have them. If they were already present, they will be removed again below.
         if isProton(self):

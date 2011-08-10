@@ -399,7 +399,7 @@ end y
             try:
                 value = float(valueStringList[0])
             except:
-                nTerror("Failed to parse value as a float for check [%s] for line [%s] from What If string [%s]; setting value to a None" % (
+                nTerror("Failed to parse value as a float for check [%s] for line [%s] from What If string [%s]; setting value to a None"%(
                     checkId,line,valueStringList[0]))
                 nTmessage("See also issue: %s%d" % (issueListUrl, 242))
                 value = None

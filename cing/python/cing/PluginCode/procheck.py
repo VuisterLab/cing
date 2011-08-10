@@ -339,7 +339,8 @@ B   7 U   999.900 999.900 999.900 999.900 999.900 999.900   0.000   1.932 999.90
         if resCountTotal >= MAX_PROCHECK_TOTAL_RESIDUES:
             max_models_org = max_models
             max_models =  MAX_PROCHECK_TOTAL_RESIDUES / resCount
-            nTdebug("Reducing number of models from %s to %s to limit residue count to less than %s" % (max_models_org, max_models, MAX_PROCHECK_TOTAL_RESIDUES))
+            nTdebug("Reducing number of models from %s to %s to limit residue count to less than %s" % (max_models_org, max_models, 
+                MAX_PROCHECK_TOTAL_RESIDUES))
         if max_models < 1:
             nTerror("Molecule is to large for procheck to even run on a single model")
             return True

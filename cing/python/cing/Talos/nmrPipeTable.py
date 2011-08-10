@@ -6,10 +6,10 @@ gv 21 March 2006
 from cing.Libs.AwkLike import AwkLike
 from cing.Libs.NTutils import * #@UnusedWildImport
 
-class nmrPipeTabRow( NTdict ):
+class NmrPipeTabRow( NTdict ):
 
     def __init__( self, table, id, **kwds ):
-        NTdict.__init__( self, __CLASS__  = 'nmrPipeTabRow',
+        NTdict.__init__( self, __CLASS__  = 'NmrPipeTabRow',
                                  table      = table,
                                  id         = id,
                                  name       = 'row'+str(id),
@@ -58,16 +58,16 @@ class nmrPipeTabRow( NTdict ):
     #end def
 #end class
 
-class nmrPipeTable( NTdict ):
+class NmrPipeTable( NTdict ):
     """
-    nmrPipeTable class
+    NmrPipeTable class
     implemented as NTdict of NTdict's, i.e.
 
     element (row-0, INDEX) indexed as
         tab[0].INDEX   or tab[0]['INDEX']
 
-    tab = nmrPipeTable()                # Empty table
-    tab = nmrPipeTable( 'tabFile' )     # table from tabFile
+    tab = NmrPipeTable()                # Empty table
+    tab = NmrPipeTable( 'tabFile' )     # table from tabFile
 
     METHODS:
 
@@ -120,7 +120,7 @@ class nmrPipeTable( NTdict ):
         """
         Add ro to table, optional kwds can be used to set values
         """
-        row = nmrPipeTabRow( table=self, id=self.nrows, **kwds )
+        row = NmrPipeTabRow( table=self, id=self.nrows, **kwds )
         self[ self.nrows ] = row
         self.rows.append( row )
         self.nrows += 1
@@ -133,7 +133,7 @@ class nmrPipeTable( NTdict ):
         return columnDef, or None on error
         """
         if name in self:
-            nTerror('nmrPipeTable.addColumn: column "%s" already exists\n', name )
+            nTerror('NmrPipeTable.addColumn: column "%s" already exists\n', name )
             return None
         #end if
 
@@ -155,7 +155,8 @@ class nmrPipeTable( NTdict ):
     def column( self, cName ):
         """Return list of values of column cName or None on error
         """
-        if cName not in self: return None
+        if cName not in self: 
+            return None
 
         col = NTlist()
         for row in self:
@@ -170,7 +171,7 @@ class nmrPipeTable( NTdict ):
         """
         for c in cNames:
             if not c in self:
-                nTerror('nmrPipeTable.hideColumn: column "%s" not defined\n', c)
+                nTerror('NmrPipeTable.hideColumn: column "%s" not defined\n', c)
             else:
                 self[c].hide = True
             #end if
@@ -183,7 +184,7 @@ class nmrPipeTable( NTdict ):
         """
         for c in cNames:
             if not c in self:
-                nTerror('nmrPipeTable.showColumn: column "%s" not defined\n', c)
+                nTerror('NmrPipeTable.showColumn: column "%s" not defined\n', c)
             else:
                 self[c].hide = False
             #end if
@@ -251,13 +252,15 @@ class nmrPipeTable( NTdict ):
 
         fprintf(     stream, 'VARS    ' )
         for c in self.columnDefs:
-            if not c.hide: fprintf( stream, '%s ', c.name )
+            if not c.hide: 
+                fprintf( stream, '%s ', c.name )
         #end for
         fprintf( stream, '\n' )
 
         fprintf(     stream, 'FORMAT  ' )
         for c in self.columnDefs:
-            if not c.hide: fprintf( stream, '%s ', c.fmt )
+            if not c.hide: 
+                fprintf( stream, '%s ', c.fmt )
         #end for
         fprintf( stream, '\n' )
 
@@ -301,7 +304,7 @@ class nmrPipeTable( NTdict ):
 #
 if __name__ == '__main__':
 
-    tab = nmrPipeTable( 'test.tab' )
+    tab = NmrPipeTable( 'test.tab' )
     print tab[0]
     print tab[0].get('PSI')
     print tab[0].keys()

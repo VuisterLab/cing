@@ -72,7 +72,7 @@ def convertStar2Ccpn(projectName, rootDir, inputDir="XPLOR", outputDir="CCPN"):
     do_cmd(cmd)
     guiRoot.destroy()
 
-def importFullStarProjects(starFileName, projectName, inputDir='.', outputDir='.', guiRoot=None, allowPopups=0, minimalPrompts=1, verbose=1):
+def importFullStarProjects(starFileName, projectName, inputDir='.', outputDir='.', guiRoot=None, allowPopups=0,minimalPrompts=1,verbose=1):
     '''Returns a full CCPN project rooted in inputDir/projectName that will be created and saved.
     Input will be from inputDir/starFileName
 
@@ -139,7 +139,8 @@ def importStarChemicalShifts(ccpnProject, inputDir, guiRoot, allowPopups=1, mini
 
 
 #    formatCns = CnsFormat(ccpnProject, guiRoot, verbose=verbose, minimalPrompts=minimalPrompts, allowPopups=allowPopups, **presets)
-    formatNmrStarFormat = NmrStarFormat(ccpnProject, guiRoot, verbose=verbose, minimalPrompts=minimalPrompts, allowPopups=allowPopups, **presets)
+    formatNmrStarFormat = NmrStarFormat(ccpnProject, guiRoot, verbose=verbose, minimalPrompts=minimalPrompts, 
+                                        allowPopups=allowPopups, **presets)
     ccpnShiftListOfList = []
 
     # Actually just one but this is less time to code;-)

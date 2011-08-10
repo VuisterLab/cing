@@ -135,7 +135,8 @@ class Peirce:
         # row>=20 and we need delta to get an R value close to 1.
         if y >= x/2:
             # TODO: but let's not focus our attention on it now.
-#            nTdebug("Cing was trying to remove from a set of "+repr(x)+" values an unexpected high number of outliers: "+repr(y)+" this is impossible")
+#            nTdebug("Cing was trying to remove from a set of "+repr(x)+" values an unexpected high number of outliers: "+
+#repr(y)+" this is impossible")
             return None
 
         lastValue = self.peirce[row][-1]

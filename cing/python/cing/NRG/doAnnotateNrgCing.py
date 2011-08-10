@@ -142,7 +142,8 @@ def annotateEntry(entry_code, bmrb_id, *extraArgList):
 #            nTmessage('found ccpnMolSystem: %s' % ccpnMolSystem)
 #    print 'status: %s' % ccpnMolSystem.setCode(projectName) # impossible; reported to ccpn team.
 
-    importStarChemicalShifts(ccpnProject, inputStarDir, guiRoot, allowPopups=allowPopups, minimalPrompts=minimalPrompts, verbose=verbose, **presets)
+    importStarChemicalShifts(ccpnProject, inputStarDir, guiRoot, allowPopups=allowPopups, minimalPrompts=minimalPrompts, 
+                             verbose=verbose, **presets)
 
     if doSwapCheck:
 #        constraintsHandler = ConstraintsHandler()

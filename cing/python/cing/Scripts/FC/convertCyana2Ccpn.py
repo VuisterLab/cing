@@ -34,10 +34,12 @@ def convertCyana2Ccpn(projectName, rootDir):
     guiRoot.destroy()
 
 
-def importCyanaCoorAndRes(ccpnProject, inputDir, guiRoot, replaceCoordinates=1, replaceRestraints=1, allowPopups=1, minimalPrompts=0, verbose=1, **presets):
+def importCyanaCoorAndRes(ccpnProject, inputDir, guiRoot, replaceCoordinates=1, replaceRestraints=1, allowPopups=1, 
+                          minimalPrompts=0, verbose=1, **presets):
 
     if replaceCoordinates:
-        status = importPseudoPdb(ccpnProject, inputDir, guiRoot, allowPopups=allowPopups, minimalPrompts=minimalPrompts, verbose=verbose, **presets)
+        status = importPseudoPdb(ccpnProject, inputDir, guiRoot, allowPopups=allowPopups, 
+                                 minimalPrompts=minimalPrompts, verbose=verbose, **presets)
         if status:
             nTerror("Failed importCyanaCoorAndRes")
             return True
@@ -62,7 +64,7 @@ def importCyanaCoorAndRes(ccpnProject, inputDir, guiRoot, replaceCoordinates=1, 
     nTdebug("From %s will read in total files: %s" % (globPattern, fileList))
     for fn in fileList:
         fnBaseName = os.path.basename(fn).split('.')[0]
-        ccpnConstraintList = formatCyana.readDihedralConstraints(fn, minimalPrompts=minimalPrompts, allowPopups=allowPopups, verbose=verbose)
+        ccpnConstraintList = formatCyana.readDihedralConstraints(fn, minimalPrompts=minimalPrompts,allowPopups=allowPopups,verbose=verbose)
         ccpnConstraintList.setName(fnBaseName)
         ccpnConstraintListOfList.append(ccpnConstraintList)
 
@@ -108,7 +110,8 @@ if __name__ == '__main__':
 #    done: BASPLyon CuTTHAcisLyon
 #    projectList = """  BASPLyon CuTTHAcisLyon CuTTHAtransLyon ParvulustatLyon
 #    TTScoLyon VpR247Lyon apoTTHAcisLyon apoTTHAtransLyon mia40Lyon taf3Lyon wln34Lyon""".split()
-#    projectList = """   CuTTHAtransFrankfurt ParvulustatFrankfurt TTScoFrankfurt apoTTHAcisFrankfurt apoTTHAtransFrankfurt mia40Frankfurt wln34Frankfurt """.split()
+#    projectList = """   CuTTHAtransFrankfurt ParvulustatFrankfurt TTScoFrankfurt apoTTHAcisFrankfurt apoTTHAtransFrankfurt 
+#mia40Frankfurt wln34Frankfurt """.split()
     projectList = [ "VpR247Lyon" ]
     # failed for
     # BASPLyon

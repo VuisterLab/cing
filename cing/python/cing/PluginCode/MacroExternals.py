@@ -214,7 +214,8 @@ def makePyMolByResidueMacro(project, keys,
     """From http://pymolwiki.org/index.php/Color#Reassigning_B-Factors_and_Coloring
     http://pymolwiki.org/index.php/Command_Line_Options
     """
-#    nTdebug('makePyMolByResidueMacro: keys: %s, minValue: %s maxValue: %s reverseColorScheme: %s', keys, minValue, maxValue, reverseColorScheme)
+#    nTdebug('makePyMolByResidueMacro: keys: %s, minValue: %s maxValue: %s reverseColorScheme: %s', keys, minValue, 
+#maxValue, reverseColorScheme)
 
     # Just for testing:
     pdbCode = '1brv'
@@ -379,7 +380,8 @@ def makeMolmolByResidueMacro(project, keys,
                             path = None
                            ):
 
-#    nTdebug('makeMolmolByResidueMacro: keys: %s, minValue: %s maxValue: %s reverseColorScheme: %s', keys, minValue, maxValue, reverseColorScheme)
+#    nTdebug('makeMolmolByResidueMacro: keys: %s, minValue: %s maxValue: %s reverseColorScheme: %s', 
+#keys, minValue, maxValue, reverseColorScheme)
     macroTxt = \
 """%s
 

@@ -781,17 +781,13 @@ def main():
     
     if options.pylint:
         if pylintOverall(options.pylint):
-#        testOverall(namepattern="test_NTutils*.py")
             sys.exit(1)
-        # end if
         sys.exit(0)
     # end if
         
     if options.pylintsum:
         if pylintOverallSummary(options.pylintsum):
-#        testOverall(namepattern="test_NTutils*.py")
             sys.exit(1)
-        # end if
         sys.exit(0)
     # end if
         

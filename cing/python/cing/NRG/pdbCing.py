@@ -483,11 +483,12 @@ class PdbCing(Lister):
             number_of_files += 1
         nTmessage("Generating %s index html files" % (number_of_files))
 
-        example_str_template = """ <td><a href=""" + self.pdb_link_template + \
-        """>%S</a><BR><a href=""" + self.bmrb_link_template + ">%b</a>"
+        example_str_template = """ <td><a href=""" + self.pdb_link_template
+        example_str_template += """>%S</a><BR><a href=""" + self.bmrb_link_template + ">%b</a>"
 
         cingImage = '../data/%t/%s/%s.cing/%s/HTML/mol.gif'
-        example_str_template += '</td><td><a href="' + self.cing_link_template + '"><img SRC="' + cingImage + '" border=0 width="200" ></a></td>'
+        example_str_template += '</td><td><a href="' + self.cing_link_template + '"><img SRC="' 
+        example_str_template += cingImage + '" border=0 width="200" ></a></td>'
 #        file_name = os.path.join (self.base_dir, "data", "index.html")
         file_name = os.path.join (self.base_data_dir, "index.html")
 
@@ -547,6 +548,7 @@ class PdbCing(Lister):
                 new_row = [ file_id, begin_entry_code, end_entry_code ]
                 csvwriter.writerow(new_row)
 
+                # pylint: disable=C0301
                 new_string = '%s: <B>%s-%s</B> &nbsp;&nbsp; (%s-%s of %s). &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; Jump to index with %s entry id &nbsp; %s\n%s\n' % (
                         result_string,
                         begin_entry_code,

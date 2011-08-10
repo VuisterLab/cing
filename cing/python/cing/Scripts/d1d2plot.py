@@ -103,9 +103,11 @@ def plotForEntry(entryId):
                 else:
                     angles.append(0.0)
             if bb < BBCCHK_CUTOFF:
-                fprintf(fpBad, '%4d   %7.2f  %7.2f  %7.2f  %s  %s %s\n', res.resNum, d1[i], d2[i], bb, angles.format("%7.2f  "), res, res.dssp.consensus)
+                fprintf(fpBad, '%4d   %7.2f  %7.2f  %7.2f  %s  %s %s\n', 
+                        res.resNum, d1[i], d2[i], bb, angles.format("%7.2f  "), res, res.dssp.consensus)
             else:
-                fprintf(fpGood, '%4d   %7.2f  %7.2f  %7.2f  %s  %s %s\n', res.resNum, d1[i], d2[i], bb, angles.format("%7.2f  "), res, res.dssp.consensus)
+                fprintf(fpGood, '%4d   %7.2f  %7.2f  %7.2f  %s  %s %s\n', 
+                        res.resNum, d1[i], d2[i], bb, angles.format("%7.2f  "), res, res.dssp.consensus)
             #end if
         #end for models
         fn = "d1d2_%03d_%s." % (res.resNum, res.resName) + graphicsFormat
@@ -443,11 +445,13 @@ def plotDihedralD1_2d(doOnlyOverall=True):
                 sumh2 = sum(hist2)
                 titleStr += ' %d-%d' % (sumh1, sumh2)
 #                if doOnlyOverall:
-                histList = getTripletHistogramList(resTypeListBySequenceOrder, doOnlyOverall = doOnlyOverall, ssTypeRequested = None, doNormalize = False, normalizeSeparatelyToZ = False)
+                histList = getTripletHistogramList(resTypeListBySequenceOrder, doOnlyOverall = doOnlyOverall, 
+                                                   ssTypeRequested = None, doNormalize = False, normalizeSeparatelyToZ = False)
 
 #                else:
 #                    titleStr += '\n'
-#                    histList = getTripletHistogramList(resTypeListBySequenceOrder, doOnlyOverall = doOnlyOverall, ssTypeRequested = None, doNormalize = True, normalizeSeparatelyToZ = True)
+#                    histList = getTripletHistogramList(resTypeListBySequenceOrder, doOnlyOverall = doOnlyOverall, 
+#ssTypeRequested = None, doNormalize = True, normalizeSeparatelyToZ = True)
 #                    scaleBy = SCALE_BY_ONE
 
 
@@ -604,12 +608,14 @@ def plotHisBySsTypeResTypes():
                         if resTypeNext != 'VAL':
                             continue
                         resTypeListBySequenceOrder = (resTypePrev, resType , resTypeNext)
-                        myHistList = getTripletHistogramList(resTypeListBySequenceOrder, doOnlyOverall=doOnlyOverall, ssTypeRequested=ssType, doNormalize = True)
+                        myHistList = getTripletHistogramList(resTypeListBySequenceOrder, doOnlyOverall=doOnlyOverall, 
+                                                             ssTypeRequested=ssType, doNormalize = True)
                         if myHistList == None:
                             nTwarning("Encountered an error getting the D1D2 hist for %s; skipping" % str(resTypeListBySequenceOrder))
                             continue
                         if len(myHistList) != 1:
-                            nTdebug("Expected exactly one but Found %s histogram for %s; skipping" % (len(myHistList), str(resTypeListBySequenceOrder)))
+                            nTdebug("Expected exactly one but Found %s histogram for %s; skipping" % (len(myHistList), 
+                                                                                                      str(resTypeListBySequenceOrder)))
                             continue
                         myHist = deepcopy(myHistList[0])
 #                        nTdebug("myHist: %s" % str(myHist))
@@ -651,7 +657,8 @@ def plotHisBySsTypeResTypes():
                               yLabel=dihedralName2)
                             ps.addPlot(myplot)
 
-                            myplot.dihedralComboPlot([myHist], minPercentage=MIN_Z_D1D2, maxPercentage=MAX_Z_D1D2, scaleBy=SCALE_BY_Z, ssType = ssType)
+                            myplot.dihedralComboPlot([myHist], minPercentage=MIN_Z_D1D2, maxPercentage=MAX_Z_D1D2, scaleBy=SCALE_BY_Z, 
+                                                     ssType = ssType)
 
                             fn = 'd1d2_%s_%s-%s-%s' % (ssType, resTypePrev, resType, resTypeNext)
                             if doOverall:
@@ -789,9 +796,11 @@ def plotDihedralD1D2():
                                 angles.append(0.0)
                         #end for
                         if bb < 20.0: # Arbitrary 20 bb occurences as cuttoff for now
-                            fprintf(fpBad, '%4d   %7.2f  %7.2f  %7.2f  %s  %s %s\n', res.resNum, d1[i], d2[i], bb, angles.format("%7.2f  "), res, res.dssp.consensus)
+                            fprintf(fpBad,  '%4d   %7.2f  %7.2f  %7.2f  %s  %s %s\n', 
+                                    res.resNum, d1[i], d2[i], bb, angles.format("%7.2f  "), res, res.dssp.consensus)
                         else:
-                            fprintf(fpGood, '%4d   %7.2f  %7.2f  %7.2f  %s  %s %s\n', res.resNum, d1[i], d2[i], bb, angles.format("%7.2f  "), res, res.dssp.consensus)
+                            fprintf(fpGood, '%4d   %7.2f  %7.2f  %7.2f  %s  %s %s\n', 
+                                    res.resNum, d1[i], d2[i], bb, angles.format("%7.2f  "), res, res.dssp.consensus)
                 #end if
             #end if
         #end if

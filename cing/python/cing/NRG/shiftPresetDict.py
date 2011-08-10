@@ -82,8 +82,10 @@ presetDict = {
   'linkResonances': {
    'keywds': {
      'forceChainMappings': [
-        ['A', 'subunit A1 peptide 1', 1, 2], ['B', 'subunit A2 peptide 1', 1, 2], ['C', 'subunit B1 peptide 1', 1, 2], ['D', 'subunit B2 peptide 1', 1, 2],
-        ['E', 'subunit A1 peptide 2', 1, 2], ['F', 'subunit A2 peptide 2', 1, 2], ['G', 'subunit B1 peptide 2', 1, 2], ['H', 'subunit B2 peptide 2', 1, 2]
+        ['A', 'subunit A1 peptide 1', 1, 2], ['B', 'subunit A2 peptide 1', 1, 2], 
+        ['C', 'subunit B1 peptide 1', 1, 2], ['D', 'subunit B2 peptide 1', 1, 2],
+        ['E', 'subunit A1 peptide 2', 1, 2], ['F', 'subunit A2 peptide 2', 1, 2], 
+        ['G', 'subunit B1 peptide 2', 1, 2], ['H', 'subunit B2 peptide 2', 1, 2]
         ],
       },
     },

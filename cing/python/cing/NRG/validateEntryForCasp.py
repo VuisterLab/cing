@@ -61,7 +61,7 @@ def main(entryId, *extraArgList):
     nTmessage(header)
     nTmessage(getStartMessage())
 
-    expectedArgumentList = [ 'inputDir', 'outputDir', 'pdbConvention', 'restraintsConvention', 'archiveType', 'projectType', 'storeCING2db' ]
+    expectedArgumentList = [ 'inputDir', 'outputDir', 'pdbConvention', 'restraintsConvention', 'archiveType','projectType','storeCING2db']
     expectedNumberOfArguments = len(expectedArgumentList)
     if len(extraArgList) != expectedNumberOfArguments:
         nTerror("Got arguments: " + repr(extraArgList))

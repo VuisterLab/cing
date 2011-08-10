@@ -136,7 +136,8 @@ class CingGui(BasePopup):
 
     def body(self, guiFrame):
 
-        row = 0; col =0
+        row = 0
+        col =0
 #    frame = Frame( guiFrame )
 #    frame.grid(row=row, column=col, sticky='news')
         self.menuBar = Menu( guiFrame)
@@ -148,7 +149,8 @@ class CingGui(BasePopup):
 
 #    guiFrame.grid_columnconfigure(row, weight=1)
 #    frame = LabelFrame(guiFrame, text='Project', font=medFont)
-        row = +1; col =0
+        row = +1
+        col =0
         frame = LabelFrame(guiFrame, text='Project', **labelFrameAttributes )
         print '>', frame.keys()
         frame.grid(row=row, column=col, sticky='nsew' )
@@ -162,8 +164,10 @@ class CingGui(BasePopup):
                                              )
         self.projOptionsSelect.grid(row=srow,column=0,rowspan=len(self.projectOptions),columnspan=2, sticky='w')
 
-        if self.options.name: text = self.options.name
-        else: text=''
+        if self.options.name: 
+            text = self.options.name
+        else: 
+            text=''
         # end if
         self.projEntry = Entry(frame, bd=1, text=text, returnCallback=self.updateGui)
         self.projEntry.grid(row=srow,column=2,columnspan=2,sticky='ew')
@@ -241,7 +245,8 @@ class CingGui(BasePopup):
         # Validate frame
         #----------------------------------------------------------------------------------
 
-        row +=1;  col=0
+        row +=1
+        col=0
         frame = LabelFrame(guiFrame, text='Validate', **labelFrameAttributes)
 #    frame = LabelFrame(guiFrame, text='Validate', font=medFont)
         frame.grid(row=row, column=col, sticky='nsew')
@@ -345,7 +350,8 @@ class CingGui(BasePopup):
         # Miscellaneous frame
         #----------------------------------------------------------------------------------
 
-        row +=0; col=1
+        row +=0
+        col=1
 #    frame = LabelFrame(guiFrame, text='Miscellaneous', font=medFont)
         frame = LabelFrame(guiFrame, text='Miscellaneous', **labelFrameAttributes)
         frame.grid(row=row, column=col, sticky='news')
@@ -430,7 +436,8 @@ class CingGui(BasePopup):
         #----------------------------------------------------------------------------------
         # Buttons
         #----------------------------------------------------------------------------------
-        row +=1; col=0
+        row +=1
+        col=0
         texts    = ['Quit', 'Help']
         commands = [self.close, None]
         self.buttonBar = ButtonList(guiFrame, texts=texts, commands=commands,expands=True)
@@ -683,11 +690,14 @@ class CingGui(BasePopup):
 
     def openProject(self ):
         projOption = self.projOptionsSelect.get()
-        if projOption == self.projectOptions[0]: self.openOldProject()
-        elif projOption == self.projectOptions[1]: self.initPdb()
+        if projOption == self.projectOptions[0]: 
+            self.openOldProject()
+        elif projOption == self.projectOptions[1]: 
+            self.initPdb()
         # end if
 
-        if self.project: self.project.gui = self
+        if self.project: 
+            self.project.gui = self
         # end if
         self.updateGui()
     #end def
@@ -701,7 +711,8 @@ class CingGui(BasePopup):
             nTerror('Error: file "%s" does not exist\n', fName)
         #end if
 
-        if self.project: self.closeProject()
+        if self.project: 
+            self.closeProject()
         # end if
         self.project = cing.Project.open( name=fName, status='old', verbose=False )
     #end def
@@ -719,7 +730,8 @@ class CingGui(BasePopup):
     #end def
 
     def closeProject(self):
-        if self.project: self.project.close()
+        if self.project: 
+            self.project.close()
         # end if
         self.project = None
         self.updateGui()

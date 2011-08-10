@@ -356,7 +356,8 @@ class X3dna(NTdict):
 #                nTdebug("Working on entity: %s" % entity)
                 valueList = getDeepByKeysOrDefault(x3dnaCoplanar, nTfill(None, self.modelCount), entity)
                 valueList[modelNum] = results[coplanarIdStr][entity]
-#                nTdebug("Set value for coplanarIdStr %s entity %s modelNum: %s to be: %s" % (coplanarIdStr, entity, modelNum, valueList[modelNum]))
+#                nTdebug("Set value for coplanarIdStr %s entity %s modelNum: %s to be: %s" % (coplanarIdStr, 
+#entity, modelNum, valueList[modelNum]))
             # end for entity
         # end for coplanar
         return
