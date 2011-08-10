@@ -301,6 +301,8 @@ class X3dna(NTdict):
         # Identify the block by the first line
         #    print '#',block.split('\n')[1]
         found = False
+        infoText = None # Helping pylint.
+        parameterBlockId = None
         for parameterBlockId, infoText in self.outputInfoDict.iteritems():
         #        print parameterBlockId, infoText
             try:
@@ -375,7 +377,7 @@ class X3dna(NTdict):
 
                 x3dna.rise : [ 4.73, 3.99 ] for the first and second model.
         '''
-        parameterBlockId, infoText = self.identifyParameterBlock(parameterBlock) #@UnusedVariable
+        parameterBlockId, _infoText = self.identifyParameterBlock(parameterBlock) #@UnusedVariable
         splitLines = parameterBlock.split('\n')
         parseLine = False
         results = {}

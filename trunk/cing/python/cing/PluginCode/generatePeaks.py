@@ -76,9 +76,9 @@ expDict = NTdict()
 #===========================================================================
 # Baseclass for experiments
 #===========================================================================
-
 class ExperimentDef( dict ):
     """Base class for experiments"""
+    # Using global without assignment. pylint: disable=W0602
     global expdict
 
     name      = 'NoName'

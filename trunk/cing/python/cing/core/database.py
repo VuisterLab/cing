@@ -114,6 +114,7 @@ PSEUDO_ATOM_TYPES = [
 ]
 
 
+# Too many public methods pylint: disable=R0904
 class MolDef( NTtree ):
     """
     Root class for the NTdb database
@@ -1216,15 +1217,15 @@ def importNameDefs( tableFile, name)   :
         elif r.dollar[1] == 'END_RESIDUE':
             obj = mol
         elif r.dollar[1] == 'DIHEDRAL':
-            dh = res.appendDihedral( name=r.dollar[2] )
+            dh = res.appendDihedral( name=r.dollar[2] ) # Using possibly undefined loop variable 'res' pylint: disable=W0631
             obj = dh
         elif r.dollar[1] == 'END_DIHEDRAL':
-            obj = res
+            obj = res # Using possibly undefined loop variable 'res' pylint: disable=W0631
         elif r.dollar[1] == 'ATOM':
-            atm = res.appendAtomDef( name=r.dollar[2] )
+            atm = res.appendAtomDef( name=r.dollar[2] ) # Using possibly undefined loop variable 'res' pylint: disable=W0631
             obj = atm
         elif r.dollar[1] == 'END_ATOM':
-            obj = res
+            obj = res # Using possibly undefined loop variable 'res' pylint: disable=W0631
         elif r.NF > 2:
 #            nTmessage( '=> %s',repr(obj))
 #             # Get a mol representing constructor

@@ -14,7 +14,7 @@ the restraints in you project. It is not possible to restore them!!
 '''
 
 
-from munkres import Munkres
+from cing.Scripts.munkres import Munkres
 from cing.core.classes import * #@UnusedWildImport
 from cing.core.molecule import * #@UnusedWildImport
 from collections import defaultdict

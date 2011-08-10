@@ -82,6 +82,8 @@ class Queeny( Odict ):
         return Odict.__getitem__(self, key)
     #end def
 
+    # W0222 Signature differs from overridden method 
+    # pylint: disable=W0222
     def setdefault(self, key, defaultValue):
         if key[0] > key[1]:
             key = (key[1],key[0])
@@ -243,7 +245,7 @@ class Queeny( Odict ):
 
 
 #        nTdebug('Queeny._calculateAverage: %s')
-        error = False    # Indicates if an error was encountered when analyzing restraint @UnusedVariable
+#        error = False    # Indicates if an error was encountered when analyzing restraint @UnusedVariable
 
         modelCount = dr.getModelCount()
         if not modelCount:
@@ -325,7 +327,7 @@ class Queeny( Odict ):
 
         nkeys = len(self)
         #print '>', nkeys
-        count = 0
+#        count = 0
         for drl in self.project.distances:
             for dr in drl:
                 if len(dr.atomPairs) == 1:
@@ -365,7 +367,7 @@ class Queeny( Odict ):
                         pair += 1
                     #end for
                 #end if
-                count += 1
+#                count += 1
             #end for
         #end for
 

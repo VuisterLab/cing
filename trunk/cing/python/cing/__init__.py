@@ -113,7 +113,7 @@ cingDirTmp             = os.path.join("/tmp" , "cing")
 # The TMPDIR environment variable will override the default above but not the one that
 # might be defined in localConstants.py.
 try:
-    from localConstants import cingDirTmp #@UnresolvedImport
+    from cing.localConstants import cingDirTmp #@UnresolvedImport
 except:
     if os.environ.has_key("TMPDIR"):
         cingDirTmp = os.path.join(os.environ["TMPDIR"] , "cing")

@@ -541,7 +541,7 @@ AND '{2}' <@ S.chain_type; -- contains at least one protein chain.
         m = self
         try:
             djaflsjlfjalskdjf #@UndefinedVariable # pylint: disable=W0104
-            from localPlotList import plotList
+            from cing.NRG.localPlotList import plotList
         except:
 #            NTtracebackError()
 #            d5 = {IS_TRUE: SEL1_STR, USE_MIN_VALUE_STR: 0.0}
@@ -752,8 +752,8 @@ AND '{2}' <@ S.chain_type; -- contains at least one protein chain.
         if doTrending:
             os.chdir(dir_plotTrending)
 
-        e0 = {IS_SMALLER_THAN_STR: (CV_BACKBONE_STR, 0.9), IS_TRUE: SEL1_STR } #@UnusedVariable
-        e1 = {IS_SMALLER_THAN_STR: (CV_BACKBONE_STR, 0.9) } #@UnusedVariable
+#        e0 = {IS_SMALLER_THAN_STR: (CV_BACKBONE_STR, 0.9), IS_TRUE: SEL1_STR } #@UnusedVariable
+#        e1 = {IS_SMALLER_THAN_STR: (CV_BACKBONE_STR, 0.9) } #@UnusedVariable
 
         if 1: # default 0
             plotList = [

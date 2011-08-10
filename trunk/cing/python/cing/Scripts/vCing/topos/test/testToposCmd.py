@@ -1,7 +1,5 @@
 '''
 Created on Oct 20, 2010
-
-@author: jd
 '''
 
 from cing import cingDirTmp
