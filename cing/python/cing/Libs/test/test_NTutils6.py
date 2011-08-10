@@ -47,7 +47,7 @@ class AllChecks(TestCase):
         self.assertTrue( a != None )
         self.assertTrue( a.name == 'b' )
 
-    def testGetRevisionAndDateTimeFromCingLog(self):
+    def testGetRevFromCingLog(self):
         inputArchiveDir = os.path.join(cingDirTestsData, "cing")
         fileName = '1brv_2011-04-07_11-12-19.log'
         result = getRevDateCingLog( os.path.join(inputArchiveDir, fileName ))

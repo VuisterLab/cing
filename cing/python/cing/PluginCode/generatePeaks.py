@@ -346,10 +346,10 @@ class CCH( ExperimentDef ):
 
         self.peaks = NTlist()
         #Generate all CCH peaks of carbons
-        for C2 in carbons:
-            for H in C2.observableProtons( includePseudo = True ):
-                for C1 in carbons:
-                    self.peaks.append( [(0,C1.name),(0,C2.name),(0,H.name)] )
+        for c2 in carbons:
+            for h in c2.observableProtons( includePseudo = True ):
+                for c1 in carbons:
+                    self.peaks.append( [(0,c1.name),(0,c2.name),(0,h.name)] )
                 #end for
             #end for
         #end for

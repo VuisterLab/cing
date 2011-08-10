@@ -77,7 +77,7 @@ class AllChecks(TestCase):
 #                   {90, -70, -160}
 #        };
 
-    def testCircularAverageOfTwoDihdedrals(self):
+    def testCircularAverage2Dih(self):
 # VB van cing procheck routines
 #A 189 GLN   0.243   0.071   0.164   0.660   0.153   0.362   1.840   6.256  -0.73  -1.05 999.90  -0.89
 
@@ -175,7 +175,7 @@ class AllChecks(TestCase):
         self.assertEquals(val2Str(None, "%03d", useNanString=False), '')
 
 
-    def testNTlistDifferenceIntersection(self):
+    def testNTlistDifferenceInt(self):
         xL = NTlist( 'a', 'b' )
         yL = NTlist( 'b', 'c', 'c' )
         xLdiff = xL.difference(yL)

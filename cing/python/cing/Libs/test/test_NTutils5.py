@@ -32,7 +32,7 @@ class AllChecks(TestCase):
             testListNT += testList
             self.assertEquals(testListNT.getConsensus(minFraction=minFraction,useLargest=useLargest),testResult)
 
-    def testCircularAverageOfTwoDihdedrals(self):
+    def testCircularAverageOfTwoDih(self):
 # VB van cing procheck routines
 #A 189 GLN   0.243   0.071   0.164   0.660   0.153   0.362   1.840   6.256  -0.73  -1.05 999.90  -0.89
 
@@ -51,7 +51,7 @@ class AllChecks(TestCase):
             circularVariance = nTcVarianceAverage(angleList)
             self.assertAlmostEqual(circularVariance, cav, places = 3)
 
-    def testGetEnsembleAverageAndSigmaFromHistogram(self):
+    def testGetEnsembleAvAndSigHist(self):
         n = 6
         x = 10.
         nn = n * n
@@ -97,7 +97,7 @@ class AllChecks(TestCase):
         myDict.appendFromTable( myTable, 0, 1)
         self.assertTrue( myDict.isEquivalent( myDictExpected ))
 
-    def testTimedelta2HoursMinutesAndSeconds(self):
+    def testTimedelta(self):
         tList = [ 0, 601.1, 136741.0 ]
         tExpected = [ (0,0,0), (0,10,1), (37,59,1) ]
         for i,t in enumerate(tList):

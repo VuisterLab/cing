@@ -113,7 +113,7 @@ class NmrRedo(nrgCing):
                             processes_max=self.processes_max,
                             delay_between_submitting_jobs=5, # why is this so long? because of time outs at tang?
                             max_time_to_wait=self.max_time_to_wait,
-                            MAX_ENTRIES_TODO=self.max_entries_todo,
+                            max_entries_todo=self.max_entries_todo,
                             extraArgList=extraArgList):
             nTerror("Failed to doScriptOnEntryList")
             return True

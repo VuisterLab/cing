@@ -49,8 +49,8 @@ def storeCING2dbLoop(archive_id, entryList=None, expectPdbEntryList = True):
                         processes_max = 2,
                         delay_between_submitting_jobs = 1,
                         max_time_to_wait = 60 * 6,
-                        START_ENTRY_ID = 0,
-                        MAX_ENTRIES_TODO = 1,
+                        start_entry_id = 0,
+                        max_entries_todo = 1,
                         expectPdbEntryList = expectPdbEntryList,
                         extraArgList = extraArgList)
 

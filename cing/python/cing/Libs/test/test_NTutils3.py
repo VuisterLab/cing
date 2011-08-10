@@ -47,18 +47,18 @@ class AllChecks(TestCase):
         self.assertEquals(a.rogScore.colorLabel, COLOR_ORANGE)
         self.assertEquals(a.rogScore.colorCommentList[0][0], COLOR_ORANGE)
         self.assertEquals(a.rogScore.colorCommentList[0][1], ROGscore.ROG_COMMENT_NO_COOR)
-        LOTR_remark = 'One ring to rule them all'
-        Preserved_remark = 'Preserved'
-        NowHasEffect_remark = 'Now has effect'
-        NowHasEffectToo_remark = 'Now has effect too'
+        lotr_remark = 'One ring to rule them all'
+        preserved_remark = 'Preserved'
+        nowHasEffect_remark = 'Now has effect'
+        nowHasEffectToo_remark = 'Now has effect too'
         # Next line will have to wipe out the orange comments.
-        a.rogScore.setMaxColor(COLOR_RED, LOTR_remark)
-        a.rogScore.setMaxColor(COLOR_ORANGE, NowHasEffect_remark )
-        a.rogScore.setMaxColor(COLOR_RED, Preserved_remark)
-        a.rogScore.setMaxColor(COLOR_ORANGE, NowHasEffectToo_remark)
+        a.rogScore.setMaxColor(COLOR_RED, lotr_remark)
+        a.rogScore.setMaxColor(COLOR_ORANGE, nowHasEffect_remark )
+        a.rogScore.setMaxColor(COLOR_RED, preserved_remark)
+        a.rogScore.setMaxColor(COLOR_ORANGE, nowHasEffectToo_remark)
         self.assertEquals(len(a.rogScore.colorCommentList), 5)
         self.assertEquals(a.rogScore.colorCommentList[0][1], ROGscore.ROG_COMMENT_NO_COOR)
-        self.assertEquals(a.rogScore.colorCommentList[1][1], NowHasEffect_remark)
+        self.assertEquals(a.rogScore.colorCommentList[1][1], nowHasEffect_remark)
 
         myhtml = HTMLfile('testROGscore.html', project, 'A Test')
         myhtml.main("a main")

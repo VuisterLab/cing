@@ -22,7 +22,7 @@ SMLversion       = 0.25
 SMLsaveFormat  = 'INTERNAL_0'
 SMLfileVersion = None
 
-class smlFile(file):
+class SmlFile(file):
     def __init__(self, *args, **kwds):
         file.__init__(self, *args, **kwds)
         self.NR = 0
@@ -274,7 +274,7 @@ Example file:
             nTerror('Error SMLhandler.fromFile: file "%s" does not exist\n', fileName )
             return None
         #end if
-        fp   = smlFile( fileName, 'r' )
+        fp   = SmlFile( fileName, 'r' )
         line = SMLhandler.readline( fp )
         if len(line) > 0 and SMLstarthandlers.has_key(line[1]):
             handler = SMLstarthandlers[line[1]]

@@ -25,8 +25,8 @@ def mainCasd(entryId, *extraArgList):
         doProcheck = False
         doWattos = False
         doTalos = False
-    FORCE_REDO = True
-    FORCE_RETRIEVE_INPUT = True
+    fORCE_REDO = True
+    fORCE_RETRIEVE_INPUT = True
 
 
     nTmessage(header)
@@ -83,7 +83,7 @@ def mainCasd(entryId, *extraArgList):
     cingEntryDir = entryId + ".cing"
 
     if os.path.isdir(cingEntryDir):
-        if FORCE_REDO:
+        if fORCE_REDO:
             nTmessage("Enforcing a redo")
             rmtree(cingEntryDir)
         else:
@@ -120,7 +120,7 @@ def mainCasd(entryId, *extraArgList):
     if inputDir.startswith("http") or inputDir.startswith("file"):
         stillToRetrieve = False
         if os.path.exists(fileNameTgz):
-            if FORCE_RETRIEVE_INPUT:
+            if fORCE_RETRIEVE_INPUT:
                 os.unlink(fileNameTgz)
                 stillToRetrieve = True
             # end if

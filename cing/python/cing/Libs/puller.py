@@ -14,8 +14,8 @@ from sqlalchemy.ext.declarative import declarative_base
 
 def make_session(connection_string):
     engine = create_engine(connection_string, echo=False, convert_unicode=True)
-    Session = sessionmaker(bind=engine)
-    return Session(), engine
+    sessionUpperCaseStart = sessionmaker(bind=engine)
+    return sessionUpperCaseStart(), engine
 
 def pull_data(from_db, to_db, tables):
     source, sengine = make_session(from_db)
@@ -28,14 +28,14 @@ def pull_data(from_db, to_db, tables):
         table = Table(table_name, smeta, autoload=True)
         print 'Creating table on destination server'
         table.metadata.create_all(dengine)
-        NewRecord = quick_mapper(table)
+        newRecord = quick_mapper(table)
         columns = table.columns.keys()
         print 'Transferring records'
         for record in source.query(table).all():
             data = dict(
                 [(str(column), getattr(record, column)) for column in columns]
             )
-            destination.merge(NewRecord(**data))
+            destination.merge(newRecord(**data))
     print 'Committing changes'
     destination.commit()
 
@@ -53,8 +53,8 @@ Example: %s -f oracle://someuser:PaSsWd@db1/TSH1 \\
     """ % (myName, myName, myName)
 
 def quick_mapper(table):
-    Base = declarative_base()
-    class GenericMapper(Base):
+    base = declarative_base()
+    class GenericMapper(base):
         __table__ = table
     return GenericMapper
 

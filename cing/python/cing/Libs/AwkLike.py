@@ -24,25 +24,26 @@ class AwkLike:
 
     def __init__(self, filename=None, minLength = -1, commentString = None, minNF = -1,
                  skipHeaderLines = 0, separator = None ):
+        self.f = sys.stdin
+        self.FILENAME = 'stdin' # pylint: disable=C0103
+        self.minLength = minLength
+        self.commentString = commentString
+        self.minNF = minNF
+        self.skipHeaderLines = skipHeaderLines
+
+        self.NR = 0 # pylint: disable=C0103
+        self.NF = 0 # pylint: disable=C0103
+        self.dollar = []
+        self.separator = separator
+        
         if filename:
             self.FILENAME = filename
             if not os.path.exists(filename):
                 nTerror("Failed to find: [%s]" % filename)
             else:
                 self.f = open(filename,'r')
-        else:
-            self.f = sys.stdin
-            self.FILENAME = 'stdin'
+        # end if
 
-        self.minLength = minLength
-        self.commentString = commentString
-        self.minNF = minNF
-        self.skipHeaderLines = skipHeaderLines
-
-        self.NR = 0
-        self.NF = 0
-        self.dollar = []
-        self.separator = separator
 
 
     def __iter__( self ):
@@ -183,16 +184,16 @@ class AwkLikeS:
             return None
 
         self.lines = str.splitlines()
-        self.MAX_NR = len( self.lines)
+        self.MAX_NR = len( self.lines) # pylint: disable=C0103
 
         self.minLength = minLength
         self.commentString = commentString
         self.minNF = minNF
 
-        self.NR = 0
-        self.NF = 0
+        self.NR = 0 # pylint: disable=C0103
+        self.NF = 0 # pylint: disable=C0103
         self.dollar = []
-        self.FILENAME = 'string'
+        self.FILENAME = 'string' # pylint: disable=C0103
 
     def __iter__( self ):
         return self

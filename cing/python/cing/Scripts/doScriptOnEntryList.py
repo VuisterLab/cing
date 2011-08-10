@@ -10,8 +10,8 @@ from random import shuffle
 # Doing procheck on MacOSX.5.3/MacBook Pro best performance is
 # for when using 3 processes.
 
-START_ENTRY_ID                 = 0 # default 0
-MAX_ENTRIES_TODO               = 999 # default a ridiculously large number like 999999
+start_entry_id                 = 0 # default 0
+max_entries_todo               = 999 # default a ridiculously large number like 999999
 
 def mkSubDirStructure(startDir, entryCodeList, pythonScriptFileNameRoot):
     for entry_code in entryCodeList:
@@ -40,8 +40,8 @@ def doScriptOnEntryList(pythonScriptFileName,
           max_time_to_wait               = 600,
           delay_between_submitting_jobs  = 1,
           extraArgList                   = None,
-          START_ENTRY_ID                 = START_ENTRY_ID,
-          MAX_ENTRIES_TODO               = MAX_ENTRIES_TODO,
+          start_entry_id                 = start_entry_id,
+          max_entries_todo               = max_entries_todo,
           expectPdbEntryList             = True,
           shuffleBeforeSelecting         = False # fails for chain ids when included.
           ):
@@ -81,16 +81,16 @@ def doScriptOnEntryList(pythonScriptFileName,
 
     entryCountSelected = len( entryCodeList )
     # lastEntryId is id of last entry excluding the entry itself.
-    lastEntryId = min(len(entryCodeList), START_ENTRY_ID+MAX_ENTRIES_TODO)
+    lastEntryId = min(len(entryCodeList), start_entry_id+max_entries_todo)
     if shuffleBeforeSelecting:
         nTmessage("Shuffling entry list before selecting entries.")
         entryCodeListCopy = entryCodeList[:]
         shuffle(entryCodeListCopy)
-        entryCodeList = entryCodeListCopy[START_ENTRY_ID:lastEntryId] # no sense in starting at zero here; they're random.
+        entryCodeList = entryCodeListCopy[start_entry_id:lastEntryId] # no sense in starting at zero here; they're random.
     else:
-        entryCodeList = entryCodeList[START_ENTRY_ID:lastEntryId] # no sense in starting at zero here; they're random.
+        entryCodeList = entryCodeList[start_entry_id:lastEntryId] # no sense in starting at zero here; they're random.
     entryCodeList.sort()
-    chainCodeList = chainCodeList[START_ENTRY_ID:lastEntryId]
+    chainCodeList = chainCodeList[start_entry_id:lastEntryId]
 
     nTmessage('Read      %05d entries    ' % entryCountTotal)
     nTmessage('Selected  %05d entries    ' % entryCountSelected)

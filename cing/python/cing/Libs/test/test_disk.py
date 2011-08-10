@@ -14,12 +14,12 @@ class AllChecks(TestCase):
     os.chdir(cingDirTmpTest)
 
     def testDisk(self):
-        DONE = "DONE"
-        f = open(DONE,"w")
+        doneFileName = "DONE"
+        f = open(doneFileName,"w")
         for i in range(10):
             f.write("Line %d\n" % i)
         f.close()
-        f2 = open(DONE,"r")
+        f2 = open(doneFileName,"r")
         lastLineList = tail(f2,1)
         lastLine = lastLineList[0]
         self.assertEquals( "Line 9", lastLine )

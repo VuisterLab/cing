@@ -38,8 +38,8 @@ def main():
     startDir              = os.path.join(cingDirTmp,     subdir)
     entryListFileName     = os.path.join(cingDirScripts, DATA_STR, 'PDB_todo.txt')
 
-    START_ENTRY_ID                 =0 # default 0
-    MAX_ENTRIES_TODO               =20 # default a ridiculously large number like 999999
+    start_entry_id                 =0 # default 0
+    max_entries_todo               =20 # default a ridiculously large number like 999999
 
     os.chdir(os.path.join(startDir, 'pdb_hyd'))
     entryListFile = file(entryListFileName, 'r')
@@ -58,8 +58,8 @@ def main():
 
     entryCountSelected = len( entryCodeList )
     # lastEntryId is id of last entry excluding the entry itself.
-    lastEntryId = min(len(entryCodeList), START_ENTRY_ID+MAX_ENTRIES_TODO)
-    entryCodeList = entryCodeList[START_ENTRY_ID:lastEntryId]
+    lastEntryId = min(len(entryCodeList), start_entry_id+max_entries_todo)
+    entryCodeList = entryCodeList[start_entry_id:lastEntryId]
 
     nTmessage('Read      %04d entries    ' % entryCountTotal)
     nTmessage('Selected  %04d entries    ' % entryCountSelected)

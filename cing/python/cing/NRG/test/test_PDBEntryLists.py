@@ -2,6 +2,7 @@
 Unit test execute as:
 python $CINGROOT/python/cing/NRG/test/test_PDBEntryLists.py
 """
+
 from cing import cingDirTestsData #@UnusedImport
 from cing import cingDirTmp
 from cing.Libs.NTutils import * #@UnusedWildImport
@@ -29,14 +30,14 @@ class AllChecks(TestCase):
             self.assertTrue(status)
 
         if False:
-            l = getBmrbNmrGridEntriesDOCRDone()
-            nTdebug("getBmrbNmrGridEntriesDOCRDone NMR: %d %s" % (len(l), l))
-            self.assertTrue(l)
+            a = getBmrbNmrGridEntriesDOCRDone()
+            nTdebug("getBmrbNmrGridEntriesDOCRDone NMR: %d %s" % (len(a), a))
+            self.assertTrue(a)
         if False:
-            l = getBmrbNmrGridEntries()
-            nTdebug("getBmrbNmrGridEntries NMR            : %d %s" % (len(l), l))
-            self.assertTrue(l)
-            self.assertTrue(len(l) > 5000) # Fails if NRG is down or corrupted.
+            a = getBmrbNmrGridEntries()
+            nTdebug("getBmrbNmrGridEntries NMR            : %d %s" % (len(a), a))
+            self.assertTrue(a)
+            self.assertTrue(len(a) > 5000) # Fails if NRG is down or corrupted.
 
         if False:
             # fast check because there are only a few.

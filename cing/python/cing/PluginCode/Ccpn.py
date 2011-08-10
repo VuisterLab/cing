@@ -339,11 +339,11 @@ class Ccpn:
         else:
             nTerror("Failed to importFromCcpnDistanceRestraint")
             return None
-        if not self.importFromCcpnDistanceRestraintMetaData():
-#            nTdebug('Finished importFromCcpnDistanceRestraintMetaData')
+        if not self.importFromCcpnDistMetaData():
+#            nTdebug('Finished importFromCcpnDistMetaData')
             pass
         else:
-            nTerror("Failed to importFromCcpnDistanceRestraintMetaData")
+            nTerror("Failed to importFromCcpnDistMetaData")
             return None
         if self.importFromCcpnDihedralRestraint():
 #            nTdebug('Finished importFromCcpnDihedralRestraint')
@@ -643,7 +643,8 @@ class Ccpn:
 #                            nTdebug("Residue '%s' will be a new residue in convention %s." % (ccpnResName3Letter, matchingConvention))
                             pass
                         else:
-                            nTmessage("Residue '%s' will be skipped as it is non-standard in convention: %s." % (ccpnResName3Letter, matchingConvention))
+                            nTmessage("Residue '%s' will be skipped as it is non-standard in convention: %s." % (ccpnResName3Letter, 
+                                                                                                                 matchingConvention))
                             addResidue = False
                             addingNonStandardResidue = True
 #                        if not unmatchedAtomByResDict.has_key(ccpnResName3Letter):
@@ -652,14 +653,14 @@ class Ccpn:
                 if not addResidue:
                     continue
 
-                Nterminal = False
-                Cterminal = False
+                Nterminal = False # pylint: disable=C0103
+                Cterminal = False # pylint: disable=C0103
                 if ccpnMolType == Ccpn.CCPN_PROTEIN:
                     ccpnLinking = ccpnResidue.linking
                     if ccpnLinking == Ccpn.CCPN_START:
-                        Nterminal = True
+                        Nterminal = True # pylint: disable=C0103
                     elif ccpnLinking == Ccpn.CCPN_END:
-                        Cterminal = True
+                        Cterminal = True # pylint: disable=C0103
 
                 resNameCing = ccpnResNameInCingDb
                 if matchingConvention == INTERNAL:
@@ -668,7 +669,8 @@ class Ccpn:
                 if not resNameCing:
                     nTcodeerror("Failed to get a resNameCing for ccpnResidue: [" + ccpnResidue + ']')
                     continue
-                residue = chain.addResidue(resNameCing, resNumber, convention = matchingConvention, Nterminal = Nterminal, Cterminal = Cterminal)
+                residue = chain.addResidue(resNameCing, resNumber, convention = matchingConvention, Nterminal = Nterminal, Cterminal = 
+                                           Cterminal)
                 if not residue:
                     nTwarning("Failed to add residue: [" + resNameCing + ']')
                     continue
@@ -1424,7 +1426,7 @@ class Ccpn:
         return True
     # end def importFromCcpnDistanceRestraint
 
-    def importFromCcpnDistanceRestraintMetaData(self):
+    def importFromCcpnDistMetaData(self):
         '''Descrn: Import meta data from nmr constraint store.
                 put in by StereoAssignmentCleanup#storeToAppData
            Output: True on error.
@@ -1465,7 +1467,7 @@ class Ccpn:
         if not len(projectDistList):
             nTwarning("self.project.distances is empty but FC meta data will still be added.")
         projectDistList.__setattr__(STEREO_ASSIGNMENT_CORRECTIONS_STAR_STR, star_text)
-    # end def importFromCcpnDistanceRestraintMetaData
+    # end def importFromCcpnDistMetaData
 
     def importFromCcpnDihedralRestraint(self):
         '''Descrn: Import dihedral restraints from Ccpn.Project into Cing.Project.
