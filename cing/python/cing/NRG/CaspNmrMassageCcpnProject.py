@@ -24,7 +24,7 @@ __author__ = "Wim Vranken <wim@ebi.ac.uk> Jurgen Doreleijers <jurgenfd@gmail.com
 
 #    inputDir = os.path.join(cingDirTestsData, "ccpn")
 try:
-    from settings import baseCaspDir as baseDir
+    from cing.NRG.settings import baseCaspDir as baseDir
 except:
     #baseDir = '/Users/jd/CASD-NMR-CING'
     baseDir = '/Volumes/UserHome/geerten/Data/CASP-NMR-CING'

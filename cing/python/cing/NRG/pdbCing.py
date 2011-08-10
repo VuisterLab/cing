@@ -6,7 +6,6 @@ Execute like:
 
 python -u $CINGROOT/python/cing/NRG/pdbCing.py
 """
-
 from cing import cingDirScripts
 from cing import cingPythonCingDir
 from cing import cingRoot

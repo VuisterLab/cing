@@ -24,7 +24,6 @@ python -u $CINGROOT/python/cing/NRG/CaspNmrCing.py
 """
 from cing import cingPythonCingDir
 from cing import cingRoot
-from cing.Libs import forkoff
 from cing.Libs.AwkLike import AwkLike
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.Libs.forkoff import get_cmd_output
@@ -50,6 +49,7 @@ class EntryInfo(Lister):
         self.time = time
 
 
+# Too many instance attributes (43/30) # pylint: disable=R0902
 class CaspNmrCing(Lister):
 
     def __init__(self,

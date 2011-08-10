@@ -779,6 +779,7 @@ def main():
         sys.exit(0)
     # end if
     
+    # Bug in pylint requires mention of: Unable to consider inline option %r pylint: disable=I0010
     if options.pylint:
         if pylintOverall(options.pylint):
             sys.exit(1)

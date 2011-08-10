@@ -1326,6 +1326,7 @@ for r in AwkLike( 'atomTable.def' ):
     if (r.isComment() or r.isEmpty()):
         pass
     elif (r.dollar[1] == 'RESIDUE'):
+#       Too many positional arguments for function call # pylint: disable=E1121
         res = residueDefs.appendResidueDef( r.dollar[2], r.dollar[3] )
     elif (r.dollar[1] == 'END_RESIDUE'):
         pass
