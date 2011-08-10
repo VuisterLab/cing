@@ -50,7 +50,7 @@ class EntryInfo(Lister):
         self.time = time
 
 
-class caspNmrCing(Lister):
+class CaspNmrCing(Lister):
 
     def __init__(self,
                  max_entries_todo=1,
@@ -247,9 +247,9 @@ class caspNmrCing(Lister):
         Checks the completeness and errors from annotation.
         """
 
-        MAX_LINK_ERRORS = 20 # VpR247Cheshire had 16 terminii etc. problems that can be ignored.
-        MAX_CHAIN_MAPPING_ERRORS = 1
-        MAX_ANY_ERRORS = 2 * MAX_LINK_ERRORS + MAX_CHAIN_MAPPING_ERRORS
+        max_link_errors = 20 # VpR247Cheshire had 16 terminii etc. problems that can be ignored.
+        max_chain_mapping_errors = 1
+        max_any_errors = 2 * max_link_errors + max_chain_mapping_errors
 
         nTmessage("Get the entries tried, todo, crashed, and stopped from file system.")
 
@@ -352,16 +352,16 @@ class caspNmrCing(Lister):
                     continue # don't mark it as stopped anymore.
 
                 linkErrorListCount = len(linkErrorList)
-                if linkErrorListCount > MAX_LINK_ERRORS:
-                    nTerror("%-25s has more than %s link errors;          %s" % (entry_code,MAX_LINK_ERRORS,linkErrorListCount))
+                if linkErrorListCount > max_link_errors:
+                    nTerror("%-25s has more than %s link errors;          %s" % (entry_code,max_link_errors,linkErrorListCount))
                     entryCrashed = True
                 chainMappingListCount = len(chainMappingErrorList)
-                if chainMappingListCount > MAX_CHAIN_MAPPING_ERRORS:
-                    nTerror("%-25s has more than %s chain mapping errors; %s" % (entry_code,MAX_CHAIN_MAPPING_ERRORS,chainMappingListCount))
+                if chainMappingListCount > max_chain_mapping_errors:
+                    nTerror("%-25s has more than %s chain mapping errors; %s" % (entry_code,max_chain_mapping_errors,chainMappingListCount))
                     entryCrashed = True
                 anyErrorListCount = len(anyErrorList)
-                if anyErrorListCount > MAX_ANY_ERRORS:
-                    nTerror("%-25s has more than %s any errors;           %s" % (entry_code,MAX_ANY_ERRORS,anyErrorListCount))
+                if anyErrorListCount > max_any_errors:
+                    nTerror("%-25s has more than %s any errors;           %s" % (entry_code,max_any_errors,anyErrorListCount))
                     entryCrashed = True
 
                 if entryCrashed:
@@ -742,7 +742,7 @@ if __name__ == '__main__':
 #    new_hits_entry_list         = string.split("2jqv 2jnb 2jnv 2jvo 2jvr 2jy7 2jy8 2oq9 2osq 2osr 2otr 2rn9 2rnb")
 
     ## Initialize the project
-    m = caspNmrCing(max_entries_todo=max_entries_todo, max_time_to_wait=max_time_to_wait, writeWhyNot=writeWhyNot, updateIndices=updateIndices,
+    m = CaspNmrCing(max_entries_todo=max_entries_todo, max_time_to_wait=max_time_to_wait, writeWhyNot=writeWhyNot, updateIndices=updateIndices,
                 isProduction=isProduction)
 #    m.getCingEntriesTriedAndDone()
     m.update(new_hits_entry_list,doCheckAnnotation=doCheckAnnotation)

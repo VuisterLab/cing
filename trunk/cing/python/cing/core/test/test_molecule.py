@@ -127,12 +127,12 @@ class AllChecks(TestCase):
             c = mol.addChain(cId)
             for i, rName in enumerate(sequence):
                 rNumber = i+offset1
-                Nterminal = False
-                Cterminal = False
+                Nterminal = False # pylint: disable=C0103
+                Cterminal = False # pylint: disable=C0103
                 if i == 0:
-                    Nterminal = True
+                    Nterminal = True # pylint: disable=C0103
                 if i == lastResidueI:
-                    Cterminal = True
+                    Cterminal = True # pylint: disable=C0103
                 r = c.addResidue(rName, rNumber, Nterminal = Nterminal, Cterminal = Cterminal)
                 if r:
 #                    nTdebug("Adding atoms to residue: %s" % r)
@@ -152,12 +152,12 @@ class AllChecks(TestCase):
             c = mol.addChain(cId)
             for i, rName in enumerate(sequence):
                 rNumber = i+offset2
-                Nterminal = False
-                Cterminal = False
+                Nterminal = False # pylint: disable=C0103
+                Cterminal = False # pylint: disable=C0103
                 if i == 0:
-                    Nterminal = True
+                    Nterminal = True # pylint: disable=C0103
                 if i == lastResidueI:
-                    Cterminal = True
+                    Cterminal = True # pylint: disable=C0103
                 r = c.addResidue(rName, rNumber, Nterminal = Nterminal, Cterminal = Cterminal)
                 if r:
 #                    nTdebug("Adding atoms to residue: %s" % r)

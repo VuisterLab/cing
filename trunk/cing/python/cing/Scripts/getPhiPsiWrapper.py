@@ -46,14 +46,14 @@ def main():
     entryListFileName     = os.path.join(cingDirScripts, DATA_STR, 'PDB_WI_SELECT_Rfactor0.19_Res1.3_2009-02-28_noObs.LIS')
 #    entryListFileName     = os.path.join(cingDirScripts, DATA_STR, 'PDB_todo.txt')
 
-    START_ENTRY_ID                 =0 # default 0
-    MAX_ENTRIES_TODO               =1 # default a ridiculously large number like 999999
+    start_entry_id                 =0 # default 0
+    max_entries_todo               =1 # default a ridiculously large number like 999999
 
     doScriptOnEntryList(pythonScriptFileName, entryListFileName, startDir,
                         max_time_to_wait = 240, # 1gkp  took over 120
                         processes_max                  = 8,   # default 3
-                        START_ENTRY_ID                 = START_ENTRY_ID, # default 0
-                        MAX_ENTRIES_TODO               = MAX_ENTRIES_TODO # default a ridiculously large number like 999999
+                        start_entry_id                 = start_entry_id, # default 0
+                        max_entries_todo               = max_entries_todo # default a ridiculously large number like 999999
                         )
 
 if __name__ == '__main__':

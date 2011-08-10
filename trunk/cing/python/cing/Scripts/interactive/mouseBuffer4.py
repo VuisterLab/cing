@@ -42,7 +42,7 @@ if True:
                         processes_max = 2,
                         delay_between_submitting_jobs = 2,
                         max_time_to_wait = 6000,
-                        START_ENTRY_ID = 0,
-                        MAX_ENTRIES_TODO = 299,
+                        start_entry_id = 0,
+                        max_entries_todo = 299,
                         expectPdbEntryList = True,
                         extraArgList = extraArgList)

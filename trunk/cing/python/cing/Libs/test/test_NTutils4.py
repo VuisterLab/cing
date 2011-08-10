@@ -149,7 +149,7 @@ b
         x = a.getConsensus(minFraction=0.5)
         self.assertEquals( x, 'abc')
 
-    def testGetDeepByKeysOrAttributesSimple(self):
+    def testGetDeepByKeysOrAttrS(self):
 #        cing.verbosity = cing.verbosityDebug
         d = {}
         keyList = 'a b c'.split()

@@ -690,8 +690,8 @@ class pdbCing(Lister):
                             delay_between_submitting_jobs = 5, # why is this so long? because of time outs at tang?
                             max_time_to_wait = self.max_time_to_wait,
                             # <Molecule "2p80" (C:20,R:1162,A:24552,M:20)>
-                            START_ENTRY_ID = 0, # default.
-                            MAX_ENTRIES_TODO = self.max_entries_todo,
+                            start_entry_id = 0, # default.
+                            max_entries_todo = self.max_entries_todo,
                             extraArgList = extraArgList,
                             shuffleBeforeSelecting = True ):
             nTerror("Failed to doScriptOnEntryList")

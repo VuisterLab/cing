@@ -1805,7 +1805,7 @@ class nrgCing(Lister): # pylint: disable=C0103
                             processes_max=self.processes_max,
                             delay_between_submitting_jobs=5, # why is this so long? because of time outs at tang?
                             max_time_to_wait=self.max_time_to_wait,
-                            MAX_ENTRIES_TODO=self.max_entries_todo,
+                            max_entries_todo=self.max_entries_todo,
                             extraArgList=extraArgList):
             nTerror("Failed to doScriptOnEntryList")
             return True
@@ -1960,9 +1960,9 @@ class nrgCing(Lister): # pylint: disable=C0103
                                 processes_max=self.processes_max,
                                 max_time_to_wait=6000,
                                 extraArgList=extraArgList, # list of strings
-                                START_ENTRY_ID=0, # DEFAULT: 0.
-                                MAX_ENTRIES_TODO=self.max_entries_todo,
-    #                            MAX_ENTRIES_TODO=self.max_entries_todo # DEFAULT
+                                start_entry_id=0, # DEFAULT: 0.
+                                max_entries_todo=self.max_entries_todo,
+    #                            max_entries_todo=self.max_entries_todo # DEFAULT
                                 ):
                 nTerror("In nrgCing#prepare Failed to doScriptOnEntryList")
                 return True
@@ -2006,8 +2006,8 @@ class nrgCing(Lister): # pylint: disable=C0103
                             processes_max = self.processes_max,
                             delay_between_submitting_jobs = 1,
                             max_time_to_wait = 60 * 60, # Largest entries take a bit longer than the initial 6 minutes; 2hyn etc.
-                            START_ENTRY_ID = 0,
-                            MAX_ENTRIES_TODO = self.max_entries_todo,
+                            start_entry_id = 0,
+                            max_entries_todo = self.max_entries_todo,
                             expectPdbEntryList = True,
                             extraArgList = extraArgList)
         nTmessage("Done with storeCING2db.")

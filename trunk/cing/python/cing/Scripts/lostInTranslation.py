@@ -7,7 +7,7 @@ from glob import glob
 import codecs
 
 
-class lostInTranslation():
+class LostInTranslation():
     """Find the missing phrases in each language iCing tries to support"""
 
     def __init__(self):
@@ -76,5 +76,5 @@ class lostInTranslation():
 
 if __name__ == '__main__':
     cing.verbosity = cing.verbosityDebug
-    lit = lostInTranslation()
+    lit = LostInTranslation()
     lit.findPhrases()

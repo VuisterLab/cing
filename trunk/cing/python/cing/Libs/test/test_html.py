@@ -43,7 +43,7 @@ class AllChecks(TestCase):
         project.setupHtml() # Needed for creating the sub dirs.
         return project
 
-    def testMakeHtmlTableWithJavascriptEnabled(self):
+    def testMakeHtmlTableWithJS(self):
 #        CSS and Javascript is going to determine much of the formatting.
         project = self.setupSimplestProject()
         h = HTMLfile(project.htmlPath('test.html'), project)

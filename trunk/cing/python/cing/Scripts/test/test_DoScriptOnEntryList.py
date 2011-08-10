@@ -36,8 +36,8 @@ class AllChecks(TestCase):
                             processes_max = 8,
                             delay_between_submitting_jobs = 5,
                             max_time_to_wait = 20,
-                            START_ENTRY_ID = 0,
-                            MAX_ENTRIES_TODO = 1,
+                            start_entry_id = 0,
+                            max_entries_todo = 1,
                             extraArgList = extraArgList,
                             shuffleBeforeSelecting = True ))
 

@@ -50,7 +50,7 @@ doScriptOnEntryList(pythonScriptFileName,
                     startDir,
                     processes_max = 2,
                     max_time_to_wait = 12000, # 1y4o took more than 600. This is one of the optional arguments.
-                    START_ENTRY_ID                 = 0,
-                    MAX_ENTRIES_TODO               = 10,
+                    start_entry_id                 = 0,
+                    max_entries_todo               = 10,
                     extraArgList=extraArgList)
 
