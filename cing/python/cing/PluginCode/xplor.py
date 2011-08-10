@@ -140,14 +140,14 @@ DistanceRestraint.export2xplor = exportDistanceRestraint2xplor
 
 
 #-----------------------------------------------------------------------------
-def exportDistanceRestraintList2xplor( drl, path)   :
+def exportDisList2xplor( drl, path)   :
     """Export a distanceRestraintList (DRL) to xplor format:
        return drl or None on error
     """
     msgHol = MsgHoL()    
     fp = open( path, 'w' )
     if not fp:
-        nTerror('exportDistanceRestraintList2xplor: unable to open "%s"\n', path )
+        nTerror('exportDisList2xplor: unable to open "%s"\n', path )
         return None
     #end def
     for dr in drl:
@@ -164,7 +164,7 @@ def exportDistanceRestraintList2xplor( drl, path)   :
     return drl
 #end def
 # add as a method to DistanceRestraintList Class
-DistanceRestraintList.export2xplor = exportDistanceRestraintList2xplor
+DistanceRestraintList.export2xplor = exportDisList2xplor
 
 #-----------------------------------------------------------------------------
 def exportDihedralRestraint2xplor( dihedralRestraint ):
@@ -188,13 +188,13 @@ def exportDihedralRestraint2xplor( dihedralRestraint ):
 DihedralRestraint.export2xplor = exportDihedralRestraint2xplor
 
 #-----------------------------------------------------------------------------
-def exportDihedralRestraintList2xplor( drl, path)   :
+def exportDihList2xplor( drl, path)   :
     """Export a dihedralRestraintList (DRL) to xplor format:
        return drl or None on error
     """
     fp = open( path, 'w' )
     if not fp:
-        nTerror('exportDihedralRestraintList2xplor: unable to open "%s"\n', path )
+        nTerror('exportDihList2xplor: unable to open "%s"\n', path )
         return None
     #end def
     for dr in drl:
@@ -207,7 +207,7 @@ def exportDihedralRestraintList2xplor( drl, path)   :
     return drl
 #end def
 # add as a method to DistanceRestraintList Class
-DihedralRestraintList.export2xplor = exportDihedralRestraintList2xplor
+DihedralRestraintList.export2xplor = exportDihList2xplor
 
 
 #-----------------------------------------------------------------------------
@@ -361,12 +361,12 @@ def createProjectFromXplorMemory(name="xplorNIH", sim=None):
     project.initPDB(pdbFile=tmpfile.name, convention=XPLOR)
 
     # Fill in for example the DRs
-    #getDistanceRestraintFromXplorMemory( project )
+    #getDrFromXplorMemory( project )
     project.save()
 #    project.validate() # better called from a separate routine.
     return project
 
-def getDistanceRestraintFromXplorMemory( project, convention ):
+def getDrFromXplorMemory( project, convention ):
     """Convert DR from XPLOR in memory to CING in memory.
        return a DistanceRestraintList or None on error
        Probably we can take convention out from the parameters
@@ -376,7 +376,7 @@ def getDistanceRestraintFromXplorMemory( project, convention ):
 
     # check the molecule
     if not project or not project.molecule:
-        nTdebug("getDistanceRestraintFromXplorMemory: initialize molecule first")
+        nTdebug("getDrFromXplorMemory: initialize molecule first")
         return None
     #end if
     molecule = project.molecule
@@ -386,8 +386,8 @@ def getDistanceRestraintFromXplorMemory( project, convention ):
     # Temporary dictionary for fast lookup of atom objects by tuple of (segi, resi, name)
     atomDict      = molecule._getAtomDictWithChain(convention)
 
-    DRlistXPLOR = [] # TODO: fill in...
-    for _dr in DRlistXPLOR:
+    drListXPLOR = [] # TODO: fill in...
+    for _dr in drListXPLOR:
         atmIdxList = [[1,3],[4,6]]
         atmList = []
         i=0

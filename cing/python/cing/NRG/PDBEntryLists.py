@@ -75,7 +75,7 @@ def getBmrbNmrGridEntries():
     result.sort()
     return result
 
-def getBmrbNmrGridEntriesDOCRfREDDone():
+def getDOCRfREDDone():
     result = []
     urlLocation = urlDB2 + "/mrfile.txt"
     ##61458    7567    4-filtered-FRED    2gov    2006-05-11

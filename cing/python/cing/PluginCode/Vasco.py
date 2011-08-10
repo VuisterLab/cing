@@ -31,7 +31,7 @@ if True: # block
 #        import Tkinter
     except:
         switchOutput(True)
-#        NTtracebackError()
+#        nTtracebackError()
         raise ImportWarning(VASCO_STR)
     finally: # finally fails in python below 2.5
         switchOutput(True)
@@ -136,7 +136,7 @@ def runVasco(project, ccpnFolder = None):
             return True
     except:
         nTerror("Failed runVasco by throwable below.")
-        NTtracebackError()
+        nTtracebackError()
         return True
     return project
 #end def

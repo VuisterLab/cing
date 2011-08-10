@@ -10,11 +10,11 @@ topos https://topos.grid.sara.nl/4.1
 from cing import cingDirTmp
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.Libs.forkoff import Process
-from cing.Scripts.vCing.vCing import vCing
+from cing.Scripts.vCing.vCing import Vcing
 from unittest import TestCase
 import unittest
 
-vc = vCing()
+vc = Vcing()
 lockTimeOut = 6
 sleepTimeSimulatingWork = 10
 max_time_to_wait = 365 * 24 * 60 * 60 # a year in seconds

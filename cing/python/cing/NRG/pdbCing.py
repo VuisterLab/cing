@@ -52,7 +52,7 @@ def run():
     new_hits_entry_list         = string.split("1brv")
 
     ## Initialize the project
-    m = pdbCing(max_entries_todo = max_entries_todo, max_time_to_wait = max_time_to_wait, writeWhyNot = writeWhyNot,
+    m = PdbCing(max_entries_todo = max_entries_todo, max_time_to_wait = max_time_to_wait, writeWhyNot = writeWhyNot,
                 updateIndices = updateIndices, isProduction = isProduction, processes_max = processes_max)
 
     nTdebug("Publish results at directory    : " + m.results_dir)
@@ -107,7 +107,7 @@ def run():
 # end def run
 
 
-class pdbCing(Lister):
+class PdbCing(Lister):
     """Main class for running CING reports on NRG and maintaining the statistics."""
     def __init__(self,
                  max_entries_todo = 1,
@@ -187,7 +187,7 @@ class pdbCing(Lister):
         self.entry_list_todo = NTlist()
         self.timeTakenDict = NTdict()
         self.entry_list_obsolete = NTlist()
-        self.ENTRY_TO_DELETE_COUNT_MAX = 2
+        self.entry_to_delete_count_max = 2
 
 
     def getBmrbLinks(self):
@@ -258,12 +258,12 @@ class pdbCing(Lister):
                 entrySubDir = os.path.join(DATA_STR, subDir, entry_code)
                 if not entry_code in self.entry_list_pdb:
                     nTwarning("Found entry %s in PDB-CING-CING but not in PDB. Will be obsoleted in PDB-CING too" % entry_code)
-                    if len(self.entry_list_obsolete) < self.ENTRY_TO_DELETE_COUNT_MAX:
+                    if len(self.entry_list_obsolete) < self.entry_to_delete_count_max:
                         rmdir(entrySubDir)
                         self.entry_list_obsolete.append(entry_code)
                     else:
                         nTerror("Entry %s in PDB-CING not obsoleted since there were already removed: %s" % (
-                            entry_code, self.ENTRY_TO_DELETE_COUNT_MAX))
+                            entry_code, self.entry_to_delete_count_max))
                 # end if
 
                 cingDirEntry = os.path.join(entrySubDir, entry_code + ".cing")

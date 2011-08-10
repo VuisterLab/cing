@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+
 # Script for running Cing on a bunch (8?) of ccpn projects.
 # Do NOT run from $CINGROOT/scripts/vcing/startVC.csh
 # Use:
@@ -40,7 +41,7 @@ except:
 #    master_ssh_url = 'i@vc'
 
 cingDirNRG = os.path.join(cingPythonDir, 'cing', 'NRG')
-cingDirVC = os.path.join(cingDirScripts, 'vCing')
+cingDirVC = os.path.join(cingDirScripts, 'Vcing')
 
 VALIDATE_ENTRY_NRG_STR = 'validateEntryNrg'
 TEST_CING_STR          = 'testCing'
@@ -52,7 +53,7 @@ cmdDict = {
            TEST_CING_STR:          os.path.join(cingDirVC, 'test', 'cingByVCtest.py'),
             }
 
-class vCing(Lister):
+class Vcing(Lister):
     BAD_COMMAND_TOKEN_STR = 'bad_command_token'
     COMMAND_FAILED_STR = 'command_failed'
     COMMAND_FINISHED_STR = 'command_finished'
@@ -67,6 +68,7 @@ class vCing(Lister):
     MASTER_TARGET_RESULT = 'result' # Payload result
 
     def __init__(self, master_ssh_url=None, master_d=None, cmdDict='', toposPool = None, max_time_to_wait_per_job = 60 * 60 * 6):
+        Lister.__init__(self)
         self.toposDir = os.path.join(cingRoot, "scripts", "vcing", "topos")
         self.toposRealm = 'https://topos.grid.sara.nl/4.1/'
         self.toposPool = 'vCing' + pool_postfix_local
@@ -77,14 +79,14 @@ class vCing(Lister):
         self.toposProg = os.path.join(self.toposDir, "topos")
         self.toposProgCreateTokens = os.path.join(self.toposDir, "createTokens")
 
-        self.MASTER_SSH_URL = master_ssh_url_local
+        self.master_ssh_url = master_ssh_url_local
         if master_ssh_url:
-            self.MASTER_SSH_URL = master_ssh_url
-        self.MASTER_D = master_d_local
+            self.master_ssh_url = master_ssh_url
+        self.master_d = master_d_local
         if master_d:
-            self.MASTER_D = master_d
-        self.MASTER_TARGET_DIR = self.MASTER_D + '/tmp/vCingSlave/' + self.toposPool
-        self.MASTER_TARGET_URL = self.MASTER_SSH_URL + ':' + self.MASTER_TARGET_DIR
+            self.master_d = master_d
+        self.master_target_dir = self.master_d + '/tmp/vCingSlave/' + self.toposPool
+        self.master_target_url = self.master_ssh_url + ':' + self.master_target_dir
 #        self.MASTER_SOURCE_SDIR = self.MASTER_D_URL + '/tmp/vCingSlave/' + self.toposPool
         self.max_time_to_wait = 365 * 24 * 60 * 60                    # a year in seconds
         self.max_time_to_wait_per_job = max_time_to_wait_per_job      # 2p80 took the longest: 5.2 hours.
@@ -100,7 +102,7 @@ class vCing(Lister):
         Return True on error.
         Moved out of this setup so it can be run with a very limited CING install on gb-ui-kun.els.sara.nl
         """
-        return prepareMaster(MASTER_TARGET_DIR=self.MASTER_TARGET_DIR, doClean=doClean)
+        return prepareMaster(MASTER_TARGET_DIR=self.master_target_dir, doClean=doClean)
 
 
     def addTokenListToTopos(self, fileName):
@@ -235,7 +237,7 @@ class vCing(Lister):
         prefix = self.getPrefixForLevel(level_id)
 
         writeTextToFile(logFile, prefix + msg)
-        targetUrl = '/'.join([self.MASTER_TARGET_URL, self.MASTER_TARGET_LOG2])
+        targetUrl = '/'.join([self.master_target_url, self.MASTER_TARGET_LOG2])
         if putFileBySsh(logFile, targetUrl):
             nTerror("Failed to putFileBySsh with status: %s" % status)
             return True
@@ -305,7 +307,7 @@ class vCing(Lister):
 
             fs = os.path.getsize(log_file_name)
             nTmessage("Payload returned with status: %s and log file size %s" % (cmdExitCode, fs))
-            targetUrl = '/'.join([self.MASTER_TARGET_URL, self.MASTER_TARGET_LOG])
+            targetUrl = '/'.join([self.master_target_url, self.MASTER_TARGET_LOG])
             if putFileBySsh(log_file_name, targetUrl):
                 nTerror("In runSlaveThread failed putFileBySsh")
             if cmdExitCode:
@@ -389,7 +391,7 @@ if __name__ == "__main__":
     nTmessage(header)
     nTmessage(getStartMessage())
 
-    vc = vCing(cmdDict=cmdDict)
+    vc = Vcing(cmdDict=cmdDict)
     nTmessage("Starting with %r" % vc)
 
     destination = sys.argv[1]

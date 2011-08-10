@@ -4,7 +4,7 @@ python $CINGROOT/python/cing/NRG/test/test_NrgCingRdb.py
 """
 from cing import cingDirTmp
 from cing.Libs.NTutils import * #@UnusedWildImport
-from cing.NRG.nrgCingRdb import nrgCingRdb
+from cing.NRG.nrgCingRdb import NrgCingRdb
 from unittest import TestCase
 import unittest
 
@@ -17,7 +17,7 @@ class AllChecks(TestCase):
         self.failIf(os.chdir(cingDirTmpTest), msg =
             "Failed to change to test directory for files: " + cingDirTmpTest)
 
-        m = nrgCingRdb(host='localhost')
+        m = NrgCingRdb(host='localhost')
         a = m.getPdbIdList()
         nTdebug("pdbIdList length: %d %s" % (len(a), a))
         self.assertTrue(a)

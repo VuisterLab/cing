@@ -299,7 +299,7 @@ class File (Lister):
 
         input  = open(inputFN,  'r')
         output = open(outputFN, 'w')
-        L =[]
+        a =[]
         line = input.readline()
         found = False
         while line:
@@ -310,11 +310,11 @@ class File (Lister):
                     break
             if found:
                 break
-            L.append(line)
+            a.append(line)
             line = input.readline()
 
-#        print "DEBUG: writing number of lines: ", len(L)
-        output.writelines(L)
+#        print "DEBUG: writing number of lines: ", len(a)
+        output.writelines(a)
         output.close()
         if not os.path.exists(outputFN):
             nTwarning('failed to materialize file: %s' % outputFN)

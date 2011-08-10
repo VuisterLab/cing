@@ -21,7 +21,7 @@ from cing.PluginCode.required.reqWattos import * #@UnusedWildImport
 from cing.PluginCode.required.reqWhatif import * #@UnusedWildImport
 from cing.PluginCode.required.reqX3dna import X3DNA_STR
 from cing.STAR.Utils import getHumanTagName
-from cing.core.classes2 import resonanceListGetIndexFirstObjectWithRealValue
+from cing.core.classes2 import getIndexRealResList
 from cing.core.parameters import cingPaths
 from cing.core.parameters import directories
 from cing.core.parameters import htmlDirectories
@@ -1983,7 +1983,7 @@ class DihedralByProjectListHTMLfile( HTMLfile ):
 #                    nTerror('Failed to createHtmlWhatif')
 #                    return True
 
-        BOGUS_DIHEDRAL_ID = 'BOGUS'
+        bOGUS_DIHEDRAL_ID = 'BOGUS'
         # USE THE BOGUS for alignment within the table.
         # The LB dihedral is from a pseudo residue; probably of little use.
         dihedralList = """      Ramachandran Janin D1D2 BOGUS BOGUS BOGUS
@@ -2034,14 +2034,14 @@ class DihedralByProjectListHTMLfile( HTMLfile ):
                         main('tr',  openTag=False)
                     main('tr',  closeTag=False)
                 main('td',  closeTag=False)
-                if dihed != BOGUS_DIHEDRAL_ID and dihedralPresentMap.has_key(dihed):
+                if dihed != bOGUS_DIHEDRAL_ID and dihedralPresentMap.has_key(dihed):
                     dihedralByProject = NTtree( dihed )
                     self.dihedralByProjectList.append( dihedralByProject )
                     dihedralHTMLfile = DihedralByProjectHTMLfile(self.project, dihedralByProject)
                     dihedralHTMLfile.generateHtml(htmlOnly) # delay until full list is created.
                     self.insertHtmlLink(main, self.dihedralByProjectList, dihedralByProject, text=dihed)
                 else:
-                    main(BOGUS_DIHEDRAL_ID)
+                    main(bOGUS_DIHEDRAL_ID)
                 main('td',  openTag=False)
                 plotCount += 1
             #end for plot
@@ -2058,7 +2058,7 @@ class DihedralByProjectListHTMLfile( HTMLfile ):
         # Rendering done after complete list is compiled?
 #        i = 0
 #        for dihed in dihedralList:
-#            if dihed != BOGUS_DIHEDRAL_ID and dihedralPresentMap.has_key(dihed):
+#            if dihed != bOGUS_DIHEDRAL_ID and dihedralPresentMap.has_key(dihed):
 #                dihedralByProject = self.dihedralByProjectList[i]
 #                dihedralHTMLfile = dihedralByProject.html
 #                i += 1
@@ -2835,19 +2835,19 @@ class ResidueHTMLfile( HTMLfile ):
 
         tmpDict = NTdict()
         for restraint in restraintList:
-            RLname = os.path.basename(restraint.htmlLocation[0]).split('.')[0]
-            if tmpDict.has_key(RLname):
-                tmpDict[RLname].append(restraint)
+            rLname = os.path.basename(restraint.htmlLocation[0]).split('.')[0]
+            if tmpDict.has_key(rLname):
+                tmpDict[rLname].append(restraint)
             else:
-                tmpDict[RLname] = NTlist(restraint)
+                tmpDict[rLname] = NTlist(restraint)
             #end if
         #end for
-        RLists = tmpDict.keys()
+        rLists = tmpDict.keys()
         # display Restraint list
-        for k in RLists:
-            RLobj = project[k]
+        for k in rLists:
+            rLobj = project[k]
             resRight('h3', closeTag=False)
-            residue.html.insertHtmlLink(resRight, residue, RLobj, text=k)
+            residue.html.insertHtmlLink(resRight, residue, rLobj, text=k)
 
             resRL = tmpDict[k]
 #            n = len(resRL)
@@ -2971,7 +2971,7 @@ class AtomsHTMLfile( HTMLfile ):
     def _getResonanceCollapsed(self, atom):
         atomResonanceCollapsed = None
         if self.resonanceListIdx == None:
-            idx = resonanceListGetIndexFirstObjectWithRealValue(atom.resonances)
+            idx = getIndexRealResList(atom.resonances)
             if idx >= 0:
                 atomResonanceCollapsed = atom.resonances[idx]
             # end if
@@ -3471,7 +3471,7 @@ class RestraintListHTMLfile( HTMLfile ):
     #end def
 
 
-    def _generateDistanceRestraintFilterHighViolationCorrectionsHtml(self, htmlOnly=False):
+    def _genDrFilterHighViolCorHtml(self, htmlOnly=False):
         """Generate html for filtered highly violating restraints.
 
         Return True on error.
@@ -3498,7 +3498,7 @@ class RestraintListHTMLfile( HTMLfile ):
         self.main("div", openTag=False)
     #end def
 
-    def _generateDistanceRestraintSsaCorrectionsHtml(self, htmlOnly=False):
+    def _generateDrSsaCorrectionsHtml(self, htmlOnly=False):
         """Generate html for stereoAssignmentCorrectionsStar listing from STAR txt.
 
         Return True on error.
@@ -3625,7 +3625,7 @@ class RestraintListHTMLfile( HTMLfile ):
     #end def
 
 
-    def  _generateDistanceRestraintMetaHtml(self, htmlOnly=False):
+    def  _generateDrMetaHtml(self, htmlOnly=False):
 
         header = self.restraintList.name
         if hasattr(self.restraintList, 'rogScore'):
@@ -3685,13 +3685,13 @@ class RestraintListHTMLfile( HTMLfile ):
 
         Checkbox will toggle between showing either first or second division.
         """
-        if self._generateDistanceRestraintMetaHtml():
-            nTerror("Failed _generateDistanceRestraintMetaHtml")
+        if self._generateDrMetaHtml():
+            nTerror("Failed _generateDrMetaHtml")
 
-        if self._generateDistanceRestraintSsaCorrectionsHtml(htmlOnly=htmlOnly):
-            nTerror("Failed _generateDistanceRestraintSsaCorrectionsHtml")
-        if self._generateDistanceRestraintFilterHighViolationCorrectionsHtml(htmlOnly=htmlOnly):
-            nTerror("Failed _generateDistanceRestraintFilterHighViolationCorrectionsHtml")
+        if self._generateDrSsaCorrectionsHtml(htmlOnly=htmlOnly):
+            nTerror("Failed _generateDrSsaCorrectionsHtml")
+        if self._genDrFilterHighViolCorHtml(htmlOnly=htmlOnly):
+            nTerror("Failed _genDrFilterHighViolCorHtml")
         columnFormats = [   ('#', {'title':'Restraint number. Only ambiguous restraints show a dot'} ),
 
                             ('ch1', {'title':'Chain identifier of first atom'} ),
@@ -3731,7 +3731,7 @@ class RestraintListHTMLfile( HTMLfile ):
         itemListCritiqued = []
 
         mapRowIdx2RestraintAtomPair = {}
-        mapRowIdx2RestraintAtomPairCritiqued = {}
+        mapRowIdx2RestApCritiqued = {}
         rowIdx = 0
         rowIdxCritiqued = 0
         for restraint in self.restraintList:
@@ -3739,7 +3739,7 @@ class RestraintListHTMLfile( HTMLfile ):
                 mapRowIdx2RestraintAtomPair[rowIdx] = ( restraint, idx)
                 rowIdx +=1
                 if restraint.rogScore.isCritiqued():
-                    mapRowIdx2RestraintAtomPairCritiqued[rowIdxCritiqued] = ( restraint, idx)
+                    mapRowIdx2RestApCritiqued[rowIdxCritiqued] = ( restraint, idx)
                     rowIdxCritiqued += 1
             if restraint.rogScore.isCritiqued():
                 itemListCritiqued.append(restraint)
@@ -3771,7 +3771,7 @@ class RestraintListHTMLfile( HTMLfile ):
 
 
             for rowIdx in table.rows(range(pairListCritiquedCount)):
-                restraint, idx = mapRowIdx2RestraintAtomPairCritiqued[rowIdx]
+                restraint, idx = mapRowIdx2RestApCritiqued[rowIdx]
                 self._rowDr( restraint, idx, table, isSourceForAtom=False )
             self.main("div", openTag=False)
 

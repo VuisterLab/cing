@@ -154,7 +154,7 @@ load-plugins=
 #R0914 Too many local variables
 #R0915 Too many statements
 
-disable=C0111,C0322,C0323,C0324,E0602,F0401,I0011,I0013,W0102,W0122,W0142,W0201,W0401,W0402,W0511,W0611,W0613,W0614,W0622,W0701,W0702,R0911,R0912,R0913,R0914,R0915
+disable=C0111,C0322,C0323,C0324,E0602,F0401,I0011,I0013,W0102,W0122,W0142,W0201,W0401,W0402,W0511,W0611,W0613,W0614,W0621,W0622,W0701,W0702,R0911,R0912,R0913,R0914,R0915
 # JFD likes to enable again:
 #W0201: Attribute %r defined outside __init__
 #W0613 Unused argument 'xxx'
@@ -210,7 +210,7 @@ module-rgx=(([a-zA-Z_][a-zA-Z0-9_]*)|([a-zA-Z][a-zA-Z0-9]+))$
 const-rgx=(([a-zA-Z_][a-zA-Z0-9_]*)|([a-zA-Z][a-zA-Z0-9]+))$
 
 # Regular expression which should only match correct class names
-class-rgx=[A-Z_][a-zA-Z0-9]+$
+class-rgx=[A-Z_][a-zA-Z0-9_]+$
 
 # Regular expression which should only match correct function names
 #function-rgx=[a-z_][a-z0-9_]{2,30}$

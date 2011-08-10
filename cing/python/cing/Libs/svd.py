@@ -19,6 +19,7 @@ svd = SVDfitPoly( xs, sigma=None, order=2)
 p = svd.fit(ys)
 print p
 """
+
 from cing.Libs.NTutils import * #@UnusedWildImport
 from numpy import zeros #@UnresolvedImport
 from numpy.linalg import svd
@@ -58,7 +59,7 @@ class SVDfit:
         # and j for m.  Note that, in Chapter 2 (and in class), the
         # discussion of SVD itself was cast in terms of mxn matrices!
 
-        self.A          = zeros((self.n,self.m))     # rows = data (n), columns = fit (m)
+        self.a          = zeros((self.n,self.m))     # rows = data (n), columns = fit (m)
         self.sigma      = zeros( self.n )
 
         self.u          = zeros((self.n,self.m))
@@ -69,7 +70,7 @@ class SVDfit:
         self.covariance = zeros((self.m,self.m))
         self.c          = None # no fiting done
 
-        # Create the design matrix A; equation to solve is A.c = b
+        # Create the design matrix a; equation to solve is a.c = b
 
         #print '>', sigma
         for i in range(self.n):
@@ -83,11 +84,11 @@ class SVDfit:
                 nTerror('SVDfit: function returns None, check implementation')
                 return
             for j in range(m):
-                self.A[i,j] = f[j]/self.sigma[i]    # check/correct i/j, n/m conventions
+                self.a[i,j] = f[j]/self.sigma[i]    # check/correct i/j, n/m conventions
             #end def
         #end for
 
-        # SV Decompose: A = u.w.vt.  Note that there are some differences
+        # SV Decompose: a = u.w.vt.  Note that there are some differences
         # between the NR and python implementations:
         #
         # 1. NR function svdcmp returns v, while the python function
@@ -105,8 +106,8 @@ class SVDfit:
         #    argument of svd to 1 causes it to return matrices in the same
         #    form as NR.
 
-        #print '>>',self.A
-        self.u,self.w,self.vt = svd(self.A,1)
+        #print '>>',self.a
+        self.u,self.w,self.vt = svd(self.a,1)
         #print '>>', self.u,self.w,self.vt
 
         # Throw away "nearly singular" elements.
@@ -150,7 +151,7 @@ class SVDfit:
         for i in range(self.n):
             sum = 0.0
             for j in range(self.m):
-                sum += self.A[i][j]*self.c[j]
+                sum += self.a[i][j]*self.c[j]
             self.chisq += (sum-b[i])**2
         #end for
 
@@ -531,7 +532,7 @@ class SVDfitCosSin( SVDfit ):
 ## OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES
 ## PROVIDE THE PROGRAM "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED
 ## OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
-## MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.  THE ENTIRE RISK AS
+## MERCHANTABILITY AND FITNESS FOR a PARTICULAR PURPOSE.  THE ENTIRE RISK AS
 ## TO THE QUALITY AND PERFORMANCE OF THE PROGRAM IS WITH YOU.  SHOULD THE
 ## PROGRAM PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL NECESSARY SERVICING,
 ## REPAIR OR CORRECTION.
@@ -542,7 +543,7 @@ class SVDfitCosSin( SVDfit ):
 ## INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL OR CONSEQUENTIAL DAMAGES ARISING
 ## OUT OF THE USE OR INABILITY TO USE THE PROGRAM (INCLUDING BUT NOT LIMITED
 ## TO LOSS OF DATA OR DATA BEING RENDERED INACCURATE OR LOSSES SUSTAINED BY
-## YOU OR THIRD PARTIES OR A FAILURE OF THE PROGRAM TO OPERATE WITH ANY OTHER
+## YOU OR THIRD PARTIES OR a FAILURE OF THE PROGRAM TO OPERATE WITH ANY OTHER
 ## PROGRAMS), EVEN IF SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE
 ## POSSIBILITY OF SUCH DAMAGES.
 
@@ -566,7 +567,7 @@ class SVDfitCosSin( SVDfit ):
 #
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# MERCHANTABILITY or FITNESS FOR a PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
@@ -575,7 +576,7 @@ class SVDfitCosSin( SVDfit ):
 #
 # Pure Python SVD algorithm.
 # Input: 2-D list (m by n) with m >= n
-# Output: U,W V so that A = U*W*VT
+# Output: U,W V so that a = U*W*VT
 #    Note this program returns V not VT (=transpose(V))
 #    On error, a ValueError is raised.
 #

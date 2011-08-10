@@ -3,18 +3,15 @@ Collect data needed for nrgcing from RCSB-PDB REST calls.
 
 Execute like:
 
-python $CINGROOT/python/cing/NRG/getRCSB-PDB.py
-
-JFD: funny, this is the only project pydev isn't analyzing.
+python $CINGROOT/python/cing/NRG/getRCSB_PDB.py
 """
 from cing import cingDirTmp
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.NRG.PDBEntryLists import getPdbEntries
 from cing.NRG.PDBEntryLists import writeEntryListToFile
-import unittest
 
 cing.verbosity = cing.verbosityDebug
-cingDirTmpTest = os.path.join( cingDirTmp, 'getRCSB-PDB' )
+cingDirTmpTest = os.path.join( cingDirTmp, 'getRCSB_PDB' )
 mkdirs( cingDirTmpTest )
 os.chdir(cingDirTmpTest)
 

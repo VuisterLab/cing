@@ -196,7 +196,7 @@ class NTplot( NTdict ):
         for v in yValueList:
             r = bottom + height * v
             result.append( r )
-#            nTdebug('NTplot.scaleAndMove_yValuesFromAxesToData: %8.3f becomes: %8.3f with bottom,top %8.3f,%8.3f' % (v,r,bottom,top) )
+#            nTdebug('NTplot.scaleAndMove_yValues: %8.3f becomes: %8.3f with bottom,top %8.3f,%8.3f' % (v,r,bottom,top) )
         return result
 
     def move( self, point ):
@@ -426,7 +426,7 @@ class NTplot( NTdict ):
         del(attributesMatLibPlot['markeredgecolor'])
         del(attributesMatLibPlot['markerfacecolor'])
 
-    def setMatLibPlotLine2DListPropsPoint( self, line2DList, attributesMatLibPlot):
+    def setLine2DListProps( self, line2DList, attributesMatLibPlot):
         for line2D in line2DList:
             line2D.set( **attributesMatLibPlot )
 
@@ -462,7 +462,7 @@ class NTplot( NTdict ):
 #            line2Dlist.addList(caplines)
 #            line2Dlist.addList(barcols)
 #            attributesMatLibPlotNoMarker = self.removeMarkerAttributes(attributesMatLibPlot)
-#            self.setMatLibPlotLine2DListPropsPoint( line2Dlist, attributesMatLibPlotNoMarker)
+#            self.setLine2DListProps( line2Dlist, attributesMatLibPlotNoMarker)
     #end def
 
     def points( self, points, attributes=defaultAttributes ):
@@ -817,9 +817,9 @@ class NTplot( NTdict ):
 
         # chessboard on 60 degree grid to see the blending better
         if False:
-            Z1 = array(([0,1]*3 + [1,0]*3)*3)
-            Z1.shape = 6,6
-            imshow(Z1, cmap=gray, interpolation='nearest', extent=extent)
+            z1 = array(([0,1]*3 + [1,0]*3)*3)
+            z1.shape = 6,6
+            imshow(z1, cmap=gray, interpolation='nearest', extent=extent)
 
         for i,myHist in enumerate(histList):
 #        for i,myHist in enumerate(histList[0:1]):
@@ -841,8 +841,8 @@ class NTplot( NTdict ):
                 factor = 100./sumHist
                 myHistScaled *= factor
             elif scaleBy == SCALE_BY_Z:
-                Ctuple = getEnsembleAverageAndSigmaHis( myHist )
-                (c_av, c_sd, hisMin, hisMax) = Ctuple #@UnusedVariable
+                cTuple = getEnsembleAverageAndSigmaHis( myHist )
+                (c_av, c_sd, hisMin, hisMax) = cTuple #@UnusedVariable
                 # Scaled into Z-space.
                 myHistScaled -= c_av
                 myHistScaled /= c_sd
@@ -862,7 +862,7 @@ class NTplot( NTdict ):
                     nTcodeerror("Found unknown ssType : [%s]" % ssType)
                     return True
                 palette = cmapList[idx]
-            myHistColored = cmapWithAlphaGlidingScale(myHistNormalized,palette,
+            myHistColored = cmapWithAlpha(myHistNormalized,palette,
                 minAlpha=minAlpha, maxAlpha=maxAlpha, underAlpha=0., overAlpha=maxAlpha)
 
             imshow( myHistColored,
@@ -876,7 +876,7 @@ class NTplot( NTdict ):
     def plotDihedralRestraintRanges2D(self, lower1, upper1,lower2, upper2, fill=True, fillColor=None):
 
         alpha = 0.3
-        SMALL_ANGLE_DIFF_FOR_PLOT = 0.1
+        sMALL_ANGLE_DIFF_FOR_PLOT = 0.1
 
         plotparamsXmin, plotparamsXmax = (self.xRange)
         plotparamsYmin, plotparamsYmax = (self.yRange)
@@ -891,10 +891,10 @@ class NTplot( NTdict ):
         bounds2.limit(plotparamsYmin, plotparamsYmax)
 
         # When the bounds are almost the same then make the range a very thinny one instead of full circle.
-        if isAlmostEqual( bounds1, SMALL_ANGLE_DIFF_FOR_PLOT ):
-            bounds1[1] = bounds1[0] + SMALL_ANGLE_DIFF_FOR_PLOT
-        if isAlmostEqual( bounds2, SMALL_ANGLE_DIFF_FOR_PLOT ):
-            bounds2[1] = bounds2[0] + SMALL_ANGLE_DIFF_FOR_PLOT
+        if isAlmostEqual( bounds1, sMALL_ANGLE_DIFF_FOR_PLOT ):
+            bounds1[1] = bounds1[0] + sMALL_ANGLE_DIFF_FOR_PLOT
+        if isAlmostEqual( bounds2, sMALL_ANGLE_DIFF_FOR_PLOT ):
+            bounds2[1] = bounds2[0] + sMALL_ANGLE_DIFF_FOR_PLOT
 #        nTdebug("bounds1 : %s" % bounds1)
 #        nTdebug("bounds2 : %s" % bounds2)
 
@@ -1258,7 +1258,7 @@ y coordinate is in axis coordinates (from 0 to 1) when the renderer asks for the
         iconBoxXstart = 0              # data coordinate system
         iconBoxYstartAxis = 1 + ySpaceAxis # axis coordinate system
         height = scale_yValuesFromAxesToData( self.axis, [self.iconBoxYheight])[0]
-        iconBoxYstart = scaleAndMove_yValuesFromAxesToData(self.axis, [ iconBoxYstartAxis ])[0]
+        iconBoxYstart = scaleAndMove_yValues(self.axis, [ iconBoxYstartAxis ])[0]
 
         # Get a background with Z-scores of accessibility.
         i = 0
@@ -1375,7 +1375,7 @@ class HelixIconList(RangeIconList):
             v[0] += self.startPoint[0]                   # axes coordinates
             v[1] *= self.height
             v[1] += self.startPoint[1]
-#            v[1] = scaleAndMove_yValuesFromAxesToData(self.axis, [ v[1] ] )[0]          # data coordinates
+#            v[1] = scaleAndMove_yValues(self.axis, [ v[1] ] )[0]          # data coordinates
 
 
 #        nTdebug("Vertices icon: %s" % verts)
@@ -1786,7 +1786,7 @@ def scale_yValuesFromAxesToData(axis, yValueList):
 #    nTdebug('scale_yValuesFromAxesToData last y value: %8.3f becomes: %8.3f with bottom,top %8.3f' % (v,r,height) )
     return result
 
-def scaleAndMove_yValuesFromAxesToData(axis, yValueList):
+def scaleAndMove_yValues(axis, yValueList):
     """Convert y value in axis coordinates [0,1] to
     data coordinates [bottom,top].
 
@@ -1805,7 +1805,7 @@ def scaleAndMove_yValuesFromAxesToData(axis, yValueList):
         r = bottom + height * v
         result.append( r )
     # end for
-#    nTdebug('scaleAndMove_yValuesFromAxesToData last vertex: %8.3f becomes: %8.3f with bottom,top %8.3f,%8.3f' % (v,r,bottom,top) )
+#    nTdebug('scaleAndMove_yValues last vertex: %8.3f becomes: %8.3f with bottom,top %8.3f,%8.3f' % (v,r,bottom,top) )
     return result
 
 
@@ -2039,7 +2039,7 @@ class MoleculePlotSet:
 
         f = self._renderMoleculePlotSetOriginal
         if self.makeCorrelationPlot:
-            f = self._renderMoleculePlotSetCorrelation
+            f = self._renderMolPlotSetCor
         if f():
             return True
 
@@ -2173,7 +2173,7 @@ class MoleculePlotSet:
                 self.pathPngList.append(fileNamePng)
         # end for resList in rangeList:
 
-    def _renderMoleculePlotSetCorrelation(self):
+    def _renderMolPlotSetCor(self):
         nrows = len(self.keyLoLoL)
         ps = NTplotSet() # closes any previous plots
         ntPlotList = []
@@ -2234,23 +2234,23 @@ class MoleculePlotSet:
 
 #                            nTdebug("resValueListX: %s" % resValueListX)
 #                            nTdebug("resValueListY: %s" % resValueListY)
-                            Xav, Xsd, _n = resValueListX.average()
-                            Yav, Ysd, _n = resValueListY.average()
-                            if isNaN(Xsd): # No sd for single model ensembles.
-                                Xsd = 0.1
-                            if isNaN(Ysd):
-                                Ysd = 0.1
-                            width = Xsd * 2
-                            height = Ysd * 2
+                            xAv, xSd, _n = resValueListX.average()
+                            yAv, ySd, _n = resValueListY.average()
+                            if isNaN(xSd): # No sd for single model ensembles.
+                                xSd = 0.1
+                            if isNaN(ySd):
+                                ySd = 0.1
+                            width = xSd * 2
+                            height = ySd * 2
                             if False: # while testing since sd are too large to plot then.
                                 width /= 5
                                 height /= 5
                             if False: # while testing since sd are too large to plot then.
                                 width *= 5
                                 height *= 5
-#                            nTdebug("resId: %2d  x %8s width  %8s" % (resId, val2Str(Xav, "%.3f", 8), val2Str(width, "%.3f", 8)))
-#                            nTdebug("           y %8s height %8s" % (val2Str(Yav, "%.3f", 8), val2Str(height, "%.3f", 8)))
-#                            p = (Xav+0.1, Yav) # just for debugging.
+#                            nTdebug("resId: %2d  x %8s width  %8s" % (resId, val2Str(xAv, "%.3f", 8), val2Str(width, "%.3f", 8)))
+#                            nTdebug("           y %8s height %8s" % (val2Str(yAv, "%.3f", 8), val2Str(height, "%.3f", 8)))
+#                            p = (xAv+0.1, yAv) # just for debugging.
 #                            pointAttr = circlePoint
 #                            pointAttr.pointSize = 10
 #                            ntPlotList[i].lines([(0,0), p], plusPoint)
@@ -2258,11 +2258,11 @@ class MoleculePlotSet:
                             color = "blue"
                             if getDeepByKeys( key, USE_ROG_FOR_COLOR_STR):
                                 color = resValueListTupleX[NT_MOLECULE_PLOT_IDX_ROG_COLOR]
-                            ntPlotList[i].ellipse(point = (Xav, Yav), width = width, height = height, color=color, alpha = 0.9)
-#                            x.append(Xav)
-#                            y.append(Yav)
-                            pointsForAutoscalingX.append([None, Xav])
-                            pointsForAutoscalingY.append([None, Yav])
+                            ntPlotList[i].ellipse(point = (xAv, yAv), width = width, height = height, color=color, alpha = 0.9)
+#                            x.append(xAv)
+#                            y.append(yAv)
+                            pointsForAutoscalingX.append([None, xAv])
+                            pointsForAutoscalingY.append([None, yAv])
                     # While building code:
 #                    lx = len(x)
 #                    s = rand(lx)

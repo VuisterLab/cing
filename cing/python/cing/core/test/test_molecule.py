@@ -26,10 +26,10 @@ class AllChecks(TestCase):
         cc3 = Coordinate( 0.906,  -0.611,   3.099 )
         cc4 = Coordinate(-0.287,   0.182,   2.484 )
         for _i in range(1 * 100):
-            _angle = NTdihedralOpt( cc1, cc2, cc3, cc4 )
-        self.assertAlmostEqual( NTdihedralOpt( cc1, cc2, cc3, cc4 ), -47.1, 1)
-        self.assertAlmostEqual( NTangleOpt(    cc1, cc2, cc3      ), 124.4, 1)
-        self.assertAlmostEqual( NTdistanceOpt( cc1, cc2           ),   1.4, 1)
+            _angle = nTdihedralOpt( cc1, cc2, cc3, cc4 )
+        self.assertAlmostEqual( nTdihedralOpt( cc1, cc2, cc3, cc4 ), -47.1, 1)
+        self.assertAlmostEqual( nTangleOpt(    cc1, cc2, cc3      ), 124.4, 1)
+        self.assertAlmostEqual( nTdistanceOpt( cc1, cc2           ),   1.4, 1)
 
     def test_CoordinateOperations(self):
         cc1 = Coordinate( 2.427,   1.356,   3.559 )

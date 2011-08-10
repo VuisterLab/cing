@@ -284,7 +284,7 @@ if __name__ == '__main__':
         else:
             nTerror("Unknown destination: %s" % destination)
     except:
-        NTtracebackError()
+        nTtracebackError()
     finally:
         nTmessage(getStopMessage(cing.starttime))
 

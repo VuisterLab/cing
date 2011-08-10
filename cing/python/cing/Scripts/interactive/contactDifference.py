@@ -10,7 +10,7 @@ from cing.PluginCode.matplib import NTplot
 from cing.PluginCode.matplib import NTplotSet
 from cing.core.classes import Project
 from cing.core.constants import * #@UnusedWildImport
-from cing.core.molecule import NTdistanceOpt
+from cing.core.molecule import nTdistanceOpt
 from matplotlib.pyplot import * #@UnusedWildImport
 from numpy import * #@UnusedWildImport
 name = 'cbd12'
@@ -51,7 +51,7 @@ for pairIdx in range(4): # p for pairs use 4 pairs for final
         #            nTdebug("Looking at model %s between %s and %s" % (k, r1, r2))
                     atom1 = r1.CA
                     atom2 = r2.CA
-                    caDistMatrix[idx1,idx2] = NTdistanceOpt(atom1.coordinates[k], atom2.coordinates[k])
+                    caDistMatrix[idx1,idx2] = nTdistanceOpt(atom1.coordinates[k], atom2.coordinates[k])
 
     caDiffDistMatrix = caDistMatrixList[1] - caDistMatrixList[0]
     caDiffDistMatrixList.append(caDiffDistMatrix)

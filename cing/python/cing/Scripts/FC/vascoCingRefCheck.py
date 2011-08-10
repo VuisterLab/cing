@@ -308,17 +308,17 @@ class VascoCingReferenceCheck(VascoReferenceCheck):
         
         if resonanceList.vascoApplied: # boolean xor is equivalent of the above line.
 #            nTdebug("CS were rereferenced before so first undoing previous application.")
-            if mol.applyVascoChemicalShiftCorrections( resonanceList = resonanceList, doRevert = True ):
+            if mol.applyVascoCsCorrections( resonanceList = resonanceList, doRevert = True ):
                 nTerror("Failed to undo Vasco rereferencing for: %s" % resonanceList)
                 return True
             # end def
         # end def
             
-        if mol.setVascoChemicalShiftCorrections(self.rerefInfo, resonanceList ):
-            nTerror("Failed to setVascoChemicalShiftCorrections for: %s" % resonanceList)
+        if mol.setVascoCsCorrections(self.rerefInfo, resonanceList ):
+            nTerror("Failed to setVascoCsCorrections for: %s" % resonanceList)
             return True         
-        if mol.applyVascoChemicalShiftCorrections( resonanceList = resonanceList ):
-            nTerror("Failed to applyVascoChemicalShiftCorrections for: %s" % resonanceList)
+        if mol.applyVascoCsCorrections( resonanceList = resonanceList ):
+            nTerror("Failed to applyVascoCsCorrections for: %s" % resonanceList)
             return True
         # end def
     # end def

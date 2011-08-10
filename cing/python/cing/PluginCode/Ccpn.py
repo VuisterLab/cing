@@ -2017,7 +2017,7 @@ Note that this doesn't happen with other pseudos. Perhaps CCPN does not have the
                     return None
 
                 ccpnResDescriptorOrg = ccpnResDescriptorList[i]
-                ccpnResDescriptor = modifyResidueDescriptorForTerminii( ccpnResDescriptorOrg, i, seqLength, molType)
+                ccpnResDescriptor = modResDescriptorForTerminii( ccpnResDescriptorOrg, i, seqLength, molType)
 #                nTdebug("Looking at CING residue [%s] with ccpnResDescriptor, ccpnResidue.linking [%s] [%s]" % (r, ccpnResDescriptor, ccpnResidue.linking))
 
                 chemCompVarNew = None
@@ -2654,7 +2654,7 @@ def storeResidueValidationInCcpn(project, residue, context = 'CING'):
 #    nameDict = {'CCPN': 'protein Val neutral', 'BMRBd': 'VAL', 'IUPAC': 'VAL', 'AQUA': 'VAL', 'INTERNAL_0': 'VAL', 'INTERNAL_1': 'VAL', 'CYANA': 'VAL', 'CYANA2': 'VAL', 'PDB': 'VAL', 'XPLOR': 'VAL'}
 
 def patchCcpnResDescriptor(ccpnResDescriptor, ccpnMolType, ccpnLinking):
-    """See #modifyResidueDescriptorForTerminii for inverse op."""
+    """See #modResDescriptorForTerminii for inverse op."""
     # CING db has only non-terminal CCPN descriptors in DB so CING can be more concise.
     ccpnResDescriptorList = NTlist()
     ccpnResDescriptorList.addList(ccpnResDescriptor.split(';'))
@@ -2720,7 +2720,7 @@ def isRootDirectory(f):
     return False
 # end def
 
-def modifyResidueDescriptorForTerminii( ccpnResDescriptor, i, seqLength, molType):
+def modResDescriptorForTerminii( ccpnResDescriptor, i, seqLength, molType):
     """
     i starts at zero like in CING model numbering.
     Do not mix in start, middle, end for linking description.
@@ -2782,14 +2782,14 @@ stereochemistry is cna be seen by examining the atom network.
         elif i == (seqLength-1):
             deprotList["H''"] = None
         else:
-            nTcodeerror("modifyResidueDescriptorForTerminii for protein")
+            nTcodeerror("modResDescriptorForTerminii for protein")
 #    elif molType == 'DNA' or molType == 'RNA':
 #        if i == 0:
 #            protList["H3"] = None
 #        elif i == seqLength:
 #            deprotList["H''"] = None
 #        else:
-#            nTcodeerror("1 in modifyResidueDescriptorForTerminii for an NA")
+#            nTcodeerror("1 in modResDescriptorForTerminii for an NA")
     ccpnResDescriptorNew = ''
     if protList:
         keyList = protList.keys()

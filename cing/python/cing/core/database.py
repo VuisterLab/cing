@@ -204,13 +204,13 @@ class MolDef( NTtree ):
         saveToSML( self, rootPath, convention )
     #end def
 
-    def appendResidueDefFromSMLfile(self, SMLfile):
-        """Read and append ResidueDef from SMLfile
+    def appendResidueDefFromSMLfile(self, sMLfile):
+        """Read and append ResidueDef from sMLfile
         Return ResidueDef of None on error.
         """
         # cannot use SML2obj because that would require a circular import
         # pylint: disable=E1101
-        return ResidueDef.SMLhandler.fromFile( SMLfile, self )
+        return ResidueDef.SMLhandler.fromFile( sMLfile, self )
     #end def
 
     def allResidueDefs(self):

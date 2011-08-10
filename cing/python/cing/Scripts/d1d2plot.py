@@ -581,7 +581,7 @@ def plotHistogramOverall():
     return m
 
 
-def plotHistogramBySsTypeResidueTypes():
+def plotHisBySsTypeResTypes():
     graphicsFormat = "png"
 
     doOnlyOverall = False
@@ -751,21 +751,21 @@ def plotDihedralD1D2():
             nTdebug('Skipping ' % res)
 
         else:
-            CA_atms = triplet.zap('CA')
-            CB_atms = triplet.zap('CB')
+            ca_atms = triplet.zap('CA')
+            cb_atms = triplet.zap('CB')
 
-            nTdebug("%s %s %s %s" % (res, triplet, CA_atms, CB_atms))
+            nTdebug("%s %s %s %s" % (res, triplet, ca_atms, cb_atms))
 
-            if None in CB_atms: # skip Gly for now
+            if None in cb_atms: # skip Gly for now
                 nTdebug('Skipping %s' % res)
             else:
                 d1 = Dihedral(res, 'Cb4N', range=[0.0, 360.0])
-                d1.atoms = [CB_atms[0], CA_atms[0], CA_atms[1], CB_atms[1]]
+                d1.atoms = [cb_atms[0], ca_atms[0], ca_atms[1], cb_atms[1]]
                 d1.calculateValues()
                 res['Cb4N'] = d1 # append dihedral to residue
 
                 d2 = Dihedral(res, 'Cb4C', range=[0.0, 360.0])
-                d2.atoms = [CB_atms[1], CA_atms[1], CA_atms[2], CB_atms[2]]
+                d2.atoms = [cb_atms[1], ca_atms[1], ca_atms[2], cb_atms[2]]
                 d2.calculateValues()
                 res['Cb4C'] = d2 # append dihedral to residue
 
@@ -929,4 +929,4 @@ if __name__ == "__main__":
 
     if False:
         os.chdir(plotHistogramBySsTypeResidueTypesDir)
-        plotHistogramBySsTypeResidueTypes()
+        plotHisBySsTypeResTypes()

@@ -8,7 +8,7 @@ from cing.PluginCode.Ccpn import Ccpn
 from cing.PluginCode.Ccpn import getProjectNameInFileName
 from cing.PluginCode.Ccpn import getRestraintBoundList
 from cing.PluginCode.Ccpn import isRootDirectory
-from cing.PluginCode.Ccpn import modifyResidueDescriptorForTerminii
+from cing.PluginCode.Ccpn import modResDescriptorForTerminii
 from cing.PluginCode.Ccpn import patchCcpnResDescriptor
 from unittest import TestCase
 import unittest
@@ -116,7 +116,7 @@ class AllChecks(TestCase):
         for i in range(len(rList)):
             d = rList[i]
             nTdebug("d: %s" % d)
-            self.assertEquals(d[1], modifyResidueDescriptorForTerminii( d[0], d[3], seqLength, d[2]))
+            self.assertEquals(d[1], modResDescriptorForTerminii( d[0], d[3], seqLength, d[2]))
 
 
     def _testCcpnProjectNameOfFn(self):

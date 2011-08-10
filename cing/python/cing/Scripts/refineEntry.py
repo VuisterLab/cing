@@ -46,8 +46,8 @@ def mainRefineEntry(entryId, *extraArgList):
         doWattos = False
         doQueeny = False
         doTalos = False
-    FORCE_REDO = True
-    FORCE_RETRIEVE_INPUT = True
+    force_redo = True
+    force_retrieve_input = True
 
 
     nTmessage(header)
@@ -133,7 +133,7 @@ def mainRefineEntry(entryId, *extraArgList):
     cingEntryDir = entryId + ".cing"
 
     if os.path.isdir(cingEntryDir):
-        if FORCE_REDO:
+        if force_redo:
             nTmessage("Enforcing a redo")
             rmtree(cingEntryDir)
         else:
@@ -172,7 +172,7 @@ def mainRefineEntry(entryId, *extraArgList):
     if inputProtocal in allowedInputProtocolList:
         stillToRetrieve = False
         if os.path.exists(fileNameTgz):
-            if FORCE_RETRIEVE_INPUT:
+            if force_retrieve_input:
                 os.unlink(fileNameTgz)
                 stillToRetrieve = True
             # end if
@@ -236,7 +236,7 @@ def mainRefineEntry(entryId, *extraArgList):
             if doStoreCING2db( entryId, archive_id, project=project):
                 nTerror("Failed to store CING project's data to DB but continuing.")
         except:
-            NTtracebackError()
+            nTtracebackError()
             nTerror("Failed to store CING project's data due to above traceback error.")
 
     if tgzCing:

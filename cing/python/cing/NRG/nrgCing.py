@@ -36,7 +36,6 @@ from cing.Libs.html import GOOGLE_ANALYTICS_TEMPLATE
 from cing.NRG import ARCHIVE_NMR_REDO_ID
 from cing.NRG import ARCHIVE_NRG_ID
 from cing.NRG import mapArchive2Schema
-from cing.NRG import nrgCingRdb #@UnusedImport
 from cing.NRG.PDBEntryLists import getBmrbLinks
 from cing.NRG.PDBEntryLists import getBmrbNmrGridEntries
 from cing.NRG.PDBEntryLists import getBmrbNmrGridEntriesDOCRDone
@@ -50,12 +49,13 @@ from cing.NRG.WhyNot import NO_EXPERIMENTAL_DATA
 from cing.NRG.WhyNot import TO_BE_VALIDATED_BY_CING
 from cing.NRG.WhyNot import WhyNot
 from cing.NRG.WhyNot import WhyNotEntry
+from cing.NRG.nrgCingRdb import NrgCingRdb
 from cing.NRG.settings import * #@UnusedWildImport
 from cing.Scripts.FC.utils import getBmrbCsCountsFromFile
 from cing.Scripts.doScriptOnEntryList import doScriptOnEntryList
 from cing.Scripts.vCing.vCing import TEST_CING_STR
 from cing.Scripts.vCing.vCing import VALIDATE_ENTRY_NRG_STR
-from cing.Scripts.vCing.vCing import vCing
+from cing.Scripts.vCing.vCing import Vcing
 from cing.Scripts.validateEntry import ARCHIVE_TYPE_BY_CH23
 from cing.Scripts.validateEntry import PROJECT_TYPE_CCPN
 from shutil import * #@UnusedWildImport
@@ -79,10 +79,10 @@ mapArchive2LogDir = {ARCHIVE_NRG_ID: LOG_NRG_CING, ARCHIVE_NMR_REDO_ID: LOG_REFI
 FAILURE_PREP_STR = "Failed to prepareEntry"
 
 # pylint: disable=R0902
-class nrgCing(Lister): # pylint: disable=C0103
+class NrgCing(Lister):
     """Main class for preparing and running CING reports on NRG and maintaining the statistics."""
     
-    ENTRY_TO_DELETE_COUNT_MAX = 0 # DEFAULT: 4 can be as many as fail every time.
+    entry_to_delete_count_max = 0 # DEFAULT: 4 can be as many as fail every time.
     #: 2hym has 1726 and 2bgf is the only entry over 5,000 Just used for reporting. 
     #: The entry is still included and considered 'done'.
     MAX_ERROR_COUNT_CING_LOG = 2000 
@@ -355,9 +355,9 @@ class nrgCing(Lister): # pylint: disable=C0103
             
 
     def initVc(self):
-        'Initialize the vCing class'
-        nTmessage("Setting up vCing")
-        self.vc = vCing(max_time_to_wait_per_job=self.max_time_to_wait)
+        'Initialize the Vcing class'
+        nTmessage("Setting up Vcing")
+        self.vc = Vcing(max_time_to_wait_per_job=self.max_time_to_wait)
         nTmessage("Starting with %r" % self.vc)
     # end def
 
@@ -392,7 +392,7 @@ class nrgCing(Lister): # pylint: disable=C0103
                 else:
                     self.matches_many2one = getBmrbLinks()
             except:
-                NTtracebackError()
+                nTtracebackError()
                 nTerror("Failed to update matches between BMRB and PDB from " + getCallerName())
                 return True
             # end try
@@ -668,21 +668,21 @@ class nrgCing(Lister): # pylint: disable=C0103
                 entrySubDir = os.path.join(DATA_STR, subDir, entry_code)
                 if not entry_code in self.entry_list_nmr:
                     nTwarning("Found entry %s in NRG-CING but not in PDB-NMR. Will be obsoleted in NRG-CING too" % entry_code)
-                    if len(self.entry_list_obsolete) < self.ENTRY_TO_DELETE_COUNT_MAX:
+                    if len(self.entry_list_obsolete) < self.entry_to_delete_count_max:
                         rmdir(entrySubDir)
                         self.entry_list_obsolete.append(entry_code)
                     else:
                         nTerror("Entry %s in NRG-CING not obsoleted since there were already removed: %s entries." % (
-                            entry_code, self.ENTRY_TO_DELETE_COUNT_MAX))
+                            entry_code, self.entry_to_delete_count_max))
                 # end if
                 if not entry_code in self.entry_list_prep_done:
                     nTwarning("Found entry %s in NRG-CING but no prep done. Will be removed completely from NRG-CING too" % entry_code)
-                    if len(self.entry_list_missing_prep) < self.ENTRY_TO_DELETE_COUNT_MAX:
+                    if len(self.entry_list_missing_prep) < self.entry_to_delete_count_max:
                         rmdir(entrySubDir)
                         self.entry_list_missing_prep.append(entry_code)
                     else:
                         nTerror("Entry %s in NRG-CING not removed since there were already removed: %s entries." % (
-                            entry_code, self.ENTRY_TO_DELETE_COUNT_MAX))
+                            entry_code, self.entry_to_delete_count_max))
                     # end if
                 # end if
 
@@ -769,7 +769,7 @@ class nrgCing(Lister): # pylint: disable=C0103
             self.reportHeadAndTailEntries(self.timeTakenDict)
         # end if
         
-        crdb = nrgCingRdb.nrgCingRdb(schema=self.schema_id) # Lazy opening as to not burden system too much. Stupid 
+        crdb = NrgCingRdb(schema=self.schema_id) # Lazy opening as to not burden system too much. Stupid 
         self.entry_list_store_in_db = crdb.getPdbIdList()
         if not self.entry_list_store_in_db:
             nTerror("Failed to get any entry from NRG-CING RDB")
@@ -789,8 +789,8 @@ class nrgCing(Lister): # pylint: disable=C0103
             nTdebug("All entries in RDB are also done")
         # endif
         entry_list_in_db_to_remove = NTlist( *entry_list_in_db_not_done )
-        if len(entry_list_in_db_not_done) > self.ENTRY_TO_DELETE_COUNT_MAX:
-            entry_list_in_db_to_remove = entry_list_in_db_not_done[:self.ENTRY_TO_DELETE_COUNT_MAX] # doesn't make it into a NTlist.
+        if len(entry_list_in_db_not_done) > self.entry_to_delete_count_max:
+            entry_list_in_db_to_remove = entry_list_in_db_not_done[:self.entry_to_delete_count_max] # doesn't make it into a NTlist.
             entry_list_in_db_to_remove = NTlist( *entry_list_in_db_to_remove )
         if entry_list_in_db_to_remove:
             nTmessage("There are %s entries in RDB that will be removed: %s" % (
@@ -1324,7 +1324,7 @@ class nrgCing(Lister): # pylint: disable=C0103
         if doLog:
             if not self.vc:
                 self.initVc()
-            master_target_log_dir = os.path.join(self.vc.MASTER_TARGET_DIR, self.vc.MASTER_TARGET_LOG)
+            master_target_log_dir = os.path.join(self.vc.master_target_dir, self.vc.MASTER_TARGET_LOG)
             if not os.path.exists(master_target_log_dir):
                 nTerror("Skipping %s because failed to find master_target_log_dir: %s" % (entry_code, master_target_log_dir))
                 return True
@@ -1359,7 +1359,7 @@ class nrgCing(Lister): # pylint: disable=C0103
                 nTdebug("Removing local tgz %s" % (tgzFileNameCing))
                 os.remove(tgzFileNameCing)
             if doCopyTgz:
-                tgzFileNameCingMaster = os.path.join(self.vc.MASTER_D, 'NRG-CING', 'data', entryCodeChar2and3, entry_code, tgzFileNameCing)
+                tgzFileNameCingMaster = os.path.join(self.vc.master_d, 'NRG-CING', 'data', entryCodeChar2and3, entry_code, tgzFileNameCing)
                 if not os.path.exists(tgzFileNameCingMaster):
                     nTerror("Skipping %s because failed to find master's: %s" % (entry_code, tgzFileNameCingMaster))
                     return True
@@ -1964,7 +1964,7 @@ class nrgCing(Lister): # pylint: disable=C0103
                                 max_entries_todo=self.max_entries_todo,
     #                            max_entries_todo=self.max_entries_todo # DEFAULT
                                 ):
-                nTerror("In nrgCing#prepare Failed to doScriptOnEntryList")
+                nTerror("In NrgCing#prepare Failed to doScriptOnEntryList")
                 return True
             # end if
         # end for
@@ -2023,7 +2023,7 @@ class nrgCing(Lister): # pylint: disable=C0103
     
 # end class.
 
-def runNrgCing( useClass = nrgCing ):
+def runNrgCing( useClass = NrgCing ):
     """
     Additional modes I see:
         batchUpdate        Run validation checks to NRG-CING web site.
@@ -2112,7 +2112,7 @@ def runNrgCing( useClass = nrgCing ):
             nTerror("Unknown destination: %s" % destination)
         # end if
     except:
-        NTtracebackError()
+        nTtracebackError()
     finally:
         nTmessage(getStopMessage(cing.starttime))
     # end try

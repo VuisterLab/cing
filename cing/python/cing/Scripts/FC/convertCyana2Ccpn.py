@@ -1,7 +1,6 @@
 """
 See doc in convertXplor2Ccpn.py
 """
-
 from ccpnmr.format.converters.CyanaFormat import CyanaFormat
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.Libs.forkoff import do_cmd
@@ -27,7 +26,7 @@ def convertCyana2Ccpn(projectName, rootDir):
 
     project = Implementation.MemopsRoot(name=projectName)
 
-    importCyanaCoordinatesAndRestraints(project, authorDir, guiRoot)
+    importCyanaCoorAndRes(project, authorDir, guiRoot)
     project.saveModified()
     tgzFileName = "../" + projectName + ".tgz"
     cmd = "tar -czf %s %s" % (tgzFileName, projectName)
@@ -35,12 +34,12 @@ def convertCyana2Ccpn(projectName, rootDir):
     guiRoot.destroy()
 
 
-def importCyanaCoordinatesAndRestraints(ccpnProject, inputDir, guiRoot, replaceCoordinates=1, replaceRestraints=1, allowPopups=1, minimalPrompts=0, verbose=1, **presets):
+def importCyanaCoorAndRes(ccpnProject, inputDir, guiRoot, replaceCoordinates=1, replaceRestraints=1, allowPopups=1, minimalPrompts=0, verbose=1, **presets):
 
     if replaceCoordinates:
         status = importPseudoPdb(ccpnProject, inputDir, guiRoot, allowPopups=allowPopups, minimalPrompts=minimalPrompts, verbose=verbose, **presets)
         if status:
-            nTerror("Failed importCyanaCoordinatesAndRestraints")
+            nTerror("Failed importCyanaCoorAndRes")
             return True
     if not replaceRestraints:
         return

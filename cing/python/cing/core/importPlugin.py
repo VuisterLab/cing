@@ -34,7 +34,7 @@ def importPlugin( pluginName ):
         except SkipTest, extraInfo:
             nTmessage("Skipping reload report of an optional compound: %s" % extraInfo)            
         except Exception:
-            NTtracebackError()
+            nTtracebackError()
             nTexception('A reload failed for ' + pluginName)
             return None
 #    module = __import__( moduleName, globals(), locals(), [] )
@@ -53,7 +53,7 @@ def importPlugin( pluginName ):
     except SkipTest:
         nTdebug("Skipping import of an optional plugin: [%s]" % pluginName )            
     except:
-        NTtracebackError()
+        nTtracebackError()
         nTerror( 'Failed to import pluginCodeModule: [%s]' % pluginName)
         return None
 

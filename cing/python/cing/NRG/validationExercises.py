@@ -26,7 +26,7 @@ class EntryInfo(Lister):
         self.time = time
 
 
-class validationExercises(Lister):
+class ValidationExercises(Lister):
 
     def __init__(self,
                  max_entries_todo=1,
@@ -517,7 +517,7 @@ if __name__ == '__main__':
     new_hits_entry_list         = string.split("2jqv 2jnb 2jnv 2jvo 2jvr 2jy7 2jy8 2oq9 2osq 2osr 2otr 2rn9 2rnb")
 
     ## Initialize the project
-    m = validationExercises(max_entries_todo=max_entries_todo, max_time_to_wait=max_time_to_wait, writeWhyNot=writeWhyNot, updateIndices=updateIndices,
+    m = ValidationExercises(max_entries_todo=max_entries_todo, max_time_to_wait=max_time_to_wait, writeWhyNot=writeWhyNot, updateIndices=updateIndices,
                 isProduction=isProduction)
 #    m.getCingEntriesTriedAndDone()
     m.update(new_hits_entry_list)

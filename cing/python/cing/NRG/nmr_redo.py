@@ -3,7 +3,7 @@
 """
 This script will use NRG-CING files to generate new structures for existing PDB entries.
 
-Execute like nrgCing, e.g.
+Execute like NrgCing, e.g.
 
 $CINGROOT/python/cing/NRG/nmr_redo.py refine
 $CINGROOT/python/cing/NRG/nmr_redo.py getEntryInfo
@@ -16,7 +16,7 @@ from cing.NRG.nrgCing import * #@UnusedWildImport
 from cing.NRG.settings import * #@UnusedWildImport
 from cing.Scripts.validateEntry import * #@UnusedWildImport
 
-class NmrRedo(nrgCing):
+class NmrRedo(NrgCing):
     """Main class for preparing and running NMR recalculations."""
     def __init__(self,
                  useTopos=False,
@@ -42,20 +42,20 @@ class NmrRedo(nrgCing):
                  isProduction=isProduction,
 )
         kwds = kwds.toDict()
-        nrgCing.__init__( self, **kwds ) # Steal most from super class. @UndefinedVariable for init??? JFD; doesn't understand.
+        NrgCing.__init__( self, **kwds ) # Steal most from super class. @UndefinedVariable for init??? JFD; doesn't understand.
         self.results_base = results_base_redo
 
 
-        self.ENTRY_TO_DELETE_COUNT_MAX = 0 # can be as many as fail every time.
+        self.entry_to_delete_count_max = 0 # can be as many as fail every time.
         self.usedCcpnInput = 0  # For NMR_REDO it is not from the start.
         self.validateEntryExternalDone = 0
-        self.nrgCing = nrgCing() # Use as little as possible thru this convenience variable.
+        self.nrgCing = NrgCing() # Use as little as possible thru this convenience variable.
                 
         self.archive_id = ARCHIVE_NMR_REDO_ID        
-        self.validateEntryExternalDone = False # DEFAULT: True in the future and then it won't chainge but for nrgCing it is True from the start.
+        self.validateEntryExternalDone = False # DEFAULT: True in the future and then it won't chainge but for NrgCing it is True from the start.
         self.entry_list_possible = self.getPossibleEntryList()
 
-        self.updateDerivedResourceSettings() # The paths previously initialized in nrgCing. Will also chdir.
+        self.updateDerivedResourceSettings() # The paths previously initialized in NrgCing. Will also chdir.
         
         if 0:
             self.entry_list_todo = NTlist() 
@@ -90,7 +90,7 @@ class NmrRedo(nrgCing):
         writeTextToFile(entryListFileName, toCsv(self.entry_list_todo))
 
         pythonScriptFileName = os.path.join(cingDirScripts, 'refineEntry.py')
-#        inputDir = 'file://' + self.nrgCing.results_dir + '/' + self.inputDir # NB input is from nrgCing.
+#        inputDir = 'file://' + self.nrgCing.results_dir + '/' + self.inputDir # NB input is from NrgCing.
         inputDir = 'file://' + self.nrgCing.results_dir + '/' + DATA_STR
         outputDir = self.results_dir
         storeCING2db = "1" # DEFAULT: '1' All arguments need to be strings.

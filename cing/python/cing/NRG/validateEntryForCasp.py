@@ -54,8 +54,8 @@ def main(entryId, *extraArgList):
         doProcheck = False
         doWattos = False
         doTalos = False
-    FORCE_REDO = True
-    FORCE_RETRIEVE_INPUT = True
+    force_redo = True
+    force_retrieve_input = True
 
 
     nTmessage(header)
@@ -117,7 +117,7 @@ def main(entryId, *extraArgList):
     cingEntryDir = entryId + ".cing"
 
     if os.path.isdir(cingEntryDir):
-        if FORCE_REDO:
+        if force_redo:
             nTmessage("Enforcing a redo")
             rmtree(cingEntryDir)
         else:
@@ -154,7 +154,7 @@ def main(entryId, *extraArgList):
     if inputDir.startswith("http") or inputDir.startswith("file"):
         stillToRetrieve = False
         if os.path.exists(fileNameTgz):
-            if FORCE_RETRIEVE_INPUT:
+            if force_retrieve_input:
                 os.unlink(fileNameTgz)
                 stillToRetrieve = True
             # end if
@@ -269,7 +269,7 @@ def main(entryId, *extraArgList):
             if doStoreCING2db( entryId, ARCHIVE_CASP_ID, project=project):
                 nTerror("Failed to store CING project's data to DB but continuing.")
         except:
-            NTtracebackError()
+            nTtracebackError()
             nTerror("Failed to store CING project's data due to above traceback error.")
 
     project.save()

@@ -2,7 +2,7 @@ from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.Libs.cython.superpose  import NTcVector #@UnresolvedImport
 from cing.core.molecule import Coordinate #@UnusedImport
 from cing.core.molecule import CoordinateOld #@UnusedImport
-from cing.core.molecule import NTdihedralOpt
+from cing.core.molecule import nTdihedralOpt
 from unittest import TestCase
 import profile
 import pstats
@@ -24,7 +24,7 @@ class AllChecks(TestCase):
             c = Coordinate(random(),random(),random())
             cList.append(c)
         for _i in range(n):
-            _d = NTdihedralOpt(cList[0], cList[1], cList[2], cList[3])
+            _d = nTdihedralOpt(cList[0], cList[1], cList[2], cList[3])
 #            nTdebug("d: %8.3f" % d )
 
     def testSuperposeChains(self):

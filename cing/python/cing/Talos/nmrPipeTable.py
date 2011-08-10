@@ -2,7 +2,6 @@
 nmrPipeTab.py
 
 gv 21 March 2006
-
 """
 from cing.Libs.AwkLike import AwkLike
 from cing.Libs.NTutils import * #@UnusedWildImport
