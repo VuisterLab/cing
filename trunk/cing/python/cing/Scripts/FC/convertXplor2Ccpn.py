@@ -66,10 +66,12 @@ def convertXplor2Ccpn(projectName, rootDir, inputDir="XPLOR", outputDir="CCPN"):
     guiRoot.destroy()
 
 
-def importXplorCoorAndRes(ccpnProject, inputDir, guiRoot, replaceCoordinates=1, replaceRestraints=1, allowPopups=1, minimalPrompts=0, verbose=1, **presets):
+def importXplorCoorAndRes(ccpnProject, inputDir, guiRoot, replaceCoordinates=1, replaceRestraints=1, 
+                          allowPopups=1, minimalPrompts=0, verbose=1, **presets):
 
     if replaceCoordinates:
-        status = importPseudoPdb(ccpnProject, inputDir, guiRoot, allowPopups=allowPopups, minimalPrompts=minimalPrompts, verbose=verbose, **presets)
+        status = importPseudoPdb(ccpnProject, inputDir, guiRoot, allowPopups=allowPopups, minimalPrompts=minimalPrompts, 
+                                 verbose=verbose, **presets)
         if status:
             nTerror("Failed importXplorCoorAndRes")
             return True

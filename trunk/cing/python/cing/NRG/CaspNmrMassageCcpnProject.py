@@ -10,7 +10,6 @@ if the input project is in cwd.
 
 Most functionality is hard-coded here so be careful reading the actual code.
 """
-
 from cing.Libs.DBMS import DBMS
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.Libs.disk import copy
@@ -114,7 +113,7 @@ def redoLayOutArchiveWim():
         myTar.add(entryCodeNew)
         myTar.close()
 
-def getMapEntrycodeNew2EntrycodeAndCity(entryList, cityList):
+def getMapEntrycodeNew(entryList, cityList):
     result = {}
     for entry in entryList:
         for city in cityList:
@@ -221,7 +220,7 @@ entryListAll = [ 'T0538Org' ] + entryList
 #cityList = participantTable.columnOrder[1:]
 #entryList = targetTable.getColumnByIdx(0)
 #rangesPsvsList = targetTable.getColumnByIdx(6)
-#mapEntrycodeNew2EntrycodeAndCity = getMapEntrycodeNew2EntrycodeAndCity(entryList, cityList)
+#mapEntrycodeNew2EntrycodeAndCity = getMapEntrycodeNew(entryList, cityList)
 #nTdebug("Read dbms with tables: %s" % dbms.tables.keys())
 #print labList
 #print programHoH

@@ -128,7 +128,8 @@ class Vcing(Lister):
     # end def
 
     def keepLockFresh(self, lockname, lockTimeOut):
-        maxSleapingTime = self.max_time_to_wait_per_job + 100 # process will be killed outside first so we give it some extra time here for it to be reaped.
+        maxSleapingTime = self.max_time_to_wait_per_job + 100 
+        # process will be killed outside first so we give it some extra time here for it to be reaped.
         sleepTime = lockTimeOut / 2 + 1
         sleptTime = 0
         while True:
@@ -282,7 +283,8 @@ class Vcing(Lister):
                 continue
             # end if
             tokensTried += 1
-            nTmessage("In %d/%d/%d (finished/total/iterations) got token %s with lock: %s" % (tokensFinished, tokensTried, iterationsTried, token, tokenLock))
+            nTmessage("In %d/%d/%d (finished/total/iterations) got token %s with lock: %s" % (tokensFinished, 
+                        tokensTried, iterationsTried, token, tokenLock))
 
             # The script needs itself to send the results all included.
             nTmessage("Found tokenContent: %s" % tokenContent)

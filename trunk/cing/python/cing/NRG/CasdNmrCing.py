@@ -323,7 +323,8 @@ class CasdNmrCing(Lister):
                     if line.count('ERROR:'):
                         nTerror("Matched line: %s" % line)
 
-                    hasPseudoErrorListed = line.count(" .Q") # ignore the errors for pseudos e.g. in CGR26ALyon Hopefully this is unique enough; tested well.
+                    hasPseudoErrorListed = line.count(" .Q") 
+                    # ignore the errors for pseudos e.g. in CGR26ALyon Hopefully this is unique enough; tested well.
                     if line.count("Error: Not linking atom"):
                         if not hasPseudoErrorListed:
                             linkErrorList.append(line)
@@ -506,7 +507,8 @@ class CasdNmrCing(Lister):
 #        """>%S</a><BR><a href=""" + self.bmrb_link_template + ">%b</a>"
 
         cingImage = '../data/%t/%s/%s.cing/%x/HTML/mol.gif'
-        example_str_template = '<td><a href="' + self.cing_link_template + '"><img SRC="' + cingImage + '" border=0 width="200" ></a><BR>%s</td>'
+        example_str_template = '<td><a href="' + self.cing_link_template + '"><img SRC="' 
+        example_str_template += cingImage + '" border=0 width="200" ></a><BR>%s</td>'
         file_name = os.path.join (self.base_dir, self.data_dir_local, "index.html")
         file_content = open(file_name, 'r').read()
         old_string = r"<!-- INSERT NEW DATE HERE -->"
@@ -641,7 +643,8 @@ class CasdNmrCing(Lister):
                         x = 'Molecularsystem' # but not always.
 #                nTdebug("found molecular system name: %s" % x)
 
-                tmp_string = string.replace(example_str_template, r"%S", string.upper(pdb_entry_code)) # does nothing because %S was omitted.
+                tmp_string = string.replace(example_str_template, r"%S", string.upper(pdb_entry_code))
+                #does nothing because %S was omitted.
                 tmp_string = string.replace(tmp_string, r"%s", pdb_entry_code)
                 tmp_string = string.replace(tmp_string, r"%t", t)
                 tmp_string = string.replace(tmp_string, r"%x", x)
@@ -737,8 +740,8 @@ if __name__ == '__main__':
 #    new_hits_entry_list         = string.split("2jqv 2jnb 2jnv 2jvo 2jvr 2jy7 2jy8 2oq9 2osq 2osr 2otr 2rn9 2rnb")
 
     ## Initialize the project
-    m = CasdNmrCing(max_entries_todo=max_entries_todo, max_time_to_wait=max_time_to_wait, writeWhyNot=writeWhyNot, updateIndices=updateIndices,
-                isProduction=isProduction)
+    m = CasdNmrCing(max_entries_todo=max_entries_todo, max_time_to_wait=max_time_to_wait, writeWhyNot=writeWhyNot, 
+                    updateIndices=updateIndices, isProduction=isProduction)
 #    m.getCingEntriesTriedAndDone()
     m.update(new_hits_entry_list,doCheckAnnotation=doCheckAnnotation)
     nTmessage("Finished creating the CASD-NMR CING indices")

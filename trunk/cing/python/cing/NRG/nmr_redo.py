@@ -22,7 +22,9 @@ class NmrRedo(NrgCing):
                  useTopos=False,
                  getTodoList=True,
                  max_entries_todo=1,
-                 max_time_to_wait=86400, # one day. 2p80 took the longest: 5.2 hours. But <Molecule "2ku1" (C:7,R:1659,A:36876,M:30)> is taking longer. 2ku2 is taking over 12 hrs now.
+                 max_time_to_wait=86400, 
+                 # one day. 2p80 took the longest: 5.2 hours. 
+#                 But <Molecule "2ku1" (C:7,R:1659,A:36876,M:30)> is taking longer. 2ku2 is taking over 12 hrs now.
                  processes_max=None,
                  prepareInput=False,
                  writeWhyNot=True,
@@ -33,7 +35,8 @@ class NmrRedo(NrgCing):
         kwds = NTdict( useTopos=useTopos, # There must be an introspection possible for this.
                  getTodoList=getTodoList,
                  max_entries_todo=max_entries_todo,
-                 max_time_to_wait=max_time_to_wait, # one day. 2p80 took the longest: 5.2 hours. But <Molecule "2ku1" (C:7,R:1659,A:36876,M:30)> is taking longer. 2ku2 is taking over 12 hrs now.
+                 max_time_to_wait=max_time_to_wait, # one day. 2p80 took the longest: 5.2 hours. 
+#                 But <Molecule "2ku1" (C:7,R:1659,A:36876,M:30)> is taking longer. 2ku2 is taking over 12 hrs now.
                  processes_max=processes_max,
                  prepareInput=prepareInput,
                  writeWhyNot=writeWhyNot,
@@ -52,7 +55,8 @@ class NmrRedo(NrgCing):
         self.nrgCing = NrgCing() # Use as little as possible thru this convenience variable.
                 
         self.archive_id = ARCHIVE_NMR_REDO_ID        
-        self.validateEntryExternalDone = False # DEFAULT: True in the future and then it won't chainge but for NrgCing it is True from the start.
+        self.validateEntryExternalDone = False # DEFAULT: True 
+#        in the future and then it won't chainge but for NrgCing it is True from the start.
         self.entry_list_possible = self.getPossibleEntryList()
 
         self.updateDerivedResourceSettings() # The paths previously initialized in NrgCing. Will also chdir.
@@ -62,7 +66,6 @@ class NmrRedo(NrgCing):
             self.entry_list_todo += "1brv 1dum".split()
         if 0: # DEFAULT: 0
             nTmessage("Going to use specific entry_list_todo in prepare")
-#            self.entry_list_todo = "1a24 1a4d 1afp 1ai0 1b4y 1brv 1bus 1c2n 1cjg 1d3z 1hue 1ieh 1iv6 1jwe 1kr8 2cka 2fws 2hgh 2jmx 2k0e 2kib 2knr 2kz0 2rop".split()
 #            self.entry_list_todo = "1brv".split()
 #            self.entry_list_todo = readLinesFromFile('/Users/jd/NRG/lists/bmrbPdbEntryList.csv')
 #            self.entry_list_todo = NTlist( *self.entry_list_todo )

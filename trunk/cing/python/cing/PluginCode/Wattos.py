@@ -392,7 +392,8 @@ def _runWattos(project, ranges=None, tmp = None, parseOnly=False):
         timeRunEstimatedInSeconds = 0.025 * mol.modelCount * len(mol.allResidues())
         timeRunEstimatedInSeconds *= 60
         timeRunEstimatedList = timedelta2Hms(timeRunEstimatedInSeconds)
-        nTmessage('==> Running Wattos for an estimated (5,000 atoms/s): %s hours, %s minutes and %s seconds; please wait' % timeRunEstimatedList)
+        msg = '==> Running Wattos for an estimated (5,000 atoms/s): %s hours, %s minutes and %s seconds; please wait' % timeRunEstimatedList
+        nTmessage(msg)
         scriptFileName = "wattos.script"
         scriptFullFileName = os.path.join(wattosDir, scriptFileName)
         open(scriptFullFileName, "w").write(scriptComplete)

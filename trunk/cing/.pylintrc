@@ -92,7 +92,6 @@ load-plugins=
 #W0101: Unreachable code
 #W0104: Statement seems to have no effect
 #W0105: String statement has no effect
-
 #W0107: Unnecessary pass statement
 #W0108: Lambda may not be necessary
 #W0141: Used builtin function %r

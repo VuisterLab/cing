@@ -294,7 +294,8 @@ class ValidationExercises(Lister):
 #        """>%S</a><BR><a href=""" + self.bmrb_link_template + ">%b</a>"
 
         cingImage = '../data/%t/%s/%s.cing/%x/HTML/mol.gif'
-        example_str_template = '<td><a href="' + self.cing_link_template + '"><img SRC="' + cingImage + '" border=0 width="200" ></a><BR>%S</td>'
+        example_str_template = '<td><a href="' + self.cing_link_template + '"><img SRC="' +\
+            cingImage + '" border=0 width="200" ></a><BR>%S</td>'
         file_name = os.path.join (self.base_dir, self.data_dir_local, "index.html")
         file_content = open(file_name, 'r').read()
         old_string = r"<!-- INSERT NEW DATE HERE -->"
@@ -517,8 +518,8 @@ if __name__ == '__main__':
     new_hits_entry_list         = string.split("2jqv 2jnb 2jnv 2jvo 2jvr 2jy7 2jy8 2oq9 2osq 2osr 2otr 2rn9 2rnb")
 
     ## Initialize the project
-    m = ValidationExercises(max_entries_todo=max_entries_todo, max_time_to_wait=max_time_to_wait, writeWhyNot=writeWhyNot, updateIndices=updateIndices,
-                isProduction=isProduction)
+    m = ValidationExercises(max_entries_todo=max_entries_todo, max_time_to_wait=max_time_to_wait, 
+                writeWhyNot=writeWhyNot, updateIndices=updateIndices, isProduction=isProduction)
 #    m.getCingEntriesTriedAndDone()
     m.update(new_hits_entry_list)
     nTmessage("Finished creating the indices")

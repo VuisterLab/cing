@@ -157,7 +157,8 @@ class VascoCingReferenceCheck(VascoReferenceCheck):
 #                        nTerror("Found improper median index %s for %s" % (medianIndex, str(asaList)))
 #                        return True
 #                    d[chainCode][seqKey]['atoms'][atomName] = [asaList[medianIndex]] # Resetting list to only include median
-                    d[chainCode][seqKey]['atoms'][atomName] = [ml[0]] # Reseting array because JFD is not sure it's a regular array from mlab.
+                    d[chainCode][seqKey]['atoms'][atomName] = [ml[0]] 
+                    # Reseting array because JFD is not sure it's a regular array from mlab.
                 # end for
             # end for
         # end for

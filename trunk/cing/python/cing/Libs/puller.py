@@ -54,6 +54,8 @@ Example: %s -f oracle://someuser:PaSsWd@db1/TSH1 \\
 
 def quick_mapper(table):
     base = declarative_base()
+    # pylint: disable=W0232
+    # pylint: disable=R0903
     class GenericMapper(base):
         __table__ = table
     return GenericMapper

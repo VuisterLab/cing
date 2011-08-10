@@ -288,7 +288,8 @@ def calculatePairWisePhiPsiRmsd( mol1, mol2, ranges='auto' ):
 
 #            print '12>', i,j
 #    print len(pairwise1), len(pairwise2), len(pairwise12)
-    return result, pairwise1.average2(fmt='%6.2f +- %5.2f'),pairwise2.average2(fmt='%6.2f +- %5.2f'),pairwise12.average2(fmt='%6.2f +- %5.2f')
+    return ( result, pairwise1.average2(fmt='%6.2f +- %5.2f'),pairwise2.average2(fmt='%6.2f +- %5.2f'),
+        pairwise12.average2(fmt='%6.2f +- %5.2f') )
 #end def
 
 
@@ -379,7 +380,8 @@ def calculatePairWiseRmsd( mol1, mol2, ranges=None ):
 
 #            print '12>', i,j
 #    print len(pairwise1), len(pairwise2), len(pairwise12)
-    return result, pairwise1.average2(fmt='%6.2f +- %5.2f'),pairwise2.average2(fmt='%6.2f +- %5.2f'),pairwise12.average2(fmt='%6.2f +- %5.2f')
+    return ( result, pairwise1.average2(fmt='%6.2f +- %5.2f'),pairwise2.average2(fmt='%6.2f +- %5.2f'),
+        pairwise12.average2(fmt='%6.2f +- %5.2f'))
 #end def
 
 
@@ -441,7 +443,8 @@ def printOverallScores( projects, stream = sys.stdout ):
     # rmsds
     fprintf( stream, '%-20s%s\n','rmsdToMean', projects.entries.zap('summaryDict','rmsdToMean_backboneAverage').format('  %-18s') )
     fprintf( stream, '%-20s%s\n','pairwiseRmsd', projects.entries.zap('summaryDict','pairwiseRmsd').format('%-16s    ') )
-    fprintf( stream, '%-20s%s\n\n','pairwiseRmsdTo_'+projects.entries[0].group, projects.entries.zap('summaryDict','pairwiseRmsdToFirst').format('%-18s  ') )
+    fprintf( stream, '%-20s%s\n\n','pairwiseRmsdTo_'+projects.entries[0].group, projects.entries.zap(
+        'summaryDict','pairwiseRmsdToFirst').format('%-18s  ') )
 
     # CING scores
     for key in ['CING_red', 'CING_orange', 'CING_green']:
@@ -526,7 +529,8 @@ def printRestraintScores( projects, stream=sys.stdout ):
 
 def printScore( name, rogScore ):
     clist = rogScore.colorCommentList.zap(1)
-    if len(clist) == 0: clist.append('---')
+    if len(clist) == 0: 
+        clist.append('---')
     printf('%-20s%-10s %s\n', name, rogScore, clist[0])
     for c in clist[1:]:
         printf('%-20s%-10s %s\n', '', '', c)
@@ -799,9 +803,11 @@ def getRanges( projects, cutoff = 1.7 ):
             psi.cAverage()
 
             use1 = 0
-            if (2.0 - res.PHI.cv - res.PSI.cv > cutoff): use1 = 1
+            if (2.0 - res.PHI.cv - res.PSI.cv > cutoff): 
+                use1 = 1
             use2 = 0
-            if (2.0 - phi.cv - psi.cv > cutoff): use2 = 1
+            if (2.0 - phi.cv - psi.cv > cutoff): 
+                use2 = 1
             #printf('%-35s %-35s  %6.2f  %1d     %6.2f %6.2f   %6.2f  %1d     %2d\n',
             #       res.PHI, res.PSI, 2.0 - res.PHI.cv - res.PSI.cv, use1,
              #      phi.cv, psi.cv, 2.0 - phi.cv - psi.cv, use2, use1-use2

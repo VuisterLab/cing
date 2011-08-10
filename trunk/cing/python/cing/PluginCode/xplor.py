@@ -116,7 +116,8 @@ def exportDistanceRestraint2xplor( distanceRestraint ):
     s = sprintf('assi ')
     for i,atmList in enumerate( distanceRestraint.atomPairs ):
         if len(atmList) != 2:
-            nTerror("Skipping restraint because bad number of atom selections. Expected 2 but found: %s in: %s", distanceRestraint, len(atmList))
+            nTerror("Skipping restraint because bad number of atom selections. Expected 2 but found: %s in: %s", 
+                    distanceRestraint, len(atmList))
             return
         
         if i != 0:

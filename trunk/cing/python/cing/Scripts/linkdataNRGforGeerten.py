@@ -84,7 +84,8 @@ def linkdataNRG():
         if n<(ltext-2) and text[n:n+2]=='//':
             if not (n<(ltext-3) and text[n+4]=='/'):
                 pdbid=text[n+3:n+7]
-                if not is_pdb_code(pdbid): #at the end of the file an empty pdbid is selected. I haven't removed it yet, so you'll see an error.
+                if not is_pdb_code(pdbid): 
+                    # at the end of the file an empty pdbid is selected. I haven't removed it yet, so you'll see an error.
                     nTerror('[%s] is not a pdb localpdbid.'%pdbid)
                     #os._exit(1)
                 pdbidlist0.append(pdbid)
@@ -120,7 +121,8 @@ def linkdataNRG():
     perEntryRogdict = NTdict()
 
     #The ROG percentages are load from the database and put in a dictionary.
-    s5 = select([e1.c.pdb_id, r1.c.rog, 100.0 * func.count(r1.c.rog) / e1.c.res_count], from_obj=[e1.join(r1)]).group_by(e1.c.pdb_id, r1.c.rog, e1.c.res_count)
+    s5 = select([e1.c.pdb_id, r1.c.rog, 100.0 * func.count(r1.c.rog) / e1.c.res_count], 
+                from_obj=[e1.join(r1)]).group_by(e1.c.pdb_id, r1.c.rog, e1.c.res_count)
     nTdebug("SQL: %s" % s5)
     result=execute(s5).fetchall()
     #nTdebug("ROG percentage per entry: %s" % result)
@@ -146,9 +148,11 @@ def linkdataNRG():
             bbcchkdict.appendFromTable(s2, 0, 3)
             rotchkdict.appendFromTable(s2, 0, 4)
 
-    #Below, the finaltext is composed. First the original 4 columns are set back. After that, some other information is added. All information is
+    #Below, the finaltext is composed. 
+    #First the original 4 columns are set back. After that, some other information is added. All information is
     #separated by a acomma.
-    finaltext='pdbid1,pdbid2,length_total,length_match,matchfraction,experimental_meth_pdb2,Perc_most_fav_1,Ramchk_1,Bbcchk_1,Rotchk_1,ROG_Green_1,ROG_Orange_1,ROG_Red_1,Perc_most_fav_2,Ramchk_2,Bbcchk_2,C12chk_2,ROG_Green_2,ROG_Orange_2,ROG_Red_2\n'
+    finaltext=('pdbid1,pdbid2,length_total,length_match,matchfraction,experimental_meth_pdb2,Perc_most_fav_1,Ramchk_1,Bbcchk_1,Rotchk_1,'+
+                'ROG_Green_1,ROG_Orange_1,ROG_Red_1,Perc_most_fav_2,Ramchk_2,Bbcchk_2,C12chk_2,ROG_Green_2,ROG_Orange_2,ROG_Red_2\n')
     dictList = [pc_rama_coredict,ramchkdict,bbcchkdict,rotchkdict,perEntryRogdict]
     for k in range(len(pdbidlist1)):
         if k>1 and pdbidlist1[k]!=pdbidlist1[k-1]:

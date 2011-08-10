@@ -437,9 +437,12 @@ protons:    %(protons)6.3f"""
                         )
 
         for a in atms:
-            if a.isBackbone(): bb.append(a)
-            if a.isProton(): protons.append(a)
-            else: heavy.append(a)
+            if a.isBackbone(): 
+                bb.append(a)
+            if a.isProton(): 
+                protons.append(a)
+            else: 
+                heavy.append(a)
         #end for
 
         res.Qshift.allAtoms   = _calcQshift( atms )

@@ -117,7 +117,8 @@ def swapCheck(nmrConstraintStore,structureEnsemble,numSwapCheckRuns=1):
 
 #    violationCodes = {'xl':                                             {'violation': 1.0,  'fraction': 0.00001},
 #                       'l':                                             {'violation': 0.5,  'fraction': 0.5},
-#                       StereoAssignmentCleanup.VIOLATION_CODE_S_STR:    {'violation': 0.001,'fraction': -999.9} # required for reporting smaller violations.
+#                       StereoAssignmentCleanup.VIOLATION_CODE_S_STR:    {'violation': 0.001,'fraction': -999.9} 
+# required for reporting smaller violations.
 #                       }
 
     for _swapCheckRun in range(0,numSwapCheckRuns):
@@ -272,7 +273,8 @@ if __name__ == '__main__':
     argListOther = []
     if len(sys.argv) > startArgListOther:
         argListOther = sys.argv[startArgListOther:]
-    nTmessage('\nGoing to destination: %s with(out) on entry_code %s with extra arguments %s' % (destination, entry_code, str(argListOther)))
+    nTmessage('\nGoing to destination: %s with(out) on entry_code %s with extra arguments %s' % (
+                destination, entry_code, str(argListOther)))
 
     try:
         if destination == 'fcProcessEntry':

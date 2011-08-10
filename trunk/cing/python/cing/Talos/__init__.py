@@ -8,12 +8,12 @@
 # ====================================
 #
 # """
-from cing.Talos.nmrPipeTable import nmrPipeTable
+from cing.Talos.nmrPipeTable import NmrPipeTable
 import  os
 
 talosPath = os.path.split( __file__)[0]
 
-talosDb          = nmrPipeTable( talosPath + '/talos.tab' )
+talosDb          = NmrPipeTable( talosPath + '/talos.tab' )
 talosDb.atoms    = ['N', 'CA', 'HA', 'C', 'CB']
 talosDb.residues = ['R1', 'R2', 'R3']
 

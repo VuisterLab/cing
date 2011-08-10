@@ -118,8 +118,10 @@ def interp2_linear(z, tx, ty, binx=None, biny=None):
     Toy function just like interpn_linear in 2 dimensions.
     This function exists just to help the understanding and maintaining of interpn_linear.
     '''
-    if not binx is None: tx = array_coordinates(tx, binx)
-    if not biny is None: ty = array_coordinates(ty, biny)
+    if not binx is None: 
+        tx = array_coordinates(tx, binx)
+    if not biny is None: 
+        ty = array_coordinates(ty, biny)
 
     ix = tx.astype('i')
     iy = ty.astype('i')

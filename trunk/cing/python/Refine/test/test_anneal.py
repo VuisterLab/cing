@@ -70,7 +70,8 @@ class AllChecks(TestCase):
                 refineExecPath = os.path.join(refinePath, "refine.py")
     #            cmd = '%s --project %s -n %s --setup %s --useAnnealed --overwrite --models %s --superpose %s --sort Enoe' % (
     #                refineExecPath, entryId, name, target, models, ranges)           
-                cmd = '%s -v %s --project %s -n %s --setup --overwrite --superpose %s --modelsAnneal %s --modelCountAnneal %s --bestAnneal %s --best %s' % (
+                cmd = ('%s -v %s --project %s -n %s --setup --overwrite --superpose %s' +
+                       '--modelsAnneal %s --modelCountAnneal %s --bestAnneal %s --best %s') % (
                     refineExecPath, cing.verbosity, entryId, name, ranges, modelsAnneal, modelCountAnneal, bestAnneal, best)
                 self.assertFalse( do_cmd(cmd,bufferedOutput=0) )
                 for i, target in enumerate(targetList):

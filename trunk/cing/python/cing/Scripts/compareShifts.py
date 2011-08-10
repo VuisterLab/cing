@@ -113,9 +113,11 @@ def compareShifts(projectA, projectB):
 
 # define, open, read the files
 projectA = Project.open(defsA[0], 'old')
-if not projectA: exit(1)
+if not projectA: 
+    exit(1)
 projectB = Project.open(defsB[0], 'old')
-if not projectB: exit(1)
+if not projectB: 
+    exit(1)
 
 # compare A,B
 mapMolecules(projectA.molecule, projectB.molecule, zip(defsA[2], defsB[2]))

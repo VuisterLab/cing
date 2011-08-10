@@ -19,7 +19,8 @@ class AllChecks(TestCase):
         # used txt instead of the normal log because .log files are excluded by svn by default.
         logFile = os.path.join(cingDirTestsData, 'cing', 'log_validateEntry_1brv.txt')
         timeTaken, entryCrashed, nr_error, nr_warning, nr_message, nr_debug = analyzeCingLog(logFile)
-        nTdebug("Found %s/%s timeTaken/entryCrashed and %d/%d/%d/%d error,warning,message, and debug lines." % (timeTaken, entryCrashed, nr_error, nr_warning, nr_message, nr_debug) )
+        nTdebug("Found %s/%s timeTaken/entryCrashed and %d/%d/%d/%d error,warning,message, and debug lines." % (timeTaken, 
+                    entryCrashed, nr_error, nr_warning, nr_message, nr_debug) )
         self.assertFalse(entryCrashed) # The traceback is shown but was caught internally in CING and so it doesn't qualify as a true crash.
         self.assertEqual(nr_error, 2)
         self.assertEqual(nr_warning, 0)

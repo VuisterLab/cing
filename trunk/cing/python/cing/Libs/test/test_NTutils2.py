@@ -112,7 +112,8 @@ class AllChecks(TestCase):
         self.assertEquals( s, '. (+- .)')
         s = "%s"  % NTvalue(value=1.0,   error=None, fmt='%.3f (+- %.3f)')
         self.assertEquals( s, '1.0 (+- .)')
-        s = "%s"  % NTvalue(value=1.000, error=None, fmt='%.3f (+- %.3f)') # still this mistake was not detected for a number:  -0.54700000000000004 (+- .) that's why the below extra tests.
+        s = "%s"  % NTvalue(value=1.000, error=None, fmt='%.3f (+- %.3f)') 
+        # still this mistake was not detected for a number:  -0.54700000000000004 (+- .) that's why the below extra tests.
         self.assertEquals( s, '1.0 (+- .)')
         s = "%s"  % NTvalue(value=2.000, error=0.2,  fmt='%.3f (+- %.3f)')
         self.assertEquals( s, '2.000 (+- 0.200)')

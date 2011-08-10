@@ -298,7 +298,8 @@ class CCONH( ExperimentDef ):
 
     def definePeaks( self ):
         previous = self.residue.sibling( -1 )
-        if not previous: return
+        if not previous: 
+            return
 
         # I don't have in the database yet what are aliphatic and aromatic atoms
         carbons = NTlist()
