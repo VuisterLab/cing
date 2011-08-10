@@ -397,7 +397,7 @@ class pdbParser:
                 #end if
             #end if
         #end for
-        msgHol.showMessage(MAX_MESSAGES=20)
+        msgHol.showMessage(max_messages=20)
         if not foundModel: # X-rays do not have MODEL record
             self.molecule.modelCount += 1
         else:

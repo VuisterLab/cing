@@ -39,7 +39,7 @@ class AllChecks(TestCase):
         valueList = [ 9., 99., 999. ]
         for i,v in enumerate(valueList):
             r = mapValueToMolmolColor(v, 0, 1, False, msgHol=msgHol)
-        msgHol.showMessage(MAX_WARNINGS=1)
+        msgHol.showMessage(max_warnings=1)
 
     def testPyMolIntegration(self):
         pass

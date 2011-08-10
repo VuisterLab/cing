@@ -163,9 +163,9 @@ def doStoreCING2db( entry_code, archive_id, project = None):
     for logIdx in ( firstIdx, ):
         logFileName = logFileNameList[logIdx]
         logFilePath = os.path.join( project.path(directories.logs), logFileName)
-        result = getRevisionAndDateTimeFromCingLog( logFilePath )
+        result = getRevDateCingLog( logFilePath )
         if not result:
-            nTerror("In %s failed to getRevisionAndDateTimeFromCingLog for: %s" % (getCallerName(), logFilePath))
+            nTerror("In %s failed to getRevDateCingLog for: %s" % (getCallerName(), logFilePath))
             continue # with next log.
         # end if
         rev, datetime_seen = result

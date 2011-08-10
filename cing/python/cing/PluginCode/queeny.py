@@ -10,12 +10,12 @@ Residues obtain attribute 'information' with information value that is averaged 
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.Libs.cython.superpose import Rm6dist
 from cing.PluginCode.required.reqQueeny import * #@UnusedWildImport
-from cing.core.sml import SML2obj
+from cing.core.sml import sML2obj
 from cing.core.sml import obj2SML
 
 storedPropList = [QUEENY_UNCERTAINTY1_STR, QUEENY_UNCERTAINTY2_STR, QUEENY_INFORMATION_STR ]
 
-class dmElement():
+class DmElement():
     "Distance Matrix element for Queeny"
     upperDefault = 256.0
     lowerDefault =   0.0
@@ -23,18 +23,18 @@ class dmElement():
     uncertaintyMinvalue = -5.545177 # lowest value: log(1.0/256.0)
 
     def __init__(self, atm1, atm2 ):
-        #NTdict.__init__( self, __CLASS__ = 'dmElement'  )
+        #NTdict.__init__( self, __CLASS__ = 'DmElement'  )
         self.atm1 = atm1
         self.atm2 = atm2
-        self.upper  = dmElement.upperDefault
-        self.lower  = dmElement.lowerDefault
+        self.upper  = DmElement.upperDefault
+        self.lower  = DmElement.lowerDefault
         self.upperChange = 0.0 # change after using last iteration of setLU()
-        self.uncertainty = dmElement.uncertaintyDefault
+        self.uncertainty = DmElement.uncertaintyDefault
         self.flagged = False
     #end def
 
     def __str__(self):
-        return '<dmElement>'
+        return '<DmElement>'
 
     def format(self):
         return sprintf('%s (%1s) %-20s %-20s  L: %7.3f  U: %7.3f  (%7.3f)  H: %7.3f',
@@ -113,12 +113,12 @@ class Queeny( Odict ):
     #end def
 
     def initDmElement(self, atm1, atm2, lower=None, upper=None):
-        """Initialize a dmElement entry for atm1, atm2
+        """Initialize a DmElement entry for atm1, atm2
         optionally set lower and upper
         return dme
         """
         if not self.has_key((atm1.atomIndex,atm2.atomIndex)):
-            dme = dmElement(atm1, atm2)
+            dme = DmElement(atm1, atm2)
             self[(atm1.atomIndex,atm2.atomIndex)] = dme
         else:
             dme = self[(atm1.atomIndex,atm2.atomIndex)]
@@ -137,7 +137,7 @@ class Queeny( Odict ):
                 if self.has_key((atm.atomIndex,atmN.atomIndex)):
                     continue
 
-                dme = dmElement(atm, atmN)
+                dme = DmElement(atm, atmN)
                 self[(atm.atomIndex,atmN.atomIndex)] = dme
 
                 # approximate values
@@ -179,12 +179,12 @@ class Queeny( Odict ):
         #end if
 
         for res in self.molecule.residuesWithProperties('TYR'):
-            HD1 = res.getAtom('HD1',INTERNAL_0)
-            HD2 = res.getAtom('HD2',INTERNAL_0)
-            QD  = res.getAtom('QD',INTERNAL_0)
-            HE1 = res.getAtom('HE1',INTERNAL_0)
-            HE2 = res.getAtom('HE2',INTERNAL_0)
-            QE  = res.getAtom('QE',INTERNAL_0)
+            HD1 = res.getAtom('HD1',INTERNAL_0) # pylint: disable=C0103
+            HD2 = res.getAtom('HD2',INTERNAL_0) # pylint: disable=C0103
+            QD  = res.getAtom('QD',INTERNAL_0)  # pylint: disable=C0103
+            HE1 = res.getAtom('HE1',INTERNAL_0) # pylint: disable=C0103
+            HE2 = res.getAtom('HE2',INTERNAL_0) # pylint: disable=C0103
+            QE  = res.getAtom('QE',INTERNAL_0)  # pylint: disable=C0103
 
             if None in [ HD1, HD2, QD, HE1, HE2, QE]:
                 continue
@@ -200,13 +200,13 @@ class Queeny( Odict ):
         #end if
 
         for res in self.molecule.residuesWithProperties('PHE'):
-            HD1 = res.getAtom('HD1',INTERNAL_0)
-            HD2 = res.getAtom('HD2',INTERNAL_0)
-            QD  = res.getAtom('QD',INTERNAL_0)
-            HE1 = res.getAtom('HE1',INTERNAL_0)
-            HE2 = res.getAtom('HE2',INTERNAL_0)
-            QE  = res.getAtom('QE',INTERNAL_0)
-            HZ  = res.getAtom('HZ',INTERNAL_0)
+            HD1 = res.getAtom('HD1',INTERNAL_0)   # pylint: disable=C0103
+            HD2 = res.getAtom('HD2',INTERNAL_0)   # pylint: disable=C0103
+            QD  = res.getAtom('QD',INTERNAL_0)    # pylint: disable=C0103
+            HE1 = res.getAtom('HE1',INTERNAL_0)   # pylint: disable=C0103
+            HE2 = res.getAtom('HE2',INTERNAL_0)   # pylint: disable=C0103
+            QE  = res.getAtom('QE',INTERNAL_0)    # pylint: disable=C0103
+            HZ  = res.getAtom('HZ',INTERNAL_0)    # pylint: disable=C0103
 
             if None in [ HD1, HD2, QD, HE1, HE2, QE, HZ]:
                 continue
@@ -257,7 +257,7 @@ class Queeny( Odict ):
 
         models = range(modelCount)
         pair = 0
-        Rm6distances = nTfill(0.0, len(dr.atomPairs))
+        rm6distances = nTfill(0.0, len(dr.atomPairs))
 
         for atm1, atm2 in dr.atomPairs:
 
@@ -292,7 +292,7 @@ class Queeny( Odict ):
                     #end if
 
                     for i in models:
-                        Rm6distances[pair] += Rm6dist(a1.coordinates[i].e, a2.coordinates[i].e)
+                        rm6distances[pair] += Rm6dist(a1.coordinates[i].e, a2.coordinates[i].e)
                     #end for models
                 #end for a2
             #end for a1
@@ -303,12 +303,12 @@ class Queeny( Odict ):
 #                self.distances[i] = math.pow(self.distances[i], -0.166666666666666667)
 #        #end if
 
-        psum = sum(Rm6distances)
-        for i,value in enumerate(Rm6distances):
-            Rm6distances[i] = value/psum
+        psum = sum(rm6distances)
+        for i,value in enumerate(rm6distances):
+            rm6distances[i] = value/psum
         #end for
 
-        return Rm6distances
+        return rm6distances
     #end def
 
     def initRestraints( self ):
@@ -332,36 +332,36 @@ class Queeny( Odict ):
                     atm1,atm2 = dr.atomPairs[0]
                     upper = dr.upper
                     if dr.upper == None: # sometimes happens; i.e. entry 1but
-                        upper = dmElement.upperDefault
+                        upper = DmElement.upperDefault
                     lower = dr.lower
                     if dr.lower == None: # lower values sometimes set to None
-                        lower = dmElement.lowerDefault
+                        lower = DmElement.lowerDefault
                     self.initDmElement(atm1, atm2, lower, upper)
                 else:
                     # ambiguous restraints
-                    Rm6distances = self._calculateAverage( dr )
-                    if Rm6distances == None:
+                    rm6distances = self._calculateAverage( dr )
+                    if rm6distances == None:
                         nTwarning('Queeny.initRestraints: failure to analyze %s', dr)
                         break
                     #endif
 
                     upper = dr.upper
                     if dr.upper == None: # sometimes happens; i.e. entry 1but
-                        upper = dmElement.upperDefault
+                        upper = DmElement.upperDefault
                     lower = dr.lower
                     if dr.lower == None: # lower values sometimes set to None
-                        lower = dmElement.lowerDefault
+                        lower = DmElement.lowerDefault
 
-                    # Hr: total uncertainty change associated with this restraint
-                    # dH = Hmax - Hr : change in uncertainty
-                    # Hi = Hmax - dH*frac : relative R-6 contribution of atom pair: sum(Hi) = Hr
-                    Hmax = dmElement.uncertaintyDefault
-                    Hr = math.log(upper-lower)
-                    dH = Hmax - Hr
+                    # hr: total uncertainty change associated with this restraint
+                    # dH = hmax - hr : change in uncertainty
+                    # hi = hmax - dH*frac : relative R-6 contribution of atom pair: sum(hi) = hr
+                    hmax = DmElement.uncertaintyDefault
+                    hr = math.log(upper-lower)
+                    dH = hmax - hr
                     pair = 0
                     for atm1,atm2 in dr.atomPairs:
-                        Hi = Hmax - Rm6distances[pair]*dH
-                        self.initDmElement(atm1, atm2, lower, lower+math.exp(Hi))
+                        hi = hmax - rm6distances[pair]*dH
+                        self.initDmElement(atm1, atm2, lower, lower+math.exp(hi))
                         pair += 1
                     #end for
                 #end if
@@ -378,7 +378,7 @@ class Queeny( Odict ):
     def initFlagged(self):
         for dme in self.itervalues():
             dme.flagged = False
-        self.Nflagged = 0
+        self.nflagged = 0
     #end def
 
     def triangulate(self, atm1, atm2, atm3, dme12=None, dme23=None):
@@ -395,7 +395,7 @@ class Queeny( Odict ):
             if dme13.flagged:
                 return
         else:
-            dme13 = dmElement(atm1, atm3)
+            dme13 = DmElement(atm1, atm3)
             self[(atm1.atomIndex,atm3.atomIndex)] = dme13
 
         if dme12 == None:
@@ -483,10 +483,10 @@ class Queeny( Odict ):
 
         for dme in self.itervalues():
             if dme.upper > dme.lower:
-                dme.uncertainty = max(dmElement.uncertaintyMinvalue, math.log(dme.upper-dme.lower))
+                dme.uncertainty = max(DmElement.uncertaintyMinvalue, math.log(dme.upper-dme.lower))
             else:
                 nTdebug('Queeny.setUncertainty: problem with %s', dme.format())
-                dme.uncertainty = dmElement.uncertaintyMinvalue
+                dme.uncertainty = DmElement.uncertaintyMinvalue
         #end for
 
         atms = self.molecule.allAtoms()
@@ -504,8 +504,8 @@ class Queeny( Odict ):
                     atm1[key] += dme.uncertainty
                     atm2[key] += dme.uncertainty
                 else:
-                    atm1[key] += dmElement.uncertaintyDefault
-                    atm2[key] += dmElement.uncertaintyDefault
+                    atm1[key] += DmElement.uncertaintyDefault
+                    atm2[key] += DmElement.uncertaintyDefault
                 #end if
             #end for
         #end for
@@ -704,7 +704,7 @@ def restoreQueeny( project, tmp=None ):
 
    # Restore the data
     nTmessage('==> Restoring queeny results')
-    myList=SML2obj( smlFile, project.molecule)
+    myList=sML2obj( smlFile, project.molecule)
     if myList==None:
         return True
 

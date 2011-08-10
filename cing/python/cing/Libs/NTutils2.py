@@ -100,9 +100,9 @@ class NTlistOfLists(NTlist):
 #end class
 
 def addStreamnTmessageList(stream):
-    for NTm in nTmessageList:
-#        print "EEE: starting addStream to %s" % NTm
-        NTm.addStream(stream)
+    for nTm in nTmessageList:
+#        print "EEE: starting addStream to %s" % nTm
+        nTm.addStream(stream)
 def removeStreamnTmessageList():
     for NTm in nTmessageList:
 #        print "EEE: starting removeStream to %s" % NTm
@@ -211,10 +211,10 @@ class MsgHoL(NTdict):
     def appendDebug(self, msg):
         self[ DEBUG_ID ].append(msg)
 
-    def showMessage( self, MAX_ERRORS = 5, MAX_WARNINGS = 5, MAX_MESSAGES = 5, MAX_DEBUGS = 20 ):
+    def showMessage( self, max_errors = 5, max_warnings = 5, max_messages = 5, max_debugs = 20 ):
         "Limited printing of errors and the like; might have moved the arguments to the init but let's not waste time."
 
-        typeCountList = { ERROR_ID: MAX_ERRORS, WARNING_ID: MAX_WARNINGS, MESSAGE_ID: MAX_MESSAGES, DEBUG_ID: MAX_DEBUGS }
+        typeCountList = { ERROR_ID: max_errors, WARNING_ID: max_warnings, MESSAGE_ID: max_messages, DEBUG_ID: max_debugs }
         typeReportFunctionList = { ERROR_ID: nTerror, WARNING_ID: nTwarning, MESSAGE_ID: nTmessage,  DEBUG_ID: nTdebug }
 
         for t in typeCountList:
@@ -398,13 +398,13 @@ def getCallerName():
 
 def getRandomKey(size=6):
     """Get a random alphanumeric string of a given size"""
-    ALPHANUMERIC = [chr(x) for x in range(48, 58) + range(65, 91) + range(97, 123)]
-    #random.shuffle(ALPHANUMERIC)
+    alphaNumericList = [chr(x) for x in range(48, 58) + range(65, 91) + range(97, 123)]
+    #random.shuffle(alphaNumericList)
 
-    n = len(ALPHANUMERIC) - 1
+    n = len(alphaNumericList) - 1
     seed(time.time()*time.time())
 
-    return ''.join([ALPHANUMERIC[randint(0, n)] for x in range(size)])
+    return ''.join([alphaNumericList[randint(0, n)] for x in range(size)])
 # end def
 
 def isNoneorNaN(value):
@@ -483,7 +483,7 @@ def filterListByObjectClassName( myList, className ):
     return result
 # end def
 
-def getRevisionAndDateTimeFromCingLog( fileName ):
+def getRevDateCingLog( fileName ):
     """Return int revision and date or None on error."""
     txt = readTextFromFile(fileName)
     if txt == None:

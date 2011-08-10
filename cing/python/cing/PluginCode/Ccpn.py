@@ -896,7 +896,7 @@ class Ccpn:
                 lastAtomResonance.error = shiftError
                 if a.isProChiral(): # only mark those that need marking.
                     if isStereo:
-                        otherAtom = a.getSterospecificallyRelatedPartner()
+                        otherAtom = a.getStereoPartner()
 #                        nTdebug("For stereo looking at otherAtom: %s" % ( otherAtom))
                         if otherAtom != None:
                             shiftValueOther = otherAtom.resonances[index].value
@@ -904,7 +904,7 @@ class Ccpn:
                                 isStereo = False
                                 otherAtom.setStereoAssigned(False)
 #                        else:
-#                            nTdebug("Failed to getSterospecificallyRelatedPartner from %s" % a)
+#                            nTdebug("Failed to getStereoPartner from %s" % a)
                     a.setStereoAssigned(isStereo)
                 # end if prochiral
                 # Make mutual linkages between CCPN and Cing objects
@@ -1110,7 +1110,7 @@ class Ccpn:
 
                 peakList.append(peak)
             # end for peak
-            msgHol.showMessage(MAX_WARNINGS=2)
+            msgHol.showMessage(max_warnings=2)
 
             nTdetail("==> PeakList '%s' imported from CCPN Nmr project '%s'", peakListName, self.ccpnNmrProject.name)
         return True

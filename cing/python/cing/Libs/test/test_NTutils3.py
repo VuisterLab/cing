@@ -104,7 +104,7 @@ class AllChecks(TestCase):
         for i in range(5):
             msgHol.appendMessage("Message %d" % i)
             msgHol.appendDebug("Debug %d" % i)
-        msgHol.showMessage(MAX_MESSAGES=2)
+        msgHol.showMessage(max_messages=2)
 
     def testCSV(self):
         input = ['1brv', '9pcy' ]

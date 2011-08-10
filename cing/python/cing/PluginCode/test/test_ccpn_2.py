@@ -99,7 +99,7 @@ class AllChecks(TestCase):
             self.assertEquals(d[0], patchCcpnResDescriptor(d[1], d[2], d[3]))
     # end def
 
-    def testModifyResidueDescriptorForTerminii( self ):
+    def testModDescriptorForTerminii( self ):
 
         seqLength = 3
         # Note the list is the same as above; the assert has the first 2 argument switched.
@@ -119,7 +119,7 @@ class AllChecks(TestCase):
             self.assertEquals(d[1], modifyResidueDescriptorForTerminii( d[0], d[3], seqLength, d[2]))
 
 
-    def _testCcpnProjectNameFromFileName(self):
+    def _testCcpnProjectNameOfFn(self):
         inputList = ["BASP/memops/Implementation/BASP.xml",
                      "/X/Y/memops/Implementation/BASP.xml", # base not important.
                      "bla.xml",
