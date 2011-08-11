@@ -466,7 +466,7 @@ AND '{2}' <@ S.chain_type; -- contains at least one protein chain.
     #    checkResultTable = checkResultTable[:10]
     #    nTdebug("checkResultTable: %s" % str(checkResultTable))
         result = []
-        for i,element in enumerate(checkResultTable):
+        for _i,element in enumerate(checkResultTable):
 #            entry_id, chain_id, res_id, atom_id, v = element
 
             chain_id, res_id, atom_id = (-1,-1,-1)

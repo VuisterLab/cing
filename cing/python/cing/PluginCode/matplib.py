@@ -153,6 +153,7 @@ class FormatResTypesFormatter(Formatter):
             return self.resPropList[pos]
         return 'X'
 
+# pylint: disable=R0904
 class NTplot( NTdict ):
     """
     Base plotting class but don't forget to instantiate a NTplotSet first.
@@ -690,7 +691,7 @@ class NTplot( NTdict ):
             tmpValueIndexPairList = deepcopy(valueIndexPairList)
             tmpValueIndexPairList = NTsort(tmpValueIndexPairList, 1)
 
-            xlim = self.axis.get_xlim()
+#            xlim = self.axis.get_xlim()
             ylim = self.axis.get_ylim()
             _ylim_min, ylim_max = ylim
 #                nTdebug("xlim: " + repr(xlim))
@@ -842,7 +843,7 @@ class NTplot( NTdict ):
                 myHistScaled *= factor
             elif scaleBy == SCALE_BY_Z:
                 cTuple = getEnsembleAverageAndSigmaHis( myHist )
-                (c_av, c_sd, hisMin, hisMax) = cTuple #@UnusedVariable
+                (c_av, c_sd, _hisMin, _hisMax) = cTuple
                 # Scaled into Z-space.
                 myHistScaled -= c_av
                 myHistScaled /= c_sd
@@ -1061,6 +1062,7 @@ class NTplotSet( NTdict ):
     def subplotsAdjust(self, **args ):
         subplots_adjust( **args )
 
+# pylint: disable=R0904
 class ResPlot(NTplot):
     """Plot class for sequence of residues
 x coordinate is in 'data' coordinate system (sequence number)
@@ -1307,7 +1309,7 @@ y coordinate is in axis coordinates (from 0 to 1) when the renderer asks for the
 # end class
 
 
-
+# pylint: disable=R0903
 class RangeIconList:
     def __init__(self, axis=None, secStruct=' ', seq=1, startPoint=None, width=None, height=None, **kwargs):
         self.patchList= []
@@ -1417,7 +1419,7 @@ class HelixIconList(RangeIconList):
         v = s # jumps 360 after each turn done (at phase: u=0)
         t = s # will keep increasing over the different turns.
         halfTurnsDone=0.0 # number of half turns drawn
-        drawnPoly = 0
+#        drawnPoly = 0
         while halfTurnsDone < halfTurnsTotal:
             doAtLeastAnotherHalfTurn = (halfTurnsTotal-halfTurnsDone) > 0.5
 #            nTdebug("halfTurnsDone           : %f", halfTurnsDone )
@@ -1520,8 +1522,9 @@ class HelixIconList(RangeIconList):
 #            nTdebug( vertsToString(verts) )
             p = RangeIconPoly( verts=verts, axis=self.axis, **self.kwargs )
             self.patchList.append(p)
-            drawnPoly += 1
+#            drawnPoly += 1
 
+# pylint: disable=R0904
 class RangeIcon(Polygon):
     """
     A drawing specific for the residue type and in the case of
@@ -1580,6 +1583,7 @@ class RangeIcon(Polygon):
 
 
 
+# pylint: disable=R0904
 class RangeIconPoly(Polygon):
     def __init__(self, verts=None, axis=None, **kwargs):
         # pylint: disable=W0231
@@ -1590,6 +1594,7 @@ class RangeIconPoly(Polygon):
         self._path = Path(vertsAsArray)
         self.set_closed(True)
 
+# pylint: disable=R0904
 class CoilIcon(RangeIcon):
     """
     Draw an arrow for part of a potential beta stranded sheet.
@@ -1928,7 +1933,7 @@ class FormatResNumbersFormatter(Formatter):
             return self.resPropList[xint]
         return 'X'
 
-
+# pylint: disable=R0903
 class MoleculePlotSet:
     """A set of ResPlotSet (pages)."""
     # TODO: test providing the ranges

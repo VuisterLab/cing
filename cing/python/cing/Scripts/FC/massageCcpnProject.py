@@ -62,7 +62,8 @@ def convert(projectName, inputDir, projectNameNew):
 def getCASD_NMR_Overview1():
     startDir = '/Library/WebServer/Documents/' + CASD_NMR_BASE_NAME
     entryListFileName = os.path.join(startDir, 'list', 'entry_list_todo.csv')
-    entryList = readLinesFromFile(entryListFileName) #@UnusedVariable
+    entryList = readLinesFromFile(entryListFileName)
+    return entryList
 
 def replaceCoordinates():
 

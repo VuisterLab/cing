@@ -64,10 +64,10 @@ class AllChecks(TestCase):
 # [ 0.,  0.,  0.,  0.,  1.,  0.],
 # [ 0.,  0.,  0.,  0.,  0.,  0.],
 # [ 0.,  0.,  1.,  0.,  0.,  0.]]
-        c_av, c_sd, hisMin, hisMax = getEnsembleAverageAndSigmaHis(m) #@UnusedVariable
+        c_av, _c_sd, _hisMin, _hisMax = getEnsembleAverageAndSigmaHis(m)
         self.assertEqual( c_av, x) # weird average
 
-        c_av, c_sd, hisMin, hisMax = getArithmeticAverageAndSigmaHis(m) #@UnusedVariable
+        c_av, _c_sd, _hisMin, _hisMax = getArithmeticAverageAndSigmaHis(m)
         self.assertEqual( c_av, x/nn) # huge difference.
 
 

@@ -316,7 +316,7 @@ def testQuiet():
         return True
 #end def
 
-def pylintOverallSummary(pylintFileName='pylint.txt'):
+def doPylintOverallSummary(pylintFileName='pylint.txt'):
     'Summarizing which pylint message types occur'
     nTdebug("Now in " + getCallerName())
     nTdebug("Will work on " + pylintFileName)
@@ -338,7 +338,7 @@ def pylintOverallSummary(pylintFileName='pylint.txt'):
 #    nTmessage('pylint message types overall count: %s' % len(pylintMsgHash.keys()))
 #end def
     
-def pylintOverall(pylintFileName='pylint.txt'):
+def doPylintOverall(pylintFileName='pylint.txt'):
     "Add the ones you don't want to pylint (perhaps you know they don't work yet)"
     namepattern = "*.py"
     pylintDir = os.path.join( cingDirTmp, 'pylint' )
@@ -381,7 +381,7 @@ def pylintOverall(pylintFileName='pylint.txt'):
             )
     job_list = []
     for name in nameList:
-        job_list.append( (pylintByName, (name, excludedModuleList)) )
+        job_list.append( (doPylintByName, (name, excludedModuleList)) )
     done_list = f.forkoff_start(job_list, 0)
     nTmessage("Finished ids: %s", done_list)
 
@@ -398,7 +398,7 @@ def pylintOverall(pylintFileName='pylint.txt'):
             nTerror("Failed to appendTextFileToFile")
 #        nTdebug("Done appending from: %s" % pylintOutputFileName)
     # end for
-    pylintOverallSummary(pylintFileName=pylintFileName)
+    doPylintOverallSummary(pylintFileName=pylintFileName)
     nTmessage("Done with pylint")
 # end def
 
@@ -483,7 +483,7 @@ def pathToModuleName( name ):
     return mod_name
 # end def
 
-def pylintByName(name, excludedModuleList):
+def doPylintByName(name, excludedModuleList):
     'Code check an individual module, return True on error or None for success.'
     mod_name = pathToModuleName( name )
     if mod_name in excludedModuleList:
@@ -507,6 +507,7 @@ def pylintByName(name, excludedModuleList):
         nTerror("Failed to find pylint result file: " + pylintOutputFileName)
         return True        
 # end def
+
 
 def getParser():
     'Return instance of OptionParser'
@@ -623,13 +624,13 @@ def getParser():
                       help="Run script from SCRIPTFILE",
                       metavar="SCRIPTFILE"
                      )
-    parser.add_option("--pylint",
-                      dest="pylint", default=None,                      
+    parser.add_option("--doPylint",
+                      dest="doPylint", default=None,                      
                       help="Do code analysis using pylint on those matching *.py excluding some.",
                       metavar="PYLINTFILE"
                      )
-    parser.add_option("--pylintsum",
-                      dest="pylintsum", default=None,                      
+    parser.add_option("--doPylintsum",
+                      dest="doPylintsum", default=None,                      
                       help="Do summary code analysis on previous pylint run.",
                       metavar="PYLINTSUMFILE"
                      )
@@ -780,19 +781,18 @@ def main():
     # end if
     
     # Bug in pylint requires mention of: Unable to consider inline option %r pylint: disable=I0010
-    if options.pylint:
-        if pylintOverall(options.pylint):
+    if options.doPylint:
+        if doPylintOverall(options.doPylint):
             sys.exit(1)
         sys.exit(0)
     # end if
         
-    if options.pylintsum:
-        if pylintOverallSummary(options.pylintsum):
+    if options.doPylintsum:
+        if doPylintOverallSummary(options.doPylintsum):
             sys.exit(1)
         sys.exit(0)
     # end if
         
-
     #------------------------------------------------------------------------------------
     # Extended documentation
     #------------------------------------------------------------------------------------

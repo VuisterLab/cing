@@ -5,6 +5,7 @@ Read PDB files for their dihedrals; not just phi psi anymore..
 cd /Users/jd/tmp/cingTmp
 python $CINGROOT/python/cing/Scripts/getPhiPsi.py 1aba A
 """
+
 from IPython.genutils import flatten
 from cing import cingDirTestsData
 from cing import cingDirTmp
@@ -15,7 +16,8 @@ from cing.PluginCode.procheck import SECSTRUCT_STR
 from cing.Scripts.getPhiPsiWrapper import Janin
 from cing.Scripts.getPhiPsiWrapper import Ramachandran
 from cing.Scripts.getPhiPsiWrapper import d1d2
-from cing.Scripts.getPhiPsiWrapper import dihedralComboTodo # once executed all code there, hilarious locks until after an hour JFD realized.
+from cing.Scripts.getPhiPsiWrapper import dihedralComboTodo 
+# once executed all code there, hilarious locks until after an hour JFD realized.
 from cing.Scripts.getPhiPsiWrapper import subdir
 from cing.Scripts.localConstants import pdbz_dir
 from cing.core.classes import Project
@@ -146,7 +148,7 @@ def doEntry( entryCode, chainCode ):
     nTdebug('Doing entry %s chain code: %s' % (entryCode,chainCode) )
 
     lineList = []
-    idx = -1
+#    idx = -1
     strSum = ''
 
     for chain in project.molecule.allChains():
@@ -198,7 +200,7 @@ def doEntry( entryCode, chainCode ):
 
             bfactorList = nTzap(flatList,'Bfac')
             max_bfactor = max(bfactorList)
-            idx += 1 # starts at 0 when inserted.
+#            idx += 1 # starts at 0 when inserted.
             lineItem = ( entryCode, chain.name, res.resName, res.resNum, secStruct, d1_value_str, d2_value_str, max_bfactor )
             lineList.append(lineItem)
             str = "%s,%s,%-4s,%4d,%1s,%6s,%6s,%6.1f\n" % lineItem

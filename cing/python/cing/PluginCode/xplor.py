@@ -391,7 +391,7 @@ def getDrFromXplorMemory( project, convention ):
     for _dr in drListXPLOR:
         atmIdxList = [[1,3],[4,6]]
         atmList = []
-        i=0
+#        i=0
         for atmIdx in atmIdxList:
             nTdebug("Doing atmIdx: " + repr(atmIdx))
             t = ( 'A', 99, 'HA3' ) # TODO: from XPLOR
@@ -404,10 +404,10 @@ def getDrFromXplorMemory( project, convention ):
                 if errorCount == maxErrorCount+1:
                     nTerror("And so on")
                 errorCount += 1
-                i+=1
+#                i+=1
                 continue
             atmList.append( atm )
-            i+=1
+#            i+=1
         if len(atmList) != 2:
             continue
         # Unpack convenience variables.

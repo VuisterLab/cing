@@ -30,7 +30,7 @@ sloccount:
 
 pylint:
 	# CING will run pylint on individual files as not to exceed open file limit.
-	-cd python; python -u cing/main.py --pylint pylint.txt
+	-cd python; python -u cing/main.py --doPylint pylint.txt
 	
 # Next fails in recursion with old version of pylint 0.20.0 but works fine with version 0.23.0
 pylint_old:

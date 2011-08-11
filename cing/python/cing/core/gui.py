@@ -43,6 +43,7 @@ labelFrameAttributes = dict(
 
 import Tkinter
 
+# pylint: disable=R0904
 class LabelFrame(Tkinter.LabelFrame):
     """Replacement for CCPN stuff that does not allow textcolor ed to be changed
     """
@@ -113,6 +114,7 @@ class TextPipe:
 
 
 
+# pylint: disable=R0904
 class CingGui(BasePopup):
 
     def __init__(self, parent, options, *args, **kw):
@@ -612,7 +614,7 @@ class CingGui(BasePopup):
             self.pdbEntry.configure(state='normal')
             self.pdbEntry.set(fileName)
             # Put text into name widget
-            dir,name,dummy = nTpath( fileName )
+            _dir,name,dummy = nTpath( fileName )
             self.nameEntry.configure(state='normal')
             self.nameEntry.set(name)
             # choose the correct radiobutton
@@ -637,7 +639,7 @@ class CingGui(BasePopup):
             self.pdbEntry.set(fileName)
             self.projOptionsSelect.setIndex(1)
 
-            dir,name,dummy = nTpath( fileName )
+            _dir,name,dummy = nTpath( fileName )
             self.nameEntry.set(name)
         #end if
         self.ccpnEntry.set(fileName)

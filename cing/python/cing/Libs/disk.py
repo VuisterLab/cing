@@ -674,7 +674,7 @@ def _main(filepath, options):
     finally:
         tailer.close()
 
-    def main():
+    def main(): # pylint: disable=W0612
         parser = OptionParser(usage='usage: %prog [options] filename')
         parser.add_option('-f', '--follow', dest='follow', default=False, action='store_true',
                           help='output appended data as  the  file  grows')
@@ -716,7 +716,7 @@ def mkdirs(dst):
     """Make directories leading to 'dst' if they don't exist yet"""
     if dst == '' or os.path.exists(dst):
         return
-    head, tail = os.path.split(dst)
+    head, _tail = os.path.split(dst)
     if os.sep == ':' and not ':' in head:
         head = head + ':'
     mkdirs(head)

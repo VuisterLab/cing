@@ -311,10 +311,10 @@ class Xplor( refineParameters ):
     #------------------------------------------------------------------------
     def cleanPath( self, path ):
         if not os.path.exists(path):
-                os.mkdir(path)
+            os.mkdir(path)
         else:
-                removedir(path)
-                os.mkdir(path)
+            removedir(path)
+            os.mkdir(path)
 
     #------------------------------------------------------------------------
     def makePath( self, path ):
@@ -594,7 +594,7 @@ end if
         self.script = """
 {* Script sould be created elsewhere *}
 """
-        pass
+#        pass
 
     #------------------------------------------------------------------------
     def printScript( self, stream = sys.stdout ):
@@ -655,7 +655,7 @@ end if
                 return True
             # end if
         # end if
-        timeTaken, entryCrashed, nr_error, nr_warning, nr_message, nr_debug = analyzeXplorLog(logFileName) #@UnusedVariable
+        timeTaken, entryCrashed, nr_error, _nr_warning, _nr_message, _nr_debug = analyzeXplorLog(logFileName)
 
         # When reporting always show log file name because output to stderr easily gets mingled.
         if entryCrashed:

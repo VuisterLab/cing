@@ -2036,8 +2036,11 @@ class CountMap(NTdict):
         NTdict.__init__(self, *args, **kwds)
         if self.__CLASS__ == 'NTdict': # Allow kwds to override class name but set when it just defaulted.
             self.__CLASS__ = 'CountMap'
-    def __str__(self, showEmptyElements=0):
+    def __str__(self, **kwds): 
         'Default is to have no zero elements. Using trick with different method name to prevent recursion.'
+        showEmptyElements = True
+        if kwds.has_key('showEmptyElements'):
+            showEmptyElements = kwds['showEmptyElements']
         return self.__repr__(showEmptyElements=showEmptyElements)
     def toString(self):
         'Sorted by key not by value.'

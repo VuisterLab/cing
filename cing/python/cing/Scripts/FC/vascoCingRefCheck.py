@@ -172,9 +172,9 @@ class VascoCingReferenceCheck(VascoReferenceCheck):
         lines = fin.readlines()
         fin.close()
         atomsRead = 0
-        hydrogensSkipped = 0
+        _hydrogensSkipped = 0
         skipHydrogens = False # already corrected for elsewhere?
-        dataLine = False #@UnusedVariable
+#        dataLine = False
         for line in lines:
             line = line.strip()
 #            nTdebug('Line: ' + line)
@@ -193,7 +193,7 @@ class VascoCingReferenceCheck(VascoReferenceCheck):
             
             
             if skipHydrogens and atomName[0] == 'H':
-                hydrogensSkipped += 1 # are zero anyway.
+                _hydrogensSkipped += 1 # are zero anyway.
                 continue
             
             if not insertionCode:

@@ -56,9 +56,9 @@ def main():
     valuesByEntrySsAndResType = {}
     hrange = (xRange, yRange)
 
-    rowCount = 0
+#    rowCount = 0
     for row in reader:
-        rowCount += 1
+#        rowCount += 1
 #        7a3h,A,VAL ,   5,H, -62.8, -52.8
 #        7a3h,A,VAL ,   6,H, -71.2, -33.6
 #        7a3h,A,GLU ,   7,H, -63.5, -41.6
@@ -79,7 +79,7 @@ def main():
             return
         if not common20AADict.has_key(resType):
             nTdebug("Residue not in common 20 for row: %s" % repr(row))
-            rowCount -= 1
+#            rowCount -= 1
             continue
 
         appendDeepByKeys(valuesBySsAndResType, chi1, ssType, resType, 'chi1')

@@ -333,7 +333,7 @@ def semicolon_block_collapse( text ):
             1.3 "                10 "            64 ".
     """
 
-    count = 0
+#    count = 0
     startpos = 0
 
     pattern_semicolon_only = re.compile("^\;", re.MULTILINE)
@@ -344,7 +344,7 @@ def semicolon_block_collapse( text ):
 
     while(semicolon_start):
 
-        count += 1
+#        count += 1
 
         startpos = startpos + semicolon_start.start()
         semicolon_end = pattern_semicolon_only_end.search(text[startpos+1:])
@@ -450,7 +450,7 @@ def comments_strip( text ):
     """
     lines = text.split( "\n" )
     i=0
-    count = 0
+#    count = 0
     ls = len(lines)
 #    print "DEBUG: processing lines: ", ls
     while i<ls:
@@ -477,7 +477,7 @@ def comments_strip( text ):
             if len(line) != n:
                 lines[i] = line
 #                print "Changed from lenght",n,"to line: ["+line+"] at:", i
-                count += 1
+#                count += 1
         i += 1
 
 #    if verbosity >= 9:
