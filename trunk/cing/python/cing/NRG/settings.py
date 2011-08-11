@@ -23,7 +23,7 @@ dDir                = '/Library/WebServer/Documents'            # Web dir.
 VCsecret            = 'a/b/c' # Overriden locally. @UnusedVariable Only used in publishVC.py
 
 try:
-    from cing.NRG.localConstants import * #@UnusedWildImport
+    from cing.NRG.localConstants import * #@UnusedWildImport # pylint: disable=E0611
     nTdebug("Loaded NRG localConstants.py.")
 except:
     nTdebug("Consider creating a localConstants.py file with a different 'user' location.")

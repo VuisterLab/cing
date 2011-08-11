@@ -33,7 +33,7 @@ skipList = NTlist(
 
 isProduction = False
 try:
-    from cing.NRG.localConstants import isProduction
+    from cing.NRG.localConstants import isProduction # pylint: disable=E0611
 except:
     pass
 
