@@ -1053,7 +1053,7 @@ Project: Top level Cing project class
         return sprintf('<Project %s>', self.name)
     #end def
 
-    def __repr__(self):
+    def __repr__(self): # pylint: disable=W0221
         return str(self)
 
     def _list2string(self, theList, firstString, maxItems):
@@ -1071,7 +1071,7 @@ Project: Top level Cing project class
         return result
     #end def
 
-    def format(self):
+    def format(self): # pylint: disable=W0221
         result = self.header() + '\n' + \
                             'created:    %(created)s\n'
         result = result % self
@@ -1322,7 +1322,7 @@ class ProjectList(NTlist):
         #print '>>', self.basePath % name
         return self.project.path(self.basePath % name)
 
-    def append(self, instance):
+    def append(self, instance):  # pylint: disable=W0221
         """Append instance to self, storing instance.name in project
         """
         #print '>>',instance, self.project
@@ -1623,7 +1623,7 @@ for i,g in enumerate(groups):
     #end def
 
 
-    def format(self):
+    def format(self):  # pylint: disable=W0221
         header = sprintf('------------ ProjectTree %s ------------', self.name)
         footer = '-'*len(header)
         return sprintf("""%s
@@ -2256,7 +2256,7 @@ class CircularVector( NTvector ):
         return d
     #end def
 
-    def distance( self, other, period=360.0 ):
+    def distance( self, other, period=360.0 ):  # pylint: disable=W0221
         return math.sqrt( self.distanceSquared( other, period ) )
     #end def
 #end class
@@ -2495,7 +2495,7 @@ class PeakList(NTlist, ProjectListMember):
         return str(self)
     #end def
 
-    def format(self):
+    def format(self):  # pylint: disable=W0221
         s = sprintf('%s PeakList "%s" (%s,%d,%s) %s\n', dots, self.name, self.status, len(self), self.rogScore, dots)
         for peak in self:
             s = s + str(peak) + '\n'
@@ -3474,7 +3474,7 @@ class DistanceRestraintList(RestraintList):
         #end for
     #end def
 
-    def format(self, allowHtml = False, showAll = False):
+    def format(self, allowHtml = False, showAll = False):  # pylint: disable=W0221
         msg = sprintf(
 '''
 classes
@@ -3821,7 +3821,7 @@ class DihedralRestraint(Restraint):
         return name
     #end def
 
-    def format(self):
+    def format(self):  # pylint: disable=W0221
         # set the last string to something readable in terms of known dihedrals, or just the atoms if nothing is found
         s = self.getName()
         if len(s) == 0:
@@ -4052,7 +4052,7 @@ class RDCRestraint(DistanceRestraint):
         return s.strip()
     #end def
 
-    def format(self):
+    def format(self): # pylint: disable=W0221
 #        s = '('
 #        for p in self.atoms:
 #            s = s + sprintf('%-11s ', p.cName(1) )
@@ -4220,7 +4220,7 @@ class History(NTlist):
     """Cing history storage class
     """
 
-    def __call__(self, line, timeStamp = True):
+    def __call__(self, line, timeStamp = True):  # pylint: disable=W0221
         if timeStamp:
             self.append((time.asctime(), line))
         else:

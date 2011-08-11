@@ -118,7 +118,7 @@ class Projects( NTtree ):
     #end def
 
 
-    def format(self):
+    def format(self): # pylint: disable=W0221
         header = sprintf('------------ Projects %s ------------', self.name)
         footer = '-'*len(header)
         return sprintf("""%s
@@ -157,7 +157,7 @@ class CircularVector( NTvector ):
         return d
     #end def
 
-    def distance( self, other, period=360.0 ):
+    def distance( self, other, period=360.0 ): # pylint: disable=W0221
         return math.sqrt( self.distanceSquared( other, period ) )
     #end def
 #end class

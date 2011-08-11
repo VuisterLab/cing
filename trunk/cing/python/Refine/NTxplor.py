@@ -241,7 +241,7 @@ class refineNoeParameters( NTdict ):
     def __str__( self ):
         return self.format()
     #end def
-    def __repr__( self ):
+    def __repr__( self ):  # pylint: disable=W0221
         return self.format()
     #end def
 #end class
@@ -270,7 +270,7 @@ class refineDihedralParameters( NTdict ):
     def __str__( self ):
         return self.format()
     #end def
-    def __repr__( self ):
+    def __repr__( self ):  # pylint: disable=W0221
         return self.format()
     #end def
 #end class

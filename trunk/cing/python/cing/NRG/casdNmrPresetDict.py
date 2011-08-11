@@ -67,13 +67,16 @@ The funny thing is that '   A' needs to be used for xplor's '   A' and not simpl
 'PGR122ASeattle4'  : {'readCoordinates': {'keywds': {'forceDefaultChainMapping': 1, }, }, },
 'PGR122AUtrecht'   : {'readCoordinates': {'keywds': {'forceDefaultChainMapping': 1, }, }, },
 
-'ET109AredParis'   : {'readCoordinates': {'keywds': {'forceDefaultChainMapping': 1, }, }, # The RDC frame coordinates are messing things up. Best if removed.
+'ET109AredParis'   : {'readCoordinates': {'keywds': {'forceDefaultChainMapping': 1, }, }, 
+                      # The RDC frame coordinates are messing things up. Best if removed.
                       'linkResonances':  {'keywds': {'forceChainMappings': [['A', ' ', 1, 89], ['A', '   A', 1, 89], ['A', 'A', 1, 89]], }},
                       },
-'ET109AoxParis'    : {'readCoordinates': {'keywds': {'forceDefaultChainMapping': 1, }, }, # The RDC frame coordinates are messing things up. Best if removed.
+'ET109AoxParis'    : {'readCoordinates': {'keywds': {'forceDefaultChainMapping': 1, }, }, 
+                      # The RDC frame coordinates are messing things up. Best if removed.
                       'linkResonances':  {'keywds': {'forceChainMappings': [['A', ' ', 1, 89], ['A', '   A', 1, 89], ['A', 'A', 1, 89]], }},
                       },
-'PGR122AParis2'    : {'readCoordinates': {'keywds': {'forceDefaultChainMapping': 1, }, }, # The RDC frame coordinates are messing things up. Best if removed.
+'PGR122AParis2'    : {'readCoordinates': {'keywds': {'forceDefaultChainMapping': 1, }, }, 
+                      # The RDC frame coordinates are messing things up. Best if removed.
 #                      'linkResonances':  {'keywds': {'forceChainMappings': [['A', ' ', 1, 0], ['A', '   A', 1, 0]],}},
 #                      'linkResonances':  {'keywds': {'forceDefaultChainMapping': 1,},},
                       },

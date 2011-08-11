@@ -63,9 +63,11 @@ for res in project.molecule.A.allResidues():
                             angles.append( 0.0 )
                     #end for
                     if bb<20.0: # Arbitrary 20 bb occurences as cuttoff for now
-                        fprintf(fpBad,'%4d   %7.2f  %7.2f  %7.2f  %s  %s %s\n', res.resNum, d1[i], d2[i], bb, angles.format("%7.2f  "), res, res.dssp.consensus)
+                        fprintf(fpBad,'%4d   %7.2f  %7.2f  %7.2f  %s  %s %s\n', res.resNum, d1[i], d2[i], bb, angles.format("%7.2f  "), 
+                                res, res.dssp.consensus)
                     else:
-                        fprintf(fpGood,'%4d   %7.2f  %7.2f  %7.2f  %s  %s %s\n', res.resNum, d1[i], d2[i], bb, angles.format("%7.2f  "), res, res.dssp.consensus)
+                        fprintf(fpGood,'%4d   %7.2f  %7.2f  %7.2f  %s  %s %s\n', res.resNum, d1[i], d2[i], bb, angles.format("%7.2f  "), 
+                                res, res.dssp.consensus)
             #end if
         #end if
     #end if

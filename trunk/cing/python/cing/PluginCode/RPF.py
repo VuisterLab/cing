@@ -4,6 +4,7 @@ from cing.PluginCode.required.reqCcpn import CCPN_LOWERCASE_STR
 
 __author__ += 'Tim Stevens '
 
+# pylint: disable=R0903
 class RPF():
     def __init__(self, project):
         self.project = project
@@ -15,7 +16,8 @@ class RPF():
         nTmessage("starting toRPFFile")
 
         if not hasattr(self.project, CCPN_LOWERCASE_STR):
-            nTdebug("Failed to find ccpn attribute project. Happens when no CCPN project was read first.") # TODO: change when cing to ccpn code works.
+            nTdebug("Failed to find ccpn attribute project. Happens when no CCPN project was read first.") 
+            # TODO: change when cing to ccpn code works.
             return
 
         self.ccpnProject = self.project[ CCPN_LOWERCASE_STR ]

@@ -401,7 +401,7 @@ class Molecule( NTtree, ResidueList ):
         self.red = NTlist()
     #end def
 
-    def format(self):
+    def format(self): # pylint: disable=W0221
         self.nAssigned = 0
         self.nStereoAssigned = 0
         for atm in self.allAtoms():
@@ -3260,7 +3260,7 @@ class Ensemble( NTlist ):
         return str(self)
     #end def
 
-    def format( self ):
+    def format( self ): # pylint: disable=W0221
         return str( self )
     #end def
 #end class
@@ -4906,7 +4906,7 @@ class Dihedral( NTlist ):
     def __repr__(self):
         return self.__str__()
 
-    def format(self):
+    def format(self): # pylint: disable=W0221
         if self.residue:
             dname = self.residue.name + '.' + self.name
         else:
@@ -5209,7 +5209,7 @@ Atom class: Defines object for storing atom properties
         return '<%s %s>' % ( self._className(), self.cName(2) ) # Include chain id as well as residue id.
     #end def
 
-    def format(self):
+    def format(self): # pylint: disable=W0221
         return sprintf("""%s %s %s
 resonances:  %s
 coordinates: %s"""  , dots, self, dots
@@ -6182,7 +6182,7 @@ class AtomList( NTlist ):
             comment = 'Cascaded from: %s' % atom.toString() 
             self.rogScore.setMaxColor( atom.rogScore.colorLabel, comment = comment)
 
-    def append( self, obj ):
+    def append( self, obj ): # pylint: disable=W0221
         obj.id = self.currentId
         NTlist.append( self, obj )
         self.currentId += 1
@@ -6200,7 +6200,7 @@ class AtomList( NTlist ):
         return sprintf( '<AtomList "%s" (%d)>',self.name, len(self) )
     #end def
 
-    def format( self ):
+    def format( self ): # pylint: disable=W0221
         return str(self)
     #end def
 #end class

@@ -190,6 +190,7 @@ def createHtmlCing(project, ranges=None):
 
 #end def
 
+ # pylint: disable=R0903
 class HistogramsForPlotting():
     """
     Class for enabling load on demand
@@ -2897,7 +2898,7 @@ class DihedralByProjectList( NTlist ):
         self.currentId  = 0           # Id for each element of list
     #end def
 
-    def append( self, obj ):
+    def append( self, obj ): # pylint: disable=W0221
         obj.id = self.currentId
         NTlist.append( self, obj )
         self.currentId += 1
@@ -2906,7 +2907,7 @@ class DihedralByProjectList( NTlist ):
         return sprintf( '<DihedralByProjectList "%s" (%d)>',self.name, len(self) )
     #end def
 
-    def format( self ):
+    def format( self ):  # pylint: disable=W0221
         return str(self)
     #end def
 #end class

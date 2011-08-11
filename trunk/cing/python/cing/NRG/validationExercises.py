@@ -5,26 +5,14 @@ python -u $CINGROOT/python/cing/NRG/validationExercises.py
 """
 from cing import cingPythonCingDir
 from cing import cingRoot
-from cing.Libs import forkoff
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.Libs.forkoff import get_cmd_output
 from cing.Libs.html import GOOGLE_ANALYTICS_TEMPLATE
+from cing.NRG.CaspNmrCing import MyDict
 import csv
 import shutil
 import string
 import urllib
-
-class MyDict(Lister):
-    """just a simple dictionary"""
-    def __init__(self):
-        Lister.__init__(self)
-        self.d = {}
-
-class EntryInfo(Lister):
-    def __init__(self, time=None):
-        Lister.__init__(self)
-        self.time = time
-
 
 class ValidationExercises(Lister):
 

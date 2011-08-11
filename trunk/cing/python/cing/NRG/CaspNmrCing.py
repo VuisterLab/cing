@@ -37,12 +37,14 @@ import shutil
 import string
 
 
+# pylint: disable=R0903
 class MyDict(Lister):
     """just a simple dictionary"""
     def __init__(self):
         Lister.__init__(self)
         self.d = {}
 
+# pylint: disable=R0903
 class EntryInfo(Lister):
     def __init__(self, time=None):
         Lister.__init__(self)

@@ -55,7 +55,7 @@ class WhatifResult( NTdict ):
         return '<WhatifResult %(checkID)s>' % self
     #end def
 
-    def format(self):
+    def format(self):  # pylint: disable=W0221
         return sprintf(
 """%s WhatifResult %s (%s) %s
 comment   = %s

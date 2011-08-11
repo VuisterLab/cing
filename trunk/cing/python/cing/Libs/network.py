@@ -110,7 +110,8 @@ def putFileBySsh( fileName, targetUrl, ensureDirIsPresent = True, rsyncOptions =
             if 'File exists' in result:
                 pass # this is ok
             else:
-                nTerror("Failed to create remote directory %s by ssh to %s. Status: %s with result %s" % (userNameAtDomain, targetDir, status, result))
+                nTerror("Failed to create remote directory %s by ssh to %s. Status: %s with result %s" % (userNameAtDomain, targetDir, 
+                                                                                                          status, result))
                 return True
             # end if
         # end if

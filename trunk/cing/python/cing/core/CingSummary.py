@@ -4,6 +4,7 @@ from cing.PluginCode.required.reqWhatif import * #@UnusedWildImport
 from cing.core.parameters import plugins
 
 
+# pylint: disable=R0902
 class CingSummary( NTdict ):
     """
     Simple class to store CING summary result as a dict for easy retrieval
