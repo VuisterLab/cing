@@ -95,19 +95,19 @@ class AllChecks(TestCase):
 #        project.validate(parseOnly=False, htmlOnly=True, doProcheck=False, doWhatif=False, doWattos=False, doTalos=False) # needed?
 
         self.assertFalse( project.molecule.setRanges(ranges) )
-        from cing.PluginCode.dssp import runDssp # Triggers checks. @UnusedImport
+        from cing.PluginCode.dssp import runDssp # Triggers checks. @UnusedImport # pylint: disable=W0612,W0404
 
         project.runDssp()
         if actuallyRunWhatif:
-            from cing.PluginCode.Whatif import runWhatif # Triggers checks.
+            from cing.PluginCode.Whatif import runWhatif # Triggers checks. # pylint: disable=W0612,W0404
             self.assertFalse(runWhatif(project))
         else:
             rangeList = project.molecule.getFixedRangeList(
                 max_length_range=ResPlot.MAX_WIDTH_IN_RESIDUES)
-            resNumb = 0
+            _resNumb = 0
             for resList in rangeList:
                 for res in resList:
-                    resNumb += 1
+                    _resNumb += 1
 
         #            nTdebug(repr(res))
 

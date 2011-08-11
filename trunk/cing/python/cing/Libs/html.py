@@ -1,7 +1,6 @@
 """
 Adds html generation methods
 """
-
 from cing import authorList
 from cing import cingDirData
 from cing import cingRevision
@@ -876,7 +875,6 @@ def _makeDihedralByProjectTableHtml( obj, residues, text=None, ncols=10, picture
 
     prevRes = None
     project = obj.html.project
-    mol = project.molecule #@UnusedVariable
     for res in residues:
         chainBreakDetected = (prevRes!=None) and (prevRes.resNum != (res.resNum - 1))
         if chainBreakDetected or res.resNum%ncols == 0:

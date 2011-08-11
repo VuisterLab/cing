@@ -2171,7 +2171,7 @@ ranges:  %s
 
         for m in closestToMean[1:]:
             #print m.format()
-            r = m.superpose(closestToMean[0]) #@UnusedVariable
+            _r = m.superpose(closestToMean[0])
             #print '>', m.format()
             #print '>', r
         # Export
@@ -2656,15 +2656,15 @@ class DistanceRestraint(Restraint):
         if not self.atomPairs:
 #            nTdebug("Failed to find any atom pair in %s" % self)
             return False
-        for i, atomPair in enumerate(self.atomPairs): #@UnusedVariable
+        for _i, atomPair in enumerate(self.atomPairs):
             if not atomPair: # eg [ HA ] [ HB,HC ]
 #                nTdebug("Failed to find any atomList (should always be 2 present) in atompair %d of:\n%s" % (i,self))
                 return False
-            for j, atomList in enumerate(atomPair): #@UnusedVariable
+            for _j, atomList in enumerate(atomPair):
                 if not atomList: # eg [ HB,HC ]
 #                    nTdebug("Failed to find any atom in atomList (%d,%d) of %s" % (i,j,self))
                     return False
-                for k, atom in enumerate(atomList): #@UnusedVariable
+                for _k, atom in enumerate(atomList):
                     if not atom: # eg HB
 #                        nTdebug("Failed to find atom in atomList (%d,%d,%d) of %s" % (i,j,k,self))
                         return False
@@ -2828,8 +2828,8 @@ class DistanceRestraint(Restraint):
 
             for atomPairIdxI in range(atomPairIdxJ): # Compare only with the previous atom pairs
                 atomPairI = self.atomPairs[atomPairIdxI]
-                atom0I = atomPairI[0] #@UnusedVariable
-                atom1I = atomPairI[1] #@UnusedVariable
+                _atom0I = atomPairI[0]
+                _atom1I = atomPairI[1]
 #                nTdebug('    Using atoms I %s and %s' % ( atom0I, atom1I) )
                 atomPairIset = set(atomPairI)
                 atomPairIntersection = atomPairIset.intersection(atomPairJset)
@@ -2921,15 +2921,15 @@ class DistanceRestraint(Restraint):
             atomPairIdxJ -= 1
             atomPairJ = self.atomPairs[atomPairIdxJ]
             atomPairJset = set(atomPairJ) # Important to use api of unsorted atoms in pair (left right will not matter)
-            atom0J = atomPairJ[0] #@UnusedVariable
-            atom1J = atomPairJ[1] #@UnusedVariable
+            _atom0J = atomPairJ[0]
+            _atom1J = atomPairJ[1]
 
 #            nTdebug('For atomPairIdxJ %d using atoms J %s and %s' % ( atomPairIdxJ, atom0J, atom1J) )
 
             for atomPairIdxI in range(atomPairIdxJ): # Compare only with the previous atom pairs
                 atomPairI = self.atomPairs[atomPairIdxI]
-                atom0I = atomPairI[0] #@UnusedVariable
-                atom1I = atomPairI[1] #@UnusedVariable
+                _atom0I = atomPairI[0]
+                _atom1I = atomPairI[1]
 #                nTdebug('    Using atoms I %s and %s' % ( atom0I, atom1I) )
                 atomPairIset = set(atomPairI)
                 atomPairIntersection = atomPairIset.intersection(atomPairJset)
@@ -3577,7 +3577,7 @@ class DihedralRestraint(Restraint):
         if n != 4:
 #            nTdebug("Expected four atoms but found %d in:\n%s" % (n,self))
             return False
-        for i, atom in enumerate(self.atoms): #@UnusedVariable
+        for _i, atom in enumerate(self.atoms):
             if not atom:
 #                nTdebug("Failed to find valid atom in:\n%s" % (i,self))
                 return False

@@ -111,7 +111,6 @@ load-plugins=
 #W0332: Use l as long integer identifier
 #W0333: Use of the `` operator
 #W0403: Relative import %r
-#W0404: Reimport %r (imported line %s)
 #W0406: Module import itself
 #W0410: __future__ import is not the first non docstring statement
 #W0511 (warning notes in code comments)
@@ -128,19 +127,19 @@ load-plugins=
 #W1001: Use of "property" on an old style class
 #W1111: Assigning to function call which only returns None
 
-# Disabled warning forever
+# Disabled forever
 #W0102 Dangerous default value [] 
 #W0122 Use of the exec statement 
 #W0142 Used * or ** magic   
 #W0401 Wildcard import  
 #W0402 Uses of a deprecated module 'xxx'
+#W0404: Reimport %r (imported line %s)
 #W0611 Unused import. Pydev
 #W0614 Unused import
 #W0621 Redefining name 'xxx' from outer scope
 #W0622 Redefining built-in 'xxx' 
 #W0701 Raising a string exception
 #W0702 No exception type(s) specified
-# Disabled other:
 #C0322 Operator not preceded by a space
 #C0323 Operator not followed by a space
 #C0324 Comma not followed by a space
@@ -153,12 +152,7 @@ load-plugins=
 #R0914 Too many local variables
 #R0915 Too many statements
 
-disable=C0111,C0322,C0323,C0324,E0602,F0401,I0011,I0013,W0102,W0122,W0142,W0201,W0212,W0401,W0402,W0511,W0611,W0613,W0614,W0621,W0622,W0701,W0702,R0201,R0911,R0912,R0913,R0914,R0915
-# JFD likes to enable again:
-#W0201: Attribute %r defined outside __init__
-#W0613 Unused argument 'xxx'
-#C0111: Missing docstring
-
+disable=C0111,C0322,C0323,C0324,E0602,F0401,I0011,I0013,W0102,W0122,W0142,W0201,W0212,W0401,W0402,W0404,W0511,W0611,W0613,W0614,W0621,W0622,W0701,W0702,R0201,R0911,R0912,R0913,R0914,R0915
 
 [REPORTS]
 

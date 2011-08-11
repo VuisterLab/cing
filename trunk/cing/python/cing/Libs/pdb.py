@@ -127,9 +127,9 @@ class pdbParser:
         mapChainId = {} # Keep track of mappings between input and CING when they're not the same.
         chainIdListAlreadyUsed = [] # simpler list.
 
-        atmCount = 0
+#        atmCount = 0
         foundModel = False
-        for i,record in enumerate(self.pdbRecords): #@UnusedVariable
+        for _i,record in enumerate(self.pdbRecords):
 #            if i >= 459:
 #                nTdebug("Working on record: %s" % record)
             recordName = record._name.strip()
@@ -210,7 +210,7 @@ class pdbParser:
 
                 # Make a reference to the tree
                 record.atm = atm
-                atmCount += 1
+#                atmCount += 1
             #end if
         #end for
         if not foundModel: # X-rays do not have MODEL record

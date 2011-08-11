@@ -763,7 +763,7 @@ def generatePDBfiles( projects ):
 
     for m in closestToMean[1:]:
         #print m.format()
-        r = m.superpose(closestToMean[0]) #@UnusedVariable
+        _r = m.superpose(closestToMean[0])
         #print '>', m.format()
         #print '>', r
     # Export

@@ -34,10 +34,10 @@ class AllChecks(TestCase):
     def testDBMShashing(self):
         dbms = DBMS()
         mTable = Relation('mTable', dbms, columnList=['pdb_id', 'bmrb_id'])
-        pdbIdNewMany2OneList = mTable.getColumn('pdb_id')
-        bmrbIdNewMany2OneList = mTable.getColumn('bmrb_id')
-        pdbIdNewMany2OneList += '2kz0 2rop'.split()
-        bmrbIdNewMany2OneList += [16995, 11041]
+        _pdbIdNewMany2OneList = mTable.getColumn('pdb_id')
+        _bmrbIdNewMany2OneList = mTable.getColumn('bmrb_id')
+        _pdbIdNewMany2OneList += '2kz0 2rop'.split()
+        _bmrbIdNewMany2OneList += [16995, 11041]
         mTableHash = mTable.getHash()
         rowList = mTableHash['2rop']
         self.assertEqual(11041,rowList[1])

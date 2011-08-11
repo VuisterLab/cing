@@ -240,7 +240,7 @@ def main():
                     hist2d = multiply(m1,m2)
 
                     cTuple = getEnsembleAverageAndSigmaHis( hist2d )
-                    (c_av, c_sd, hisMin, hisMax) = cTuple #@UnusedVariable
+                    (_c_av, c_sd, _hisMin, _hisMax) = cTuple #@UnusedVariable
                     cTuple += tuple([str([ssType, resType, resTypePrev, resTypeNext])]) # append the hash keys as a way of id.
 #                    nTdebug("For ssType %s residue types %s %s %s found (av/sd/min/max) %8.0f %8.0f %8.0f %8.0f" % (
 #                        ssType, resType, resTypePrev, resTypeNext, c_av, c_sd, hisMin, hisMax))

@@ -97,10 +97,10 @@ class MatchBmrbPdb(Lister):
                 return True
         if 1: # DEFAULT: 1
             dbms2 = DBMS()
-            pdbList = getPdbEntries(onlyNmr = True)
+#            pdbList = getPdbEntries(onlyNmr = True)
             pdbNmrTable = Relation('pdbNmr', dbms2, columnList=['pdb_id'])
-            pdbIdColumn = pdbNmrTable.getColumnByIdx(0)
-            pdbIdColumn += pdbList
+#            pdbIdColumn = pdbNmrTable.getColumnByIdx(0)
+#            pdbIdColumn += pdbList
             pdbNmrTable.writeCsvFile('pdbNmrTable.csv')
 #        if False:
 #            newMany2OneTable =dbms.tables['newMany2OneTable'] #@UnusedVariable
@@ -145,7 +145,7 @@ class MatchBmrbPdb(Lister):
         tableManual = dbms.tables['manualMatches'] # Maintain this list in SVN control.
         bmrbIdManualList = tableManual.getColumn('bmrb_id')
         pdbIdManualList = tableManual.getColumn('pdb_id')
-        pdbIdManualNmrHash = list2dict( pdbIdManualList ) #@UnusedVariable
+        _pdbIdManualNmrHash = list2dict( pdbIdManualList )
 
         tablePdbNmrTable = dbms.tables['pdbNmrTable']
         pdbIdPdbNmrList = tablePdbNmrTable.getColumn('pdb_id')

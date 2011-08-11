@@ -310,6 +310,7 @@ class ResidueList(SMLhandled):
 # end class
 
 
+# pylint: disable=R0904
 class Molecule( NTtree, ResidueList ):
     """
     Molecule class: defines the holder for molecule items.
@@ -523,11 +524,11 @@ class Molecule( NTtree, ResidueList ):
             return None
         # end if
         redPer = 100. * redCount / residueCount
-        oraPer = 100. * oraCount / residueCount
+#        oraPer = 100. * oraCount / residueCount
         grePer = 100. * greCount / residueCount 
         grePerCutoffRed    = redPer - 20
         grePerCutoffOrange = redPer + 20
-        msg = 'Residue perc. ROG (red/orange/green: %.0f/%.0f/%.0f).' % (redPer,oraPer,grePer) #@UnusedVariable
+#        msg = 'Residue perc. ROG (red/orange/green: %.0f/%.0f/%.0f).' % (redPer,oraPer,grePer) #@UnusedVariable
 #        nTdebug(msg)
         if grePer < grePerCutoffRed:
             return COLOR_RED
@@ -2314,7 +2315,7 @@ class Molecule( NTtree, ResidueList ):
             return
 
         unmatchedAtomByResDict = {}
-        for i, atom in enumerate(atomListToSyncToSink): #@UnusedVariable
+        for _i, atom in enumerate(atomListToSyncToSink):
 #            if i <= 10:
 #                nTdebug("Sink [%s] %s with %s coordinates whereas modelcount is %s." % (i, atom, len(atom.coordinates), self.modelCount))
             res = atom._parent
@@ -2812,7 +2813,7 @@ Return an Molecule instance or None on error
 #        nTdebug("... rmsd's: [ %s] average: %.2f +- %.2f",
 #                self.ensemble.rmsd.format('%.2f '), self.ensemble.rmsd.av, self.ensemble.rmsd.sd
 #               )
-        r = self.calculateRMSDs(ranges=ranges) #@UnusedVariable
+        _r = self.calculateRMSDs(ranges=ranges)
 #        nTdetail( r.format() )
         return self.ensemble
     #end def
@@ -2973,11 +2974,11 @@ Return an Molecule instance or None on error
                 models = models[0:max_models]
 
         useRanges = ranges and not self.rangesIsAll(ranges)
-        rangesStr = '' #@UnusedVariable
+#        rangesStr = ''
         resHashSelection = NTdict() # use for speed
 #        nTdebug("In toPDB ranges: %s useRanges %s" % (ranges, useRanges))
         if useRanges:
-            rangesStr = ', ranges: %s' % ranges #@UnusedVariable
+#            rangesStr = ', ranges: %s' % ranges #@UnusedVariable
             resListSelection = self.ranges2list(ranges)
             resHashSelection.appendFromList(resListSelection)
 #        nTdebug("In toPDB resHashSelection.keys: %s" % str(resHashSelection.keys()))
@@ -3512,6 +3513,7 @@ class RmsdResult( NTdict ):
 
 
 
+# pylint: disable=R0904
 class Chain( NTtree, ResidueList ):
     """
 -------------------------------------------------------------------------------
@@ -3936,6 +3938,7 @@ Chain class: defines chain properties and methods
 ##register this handler
 #Chain.XMLhandler = XMLChainHandler()
 
+# pylint: disable=R0904
 class Residue( NTtree, SMLhandled ):
     """
 -------------------------------------------------------------------------------
@@ -5121,6 +5124,7 @@ e.g.
 #end class
 
 
+# pylint: disable=R0904
 class Atom( NTtree ):
     """
 -------------------------------------------------------------------------------

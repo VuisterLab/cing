@@ -59,11 +59,11 @@ def yasaraShell(project):
         exit(1)
 
     # shortcuts
-    f = pformat #@UnusedVariable
-    p = project #@UnusedVariable
-    mol = project.molecule #@UnusedVariable
+    f = pformat             #@UnusedVariable # pylint: disable=W0612
+    p = project             #@UnusedVariable # pylint: disable=W0612
+    mol = project.molecule  #@UnusedVariable # pylint: disable=W0612
 
-    def commands():
+    def commands(): # pylint: disable=W0612
         cmds = ['commands', 'colorByResidue', 'colorGF', 'colorJanin', 'colorROG', 'colorWhatif',
                 'getSelectedResidue', 'hud', 'loadPDB', 'screenDump', 'showHtml']
         cmds.sort()
@@ -93,10 +93,10 @@ def yasaraShell(project):
         Style('Ribbon', 'off')
     #end def
     # alternate names
-    loadpdb = loadPDB #@UnusedVariable
-    loadPdb = loadPDB #@UnusedVariable
+    loadpdb = loadPDB #@UnusedVariable # pylint: disable=W0612
+    loadPdb = loadPDB #@UnusedVariable # pylint: disable=W0612
 
-    def colorROG(object = 1):
+    def colorROG(object = 1): # pylint: disable=W0612
         """
         Color residues according to Cing ROG score
         """
@@ -111,7 +111,7 @@ def yasaraShell(project):
         Console('on')
     #end def
 
-    def colorGF(object = 1, minValue = -3.0, maxValue = 1.0):
+    def colorGF(object = 1, minValue = -3.0, maxValue = 1.0): # pylint: disable=W0612
         """
         Color residues according to Procheck gf score
         """
@@ -150,13 +150,13 @@ def yasaraShell(project):
         Console('on')
     #end def
 
-    def colorRama(object = 1):
+    def colorRama(object = 1): # pylint: disable=W0612
         """
         Color according to Whatif ramachandran score
         """
         colorWhatif('ramachandran', object = object, minValue = -1.5, maxValue = 1.0)
 
-    def colorJanin(object = 1):
+    def colorJanin(object = 1): # pylint: disable=W0612
         """
         Color according to Whatif janin score
         """
@@ -212,18 +212,17 @@ def yasaraShell(project):
 
     def showHtml():
         """
-        SHow the html page of the selected residue
+        Show the html page of the selected residue
         """
-        import webbrowser
         res = getSelectedResidue()
         if not res:
             nTerror('showHtml: invalid residue')
 
         path = os.path.abspath(project.htmlPath('Molecule', res.chain.name, res.name, 'index.html'))
         nTmessage( 'showHtml: %s' % path )
-        webbrowser.open('file://' + path)
+        webbrowser.open('file://' + path) #@UndefinedVariable
     #end def
-    showhtml = showHtml #@UnusedVariable
+    showhtml = showHtml #@UnusedVariable # pylint: disable=W0612
 
     def screenDump(fileName, hideHUD = True):
         """
@@ -236,7 +235,7 @@ def yasaraShell(project):
         SaveBmp(path)
         hud('on')
     #end def
-    screendump = screenDump #@UnusedVariable
+    screendump = screenDump #@UnusedVariable # pylint: disable=W0612
 
     def hud(toggle):
         """

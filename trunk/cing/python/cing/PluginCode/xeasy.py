@@ -286,7 +286,7 @@ def exportSequence2Xeasy( molecule, seqFile, convention ):
     """export sequence to Xeasy seq file
     """
     fout = open( seqFile, 'w' )
-    resCount = 0
+#    resCount = 0
     for res in molecule.allResidues():
         resName = res.translate(convention)
         if (resName != None):
@@ -295,7 +295,7 @@ def exportSequence2Xeasy( molecule, seqFile, convention ):
                      res.resNum
                    )
         #end if
-        resCount += 1
+#        resCount += 1
     #end for
     fout.close()
 #end def
@@ -373,7 +373,7 @@ def exportPeaks2Xeasy( peakList, peakFile)   :
     #end for
 
     # write the peaks
-    count = 0
+#    count = 0
     for peak in peakList:
         if peak.has_key('xeasyIndex'):
             idx = peak['xeasyIndex']
@@ -413,7 +413,7 @@ def exportPeaks2Xeasy( peakList, peakFile)   :
             #end if
         #end for
         fprintf( fout, '0\n' )
-        count += 1
+#        count += 1
     #end for
 
     fout.close()
