@@ -23,7 +23,7 @@ import tarfile
 __author__ = "Wim Vranken <wim@ebi.ac.uk> Jurgen Doreleijers <jurgenfd@gmail.com>"
 #    inputDir = os.path.join(cingDirTestsData, "ccpn")
 try:
-    from cing.NRG.localConstants import baseDir #@UnresolvedImport
+    from cing.NRG.localConstants import baseDir #@UnresolvedImport # pylint: disable=E0611
 except:
     #baseDir = '/Users/jd/CASD-NMR-CING'
     baseDir = '/Volumes/UserHome/geerten/Data/CASD-NMR-CING'

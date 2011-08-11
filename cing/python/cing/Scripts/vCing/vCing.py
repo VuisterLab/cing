@@ -33,7 +33,7 @@ master_ssh_url_local = 'joe@nmr' #@UnusedVariable
 master_d_local = '/Volumes/joe/D' #@UnusedVariable
 pool_postfix_local = 'joe' #@UnusedVariable
 try:
-    from cing.Scripts.vCing.localConstants import * #@UnusedWildImport
+    from cing.Scripts.vCing.localConstants import * #@UnusedWildImport # pylint: disable=E0611
 except:
     pass
 #    NTtracebackError() # codes below are nonsense.

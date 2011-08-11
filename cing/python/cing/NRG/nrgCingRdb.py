@@ -541,7 +541,7 @@ AND '{2}' <@ S.chain_type; -- contains at least one protein chain.
         m = self
         try:
             djaflsjlfjalskdjf #@UndefinedVariable # pylint: disable=W0104
-            from cing.NRG.localPlotList import plotList
+            from cing.NRG.localPlotList import plotList # pylint: disable=E0611
         except:
 #            NTtracebackError()
 #            d5 = {IS_TRUE: SEL1_STR, USE_MIN_VALUE_STR: 0.0}

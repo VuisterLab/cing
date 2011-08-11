@@ -2,7 +2,7 @@
 #############################################
    Original Author:  Dan Kulp
    Date  :  9/8/2005
-    MOdified by Jurgen F. Doreleijers
+    Modified by Jurgen F. Doreleijers
     For Hamid Eghbalnia
 
 ############################################
@@ -11,6 +11,7 @@
  or from Terminal like:
  pymol -M /Users/jd/workspace35/cing/python/cing/Scripts/PyMol/CreateSecondaryStructures.py
 """
+
 # Next line is a pymol directive
 #python #@UndefinedVariable
 from pymol import cmd #@UnresolvedImport
@@ -56,7 +57,7 @@ def createSS(sel, sequence='ALA',repeat=1,terminal='C'):
     seq = string.split(sequence,",")
 
     # Get residue numbering .. potential bug here if number is inconsistent.. (Only works at c-terminal)
-    resi = int(cmd.get_model(sel).atom[0].resi) + 1 #@UnusedVariable # pylint: disable=W0612
+#    resi = int(cmd.get_model(sel).atom[0].resi) + 1
     # Loop and build new residues
     for i in range(1,repeat+1):
         for s in seq:
@@ -73,7 +74,7 @@ def set_phipsi(sel,phi,psi):
     atoms = cmd.get_model("byres ("+sel+")")
 
     # Loop through atoms in selection
-    for at in atoms.atom:
+    for at in atoms.atom: # pylint: disable=E1103
         if at.name == "N":
             # Check for a null chain id (some PDBs contain this)
             unit_select = ""
