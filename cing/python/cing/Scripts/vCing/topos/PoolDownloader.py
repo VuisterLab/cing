@@ -74,6 +74,7 @@ class PoolParser(SGMLParser):
             if not self.state == '':
                 self.token[self.state] = data
 
+# pylint: disable=R0903
 class TokenDownloader(object):
     """Class which downloads the tokens gathered by the PoolParser."""
     def __init__(self, url, tokens, outdir, timeout, useStamp):

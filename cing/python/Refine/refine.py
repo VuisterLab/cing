@@ -38,6 +38,7 @@ PARAMETERS_NAME = 'parameters'
 PARAMETERS_FILE_NAME = '%s.py' % PARAMETERS_NAME
 # class wrapper to allow passing of a key-argument
 # to dict entry
+# pylint: disable=R0903
 class Key:
     def __init__(self, key):
         self.key = key
@@ -329,7 +330,8 @@ def analyze(config, project, parameters, doPrint=0 ):
     done_list = f.forkoff_start(job_list, 0) # delay 0 second between jobs.
     nTmessage("Finished ids: %s", done_list)
     if not done_list:
-        nTerror("Failed to analyze %s", i)
+        notDone = parameters.modelCountAnneal - len(done_list) 
+        nTerror("Failed to analyze %s", notDone)
         return True    
 #end def
 
@@ -374,7 +376,8 @@ def refine(config, project, parameters, doPrint=0):
     done_list = f.forkoff_start(job_list, 0) # delay 0 second between jobs.
     nTmessage("Finished ids: %s", done_list)
     if not done_list:
-        nTerror("Failed to refine %s", i)
+        notDone = parameters.modelCountAnneal - len(done_list) 
+        nTerror("Failed to refine %s", notDone)
         return True
     
 #end def
@@ -421,7 +424,8 @@ def anneal(config, project, parameters, doPrint=0):
     done_list = f.forkoff_start(job_list, 0) # delay 0 second between jobs.
     nTmessage("Finished ids: %s", done_list)
     if not done_list:
-        nTerror("Failed to anneal %s", i)
+        notDone = parameters.modelCountAnneal - len(done_list) 
+        nTerror("Failed to anneal %s", notDone)
         return True
 #end def
 

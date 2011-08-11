@@ -164,15 +164,18 @@ def doEntry( entryCode, chainCode ):
 
             if dihedralComboTodo == Ramachandran:
                 if not (res.has_key(DIHEDRAL_NAME_1) and res.has_key(DIHEDRAL_NAME_2)):
-                    nTdebug('Skipping residue without backbone angles complete in entry %s for chain code %s residue %s' % (entryCode,chainCode,res))
+                    nTdebug('Skipping residue without backbone angles complete in entry %s for chain code %s residue %s' % (
+                                entryCode, chainCode,res))
                     continue
             elif dihedralComboTodo == Janin:
                 if not (res.has_key(DIHEDRAL_NAME_1) or res.has_key(DIHEDRAL_NAME_2)):
-                    nTdebug('Skipping residue without any of the requested angles complete in entry %s for chain code %s residue %s' % (entryCode,chainCode,res))
+                    nTdebug('Skipping residue without any of the requested angles complete in entry %s for chain code %s residue %s' % (
+                                entryCode, chainCode,res))
                     continue
             elif dihedralComboTodo == d1d2:
                 if not res.has_key(DIHEDRAL_NAME_1):
-                    nTdebug('Skipping residue because no first requested angle in entry %s for chain code %s residue %s' % (entryCode,chainCode,res))
+                    nTdebug('Skipping residue because no first requested angle in entry %s for chain code %s residue %s' % (
+                                entryCode,chainCode,res))
                     continue
 
             secStruct = res.getDeepByKeys( DSSP_STR, SECSTRUCT_STR)

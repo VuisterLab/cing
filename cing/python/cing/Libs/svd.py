@@ -25,6 +25,7 @@ from numpy import zeros #@UnresolvedImport
 from numpy.linalg import svd
 import copy #@UnusedImport
 
+# pylint: disable=R0902
 class SVDfit:
     """Class to do SVD fitting
 

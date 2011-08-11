@@ -5,8 +5,10 @@ python -u $CINGROOT/python/cing/NRG/runSqlForSchema.py devnrgcing    $CINGROOT/p
 
 python -u $CINGROOT/python/cing/NRG/runSqlForSchema.py nrgcing    $CINGROOT/python/cing/NRG/sql/dumpNRG-CING.sql        $D/NRG-CING/pgsql
 python -u $CINGROOT/python/cing/NRG/runSqlForSchema.py nrgcing    $CINGROOT/python/cing/NRG/sql/loadDB-CING_psql.sql    $D/NRG-CING/pgsql
-python -u $CINGROOT/python/cing/NRG/runSqlForSchema.py nrgcing    $CINGROOT/python/cing/NRG/sql/loadBmrbPdbMatch.sql    $CINGROOT/data/NRG/bmrbPdbMatch
+python -u $CINGROOT/python/cing/NRG/runSqlForSchema.py nrgcing    $CINGROOT/python/cing/NRG/sql/loadBmrbPdbMatch.sql    \
+            $CINGROOT/data/NRG/bmrbPdbMatch
 """
+
 
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.NRG import * #@UnusedWildImport

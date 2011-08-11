@@ -1,5 +1,6 @@
 from cing.Libs.NTutils import * #@UnusedWildImport
 
+# pylint: disable=R0902
 class AwkLike:
     """
     Awk-like functionality

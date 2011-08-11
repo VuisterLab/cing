@@ -4,6 +4,7 @@ from cing.PluginCode.required.reqCcpn import CCPN_LOWERCASE_STR
 
 __author__ += 'Wim Vranken '
 
+# pylint: disable=R0903
 class NmrStar():
     def __init__(self, project):
         self.project = project

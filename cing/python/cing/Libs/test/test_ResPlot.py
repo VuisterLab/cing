@@ -2,7 +2,7 @@ from cing import cingDirTestsData
 from cing import cingDirTmp
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.PluginCode.Whatif import runWhatif
-from cing.PluginCode.dssp import runDssp #@UnusedImport Added to trigger import error when module is absent. Needed for when whatif is but dssp isn't installed.
+from cing.PluginCode.dssp import runDssp #@UnusedImport Added trigger import error . Needed for when whatif is but dssp isn't installed. 
 from cing.PluginCode.matplib import * #@UnusedWildImport
 from cing.core.classes import Project
 from cing.core.constants import * #@UnusedWildImport

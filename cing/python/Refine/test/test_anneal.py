@@ -25,7 +25,8 @@ class AllChecks(TestCase):
         modelCountAnneal, bestAnneal, best = 200, 50, 25
 #        targetList = '--fullAnnealAndRefine '.split()
         # NB without leading --
-        targetNumberList= '1   2                3      4             5             6      7     8'.split() #@UnusedVariable # pylint: disable=W0612
+        #@UnusedVariable # pylint: disable=W0612
+        targetNumberList= '1   2                3      4             5             6      7     8'.split() #@UnusedVariable
         targetList      = 'psf generateTemplate anneal analyze       parse         refine parse import'.split() 
         targetOptionLoL = '.   .                .      --useAnnealed --useAnnealed .      .     .     '.split()
         fastestTest = True

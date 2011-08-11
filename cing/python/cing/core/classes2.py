@@ -8,6 +8,7 @@ from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.PluginCode.required.reqVasco import * #@UnusedWildImport
 from cing.core.ROGscore import ROGscore
 
+# pylint: disable=R0903
 class ProjectListMember():
     """An element of ProjectList always has certain attributes to add.
     """
@@ -85,7 +86,7 @@ class RestraintList(NTlist, ProjectListMember):
         self.rename(newName)
     #end def
 
-    def append(self, restraint):
+    def append(self, restraint):  # pylint: disable=W0221
         'Add a restraint to list.'
         restraint.id = self.currentId
         restraint.parent = self # being able to go from restraint to restraint list is important.
@@ -256,7 +257,7 @@ class ResonanceList(NTlist, ProjectListMember):
 #        return self.projectList.rename(self.name, newName)
         return self
     #end def
-    def append(self, item):
+    def append(self, item):  # pylint: disable=W0221
         'Append'
 #        if not hasattr(self, 'currentId'): # for deepcopy
 #            self.currentId = 0

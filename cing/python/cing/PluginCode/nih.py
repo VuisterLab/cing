@@ -800,7 +800,7 @@ class NmrPipeTable( NTdict ):
         #end if
     #end def
 
-    def format(self):
+    def format(self): # pylint: disable=W0221
         return sprintf(
 '''=== NmrPipeTable "%s" ===
 columns:  %s

@@ -1,4 +1,5 @@
 #De WHY_NOT comments moeten in een .txt-file komen te staan in /usr/scratch/whynot/comments/ op cmbi8. Het (fixed) format ziet er zo uit:
+
 #
 #PDBID        : 2q23
 #Database     : PDB_REDO
@@ -38,6 +39,8 @@ FAILED_TO_BE_VALIDATED_CING = "Failed to be validated in CING."
 PRESENT_IN_CING = "Present in CING."
 #PRESENT_IN_CING = ""
 
+
+# pylint: disable=R0903
 class WhyNotEntry:
     def __init__(self, entryId, exists=True, comment=''):
         self.entryId = entryId

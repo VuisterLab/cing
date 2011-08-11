@@ -2,6 +2,8 @@
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.core.constants import * #@UnusedWildImport
 
+# Too long lines. pylint: disable=C0301
+
 WHATIF_STR       = "Whatif" # key to the entities (atoms, residues, etc under which the results will be stored
 
 CHECK_ID_STR     = "checkID"
@@ -161,7 +163,8 @@ summaryCheckIdList = [ QUACHK_STR, NQACHK_STR, RAMCHK_STR, C12CHK_STR, BBCCHK_ST
 
 
 def cingCheckId( checkId ):
-    """Static method to return a cingId if exists. Returns checkId otherwise.
+    """
+    Static method to return a cingId if exists. Returns checkId otherwise.
     """
     if cingNameDict.has_key(checkId) and cingNameDict[checkId] != None:
         return cingNameDict[checkId]
