@@ -1,6 +1,6 @@
 #summary Using CING as a virtual appliance on CMBI's 'supermachine'
 
-= *JUST FOR INTERNAL USE FOR NOW, SORRY* =
+= JUST FOR INTERNAL USE FOR NOW, SORRY =
 
 Use case scenario for creating validation reports for NRG-CING at CMBI's cloud
 
