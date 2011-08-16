@@ -31,14 +31,14 @@ class AllChecks(TestCase):
         targetOptionLoL = '.   .                .      --useAnnealed --useAnnealed .      .     .     '.split()
         fastestTest = True
         if fastestTest:
-            numberOfStagesTodo = 2 # 8 max
+            numberOfStagesTodo = 8 # 8 max
             targetList      = 'psf generateTemplate anneal analyze       parse         refine parse import'.split()[:numberOfStagesTodo]
             targetOptionLoL = '.   .                .      --useAnnealed --useAnnealed .      .     .     '.split()[:numberOfStagesTodo]
             modelCountAnneal, bestAnneal, best = 4, 3, 2
         if 1:
             entryList  = "1dum 1brv     2fwu     2fws               1olg".split()
             rangesList = "cv   171-188  501-850  371-650            cv  ".split()
-        else:        
+        else:
             entryList  = "2kvf 1mvz 2cka 2ctm 2e5o 2kn9 2xks".split() # see below for set description.
             rangesList = ['cv' for i in range(len(entryList))]
         # end if
@@ -71,7 +71,7 @@ class AllChecks(TestCase):
                 refineExecPath = os.path.join(refinePath, "refine.py")
     #            cmd = '%s --project %s -n %s --setup %s --useAnnealed --overwrite --models %s --superpose %s --sort Enoe' % (
     #                refineExecPath, entryId, name, target, models, ranges)           
-                cmd = ('%s -v %s --project %s -n %s --setup --overwrite --superpose %s' +
+                cmd = ('%s -v %s --project %s -n %s --setup --overwrite --superpose %s ' +
                        '--modelsAnneal %s --modelCountAnneal %s --bestAnneal %s --best %s') % (
                     refineExecPath, cing.verbosity, entryId, name, ranges, modelsAnneal, modelCountAnneal, bestAnneal, best)
                 self.assertFalse( do_cmd(cmd,bufferedOutput=0) )

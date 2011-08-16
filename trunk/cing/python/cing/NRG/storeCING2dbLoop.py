@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 """
 python -u $CINGROOT/python/cing/NRG/storeCING2dbLoop.py
 # NB this script fails if the backend is not installed.
@@ -35,10 +36,9 @@ def storeCING2dbLoop(archive_id, entryList=None, expectPdbEntryList = True):
         entryListFileName = os.path.join(startDir, 'list', 'entry_list_single.csv')
         writeEntryListToFile(entryListFileName, entryList)
     else:
-        entryListFileName = os.path.join(startDir, 'list', 'entry_list_all.csv')
-    #    entryListFileName = os.path.join(startDir, 'list', 'entry_list_all_org.csv')
-    #    entryListFileName = os.path.join(startDir, 'list', 'entry_list_redo.csv')
-
+        entryListFileName = os.path.join(startDir, 'list', 'entry_list_tostore_copy.csv')
+    # end if
+    
 #    inputDir = '.'
 #    extraArgList = (archive_id, inputDir)
     extraArgList = (archive_id,) # note that for length one tuples the comma is required.
@@ -46,9 +46,9 @@ def storeCING2dbLoop(archive_id, entryList=None, expectPdbEntryList = True):
     doScriptOnEntryList(pythonScriptFileName,
                         entryListFileName,
                         startDir,
-                        processes_max = 2,
+                        processes_max = cing.ncpus,
                         delay_between_submitting_jobs = 1,
-                        max_time_to_wait = 60 * 6,
+                        max_time_to_wait = 60 * 15,
                         start_entry_id = 0,
                         max_entries_todo = 1,
                         expectPdbEntryList = expectPdbEntryList,
@@ -56,8 +56,8 @@ def storeCING2dbLoop(archive_id, entryList=None, expectPdbEntryList = True):
 
 if __name__ == '__main__':
     cing.verbosity = cing.verbosityDebug
-    #cing.verbosity = cing.verbosityDefault
-    
+    #cing.verbosity = cing.verbosityDefault    
+#    cing.ncpus = 6
     if 1:
         arch_id = ARCHIVE_NRG_ID
         eList = '1brv'.split()
@@ -74,5 +74,8 @@ if __name__ == '__main__':
         arch_id = ARCHIVE_PDB_ID
     #        eList = '1brv'.split()
         eList = "3kff 3a4r 3a34 3i40 2xdy 3mcd 3ild 1brv 1hkt".split()
-
+    else:
+        nTerror("Failed to setup if/else tree")
+        sys.exit(1)
+    # end if
     storeCING2dbLoop(archive_id=arch_id, entryList=eList)

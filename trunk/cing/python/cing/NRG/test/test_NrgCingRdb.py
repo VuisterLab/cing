@@ -16,8 +16,10 @@ class AllChecks(TestCase):
         mkdirs( cingDirTmpTest )
         self.failIf(os.chdir(cingDirTmpTest), msg =
             "Failed to change to test directory for files: " + cingDirTmpTest)
-
-        m = NrgCingRdb(host='localhost')
+        host = 'localhost'
+        if False: # DEFAULT Fa;se
+            host = 'nmr.cmbi.umcn.nl'
+        m = NrgCingRdb(host=host)
         a = m.getPdbIdList()
         nTdebug("pdbIdList length: %d %s" % (len(a), a))
         self.assertTrue(a)

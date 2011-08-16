@@ -46,6 +46,19 @@ def doScriptOnEntryList(pythonScriptFileName,
           shuffleBeforeSelecting         = False # fails for chain ids when included.
           ):
     """Return True on error"""
+    
+    if 1: # DEFAULT: False
+        nTdebug("entryListFileName            : %s" % entryListFileName)        
+        nTdebug("startDir                     : %s" % startDir                     )        
+        nTdebug("processes_max                : %s" % processes_max                )        
+        nTdebug("max_time_to_wait             : %s" % max_time_to_wait             )        
+        nTdebug("delay_between_submitting_jobs: %s" % delay_between_submitting_jobs)        
+        nTdebug("extraArgList                 : %s" % str(extraArgList            ))        
+        nTdebug("start_entry_id               : %s" % start_entry_id               )        
+        nTdebug("max_entries_todo             : %s" % max_entries_todo             )        
+        nTdebug("expectPdbEntryList           : %s" % expectPdbEntryList           )        
+        nTdebug("shuffleBeforeSelecting       : %s" % shuffleBeforeSelecting       )
+    # end if        
 #    if os.chdir(cingDirTmp):
 #        raise SetupError("Failed to change to directory for temporary test files: "+cingDirTmp)
 
@@ -81,7 +94,7 @@ def doScriptOnEntryList(pythonScriptFileName,
 
     entryCountSelected = len( entryCodeList )
     # lastEntryId is id of last entry excluding the entry itself.
-    lastEntryId = min(len(entryCodeList), start_entry_id+max_entries_todo)
+    lastEntryId = min(len(entryCodeList), start_entry_id+max_entries_todo)    
     if shuffleBeforeSelecting:
         nTmessage("Shuffling entry list before selecting entries.")
         entryCodeListCopy = entryCodeList[:]

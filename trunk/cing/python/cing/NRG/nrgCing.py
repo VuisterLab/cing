@@ -95,7 +95,7 @@ class NrgCing(Lister):
                  max_entries_todo=1,
                  max_time_to_wait=86400, 
                  processes_max=None,
-#                 prepareInput=False,
+                 prepareInput=False,
                  writeWhyNot=True,
                  writeTheManyFiles=False,
                  updateIndices=True
@@ -138,7 +138,8 @@ class NrgCing(Lister):
         if processes_max:
             self.processes_max = processes_max
 #        self.processes_max = 2 # DEFAULT: commented out.
-
+        self.prepareInput = prepareInput
+        
         ## How long to wait between submitting individual jobs when on the cluster.
         ##self.delay_between_submitting_jobs = 5
         self.delay_between_submitting_jobs = 5
@@ -316,8 +317,9 @@ class NrgCing(Lister):
             nTmessage("Consider removing from code the list of bad entries which are no longer in PDB: %s" % str(
                 self.entry_list_obsolete_bad))
         else:
-            nTmessage("No bad entries in code that are: %s" % str(self.entry_list_obsolete_bad))
-        
+#            nTmessage("No bad entries in code that are: %s" % str(self.entry_list_obsolete_bad))
+            pass
+        # end if        
     # end def
     
         
@@ -342,15 +344,17 @@ class NrgCing(Lister):
         
         os.chdir(self.results_dir)
         
-        nTdebug("In updateDerivedResourceSettings (re-)setting:")        
-        nTdebug("results_dir:             %s" % self.results_dir)        
-        nTdebug("data_dir:                %s" % self.data_dir)        
-        nTdebug("tokenListFileName:       %s" % self.tokenListFileName)        
-        nTdebug("index_pdb_file_name:     %s" % self.index_pdb_file_name)        
-        nTdebug("why_not_db_comments_dir: %s" % self.why_not_db_comments_dir)        
-        nTdebug("why_not_db_raw_dir:      %s" % self.why_not_db_raw_dir)        
-        nTdebug("schema_id:               %s" % self.schema_id)        
-        nTdebug("log_dir:                 %s" % self.log_dir)        
+        if False:
+            nTdebug("In updateDerivedResourceSettings (re-)setting:")        
+            nTdebug("results_dir:             %s" % self.results_dir)        
+            nTdebug("data_dir:                %s" % self.data_dir)        
+            nTdebug("tokenListFileName:       %s" % self.tokenListFileName)        
+            nTdebug("index_pdb_file_name:     %s" % self.index_pdb_file_name)        
+            nTdebug("why_not_db_comments_dir: %s" % self.why_not_db_comments_dir)        
+            nTdebug("why_not_db_raw_dir:      %s" % self.why_not_db_raw_dir)        
+            nTdebug("schema_id:               %s" % self.schema_id)        
+            nTdebug("log_dir:                 %s" % self.log_dir)
+        # end if        
     # end def
             
 
@@ -786,7 +790,7 @@ class NrgCing(Lister):
             nTmessage("There are %s entries in RDB that are not currently done: %s" % (
                 len(entry_list_in_db_not_done), str(entry_list_in_db_not_done)))
         else:
-            nTdebug("All entries in RDB are also done")
+            nTmessage("All entries in RDB are also done")
         # endif
         entry_list_in_db_to_remove = NTlist( *entry_list_in_db_not_done )
         if len(entry_list_in_db_not_done) > self.entry_to_delete_count_max:
@@ -796,7 +800,7 @@ class NrgCing(Lister):
             nTmessage("There are %s entries in RDB that will be removed: %s" % (
                     len(entry_list_in_db_to_remove), str(entry_list_in_db_to_remove)))
         else:
-            nTdebug("No entries in RDB need to be removed.")
+            nTmessage("No entries in RDB need to be removed.")
         # end if
         for entry_code in entry_list_in_db_to_remove:
             if crdb.removeEntry( entry_code ):
@@ -1035,7 +1039,9 @@ class NrgCing(Lister):
             whyNotEntry.exists = False
 
         for entry_code in self.entry_list_nmr:
-            whyNotEntry = whyNot[entry_code]
+            whyNotEntry = getDeepByKeysOrAttributes(whyNot, entry_code)
+            if not whyNotEntry:                
+                continue
             whyNotEntry.exists = True
             if entry_code not in self.entry_list_nrg:
                 whyNotEntry.comment = NO_EXPERIMENTAL_DATA
@@ -2023,14 +2029,15 @@ class NrgCing(Lister):
     
 # end class.
 
-def runNrgCing( useClass = NrgCing ):
+def runNrgCing( useClass = NrgCing,
+            max_entries_todo = 40 # DEFAULT: 40 # for weekly update. Further customize for manual work in __init__
+                 ):
     """
     Additional modes I see:
         batchUpdate        Run validation checks to NRG-CING web site.
         prepare            Only moves the entries through prep stages.
     """
     cing.verbosity = verbosityDebug
-    max_entries_todo = 0  # DEFAULT: 40 # for weekly update. Further customize for manual work in __init__
     useTopos = 0           # DEFAULT: 0
     processes_max = None # Default None to be determined by os.
 
@@ -2120,4 +2127,4 @@ def runNrgCing( useClass = NrgCing ):
 
 
 if __name__ == '__main__':
-    runNrgCing()
+    runNrgCing( max_entries_todo = 40 ) # DEFAULT: 40

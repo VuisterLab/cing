@@ -1,6 +1,7 @@
 """
 Create plots like the GreenVersusRed scatter by entry.
-Use: python -u $CINGROOT/python/cing/NRG/nrgCingRdb.py 
+Use: 
+python -u $CINGROOT/python/cing/NRG/nrgCingRdb.py 
 """
 
 from cing import cingDirTmp
@@ -63,7 +64,7 @@ class NrgCingRdb():
             self.csql = CsqlAlchemy(host=host, user=user, db=db, schema=schema)
             self.csql.connect()
             self.execute = self.csql.conn.execute
-            if True: # DEFAULT True but disable for quicker testing.
+            if 0: # DEFAULT True but disable for quicker testing.
                 self.populateDepTables()
             self.csql.autoload()
             #csql.close()
@@ -109,7 +110,7 @@ class NrgCingRdb():
 
     def showCounts(self):
         m = self
-        if False:
+        if True:
             tableList = [m.centry, m.cchain, m.cresidue, m.catom, m.brief_summary]
 #            countList = [m.query(table).count() for table in tableList]
 
@@ -135,9 +136,9 @@ class NrgCingRdb():
         columnName = PDB_ID_STR
 
         if not fromNrg:
-            table = self.bs.c
+            table = self.bs
             columnName =PDBJ_ENTRY_ID_STR
-
+#        nTdebug("Using table: %s" % table)
         try:
             s = select([table.c[columnName]])
     #        nTdebug("SQL: %s" % s)
@@ -1235,6 +1236,14 @@ def bin_by(y, x, nbins=None, ymin=None, ymax=None):
     # Just return the left edges of the bins
     bins = bins[:-1]
     return output, bins
+# end def
+
+def getPdbIdList(fromNrg=False, host='localhost'):
+    'Convenience method'
+    n = NrgCingRdb( host = host )
+    entryList = n.getPdbIdList(fromNrg=fromNrg)
+    return entryList
+# end def
 
 if __name__ == '__main__':
     cing.verbosity = verbosityDebug
@@ -1246,7 +1255,7 @@ if __name__ == '__main__':
     host = 'localhost'
     if 0: # DEFAULT 0
         host = 'nmr.cmbi.umcn.nl'
-    n = nrgCingRdb( schema=schema, host = host )
+    n = NrgCingRdb( schema=schema, host = host )
 
     if 0:
         n.createPlots(doTrending = False)
