@@ -82,7 +82,7 @@ FAILURE_PREP_STR = "Failed to prepareEntry"
 class NrgCing(Lister):
     """Main class for preparing and running CING reports on NRG and maintaining the statistics."""
     
-    entry_to_delete_count_max = 0 # DEFAULT: 4 can be as many as fail every time.
+    entry_to_delete_count_max = 4 # DEFAULT: 4 can be as many as fail every time.
     #: 2hym has 1726 and 2bgf is the only entry over 5,000 Just used for reporting. 
     #: The entry is still included and considered 'done'.
     MAX_ERROR_COUNT_CING_LOG = 2000 
@@ -251,7 +251,7 @@ class NrgCing(Lister):
         self.archive_id = ARCHIVE_NRG_ID
         self.schema_id  = None
         self.log_dir    = None
-        self.usePreviousPdbEntries      = True  # DEFAULT: False 
+        self.usePreviousPdbEntries      = False # DEFAULT: False 
         self.usedCcpnInput              = True  # DEFAULT: True For NMR_REDO it is not from the start.
         self.validateEntryExternalDone  = True  # DEFAULT: True For NMR_REDO it is not from the start.
         self.entry_list_possible = None # Set below 
@@ -297,7 +297,7 @@ class NrgCing(Lister):
                 self.entry_list_nmr         = getEntryListFromCsvFile('entry_list_nmr.csv')
             else:
                 ## following statement is equivalent to a unix command like:
-    #            nTmessage("Looking for entries from the PDB database.")
+                nTmessage("Looking for entries from the PDB database.")
                 self.entry_list_nmr = NTlist()
                 self.entry_list_nmr.addList(getPdbEntries(onlyNmr=True))
                 if not self.entry_list_nmr:

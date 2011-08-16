@@ -182,6 +182,10 @@ DISTANCE_RESTRAINT_LIST_HIGH_VIOLATIONS_FILTERED_STR = 'distance_restraint_list_
 
 # SQL stuff
 NAME_STR        = 'name'
+RES_NAME_STR    = 'resName'
+RES_NUMB_STR    = 'resNum'
+NUMBER_STR      = 'number'
+
 PDB_ID_STR      = 'pdb_id'
 ENTRY_ID_STR    = 'entry_id'
 CHAIN_ID_STR    = 'chain_id'
