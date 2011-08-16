@@ -345,11 +345,108 @@ CREATE INDEX atom_se4 ON casdcing.cingatom (sel_4);
 CREATE INDEX atom_se5 ON casdcing.cingatom (sel_5);
 
 
+CREATE TABLE casdcing.drlist
+(
+    drlist_id                SERIAL UNIQUE PRIMARY KEY,
+    number                         INT              NOT NULL,
+    entry_id                 INT              NOT NULL,
+    name                     VARCHAR(255),
+    viol_count_lower         INT              DEFAULT NULL,   -- Total lower-bound violations over 0.1 A
+    viol_count1              INT              DEFAULT NULL, 
+    viol_count3              INT              DEFAULT NULL, 
+    viol_count5              INT              DEFAULT NULL, 
+    viol_max                 FLOAT            DEFAULT NULL, 
+    viol_upper_max           FLOAT            DEFAULT NULL, 
+    viol_lower_max           FLOAT            DEFAULT NULL, 
+    intra_residual_count     INT              DEFAULT NULL,   
+    sequential_count         INT              DEFAULT NULL,   
+    medium_range_count       INT              DEFAULT NULL,   
+    long_range_count         INT              DEFAULT NULL,   
+    ambiguous_count          INT              DEFAULT NULL,   
+    unique_distances_count   INT              DEFAULT NULL,   -- _count of all defined distance restraints
+    without_duplicates_count INT              DEFAULT NULL,   -- _count of all restraints without duplicates
+    with_duplicates_count    INT              DEFAULT NULL,   -- _count of all restraints with duplicates
+    rog                            INT DEFAULT NULL,
+    
+    FOREIGN KEY (entry_id)         REFERENCES casdcing.cingentry (entry_id) ON DELETE CASCADE
+);
+CREATE INDEX drlist_001 ON casdcing.drlist (entry_id);
+CREATE INDEX drlist_002 ON casdcing.drlist (name);
+CREATE INDEX drlist_003 ON casdcing.drlist (rog);
+
+-- Modelled after NMR-STAR 3.1 as in ftp://ftp.wwpdb.org/pub/pdb/data/structures/divided/nmr_restraints_v2/cj/1cjg_mr.str.gz
+-- NB for ambiguous DR more than one row constitutes a single dr. They will share the same number/drlist_id ids.
+CREATE TABLE casdcing.dr
+(
+    dr_id                 SERIAL UNIQUE PRIMARY KEY,
+    number                INT              NOT NULL,
+    drlist_id                INT              NOT NULL,
+    entry_id                 INT              NOT NULL,
+    member_id                INT              NOT NULL,
+    member_logic_code        VARCHAR(5)       DEFAULT NULL, -- Only allow OR or NULL for now.
+    atom_id_1      INT              DEFAULT NULL,    
+    residue_id_1   INT              DEFAULT NULL,    
+    chain_id_1     INT              DEFAULT NULL,    
+    atom_id_2      INT              DEFAULT NULL,    
+    residue_id_2   INT              DEFAULT NULL,    
+    chain_id_2     INT              DEFAULT NULL,    
+    -- convenience columns
+    atom_name_1     VARCHAR(5)       DEFAULT NULL,    
+    residue_num_1   INT              DEFAULT NULL,    
+    residue_name_1  VARCHAR(5)       DEFAULT NULL,    
+    chain_name_1    VARCHAR(5)       DEFAULT NULL,    
+    atom_name_2     VARCHAR(5)       DEFAULT NULL,    
+    residue_num_2   INT              DEFAULT NULL,    
+    residue_name_2  VARCHAR(5)       DEFAULT NULL,    
+    chain_name_2    VARCHAR(5)       DEFAULT NULL,                                        
+    -- common to all restraints
+    target            FLOAT            DEFAULT NULL, -- Treated implicitely in CING. Not even parsed from CCPN.
+    lower             FLOAT            DEFAULT NULL, 
+    upper             FLOAT            DEFAULT NULL,     
+    contribution      FLOAT            DEFAULT NULL, -- Not populated yet.
+    viol_count1       INT              DEFAULT NULL, -- Number of violations over 1 degree (0.1A)
+    viol_count3       INT              DEFAULT NULL, -- Number of violations over 3 degrees (0.3A)
+    viol_count5       INT              DEFAULT NULL, -- Number of violations over 5 degrees (0.5A)
+    viol_max          FLOAT            DEFAULT NULL, -- Maximum violation
+    viol_av           FLOAT            DEFAULT NULL, -- Average violation
+    viol_sd           FLOAT            DEFAULT NULL, -- Sd of violations
+    -- specific to DR
+    av                FLOAT            DEFAULT NULL, -- Average distance
+    sd                FLOAT            DEFAULT NULL, -- sd on distance
+    min               FLOAT            DEFAULT NULL, -- Minimum distance
+    max               FLOAT            DEFAULT NULL, -- Max distance
+    viol_count_lower  INT              DEFAULT NULL, -- Lower-bound violations
+    viol_upper_max    FLOAT            DEFAULT NULL, -- Max violation over upper bound
+    viol_lower_max    FLOAT            DEFAULT NULL, -- Max violation over lower bound
+    has_analyze_error BOOLEAN          DEFAULT NULL, -- Indicates if an error was encountered when analyzing restraint
+    rog                            INT DEFAULT NULL,
+    
+    FOREIGN KEY (drlist_id)           REFERENCES casdcing.drlist      (drlist_id)    ON DELETE CASCADE,
+    FOREIGN KEY (atom_id_1)           REFERENCES casdcing.cingatom    (atom_id)    ON DELETE CASCADE,
+    FOREIGN KEY (residue_id_1)        REFERENCES casdcing.cingresidue (residue_id) ON DELETE CASCADE,
+    FOREIGN KEY (chain_id_1)          REFERENCES casdcing.cingchain   (chain_id)   ON DELETE CASCADE,        
+    FOREIGN KEY (atom_id_2)           REFERENCES casdcing.cingatom    (atom_id)    ON DELETE CASCADE,
+    FOREIGN KEY (residue_id_2)        REFERENCES casdcing.cingresidue (residue_id) ON DELETE CASCADE,
+    FOREIGN KEY (chain_id_2)          REFERENCES casdcing.cingchain   (chain_id)   ON DELETE CASCADE,
+    FOREIGN KEY (entry_id)            REFERENCES casdcing.cingentry   (entry_id)   ON DELETE CASCADE        
+);
+CREATE INDEX dr_001 ON casdcing.dr (entry_id);
+--CREATE INDEX dr_002 ON casdcing.dr (name);
+CREATE INDEX dr_003 ON casdcing.dr (rog);
+CREATE INDEX dr_004 ON casdcing.dr (entry_id);
+CREATE INDEX dr_005 ON casdcing.dr (atom_id_1);
+CREATE INDEX dr_006 ON casdcing.dr (residue_id_1);
+CREATE INDEX dr_007 ON casdcing.dr (chain_id_1);
+CREATE INDEX dr_008 ON casdcing.dr (atom_id_2);
+CREATE INDEX dr_009 ON casdcing.dr (residue_id_2);
+CREATE INDEX dr_010 ON casdcing.dr (chain_id_2);
+
 CREATE TABLE casdcing.cingresonancelist
 (
     resonancelist_id               SERIAL UNIQUE PRIMARY KEY,
     entry_id                       INT              NOT NULL,
     name                           VARCHAR(255),
+--    number                         INT              NOT NULL,
     applied                        BOOLEAN DEFAULT FALSE, -- only when applicable
     rog                            INT DEFAULT NULL,
     FOREIGN KEY (entry_id)         REFERENCES casdcing.cingentry (entry_id) ON DELETE CASCADE

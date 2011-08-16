@@ -109,7 +109,8 @@ def doStoreCING2db( entry_code, archive_id, project = None):
     catom = csql.cingatom
     cresonancelist = csql.cingresonancelist
     cresonancelistperatomclass = csql.cingresonancelistperatomclass
-
+    cdrlist = csql.drlist
+    cdr = csql.dr
     if doReadProject:
         # presume the directory still needs to be created.
         cingEntryDir = entry_code + ".cing"
@@ -476,6 +477,9 @@ def doStoreCING2db( entry_code, archive_id, project = None):
     chainCommittedCount = 0
     residueCommittedCount = 0
     atomCommittedCount = 0
+    atomIdHash = NTdict() # map to RDB entity id
+    residueIdHash = NTdict()
+    chainIdHash = NTdict()
     for chain in project.molecule.allChains():
         nameC = chain.name
         chothia_class = molecule.chothiaClassInt()
@@ -489,15 +493,13 @@ def doStoreCING2db( entry_code, archive_id, project = None):
         )
         s = select([cchain.c.chain_id],and_(cchain.c.entry_id == entry_id, cchain.c.name == nameC))
         chain_id = execute(s).fetchall()[0][0]
-#        nTdebug("Inserted chain id %s" % chain_id)
+        nTdebug("Inserted chain id %s" % chain_id)
+        chainIdHash[ chain ] = chain_id        
         chainCommittedCount += 1
         for residue in chain.allResidues():
-
             if residue.hasProperties('water'):
                 continue
-
 #            nTmessage("Residue: %s" % residue)
-
             # CING
     #        print m.C.ASN46.distanceRestraints
 #            residue = m.C.ASN46
@@ -709,6 +711,7 @@ def doStoreCING2db( entry_code, archive_id, project = None):
                   cresidue.c.number == numberR
                   ))
             residue_id = execute(s).fetchall()[0][0]
+            residueIdHash[ residue ] = residue_id        
             residueCommittedCount += 1
 #            nTdebug("Inserted residue %s" % residue_id)
             if True:
@@ -735,28 +738,28 @@ def doStoreCING2db( entry_code, archive_id, project = None):
                         if a_cs != None:
                             a_cs_err = getDeepWithNone(a_first_resonance, ERROR_STR)
                             a_cs_ssa = truthToInt( atom.isStereoAssigned() )
-                    # Store only atoms for which there is useful info.
-                    useFulColumns = [
-#                        a_wi_ba2lst,
-#                        a_wi_bh2chk,
-                        a_wi_chichk,
-                        a_wi_dunchk,
-                        a_wi_hndchk,
-#                        a_wi_mischk,
-#                        a_wi_mo2chk,
-                        a_wi_pl2chk,
-                        a_wi_wgtchk,
-                        a_cs,
-                        a_cs_err,
-                        a_cs_ssa
-                    ]
-                    hasUsefulColumn = False
-                    for _i,column in enumerate(useFulColumns):
-                        if column != None:
-#                            nTdebug("Found useful column: %s %s" % ( i, column))
-                            hasUsefulColumn = True
-                    if not hasUsefulColumn:
-                        continue
+                    # Store all atoms including pseudos.
+#                    useFulColumns = [
+##                        a_wi_ba2lst,
+##                        a_wi_bh2chk,
+#                        a_wi_chichk,
+#                        a_wi_dunchk,
+#                        a_wi_hndchk,
+##                        a_wi_mischk,
+##                        a_wi_mo2chk,
+#                        a_wi_pl2chk,
+#                        a_wi_wgtchk,
+#                        a_cs,
+#                        a_cs_err,
+#                        a_cs_ssa
+#                    ]
+#                    hasUsefulColumn = False
+#                    for _i,column in enumerate(useFulColumns):
+#                        if column != None:
+##                            nTdebug("Found useful column: %s %s" % ( i, column))
+#                            hasUsefulColumn = True
+#                    if not hasUsefulColumn:
+#                        continue
                     a_rog = atom.rogScore.rogInt()
                     atomInfoList = [entry_id,chain_id,residue_id,
                         a_name,a_wi_chichk,a_wi_dunchk,a_wi_hndchk, a_wi_pl2chk, a_wi_wgtchk, a_cs,a_cs_err,a_cs_ssa,a_rog]
@@ -790,18 +793,142 @@ def doStoreCING2db( entry_code, archive_id, project = None):
                               catom.c.residue_id == residue_id,
                               catom.c.name == a_name
                               ))
-    #                    atom_id = execute(s).fetchall()[0][0]
-    #                    nTdebug("Inserted atom %s %s" % (atom_id, atom))
+                        atom_id = execute(s).fetchall()[0][0]
+#                        nTdebug("Inserted atom %s %s" % (atom_id, atom))
+                        atomIdHash[ atom ] = atom_id
                         atomCommittedCount += 1
                     except:
                         nTtracebackError()
                         nTerror("Failed to insert atom [%s] with info: %s" % ( atom, str(atomInfoList)))
                         continue
+                    # end try
                 # end for atom
             # end if atom
         # end for residue
     # end for chain
     nTmessage("Committed %d chains %d residues %d atoms" % (chainCommittedCount,residueCommittedCount,atomCommittedCount))
+    nTdebug("Memorized %d chains %d residues %d atoms" % (len(chainIdHash.keys()),len(residueIdHash.keys()),len(atomIdHash.keys())))
+    
+    drlCommittedCount = 0
+    drCommittedCount = 0
+    drRowCommittedCount = 0
+#    drlIdHash = NTdict()
+    drIdHash = NTdict()
+    for drl_number, drl in enumerate(project.distances, 1):
+        if not drl:
+            continue
+        drl_name = drl.name
+        drl_rog = drl.rogScore.rogInt()
+        result = execute(cdrlist.insert().values(
+            entry_id=entry_id,
+            name=drl_name,
+            number=drl_number,
+            rog=drl_rog
+            )
+        )
+        s = select([cdrlist.c.drlist_id],and_(cdrlist.c.entry_id == entry_id, cdrlist.c.number == drl_number))
+        drl_id = execute(s).fetchall()[0][0]
+#        drlIdHash[ drl ] = drl_id
+        drlCommittedCount += 1        
+        for dr_number,dr in enumerate(drl, 1):
+            if not dr:
+                nTerror("Failed to get dr from drl: %s" % drl)
+                continue
+            dr_rog = dr.rogScore.rogInt()
+
+#            dr_target            = dr.target           
+            dr_lower             = dr.lower            
+            dr_upper             = dr.upper            
+#            dr_contribution      = dr.contribution     
+            dr_viol_count1       = dr.violCount1      
+            dr_viol_count3       = dr.violCount3      
+            dr_viol_count5       = dr.violCount5      
+            dr_viol_max          = dr.violMax         
+            dr_viol_av           = dr.violAv          
+            dr_viol_sd           = dr.violSd          
+            dr_av                = dr.av               
+            dr_sd                = dr.sd               
+            dr_min               = dr.min              
+            dr_max               = dr.max              
+            dr_viol_count_lower  = dr.violCountLower 
+            dr_viol_upper_max    = dr.violUpperMax   
+            dr_viol_lower_max    = dr.violLowerMax   
+            dr_has_analyze_error = bool(dr.error)            
+            
+            for member_id, atomPair in enumerate(dr.atomPairs, 1):
+                member_logic = None
+                if len(dr.atomPairs) > 1:
+                    member_logic = 'OR'
+                atom1, atom2 = atomPair
+                residue1 = getDeepByKeysOrAttributes( atom1, '_parent')    
+                chain1 = getDeepByKeysOrAttributes( residue1, '_parent')    
+                atom_id_1       = getDeepByKeysOrAttributes(atomIdHash, atom1)
+                residue_id_1    = getDeepByKeysOrAttributes(residueIdHash, residue1)    
+                chain_id_1      = getDeepByKeysOrAttributes(chainIdHash, chain1)                    
+
+                residue2 = getDeepByKeysOrAttributes( atom2, '_parent')    
+                chain2 = getDeepByKeysOrAttributes( residue2, '_parent')    
+                atom_id_2       = getDeepByKeysOrAttributes(atomIdHash, atom2)
+                residue_id_2    = getDeepByKeysOrAttributes(residueIdHash, residue2)    
+                chain_id_2      = getDeepByKeysOrAttributes(chainIdHash, chain2)
+                
+                                    
+                result = execute(cdr.insert().values(
+                    entry_id=entry_id,
+                    drlist_id=drl_id,
+                    number=dr_number,
+                    member_id = member_id,
+                    member_logic = member_logic,
+                    atom_id_1 = atom_id_1,
+                    residue_id_1 = residue_id_1,
+                    chain_id_1 = chain_id_1,
+                    atom_id_2 = atom_id_2,
+                    residue_id_2 = residue_id_2,
+                    chain_id_2 = chain_id_2,
+                    
+                    atom_name_1     = getDeepByKeysOrAttributes(atom1, NAME_STR),    
+                    residue_num_1   = getDeepByKeysOrAttributes(residue1, RES_NUMB_STR),    
+                    residue_name_1  = getDeepByKeysOrAttributes(residue1, RES_NAME_STR),    
+                    chain_name_1    = getDeepByKeysOrAttributes(chain1, NAME_STR),                        
+                    
+                    atom_name_2     = getDeepByKeysOrAttributes(atom2, NAME_STR),    
+                    residue_num_2   = getDeepByKeysOrAttributes(residue2, RES_NUMB_STR),    
+                    residue_name_2  = getDeepByKeysOrAttributes(residue2, RES_NAME_STR),    
+                    chain_name_2    = getDeepByKeysOrAttributes(chain2, NAME_STR),                        
+                                        
+#                    target            = dr_target           ,
+                    lower             = dr_lower            ,
+                    upper             = dr_upper            ,
+#                    contribution      = dr_contribution     ,
+                    viol_count1       = dr_viol_count1      ,
+                    viol_count3       = dr_viol_count3      ,
+                    viol_count5       = dr_viol_count5      ,
+                    viol_max          = dr_viol_max         ,
+                    viol_av           = dr_viol_av          ,
+                    viol_sd           = dr_viol_sd          ,
+                    av                = dr_av               ,
+                    sd                = dr_sd               ,
+                    min               = dr_min              ,
+                    max               = dr_max              ,
+                    viol_count_lower  = dr_viol_count_lower ,
+                    viol_upper_max    = dr_viol_upper_max   ,
+                    viol_lower_max    = dr_viol_lower_max   ,
+                    has_analyze_error = dr_has_analyze_error,
+                        
+                    rog=dr_rog
+                    )
+                )
+                s = select([cdr.c.dr_id],and_(cdr.c.entry_id == entry_id, cdr.c.drlist_id == drl_id, cdr.c.number == dr_number, cdr.c.member_id == member_id))
+                dr_id = execute(s).fetchall()[0][0]
+                drIdHash[ dr_id ] = dr_id # bogus statement
+                drRowCommittedCount += 1
+            # end for
+            drCommittedCount += 1
+        # end for
+        nTdebug("Committed %d dr %d drrows" % (drCommittedCount,drRowCommittedCount))
+        drlCommittedCount += 1        
+    # end for
+    nTmessage("Committed %d drl and overall %d dr %d drrows" % (drlCommittedCount,drCommittedCount,drRowCommittedCount))
 #    project.close(save=False) # needed ???
 
     # Needed for the above hasn't been auto-committed.

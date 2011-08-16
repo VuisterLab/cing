@@ -47,7 +47,9 @@ def doScriptOnEntryList(pythonScriptFileName,
           ):
     """Return True on error"""
     
-    if 1: # DEFAULT: False
+    if True: # DEFAULT: True
+        pid = os.getpid()
+        nTdebug("Use kill -2 %s (sending a INT (interrupt) to this Process ID) twice to kill all child processes.\n" % pid)
         nTdebug("entryListFileName            : %s" % entryListFileName)        
         nTdebug("startDir                     : %s" % startDir                     )        
         nTdebug("processes_max                : %s" % processes_max                )        

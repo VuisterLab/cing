@@ -2634,6 +2634,7 @@ class DistanceRestraint(Restraint):
         self.violCountLower = 0    # Lower-bound violations
         self.violUpperMax = 0.0    # Max violation over upper bound
         self.violLowerMax = 0.0    # Max violation over lower bound
+        
         self.duplicates = NTlist() # NTlist instance with DistanceRestraint instances considered duplicates; TODO: check this code
         self.error = False    # Indicates if an error was encountered when analyzing restraint
 
@@ -3140,12 +3141,12 @@ class DistanceRestraint(Restraint):
         self.violCount3 = 0        # Number of violations > 0.3A
         self.violCount5 = 0        # Number of violations > 0.5A
         self.violCountLower = 0    # Number of lower-bound violations over 0.1A
-        self.violMax = 0.0    # Maximum violation
+        self.violMax = 0.0         # Maximum violation
         self.violUpperMax = 0.0    # Max violation over upper bound
         self.violLowerMax = 0.0    # Max violation over lower bound
-        self.violAv = 0.0      # Average violation
-        self.violSd = None     # Sd of violations
-        self.violSum = 0.0      # Sum of violations
+        self.violAv = 0.0          # Average violation
+        self.violSd = None         # Sd of violations
+        self.violSum = 0.0         # Sum of violations
         self.distances = nTfill(0.0, modelCount) #list with actual effective distances
 
         models = range(modelCount)

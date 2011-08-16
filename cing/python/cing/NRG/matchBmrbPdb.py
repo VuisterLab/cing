@@ -46,6 +46,7 @@ class MatchBmrbPdb(Lister):
         self.restartFromScratch = 1
 
     def prepare(self):
+        'Return True on error.'
         if self.restartFromScratch:
             rmdir(matchBmrbPdbDir)
         if not os.path.exists(matchBmrbPdbDir):
@@ -57,6 +58,7 @@ class MatchBmrbPdb(Lister):
             nTmessage("Reusing existing data dir " + matchBmrbPdbDir)
         os.chdir(matchBmrbPdbDir)
         if 1: # DEFAULT: 1
+            nTmessage("Getting ADIT from: %s" % self.adit_url)
             if os.path.exists(self.adit_fn):
                 os.unlink(self.adit_fn) # prevent buildup of endless copies.
             wgetProgram = ExecuteProgram('wget --no-verbose %s' % self.adit_url, redirectOutputToFile ='getAdit.log' )
@@ -71,7 +73,9 @@ class MatchBmrbPdb(Lister):
             if addColumnHeaderRowToCsvFile(self.adit_fn, columnOrder):
                 nTerror("Failed to add header row to " + self.adit_fn)
                 return True
+            nTmessage("Got the ADIT info")
         if 1: # DEFAULT: 1
+            nTmessage("Getting BMRB file list from : %s" % bmrbDir)
             bmrbFileList = findFiles("bmr*_21.str", bmrbDir)
             bmrbIdList = []
             for bmrbFile in bmrbFileList:
@@ -97,10 +101,10 @@ class MatchBmrbPdb(Lister):
                 return True
         if 1: # DEFAULT: 1
             dbms2 = DBMS()
-#            pdbList = getPdbEntries(onlyNmr = True)
+            pdbList = getPdbEntries(onlyNmr = True)
             pdbNmrTable = Relation('pdbNmr', dbms2, columnList=['pdb_id'])
-#            pdbIdColumn = pdbNmrTable.getColumnByIdx(0)
-#            pdbIdColumn += pdbList
+            pdbIdColumn = pdbNmrTable.getColumnByIdx(0) # pylint: disable=W0612
+            pdbIdColumn += pdbList
             pdbNmrTable.writeCsvFile('pdbNmrTable.csv')
 #        if False:
 #            newMany2OneTable =dbms.tables['newMany2OneTable'] #@UnusedVariable

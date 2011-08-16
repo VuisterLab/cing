@@ -292,3 +292,44 @@ JOIN pdbj."E://entity" e ON e.docid = s.docid
 JOIN "//entity/pdbx_number_of_molecules" p2    ON p2.docid = e.docid AND p2.pos BETWEEN e.pstart AND e.pend
 JOIN "//entity/formula_weight" p3              ON p3.docid = e.docid AND p3.pos BETWEEN e.pstart AND e.pend
 GROUP BY s.pdbid
+
+SELECT count(*) from nrgcing.drlist;
+SELECT count(*) from nrgcing.dr;
+SELECT count(*) from nrgcing.cingatom;
+
+-- Get the non-ambi dr pairs for leucine HG using only 3 relations.
+SELECT e.name, dl.number as dl_number, d.dr_id, d.member_id, d.upper, d.chain_name_1, d.residue_name_1, d.residue_num_1, d.atom_name_1
+FROM
+nrgcing.cingentry e,
+nrgcing.drlist dl,
+nrgcing.dr d
+ where
+d.entry_id = e.entry_id AND
+d.drlist_id = dl.drlist_id AND (
+    (d.atom_name_1  = 'HG' AND d.residue_name_1 = 'LEU' ) 
+OR  (d.atom_name_2  = 'HG' AND d.residue_name_2 = 'LEU' )
+) AND
+d.member_logic_code IS NULL
+order by e.name, dl.number, d.dr_id, d.member_id asc;
+
+-- Then the similar thing using 6 relations
+-- Get the non-ambi dr pairs for where the first atom is a leucine HG
+SELECT e.name, dl.number as dl_number, d.dr_id, d.member_id, d.upper, a.name as a_name, r.name as r_name, r.number as r_number, c.name as c_name
+FROM
+nrgcing.cingentry e,
+nrgcing.cingchain c,
+nrgcing.cingresidue r,
+nrgcing.cingatom a,
+nrgcing.drlist dl,
+nrgcing.dr d
+ where
+d.entry_id = e.entry_id AND
+d.drlist_id = dl.drlist_id AND
+a.atom_id  = d.atom_id_1 AND 
+a.residue_id  = r.residue_id AND 
+a.chain_id  = c.chain_id AND 
+a.name = 'HG' AND 
+r.name = 'LEU' AND 
+d.member_logic_code IS NULL
+order by e.name, dl.number, d.dr_id, d.member_id asc;
+

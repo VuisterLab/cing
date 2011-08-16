@@ -169,6 +169,7 @@ class CsqlAlchemy(CgenericSql): # pylint: disable=R0902
                     unix_socket=unix_socket, db=db, schema=schema, echo=echo)
         # be explicit here to take advantage of code analysis.
         self.tableNameList = ('cingentry cingchain cingresidue cingatom ' +
+                              'drlist dr ' +
                               'cingresonancelist cingresonancelistperatomclass cingsummary entry_list_selection').split()
 #        self.tableNameList = [ 'casdcing.'+x for x in self.tableNameList]
 #        self.entry = None
@@ -178,6 +179,8 @@ class CsqlAlchemy(CgenericSql): # pylint: disable=R0902
         self.cingatom = None
         self.cingresonancelist = None
         self.cingresonancelistperatomclass = None
+        self.cdrlist = None
+        self.cdr = None
         self.cingsummary = None
         self.entry_list_selection = None
 
