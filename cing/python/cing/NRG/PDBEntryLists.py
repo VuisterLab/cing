@@ -9,6 +9,7 @@ from cing import cingPythonDir
 from cing.Libs.DBMS import DBMS
 from cing.Libs.DBMS import getRelationFromCsvFile
 from cing.Libs.NTutils import * #@UnusedWildImport
+from cing.NRG.nrgCingRdb import getPdbIdList
 from cing.NRG.settings import matchBmrbPdbDir
 import urllib
 import urllib2
@@ -266,7 +267,29 @@ def getBmrbCsCounts():
 
     return bmrbCountMap
 
+def findMissingPdbjEntries():
+    'Return True if entries are missing in pdbj wrt rcsb-pdb.'
+    pdbRcsbEntryList = getPdbEntries()
+    NTmessage("Found RCSB PDB entries count: %s" % len(pdbRcsbEntryList))
+    host = 'localhost'
+    if 1: # DEFAULT Fa;se
+        host = 'nmr.cmbi.umcn.nl'
+    pdbjEntryList = getPdbIdList(fromNrg=False, host=host)
+    if not pdbRcsbEntryList:
+        NTerror("Failed to find any entry in RCSB-PDB")
+        return True
+    if not pdbjEntryList:
+        NTerror("Failed to find any entry in pdbj's")
+        return True
+    NTmessage("Found PDBj entries count: %s" % len(pdbjEntryList))
+    pdbRcsbEntryNtList = NTlist(*pdbRcsbEntryList)
+    pdbjEntryNtList = NTlist(*pdbjEntryList)
+    pdbjMissingEntryNtList = pdbRcsbEntryNtList.difference(pdbjEntryNtList)
+    NTmessage("Found PDBj missing entries count: %s %s" % (len(pdbjMissingEntryNtList), pdbjMissingEntryNtList))
+    pdbRcsbMissingEntryNtList = pdbjEntryNtList.difference(pdbRcsbEntryNtList)
+    NTmessage("Found RCSB-PDB missing entries count: %s %s" % (len(pdbRcsbMissingEntryNtList), pdbRcsbMissingEntryNtList))
 # end def
+    
 if __name__ == '__main__':
-    cing.verbosity = cing.verbosityDebug
-    getBmrbEntries()
+#    cing.verbosity = cing.verbosityDebug
+    findMissingPdbjEntries()

@@ -446,7 +446,7 @@ def getDrFromXplorMemory( project, convention ):
 def fullRedo(project, modelCountAnneal = 200, bestAnneal = 50, best = 25):
     'Return True on error.'
         
-    nTmessage("==> Recalculating and refining a new enesemble in cing.PluginCode.xplor#%s" % getCallerName())
+    nTmessage("==> Recalculating and refining a new ensemble in cing.PluginCode.xplor#%s" % getCallerName())
     
     if 0: # DEFAULT: 0
         modelCountAnneal, bestAnneal, best = 4,3,2

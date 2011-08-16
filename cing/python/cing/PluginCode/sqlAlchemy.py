@@ -119,7 +119,7 @@ class CgenericSql(NTdict): # pylint: disable=R0902
 
         self.dBversion = self.session.execute(func.version()).fetchone()[0]
 #        nTmessage("Now connected on host %s to database %s schema %s by user %s" % (self.host, self.db, self.schema, self.user))
-        nTmessage("Connection CgenericSql: %20s %10s %10s %10s" % (self.host, self.db, self.schema, self.user))
+        nTdebug("Connection CgenericSql: %20s %10s %10s %10s" % (self.host, self.db, self.schema, self.user))
         if self.db_type == DB_TYPE_MYSQL:
             dBversionTuple = self.dBversion.split('.')
             dBversionFloat = float(dBversionTuple[0] + '.' + dBversionTuple[1])
@@ -149,10 +149,10 @@ class CgenericSql(NTdict): # pylint: disable=R0902
         #The MetaData object supports some handy methods, such as getting a list of Tables in the order (or reverse) of their dependency:
 #        with warnings.catch_warnings(): 
 # can't use the python 2.5 feature since it's not always enabled. Update when no longer supporting 2.5
-        if True:
+        if 0:
             warnings.simplefilter("ignore")
 #            for _t in self.metadata.table_iterator(reverse=False): # obsoleted
-            for t in self.metadata.sorted_tables:
+            for t in self.metadata.sorted_tables:                
                 nTdebug("Table: %s" % t.name)
             warnings.simplefilter("default") # reset to default warning behavior.
 #            warnings.warn("depreciated 123", DeprecationWarning)

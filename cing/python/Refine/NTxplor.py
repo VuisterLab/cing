@@ -914,7 +914,7 @@ parameter
         !ILE: chirality CB
         improper (name HB and resn ILE)(name CA and resn ILE)(name CG2 and resn ILE)(name CG1 and resn ILE) $kchira TOKEN TOKEN
         !chirality CA
-        improper (name HA)(name N)(name C)(name CB) $kchira TOKEN TOKEN
+        improper (name HA) (name N) (name C) (name CB) $kchira TOKEN TOKEN
         improper (name O)  (name C) (name N) (name CA) $komega TOKEN TOKEN
         improper (name HN) (name N) (name C) (name CA) $komega TOKEN TOKEN
         improper (name CA) (name C) (name N) (name CA) $komega TOKEN TOKEN

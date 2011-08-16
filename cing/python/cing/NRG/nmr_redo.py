@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-This script will use NRG-CING files to generate new structures for existing PDB entries.
+This script will use NRG-CING files to generate new structures for existing NMR PDB entries.
 
 Execute like NrgCing, e.g.
 
@@ -10,11 +10,16 @@ $CINGROOT/python/cing/NRG/nmr_redo.py getEntryInfo
 $CINGROOT/python/cing/NRG/nmr_redo.py 1brv storeCING2db
 """
 
+from cing import cingDirScripts
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.Libs.helper import * #@UnusedWildImport
-from cing.NRG.nrgCing import * #@UnusedWildImport
+from cing.NRG import ARCHIVE_NMR_REDO_ID
+from cing.NRG.nrgCing import NrgCing
+from cing.NRG.nrgCing import runNrgCing
 from cing.NRG.settings import * #@UnusedWildImport
-from cing.Scripts.validateEntry import * #@UnusedWildImport
+from cing.NRG.validateEntryForCasp import ARCHIVE_TYPE_BY_CH23_BY_ENTRY
+from cing.Scripts.doScriptOnEntryList import doScriptOnEntryList
+from cing.Scripts.validateEntry import PROJECT_TYPE_CING
 
 class NmrRedo(NrgCing):
     """Main class for preparing and running NMR recalculations."""
@@ -30,9 +35,10 @@ class NmrRedo(NrgCing):
                  writeWhyNot=True,
                  writeTheManyFiles=False,
                  updateIndices=True,
-                 isProduction=True
+#                 isProduction=True
                 ):
-        kwds = NTdict( useTopos=useTopos, # There must be an introspection possible for this.
+        kwds = NTdict( 
+                 useTopos=useTopos, # There must be an introspection possible for this.
                  getTodoList=getTodoList,
                  max_entries_todo=max_entries_todo,
                  max_time_to_wait=max_time_to_wait, # one day. 2p80 took the longest: 5.2 hours. 
@@ -42,28 +48,27 @@ class NmrRedo(NrgCing):
                  writeWhyNot=writeWhyNot,
                  writeTheManyFiles=writeTheManyFiles,
                  updateIndices=updateIndices,
-                 isProduction=isProduction,
+#                 isProduction=isProduction,
 )
         kwds = kwds.toDict()
-        NrgCing.__init__( self, **kwds ) # Steal most from super class. @UndefinedVariable for init??? JFD; doesn't understand.
+        NrgCing.__init__( self, **kwds ) # Steal most from super class. 
         self.results_base = results_base_redo
 
 
         self.entry_to_delete_count_max = 0 # can be as many as fail every time.
         self.usedCcpnInput = 0  # For NMR_REDO it is not from the start.
         self.validateEntryExternalDone = 0
-        self.nrgCing = NrgCing() # Use as little as possible thru this convenience variable.
+        self.nrgCing = NrgCing() # Use as little as possible thru this inconvenience variable.
                 
         self.archive_id = ARCHIVE_NMR_REDO_ID        
         self.validateEntryExternalDone = False # DEFAULT: True 
-#        in the future and then it won't chainge but for NrgCing it is True from the start.
-        self.entry_list_possible = self.getPossibleEntryList()
-
+#        in the future and then it won't change but for NrgCing it is True from the start.
         self.updateDerivedResourceSettings() # The paths previously initialized in NrgCing. Will also chdir.
         
-        if 0:
+        if 1:
             self.entry_list_todo = NTlist() 
-            self.entry_list_todo += "1brv 1dum".split()
+#            self.entry_list_todo += "1brv 1dum".split()
+            self.entry_list_todo += "1brv".split()
         if 0: # DEFAULT: 0
             nTmessage("Going to use specific entry_list_todo in prepare")
 #            self.entry_list_todo = "1brv".split()
@@ -79,11 +84,6 @@ class NmrRedo(NrgCing):
             self.entry_list_todo = NTlist( *self.entry_list_todo )
     # end def  
         
-    def getPossibleEntryList(self):
-        self.entry_list_possible = NTlist() # NEW: monomeric, and beyond.
-        self.entry_list_possible += '1brv 1dum'.split()
-        return self.entry_list_possible
-    # end def   
     
     def refine(self):
         """On self.entry_list_todo.
@@ -113,10 +113,11 @@ class NmrRedo(NrgCing):
         if doScriptOnEntryList(pythonScriptFileName,
                             entryListFileName,
                             self.results_dir,
-                            processes_max=self.processes_max,
-                            delay_between_submitting_jobs=5, # why is this so long? because of time outs at tang?
-                            max_time_to_wait=self.max_time_to_wait,
-                            max_entries_todo=self.max_entries_todo,
+                            processes_max = self.processes_max,
+                            delay_between_submitting_jobs = 5, # why is this so long? because of time outs at tang?
+                            max_time_to_wait = self.max_time_to_wait,
+                            start_entry_id = 0,
+                            max_entries_todo = self.max_entries_todo,                            
                             extraArgList=extraArgList):
             nTerror("Failed to doScriptOnEntryList")
             return True
@@ -125,4 +126,5 @@ class NmrRedo(NrgCing):
 # end class.
 
 if __name__ == '__main__':
-    runNrgCing( useClass = NmrRedo )
+    max_entries_todo = 1
+    runNrgCing( useClass = NmrRedo, max_entries_todo = max_entries_todo )
