@@ -9,8 +9,6 @@ from cing import cingPythonDir
 from cing.Libs.DBMS import DBMS
 from cing.Libs.DBMS import getRelationFromCsvFile
 from cing.Libs.NTutils import * #@UnusedWildImport
-from cing.NRG.nrgCing import NrgCing
-from cing.NRG.nrgCingRdb import NrgCingRdb
 from cing.NRG.nrgCingRdb import getPdbIdList
 from cing.NRG.settings import matchBmrbPdbDir
 import urllib
@@ -292,37 +290,6 @@ def findMissingPdbjEntries():
     NTmessage("Found RCSB-PDB missing entries count: %s %s" % (len(pdbRcsbMissingEntryNtList), pdbRcsbMissingEntryNtList))
 # end def
     
-def findMissingNrgCingEntries():
-    'Return True if entries are missing in pdbj wrt rcsb-pdb.'
-    # BAD
-    nc = NrgCing()
-    nrgCingBadEntryNtList = nc.entry_list_bad_overall
-    NTmessage("Found NRG-CING bad entries count: %s (expected to be missing)." % len(nrgCingBadEntryNtList))
-    # GOOD
-    host = 'localhost'
-    if False: # DEFAULT False
-        host = 'nmr.cmbi.umcn.nl'
-    crdb = NrgCingRdb(host=host) 
-    nrgCingEntryList = crdb.getPdbIdList()
-    if not nrgCingEntryList:
-        nTerror("Failed to get any entry from NRG-CING RDB")
-        return True
-    NTmessage("Found NRG-CING entries count: %s" % len(nrgCingEntryList))
-    # PDB
-    pdbRcsbEntryList = getPdbEntries(onlyNmr=True)
-    NTmessage("Found RCSB PDB entries count: %s" % len(pdbRcsbEntryList))
-    
-    
-    pdbRcsbEntryNtList = NTlist(*pdbRcsbEntryList)
-    nrgCingEntryNtList = NTlist(*nrgCingEntryList)
-    nrgCingMissingEntryNtList = pdbRcsbEntryNtList.difference(nrgCingEntryNtList)
-    nrgCingMissingEntryNtList = nrgCingMissingEntryNtList.difference(nrgCingBadEntryNtList)
-    NTmessage("Found NRG-CING missing entries count: %s %s" % (len(nrgCingMissingEntryNtList), nrgCingMissingEntryNtList))
-    pdbRcsbMissingEntryNtList = nrgCingEntryNtList.difference(pdbRcsbEntryNtList)
-    NTmessage("Found RCSB-PDB missing entries count: %s %s" % (len(pdbRcsbMissingEntryNtList), pdbRcsbMissingEntryNtList))
-# end def
-    
 if __name__ == '__main__':
 #    cing.verbosity = cing.verbosityDebug
-#    findMissingPdbjEntries()
-    findMissingNrgCingEntries()
+    findMissingPdbjEntries()

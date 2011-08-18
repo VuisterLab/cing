@@ -258,12 +258,11 @@ class NrgCing(Lister):
         self.setPossibleEntryList()
         
         self.updateDerivedResourceSettings() # The paths previously initialized with None.
-        # See NRG issue XXX FC bug ApiError: ccp.molecule.MolSystem.Chain.checkValid:
-#       constraint seqCode_and_seqInsertCode_form_secondary_key_for_residues violated: <ccp.molecule.MolSystem.Chain ['177d', 'A']>
-        self.entry_list_bad_nrg_docr.addList( '177d'.split() ) 
         # See NRG issue 272 bad ccpn docr project
         self.entry_list_bad_nrg_docr.addList( '1lcc 1lcd 2l2z'.split() ) 
-#        self.entry_list_bad_overall.addList( '134d '.split() ) # CING Issue 266 fixed.
+        # CING Issue 266 closed.
+        self.entry_list_bad_overall.addList( '134d 177d'.split() ) 
+        self.entry_list_bad_overall.addList( self.entry_list_bad_nrg_docr ) 
 
         
         if 0:
@@ -2031,6 +2030,34 @@ class NrgCing(Lister):
         return True
     # end def
     
+    def findMissingNrgCingEntries(self):
+        'Return True if entries are missing in pdbj wrt rcsb-pdb.'
+        # BAD
+        nrgCingBadEntryNtList = self.entry_list_bad_overall
+        NTmessage("Found NRG-CING bad entries count: %s (expected to be missing)." % len(nrgCingBadEntryNtList))
+        # GOOD
+        host = 'localhost'
+        if False: # DEFAULT False
+            host = 'nmr.cmbi.umcn.nl'
+        crdb = NrgCingRdb(host=host) 
+        nrgCingEntryList = crdb.getPdbIdList()
+        if not nrgCingEntryList:
+            nTerror("Failed to get any entry from NRG-CING RDB")
+            return True
+        NTmessage("Found NRG-CING entries count: %s" % len(nrgCingEntryList))
+        # PDB
+        pdbRcsbEntryList = getPdbEntries(onlyNmr=True)
+        NTmessage("Found RCSB PDB entries count: %s" % len(pdbRcsbEntryList))
+        
+        
+        pdbRcsbEntryNtList = NTlist(*pdbRcsbEntryList)
+        nrgCingEntryNtList = NTlist(*nrgCingEntryList)
+        nrgCingMissingEntryNtList = pdbRcsbEntryNtList.difference(nrgCingEntryNtList)
+        nrgCingMissingEntryNtList = nrgCingMissingEntryNtList.difference(nrgCingBadEntryNtList)
+        NTmessage("Found NRG-CING missing entries count: %s %s" % (len(nrgCingMissingEntryNtList), nrgCingMissingEntryNtList))
+        pdbRcsbMissingEntryNtList = nrgCingEntryNtList.difference(pdbRcsbEntryNtList)
+        NTmessage("Found RCSB-PDB missing entries count: %s %s" % (len(pdbRcsbMissingEntryNtList), pdbRcsbMissingEntryNtList))
+    # end def        
 # end class.
 
 def runNrgCing( useClass = NrgCing,
@@ -2119,6 +2146,9 @@ def runNrgCing( useClass = NrgCing,
         elif destination == 'refine':
             if uClass.refine(): # in nmr_redo
                 nTerror("Failed to refine")
+        elif destination == 'findMissingNrgCingEntries':
+            if uClass.findMissingNrgCingEntries(): # in nmr_redo
+                nTerror("Failed to findMissingNrgCingEntries")
         else:
             nTerror("Unknown destination: %s" % destination)
         # end if
