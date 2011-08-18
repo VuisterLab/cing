@@ -292,6 +292,7 @@ CREATE INDEX residue_003 ON casdcing.cingresidue (number);
 CREATE INDEX residue_004 ON casdcing.cingresidue (dssp_id);
 CREATE INDEX residue_005 ON casdcing.cingresidue (rog);
 CREATE INDEX residue_006 ON casdcing.cingresidue (dis_c5_viol);
+CREATE INDEX residue_007 ON casdcing.cingresidue (name);
 CREATE INDEX residue_se1 ON casdcing.cingresidue (sel_1);
 CREATE INDEX residue_se2 ON casdcing.cingresidue (sel_2);
 CREATE INDEX residue_se3 ON casdcing.cingresidue (sel_3);
@@ -431,15 +432,18 @@ CREATE TABLE casdcing.dr
     FOREIGN KEY (entry_id)            REFERENCES casdcing.cingentry   (entry_id)   ON DELETE CASCADE        
 );
 CREATE INDEX dr_001 ON casdcing.dr (entry_id);
---CREATE INDEX dr_002 ON casdcing.dr (name);
-CREATE INDEX dr_003 ON casdcing.dr (rog);
-CREATE INDEX dr_004 ON casdcing.dr (entry_id);
-CREATE INDEX dr_005 ON casdcing.dr (atom_id_1);
-CREATE INDEX dr_006 ON casdcing.dr (residue_id_1);
-CREATE INDEX dr_007 ON casdcing.dr (chain_id_1);
-CREATE INDEX dr_008 ON casdcing.dr (atom_id_2);
-CREATE INDEX dr_009 ON casdcing.dr (residue_id_2);
-CREATE INDEX dr_010 ON casdcing.dr (chain_id_2);
+CREATE INDEX dr_002 ON casdcing.dr (drlist_id);
+CREATE INDEX dr_003 ON casdcing.dr (number);
+CREATE INDEX dr_004 ON casdcing.dr (member_id);
+CREATE INDEX dr_005 ON casdcing.dr (member_logic_code);
+CREATE INDEX dr_006 ON casdcing.dr (atom_id_1);
+CREATE INDEX dr_007 ON casdcing.dr (residue_id_1);
+CREATE INDEX dr_008 ON casdcing.dr (chain_id_1);
+CREATE INDEX dr_009 ON casdcing.dr (atom_id_2);
+CREATE INDEX dr_010 ON casdcing.dr (residue_id_2);
+CREATE INDEX dr_011 ON casdcing.dr (chain_id_2);
+CREATE INDEX dr_012 ON casdcing.dr (rog);
+
 
 CREATE TABLE casdcing.cingresonancelist
 (

@@ -17,7 +17,7 @@ $PGDATA/postgresql.conf
 Can be confirmed by sql query: SHOW config_file;
 e.g. shows default port to be 5432
 max_locks_per_transaction set to 5120 before I could drop pdbj schema; needed to restart PostgreSQL.
-
+max_connections = 60 # ran out of connections when doing updates with 8 processes from storeCING2db at a time.
 Log:
 sudo tail -f $PGDATA/logfile
 

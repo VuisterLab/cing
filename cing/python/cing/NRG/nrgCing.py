@@ -258,7 +258,11 @@ class NrgCing(Lister):
         self.setPossibleEntryList()
         
         self.updateDerivedResourceSettings() # The paths previously initialized with None.
-        self.entry_list_bad_nrg_docr.addList( '1lcc 1lcd 2l2z'.split() ) # See NRG issue 272 bad ccpn docr project
+        # See NRG issue XXX FC bug ApiError: ccp.molecule.MolSystem.Chain.checkValid:
+#       constraint seqCode_and_seqInsertCode_form_secondary_key_for_residues violated: <ccp.molecule.MolSystem.Chain ['177d', 'A']>
+        self.entry_list_bad_nrg_docr.addList( '177d'.split() ) 
+        # See NRG issue 272 bad ccpn docr project
+        self.entry_list_bad_nrg_docr.addList( '1lcc 1lcd 2l2z'.split() ) 
 #        self.entry_list_bad_overall.addList( '134d '.split() ) # CING Issue 266 fixed.
 
         
@@ -778,7 +782,7 @@ class NrgCing(Lister):
         if not self.entry_list_store_in_db:
             nTerror("Failed to get any entry from NRG-CING RDB")
             self.entry_list_store_in_db = NTlist()
-        nTmessage("Found %s entries in RDB" % len(self.entry_list_store_in_db))
+        nTmessage("Found %s entries in NRG-CING RDB" % len(self.entry_list_store_in_db))
 
         writeTextToFile("entry_list_nmr_redo.csv",      toCsv(self.entry_list_nmr_redo))
 

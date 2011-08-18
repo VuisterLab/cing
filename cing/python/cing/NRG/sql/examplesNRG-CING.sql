@@ -314,7 +314,9 @@ order by e.name, dl.number, d.dr_id, d.member_id asc;
 
 -- Then the similar thing using 6 relations
 -- Get the non-ambi dr pairs for where the first atom is a leucine HG
-SELECT e.name, dl.number as dl_number, d.dr_id, d.member_id, d.upper, a.name as a_name, r.name as r_name, r.number as r_number, c.name as c_name
+SELECT count(*) FROM nrgcing.cingentry;
+SELECT e.name, dl.number as dl_number, d.dr_id, d.member_id, d.upper, 
+        a.name as a_name, r.name as r_name, r.number as r_number, c.name as c_name
 FROM
 nrgcing.cingentry e,
 nrgcing.cingchain c,

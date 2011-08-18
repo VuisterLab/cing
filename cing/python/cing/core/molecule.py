@@ -1974,8 +1974,8 @@ class Molecule( NTtree, ResidueList ):
             ncsSymmetry = chain0.calculateRmsd( chain1, modelIdx = 0 ) # Only for first model
             drSymmetry = chain0.getSymmetryDR( chain1, modelIdx = 0 )
 
-            nTdebug("ncsSymmetry %.2f" % ncsSymmetry)
-            nTdebug("drSymmetry  %.2f" % drSymmetry)
+            nTdebug("ncsSymmetry %s" % val2Str(ncsSymmetry, "%.2f", 8))
+            nTdebug("drSymmetry  %s" % val2Str(drSymmetry,  "%.2f", 8))
             if ncsSymmetry == None:
                 nTerror("In %s getNcsSymmetryPerResidue Failed" % getCallerName())
                 return None                

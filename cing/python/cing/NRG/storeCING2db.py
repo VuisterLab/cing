@@ -918,7 +918,10 @@ def doStoreCING2db( entry_code, archive_id, project = None):
                     rog=dr_rog
                     )
                 )
-                s = select([cdr.c.dr_id],and_(cdr.c.entry_id == entry_id, cdr.c.drlist_id == drl_id, cdr.c.number == dr_number, cdr.c.member_id == member_id))
+                s = select([cdr.c.dr_id],and_(cdr.c.entry_id == entry_id, 
+                                              cdr.c.drlist_id == drl_id, 
+                                              cdr.c.number == dr_number, 
+                                              cdr.c.member_id == member_id))
                 dr_id = execute(s).fetchall()[0][0]
                 drIdHash[ dr_id ] = dr_id # bogus statement
                 drRowCommittedCount += 1
