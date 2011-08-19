@@ -99,3 +99,15 @@ set archive_id = CASD-NMR-CING
 set archive_id = NRG-CING
 set cmd = ("rsync -av /Volumes/tria3/$archive_id/ /Volumes/tria4/$archive_id")
 $cmd | & mail -s rsync.log jd &
+
+set baseDir = $D/NRG-CING
+set list = (`cat /Library/WebServer/Documents/NRG-CING/list/entry_list_recoord_nrgcing.csv`)
+#set list = ( 3trx )
+foreach x ( $list )
+    echo $x
+    set ch23 = ( `echo $x | cut -c2-3` )
+    set eDir = $baseDir/data/$ch23/$x
+    mkdir -p $eDir
+    scp jd@nmr:$eDir/$x.cing.tgz $eDir
+end
+

@@ -335,3 +335,4 @@ r.name = 'LEU' AND
 d.member_logic_code IS NULL
 order by e.name, dl.number, d.dr_id, d.member_id asc;
 
+select count(*) from nrgcing.cingentry;

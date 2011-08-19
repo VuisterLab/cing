@@ -50,6 +50,7 @@ from cing.NRG.WhyNot import TO_BE_VALIDATED_BY_CING
 from cing.NRG.WhyNot import WhyNot
 from cing.NRG.WhyNot import WhyNotEntry
 from cing.NRG.nrgCingRdb import NrgCingRdb
+from cing.NRG.nrgCingRdb import getPdbIdList
 from cing.NRG.settings import * #@UnusedWildImport
 from cing.Scripts.FC.utils import getBmrbCsCountsFromFile
 from cing.Scripts.doScriptOnEntryList import doScriptOnEntryList
@@ -777,7 +778,7 @@ class NrgCing(Lister):
         # end if
         
         crdb = NrgCingRdb(schema=self.schema_id) # Lazy opening as to not burden system too much. Stupid 
-        self.entry_list_store_in_db = crdb.getPdbIdList()
+        self.entry_list_store_in_db = getPdbIdList(fromNrg=True)
         if not self.entry_list_store_in_db:
             nTerror("Failed to get any entry from NRG-CING RDB")
             self.entry_list_store_in_db = NTlist()
@@ -876,6 +877,15 @@ class NrgCing(Lister):
 
         self.entry_list_todo = NTlist(*self.entry_list_nmr)
         self.entry_list_todo = self.entry_list_todo.difference(self.entry_list_done)
+        self.entry_list_todo = self.entry_list_todo.difference(self.entry_list_bad_overall)        
+        # Prioritize the entries not done yet so we have at least a first version of them.
+        if self.max_entries_todo < len(self.entry_list_todo):
+            prioritizedTodoList = self.prioritizeTodoList()
+            if prioritizedTodoList == None:
+                nTerror("Failed to prioritizeTodoList. Keeping current entry_list_todo")
+            else:                
+                self.entry_list_todo = prioritizedTodoList
+        
         self.entry_list_untried = NTlist(*self.entry_list_nmr)
         self.entry_list_untried = self.entry_list_untried.difference(self.entry_list_tried)
 
@@ -892,9 +902,10 @@ class NrgCing(Lister):
         nTmessage("Found %4d entries that CING stopped (S)." % len(self.entry_list_stopped))
         nTmessage("Found %4d entries that CING should update (U)." % len(self.entry_list_updated))
         nTmessage("Found %4d entries that CING did (B=A-C-S-U)." % len(self.entry_list_done))
-        nTmessage("Found %4d entries todo (A-B)." % len(self.entry_list_todo))
+        nTmessage("Found %4d entries todo (A-B, to a max of %d)." % (len(self.entry_list_todo), self.max_entries_todo))
         nTmessage("Found %4d entries in NRG-CING made obsolete." % len(self.entry_list_obsolete))
         nTmessage("Found %4d entries in NRG-CING without prep." % len(self.entry_list_missing_prep))
+        nTmessage("Found %4d entries in RDB NRG-CING." % len(self.entry_list_store_in_db))
 
         nTmessage("Found %4d entries that CING store tried." % len(self.entry_list_store_tried))
         nTmessage("Found %4d entries that CING store crashed." % len(self.entry_list_store_crashed))
@@ -911,6 +922,58 @@ class NrgCing(Lister):
 
 #        nTmessage("Writing the entry lists already; will likely be overwritten next.")
         self.writeEntryListOfList()
+    # end def
+
+    def prioritizeTodoList(self):
+        '''
+        Prioritize the entries not done yet so we have at least a first version of them.
+        Input from self is 
+        max_entries_todo
+        entry_list_todo
+        entry_list_untried
+        Return is an (empty) NTlist or None (default return value) on error. 
+        '''
+        result = NTlist()
+        if not self.max_entries_todo:
+            nTdebug("Returning empty todo list because max_entries_todo is null." )
+            return result
+        # end if            
+        if self.max_entries_todo >= len(self.entry_list_todo):
+            nTmessage('No need to prioritizeTodoList because all entries can be done (tried at least)')
+            return self.entry_list_todo
+        # Undone entries have highest priority.
+        n = 0 
+        if self.entry_list_untried:
+            n = min( len(self.entry_list_untried), self.max_entries_todo)
+            result = self.entry_list_untried[:n]
+            nTdebug("Added %d entries to new todo list.")
+            if n == self.max_entries_todo:
+                nTdebug("Returning new todo list with only %d untried entries." % (len(result)))
+                return result
+            # end if
+        # end if
+        entry_list_todo_minus_untried = self.entry_list_todo.difference(self.entry_list_untried)
+        count_todo_minus_untried = len(entry_list_todo_minus_untried)
+        nTdebug("entry_list_todo_minus_untried with %d entries." % count_todo_minus_untried )
+        if not count_todo_minus_untried:
+            nTmessage("No todo entries to additionally add. Returning new todo list with %d entries." % (len(result)))
+            return result
+        # m is the number of entries to still add
+        m = self.max_entries_todo - n
+        # p is the number of entries that can be added.
+        p = min( m, count_todo_minus_untried )
+        nTdebug("%d entries to still add and %d entries that can be added." % ( m, p))
+        result.union(self.max_entries_todo[:p])
+        nTdebug("result with %d entries." % len(result) )
+        
+        duplicateList = result.removeDuplicates()
+        if duplicateList:
+            nTcodeerror("Found unexpected duplicates: %s" % str(duplicateList))
+            nTcodeerror("Removed and continueing with %d entries" % len(result))
+            return
+        # end if
+        result = result.sort()    
+        return result 
     # end def
 
     def searchPdbEntries(self, redo = False):
@@ -2039,8 +2102,8 @@ class NrgCing(Lister):
         host = 'localhost'
         if False: # DEFAULT False
             host = 'nmr.cmbi.umcn.nl'
-        crdb = NrgCingRdb(host=host) 
-        nrgCingEntryList = crdb.getPdbIdList()
+#        crdb = NrgCingRdb(host=host) 
+        nrgCingEntryList = getPdbIdList(fromNrg=True, host=host)
         if not nrgCingEntryList:
             nTerror("Failed to get any entry from NRG-CING RDB")
             return True
