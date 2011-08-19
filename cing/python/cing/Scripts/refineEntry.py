@@ -5,7 +5,7 @@ Regular use: from nmr_redo.
 
 Execute like:
 cd /Library/WebServer/Documents/NMR_REDO/data/br/1brv
-python -u /Users/jd/workspace35/cing/python/cing/Scripts/refineEntry.py 1brv 9 \
+python -u $C/python/cing/Scripts/refineEntry.py 1brv 9 \
 file:///Library/WebServer/Documents/NRG-CING/data \
        /Library/WebServer/Documents/NMR_REDO \
 . . BY_CH23_BY_ENTRY CING 1 auto 0 0
