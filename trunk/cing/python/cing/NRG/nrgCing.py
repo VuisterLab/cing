@@ -235,7 +235,6 @@ class NrgCing(Lister):
         #: List of entries that might be in NRG but are invalid. NRG-CING will start from coordinates only.
         self.entry_list_bad_nrg_docr = NTlist() 
         self.entry_list_bad_overall = NTlist() # List of entries that NRG-CING should not even attempt.
-        self.entry_list_bad_nrg_docr = NTlist()
 
         self.wattosVerbosity = cing.verbosity
         #: development machine Stella only has 4g total
@@ -417,28 +416,37 @@ class NrgCing(Lister):
         if self.searchPdbEntries():
             nTerror("Failed to searchPdbEntries")
             return True
+        # end if        
         self.entry_list_possible = NTlist(*self.entry_list_nmr)
         nTmessage("Using all %d NMR entries in PDB as possible entries." % len(self.entry_list_possible))
 
         if new_hits_entry_list:
+            nTmessage("Using new_hits_entry_list with %d entries." % len(new_hits_entry_list))
             self.entry_list_todo = NTlist(*new_hits_entry_list)
         elif self.getTodoList:
             # Get todo list and some others.
             if self.getEntryInfo():
                 nTerror("Failed to getEntryInfo (first time).")
                 return True
+            # end if
+        # end if
 
         if self.entry_list_todo and self.max_entries_todo:
+            nTdebug("Now in updateWeekly starting to prepare")
             if self.prepare():
                 nTerror("Failed to prepare")
                 return True
-
+            # end if
             if self.getEntryInfo(): # need to see which preps failed; they are then excluded from todo list.
                 nTerror("Failed to getEntryInfo (second time in updateWeekly).")
                 return True
+            # end if
             # WARNING: the above command wipes out the self.entry_list_todo
             if new_hits_entry_list:
+                nTwarning("Using new_hits_entry_list with %d entries. (B)" % len(new_hits_entry_list))
                 self.entry_list_todo = NTlist(*new_hits_entry_list)
+            # end if
+            nTdebug("Doing runCing only on entries for which prep is considered done.")
             self.entry_list_todo = self.entry_list_todo.intersection( self.entry_list_prep_done )
             if self.runCing():
                 nTerror("Failed to runCing")
@@ -791,8 +799,9 @@ class NrgCing(Lister):
         # Remove a few entries in RDB that are not done.
         entry_list_in_db_not_done =  self.entry_list_store_in_db.difference(self.entry_list_done)
         if entry_list_in_db_not_done:
-            nTmessage("There are %s entries in RDB that are not currently done: %s" % (
-                len(entry_list_in_db_not_done), str(entry_list_in_db_not_done)))
+            txt = str(entry_list_in_db_not_done)
+            txt = txt[:80]
+            nTmessage("There are %s entries in RDB that are not currently done: %s" % ( len(entry_list_in_db_not_done), txt) )
         else:
             nTmessage("All entries in RDB are also done")
         # endif
@@ -878,6 +887,11 @@ class NrgCing(Lister):
         self.entry_list_todo = NTlist(*self.entry_list_nmr)
         self.entry_list_todo = self.entry_list_todo.difference(self.entry_list_done)
         self.entry_list_todo = self.entry_list_todo.difference(self.entry_list_bad_overall)        
+
+        self.entry_list_untried = NTlist(*self.entry_list_nmr)
+        self.entry_list_untried = self.entry_list_untried.difference(self.entry_list_tried)
+        self.entry_list_untried = self.entry_list_untried.difference(self.entry_list_bad_overall)
+        
         # Prioritize the entries not done yet so we have at least a first version of them.
         if self.max_entries_todo < len(self.entry_list_todo):
             prioritizedTodoList = self.prioritizeTodoList()
@@ -885,9 +899,8 @@ class NrgCing(Lister):
                 nTerror("Failed to prioritizeTodoList. Keeping current entry_list_todo")
             else:                
                 self.entry_list_todo = prioritizedTodoList
-        
-        self.entry_list_untried = NTlist(*self.entry_list_nmr)
-        self.entry_list_untried = self.entry_list_untried.difference(self.entry_list_tried)
+            # end if
+        # end if
 
         nTmessage("Found %4d entries by NMR (A)." % len(self.entry_list_nmr))
 
@@ -946,11 +959,13 @@ class NrgCing(Lister):
         if self.entry_list_untried:
             n = min( len(self.entry_list_untried), self.max_entries_todo)
             result = self.entry_list_untried[:n]
-            nTdebug("Added %d entries to new todo list.")
+            nTdebug("Added %d entries to new todo list." % len(result))
             if n == self.max_entries_todo:
                 nTdebug("Returning new todo list with only %d untried entries." % (len(result)))
                 return result
             # end if
+        else:
+            nTdebug("All entries have been tried.")
         # end if
         entry_list_todo_minus_untried = self.entry_list_todo.difference(self.entry_list_untried)
         count_todo_minus_untried = len(entry_list_todo_minus_untried)
@@ -963,13 +978,13 @@ class NrgCing(Lister):
         # p is the number of entries that can be added.
         p = min( m, count_todo_minus_untried )
         nTdebug("%d entries to still add and %d entries that can be added." % ( m, p))
-        result.union(self.max_entries_todo[:p])
+        result = result.union(entry_list_todo_minus_untried[:p])
         nTdebug("result with %d entries." % len(result) )
         
         duplicateList = result.removeDuplicates()
         if duplicateList:
             nTcodeerror("Found unexpected duplicates: %s" % str(duplicateList))
-            nTcodeerror("Removed and continueing with %d entries" % len(result))
+            nTcodeerror("Removed and continuing with %d entries" % len(result))
             return
         # end if
         result = result.sort()    
@@ -1837,31 +1852,35 @@ class NrgCing(Lister):
 
 
     def runCing(self):
-        """On self.entry_list_todo.
+        """
+        On self.entry_list_todo.
         Return True on error.
         """
-
         nTmessage("Starting runCing")
         if 0: # DEFAULT 0
             nTmessage("Going to use non-default entry_list_todo in runCing")
 #            self.entry_list_todo = readLinesFromFile('/Users/jd/NRG/lists/bmrbPdbEntryList.csv')
             self.entry_list_todo = "1brv 1hkt 1mo7 1mo8 1ozi 1p9j 1pd7 1qjt 1vj6 1y7n 2fws 2fwu 2jsx".split()
             self.entry_list_todo = NTlist( *self.entry_list_todo )
-
             if self.searchPdbEntries():
                 nTerror("Failed to searchPdbEntries")
                 return True
-
+            # end if
+        # end if
+        if not self.entry_list_todo:
+            nTmessage("Skipping runCing since no entries present in self.entry_list_todo")
+            return
+        # end if        
         entryListFileName = "entry_list_todo.csv"
         writeTextToFile(entryListFileName, toCsv(self.entry_list_todo))
 
         pythonScriptFileName = os.path.join(cingDirScripts, 'validateEntry.py')
         inputDir = 'file://' + self.results_dir + '/' + self.inputDir
         outputDir = self.results_dir
-        storeCING2db = "1" # DEFAULT: '1' All arguments need to be strings.
-        filterTopViolations = '1' # DEFAULT: '1'
-        filterVasco = '1'
-        singleCoreOperation = '1'
+        storeCING2db = "1"          # DEFAULT: '1' All arguments need to be strings.
+        filterTopViolations = '1'   # DEFAULT: '1'
+        filterVasco = '1'           # DEFAULT: '1'
+        singleCoreOperation = '1'   # DEFAULT: '1'
         # Tune this to:
 #            verbosity         inputDir             outputDir
 #            pdbConvention     restraintsConvention archiveType         projectType
@@ -1968,62 +1987,65 @@ class NrgCing(Lister):
         writeTextToFile(self.tokenListFileName, tokenListStr)
     # end def
 
-    def prepare(self,
-#                     doInteractive=None,        
-                     convertMmCifCoor=None,    # If any of these 4 parameters is NOT None then they will be generate
-                     convertMrRestraints=None,
-                     convertStarCS=None,
-                     filterCcpnAll=None             
-                ):
+    def prepare(self):
         "Return True on error."
 
         nTmessage("Starting prepare using self.entry_list_todo")
-
-        permutationArgumentList = NTdict() # per permutation hold the entry list.
+        permutationArgumentMap = NTdict() # per permutation hold the entry list.
 
         for entry_code in self.entry_list_todo:
-            if convertMmCifCoor==None or convertMrRestraints==None or convertStarCS==None or filterCcpnAll==None:
+            convertMmCifCoor = 0
+            convertMrRestraints = 0
+            convertStarCS = 0
+            filterCcpnAll = 0
+            if entry_code in self.entry_list_nmr:
+                convertMmCifCoor = 1
+            if entry_code in self.entry_list_nrg_docr:
+                convertMrRestraints = 1
+            if convertMrRestraints:
                 convertMmCifCoor = 0
-                convertMrRestraints = 0
-                convertStarCS = 0
-                filterCcpnAll = 0
-                if entry_code in self.entry_list_nmr:
-                    convertMmCifCoor = 1
-                if entry_code in self.entry_list_nrg_docr:
-                    convertMrRestraints = 1
-                if convertMrRestraints:
-                    convertMmCifCoor = 0
-                if self.matches_many2one.has_key(entry_code):
-                    convertStarCS = 1
-                if convertMrRestraints: # Filter when there are restraints
-                    filterCcpnAll = 1
+            if self.matches_many2one.has_key(entry_code):
+                convertStarCS = 1
+            if convertMrRestraints: # Filter when there are restraints
+                filterCcpnAll = 1
             if not (convertMmCifCoor or convertMrRestraints):
                 nTerror("not (convertMmCifCoor or convertMrRestraints) in prepare. Skipping entry: %s" % entry_code)
                 continue
+            # end if
             argList = [convertMmCifCoor, convertMrRestraints, convertStarCS, filterCcpnAll]
             argStringList = [ str(x) for x in argList ]
             permutationKey = ' '.join(argStringList) # strings
-            if not getDeepByKeysOrAttributes(permutationArgumentList, permutationKey):
-                permutationArgumentList[permutationKey] = NTlist()
-            permutationArgumentList[permutationKey].append(entry_code)
-#
-#        nTmessage("Found entries in NMR          : %d" %  len(self.entry_list_nmr))
-#        nTmessage("Found entries in NRG-CING done: %d" %  len(self.entry_list_done))
-        nTmessage("Found entries in NRG-CING todo: %d" % len(self.entry_list_todo))
-        for permutationKey in permutationArgumentList.keys(): # strings
+            if not getDeepByKeysOrAttributes(permutationArgumentMap, permutationKey):
+                permutationArgumentMap[permutationKey] = NTlist()
+            # end if
+            permutationArgumentMap[permutationKey].append(entry_code)
+        # end for#
+        nTdebug("Found entries in NMR          : %d (entry_list_nmr)"         %  len(self.entry_list_nmr))
+        nTdebug("Found entries in NRG DOCR     : %d (entry_list_nrg_docr)"    %  len(self.entry_list_nrg_docr))
+        nTdebug("Found entries in              : %d (matches_many2one)"       %  len(self.matches_many2one.keys()))
+        nTdebug("Found entries todo            : %d" % len(self.entry_list_todo))
+
+        nTdebug("Permutations:")
+        for permutationKey in permutationArgumentMap.keys():
+            nTdebug("Keys: %s split to: %s %s %s %s with number of entries %d" % (
+                    permutationKey, convertMmCifCoor, convertMrRestraints, convertStarCS, 
+                    filterCcpnAll, len(permutationArgumentMap[permutationKey])))
+        # end for
+        
+        for permutationKey in permutationArgumentMap.keys(): # strings
 #            permutationKeyForFileName = re.compile('[ ,\[\]]').sub('', permutationKey)
             permutationKeyForFileName = permutationKey.replace(' ', '')
             extraArgList = permutationKey.split()
             convertMmCifCoor, convertMrRestraints, convertStarCS, filterCcpnAll = extraArgList
             nTmessage("Keys: %s split to: %s %s %s %s with number of entries %d" % (
                     permutationKey, convertMmCifCoor, convertMrRestraints, convertStarCS, 
-                    filterCcpnAll, len(permutationArgumentList[permutationKey])))
+                    filterCcpnAll, len(permutationArgumentMap[permutationKey])))
 
 #            nTdebug("Quitting for now.")
 #            continue
 
             entryListFileName = "entry_list_todo_prep_perm_%s.csv" % permutationKeyForFileName
-            writeTextToFile(entryListFileName, toCsv(permutationArgumentList[permutationKey]))
+            writeTextToFile(entryListFileName, toCsv(permutationArgumentMap[permutationKey]))
             pythonScriptFileName = __file__ # recursive call in fact.
             extraArgList = ['prepare' ] + extraArgList
             if doScriptOnEntryList(pythonScriptFileName,

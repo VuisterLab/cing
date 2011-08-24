@@ -29,21 +29,26 @@ if ( -e $log_file ) then
     exit 1
 endif
 
+echo "Trying to begin nrgCing.csh with [$$] and [$0]" |& tee $log_file
+
 # status on the final grep will be zero when it did grep something.
 # $$ is the process number of current shell.
 # Need to add the x flag to grep to catch the process without having a controlling terminal.
 # a flag for all processes including cron's
 # ww for extra wide display showing the full command and parameters.
-# ps -axww | grep "$0" | grep -v grep | grep -v $$ >>& $log_file
-# if ( ! $status ) then
-#     echo "ERROR: Stopping this job for another hasn't finished; see above list" >>& $log_file
-#     exit 1
-# endif
+ps -axww | grep "$0" | grep -v grep | grep -v $$ >>& $log_file
+if ( ! $status ) then
+    echo "ERROR: Stopping this job for another hasn't finished; see above list" >>& $log_file
+    exit 1
+endif
 
-echo "Starting nrgCing.csh with [$$] and [$0]" >>& $log_file
+echo "Starting nrgCing.csh with [$$] and [$0]" |& tee $log_file
 # TODO: Remove next line when done.
 #exit 1
 
 python -u $CINGROOT/python/cing/NRG/nrgCing.py updateWeekly >>& $log_file
+if ( $status ) then 
+    echo "ERROR: failed nrgCing.csh" |& tee $log_file
+endif
 
 echo "Finished" >>& $log_file

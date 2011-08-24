@@ -4585,7 +4585,8 @@ Residue class: Defines residue properties
     #end def
 
     def validateChemicalShiftLeu( self, resultList ):
-        """Returns True on error.
+        """
+        Returns True on error.
         Append to result list if validation found a problem.
 
         Uses the data in:
@@ -4605,8 +4606,8 @@ Residue class: Defines residue properties
 
         If the csd < 0.01 then the resonances were assumed to overlap and no critiques are attempted.
 
-        TODO: Figure out how to handle multiple lists of shifts.
-            -
+        TODO: - Figure out how to handle multiple lists of shifts.
+              -
         """
 
         cUTOFF_LOL_CSD_LEU_CD = [[ -4, 4 ], [ -3, 3 ]] # ERROR/WARNING LIMITS

@@ -101,13 +101,16 @@ set cmd = ("rsync -av /Volumes/tria3/$archive_id/ /Volumes/tria4/$archive_id")
 $cmd | & mail -s rsync.log jd &
 
 set baseDir = $D/NRG-CING
+#set srcSshUrl = jd@nmr
+set srcSshUrl = "-P 39676 jd@localhost-nmr"
 set list = (`cat /Library/WebServer/Documents/NRG-CING/list/entry_list_recoord_nrgcing.csv`)
-#set list = ( 3trx )
+set list = ( 1mmc 1ks0 1b4r 1nxi 1eww 1hp3 1iox 2u2f 1kjs 1orx )
+set x = 1dum
 foreach x ( $list )
     echo $x
     set ch23 = ( `echo $x | cut -c2-3` )
     set eDir = $baseDir/data/$ch23/$x
     mkdir -p $eDir
-    scp jd@nmr:$eDir/$x.cing.tgz $eDir
+    scp $srcSshUrl":"$eDir/$x.cing.tgz $eDir
 end
 

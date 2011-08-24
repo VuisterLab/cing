@@ -5,6 +5,7 @@ This script will use NRG-CING files to generate new structures for existing NMR 
 
 Execute like NrgCing, e.g.
 
+$CINGROOT/python/cing/NRG/nmr_redo.py 1brv refine
 $CINGROOT/python/cing/NRG/nmr_redo.py refine
 $CINGROOT/python/cing/NRG/nmr_redo.py getEntryInfo
 $CINGROOT/python/cing/NRG/nmr_redo.py 1brv storeCING2db
@@ -66,9 +67,10 @@ class NmrRedo(NrgCing):
         self.updateDerivedResourceSettings() # The paths previously initialized in NrgCing. Will also chdir.
         
         if 1:
-            self.entry_list_todo = NTlist() 
-#            self.entry_list_todo += "1brv 1dum".split()
-            self.entry_list_todo += "1brv".split()
+            self.entry_list_todo.clear() 
+            # Random set of 10 from RECOORD still present in PDB.
+            self.entry_list_todo += "1mmc 1ks0 1b4r 1nxi 1eww 1hp3 1iox 2u2f 1kjs 1orx".split()
+#            self.entry_list_todo += "1brv".split()
         if 0: # DEFAULT: 0
             nTmessage("Going to use specific entry_list_todo in prepare")
 #            self.entry_list_todo = "1brv".split()
@@ -96,10 +98,10 @@ class NmrRedo(NrgCing):
 #        inputDir = 'file://' + self.nrgCing.results_dir + '/' + self.inputDir # NB input is from NrgCing.
         inputDir = 'file://' + self.nrgCing.results_dir + '/' + DATA_STR
         outputDir = self.results_dir
-        storeCING2db = "1" # DEFAULT: '1' All arguments need to be strings.
-        filterTopViolations = '0' # DEFAULT: '1'
-        filterVasco = '0'
-        singleCoreOperation = '1'
+        storeCING2db =          "1" # DEFAULT: '1' All arguments need to be strings.
+        filterTopViolations =   '0' # DEFAULT: '1'
+        filterVasco =           '0'
+        singleCoreOperation =   '1'
         # Tune this to:
 #            verbosity         inputDir             outputDir
 #            pdbConvention     restraintsConvention archiveType         projectType
@@ -126,5 +128,5 @@ class NmrRedo(NrgCing):
 # end class.
 
 if __name__ == '__main__':
-    max_entries_todo = 1
+    max_entries_todo = 10
     runNrgCing( useClass = NmrRedo, max_entries_todo = max_entries_todo )

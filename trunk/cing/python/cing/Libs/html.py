@@ -1521,8 +1521,8 @@ class HTMLfile:
 
         if not source:
             # Happens for 2k0e
-            nTdebug("No Cing object source in insertHtmlLink( self, section, source, destination, text=None, id=None, **kwds ):")
-            nTdebug("[%s, %s, %s, %s, %s, %s, %s]" % ( self, section, source, destination, text, id, kwds ))
+#            nTdebug("No Cing object source in insertHtmlLink( self, section, source, destination, text=None, id=None, **kwds ):")
+#            nTdebug("[%s, %s, %s, %s, %s, %s, %s]" % ( self, section, source, destination, text, id, kwds ))
             return None
 
         if not destination:
