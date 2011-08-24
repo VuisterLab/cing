@@ -343,7 +343,7 @@ Sum                %s""" % (
 
     def removeDuplicates(self, useVersion = 2):
         """
-        Removes all duplicate
+        Removes all duplicate from self so this is an in-place operation.
         Can be optimized when needed by doing a sorted lookup table; It is extremely slow to take a slice every time.
         Return the duplicate list when using version 2.
         """
