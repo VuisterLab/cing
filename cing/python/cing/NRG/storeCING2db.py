@@ -14,6 +14,9 @@ python -u $CINGROOT/python/cing/NRG/storeCING2db.py 1brv ARCHIVE_NRG
 cd /Library/WebServer/Documents/NMR_REDO/data/br/1brv; \
 python -u $CINGROOT/python/cing/NRG/storeCING2db.py 1brv ARCHIVE_NMR_REDO
 
+cd /Library/WebServer/Documents/RECOORD/data/br/1brv; \
+python -u $CINGROOT/python/cing/NRG/storeCING2db.py 1brv ARCHIVE_RECOORD
+
 NB this script fails if the Postgresql backend is not installed. Which is exactly why it's kept out of CING's core routines.
 """
 
@@ -51,8 +54,13 @@ def doStoreCING2db( entry_code, archive_id, project = None):
 
     pdb_id = None
     casd_id = None
-    schema = PDB_DB_NAME
-    if archive_id in  [ ARCHIVE_NRG_ID, ARCHIVE_DEV_NRG_ID, ARCHIVE_PDB_ID, ARCHIVE_NMR_REDO_ID]:
+    schema = getDeepByKeysOrAttributes( mapArchive2Schema, archive_id)
+    if not schema:
+        nTerror("Expected valid schema for archive_id: %s" % archive_id)
+        return True
+    # end if
+        
+    if archive_id in  [ ARCHIVE_NRG_ID, ARCHIVE_DEV_NRG_ID, ARCHIVE_PDB_ID, ARCHIVE_NMR_REDO_ID, ARCHIVE_NMR_REDOA_ID, ARCHIVE_RECOORD_ID, ARCHIVE_RECOORDA_ID]:
         pdb_id = entry_code
         if pdb_id == None:
             nTerror("Expected pdb_id argument")
@@ -60,12 +68,6 @@ def doStoreCING2db( entry_code, archive_id, project = None):
         if not is_pdb_code(pdb_id):
             nTerror("Expected pdb_id argument and [%s] isn't recognized as such." % pdb_id)
             return True
-        if archive_id == ARCHIVE_NRG_ID:
-            schema = NRG_DB_NAME
-        elif archive_id == ARCHIVE_DEV_NRG_ID:
-            schema = DEV_NRG_DB_NAME
-        elif archive_id == ARCHIVE_NMR_REDO_ID:
-            schema = NMR_REDO_DB_NAME
         # end if
     elif archive_id in [ ARCHIVE_CASD_ID, ARCHIVE_CASP_ID]:
         casd_id = entry_code
@@ -73,10 +75,6 @@ def doStoreCING2db( entry_code, archive_id, project = None):
             nTerror("Expected casd_id argument")
             return True
         entry_code = casd_id
-        schema = CASD_DB_NAME
-        if archive_id == ARCHIVE_CASP_ID:
-            schema = CASP_DB_NAME
-        # end if
     else:
         nTerror("Expected valid archive_id argument but got: %s" % archive_id)
         return True

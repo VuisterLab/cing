@@ -7,8 +7,7 @@ CREATE SCHEMA casdcing;
 -- creating the account
 CREATE ROLE casdcing1 LOGIN CREATEDB SUPERUSER PASSWORD '4I4KMS';
 -- not needed really...
-ALTER ROLE casdcing1 WITH PASSWORD '4I4KMS'
-
+ALTER ROLE casdcing1 WITH PASSWORD '4I4KMS';
 
 -- Create a 'normal' user pbreader
 CREATE ROLE pbreader WITH LOGIN NOSUPERUSER NOCREATEDB NOCREATEROLE PASSWORD 'pass';
