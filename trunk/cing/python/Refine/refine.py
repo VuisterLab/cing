@@ -74,47 +74,9 @@ def importFrom(config, project, parameters):
     nTdebug( 'bestModels:     %s' % bestModels) 
     nTdebug( 'models:         %s' % models) 
     
+    xplor_path = xplor.joinPath(inPath, xplor.baseName)
+    project.molecule.replaceCoordinatesByPdb(xplor_path, bestModels, name = xplor.name)
     
-    if len(models) == 0:
-        nTerror('%s: no bestModels defined' % getCallerName())
-        return
-    #end if
-
-    if not project.contentIsRestored:
-        project.restore()
-
-    # import the coordinates from Xplor PDB files
-    path = xplor.joinPath(inPath, xplor.baseName)
-    nTmessage('==> Importing coordinates from %s, models %s (low verbosity on later models)', path, models)
-    project.molecule.initCoordinates(resetStatusObjects = True)
-    for i, m in enumerate(models):
-        xplorFile = sprintf(path, m)
-        if not os.path.exists(xplorFile):
-            nTerror('%s: model "%s" not found' % (getCallerName(), xplorFile))
-            return
-        #end if
-        verbosity = None
-        if i != 0: # Only show regular messages for first model
-#            nTmessage("Setting verbosity to errors only")
-            verbosity = cing.verbosityError
-        if not project.molecule.importFromPDB(xplorFile, convention=XPLOR, nmodels=1, verbosity = verbosity):
-            nTerror("Failed to importFromPDB from: " + getCallerName())
-            return
-    #end for
-    project.molecule.updateAll()
-
-    # rename the molecule if needed
-    if project.molecule.name != xplor.name: # It's fine if the name already matches. Certainly the coordinates are already zipped.        
-        project.molecules.rename(project.molecule.name, xplor.name)
-        msg = "Renamed molecule to " + project.molecule.name
-        project.addHistory(msg)
-        nTmessage( msg )
-    # end if        
-    project.updateProject()
-    nTmessage( "Molecule: %s" % project.molecule.format() )
-
-    project.createMoleculeDirectories(project.molecule)
-
     if getDeepByKeysOrAttributes(parameters, 'superpose'):
         project.molecule.superpose(ranges=parameters.superpose)
 
@@ -640,8 +602,6 @@ def fullRefine( config, project, parameters, options ):
     """
     Refine the coordinates and process them back into CING.
     Return None on error or parameters on success.
-    
-       
     """
     nTmessage("\n-- %s --" % getCallerName())
     refinePath = project.path(project.directories.refine )

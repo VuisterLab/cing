@@ -5,10 +5,10 @@ This script will use NRG-CING files to generate new structures for existing NMR 
 
 Execute like NrgCing, e.g.
 
-$CINGROOT/python/cing/NRG/nmr_redo.py 1brv refine
-$CINGROOT/python/cing/NRG/nmr_redo.py refine
-$CINGROOT/python/cing/NRG/nmr_redo.py getEntryInfo
-$CINGROOT/python/cing/NRG/nmr_redo.py 1brv storeCING2db
+$C/python/cing/NRG/nmr_redo.py 1brv refine
+$C/python/cing/NRG/nmr_redo.py refine
+$C/python/cing/NRG/nmr_redo.py getEntryInfo
+$C/python/cing/NRG/nmr_redo.py 1brv storeCING2db
 """
 
 from cing import cingDirScripts
@@ -66,16 +66,15 @@ class NmrRedo(NrgCing):
 #        in the future and then it won't change but for NrgCing it is True from the start.
         self.updateDerivedResourceSettings() # The paths previously initialized in NrgCing. Will also chdir.
         
-        if 1:
+        if 0:
             self.entry_list_todo.clear() 
             # Random set of 10 from RECOORD still present in PDB.
             self.entry_list_todo += "1mmc 1ks0 1b4r 1nxi 1eww 1hp3 1iox 2u2f 1kjs 1orx".split()
 #            self.entry_list_todo += "1brv".split()
-        if 0: # DEFAULT: 0
+        if 1: # DEFAULT: 0
             nTmessage("Going to use specific entry_list_todo in prepare")
-#            self.entry_list_todo = "1brv".split()
-#            self.entry_list_todo = readLinesFromFile('/Users/jd/NRG/lists/bmrbPdbEntryList.csv')
-#            self.entry_list_todo = NTlist( *self.entry_list_todo )
+            self.entry_list_todo = readLinesFromFile('/Library/WebServer/Documents/NRG-CING/list/entry_list_recoord_nrgcing_shuffled.csv')
+            self.entry_list_todo = NTlist( *self.entry_list_todo )
 #            self.entry_list_todo = readLinesFromFile(os.path.join(self.results_dir, 'entry_list_nmr_random_1-500.csv'))
 #            self.entry_list_todo = readLinesFromFile(os.path.join(self.results_dir, 'entry_list_prep_todo.csv'))
 #            self.entry_list_nmr = deepcopy(self.entry_list_todo)
@@ -128,5 +127,5 @@ class NmrRedo(NrgCing):
 # end class.
 
 if __name__ == '__main__':
-    max_entries_todo = 10
+    max_entries_todo = 10 # DEFAULT: 10
     runNrgCing( useClass = NmrRedo, max_entries_todo = max_entries_todo )

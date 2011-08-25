@@ -1,14 +1,16 @@
 #!/usr/bin/env python
 
 """
-Regular use: from nmr_redo.
+Regular use: from recoord.
 
 Execute like:
-cd /Library/WebServer/Documents/NMR_REDO/data/br/1brv
-python -u $C/python/cing/Scripts/refineEntry.py 1brv 9 \
+cd /Library/WebServer/Documents/RECOORD/data/br/1brv
+python -u $C/python/cing/Scripts/replaceCoordinates.py 1brv 9 \
 file:///Library/WebServer/Documents/NRG-CING/data \
-       /Library/WebServer/Documents/NMR_REDO \
-. . BY_CH23_BY_ENTRY CING 1 auto 0 0
+       /Library/WebServer/Documents/RECOORD \
+. . BY_CH23_BY_ENTRY CING 1 auto 0 0 1 \
+/Library/WebServer/Documents/recoord_cns_w/web/%s_cns_w.pdb ARCHIVE_RECOORD XPLOR
+
 """
 
 from cing.Libs.NTutils import * #@UnusedWildImport
@@ -19,26 +21,20 @@ from cing.Scripts.validateEntry import * #@UnusedWildImport
 from cing.core.constants import * #@UnusedWildImport
 
 
-def mainRefineEntry(entryId, *extraArgList):
+def mainReplaceCoordinatesEntry(entryId, *extraArgList):
     """inputDir may be a directory or a url. A url needs to start with http://.
     """
 
     fastestTest = False # DEFAULT: False
-    modelCountAnneal, bestAnneal, best = 200, 50, 25    
-    htmlOnly = False # default: False but enable it for faster runs without some actual data.
-    doWhatif = True # disables whatif actual run
+    
+    htmlOnly = False # DEFAULT:: False but enable it for faster runs without some actual data.
+    doWhatif = True 
     doProcheck = True
     doWattos = True
     doQueeny = True
     doTalos = True
-    tgzCing = True # default: True # Create a tgz for the cing project. In case of a CING project input it will be overwritten.
-                    # NB leave this set to True or modify code below.
-#    modelCount = None # default setting is None
-#    ranges = None
 
     if fastestTest:
-        modelCountAnneal, bestAnneal, best = 4, 3, 2        
-#        modelCount = 2 # if this is more and there is only one model present it leads to an error message.
         htmlOnly = True
         doWhatif = False
         doProcheck = False
@@ -57,7 +53,7 @@ def mainRefineEntry(entryId, *extraArgList):
     verbosity         inputDir             outputDir
     pdbConvention     restraintsConvention archiveType         projectType
     storeCING2db      ranges               filterTopViolations filterVasco
-    singleCoreOperation
+    singleCoreOperation inPathTemplate     archive_id          convention
     """.split()
     expectedNumberOfArguments = len(expectedArgumentList)
     if len(extraArgList) != expectedNumberOfArguments:
@@ -89,7 +85,10 @@ def mainRefineEntry(entryId, *extraArgList):
     else:
         filterVasco = 1 # Default should be True
     singleCoreOperation = getDeepByKeysOrAttributes(extraArgList, IDX_SINGLE_CORE_OPERATION )
-
+    inPathTemplate = getDeepByKeysOrAttributes(extraArgList, IDX_SINGLE_CORE_OPERATION + 1 )    
+    archive_id = getDeepByKeysOrAttributes(extraArgList, IDX_SINGLE_CORE_OPERATION + 2 )    
+    convention = getDeepByKeysOrAttributes(extraArgList, IDX_SINGLE_CORE_OPERATION + 3 )        
+    
     if archiveType == ARCHIVE_TYPE_FLAT:
         pass # default
     elif archiveType == ARCHIVE_TYPE_BY_ENTRY:
@@ -116,11 +115,10 @@ def mainRefineEntry(entryId, *extraArgList):
     nTdebug("filterTopViolations:  %s" % filterTopViolations)
     nTdebug("filterVasco:          %s" % filterVasco)
     nTdebug("singleCoreOperation:  %s" % singleCoreOperation)
+    nTdebug("inPathTemplate:       %s" % inPathTemplate)
+#    nTdebug("inPath:               %s" % inPath)
     nTdebug("")
     nTdebug("Using derived settings:")
-    nTdebug("modelCountAnneal:     %s" % modelCountAnneal)
-    nTdebug("bestAnneal:           %s" % bestAnneal)
-    nTdebug("best:                 %s" % best)
     nTdebug("isRemoteOutputDir:    %s" % isRemoteOutputDir)
     
     # For NMR_REDO required as most efficient.
@@ -202,12 +200,13 @@ def mainRefineEntry(entryId, *extraArgList):
         # end if
     # end if
 
-####> MAIN UTILITY HERE
-    if project.fullRedo(modelCountAnneal = modelCountAnneal, bestAnneal = bestAnneal, best = best):  
-        nTerror("Failed fullAnnealAndRefine.")
+####> MAIN UTILITY HERE    
+    name = entryId + "_recoord"
+    inPath = inPathTemplate % entryId    
+    if project.molecule.replaceCoordinatesByPdb( inPath, name = name, convention=convention ):  
+        nTerror("Failed replaceCoordinatesByPdb.")
         return True
-    
-          
+    # end if          
     
     if ranges != None:
         project.molecule.setRanges(ranges)
@@ -222,53 +221,23 @@ def mainRefineEntry(entryId, *extraArgList):
     # end if filterVasco
 
     project.save()
-
+    
     if storeCING2db:
-        # Does require:
-        #from cing.PluginCode.sqlAlchemy import csqlAlchemy
-        # and should never crash  run.
-        archive_id = ARCHIVE_NMR_REDO_ID
-#        if isProduction:
-#            archive_id = ARCHIVE_NRG_ID
         try:
             if doStoreCING2db( entryId, archive_id, project=project):
                 nTerror("Failed to store CING project's data to DB but continuing.")
         except:
             nTtracebackError()
             nTerror("Failed to store CING project's data due to above traceback error.")
+    # end if
 
-    if tgzCing:
-        directoryNameCing = entryId + ".cing"
-        tgzFileNameCing = directoryNameCing + ".tgz"
-        if os.path.exists(tgzFileNameCing):
-            nTwarning("Overwriting: " + tgzFileNameCing)
-        cmd = "tar -czf %s %s" % (tgzFileNameCing, directoryNameCing)
-        nTdebug("cmd: %s" % cmd)
-#        do_cmd(cmd)
-        status, result = commands.getstatusoutput(cmd)
-        if status:
-            nTerror("Failed to tar status: %s with result %s" % (status, result))
-            return True
-        if isRemoteOutputDir:
-            if putFileBySsh(tgzFileNameCing, outputDir, ntriesMax = 2):
-                nTerror("Failed to send File By Scp status: %s with result %s" % (status, result))
-                nTerror("Maintaining results.")
-                return True
-            # end if
-            nTmessage("Removing tgz result: %s" % tgzFileNameCing)
-            os.remove(tgzFileNameCing)
-            nTmessage("Removing cing dir itself: %s" % directoryNameCing)
-            rmdir(directoryNameCing)
-        else: # do NOT remove local copy
-            pass
-        # end if/else
-    # end if tgzCing
+    
 # end def
 
 if __name__ == "__main__":
     cing.verbosity = verbosityDebug
 #        sys.exit(1) # can't be used in forkoff api
     try:
-        status = mainRefineEntry(*sys.argv[1:])
+        status = mainReplaceCoordinatesEntry(*sys.argv[1:])
     finally:
         nTmessage(getStopMessage(cing.starttime))

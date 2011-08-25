@@ -28,6 +28,7 @@ Cluster issues
 FAST_FOR_TESTING = 0 # DEFAULT 0 Use 1 for testing quickly. TODO: set to default value.
 #------------------------------------------------------------------------------
 timest = 0.003
+
 nstepheat = 100
 nstephot = 2000
 nstepcool = 200

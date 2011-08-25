@@ -2091,7 +2091,83 @@ class Molecule( NTtree, ResidueList ):
         # end if
     #end def
         
-
+    def replaceCoordinatesByPdb(self, inPath, name = None, useModels = None, convention=IUPAC):
+        """
+        Replace any current coordinates with the coordinates read from a PDB file.
+        If inPath contains the string "%d" then that string will be replaced by the model number
+        and this code will loop over all requested models.
+        useModels is a string describing the integer model numbers to use or None for all (but
+        that's exclusive with doing multiple files).
+        If name is given then it will be used as the new molecule name.
+        
+        Return True on error.
+        """
+        
+        
+        nTdebug( 'inPath:          %s' % inPath) 
+        nTdebug( 'useModels:       %s' % useModels)
+        models = None
+        if useModels:
+            models = asci2list(useModels)
+        nTdebug( 'models:          %s' % str(models)) 
+        
+        if models and (len(models) == 0):
+            nTerror('%s: no useModels defined' % getCallerName())
+            return
+        #end if
+        if not self.project.contentIsRestored:
+            self.project.restore()
+        #end if
+        # import the coordinates from Xplor PDB files
+        nTmessage('==> Importing coordinates from %s, models %s (low verbosity on later models)', inPath, models)
+        self.initCoordinates(resetStatusObjects = True)
+        
+        useMultipleFiles = "%d" in inPath
+        if useMultipleFiles:
+            nTdebug("Using multiple input files from %s" % inPath)
+            for i, m in enumerate(models):
+                inFile = sprintf(inPath, m)
+                if not os.path.exists(inFile):
+                    nTerror('%s: model "%s" not found' % (getCallerName(), inFile))
+                    return True
+                #end if
+                verbosity = None
+                if i != 0: # Only show regular messages for first model
+        #            nTmessage("Setting verbosity to errors only")
+                    verbosity = cing.verbosityError
+                if not self.importFromPDB(inFile, convention=convention, nmodels=1, verbosity = verbosity):
+                    nTerror("Failed (1) to importFromPDB from: " + getCallerName())
+                    return True
+            #end for
+        else:
+            nTdebug("Using single input file %s" % inPath)
+            inFile = inPath
+            if not os.path.exists(inFile):
+                nTerror('%s: model "%s" not found' % (getCallerName(), inFile))
+                return True
+            #end if
+            nmodels = None
+            if models:
+                nmodels = len(models)
+            nTwarning("Assuming requested %s models are consecutive in useModels: %s" % (nmodels, useModels))
+            if not self.importFromPDB(inFile, convention=convention, nmodels=nmodels):
+                nTerror("Failed (2) to importFromPDB from: " + getCallerName())
+                return True
+        # end if
+        self.updateAll()    
+        # rename the molecule if needed
+        if self.name != name: # It's fine if the name already matches. Certainly the coordinates are already zipped.        
+            self.project.molecules.rename(self.name, name)
+            msg = "Renamed molecule to " + self.name
+            self.project.addHistory(msg)
+            nTmessage( msg )
+        # end if        
+        self.project.updateProject()
+        nTmessage( "Molecule: %s" % self.format() )
+    
+        self.project.createMoleculeDirectories(self.project.molecule)    
+    # end def    
+    
     def updateTopology( self)   :
         """Define the _topology key for all atoms.
         """

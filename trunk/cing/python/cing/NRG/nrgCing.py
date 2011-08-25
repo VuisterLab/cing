@@ -35,6 +35,7 @@ from cing.Libs.disk import rmdir
 from cing.Libs.html import GOOGLE_ANALYTICS_TEMPLATE
 from cing.NRG import ARCHIVE_NMR_REDO_ID
 from cing.NRG import ARCHIVE_NRG_ID
+from cing.NRG import ARCHIVE_RECOORD_ID
 from cing.NRG import mapArchive2Schema
 from cing.NRG.PDBEntryLists import getBmrbLinks
 from cing.NRG.PDBEntryLists import getBmrbNmrGridEntries
@@ -58,7 +59,9 @@ from cing.Scripts.vCing.vCing import TEST_CING_STR
 from cing.Scripts.vCing.vCing import VALIDATE_ENTRY_NRG_STR
 from cing.Scripts.vCing.vCing import Vcing
 from cing.Scripts.validateEntry import ARCHIVE_TYPE_BY_CH23
+from cing.Scripts.validateEntry import ARCHIVE_TYPE_BY_CH23_BY_ENTRY
 from cing.Scripts.validateEntry import PROJECT_TYPE_CCPN
+from cing.Scripts.validateEntry import PROJECT_TYPE_CING
 from shutil import * #@UnusedWildImport
 import commands
 import csv
@@ -74,8 +77,12 @@ PHASE_F = 'F' # SSA swap/deassign
 LOG_NRG_CING = 'log_nrgCing'
 LOG_STORE_CING2DB = 'log_storeCING2db'
 LOG_REFINE_ENTRY = 'log_refineEntry'
+LOG_REPLACE_COOR = 'log_replaceCoordinates'
 #DATA_STR = 'log_nrgCing'
-mapArchive2LogDir = {ARCHIVE_NRG_ID: LOG_NRG_CING, ARCHIVE_NMR_REDO_ID: LOG_REFINE_ENTRY}
+mapArchive2LogDir = {ARCHIVE_NRG_ID:        LOG_NRG_CING, 
+                     ARCHIVE_NMR_REDO_ID:   LOG_REFINE_ENTRY,
+                     ARCHIVE_RECOORD_ID:    LOG_REPLACE_COOR,
+                     }
 
 FAILURE_PREP_STR = "Failed to prepareEntry"
 
@@ -2107,6 +2114,46 @@ class NrgCing(Lister):
         nTmessage("Done with storeCING2db.")
     # end def
     
+    def replaceCoordinates(self):
+        """
+        On self.entry_list_todo.
+        Return True on error.
+        
+        """
+        entryListFileName = "entry_list_todo.csv"
+        writeTextToFile(entryListFileName, toCsv(self.entry_list_todo))
+
+        pythonScriptFileName = os.path.join(cingDirScripts, 'replaceCoordinates.py')
+#        inputDir = 'file://' + self.nrgCing.results_dir + '/' + self.inputDir # NB input is from NrgCing.
+        inputDir = 'file://' + self.results_dir + '/' + DATA_STR
+        outputDir = self.results_dir
+        storeCING2db =          "1" # DEFAULT: '1' All arguments need to be strings.
+        filterTopViolations =   '0' # DEFAULT: '1'
+        filterVasco =           '0'
+        singleCoreOperation =   '1'
+        # RECOORD coordinates
+        inPathTemplate          = "/Library/WebServer/Documents/recoord_cns_w/web/%s_cns_w.pdb"
+        convention              = XPLOR
+        
+        extraArgList = ( str(cing.verbosity), inputDir, outputDir,
+                         '.', '.', ARCHIVE_TYPE_BY_CH23_BY_ENTRY, PROJECT_TYPE_CING,
+                         storeCING2db, CV_RANGES_STR, filterTopViolations, filterVasco, singleCoreOperation,
+                         inPathTemplate, self.archive_id, convention )
+
+        if doScriptOnEntryList(pythonScriptFileName,
+                            entryListFileName,
+                            self.results_dir,
+                            processes_max = self.processes_max,
+                            delay_between_submitting_jobs = 5, # why is this so long? because of time outs at tang?
+                            max_time_to_wait = self.max_time_to_wait,
+                            start_entry_id = 0,
+                            max_entries_todo = self.max_entries_todo,                            
+                            extraArgList=extraArgList):
+            nTerror("Failed to doScriptOnEntryList")
+            return True
+        # end if
+    # end def        
+    
     def refine(self):  # pylint: disable=R0201
         """
         Needs to be overriden by e.g. nmr_redo.
@@ -2231,6 +2278,9 @@ def runNrgCing( useClass = NrgCing,
         elif destination == 'refine':
             if uClass.refine(): # in nmr_redo
                 nTerror("Failed to refine")
+        elif destination == 'replaceCoordinates':
+            if uClass.replaceCoordinates(): # in recoord
+                nTerror("Failed to replaceCoordinates")
         elif destination == 'findMissingNrgCingEntries':
             if uClass.findMissingNrgCingEntries(): # in nmr_redo
                 nTerror("Failed to findMissingNrgCingEntries")
