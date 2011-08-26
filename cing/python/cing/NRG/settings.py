@@ -43,7 +43,7 @@ PDBZ2           = os.path.join(divDir,'pdb')
 CIFZ2           = os.path.join(divDir,'mmCIF')
 PDBNMR2         = os.path.join(divDir,'nmr_restraints')
 
-
+# Url part of http://nmr.cmbi.ru.nl/NRG-CING
 results_base         = 'NRG-CING'
 results_base_redo    = 'NMR_REDO'
 results_base_recoord = 'RECOORD'

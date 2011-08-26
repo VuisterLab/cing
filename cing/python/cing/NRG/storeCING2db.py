@@ -60,7 +60,8 @@ def doStoreCING2db( entry_code, archive_id, project = None):
         return True
     # end if
         
-    if archive_id in  [ ARCHIVE_NRG_ID, ARCHIVE_DEV_NRG_ID, ARCHIVE_PDB_ID, ARCHIVE_NMR_REDO_ID, ARCHIVE_NMR_REDOA_ID, ARCHIVE_RECOORD_ID, ARCHIVE_RECOORDA_ID]:
+    if archive_id in  [ ARCHIVE_NRG_ID, ARCHIVE_DEV_NRG_ID, ARCHIVE_PDB_ID, 
+                        ARCHIVE_NMR_REDO_ID, ARCHIVE_NMR_REDOA_ID, ARCHIVE_RECOORD_ID, ARCHIVE_RECOORDA_ID]:
         pdb_id = entry_code
         if pdb_id == None:
             nTerror("Expected pdb_id argument")
