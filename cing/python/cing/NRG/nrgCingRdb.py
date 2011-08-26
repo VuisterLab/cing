@@ -130,12 +130,12 @@ class NrgCingRdb():
         # end if
     # end def
 
-    def getPdbIdList(self, fromNrg=True):
+    def getPdbIdList(self, fromCing=True):
         "Return None on error. And NTlist otherwise."
         table = self.centry
         columnName = PDB_ID_STR
 
-        if not fromNrg:
+        if not fromCing:
             table = self.bs
             columnName =PDBJ_ENTRY_ID_STR
 #        nTdebug("Using table: %s" % table)
@@ -1238,10 +1238,11 @@ def bin_by(y, x, nbins=None, ymin=None, ymax=None):
     return output, bins
 # end def
 
-def getPdbIdList(fromNrg=False, host='localhost'):
+
+def getPdbIdList(fromCing=False, host='localhost'):
     'Convenience method'
     n = NrgCingRdb( host = host )
-    entryList = n.getPdbIdList(fromNrg=fromNrg)
+    entryList = n.getPdbIdList(fromCing=fromCing)
     return entryList
 # end def
 
