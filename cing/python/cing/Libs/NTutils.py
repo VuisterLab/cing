@@ -345,7 +345,7 @@ Sum                %s""" % (
         """
         Removes all duplicate from self so this is an in-place operation.
         Can be optimized when needed by doing a sorted lookup table; It is extremely slow to take a slice every time.
-        Return the duplicate list when using version 2.
+        Return the duplicate list when using version 2 but None otherwise.
         """
 
         if len(self) <= 1:
@@ -421,14 +421,13 @@ Sum                %s""" % (
     # end def
 
     def union(self, other):
-        """Returns a new set of self minus other
+        """Returns a new set of self plus other
         This is a common operation. Order in list will not be altered.
-        If duplicates are present in this/self list then they might not all be removed (multiset semantics).
         So by examples at: http://en.wikipedia.org/wiki/Multiset
 
         { 1, 1, 1, 3 } intersection { 1, 1, 2 } = { 1, 1 }         # intersection (upside down letter u)
         { 1, 1 } unionMinus { 1, 2 }            = { 1, 1, 2 }      # union because only one 1 is present in the second set one 1 from the first set gets added. This may be implemented in another union
-        { 1, 1 } unionPlus  { 1, 2 }            = { 1, 1, 1, 2 }   # union (letter u) This method.
+        { 1, 1 } unionPlus  { 1, 2 }            = { 1, 1, 1, 2 }   # union (letter u) -This method-.
         { 1, 2, 3} \ {2,3,4}                    = { 1 }            # difference (backslash) An example from http://en.wikipedia.org/wiki/Difference_(set_theory)
         """
         result = deepcopy(self)
