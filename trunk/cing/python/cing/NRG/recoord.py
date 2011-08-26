@@ -5,6 +5,7 @@ This script will use NRG-CING files to generate new structures for existing NMR 
 
 Execute like NrgCing, e.g.
 
+$C/python/cing/NRG/recoord.py updateWeekly
 $C/python/cing/NRG/recoord.py 1brv replaceCoordinates
 """
 
@@ -13,6 +14,7 @@ from cing.Libs.helper import * #@UnusedWildImport
 from cing.NRG import ARCHIVE_RECOORD_ID
 from cing.NRG.nrgCing import NrgCing
 from cing.NRG.nrgCing import runNrgCing
+from cing.NRG.nrgCingRdb import NrgCingRdb
 from cing.NRG.settings import * #@UnusedWildImport
 
 class Recoord(NrgCing):
@@ -51,13 +53,18 @@ class Recoord(NrgCing):
         self.entry_to_delete_count_max = 0 # can be as many as fail every time.
         self.usedCcpnInput = 0  # For NMR_REDO it is not from the start.
         self.validateEntryExternalDone = 0
-        self.nrgCing = NrgCing() # Use as little as possible thru this inconvenience variable.
-                
+        self.nrgCing = NrgCing() # Use as little as possible thru this inconvenience variable.                
         self.archive_id = ARCHIVE_RECOORD_ID        
         self.validateEntryExternalDone = False # DEFAULT: True 
 #        in the future and then it won't change but for NrgCing it is True from the start.
         self.updateDerivedResourceSettings() # The paths previously initialized in NrgCing. Will also chdir.
         
+        if 1:
+            nTmessage("Going to use specific entry_list_todo in prepare")
+#            self.entry_list_done = readLinesFromFile('/Library/WebServer/Documents/NRG-CING/list/entry_list_recoord_nrgcing_shuffled.csv')
+            m = NrgCingRdb(schema=self.schema_id)
+            self.entry_list_done = m.getPdbIdList(fromCing=True)            
+            self.entry_list_done = NTlist( *self.entry_list_done )
         if 0:
             self.entry_list_todo.clear() 
             # Random set of 10 from RECOORD still present in PDB.
@@ -67,9 +74,10 @@ class Recoord(NrgCing):
             nTmessage("Going to use specific entry_list_todo in prepare")
             self.entry_list_todo = readLinesFromFile('/Library/WebServer/Documents/NRG-CING/list/entry_list_recoord_nrgcing_shuffled.csv')
             self.entry_list_todo = NTlist( *self.entry_list_todo )
-    # end def  
-        
-    
+    # end def
+    def setPossibleEntryList(self): # pylint: disable=W0221        
+        pass
+    # end def
 # end class.
 
 if __name__ == '__main__':

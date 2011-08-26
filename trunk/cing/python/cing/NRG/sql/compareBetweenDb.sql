@@ -15,6 +15,7 @@ WHERE e1.name in ( select pdb_id from nmr_redo.tmpentrylist )
 
 WHERE e1.name in ( '1brv', '1dum', '1mmc' )
 
+e1.name in ( select pdb_id from nmr_redo.tmpentrylist )
 
 
 select e1.name as pdb_id,
@@ -26,8 +27,7 @@ e2.dis_rms_all - e1.dis_rms_all as ddis_rms_all,
 e1.rev_last,
 e2.rev_last
 from
-nmr_redo.cingentry e1,
-nrgcing.cingentry  e2
-where e1.name = e2.name and
-e1.name in ( select pdb_id from nmr_redo.tmpentrylist )
+recoord.cingentry  e1,
+nmr_redo.cingentry e2
+where e1.name = e2.name
 order by e1.name;
