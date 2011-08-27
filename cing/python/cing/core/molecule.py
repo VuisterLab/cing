@@ -2106,6 +2106,7 @@ class Molecule( NTtree, ResidueList ):
         
         nTdebug( 'inPath:          %s' % inPath) 
         nTdebug( 'useModels:       %s' % useModels)
+        nTdebug( 'convention:      %s' % convention)
         models = None
         if useModels:
             models = asci2list(useModels)
@@ -2122,7 +2123,7 @@ class Molecule( NTtree, ResidueList ):
         nTmessage('==> Importing coordinates from %s, models %s (low verbosity on later models)', inPath, models)
         self.initCoordinates(resetStatusObjects = True)
         
-        useMultipleFiles = "%d" in inPath
+        useMultipleFiles = "%" in inPath
         if useMultipleFiles:
             nTdebug("Using multiple input files from %s" % inPath)
             for i, m in enumerate(models):
