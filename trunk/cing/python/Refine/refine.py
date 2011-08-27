@@ -75,7 +75,7 @@ def importFrom(config, project, parameters):
     nTdebug( 'models:         %s' % models) 
     
     xplor_path = xplor.joinPath(inPath, xplor.baseName)
-    project.molecule.replaceCoordinatesByPdb(xplor_path, bestModels, name = xplor.name)
+    project.molecule.replaceCoordinatesByPdb(xplor_path, name = xplor.name, useModels = bestModels, convention = 'XPLOR' )
     
     if getDeepByKeysOrAttributes(parameters, 'superpose'):
         project.molecule.superpose(ranges=parameters.superpose)
