@@ -11,7 +11,7 @@ import unittest
 class AllChecks(TestCase):
     'Test case.'
     def test_ConvoluteNumpy(self):
-        "Try to test numpy's matrices"
+#        Try to test numpy's matrices
         hist1 = [ 0, 1, 2]
         hist2 = [10, 21, 22]
 #        m1 = mat(hist1)

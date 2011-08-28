@@ -171,9 +171,7 @@ class AllChecks(TestCase):
 #        self.assertEquals(extension, '.txt')
 
     def testSelectByItems(self):
-        """
-        E.g. if adl is the AtomDef NTlist
-        """
+#        E.g. if adl is the AtomDef NTlist
         byItems = ( 'type', 'C_VIN' )
         vadl = NTdb.allAtomDefs().selectByItems( *byItems )
 #       vadl = adl.
