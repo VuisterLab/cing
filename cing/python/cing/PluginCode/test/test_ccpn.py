@@ -36,7 +36,6 @@ class AllChecks(TestCase):
 #    entryList = "2k6q".split()
     
     def test_ccpn(self):
-        'Testing ccpn'
 #        cing.verbosity = verbosityDebug
 #        if you have a local copy you can use it; make sure to adjust the path setting below.
         fastestTest = True             # DEFAULT: True. Not passed to the validate routine in order to customize checks for speed.
