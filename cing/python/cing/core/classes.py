@@ -995,7 +995,8 @@ Project: Top level Cing project class
 #    #end def
 
     def analyzeRestraints(self):
-        """Call analyze method for all restraint lists
+        """
+        Call analyze method for all restraint lists
         """
         nTdetail('==> Analyzing restraints')
         for drl in self.allRestraintLists():
@@ -1003,12 +1004,14 @@ Project: Top level Cing project class
     #end def
 
     def allRestraintLists(self):
-        """Return an NTlist instance with all restraints lists
+        """
+        Return an NTlist instance with all restraints lists
         """
         return self.distances + self.dihedrals + self.rdcs
 
     def allRestraints(self, restraintLoL = None):
-        """Return an RestraintList instance with all restraints
+        """
+        Return an RestraintList instance with all restraints
         parameter defaults to self.distances
 
         Sets a _parent attribute to find original list back like in NTtree.
@@ -1141,6 +1144,35 @@ Project: Top level Cing project class
 
     def criticize(self, toFile = True):
         return criticize(self, toFile = toFile)
+    
+    def decriticize(self):
+        """
+        Reset all Rog score objects in this project.
+        
+        Return True on error and None on success.
+        """
+    
+#        nTdebug("Now in project#decriticize")
+        
+        self.rogScore.reset()
+        # Project lists of lists
+        projectLoL = []
+        projectLoL += self.allRestraintLists() # distances, etc.        
+        projectLoL += self.peaks     
+        for projectList in projectLoL:
+            if projectList.decriticize():
+                nTerror("Failed to decriticize %s in project#decriticize" % str(projectList))
+                return True
+            #end if
+        # end for
+            
+        if self.molecule:
+            if self.molecule.decriticize():
+                nTerror("Failed to decriticize %s in project#decriticize" % str(self.molecule))
+                return True                
+            #end if
+        #end if
+    #end def
 
     def validate(self, ranges = None, parseOnly = False, htmlOnly = False, doProcheck = True, doWhatif = True,
                  doWattos = True, doQueeny = True, doTalos = True,
@@ -2393,6 +2425,11 @@ class Peak(NTdict, Lister):
         self.rogScore = ROGscore()
     #end def
 
+    def decriticize(self):
+        nTdebug("Now in Peak#decriticize")
+        self.rogScore.reset()
+    #end def
+
     def isAssigned(self, axis):
         if axis >= self.dimension: 
             return False
@@ -2446,7 +2483,6 @@ class PeakList(NTlist, ProjectListMember):
         self.name = name
         self.status = status
         self.listIndex = -1 # list is not appended to anything yet
-        self.rogScore = ROGscore()
     #end def
 
     def minMaxDimension(self):
@@ -2558,6 +2594,12 @@ class Restraint(NTdict):
     def __str__(self):
         return '<%s %d>' % (self.__CLASS__, self.id)
     #end def
+    
+    def decriticize(self):
+#        nTdebug("Now in Restraint#%s" % getCallerName())
+        self.rogScore.reset()
+    #end def
+    
     def getModelCount(self):
         """Iterate over the atoms until an atom is found that returns not a None for getModelCount.
         Return 0 if it doesn't have any models or None on error.
@@ -2675,7 +2717,6 @@ class DistanceRestraint(Restraint):
 
     def criticize(self, project):
         """Only the self violations,violMax and violSd needs to be set before calling this routine"""
-
         self.rogScore.reset()
 #        nTdebug( '%s' % self )
         if (project.valSets.DR_MAXALL_BAD != None) and (self.violMax >= project.valSets.DR_MAXALL_BAD):
@@ -3325,7 +3366,6 @@ class DistanceRestraintList(RestraintList):
         Criticize restraints of this list; infer own ROG score from individual restraints.
         """
 #        nTdebug('DistanceRestraintList.criticize %s', self)
-
         self.rogScore.reset()
 
         for dr in self:
@@ -3362,7 +3402,7 @@ class DistanceRestraintList(RestraintList):
         """
         Calculate averages for every restraint.
         Partition restraints into classes.
-        Analyse for duplicate restraints.
+        Analyze for duplicate restraints.
 
         Return <rmsd>, sd and total violations over 0.1, 0.3, 0.5 A as tuple
         or (None, None, None, None, None) on error
@@ -3372,7 +3412,7 @@ class DistanceRestraintList(RestraintList):
 
         if (len(self) == 0):
             # happens for entry 2k0e imported from CCPN. Has unlinked restraints.
-#            nTdebug('DistanceRestraintList.analyze: "%s" empty list'% self.name )
+            nTdebug('DistanceRestraintList.analyze: "%s" empty list'% self.name )
             return (None, None, None, None, None)
         #end if
 
@@ -3588,6 +3628,8 @@ class DihedralRestraint(Restraint):
     def criticize(self, project):
         """Only the self violations,violMax and violSd needs to be set before calling this routine"""
 #        nTdebug( '%s (dih)' % self )
+        self.rogScore.reset()
+
         if (project.valSets.AC_MAXALL_BAD != None) and (self.violMax >= project.valSets.AC_MAXALL_BAD):
             comment = 'violMax: %7.2f' % self.violMax
 #            nTdebug(comment)
@@ -3857,7 +3899,6 @@ class DihedralRestraintList(RestraintList):
         Criticize restraints of this list; infer own ROG score from individual restraints.
         """
 #        nTdebug('DihedralRestraintList.criticize %s', self)
-
         self.rogScore.reset()
 
         for dr in self:
@@ -4136,11 +4177,9 @@ class RDCRestraintList(RestraintList):
         """
         Criticize restraints of this list; infer own ROG score from individual restraints.
 
-        Need implementation
+        TODO: Need implementation
         """
-
 #        nTdebug('RDCRestraintList.criticize %s', self)
-
         self.rogScore.reset()
 
 #        for dr in self:

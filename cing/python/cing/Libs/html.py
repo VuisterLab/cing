@@ -608,6 +608,7 @@ def generateHtml( project, htmlOnly=False ):
         nTmessage(' and images.')
 
     project.html.generateHtml(htmlOnly=htmlOnly)
+    nTmessageNoEOL('==> Generating molecule HTML code')
     project.molecule.html.generateHtml(htmlOnly=htmlOnly)
     for chain in project.molecule.allChains():
         chain.html.generateHtml(htmlOnly=htmlOnly)

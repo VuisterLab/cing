@@ -2100,6 +2100,10 @@ class Molecule( NTtree, ResidueList ):
         that's exclusive with doing multiple files).
         If name is given then it will be used as the new molecule name.
         
+        NB all rog scores and critiques for all levels (molecule, etc.) are reset.
+             TODO: enable a molecule level and down wipe out of coordinate derived properties such as
+                     rog but also other values such as CHK.RAMACHANDRAN_CHK. It is too 
+                     dangerous to keep these laying around.
         Return True on error.
         """
         
@@ -2162,10 +2166,14 @@ class Molecule( NTtree, ResidueList ):
             msg = "Renamed molecule to " + self.name
             self.project.addHistory(msg)
             nTmessage( msg )
-        # end if        
-        self.project.updateProject()
-        nTmessage( "Molecule: %s" % self.format() )
-    
+        # end if
+        
+        self.project.updateProject() 
+        if self.project.decriticize():
+            nTerror("Failed to project.decriticize() in molecule#replaceCoordinatesByPdb")
+            return True
+        # end if
+        nTmessage( "Molecule: %s" % self.format() )    
         self.project.createMoleculeDirectories(self.project.molecule)    
     # end def    
     
@@ -3018,6 +3026,29 @@ Return an Molecule instance or None on error
         return self.rmsd
     #end def
 
+    def decriticize(self):
+        """
+        Reset all Rog score objects in this project.        
+        Return True on error and None on success.
+        """
+#        nTdebug("Now in molecule#%s" % getCallerName())
+        self.rogScore.reset()
+        
+        self.green.clear()
+        self.orange.clear()
+        self.red.clear()
+        
+        objectListOfLists = []
+        objectListOfLists += self.resonanceSources      # CS
+        objectListOfLists += self.subNodes( depth = 1 ) # chain
+        for objectList in objectListOfLists:
+            if objectList.decriticize():
+                nTerror("Failed to decriticize %s in molecule#decriticize" % str(objectList))
+                return True
+            #end if
+        #end for
+    #end def
+
     def toPDB(self, fileName = None, model=None, ranges=None, convention=IUPAC, max_models=None,
               chainName = None,
               useRangesForLoweringOccupancy=False):
@@ -3651,6 +3682,21 @@ Chain class: defines chain properties and methods
         return id == Chain.NULL_VALUE
     isNullValue = staticmethod( isNullValue )
 
+    def decriticize(self):
+        """
+        Reset all Rog score objects in this project.        
+        Return True on error and None on success.
+        """
+#        nTdebug("Now in Chain#%s" % getCallerName())
+        self.rogScore.reset()
+        for obj in self.subNodes( depth = 1 ):
+            if obj.decriticize():
+                nTerror("Failed to decriticize %s in Chain#decriticize" % str(obj))
+                return True
+            #end if
+        #end for
+    #end def
+
     # pylint: disable=C0103
     def addResidue( self, resName, resNum, convention=INTERNAL, 
                     Nterminal=False, Cterminal=False,                   
@@ -4096,6 +4142,22 @@ Residue class: Defines residue properties
         else:
             result += self.number
         return result
+
+    def decriticize(self):
+        """
+        Reset all Rog score objects in this project.        
+        Return True on error and None on success.
+        """
+#        nTdebug("Now in Residue#%s" % getCallerName())
+        self.rogScore.reset()
+        for obj in self.subNodes( depth = 1 ):
+            if obj.decriticize():
+                nTerror("Failed to decriticize %s in Residue#decriticize" % str(obj))
+                return True
+            #end if
+        #end for
+    #end def
+
 
     def _nameResidue( self, resName, resNum, convention = INTERNAL ):
         """Internal routine to set all the naming right and database references right
@@ -5298,9 +5360,26 @@ coordinates: %s"""  , dots, self, dots
 
     def criticize(self):
 #        nTdebug( '%s' % self )
+#        self.rogScore.reset() # Can't do this because elsewhere critiques might already be added?
         if not self.hasCoordinates():
 #            nTdebug('Setting atom to max orange [crit.1] because it has no coordinates')
             self.rogScore.setMaxColor( COLOR_ORANGE, comment=ROGscore.ROG_COMMENT_NO_COOR)
+
+    def decriticize(self):
+        """
+        Reset all Rog score objects in this project.        
+        Return True on error and None on success.
+        """
+#        nTdebug("Now in Atom#%s" % getCallerName())
+        self.rogScore.reset()
+        for obj in self.subNodes( depth = 1 ):
+            if obj.decriticize():
+                nTerror("Failed to decriticize %s in Atom#decriticize" % str(obj))
+                return True
+            #end if
+        #end for
+    #end def
+
 
     def toString(self, showChainId=True, showResidueType=True):
         res = self._parent

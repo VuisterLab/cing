@@ -38,13 +38,13 @@ class AllChecks(TestCase):
         ranges = 'A.173-178'
         nTdebug("m: %s" % m)
         self.assertTrue( m.toPDB('m001.pdb', model=0, ranges=ranges, convention='XPLOR'))
-        nTdebug("Manual reimport")
-        m.initCoordinates()
-        m.importFromPDB('m001.pdb',convention='XPLOR')
+#        nTdebug("Manual reimport")
+#        m.initCoordinates()
+#        m.importFromPDB('m001.pdb',convention='XPLOR')
         nTdebug("Reimport 1")
         m.replaceCoordinatesByPdb(pdbFilePath, name = entryId+'_reimport', convention=IUPAC)
-        nTdebug("Reimport 2")
-        m.replaceCoordinatesByPdb(pdbFilePath, name = entryId+'_reimport', useModels = "1", convention=IUPAC)
+#        nTdebug("Reimport 2")
+#        m.replaceCoordinatesByPdb(pdbFilePath, name = entryId+'_reimport', useModels = "1", convention=IUPAC)
 
         self.assertFalse(project.mkMacros())
 #       self.assertFalse(project.validate(htmlOnly=False, doWhatif = False, doProcheck = False))
