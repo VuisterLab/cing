@@ -426,10 +426,15 @@ def criticize(project, toFile=True):
     Restraint red ROGs get carried as orange to residue ROGs
     """
 
-    # Restraints lists
+#    nTdebug("Now in validate.py#criticize")
+    if project.decriticize():
+        nTerror("Failed to project.decriticize in validate#criticize")
+        return True
+    # end if
     for drl in project.allRestraintLists():
         drl.criticize(project, toFile=toFile)
-
+    # end for
+    
     #Peaks
     criticizePeaks( project, toFile=toFile )
 
@@ -497,9 +502,6 @@ def criticize(project, toFile=True):
             nTdetail('==> Criticizing project')
         #end if
     #end if
-
-    # store an
-
 #end def
 
 def _ROGsummary( residueList, allowHtml=False ):

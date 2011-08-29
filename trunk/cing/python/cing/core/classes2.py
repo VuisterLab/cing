@@ -19,7 +19,18 @@ class ProjectListMember():
         self.project = None
         self.objectPath = None
         self.projectList = None
+        self.rogScore = ROGscore()        
     # end def
+    
+    def decriticize(self):
+#        nTdebug("Now in ProjectListMember#%s" % getCallerName())
+        # Any list
+        self.rogScore.reset()
+        for obj in self:
+#            nTdebug("Looking at object: %s [%r]" % (str(obj), repr(obj)))
+            obj.decriticize()
+        # end for
+    #end def    
 # end class
 
 
@@ -51,10 +62,9 @@ class RestraintList(NTlist, ProjectListMember):
 
 #        self.export2cyana = passThru # Explicite mention. Defaulting to passthru method.
 #        self.export2xplor = passThru
-#        self.path = None
-        
-        self.rogScore = ROGscore()
+#        self.path = None        
     #end def
+    
     def __str__(self):
         return sprintf('<%s "%s" (%s,%d)>' % (self.__CLASS__, self.name, self.status, len(self)))
     #end def
@@ -65,6 +75,7 @@ class RestraintList(NTlist, ProjectListMember):
         'rename'
         return self.projectList.rename(self.name, newName)
     #end def
+    
     def renameToXplorCompatible(self):
         'rename to Xplor Compatible'
         n = len(self.name)
@@ -192,6 +203,15 @@ class ResonanceList(NTlist, ProjectListMember):
         self.vascoApplied  = False # VASCO_APPLIED_STR
         self.rogScore = ROGscore()
         self.SMLhandler.SML_SAVE_ATTRIBUTE_LIST = self.SML_SAVE_ATTRIBUTE_LIST
+    #end def
+
+    def decriticize(self):
+#        nTdebug("Now in ResonanceList#decriticize")
+        # Restraints lists
+        self.rogScore.reset()
+        for dr in self:
+            dr.rogScore.reset()
+        # end for
     #end def
 
     def hasVascoCorrectionsApplied(self):
