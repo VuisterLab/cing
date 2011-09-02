@@ -246,10 +246,10 @@ class NrgCing(Lister):
         self.wattosVerbosity = cing.verbosity
         #: development machine Stella only has 4g total
         #: This is only important for largest entries like 2ku2
-        self.wattosMemory = '4g'
+        self.wattosMemory = '2g' # DEFAULT: 4g but reduced to 2 because -d32 was needed on OSX Lion currently.
 #        if not self.isProduction:
 #            self.wattosMemory = '2g'  
-        self.wattosProg = "java -Djava.awt.headless=true -Xmx%s Wattos.CloneWars.UserInterface -at -verbosity %s" % (
+        self.wattosProg = "java -d32 -Djava.awt.headless=true -Xmx%s Wattos.CloneWars.UserInterface -at -verbosity %s" % (
             self.wattosMemory, self.wattosVerbosity)
         self.tokenListFileName = None
         self.vc = None

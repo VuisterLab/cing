@@ -11,7 +11,7 @@ cd $0:h
 
 echo "DEBUG: PATH       1: $PATH"
 echo "DEBUG: PYTHONPATH 1: $PYTHONPATH"
-echo "DEBUG: CLASSPATH  1: $CLASSPATH"
+# echo "DEBUG: CLASSPATH  1: $CLASSPATH"
 
 setenv CINGROOT $cwd
 

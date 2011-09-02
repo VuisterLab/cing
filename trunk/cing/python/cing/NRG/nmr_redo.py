@@ -9,6 +9,7 @@ $C/python/cing/NRG/nmr_redo.py 1brv refine
 $C/python/cing/NRG/nmr_redo.py refine
 $C/python/cing/NRG/nmr_redo.py getEntryInfo
 $C/python/cing/NRG/nmr_redo.py 1brv storeCING2db
+$C/python/cing/NRG/nmr_redo.py updateIndexFiles
 """
 
 from cing import cingDirScripts
@@ -28,9 +29,7 @@ class NmrRedo(NrgCing):
                  useTopos=False,
                  getTodoList=True,
                  max_entries_todo=1,
-                 max_time_to_wait=86400, 
-                 # one day. 2p80 took the longest: 5.2 hours. 
-#                 But <Molecule "2ku1" (C:7,R:1659,A:36876,M:30)> is taking longer. 2ku2 is taking over 12 hrs now.
+                 max_time_to_wait=86400*2, # two days. 1d8v (263 residues) took the longest: about 26 hours. 
                  processes_max=None,
                  prepareInput=False,
                  writeWhyNot=True,
@@ -58,7 +57,6 @@ class NmrRedo(NrgCing):
 
         self.entry_to_delete_count_max = 0 # can be as many as fail every time.
         self.usedCcpnInput = 0  # For NMR_REDO it is not from the start.
-        self.validateEntryExternalDone = 0
         self.nrgCing = NrgCing() # Use as little as possible thru this inconvenience variable.
                 
         self.archive_id = ARCHIVE_NMR_REDO_ID        
