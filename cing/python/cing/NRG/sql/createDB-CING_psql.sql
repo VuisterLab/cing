@@ -18,7 +18,11 @@
 SET AUTOCOMMIT=1;
 
 -- ===== Registers ======
--- Register 1 is reserved for ranges selection at the residue level only.
+-- ENTRY
+-- 1 N/A 
+-- RESIDUE
+-- 1 ranges selection
+-- 2 GOOD according to flexible criteria as examplified in compareBetweenDb.sql
 
 -- Only now that the tables have been removed can the schema be removed.
 DROP SCHEMA IF EXISTS casdcing CASCADE;
@@ -44,6 +48,7 @@ CREATE TABLE casdcing.cingentry
     sel_3                     BOOLEAN DEFAULT NULL,
     sel_4                     BOOLEAN DEFAULT NULL,
     sel_5                     BOOLEAN DEFAULT NULL,
+    selection                 bigint DEFAULT NULL,
     bmrb_id                        INT DEFAULT NULL,
     casd_id                        VARCHAR(255) UNIQUE,
     pdb_id                         VARCHAR(255), -- (10)
@@ -170,6 +175,7 @@ CREATE TABLE casdcing.cingchain
     sel_3                     BOOLEAN DEFAULT NULL,
     sel_4                     BOOLEAN DEFAULT NULL,
     sel_5                     BOOLEAN DEFAULT NULL,
+    selection                 bigint DEFAULT NULL,
     chothia_class                   INT DEFAULT NULL,
     rog                             INT DEFAULT NULL,
     FOREIGN KEY (entry_id)          REFERENCES casdcing.cingentry (entry_id) ON DELETE CASCADE
@@ -195,6 +201,7 @@ CREATE TABLE casdcing.cingresidue
     sel_3                     BOOLEAN DEFAULT NULL,
     sel_4                     BOOLEAN DEFAULT NULL,
     sel_5                     BOOLEAN DEFAULT NULL,
+    selection                 bigint DEFAULT NULL,
     is_common                      BOOLEAN DEFAULT NULL,
     is_termin                      BOOLEAN DEFAULT NULL,
 --   whatif (averages over the ensemble of selected models)
@@ -314,6 +321,7 @@ CREATE TABLE casdcing.cingatom
     sel_3                     BOOLEAN DEFAULT NULL,
     sel_4                     BOOLEAN DEFAULT NULL,
     sel_5                     BOOLEAN DEFAULT NULL,
+    selection                 bigint DEFAULT NULL,
 --   whatif
     wi_ba2chk                      FLOAT DEFAULT NULL,
     wi_bh2chk                      VARCHAR(255) DEFAULT NULL,
@@ -352,6 +360,7 @@ CREATE TABLE casdcing.drlist
     number                         INT              NOT NULL,
     entry_id                 INT              NOT NULL,
     name                     VARCHAR(255),
+    selection                 bigint DEFAULT NULL,
     viol_count_lower         INT              DEFAULT NULL,   -- Total lower-bound violations over 0.1 A
     viol_count1              INT              DEFAULT NULL, 
     viol_count3              INT              DEFAULT NULL, 
@@ -380,6 +389,7 @@ CREATE INDEX drlist_003 ON casdcing.drlist (rog);
 CREATE TABLE casdcing.dr
 (
     dr_id                 SERIAL UNIQUE PRIMARY KEY,
+    selection                 bigint DEFAULT NULL,
     number                INT              NOT NULL,
     drlist_id                INT              NOT NULL,
     entry_id                 INT              NOT NULL,
@@ -448,6 +458,7 @@ CREATE INDEX dr_012 ON casdcing.dr (rog);
 CREATE TABLE casdcing.cingresonancelist
 (
     resonancelist_id               SERIAL UNIQUE PRIMARY KEY,
+    selection                 bigint DEFAULT NULL,
     entry_id                       INT              NOT NULL,
     name                           VARCHAR(255),
 --    number                         INT              NOT NULL,
@@ -462,6 +473,7 @@ CREATE INDEX cingresonancelist_003 ON casdcing.cingresonancelist (rog);
 CREATE TABLE casdcing.cingresonancelistperatomclass
 (
     resonancelistperatomclass_id   SERIAL UNIQUE PRIMARY KEY,
+    selection                 bigint DEFAULT NULL,
     resonancelist_id               INT              NOT NULL,
     entry_id                       INT              NOT NULL,
     atomclass                      VARCHAR(255),          -- atom clas
@@ -480,11 +492,13 @@ CREATE INDEX cingresonancelistperatomclass_004 ON casdcing.cingresonancelistpera
 CREATE table casdcing.cingsummary
 (
     pdb_id                         VARCHAR(255) UNIQUE PRIMARY KEY,
+    selection                 bigint DEFAULT NULL,
     weight                         FLOAT DEFAULT NULL
 );
 
 CREATE table casdcing.entry_list_selection
 (
-    pdb_id                         VARCHAR(255) UNIQUE PRIMARY KEY
+    pdb_id                         VARCHAR(255) UNIQUE PRIMARY KEY,
+    selection                 bigint DEFAULT NULL
 );
 

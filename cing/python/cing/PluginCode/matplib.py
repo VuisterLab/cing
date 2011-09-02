@@ -775,7 +775,7 @@ class NTplot( NTdict ):
 
     def imshow(self, imageFileName):
         alpha = 0.05 # much lower than any background.
-        im = Image.open( imageFileName )
+        im = Image.open( imageFileName ) #@UndefinedVariable
 #        s = im.tostring()
 #        rgb = fromstring( s, UInt8).astype(Float)/255.0
 #        rgb = resize(im, (im.size[1],im.size[0], 3))
