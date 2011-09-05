@@ -520,9 +520,13 @@ def doStoreCING2db( entry_code, archive_id, project = None):
             sel_1R = molecule.rangesContainsResidue(residue)
             dssp_id = getDsspSecStructConsensusId(residue)
 
-            r_distance_count = residue.distanceRestraints.lenRecursive(max_depth = 1) # filled by filled in partition restraints
-            r_dihedral_count = residue.dihedralRestraints.lenRecursive(max_depth = 1)
-            r_rdc_count = residue.rdcRestraints.lenRecursive(max_depth = 1)
+#            r_distance_count = residue.distanceRestraints.lenRecursive(max_depth = 1) # filled in partition restraints
+#            r_dihedral_count = residue.dihedralRestraints.lenRecursive(max_depth = 1)
+#            r_rdc_count = residue.rdcRestraints.lenRecursive(max_depth = 1)
+
+            r_distance_count = len(residue.distanceRestraints)
+            r_dihedral_count = len(residue.dihedralRestraints)
+            r_rdc_count =      len(residue.rdcRestraints)
 
 #            nTdebug("r_distance_count r_dihedral_count r_rdc_count %d %d %d" % (r_distance_count, r_dihedral_count, r_rdc_count))
             # TODO: test with cs present

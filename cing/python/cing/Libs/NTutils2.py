@@ -392,7 +392,17 @@ def truthToInt(i):
 # end def
 
 def getCallerName():
-    return inspect.stack()[1][3]
+    callerFrame = inspect.stack()[1]
+#    nTdebug("callerFrame: %s" % str(callerFrame))
+    return callerFrame[3]
+# end def
+
+def getCallerFileName():
+    callerFrame = inspect.stack()[1]
+    # Not using inspect.getsourcefile(object) because:
+    # This will fail with a TypeError if the object is a built-in module, class, or function.
+#    nTdebug("callerFrame: %s" % str(callerFrame))
+    return callerFrame[1]
 # end def
 
 def getRandomKey(size=6):

@@ -1092,7 +1092,7 @@ AND '{2}' <@ S.chain_type; -- contains at least one protein chain.
                 plotDictAxisList.append( deepcopy( plotDictList[1+dim] ))
                 plotDictAxisList[dim][REPLACE_BY_NATURAL_IDS] = True # Needed because the regular ids are only unique within schema.
                 if dim == 0:
-                    plotDictAxisList[dim][IS_TRUE] = SEL1_STR
+                    plotDictAxisList[dim][IS_TRUE] = [ SEL1_STR, SEL2_STR ]
                 else:  
                     plotDictAxisList[dim][IS_TRUE] = [ SEL1_STR, SEL2_STR ] # Overall, x and y axis dictionary settings.
                 # end if

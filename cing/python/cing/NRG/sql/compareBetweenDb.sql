@@ -60,10 +60,23 @@ insert into nmr_redo.testResidue VALUES ( 1, NULL );
 insert into nmr_redo.testResidue VALUES ( 2, NULL );
 insert into nmr_redo.testResidue VALUES ( 3, NULL );
 
--- sel_2 means that the entry has 25 models in nmr_redo and 
--- sel_2 is set everywhere in recoord.
-update recoord.cingresidue set sel_2 = TRUE;
 
+
+select count(*) from  recoord.cingresidue WHERE sel_1 = TRUE AND sel_2 = TRUE;
+select count(*) from nmr_redo.cingresidue WHERE sel_1 = TRUE AND sel_2 = TRUE;
+select count(*) from nmr_redo.cingentry e2 where e2.model_count < 25;
+
+-- RECOORD manipulations
+-- sel_2 means that the entry has 25 models in nmr_redo and 
+-- See problemEntryListNMR_REDO.csv
+update recoord.cingresidue set sel_2 = TRUE;
+update recoord.cingresidue set sel_2 = FALSE where name IN ( '1omt' ); -- NRG issue 278 Bounds badly interpreted or specified
+update recoord.cingresidue set sel_2 = FALSE where name IN ( '1u2f' ); -- NRG issue 279 XPLOR atom name HG1# for Thr should be mapped to methyl i.s.o. hydroxyl proton
+
+
+-- NMR_REDO manipulations
+-- sel_2 is set everywhere in recoord.
+update nmr_redo.cingresidue set sel_2 = FALSE;
 update nmr_redo.cingresidue set sel_2 = TRUE where residue_id IN
 ( 
 select r2.residue_id
@@ -72,22 +85,22 @@ select r2.residue_id
     nmr_redo.cingentry e2
     where
     r2.entry_id = e2.entry_id AND
-    e2.model_count = 25	
-)
+    e2.model_count = 25
+);
+
+--     e2.name = '1brv'    
+
+select residue_id, r0.distance_count 
+from  
+    nrgcing.cingresidue  r0,
+    nrgcing.cingentry e0
+WHERE 
+    r0.entry_id = e0.entry_id AND
+e0.name = '1brv' AND
+r0.name = 'PRO' AND
+r0.number = 172
 ;
-select count(*) from recoord.cingresidue WHERE sel_2 = TRUE;
-
-
-update recoord.cingresidue set sel_2 = TRUE;
--- NRG issue 278 Bounds badly interpreted or specified
-update recoord.cingresidue set sel_2 = FALSE where name IN ( '1omt' );
--- NRG issue 279 XPLOR atom name HG1# for Thr should be mapped to methyl i.s.o. hydroxyl proton
-update recoord.cingresidue set sel_2 = FALSE where name IN ( '1u2f' );
-
-select count(*)
-from recoord.cingresidue r2
-where r2.sel_2 = TRUE;
-
+-- OTHER
 ( 
 select r2.residue_id
     from
@@ -102,7 +115,7 @@ select r2.residue_id
 select name, sel_2 from recoord.cingentry;
 
 -- Get outliers from selections.
-select e1.name, r1.name, r1.number, r1.wi_plnchk
+select e1.name, r1.name, r1.number, r1.pc_gf_PHIPSI, r2.pc_gf_PHIPSI
 from 
     recoord.cingresidue  r1,
     recoord.cingentry e1,
@@ -116,5 +129,30 @@ r1.number = r2.number AND
 r1.sel_1 = TRUE AND
 r2.sel_1 = TRUE AND
 r2.sel_2 = TRUE AND
-r1.wi_plnchk > 4;
+(
+r1.pc_gf_PHIPSI > 8 or
+r2.pc_gf_PHIPSI > 8
+);
+
+
+-- Get outliers from selections.
+select e1.name, r1.name, r1.number, r1.pc_gf_PHIPSI, r2.pc_gf_PHIPSI
+from 
+    nrgcing.cingresidue  r1,
+    nrgcing.cingentry e1,
+    nmr_redo.cingresidue  r2,
+    nmr_redo.cingentry e2
+where 
+e1.name = e2.name AND
+r1.entry_id = e1.entry_id AND
+r2.entry_id = e2.entry_id AND
+r1.number = r2.number AND
+r1.sel_1 = TRUE AND
+r2.sel_1 = TRUE AND
+r2.sel_2 = TRUE AND
+(
+r1.pc_gf_PHIPSI > 1.5 or
+r2.pc_gf_PHIPSI > 1.5
+);
+
 

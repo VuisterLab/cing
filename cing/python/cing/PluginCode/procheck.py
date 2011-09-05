@@ -611,6 +611,16 @@ B   7 U   999.900 999.900 999.900 999.900 999.900 999.900   0.000   1.932 999.90
             for field, value in result.iteritems():
                 if not self.procheckEnsembleDefs[field][3]: # Checking store parameter.
                     continue
+                # end if
+                # Truncate for those rare instances ( < 10 for > 9,000 entries )
+#pc gf phipsi can be extremely high: 
+# 1b64 SER      82        34.36      this might be an installation bug as it's value in PDBe is normal.
+                if value and (field in gf_LIST_STR):
+                    if value > PCgFactorMaxErrorValue:
+                        value = PCgFactorMaxErrorValue
+                        nTerror("A pc g-factor for %s of %s was truncated to %s" % ( value, field, PCgFactorMaxErrorValue))
+                    # end if 
+                # end if
                 residue.procheck[field] = value
             #end for
         #end for

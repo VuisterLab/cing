@@ -23,6 +23,8 @@ SET AUTOCOMMIT=1;
 -- RESIDUE
 -- 1 ranges selection
 -- 2 GOOD according to flexible criteria as examplified in compareBetweenDb.sql
+--    RECOORD: no problems such as in problemEntryListNMR_REDO.csv
+--    NMR_REDO: models = 25 (large number of models)
 
 -- Only now that the tables have been removed can the schema be removed.
 DROP SCHEMA IF EXISTS casdcing CASCADE;

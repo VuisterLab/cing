@@ -12,7 +12,7 @@ gf_CHI12_STR = 'gfCHI12'
 gf_CHI1_STR = 'gfCHI1'
 
 # Used in RDB
-pc_gf_STR           = 'pc_gf_PHIPSI'
+pc_gf_STR           = 'pc_gf'
 pc_gf_PHIPSI_STR    = 'pc_gf_PHIPSI'
 pc_gf_CHI12_STR     = 'pc_gf_CHI12'
 pc_gf_CHI1_STR      = 'pc_gf_CHI1'
@@ -44,6 +44,9 @@ MAX_PROCHECK_TOTAL_RESIDUES = 50000
 
 PCgFactorMinValue = - 3.0
 PCgFactorMaxValue = 1.0
+# Value above which the program PC was actually incorrect most likely
+# See procheck.py code.
+PCgFactorMaxErrorValue = 1.5
 PCgFactorReverseColorScheme = True
 
 def to3StatePC( strNTList ):
