@@ -5297,6 +5297,7 @@ Atom class: Defines object for storing atom properties
         self.resonances  = NTlist()
         self.coordinates = NTlist()
         self.rogScore    = ROGscore()
+        self.stereoAssigned = None # WARNING: only set when asked for.
         self[CHK_STR] = NTdict()
 
         self._topology = None #intially None; defined by the updateTopolgy call of the Molecule class
