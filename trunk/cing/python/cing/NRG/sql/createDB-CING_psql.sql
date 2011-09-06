@@ -62,10 +62,11 @@ CREATE TABLE casdcing.cingentry
     ncs_symmetry                    FLOAT DEFAULT NULL, 
     dr_symmetry                     FLOAT DEFAULT NULL,
     chothia_class                  INT DEFAULT NULL,     -- (10) alpha, beta, of a/b, a+b, or coil
-    protein_count                  INT DEFAULT NULL,     -- Number of protein chains. Not necessarily unique so e.g. 1hue has 2 that are identical (homodimer). TODO: fill.
-    dna_count                      INT DEFAULT NULL,
+    protein_count                  INT DEFAULT NULL,     -- Number of protein chains. Not necessarily unique so e.g. 1hue has 2 that are identical (homodimer).
+    dna_count                      INT DEFAULT NULL,     -- The Sum should be the total number of chains; chain_count
     rna_count                      INT DEFAULT NULL,
-    dna_rna_hybrid_count           INT DEFAULT NULL,
+    water_count                    INT DEFAULT NULL,
+    other_count                    INT DEFAULT NULL,
     is_minimized                   BOOLEAN DEFAULT NULL, -- (20) (optimized) minimized structure only known for 1340 entries in PDB overall on Jan 2010.
     software_collection            VARCHAR(255) DEFAULT NULL, -- _pdbx_nmr_software.name etc. only 8,000 items estimated 1,000 entries available
     software_processing            VARCHAR(255) DEFAULT NULL,
@@ -77,6 +78,8 @@ CREATE TABLE casdcing.cingentry
     in_dress                       BOOLEAN DEFAULT NULL,
     ranges                         VARCHAR(512) DEFAULT NULL,
     res_count                      INT DEFAULT NULL,     -- (30) number of residues
+    chain_count                    INT DEFAULT NULL,     -- Addition of above protein_count etc. but stored separately.
+    atom_count                     INT DEFAULT NULL,     -- 
     model_count                    INT DEFAULT NULL,
     distance_count                 INT DEFAULT NULL,
     distance_count_sequential      INT DEFAULT NULL,
@@ -172,13 +175,14 @@ CREATE TABLE casdcing.cingchain
     chain_id                        SERIAL UNIQUE PRIMARY KEY,
     entry_id                        INT NOT NULL,
     name                            VARCHAR(255)    DEFAULT 'A',
-    sel_1                     BOOLEAN DEFAULT NULL,
-    sel_2                     BOOLEAN DEFAULT NULL,
-    sel_3                     BOOLEAN DEFAULT NULL,
-    sel_4                     BOOLEAN DEFAULT NULL,
-    sel_5                     BOOLEAN DEFAULT NULL,
-    selection                 bigint DEFAULT NULL,
-    chothia_class                   INT DEFAULT NULL,
+    sel_1                           BOOLEAN DEFAULT NULL,
+    sel_2                           BOOLEAN DEFAULT NULL,
+    sel_3                           BOOLEAN DEFAULT NULL,
+    sel_4                           BOOLEAN DEFAULT NULL,
+    sel_5                           BOOLEAN DEFAULT NULL,
+    selection                       bigint DEFAULT NULL,
+    chothia_class                   INT DEFAULT NULL,    
+    mol_type_idx                    INT DEFAULT NULL,-- 0 is protein; see doc at entry level.    
     rog                             INT DEFAULT NULL,
     FOREIGN KEY (entry_id)          REFERENCES casdcing.cingentry (entry_id) ON DELETE CASCADE
 );
@@ -391,12 +395,12 @@ CREATE INDEX drlist_003 ON casdcing.drlist (rog);
 CREATE TABLE casdcing.dr
 (
     dr_id                 SERIAL UNIQUE PRIMARY KEY,
-    selection                 bigint DEFAULT NULL,
+    selection             bigint DEFAULT NULL,
     number                INT              NOT NULL,
-    drlist_id                INT              NOT NULL,
-    entry_id                 INT              NOT NULL,
-    member_id                INT              NOT NULL,
-    member_logic_code        VARCHAR(5)       DEFAULT NULL, -- Only allow OR or NULL for now.
+    drlist_id             INT              NOT NULL,
+    entry_id              INT              NOT NULL,
+    item_id               INT              NOT NULL,
+    item_logic_code       VARCHAR(5)       DEFAULT NULL, -- Only allow OR or NULL for now.
     atom_id_1      INT              DEFAULT NULL,    
     residue_id_1   INT              DEFAULT NULL,    
     chain_id_1     INT              DEFAULT NULL,    
@@ -408,12 +412,12 @@ CREATE TABLE casdcing.dr
     residue_num_1   INT              DEFAULT NULL,    
     residue_name_1  VARCHAR(5)       DEFAULT NULL,    
     chain_name_1    VARCHAR(5)       DEFAULT NULL,    
-    atom_name_2     VARCHAR(5)       DEFAULT NULL,    
+    atom_name_2     VARCHAR(5)       DEFAULT NULL,
     residue_num_2   INT              DEFAULT NULL,    
     residue_name_2  VARCHAR(5)       DEFAULT NULL,    
     chain_name_2    VARCHAR(5)       DEFAULT NULL,                                        
     -- common to all restraints
-    target            FLOAT            DEFAULT NULL, -- Treated implicitely in CING. Not even parsed from CCPN.
+    target            FLOAT            DEFAULT NULL, -- Treated implicitely in CING. Not even parsed from CCPN. TODO: 
     lower             FLOAT            DEFAULT NULL, 
     upper             FLOAT            DEFAULT NULL,     
     contribution      FLOAT            DEFAULT NULL, -- Not populated yet.

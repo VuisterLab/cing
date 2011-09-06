@@ -2639,6 +2639,22 @@ Return an Molecule instance or None on error
                 return True
         return None # is actually the default of course.
 
+    def getMolTypeCountList(self):
+        """
+        Return list of chain counts per molecule type.
+        See molTypeList. May be a list of zero values.
+        """
+        molTypeCountList = [0] * 5
+        for chain in self.allChains():
+            idxChainMoltype = chain.getIdxMolType()
+            molTypeCountList[ idxChainMoltype ] += 1
+        # end for
+        if self.chainCount != sum(molTypeCountList):
+            nTerror("In %s found self.chainCount %s != sum(molTypeCountList) %s" % ( self.chainCount, str(molTypeCountList)))
+            nTerror("Returning potentially wrong result anyway")
+        # end if
+        return molTypeCountList
+
     def hasNucleicAcid(self):
         for res in self.allResidues():
             if res.hasProperties('nucleic'):
@@ -3791,6 +3807,38 @@ Chain class: defines chain properties and methods
     #end def
 
         
+    def getIdxMolType(self):
+        """
+        Counts the number of residues in each type of mol type allowing detection of mixed mode polymers such as DNA/RNA in
+        PDB entry 1b4y.
+        
+        Note, the algorithm is a bit verbose to preserve compatibility in the future.
+        """
+        molTypeResidueCountList = [0] * 5
+        for residue in self.allResidues():
+            if residue.hasProperties(PROTEIN_STR):
+                molTypeResidueCountList[mapMoltypeToInt[PROTEIN_STR]] += 1
+            elif residue.hasProperties(DNA_STR):
+                molTypeResidueCountList[mapMoltypeToInt[DNA_STR]] += 1
+            elif residue.hasProperties(RNA_STR):
+                molTypeResidueCountList[mapMoltypeToInt[RNA_STR]] += 1
+            elif residue.hasProperties(WATER_STR):
+                molTypeResidueCountList[mapMoltypeToInt[WATER_STR]] += 1
+            else:
+                nTwarning("Found uncommon mol type for %s" % residue)
+                molTypeResidueCountList[mapMoltypeToInt[OTHER_STR]] += 1
+            # endif
+        # end for        
+        resCount = len(self.allResidues())
+        nTdebug("For %s found resCount %s and molTypeResidueCountList %s" % (self, resCount, str(molTypeResidueCountList)))
+        for molTypeIdx, _molType in enumerate(molTypeList):
+            if molTypeResidueCountList[molTypeIdx] == resCount:
+                return molTypeIdx
+            # end if
+        # end for
+        return mapMoltypeToInt[OTHER_STR]
+    #end def
+    
     def getSymmetryDR( self, other, modelIdx = None ):
         """
         Return None on error or the distance between Calphas or C1' averaged of the length

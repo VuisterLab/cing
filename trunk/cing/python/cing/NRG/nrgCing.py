@@ -938,7 +938,7 @@ class NrgCing(Lister):
         nTmessage("Found %4d entries todo (A-B, to a max of %d)." % (len(self.entry_list_todo), self.max_entries_todo))
         nTmessage("Found %4d entries in %s made obsolete." % (len(self.entry_list_obsolete), self.results_base))
         nTmessage("Found %4d entries in %s without prep." % (len(self.entry_list_missing_prep), self.results_base))
-        nTmessage("Found %4d entries in RDB %s." % (len(self.entry_list_store_in_db)))
+        nTmessage("Found %4d entries in RDB %s." % (len(self.entry_list_store_in_db), self.results_base))
 
         nTmessage("Found %4d entries that CING store tried." % len(self.entry_list_store_tried))
         nTmessage("Found %4d entries that CING store crashed." % len(self.entry_list_store_crashed))

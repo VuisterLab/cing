@@ -67,7 +67,7 @@ def run():
             return True
         nTmessage("Downloaded %s" % fn)
 
-    if False:
+    if True:
         # Absolutely needed to redirect to separate log file as these get very verbose when there are errors..
         command = 'gunzip < %s | psql pdbmlplus pdbj' % fn
         nTmessageT("Starting weekly update with [%s] and logging to: %s" % ( command, psqlLogFile ))

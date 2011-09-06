@@ -28,7 +28,7 @@ from cing.core.validate import xGrid360
 from cing.core.validate import yGrid360
 from matplotlib.pyplot import hist
 from numpy.ma.core import multiply
-from numpy.matrixlib.defmatrix import mat
+from numpy.matrixlib.defmatrix import mat # pylint: disable=E0611
 import cPickle
 import csv
 

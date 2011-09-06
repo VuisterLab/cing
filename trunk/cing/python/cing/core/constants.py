@@ -336,4 +336,14 @@ hideMissingAtomsJfdKnowsAbout = True # default should be False
 if hideMissingAtomsJfdKnowsAbout:
     ATOM_LIST_TO_IGNORE_REPORTING = "H1 H2 H3 OXT ZN O' HO3' HO5' HOP2 HOP3 OP3".split(' ')
 
+# Mol types as per CCPN defs.
+PROTEIN_STR = 'protein'
+DNA_STR = 'DNA'
+RNA_STR = 'RNA'
+WATER_STR = 'water'
+OTHER_STR = 'other'
+
+molTypeList = [ PROTEIN_STR, DNA_STR, RNA_STR, WATER_STR, OTHER_STR ]
+mapMoltypeToInt = {PROTEIN_STR: 0, DNA_STR : 1, RNA_STR : 2, WATER_STR : 3, OTHER_STR: 4}
+
 VAL_SETS_CFG_DEFAULT_FILENAME = 'valSets.cfg'
