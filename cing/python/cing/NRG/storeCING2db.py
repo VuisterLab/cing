@@ -195,6 +195,12 @@ def doStoreCING2db( entry_code, archive_id, project = None):
         symmetry, ncsSymmetry, drSymmetry = symmetryResult
         
     chothia_class = molecule.chothiaClassInt()
+    molTypeCountList = molecule.getMolTypeCountList()    
+    p_protein_count = molTypeCountList[ mapMoltypeToInt[PROTEIN_STR] ]
+    p_dna_count     = molTypeCountList[ mapMoltypeToInt[DNA_STR] ]
+    p_rna_count     = molTypeCountList[ mapMoltypeToInt[RNA_STR] ]
+    p_water_count   = molTypeCountList[ mapMoltypeToInt[WATER_STR] ]
+    p_other_count   = molTypeCountList[ mapMoltypeToInt[OTHER_STR] ]
 
     p_distance_count = project.distances.lenRecursive(max_depth = 1)
 
@@ -334,6 +340,13 @@ def doStoreCING2db( entry_code, archive_id, project = None):
         ncs_symmetry = ncsSymmetry, 
         dr_symmetry  = drSymmetry ,
         chothia_class=chothia_class,
+        
+        protein_count        =  p_protein_count               ,
+        dna_count            =  p_dna_count                   ,
+        rna_count            =  p_rna_count                   ,
+        water_count          =  p_water_count                 ,
+        other_count          =  p_other_count                 ,
+        
         ranges=ranges,
 #        omega_dev_av_all = p_omega_dev_av_all,
         cv_backbone      = p_cv_backbone     ,
@@ -341,8 +354,11 @@ def doStoreCING2db( entry_code, archive_id, project = None):
         rmsd_backbone    = p_rmsd_backbone   ,
         rmsd_sidechain   = p_rmsd_sidechain  ,
 
-        res_count=molecule.residueCount,
-        model_count=molecule.modelCount,
+        res_count   =molecule.residueCount,
+        chain_count =molecule.chainCount,
+        atom_count  =molecule.atomCount,
+        model_count =molecule.modelCount,
+        
         distance_count=p_distance_count,
         distance_count_sequential      = p_distance_count_sequential    ,
         distance_count_intra_residual  = p_distance_count_intra_residual,
@@ -475,18 +491,20 @@ def doStoreCING2db( entry_code, archive_id, project = None):
 
     chainCommittedCount = 0
     residueCommittedCount = 0
+    waterResidueCount = 0
     atomCommittedCount = 0
     atomIdHash = NTdict() # map to RDB entity id
     residueIdHash = NTdict()
     chainIdHash = NTdict()
     for chain in project.molecule.allChains():
         nameC = chain.name
-        chothia_class = molecule.chothiaClassInt()
+        chothia_class = chain.chothiaClassInt()
         rogC = chain.rogScore.rogInt()
         result = execute(cchain.insert().values(
             entry_id=entry_id,
             name=nameC,
             chothia_class=chothia_class,
+            mol_type_idx = chain.getIdxMolType(),
             rog=rogC,
             )
         )
@@ -497,6 +515,7 @@ def doStoreCING2db( entry_code, archive_id, project = None):
         chainCommittedCount += 1
         for residue in chain.allResidues():
             if residue.hasProperties('water'):
+                waterResidueCount += 1
                 continue
 #            nTmessage("Residue: %s" % residue)
             # CING
@@ -717,31 +736,30 @@ def doStoreCING2db( entry_code, archive_id, project = None):
             residueIdHash[ residue ] = residue_id        
             residueCommittedCount += 1
 #            nTdebug("Inserted residue %s" % residue_id)
-            if True:
-                for atom in residue.allAtoms():
-                    a_name = atom.name
-                    a_spin_type = getDeepByKeysOrAttributes( atom, DB_STR, SPINTYPE_STR )
-                    # WI
+            for atom in residue.allAtoms():
+                a_name = atom.name
+                a_spin_type = getDeepByKeysOrAttributes( atom, DB_STR, SPINTYPE_STR )
+                # WI
 #                    a_wi_ba2lst = atom.getDeepAvgByKeys(WHATIF_STR, BA2CHK_STR, VALUE_LIST_STR) # should have worked
 #                    a_wi_bh2chk = atom.getDeepAvgByKeys(WHATIF_STR, BH2CHK_STR, VALUE_LIST_STR) # should have worked
-                    a_wi_chichk = atom.getDeepAvgByKeys(WHATIF_STR, CHICHK_STR, VALUE_LIST_STR)
-                    a_wi_dunchk = atom.getDeepAvgByKeys(WHATIF_STR, DUNCHK_STR, VALUE_LIST_STR)
-                    a_wi_hndchk = atom.getDeepAvgByKeys(WHATIF_STR, HNDCHK_STR, VALUE_LIST_STR)
+                a_wi_chichk = atom.getDeepAvgByKeys(WHATIF_STR, CHICHK_STR, VALUE_LIST_STR)
+                a_wi_dunchk = atom.getDeepAvgByKeys(WHATIF_STR, DUNCHK_STR, VALUE_LIST_STR)
+                a_wi_hndchk = atom.getDeepAvgByKeys(WHATIF_STR, HNDCHK_STR, VALUE_LIST_STR)
 #                    a_wi_mischk = atom.getDeepAvgByKeys(WHATIF_STR, MISCHK_STR, VALUE_LIST_STR)
 #                    a_wi_mo2chk = atom.getDeepAvgByKeys(WHATIF_STR, MO2CHK_STR, VALUE_LIST_STR)
-                    a_wi_pl2chk = atom.getDeepAvgByKeys(WHATIF_STR, PL2CHK_STR, VALUE_LIST_STR)
-                    a_wi_wgtchk = atom.getDeepAvgByKeys(WHATIF_STR, WGTCHK_STR, VALUE_LIST_STR)
+                a_wi_pl2chk = atom.getDeepAvgByKeys(WHATIF_STR, PL2CHK_STR, VALUE_LIST_STR)
+                a_wi_wgtchk = atom.getDeepAvgByKeys(WHATIF_STR, WGTCHK_STR, VALUE_LIST_STR)
 
-                    a_cs = None
-                    a_cs_err = None
-                    a_cs_ssa = None
-                    a_first_resonance = getDeepByKeysOrAttributes(atom, RESONANCES_STR, 0)
-                    if a_first_resonance != None:
-                        a_cs = getDeepWithNone(a_first_resonance, VALUE_STR)
-                        if a_cs != None:
-                            a_cs_err = getDeepWithNone(a_first_resonance, ERROR_STR)
-                            a_cs_ssa = truthToInt( atom.isStereoAssigned() )
-                    # Store all atoms including pseudos.
+                a_cs = None
+                a_cs_err = None
+                a_cs_ssa = None
+                a_first_resonance = getDeepByKeysOrAttributes(atom, RESONANCES_STR, 0)
+                if a_first_resonance != None:
+                    a_cs = getDeepWithNone(a_first_resonance, VALUE_STR)
+                    if a_cs != None:
+                        a_cs_err = getDeepWithNone(a_first_resonance, ERROR_STR)
+                        a_cs_ssa = truthToInt( atom.isStereoAssigned() )
+                # Store all atoms including pseudos.
 #                    useFulColumns = [
 ##                        a_wi_ba2lst,
 ##                        a_wi_bh2chk,
@@ -763,54 +781,69 @@ def doStoreCING2db( entry_code, archive_id, project = None):
 #                            hasUsefulColumn = True
 #                    if not hasUsefulColumn:
 #                        continue
-                    a_rog = atom.rogScore.rogInt()
-                    atomInfoList = [entry_id,chain_id,residue_id,
-                        a_name,a_wi_chichk,a_wi_dunchk,a_wi_hndchk, a_wi_pl2chk, a_wi_wgtchk, a_cs,a_cs_err,a_cs_ssa,a_rog]
+                a_rog = atom.rogScore.rogInt()
+                atomInfoList = [entry_id,chain_id,residue_id,
+                    a_name,a_wi_chichk,a_wi_dunchk,a_wi_hndchk, a_wi_pl2chk, a_wi_wgtchk, a_cs,a_cs_err,a_cs_ssa,a_rog]
 #                    nTdebug("Inserting atom: " + str(atomInfoList))
-                    try:
-                        result = execute(catom.insert().values(
-                            entry_id=entry_id,
-                            chain_id=chain_id,
-                            residue_id=residue_id,
-                            name=a_name,
-                            spin_type=a_spin_type,
-    #                        wi_ba2lst=a_wi_ba2lst,
-    #                        wi_bh2chk=a_wi_bh2chk,
-                            wi_chichk=a_wi_chichk,
-                            wi_dunchk=a_wi_dunchk,
-                            wi_hndchk=a_wi_hndchk,
+                try:
+                    result = execute(catom.insert().values(
+                        entry_id=entry_id,
+                        chain_id=chain_id,
+                        residue_id=residue_id,
+                        name=a_name,
+                        spin_type=a_spin_type,
+#                        wi_ba2lst=a_wi_ba2lst,
+#                        wi_bh2chk=a_wi_bh2chk,
+                        wi_chichk=a_wi_chichk,
+                        wi_dunchk=a_wi_dunchk,
+                        wi_hndchk=a_wi_hndchk,
 #                            wi_mischk=a_wi_mischk,
 #                            wi_mo2chk=a_wi_mo2chk,
-                            wi_pl2chk=a_wi_pl2chk,
-                            wi_wgtchk=a_wi_wgtchk,
-                            cs = a_cs,
-                            cs_err = a_cs_err,
-                            cs_ssa = a_cs_ssa,
-                            rog=a_rog
-                            )
+                        wi_pl2chk=a_wi_pl2chk,
+                        wi_wgtchk=a_wi_wgtchk,
+                        cs = a_cs,
+                        cs_err = a_cs_err,
+                        cs_ssa = a_cs_ssa,
+                        rog=a_rog
                         )
-    #                    atom_id = result.last_inserted_ids()[0] # TODO: update to this again.
-                        s = select([catom.c.atom_id],and_(
-                              catom.c.entry_id == entry_id,
-                              catom.c.chain_id == chain_id,
-                              catom.c.residue_id == residue_id,
-                              catom.c.name == a_name
-                              ))
-                        atom_id = execute(s).fetchall()[0][0]
+                    )
+#                    atom_id = result.last_inserted_ids()[0] # TODO: update to this again.
+                    s = select([catom.c.atom_id],and_(
+                          catom.c.entry_id == entry_id,
+                          catom.c.chain_id == chain_id,
+                          catom.c.residue_id == residue_id,
+                          catom.c.name == a_name
+                          ))
+                    atom_id = execute(s).fetchall()[0][0]
 #                        nTdebug("Inserted atom %s %s" % (atom_id, atom))
-                        atomIdHash[ atom ] = atom_id
-                        atomCommittedCount += 1
-                    except:
-                        nTtracebackError()
-                        nTerror("Failed to insert atom [%s] with info: %s" % ( atom, str(atomInfoList)))
-                        continue
-                    # end try
-                # end for atom
-            # end if atom
+                    atomIdHash[ atom ] = atom_id
+                    atomCommittedCount += 1
+                except:
+                    nTtracebackError()
+                    nTerror("Failed to insert atom [%s] with info: %s" % ( atom, str(atomInfoList)))
+                    continue
+                # end try
+            # end for atom
         # end for residue
-    # end for chain
+    # end for chain    
     nTmessage("Committed %d chains %d residues %d atoms" % (chainCommittedCount,residueCommittedCount,atomCommittedCount))
     nTdebug("Memorized %d chains %d residues %d atoms" % (len(chainIdHash.keys()),len(residueIdHash.keys()),len(atomIdHash.keys())))
+    if chainCommittedCount != molecule.chainCount:
+        msg = "chainCommittedCount %s != molecule.chainCount %s" % (chainCommittedCount, molecule.chainCount)
+        nTerror(msg)
+    # end if
+    if (residueCommittedCount + waterResidueCount) != molecule.residueCount:
+        msg = "residueCommittedCount %s + waters %s != molecule.residueCount %s" % (
+            residueCommittedCount, waterResidueCount, molecule.residueCount)
+        nTerror(msg)
+    # end if
+    if (atomCommittedCount + waterResidueCount*3) != molecule.atomCount:
+        msg = "atomCommittedCount %s + waterResidueCount (%s) *3 (=%s) != molecule.atomCount %s" % (
+            atomCommittedCount,      waterResidueCount, 
+            atomCommittedCount + 3 * waterResidueCount,
+            molecule.atomCount)
+        nTerror(msg)
+    # end if
     
     drlCommittedCount = 0
     drCommittedCount = 0
@@ -826,9 +859,25 @@ def doStoreCING2db( entry_code, archive_id, project = None):
             entry_id=entry_id,
             name=drl_name,
             number=drl_number,
-            rog=drl_rog
+            
+            viol_count1       = drl.violCount1,    
+            viol_count3       = drl.violCount3,    
+            viol_count5       = drl.violCount5,    
+            viol_max          = drl.violMax   ,    
+            viol_upper_max    = drl.violUpperMax,    
+            viol_lower_max    = drl.violLowerMax,    
+
+            intra_residual_count     = len( drl.intraResidual ),
+            sequential_count         = len( drl.sequential  ),
+            medium_range_count       = len( drl.mediumRange ),
+            long_range_count         = len( drl.longRange  ),
+            ambiguous_count          = len( drl.ambiguous  ),
+            unique_distances_count   = drl.uniqueDistancesCount  ,
+            without_duplicates_count = len( drl.withoutDuplicates ),
+            with_duplicates_count    = len( drl.withDuplicates    ),
+            rog = drl_rog
             )
-        )
+        )        
         s = select([cdrlist.c.drlist_id],and_(cdrlist.c.entry_id == entry_id, cdrlist.c.number == drl_number))
         drl_id = execute(s).fetchall()[0][0]
 #        drlIdHash[ drl ] = drl_id
@@ -858,10 +907,10 @@ def doStoreCING2db( entry_code, archive_id, project = None):
             dr_viol_lower_max    = dr.violLowerMax   
             dr_has_analyze_error = bool(dr.error)            
             
-            for member_id, atomPair in enumerate(dr.atomPairs, 1):
-                member_logic = None
+            for item_id, atomPair in enumerate(dr.atomPairs, 1):
+                item_logic = None
                 if len(dr.atomPairs) > 1:
-                    member_logic = 'OR'
+                    item_logic = 'OR'
                 atom1, atom2 = atomPair
                 residue1 = getDeepByKeysOrAttributes( atom1, '_parent')    
                 chain1 = getDeepByKeysOrAttributes( residue1, '_parent')    
@@ -880,8 +929,8 @@ def doStoreCING2db( entry_code, archive_id, project = None):
                     entry_id=entry_id,
                     drlist_id=drl_id,
                     number=dr_number,
-                    member_id = member_id,
-                    member_logic = member_logic,
+                    item_id = item_id,
+                    item_logic = item_logic,
                     atom_id_1 = atom_id_1,
                     residue_id_1 = residue_id_1,
                     chain_id_1 = chain_id_1,
@@ -924,7 +973,7 @@ def doStoreCING2db( entry_code, archive_id, project = None):
                 s = select([cdr.c.dr_id],and_(cdr.c.entry_id == entry_id, 
                                               cdr.c.drlist_id == drl_id, 
                                               cdr.c.number == dr_number, 
-                                              cdr.c.member_id == member_id))
+                                              cdr.c.item_id == item_id))
                 dr_id = execute(s).fetchall()[0][0]
                 drIdHash[ dr_id ] = dr_id # bogus statement
                 drRowCommittedCount += 1
@@ -936,7 +985,6 @@ def doStoreCING2db( entry_code, archive_id, project = None):
     # end for
     nTmessage("Committed %d drl and overall %d dr %d drrows" % (drlCommittedCount,drCommittedCount,drRowCommittedCount))
 #    project.close(save=False) # needed ???
-
     # Needed for the above hasn't been auto-committed.
 #    nTdebug("Committing changes")
     csql.session.commit()

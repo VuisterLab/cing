@@ -107,7 +107,7 @@ class VascoCingReferenceCheck(VascoReferenceCheck):
                 if len(seqCodeStr) < 1:
                     # happens for PDB entry 1cjg for 2 residues
                     # and for 2k6q for 2 residues.
-                    nTdebug("Skipping line with empty seqCode string: " + line.strip()) 
+                    nTdebug("Skipping DSSP line for Vasco with empty seqCode string: " + line.strip()) 
                     continue                
                 seqCode = returnInt(seqCodeStr)
                 chainCode = line[11:12]

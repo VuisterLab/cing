@@ -575,7 +575,8 @@ AND '{2}' <@ S.chain_type; -- contains at least one protein chain.
 #                nTdebug("doing filterForTruth")
                 for truthResultDict in truthResultDictList:
                     foundKey = truthResultDict.has_key(filterId)
-#                    nTdebug("filterForTruth with truthResultDict with %d elements for %s foundKey: %s" % (len(truthResultDict.keys()), filterId, foundKey))
+#                    nTdebug("filterForTruth with truthResultDict with %d elements for %s foundKey: %s" % (
+#                        len(truthResultDict.keys()), filterId, foundKey))
                     if not foundKey:
                         skipItem = True
                         break

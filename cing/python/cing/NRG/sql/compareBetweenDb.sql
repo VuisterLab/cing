@@ -6,6 +6,24 @@
 SELECT count(*) FROM nmr_redo.cingentry;
 SELECT name, residue_count FROM nmr_redo.cingentry;
 
+select * from nrgcing.cingentry where name = '2lfh';
+
+SELECT e.name, c.name, r.number, a.name 
+FROM 
+nrgcing.cingentry    e,
+nrgcing.cingchain    c,
+nrgcing.cingresidue  r,
+nrgcing.cingatom     a
+where
+e.entry_id = c.entry_id AND
+c.chain_id = r.chain_id AND
+r.residue_id = a.residue_id AND
+e.name = '2lfh' AND
+c.name = 'A' AND
+r.number = 68 AND
+a.name like 'O%'
+
+
 CREATE TABLE nmr_redo.tmpentrylist
 (    pdb_id                       VARCHAR(255) UNIQUE PRIMARY KEY );
 COPY nmr_redo.tmpentrylist     FROM '/Library/WebServer/Documents/NMR_REDO/list/tmpentrylist.csv'   CSV HEADER;
@@ -154,5 +172,22 @@ r2.sel_2 = TRUE AND
 r1.pc_gf_PHIPSI > 1.5 or
 r2.pc_gf_PHIPSI > 1.5
 );
+
+
+select e1.name, e1.distance_count
+from 
+nrgcing.cingresidue  r1,
+nrgcing.cingentry e1
+where 
+r1.entry_id = e1.entry_id AND
+e1.distance_count > 0 AND
+e1.protein_count        > 0 AND 
+e1.dna_count            = 0 AND 
+e1.rna_count            = 0 AND 
+e1.dna_rna_hybrid_count = 0 
+group by e1.name, e1.distance_count
+
+
+
 
 
