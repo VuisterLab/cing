@@ -399,7 +399,8 @@ def _runWattos(project, ranges=None, tmp = None, parseOnly=False):
         open(scriptFullFileName, "w").write(scriptComplete)
     #    wattosPath = "echo $CLASSPATH; java -Xmx512m -Djava.awt.headless=true Wattos.CloneWars.UserInterface -at"
 #        wattosPath = "java -Xmx512m -Djava.awt.headless=true Wattos.CloneWars.UserInterface -at"
-        wattosPath = "java -d32 -Xmx2g -Djava.awt.headless=true Wattos.CloneWars.UserInterface -at"
+        # 2 Gb fails on ubuntu 11.4 but 1800 Mb works.
+        wattosPath = "java -d32 -Xmx1800m -Djava.awt.headless=true Wattos.CloneWars.UserInterface -at"
         logFileName = "wattos_compl.log"
         wattosProgram = ExecuteProgram(wattosPath, rootPath = wattosDir,
                                  redirectOutputToFile = logFileName,
