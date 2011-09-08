@@ -4,6 +4,7 @@
 --      echo "SELECT count(*) FROM recoord.cingentry;" | psql pdbmlplus pdbj
 
 SELECT count(*) FROM nmr_redo.cingentry;
+SELECT count(*) FROM brief_summary;
 SELECT name, residue_count FROM nmr_redo.cingentry;
 
 select * from nrgcing.cingentry where name = '2lfh';

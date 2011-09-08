@@ -238,7 +238,7 @@ def getPdbEntriesOca(onlyNmr=False):
     for dataLine in dataLines:
         if dataLine:
             if not dataLine[0].isdigit():
-                 # skipping html and header.
+                # skipping html and header.
                 continue
             items = dataLine.split()
             if items:

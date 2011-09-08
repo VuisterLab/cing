@@ -2650,7 +2650,7 @@ Return an Molecule instance or None on error
             molTypeCountList[ idxChainMoltype ] += 1
         # end for
         if self.chainCount != sum(molTypeCountList):
-            nTerror("In %s found self.chainCount %s != sum(molTypeCountList) %s" % ( self.chainCount, str(molTypeCountList)))
+            nTerror("In %s found self.chainCount %s != sum(molTypeCountList) %s" % ( self, self.chainCount, str(molTypeCountList)))
             nTerror("Returning potentially wrong result anyway")
         # end if
         return molTypeCountList
@@ -4419,7 +4419,7 @@ Residue class: Defines residue properties
 
                 if dihed.atoms == None:
                     continue
- #               print '>>',dihed.format()
+#               print '>>',dihed.format()
 
                 missingCoordinates = False
                 for a in dihed.atoms:
