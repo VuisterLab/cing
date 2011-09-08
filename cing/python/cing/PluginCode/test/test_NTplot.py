@@ -1,3 +1,7 @@
+"""
+Unit test execute as:
+python $CINGROOT/python/cing/Libs/test/test_NTplot.py
+"""
 from cing import cingDirTmp
 from cing.Libs.NTplot import * #@UnusedWildImport
 from cing.Libs.NTutils import * #@UnusedWildImport
