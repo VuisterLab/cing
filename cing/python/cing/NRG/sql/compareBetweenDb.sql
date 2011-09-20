@@ -81,16 +81,26 @@ insert into nmr_redo.testResidue VALUES ( 3, NULL );
 
 
 
+select count(*) from  nrgcing.cingresidue WHERE sel_1 = TRUE AND sel_2 = TRUE;
 select count(*) from  recoord.cingresidue WHERE sel_1 = TRUE AND sel_2 = TRUE;
 select count(*) from nmr_redo.cingresidue WHERE sel_1 = TRUE AND sel_2 = TRUE;
 select count(*) from nmr_redo.cingentry e2 where e2.model_count < 25;
+
+-- NRG-CING manipulations
+-- sel_2 means that the entry has 25 models in nmr_redo and 
+-- See problemEntryListNMR_REDO.csv
+update nrgcing.cingresidue set sel_2 = TRUE;
+update               nrgcing.cingresidue set sel_2 = FALSE where entry_id IN ( 
+select entry_id from nrgcing.cingentry where name IN ( '1omt', '1u2f' )
+);
 
 -- RECOORD manipulations
 -- sel_2 means that the entry has 25 models in nmr_redo and 
 -- See problemEntryListNMR_REDO.csv
 update recoord.cingresidue set sel_2 = TRUE;
-update recoord.cingresidue set sel_2 = FALSE where name IN ( '1omt' ); -- NRG issue 278 Bounds badly interpreted or specified
-update recoord.cingresidue set sel_2 = FALSE where name IN ( '1u2f' ); -- NRG issue 279 XPLOR atom name HG1# for Thr should be mapped to methyl i.s.o. hydroxyl proton
+update               recoord.cingresidue set sel_2 = FALSE where entry_id IN ( 
+select entry_id from recoord.cingentry where name IN ( '1omt', '1u2f' )
+);
 
 
 -- NMR_REDO manipulations

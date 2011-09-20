@@ -14,9 +14,13 @@ def createStarUserLib():
             for dihedral in resDef.dihedrals:
                 nTmessage('%-4s %-10s' % (resDef.name, dihedral.name))
     # end if
+    if 1:
+        for resDef in NTdb:
+            NTmessageNoEOL("('%s')," % resDef.name)
+    # end if
     
     # For completeness lib.
-    if 1:
+    if 0:
         for resDef in NTdb:
             for atomDef in resDef.atoms:
                 msg = '%-4s %-10s' % (resDef.name, atomDef.name)

@@ -749,7 +749,10 @@ def doStoreCING2db( entry_code, archive_id, project = None):
 #                    a_wi_mo2chk = atom.getDeepAvgByKeys(WHATIF_STR, MO2CHK_STR, VALUE_LIST_STR)
                 a_wi_pl2chk = atom.getDeepAvgByKeys(WHATIF_STR, PL2CHK_STR, VALUE_LIST_STR)
                 a_wi_wgtchk = atom.getDeepAvgByKeys(WHATIF_STR, WGTCHK_STR, VALUE_LIST_STR)
-
+                a_wi_wsvacc = atom.getDeepAvgByKeys(WHATIF_STR, WSVACC_STR, VALUE_LIST_STR)
+                a_queen_information  = getDeepByKeysOrAttributes(atom, QUEENY_UNCERTAINTY1_STR)
+                a_queen_uncertainty1 = getDeepByKeysOrAttributes(atom, QUEENY_UNCERTAINTY2_STR)
+                a_queen_uncertainty2 = getDeepByKeysOrAttributes(atom, QUEENY_INFORMATION_STR )
                 a_cs = None
                 a_cs_err = None
                 a_cs_ssa = None
@@ -801,9 +804,13 @@ def doStoreCING2db( entry_code, archive_id, project = None):
 #                            wi_mo2chk=a_wi_mo2chk,
                         wi_pl2chk=a_wi_pl2chk,
                         wi_wgtchk=a_wi_wgtchk,
+                        wi_wsvacc=a_wi_wsvacc,
                         cs = a_cs,
                         cs_err = a_cs_err,
                         cs_ssa = a_cs_ssa,
+                        queen_information  = a_queen_information ,                        
+                        queen_uncertainty1 = a_queen_uncertainty1,
+                        queen_uncertainty2 = a_queen_uncertainty2,
                         rog=a_rog
                         )
                     )

@@ -46,6 +46,7 @@ MISCHK_STR       = 'MISCHK'
 MO2CHK_STR       = 'MO2CHK'
 PL2CHK_STR       = 'PL2CHK'
 WGTCHK_STR       = 'WGTCHK'
+WSVACC_STR       = 'WSVACC'
 
 #define some more user friendly names
 # List of defs at:

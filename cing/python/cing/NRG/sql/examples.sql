@@ -12,6 +12,21 @@ SELECT S.PDBID, P.VAL AS "resolution"
        "pdbj".BRIEF_SUMMARY AS S JOIN "pdbj"."//refine/ls_d_res_high" AS P ON S.DOCID = P.DOCID
   WHERE P.VAL <= 1.0
 
+SELECT p.VAL AS "program", count(p.val)
+  FROM
+       "pdbj".BRIEF_SUMMARY AS S JOIN 
+             "pdbj"."/datablock/pdbx_nmr_softwareCategory/pdbx_nmr_software/name" AS P ON S.DOCID = P.DOCID
+  JOIN "//exptl/@method" p1 ON s.docid = p1.docid
+    WHERE p1.val LIKE '%NMR' 
+--    AND
+--    s.pdbid = '1brv'
+group by p.val
+order by count(p.val) desc
+LIMIT 100
+
+SELECT val, count(val) FROM "pdbj"."/datablock/computingCategory/computing/structure_refinement"
+group by val
+order by count(val) desc
 
 SELECT table_name FROM information_schema.tables
 where table_schema = 'pdbj' AND table_name like '%exp%data%'

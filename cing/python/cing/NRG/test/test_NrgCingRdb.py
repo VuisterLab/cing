@@ -9,6 +9,7 @@ from cing.NRG import RECOORD_DB_SCHEMA
 from cing.NRG.nrgCingRdb import NrgCingRdb
 from unittest import TestCase
 import unittest
+from cing.NRG import NRG_DB_NAME
 
 class AllChecks(TestCase):
 
@@ -21,7 +22,9 @@ class AllChecks(TestCase):
         host = 'localhost'
         if 1: # DEFAULT False
             host = 'nmr.cmbi.umcn.nl'
-        m = NrgCingRdb(host=host,schema=RECOORD_DB_SCHEMA)
+        # schema=RECOORD_DB_SCHEMA #@UnusedVariable
+        schema=NRG_DB_NAME
+        m = NrgCingRdb(host=host,schema=schema)
 
 #        self.assertFalse( m.showCounts())
 #        self.assertFalse( m.createScatterPlots())
