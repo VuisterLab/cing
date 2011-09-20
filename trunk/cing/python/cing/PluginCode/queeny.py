@@ -704,7 +704,7 @@ def restoreQueeny( project, tmp=None ):
         nTerror('restoreQueeny: file "%s" with queeny data not found', path)
         return True
 
-   # Restore the data
+    # Restore the data
     nTmessage('==> Restoring queeny results')
     myList=sML2obj( smlFile, project.molecule)
     if myList==None:

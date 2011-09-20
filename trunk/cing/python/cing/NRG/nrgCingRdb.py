@@ -438,15 +438,24 @@ AND '{2}' <@ S.chain_type; -- contains at least one protein chain.
         if replaceUniqueIdByNaturalId:
             nTdebug("Preparing maps to natural ids.")
             try:
-                s = select([m.c1.c[CHAIN_ID_STR], m.c1.c[NAME_STR]])
-                nTdebug("SQL: %s" % s)
-                chainNameResultTable = m.execute(s).fetchall()
-                s = select([m.r1.c[RESIDUE_ID_STR], m.r1.c[NUMBER_STR]])
-                nTdebug("SQL: %s" % s)
-                residueNumberResultTable = m.execute(s).fetchall()
-                s = select([m.a1.c[ATOM_ID_STR], m.a1.c[NAME_STR]])
-                nTdebug("SQL: %s" % s)
-                atomNameResultTable = m.execute(s).fetchall()
+                if level_number <= 2:
+                    s = select([m.c1.c[CHAIN_ID_STR], m.c1.c[NAME_STR]])
+                    nTdebug("SQL: %s" % s)
+                    chainNameResultTable = m.execute(s).fetchall()
+                    nTdebug("result chain count: %s" % len(chainNameResultTable))
+                # end if
+                if level_number <= 1:
+                    s = select([m.r1.c[RESIDUE_ID_STR], m.r1.c[NUMBER_STR]])
+                    nTdebug("SQL: %s" % s)
+                    residueNumberResultTable = m.execute(s).fetchall()
+                    nTdebug("result residue count: %s" % len(residueNumberResultTable))
+                # end if
+                if level_number <= 0:
+                    s = select([m.a1.c[ATOM_ID_STR], m.a1.c[NAME_STR]])
+                    nTdebug("SQL: %s" % s)
+                    atomNameResultTable = m.execute(s).fetchall()
+                    nTdebug("result atom count: %s" % len(atomNameResultTable))
+                # end if
             except:
                 nTtracebackError()
                 return
@@ -455,10 +464,19 @@ AND '{2}' <@ S.chain_type; -- contains at least one protein chain.
         chainIdChainNameResultDict = NTdict()
         resIdResNumberResultDict = NTdict()
         atomIdAtomNameResultDict = NTdict()
-        chainIdChainNameResultDict.appendFromTable(         chainNameResultTable,       0, 1)
-        resIdResNumberResultDict.appendFromTable(       residueNumberResultTable,       0, 1)
-        atomIdAtomNameResultDict.appendFromTable(           atomNameResultTable,        0, 1)
-            
+        if level_number <= 2:
+            nTdebug("Setting up dictionary for chain")
+            chainIdChainNameResultDict.appendFromTable(         chainNameResultTable,       0, 1)
+        # end if
+        if level_number <= 1:
+            nTdebug("Setting up dictionary for residue")
+            resIdResNumberResultDict.appendFromTable(       residueNumberResultTable,       0, 1)
+        # end if
+        if level_number <= 0:
+            nTdebug("Setting up dictionary for atom")
+            atomIdAtomNameResultDict.appendFromTable(           atomNameResultTable,        0, 1)
+        # end if
+        nTdebug("Done setting up any mapping dictionary.")
 
         # Get actual value of interest together with attributes to filter on.
         try:
@@ -1063,7 +1081,10 @@ AND '{2}' <@ S.chain_type; -- contains at least one protein chain.
 #        ]
         # end try
         labelList = [ self.schema, other.schema ]
-        for plotParameterList in plotList[45:46]:
+        startPlotIdx = 44 # 73
+        endPlotIdx = 99 # WAS 74
+        nTmessage("Ploting from %s to %s." % (startPlotIdx, endPlotIdx))
+        for plotParameterList in plotList[startPlotIdx:endPlotIdx]:
             level, progId, chk_id, _plotDictList = plotParameterList
             plotDictList = [ {}, {}, {} ]
             plotDict = plotDictList[0]

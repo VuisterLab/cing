@@ -85,16 +85,6 @@ class Vasco(NTdict):
             return
 
         # DSSP checks
-        wiSummary = getDeepByKeys(mol, WHATIF_STR, 'summary')
-        if not wiSummary:
-            nTmessage("Skipping Vasco because no What If summary")
-            return
-        whatifDir = self.project.path( mol.name, self.project.moleculeDirectories.whatif  )
-        fileNames = glob(os.path.join(whatifDir,"wsvacc*.log"))
-        if not fileNames:
-            nTmessage("Skipping Vasco because no What If accessibility files found.")
-            return
-
         dsspDir = self.project.path( mol.name, self.project.moleculeDirectories.dssp  )
         fileNames = glob(os.path.join(dsspDir,"model_*.dssp"))
         if not fileNames:

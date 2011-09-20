@@ -221,6 +221,8 @@ class VascoCingReferenceCheck(VascoReferenceCheck):
                 d[chainCode][seqKey]['atoms'][atomName] = []
 
             d[chainCode][seqKey]['atoms'][atomName].append(accessibility)
+            # TODO: match to cing data model for storage at atom level and to RDB cingresidue.wi_wsvacc using
+            # WSVACC_STR
             atomsRead += 1
         # end for
 #        nTdebug("Read %s atoms" % atomsRead)
@@ -330,7 +332,7 @@ if __name__ == '__main__':
     cingProject = Project.open(entryCode, status='old')
 
     if 0: # DEFAULT 0 for not using original implementation
-          # Fails because of dependency on:
+        # Fails because of dependency on:
 #              File "/Users/jd/workspace35/ccpn/python/pdbe/software/vascoReferenceCheck.py", line 178, in createSsInfo
 #                from pdbe.analysis.external.stride.Util import StrideInfo #@UnresolvedImport
 #            ImportError: No module named external.stride.Util          

@@ -162,7 +162,7 @@ $pdb_file
 # # Returns for each atom in the input file its solvent accessibility in A**2. Waters are neglected by this service.
 # 0
 
-# Get's written to OUTPUT.TXT but that's undocumented so I rather not use it...
+# Will be written to OUTPUT.TXT but that's undocumented so I rather not use it...
 %wsvacc
 
 $mv OUTPUT.TXT wsvacc_$modelNumberString.log

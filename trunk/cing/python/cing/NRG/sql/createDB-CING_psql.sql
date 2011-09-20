@@ -160,6 +160,7 @@ CREATE INDEX entry_se2 ON casdcing.cingentry (sel_2);
 CREATE INDEX entry_se3 ON casdcing.cingentry (sel_3);
 CREATE INDEX entry_se4 ON casdcing.cingentry (sel_4);
 CREATE INDEX entry_se5 ON casdcing.cingentry (sel_5);
+CREATE INDEX entry_se6 ON casdcing.cingentry (selection);
 
 -- mrfile
 -- MySQL doesn't accept the SYSDATE default for date_modified so always present date on insert.
@@ -193,6 +194,7 @@ CREATE INDEX chain_se2 ON casdcing.cingchain (sel_2);
 CREATE INDEX chain_se3 ON casdcing.cingchain (sel_3);
 CREATE INDEX chain_se4 ON casdcing.cingchain (sel_4);
 CREATE INDEX chain_se5 ON casdcing.cingchain (sel_5);
+CREATE INDEX chain_se6 ON casdcing.cingchain (selection);
 
 -- residue
 CREATE TABLE casdcing.cingresidue
@@ -311,6 +313,7 @@ CREATE INDEX residue_se2 ON casdcing.cingresidue (sel_2);
 CREATE INDEX residue_se3 ON casdcing.cingresidue (sel_3);
 CREATE INDEX residue_se4 ON casdcing.cingresidue (sel_4);
 CREATE INDEX residue_se5 ON casdcing.cingresidue (sel_5);
+CREATE INDEX residue_se6 ON casdcing.cingresidue (selection);
 
 
 -- atom
@@ -338,10 +341,15 @@ CREATE TABLE casdcing.cingatom
     wi_mo2chk                      VARCHAR(255) DEFAULT NULL,
     wi_pl2chk                      FLOAT DEFAULT NULL,
     wi_wgtchk                      FLOAT DEFAULT NULL,
+    wi_wsvacc                      FLOAT DEFAULT NULL, -- TODO: see vascoCingRefCheck.py
 --   cing
     cs                             FLOAT DEFAULT NULL,
     cs_err                         FLOAT DEFAULT NULL,
     cs_ssa                         INT DEFAULT NULL, -- atom.stereoAssigned flag in CING data model.
+--   queen
+    queen_information      FLOAT DEFAULT NULL,
+    queen_uncertainty1     FLOAT DEFAULT NULL,
+    queen_uncertainty2     FLOAT DEFAULT NULL, 
 
     rog                            INT DEFAULT NULL,
     FOREIGN KEY (residue_id)        REFERENCES casdcing.cingresidue (residue_id) ON DELETE CASCADE,

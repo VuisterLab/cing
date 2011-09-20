@@ -1,6 +1,6 @@
 """
 Unit test execute as:
-python $CINGROOT/python/cing/NRG/test/test_PDBEntryLists.py
+python $CINGROOT/python/cing/NRG/test/test_storeCING2db.py
 """
 from cing import cingDirTestsData #@UnusedImport
 from cing import cingDirTmp
@@ -17,7 +17,7 @@ import unittest
 
 class AllChecks(TestCase):
 
-    def _test_PDBEntryLists(self): #DEFAULT disabled because it's a specific test for services not commonly used.
+    def _test_storeCING2db(self): #DEFAULT disabled because it's a specific test for services not commonly used.
         cingDirTmpTest = os.path.join( cingDirTmp, getCallerName() )
         mkdirs( cingDirTmpTest )
         self.failIf(os.chdir(cingDirTmpTest), msg =

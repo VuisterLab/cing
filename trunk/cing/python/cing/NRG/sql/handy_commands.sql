@@ -184,3 +184,8 @@ SELECT pdb_id, model_count
 FROM nrgcing.CINGENTRY
 WHERE model_count > 50
 order by model_count
+
+-- delete from nrgcing.cingentry;
+
+select * from nrgcing.cingatom
+where name = 'HA'
