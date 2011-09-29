@@ -194,7 +194,9 @@ CREATE INDEX chain_se2 ON casdcing.cingchain (sel_2);
 CREATE INDEX chain_se3 ON casdcing.cingchain (sel_3);
 CREATE INDEX chain_se4 ON casdcing.cingchain (sel_4);
 CREATE INDEX chain_se5 ON casdcing.cingchain (sel_5);
-CREATE INDEX chain_se6 ON casdcing.cingchain (selection);
+CREATE INDEX chain_se6 ON casdcing.cingchain (name);
+CREATE INDEX chain_se7 ON casdcing.cingchain (rog);
+CREATE INDEX chain_se8 ON casdcing.cingchain (selection);
 
 -- residue
 CREATE TABLE casdcing.cingresidue

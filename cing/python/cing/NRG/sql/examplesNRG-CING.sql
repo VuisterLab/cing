@@ -335,3 +335,42 @@ r.name = 'LEU' AND
 d.member_logic_code IS NULL
 order by e.name, dl.number, d.dr_id, d.member_id asc;
 
+SELECT e.name, r.cs_count,
+       r.name as r_name, r.number as r_number, c.name as c_name
+FROM
+nrgcing.cingentry e,
+nrgcing.cingchain c,
+nrgcing.cingresidue r
+ where
+r.entry_id = e.entry_id AND
+c.entry_id = e.entry_id AND
+r.name = 'ALA' AND
+r.cs_count > 13
+order by r.cs_count desc
+limit 100
+;
+
+SELECT r.residue_id, count(*) as r_cs_count
+FROM
+nrgcing.cingresidue r,
+nrgcing.cingatom a
+ where
+a.residue_id = r.residue_id AND
+a.cs IS NOT NULL
+group by r.residue_id
+order by r_cs_count desc
+limit 100
+;
+
+SELECT e.name, r.name as r_name, r.number as r_number, c.name as c_name,
+    r.cs_count
+FROM
+nrgcing.cingentry e,
+nrgcing.cingchain c,
+nrgcing.cingresidue r
+ where
+r.entry_id = e.entry_id AND
+c.entry_id = e.entry_id AND
+r.residue_id = 615999
+;
+

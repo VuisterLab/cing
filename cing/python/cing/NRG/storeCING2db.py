@@ -517,6 +517,11 @@ def doStoreCING2db( entry_code, archive_id, project = None):
             if residue.hasProperties('water'):
                 waterResidueCount += 1
                 continue
+            if residue.resName == 'HOH':
+                waterResidueCount += 1
+                nTerror("Water residue %s almost slipped into RDB because it doesn't have the water property set. Skipping now." % residue)
+                continue
+                        
 #            nTmessage("Residue: %s" % residue)
             # CING
     #        print m.C.ASN46.distanceRestraints

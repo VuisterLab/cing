@@ -5,6 +5,8 @@ python -u $CINGROOT/python/cing/NRG/nrgCingRdb.py
 """
 
 from cing import cingDirTmp
+from cing.Libs.DBMS import DBMS
+from cing.Libs.DBMS import Relation
 from cing.Libs.NTplot import * #@UnusedWildImport
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.NRG import * #@UnusedWildImport
@@ -1063,7 +1065,7 @@ AND '{2}' <@ S.chain_type; -- contains at least one protein chain.
     # end def
 
 
-    def createPlotsCompareBetweenDb(self, other_schema=RECOORD_DB_SCHEMA):
+    def createPlotsCompareBetweenDb(self, other_schema=RECOORD_DB_SCHEMA, doWriteCsv = True, doDiffHist = True):
         '''
         Comparisons.
         '''
@@ -1081,8 +1083,8 @@ AND '{2}' <@ S.chain_type; -- contains at least one protein chain.
 #        ]
         # end try
         labelList = [ self.schema, other.schema ]
-        startPlotIdx = 44 # 73
-        endPlotIdx = 99 # WAS 74
+        startPlotIdx = 73 # 73 for residue level BBCCHK
+        endPlotIdx = 74 # WAS 74
         nTmessage("Ploting from %s to %s." % (startPlotIdx, endPlotIdx))
         for plotParameterList in plotList[startPlotIdx:endPlotIdx]:
             level, progId, chk_id, _plotDictList = plotParameterList
@@ -1205,6 +1207,7 @@ AND '{2}' <@ S.chain_type; -- contains at least one protein chain.
             clf()
             scatter(x=floatValueLoL2[0], y=floatValueLoL2[1], s=10, c='b', marker='o', 
                     cmap=None, norm=None, vmin=None, vmax=None, alpha=None, linewidths=None )
+            
             if minList[0] != None:
                 xlim(xmin=minList[0])
             if minList[1] != None:
@@ -1227,11 +1230,46 @@ AND '{2}' <@ S.chain_type; -- contains at least one protein chain.
                 nTdebug("Plotting from %s to %s" %( minV, maxV ))            
                 plot( (minV, maxV), (minV, maxV))
             # end if
-            for fmt in ['png' ]:
-                fn = "plotHist_%s.%s" % (chk_id_unique, fmt)
-                nTdebug("Writing " + fn)
-                savefig(fn)
-            # end for fmt
+            fn = "plotHist_%s" % chk_id_unique
+            nTdebug("Writing png for: " + fn)
+            savefig(fn+".png")
+
+            if doWriteCsv:
+                nTmessage("Writing CSV data.")
+                if not os.path.exists('csv'):
+                    os.mkdir('csv')
+                dbms = DBMS()
+                r = Relation(fn, dbms, columnList=['x', 'y'])
+                ta = transpose(floatValueLoL2)
+                r.fromLol(ta)
+                r.writeCsvFile(os.path.join('csv', fn +'.csv'))            
+            # end if
+            
+            if doDiffHist:
+                nTmessage("Plotting difference histogram.")
+                clf()
+                a = floatValueLoL2
+                n = len(a[0])
+                
+                d = [a[1][i]-a[0][i] for i in range(n) ]
+                dNtList = NTlist(*d)
+                _av, _sd, m = dNtList.average()
+                if n != m:
+                    nTerror("Failed doDiffHist")
+                    continue
+#                normed = True
+                n, _bins, _patches = hist(d, bins=80, facecolor='green', alpha=0.75)
+                # Draw a line to fit.
+#                if normed:
+#                    y = mlab.normpdf( bins, av, sd) # would loose the y-axis count by a varying scale factor. Not desirable.
+#                    plot(bins, y, 'r--', linewidth=1)
+#                # end if
+                nTdebug("Title:\n%s" % titleStr)
+                title(titleStr, fontsize='small')
+                fn = "diffHist_%s" % chk_id_unique
+                nTdebug("Writing png for: " + fn)
+                savefig(fn+".png")
+                
         # end for plot
     # end def
 
