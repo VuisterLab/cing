@@ -54,6 +54,7 @@ inputDirCASD_NMR = 'file:///Users/jd/%s/data' + CASD_NMR_BASE_NAME
 CASP_NMR_BASE_NAME = 'CASP-NMR-CING'
 inputDirCASP_NMR = 'file:///Users/jd/%s/data' + CASP_NMR_BASE_NAME
 
+SCHEMA_ID_ALL_STR = 'SCHEMA_ID_ALL' # Used as a wild card for all below ids.
 schemaIdList  = [ CASD_DB_NAME,    PDB_DB_NAME,    NRG_DB_NAME,    DEV_NRG_DB_SCHEMA,    CASP_DB_NAME,    
                  NMR_REDO_DB_SCHEMA,    NMR_REDOA_DB_SCHEMA,    RECOORD_DB_SCHEMA, RECOORDA_DB_SCHEMA   ]
 archiveIdList = [ ARCHIVE_CASD_ID, ARCHIVE_PDB_ID, ARCHIVE_NRG_ID, ARCHIVE_DEV_NRG_ID,   ARCHIVE_CASP_ID, 

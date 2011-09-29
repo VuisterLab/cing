@@ -34,8 +34,9 @@ class Relation():
     def insertColumn(self, index=-1, label=None, 
 #                     foreignKeyConstr=None
                      ):
-        """Insert a column for a certain variable type; before the given position.
-         label Column name; has to be unique.
+        """
+        Insert a column for a certain variable type; before the given position. Or at the end when a -1 is given.
+        label Column name; has to be unique.
         """
 #        if ( hasColumn( label )  ) {
 #            General.showWarning("in insertColumn label already present for label: [" +
@@ -461,9 +462,35 @@ class Relation():
     def fromLol( self, lol ):
         """
         Moves data from standard list of lists in.
+        Relation will grow extra rows if size is too small.
+        Input needs to be at least as big as Relation.
         """
-        sizeRows = self.sizeRows()
         sizeColumns = self.sizeColumns()
+        inputSizeColumns = len(lol[0])
+        if inputSizeColumns > sizeColumns:
+            nTdebug("Growing relation columns from %s to %s" % (sizeColumns, inputSizeColumns))
+            for _i in range(inputSizeColumns - sizeColumns):
+                label = "column_%d" % self.sizeColumns()
+#                nTdebug("Adding column %s" % label)
+                self.insertColumn(-1, label)
+            # end for
+            sizeColumns = self.sizeColumns()
+        # end if
+
+        sizeRows = self.sizeRows()
+        inputSizeRows = len(lol)
+        if inputSizeRows > sizeRows:
+            nTdebug("Growing relation rows from %s to %s" % (sizeRows, inputSizeRows))
+            rowCountToAdd = inputSizeRows - sizeRows
+            for colIdx in range(sizeColumns):
+                column = self.getColumnByIdx(colIdx)
+                for rowIdx in range(rowCountToAdd):
+                    column.append( None )
+                # end for
+            # end for
+            sizeRows = self.sizeRows()
+        # end if
+
         for colIdx in range(sizeColumns):
             column = self.getColumnByIdx(colIdx)
             for rowIdx in range(sizeRows):

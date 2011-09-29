@@ -2202,7 +2202,7 @@ class NTtree(NTdict):
     def _decodeCname(self, cName):
         """Decode a cName relative to self"""        
         return self._decodeTreeName( cName.split('.') )
-   #end def
+    #end def
 
     def getParent(self, level=1):
         'Silent method returning parent or None.'

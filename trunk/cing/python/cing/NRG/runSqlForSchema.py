@@ -19,6 +19,17 @@ user_name = PDBJ_DB_USER_NAME
 
 
 def runSqlForSchema(sqlFile, schemaId = CASD_DB_NAME, rootPath=None):
+    
+    if schemaId == SCHEMA_ID_ALL_STR:
+        for schemaIdSpecific in schemaIdList:
+            if runSqlForSchema(sqlFile, schemaId = schemaIdSpecific, rootPath=rootPath):
+                nTerror("Failed for schema: %s" % schemaIdSpecific)
+            # end if
+        # end for
+        nTmessage("Done with overall runSqlForSchema")
+        return
+    # end if
+
     if rootPath:
         os.chdir(rootPath)
     txt = readTextFromFile(sqlFile)
@@ -38,7 +49,7 @@ def runSqlForSchema(sqlFile, schemaId = CASD_DB_NAME, rootPath=None):
                                    redirectInputFromFile = fn
                                  )
     argumentListStr = '%s %s' % (db_name, user_name)
-    nTmessage('==> Running psql ... ')
+    nTmessage('==> Running psql on schema %s ... ' % schemaId)
     psqlProgram(argumentListStr)
     nTmessage('Done!')
 
@@ -50,7 +61,7 @@ if __name__ == '__main__':
     schemaId = args[0]
     sqlFile = args[1]
     rootPath = args[2]
-    if schemaId not in schemaIdList:
+    if (schemaId != SCHEMA_ID_ALL_STR) and (schemaId not in schemaIdList):
         nTerror("Need to be called with valid schema id from %s but got: [%s]" % (str(schemaIdList), schemaId))
         sys.exit(1)
     if not os.path.exists(rootPath):

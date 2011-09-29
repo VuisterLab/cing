@@ -3,18 +3,19 @@ Unit test execute as:
 python $CINGROOT/python/cing/NRG/test/test_NrgCingRdb.py
 """
 from cing import cingDirTmp
+from cing.Libs.DBMS import DBMS
+from cing.Libs.DBMS import Relation
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.NRG import NMR_REDO_DB_SCHEMA
+from cing.NRG import NRG_DB_NAME
 from cing.NRG import RECOORD_DB_SCHEMA
 from cing.NRG.nrgCingRdb import NrgCingRdb
 from unittest import TestCase
 import unittest
-from cing.NRG import NRG_DB_NAME
 
 class AllChecks(TestCase):
 
     def _test_NrgCingRdb(self):
-
         cingDirTmpTest = os.path.join( cingDirTmp, getCallerName() )
         mkdirs( cingDirTmpTest )
         self.failIf(os.chdir(cingDirTmpTest), msg =
@@ -22,7 +23,7 @@ class AllChecks(TestCase):
         host = 'localhost'
         if 1: # DEFAULT False
             host = 'nmr.cmbi.umcn.nl'
-        # schema=RECOORD_DB_SCHEMA #@UnusedVariable
+        schema=RECOORD_DB_SCHEMA #@UnusedVariable
         schema=NRG_DB_NAME
         m = NrgCingRdb(host=host,schema=schema)
 
@@ -43,7 +44,21 @@ class AllChecks(TestCase):
     #            self.assertFalse( m.removeEntry(entry_code))
             # end if
         # end if
+    # end def
 
+    def test_writeCsvNRG(self):
+        cingDirTmpTest = os.path.join( cingDirTmp, getCallerName() )
+        mkdirs( cingDirTmpTest )
+        self.failIf(os.chdir(cingDirTmpTest), msg =
+            "Failed to change to test directory for files: " + cingDirTmpTest)
+        myLoL = [ [0,1,2], [3,4,5] ]
+        dbms = DBMS()
+        r = Relation('mTable', dbms, columnList=['x', 'y'])
+        r.fromLol(myLoL)
+        r.writeCsvFile('myLoL')
+    # end def
+        
+    
 if __name__ == "__main__":
     cing.verbosity = verbosityDebug
     unittest.main()

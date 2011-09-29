@@ -94,11 +94,12 @@ def countDsspSecStructConsensus(resList):
     return countA, countB, countC
 
 def getChothiaClass(resList):
-    """Determine if molecule has at least one of alpha or beta protein regions.
+    """
+    Determine if molecule has at least one of alpha or beta protein regions.
     Molecule may contain other types of macromolecules than protein.
     Return None if DSSP wasn't run or no amino acids are present.
     Chothia's original paper distinguished between alpha and/plus beta which
-    is beyond this function's scop.
+    is beyond this function's scope.
     """
     countA, countB, countC = countDsspSecStructConsensus(resList)
     if countA:
