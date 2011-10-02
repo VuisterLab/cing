@@ -1,9 +1,11 @@
 #summary How to simply create a screencast on the Mac
 #labels Phase-Support
 
-Feel free to improve!
-
 === Snapz Pro X Version 2.1.3 trial version ===
+
+*UPDATE*
+Note that nowadays in Lion the capture can be done from Quicktime as detailed here:
+http://www.macstories.net/reviews/lions-quicktime-player-screen-recording-improvements-and-new-sharing-features/
 
 = Setup =
   * Set to single display.
