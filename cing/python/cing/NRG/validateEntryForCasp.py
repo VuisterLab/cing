@@ -206,45 +206,6 @@ def main(entryId, *extraArgList):
             nTdebug("Removing tmp: %s" % pdbFilePath)
             os.unlink(pdbFilePath)
 
-
-    elif projectType == PROJECT_TYPE_CYANA:
-        project = Project.open(entryId, status='new')
-        pdbFileName = entryId + ".pdb"
-    #    pdbFilePath = os.path.join( inputDir, pdbFileName)
-        pdbFilePath = os.path.join(inputDir, pdbFileName)
-
-        if True:
-            pdbConvention = IUPAC
-            if entryId.startswith("1YWUcdGMP"):
-                pdbConvention = XPLOR
-            if entryId.startswith("2hgh"):
-                pdbConvention = CYANA
-            if entryId.startswith("1tgq"):
-                pdbConvention = PDB
-        project.initPDB(pdbFile=pdbFilePath, convention=pdbConvention, nmodels=modelCount)
-        nTdebug("Reading files from directory: " + inputDir)
-        kwds = {'uplFiles': [ entryId ],
-                'acoFiles': [ entryId ]
-                  }
-
-        if entryId.startswith("1YWUcdGMP"):
-            del(kwds['acoFiles'])
-
-        if os.path.exists(os.path.join(inputDir, entryId + ".prot")):
-            if os.path.exists(os.path.join(inputDir, entryId + ".seq")):
-                kwds['protFile'] = entryId
-                kwds['seqFile'] = entryId
-            else:
-                nTerror("Failed to find the .seq file whereas there was a .prot file.")
-
-        # Skip restraints if absent.
-        if os.path.exists(os.path.join(inputDir, entryId + ".upl")):
-            project.cyana2cing(cyanaDirectory=inputDir,
-                               convention=restraintsConvention,
-                               copy2sources=True,
-                               nmodels=modelCount,
-                               **kwds)
-
 #    if inputDirOrg == inputDirCASD_NMR:
 #    if True: # Default is False for this is specific to CASD-NMR
 #        nTmessage("Renaming molecule name to entry id: %s" % entryId)

@@ -46,7 +46,7 @@ class AllChecks(TestCase):
         # end if
     # end def
 
-    def test_writeCsvNRG(self):
+    def _test_writeCsvNRG(self):
         cingDirTmpTest = os.path.join( cingDirTmp, getCallerName() )
         mkdirs( cingDirTmpTest )
         self.failIf(os.chdir(cingDirTmpTest), msg =

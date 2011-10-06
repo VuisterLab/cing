@@ -57,11 +57,6 @@ class AllChecks(TestCase):
         if not parseOnly:
             project.removeFromDisk()
             project = Project.open( entryId, status='new' )
-#            cyanaDirectory = os.path.join(cingDirTestsData,"cyana", entryId)
-#            pdbFileName = entryId+".pdb"
-#            pdbFilePath = os.path.join( cyanaDirectory, pdbFileName)
-#            nTdebug("Reading files from directory: " + cyanaDirectory)
-#            project.initPDB( pdbFile=pdbFilePath, convention = pdbConvention )
             inputArchiveDir = os.path.join(cingDirTestsData, "ccpn")
 
             ccpnFile = os.path.join(inputArchiveDir, entryId + ".tgz")

@@ -1222,7 +1222,7 @@ Project: Top level Cing project class
             restraintLoL = self.distances
 
         if not restraintLoL:
-            nTdebug("No restraint list in filterHighDistanceViol.")
+#            nTdebug("No restraint list in filterHighDistanceViol.")
             return 1
         # end if
         # Get instance of DistanceRestraintList
@@ -2249,9 +2249,9 @@ ranges:  %s
                 if (2.0 - phi.cv - psi.cv > cutoff): 
                     use2 = 1
                 #printf('%-35s %-35s  %6.2f  %1d     %6.2f %6.2f   %6.2f  %1d     %2d\n',
-                #       res.PHI, res.PSI, 2.0 - res.PHI.cv - res.PSI.cv, use1,
-                 #      phi.cv, psi.cv, 2.0 - phi.cv - psi.cv, use2, use1-use2
-                 #     )
+                #      res.PHI, res.PSI, 2.0 - res.PHI.cv - res.PSI.cv, use1,
+                #      phi.cv, psi.cv, 2.0 - phi.cv - psi.cv, use2, use1-use2
+                #     )
                 if use1:
                     resList1.append(res.resNum)
                 if use2:
@@ -2426,7 +2426,7 @@ class Peak(NTdict, Lister):
     #end def
 
     def decriticize(self):
-        nTdebug("Now in Peak#decriticize")
+#        nTdebug("Now in Peak#decriticize")
         self.rogScore.reset()
     #end def
 
@@ -2757,8 +2757,8 @@ class DistanceRestraint(Restraint):
                 atms2 = atm2.realAtoms()
                 for a in atms1 + atms2:
                     if a and a.hasMissingCoordinates(): # gv has mase this into a method because the getModelCount()
-                                                 # can crash when reading back NRG dataset because of their
-                                                 # incompleteness
+                    # can crash when reading back NRG dataset because of their
+                    # incompleteness
                     #if len(a.coordinates) < modelCount:
                         msg = "Missing coordinates (%s)" % a.toString()
 #                        nTdebug(msg)
@@ -3671,8 +3671,8 @@ class DihedralRestraint(Restraint):
 
                 #if len(a.coordinates) < modelCount:
                 if a and a.hasMissingCoordinates(): # gv has mase this into a method because the getModelCount()
-                                             # can crash when reading back NRG dataset because of their
-                                             # incompleteness
+                    # can crash when reading back NRG dataset because of their
+                    # incompleteness
                     msg = "Missing coordinates in dihedral (%s)" % a.toString()
 #                    nTdebug(msg)
                     self.rogScore.setMaxColor(COLOR_RED, msg)

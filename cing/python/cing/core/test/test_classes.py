@@ -70,32 +70,6 @@ class AllChecks(TestCase):
         nTmessage("hello")
         nTdebug(p.root)
 
-    def test_classes(self):
-        htmlOnly = True
-        pdbConvention = IUPAC
-        entryId = "1brv_1model"        # Small much studied PDB NMR entry
-
-        project = Project.open(entryId, status='new')
-        if not project:
-            nTerror('Failed opening project %s', entryId)
-            exit(1)
-
-        cyanaDirectory = os.path.join(cingDirTestsData, "cyana", entryId)
-        nTdebug("Reading files from directory: " + cyanaDirectory)
-
-        kwds = {}
-        kwds['pdbFile'] = entryId
-        project.cyana2cing(cyanaDirectory=cyanaDirectory,
-                           convention=None,
-                           coordinateConvention=pdbConvention,
-                           copy2sources = True,
-                           **kwds)
-#        project.save()
-        project.runCingChecks()
-        project.setupHtml()
-        project.generateHtml(htmlOnly = htmlOnly)
-        project.renderHtml()
-
 
     def _test_HTMLfile(self):
 

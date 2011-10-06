@@ -10,27 +10,11 @@ from unittest import TestCase
 import unittest
 
 class AllChecks(TestCase):
-
     def test_shiftx(self):
-        pdbConvention = IUPAC
 #        entryId = "1brv" # Small much studied PDB NMR entry
 #        entryId = "2hgh_1model"  RNA-protein complex.
-        entryId = "1brv_1model"
+        entryId = "1brv"
 #        entryId = "1tgq_1model" # withdrawn entry
-#        entryId = "1YWUcdGMP" # Example entry from external user, Martin Allan
-#        entryId = "H2_2Ca_53"
-
-        if entryId.startswith("1YWUcdGMP"):
-            pdbConvention = XPLOR
-        if entryId.startswith("2hgh"):
-            pdbConvention = CYANA
-        if entryId.startswith("1tgq"):
-            pdbConvention = PDB
-        if entryId.startswith("1brv"):
-            pdbConvention = IUPAC
-        if entryId.startswith("H2_2Ca_53"):
-            pdbConvention = CYANA2
-
         cingDirTmpTest = os.path.join( cingDirTmp, getCallerName() )
         mkdirs( cingDirTmpTest )
         self.failIf(os.chdir(cingDirTmpTest), msg =
@@ -39,15 +23,10 @@ class AllChecks(TestCase):
         project = Project( entryId )
         self.failIf( project.removeFromDisk())
         project = Project.open( entryId, status='new' )
-        cyanaDirectory = os.path.join(cingDirTestsData,"cyana", entryId)
-        pdbFileName = entryId+".pdb"
-        pdbFilePath = os.path.join( cyanaDirectory, pdbFileName)
-
-        project.initPDB( pdbFile=pdbFilePath, convention = pdbConvention )
+        cyanaFile = os.path.join(cingDirTestsData, "cyana", entryId + ".cyana.tgz")
+        self.assertTrue(project.initCyana(cyanaFolder = cyanaFile))
         project.runShiftx()
 
 if __name__ == "__main__":
-    cing.verbosity = verbosityNothing
-    cing.verbosity = verbosityError
     cing.verbosity = verbosityDebug
     unittest.main()

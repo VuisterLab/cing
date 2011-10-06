@@ -200,11 +200,11 @@ public class iCing implements EntryPoint, HistoryListener {
         String imgHtml = "<img class=\"gwt-Image\" style=\"width:16px;height:12px;border:0px\" src=\"images/icon_email.gif\">";
 
         final HTML html = new HTML("<div id=\"footer\">" + GenClient.eol + "<p align=\"center\">" + GenClient.eol
-                + cingRevisionhtml + "\t" + GenClient.eol + "Geerten W. Vuister"
-                + " <a href=\"mailto:g.vuister@science.ru.nl\">" + imgHtml + "</a>, \t" + GenClient.eol
-                + "Jurgen F. Doreleijers \t" + "<a href=\"mailto:jurgend@cmbi.ru.nl\">" + imgHtml + "</a> \t"
-                + GenClient.eol + " " + c.and() + " \t" + GenClient.eol + "Alan Wilter Sousa da Silva \t"
-                + "<a href=\"mailto:alanwilter@gmail.com\">" + imgHtml + "</a> \t" + "</p>" + GenClient.eol + "</div>"
+                + cingRevisionhtml + "\t" + GenClient.eol 
+                + "Geerten W. Vuister          <a href=\"mailto:g.vuister@science.ru.nl\">" + imgHtml + "</a>, \t" + GenClient.eol                 
+                + "Alan Wilter Sousa da Silva  <a href=\"mailto:alanwilter@gmail.com\">"    + imgHtml + "</a>, \t" + c.and()  
+                + "Jurgen F. Doreleijers       <a href=\"mailto:jurgend@cmbi.ru.nl\">"      + imgHtml + "</a>"
+                + "</p>" + GenClient.eol + "</div>"
                 + GenClient.eol);
         vPanel.add(html);
         html.setHorizontalAlignment(HasHorizontalAlignment.ALIGN_CENTER);

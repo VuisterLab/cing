@@ -29,6 +29,8 @@ Options:
   --initPDB=PDBFILE[,CONVENTION]
                         Initialize new project PROJECTNAME from
                         PDBFILE[,CONVENTION]
+  --initCyana=CYANA_PROJECT_FILE[,CONVENTION]
+                        Initialize new project from .cyana.tgz
   --initBMRB=BMRBFILE   Initialize new project PROJECTNAME from edited BMRB
                         file
   --initCcpn=CCPNFOLDER
@@ -579,6 +581,10 @@ def getParser():
                       help="Initialize new project PROJECTNAME from PDBFILE[,CONVENTION]",
                       metavar="PDBFILE[,CONVENTION]"
                      )
+    parser.add_option("--initCyana",
+                      dest="initCyana", default=None,
+                      help="Initialize new project from *.cyana.tgz"
+                     )
     parser.add_option("--initBMRB",
                       dest="initBMRB", default=None,
                       help="Initialize new project PROJECTNAME from edited BMRB file",
@@ -891,6 +897,9 @@ def main():
         elif options.initBMRB:
             project = Project.open(options.name, status='new')
             project.initBMRB(bmrbFile=options.initBMRB, moleculeName=project.name)
+        elif options.initCyana:
+            project = Project.open(options.name, status='new')
+            project.initCyana(cyanaFolder=options.initCyana)
         elif options.initCcpn:
             project = Project.open(options.name, status='new')
 #            if options.ensemble:
@@ -933,7 +942,7 @@ def main():
         m = project.molecule #@UnusedVariable # pylint: disable=W0612
 
 #        nTdebug("p.molecule.ranges: %s" % p.molecule.ranges)
-     #   pr = print
+    #   pr = print
         f = pformat #@UnusedVariable # pylint: disable=W0612
         fa = pformatall #@UnusedVariable # pylint: disable=W0612
 

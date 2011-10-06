@@ -1,5 +1,5 @@
 NB some PDB files have been transformed to IUPAC by Yasara
-	They can be recognized by looking for a $x_org.pdb file present.
+    They can be recognized by looking for a $x_org.pdb file present.
 
 1ai0: is a nice example for it's a divers molecular system.
     - Mol.Sys.  - 2 models (truncated to for speed reason)
@@ -30,9 +30,6 @@ NB some PDB files have been transformed to IUPAC by Yasara
     - replaced by the authors in 2004 (new pdb entry 1tkv).
     - discussed at: http://proteins.dyndns.org/Education/Validation
 
-1pdb:
-    - generic pdb structure as example for something I forgot.
-
 1tgq:
     - SG group structure now replaced by the dimeric interpretation in 2b95.
 
@@ -41,14 +38,12 @@ NB some PDB files have been transformed to IUPAC by Yasara
 1y4o:
     - CESG group structure from Jikui Song. Nice dimer.
 
-1YWUcdGMP:
-    - user prelim data
-
 2hgh:
     - larger system of a protein/RNA complex
 
 2hm9:
     - entry from Nadia K.W.
+    - Has problems importing.
 
 H2_2Ca_53:
     - from Mark H. with 2 Ca. Demonstrated a bug in shiftx or core/molecule.py.

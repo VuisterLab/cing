@@ -27,13 +27,10 @@ class AllChecks(TestCase):
         #entryId = "1ai0" # Most complex molecular system in any PDB NMR entry
 #        entryId = "2hgh" # Small much studied PDB NMR entry; 48 models
 #        entryId = "1bus" # Small much studied PDB NMR entry:  5 models of 57 AA.: 285 residues.
-#        entryId = "2hgh_1model"
-        entryId = "1brv_1model"
+        entryId = "1brv"
 
-        pdbConvention = IUPAC
         ranges = None
         if entryId.startswith("2hgh"):
-            pdbConvention = CYANA
             # Compile a NTlist instance with residue objects.
             ranges = "2-54,111-136,145-193"
                 # 1 and 55 are 5' and 3' terminii which are a little looser.
@@ -46,12 +43,9 @@ class AllChecks(TestCase):
         project = Project( entryId )
         project.removeFromDisk()
         project = Project.open( entryId, status='new' )
-        cyanaDirectory = os.path.join(cingDirTestsData,"cyana", entryId)
-        pdbFileName = entryId+".pdb"
-        pdbFilePath = os.path.join( cyanaDirectory, pdbFileName)
-        nTdebug("Reading files from directory: " + cyanaDirectory)
-        # Fast
-        project.initPDB( pdbFile=pdbFilePath, convention = pdbConvention )
+        cyanaFolder = os.path.join(cingDirTestsData,"cyana", entryId+".cyana.tgz")
+        nTdebug("Reading files from: " + cyanaFolder)
+        project.initCyana( cyanaFolder )
         project.runDssp()
 
         rangeList = project.molecule.getFixedRangeList(

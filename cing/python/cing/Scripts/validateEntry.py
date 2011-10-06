@@ -266,27 +266,6 @@ def main(entryId, *extraArgList):
         if True:
             nTdebug("Removing tmp: %s" % pdbFilePath)
             os.unlink(pdbFilePath)
-    elif projectType == PROJECT_TYPE_CYANA:
-        project = Project.open(entryId, status='new')
-        pdbFileName = entryId + ".pdb"
-        pdbFilePath = os.path.join(inputDir, pdbFileName)
-        project.initPDB(pdbFile=pdbFilePath, convention=IUPAC, nmodels=modelCount)
-        nTdebug("Reading files from directory: " + inputDir)
-        kwds = {'uplFiles': [ entryId ], 'acoFiles': [ entryId ] }
-        if os.path.exists(os.path.join(inputDir, entryId + ".prot")):
-            if os.path.exists(os.path.join(inputDir, entryId + ".seq")):
-                kwds['protFile'] = entryId
-                kwds['seqFile'] = entryId
-            else:
-                nTerror("Failed to find the .seq file whereas there was a .prot file.")
-        # Skip restraints if absent.
-        if os.path.exists(os.path.join(inputDir, entryId + ".upl")):
-            project.cyana2cing(cyanaDirectory=inputDir,
-                               convention=restraintsConvention,
-                               copy2sources=True,
-                               nmodels=modelCount,
-                               **kwds)
-        # end if
     # end if
     if ranges != None:
         project.molecule.setRanges(ranges)

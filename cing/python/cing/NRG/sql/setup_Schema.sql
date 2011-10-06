@@ -22,3 +22,5 @@ GRANT USAGE ON SCHEMA casdcing TO pbreader;
 CREATE FUNCTION execute(text) returns void AS $BODY$BEGIN EXECUTE $1; END;$BODY$ language plpgsql;
 --SELECT execute('GRANT SELECT ON nrgcing.'  || tablename || ' TO pbreader;') FROM pg_tables WHERE schemaname = 'nrgcing';
   SELECT execute('GRANT SELECT ON casdcing.' || tablename || ' TO pbreader;') FROM pg_tables WHERE schemaname = 'casdcing';
+  SELECT execute('GRANT SELECT ON casdcing.' || tablename || ' TO wim;')      FROM pg_tables WHERE schemaname = 'casdcing';
+GRANT USAGE on SCHEMA casdcing TO wim;

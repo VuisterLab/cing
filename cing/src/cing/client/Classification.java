@@ -16,6 +16,8 @@ public class Classification {
                     Settings.VAL_SETS_CFG_DEFAULT_FILENAME },
             // { "CING", "project", iCing.STRING_NA, iCing.STRING_NA },
             // { "CCPN", "bogus", "blabla", iCing.STRING_NA },
+//                    { Settings.FILE_PROGRAM_CYANA, Settings.FILE_TYPE_PROJECT, Settings.FILE_SUBTYPE_CYANA,  iCing.STRING_NA,    "1brv.cyana.tgz" },
+                    { Settings.FILE_PROGRAM_CYANA, Settings.FILE_TYPE_PROJECT, iCing.STRING_NA, iCing.STRING_NA, "CopZ-in.cyana.tgz" },
             // { "DYANA/DIANA", "distance", "hydrogen bond", "upper" },
             // { "DYANA/DIANA", "distance", "hydrogen bond", "lower" },
             // { "DYANA/DIANA", "distance", "NOE", "upper" },

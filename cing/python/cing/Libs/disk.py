@@ -776,4 +776,23 @@ def globLast( pattern ):
     if not fnList:
         return False
     return getNewestFileFromList( fnList )
+# end def
 
+def isRootDirectory(f):
+    """
+    Algorithm for finding just the root dir.
+    See unit test for examples.
+    """
+#    nTdebug("Checking _isRootDirectory on : ["+f+"]")
+    idxSlash = f.find("/")
+    if idxSlash < 0:
+        # Happens for every toplevel file. E.g. 1brv_aria.xml in issue 146 for 1brv_ccpngrid.tgz
+#        nTdebug("Found no forward slash in entry in tar file.")
+        return None
+
+    idxLastChar = len(f) - 1
+    if idxSlash == idxLastChar or idxSlash == (idxLastChar - 1):
+#        nTdebug("If the first slash is the last or second last BINGO: ["+f+"]")
+        return True
+    return False
+# end def
