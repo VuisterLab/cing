@@ -474,6 +474,9 @@ public class iCingServlet extends HttpServlet {
         if (projectFileName.endsWith(".cing.tgz") || projectFileName.endsWith(".cing.tar.gz")) {
             return "--old";
         }
+        if (projectFileName.endsWith(".cyana.tgz") || projectFileName.endsWith(".cyana.tar.gz")) {
+            return "--initCyana " + projectFileName;
+        }
         if (projectFileName.endsWith(".tgz") || projectFileName.endsWith(".tar.gz")) {
             return "--initCcpn " + projectFileName;
         }

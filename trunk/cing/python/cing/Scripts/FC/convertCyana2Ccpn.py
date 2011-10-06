@@ -86,13 +86,13 @@ def importCyanaCoorAndRes(ccpnProject, inputDir, guiRoot, replaceCoordinates=1, 
 #    nmrConstraintStore = ccpnConstraintList.nmrConstraintStore
 #    structureGeneration = nmrConstraintStore.findFirstStructureGeneration()
 
-  # Many options are available - see ccpnmr.format.process.linkResonances
-  #
-  # The current options are the 'safest' to maintain the original information,
-  # although bear in mind that here all atoms in the original list are
-  # considered to be stereospecifically assigned
-  #
-  # Not needed or is it?
+    # Many options are available - see ccpnmr.format.process.linkResonances
+    #
+    # The current options are the 'safest' to maintain the original information,
+    # although bear in mind that here all atoms in the original list are
+    # considered to be stereospecifically assigned
+    #
+    # Not needed or is it?
 #    format2.linkResonances(
 #                      forceDefaultChainMapping = 1,
 #                      globalStereoAssign = 1,

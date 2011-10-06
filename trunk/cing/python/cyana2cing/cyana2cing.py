@@ -8,6 +8,8 @@
 
     Uses the CING API to convert cyana run to cing framework.
     Optionally export on-the-fly to a xplor refine setup.
+    
+    NB there is also a more limite functionality for this in cing --initCyana.
 
 """
 

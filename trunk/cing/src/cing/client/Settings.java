@@ -16,7 +16,7 @@ public interface Settings {
     /** The next statement should updated manually now.*/
 //    public static final String VERSION = "0.88"; discontinued as it is different here from CING and might lead to confusion.
     /** The next statement should updated manually now. Can be automated by ant script querying svn info like for WATTOS project*/
-    public static final String REVISION = "765";
+    public static final String REVISION = "1081";
     /** URL for svn site specific for certain revision. */
     public static final String CING_REVISION_URL = "http://code.google.com/p/cing/source/detail?r=";
     /** URL base for all secure work; really no different from regular IP but security added. */
@@ -121,6 +121,7 @@ public interface Settings {
     public static final String RESPONSE_LOG_VALUE_NONE = RESPONSE_RESULT_DEFAULT;
     public static final String VAL_SETS_CFG_DEFAULT_FILENAME = "valSets.cfg";
     public static final String FILE_PROGRAM_CING = "CING";
+    public static final String FILE_PROGRAM_CYANA = "CYANA";
     public static final String FILE_PROGRAM_CCPN = "CCPN";
     public static final String FILE_PROGRAM_PDB = "PDB";
     public static final String FILE_TYPE_PROJECT = "project";

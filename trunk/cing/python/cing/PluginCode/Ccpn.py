@@ -3,6 +3,7 @@ Collaborative Computing Project for NMR
 '''
 from cing import issueListUrl
 from cing.Libs.NTutils import * #@UnusedWildImport
+from cing.Libs.disk import isRootDirectory
 from cing.Libs.forkoff import do_cmd
 from cing.core.classes import DihedralRestraint
 from cing.core.classes import DistanceRestraint
@@ -206,7 +207,8 @@ class Ccpn:
                     nTerror("No ccpnRootDirectory found in gzipped tar file: %s" % self.project.ccpnFolder)
                     nTerror("First listed directory after sorting: %s" % ccpnRootDirectory)
                     return None
-
+                # end if
+            # end if
             if ccpnRootDirectory != self.project.name:
                 nTmessage("Moving CCPN directory from [%s] to [%s]" % (ccpnRootDirectory, self.project.name))
                 move(ccpnRootDirectory, self.project.name)
@@ -2680,23 +2682,6 @@ def getProjectNameInFileName(fileName):
     projectName = g[0]
 #    nTdebug("projectName: [%s]" % projectName)
     return projectName
-
-def isRootDirectory(f):
-    """ Algorithm for finding just the root dir.
-    See unit test for examples.
-    """
-#    nTdebug("Checking _isRootDirectory on : ["+f+"]")
-    idxSlash = f.find("/")
-    if idxSlash < 0:
-        # Happens for every toplevel file. E.g. 1brv_aria.xml in issue 146 for 1brv_ccpngrid.tgz
-#        nTdebug("Found no forward slash in entry in tar file.")
-        return None
-
-    idxLastChar = len(f) - 1
-    if idxSlash == idxLastChar or idxSlash == (idxLastChar - 1):
-#        nTdebug("If the first slash is the last or second last BINGO: ["+f+"]")
-        return True
-    return False
 # end def
 
 def modResDescriptorForTerminii( ccpnResDescriptor, i, seqLength, molType):

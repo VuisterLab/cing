@@ -192,7 +192,7 @@ class NrgCing(Lister):
         self.entry_list_nmr_redo = NTlist()
 
         # Stages are cumulative in that e.g. R always includes all from C. This simplifies this setup hopefully.
-                      # id #name         #code
+        # id #name         #code
 
         self.phaseIdList = [PHASE_C, PHASE_R, PHASE_S, PHASE_F ]
         self.phaseDataList = [
@@ -2111,8 +2111,8 @@ class NrgCing(Lister):
             nTmessage("Going to use non-default entry_list_todo in storeCING2db")
             self.entry_list_todo = '1brv'.split()
 #            self.entry_list_todo = readLinesFromFile('/Users/jd/NRG/lists/entry_list_vuisterlab.csv')
-#            self.entry_list_todo = readLinesFromFile(os.path.join(self.results_dir, 'entry_list_todo_nmr_all.csv'))
-            self.entry_list_todo = readLinesFromFile(os.path.join('/Users/jd', 'entry_list_to_store.csv'))
+            self.entry_list_todo = readLinesFromFile(os.path.join(self.results_dir, 'list', 'entry_list_tostore.csv'))
+#            self.entry_list_todo = readLinesFromFile(os.path.join('/Users/jd', 'entry_list_to_store.csv'))
             self.entry_list_todo = NTlist( *self.entry_list_todo )
 
         nTmessage("Found entries in %s todo: %d" % (self.results_base, len(self.entry_list_todo)))

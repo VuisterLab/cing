@@ -36,13 +36,9 @@ class AllChecks(TestCase):
 #        entryId = "2hgh_1model"
 #        entryId = "1brv_1model"
 
-        pdbConvention = CYANA
-        restraintsConvention = CYANA
-
 #        ranges = None
         ranges = 'cv'
         if entryId.startswith("2hgh"):
-            pdbConvention = CYANA
             # Compile a NTlist instance with residue objects.
             ranges = "2-54,111-136,145-193"
             ranges = None
@@ -56,41 +52,9 @@ class AllChecks(TestCase):
         elif entryId.startswith("1bus"):
             ranges = "6-13,29-45"
 
-        project = Project(entryId)
-        project.removeFromDisk()
         project = Project.open(entryId, status='new')
-        cyanaDirectory = os.path.join(cingDirTestsData, "cyana", entryId)
-#        pdbFileName = entryId + ".pdb"
-#        pdbFilePath = os.path.join(cyanaDirectory, pdbFileName)
-        nTdebug("Reading files from directory: " + cyanaDirectory)
-
-        kwds = {}
-        kwds['pdbFile'] = entryId
-        kwds['nmodels'] = modelNum
-
-
-        # Skip restraints if absent.
-        if os.path.exists(os.path.join(cyanaDirectory, entryId + ".upl")):
-            kwds['uplFiles'] = [entryId]
-        if os.path.exists(os.path.join(cyanaDirectory, entryId + ".aco")) and not entryId.startswith("1YWUcdGMP"):
-            kwds['acoFiles'] = [ entryId ]
-
-        if os.path.exists(os.path.join(cyanaDirectory, entryId + ".seq")):
-            kwds['seqFile'] = entryId
-
-        if os.path.exists(os.path.join(cyanaDirectory, entryId + ".seq")):
-            kwds['seqFile'] = entryId
-
-        if os.path.exists(os.path.join(cyanaDirectory, entryId + ".prot")):
-            self.assertTrue(os.path.exists(os.path.join(cyanaDirectory, entryId + ".seq")),
-                "Converter for cyana also needs a seq file before a prot file can be imported")
-            kwds['protFile'] = entryId
-            kwds['seqFile'] = entryId
-        self.assertTrue(project.cyana2cing(cyanaDirectory = cyanaDirectory,
-                           convention = restraintsConvention,
-                           coordinateConvention = pdbConvention,
-                           copy2sources = True,
-                           **kwds))
+        cyanaFile = os.path.join(cingDirTestsData, "cyana", entryId + ".cyana.tgz")
+        self.assertTrue(project.initCyana(cyanaFolder = cyanaFile))
 
 #        project.validate(parseOnly=False, htmlOnly=True, doProcheck=False, doWhatif=False, doWattos=False, doTalos=False) # needed?
 

@@ -113,6 +113,8 @@ class Xeasy( NTdict ):
         maxToReport = 100 # no need to fill screen.
         errCount = 0
         for p in self.prot.itervalues():
+            if p.shift == NOSHIFT: # don't waiste user attention for unimportant stuff.
+                continue
             if not p.resNum in resNumDict:
                 if errCount <= maxToReport:
                     nTerror('Xeasy.map2molecule: residue "%s %d" for atom %-4s not defined in %s'%(

@@ -4,10 +4,10 @@ python $CINGROOT/python/cing/PluginCode/test/test_ccpn_2.py
 """
 
 from cing.Libs.NTutils import * #@UnusedWildImport
+from cing.Libs.disk import isRootDirectory
 from cing.PluginCode.Ccpn import Ccpn
 from cing.PluginCode.Ccpn import getProjectNameInFileName
 from cing.PluginCode.Ccpn import getRestraintBoundList
-from cing.PluginCode.Ccpn import isRootDirectory
 from cing.PluginCode.Ccpn import modResDescriptorForTerminii
 from cing.PluginCode.Ccpn import patchCcpnResDescriptor
 from unittest import TestCase
@@ -15,12 +15,12 @@ import unittest
 
 class AllChecks(TestCase):
 
-    def _testIsRootDirectory(self):
+    def testIsRootDirectory(self):
         self.assertTrue( isRootDirectory("linkNmrStarData/"))
         self.assertTrue( isRootDirectory("linkNmrStarData//"))
         self.assertFalse( isRootDirectory("linkNmrStarData/ccp/"))
         self.assertFalse( isRootDirectory("linkNmrStarData/ccp//"))
-
+    # end def
 
     def _testRestraintsValuesRegular(self):
         _alsoSee = """See http://code.google.com/p/cing/issues/detail?id=121"""

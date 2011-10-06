@@ -64,7 +64,7 @@ end
 
 
 
-echo "\nFound number of log files: $#logFileList"
+echo "Found number of log files: $#logFileList"
 
 
 

@@ -208,10 +208,6 @@ class AllChecks(TestCase):
 
     def _testCreateCcpn(self):
         'Disabled test because...'
-        doRestraints = False
-        pdbConvention = IUPAC
-        restraintsConvention = CYANA
-
         cingDirTmpTest = os.path.join( cingDirTmp, getCallerName() )
         mkdirs( cingDirTmpTest )
         self.failIf(os.chdir(cingDirTmpTest), msg =
@@ -219,43 +215,14 @@ class AllChecks(TestCase):
 
         for entryId in AllChecks.entryList:
             # Allow pdb files to be of different naming systems for this test.
-            if entryId.startswith("2hgh"):
-                pdbConvention = CYANA
-            if entryId.startswith("1tgq"):
-                pdbConvention = PDB
-            if entryId.startswith("1brv"):
-                pdbConvention = IUPAC
-            if entryId.startswith("1YWUcdGMP"):
-                pdbConvention = XPLOR
-
             project = Project(entryId)
             self.failIf(project.removeFromDisk())
             project = Project.open(entryId, status = 'new')
-            cyanaDirectory = os.path.join(cingDirTestsData, "cyana", entryId)
-            pdbFileName = entryId + ".pdb"
-            pdbFilePath = os.path.join(cyanaDirectory, pdbFileName)
-            project.initPDB(pdbFile = pdbFilePath, convention = pdbConvention)
 
-            if doRestraints:
-                nTdebug("Reading files from directory: " + cyanaDirectory)
-                kwds = {'uplFiles': [ entryId ],
-                        'acoFiles': [ entryId ]
-                          }
-                if entryId.startswith("1YWUcdGMP"):
-                    del(kwds['acoFiles'])
+            cyanaFolder = os.path.join(cingDirTestsData,"cyana", entryId+".cyana.tgz")
+            nTdebug("Reading files from: " + cyanaFolder)
+            project.initCyana( cyanaFolder)
 
-                if os.path.exists(os.path.join(cyanaDirectory, entryId + ".prot")):
-                    self.assertTrue(os.path.exists(os.path.join(cyanaDirectory, entryId + ".seq")),
-                        "Converter for cyana also needs a seq file before a prot file can be imported")
-                    kwds['protFile'] = entryId
-                    kwds['seqFile'] = entryId
-
-                # Skip restraints if absent.
-                if os.path.exists(os.path.join(cyanaDirectory, entryId + ".upl")):
-                    project.cyana2cing(cyanaDirectory = cyanaDirectory, convention = restraintsConvention,
-                                copy2sources = True,
-                                **kwds)
-            # end if
             project.save()
             nTmessage( "Project: %s" % project)
             ccpnFolder = entryId + "New"

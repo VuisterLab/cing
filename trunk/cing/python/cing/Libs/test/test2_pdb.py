@@ -20,7 +20,6 @@ class AllChecks(TestCase):
     def testPdbFile(self):
         nTwarning("This test case will take about 5 (+3 for 1v0e) minutes and is recommended to be done before major releases.")
     #        entryId = "1ai0" # Most complex molecular system in any PDB NMR entry
-#        entryList = "1a4d".split() # Small much studied PDB NMR entry
     #        entryId = "1brv" # Small much studied PDB NMR entry
     #        entryId = "2hgh_1model"
 #        entryList = "1kr8".split()

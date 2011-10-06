@@ -24,18 +24,7 @@ class AllChecks(TestCase):
         #entryId = "1ai0" # Most complex molecular system in any PDB NMR entry
         entryId = "1bus"
 #        entryId = "1brv_1model" # Small much studied PDB NMR entry
-#        entryId = "1YWUcdGMP" # Example entry from external user, Martin Allan
         ranges = None
-        pdbConvention = IUPAC
-        restraintsConvention = CYANA
-        if entryId.startswith("1YWUcdGMP"):
-            pdbConvention = XPLOR
-        if entryId.startswith("2hgh"):
-            pdbConvention = CYANA
-        if entryId.startswith("1tgq"):
-            pdbConvention = PDB
-        if entryId.startswith("1brv"):
-            pdbConvention = IUPAC
 
         if entryId.startswith("1brv"):
             ranges = "173-186"
@@ -70,32 +59,10 @@ class AllChecks(TestCase):
         project = Project( entryId )
         self.failIf( project.removeFromDisk() )
         project = Project.open( entryId, status='new' )
-        cyanaDirectory = os.path.join(cingDirTestsData,"cyana", entryId)
-        pdbFileName = entryId+".pdb"
-        pdbFilePath = os.path.join( cyanaDirectory, pdbFileName)
-        project.initPDB( pdbFile=pdbFilePath, convention = pdbConvention )
-
+        cyanaFile = os.path.join(cingDirTestsData, "cyana", entryId + ".cyana.tgz")
+        self.assertTrue(project.initCyana(cyanaFolder = cyanaFile))
         project.molecule.setRanges(ranges)
-
-        nTdebug("Reading files from directory: " + cyanaDirectory)
-        kwds = {'uplFiles': [ entryId ],
-                'acoFiles': [ entryId ]
-                  }
-        if entryId.startswith("1YWUcdGMP"):
-            del(kwds['acoFiles'])
-
-        if os.path.exists( os.path.join( cyanaDirectory, entryId+".prot")):
-            self.assertTrue( os.path.exists( os.path.join( cyanaDirectory, entryId+".seq")),
-                "Converter for cyana also needs a seq file before a prot file can be imported" )
-            kwds['protFile'] = entryId
-            kwds['seqFile']  = entryId
-
-        # Skip restraints if absent.
-        if os.path.exists( os.path.join( cyanaDirectory, entryId+".upl")):
-            project.cyana2cing(cyanaDirectory=cyanaDirectory, convention=restraintsConvention,
-                        copy2sources = True,
-                        **kwds )
-
+        
         project.save()
         self.failIf(project.runProcheck(createPlots=True, runAqua=runAqua) is None)
 

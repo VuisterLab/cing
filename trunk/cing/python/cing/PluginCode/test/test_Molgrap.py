@@ -20,31 +20,19 @@ class AllChecks(TestCase):
     os.chdir(cingDirTmpTest)
 
     def testMolgrapRunFromPdbFile(self):
-        pdbConvention = CYANA
 #        SETUP FIRST
         #entryId = "1ai0" # Most complex molecular system in any PDB NMR entry
 #        entryId = "1a4d" # Small much studied PDB NMR entry
 #        entryId = "1zwj" # X-ray entry of CESG interest.
-        entryId = "1brv_1model" # Small much studied PDB NMR entry
+        entryId = "1brv" # Small much studied PDB NMR entry
 #        entryId = "2hgh_1model"
-        if entryId.startswith("1YWUcdGMP"):
-            pdbConvention = XPLOR
-        if entryId.startswith("2hgh"):
-            pdbConvention = CYANA
-        if entryId.startswith("1tgq") or entryId.startswith("1a4d"):
-            pdbConvention = PDB
-        if entryId.startswith("1brv"):
-            pdbConvention = IUPAC
-
-        cyanaDirectory = os.path.join(cingDirTestsData,"cyana", entryId)
-        pdbFileName = entryId+".pdb"
-        pdbFilePath = os.path.join( cyanaDirectory, pdbFileName)
 
         # does it matter to import it just now?
         project = Project( entryId )
         self.failIf( project.removeFromDisk())
         project = Project.open( entryId, status='new' )
-        project.initPDB( pdbFile=pdbFilePath, convention = pdbConvention )
+        cyanaFile = os.path.join(cingDirTestsData, "cyana", entryId + ".cyana.tgz")
+        self.assertTrue(project.initCyana(cyanaFolder = cyanaFile))
         project.save()
         gifFileName = entryId+".gif"
         pathGif = os.path.join( self.cingDirTmpTest, gifFileName)

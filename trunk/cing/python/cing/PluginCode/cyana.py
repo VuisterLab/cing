@@ -26,15 +26,21 @@ Methods:
         return drl or None on error
 
 """
+from cing.Libs import PyMMLib
 from cing.Libs.AwkLike import AwkLike
 from cing.Libs.NTutils import * #@UnusedWildImport
+from cing.Libs.disk import isRootDirectory
 from cing.core.classes import DihedralRestraint
 from cing.core.classes import DihedralRestraintList
 from cing.core.classes import DistanceRestraint
 from cing.core.classes import DistanceRestraintList
 from cing.core.constants import * #@UnusedWildImport
 from cing.core.molecule import translateTopology
+from glob import glob
+from shutil import move
+from shutil import rmtree
 import shutil
+import tarfile
 
 def exportDihedralRestraint2cyana( dr, convention ):
     """Return string with distanceRestraint (dr) in cyana format or None on error
@@ -404,9 +410,42 @@ def export2cyana( project):
     #end for
 #end def
 
+def autoDetectCyanaConvention(pdbFile):
+    'Returns None on error or CYANA or CYANA2'
+#    tmpProjectName = getRandomKey(size=10)
+#    switchOutput(False) # disable standard out.
+    countMap = CountMap()    
+    countMap['HN'] = 0 # CYANA 1
+    countMap['H'] = 0
+    pdbRecords = PyMMLib.PDBFile(pdbFile)
+    for _i,record in enumerate(pdbRecords):
+        recordName = record._name.strip()
+        if recordName != "ATOM":
+            continue            
+        # end if
+        atmName = record.name.strip()
+        if not (atmName == 'HN' or atmName == 'H'):
+            continue 
+        # end if
+        countMap.increaseCount(atmName, 1)
+    # end for
+    overallCount = countMap.overallCount()
+    if not overallCount:
+        nTmessage("Assuming default CYANA2 convention because no amide protons counted at all.")
+        return CYANA2
+    # end if
+    msg = "Amide protons counted of CYANA 1/2 (HN/H) are: %s/%s." % ( countMap['HN'], countMap['H'])
+    if countMap['HN'] > countMap['H']:
+        nTmessage("Autodetected CYANA convention because " + msg)
+        return CYANA
+    nTmessage("Autodetected CYANA2 convention because " + msg)
+#    switchOutput(True) # disable standard out.
+    return CYANA2
+# end def
+
 #-----------------------------------------------------------------------------
 def cyana2cing( project, cyanaDirectory, convention=CYANA2, copy2sources=True, update=True,
-                coordinateConvention=None, **kwds):
+                coordinateConvention=None, useAllInDirectory=False, autoDetectFormat=True, nmodels=None, **kwds):
     """
      kwds options:
                 seqFile   = None,
@@ -420,61 +459,133 @@ def cyana2cing( project, cyanaDirectory, convention=CYANA2, copy2sources=True, u
 
 
     Read the data from the cyanaDirectory and store in project.
-    Optionally set to defaults by supplying 'default' as argument
-
+    If useAllInDirectory is set than only but all the files in the directory will matched
+    based on filename extension.
+    If autoDetectFormat is set and no convention is specified then the PDB file will be queried for 
+    distinguishing CYANA from CYANA2.    
+     
     Return list of sources or None on error.
     """
-
-    if not coordinateConvention:
-        coordinateConvention = convention
+    nTdebug("In %s found convention %s" % ( getCallerName(), convention))
     sources   = NTlist()
     sourceDir = project.mkdir( project.directories.sources, 'Cyana' )
 
+    if useAllInDirectory:
+        nTdebug("Reseting all keywords in cyana2cing and determining the input from filename extensions.")
+        kwds = {}
+    # end if
     kwds.setdefault('seqFile',  None)
     kwds.setdefault('protFile', None)
     kwds.setdefault('stereoFile', None)
     kwds.setdefault('pdbFile',  None)
-    kwds.setdefault('nmodels',  None)
-
-    # peakFiles, uplFiles, acoFiles arguments can be a list of comma-separated string
+#    kwds.setdefault('nmodels',  None) now a named parameter
+    # Can be a list of comma-separated string
     for f in ['peakFiles','uplFiles','acoFiles']:
         kwds.setdefault(f,  [])
         if isinstance( kwds[f], str ):
             kwds[f] = kwds[f].split(',')
 #    nTdebug( '>>'+ repr(kwds) )
-
+        #end if
+    #end for    
+    mapExtension2KwdTuple = { # Nice to have an overview of the different types here.
+        'pdb':   (0, 'pdbFile'),
+        'seq':   (0, 'seqFile'),
+        'prot':  (0, 'protFile'),
+        'stereo':(0, 'stereoFile'),        
+        'peaks': (1, 'peakFiles'),
+        'upl':   (1, 'uplFiles'),
+        'aco':   (1, 'acoFiles'),                        
+    }
+    if useAllInDirectory:
+#        nTdebug("Determining the input from filename extensions.")
+        for extension in mapExtension2KwdTuple.keys():
+            pluralityIdx, keyWord = mapExtension2KwdTuple[extension]        
+#            nTdebug("Match found for keyword %s and extension %s." % (keyWord, extension))
+            globPattern = cyanaDirectory + '/*.' + extension
+            fileList = glob(globPattern)
+            if not fileList:
+#                nTdebug("No match found for %s." % globPattern)
+                continue
+            # end if
+            fileListLength = len(fileList)
+            if pluralityIdx == 0:
+                if fileListLength == 1:
+                    pass
+#                    nTdebug("From %s will read file: %s" % (globPattern, fileList))
+                else:
+                    nTwarning("From %s will read ONLY FIRST file: %s" % (globPattern, fileList[0]))
+                # end if
+                fn = fileList[0]
+                fnBaseName = os.path.basename(fn).split('.')[0]
+#                nTdebug("Appending singular %s to keyWord: %s" % (fnBaseName, keyWord))
+                kwds[keyWord] = fnBaseName
+                continue
+            # end if
+            kwds[keyWord] = []        
+            for fn in fileList:
+                fnBaseName = os.path.basename(fn).split('.')[0]
+#                nTdebug("Appending potentially plural %s to keyWord: %s" % (fnBaseName, keyWord))
+                kwds[keyWord].append(fnBaseName)
+            # end for        
+        # end for
+    # end if
+        
+    nTdebug("In %s found convention %s" % ( getCallerName(), convention))
+    if not convention:
+        convention = CYANA2
+        if autoDetectFormat:
+            if not kwds['pdbFile']:
+                nTdebug("Convention %s will be assumed as no PDB file was given." % CYANA2)
+            else:
+                pdbFile = os.path.join( cyanaDirectory, kwds['pdbFile'] + '.pdb')
+                convention = autoDetectCyanaConvention(pdbFile)
+                if convention:
+                    NTmessage("Detected convention: %s" % convention)
+                else:
+                    NTwarning("No CYANA like convention detected")
+            # end if
+        # end if
+    # end if
+    if not coordinateConvention:
+        coordinateConvention = convention
+    # end if
+    
     # look for pdb, initiate new Molecule instance.
     # This goes first so that peaks, upls and acos refer to this molecule
-    if (kwds['pdbFile'] != None):
+    if kwds['pdbFile']:
         pdbFile = os.path.join( cyanaDirectory, kwds['pdbFile'] + '.pdb')
-        mol = project.initPDB( pdbFile, coordinateConvention, nmodels=kwds['nmodels'], update=update )
+        mol = project.initPDB( pdbFile, coordinateConvention, nmodels=nmodels, update=update )
         if not mol:
             nTerror('Project.cyana2cing: parsing PDB-file "%s" failed', pdbFile)
             return None
         #end if
         nTmessage('Parsed PDB file "%s", molecule %s', pdbFile, mol)
         sources.append( pdbFile )
-
-    if (kwds['seqFile'] != None and kwds['protFile'] != None):
+    #end if
+    if kwds['seqFile'] and kwds['protFile']:
         seqFile  = os.path.join( cyanaDirectory, kwds['seqFile']  +'.seq')
         protFile = os.path.join( cyanaDirectory, kwds['protFile'] +'.prot')
         if project.importXeasy( seqFile, protFile, convention ) != None:
             sources.append( seqFile, protFile )
-
-    if (kwds['stereoFile'] != None):
-        stereoFile = os.path.join( cyanaDirectory, kwds['stereoFile']  +'.cya')
+        #end if
+    #end if
+    if kwds['stereoFile']:
+        # renamed to .stereo to fit normal extension as coming in to iCing.
+        # JFD realizing that this may limit the more extensive features already in the importer now.
+        stereoFile = os.path.join( cyanaDirectory, kwds['stereoFile']  +'.stereo')
         if project.importCyanaStereoFile( stereoFile, convention ):
             sources.append( stereoFile )
-
-
+        # end if
+    # end if
     for f in kwds['peakFiles']:
         if (kwds['seqFile'] != None and kwds['protFile'] != None):
             seqFile  = os.path.join( cyanaDirectory, kwds['seqFile']  + '.seq')
             protFile = os.path.join( cyanaDirectory, kwds['protFile'] + '.prot')
             pkFile   = os.path.join( cyanaDirectory, f + '.peaks')
-            if project.importXeasyPeaks( seqFile,protFile,pkFile,convention ):
+            if project.importXeasyPeaks( seqFile, protFile, pkFile, convention ):
                 sources.append( seqFile, protFile, pkFile )
-
+        # end if
+    # end for
     for f in kwds['uplFiles']:
         uplFile = os.path.join( cyanaDirectory, f + '.upl')
         if project.importUpl( uplFile, convention ):
@@ -491,7 +602,7 @@ def cyana2cing( project, cyanaDirectory, convention=CYANA2, copy2sources=True, u
         #end if
     #end for
 
-#    nTdebug( str(sources) )
+    nTmessage( 'Added to source directory %s: sources %s' % (sourceDir, str(sources) ))
     sources.removeDuplicates()
     if copy2sources:
         for f in sources:
@@ -499,8 +610,7 @@ def cyana2cing( project, cyanaDirectory, convention=CYANA2, copy2sources=True, u
             shutil.copy( f, sourceDir )
         #end for
     #end if
-
-    nTmessage( 'cyana2cing: %s', project.format())
+    nTmessage( 'cyana2cing:\n%s', project.format())
     return sources
 #end def
 
@@ -517,9 +627,84 @@ def cyana2cing( project, cyanaDirectory, convention=CYANA2, copy2sources=True, u
 #    #end if
 ##end def
 
+def initCyana(project, cyanaFolder, modelCount = None, convention=None, coordinateConvention=None, autoDetectFormat=True):
+    """
+    Return True on success or None on failure
+    cyanaFolder can be a directory or a .tgz.
+    """
+    nTdebug("In %s found convention %s" % ( getCallerName(), convention))
+    if not cyanaFolder:
+        nTerror("cyanaFolder not specified")
+        return None
+    # end if
+    if not os.path.exists( cyanaFolder ):
+        nTerror('initCyana: cyanaFolder "%s" does not exist', cyanaFolder)
+        return None
+    # end if    
+    if os.path.isfile(cyanaFolder) and ( cyanaFolder.endswith(".tgz") or cyanaFolder.endswith(".tar.gz")):
+        try: # If present the target will be removed so it doesn't need to be overwritten.
+            rmtree(project.name)
+            nTmessage("Removed directory: %s" % project.name)
+        except:
+            pass
+        # Get a TarFile class.
+        cyanaRootDirectory = None
+        tar = tarfile.open(cyanaFolder, "r:gz")
+        tarFileNames = []
+        for itar in tar:
+#            nTdebug("working on: " + itar.name)
+            if os.path.exists(itar.name):
+                nTerror("Will not untar %s by overwriting current copy" % itar.name)
+                return None
+            if itar.name.count('._'):
+#                nTdebug("Skipping special hidden file: " + itar.name)
+                continue
+            tar.extract(itar.name, '.') # itar is a TarInfo object
+            if not cyanaRootDirectory: # pick only the first one.
+                tarFileNames.append(itar.name)
+                if isRootDirectory(itar.name):
+                    cyanaRootDirectory = itar.name.replace("/", '')
+                    if not cyanaRootDirectory:
+                        nTerror("Skipping potential cyanaRootDirectory")
+                    # end if            
+                # end if            
+            # end if            
+        # end for
+        tar.close()        
+        if not cyanaRootDirectory:
+            # in python 2.6 tarfile class doesn't append '/' in root dir anymore
+            # sorting by length and taking the shortest, likely the root dir.
+            tarFileNames.sort()
+            cyanaRootDirectory = tarFileNames[0]
+            if not os.path.isdir(cyanaRootDirectory):
+                nTerror("No cyanaRootDirectory found in gzipped tar file: %s" % cyanaFolder)
+                nTerror("First listed directory after sorting: %s" % cyanaRootDirectory)
+                return None
+            # end if
+        # end if                
+        if cyanaRootDirectory != project.name:
+            nTmessage("Moving Cyana directory from [%s] to [%s]" % (cyanaRootDirectory, project.name))
+            move(cyanaRootDirectory, project.name)
+        # end if
+        cyanaFolder = project.name # Now it is a folder.
+    # end if
+    if not os.path.exists(cyanaFolder):
+        nTerror("cyanaFolder '%s' not found", cyanaFolder)
+        return None
+    # end if
+    if not os.path.isdir(cyanaFolder):
+        nTerror("cyanaFolder '%s' not not a directory", cyanaFolder)
+        return None
+    # end if
+    sourceList = cyana2cing( project, cyanaFolder, 
+                             convention=convention, coordinateConvention=coordinateConvention, 
+                             useAllInDirectory=True, autoDetectFormat=autoDetectFormat)    
+    return sourceList
+# end def
 #-----------------------------------------------------------------------------
 # register the functions
-methods  = [(importUpl, None),
+methods  = [(initCyana, None),
+            (importUpl, None),
             (importAco, None),
             (cyana2cing, None),
             (importCyanaStereoFile, None)

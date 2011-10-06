@@ -7,6 +7,10 @@
 
 
 * With macports:
+
+    NEW &&&&&&&&&&&&&&&&&&&&
+    sudo port load tomcat6    
+    NEW &&&&&&&&&&&&&&&&&&&&
     -Using Tomcat/6.0.29_0
     # runs under as root (TODO: run under tomcat user as this poses a security risk)
     export CATALINA_HOME=/opt/local/share/java/tomcat6
