@@ -202,7 +202,7 @@ public class iCing implements EntryPoint, HistoryListener {
         final HTML html = new HTML("<div id=\"footer\">" + GenClient.eol + "<p align=\"center\">" + GenClient.eol
                 + cingRevisionhtml + "\t" + GenClient.eol 
                 + "Geerten W. Vuister          <a href=\"mailto:g.vuister@science.ru.nl\">" + imgHtml + "</a>, \t" + GenClient.eol                 
-                + "Alan Wilter Sousa da Silva  <a href=\"mailto:alanwilter@gmail.com\">"    + imgHtml + "</a>, \t" + c.and()  
+                + "Alan Wilter Sousa da Silva  <a href=\"mailto:alanwilter@gmail.com\">"    + imgHtml + "</a>, \t" + c.and() + "\t "  
                 + "Jurgen F. Doreleijers       <a href=\"mailto:jurgend@cmbi.ru.nl\">"      + imgHtml + "</a>"
                 + "</p>" + GenClient.eol + "</div>"
                 + GenClient.eol);

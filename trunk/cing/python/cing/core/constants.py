@@ -341,9 +341,11 @@ PROTEIN_STR = 'protein'
 DNA_STR = 'DNA'
 RNA_STR = 'RNA'
 WATER_STR = 'water'
+HOH_STR = 'HOH'
 OTHER_STR = 'other'
 
 molTypeList = [ PROTEIN_STR, DNA_STR, RNA_STR, WATER_STR, OTHER_STR ]
 mapMoltypeToInt = {PROTEIN_STR: 0, DNA_STR : 1, RNA_STR : 2, WATER_STR : 3, OTHER_STR: 4}
 
+WATER_ATOM_COUNT = 4 # Including QH.
 VAL_SETS_CFG_DEFAULT_FILENAME = 'valSets.cfg'

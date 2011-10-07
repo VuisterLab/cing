@@ -982,13 +982,13 @@ def validateSaltbridge( residue1, residue2 ):
     #end if
 
     if residue1.db.shortName not in ['E','D','H','K','R']:
-        nTerror('validateSaltbridge: invalid residue %s, should be E,D,H,K, or R', residue1)
+        nTwarning('validateSaltbridge: invalid residue %s, should be E,D,H,K, or R', residue1)
         return None
     #end if
 
 
     if residue2.db.shortName not in ['E','D','H','K','R']:
-        nTerror('validateSaltbridge: invalid residue %s, should be E,D,H,K, or R', residue2)
+        nTwarning('validateSaltbridge: invalid residue %s, should be E,D,H,K, or R', residue2)
         return None
     #end if
 

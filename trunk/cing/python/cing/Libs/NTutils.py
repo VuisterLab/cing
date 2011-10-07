@@ -4507,7 +4507,7 @@ def appendDeepByKeys(c, value, *keyList):
             return
         myList.append(value) # No extra checks done here for speed purposes.
         return
-    # endif on lk==1, above section was misalligned before.
+    # end if on lk==1, above section was misalligned before.
 
     if c.has_key(key):
         deeper = c[key]
