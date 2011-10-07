@@ -41,7 +41,8 @@ from sqlalchemy.sql.expression import select
 
 db_name = PDBJ_DB_NAME
 user_name = PDBJ_DB_USER_NAME
-
+maxNumberOfRdbConnectionTries = 5
+rdbConnectionRetryDelaySeconds = 60
 def doStoreCING2db( entry_code, archive_id, project = None):
     """Cwd should be where the project is located.
     Returns True on error.
@@ -90,26 +91,8 @@ def doStoreCING2db( entry_code, archive_id, project = None):
     nTdebug("schema:               %s" % schema)
     nTdebug("doReadProject:        %s" % doReadProject)
 
-
-#    csql = CsqlAlchemy(user=archive_user, db=archive_db, echo=False)
-#    echo = 'debug'
-    echo = False # Default no echo. Can be True or 'debug'.
-    csql = CsqlAlchemy(user=user_name, db=db_name,schema=schema, echo=echo)
-
-    if csql.connect():
-        nTerror("Failed to connect to DB")
-        return True
-    csql.autoload()
-
-    execute = csql.conn.execute
-    centry = csql.cingentry
-    cchain = csql.cingchain
-    cresidue = csql.cingresidue
-    catom = csql.cingatom
-    cresonancelist = csql.cingresonancelist
-    cresonancelistperatomclass = csql.cingresonancelistperatomclass
-    cdrlist = csql.drlist
-    cdr = csql.dr
+    # Read project before opening the database connection in order to save access time to RDB.
+    # Storing is on same order of time as reading.
     if doReadProject:
         # presume the directory still needs to be created.
         cingEntryDir = entry_code + ".cing"
@@ -124,6 +107,26 @@ def doStoreCING2db( entry_code, archive_id, project = None):
             return True
         # end if.
     # end if project
+
+
+#    echo = 'debug'
+    echo = False # Default no echo. Can be True or 'debug'    
+    csql = CsqlAlchemy(user=user_name, db=db_name,schema=schema, echo=echo)
+    if csql.connect(maxTries=5, retryInitialDelaySeconds = 60., retryDelayFactor = 4. ):
+        nTerror("Failed to connect to DB.")
+        return True
+    # end if    
+    csql.autoload()
+
+    execute = csql.conn.execute
+    centry = csql.cingentry
+    cchain = csql.cingchain
+    cresidue = csql.cingresidue
+    catom = csql.cingatom
+    cresonancelist = csql.cingresonancelist
+    cresonancelistperatomclass = csql.cingresonancelistperatomclass
+    cdrlist = csql.drlist
+    cdr = csql.dr
 
     # shortcuts
     p = project
@@ -526,7 +529,7 @@ def doStoreCING2db( entry_code, archive_id, project = None):
                 continue
 #            if residue.resName == 'HOH':
 #                waterResidueCount += 1
-#                NTcodeerror("Water residue %s almost slipped into RDB because it doesn't have the water property set. Skipping now." % residue)
+#                NTcodeerror("Water residue %s almost slipped into RDB because it doesn't have the water property set. Skipping." % residue)
 #                continue
                         
 #            nTmessage("Residue: %s" % residue)
@@ -846,7 +849,7 @@ def doStoreCING2db( entry_code, archive_id, project = None):
         # end for residue
     # end for chain    
     nTmessage("Committed %d chains %d residues %d atoms" % (chainCommittedCount,residueCommittedCount,atomCommittedCount))
-    nTdebug("Memorized %d chains %d residues %d atoms" % (len(chainIdHash.keys()),len(residueIdHash.keys()),len(atomIdHash.keys())))
+#    nTdebug("Memorized %d chains %d residues %d atoms" % (len(chainIdHash.keys()),len(residueIdHash.keys()),len(atomIdHash.keys())))
     if chainCommittedCount != molecule.chainCount:
         msg = "chainCommittedCount %s != molecule.chainCount %s" % (chainCommittedCount, molecule.chainCount)
         nTerror(msg)

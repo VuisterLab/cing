@@ -7,6 +7,10 @@ Fails if MySql backends are absent.
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.NRG import CASD_DB_NAME
 from cing.NRG import CASD_DB_USER_NAME
+from cing.NRG import DEV_NRG_DB_SCHEMA
+from cing.NRG import DEV_NRG_DB_USER_NAME
+from cing.NRG import NRG_DB_SCHEMA
+from cing.NRG import NRG_DB_USER_NAME
 from cing.NRG import PDBJ_DB_NAME
 from cing.PluginCode.sqlAlchemy import CsqlAlchemy
 from sqlalchemy.ext.declarative import declarative_base
@@ -18,8 +22,6 @@ from sqlalchemy.sql.expression import select
 from sqlalchemy.types import Integer, String
 from unittest import TestCase
 import unittest
-from cing.NRG import DEV_NRG_DB_USER_NAME
-from cing.NRG import DEV_NRG_DB_SCHEMA
 
 Base = declarative_base()
 
@@ -111,18 +113,21 @@ class AllChecks(TestCase):
         'Watch out with this method, it kills.'
         if True: # default: True
             db_name = PDBJ_DB_NAME
-            user_name = DEV_NRG_DB_USER_NAME
-            schema = DEV_NRG_DB_SCHEMA
+            user_name = NRG_DB_USER_NAME
+            schema = NRG_DB_SCHEMA
         else:
             db_name = CASD_DB_NAME
             user_name = CASD_DB_USER_NAME
 
         csql = CsqlAlchemy(user=user_name, db=db_name,schema=schema)
-        try:
-            self.assertFalse(csql.connect())
-        except:
-            # In case the db is not available this is perfectly fine.
+        self.assertFalse(csql.connect())
+        if not csql.conn:
+            nTerror("Failed to connect in %s" % getCallerFileName())
             return
+        nTmessage("Connected to RDB now.")
+        if True:
+            return # Just be sure to not continue here. 
+    
 #        users_table = Table('users', csql.metadata,
 #            Column('id', Integer, primary_key = True),
 #            Column('name', String(50)),
