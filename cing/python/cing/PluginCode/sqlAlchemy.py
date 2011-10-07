@@ -83,8 +83,12 @@ class CgenericSql(NTdict): # pylint: disable=R0902
             gc.collect()
     # end def
 
-    def connect(self):
-        "Return True on error"
+    def connect(self, maxTries = 2, retryInitialDelaySeconds = 5., retryDelayFactor = 1.2):
+        """
+        Return True on error
+        
+        Retry given number of times with given delay scheme for when RDB has not enough connections.
+        """
 #        create_engine('oracle://PDBe:password@cmbiora/PDBE') for oracle driver call.
         # driver://username:password@host:port/database
 #        connectionString = '%s://%s/%s?user=%s&unix_socket=%s&passwd=%s' % (
@@ -97,18 +101,29 @@ class CgenericSql(NTdict): # pylint: disable=R0902
         )
 #        nTdebug("Using connectionString %s" % connectionString)
         self.engine = create_engine(connectionString, echo=self.echo)
-        if True:
-            self.conn = self.engine.connect()
-        else:
+        
+        ntries = 0
+        while ntries < maxTries:
+            ntries += 1
+            nTdebug("Trying to connect to DB")
             try:
                 self.conn = self.engine.connect()
+                if self.conn:
+                    break
+                # end if
             except:
-                if cing.verbosity >= verbosityWarning:
-                    nTexception("Failed to connect to engine")
-                return True
+                nTtracebackError()
+                nTerror("Failed to connect to DB for try %s" % ntries)                
+            # end try
+            nTdebug("Now sleeping %s seconds.")
+            time.sleep(retryInitialDelaySeconds)
+            retryInitialDelaySeconds *= retryDelayFactor
+        # end while
+
         if not self.conn:
-            nTerror("DB connection failed")
+            NTcodeerror("Failed to connect to DB")
             return True
+        # end if
 
         self.metadata.bind = self.engine
         self.sessionUpperCase = sessionmaker(bind=self.engine)

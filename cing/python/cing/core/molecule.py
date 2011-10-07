@@ -3831,7 +3831,7 @@ Chain class: defines chain properties and methods
             # end if
         # end for        
         resCount = len(self.allResidues())
-        nTdebug("For %s found resCount %s and molTypeResidueCountList %s" % (self, resCount, str(molTypeResidueCountList)))
+#        nTdebug("For %s found resCount %s and molTypeResidueCountList %s" % (self, resCount, str(molTypeResidueCountList)))
         for molTypeIdx, _molType in enumerate(molTypeList):
             if molTypeResidueCountList[molTypeIdx] == resCount:
                 return molTypeIdx
@@ -5554,11 +5554,11 @@ coordinates: %s"""  , dots, self, dots
         """
         lenSelf = len( self.coordinates)
         if lenSelf == 0:
-            nTdebug("No coordinates for self %s" % self)
+            nTdebug("In Atom.distance: No coordinates for self %s" % self)
             return None
         #end if
         if lenSelf != len( other.coordinates ):
-            nTdebug("No coordinates for other %s" % other)
+            nTdebug("In Atom.distance: No coordinates for other %s" % other)
             return None
         #end if
         self.distances = NTlist()

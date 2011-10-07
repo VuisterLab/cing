@@ -398,13 +398,10 @@ class NrgCing(Lister):
         self.writeWhyNot = True     # DEFAULT: True.
         self.updateIndices = True   # DEFAULT: True.
         #: If and only if new_hits_entry_list is empty and getTodoList is False; no entries will be attempted.
-        self.getTodoList = True     # DEFAULT: True. 
-
+        self.getTodoList = True     # DEFAULT: True.
         # The variable below is local and can be used to update a specific batch.
         new_hits_entry_list = [] # DEFAULT: [].define empty for checking new ones.
-#        new_hits_entry_list = ['1brv']
-    #    new_hits_entry_list         = string.split("2jqv 2jnb 2jnv 2jvo 2jvr 2jy7 2jy8 2oq9 2osq 2osr 2otr 2rn9 2rnb")
-
+#        new_hits_entry_list = string.split("")
         if 0: # DEFAULT False; use for processing a specific batch.
             entryListFileName = os.path.join(self.results_dir, 'entry_list_nmr_random_1-500.csv')
             new_hits_entry_list = readLinesFromFile(entryListFileName)
@@ -661,7 +658,7 @@ class NrgCing(Lister):
             # end if                    
             timeTaken, entryCrashed, nr_error, nr_warning, nr_message, nr_debug = analysisResultTuple
             if entryCrashed:
-                nTmessage("Detected a crash: %s" % entry_code, logLastFile)
+                nTmessage("Detected a crash: %s in %s" % (entry_code, logLastFile))
                 self.entry_list_prep_crashed.append(entry_code)
                 continue # don't mark it as stopped anymore.
             # end if
@@ -2382,4 +2379,4 @@ def runNrgCing( useClass = NrgCing,
 
 
 if __name__ == '__main__':
-    runNrgCing( max_entries_todo = 400 ) # DEFAULT: 40
+    runNrgCing( max_entries_todo = 40 ) # DEFAULT: 40
