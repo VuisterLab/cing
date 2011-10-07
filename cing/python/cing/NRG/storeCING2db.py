@@ -499,12 +499,13 @@ def doStoreCING2db( entry_code, archive_id, project = None):
     for chain in project.molecule.allChains():
         nameC = chain.name
         chothia_class = chain.chothiaClassInt()
+        cIdxMolType = chain.getIdxMolType()
         rogC = chain.rogScore.rogInt()
         result = execute(cchain.insert().values(
             entry_id=entry_id,
             name=nameC,
             chothia_class=chothia_class,
-            mol_type_idx = chain.getIdxMolType(),
+            mol_type_idx = cIdxMolType,
             rog=rogC,
             )
         )
@@ -513,14 +514,20 @@ def doStoreCING2db( entry_code, archive_id, project = None):
         nTdebug("Inserted chain id %s" % chain_id)
         chainIdHash[ chain ] = chain_id        
         chainCommittedCount += 1
+        if cIdxMolType == mapMoltypeToInt[WATER_STR]:
+            nTdebug("Not storing water residues for this water chain id %s" % chain_id)
+            waterResidueCount += len( chain.allResidues())
+            continue
+        # end if
         for residue in chain.allResidues():
-            if residue.hasProperties('water'):
+            if residue.hasProperties('HOH'): # In entry 1l0r the water had HOH but not water set.
+                nTwarning("Water residue %s almost slipped into RDB because it was in a non water chain. Skipping now." % residue)
                 waterResidueCount += 1
                 continue
-            if residue.resName == 'HOH':
-                waterResidueCount += 1
-                nTerror("Water residue %s almost slipped into RDB because it doesn't have the water property set. Skipping now." % residue)
-                continue
+#            if residue.resName == 'HOH':
+#                waterResidueCount += 1
+#                NTcodeerror("Water residue %s almost slipped into RDB because it doesn't have the water property set. Skipping now." % residue)
+#                continue
                         
 #            nTmessage("Residue: %s" % residue)
             # CING
@@ -849,10 +856,10 @@ def doStoreCING2db( entry_code, archive_id, project = None):
             residueCommittedCount, waterResidueCount, molecule.residueCount)
         nTerror(msg)
     # end if
-    if (atomCommittedCount + waterResidueCount*3) != molecule.atomCount:
+    if (atomCommittedCount + waterResidueCount*WATER_ATOM_COUNT) != molecule.atomCount:
         msg = "atomCommittedCount %s + waterResidueCount (%s) *3 (=%s) != molecule.atomCount %s" % (
-            atomCommittedCount,      waterResidueCount, 
-            atomCommittedCount + 3 * waterResidueCount,
+            atomCommittedCount,                     waterResidueCount, 
+            atomCommittedCount + WATER_ATOM_COUNT * waterResidueCount,
             molecule.atomCount)
         nTerror(msg)
     # end if

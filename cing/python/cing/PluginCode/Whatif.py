@@ -447,7 +447,7 @@ end y
                 qualList.append( '('+q+')' )
             else:
                 qualList.append( '' )
-       # end for
+        # end for
         fmt = "%7.3f"
         spaceCount = 7
         rangesStr = ', ranges "all"' # None is not nice to print.
@@ -725,7 +725,7 @@ RMS Z-scores, should be close to 1.0:
                         continue
                     entity = self.molecule.decodeNameTuple( nameTuple ) # can be a chain, residue or atom level object
                     if not entity:
-                        nTdebug('Whatif._processCheckdb: mapping entity "%s" descriptor, tuple %s', curLocId, nameTuple)
+#                        nTdebug('Whatif._processCheckdb: mapping entity "%s" descriptor, tuple %s', curLocId, nameTuple)
                         continue
                     #nTdebug("adding to entity: " + repr(entity))
                     entityWhatifDic = entity.setdefault(WHATIF_STR, NTdict())
@@ -1027,7 +1027,8 @@ def runWhatif( project, ranges=None, parseOnly=False ):
         for res in residueList:
             if not (res.hasProperties('protein') or res.hasProperties('nucleic')):
                 if not res.hasProperties('HOH'): # don't report waters
-                    nTmessage('runWhatif: non-standard residue %s found and will be written out for What If' % repr(res))
+                    nTdebug('runWhatif: non-standard residue %s found and will be written out for What If' % repr(res))
+                # end if
                 whatifStatus.nonStandardResidues.append(repr(res))
         #end for
 

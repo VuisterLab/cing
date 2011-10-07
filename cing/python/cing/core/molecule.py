@@ -2880,8 +2880,8 @@ Return an Molecule instance or None on error
                 rangeListNew.append(rangeStr)
             # end for
             if not rangeListNew:
-                nTwarning("No residues left in rangesByCv for ranges: [%s] in rangesByCv after sub selecting for excludeFragmentSize. "+
-                          "Returning all residues." % ranges)
+                nTwarning(("No residues left in rangesByCv for ranges: [%s] in rangesByCv after sub selecting for excludeFragmentSize. "+
+                          "Returning all residues.") % ranges)
                 return ALL_RANGES_STR
             ranges = ','.join(rangeListNew)
             if debugRoutine:
@@ -3823,12 +3823,12 @@ Chain class: defines chain properties and methods
                 molTypeResidueCountList[mapMoltypeToInt[DNA_STR]] += 1
             elif residue.hasProperties(RNA_STR):
                 molTypeResidueCountList[mapMoltypeToInt[RNA_STR]] += 1
-            elif residue.hasProperties(WATER_STR):
+            elif residue.hasProperties(HOH_STR):                          # NB the difference betweeen HOH_STR and WATER_STR
                 molTypeResidueCountList[mapMoltypeToInt[WATER_STR]] += 1
             else:
                 nTwarning("Found uncommon mol type for %s" % residue)
                 molTypeResidueCountList[mapMoltypeToInt[OTHER_STR]] += 1
-            # endif
+            # end if
         # end for        
         resCount = len(self.allResidues())
         nTdebug("For %s found resCount %s and molTypeResidueCountList %s" % (self, resCount, str(molTypeResidueCountList)))
@@ -3864,16 +3864,32 @@ Chain class: defines chain properties and methods
             return 0.0
               
         sumDd = 0.0
+        a0PairCountMinus = 0
         for i in range( a0PairCount ):
             atomA0 = a0List[i]
             atomA1 = a1List[a0Size-i-1]
             atomB0 = a0List[a0Size-i-1]
             atomB1 = a1List[i]
-            dA = atomA0.distance( atomA1, modelIdx = modelIdx )[0] # (av,sd,minv,maxv)
-            dB = atomB0.distance( atomB1, modelIdx = modelIdx )[0]
+            distA = atomA0.distance( atomA1, modelIdx = modelIdx ) # (av,sd,minv,maxv)
+            distB = atomB0.distance( atomB1, modelIdx = modelIdx )
+            if distA == None or distB == None:
+                a0PairCountMinus += 1
+                if distA == None:
+                    nTerror("Failed to find distance between %s and %s for model %s" % (atomA0, atomA1, modelIdx))
+                # end if
+                if distB == None:
+                    nTerror("Failed to find distance between %s and %s for model %s" % (atomB0, atomB1, modelIdx))
+                # end if
+            # end if
+            dA = distA[0]
+            dB = distB[0]
             sumDd += math.fabs(dA-dB)
 #            nTdebug("pair %3d %s %s %s %s %.2f %.2f sumDd: %.2f" % (i, atomA0, atomA1, atomB0, atomB1, dA, dB, sumDd))
         # end for
+        a0PairCountReal = a0PairCount - a0PairCountMinus
+        if a0PairCountReal == 0:
+            nTerror("Failed to find any distance in %s" % getCallerName())
+            return None
         result =  sumDd / a0PairCount
         return result
         
@@ -4804,8 +4820,12 @@ Residue class: Defines residue properties
             nTerror("Can not validateChemicalShiftLeu for non Leu: %s" % self)
             return True
         # Allready generalize for VAL application TODO:
-        atomC1 = self.CD1
-        atomC2 = self.CD2
+        atomC1 = getDeepByKeysOrAttributes( self, 'CD1')
+        atomC2 = getDeepByKeysOrAttributes( self, 'CD2')
+        if not ( atomC1 and atomC2 ): # See e.g. entry 1msh
+            nTwarning("Failed %s because one or both atoms CD1/2 are missing. All atoms: %s" % (getCallerName(), str(self.allAtoms())))
+            return True
+        # end if
         c1Shift = atomC1.shift()
         c2Shift = atomC2.shift()
         chi = getDeepByKeysOrAttributes( self, CHI2_STR )
@@ -5534,9 +5554,11 @@ coordinates: %s"""  , dots, self, dots
         """
         lenSelf = len( self.coordinates)
         if lenSelf == 0:
+            nTdebug("No coordinates for self %s" % self)
             return None
         #end if
         if lenSelf != len( other.coordinates ):
+            nTdebug("No coordinates for other %s" % other)
             return None
         #end if
         self.distances = NTlist()
@@ -6266,7 +6288,7 @@ coordinates: %s"""  , dots, self, dots
 #                pdbAtmName = 'OT1'
 #            elif self.name == 'OXT':
 #                pdbAtmName = 'OT2'
-#            # endif
+#            # end if
 #        # end if
 
         pdbResName = self.residue.translate( convention )

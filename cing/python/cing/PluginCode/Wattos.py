@@ -420,7 +420,7 @@ def _runWattos(project, ranges=None, tmp = None, parseOnly=False):
             nTerror("Failed wattos checks with exit code: " + repr(wattosExitCode))
             return None
         wattosStatus.completed = True
-    # endif not parseOnly
+    # end if not parseOnly
 
     if not project.hasDistanceRestraints():
         return wattos
