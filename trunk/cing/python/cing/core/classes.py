@@ -2921,7 +2921,7 @@ class DistanceRestraint(Restraint):
 #                    nTdebug('    no pseudo for this atom %s' % atomItoMerge)
                     pseudoOfAtom = atomItoMerge.getPseudoOfPseudoAtom()
                     if not pseudoOfAtom:
-                        nTerror('    no pseudo of pseudoatom %s' % atomItoMerge) # happens in 1y0j for <Atom A.VAL205.CG1>
+                        nTwarning('    no pseudo of pseudoatom %s' % atomItoMerge) # happens in 1y0j for <Atom A.VAL205.CG1>
                         continue
                     # end if
                 # end if

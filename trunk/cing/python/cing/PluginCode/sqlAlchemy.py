@@ -65,8 +65,6 @@ class CgenericSql(NTdict): # pylint: disable=R0902
         self.echo = echo
         self.metadata = MetaData()
         self.tableNameList = []
-        
-        
     # end def
 
     def close(self, wait_time=1.0, force_gc = True):
@@ -81,6 +79,7 @@ class CgenericSql(NTdict): # pylint: disable=R0902
             time.sleep(wait_time)
         if force_gc:
             gc.collect()
+        # end if
     # end def
 
     def connect(self, maxTries = 2, retryInitialDelaySeconds = 5., retryDelayFactor = 1.2):

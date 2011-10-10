@@ -47,7 +47,9 @@ class Lister(Formatted): # pylint: disable=R0903
         keys.sort()
         for attr in keys:
             if attr[:2] == "__":
-                result = result + "\tname %s=<built-in>\n" % attr
+                if attr == '__FORMAT__':
+                    continue
+                result += "\tname %s=<built-in>\n" % attr
             else:
                 valueStr = '%s' % self.__dict__[attr]
                 if len(valueStr) > self.MAX_LINE_SIZE_VALUE:

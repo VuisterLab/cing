@@ -221,9 +221,9 @@ class ForkOff:
 
         ## Check if all finished correctly
         if self.processes_finished != self.processes_started:
-            str = "ERROR: Number of processes finished and started do not match"
-            str += repr(self.processes_finished) + " " + repr(self.processes_started)
-            raise str
+            strMsg = "ERROR: Number of processes finished and started do not match"
+            strMsg += repr(self.processes_finished) + " " + repr(self.processes_started)
+            raise strMsg
 
         if self.verbosity > 1:
             nTmessage("Finished %s out of the %s processes successfully" \
@@ -381,8 +381,8 @@ class Process:
         exit_status = 1
 
         if pid != 0:
-            str = "ERROR: code error in Fork, process_start, pid =" + str(os.getpid())
-            raise str
+            strMsg = "ERROR: code error in Fork, process_start, pid =" + str(os.getpid())
+            raise strMsg
         if self.verbosity > 2:
             nTmessage("Starting subprocess with pid: %s" % os.getpid())
 #        if self.verbosity > 8:

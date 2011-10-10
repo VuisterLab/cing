@@ -62,7 +62,7 @@ class TagTable (Lister):
         tagnames_ident_size     = loop_ident_size + 3
         show_stop_tag           = 1
 
-        str         = ''
+        strMsg         = ''
         count       = -1
         count_hash  = 100000 # Show progress hashes while composing text for each count_hash number of values approximately
 
@@ -75,19 +75,19 @@ class TagTable (Lister):
                     tagvalue = quotes_add( self.tagvalues[i][0] )
                 else:
                     tagvalue = self.tagvalues[i][0]
-                str = str + free_ident_size * ' ' + "%s %s" % ( tagname, tagvalue )
+                strMsg += free_ident_size * ' ' + "%s %s" % ( tagname, tagvalue )
                 if tagvalue[ -1 ] != '\n':
-                    str = str + '\n'
+                    strMsg += '\n'
                 i = i + 1
-            return str
+            return strMsg
 
         ## Loop tags here
-        str = str + loop_ident_size * ' ' + 'loop_\n'
+        strMsg += loop_ident_size * ' ' + 'loop_\n'
 
         for tagname in self.tagnames:
             ## Just format it such that it will take the least space
-            str = str + tagnames_ident_size * ' ' + '%s\n' % tagname
-        str = str + '\n'
+            strMsg += tagnames_ident_size * ' ' + '%s\n' % tagname
+        strMsg += '\n'
 
         col_count = len( self.tagnames )
         row_count = len( self.tagvalues[0] )
@@ -137,13 +137,13 @@ class TagTable (Lister):
         if show_stop_tag:
             str_row.append( '\n' + loop_ident_size * ' ' + 'stop_\n' )
 
-        str += '\n'.join(str_row)
-#        str += str_row.join( '\n')
+        strMsg += '\n'.join(str_row)
+#        strMsg += str_row.join( '\n')
 
         # Save some space
         del tagvalues_tr
 
-        return str
+        return strMsg
 
     def getStringListByColumnName(self, columnName):
         """Return a list of values or None for Error"""

@@ -183,7 +183,8 @@ def runAbunch():
 # OK (only 1 chain done) 1cjg 1hue 2jmx 1iv6 2kib
 
 # cp $CINGROOT/Tests/data/ccpn/$x.tgz .
-# scp    nmr:/Library/WebServer/Documents/NRG-CING/recoordSync/$x/$x.tgz .
+# scp    -r nmr:/Library/WebServer/Documents/NRG-CING/recoordSync/$x $D/NRG-CING/recoordSync
+
 # scp -r nmr:/Users/jd/wattosTestingPlatform/bmrb/ftp.bmrb.wisc.edu/pub/bmrb/entry_directories/bmr$y .
 
     _comboList =    '''

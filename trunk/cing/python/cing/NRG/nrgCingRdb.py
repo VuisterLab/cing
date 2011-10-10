@@ -113,6 +113,19 @@ class NrgCingRdb():
         # end if
     # end def
 
+    def close(self):
+        'Instead of waiting for gc or otherwise to close the connections.'
+        nTmessage("Closing RDB connections for %s" % self)
+        for c in [ self.jsql, self.csql]:
+            nTdebug("Closing %s" % c)
+            if not c:
+                nTdebug("Was not open to be closed %s" % c)
+                continue
+            # end if
+            c.close()
+        # end for
+    # end def                
+    
     def showCounts(self):
         m = self
         if True:

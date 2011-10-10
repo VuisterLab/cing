@@ -62,14 +62,14 @@ class File (Lister):
         "Returns the STAR text representation"
         if flavor == None:
             flavor = self.flavor
-        str = 'data_%s\n' % self.title
+        strMsg = 'data_%s\n' % self.title
         # Data node objects can be of type SaveFrame OR TagTable only
         # Data node object can now also contain comment information
         #      these comments are printed before the saveframe (Wim 2003/08/05)
         for datanode in self.datanodes:
-            str = str + datanode.comment
-            str = str + datanode.star_text(flavor = flavor)
-        return str
+            strMsg += datanode.comment
+            strMsg += datanode.star_text(flavor = flavor)
+        return strMsg
 
 
     def read (self, nmrView_type = 0):
