@@ -206,9 +206,9 @@ def doEntry( entryCode, chainCode ):
 #            idx += 1 # starts at 0 when inserted.
             lineItem = ( entryCode, chain.name, res.resName, res.resNum, secStruct, d1_value_str, d2_value_str, max_bfactor )
             lineList.append(lineItem)
-            str = "%s,%s,%-4s,%4d,%1s,%6s,%6s,%6.1f\n" % lineItem
-            nTmessageNoEOL(str)
-            strSum += str # expensive
+            strMsg = "%s,%s,%-4s,%4d,%1s,%6s,%6s,%6.1f\n" % lineItem
+            nTmessageNoEOL(strMsg)
+            strSum += strMsg # expensive
 
     if doSave:
         if not project.save():

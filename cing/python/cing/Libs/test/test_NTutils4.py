@@ -46,13 +46,13 @@ class AllChecks(TestCase):
 
     def testToPoundedComment(self):
         # Note the test for an empty line is included.
-        str = """a
+        strMsg = """a
 b
 """
         expectedOutput = """# a
 # b
 # """
-        self.assertEquals(expectedOutput, toPoundedComment(str))
+        self.assertEquals(expectedOutput, toPoundedComment(strMsg))
 
 
     def testNTlistRemoveDuplicates(self):

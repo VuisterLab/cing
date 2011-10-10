@@ -3870,19 +3870,20 @@ Chain class: defines chain properties and methods
             atomA1 = a1List[a0Size-i-1]
             atomB0 = a0List[a0Size-i-1]
             atomB1 = a1List[i]
-            distA = atomA0.distance( atomA1, modelIdx = modelIdx ) # (av,sd,minv,maxv)
-            distB = atomB0.distance( atomB1, modelIdx = modelIdx )
-            if distA == None or distB == None:
+            distTupleA = atomA0.distance( atomA1, modelIdx = modelIdx ) # (av,sd,minv,maxv)
+            distTupleB = atomB0.distance( atomB1, modelIdx = modelIdx )
+            if distTupleA == None or distTupleB == None:
                 a0PairCountMinus += 1
-                if distA == None:
+                if distTupleA == None:
                     nTerror("Failed to find distance between %s and %s for model %s" % (atomA0, atomA1, modelIdx))
                 # end if
-                if distB == None:
+                if distTupleB == None:
                     nTerror("Failed to find distance between %s and %s for model %s" % (atomB0, atomB1, modelIdx))
                 # end if
+                return None
             # end if
-            dA = distA[0]
-            dB = distB[0]
+            dA = distTupleA[0]
+            dB = distTupleB[0]
             sumDd += math.fabs(dA-dB)
 #            nTdebug("pair %3d %s %s %s %s %.2f %.2f sumDd: %.2f" % (i, atomA0, atomA1, atomB0, atomB1, dA, dB, sumDd))
         # end for
@@ -4823,7 +4824,7 @@ Residue class: Defines residue properties
         atomC1 = getDeepByKeysOrAttributes( self, 'CD1')
         atomC2 = getDeepByKeysOrAttributes( self, 'CD2')
         if not ( atomC1 and atomC2 ): # See e.g. entry 1msh
-            nTwarning("Failed %s because one or both atoms CD1/2 are missing. All atoms: %s" % (getCallerName(), str(self.allAtoms())))
+            nTwarning("Failed %s because one or both atoms CD1/2 are missing. All atoms: %s" % ( getCallerName(), str(self.allAtoms())))
             return True
         # end if
         c1Shift = atomC1.shift()
@@ -4855,7 +4856,7 @@ Residue class: Defines residue properties
 
 #        for i,color in enumerate( [ COLOR_RED, COLOR_ORANGE ]):
         for i,color in enumerate( [ COLOR_RED ]):
-            str = None
+            strMsg = None
             rangeListCd = cUTOFF_LOL_CSD_LEU_CD[i]
             # Determine CS indication
             csIndicatesAveraging = rangeListCd[0] < shiftDifference < rangeListCd[1]
@@ -4881,32 +4882,32 @@ Residue class: Defines residue properties
 #                   self, shiftDifference, csIndicatesAveraging, csIndicatesSingleConformer, cvIndicatesAveraging, 
 #                   dihForSingleConformer ))
             if dihForSingleConformer == DIHEDRAL_300_STR:
-                str = 'Conformer %s chi impossible regardless of csd value [%.3f]' % (dihForSingleConformer, shiftDifference)
+                strMsg = 'Conformer %s chi impossible regardless of csd value [%.3f]' % (dihForSingleConformer, shiftDifference)
                 # will be flagged by other software as well so eliminate here?
             else:
                 if cvIndicatesAveraging:
                     if csIndicatesAveraging:
                         pass
                     else:
-                        str = 'csd [%.3f]: single conformer but cv [%.3f]' % (shiftDifference, chi.cv)
+                        strMsg = 'csd [%.3f]: single conformer but cv [%.3f]' % (shiftDifference, chi.cv)
                     # end if
                 else:
                     if csIndicatesAveraging:
-                        str = 'csd [%.3f]: averaging but cv [%.3f]' % (shiftDifference, chi.cv)
+                        strMsg = 'csd [%.3f]: averaging but cv [%.3f]' % (shiftDifference, chi.cv)
                     else:
                         # cs and dihedral agree on single conformer. Now do they match?
                         if csIndicatesSingleConformer == dihForSingleConformer:
                             continue
-                        str = 'csd [%.3f]: %s but found %s' % (shiftDifference,csIndicatesSingleConformer,dihForSingleConformer)
+                        strMsg = 'csd [%.3f]: %s but found %s' % (shiftDifference,csIndicatesSingleConformer,dihForSingleConformer)
                     # end if
                 # end if
             # end if
-            if not str:
+            if not strMsg:
                 continue
-#            nTdebug("critque: %s %s" % ( color, str))
+#            nTdebug("critque: %s %s" % ( color, strMsg))
             resultList.append( atomC1 ) # Just do this once.
-#            atomC1.validateAssignment.append(str)
-            atomC1.rogScore.setMaxColor( color, comment = str )
+#            atomC1.validateAssignment.append(strMsg)
+            atomC1.rogScore.setMaxColor( color, comment = strMsg )
             if i == 0: # skip orange if red was already established
                 return
         # end for
@@ -4946,11 +4947,11 @@ Residue class: Defines residue properties
 
         shiftDifference = cbShift - cgShift
         if shiftDifference < 0.:
-            str = sprintf('For %s the difference of cb %8.3f minus cg  %8.3f: was not expected to be negative but is %8.3f.' % (
+            strMsg = sprintf('For %s the difference of cb %8.3f minus cg  %8.3f: was not expected to be negative but is %8.3f.' % (
                                     self, cbShift,cgShift,shiftDifference))
-            nTdebug(str)
+            nTdebug(strMsg)
             resultList.append( atomCb ) # Just do this once.
-            atomCb.validateAssignment.append(str)
+            atomCb.validateAssignment.append(strMsg)
             return
 
         omega = getDeepByKeysOrAttributes( self, OMEGA_STR)
@@ -4966,24 +4967,24 @@ Residue class: Defines residue properties
 
         color = COLOR_GREEN
         if shiftDifference < 4.8 and not isTrans:
-            str = "CS CB-CG %8.3f (<4.8) contradicted a trans state with great certainty." % shiftDifference
+            strMsg = "CS CB-CG %8.3f (<4.8) contradicted a trans state with great certainty." % shiftDifference
             color = COLOR_RED
         elif shiftDifference > 9.15 and isTrans:
-            str = "CS CB-CG %8.3f (>9.15) contradicted a cis state with great certainty."  % shiftDifference
+            strMsg = "CS CB-CG %8.3f (>9.15) contradicted a cis state with great certainty."  % shiftDifference
             color = COLOR_RED
         if shiftDifference < 6.0 and not isTrans:
-            str = "CS CB-CG %8.3f (<6.0) contradicted a trans state."  % shiftDifference
+            strMsg = "CS CB-CG %8.3f (<6.0) contradicted a trans state."  % shiftDifference
             color = COLOR_ORANGE
         elif shiftDifference > 7.95 and isTrans:
-            str = "CS CB-CG %8.3f (>7.95) contradicted a cis state."  % shiftDifference
+            strMsg = "CS CB-CG %8.3f (>7.95) contradicted a cis state."  % shiftDifference
             color = COLOR_ORANGE
 
         if color == COLOR_GREEN:
             return
 
         resultList.append( atomCb ) # Just do this for one atom of the residue..
-        atomCb.validateAssignment.append(str)
-        nTdebug("For %s found %s" % (self, str))
+        atomCb.validateAssignment.append(strMsg)
+        nTdebug("For %s found %s" % (self, strMsg))
         if color == COLOR_RED:
             atomCb.rogScore.setMaxColor( COLOR_RED, atomCb.validateAssignment )
         # end if

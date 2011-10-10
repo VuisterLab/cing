@@ -30,14 +30,14 @@ class SaveFrame (Lister):
                    flavor = 'NMR-STAR'
                    ):
         "Returns the STAR text representation"
-        str = "\n"
-        str = str + 'save_%s\n' % self.title
+        strMsg = "\n"
+        strMsg += 'save_%s\n' % self.title
 
         for tagtable in self.tagtables:
-            str = str + tagtable.star_text( flavor=flavor )
+            strMsg += tagtable.star_text( flavor=flavor )
 
-        str = str + '\nsave_\n'
-        return str
+        strMsg += '\nsave_\n'
+        return strMsg
 
     def check_integrity( self,  recursive = 1  ):
         "Simple checks on integrity"

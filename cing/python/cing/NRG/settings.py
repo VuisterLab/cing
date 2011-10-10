@@ -70,3 +70,9 @@ bmrbDir         = os.path.join(bmrbbase_dir,'rsync') # Switching to 3 later.
 #bmrbDir         = os.path.join(bmrbbase_dir,'2.1.1') # Switching to 3 later.
 #bmrbDir         = os.path.join(bmrbbase_dir,'3.0.8.34')
 matchBmrbPdbDir = os.path.join(bmrbbase_dir,'matchBmrbPdb') # Switching to 3 later.
+
+# Replace % b with BMRB id.
+#           s with PDB id.
+bmrb_link_template = 'http://www.bmrb.wisc.edu/cgi-bin/explore.cgi?bmrbId=%b'
+pdb_link_template  = 'http://www.rcsb.org/pdb/explore/explore.do?structureId=%s'
+
