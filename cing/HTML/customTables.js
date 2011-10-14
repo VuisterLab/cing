@@ -11,9 +11,9 @@ jQuery(document).ready(function() {
         // Set the data types just in case the automatic detection fails (because of '.' values eg). Important for sorting.
         // mandatory to list each column if using this parameter!
         "aoColumns": [
-                      { "sType": "html" }, 				        // image html
+//                      { "sType": "html" }, 				        // image html
                       { "sType": "html" }, 				        // pdb html
-                      { "sType": "numeric", "sClass": "right" },// bmrb 
+//                      { "sType": "numeric", "sClass": "right" },// bmrb 
                       { "sType": "numeric", "sClass": "right" },// rog 
                       { "sType": "numeric", "sClass": "right" },// distance_count 
                       { "sType": "numeric", "sClass": "right" },// cs_count 
@@ -32,11 +32,15 @@ jQuery(document).ready(function() {
 //        "sSwfPath": "",       
 //      "sSwfPath": "dataTableMedia/swf/ZeroClipboard.swf",       
 //        "sSwfPath": "dataTableMedia/swf/copy_cvs_xls_pdf.swf"},
-        "sAjaxSource": 'entry_list_summary.json'
+        "sAjaxSource": 'entry_list_summary.json',
+        "oLanguage": {
+            "sSearch": "Search (e.g. 9pcy):",
+    }
+        
     } );            
 //    Add a select menu for some TH element (rog and chothia_class) in the table footer 
     $("tfoot th").each( function ( i ) {
-        if (i != 3 && i != 6) {
+        if (i != 1 && i != 4) {
             return;
         }
         $('select', this).change( function () {

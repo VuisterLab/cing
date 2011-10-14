@@ -36,7 +36,7 @@ body {
     /*text-align: center; changed to make popup html code align left*/
     color: #000000;
     /** Scales back all font sizes in CING report to better match */
-    font: 88.0%% Verdana, Arial, Helvetica, sans-serif;
+    font: 88.0% Verdana, Arial, Helvetica, sans-serif;
 }
 
 p {
@@ -362,9 +362,8 @@ h3 {
      font-size: 0.8em;
 }
 
-/* Used for checkboxes like selecting only the critiqued records.
+/* Used for checkboxes like selecting only the critiqued records. */
 .mediumCheckbox {
    height: 1.73em;
    width: 1.73em;
 }
-
