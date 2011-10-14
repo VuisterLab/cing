@@ -275,8 +275,8 @@ def _criticizeResidue( residue, valSets ):
             if isinstance(actualValue, NTlist):
                 actualValue = actualValue.average()[0]
 
- #           nTdebug('%s key %s: actual %s, thresholdPoor %s, thresholdBad %s', residue, key,
- #                   actualValue, thresholdValuePoor, thresholdValueBad)
+#           nTdebug('%s key %s: actual %s, thresholdPoor %s, thresholdBad %s', residue, key,
+#                   actualValue, thresholdValuePoor, thresholdValueBad)
 
             actualValueStr = val2Str( actualValue, fmt='%8.3f', count=8 )
             if actualValue < thresholdValueBad: # assuming Z score

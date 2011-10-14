@@ -27,13 +27,60 @@ from cing.NRG import * #@UnusedWildImport
 #nTmessageT("Hello new teed message")
 #sys.exit(0)
 
+tmp_dir = '/Users/jd/tmpPdbj'
+psqlLogFile = 'psqlUpdate.latest.log'
+psqlTmpCsvFile = 'psqlCmd.csv'
+
+def getNumberOfEntries():
+    nTmessage("Getting overall number of entry count")
+
+    if os.path.exists(psqlTmpCsvFile):
+        nTdebug('Removing previous copy of %s' % psqlTmpCsvFile)
+        os.unlink(psqlTmpCsvFile)
+    # end if
+    # without semi-colon
+    sqlSelectCmd = "select count(*) from pdbj.brief_summary"
+    # without semi-colon
+    sqlCopyCmd = "COPY (%s) TO STDOUT WITH CSV HEADER" % sqlSelectCmd
+    command = "psql -h %s --command='%s' pdbmlplus pdbj" % ( PDBJ_DB_HOST, sqlCopyCmd)
+    nTdebug("command: [%s]" % command)
+    psqlProgram = ExecuteProgram(command, redirectOutputToFile=psqlTmpCsvFile)
+    exitCode = psqlProgram()
+    if exitCode:
+        nTerrorT("Failed to run psql program with command: [%s]" % command)
+        return True
+    # end if    
+    if not os.path.exists( psqlTmpCsvFile ):
+        nTerror('Csv file %s not found' % psqlTmpCsvFile)
+        return True
+    # end if
+    if not os.path.getsize(psqlTmpCsvFile):
+        nTerror('Csv file %s is empty' % psqlTmpCsvFile)
+        return True
+    # end if
+    relationNames = [ psqlTmpCsvFile ]
+    # Truncate the .csv extensions
+    relationNames = [ relationName[:-4] for relationName in relationNames]
+    dbms = DBMS()
+    if dbms.readCsvRelationList(relationNames):
+        nTerror("Failed to read relation: %s" % str(relationNames))
+        return True
+    # end if
+    entryCountTable = dbms.tables[relationNames[0]]
+#        nTdebug('\n'+str(entryCountTable))
+    entryCountColumnName = entryCountTable.columnOrder[0]
+    if entryCountColumnName != 'count':
+        nTerrorT("Failed to find count column name from DB")
+        return True
+    # end if
+    entryCountList = entryCountTable.getColumnByIdx(0)
+    entryCount = entryCountList[0]
+    nTmessage("Currently found %s number of entries in pdbmlplus" % entryCount)
+    return entryCount
+# end def
 
 def run():
     '''returns True on error'''
-
-    tmp_dir = '/Users/jd/tmpPdbj'
-    psqlLogFile = 'psqlUpdate.latest.log'
-    psqlTmpCsvFile = 'psqlCmd.csv'
 
     os.chdir(tmp_dir)
     logFile = '/Users/jd/Library/Logs/weeklyUpdatePdbjMine.log'
@@ -42,6 +89,10 @@ def run():
         sys.exit(1)
 
     nTmessageT("Starting $CINGROOT/python/cing/NRG/weeklyUpdatePdbjMine.py")
+
+    if True:
+        getNumberOfEntries()
+    # end if
 
     fn = 'pdbmlplus_weekly.latest.gz'
     if True:
@@ -77,46 +128,10 @@ def run():
             nTerrorT("Failed to run psql program with command: [%s]" % command)
             return True
     if True:
-        nTmessage("Getting overall number of entry count")
-
-        if os.path.exists(psqlTmpCsvFile):
-            nTdebug('Removing previous copy of %s' % psqlTmpCsvFile)
-            os.unlink(psqlTmpCsvFile)
-
-        # without semi-colon
-        sqlSelectCmd = "select count(*) from pdbj.brief_summary"
-        # without semi-colon
-        sqlCopyCmd = "COPY (%s) TO STDOUT WITH CSV HEADER" % sqlSelectCmd
-        command = "psql -h %s --command='%s' pdbmlplus pdbj" % ( PDBJ_DB_HOST, sqlCopyCmd)
-        nTdebug("command: [%s]" % command)
-        psqlProgram = ExecuteProgram(command, redirectOutputToFile=psqlTmpCsvFile)
-        exitCode = psqlProgram()
-        if exitCode:
-            nTerrorT("Failed to run psql program with command: [%s]" % command)
-            return True
-        if not os.path.exists( psqlTmpCsvFile ):
-            nTerror('Csv file %s not found' % psqlTmpCsvFile)
-            return True
-        if not os.path.getsize(psqlTmpCsvFile):
-            nTerror('Csv file %s is empty' % psqlTmpCsvFile)
-            return True
-        relationNames = [ psqlTmpCsvFile ]
-        # Truncate the .csv extensions
-        relationNames = [ relationName[:-4] for relationName in relationNames]
-        dbms = DBMS()
-        if dbms.readCsvRelationList(relationNames):
-            nTerror("Failed to read relation: %s" % str(relationNames))
-            return True
-        entryCountTable = dbms.tables[relationNames[0]]
-#        nTdebug('\n'+str(entryCountTable))
-        entryCountColumnName = entryCountTable.columnOrder[0]
-        if entryCountColumnName != 'count':
-            nTerrorT("Failed to find count column name from DB")
-            return True
-        entryCountList = entryCountTable.getColumnByIdx(0)
-        entryCount = entryCountList[0]
-        nTmessage("Currently found %s number of entries in pdbmlplus" % entryCount)
-
+        getNumberOfEntries()
+    # end if
+# end def
+    
 if __name__ == '__main__':
 #    cing.verbosity = cing.verbosityDebug
     if run():

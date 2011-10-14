@@ -189,3 +189,24 @@ order by model_count
 
 select * from nrgcing.cingatom
 where name = 'HA'
+
+summaryHeaderList = 'name bmrb_id rog distance_count cs_count chothia_class chain_count res_count'.split()
+
+delete from nrgcing.cingentry;
+insert into nrgcing.cingentry(rev_first, name, bmrb_id, rog, distance_count, cs_count, chothia_class, chain_count, res_count) values 
+(   3, '2lfh', 1234, 0, 263, 50, 0, 1,  32),
+(   3, '9pcy', 9999, 1,   0,  0, 2, 2, 100),
+(   3, '1cjg', 4020, 2, 263, 50, 0, 1,   9),
+(   3, '1brv', 4020, 0, 263, 50, 0, 1,  32),
+(   3, '9pcy', 9999, 1,   0,  0, 2, 2, 100),
+(   3, '1cjg', 4020, 2, 263, 50, 0, 1,   9),
+(   3, '1brv', 4020, 0, 263, 50, 0, 1,  32),
+(   4, '9pcy', 9999, 1,   0,  0, 2, 2, 100),
+(   3, '1cjg', 4020, 2, 263, 50, 0, 1,   9),
+(   3, '1brv', 4020, 0, 263, 50, 0, 1,  32),
+(   3, '9pcy', 9999, 1,   0,  0, 2, 2, 100),
+(1234, '1cjg', 4020, 2, 263, 50, 0, 1,   9),
+( 123, '1brv', 4020, 0, 263, 50, 0, 1,  32),
+(  23, '9pcy', 9999, 1,   0,  0, 2, 2, 100),
+(   3, '1cjg', 4020, 2, 263, 50, 0, 1,   9),
+(9999, '2hue',    9, 3,   0,  0, 2, 2, 999);

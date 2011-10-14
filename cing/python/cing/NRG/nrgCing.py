@@ -5,9 +5,10 @@ indices that live on top of them. For weekly and for more mass updates.
 
 Execute like:
 
-$CINGROOT/python/cing/NRG/nrgCing.py [entry_code] \
+$CINGROOT/python/cing/NRG/nrgCing.py [entry_code]
      updateWeekly prepare runCing runCingEntry storeCING2db 
      createToposTokens getEntryInfo searchPdbEntries createToposTokens
+     updateIndexFiles
 
 $CINGROOT/python/cing/NRG/nrgCing.py 1brv prepare
 $CINGROOT/python/cing/NRG/nrgCing.py 1brv runCing
@@ -33,6 +34,7 @@ from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.Libs.disk import globLast
 from cing.Libs.disk import rmdir
 from cing.Libs.html import GOOGLE_ANALYTICS_TEMPLATE
+from cing.Libs.html import copyCingHtmlJsAndCssToDirectory
 from cing.NRG import ARCHIVE_NMR_REDO_ID
 from cing.NRG import ARCHIVE_NRG_ID
 from cing.NRG import ARCHIVE_RECOORD_ID
@@ -62,9 +64,11 @@ from cing.Scripts.validateEntry import ARCHIVE_TYPE_BY_CH23
 from cing.Scripts.validateEntry import ARCHIVE_TYPE_BY_CH23_BY_ENTRY
 from cing.Scripts.validateEntry import PROJECT_TYPE_CCPN
 from cing.Scripts.validateEntry import PROJECT_TYPE_CING
+from cing.core.parameters import cingPaths
 from shutil import * #@UnusedWildImport
 import commands
 import csv
+import json
 import shutil
 import string
 
@@ -93,7 +97,7 @@ mapArchive2LogDir = {ARCHIVE_NRG_ID:        LOG_NRG_CING,
 
 FAILURE_PREP_STR    = "Failed to prepareEntry"
 recoordSyncDir      = 'recoordSync'
-inputDir            = 'input'
+
 
 # pylint: disable=R0902
 class NrgCing(Lister):
@@ -286,7 +290,7 @@ class NrgCing(Lister):
                 # end if
             # end if
         # end if
-        nTmessage("Found %d NMR entries." % len(self.entry_list_nmr) )
+        nTmessage("Found %5d NMR entries." % len(self.entry_list_nmr) )
         nTmessage("Subtracting %d NMR entries that are known to fail because of issue(s)." % len(self.entry_list_bad_overall))
         nTmessage("Subtracting: %s" % str(self.entry_list_bad_overall))
         
@@ -491,8 +495,7 @@ class NrgCing(Lister):
         "Looking at NRG input file modification times."
         nTmessage(self.addModTimesFromNrg.__doc__)
         for entry_code in self.entry_list_nrg_docr:
-            inputDir = os.path.join(self.results_dir, recoordSyncDir)
-            fileName = os.path.join(inputDir, entry_code, '%s.tgz' % entry_code)
+            fileName = os.path.join(self.results_dir, recoordSyncDir, entry_code, '%s.tgz' % entry_code)
             if not os.path.exists(fileName):
                 if self.isProduction:
                     nTdebug("Failed to find: " + fileName)
@@ -542,7 +545,7 @@ class NrgCing(Lister):
         In NMR_REDO a prep stage is everything but validation.                    
         """
         
-        showTimings = 1 # DEFAULT: False Enable for reporting.
+        showTimings = False # DEFAULT: False Enable for reporting.
         
         nTmessage("Get the entries tried, todo, crashed, and stopped in %s from file system." % self.results_base)
 
@@ -638,7 +641,7 @@ class NrgCing(Lister):
                 timeTakenDict[entry_code] = timeTaken
             # end if        
             # Check resulting file.
-            ccpnInputFilePath = os.path.join(self.results_dir, inputDir, entryCodeChar2and3, "%s.tgz" % entry_code)
+            ccpnInputFilePath = os.path.join(self.results_dir, INPUT_STR, entryCodeChar2and3, "%s.tgz" % entry_code)
             if not os.path.exists(ccpnInputFilePath):
                 self.entry_list_prep_failed.append(entry_code)
                 nTerror("%s Failed to find ccpn input file: %s" % (entry_code,ccpnInputFilePath))
@@ -794,6 +797,7 @@ class NrgCing(Lister):
         if not self.entry_list_store_in_db:
             nTerror("Failed to get any entry from schema %s RDB" % self.schema_id)
             self.entry_list_store_in_db = NTlist()
+        # end if
         nTmessage("Found %s entries in schema %s RDB" % (len(self.entry_list_store_in_db), self.schema_id))
 
         writeTextToFile("entry_list_nmr_redo.csv",      toCsv(self.entry_list_nmr_redo))
@@ -1194,14 +1198,186 @@ class NrgCing(Lister):
         # end if            
     # end def
 
+    def _write_entries_to_csv(self, tableFile):
+        """
+        Return tuple of headers, cing_entries.
+        or None on error.
+        """        
+        crdb = NrgCingRdb(schema=self.schema_id) # Make sure to close it.
+        if not crdb:
+            nTerror("In %s RDB connection was not opened" % getCallerName())
+            return
+        # end if
+        resultRelation = crdb.getSummaryRelation()                
+        crdb.close()
+        if not resultRelation:
+            nTerror("Failed to get any entry from schema %s RDB" % self.schema_id)
+            return
+        # end if
+        
+        if resultRelation.writeCsvFile(tableFile):        
+            nTerror('Failed %s because failed to write to %s.' % (getCallerName, tableFile))
+            return
+        # end if
+        return resultRelation
+    # end def
+            
+    def _format_html(self, file_content, resultLol):
+        """
+        Reformat the input HTML file content and return it.
+        """
+        
+        old_string = r"<!-- INSERT NEW DATE HERE -->"
+        new_string = time.asctime()
+        file_content = string.replace(file_content, old_string, new_string)
+        old_string = r"<!-- INSERT FOOTER HERE -->"
+        file_content = string.replace(file_content, old_string, GOOGLE_ANALYTICS_TEMPLATE)
+        
+        # TODO: sync with main CING code in html#HTMLfile.render()
+        # Removed:
+#                            "oTableTools": {"sSwfPath": "extras/TableTools/media/swf/copy_cvs_xls_pdf.swf"},
+        
+#                
+        additional_head_string = '''        
+<link media="screen" href="cing.css"                                  type="text/css" rel="stylesheet"/>
+<link media="screen" href="dataTableMedia/css/demo_table.css"         type="text/css" rel="stylesheet"/>
+<link media="screen" href="dataTableMedia/css/TableTools.css"         type="text/css" rel="stylesheet"/>
+<script src="multilineTitles.js"                                      type="text/javascript"></script>
+<script src="util.js"                                                 type="text/javascript"></script>
+<script src="jquery.js"                                               type="text/javascript"></script>
+<script src="customTables.js"                                         type="text/javascript"></script>
+<script src="dataTableMedia/js/jquery.dataTables.js"                  type="text/javascript"></script>
+<script src="dataTableMedia/js/TableTools.js"                         type="text/javascript"></script>
+<script src="dataTableMedia/js/jquery.dataTables.select.filtering.js" type="text/javascript" ></script>
+<script src="dataTableMedia/ZeroClipboard/ZeroClipboard.js"           type="text/javascript"></script>        
+        '''
+        old_string = r"<!-- INSERT ADDITIONAL HEAD STRING HERE -->"        
+        file_content = string.replace(file_content, old_string, additional_head_string)
+        
+        new_string = '''
+            <table id="dataTables-summaryArchive"> 
+            <thead>
+            <tr> 
+        '''
+        #Write headers: 'name', 'rog', 'distance_count', 'cs_count', 'chothia_class', 'chain_count', 'res_count'
+        for i,header in enumerate(summaryHeaderList):
+            new_string += '\t<th "title"="{help}">{header}</th>\n'.format(header = summaryHeader2List[i],
+                                                                          help = summaryHeaderTitleList[i])
+        # end for
+        new_string += '''
+            </tr> 
+            </thead>
+            <tfoot>
+            <tr> 
+        '''
+        selectableColumnList = 'rog chothia_class'.split()
+        #Write footers: 'name', 'rog', 'distance_count', 'cs_count', 'chothia_class', 'chain_count', 'res_count'
+        for c, header in enumerate(summaryHeaderList):
+#            nTdebug("Working on column %s: %s" % (c,header))
+            if header not in selectableColumnList:
+                new_string += '\t<th></th>\n'
+                continue
+            # end if
+            msg = '\t<th><select><option value=""></option>'
+            listX = []
+            for row in resultLol:
+                v = row[c]
+                if row[c] == None:
+                    continue
+                # end if
+                if v not in listX:
+                    listX.append(v)
+                # end if
+            # end for
+            listX.sort()
+            for value in listX:
+                msg += '<option value="{0}">{0}</option>'.format(value, value)
+            msg += '</select></th>\n'
+#            nTdebug("Adding msg: %s" % msg)
+            new_string += msg
+        # end for
+        new_string += '''
+            </tr>
+            </tfoot>
+            </table>
+        '''
+        old_string = r"<!-- INSERT NEW RESULT STRING HERE -->"        
+        file_content = string.replace(file_content, old_string, new_string)
+        return file_content
+    # end def
+
+    def _reformatJson(self, resultLol):
+        for row in resultLol:
+            pdb_id = row[1]
+            ch23 = pdb_id[1:3]
+            kwds = {'ch23':ch23, 'pdb_id':pdb_id}
+            row[0] = '<img src="../data/{ch23}/{pdb_id}/{pdb_id}.cing/{pdb_id}/HTML/mol.gif" border="0" width="40">'.format( **kwds )
+            row[1] =  '<a href="../data/{ch23}/{pdb_id}/{pdb_id}.cing">{pdb_id}</a>'.format( ch23=ch23, pdb_id=pdb_id )
+#            row[0] = <a href="../data/%s/%s/%s.cing"><img src="../data/04/104d/104d.cing/104d/HTML/mol.gif" border="0" width="200"></a>
+#            http://localhost/NRG-CING/data/l0/1l0r/1l0r.cing/1l0r/HTML/Molecule/atoms.html#_top
+#http://localhost/NRG-CING/data/lf/2lfh/2lfh.cing/2lfh/HTML/mol.gif
+        # end for
+    # end def
+
+    def updateSummaryTable(self):
+        """
+        Create a overall summary table that shows an overview of the tables.
+        Created on Oct 13, 2011        
+        @author: tbeek
+        """
+#        nTmessage('''
+#        Please manually do:
+#        mkdir -p $D/NRG-CING/dataTableMedia/swf
+#        cp $C/HTML/dataTableMedia/swf/ZeroClipboard.swf $D/NRG-CING/dataTableMedia/swf
+#        ''')
+        extraSwfDir = os.path.join(self.results_dir, "dataTableMedia", "swf")
+        if not os.path.isdir(extraSwfDir):
+            nTdebug("Creating extra swf directory for datatables plugin. Please reduce this duplication later on.")
+            mkdirs(extraSwfDir)
+        # end if
+        htmlDir = os.path.join(self.results_dir, "HTML")
+        srcHtmlPath = os.path.join(cingRoot, cingPaths.html)        
+        srcFile = os.path.join(srcHtmlPath, 'dataTableMedia','swf','ZeroClipboard.swf')
+        dstFile = os.path.join(extraSwfDir,                        'ZeroClipboard.swf')
+        copyfile(srcFile, dstFile)            
+        nTdebug("Creating extra swf resource %s. Please reduce this duplication later on." % dstFile)
+
+        # Source
+        data_dir = os.path.join (self.base_dir, "data" )
+        base_data_dir = os.path.join (data_dir, self.results_base )
+        copyCingHtmlJsAndCssToDirectory(htmlDir)
+        #Create csv file
+        tablefile = os.path.join(htmlDir, '%s.csv' % entry_list_summary_file_name_base)
+        resultRelation = self._write_entries_to_csv(tablefile)
+        #Write out JSON file
+        jsonfile = os.path.join(htmlDir, '%s.json' % entry_list_summary_file_name_base)
+        json_handle = open(jsonfile, mode = 'w')
+        resultLol = resultRelation.toLol()
+        self._reformatJson(resultLol)
+        json.dump({'aaData':resultLol}, json_handle)        
+        nTdebug("Written JSON file: %s" % jsonfile)
+
+        # Get framework input
+        file_name = os.path.join ( base_data_dir, "index.html" )
+        file_content = open(file_name, 'r').read()        
+        file_content = self._format_html(file_content, resultLol)                            
+        htmlfile = os.path.join(htmlDir, 'index.html')
+        writeTextToFile(htmlfile, file_content)
+        nTdebug("Written HTML index file: %s" % htmlfile)
+    # end def
+    
+    
     def updateIndexFiles(self):
         """
         Updating the index files based on self.entry_list_done
         Run other steps first.
         Return True on error.
         """
-        nTmessage("Updating index files")
-
+        nTmessage("Will create new front page instead of updating index files")
+        if self.updateSummaryTable():
+            nTerror("Failed to updateSummaryTable")
+            return True
+        # end if
         number_of_entries_per_row = 4
         number_of_files_per_column = 4
         url_directer = '../direct.php' # relative to index directory.
@@ -1211,7 +1387,7 @@ class NrgCing(Lister):
         base_data_dir = os.path.join (data_dir, self.results_base )
         indexDir = os.path.join(self.results_dir, "index")
         # The csv file name for indexing pdb
-        index_pdb_file_name = indexDir + "/index/index_pdb.csv"
+        index_pdb_file_name = indexDir + "/index_pdb.csv"
         
         if os.path.exists(indexDir):
             shutil.rmtree(indexDir)
@@ -1937,7 +2113,7 @@ class NrgCing(Lister):
                 nTerror("final input tgz missing: %s" % finalInputTgz)
                 return True
             # end if
-            dst = os.path.join(self.results_dir, inputDir, entryCodeChar2and3)
+            dst = os.path.join(self.results_dir, INPUT_STR, entryCodeChar2and3)
             if not os.path.exists(dst):
                 os.mkdir(dst)
             # end if
@@ -1983,7 +2159,7 @@ class NrgCing(Lister):
         writeTextToFile(entryListFileName, toCsv(self.entry_list_todo))
 
         pythonScriptFileName = os.path.join(cingDirScripts, 'validateEntry.py')
-        inputDir = 'file://' + self.results_dir + '/' + inputDir
+        inputDir = 'file://' + self.results_dir + '/' + INPUT_STR
         outputDir = self.results_dir
         storeCING2db = "1"          # DEFAULT: '1' All arguments need to be strings.
         filterTopViolations = '1'   # DEFAULT: '1'

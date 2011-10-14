@@ -64,3 +64,20 @@ mapArchive2Schema = {}
 for _idxArchiveId,archiveId in enumerate( archiveIdList ):
     mapArchive2Schema[ archiveId ] = schemaIdList[_idxArchiveId]
 
+
+# Section from Tim
+import logging
+import sys
+
+#Configure logging LOG_FORMAT
+LOG_FORMAT = '%(levelname)s\t%(asctime)s %(module)s.%(funcName)s:%(lineno)d\t%(message)s'
+LOG_DATE_FORMAT = '%H:%M:%S'
+
+#Logs WARNING messages and anything above to sys.stdout
+logging.basicConfig(level = logging.INFO, stream = sys.stdout, format = LOG_FORMAT, datefmt = LOG_DATE_FORMAT)
+
+#Log ERROR messages to stderr separately; these will fail a tool run in Galaxy
+STDERR_HANDLER = logging.StreamHandler(sys.stderr)
+STDERR_HANDLER.setLevel(logging.ERROR)
+STDERR_HANDLER.setFormatter(logging.Formatter(fmt = LOG_FORMAT, datefmt = LOG_DATE_FORMAT))
+logging.root.addHandler(STDERR_HANDLER)

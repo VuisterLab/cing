@@ -76,3 +76,21 @@ matchBmrbPdbDir = os.path.join(bmrbbase_dir,'matchBmrbPdb') # Switching to 3 lat
 bmrb_link_template = 'http://www.bmrb.wisc.edu/cgi-bin/explore.cgi?bmrbId=%b'
 pdb_link_template  = 'http://www.rcsb.org/pdb/explore/explore.do?structureId=%s'
 
+# Front page
+entry_list_summary_file_name_base = 'entry_list_summary'
+#rev_first becomes an image column
+summaryHeaderList = 'rev_first name bmrb_id rog distance_count cs_count chothia_class chain_count res_count'.split()
+summaryHeader2List = 'img. PDB BMRB ROG distances chem.s. Chothia Chains Residues'.split()
+summaryHeaderTitleList = [
+    'Molecule image',
+    'PDB entry code (click on to go to NRG-CING report.)',
+    'BMRB entry code',
+    'CING green, orange, red score [0,1,2]',
+    'Number of distance restraints',
+    'Number of chemical shifts',
+    'Chothia definition for alpha,beta,alpha/beta,coil [0,1,2,3]',
+    'Number of chains including water',
+    'Total number of residues'
+]    
+
+

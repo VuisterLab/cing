@@ -1,4 +1,11 @@
-#De WHY_NOT comments moeten in een .txt-file komen te staan in /usr/scratch/whynot/comments/ op cmbi8. Het (fixed) format ziet er zo uit:
+# NEW Tim is taking the data from the csv files at:
+#NMR          http://nmr.cmbi.ru.nl/NRG-CING/entry_list_nmr.csv;
+#NRG          http://nmr.cmbi.ru.nl/NRG-CING/entry_list_nrg.csv;
+#NRG-DOCR     http://nmr.cmbi.ru.nl/NRG-CING/entry_list_nrg_docr.csv;
+#NRG-CING     http://nmr.cmbi.ru.nl/NRG-CING/entry_list_done.csv;
+
+#The WHY_NOT comments need to be presented in a .txt file at cmbi8:/usr/scratch/whynot/comments. 
+#The fixed format looks like:
 
 #
 #PDBID        : 2q23

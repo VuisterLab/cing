@@ -4933,11 +4933,18 @@ Residue class: Defines residue properties
         dynamics on this is provided.
         """
 
+
         if not ( self.hasProperties('PRO') or self.hasProperties('cPRO')):
-            nTerror("Can not validateChemicalShiftProPeptide for non Pro: %s" % self)
+            nTerror("Can not %s for non Pro: %s" % (getCallerName(), self))
             return True
-        atomCb = self.CB
-        atomCg = self.CG
+        # end if
+        atomCb = getDeepByKeysOrAttributes( self, 'CB')
+        atomCg = getDeepByKeysOrAttributes( self, 'CG')
+        if not ( atomCb and atomCg ): # See e.g. entry 1msh
+            nTwarning("Failed %s because one or both atoms CB/CG are missing. All atoms: %s" % ( getCallerName(), str(self.allAtoms())))
+            return True
+        # end if
+        
         cbShift = atomCb.shift()
         cgShift = atomCg.shift()
 
