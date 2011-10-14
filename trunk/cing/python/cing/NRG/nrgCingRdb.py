@@ -57,10 +57,15 @@ IS_FALSE = 'isFalse'
 
 REPLACE_BY_NATURAL_IDS = 'replaceByNaturalIds'
 
+#sizePoints = 400 # Quicky
+sizePoints = 1500 # Publication quality
+
+
 if False:
     from matplotlib import use #@UnusedImport
     use('TkAgg') # Instead of agg
     interactive(True)
+# end if
 
 class NrgCingRdb():
     def __init__(self,host='localhost', user=PDBJ_DB_USER_NAME, db=PDBJ_DB_NAME, schema=NRG_DB_SCHEMA):
@@ -179,7 +184,42 @@ class NrgCingRdb():
         pdbIdList = NTlist( *pdbIdList )
         return pdbIdList
     # end def
-
+    
+    def getSummaryRelation(self):
+        "For generating front page table."
+        table = self.centry
+        columnName = PDB_ID_STR
+        nTdebug("Using table: %s" % table)
+        try: # rev_first will become image column
+            s = select([table.c['rev_first'],table.c['name'],         table.c['bmrb_id'],       table.c['rog'],         
+                        table.c['distance_count'], 
+                        table.c['cs_count'],table.c['chothia_class'], table.c['chain_count'], table.c['res_count'] ])
+            nTdebug("SQL: %s" % s)
+            resultTable = self.execute(s).fetchall()
+        except:
+            nTtracebackError()
+            return
+        # end try
+        if resultTable == None:
+            nTerror("Failed retrieval from NRG-CING RDB from table %s and column %s" % (table, columnName))
+            return None
+        # end if
+        if not resultTable:
+            nTwarning("Failed to retrieve any entries from NRG-CING RDB from table %s and column %s" % (table, columnName))
+            return []
+        # end if
+        if len(summaryHeaderList) != len(resultTable[0]):
+            nTerror("Expected len(summaryHeaderList) == len(resultTable[0] but found %s and %s for expected list: %s --and-- %s" % (
+                len(summaryHeaderList), len(resultTable[0]), str(summaryHeaderList), str(resultTable[0])))
+            return None
+        # end if
+        dbms = DBMS()
+        resultRelation = Relation('summary', dbms, columnList=summaryHeaderList, lol=resultTable)                            
+        nTdebug('resultTable first 80 chars: %s' % str(resultTable)[:80])        
+#        nTdebug("Retrieved resultTable: %s" % str(resultTable))
+        return resultRelation
+    # end def
+    
     def removeEntry(self, entry_code):
         """
         Return True on error.
@@ -1368,7 +1408,7 @@ AND '{2}' <@ S.chain_type; -- contains at least one protein chain.
         nTdebug("SQL: %s" % s)
         result = m.execute(s).fetchall()
 
-        nTdebug("ROG per residue calculated for number of entry rog scores: %s" % len(result))
+        nTdebug("ROG per residue calculated for number of entry rog scores: %s (roughly 3 times the number of entries)" % len(result))
         for row in result:
         #    print row[0]
             k = row[0]
@@ -1396,7 +1436,7 @@ AND '{2}' <@ S.chain_type; -- contains at least one protein chain.
 
         strTitle = 'rog'
         ps = NTplotSet() # closes any previous plots
-        ps.hardcopySize = (1000, 1000)
+        ps.hardcopySize = (sizePoints, sizePoints)
         myplot = NTplot(title=strTitle)
         ps.addPlot(myplot)
 
@@ -1573,8 +1613,8 @@ def getPdbIdList(fromCing=False, host='localhost'):
 if __name__ == '__main__':
     cing.verbosity = verbosityDebug
 
-    schema = NMR_REDO_DB_SCHEMA
-#    schema = NRG_DB_SCHEMA
+#    schema = NMR_REDO_DB_SCHEMA
+    schema = NRG_DB_SCHEMA
 #    if isProduction:
 #        schema = NRG_DB_SCHEMA
     host = 'localhost'
@@ -1602,3 +1642,4 @@ if __name__ == '__main__':
         n.createPlotsCompareBetweenDb(other_schema=NMR_REDO_DB_SCHEMA)
 
     nTmessage("done with NrgCingRdb")
+# end if

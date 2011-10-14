@@ -2,9 +2,48 @@
 //    - Customized jquery.dataTables.js for:
 //	  - Added additional number of rows to paginate (5 and up to 10,000)
 //    - Changed the wording of 'entries' to 'items'.
-
 jQuery(document).ready(function() {
-
+    // Safe variable for below JS.
+    var oTable = $("table[id^='dataTables-summaryArchive']").dataTable({
+        "bSort": true,
+        // Initially show the reverse natural order of PDB entries. High numbers in NRG-CING are more interesting.
+        "aaSorting": [[0,'desc']],
+        // Set the data types just in case the automatic detection fails (because of '.' values eg). Important for sorting.
+        // mandatory to list each column if using this parameter!
+        "aoColumns": [
+                      { "sType": "html" }, 				        // image html
+                      { "sType": "html" }, 				        // pdb html
+                      { "sType": "numeric", "sClass": "right" },// bmrb 
+                      { "sType": "numeric", "sClass": "right" },// rog 
+                      { "sType": "numeric", "sClass": "right" },// distance_count 
+                      { "sType": "numeric", "sClass": "right" },// cs_count 
+                      { "sType": "numeric", "sClass": "right" },// chothia_class 
+                      { "sType": "numeric", "sClass": "right" },// chain_count 
+                      { "sType": "numeric", "sClass": "right" } // res_count 
+                  ],
+        // Pagination options.
+        "bPaginate": true,
+        "bLengthChange": true,
+        "iDisplayLength": 10,
+        "bFilter": true,
+        "bProcessing": true,
+        "bAutoWidth": false, // recalculates the column widths on the fly but as this fails it's switched off.
+        "sDom": 'lfrtip',
+//        "sSwfPath": "",       
+//      "sSwfPath": "dataTableMedia/swf/ZeroClipboard.swf",       
+//        "sSwfPath": "dataTableMedia/swf/copy_cvs_xls_pdf.swf"},
+        "sAjaxSource": 'entry_list_summary.json'
+    } );            
+//    Add a select menu for some TH element (rog and chothia_class) in the table footer 
+    $("tfoot th").each( function ( i ) {
+        if (i != 3 && i != 6) {
+            return;
+        }
+        $('select', this).change( function () {
+            oTable.fnFilter( $(this).val(), i );
+        } );
+    } );
+    
     $("table[id^='dataTables-atomList']").dataTable({
         "sDom": 'T<"clear">lfrtip',
         "bSort": true,

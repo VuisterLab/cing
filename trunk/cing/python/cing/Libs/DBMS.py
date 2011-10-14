@@ -18,7 +18,7 @@ NULL_STRING = '' # may be modified
 
 class Relation():
 
-    def __init__(self, name, dbms, columnList=None):
+    def __init__(self, name, dbms, columnList=None, lol=None):
         # Name for the column. Only place where order of columns is defined and matters.*/
         self.columnOrder = []
         self.name = name
@@ -30,7 +30,12 @@ class Relation():
             for col in columnList:
                 self.insertColumn(label=col)
 
-
+        if lol:
+            self.fromLol( lol )
+        # end if
+        
+    # end def
+            
     def insertColumn(self, index=-1, label=None, 
 #                     foreignKeyConstr=None
                      ):

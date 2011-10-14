@@ -158,6 +158,7 @@ DIHEDRAL_BY_RESIDUE_STR = 'DihedralByResidue'
 
 SUMMARY_STR = 'summary'
 
+INPUT_STR = 'input' # To files like $D/NRG-CING/input/br/1brv.tgz
 DATA_STR = 'data' # mostly for NRG.
 DB_STR = 'db'
 COMMON_NAME_STR = 'commonName'

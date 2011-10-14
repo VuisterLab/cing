@@ -190,7 +190,7 @@ def createHtmlCing(project, ranges=None):
 
 #end def
 
- # pylint: disable=R0903
+# pylint: disable=R0903
 class HistogramsForPlotting():
     """
     Class for enabling load on demand
@@ -1592,7 +1592,7 @@ class ProjectHTMLfile( HTMLfile ):
         if project.has_key('html'):    # delete any old instances
             del(project['html'])
         project.html = self
-
+        copyCingHtmlJsAndCssToDirectory(project.htmlPath())
         #css and javascript now in HTML dir
         htmlPath = os.path.join(cingRoot,cingPaths.html) # copy needed css and other files/directories.
 
@@ -4151,3 +4151,47 @@ def sortListByRogAndKey(theList, sortKey=None, descending=True):
             listGreen.append(item)
     theList = listRed + listOrange + listGreen
     return theList
+# end def
+
+def copyCingHtmlJsAndCssToDirectory(dstDir):
+    """
+    css and javascript now in HTML dir
+    """
+    if not os.path.exists(dstDir):
+        nTdebug("Creating new HTML dir: dstDir")
+        os.mkdir(dstDir)
+    # end if
+    htmlPath = os.path.join(cingRoot,cingPaths.html) # copy needed css and other files/directories.
+
+#    nTdebug("Listing: [%s]" % htmlPath )
+    for f in os.listdir( htmlPath ):
+#        nTdebug("Listing item: [%s]" % f)
+        htmlFile = os.path.join(htmlPath,f)
+        if os.path.isfile(htmlFile):
+            shutil.copy( htmlFile, dstDir )
+            continue
+        # end if        
+        if os.path.isdir(htmlFile):
+#            nTdebug("Listing dir: [%s]" % f)
+            if f.find('.svn') >= 0:
+                continue
+            # end if
+            dst = os.path.join( dstDir, f)
+#            nTdebug("Copying dir: [%s] to [%s]" % (htmlFile, dst))
+            if os.path.exists(dst):
+#                nTdebug("Removing directory: %s" % dst)
+                shutil.rmtree(dst)
+            # end if
+            shutil.copytree(htmlFile,  dst )
+            # TODO: exclude .svn items within subdir
+            svnDirectoryList = find2(".svn", startdir=dst) # don't use the one from pylab.
+            for f2 in svnDirectoryList:
+#                nTdebug("Considering removing directory: %s" % (f2))
+                if os.path.exists(f2):
+#                    nTdebug("Removing directory: %s" % f2)
+                    shutil.rmtree(f2)
+                # end if
+            # end for
+        # end if
+    #end for
+# end def
