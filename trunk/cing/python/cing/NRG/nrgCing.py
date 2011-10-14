@@ -1308,11 +1308,12 @@ class NrgCing(Lister):
 
     def _reformatJson(self, resultLol):
         for row in resultLol:
-            pdb_id = row[1]
+            pdb_id = row[PDB_ID_IDX]
             ch23 = pdb_id[1:3]
             kwds = {'ch23':ch23, 'pdb_id':pdb_id}
-            row[0] = '<img src="../data/{ch23}/{pdb_id}/{pdb_id}.cing/{pdb_id}/HTML/mol.gif" border="0" width="40">'.format( **kwds )
-            row[1] =  '<a href="../data/{ch23}/{pdb_id}/{pdb_id}.cing">{pdb_id}</a>'.format( ch23=ch23, pdb_id=pdb_id )
+#            row[0] = '-'.format( **kwds )
+#            row[0] = '<img src="../data/{ch23}/{pdb_id}/{pdb_id}.cing/{pdb_id}/HTML/mol.gif" border="0" width="40">'.format( **kwds )
+            row[0] =  '<a href="../data/{ch23}/{pdb_id}/{pdb_id}.cing">{pdb_id}</a>'.format( **kwds )
 #            row[0] = <a href="../data/%s/%s/%s.cing"><img src="../data/04/104d/104d.cing/104d/HTML/mol.gif" border="0" width="200"></a>
 #            http://localhost/NRG-CING/data/l0/1l0r/1l0r.cing/1l0r/HTML/Molecule/atoms.html#_top
 #http://localhost/NRG-CING/data/lf/2lfh/2lfh.cing/2lfh/HTML/mol.gif
@@ -1342,9 +1343,17 @@ class NrgCing(Lister):
         copyfile(srcFile, dstFile)            
         nTdebug("Creating extra swf resource %s. Please reduce this duplication later on." % dstFile)
 
-        # Source
         data_dir = os.path.join (self.base_dir, "data" )
         base_data_dir = os.path.join (data_dir, self.results_base )
+
+        fnList = 'helpUpFront.html plot.html'.split()
+        for fn in fnList:
+            srcFile = os.path.join(base_data_dir, fn)
+            dstFile = os.path.join(htmlDir,       fn)
+            copyfile(srcFile, dstFile)            
+            nTdebug("Added extra help file %s." % dstFile)
+        # end for
+        # Source
         copyCingHtmlJsAndCssToDirectory(htmlDir)
         #Create csv file
         tablefile = os.path.join(htmlDir, '%s.csv' % entry_list_summary_file_name_base)

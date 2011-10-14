@@ -1,4 +1,4 @@
-from cing import cingDirTestsData
+#from cing import cingDirTestsData
 from cing import cingDirTmp
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.Libs.html import HTMLfile

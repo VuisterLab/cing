@@ -40,7 +40,7 @@
 
 .dataTables_paginate {
     width: 44px;
-    * width: 50px;
+/**    * width: 50px; JFD comments out */
     float: right;
     text-align: right;
 }
@@ -85,7 +85,8 @@ table.display thead th {
     border-bottom: 1px solid black;
     font-weight: bold;
     cursor: pointer;
-    * cursor: hand;
+/** * cursor: hand; JFD comments out */
+    
 }
 
 table.display tfoot th {
@@ -213,7 +214,7 @@ td.details {
     padding: 2px 5px;
     margin: 0 3px;
     cursor: pointer;
-    *cursor: hand;
+    /** *cursor: hand; JFD comments out.*/
 }
 
 .example_alt_pagination div.dataTables_paginate span.paginate_button {
@@ -264,5 +265,4 @@ tr.even td.sorting_2 {
 tr.even td.sorting_3 {
     background-color: #F9F9FF;
 }
-
-}
+/** } JFD comments out.*/
