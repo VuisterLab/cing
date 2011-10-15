@@ -1307,13 +1307,23 @@ class NrgCing(Lister):
     # end def
 
     def _reformatJson(self, resultLol):
-        for row in resultLol:
+        for r, row in enumerate(resultLol):
+            if r < 10:
+                nTdebug("row: %s" % str(row))
+            # end if
             pdb_id = row[PDB_ID_IDX]
             ch23 = pdb_id[1:3]
             kwds = {'ch23':ch23, 'pdb_id':pdb_id}
 #            row[0] = '-'.format( **kwds )
 #            row[0] = '<img src="../data/{ch23}/{pdb_id}/{pdb_id}.cing/{pdb_id}/HTML/mol.gif" border="0" width="40">'.format( **kwds )
             row[0] =  '<a href="../data/{ch23}/{pdb_id}/{pdb_id}.cing">{pdb_id}</a>'.format( **kwds )
+            for c in range(len(row)):
+#                if row[c] == 'None' or row[c] == '' or row[c] == 'none':
+                if row[c] == None:
+                    nTdebug("Found None: [%s] and replacing it with STAR empty string." % str(row[c]))
+                    row[c] = '.'
+                # end if
+            # end if                
 #            row[0] = <a href="../data/%s/%s/%s.cing"><img src="../data/04/104d/104d.cing/104d/HTML/mol.gif" border="0" width="200"></a>
 #            http://localhost/NRG-CING/data/l0/1l0r/1l0r.cing/1l0r/HTML/Molecule/atoms.html#_top
 #http://localhost/NRG-CING/data/lf/2lfh/2lfh.cing/2lfh/HTML/mol.gif
