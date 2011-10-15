@@ -1337,6 +1337,10 @@ class NrgCing(Lister):
             mkdirs(extraSwfDir)
         # end if
         htmlDir = os.path.join(self.results_dir, "HTML")
+        if not os.path.isdir(htmlDir):
+            nTdebug("Creating html directory for NRG-CING.")
+            mkdirs(htmlDir)
+        # end if
         srcHtmlPath = os.path.join(cingRoot, cingPaths.html)        
         srcFile = os.path.join(srcHtmlPath, 'dataTableMedia','swf','ZeroClipboard.swf')
         dstFile = os.path.join(extraSwfDir,                        'ZeroClipboard.swf')
@@ -1346,15 +1350,22 @@ class NrgCing(Lister):
         data_dir = os.path.join (self.base_dir, "data" )
         base_data_dir = os.path.join (data_dir, self.results_base )
 
-        fnList = 'helpUpFront.html plot.html'.split()
+        # Source
+        copyCingHtmlJsAndCssToDirectory(htmlDir)
+
+        fnList = 'about.html cing.png credits.html funding.html help.html helpCing.html helpPlot.html more.html plot.html'.split()
         for fn in fnList:
             srcFile = os.path.join(base_data_dir, fn)
             dstFile = os.path.join(htmlDir,       fn)
             copyfile(srcFile, dstFile)            
             nTdebug("Added extra help file %s." % dstFile)
         # end for
-        # Source
-        copyCingHtmlJsAndCssToDirectory(htmlDir)
+        nTmessage("Copy the overall index")
+        org_file = os.path.join(data_dir, 'redirect.html')
+        new_file = os.path.join(self.results_dir, 'index.html')
+        shutil.copy(org_file, new_file)
+        
+        
         #Create csv file
         tablefile = os.path.join(htmlDir, '%s.csv' % entry_list_summary_file_name_base)
         resultRelation = self._write_entries_to_csv(tablefile)

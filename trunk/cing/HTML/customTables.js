@@ -13,7 +13,7 @@ jQuery(document).ready(function() {
         "aoColumns": [
 //                      { "sType": "html" }, 				        // image html
                       { "sType": "html" }, 				        // pdb html
-//                      { "sType": "numeric", "sClass": "right" },// bmrb 
+                      { "sType": "numeric", "sClass": "right" },// bmrb 
                       { "sType": "numeric", "sClass": "right" },// rog 
                       { "sType": "numeric", "sClass": "right" },// distance_count 
                       { "sType": "numeric", "sClass": "right" },// cs_count 
@@ -29,18 +29,19 @@ jQuery(document).ready(function() {
         "bProcessing": true,
         "bAutoWidth": false, // recalculates the column widths on the fly but as this fails it's switched off.
         "sDom": 'lfrtip',
+//        "sDom": '<flr>tip',
+//        "sDom": '<"top"flr>t<"bottom"ip>',
 //        "sSwfPath": "",       
 //      "sSwfPath": "dataTableMedia/swf/ZeroClipboard.swf",       
 //        "sSwfPath": "dataTableMedia/swf/copy_cvs_xls_pdf.swf"},
         "sAjaxSource": 'entry_list_summary.json',
         "oLanguage": {
-            "sSearch": "Search (e.g. 9pcy):",
-    }
-        
+            "sSearch": "Search (e.g. 9pcy):"
+        }        
     } );            
 //    Add a select menu for some TH element (rog and chothia_class) in the table footer 
     $("tfoot th").each( function ( i ) {
-        if (i != 1 && i != 4) {
+        if (i != 2 && i != 5) {
             return;
         }
         $('select', this).change( function () {
