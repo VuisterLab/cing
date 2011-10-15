@@ -192,7 +192,9 @@ class NrgCingRdb():
         nTdebug("Using table: %s" % table)
         try: # rev_first will become image column
 #            table.c['rev_first'], 
-            s = select([table.c['name'],    table.c['bmrb_id'],       table.c['rog'],         table.c['distance_count'], 
+            s = select([table.c['name'],    
+#                        table.c['bmrb_id'],       
+                        table.c['rog'],         table.c['distance_count'], 
                         table.c['cs_count'],table.c['chothia_class'], table.c['chain_count'], table.c['res_count'] ])
             nTdebug("SQL: %s" % s)
             resultTable = self.execute(s).fetchall()
