@@ -82,12 +82,12 @@ entry_list_summary_file_name_base = 'entry_list_summary'
 #summaryHeaderList = 'rev_first name bmrb_id rog distance_count cs_count chothia_class chain_count res_count'.split()
 #summaryHeader2List = 'img. PDB BMRB ROG distances chem.s. Chothia chains residues'.split()
 PDB_ID_IDX = 0
-summaryHeaderList = 'name bmrb_id rog distance_count cs_count chothia_class chain_count res_count'.split()
-summaryHeader2List = 'PDB BMRB ROG distances chem.s. Chothia chains residues'.split()
+summaryHeaderList = 'name rog distance_count cs_count chothia_class chain_count res_count'.split()
+summaryHeader2List = 'PDB ROG distances chem.s. Chothia chains residues'.split()
 summaryHeaderTitleList = [
 #    'Molecule image',
     'PDB entry code (click on to go to NRG-CING report.)',
-    'BMRB entry code',
+#    'BMRB entry code',
     'CING green, orange, red score [0,1,2]',
     'Number of distance restraints',
     'Number of chemical shifts',

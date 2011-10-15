@@ -41,7 +41,7 @@ jQuery(document).ready(function() {
     } );            
 //    Add a select menu for some TH element (rog and chothia_class) in the table footer 
     $("tfoot th").each( function ( i ) {
-        if (i != 2 && i != 5) {
+        if (i != 1 && i != 4) {
             return;
         }
         $('select', this).change( function () {

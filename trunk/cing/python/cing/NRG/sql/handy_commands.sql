@@ -210,3 +210,5 @@ insert into nrgcing.cingentry(rev_first, name, bmrb_id, rog, distance_count, cs_
 (  23, '9pcy', 9999, 1,   0,  0,         2, 2, 100),
 (   3, '1cjg', 4020, 2, 263, 50,         0, 1,   9),
 (9999, '2hue',    9, 3,   0,  0,         2, 2, 999);
+
+update nrgcing.cingentry set bmrb_id = 9999;
