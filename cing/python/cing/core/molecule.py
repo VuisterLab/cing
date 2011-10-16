@@ -4974,16 +4974,16 @@ Residue class: Defines residue properties
 
         color = COLOR_GREEN
         if shiftDifference < 4.8 and not isTrans:
-            strMsg = "CS CB-CG %8.3f (<4.8) contradicted a trans state with great certainty." % shiftDifference
+            strMsg = "CS CB-CG %8.3f (<4.8) contradicted a cis state with great certainty." % shiftDifference
             color = COLOR_RED
         elif shiftDifference > 9.15 and isTrans:
-            strMsg = "CS CB-CG %8.3f (>9.15) contradicted a cis state with great certainty."  % shiftDifference
+            strMsg = "CS CB-CG %8.3f (>9.15) contradicted a trans state with great certainty."  % shiftDifference
             color = COLOR_RED
         if shiftDifference < 6.0 and not isTrans:
-            strMsg = "CS CB-CG %8.3f (<6.0) contradicted a trans state."  % shiftDifference
+            strMsg = "CS CB-CG %8.3f (<6.0) contradicted a cis state."  % shiftDifference
             color = COLOR_ORANGE
         elif shiftDifference > 7.95 and isTrans:
-            strMsg = "CS CB-CG %8.3f (>7.95) contradicted a cis state."  % shiftDifference
+            strMsg = "CS CB-CG %8.3f (>7.95) contradicted a trans state."  % shiftDifference
             color = COLOR_ORANGE
 
         if color == COLOR_GREEN:

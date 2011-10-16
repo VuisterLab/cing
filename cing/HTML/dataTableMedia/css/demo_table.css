@@ -17,8 +17,11 @@
     margin-left: -125px;
     border: 1px solid #ddd;
     text-align: center;
-    color: #999;
-    font-size: 11px;
+    /* JFD mods from: color: #999; */
+    color: red;
+    /* background-color: red; */    
+    /* org: font-size: 11px; */
+    font-size: 20px;
     padding: 2px 0;
 }
 
