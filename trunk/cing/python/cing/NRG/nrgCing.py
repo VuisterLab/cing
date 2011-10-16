@@ -1320,7 +1320,7 @@ class NrgCing(Lister):
             for c in range(len(row)):
 #                if row[c] == 'None' or row[c] == '' or row[c] == 'none':
                 if row[c] == None:
-                    nTdebug("Found None: [%s] and replacing it with STAR empty string." % str(row[c]))
+#                    nTdebug("Found None: [%s] and replacing it with STAR empty string." % str(row[c]))
                     row[c] = '.'
                 # end if
             # end if                

@@ -36,7 +36,8 @@ jQuery(document).ready(function() {
 //        "sSwfPath": "dataTableMedia/swf/copy_cvs_xls_pdf.swf"},
         "sAjaxSource": 'entry_list_summary.json',
         "oLanguage": {
-            "sSearch": "Search (e.g. 9pcy):"
+            "sSearch": "Search (e.g. 9pcy):",
+            "sProcessing": "Please wait while loading..."
         }        
     } );            
 //    Add a select menu for some TH element (rog and chothia_class) in the table footer 
