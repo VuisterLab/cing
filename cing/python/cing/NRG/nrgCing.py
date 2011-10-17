@@ -6,7 +6,7 @@ indices that live on top of them. For weekly and for more mass updates.
 Execute like:
 
 $CINGROOT/python/cing/NRG/nrgCing.py [entry_code]
-     updateWeekly prepare runCing runCingEntry storeCING2db 
+     updateWeekly prepare runCing storeCING2db 
      createToposTokens getEntryInfo searchPdbEntries createToposTokens
      updateIndexFiles
 
@@ -2396,8 +2396,8 @@ class NrgCing(Lister):
 #        self.getEntryInfo()
         if 0: # DEFAULT: False
             nTmessage("Going to use non-default entry_list_todo in storeCING2db")
-            self.entry_list_todo = '1jo4 1mag 1mic 1msh 1n2y 1ng8 1nt5 2kox'.split()
-#            self.entry_list_todo = readLinesFromFile('/Users/jd/NRG/lists/entry_list_vuisterlab.csv')
+#            self.entry_list_todo = '1jo4 1mag 1mic 1msh 1n2y 1ng8 1nt5 2kox'.split()
+            self.entry_list_todo = readLinesFromFile('/Users/jd/entry_list_of_interest.csv')
 #            self.entry_list_todo = readLinesFromFile(os.path.join(self.results_dir, 'list', 'entry_list_tostore.csv'))
 #            self.entry_list_todo = readLinesFromFile(os.path.join('/Users/jd', 'entry_list_to_store.csv'))
             self.entry_list_todo = NTlist( *self.entry_list_todo )

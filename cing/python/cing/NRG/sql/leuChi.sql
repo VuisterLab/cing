@@ -1,19 +1,22 @@
 -- Count number of leu
--- Result 27,197
+-- Result 66,423
 select count(*)
-from "devnrgcing"."cingresidue" r
+from "nrgcing"."cingresidue" r
 where
-r.name = 'LEU'
-;
+r.name = 'LEU';
+-- Number of entries
+select count(*)
+from "nrgcing"."cingentry" e;
+
 
 -- Count number of leu with CS for both Cdeltas (stereospecifically) and single conformer (low cv).
--- Result 12,661
+-- Result 11,132
 select count(*)
-FROM "devnrgcing"."cingatom" a1
-inner join "devnrgcing"."cingatom"   a2 on  a1.residue_id = a2.residue_id
-inner join "devnrgcing"."cingresidue" r on a1.residue_id = r.residue_id
-inner join "devnrgcing"."cingchain"   c on r.chain_id = c.chain_id
-inner join "devnrgcing"."cingentry"   e on c.entry_id = e.entry_id
+FROM "nrgcing"."cingatom" a1
+inner join "nrgcing"."cingatom"   a2 on  a1.residue_id = a2.residue_id
+inner join "nrgcing"."cingresidue" r on a1.residue_id = r.residue_id
+inner join "nrgcing"."cingchain"   c on r.chain_id = c.chain_id
+inner join "nrgcing"."cingentry"   e on c.entry_id = e.entry_id
 where
 r.name = 'LEU' AND
 a1.name = 'CD1' and a2.name = 'CD2' AND
@@ -30,11 +33,11 @@ select e.pdb_id as pdb, c.name as c, r.number as num, r.name, a1.name, a2.name,
 to_char(a1.cs-a2.cs, 'FM990.0') as csd,
 to_char(r.chi2_avg,  'FM990.0') as chi2_avg,
 to_char(r.chi2_cv,   'FM0.00') as chi2_cv
-FROM "devnrgcing"."cingatom" a1
-inner join "devnrgcing"."cingatom"   a2 on  a1.residue_id = a2.residue_id
-inner join "devnrgcing"."cingresidue" r on a1.residue_id = r.residue_id
-inner join "devnrgcing"."cingchain"   c on r.chain_id = c.chain_id
-inner join "devnrgcing"."cingentry"   e on c.entry_id = e.entry_id
+FROM "nrgcing"."cingatom" a1
+inner join "nrgcing"."cingatom"   a2 on  a1.residue_id = a2.residue_id
+inner join "nrgcing"."cingresidue" r on a1.residue_id = r.residue_id
+inner join "nrgcing"."cingchain"   c on r.chain_id = c.chain_id
+inner join "nrgcing"."cingentry"   e on c.entry_id = e.entry_id
 where
 e.name in ( '1brv','1hkt','1mo7','1mo8','1ozi','1p9j','1pd7','1qjt','1vj6','1y7n','2fws','2fwu','2jsx') AND
 r.name = 'LEU' AND
@@ -46,32 +49,48 @@ r.chi2_cv < 0.2 AND ( r.chi2_avg > 240 AND r.chi2_avg < 360 )
 ;
 
 -- Find Leu with conflict between CD chemical shifts and chi2
--- result 213 residue around +180
+-- result 218 residue around +180
 select e.pdb_id as pdb, c.name as c, r.number as num, r.name, a1.name, a2.name,
 to_char(a1.cs-a2.cs, 'FM990.0') as csd,
 to_char(r.chi2_avg,  'FM990.0') as chi2_avg,
 to_char(r.chi2_cv,   'FM0.00') as chi2_cv
-FROM "devnrgcing"."cingatom" a1
-inner join "devnrgcing"."cingatom"   a2 on  a1.residue_id = a2.residue_id
-inner join "devnrgcing"."cingresidue" r on a1.residue_id = r.residue_id
-inner join "devnrgcing"."cingchain"   c on r.chain_id = c.chain_id
-inner join "devnrgcing"."cingentry"   e on c.entry_id = e.entry_id
+FROM "nrgcing"."cingatom" a1
+inner join "nrgcing"."cingatom"   a2 on  a1.residue_id = a2.residue_id
+inner join "nrgcing"."cingresidue" r on a1.residue_id = r.residue_id
+inner join "nrgcing"."cingchain"   c on r.chain_id = c.chain_id
+inner join "nrgcing"."cingentry"   e on c.entry_id = e.entry_id
 where
 r.name = 'LEU' AND
 a1.name = 'CD1' and a2.name = 'CD2' AND
 a1.cs IS NOT NULL AND a2.cs IS NOT NULL AND
 abs(a1.cs-a2.cs) > 0.01 AND
 r.chi2_avg IS NOT NULL AND r.chi2_cv IS NOT NULL AND
-(r.chi2_avg > 120. and r.chi2_avg < 240.) AND -- around +60
+(r.chi2_avg > 120. and r.chi2_avg < 240.) AND -- around +180
 (a1.cs-a2.cs) < -4 AND                       -- >4 ppm (indicates trans)
 r.chi2_cv < 0.2 AND ( r.chi2_avg > 0 AND r.chi2_avg < 240 )
-order by (a1.cs-a2.cs) ASC
-;
+order by (a1.cs-a2.cs) ASC;
 
 -- And similar part for other conformation:
--- NB adjust sort order from DESC to ASC
+-- 115 residues around +60
+select e.pdb_id as pdb, c.name as c, r.number as num, r.name, a1.name, a2.name,
+to_char(a1.cs-a2.cs, 'FM990.0') as csd,
+to_char(r.chi2_avg,  'FM990.0') as chi2_avg,
+to_char(r.chi2_cv,   'FM0.00') as chi2_cv
+FROM "nrgcing"."cingatom" a1
+inner join "nrgcing"."cingatom"   a2 on  a1.residue_id = a2.residue_id
+inner join "nrgcing"."cingresidue" r on a1.residue_id = r.residue_id
+inner join "nrgcing"."cingchain"   c on r.chain_id = c.chain_id
+inner join "nrgcing"."cingentry"   e on c.entry_id = e.entry_id
+where
+r.name = 'LEU' AND
+a1.name = 'CD1' and a2.name = 'CD2' AND
+a1.cs IS NOT NULL AND a2.cs IS NOT NULL AND
+abs(a1.cs-a2.cs) > 0.01 AND
+r.chi2_avg IS NOT NULL AND r.chi2_cv IS NOT NULL AND
 (r.chi2_avg > 0. and r.chi2_avg < 120.) AND -- around +60
 (a1.cs-a2.cs) > 4 AND                       -- >4 ppm (indicates trans)
+r.chi2_cv < 0.2 AND ( r.chi2_avg > 0 AND r.chi2_avg < 240 )
+order by (a1.cs-a2.cs) DESC;
 
 -- Values for Vuister lab entries
 -- No conflicts with CS at all!
@@ -79,11 +98,11 @@ select e.pdb_id as pdb, c.name as c, r.number as num, r.name, a1.name, a2.name,
 to_char(a1.cs-a2.cs, 'FM990.0') as csd,
 to_char(r.chi2_avg,  'FM990.0') as chi2_avg,
 to_char(r.chi2_cv,   'FM0.00') as chi2_cv
-FROM "devnrgcing"."cingatom" a1
-inner join "devnrgcing"."cingatom"   a2 on  a1.residue_id = a2.residue_id
-inner join "devnrgcing"."cingresidue" r on a1.residue_id = r.residue_id
-inner join "devnrgcing"."cingchain"   c on r.chain_id = c.chain_id
-inner join "devnrgcing"."cingentry"   e on c.entry_id = e.entry_id
+FROM "nrgcing"."cingatom" a1
+inner join "nrgcing"."cingatom"   a2 on  a1.residue_id = a2.residue_id
+inner join "nrgcing"."cingresidue" r on a1.residue_id = r.residue_id
+inner join "nrgcing"."cingchain"   c on r.chain_id = c.chain_id
+inner join "nrgcing"."cingentry"   e on c.entry_id = e.entry_id
 where
 e.name in ( '1brv','1hkt','1mo7','1mo8','1ozi','1p9j','1pd7','1qjt','1vj6','1y7n','2fws','2fwu','2jsx') AND
 r.name = 'LEU' AND

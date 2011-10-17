@@ -389,7 +389,7 @@ AND '{2}' <@ S.chain_type; -- contains at least one protein chain.
                          getDeepByKeysOrAttributes( plotDict, IS_FALSE)
         filterForOtherValueEqual = getDeepByKeysOrAttributes( plotDict, IS_OTHER_VALUE_STR)
 
-        if doTrending: # optimalization is to ignore the 'pure' X-ray,
+        if doTrending: # optimization is to ignore the 'pure' X-ray,
             # First get the entry entry_name info
             try:
                 s = select([m.bs.c[PDBJ_ENTRY_ID_STR], m.bs.c[DEPOSITION_DATE_STR]])
@@ -518,22 +518,24 @@ AND '{2}' <@ S.chain_type; -- contains at least one protein chain.
                 return
             # end try
         # end if
-        chainIdChainNameResultDict = NTdict()
-        resIdResNumberResultDict = NTdict()
-        atomIdAtomNameResultDict = NTdict()
-        if level_number <= 2:
-            nTdebug("Setting up dictionary for chain")
-            chainIdChainNameResultDict.appendFromTable(         chainNameResultTable,       0, 1)
+        if replaceUniqueIdByNaturalId:        
+            chainIdChainNameResultDict = NTdict()
+            resIdResNumberResultDict = NTdict()
+            atomIdAtomNameResultDict = NTdict()
+            if level_number <= 2:
+                nTdebug("Setting up dictionary for chain")
+                chainIdChainNameResultDict.appendFromTable(         chainNameResultTable,       0, 1)
+            # end if
+            if level_number <= 1:
+                nTdebug("Setting up dictionary for residue")
+                resIdResNumberResultDict.appendFromTable(       residueNumberResultTable,       0, 1)
+            # end if
+            if level_number <= 0:
+                nTdebug("Setting up dictionary for atom")
+                atomIdAtomNameResultDict.appendFromTable(           atomNameResultTable,        0, 1)
+            # end if
+            nTdebug("Done setting up any mapping dictionary.")
         # end if
-        if level_number <= 1:
-            nTdebug("Setting up dictionary for residue")
-            resIdResNumberResultDict.appendFromTable(       residueNumberResultTable,       0, 1)
-        # end if
-        if level_number <= 0:
-            nTdebug("Setting up dictionary for atom")
-            atomIdAtomNameResultDict.appendFromTable(           atomNameResultTable,        0, 1)
-        # end if
-        nTdebug("Done setting up any mapping dictionary.")
 
         # Get actual value of interest together with attributes to filter on.
         try:
@@ -913,13 +915,13 @@ AND '{2}' <@ S.chain_type; -- contains at least one protein chain.
 #        e0 = {IS_SMALLER_THAN_STR: (CV_BACKBONE_STR, 0.9), IS_TRUE: SEL1_STR } #@UnusedVariable
 #        e1 = {IS_SMALLER_THAN_STR: (CV_BACKBONE_STR, 0.9) } #@UnusedVariable
 
-        if 1: # default 0
-            plotList = [
-#                        [ RES_LEVEL,   PC_STR,             pc_gf_CHI12_STR,   {USE_MIN_VALUE_STR: -5.0, USE_MAX_VALUE_STR: 5.0} ],
-                        [ CSLPA_LEVEL, VASCO_STR,          csd_STR,           {IS_OTHER_VALUE_STR: (( atomclass_STR, H_None_STR),) } ],
-                        [ CSLPA_LEVEL, VASCO_STR,          csd_STR,           {IS_OTHER_VALUE_STR: (( atomclass_STR, N_None_STR),) } ],
-                        [ CSLPA_LEVEL, VASCO_STR,          csd_STR,           {IS_OTHER_VALUE_STR: (( atomclass_STR, C_3_STR),) } ],
-                    ]
+        try:
+#            djaflsjlfjalskdjf #@UndefinedVariable # pylint: disable=W0104
+            from cing.NRG.localPlotList import plotList # pylint: disable=E0611
+        except:
+#            plotList = [
+#                        [ PROJECT_LEVEL, CING_STR, DISTANCE_COUNT_STR,dict4 ], # 1
+#                    ]
 #            plotList = []
 #            for cutoff_max in arange(0.1, 1.0, 0.1):
 #                cutoff_min = cutoff_max - 0.1
@@ -945,8 +947,12 @@ AND '{2}' <@ S.chain_type; -- contains at least one protein chain.
     #            [ RES_LEVEL, CING_STR, CV_BACKBONE_STR, {IS_FALSE: SEL1_STR} ],
     #            [ RES_LEVEL, CING_STR, CV_SIDECHAIN_STR, {IS_FALSE: SEL1_STR} ],
     #            ]
+            nTtracebackError()
+#            pass
         # end try
-
+#        plotIdx = 94
+#        plotList = plotList[plotIdx:(plotIdx+1+0)]
+#        plotList = plotList[plotIdx:]
 
         for p in plotList:
             level, progId, chk_id, plotDict = p
@@ -1034,7 +1040,7 @@ AND '{2}' <@ S.chain_type; -- contains at least one protein chain.
                 dataAll = []
                 for i,bin in enumerate(numBins):
                     bins.append(num2date(bin) + halfBinSize )
-                    widths.append(datetime.timedelta(365)) # 1 year width for box
+                    widths.append(datetime.timedelta(365)) # 1 year width for box. TODO: CHECK UNITS CODE FAILS HERE.
                     spread = binned_valueList[i]
                     spread.sort()
 #                    aspread = asarray(spread)
@@ -1336,7 +1342,7 @@ AND '{2}' <@ S.chain_type; -- contains at least one protein chain.
         mkdirs( cingDirTmpTest )
         if os.chdir(cingDirTmpTest):
             nTerror("Failed to change to test directory for files: " + cingDirTmpTest)
-
+        # end if
         m = self
         perEntryRog = m.perEntryRog
         s = select([m.e1.c.pdb_id, m.r1.c.rog, 100.0 * func.count(m.r1.c.rog) / m.e1.c.res_count
@@ -1399,6 +1405,11 @@ AND '{2}' <@ S.chain_type; -- contains at least one protein chain.
 
 
     def getAndPlotColorVsColor(self, doPlot = True):
+        cingDirTmpTest = os.path.join( cingDirTmp, getCallerName() )
+        mkdirs( cingDirTmpTest )
+        if os.chdir(cingDirTmpTest):
+            nTerror("Failed to change to test directory for files: " + cingDirTmpTest)
+        # end if
         m = self
         perEntryRog = m.perEntryRog
         # Plot the % red vs green for all in nrgcing
@@ -1437,33 +1448,64 @@ AND '{2}' <@ S.chain_type; -- contains at least one protein chain.
     #    nTdebug("ROG per residue: %s" % m)
 
         strTitle = 'rog'
-        ps = NTplotSet() # closes any previous plots
-        ps.hardcopySize = (sizePoints, sizePoints)
-        myplot = NTplot(title=strTitle)
-        ps.addPlot(myplot)
+#        ps = NTplotSet() # closes any previous plots
+#        ps.hardcopySize = (sizePoints, sizePoints)
+#        myplot = NTplot(title=strTitle)
+#        myplot = NTplot(title='CING ROG Scores')
+#        myplot = NTplot(title='')
+#        ps.addPlot(myplot)
 
         cla() # clear all.
-        _p = plt.plot(color[2], color[0], '+', color='blue')
+        lw = 5.0
+        cl = 'black'
+        rc('lines', linewidth=lw, color=cl)     
+        rc('axes',  linewidth=lw )     
+        rc('grid',  linewidth=lw )     
+        rc('font', size=140)
+
+        _p = plt.plot(color[2], color[0], 'o', color=cl, markerfacecolor=cl, markersize=20 )
         xlim(0, 100)
         ylim(0, 100)
-        xlabel('% residues red')
-        ylabel('% residues green')
-
+        xlabel('% Residues Red')
+        ylabel('% Residues Green')
+#        xlabel('')
+#        ylabel('')
+#        grid( linewidth=lw )
         a = gca()
-        attributesMatLibPlot = {'linewidth' :2}
+        attributesMatLibPlot = {'linewidth' :20.0}
         xOffset = 20
         line2D = Line2D([0, 100 - xOffset], [xOffset, 100])
         line2D.set(**attributesMatLibPlot)
-        line2D.set_c('g')
+#        line2D.set_c('g')
+#        line2D.set_c('black')
         a.add_line(line2D)
         line2D = Line2D([xOffset, 100], [0, 100 - xOffset])
         line2D.set(**attributesMatLibPlot)
-        line2D.set_c('r')
+#        line2D.set_c('r')
+#        line2D.set_c('black')
         a.add_line(line2D)
-
-        fn = strTitle + '.png'
-        ps.hardcopy(fn)
-
+        grid( linewidth=lw, linestyle='-',  color=cl )
+        fn = strTitle + '.eps'
+        nTdebug("Saving plot file: %s" % fn)
+#        ps.hardcopy(fn)
+        fig_width_pt = 4000
+        fig_height_pt = fig_width_pt
+        fig_width     = fig_width_pt*inches_per_pt  # width in inches
+        fig_height    = fig_height_pt*inches_per_pt # height in inches
+        fig_size      = [fig_width,fig_height]
+        params = {#'backend':          self.graphicsOutputFormat,
+                  'figure.dpi':       dpi,
+                  'figure.figsize':   fig_size,
+                  'savefig.dpi':      dpi,
+                  'savefig.figsize':  fig_size,
+                   }
+        rcParams.update(params)
+        figure = gcf()
+        figure.set_size_inches(  fig_size )
+        savefig(fn)
+    # end def
+    
+    
     def plotQualityVsColor(self):
         m = self
         elementNameList = ['WI_Backbone', 'WI_Rama', 'PC_Backbone']
@@ -1624,15 +1666,15 @@ if __name__ == '__main__':
         host = 'nmr.cmbi.umcn.nl'
     n = NrgCingRdb( schema=schema, host = host )
 
-    if 0:
+    if True: # Default 0
         n.createPlots(doTrending = False)
     if 0:
         n.createScatterPlots()
-    if False:
+    if 0: # Default 0
 #        m.plotQualityVsColor()
 #        m.plotQualityPcVsColor()
-        n.getAndPlotColorVsColor(doPlot = True)
-    if False:
+        n.getAndPlotColorVsColor(doPlot = True) # ROG Plot for paper.
+    if 0:
         n.createScatterPlotGreenVersusRed()
     if 0:
         pdbIdList = n.getPdbIdList()
