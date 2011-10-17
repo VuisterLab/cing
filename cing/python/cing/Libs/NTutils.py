@@ -5091,6 +5091,15 @@ def toCsv(inObject):
     return result
 # end def
 
+def updateAndReturnDict(d, fromDict):
+    e = NTdict()
+    e( **d )
+    e( **fromDict )
+    return e
+# end def
+
+
+
 prefixError     = 'ERROR: '
 prefixCodeError = 'ERROR IN CODE: '
 prefixException = 'EXCEPTION CAUGHT: '
