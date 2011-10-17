@@ -37,7 +37,7 @@ jQuery(document).ready(function() {
         "sAjaxSource": 'entry_list_summary.json',
         "oLanguage": {
             "sSearch": "Search (e.g. 9pcy):",
-            "sProcessing": "Please wait while loading..."
+            "sProcessing": "Please wait. Processing..."
         }        
     } );            
 //    Add a select menu for some TH element (rog and chothia_class) in the table footer 

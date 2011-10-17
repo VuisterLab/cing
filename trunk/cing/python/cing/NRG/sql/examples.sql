@@ -80,6 +80,14 @@ AND release_date > deposition_date + interval '4 year'
 ORDER BY deposition_date desc
 LIMIT 10;
 
+-- Find first 10 PDB NMR entries.
+SELECT pdbid, deposition_date, release_date
+FROM brief_summary b
+JOIN "//exptl/@method" p1 ON b.docid = p1.docid
+WHERE p1.val LIKE '%NMR'
+ORDER BY deposition_date asc
+LIMIT 10;
+
 -- Get listing of non-SG PDB pdbid)
 select s.docid FROM brief_summary s
 JOIN "//exptl/@method" p1 ON s.docid = p1.docid
