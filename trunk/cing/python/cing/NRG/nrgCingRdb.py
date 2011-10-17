@@ -894,7 +894,7 @@ AND '{2}' <@ S.chain_type; -- contains at least one protein chain.
                 fn = "plotHist_%s.%s" % (chk_id_unique, fmt)
                 nTdebug("Writing " + fn)
                 savefig(fn)
-#~
+            # end for
         # end for plot
     # end def
 
@@ -905,6 +905,7 @@ AND '{2}' <@ S.chain_type; -- contains at least one protein chain.
         doTrending shows history on x-axis.
         '''
         m = self
+        onlyScatter = True # Need to debug the whiskers etc.
         # NB The level of project is equivalent to the entry level in the database.
         # Sorted by project, program.
 
@@ -950,9 +951,9 @@ AND '{2}' <@ S.chain_type; -- contains at least one protein chain.
             nTtracebackError()
 #            pass
         # end try
-#        plotIdx = 94
-#        plotList = plotList[plotIdx:(plotIdx+1+0)]
-#        plotList = plotList[plotIdx:]
+        plotIdx = 0
+#        plotList = plotList[plotIdx:(plotIdx+1+5)]
+        plotList = plotList[plotIdx:]
 
         for p in plotList:
             level, progId, chk_id, plotDict = p
@@ -1005,56 +1006,68 @@ AND '{2}' <@ S.chain_type; -- contains at least one protein chain.
                 # end list creation.
                 scatter(xDate, y, s=0.1) # Plot of the data and the fit
                 p = polyfit(x, y, 1)  # deg 1 means 2 parameters for a order 2 polynomial
-                nTmessage("Fit with terms             : %s" % p)
+#                nTmessage("Fit with terms             : %s" % p)
                 titleStr += ' trending %s per year' % (p[0]*365.25)
 
                 t = [min(xDate), max(xDate)] # Only need 2 points for straight line!
                 plot(t, fitDatefuncD2(p, t), "r--", linewidth=1) # Plot of the data and the fit
-                # Now bin
-                yearMin = 1990 # inclusive start
-                yearMax = 2012 # exclusive end
-                yearBinSize = 2
-                nbins = ( yearMax - yearMin ) / yearBinSize  # should match above. last bin will start at 2010
-                dateMin = datetime.date(yearMin, 1, 1)
-                dateMax = datetime.date(yearMax, 1, 1)
-                dateNumMin = date2num(dateMin)
-                dateNumMax = date2num(dateMax)
-#                dateNumSpan = dateNumMax - dateNumMin
-                halfBinSize = datetime.timedelta(365*yearBinSize/2.)
-                nTmessage("Date number min/max: %s %s" % (dateNumMin, dateNumMax))
-                if False: # test positions
-                    testX = [dateMin,dateMax]
-                    testY = [-10.,0.]
-                    plot(testX, testY)
-
-#                nr = 100 # number of records
-#                x = np.random.random(nr) * dateNumSpan + dateNumMin
-                x = np.array(x)
-#                y = np.random.random(nr) * 10
-                y = np.array(y)
-                print "x: %s" % x
-                print "y: %s" % y
-                binned_valueList, numBins = bin_by(y, x, nbins=nbins, ymin=dateNumMin, ymax=dateNumMax)
-                bins = []
-                widths = []
-                dataAll = []
-                for i,bin in enumerate(numBins):
-                    bins.append(num2date(bin) + halfBinSize )
-                    widths.append(datetime.timedelta(365)) # 1 year width for box. TODO: CHECK UNITS CODE FAILS HERE.
-                    spread = binned_valueList[i]
-                    spread.sort()
-#                    aspread = asarray(spread)
-                    dataAll.append(spread)
-                    nTdebug("spread: %s" % spread)
-                # end for
-                nTdebug("numBins: %s" % numBins)
-                sym = '' # no symbols
-                sym = 'k.'
-                wiskLoL = boxplot(dataAll, positions=bins, widths=widths, sym=sym)
-#                scatter(x, y, s=0.1) # Plot of the data and the fit
-                print 'wiskLoL: %s' % wiskLoL
-                xlim(xmin=dateMin, xmax=dateMax)
-            else:
+                if not onlyScatter:
+                    # Now bin
+                    yearMin = 1990 # inclusive start
+                    yearMax = 2012 # exclusive end
+                    yearBinSize = 2
+                    nbins = ( yearMax - yearMin ) / yearBinSize  # should match above. last bin will start at 2010
+                    dateMin = datetime.date(yearMin, 1, 1)
+                    dateMax = datetime.date(yearMax, 1, 1)
+                    dateNumMin = date2num(dateMin)
+                    dateNumMax = date2num(dateMax)
+    #                dateNumSpan = dateNumMax - dateNumMin
+                    halfBinSize = datetime.timedelta(365*yearBinSize/2.)
+                    nTmessage("Date number min/max: %s %s" % (dateNumMin, dateNumMax))
+                    if False: # test positions
+                        testX = [dateMin,dateMax]
+                        testY = [-10.,0.]
+                        plot(testX, testY)
+    
+    #                nr = 100 # number of records
+    #                x = np.random.random(nr) * dateNumSpan + dateNumMin
+                    x = np.array(x)
+    #                y = np.random.random(nr) * 10
+                    y = np.array(y)
+                    print "x: %s" % x
+                    print "y: %s" % y
+                    binned_valueList, numBins = bin_by(y, x, nbins=nbins, ymin=dateNumMin, ymax=dateNumMax)
+                    bins = []
+                    widths = []
+                    dataAll = []
+                    for i,bin in enumerate(numBins):
+                        bins.append(num2date(bin) + halfBinSize )
+                        widths.append(datetime.timedelta(365)) # 1 year width for box. TODO: CHECK UNITS CODE FAILS HERE.
+                        spread = binned_valueList[i]
+                        spread.sort()
+    #                    aspread = asarray(spread)
+                        dataAll.append(spread)
+                        nTdebug("spread: %s" % spread)
+                    # end for
+                    nTdebug("numBins: %s" % numBins)
+                    sym = '' # no symbols
+                    sym = 'k.'
+                    wiskLoL = boxplot(dataAll, positions=bins, widths=widths, sym=sym)
+    #                scatter(x, y, s=0.1) # Plot of the data and the fit
+                    print 'wiskLoL: %s' % wiskLoL
+#                    xlim(xmin=dateMin, xmax=dateMax)
+                # end if scatterOnly
+                
+                # When trending the limits are for the y-axis.
+                if xmin != None:
+                    ylim(ymin=xmin)
+#                    nTdebug('Set y limit min to: %s' % xmin)
+                # end if
+                if xmax != None:
+                    ylim(ymax=xmax)
+#                    nTdebug('Set y limit max to: %s' % xmax)
+                # end if
+            else: # else not trending.
                 # Histogram the data
                 normed = 0 # Default zero
                 num_bins = 50
@@ -1090,8 +1103,8 @@ AND '{2}' <@ S.chain_type; -- contains at least one protein chain.
                     maxValueHist = max(y)
                     p0 = [maxValueHist, av, variance] # Initial guess for the parameters
                     if False: # actually do the fit or save some time.
-                        msg = "Started fit with maxValueHist, mu, variance     : %8.3f %8.3f %8.3f" % tuple(p0)
-                        nTmessage(msg)
+#                        msg = "Started fit with maxValueHist, mu, variance     : %8.3f %8.3f %8.3f" % tuple(p0)
+#                        nTmessage(msg)
                         # Use full output to get error estimates etc from Fortran library.
                         p1, success = optimize.leastsq(errfunc, p0[:], full_output=0, args=(x, y))
                         nTmessage("Success: %s" % success)
@@ -1114,7 +1127,8 @@ AND '{2}' <@ S.chain_type; -- contains at least one protein chain.
             xlabel(chk_id_unique)
             title(titleStr)
             for fmt in ['png' ]:
-                fn = "plotHist_" + chk_id_unique
+#                fn = "plotHist_" + chk_id_unique
+                fn = chk_id_unique
                 if cutoff_min != None:
                     fn += "_%s" % cutoff_min
                 if cutoff_max != None:
@@ -1667,7 +1681,7 @@ if __name__ == '__main__':
     n = NrgCingRdb( schema=schema, host = host )
 
     if True: # Default 0
-        n.createPlots(doTrending = False)
+        n.createPlots(doTrending = 1) # Main plots for NRG-CING front site.
     if 0:
         n.createScatterPlots()
     if 0: # Default 0
