@@ -171,6 +171,7 @@ tr.even {
 
 .clear {
     clear: both;
+    content: "&nbsp";
 }
 
 .dataTables_empty {

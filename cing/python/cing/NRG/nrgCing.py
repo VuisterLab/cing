@@ -1239,7 +1239,6 @@ class NrgCing(Lister):
         
 #                
         additional_head_string = '''        
-<link media="screen" href="cing.css"                                  type="text/css" rel="stylesheet"/>
 <link media="screen" href="dataTableMedia/css/demo_table.css"         type="text/css" rel="stylesheet"/>
 <link media="screen" href="dataTableMedia/css/TableTools.css"         type="text/css" rel="stylesheet"/>
 <script src="multilineTitles.js"                                      type="text/javascript"></script>
@@ -1255,13 +1254,13 @@ class NrgCing(Lister):
         file_content = string.replace(file_content, old_string, additional_head_string)
         
         new_string = '''
-            <table id="dataTables-summaryArchive"> 
+            <table id="dataTables-summaryArchive" class="display" cellspacing="0" cellpadding="0" border="0""> 
             <thead>
             <tr> 
         '''
         #Write headers: 'name', 'rog', 'distance_count', 'cs_count', 'chothia_class', 'chain_count', 'res_count'
         for i,header in enumerate(summaryHeaderList):
-            new_string += '\t<th "title"="{help}">{header}</th>\n'.format(header = summaryHeader2List[i],
+            new_string += '\t<th title="{help}">{header}</th>\n'.format(header = summaryHeader2List[i],
                                                                           help = summaryHeaderTitleList[i])
         # end for
         new_string += '''
@@ -1311,12 +1310,12 @@ class NrgCing(Lister):
             if r < 10:
                 nTdebug("row: %s" % str(row))
             # end if
-            pdb_id = row[PDB_ID_IDX]
-            ch23 = pdb_id[1:3]
-            kwds = {'ch23':ch23, 'pdb_id':pdb_id}
+#            pdb_id = row[PDB_ID_IDX]
+#            ch23 = pdb_id[1:3]
+#            kwds = {'ch23':ch23, 'pdb_id':pdb_id}
 #            row[0] = '-'.format( **kwds )
 #            row[0] = '<img src="../data/{ch23}/{pdb_id}/{pdb_id}.cing/{pdb_id}/HTML/mol.gif" border="0" width="40">'.format( **kwds )
-            row[0] =  '<a href="../data/{ch23}/{pdb_id}/{pdb_id}.cing">{pdb_id}</a>'.format( **kwds )
+#            row[0] =  '<a href="../data/{ch23}/{pdb_id}/{pdb_id}.cing">{pdb_id}</a>'.format( **kwds )
             for c in range(len(row)):
 #                if row[c] == 'None' or row[c] == '' or row[c] == 'none':
                 if row[c] == None:
