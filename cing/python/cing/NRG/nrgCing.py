@@ -1237,6 +1237,7 @@ class NrgCing(Lister):
         # Removed:
 #                            "oTableTools": {"sSwfPath": "extras/TableTools/media/swf/copy_cvs_xls_pdf.swf"},
         
+#<script src="dataTableMedia/ZeroClipboard/ZeroClipboard.js"           type="text/javascript"></script>        
 #                
         additional_head_string = '''        
 <link media="screen" href="dataTableMedia/css/demo_table.css"         type="text/css" rel="stylesheet"/>
@@ -1248,7 +1249,6 @@ class NrgCing(Lister):
 <script src="dataTableMedia/js/jquery.dataTables.js"                  type="text/javascript"></script>
 <script src="dataTableMedia/js/TableTools.js"                         type="text/javascript"></script>
 <script src="dataTableMedia/js/jquery.dataTables.select.filtering.js" type="text/javascript" ></script>
-<script src="dataTableMedia/ZeroClipboard/ZeroClipboard.js"           type="text/javascript"></script>        
         '''
         old_string = r"<!-- INSERT ADDITIONAL HEAD STRING HERE -->"        
         file_content = string.replace(file_content, old_string, additional_head_string)
@@ -1310,12 +1310,12 @@ class NrgCing(Lister):
             if r < 10:
                 nTdebug("row: %s" % str(row))
             # end if
-#            pdb_id = row[PDB_ID_IDX]
-#            ch23 = pdb_id[1:3]
-#            kwds = {'ch23':ch23, 'pdb_id':pdb_id}
+            pdb_id = row[PDB_ID_IDX]
+            ch23 = pdb_id[1:3]
+            kwds = {'ch23':ch23, 'pdb_id':pdb_id}
 #            row[0] = '-'.format( **kwds )
 #            row[0] = '<img src="../data/{ch23}/{pdb_id}/{pdb_id}.cing/{pdb_id}/HTML/mol.gif" border="0" width="40">'.format( **kwds )
-#            row[0] =  '<a href="../data/{ch23}/{pdb_id}/{pdb_id}.cing">{pdb_id}</a>'.format( **kwds )
+            row[0] =  '<a href="../data/{ch23}/{pdb_id}/{pdb_id}.cing">{pdb_id}</a>'.format( **kwds )
             for c in range(len(row)):
 #                if row[c] == 'None' or row[c] == '' or row[c] == 'none':
                 if row[c] == None:

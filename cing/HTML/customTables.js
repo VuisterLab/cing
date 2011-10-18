@@ -3,7 +3,17 @@
 //	  - Added additional number of rows to paginate (5 and up to 10,000)
 //    - Changed the wording of 'entries' to 'items'.
 jQuery(document).ready(function() {
-    // Safe variable for below JS.
+    /*    "fnRender": function ( oObj ) {
+     console.log("Hello World! I'm in.");
+     var c = oObj.iDataColumn;
+     var pdbId =  oObj.aData[c];
+     if ( pdbId.length != 4 ) {
+         console.log('Skipping supposed to be pdbId: ' + pdbId);
+         return ''
+     }
+     var a = "<a href='" + "../data/" + pdbId.substring(1, 3) + "/" + pdbId + "/" + pdbId + ".cing" + "'>" + pdbId + "</a>";
+     return a;
+     } */	
     var oTable = $("table[id^='dataTables-summaryArchive']").dataTable({
         "bSort": true,
         // Initially show the reverse natural order of PDB entries. High numbers in NRG-CING are more interesting.
@@ -11,23 +21,8 @@ jQuery(document).ready(function() {
         // Set the data types just in case the automatic detection fails (because of '.' values eg). Important for sorting.
         // mandatory to list each column if using this parameter!
         "aoColumns": [
-//                      { "sType": "html" }, 				        // image html
-                      { "sType": "html",    
-                         "fnRender": function ( oObj ) {
-                          /* console.log("Hello World! I'm in."); */
-                          var c = oObj.iDataColumn;
-                          var pdbId =  oObj.aData[c];
-                          if ( pdbId.length != 4 ) {
-                              console.log('Skipping supposed to be pdbId: ' + pdbId);
-                              return ''
-                          }
-                          var ch23 =  pdbId.substring(1, 3);
-                          /* http://nmr.cmbi.ru.nl/NRG-CING/data/pc/9pcy/9pcy.cing */
-                          var url = "../data/" + ch23 + "/" + pdbId + "/" + pdbId + ".cing";
-                          var a = "<a href='" + url + "'>" + pdbId + "</a>";
-                          return a;
-                          }
-                      },
+//                      { "sType": "html" }, 				    // image html
+                      { "sType": "html"   , "sClass": "left"  },// pdb
 //                      { "sType": "numeric", "sClass": "right" },// bmrb 
                       { "sType": "numeric", "sClass": "right" },// rog 
                       { "sType": "numeric", "sClass": "right" },// distance_count 
@@ -44,18 +39,17 @@ jQuery(document).ready(function() {
         "bProcessing": true,
         "bAutoWidth": false, // recalculates the column widths on the fly but as this fails it's switched off.
         "sDom": '<lfr><"clear">tip',
-//        "sDom": '<flr>tip',
-//        "sDom": '<"top"flr>t<"bottom"ip>',
-//        "sSwfPath": "",       
-//      "sSwfPath": "dataTableMedia/swf/ZeroClipboard.swf",       
-//        "sSwfPath": "dataTableMedia/swf/copy_cvs_xls_pdf.swf"},
         "sAjaxSource": 'entry_list_summary.json',
         "oLanguage": {
             "sSearch": "Search (e.g. 9pcy):",
             "sProcessing": "Please wait. Processing..."
-        }        
+        },
+        "bScrollInfinite": true,
+        "bScrollCollapse": true,
+        "sScrollY": "200px"    
     } );            
 //    Add a select menu for some TH element (rog and chothia_class) in the table footer 
+    
     $("tfoot th").each( function ( i ) {
         if (i != 1 && i != 4) {
             return;
@@ -64,6 +58,7 @@ jQuery(document).ready(function() {
             oTable.fnFilter( $(this).val(), i );
         } );
     } );
+    
     // Usage of the console object
 //    console.log("Hello World! 2");
     /* td[class^='PDB'] */
@@ -108,7 +103,7 @@ jQuery(document).ready(function() {
         "iDisplayLength": 10000,
         "bFilter": true,
         "bProcessing": true,
-        "bAutoWidth": false, // recalculates the column widths on the fly but as this fails it's switched off.
+        "bAutoWidth": false // recalculates the column widths on the fly but as this fails it's switched off.
 //        "bStateSave": true, // uses cookie! test first! Not really nicer..
     } );
 
