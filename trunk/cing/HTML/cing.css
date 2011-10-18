@@ -367,3 +367,12 @@ h3 {
    height: 1.73em;
    width: 1.73em;
 }
+
+/* Front page of archive */
+#summaryArchiveDiv {
+    border: 0.091em solid #0ca0ad;
+    float: left;
+    width:70%;
+    padding: 5px; 
+    margin: 10px;
+}

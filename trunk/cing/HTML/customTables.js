@@ -12,7 +12,22 @@ jQuery(document).ready(function() {
         // mandatory to list each column if using this parameter!
         "aoColumns": [
 //                      { "sType": "html" }, 				        // image html
-                      { "sType": "html" }, 				        // pdb html
+                      { "sType": "html",    
+                         "fnRender": function ( oObj ) {
+                          /* console.log("Hello World! I'm in."); */
+                          var c = oObj.iDataColumn;
+                          var pdbId =  oObj.aData[c];
+                          if ( pdbId.length != 4 ) {
+                              console.log('Skipping supposed to be pdbId: ' + pdbId);
+                              return ''
+                          }
+                          var ch23 =  pdbId.substring(1, 3);
+                          /* http://nmr.cmbi.ru.nl/NRG-CING/data/pc/9pcy/9pcy.cing */
+                          var url = "../data/" + ch23 + "/" + pdbId + "/" + pdbId + ".cing";
+                          var a = "<a href='" + url + "'>" + pdbId + "</a>";
+                          return a;
+                          }
+                      },
 //                      { "sType": "numeric", "sClass": "right" },// bmrb 
                       { "sType": "numeric", "sClass": "right" },// rog 
                       { "sType": "numeric", "sClass": "right" },// distance_count 
@@ -28,7 +43,7 @@ jQuery(document).ready(function() {
         "bFilter": true,
         "bProcessing": true,
         "bAutoWidth": false, // recalculates the column widths on the fly but as this fails it's switched off.
-        "sDom": 'lfrtip',
+        "sDom": '<lfr><"clear">tip',
 //        "sDom": '<flr>tip',
 //        "sDom": '<"top"flr>t<"bottom"ip>',
 //        "sSwfPath": "",       
@@ -49,6 +64,15 @@ jQuery(document).ready(function() {
             oTable.fnFilter( $(this).val(), i );
         } );
     } );
+    // Usage of the console object
+//    console.log("Hello World! 2");
+    /* td[class^='PDB'] */
+//    $("#dataTables-summaryArchive td[class^='PDB']").each( function(nr, elem) {
+//        console.log("Hello World! I'm in.");    	
+//        var url = "http://www.bla.nl/" + $(elem).text().substring(1, 3) + "/" + $(elem).text() + ".gif";
+//        var a = "<a href='" + url + "'>" + $(elem).text() + "</a>";
+//        $(elem).html(a);
+//    });
     
     $("table[id^='dataTables-atomList']").dataTable({
         "sDom": 'T<"clear">lfrtip',
@@ -85,7 +109,6 @@ jQuery(document).ready(function() {
         "bFilter": true,
         "bProcessing": true,
         "bAutoWidth": false, // recalculates the column widths on the fly but as this fails it's switched off.
-        "sDom": 'T<"clear">lfrtip'
 //        "bStateSave": true, // uses cookie! test first! Not really nicer..
     } );
 
