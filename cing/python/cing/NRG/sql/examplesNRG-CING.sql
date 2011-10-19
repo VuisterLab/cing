@@ -374,3 +374,14 @@ c.entry_id = e.entry_id AND
 r.residue_id = 615999
 ;
 
+ALTER TABLE nrgcing.cingentry ADD COLUMN rog_str VARCHAR(255) DEFAULT NULL;
+ALTER TABLE nrgcing.cingentry ADD COLUMN chothia_class_str VARCHAR(255) DEFAULT NULL;
+
+update nrgcing.cingentry set rog_str='green' where rog = 0; 
+update nrgcing.cingentry set rog_str='orange' where rog = 1; 
+update nrgcing.cingentry set rog_str='red' where rog = 2; 
+
+update nrgcing.cingentry set chothia_class_str='alpha' where chothia_class = 0; 
+update nrgcing.cingentry set chothia_class_str='beta' where chothia_class = 1; 
+update nrgcing.cingentry set chothia_class_str='a/b' where chothia_class = 2; 
+update nrgcing.cingentry set chothia_class_str='coil' where chothia_class = 3; 

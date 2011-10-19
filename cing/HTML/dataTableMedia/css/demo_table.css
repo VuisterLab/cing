@@ -18,10 +18,10 @@
     border: 1px solid #ddd;
     text-align: center;
     /* JFD mods from: color: #999; */
-    color: red;
+    color: #999;
     /* background-color: red; */    
     /* org: font-size: 11px; */
-    font-size: 20px;
+    font-size: 11px;
     padding: 2px 0;
 }
 

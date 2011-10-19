@@ -3,17 +3,6 @@
 //	  - Added additional number of rows to paginate (5 and up to 10,000)
 //    - Changed the wording of 'entries' to 'items'.
 jQuery(document).ready(function() {
-    /*    "fnRender": function ( oObj ) {
-     console.log("Hello World! I'm in.");
-     var c = oObj.iDataColumn;
-     var pdbId =  oObj.aData[c];
-     if ( pdbId.length != 4 ) {
-         console.log('Skipping supposed to be pdbId: ' + pdbId);
-         return ''
-     }
-     var a = "<a href='" + "../data/" + pdbId.substring(1, 3) + "/" + pdbId + "/" + pdbId + ".cing" + "'>" + pdbId + "</a>";
-     return a;
-     } */	
     var oTable = $("table[id^='dataTables-summaryArchive']").dataTable({
         "bSort": true,
         // Initially show the reverse natural order of PDB entries. High numbers in NRG-CING are more interesting.
@@ -22,9 +11,21 @@ jQuery(document).ready(function() {
         // mandatory to list each column if using this parameter!
         "aoColumns": [
 //                      { "sType": "html" }, 				    // image html
-                      { "sType": "html"   , "sClass": "left"  },// pdb
+                      { "sType": "html"   , "sClass": "left",   // pdb
+                        "fnRender": function ( oObj ) {
+        //                      console.log("Hello World! I'm in.");
+                              var c = oObj.iDataColumn;
+                              var pdbId =  oObj.aData[c];
+                              if ( pdbId.length != 4 ) {
+                                  console.log('Skipping supposed to be pdbId: ' + pdbId);
+                                  return ''
+                              }
+                              var a = "<a href='" + "../data/" + pdbId.substring(1, 3) + "/" + pdbId + "/" + pdbId + ".cing" + "'>" + pdbId + "</a>";
+                              return a;
+                              }
+                      },                      
 //                      { "sType": "numeric", "sClass": "right" },// bmrb 
-                      { "sType": "numeric", "sClass": "right" },// rog 
+                      { "sType": "html", "sClass": "left" },// rog_str                      
                       { "sType": "numeric", "sClass": "right" },// distance_count 
                       { "sType": "numeric", "sClass": "right" },// cs_count 
                       { "sType": "numeric", "sClass": "right" },// chothia_class 
@@ -37,19 +38,21 @@ jQuery(document).ready(function() {
         "iDisplayLength": 10,
         "bFilter": true,
         "bProcessing": true,
+        "bServerSide": true,
         "bAutoWidth": false, // recalculates the column widths on the fly but as this fails it's switched off.
         "sDom": '<lfr><"clear">tip',
-        "sAjaxSource": 'entry_list_summary.json',
+        "sAjaxSource": '../../cgi-bin/DataTablesServer.py',
         "oLanguage": {
             "sSearch": "Search (e.g. 9pcy):",
-            "sProcessing": "Please wait. Processing..."
-        },
-        "bScrollInfinite": true,
-        "bScrollCollapse": true,
-        "sScrollY": "200px"    
+            "sProcessing": "Please wait..."
+        }
+//        "iDeferLoading": 9073
+//        "bScrollInfinite": true,
+//        "bScrollCollapse": true,        
+//        "sScrollY": "200px"
     } );            
 //    Add a select menu for some TH element (rog and chothia_class) in the table footer 
-    
+    /*
     $("tfoot th").each( function ( i ) {
         if (i != 1 && i != 4) {
             return;
@@ -58,6 +61,7 @@ jQuery(document).ready(function() {
             oTable.fnFilter( $(this).val(), i );
         } );
     } );
+    */
     
     // Usage of the console object
 //    console.log("Hello World! 2");

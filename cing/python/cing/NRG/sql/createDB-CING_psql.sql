@@ -62,6 +62,7 @@ CREATE TABLE casdcing.cingentry
     ncs_symmetry                    FLOAT DEFAULT NULL, 
     dr_symmetry                     FLOAT DEFAULT NULL,
     chothia_class                  INT DEFAULT NULL,     -- (10) alpha, beta, of a/b, a+b, or coil
+    chothia_class_str              VARCHAR(255) DEFAULT NULL,     -- (10) alpha, beta, of a/b, a+b, or coil
     protein_count                  INT DEFAULT NULL,     -- Number of protein chains. Not necessarily unique so e.g. 1hue has 2 that are identical (homodimer).
     dna_count                      INT DEFAULT NULL,     -- The Sum should be the total number of chains; chain_count
     rna_count                      INT DEFAULT NULL,
@@ -149,7 +150,8 @@ CREATE TABLE casdcing.cingentry
     dih_c1_viol                    INT DEFAULT NULL,
     dih_c3_viol                    INT DEFAULT NULL,
     dih_c5_viol                    INT DEFAULT NULL,
-    rog                            INT DEFAULT NULL
+    rog                            INT DEFAULT NULL,
+    rog_str                        VARCHAR(255) DEFAULT NULL    
 --    pdbx_SG_project_XXXinitial_of_center  VARCHAR(25) DEFAULT NULL, -- pdbx_SG_project_Initial_of_center E.g. RSGI; NULL means not from any SG.
 );
 
