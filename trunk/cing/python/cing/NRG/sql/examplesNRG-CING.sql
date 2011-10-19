@@ -385,3 +385,5 @@ update nrgcing.cingentry set chothia_class_str='alpha' where chothia_class = 0;
 update nrgcing.cingentry set chothia_class_str='beta' where chothia_class = 1; 
 update nrgcing.cingentry set chothia_class_str='a/b' where chothia_class = 2; 
 update nrgcing.cingentry set chothia_class_str='coil' where chothia_class = 3; 
+
+update nrgcing.cingentry set bmrb_id=NULL where bmrb_id = 9; 
