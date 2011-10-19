@@ -7,6 +7,7 @@ python -u $CINGROOT/python/cing/NRG/nrgCingRdb.py
 from cing import cingDirTmp
 from cing.Libs.DBMS import DBMS
 from cing.Libs.DBMS import Relation
+from cing.Libs.DBMS import getRelationFromCsvFile
 from cing.Libs.NTplot import * #@UnusedWildImport
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.NRG import * #@UnusedWildImport
@@ -191,9 +192,9 @@ class NrgCingRdb():
         columnName = PDB_ID_STR
         nTdebug("Using table: %s" % table)
         try: # rev_first will become image column
-#            table.c['rev_first'], 
             s = select([table.c['name'],    
-#                        table.c['bmrb_id'],       
+                        table.c['pdb_id'],       
+                        table.c['bmrb_id'],       
                         table.c['rog'],         table.c['distance_count'], 
                         table.c['cs_count'],table.c['chothia_class'], table.c['chain_count'], table.c['res_count'] ])
             nTdebug("SQL: %s" % s)
@@ -277,6 +278,25 @@ AND '{2}' <@ S.chain_type; -- contains at least one protein chain.
 
         # end for
     # end def
+    
+    def populateBmrbIds(self):
+        nTmessage("Inserting BMRB ids from CSV file to RDB.")
+        os.chdir(matchBmrbPdbDir)
+        csvFileName = "newMany2OneTable.csv"
+        relation = getRelationFromCsvFile( csvFileName, containsHeaderRow=True)
+        rowIdxList = range( relation.sizeRows() )
+#        rowIdxList = rowIdxList[:1000]          
+        for rowIdx in rowIdxList:
+            pdb_id = relation.getValueString( rowIdx, 0)
+            bmrb_id = relation.getValueString( rowIdx, 1)
+            stmt = "update %s.cingentry set bmrb_id=%s where pdb_id='%s'" % (self.schema, bmrb_id, pdb_id )
+            nTdebug("Executing: %s" % stmt)
+            self.execute(stmt)
+#            printResult(result)
+        # end for
+    # end def
+    
+
 
     def getDbTable( self, level ):
         m = self
@@ -1680,7 +1700,7 @@ if __name__ == '__main__':
         host = 'nmr.cmbi.umcn.nl'
     n = NrgCingRdb( schema=schema, host = host )
 
-    if True: # Default 0
+    if 0: # Default 0
         n.createPlots(doTrending = 1) # Main plots for NRG-CING front site.
     if 0:
         n.createScatterPlots()
@@ -1698,6 +1718,8 @@ if __name__ == '__main__':
         n.showCounts()
     if 0:
         n.createPlotsCompareBetweenDb(other_schema=NMR_REDO_DB_SCHEMA)
+    if 1:
+        n.populateBmrbIds()
 
     nTmessage("done with NrgCingRdb")
 # end if

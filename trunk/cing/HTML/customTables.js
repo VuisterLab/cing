@@ -6,26 +6,14 @@ jQuery(document).ready(function() {
     var oTable = $("table[id^='dataTables-summaryArchive']").dataTable({
         "bSort": true,
         // Initially show the reverse natural order of PDB entries. High numbers in NRG-CING are more interesting.
-        "aaSorting": [[0,'desc']],
+        "aaSorting": [[1,'desc']],
         // Set the data types just in case the automatic detection fails (because of '.' values eg). Important for sorting.
         // mandatory to list each column if using this parameter!
         "aoColumns": [
-//                      { "sType": "html" }, 				    // image html
-                      { "sType": "html"   , "sClass": "left",   // pdb
-                        "fnRender": function ( oObj ) {
-        //                      console.log("Hello World! I'm in.");
-                              var c = oObj.iDataColumn;
-                              var pdbId =  oObj.aData[c];
-                              if ( pdbId.length != 4 ) {
-                                  console.log('Skipping supposed to be pdbId: ' + pdbId);
-                                  return ''
-                              }
-                              var a = "<a href='" + "../data/" + pdbId.substring(1, 3) + "/" + pdbId + "/" + pdbId + ".cing" + "'>" + pdbId + "</a>";
-                              return a;
-                              }
-                      },                      
-//                      { "sType": "numeric", "sClass": "right" },// bmrb 
-                      { "sType": "html", "sClass": "left" },// rog_str                      
+                      { "sType": "html" }, 				    	// image html
+                      { "sType": "html", "sClass": "left" },    // pdb
+                      { "sType": "html", "sClass": "left" },	// bmrb 
+                      { "sType": "html", "sClass": "left" },	// rog_str                      
                       { "sType": "numeric", "sClass": "right" },// distance_count 
                       { "sType": "numeric", "sClass": "right" },// cs_count 
                       { "sType": "numeric", "sClass": "right" },// chothia_class 
@@ -46,10 +34,6 @@ jQuery(document).ready(function() {
             "sSearch": "Search (e.g. 9pcy):",
             "sProcessing": "Please wait..."
         }
-//        "iDeferLoading": 9073
-//        "bScrollInfinite": true,
-//        "bScrollCollapse": true,        
-//        "sScrollY": "200px"
     } );            
 //    Add a select menu for some TH element (rog and chothia_class) in the table footer 
     /*

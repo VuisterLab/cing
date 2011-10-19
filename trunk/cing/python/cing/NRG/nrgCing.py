@@ -1232,7 +1232,9 @@ class NrgCing(Lister):
         file_content = string.replace(file_content, old_string, new_string)
         old_string = r"<!-- INSERT FOOTER HERE -->"
         file_content = string.replace(file_content, old_string, GOOGLE_ANALYTICS_TEMPLATE)
-        
+        old_string = r"<!-- INSERT JUMP BOX HERE -->"
+        new_string = self._getJumpBoxHtml()
+        file_content = string.replace(file_content, old_string, new_string)        
         # TODO: sync with main CING code in html#HTMLfile.render()
         # Removed:
 #                            "oTableTools": {"sSwfPath": "extras/TableTools/media/swf/copy_cvs_xls_pdf.swf"},
@@ -1254,7 +1256,7 @@ class NrgCing(Lister):
         file_content = string.replace(file_content, old_string, additional_head_string)
         
         new_string = '''
-            <table id="dataTables-summaryArchive" class="display" cellspacing="0" cellpadding="0" border="0""> 
+            <table id="dataTables-summaryArchive" class="display" cellspacing="0" cellpadding="0" border="0"> 
             <thead>
             <tr> 
         '''
@@ -1267,43 +1269,6 @@ class NrgCing(Lister):
         new_string += '''
             </tr> 
             </thead>
-        '''
-        _bagger = """
-            <tfoot>
-            <tr> 
-
-        selectableColumnList = 'rog chothia_class'.split()
-        #Write footers: 'name', 'rog', 'distance_count', 'cs_count', 'chothia_class', 'chain_count', 'res_count'
-        for c, header in enumerate(summaryHeaderList):
-#            nTdebug("Working on column %s: %s" % (c,header))
-            if header not in selectableColumnList:
-                new_string += '\t<th></th>\n'
-                continue
-            # end if
-            msg = '\t<th><select><option value=""></option>'
-            listX = []
-            for row in resultLol:
-                v = row[c]
-                if row[c] == None:
-                    continue
-                # end if
-                if v not in listX:
-                    listX.append(v)
-                # end if
-            # end for
-            listX.sort()
-            for value in listX:
-                msg += '<option value="{0}">{0}</option>'.format(value, value)
-            msg += '</select></th>\n'
-#            nTdebug("Adding msg: %s" % msg)
-            new_string += msg
-        # end for
-
-            </tr>
-            </tfoot>
-        
-        """
-        new_string += '''
             </table>
         '''
         old_string = r"<!-- INSERT NEW RESULT STRING HERE -->"        
@@ -1368,7 +1333,19 @@ class NrgCing(Lister):
         # Source
         copyCingHtmlJsAndCssToDirectory(htmlDir)
 
-        fnList = 'about.html cing.png credits.html funding.html help.html helpCing.html helpPlot.html more.html plot.html'.split()
+        fnList = """
+            about.html 
+            contact.html 
+            credits.html 
+            help.html 
+            helpCing.html 
+            helpPlot.html 
+            more.html 
+            plot.html 
+            cing.png 
+            icon_email.gif
+            NRG-CING_circle.png
+            """.split()
         for fn in fnList:
             srcFile = os.path.join(base_data_dir, fn)
             dstFile = os.path.join(htmlDir,       fn)
@@ -2512,6 +2489,18 @@ class NrgCing(Lister):
         pdbRcsbMissingEntryNtList = entryNtList.difference(pdbRcsbEntryNtList)
         NTmessage("Found RCSB-PDB missing entries count: %s %s" % (len(pdbRcsbMissingEntryNtList), pdbRcsbMissingEntryNtList))
     # end def        
+    def _getJumpBoxHtml(self):
+        return '''
+            <div style="width: 25em">
+            <FORM method="GET" action="../direct.php" class="display">
+            Search by PDB ID (e.g. 9pcy):
+            <INPUT type="hidden" name="database" value="pdb" align="left">
+            <INPUT type="text" size="4" name="id" value="" title="Please provide the PDB identifier to obtain the validation report">
+            <INPUT type="submit" name="button" value="Go">                        
+            </FORM>
+            </div>
+        '''
+    # end def                
 # end class.
 
 def runNrgCing( useClass = NrgCing,
