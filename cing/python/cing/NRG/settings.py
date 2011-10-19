@@ -81,17 +81,17 @@ entry_list_summary_file_name_base = 'entry_list_summary'
 #rev_first becomes an image column
 #summaryHeaderList = 'rev_first name bmrb_id rog distance_count cs_count chothia_class chain_count res_count'.split()
 #summaryHeader2List = 'img. PDB BMRB ROG distances chem.s. Chothia chains residues'.split()
-PDB_ID_IDX = 0
-summaryHeaderList = 'name rog_str distance_count cs_count chothia_class_str chain_count res_count'.split()
-summaryHeader2List = 'PDB ROG distances chem.s. Chothia chains residues'.split()
+PDB_ID_IDX = 1
+summaryHeaderList  = 'name  pdb_id bmrb_id rog_str distance_count cs_count chothia_class_str chain_count res_count'.split()
+summaryHeader2List = 'image PDB    BMRB    ROG     distances      chem.s.  Chothia           chains      residues'.split()
 summaryHeaderTitleList = [
-#    'Molecule image',
-    'PDB entry code (click on to go to NRG-CING report.)',
-#    'BMRB entry code',
-    'CING green, orange, red score [0,1,2]',
+    'Molecule image (click on to go to NRG-CING report.)',
+    'PDB entry code (click on to go to RCSB-PDB for original data.)',
+    'BMRB entry code (click on to go to BMRB for original data.)',
+    'CING Red Orange Green scores',
     'Number of distance restraints',
     'Number of chemical shifts',
-    'Chothia definition for alpha,beta,alpha/beta,coil [0,1,2,3]',
+    'Chothia definition for alpha,beta,alpha/beta,coil,None',
     'Number of chains including water',
     'Total number of residues'
 ]    

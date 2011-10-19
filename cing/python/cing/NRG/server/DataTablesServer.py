@@ -21,10 +21,10 @@ log = sys.stderr.write
 # Easy set varaibles
 #
 # Array of database columns which should be read and sent back to DataTables
-_columns = 'name rog_str distance_count cs_count chothia_class_str chain_count res_count'.split()
-_string_columns = 'name rog_str chothia_class_str'.split() # can be simply filtered for.
+_columns = 'name pdb_id bmrb_id rog_str distance_count cs_count chothia_class_str chain_count res_count'.split()
+_string_columns = 'name pdb_id rog_str chothia_class_str'.split() # can be simply filtered for.
 # Indexed column (used for fast and accurate table cardinality)
-_indexColumn = "name"
+_indexColumn = "pdb_id"
 # DB table to use
 _sTable = "nrgcing.cingentry"
 #schema= NRG_DB_SCHEMA  
@@ -94,14 +94,50 @@ class DataTablesServer:
 #                  3:'coil',
 #                  None:'other',
 #                  }
+        refEndTag = "</a>"                    
         for row in self.resultData:
             output += '['
             for i in range( len(_columns) ):
-                v = row[ _columns[i] ]
-                if _columns[i] == "rog_str" :
+                columnName = _columns[i]
+                v = str( row[ _columns[i] ] )
+                if columnName == "name" or columnName == "pdb_id":
+                    dbId = v
+                    if not dbId:
+                        log("Strange got null for expected pdb id.")
+                        continue
+                    # end if                    
+                    if len(dbId) != 4:
+                        log("Strange got bad length for expected pdb id: [%s]" % str(dbId))
+                        continue
+                    # end if                    
+                    ch23 = dbId[1:3]
+                    refTag = "<a href='" + "../data/" + ch23 + "/"+dbId+"/"+dbId+".cing" + "'>" 
+                    if columnName == "name":
+#                        http://localhost/NRG-CING/data/br/1brv/1brv.cing/1brv/HTML/mol.gif
+                        imgTag = "<img src='" + "../data/" + ch23 + "/"+dbId+"/"+dbId+".cing/"+dbId+"/HTML/mol.gif' width=40 heigth=40>"
+                        v = refTag + imgTag + refEndTag
+                    else:
+#                        http://www.rcsb.org/pdb/explore/explore.do?structureId=1brv
+                        refTag = "<a href='" + "http://www.rcsb.org/pdb/explore/explore.do?structureId=" + dbId + "'>"
+                        v = refTag + dbId + refEndTag
+                    # end def
+                if columnName == "bmrb_id":
+                    dbId = v
+                    if not dbId:
+                        log("Strange got null for expected bmrb id.")
+                        continue
+                    # end if                    
+                    if len(dbId) < 1:
+                        log("Strange got bad length for expected bmrb id: [%s]" % str(dbId))
+                        continue
+                    # end if         
+#                    http://www.bmrb.wisc.edu/data_library/generate_summary.php?bmrbId=4020           
+                    refTag = "<a href='" + "http://www.bmrb.wisc.edu/data_library/generate_summary.php?bmrbId=" + dbId + "'>"
+                    v = refTag + dbId + refEndTag
+                elif _columns[i] == "rog_str":
                     v = mapRog[ v ]
-#                elif _columns[i] == "chothia_class" :
-#                    v = mapCho[ v ]
+#                elif _columns[i] == "bmrb_id":
+#                    v = 'bmr' + v
                 # end if
                 output += '"%s",' % v
             # end for            
