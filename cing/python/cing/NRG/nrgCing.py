@@ -8,7 +8,7 @@ Execute like:
 $CINGROOT/python/cing/NRG/nrgCing.py [entry_code]
      updateWeekly prepare runCing storeCING2db 
      createToposTokens getEntryInfo searchPdbEntries createToposTokens
-     updateIndexFiles
+     updateFrontPages
 
 $CINGROOT/python/cing/NRG/nrgCing.py 1brv prepare
 $CINGROOT/python/cing/NRG/nrgCing.py 1brv runCing
@@ -64,11 +64,8 @@ from cing.Scripts.validateEntry import ARCHIVE_TYPE_BY_CH23
 from cing.Scripts.validateEntry import ARCHIVE_TYPE_BY_CH23_BY_ENTRY
 from cing.Scripts.validateEntry import PROJECT_TYPE_CCPN
 from cing.Scripts.validateEntry import PROJECT_TYPE_CING
-from cing.core.parameters import cingPaths
 from shutil import * #@UnusedWildImport
 import commands
-import csv
-import json
 import shutil
 import string
 
@@ -437,7 +434,7 @@ class NrgCing(Lister):
             nTerror("Failed to writeWhyNotEntries")
             return True
         # end if        
-        if self.updateIndexFiles():
+        if self.updateFrontPages():
             nTerror("Failed to update index files.")
             return True
         # end if        
@@ -1197,50 +1194,15 @@ class NrgCing(Lister):
             # end for
         # end if            
     # end def
-
-    def _write_entries_to_csv(self, tableFile):
-        """
-        Return tuple of headers, cing_entries.
-        or None on error.
-        """        
-        crdb = NrgCingRdb(schema=self.schema_id) # Make sure to close it.
-        if not crdb:
-            nTerror("In %s RDB connection was not opened" % getCallerName())
-            return
-        # end if
-        resultRelation = crdb.getSummaryRelation()                
-        crdb.close()
-        if not resultRelation:
-            nTerror("Failed to get any entry from schema %s RDB" % self.schema_id)
-            return
-        # end if
-        
-        if resultRelation.writeCsvFile(tableFile):        
-            nTerror('Failed %s because failed to write to %s.' % (getCallerName, tableFile))
-            return
-        # end if
-        return resultRelation
-    # end def
             
-    def _format_html(self, file_content, resultLol):
+    def _format_html(self, file_content):
         """
         Reformat the input HTML file content and return it.
-        """
-        
-        old_string = r"<!-- INSERT NEW DATE HERE -->"
-        new_string = time.asctime()
-        file_content = string.replace(file_content, old_string, new_string)
-        old_string = r"<!-- INSERT FOOTER HERE -->"
-        file_content = string.replace(file_content, old_string, GOOGLE_ANALYTICS_TEMPLATE)
+        """        
         old_string = r"<!-- INSERT JUMP BOX HERE -->"
         new_string = self._getJumpBoxHtml()
         file_content = string.replace(file_content, old_string, new_string)        
         # TODO: sync with main CING code in html#HTMLfile.render()
-        # Removed:
-#                            "oTableTools": {"sSwfPath": "extras/TableTools/media/swf/copy_cvs_xls_pdf.swf"},
-        
-#<script src="dataTableMedia/ZeroClipboard/ZeroClipboard.js"           type="text/javascript"></script>        
-#                
         additional_head_string = '''        
 <link media="screen" href="dataTableMedia/css/demo_table.css"         type="text/css" rel="stylesheet"/>
 <link media="screen" href="dataTableMedia/css/TableTools.css"         type="text/css" rel="stylesheet"/>
@@ -1253,8 +1215,7 @@ class NrgCing(Lister):
 <script src="dataTableMedia/js/jquery.dataTables.select.filtering.js" type="text/javascript" ></script>
         '''
         old_string = r"<!-- INSERT ADDITIONAL HEAD STRING HERE -->"        
-        file_content = string.replace(file_content, old_string, additional_head_string)
-        
+        file_content = string.replace(file_content, old_string, additional_head_string)        
         new_string = '''
             <table id="dataTables-summaryArchive" class="display" cellspacing="0" cellpadding="0" border="0"> 
             <thead>
@@ -1264,8 +1225,7 @@ class NrgCing(Lister):
         for i,_header in enumerate(summaryHeaderList):
             new_string += '\t<th title="{help}">{header}</th>\n'.format(header = summaryHeader2List[i],
                                                                           help = summaryHeaderTitleList[i])
-        # end for
-        
+        # end for        
         new_string += '''
             </tr> 
             </thead>
@@ -1276,61 +1236,22 @@ class NrgCing(Lister):
         return file_content
     # end def
 
-    def _reformatJson(self, resultLol):
-        for r, row in enumerate(resultLol):
-            if r < 10:
-                nTdebug("row: %s" % str(row))
-            # end if
-            pdb_id = row[PDB_ID_IDX]
-            ch23 = pdb_id[1:3]
-            kwds = {'ch23':ch23, 'pdb_id':pdb_id}
-#            row[0] = '-'.format( **kwds )
-#            row[0] = '<img src="../data/{ch23}/{pdb_id}/{pdb_id}.cing/{pdb_id}/HTML/mol.gif" border="0" width="40">'.format( **kwds )
-            row[0] =  '<a href="../data/{ch23}/{pdb_id}/{pdb_id}.cing">{pdb_id}</a>'.format( **kwds )
-            for c in range(len(row)):
-#                if row[c] == 'None' or row[c] == '' or row[c] == 'none':
-                if row[c] == None:
-#                    nTdebug("Found None: [%s] and replacing it with STAR empty string." % str(row[c]))
-                    row[c] = '.'
-                # end if
-            # end if
-#            row[0] = <a href="../data/%s/%s/%s.cing"><img src="../data/04/104d/104d.cing/104d/HTML/mol.gif" border="0" width="200"></a>
-#            http://localhost/NRG-CING/data/l0/1l0r/1l0r.cing/1l0r/HTML/Molecule/atoms.html#_top
-#http://localhost/NRG-CING/data/lf/2lfh/2lfh.cing/2lfh/HTML/mol.gif
-        # end for
-    # end def
-
-    def updateSummaryTable(self):
+    def updateFrontPages(self):
         """
         Create a overall summary table that shows an overview of the tables.
         Created on Oct 13, 2011        
         @author: tbeek
         """
-#        nTmessage('''
-#        Please manually do:
-#        mkdir -p $D/NRG-CING/dataTableMedia/swf
-#        cp $C/HTML/dataTableMedia/swf/ZeroClipboard.swf $D/NRG-CING/dataTableMedia/swf
-#        ''')
-        extraSwfDir = os.path.join(self.results_dir, "dataTableMedia", "swf")
-        if not os.path.isdir(extraSwfDir):
-            nTdebug("Creating extra swf directory for datatables plugin. Please reduce this duplication later on.")
-            mkdirs(extraSwfDir)
-        # end if
+        nTdebug("Starting %s" % getCallerName())
         htmlDir = os.path.join(self.results_dir, "HTML")
         if not os.path.isdir(htmlDir):
             nTdebug("Creating html directory for NRG-CING.")
             mkdirs(htmlDir)
         # end if
-        srcHtmlPath = os.path.join(cingRoot, cingPaths.html)        
-        srcFile = os.path.join(srcHtmlPath, 'dataTableMedia','swf','ZeroClipboard.swf')
-        dstFile = os.path.join(extraSwfDir,                        'ZeroClipboard.swf')
-        copyfile(srcFile, dstFile)            
-        nTdebug("Creating extra swf resource %s. Please reduce this duplication later on." % dstFile)
-
+#        srcHtmlPath = os.path.join(cingRoot, cingPaths.html)        
         data_dir = os.path.join (self.base_dir, "data" )
         base_data_dir = os.path.join (data_dir, self.results_base )
-
-        # Source
+        # Most crud can come in from the traditional method.
         copyCingHtmlJsAndCssToDirectory(htmlDir)
 
         fnList = """
@@ -1340,6 +1261,7 @@ class NrgCing(Lister):
             help.html 
             helpCing.html 
             helpPlot.html 
+            index.html
             more.html 
             plot.html 
             cing.png 
@@ -1349,274 +1271,33 @@ class NrgCing(Lister):
         for fn in fnList:
             srcFile = os.path.join(base_data_dir, fn)
             dstFile = os.path.join(htmlDir,       fn)
-            copyfile(srcFile, dstFile)            
-            nTdebug("Added extra help file %s." % dstFile)
-        # end for
-        nTmessage("Copy the overall index")
-        org_file = os.path.join(data_dir, 'redirect.html')
-        new_file = os.path.join(self.results_dir, 'index.html')
-        shutil.copy(org_file, new_file)
-        
-        
-        #Create csv file
-        tablefile = os.path.join(htmlDir, '%s.csv' % entry_list_summary_file_name_base)
-        resultRelation = self._write_entries_to_csv(tablefile)
-        #Write out JSON file
-        jsonfile = os.path.join(htmlDir, '%s.json' % entry_list_summary_file_name_base)
-        json_handle = open(jsonfile, mode = 'w')
-        resultLol = resultRelation.toLol()
-        self._reformatJson(resultLol)
-        json.dump({'aaData':resultLol}, json_handle)        
-        nTdebug("Written JSON file: %s" % jsonfile)
-
-        # Get framework input
-        file_name = os.path.join ( base_data_dir, "index.html" )
-        file_content = open(file_name, 'r').read()        
-        file_content = self._format_html(file_content, resultLol)                            
-        htmlfile = os.path.join(htmlDir, 'index.html')
-        writeTextToFile(htmlfile, file_content)
-        nTdebug("Written HTML index file: %s" % htmlfile)
-    # end def
-    
-    
-    def updateIndexFiles(self):
-        """
-        Updating the index files based on self.entry_list_done
-        Run other steps first.
-        Return True on error.
-        """
-        nTmessage("Will create new front page instead of updating index files")
-        if self.updateSummaryTable():
-            nTerror("Failed to updateSummaryTable")
-            return True
-        # end if
-        number_of_entries_per_row = 4
-        number_of_files_per_column = 4
-        url_directer = '../direct.php' # relative to index directory.
-#        url_redirecter = '../redirect.php'
-        
-        data_dir = os.path.join (self.base_dir, "data" )
-        base_data_dir = os.path.join (data_dir, self.results_base )
-        indexDir = os.path.join(self.results_dir, "index")
-        # The csv file name for indexing pdb
-        index_pdb_file_name = indexDir + "/index_pdb.csv"
-        
-        if os.path.exists(indexDir):
-            shutil.rmtree(indexDir)
-        # end if
-        os.mkdir(indexDir)
-        htmlDir = os.path.join(cingRoot, "HTML")
-
-        # In principle only index those that are done
-        entry_list_to_index = self.entry_list_done[:]
-        # Add any that are done but out of date (considered not done in other parts of the code here.)
-        entry_list_to_index = entry_list_to_index.union(self.entry_list_updated)
-        # There might be some overlap.
-        entry_list_to_index.removeDuplicates()
-        # Exclude entries not in the RDB. Really need them in.
-        entry_list_to_index = entry_list_to_index.difference(self.entry_list_store_not_in_db)
-        
-        csvwriter = csv.writer(file(index_pdb_file_name, "w"))
-        if not entry_list_to_index:
-            nTwarning("No entries done, skipping creation of indexes")
-            return
-        # end if
-
-        entry_list_to_index = entry_list_to_index.sort()
-
-        number_of_entries_per_file = number_of_entries_per_row * number_of_files_per_column
-        ## Get the number of files required for building an index
-        number_of_entries_all_present = len(entry_list_to_index)
-        ## Number of files with indexes in google style
-        number_of_files = int(number_of_entries_all_present / number_of_entries_per_file)
-        if number_of_entries_all_present % number_of_entries_per_file:
-            number_of_files += 1
-        nTmessage("Generating %s index html files in %s" % (number_of_files, indexDir))
-
-        example_str_template = """ <td><a href=""" + pdb_link_template + \
-            """>%S</a><BR><a href=""" + bmrb_link_template + ">%b</a>"
-        cingImage = '../data/%t/%s/%s.cing/%s/HTML/mol.gif'
-        example_str_template += '</td><td><a href="' + '../data/%t/%s/%s.cing'
-        example_str_template += '"><img SRC="' + cingImage + '" border=0 width="200" ></a></td>'
-        file_name = os.path.join ( base_data_dir, "index.html" )
-        file_content = open(file_name, 'r').read()
-        old_string = r"<!-- INSERT NEW DATE HERE -->"
-        new_string = time.asctime()
-        file_content = string.replace(file_content, old_string, new_string)
-
-        old_string = r"<!-- INSERT FOOTER HERE -->"
-        file_content = string.replace(file_content, old_string, GOOGLE_ANALYTICS_TEMPLATE)
-
-        ## Count will track the number of entries done per index file
-        entries_done_per_file = 0
-        ## Following variable will track all done sofar
-        entries_done_all = 0
-        ## Tracking the number in the current row. Set for the rare case that there
-        ## are no entries at all. Otherwise it will be initialize on first pass.
-        num_in_row = 0
-        ## Tracking the index file number
-        file_id = 1
-        ## Text per row in an index file to insert
-        insert_text = ''
-
-        ## Repeat for all entries plus a dummy pass for writing the last index file
-        for x_entry_code in entry_list_to_index + [ None ]:
-            if x_entry_code:
-                pdb_entry_code = x_entry_code
-                bmrb_entry_code = ""
-                if self.matches_many2one.has_key(pdb_entry_code):
-                    bmrb_entry_code = self.matches_many2one[pdb_entry_code]
-#                    bmrb_entry_code = bmrb_entry_code
-                # end if
+            if not fn.endswith('.html'):
+                copyfile(srcFile, dstFile)
+                nTdebug("-1- Added extra file %s." % dstFile)
+                continue
             # end if
-            ## Finish this index file
-            ## The last index file will only be written once...
-            if entries_done_per_file == number_of_entries_per_file or \
-                    entries_done_all == number_of_entries_all_present:
-
-                begin_entry_count = number_of_entries_per_file * (file_id - 1) + 1
-                end_entry_count = min(number_of_entries_per_file * file_id,
-                                           number_of_entries_all_present)
-#                nTdebug("%5d %5d %5d" % (begin_entry_count, end_entry_count, number_of_entries_all_present))
-
-                old_string = r"<!-- INSERT NEW RESULT STRING HERE -->"
-                jump_form_start = '<FORM method="GET" action="%s">' % url_directer
-                result_string = jump_form_start + "PDB entries"
-                db_id = "PDB"
-
-                jump_form = '<INPUT type="hidden" name="database" value="%s">' % string.lower(db_id)
-                jump_form = jump_form + \
-"""<INPUT type="text" size="4" name="id" value="" >
-<INPUT type="submit" name="button" value="go">"""
-                jump_form_end = "</FORM>"
-
-                begin_entry_code = string.upper(entry_list_to_index[ begin_entry_count - 1 ])
-                end_entry_code = string.upper(entry_list_to_index[ end_entry_count - 1 ])
-                new_row = [ file_id, begin_entry_code, end_entry_code ]
-                csvwriter.writerow(new_row)
-
-                new_string = '%s: <B>%s-%s</B> &nbsp;&nbsp; (%s-%s of %s). &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; Jump to index with %s entry id &nbsp; %s\n%s\n' % (# pylint: disable=C0301
-                        result_string,
-                        begin_entry_code,
-                        end_entry_code,
-                        begin_entry_count,
-                        end_entry_count,
-                        number_of_entries_all_present,
-                        db_id,
-                        jump_form,
-                        jump_form_end
-                        )
-                new_file_content = string.replace(file_content, old_string, new_string)
-
-                # Always end the row by adding dummy columns
-                if num_in_row != number_of_entries_per_row:
-                    insert_text += (number_of_entries_per_row -
-                                     num_in_row) * 2 * r"<td>&nbsp;</td>" + r"</tr>"
-                # end if
-                ## Create the new index file from the example one by replacing a string
-                ## with the new content.
-                old_string = r"<!-- INSERT NEW ROWS HERE -->"
-                new_file_content = string.replace(new_file_content, old_string, insert_text)
-
-                if file_id > 1:
-                    prev_string = '<a href="index_%s.html">Previous &lt;</a>' % (
-                        file_id - 1)
-                else:
-                    prev_string = ''
-                # end if                    
-                if file_id < number_of_files:
-                    next_string = '<a href="index_%s.html">> Next</a>' % ( file_id + 1)
-                else:
-                    next_string = ''
-                # end if
-                first_link = max(1, file_id - number_of_files_per_column)
-                last_link = min(number_of_files, file_id + number_of_files_per_column - 1)
-                links_string = ''
-                for link in range(first_link, last_link + 1):
-                    ## List link but don't include a link out for the current file_id
-                    if link == file_id:
-                        links_string += ' <B>%s</B>' % link
-                    else:
-                        links_string += ' <a href="index_%s.html">%s</a>' % ( link, link)
-                    # end if                    
-                # end for                    
-
-                old_string = r"<!-- INSERT NEW LINKS HERE -->"
-                new_string = 'Result page: %s %s %s' % ( prev_string, links_string, next_string)
-                new_file_content = string.replace(new_file_content, old_string, new_string)
-
-                ## Make the first index file name still index.html
-                new_file_name = indexDir + '/index_%s.html' % file_id 
-                if not file_id:
-                    new_file_name = indexDir + '/index.html'
-                # end if                    
-                open(new_file_name, 'w').write(new_file_content)
-
-                entries_done_per_file = 0
-                num_in_row = 0
-                insert_text = ""
-                file_id += 1
-            # end if                    
-            ## Build on current index file
-            ## The last iteration will not execute this block because of this clause
-            if entries_done_all < number_of_entries_all_present:
-                entries_done_all += 1
-                entries_done_per_file += 1
-                ## Get the html code right by abusing the formatting chars.
-                ## as in sprintf etc.
-                tmp_string = string.replace(example_str_template, r"%S", string.upper(pdb_entry_code))
-                tmp_string = string.replace(tmp_string, r"%s", pdb_entry_code)
-                tmp_string = string.replace(tmp_string, r"%t", pdb_entry_code[1:3])
-                tmp_string = string.replace(tmp_string, r"%b", bmrb_entry_code)
-
-                num_in_row = entries_done_per_file % number_of_entries_per_row
-                if num_in_row == 0:
-                    num_in_row = number_of_entries_per_row
-                # end if                    
-                if num_in_row == 1:
-                    # Start new row
-                    tmp_string = r"<tr>" + tmp_string
-                elif (num_in_row == number_of_entries_per_row):
-                    # End this row
-                    tmp_string = tmp_string + r"</tr>"
-                # end if                    
-                insert_text += tmp_string
-            # end if                    
-        # end for x_entry_code                    
-
-        ## Make a sym link from the index_pdb_1.html file to the index_pdb.html file
-        index_file_first = 'index_1.html'
-        index_file = os.path.join(indexDir, 'index.html')
-        ## Assume that a link that is already present is valid and will do the job
-#        nTmessage('Symlinking: %s %s' % (index_file_first, index_file))
-        symlink(index_file_first, index_file)
-
-#        ## Make a sym link from the index_bmrb.html file to the index.html file
-#        index_file_first = 'index_pdb.html'
-#        index_file_first = index_file_first
-#        index_file = os.path.join(self.results_dir + "/index", 'index.html')
-#        nTdebug('Symlinking (B): %s %s' % (index_file_first, index_file))
-#        symlink(index_file_first, index_file)
-
-        fileListToCopy = [ 'direct.php', 'redirect.php', 'pdb.php']
-        nTmessage("Copy the php scripts: %s" % fileListToCopy)
-        for fileNameToCopy in fileListToCopy:
-            org_file = os.path.join(data_dir, fileNameToCopy)
-            shutil.copy(org_file, self.results_dir)
+            file_content = open(srcFile, 'r').read()                    
+            old_string = r"<!-- INSERT NEW DATE HERE -->"
+            new_string = time.asctime()
+            file_content = string.replace(file_content, old_string, new_string)
+            old_string = r"<!-- INSERT GOOGLE ANALYTICS TEMPLATE HERE -->"
+            file_content = string.replace(file_content, old_string, GOOGLE_ANALYTICS_TEMPLATE)                        
+            if fn != 'index.html':
+                writeTextToFile(dstFile, file_content)
+                nTdebug("-2- Added extra file %s." % dstFile)
+                continue
+            # end if
+            # Get framework input
+            file_content = self._format_html(file_content)                            
+            htmlfile = os.path.join(htmlDir, 'index.html')
+            writeTextToFile(htmlfile, file_content)
+            nTdebug("-3- Written HTML index file: %s" % htmlfile)            
         # end for
         nTmessage("Copy the overall index")
         org_file = os.path.join(data_dir, 'redirect.html')
         new_file = os.path.join(self.results_dir, 'index.html')
         shutil.copy(org_file, new_file)
-
-        fileListToCopy = [ 'cing.css', 'header_bg.jpg', ]
-        nTmessage("Copy the html files: %s" % fileListToCopy)
-        for fileNameToCopy in fileListToCopy:
-            org_file = os.path.join(htmlDir, fileNameToCopy)
-            shutil.copy(org_file, indexDir)
-        # end for            
     # end def
-
 
     def postProcessEntryAfterVc(self, entry_code):
         """
@@ -2492,7 +2173,7 @@ class NrgCing(Lister):
     def _getJumpBoxHtml(self):
         return '''
             <div style="width: 25em">
-            <FORM method="GET" action="../direct.php" class="display">
+            <FORM method="GET" action="../../cgi-bin/DataTablesServer.py" class="display">
             Search by PDB ID (e.g. 9pcy):
             <INPUT type="hidden" name="database" value="pdb" align="left">
             <INPUT type="text" size="4" name="id" value="" title="Please provide the PDB identifier to obtain the validation report">
@@ -2614,9 +2295,9 @@ def runNrgCing( useClass = NrgCing,
             if uClass.findMissingEntries(): # in nmr_redo
                 nTerror("Failed to findMissingEntries")
             # end if
-        elif destination == 'updateIndexFiles':
-            if uClass.updateIndexFiles(): # in nmr_redo
-                nTerror("Failed to updateIndexFiles")                
+        elif destination == 'updateFrontPages':
+            if uClass.updateFrontPages(): # in nmr_redo
+                nTerror("Failed to updateFrontPages")                
             # end if
         else:
             nTerror("Unknown destination: %s" % destination)

@@ -3,6 +3,7 @@ Adds html generation methods
 """
 from cing import authorList
 from cing import cingDirData
+from cing import cingPythonCingDir
 from cing import cingRevision
 from cing import cingRevisionUrl
 from cing import cingRoot
@@ -4157,15 +4158,16 @@ def copyCingHtmlJsAndCssToDirectory(dstDir):
     """
     css and javascript now in HTML dir
     """
+    nTdebug("Starting %s" % getCallerName())
     if not os.path.exists(dstDir):
         nTdebug("Creating new HTML dir: dstDir")
         os.mkdir(dstDir)
     # end if
     htmlPath = os.path.join(cingRoot,cingPaths.html) # copy needed css and other files/directories.
 
-#    nTdebug("Listing: [%s]" % htmlPath )
+    nTdebug("Listing: [%s]" % htmlPath )
     for f in os.listdir( htmlPath ):
-#        nTdebug("Listing item: [%s]" % f)
+        nTdebug("Listing item: [%s]" % f)
         htmlFile = os.path.join(htmlPath,f)
         if os.path.isfile(htmlFile):
             shutil.copy( htmlFile, dstDir )
@@ -4194,4 +4196,22 @@ def copyCingHtmlJsAndCssToDirectory(dstDir):
             # end for
         # end if
     #end for
+    base_dir = os.path.join(cingPythonCingDir, "NRG")    
+    data_dir = os.path.join (base_dir, "data" )
+#    base_data_dir = os.path.join (data_dir, self.results_base )
+    
+#    fileListToCopy = [ 'direct.php' ]
+    fileListToCopy = []
+    nTmessage("Copy the php scripts: %s" % fileListToCopy)
+    for fileNameToCopy in fileListToCopy:
+        org_file = os.path.join(data_dir, fileNameToCopy)
+        new_file = os.path.join(dstDir, '..', fileNameToCopy)
+        nTdebug('Copy from %s to %s' % ( org_file, new_file))
+        shutil.copy(org_file, new_file)
+    # end for
+    nTmessage("Copy the overall index")
+    org_file = os.path.join(data_dir, 'redirect.html')
+    new_file = os.path.join(dstDir, '..', 'index.html')
+    nTdebug('Copy from %s to %s' % ( org_file, new_file))
+    shutil.copy(org_file, new_file)    
 # end def
