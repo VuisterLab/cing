@@ -1259,16 +1259,19 @@ class NrgCing(Lister):
             <tr> 
         '''
         #Write headers: 'name', 'rog', 'distance_count', 'cs_count', 'chothia_class', 'chain_count', 'res_count'
-        for i,header in enumerate(summaryHeaderList):
+        for i,_header in enumerate(summaryHeaderList):
             new_string += '\t<th title="{help}">{header}</th>\n'.format(header = summaryHeader2List[i],
                                                                           help = summaryHeaderTitleList[i])
         # end for
+        
         new_string += '''
             </tr> 
             </thead>
+        '''
+        _bagger = """
             <tfoot>
             <tr> 
-        '''
+
         selectableColumnList = 'rog chothia_class'.split()
         #Write footers: 'name', 'rog', 'distance_count', 'cs_count', 'chothia_class', 'chain_count', 'res_count'
         for c, header in enumerate(summaryHeaderList):
@@ -1295,9 +1298,12 @@ class NrgCing(Lister):
 #            nTdebug("Adding msg: %s" % msg)
             new_string += msg
         # end for
-        new_string += '''
+
             </tr>
             </tfoot>
+        
+        """
+        new_string += '''
             </table>
         '''
         old_string = r"<!-- INSERT NEW RESULT STRING HERE -->"        
@@ -1322,7 +1328,7 @@ class NrgCing(Lister):
 #                    nTdebug("Found None: [%s] and replacing it with STAR empty string." % str(row[c]))
                     row[c] = '.'
                 # end if
-            # end if                
+            # end if
 #            row[0] = <a href="../data/%s/%s/%s.cing"><img src="../data/04/104d/104d.cing/104d/HTML/mol.gif" border="0" width="200"></a>
 #            http://localhost/NRG-CING/data/l0/1l0r/1l0r.cing/1l0r/HTML/Molecule/atoms.html#_top
 #http://localhost/NRG-CING/data/lf/2lfh/2lfh.cing/2lfh/HTML/mol.gif
