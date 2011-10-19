@@ -12,7 +12,7 @@ jQuery(document).ready(function() {
         "aoColumns": [
                       { "sType": "html" }, 				    	// image html
                       { "sType": "html", "sClass": "left" },    // pdb
-                      { "sType": "html", "sClass": "left" },	// bmrb 
+                      { "sType": "html", "sClass": "right" },	// bmrb 
                       { "sType": "html", "sClass": "left" },	// rog_str                      
                       { "sType": "numeric", "sClass": "right" },// distance_count 
                       { "sType": "numeric", "sClass": "right" },// cs_count 

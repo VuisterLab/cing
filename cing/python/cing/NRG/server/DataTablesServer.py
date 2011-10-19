@@ -74,11 +74,8 @@ class DataTablesServer:
         self.outputResult()
     # end def
     
-    #
-    # outputResult
-    # Output the JSON required for DataTables
-    #
     def outputResult( self ):
+        'Output the JSON required for DataTables'
         output = '{'
         output += '"sEcho": '+str(int(self.cgi['sEcho'].value))+', '
         output += '"iTotalRecords": '+str(self.cardinality)+', '
@@ -88,33 +85,40 @@ class DataTablesServer:
         mapRog = {'green':  '<font color=#000000>green</font>', 
                   'orange': '<font color=#FFA500>orange</font>', 
                   'red':    '<font color=#FF0000>red</font>'}
-#        mapCho = {0:'alpha', 
-#                  1:'beta', 
-#                  2:'a/b',
-#                  3:'coil',
-#                  None:'other',
-#                  }
         refEndTag = "</a>"                    
         for row in self.resultData:
+#            log("Looking at row: %s.\n" % str(row))
             output += '['
             for i in range( len(_columns) ):
                 columnName = _columns[i]
                 v = str( row[ _columns[i] ] )
+                if v == None:
+                    log("ERROR: got actual None for value.\n")
+                    output += '"%s",' % '.'
+                    continue
+                # end if                    
+                if v == 'None':
+#                    log("Resetting None string to empty string\n")
+                    output += '"%s",' % ''
+                    continue
+                # end if                    
+                if len(v) < 1:
+#                    log("WARNING: Strange got empty string in column: [%s]\n" % columnName)
+                    output += '"%s",' % ''
+                    continue
+                # end if                         
                 if columnName == "name" or columnName == "pdb_id":
                     dbId = v
-                    if not dbId:
-                        log("Strange got null for expected pdb id.")
-                        continue
-                    # end if                    
                     if len(dbId) != 4:
-                        log("Strange got bad length for expected pdb id: [%s]" % str(dbId))
+                        log("WARNING: Strange got bad length for expected pdb id: [%s]\n" % str(dbId))
+                        output += '"%s",' % v
                         continue
                     # end if                    
                     ch23 = dbId[1:3]
                     refTag = "<a href='" + "../data/" + ch23 + "/"+dbId+"/"+dbId+".cing" + "'>" 
                     if columnName == "name":
 #                        http://localhost/NRG-CING/data/br/1brv/1brv.cing/1brv/HTML/mol.gif
-                        imgTag = "<img src='" + "../data/" + ch23 + "/"+dbId+"/"+dbId+".cing/"+dbId+"/HTML/mol.gif' width=40 heigth=40>"
+                        imgTag = "<img src='" + "../data/" + ch23 + "/"+dbId+"/"+dbId+".cing/"+dbId+"/HTML/mol.gif' width=40 height=40 border=0>"
                         v = refTag + imgTag + refEndTag
                     else:
 #                        http://www.rcsb.org/pdb/explore/explore.do?structureId=1brv
@@ -123,14 +127,6 @@ class DataTablesServer:
                     # end def
                 if columnName == "bmrb_id":
                     dbId = v
-                    if not dbId:
-                        log("Strange got null for expected bmrb id.")
-                        continue
-                    # end if                    
-                    if len(dbId) < 1:
-                        log("Strange got bad length for expected bmrb id: [%s]" % str(dbId))
-                        continue
-                    # end if         
 #                    http://www.bmrb.wisc.edu/data_library/generate_summary.php?bmrbId=4020           
                     refTag = "<a href='" + "http://www.bmrb.wisc.edu/data_library/generate_summary.php?bmrbId=" + dbId + "'>"
                     v = refTag + dbId + refEndTag
