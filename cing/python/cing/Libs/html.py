@@ -1834,8 +1834,11 @@ class ProjectHTMLfile( HTMLfile ):
         pathMolGif     = self.project.htmlPath(molGifFileName)
         if not htmlOnly:
             if hasattr(plugins, MOLGRAP_STR) and plugins[ MOLGRAP_STR ].isInstalled:
-#                nTdebug("ProjectHtmlFile.generateHtml: trying to create : " + pathMolGif)
-                self.project.molecule.export2gif(pathMolGif, project=self.project)
+                nTdebug("ProjectHtmlFile.generateHtml: trying to create : " + pathMolGif)
+                if self.project.molecule.export2gif(pathMolGif, project=self.project):
+                    nTwarning("Failed to get the molecular image but using a default image instead")
+                # end if
+#                which convert TODO:
 #            else:
 #                nTdebug("Skipping self.project.molecule.export2gif because Molgrap Module is not available.")
 
