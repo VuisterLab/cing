@@ -181,6 +181,90 @@ def doScriptOnEntryList(pythonScriptFileName,
         _do_cmd, cmdTuple = job
         cmd = cmdTuple[0]
         nTerror("In doScriptOnEntryList failed forked: %s" % cmd)
+        
+def doFunctionOnEntryList(
+          f,
+          entryListFileName,
+          processes_max                  = 3,   # default 3
+          max_time_to_wait               = 600,
+          delay_between_submitting_jobs  = 0,
+          extraArgList                   = None,
+          start_entry_id                 = start_entry_id,
+          max_entries_todo               = max_entries_todo,
+          shuffleBeforeSelecting         = False # fails for chain ids when included.
+          ):
+    """Return True on error"""
+    
+    if True: # DEFAULT: True
+        pid = os.getpid()
+        nTdebug("Use kill -2 %s (sending a INT (interrupt) to this Process ID) twice to kill all child processes.\n" % pid)
+        nTdebug("entryListFileName            : %s" % entryListFileName)        
+        nTdebug("processes_max                : %s" % processes_max                )        
+        nTdebug("max_time_to_wait             : %s" % max_time_to_wait             )        
+        nTdebug("delay_between_submitting_jobs: %s" % delay_between_submitting_jobs)        
+        nTdebug("extraArgList                 : %s" % str(extraArgList            ))        
+        nTdebug("start_entry_id               : %s" % start_entry_id               )        
+        nTdebug("max_entries_todo             : %s" % max_entries_todo             )        
+        nTdebug("shuffleBeforeSelecting       : %s" % shuffleBeforeSelecting       )
+    # end if        
+#    if os.chdir(cingDirTmp):
+#        raise SetupError("Failed to change to directory for temporary test files: "+cingDirTmp)
 
-if __name__ == '__main__':
-    entryCodeList = '1brv 1bus'.split()
+    # Empty list means no filtering done.
+    entryCodeListFilter = []
+#    entryCodeListFilter = string.split("1n62")
+
+    entryListFile = file(entryListFileName, 'r')
+    entryCodeList = []
+    entryCountTotal = 0
+    for line in entryListFile.readlines():
+        line = line.strip()
+        if line == '': # skip empty lines.
+            continue
+        entryCountTotal += 1
+        entryCode = line
+        if entryCode in entryCodeListFilter:
+            continue
+        entryCodeList.append( entryCode )
+    entryListFile.close()
+
+    entryCountSelected = len( entryCodeList )
+    # lastEntryId is id of last entry excluding the entry itself.
+    lastEntryId = min(len(entryCodeList), start_entry_id+max_entries_todo)    
+    if shuffleBeforeSelecting:
+        nTmessage("Shuffling entry list before selecting entries.")
+        entryCodeListCopy = entryCodeList[:]
+        shuffle(entryCodeListCopy)
+        entryCodeList = entryCodeListCopy[start_entry_id:lastEntryId] # no sense in starting at zero here; they're random.
+    else:
+        entryCodeList = entryCodeList[start_entry_id:lastEntryId] # no sense in starting at zero here; they're random.
+    entryCodeList.sort()
+
+    nTmessage('Read      %05d entries    ' % entryCountTotal)
+    nTmessage('Selected  %05d entries    ' % entryCountSelected)
+    nTmessage('Sliced    %05d entries: %s' % (len(entryCodeList), entryCodeList ))
+#    nTmessage('Sliced    %05d chains:  %s' % (len(chainCodeList), chainCodeList ))
+
+    job_list = []
+    for _i, entry_code in enumerate(entryCodeList):
+        extraArgListStr = ''
+        if extraArgList:
+            extraArgListStr = ' '.join( extraArgList )
+        job = ( f, tuple([entry_code, extraArgListStr]) )
+        job_list.append( job )
+    f = ForkOff( processes_max       = processes_max, max_time_to_wait    = max_time_to_wait)
+    done_entry_list = f.forkoff_start( job_list, delay_between_submitting_jobs )
+    done_entry_list.sort()
+    not_done_entry_list = range(len(job_list))
+    for id in done_entry_list:
+        idx = not_done_entry_list.index(id)
+        if idx >= 0:
+            del(not_done_entry_list[idx])
+    nTmessage("In doScriptOnEntryList Finished list  : %s" % done_entry_list)
+    nTmessage("In doScriptOnEntryList Unfinished list: %s" % not_done_entry_list)
+    for id in not_done_entry_list:
+        job = job_list[id]
+        _do_cmd, cmdTuple = job
+        cmd = cmdTuple[0]
+        nTerror("In doFunctionOnEntryList failed forked: %s" % cmd)
+

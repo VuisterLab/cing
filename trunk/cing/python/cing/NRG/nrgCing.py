@@ -8,7 +8,7 @@ Execute like:
 $CINGROOT/python/cing/NRG/nrgCing.py [entry_code]
      updateWeekly prepare runCing storeCING2db 
      createToposTokens getEntryInfo searchPdbEntries createToposTokens
-     updateFrontPages
+     updateFrontPages forEachStoredEntry
 
 $CINGROOT/python/cing/NRG/nrgCing.py 1brv prepare
 $CINGROOT/python/cing/NRG/nrgCing.py 1brv runCing
@@ -56,7 +56,9 @@ from cing.NRG.nrgCingRdb import NrgCingRdb
 from cing.NRG.nrgCingRdb import getPdbIdList
 from cing.NRG.settings import * #@UnusedWildImport
 from cing.Scripts.FC.utils import getBmrbCsCountsFromFile
+from cing.Scripts.doScriptOnEntryList import doFunctionOnEntryList
 from cing.Scripts.doScriptOnEntryList import doScriptOnEntryList
+from cing.Scripts.interactive.mouseBuffer4 import createPinUp
 from cing.Scripts.vCing.vCing import TEST_CING_STR
 from cing.Scripts.vCing.vCing import VALIDATE_ENTRY_NRG_STR
 from cing.Scripts.vCing.vCing import Vcing
@@ -2089,6 +2091,33 @@ class NrgCing(Lister):
         nTmessage("Done with storeCING2db.")
     # end def
     
+    def forEachStoredEntry(self):
+        "Do a manual action on every entry in RDB."
+        f = createPinUp        
+        extraArgList = (self.results_base,) # note that for length one tuples the comma is required.
+        # NO CHANGES BELOW
+        nTmessage("Starting forEachStoredEntry")
+        
+        self.entry_list_todo = getPdbIdList(fromCing=True)
+        self.entry_list_todo = NTlist( *self.entry_list_todo )
+        if not self.entry_list_todo:
+            nTerror("Failed to get any entry from RDB")
+            return True
+        # end if
+        nTmessage("Found entries in %s todo: %d" % (self.results_base, len(self.entry_list_todo)))
+        # parameters for doScriptOnEntryList
+        entryListFileName = os.path.join( self.results_dir, 'entry_list_todo.csv')
+        writeEntryListToFile(entryListFileName, self.entry_list_todo)
+        doFunctionOnEntryList(f,
+                            entryListFileName,
+                            processes_max = self.processes_max,
+                            max_time_to_wait = 60 * 60, # Largest entries take a bit longer than the initial 6 minutes; 2hyn etc.
+                            start_entry_id = 0,
+                            max_entries_todo = 9999,
+                            extraArgList = extraArgList)
+        nTmessage("Done with storeCING2db.")
+    # end def
+        
     def replaceCoordinates(self):
         """
         On self.entry_list_todo.
@@ -2298,6 +2327,10 @@ def runNrgCing( useClass = NrgCing,
         elif destination == 'updateFrontPages':
             if uClass.updateFrontPages(): # in nmr_redo
                 nTerror("Failed to updateFrontPages")                
+            # end if
+        elif destination == 'forEachStoredEntry':
+            if uClass.forEachStoredEntry(): # in nmr_redo
+                nTerror("Failed to forEachStoredEntry")                
             # end if
         else:
             nTerror("Unknown destination: %s" % destination)

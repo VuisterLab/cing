@@ -61,11 +61,12 @@ htmlBody = """<body>
 <!-- end header --> </div>        
 <div id="main">        
 <!-- INSERT MAIN HERE -->
-</div>
-</div>
+<!-- end main --></div>
+<br style="clear: both;"/>
 <div id="footer">
 <p>Generated on:&nbsp;<!-- INSERT NEW DATE HERE --></p>
 <!-- end footer --></div>
+<!-- end container --></div>
 <!-- INSERT GOOGLE ANALYTICS TEMPLATE HERE -->
 </body>
 </html>        
@@ -167,6 +168,12 @@ class DataTablesServer:
         Consider checking the WHY_NOT site for this PDB identifier:
         <A HREF="http://www.cmbi.ru.nl/WHY_NOT2/search/pdbid/%(pdb_id)s"> %(pdb_id)s</a>
         to find out why it is not (yet) present in NRG-CING and other databases perhaps.
+        </p>
+        <p>        
+        Or look at the 
+        PDBREPORT validation report for:
+        <A HREF="http://www.cmbi.ru.nl/pdbreport/cgi-bin/nonotes?PDBID=%(pdb_id)s">%(pdb_id)s</a>
+        which will exist even if this is a valid PDB identifier of an entry solved by X-ray crystallography.        
         </P>
         <p>Alternatively, you may go back and try again.</P>
         """   
@@ -250,7 +257,7 @@ class DataTablesServer:
                     if columnName == "name":
 #                        http://localhost/NRG-CING/data/br/1brv/1brv.cing/1brv/HTML/mol.gif
                         imgTag = "<img src='" + "../data/" + ch23 + "/"+dbId+"/"+dbId+".cing/"+dbId+\
-                                    "/HTML/mol.gif' width=57 height=40 border=0>"
+                                    "/HTML/mol_pin.gif' width=57 height=40 border=0>"
                         v = refTag + imgTag + refEndTag
                     else:
 #                        http://www.rcsb.org/pdb/explore/explore.do?structureId=1brv
