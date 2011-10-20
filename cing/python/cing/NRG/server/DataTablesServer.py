@@ -195,6 +195,7 @@ class DataTablesServer:
             print file_content
             return
         # end def
+        pdb_id = pdb_id.lower()
         if not self.isPresentInDb(pdb_id):
             file_content = htmlHead + '\n' + htmlBody
             old_string = r"<!-- INSERT MAIN HERE -->"

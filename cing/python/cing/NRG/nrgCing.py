@@ -1208,7 +1208,6 @@ class NrgCing(Lister):
         additional_head_string = '''        
 <link media="screen" href="dataTableMedia/css/demo_table.css"         type="text/css" rel="stylesheet"/>
 <link media="screen" href="dataTableMedia/css/TableTools.css"         type="text/css" rel="stylesheet"/>
-<script src="multilineTitles.js"                                      type="text/javascript"></script>
 <script src="util.js"                                                 type="text/javascript"></script>
 <script src="jquery.js"                                               type="text/javascript"></script>
 <script src="customTables.js"                                         type="text/javascript"></script>
