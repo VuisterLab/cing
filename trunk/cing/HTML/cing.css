@@ -168,6 +168,7 @@ a.green:hover, a.green:active {
     background: #FFFFFF right; /* This Is The BG Color Of The Main Div */
     width: 100%;
 /*  margin: 0.0em auto; /* Right And Left Margin Widths To Auto */
+    padding-left: 0.5em; /* Chris choice */
     text-align: left; /* Hack To Keep IE5 Windows Happy */
     color: #3e3e3e;
     color: #333333;
@@ -375,4 +376,13 @@ h3 {
     width:70%;
     padding: 5px; 
     margin: 10px;
+}
+
+/* The below will also mix into DataTables  { */
+table thead {    
+    color: #0ca0ad;
+}
+
+th {    /* Override the assumed default by Chrome et al. */
+    font-weight: normal;
 }

@@ -1246,7 +1246,6 @@ class HTMLfile:
         # jQuery JS utilities
         # custom JS utilities for working with jQuery
         importJsListStr = """
-            multilineTitles.js
             util.js
             jquery.js
             customTables.js
