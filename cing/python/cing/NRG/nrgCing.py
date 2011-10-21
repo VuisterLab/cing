@@ -1263,10 +1263,12 @@ class NrgCing(Lister):
             helpCing.html 
             helpPlot.html 
             index.html
-            more.html 
+            download.html 
             plot.html 
             cing.png 
             icon_email.gif
+            icon_reference.gif
+            icon_website.png
             NRG-CING_circle.png
             """.split()
         for fn in fnList:

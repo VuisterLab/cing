@@ -131,7 +131,7 @@ class DataTablesServer:
         self.cadinalityFiltered = 0
         self.cadinality = 0
         # Who's calling
-        if self.cgi.has_key('database') and self.cgi.has_key('id'):
+        if self.cgi.has_key('database'):
             self.processSimpleTextBoxQuery()
             return
         # end if         
@@ -186,7 +186,9 @@ class DataTablesServer:
             print basicRedirectHtml % '../NRG-CING/HTML/index.html'
             return
         # end def
-        pdb_id = self.cgi['id'].value
+        pdb_id = ''
+        if self.cgi.has_key('id'): # the id might not even exist if the submitted value was empty.            
+            pdb_id = self.cgi['id'].value
         if not is_pdb_code(pdb_id):
             file_content = htmlHead + '\n' + htmlBody
             old_string = r"<!-- INSERT MAIN HERE -->"
