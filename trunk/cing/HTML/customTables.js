@@ -32,9 +32,17 @@ jQuery(document).ready(function() {
         "sAjaxSource": '../../cgi-bin/DataTablesServer.py',
         "oLanguage": {
             "sSearch": "Search (e.g. 9pcy):",
-            "sProcessing": "Please wait..."
+            "sProcessing":  "Please wait...",
+                            "sLengthMenu": 'Show <select>'+
+                                '<option value="5">5</option>'+
+                                '<option value="10">10</option>'+
+                                '<option value="25">25</option>'+
+                                '<option value="100">100</option>'+
+                                '<option value="1000">1000</option>'+
+                                '<option value="10000">10000</option>'+
+                            '</select> records'
         }
-    } );            
+    } );
 //    Add a select menu for some TH element (rog and chothia_class) in the table footer 
     /*
     $("tfoot th").each( function ( i ) {
@@ -90,7 +98,7 @@ jQuery(document).ready(function() {
         "bLengthChange": true,
         "iDisplayLength": 10000,
         "bFilter": true,
-        "bProcessing": true,
+        "bProcessing": true,        
         "bAutoWidth": false // recalculates the column widths on the fly but as this fails it's switched off.
 //        "bStateSave": true, // uses cookie! test first! Not really nicer..
     } );
