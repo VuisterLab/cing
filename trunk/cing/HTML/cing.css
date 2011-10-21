@@ -35,7 +35,10 @@ body {
     text-align: left;
     /*text-align: center; changed to make popup html code align left*/
     color: #000000;
-    /** Scales back all font sizes in CING report to better match */
+    /** Scales back all font sizes in CING report to better match.
+    JFD: This is a bit weird when table text doesn't have that. E.g.
+    in http://nmr.cmbi.ru.nl/NRG-CING/HTML/about.html.
+     */
     font: 88.0% Verdana, Arial, Helvetica, sans-serif;
 }
 
@@ -168,7 +171,7 @@ a.green:hover, a.green:active {
     background: #FFFFFF right; /* This Is The BG Color Of The Main Div */
     width: 100%;
 /*  margin: 0.0em auto; /* Right And Left Margin Widths To Auto */
-    padding-left: 0.5em; /* Chris choice */
+    padding-left: 0.5em; /* Chris' choice */
     text-align: left; /* Hack To Keep IE5 Windows Happy */
     color: #3e3e3e;
     color: #333333;
@@ -376,6 +379,12 @@ h3 {
     width:70%;
     padding: 5px; 
     margin: 10px;
+}
+
+/* Same as rest */
+table {     
+    font: Verdana, Arial, Helvetica, sans-serif;
+    font-size: 100%; /* Overrides user agent css */
 }
 
 /* The below will also mix into DataTables  { */
