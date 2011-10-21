@@ -17,41 +17,49 @@
     <A HREF="./help.html" title="goto page with help">Help</A>
     <br/>
     <br/>
-    <A HREF="./help.html" title="goto NRG-CING help page">Help</A>
-    <A HREF="./helpCing.html" title="goto this help page">Help CING</A>
+    <A HREF="./help.html" title="goto NRG-CING help page">Help NRG-CING</A>
+    <A HREF="#HelpCing" title="goto this help page">Help CING</A>
 <!-- end header --> </div>
 
 <div id="main">
-<H1>Help CING</H1>
-<table>
-<tr>
-<td>
-    <h5>Explanations of external program features</h5>
-    <h3>WHATIF</h3>
-        See <a href="http://proteins.dyndns.org/Education/Validation/HTML/CheckHelp/index.html">Protein
-        structure verification</a>
-        and <a href="http://proteins.dyndns.org/Education/Validation/HTML/USF/whatif.html"> A crystallographer's
-        guide to interpreting WHATIF output</a>.
-    <h3>Procheck_NMR</h3>
-        See <a href="http://www.biochem.ucl.ac.uk/~roman/procheck_nmr/manual/index.html">
-        AQUA and PROCHECK-NMR - Operating manual</a>.
-    <br><h5>CING Plots</h5>
-    <h3>Ramachandran and Janin plots</h3>
-    <ul><li>The background shading is for the probability derived from the What If
-     internal database of high-resolution structures on a 10 by 10 degree grid.
-     The color coding refers to one of three states the secondary structure (by
-     DSSP) was assigned to be in. Blue, yellow, and green are respectively for
-     helix, sheet, and other. The coloring changes linearly from white to e.g.
-     yellow for densities 2 to 20 percent. They are consequently put on top of each
-     other (blue on top) with some alpha blending. More details in code at
-     <a href="http://code.google.com/p/cing/source/browse/trunk/cing/python/cing/Libs/NTplot.py">dihedralComboPlot</a>.</li>
-     <li>The CHI 1 and 2 combination plot is named after <a href="http://en.wikipedia.org/wiki/Janin_Plot">Janin</a></li>
-    <li>For angles PHI, PSI, CHI 1 and 2, if a dihedral restraint
-    involves one or more of these angles, a transluced orange rectangle or square
-    will be drawn evidencing the limits of this particular dihedral</li>
-</ul>
-    <h3>Symbols</h3>
-    <dl><dd><span style="color: rgb(0, 0, 153);">o</span> (blue)
+
+<H1 id="HelpCing">Help CING</H1>
+
+<h3>WHATIF</h3>
+<p>
+    See <a href="http://proteins.dyndns.org/Education/Validation/HTML/CheckHelp/index.html">Protein
+    structure verification</a>
+    and <a href="http://proteins.dyndns.org/Education/Validation/HTML/USF/whatif.html"> A crystallographer's
+    guide to interpreting WHATIF output</a>.
+</p>
+
+<h3>Procheck_NMR</h3>
+<p>
+    See <a href="http://www.biochem.ucl.ac.uk/~roman/procheck_nmr/manual/index.html">
+    AQUA and PROCHECK-NMR - Operating manual</a>.
+</p>
+
+<h3>CING's Ramachandran and Janin plots</h3>
+<p>
+The background shading is for the probability derived from the What If
+ internal database of high-resolution structures on a 10 by 10 degree grid.
+ The color coding refers to one of three states the secondary structure (by
+ DSSP) was assigned to be in. Blue, yellow, and green are respectively for
+ helix, sheet, and other. The coloring changes linearly from white to e.g.
+ yellow for densities 2 to 20 percent. They are consequently put on top of each
+ other (blue on top) with some alpha blending. More details in code at
+ <a href="http://code.google.com/p/cing/source/browse/trunk/cing/python/cing/Libs/NTplot.py">dihedralComboPlot</a>.
+</p>
+<p>
+The CHI 1 and 2 combination plot is named after <a href="http://en.wikipedia.org/wiki/Janin_Plot">Janin</a>
+For angles PHI, PSI, CHI 1 and 2, if a dihedral restraint
+involves one or more of these angles, a transluced orange rectangle or square
+will be drawn evidencing the limits of this particular dihedral.
+</p>
+
+<h3>Symbols</h3>
+<dl>
+    <dd><span style="color: rgb(0, 0, 153);">o</span> (blue)
     circular averaged value</dd>
     <dd><span style="color: rgb(0, 153, 0);">+</span>
     (green) non-proline/glycine
@@ -63,8 +71,9 @@
     (green) non-cacheable-proline
     </dd>
     <dd><span style="color: rgb(0, 0, 153);">|</span>
-    (blue) a line indicates the circular averaged value for a given angle </dd></dl>
-</td></tr></table>
+    (blue) a line indicates the circular averaged value for a given angle </dd>
+</dl>
+
 
 </div><!-- end main --> 
 <br style="clear: both;"/>
