@@ -1269,6 +1269,7 @@ class NrgCing(Lister):
             icon_email.gif
             icon_reference.gif
             icon_website.png
+            icon_youtube.jpeg
             icon_download.gif
             NRG-CING_circle.png
             """.split()
