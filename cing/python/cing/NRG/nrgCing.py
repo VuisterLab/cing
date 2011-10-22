@@ -1204,7 +1204,7 @@ class NrgCing(Lister):
         old_string = r"<!-- INSERT JUMP BOX HERE -->"
         new_string = self._getJumpBoxHtml()
         file_content = string.replace(file_content, old_string, new_string)        
-        # TODO: sync with main CING code in html#HTMLfile.render()
+
         additional_head_string = '''        
 <link media="screen" href="dataTableMedia/css/demo_table.css"         type="text/css" rel="stylesheet"/>
 <link media="screen" href="dataTableMedia/css/TableTools.css"         type="text/css" rel="stylesheet"/>
@@ -1212,7 +1212,7 @@ class NrgCing(Lister):
 <script src="jquery.js"                                               type="text/javascript"></script>
 <script src="customTables.js"                                         type="text/javascript"></script>
 <script src="dataTableMedia/js/jquery.dataTables.js"                  type="text/javascript"></script>
-<script src="dataTableMedia/js/TableTools.js"                         type="text/javascript"></script>
+<script src="dataTableMedia/js/TableTools.js"                     type="text/javascript"></script>
 <script src="dataTableMedia/js/jquery.dataTables.select.filtering.js" type="text/javascript" ></script>
         '''
         old_string = r"<!-- INSERT ADDITIONAL HEAD STRING HERE -->"        
@@ -1269,6 +1269,7 @@ class NrgCing(Lister):
             icon_email.gif
             icon_reference.gif
             icon_website.png
+            icon_download.gif
             NRG-CING_circle.png
             """.split()
         for fn in fnList:
