@@ -81,11 +81,12 @@ entry_list_summary_file_name_base = 'entry_list_summary'
 #rev_first becomes an image column
 #summaryHeaderList = 'rev_first name bmrb_id rog distance_count cs_count chothia_class chain_count res_count'.split()
 #summaryHeader2List = 'img. PDB BMRB ROG distances chem.s. Chothia chains residues'.split()
-PDB_ID_IDX = 1
-summaryHeaderList  = 'name  pdb_id bmrb_id rog_str distance_count cs_count chothia_class_str chain_count res_count'.split()
-summaryHeader2List = 'image PDB    BMRB    ROG     distances      chem.s.  Chothia           chains      residues'.split()
+PDB_ID_IDX = 2
+summaryHeaderList  = 'rev_first  name   pdb_id bmrb_id rog_str distance_count cs_count chothia_class_str chain_count res_count'.split()
+summaryHeader2List = 'tgz        report PDB    BMRB    ROG     distances      chem.s.  Chothia           chains      residues'.split()
 summaryHeaderTitleList = [
-    'Molecule image (click on to go to NRG-CING report.)',
+    'Complete NRG-CING report (click on icon to download)',
+    'NRG-CING report (click on to go to NRG-CING report.)',
     'PDB entry code (click on to go to RCSB-PDB for original data.)',
     'BMRB entry code (click on to go to BMRB for original data.)',
     'CING Red Orange Green scores',

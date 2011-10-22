@@ -375,10 +375,19 @@ h3 {
 /* Front page of archive */
 #summaryArchiveDiv {
     border: 0.091em solid #0ca0ad;
-    float: left;
-    width:70%;
+    float: left; /* Strange but without this the table pagination when set to full-range falls outside the div box */
+    width: 80%;
     padding: 5px; 
     margin: 10px;
+}
+
+#summaryArchiveDiv .paging_full_numbers { /* Specificity of this rule overrides the demo_table.css */
+    width: 80%;
+    padding: 5px; 
+}
+#summaryArchiveDiv .dataTables_info {
+    width: 80%;
+    float: left;
 }
 
 /* Same as rest */
@@ -395,3 +404,4 @@ table thead {
 th {    /* Override the assumed default by Chrome et al. */
     font-weight: normal;
 }
+

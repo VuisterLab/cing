@@ -3,13 +3,47 @@
 //	  - Added additional number of rows to paginate (5 and up to 10,000)
 //    - Changed the wording of 'entries' to 'items'.
 jQuery(document).ready(function() {
+    
+    TableTools.BUTTONS.download = {
+            "sAction": "text",
+            "sFieldBoundary": "",
+            "sFieldSeperator": "\t",
+            "sNewLine": "<br>",
+            "sToolTip": "",
+            "sButtonClass": "DTTT_button_text",
+            "sButtonClassHover": "DTTT_button_text_hover",
+            "sButtonText": "Download",
+            "mColumns": "all",
+            "iDisplayLength": "123456", // special value to indicate all in selected rows.
+            "bHeader": true,
+            "bFooter": true,
+            "sDiv": "",
+            "fnMouseover": null,
+            "fnMouseout": null,
+            "fnClick": function( nButton, oConfig ) {
+              var oParams = this.s.dt.oApi._fnAjaxParameters( this.s.dt );
+              var iframe = document.createElement('iframe');
+              iframe.style.height = "0px";
+              iframe.style.width = "0px";
+              iframe.src = oConfig.sUrl+"?"+$.param(oParams);
+              document.body.appendChild( iframe );
+            },
+            "fnSelect": null,
+            "fnComplete": null,
+            "fnInit": null
+//            "fnServerParams": function ( aoData ) { // FAILS
+//                aoData.push( { "name": "query_type3", "value": "download" } );
+//            }            
+        };
+    
     var oTable = $("table[id^='dataTables-summaryArchive']").dataTable({
         "bSort": true,
         // Initially show the reverse natural order of PDB entries. High numbers in NRG-CING are more interesting.
-        "aaSorting": [[1,'desc']],
+        "aaSorting": [[2,'desc']],
         // Set the data types just in case the automatic detection fails (because of '.' values eg). Important for sorting.
         // mandatory to list each column if using this parameter!
         "aoColumns": [
+                      { "sType": "html" }, 				    	// entry_id html
                       { "sType": "html" }, 				    	// image html
                       { "sType": "html", "sClass": "left" },    // pdb
                       { "sType": "html", "sClass": "right" },	// bmrb 
@@ -22,13 +56,18 @@ jQuery(document).ready(function() {
                   ],
         // Pagination options.
         "bPaginate": true,
+        "sPaginationType": "full_numbers",
         "bLengthChange": true,
-        "iDisplayLength": 10,
+        "iDisplayLength": 5,
         "bFilter": true,
         "bProcessing": true,
         "bServerSide": true,
+//        "bStateSave": true,
         "bAutoWidth": false, // recalculates the column widths on the fly but as this fails it's switched off.
-        "sDom": '<lfr><"clear">tip',
+//        "sDom": '<lfr><"clear">tip',
+//        "sDom": 'T<"clear"><lfr><"clear">tip',
+        "sDom": 'iT<"clear"><lfr><"clear">tp',
+        
         "sAjaxSource": '../../cgi-bin/DataTablesServer.py',
         "oLanguage": {
             "sSearch": "Search (e.g. 9pcy):",
@@ -41,8 +80,35 @@ jQuery(document).ready(function() {
                                 '<option value="1000">1000</option>'+
                                 '<option value="10000">10000</option>'+
                             '</select> records'
-        }
+//            "sInfo": "Showing _START_:_END_ of _TOTAL_",
+//            "sInfoEmpty": "Showing 0 to 0 of 0 entries",
+//            "sInfoFiltered": "(filtered from _MAX_ total)"                                
+        },
+        /*
+        "oTableTools": {
+            "sSwfPath": "./dataTableMedia/swf/copy_cvs_xls.swf",
+            "aButtons": {
+                "sExtends": 	"download",
+                "sButtonText":  "Download CSV",
+                "sUrl": 		"'../../cgi-bin/DataTablesServer.py'"
+            }
+        } 
+        */      
+        "fnServerParams": function ( aoData ) { // WORKS
+            aoData.push( { "name": "query_type", "value": "normal" } );
+        },                
+        "oTableTools": {
+            "sSwfPath": "./dataTableMedia/swf/copy_cvs_xls.swf",
+            "aButtons": [ {
+                "sExtends": "download",
+                "sButtonText": "CSV",
+                "sButtonClass": "DTTT_button_csv",
+                "sButtonClassHover": "DTTT_button_csv_hover",
+                "sUrl": "../../cgi-bin/DataTablesServer.py"            
+            } ]
+        }        
     } );
+    
 //    Add a select menu for some TH element (rog and chothia_class) in the table footer 
     /*
     $("tfoot th").each( function ( i ) {
@@ -440,5 +506,5 @@ jQuery(document).ready(function() {
 
     $("#example").dataTable({
         "sDom": 'T<"clear">lfrtip'
-    } );
+    } );    
 });

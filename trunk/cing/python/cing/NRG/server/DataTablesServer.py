@@ -18,10 +18,12 @@ log = sys.stderr.write
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 #
 # Array of database columns which should be read and sent back to DataTables
-_columns = 'name pdb_id bmrb_id rog_str distance_count cs_count chothia_class_str chain_count res_count'.split()
-_string_columns = 'name pdb_id rog_str chothia_class_str'.split() # can be simply filtered for.
+PDB_ID_IDX = 2 # Keep in sync with settings.py where it serves no purpose but to remind us of order importance.
 # Indexed column (used for fast and accurate table cardinality)
-_indexColumn = "pdb_id"
+#_indexColumn = "pdb_id"
+_columns = 'is_solid name pdb_id bmrb_id rog_str distance_count cs_count chothia_class_str chain_count res_count'.split()
+_boolean_columns = 'is_solid'.split() # can be simply filtered for.
+_string_columns = 'name pdb_id rog_str chothia_class_str'.split() # can be simply filtered for.
 # DB table to use
 _sTable = "nrgcing.cingentry"
 #schema= NRG_DB_SCHEMA  
@@ -30,6 +32,28 @@ conn_string = "host='localhost' dbname='pdbmlplus' user='nrgcing1' password='4I4
 # If you just want to use the basic configuration for DataTables with PHP server-side, there is
 # no need to edit below this line
 #
+def toCsv(inObject):
+    'Return None on empty or invalid inObject.'
+    if not inObject:
+        return None
+    result = ','.join(_columns[2:]) + '\n' # Header row
+    for r in range(len(inObject)):
+        rowStr = ''
+        row = inObject[r]
+        for c in range(2,len(row)):            
+            v = row[c]
+            if isinstance(v, str): # Strings are usually quoted.
+                v = '"%s"' % v
+            # end if                      
+            if v == None: # Nulls are empty unquoted values.
+                v = ''
+            # end if
+            rowStr += str(v) + ','
+        # end for        
+        result += "%s\n" % rowStr[:-1]
+    return result
+# end def
+
 
 def is_pdb_code( chk_string ):
     """
@@ -116,9 +140,9 @@ class DataTablesServer:
                 # even though we enabled columns by name I'm showing you this to
                 # show that you can still access columns by index and iterate over them.
                 print "Value: ", memory[0]
-    #             print the entire row 
+#    #             print the entire row 
                 print "Row:    ", memory
-                return
+#                return
             # end if            
         except:
             traceBackString = format_exc()
@@ -132,14 +156,27 @@ class DataTablesServer:
         self.cadinality = 0
         # Who's calling
         if self.cgi.has_key('database'):
+            log( "Processing textbox query.\n" )
             self.processSimpleTextBoxQuery()
             return
         # end if         
-        print "Content-Type: text/plain\n"
-#        print "cgi: %s" % str(self.cgi)
+#        log( "cgi: %s\n" % str(self.cgi) )
                                           
-        self.runQueries()
-        self.outputResult()
+        
+        if self.cgi.has_key('query_type') and self.cgi['query_type'].value == "normal":
+            print "Content-Type: text/plain\n"
+            log( "Processing normal query.\n" )
+            self.runQueries(usePaging=True)
+            self.outputResult()
+        else:
+            print "Content-Disposition: attachment; filename=NRG-CING_summary_selection.csv;\n"
+            log( "Processing download query.\n" )
+#            self.cgi['iDisplayLength'] = -1 # All filtered rows please
+            self.runQueries(usePaging=False)
+#            log( "self.resultData: %s\n" % str(self.resultData) )
+            print toCsv( self.resultData )            
+            return
+        # end def            
     # end def
     
     def processSimpleTextBoxQuery( self ):
@@ -182,7 +219,7 @@ class DataTablesServer:
         # Sanity check.        
         dbValue = self.cgi['database'].value
         if dbValue != 'pdb':
-            log("ERROR: got a cgi database parameter but the value was not pdb but: %s" % str(dbValue))
+            log("ERROR: got a cgi database parameter but the value was not pdb but: %s\n" % str(dbValue))
             print basicRedirectHtml % '../NRG-CING/HTML/index.html'
             return
         # end def
@@ -227,34 +264,34 @@ class DataTablesServer:
                   'orange': '<font color=#FFA500>orange</font>', 
                   'red':    '<font color=#FF0000>red</font>'}
         refEndTag = "</a>"                    
-        for row in self.resultData:
+        for r,row in enumerate(self.resultData): #@UnusedVariable # pylint: disable=W0612
 #            log("Looking at row: %s.\n" % str(row))
             output += '['
             for i in range( len(_columns) ):
                 columnName = _columns[i]
                 v = str( row[ _columns[i] ] )
-                if v == None:
-                    log("ERROR: got actual None for value.\n")
-                    output += '"%s",' % '.'
-                    continue
-                # end if                    
                 if v == 'None':
 #                    log("Resetting None string to empty string\n")
-                    output += '"%s",' % ''
-                    continue
+                    v = ''
                 # end if                    
-                if len(v) < 1:
-#                    log("WARNING: Strange got empty string in column: [%s]\n" % columnName)
-                    output += '"%s",' % ''
-                    continue
-                # end if                         
-                if columnName == "name" or columnName == "pdb_id":
+                if columnName == "name" or columnName == "pdb_id" or i == 0:
+                    if len(v) != 4: # for when we are at row 0: is_solid. We need to actually look in column 1.
+#                        log("DEBUG: getting thru PDB id from different column number 1.\n")
+#                        log("WARNING: Strange got bad length for expected pdb id: [%s]\n" % str(dbId))
+                        v = str( row[ _columns[PDB_ID_IDX] ] ) # 1 is pdb_id
+#                        log("DEBUG: XXXX.\n")
+                        if v == None:
+                            log("ERROR: got actual None for value.\n")
+                            output += '"%s",' % '.'
+                            continue
+                        # end if                         
+                        if len(v) != 4:
+                            log("ERROR: Strange got no pdb_id string in column: [%s] but [%s]\n" % (columnName,str(v)))
+                            output += '"%s",' % ''
+                            continue
+                        # end if                                                 
+                    # end if                         
                     dbId = v
-                    if len(dbId) != 4:
-                        log("WARNING: Strange got bad length for expected pdb id: [%s]\n" % str(dbId))
-                        output += '"%s",' % v
-                        continue
-                    # end if                    
                     ch23 = dbId[1:3]
                     refTag = "<a href='" + "../data/" + ch23 + "/"+dbId+"/"+dbId+".cing" + "'>" 
                     if columnName == "name":
@@ -262,11 +299,22 @@ class DataTablesServer:
                         imgTag = "<img src='" + "../data/" + ch23 + "/"+dbId+"/"+dbId+".cing/"+dbId+\
                                     "/HTML/mol_pin.gif' width=57 height=40 border=0>"
                         v = refTag + imgTag + refEndTag
-                    else:
+                    elif columnName == "pdb_id":
 #                        http://www.rcsb.org/pdb/explore/explore.do?structureId=1brv
                         refTag = "<a href='" + "http://www.rcsb.org/pdb/explore/explore.do?structureId=" + dbId + "'>"
                         v = refTag + dbId + refEndTag
+                    elif i ==0: # is_solid, an alias for download url.
+#                        http://nmr.cmbi.ru.nl/NRG-CING/data/br/1brv/1brv.cing.tgz                    
+                        refTag = "<a href='" + "../data/" + ch23 + "/"+dbId+"/"+dbId+".cing.tgz" + "'>" 
+#                        http://localhost/NRG-CING/data/br/1brv/1brv.cing/1brv/HTML/mol.gif
+                        imgTag = "<img src='icon_download.gif' width=34 height=34 border=0>"
+                        v = refTag + imgTag + refEndTag
+                    else: # is_solid, an alias for download url.
+                        log("ERROR: code bug. Please revise loop here.\n")
                     # end def
+                    output += '"%s",' % v
+                    continue
+                # end def
                 if columnName == "bmrb_id":
                     dbId = v
 #                    http://www.bmrb.wisc.edu/data_library/generate_summary.php?bmrbId=4020           
@@ -274,11 +322,11 @@ class DataTablesServer:
                     v = refTag + dbId + refEndTag
                 elif _columns[i] == "rog_str":
                     v = mapRog[ v ]
-#                elif _columns[i] == "bmrb_id":
-#                    v = 'bmr' + v
                 # end if
                 output += '"%s",' % v
+#                log("DEBUG: Logging value: [%s]\n" % v)                
             # end for            
+#            log("DEBUG: Logged row: %s\n" % r)                
             # Optional Configuration:
             # If you need to add any extra columns (add/edit/delete etc) to the table, that aren't in the
             # database - you can do it here
@@ -301,12 +349,15 @@ class DataTablesServer:
         return count > 0
     # end def
     
-    def runQueries( self ):
+    def runQueries( self, usePaging = True ):
         'Generate the SQL needed and run the queries'
         dataCursor = self.dbh.cursor(cursor_factory=DictCursor)
         where=self.filtering()
         order=self.ordering()
-        limit=self.paging()
+        limit = ''
+        if usePaging:
+#            log("Paging\n")
+            limit=self.paging()
 #        print 'where: %s' % where
 #        print 'order: %s' % order
 #        print 'limit: %s' % limit
@@ -349,6 +400,8 @@ class DataTablesServer:
                 s = "to_char(%s,'999999')" % _columns[i]  
                 if _columns[i] in _string_columns:
                     s = _columns[i]
+                elif _columns[i] in _boolean_columns:
+                    continue # skip booleans for now.
                 # end if
 #                log('Doing matching with: %s\n' % s)
                 filter += "%s LIKE '%%%s%%' OR " % (s, self.cgi['sSearch'].value)
