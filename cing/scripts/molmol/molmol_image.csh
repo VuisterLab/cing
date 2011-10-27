@@ -199,6 +199,8 @@ endif
 setenv MOLMOLDEV TTY/NO
 $executableMm -t -f - < $mac_file >>& $log_file
 set molmol_status = $status
+#$executableMm -t -f - < $mac_file
+#echo $mac_file | $executableMm -t -f -
 #echo "DEBUG: 7"
 
 if ( $molmol_status ) then
@@ -226,7 +228,9 @@ endif
 # Remove the temporary stuff
 # Don't remove input and log file if no pov file was created.
 # DEBUG: comment next line if you want to keep the files.
-\rm -f $mac_file $log_file
+if ( 1 ) then # DEFAULT: 1
+    \rm -f $mac_file $log_file
+endif
 
 exit 0
 

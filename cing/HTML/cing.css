@@ -171,7 +171,8 @@ a.green:hover, a.green:active {
     background: #FFFFFF right; /* This Is The BG Color Of The Main Div */
     width: 100%;
 /*  margin: 0.0em auto; /* Right And Left Margin Widths To Auto */
-    padding-left: 0.5em; /* Chris' choice */
+    padding-left: 0.5em; /* Chris' choice was 2 or so. */
+    padding-right: 0.5em; /* FF doesn't seem to be honoring this directive. */
     text-align: left; /* Hack To Keep IE5 Windows Happy */
     color: #3e3e3e;
     color: #333333;

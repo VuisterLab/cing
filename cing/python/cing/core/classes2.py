@@ -186,7 +186,7 @@ class ResonanceList(NTlist, ProjectListMember):
     NB the name is not necessarily unique within even the molecule.
     I.e. for PDB entry 1cjg and from NMR-STAR entry 4813 will get the resonance list name bmr4813_21.str twice from CCPN.
     """
-    SML_SAVE_ATTRIBUTE_LIST = 'name status vascoApplied vascoResults'.split() # Used in cing.core.sml.SMLNTListWithAttrHandler
+    SML_SAVE_ATTRIBUTE_LIST = 'name status bmrb_id vascoApplied vascoResults'.split() # Used in cing.core.sml.SMLNTListWithAttrHandler
     # use the same spelling through out.
 
     # NB the unusual init. Differs in that arguments aren't added to the list.
@@ -194,15 +194,17 @@ class ResonanceList(NTlist, ProjectListMember):
         NTlist.__init__(self)
         ProjectListMember.__init__(self)      # Initialized objectPath  
         self.__CLASS__ = 'ResonanceList'
-        self.name = name        # Name of the list
+        self.name = name        # Name of the list        
         self.status = status    # Status of the list; 'keep' indicates storage required
         self.currentId = 0      # Id for each element of list
         self._idDict = {}       # dictionary to look up id in case the list is sorted differently
         self._byItem = None     # if not None: list was sorted _byItem.
         self.vascoResults  = NTdict() # See applyVascoChemicalShiftCorrections # NB match with VASCO_RESULTS_STR
         self.vascoApplied  = False # VASCO_APPLIED_STR
+        self.bmrb_id = None # Will be derived from name when calling rename.
         self.rogScore = ROGscore()
         self.SMLhandler.SML_SAVE_ATTRIBUTE_LIST = self.SML_SAVE_ATTRIBUTE_LIST
+        self.rename(name) # Triggers setting self.bmrb_id
     #end def
 
     def decriticize(self):
@@ -273,7 +275,22 @@ class ResonanceList(NTlist, ProjectListMember):
         return self.__str__()
     #end def
     def rename(self, newName):
+        'Please use this rename instead of directly renaming so BMRB ID detection can kick in.'        
         self.name = newName
+        # Detect the id from strings like: bmr4020_21.str
+        pattern = re.compile( '^.*(bmr\d+).*$' )
+        match = pattern.match( self.name )
+        if match:
+            bmrb_idStr = match.group(1)[3:]            
+            self.bmrb_id = int(bmrb_idStr)
+            if is_bmrb_code(self.bmrb_id):
+                nTdebug("-0- Autodetected BMRB ID %s from new name: %s" % (self.bmrb_id, self.name))
+                return self
+            # end if
+            nTerror("-1- Failed to detect valid BMRB ID from new name: %s" % self.name)
+            return self
+        # end if
+        nTdebug("-2- No BMRB ID was matched from new name: %s" % self.name)
 #        return self.projectList.rename(self.name, newName)
         return self
     #end def

@@ -15,6 +15,7 @@ from cing.Libs.cython.superpose import calculateRMSD
 from cing.Libs.cython.superpose import superposeVectors
 from cing.Libs.html import addPreTagLines
 from cing.Libs.html import hPlot
+from cing.NRG import archiveIdPdbBased
 from cing.PluginCode.required.reqDssp import * #@UnusedWildImport
 from cing.PluginCode.required.reqNih import TALOSPLUS_STR
 from cing.PluginCode.required.reqVasco import * #@UnusedWildImport
@@ -378,6 +379,9 @@ class Molecule( NTtree, ResidueList ):
         self.xeasy            = None         # reference to xeasy class, used in parsing
         self.rogScore         = ROGscore()
         self.ranges           = None         # ranges used for superposition/rmsd calculations. None means all. 'auto' will be converted.
+        self.archive_id        = None         # See doc in setArchiveId
+        self.bmrbEntryList    = []           # List of BMRB entries whose data occurs in this object.
+        self.pdbEntryList     = []           # List of PDB entries whose data occurs in this object.
 
 #        self.saveXML('chainCount','residueCount','atomCount')
 
@@ -953,6 +957,79 @@ class Molecule( NTtree, ResidueList ):
         #end for
         return atomDict
     #end def
+
+    def getInvolvedBmrbIdList(self):
+        """
+        Derives the BMRB ids for this molecule if present.
+        Return an empty list when none could be detected or None on error.
+        Doesn't set self attribute.
+        """
+        bmrbEntryList = []
+        for i, resonanceSource in enumerate(self.resonanceSources):
+            if not isinstance( resonanceSource, ResonanceList):
+                nTerror("ResonanceList expected but found for iteration %s: [%s], skipping." % (i, resonanceSource))
+                return True            
+            #end if
+            if resonanceSource.bmrb_id:
+                if resonanceSource.bmrb_id in bmrbEntryList:
+                    nTdebug("BMRB ID: %s already in list: %s. Skip adding another." % (resonanceSource.bmrb_id,
+                                                                                       str(resonanceSource.bmrb_id)))
+                else:
+                    nTdebug("Adding BMRB ID: %s to list: %s" % (resonanceSource.bmrb_id,str(resonanceSource.bmrb_id)))
+                    bmrbEntryList.append(resonanceSource.bmrb_id)
+                # end if
+            # end if
+        #end for
+        return bmrbEntryList
+    #end def
+
+    def setArchiveId(self, archive_id, pdbEntryList = None, bmrbEntryList = None ):
+        """
+        Denotes which archive if any this molecule is part of.
+        E.g. archive_id can be NRG-CING or NMR_REDO.
+        It will also set the related entry ids.
+        E.g. for bmrbEntryList = [ 4020, 4060 ]
+        """
+        self.archive_id = archive_id
+        if pdbEntryList:
+            self.pdbEntryList = pdbEntryList
+        else:        
+            if is_pdb_code( self.name ):
+                pdb_id = self.name
+                nTmessage("Autodetected PDB entry ID: %s" % pdb_id)
+                self.pdbEntryList = [ pdb_id ]
+            else:
+                nTdebug("Failed to derive PDB entry ID from molecule name: %s" % self.name)
+            # end if
+        #end if PDB
+        if bmrbEntryList:
+            self.bmrbEntryList = bmrbEntryList
+        else:        
+            bmrbEntryList = self.getInvolvedBmrbIdList()            
+            if bmrbEntryList:
+                self.bmrbEntryList = []
+                for bmrb_id in bmrbEntryList:
+                    if is_bmrb_code( bmrb_id ):
+                        nTmessage("Autodetected BMRB entry ID: %s" % bmrb_id)
+                        self.bmrbEntryList.append( bmrb_id )
+                    else:
+                        nTerror("Skipping autoderived invalid BMRB entry ID: %s." % bmrb_id)
+                    # end if
+                # end for
+            else:
+                nTdebug("Failed to derive any BMRB entry ID from resonance list name(s): %s" % self.name)
+            # end if
+        #end if BMRB
+        
+        # Just one of the possible sanity checks.
+        if self.archive_id in archiveIdPdbBased:
+            if not self.pdbEntryList:
+                nTerror("Failed to set any PDB ID for a PDB based archive.")
+                return True
+            # end if
+        # end if
+    #end def
+
 
     def setRanges(self, ranges=None):
         """
@@ -1699,7 +1776,8 @@ class Molecule( NTtree, ResidueList ):
     #end def
 
     def _convertResonanceSources(self, sMLfileVersion):
-        """Update to new data model as of sml
+        """
+        Update to new data model as e.g. from sml source
         Return True on error.
         """
         msg = "In %s with sMLfileVersion %s" % ( getCallerName(), sMLfileVersion )
@@ -4666,14 +4744,17 @@ Residue class: Defines residue properties
             doublet.append( self.sibling(i) )
 
         if None in doublet:
-            if not self.isNterminal():
-                msg = 'Residue.addDihedralD1: skipping non N-terminal residue without doublet ' + str(self) +\
-                        ' (missing preceding neighbor but not N-terminal)'
-                if msgHol == None:
-                    nTdebug(msg)
-                else:
-                    msgHol.appendDebug(msg)
+#            if not self.isNterminal():
+#                msg = 'Residue.addDihedralD1: skipping non N-terminal residue without doublet ' + str(self) +\
+#                        ' (missing preceding neighbor but not N-terminal)'
+#                if msgHol == None:
+#                    nTdebug(msg)
+#                else:
+#                    msgHol.appendDebug(msg)
+#                # end if
+#            # end if
             return
+        # end if
         ca_atms = doublet.zap('CA')
         cb_atms = [] # CB or Gly HA3 (called HA2 in INTERNAL_0) atom list
         for doubletResidue in doublet:
@@ -4698,8 +4779,8 @@ Residue class: Defines residue properties
             else:
                 cb_atm = doubletResidue.getAtom('CB',IUPAC)
             if not cb_atm:
-#                msg = 'Residue.addDihedralD1: skipping for absent CB/%s in doubletResidue %s of doublet %s' % ( 
-#                        GLY_HA3_NAME_CING, doubletResidue, doublet )
+                msg = 'Residue.addDihedralD1: skipping for absent CB/%s in doubletResidue %s of doublet %s' % ( 
+                        GLY_HA3_NAME_CING, doubletResidue, doublet )
                 if msgHol == None:
                     nTerror(msg)
                 else:
@@ -5562,11 +5643,11 @@ coordinates: %s"""  , dots, self, dots
         """
         lenSelf = len( self.coordinates)
         if lenSelf == 0:
-            nTdebug("In Atom.distance: No coordinates for self %s" % self)
+#            nTdebug("In Atom.distance: No coordinates for self %s" % self)
             return None
         #end if
         if lenSelf != len( other.coordinates ):
-            nTdebug("In Atom.distance: No coordinates for other %s" % other)
+#            nTdebug("In Atom.distance: No coordinates for other %s" % other)
             return None
         #end if
         self.distances = NTlist()

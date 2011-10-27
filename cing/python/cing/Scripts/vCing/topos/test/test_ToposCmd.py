@@ -15,12 +15,12 @@ lockTimeOut = 1 * 1 * 5 * 60 # 5 minutes
 vc = Vcing()
 
 class AllChecks(TestCase):
-    # important to switch to temp space before starting to generate files for the project.
-    cingDirTmpTest = os.path.join( cingDirTmp, 'testToposCmd' )
-    mkdirs( cingDirTmpTest )
-    os.chdir(cingDirTmpTest)
 
     def _testAll(self): ###  TODO: fails in current setup.
+        # important to switch to temp space before starting to generate files for the project.
+        cingDirTmpTest = os.path.join( cingDirTmp, 'test_ToposCmd' )
+        mkdirs( cingDirTmpTest )
+        os.chdir(cingDirTmpTest)
 #        exitCode, token, tokenLock = vcMaster.nextTokenWithLock(lockTimeOut)
 #        if exitCode:
 #            nTdebug("Failed to vcMaster.nextTokenWithLock(). Was the token deleted?")
@@ -38,7 +38,7 @@ class AllChecks(TestCase):
 #        vcMaster.toposCmd.remove_token()
 
 #        p.process_kill( pid )
-        pass
+#        pass
 
 if __name__ == "__main__":
     cing.verbosity = verbosityDebug

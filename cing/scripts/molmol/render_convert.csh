@@ -70,11 +70,12 @@ if ( ! -e $id.gif ) then
     goto error
 endif
 
-echo "DEBUG: trying to remove the temporary stuff: $tga_tmp $log"
-
-# Don't remove input and log file if no picture file was created.
-\rm -f $tga_tmp
-\rm -f $log
+if ( 1 ) then # DEFAULT: 1
+    echo "DEBUG: trying to remove the temporary stuff: $tga_tmp $log"
+    # Don't remove input and log file if no picture file was created.
+    \rm -f $tga_tmp
+    \rm -f $log
+endif
 
 exit ( 0 )
 

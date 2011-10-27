@@ -40,6 +40,7 @@ from cing.Libs.disk import copy
 from cing.Libs.disk import rmdir
 from cing.Libs.network import * #@UnusedWildImport
 from cing.NRG import * #@UnusedWildImport
+from cing.NRG.Utils import getArchiveIdFromDirectoryName
 from cing.NRG.settings import * #@UnusedWildImport
 from cing.NRG.storeCING2db import doStoreCING2db
 from cing.core.classes import Project
@@ -161,8 +162,10 @@ def main(entryId, *extraArgList):
     isRemoteOutputDir = False
     if '@' in outputDir:
         isRemoteOutputDir = True
+    # end if
 #    vc = vCing('.') # argument is a fake master_ssh_url not needed here.
-
+    archive_id = getArchiveIdFromDirectoryName( inputDir )
+    
     nTdebug("Using program arguments:")
     nTdebug("inputDir:             %s" % inputDir)
     nTdebug("outputDir:            %s" % outputDir)
@@ -179,6 +182,8 @@ def main(entryId, *extraArgList):
     nTdebug("Using derived settings:")
     nTdebug("modelCount:           %s" % modelCount)
     nTdebug("isRemoteOutputDir:    %s" % isRemoteOutputDir)
+    nTdebug("archive_id:            %s" % archive_id)
+    
     
     # For NMR_REDO required as most efficient.
     if singleCoreOperation: 
@@ -269,6 +274,10 @@ def main(entryId, *extraArgList):
     # end if
     if ranges != None:
         project.molecule.setRanges(ranges)
+    # end if
+    if archive_id:
+        project.molecule.setArchiveId(archive_id)
+    # end if
     project.molecule.superpose(ranges=ranges)
     if filterTopViolations and not project.filterHighRestraintViol():
         nTerror("Failed to filterHighRestraintViol")    
@@ -280,16 +289,15 @@ def main(entryId, *extraArgList):
         nTerror("Failed to validate project read")
         return True
     # end if filterVasco
-
     project.save()
 
-    if storeCING2db:
+    if storeCING2db and archive_id:
         # Does require:
         #from cing.PluginCode.sqlAlchemy import csqlAlchemy
         # and should never crash  run.
-        archive_id = ARCHIVE_DEV_NRG_ID
-        if isProduction:
-            archive_id = ARCHIVE_NRG_ID
+#        archive_id = ARCHIVE_DEV_NRG_ID
+#        if isProduction:
+#            archive_id = ARCHIVE_NRG_ID
         try:
             if doStoreCING2db( entryId, archive_id, project=project):
                 nTerror("Failed to store CING project's data to DB but continuing.")

@@ -1,5 +1,9 @@
 # These archive ids will be used to switch beteen the different setups/rdbs/projects. E.g. look at the use of nrgCing.archive_id
 # Use the below map from archive to schema for switching.
+from cing.NRG.settings import results_base
+from cing.NRG.settings import results_base_recoord
+from cing.NRG.settings import results_base_redo
+
 ARCHIVE_NRG_ID      =  'ARCHIVE_NRG'
 ARCHIVE_DEV_NRG_ID  =  'ARCHIVE_DEV_NRG'
 ARCHIVE_CASD_ID     =  'ARCHIVE_CASD'
@@ -60,24 +64,17 @@ schemaIdList  = [ CASD_DB_NAME,    PDB_DB_NAME,    NRG_DB_NAME,    DEV_NRG_DB_SC
 archiveIdList = [ ARCHIVE_CASD_ID, ARCHIVE_PDB_ID, ARCHIVE_NRG_ID, ARCHIVE_DEV_NRG_ID,   ARCHIVE_CASP_ID, 
                  ARCHIVE_NMR_REDO_ID,   ARCHIVE_NMR_REDOA_ID,   ARCHIVE_RECOORD_ID, ARCHIVE_RECOORDA_ID   ]
 
+archiveIdPdbBased = archiveIdList[:] # Requires PDB ID can be derived.
+
 mapArchive2Schema = {}
-for _idxArchiveId,archiveId in enumerate( archiveIdList ):
-    mapArchive2Schema[ archiveId ] = schemaIdList[_idxArchiveId]
-
-
-# Section from Tim
-import logging
-import sys
-
-#Configure logging LOG_FORMAT
-LOG_FORMAT = '%(levelname)s\t%(asctime)s %(module)s.%(funcName)s:%(lineno)d\t%(message)s'
-LOG_DATE_FORMAT = '%H:%M:%S'
-
-#Logs WARNING messages and anything above to sys.stdout
-logging.basicConfig(level = logging.INFO, stream = sys.stdout, format = LOG_FORMAT, datefmt = LOG_DATE_FORMAT)
-
-#Log ERROR messages to stderr separately; these will fail a tool run in Galaxy
-STDERR_HANDLER = logging.StreamHandler(sys.stderr)
-STDERR_HANDLER.setLevel(logging.ERROR)
-STDERR_HANDLER.setFormatter(logging.Formatter(fmt = LOG_FORMAT, datefmt = LOG_DATE_FORMAT))
-logging.root.addHandler(STDERR_HANDLER)
+for _idxArchiveId,archive_id in enumerate( archiveIdList ):
+    mapArchive2Schema[ archive_id ] = schemaIdList[_idxArchiveId]
+# end for
+mapBase2Archive = {}
+mapBase2Archive[ results_base ]         = ARCHIVE_NRG_ID
+mapBase2Archive[ results_base_recoord ] = ARCHIVE_RECOORD_ID
+mapBase2Archive[ results_base_redo ]    = ARCHIVE_NMR_REDO_ID
+mapArchive2Base = {}
+mapArchive2Base[ ARCHIVE_NRG_ID         ] = results_base
+mapArchive2Base[ ARCHIVE_RECOORD_ID     ] = results_base_recoord
+mapArchive2Base[ ARCHIVE_NMR_REDO_ID    ] = results_base_redo

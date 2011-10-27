@@ -167,7 +167,7 @@ class AllChecks(TestCase):
                                               filterVasco=filterVasco,
                                               filterTopViolations = filterTopViolations
                                                ))
-                if doWattos:
+                if doWattos and False:
                     mol = project.molecule
                     completenessMol = mol.getDeepByKeys( WATTOS_STR, COMPLCHK_STR, VALUE_LIST_STR)
                     nTdebug("completenessMol: %s" % completenessMol)

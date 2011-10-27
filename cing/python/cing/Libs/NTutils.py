@@ -46,6 +46,8 @@ import sys
 import time
 
 FAC = 180.0/math.pi
+SMALLEST_BMRB_ID = 3
+LARGEST_BMRB_ID = 99*1000
 
 # For plotting with thousand separators.
 # Disabled in an emergency fix for this failed after upgrade Mac Ports to 2.6.7
@@ -4923,10 +4925,37 @@ def is_pdb_code( chk_string ):
     """
     pattern = re.compile( '^\d\w\w\w$' )
     match = pattern.match( chk_string )
-    if ( match ):
-        return 1
-    else:
-        return 0
+    if match:
+        pattern = re.compile( '^\d\d\d\d$' )
+        match = pattern.match( chk_string )
+        if match:
+            nTdebug("Currently no PDB ID has all digits.")
+            return False
+        # end if
+        return True
+    # end if
+    return False
+# end def
+
+def is_bmrb_code( chk_int ):
+    """
+    This function checks to see if the input integer is a reasonable candidate for a
+    BMRB entry ID that is numeric.
+    """
+    if not isinstance(chk_int, int):
+        nTwarning("Input of %s should be int but is: [%s]" % ( getCallerName(), chk_int))
+        return False
+    # end if
+    # 3 PDB ID 1acp was the first still in existence.
+    # 20128 (no PDB ID) was the most recent one in Oct 2012.
+    rangeStr = "[%s,%s]" % ( SMALLEST_BMRB_ID, LARGEST_BMRB_ID )
+    if chk_int < SMALLEST_BMRB_ID or chk_int > LARGEST_BMRB_ID:
+        nTdebug("Input of %s is not a valid BMRB ID because it lies outside the known range: %s" % ( chk_int, rangeStr))
+        return False
+    # end if
+#    nTdebug("Input of %s is a valid BMRB ID because it lies inside the known range: %s" % ( chk_int, rangeStr ))
+    return True
+# end def
 
 def symlink( file_1, file_2 ):
     """

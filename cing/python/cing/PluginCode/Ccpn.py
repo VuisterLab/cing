@@ -820,7 +820,7 @@ class Ccpn:
 
 
     def _getCcpnShiftList(self, ccpnMolSystem, ccpnShiftList):
-        """Descrn: Intenal function to transfer CCPN assignments in the
+        """Descrn: Internal function to transfer CCPN assignments in the
                    input shift list, which match to a given ccpnMolSystem,
                    to the relevant Cing objects. This function assumes
                    that Cing molecules are already mapped to CCPN molSystems

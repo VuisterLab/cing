@@ -103,6 +103,50 @@ class AllChecks(TestCase):
         NTsort( inputList, 'a', inplace=True )
 #        inputList.reverse()
         self.assertEqual( expectedOutputList, inputList)
+    # end def
+        
+    def test_is_pdb_code(self):
+        inputList = """
+            .            
+            1brv
+            1234
+        """.split()
+        expectedList = [ 
+            False,
+            True,
+            False            
+        ] 
+        for i, inputStr in enumerate(inputList):
+            result = is_pdb_code(inputStr)
+            self.assertEqual( result, expectedList[i])
+        # end for
+    # end def
+        
+    def test_is_bmrb_code(self):
+        inputList = """
+            1brv
+            4020
+            1
+            999999999
+        """.split()
+        expectedList = [ 
+            False,
+            True,
+            False,            
+            False            
+        ]
+        for i, inputStr in enumerate(inputList):
+            try:
+                inputInt = int(inputStr)
+            except:
+#                nTtracebackError()
+                inputInt = inputStr # For testing purposes.
+            # end try
+            result = is_bmrb_code(inputInt)
+#            nTdebug("Found on iteration %s with input: %s the result %s and expected %s" % ( i, inputStr, result, expectedList[i]))
+            self.assertEqual( result, expectedList[i])
+        # end for
+    # end def
         
         
 # end class

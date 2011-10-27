@@ -21,14 +21,14 @@ max_time_to_wait = 365 * 24 * 60 * 60 # a year in seconds
 p = Process( max_time_to_wait_kill = max_time_to_wait)
 
 class AllChecks(TestCase):
-    # important to switch to temp space before starting to generate files for the project.
-    cingDirTmpTest = os.path.join( cingDirTmp, 'testvCing' )
-    mkdirs( cingDirTmpTest )
-    os.chdir(cingDirTmpTest)
-
     # Test will fail if topos hasn't been properly initialized.
     # It is not intended to be run every time the other cing unit test are.
     def _testvCingMaster(self):
+        # important to switch to temp space before starting to generate files for the project.
+        cingDirTmpTest = os.path.join( cingDirTmp, 'test_vCing' )
+        mkdirs( cingDirTmpTest )
+        os.chdir(cingDirTmpTest)
+
         exitCode, token, tokenLock = vc.nextTokenWithLock(lockTimeOut)
         if exitCode:
             nTdebug("Failed to vc.nextTokenWithLock(). Was the token deleted?")

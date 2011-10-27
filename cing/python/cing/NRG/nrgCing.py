@@ -1254,7 +1254,7 @@ class NrgCing(Lister):
         base_data_dir = os.path.join (data_dir, self.results_base )
         # Most crud can come in from the traditional method.
         copyCingHtmlJsAndCssToDirectory(htmlDir)
-
+        
         fnList = """
             about.html 
             contact.html 
@@ -1262,6 +1262,8 @@ class NrgCing(Lister):
             help.html 
             helpCing.html 
             helpPlot.html 
+            helpTutorials.html
+            glossary.html 
             index.html
             download.html 
             plot.html 
@@ -1278,7 +1280,7 @@ class NrgCing(Lister):
             dstFile = os.path.join(htmlDir,       fn)
             if not fn.endswith('.html'):
                 copyfile(srcFile, dstFile)
-                nTdebug("-1- Added extra file %s." % dstFile)
+#                nTdebug("-1- Added extra file %s." % dstFile)
                 continue
             # end if
             file_content = open(srcFile, 'r').read()                    
@@ -1289,14 +1291,14 @@ class NrgCing(Lister):
             file_content = string.replace(file_content, old_string, GOOGLE_ANALYTICS_TEMPLATE)                        
             if fn != 'index.html':
                 writeTextToFile(dstFile, file_content)
-                nTdebug("-2- Added extra file %s." % dstFile)
+#                nTdebug("-2- Added extra file %s." % dstFile)
                 continue
             # end if
             # Get framework input
             file_content = self._format_html(file_content)                            
             htmlfile = os.path.join(htmlDir, 'index.html')
             writeTextToFile(htmlfile, file_content)
-            nTdebug("-3- Written HTML index file: %s" % htmlfile)            
+#            nTdebug("-3- Written HTML index file: %s" % htmlfile)            
         # end for
         nTmessage("Copy the overall index")
         org_file = os.path.join(data_dir, 'redirect.html')

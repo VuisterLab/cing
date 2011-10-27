@@ -150,15 +150,17 @@ class Molgrap(NTdict):
         if status:
             nTmessage( "Molgrap.run: rendered/converted entry: %s" % entry_code)
             return True
-
+        # end if
 #        ## Remove temporary files if successful and possible
-        try:
-            os.unlink( pdb_first_file_name )
-            os.unlink( pov_file_name )
-            os.unlink( pov_cor_file_name )
-        except:
-            pass
-
+        if 1: # DEFAULT: True
+            try:
+                os.unlink( pdb_first_file_name )
+                os.unlink( pov_file_name )
+                os.unlink( pov_cor_file_name )
+            except:
+                pass
+            # end try
+        # end if
 
     def _make_molmol_pov_file(self, pdb_file_name, id, backcolor):
         """

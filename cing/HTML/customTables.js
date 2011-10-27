@@ -3,6 +3,8 @@
 //	  - Added additional number of rows to paginate (5 and up to 10,000)
 //    - Changed the wording of 'entries' to 'items'.
 jQuery(document).ready(function() {
+
+    TableTools.DEFAULTS.aButtons = [ "copy", "csv", "xls" ];
     
     TableTools.BUTTONS.download = {
             "sAction": "text",
@@ -35,7 +37,7 @@ jQuery(document).ready(function() {
 //                aoData.push( { "name": "query_type3", "value": "download" } );
 //            }            
         };
-    
+        
     var oTable = $("table[id^='dataTables-summaryArchive']").dataTable({
         "bSort": true,
         // Initially show the reverse natural order of PDB entries. High numbers in NRG-CING are more interesting.
@@ -64,10 +66,7 @@ jQuery(document).ready(function() {
         "bServerSide": true,
 //        "bStateSave": true,
         "bAutoWidth": false, // recalculates the column widths on the fly but as this fails it's switched off.
-//        "sDom": '<lfr><"clear">tip',
-//        "sDom": 'T<"clear"><lfr><"clear">tip',
-        "sDom": 'iT<"clear"><lfr><"clear">tp',
-        
+        "sDom": 'iT<"clear"><lfr><"clear">tp',        
         "sAjaxSource": '../../cgi-bin/DataTablesServer.py',
         "oLanguage": {
             "sSearch": "Search (e.g. 9pcy):",
@@ -84,16 +83,6 @@ jQuery(document).ready(function() {
 //            "sInfoEmpty": "Showing 0 to 0 of 0 entries",
 //            "sInfoFiltered": "(filtered from _MAX_ total)"                                
         },
-        /*
-        "oTableTools": {
-            "sSwfPath": "./dataTableMedia/swf/copy_cvs_xls.swf",
-            "aButtons": {
-                "sExtends": 	"download",
-                "sButtonText":  "Download CSV",
-                "sUrl": 		"'../../cgi-bin/DataTablesServer.py'"
-            }
-        } 
-        */      
         "fnServerParams": function ( aoData ) { // WORKS
             aoData.push( { "name": "query_type", "value": "normal" } );
         },                
@@ -132,7 +121,12 @@ jQuery(document).ready(function() {
 //    });
     
     $("table[id^='dataTables-atomList']").dataTable({
-        "sDom": 'T<"clear">lfrtip',
+        "sDom": 'iT<"clear"><lfr><"clear">tp',
+        "oTableTools": { "sSwfPath": "../dataTableMedia/swf/copy_cvs_xls.swf" },
+        "oLanguage": {
+            "sSearch": "Search (e.g. 13c leu):"
+        },
+        
         "bSort": true,
         // Initially show the natural order in molecule in order to show critiqued near by when coming in from other page.
         "aaSorting": [[0,'asc'], [1,'asc'], [3,'asc']],
@@ -194,7 +188,11 @@ jQuery(document).ready(function() {
         "bInfo": true,
         "bProcessing": true,
         "bAutoWidth": false,
-        "sDom": 'T<"clear">lfrtip',
+        "sDom": 'i<"clear"><lfr><"clear">tp',
+//        "oTableTools": { "sSwfPath": "../dataTableMedia/swf/copy_cvs_xls.swf" }, # Can't get this one working without showing it first?
+        "oLanguage": {
+            "sSearch": "Search (e.g. leu):"
+        },
         "aoColumns": [
                       {"sType": "numeric", "sClass": "right" }, // 1 #
                       {"sType": "html" }, 						// 2 ch
@@ -227,7 +225,11 @@ jQuery(document).ready(function() {
         "bInfo": true,
         "bProcessing": true,
         "bAutoWidth": false,
-        "sDom": 'T<"clear">lfrtip',
+        "sDom": 'iT<"clear"><lfr><"clear">tp',
+        "oTableTools": { "sSwfPath": "../dataTableMedia/swf/copy_cvs_xls.swf" },
+        "oLanguage": {
+            "sSearch": "Search (e.g. viol):"
+        },
         "aoColumns": [
                       { "sType": "numeric", "sClass": "right" }, // #
          // atom 1
@@ -269,7 +271,12 @@ jQuery(document).ready(function() {
         "bInfo": true,
         "bProcessing": true,
         "bAutoWidth": false,
-        "sDom": 'T<"clear">lfrtip',
+        "sDom": 'iT<"clear"><lfr><"clear">tp',
+          "oTableTools": { "sSwfPath": "../dataTableMedia/swf/copy_cvs_xls.swf" },
+          "oLanguage": {
+              "sSearch": "Search (e.g. leu):"
+          },
+        
         "aoColumns": [
                       { "sType": "numeric", "sClass": "right" },// #
                       { "sType": "html" }, 						// ch
@@ -305,7 +312,11 @@ jQuery(document).ready(function() {
         "bInfo": true,
         "bProcessing": true,
         "bAutoWidth": false,
-        "sDom": 'T<"clear">lfrtip',
+        "sDom": 'i<"clear"><lfr><"clear">tp',
+      "oTableTools": { "sSwfPath": "../dataTableMedia/swf/copy_cvs_xls.swf" },
+      "oLanguage": {
+          "sSearch": "Search (e.g. leu):"
+      },
         "aoColumns": [
                       { "sType": "numeric", "sClass": "right" }, // #
 
@@ -335,7 +346,11 @@ jQuery(document).ready(function() {
         "bInfo": true,
         "bProcessing": true,
         "bAutoWidth": false,
-        "sDom": 'T<"clear">lfrtip',
+        "sDom": 'i<"clear"><lfr><"clear">tp',
+        "oTableTools": { "sSwfPath": "../dataTableMedia/swf/copy_cvs_xls.swf" },
+        "oLanguage": {
+            "sSearch": "Search (e.g. leu):"
+        },
         "aoColumns": [
                       { "sType": "numeric", "sClass": "right" }, // #
 
@@ -371,7 +386,11 @@ jQuery(document).ready(function() {
         "bInfo": true,
         "bProcessing": true,
         "bAutoWidth": false,
-        "sDom": 'T<"clear">lfrtip',
+        "sDom": 'i<"clear"><lfr><"clear">tp',
+        "oTableTools": { "sSwfPath": "../dataTableMedia/swf/copy_cvs_xls.swf" },
+        "oLanguage": {
+            "sSearch": "Search (e.g. leu):"
+        },
         "aoColumns": [
                       { "sType": "numeric", "sClass": "right" }, // #
 
@@ -413,7 +432,11 @@ jQuery(document).ready(function() {
         "bInfo": true,
         "bProcessing": true,
         "bAutoWidth": false,
-        "sDom": 'T<"clear">lfrtip',
+        "sDom": 'i<"clear"><lfr><"clear">tp',
+        "oTableTools": { "sSwfPath": "../dataTableMedia/swf/copy_cvs_xls.swf" },
+        "oLanguage": {
+            "sSearch": "Search (e.g. leu):"
+        },
         "aoColumns": [
                       { "sType": "numeric", "sClass": "right" }, // #
 
@@ -459,11 +482,15 @@ jQuery(document).ready(function() {
     $("table[id^='dataTables-resDRList']").dataTable({
         "bPaginate": true,
         "bLengthChange": true,
-        "iDisplayLength": 10,
+        "iDisplayLength": 5,
         "bInfo": true,
         "bProcessing": true,
         "bAutoWidth": false,
-        "sDom": 'T<"clear">lfrtip',
+        "sDom": 'i<"clear"><lfr><"clear">tp',
+//        "oTableTools": { "sSwfPath": "../../../dataTableMedia/swf/copy_cvs_xls.swf" },
+        "oLanguage": {
+            "sSearch": "Search (e.g. HA):"
+        },
         "aaSorting": [[8,'desc'],[0,'asc']],
         "aoColumns": [
           { "sType": "html", "sClass": "right" }, // 0 #
@@ -482,11 +509,11 @@ jQuery(document).ready(function() {
     $("table[id^='dataTables-resACList']").dataTable({
         "bPaginate": true,
         "bLengthChange": true,
-        "iDisplayLength": 10,
+        "iDisplayLength": 5,
         "bInfo": true,
         "bProcessing": true,
         "bAutoWidth": false,
-        "sDom": 'T<"clear">lfrtip',
+        "sDom": 'i<"clear"><lfr><"clear">tp',
         "aaSorting": [[9,'desc'],[0,'asc']],
         "aoColumns": [
 /*          { "sType": "numeric", "sClass": "right", "bVisible": false, "sWidth": "30em"  }, */

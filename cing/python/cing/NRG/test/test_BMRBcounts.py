@@ -34,10 +34,10 @@ class AllChecks(TestCase):
 #        idxColumnKeyList = [0, 1, 2]
         idxColumnKeyList = []
         bmrbCountMap.appendFromTableGeneric(bmrbCountTableProper, *idxColumnKeyList)
-        bmrbId = 4020
-        self.assertEqual( getDeepByKeysOrAttributes( bmrbCountMap, bmrbId, '1H' ), 183)
-        self.assertEqual( getDeepByKeysOrAttributes( bmrbCountMap, bmrbId, '13C' ), 73)
-        self.assertEqual( getDeepByKeysOrAttributes( bmrbCountMap, bmrbId, '15N' ), None)
+        bmrb_id = 4020
+        self.assertEqual( getDeepByKeysOrAttributes( bmrbCountMap, bmrb_id, '1H' ), 183)
+        self.assertEqual( getDeepByKeysOrAttributes( bmrbCountMap, bmrb_id, '13C' ), 73)
+        self.assertEqual( getDeepByKeysOrAttributes( bmrbCountMap, bmrb_id, '15N' ), None)
 
     def test_BMRBcounts2(self):
 

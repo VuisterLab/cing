@@ -163,7 +163,7 @@ class CgenericSql(NTdict): # pylint: disable=R0902
         #The MetaData object supports some handy methods, such as getting a list of Tables in the order (or reverse) of their dependency:
 #        with warnings.catch_warnings(): 
 # can't use the python 2.5 feature since it's not always enabled. Update when no longer supporting 2.5
-        if 0:
+        if False: # DEFAULT: False
             warnings.simplefilter("ignore")
 #            for _t in self.metadata.table_iterator(reverse=False): # obsoleted
             for t in self.metadata.sorted_tables:                
