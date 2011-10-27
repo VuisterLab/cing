@@ -42,6 +42,9 @@ class AllChecks(TestCase):
         pathGif = os.path.join( self.cingDirTmpTest, gifFileName)
         self.assertFalse(project.molecule.export2gif(pathGif, project=project))
         self.assertTrue(os.path.exists(pathGif))
+        pathMolGifPinup = pathGif[:-4] + '_pin.gif'
+        self.assertTrue(os.path.exists(pathMolGifPinup))
+
         
         pathGifDefault =  os.path.join( cingPythonCingDir, 'PluginCode', DATA_STR, 'UnknownImage.gif' )
         self.assertFalse(os.path.getsize(pathGif) == os.path.getsize(pathGifDefault))

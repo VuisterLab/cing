@@ -14,6 +14,7 @@ class ROGscore(NTdict):
     MAX_TO_REPORT_IN_POPUP = 5
 
     mapColorString2Int = {COLOR_GREEN: 0, COLOR_ORANGE : 1, COLOR_RED : 2}
+    mapColorInt2String2 = {0:COLOR_GREEN, 1:COLOR_ORANGE, 2: COLOR_RED}
 
     def __init__(self):
         NTdict.__init__(self,
@@ -43,6 +44,10 @@ class ROGscore(NTdict):
     def rogInt(self):
         """Integer value for fast lookup in db"""
         return self.mapColorString2Int[ self.colorLabel ]
+
+    def rogString(self):
+        """String value for easy lookup in db"""
+        return self.colorLabel
 
 
     def isRed(self):

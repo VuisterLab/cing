@@ -262,7 +262,9 @@ class DataTablesServer:
         
         mapRog = {'green':  '<font color=#000000>green</font>', 
                   'orange': '<font color=#FFA500>orange</font>', 
-                  'red':    '<font color=#FF0000>red</font>'}
+                  'red':    '<font color=#FF0000>red</font>',
+                  '': 'n.d.'
+                  }
         refEndTag = "</a>"                    
         for r,row in enumerate(self.resultData): #@UnusedVariable # pylint: disable=W0612
 #            log("Looking at row: %s.\n" % str(row))

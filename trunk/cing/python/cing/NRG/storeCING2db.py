@@ -328,7 +328,8 @@ def doStoreCING2db( entry_code, archive_id, project = None):
 
     # Overall rog
     rogC = molecule.rogScore.rogInt()
-
+    rog_str = molecule.rogScore.colorLabel
+    
     result = execute(centry.insert().values(
         pdb_id=pdb_id,
         casd_id=casd_id,
@@ -431,6 +432,7 @@ def doStoreCING2db( entry_code, archive_id, project = None):
         noe_compl_obs=p_noe_compl_obs,
         noe_compl_exp=p_noe_compl_exp,
         noe_compl_mat=p_noe_compl_mat,
+        rog_str=rog_str,
         rog=rogC
         )
     )
