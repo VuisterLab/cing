@@ -1,78 +1,2410 @@
-// Simple Set Clipboard System
-// Author: Joseph Huckaby
-var ZeroClipboard={version:"1.0.4-TableTools2",clients:{},moviePath:"",nextId:1,$:function(a){if(typeof a=="string")a=document.getElementById(a);if(!a.addClass){a.hide=function(){this.style.display="none"};a.show=function(){this.style.display=""};a.addClass=function(b){this.removeClass(b);this.className+=" "+b};a.removeClass=function(b){this.className=this.className.replace(new RegExp("\\s*"+b+"\\s*")," ").replace(/^\s+/,"").replace(/\s+$/,"")};a.hasClass=function(b){return!!this.className.match(new RegExp("\\s*"+
-b+"\\s*"))}}return a},setMoviePath:function(a){this.moviePath=a},dispatch:function(a,b,c){(a=this.clients[a])&&a.receiveEvent(b,c)},register:function(a,b){this.clients[a]=b},getDOMObjectPosition:function(a){var b={left:0,top:0,width:a.width?a.width:a.offsetWidth,height:a.height?a.height:a.offsetHeight};if(a.style.width!="")b.width=a.style.width.replace("px","");if(a.style.height!="")b.height=a.style.height.replace("px","");for(;a;){b.left+=a.offsetLeft;b.top+=a.offsetTop;a=a.offsetParent}return b},
-Client:function(a){this.handlers={};this.id=ZeroClipboard.nextId++;this.movieId="ZeroClipboardMovie_"+this.id;ZeroClipboard.register(this.id,this);a&&this.glue(a)}};
-ZeroClipboard.Client.prototype={id:0,ready:false,movie:null,clipText:"",fileName:"",action:"copy",handCursorEnabled:true,cssEffects:true,handlers:null,sized:false,glue:function(a,b){this.domElement=ZeroClipboard.$(a);a=99;if(this.domElement.style.zIndex)a=parseInt(this.domElement.style.zIndex)+1;var c=ZeroClipboard.getDOMObjectPosition(this.domElement);this.div=document.createElement("div");var d=this.div.style;d.position="absolute";d.left=this.domElement.offsetLeft+"px";d.top=this.domElement.offsetTop+
-"px";d.width=c.width+"px";d.height=c.height+"px";d.zIndex=a;if(typeof b!="undefined"&&b!="")this.div.title=b;if(c.width!=0&&c.height!=0)this.sized=true;this.domElement.parentNode.appendChild(this.div);this.div.innerHTML=this.getHTML(c.width,c.height)},positionElement:function(){var a=ZeroClipboard.getDOMObjectPosition(this.domElement),b=this.div.style;b.position="absolute";b.left=this.domElement.offsetLeft+"px";b.top=this.domElement.offsetTop+"px";b.width=a.width+"px";b.height=a.height+"px";if(a.width!=
-0&&a.height!=0)this.sized=true;b=this.div.childNodes[0];b.width=a.width;b.height=a.height},getHTML:function(a,b){var c="",d="id="+this.id+"&width="+a+"&height="+b;if(navigator.userAgent.match(/MSIE/)){var f=location.href.match(/^https/i)?"https://":"http://";c+='<object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000" codebase="'+f+'download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=10,0,0,0" width="'+a+'" height="'+b+'" id="'+this.movieId+'" align="middle"><param name="allowScriptAccess" value="always" /><param name="allowFullScreen" value="false" /><param name="movie" value="'+
-ZeroClipboard.moviePath+'" /><param name="loop" value="false" /><param name="menu" value="false" /><param name="quality" value="best" /><param name="bgcolor" value="#ffffff" /><param name="flashvars" value="'+d+'"/><param name="wmode" value="transparent"/></object>'}else c+='<embed id="'+this.movieId+'" src="'+ZeroClipboard.moviePath+'" loop="false" menu="false" quality="best" bgcolor="#ffffff" width="'+a+'" height="'+b+'" name="'+this.movieId+'" align="middle" allowScriptAccess="always" allowFullScreen="false" type="application/x-shockwave-flash" pluginspage="http://www.macromedia.com/go/getflashplayer" flashvars="'+
-d+'" wmode="transparent" />';return c},hide:function(){if(this.div)this.div.style.left="-2000px"},show:function(){this.reposition()},destroy:function(){if(this.domElement&&this.div){this.hide();this.div.innerHTML="";var a=document.getElementsByTagName("body")[0];try{a.removeChild(this.div)}catch(b){}this.div=this.domElement=null}},reposition:function(a){if(a)(this.domElement=ZeroClipboard.$(a))||this.hide();if(this.domElement&&this.div){a=ZeroClipboard.getDOMObjectPosition(this.domElement);var b=
-this.div.style;b.left=""+a.left+"px";b.top=""+a.top+"px"}},clearText:function(){this.clipText="";this.ready&&this.movie.clearText()},appendText:function(a){this.clipText+=a;this.ready&&this.movie.appendText(a)},setText:function(a){this.clipText=a;this.ready&&this.movie.setText(a)},setCharSet:function(a){this.charSet=a;this.ready&&this.movie.setCharSet(a)},setBomInc:function(a){this.incBom=a;this.ready&&this.movie.setBomInc(a)},setFileName:function(a){this.fileName=a;this.ready&&this.movie.setFileName(a)},
-setAction:function(a){this.action=a;this.ready&&this.movie.setAction(a)},addEventListener:function(a,b){a=a.toString().toLowerCase().replace(/^on/,"");this.handlers[a]||(this.handlers[a]=[]);this.handlers[a].push(b)},setHandCursor:function(a){this.handCursorEnabled=a;this.ready&&this.movie.setHandCursor(a)},setCSSEffects:function(a){this.cssEffects=!!a},receiveEvent:function(a,b){a=a.toString().toLowerCase().replace(/^on/,"");switch(a){case "load":this.movie=document.getElementById(this.movieId);
-if(!this.movie){var c=this;setTimeout(function(){c.receiveEvent("load",null)},1);return}if(!this.ready&&navigator.userAgent.match(/Firefox/)&&navigator.userAgent.match(/Windows/)){c=this;setTimeout(function(){c.receiveEvent("load",null)},100);this.ready=true;return}this.ready=true;this.movie.clearText();this.movie.appendText(this.clipText);this.movie.setFileName(this.fileName);this.movie.setAction(this.action);this.movie.setCharSet(this.charSet);this.movie.setBomInc(this.incBom);this.movie.setHandCursor(this.handCursorEnabled);
-break;case "mouseover":this.domElement&&this.cssEffects&&this.recoverActive&&this.domElement.addClass("active");break;case "mouseout":if(this.domElement&&this.cssEffects){this.recoverActive=false;if(this.domElement.hasClass("active")){this.domElement.removeClass("active");this.recoverActive=true}}break;case "mousedown":this.domElement&&this.cssEffects&&this.domElement.addClass("active");break;case "mouseup":if(this.domElement&&this.cssEffects){this.domElement.removeClass("active");this.recoverActive=
-false}break}if(this.handlers[a])for(var d=0,f=this.handlers[a].length;d<f;d++){var e=this.handlers[a][d];if(typeof e=="function")e(this,b);else if(typeof e=="object"&&e.length==2)e[0][e[1]](this,b);else typeof e=="string"&&window[e](this,b)}}};
-
-
 /*
- * File:        TableTools.min.js
+ * File:        TableTools.js
  * Version:     2.0.1
+ * Description: Tools and buttons for DataTables
  * Author:      Allan Jardine (www.sprymedia.co.uk)
+ * Language:    Javascript
+ * License:     LGPL / 3 point BSD
+ * Project:     DataTables
  * 
  * Copyright 2009-2011 Allan Jardine, all rights reserved.
- *
- * This source file is free software, under either the GPL v2 license or a
- * BSD (3 point) style license, as supplied with this software.
- * 
- * This source file is distributed in the hope that it will be useful, but 
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
- * or FITNESS FOR A PARTICULAR PURPOSE. See the license files for details.
  */
+
+/* Global scope for TableTools */
 var TableTools;
-(function(e,n,j){TableTools=function(a,b){if(!this.CLASS||this.CLASS!="TableTools")alert("Warning: TableTools must be initialised with the keyword 'new'");this.s={that:this,dt:null,print:{saveStart:-1,saveLength:-1,saveScroll:-1,funcEnd:function(){}},buttonCounter:0,select:{type:"",selected:[],preRowSelect:null,postSelected:null,postDeselected:null,all:false,selectedClass:""},custom:{},swfPath:"",buttonSet:[],master:false};this.dom={container:null,table:null,print:{hidden:[],message:null},collection:{collection:null,
-background:null}};this.fnSettings=function(){return this.s};if(typeof b=="undefined")b={};this.s.dt=a.fnSettings();this._fnConstruct(b);return this};TableTools.prototype={fnGetSelected:function(){return this._fnGetMasterSettings().select.selected},fnIsSelected:function(a){for(var b=this.fnGetSelected(),c=0,d=b.length;c<d;c++)if(a==b[c])return true;return false},fnSelectAll:function(){this._fnGetMasterSettings().that._fnRowSelectAll()},fnSelectNone:function(){this._fnGetMasterSettings().that._fnRowDeselectAll()},
-fnGetTitle:function(a){var b="";if(typeof a.sTitle!="undefined"&&a.sTitle!=="")b=a.sTitle;else{a=j.getElementsByTagName("title");if(a.length>0)b=a[0].innerHTML}return"\u00a1".toString().length<4?b.replace(/[^a-zA-Z0-9_\u00A1-\uFFFF\.,\-_ !\(\)]/g,""):b.replace(/[^a-zA-Z0-9_\.,\-_ !\(\)]/g,"")},fnCalcColRatios:function(a){var b=this.s.dt.aoColumns;a=this._fnColumnTargets(a.mColumns);var c=[],d=0,f=0,h,g;h=0;for(g=a.length;h<g;h++)if(a[h]){d=b[h].nTh.offsetWidth;f+=d;c.push(d)}h=0;for(g=c.length;h<
-g;h++)c[h]/=f;return c.join("\t")},fnGetTableData:function(a){if(this.s.dt)return this._fnGetDataTablesData(a)},fnSetText:function(a,b){this._fnFlashSetText(a,b)},fnResizeButtons:function(){for(var a in ZeroClipboard.clients)if(a){var b=ZeroClipboard.clients[a];typeof b.domElement!="undefined"&&b.domElement.parentNode==this.dom.container&&b.positionElement()}},fnResizeRequired:function(){for(var a in ZeroClipboard.clients)if(a){var b=ZeroClipboard.clients[a];if(typeof b.domElement!="undefined"&&b.domElement.parentNode==
-this.dom.container&&b.sized===false)return true}return false},_fnConstruct:function(a){this._fnCustomiseSettings(a);this.dom.container=j.createElement("div");this.dom.container.style.position="relative";this.dom.container.className=!this.s.dt.bJUI?"DTTT_container":"DTTT_container ui-buttonset ui-buttonset-multi";this.s.select.type!="none"&&this._fnRowSelectConfig();this._fnButtonDefinations(this.s.buttonSet,this.dom.container)},_fnCustomiseSettings:function(a){if(typeof this.s.dt._TableToolsInit==
-"undefined"){this.s.master=true;this.s.dt._TableToolsInit=true}this.dom.table=this.s.dt.nTable;this.s.custom=e.extend({},TableTools.DEFAULTS,a);this.s.swfPath=this.s.custom.sSwfPath;if(typeof ZeroClipboard!="undefined")ZeroClipboard.moviePath=this.s.swfPath;this.s.select.type=this.s.custom.sRowSelect;this.s.select.preRowSelect=this.s.custom.fnPreRowSelect;this.s.select.postSelected=this.s.custom.fnRowSelected;this.s.select.postDeselected=this.s.custom.fnRowDeselected;this.s.select.selectedClass=this.s.custom.sSelectedClass;
-this.s.buttonSet=this.s.custom.aButtons},_fnButtonDefinations:function(a,b){for(var c,d=0,f=a.length;d<f;d++){if(typeof a[d]=="string"){if(typeof TableTools.BUTTONS[a[d]]=="undefined"){alert("TableTools: Warning - unknown button type: "+a[d]);continue}c=e.extend({},TableTools.BUTTONS[a[d]],true)}else{if(typeof TableTools.BUTTONS[a[d].sExtends]=="undefined"){alert("TableTools: Warning - unknown button type: "+a[d].sExtends);continue}c=e.extend({},TableTools.BUTTONS[a[d].sExtends],true);c=e.extend(c,
-a[d],true)}if(this.s.dt.bJUI){c.sButtonClass+=" ui-button ui-state-default";c.sButtonClassHover+=" ui-button ui-state-default ui-state-hover"}b.appendChild(this._fnCreateButton(c))}},_fnCreateButton:function(a){var b=this._fnButtonBase(a);if(a.sAction=="print")this._fnPrintConfig(b,a);else if(a.sAction.match(/flash/))this._fnFlashConfig(b,a);else if(a.sAction=="text")this._fnTextConfig(b,a);else if(a.sAction=="collection"){this._fnTextConfig(b,a);this._fnCollectionConfig(b,a)}return b},_fnButtonBase:function(a){var b=
-j.createElement("button"),c=j.createElement("span"),d=this._fnGetMasterSettings();b.className="DTTT_button "+a.sButtonClass;b.setAttribute("id","ToolTables_"+this.s.dt.sInstance+"_"+d.buttonCounter);b.appendChild(c);c.innerHTML=a.sButtonText;d.buttonCounter++;return b},_fnGetMasterSettings:function(){if(this.s.master)return this.s;else for(var a=TableTools._aInstances,b=0,c=a.length;b<c;b++)if(this.dom.table==a[b].s.dt.nTable)return a[b].s},_fnCollectionConfig:function(a,b){a=j.createElement("div");
-a.style.display="none";a.className=!this.s.dt.bJUI?"DTTT_collection":"DTTT_collection ui-buttonset ui-buttonset-multi";b._collection=a;this._fnButtonDefinations(b.aButtons,a)},_fnCollectionShow:function(a,b){var c=this,d=e(a).offset(),f=b._collection;b=d.left;d=d.top+e(a).outerHeight();var h=e(n).height(),g=e(j).height(),k=e(n).width(),m=e(j).width();f.style.position="absolute";f.style.left=b+"px";f.style.top=d+"px";f.style.display="block";e(f).css("opacity",0);var l=j.createElement("div");l.style.position=
-"absolute";l.style.left="0px";l.style.top="0px";l.style.height=(h>g?h:g)+"px";l.style.width=(k>m?k:m)+"px";l.className="DTTT_collection_background";e(l).css("opacity",0);j.body.appendChild(l);j.body.appendChild(f);h=e(f).outerWidth();k=e(f).outerHeight();if(b+h>m)f.style.left=m-h+"px";if(d+k>g)f.style.top=d-k-e(a).outerHeight()+"px";this.dom.collection.collection=f;this.dom.collection.background=l;setTimeout(function(){e(f).animate({opacity:1},500);e(l).animate({opacity:0.25},500)},10);e(l).click(function(){c._fnCollectionHide.call(c,
-null,null)})},_fnCollectionHide:function(a,b){if(!(b!==null&&b.sExtends=="collection"))if(this.dom.collection.collection!==null){e(this.dom.collection.collection).animate({opacity:0},500,function(){this.style.display="none"});e(this.dom.collection.background).animate({opacity:0},500,function(){this.parentNode.removeChild(this)});this.dom.collection.collection=null;this.dom.collection.background=null}},_fnRowSelectConfig:function(){if(this.s.master){var a=this,b,c,d=this.s.dt.aoOpenRows;e(a.s.dt.nTable).addClass("DTTT_selectable");
-e("tr",a.s.dt.nTBody).live("click",function(f){if(this.parentNode==a.s.dt.nTBody){b=0;for(c=d.length;b<c;b++)if(this==d[b].nTr)return;a.s.select.preRowSelect!==null&&!a.s.select.preRowSelect.call(a,f)||(a.s.select.type=="single"?a._fnRowSelectSingle.call(a,this):a._fnRowSelectMulti.call(a,this))}});a.s.dt.aoDrawCallback.push({fn:function(){a.s.select.all&&a.s.dt.oFeatures.bServerSide&&a.fnSelectAll()},sName:"TableTools_select"})}},_fnRowSelectSingle:function(a){if(this.s.master)if(!e("td",a).hasClass(this.s.dt.oClasses.sRowEmpty)){if(e(a).hasClass(this.s.select.selectedClass))this._fnRowDeselect(a);
-else{this.s.select.selected.length!==0&&this._fnRowDeselectAll();this.s.select.selected.push(a);e(a).addClass(this.s.select.selectedClass);this.s.select.postSelected!==null&&this.s.select.postSelected.call(this,a)}TableTools._fnEventDispatch(this,"select",a)}},_fnRowSelectMulti:function(a){if(this.s.master)if(!e("td",a).hasClass(this.s.dt.oClasses.sRowEmpty)){if(e(a).hasClass(this.s.select.selectedClass))this._fnRowDeselect(a);else{this.s.select.selected.push(a);e(a).addClass(this.s.select.selectedClass);
-this.s.select.postSelected!==null&&this.s.select.postSelected.call(this,a)}TableTools._fnEventDispatch(this,"select",a)}},_fnRowSelectAll:function(){if(this.s.master){for(var a,b=0,c=this.s.dt.aiDisplayMaster.length;b<c;b++){a=this.s.dt.aoData[this.s.dt.aiDisplayMaster[b]].nTr;if(!e(a).hasClass(this.s.select.selectedClass)){this.s.select.selected.push(a);e(a).addClass(this.s.select.selectedClass)}}this.s.select.all=true;TableTools._fnEventDispatch(this,"select",null)}},_fnRowDeselectAll:function(){if(this.s.master){for(var a=
-this.s.select.selected.length-1;a>=0;a--)this._fnRowDeselect(a);this.s.select.all=false;TableTools._fnEventDispatch(this,"select",null)}},_fnRowDeselect:function(a){if(typeof a.nodeName!="undefined")a=e.inArray(a,this.s.select.selected);var b=this.s.select.selected[a];e(b).removeClass(this.s.select.selectedClass);this.s.select.selected.splice(a,1);this.s.select.postDeselected!==null&&this.s.select.postDeselected.call(this,b);this.s.select.all=false},_fnTextConfig:function(a,b){var c=this;b.fnInit!==
-null&&b.fnInit.call(this,a,b);if(b.sToolTip!=="")a.title=b.sToolTip;e(a).hover(function(){e(a).removeClass(b.sButtonClass).addClass(b.sButtonClassHover);b.fnMouseover!==null&&b.fnMouseover.call(this,a,b,null)},function(){e(a).removeClass(b.sButtonClassHover).addClass(b.sButtonClass);b.fnMouseout!==null&&b.fnMouseout.call(this,a,b,null)});b.fnSelect!==null&&TableTools._fnEventListen(this,"select",function(d){b.fnSelect.call(c,a,b,d)});e(a).click(function(d){d.preventDefault();b.fnClick!==null&&b.fnClick.call(c,
-a,b,null);b.fnComplete!==null&&b.fnComplete.call(c,a,b,null,null);c._fnCollectionHide(a,b)})},_fnFlashConfig:function(a,b){var c=this,d=new ZeroClipboard.Client;b.fnInit!==null&&b.fnInit.call(this,a,b);d.setHandCursor(true);if(b.sAction=="flash_save"){d.setAction("save");d.setCharSet(b.sCharSet=="utf16le"?"UTF16LE":"UTF8");d.setBomInc(b.bBomInc);d.setFileName(b.sFileName.replace("*",this.fnGetTitle(b)))}else if(b.sAction=="flash_pdf"){d.setAction("pdf");d.setFileName(b.sFileName.replace("*",this.fnGetTitle(b)))}else d.setAction("copy");
-d.addEventListener("mouseOver",function(){e(a).removeClass(b.sButtonClass).addClass(b.sButtonClassHover);b.fnMouseover!==null&&b.fnMouseover.call(c,a,b,d)});d.addEventListener("mouseOut",function(){e(a).removeClass(b.sButtonClassHover).addClass(b.sButtonClass);b.fnMouseout!==null&&b.fnMouseout.call(c,a,b,d)});d.addEventListener("mouseDown",function(){b.fnClick!==null&&b.fnClick.call(c,a,b,d)});d.addEventListener("complete",function(f,h){b.fnComplete!==null&&b.fnComplete.call(c,a,b,d,h);c._fnCollectionHide(a,
-b)});this._fnFlashGlue(d,a,b.sToolTip)},_fnFlashGlue:function(a,b,c){var d=this,f=b.getAttribute("id");if(j.getElementById(f)){a.glue(b,c);if(a.domElement.parentNode!=a.div.parentNode&&typeof d.__bZCWarning=="undefined"){d.s.dt.oApi._fnLog(this.s.dt,0,"It looks like you are using the version of ZeroClipboard which came with TableTools 1. Please update to use the version that came with TableTools 2.");d.__bZCWarning=true}}else setTimeout(function(){d._fnFlashGlue(a,b,c)},100)},_fnFlashSetText:function(a,
-b){b=this._fnChunkData(b,8192);a.clearText();for(var c=0,d=b.length;c<d;c++)a.appendText(b[c])},_fnColumnTargets:function(a){var b=[],c=this.s.dt;if(typeof a=="object"){i=0;for(iLen=c.aoColumns.length;i<iLen;i++)b.push(false);i=0;for(iLen=a.length;i<iLen;i++)b[a[i]]=true}else if(a=="visible"){i=0;for(iLen=c.aoColumns.length;i<iLen;i++)b.push(c.aoColumns[i].bVisible?true:false)}else if(a=="hidden"){i=0;for(iLen=c.aoColumns.length;i<iLen;i++)b.push(c.aoColumns[i].bVisible?false:true)}else{i=0;for(iLen=
-c.aoColumns.length;i<iLen;i++)b.push(true)}return b},_fnNewline:function(a){return a.sNewLine=="auto"?navigator.userAgent.match(/Windows/)?"\r\n":"\n":a.sNewLine},_fnGetDataTablesData:function(a){var b,c,d,f,h="",g="",k=this.s.dt,m=new RegExp(a.sFieldBoundary,"g"),l=this._fnColumnTargets(a.mColumns),o=this._fnNewline(a);if(a.bHeader){b=0;for(c=k.aoColumns.length;b<c;b++)if(l[b]){g=k.aoColumns[b].sTitle.replace(/\n/g," ").replace(/<.*?>/g,"");g=this._fnHtmlDecode(g);h+=this._fnBoundData(g,a.sFieldBoundary,
-m)+a.sFieldSeperator}h=h.slice(0,a.sFieldSeperator.length*-1);h+=o}d=0;for(f=k.aiDisplay.length;d<f;d++)if(!(typeof a.bSelectedOnly&&a.bSelectedOnly&&!e(k.aoData[k.aiDisplay[d]].nTr).hasClass(this.s.select.selectedClass))){b=0;for(c=k.aoColumns.length;b<c;b++)if(l[b]){g=k.aoData[k.aiDisplay[d]]._aData[b];if(typeof g=="string"){g=g.replace(/\n/g," ");g=g.replace(/<img.*?\s+alt\s*=\s*(?:"([^"]+)"|'([^']+)'|([^\s>]+)).*?>/gi,"$1$2$3");g=g.replace(/<.*?>/g,"")}else g=g+"";g=g.replace(/^\s+/,"").replace(/\s+$/,
-"");g=this._fnHtmlDecode(g);h+=this._fnBoundData(g,a.sFieldBoundary,m)+a.sFieldSeperator}h=h.slice(0,a.sFieldSeperator.length*-1);h+=o}h.slice(0,-1);if(a.bFooter){b=0;for(c=k.aoColumns.length;b<c;b++)if(l[b]&&k.aoColumns[b].nTf!==null){g=k.aoColumns[b].nTf.innerHTML.replace(/\n/g," ").replace(/<.*?>/g,"");g=this._fnHtmlDecode(g);h+=this._fnBoundData(g,a.sFieldBoundary,m)+a.sFieldSeperator}h=h.slice(0,a.sFieldSeperator.length*-1)}return _sLastData=h},_fnBoundData:function(a,b,c){return b===""?a:b+
-a.replace(c,"\\"+b)+b},_fnChunkData:function(a,b){for(var c=[],d=a.length,f=0;f<d;f+=b)f+b<d?c.push(a.substring(f,f+b)):c.push(a.substring(f,d));return c},_fnHtmlDecode:function(a){if(a.indexOf("&")==-1)return a;a=this._fnChunkData(a,2048);var b=j.createElement("div"),c,d,f,h="";c=0;for(d=a.length;c<d;c++){f=a[c].lastIndexOf("&");if(f!=-1&&a[c].length>=8&&f>a[c].length-8){a[c].substr(f);a[c]=a[c].substr(0,f)}b.innerHTML=a[c];h+=b.childNodes[0].nodeValue}return h},_fnPrintConfig:function(a,b){var c=
-this;b.fnInit!==null&&b.fnInit.call(this,a,b);e(a).hover(function(){e(a).removeClass(b.sButtonClass).addClass(b.sButtonClassHover)},function(){e(a).removeClass(b.sButtonClassHover).addClass(b.sButtonClass)});b.fnSelect!==null&&TableTools._fnEventListen(this,"select",function(d){b.fnSelect.call(c,a,b,d)});e(a).click(function(d){d.preventDefault();c._fnPrintStart.call(c,d,b);b.fnClick!==null&&b.fnClick.call(c,a,b,null);b.fnComplete!==null&&b.fnComplete.call(c,a,b,null,null);c._fnCollectionHide(a,b)})},
-_fnPrintStart:function(a,b){var c=this;a=this.s.dt;this._fnPrintHideNodes(a.nTable);this.s.print.saveStart=a._iDisplayStart;this.s.print.saveLength=a._iDisplayLength;if(b.bShowAll){a._iDisplayStart=0;a._iDisplayLength=-1;a.oApi._fnCalculateEnd(a);a.oApi._fnDraw(a)}if(a.oScroll.sX!==""||a.oScroll.sY!=="")this._fnPrintScrollStart(a);a=a.aanFeatures;for(var d in a)if(d!="i"&&d!="t"&&d.length==1)for(var f=0,h=a[d].length;f<h;f++){this.dom.print.hidden.push({node:a[d][f],display:"block"});a[d][f].style.display=
-"none"}e(j.body).addClass("DTTT_Print");if(b.sInfo!==""){var g=j.createElement("div");g.className="DTTT_print_info";g.innerHTML=b.sInfo;j.body.appendChild(g);setTimeout(function(){e(g).fadeOut("normal",function(){j.body.removeChild(g)})},2E3)}if(b.sMessage!==""){this.dom.print.message=j.createElement("div");this.dom.print.message.className="DTTT_PrintMessage";this.dom.print.message.innerHTML=b.sMessage;j.body.insertBefore(this.dom.print.message,j.body.childNodes[0])}this.s.print.saveScroll=e(n).scrollTop();
-n.scrollTo(0,0);this.s.print.funcEnd=function(k){c._fnPrintEnd.call(c,k)};e(j).bind("keydown",null,this.s.print.funcEnd)},_fnPrintEnd:function(a){if(a.keyCode==27){a.preventDefault();a=this.s.dt;var b=this.s.print,c=this.dom.print;this._fnPrintShowNodes();if(a.oScroll.sX!==""||a.oScroll.sY!=="")this._fnPrintScrollEnd();n.scrollTo(0,b.saveScroll);if(c.message!==null){j.body.removeChild(c.message);c.message=null}e(j.body).removeClass("DTTT_Print");a._iDisplayStart=b.saveStart;a._iDisplayLength=b.saveLength;
-a.oApi._fnCalculateEnd(a);a.oApi._fnDraw(a);e(j).unbind("keydown",this.s.print.funcEnd);this.s.print.funcEnd=null}},_fnPrintScrollStart:function(){var a=this.s.dt;a.nScrollHead.getElementsByTagName("div")[0].getElementsByTagName("table");var b=a.nTable.parentNode,c=a.nTable.getElementsByTagName("thead");c.length>0&&a.nTable.removeChild(c[0]);if(a.nTFoot!==null){c=a.nTable.getElementsByTagName("tfoot");c.length>0&&a.nTable.removeChild(c[0])}c=a.nTHead.cloneNode(true);a.nTable.insertBefore(c,a.nTable.childNodes[0]);
-if(a.nTFoot!==null){c=a.nTFoot.cloneNode(true);a.nTable.insertBefore(c,a.nTable.childNodes[1])}if(a.oScroll.sX!==""){a.nTable.style.width=e(a.nTable).outerWidth()+"px";b.style.width=e(a.nTable).outerWidth()+"px";b.style.overflow="visible"}if(a.oScroll.sY!==""){b.style.height=e(a.nTable).outerHeight()+"px";b.style.overflow="visible"}},_fnPrintScrollEnd:function(){var a=this.s.dt,b=a.nTable.parentNode;if(a.oScroll.sX!==""){b.style.width=a.oApi._fnStringToCss(a.oScroll.sX);b.style.overflow="auto"}if(a.oScroll.sY!==
-""){b.style.height=a.oApi._fnStringToCss(a.oScroll.sY);b.style.overflow="auto"}},_fnPrintShowNodes:function(){for(var a=this.dom.print.hidden,b=0,c=a.length;b<c;b++)a[b].node.style.display=a[b].display;a.splice(0,a.length)},_fnPrintHideNodes:function(a){for(var b=this.dom.print.hidden,c=a.parentNode,d=c.childNodes,f=0,h=d.length;f<h;f++)if(d[f]!=a&&d[f].nodeType==1){var g=e(d[f]).css("display");if(g!="none"){b.push({node:d[f],display:g});d[f].style.display="none"}}c.nodeName!="BODY"&&this._fnPrintHideNodes(c)}};
-TableTools._aInstances=[];TableTools._aListeners=[];TableTools.fnGetMasters=function(){for(var a=[],b=0,c=TableTools._aInstances.length;b<c;b++)TableTools._aInstances[b].s.master&&a.push(TableTools._aInstances[b].s);return a};TableTools.fnGetInstance=function(a){if(typeof a!="object")a=j.getElementById(a);for(var b=0,c=TableTools._aInstances.length;b<c;b++)if(TableTools._aInstances[b].s.master&&TableTools._aInstances[b].dom.table==a)return TableTools._aInstances[b];return null};TableTools._fnEventListen=
-function(a,b,c){TableTools._aListeners.push({that:a,type:b,fn:c})};TableTools._fnEventDispatch=function(a,b,c){for(var d=TableTools._aListeners,f=0,h=d.length;f<h;f++)a.dom.table==d[f].that.dom.table&&d[f].type==b&&d[f].fn(c)};TableTools.BUTTONS={csv:{sAction:"flash_save",sCharSet:"utf8",bBomInc:false,sFileName:"*.csv",sFieldBoundary:"'",sFieldSeperator:",",sNewLine:"auto",sTitle:"",sToolTip:"",sButtonClass:"DTTT_button_csv",sButtonClassHover:"DTTT_button_csv_hover",sButtonText:"CSV",mColumns:"all",
-bHeader:true,bFooter:true,bSelectedOnly:false,fnMouseover:null,fnMouseout:null,fnClick:function(a,b,c){this.fnSetText(c,this.fnGetTableData(b))},fnSelect:null,fnComplete:null,fnInit:null},xls:{sAction:"flash_save",sCharSet:"utf16le",bBomInc:true,sFileName:"*.csv",sFieldBoundary:"",sFieldSeperator:"\t",sNewLine:"auto",sTitle:"",sToolTip:"",sButtonClass:"DTTT_button_xls",sButtonClassHover:"DTTT_button_xls_hover",sButtonText:"Excel",mColumns:"all",bHeader:true,bFooter:true,bSelectedOnly:false,fnMouseover:null,
-fnMouseout:null,fnClick:function(a,b,c){this.fnSetText(c,this.fnGetTableData(b))},fnSelect:null,fnComplete:null,fnInit:null},copy:{sAction:"flash_copy",sFieldBoundary:"",sFieldSeperator:"\t",sNewLine:"auto",sToolTip:"",sButtonClass:"DTTT_button_copy",sButtonClassHover:"DTTT_button_copy_hover",sButtonText:"Copy",mColumns:"all",bHeader:true,bFooter:true,bSelectedOnly:false,fnMouseover:null,fnMouseout:null,fnClick:function(a,b,c){this.fnSetText(c,this.fnGetTableData(b))},fnSelect:null,fnComplete:function(a,
-b,c,d){a=d.split("\n").length;a=this.s.dt.nTFoot===null?a-1:a-2;alert("Copied "+a+" row"+(a==1?"":"s")+" to the clipboard")},fnInit:null},pdf:{sAction:"flash_pdf",sFieldBoundary:"",sFieldSeperator:"\t",sNewLine:"\n",sFileName:"*.pdf",sToolTip:"",sTitle:"",sButtonClass:"DTTT_button_pdf",sButtonClassHover:"DTTT_button_pdf_hover",sButtonText:"PDF",mColumns:"all",bHeader:true,bFooter:false,bSelectedOnly:false,fnMouseover:null,fnMouseout:null,sPdfOrientation:"portrait",sPdfSize:"A4",sPdfMessage:"",fnClick:function(a,
-b,c){this.fnSetText(c,"title:"+this.fnGetTitle(b)+"\nmessage:"+b.sPdfMessage+"\ncolWidth:"+this.fnCalcColRatios(b)+"\norientation:"+b.sPdfOrientation+"\nsize:"+b.sPdfSize+"\n--/TableToolsOpts--\n"+this.fnGetTableData(b))},fnSelect:null,fnComplete:null,fnInit:null},print:{sAction:"print",sInfo:"<h6>Print view</h6><p>Please use your browser's print function to print this table. Press escape when finished.",sMessage:"",bShowAll:true,sToolTip:"View print view",sButtonClass:"DTTT_button_print",sButtonClassHover:"DTTT_button_print_hover",
-sButtonText:"Print",fnMouseover:null,fnMouseout:null,fnClick:null,fnSelect:null,fnComplete:null,fnInit:null},text:{sAction:"text",sToolTip:"",sButtonClass:"DTTT_button_text",sButtonClassHover:"DTTT_button_text_hover",sButtonText:"Text button",mColumns:"all",bHeader:true,bFooter:true,bSelectedOnly:false,fnMouseover:null,fnMouseout:null,fnClick:null,fnSelect:null,fnComplete:null,fnInit:null},select:{sAction:"text",sToolTip:"",sButtonClass:"DTTT_button_text",sButtonClassHover:"DTTT_button_text_hover",
-sButtonText:"Select button",mColumns:"all",bHeader:true,bFooter:true,fnMouseover:null,fnMouseout:null,fnClick:null,fnSelect:function(a){this.fnGetSelected().length!==0?e(a).removeClass("DTTT_disabled"):e(a).addClass("DTTT_disabled")},fnComplete:null,fnInit:function(a){e(a).addClass("DTTT_disabled")}},select_single:{sAction:"text",sToolTip:"",sButtonClass:"DTTT_button_text",sButtonClassHover:"DTTT_button_text_hover",sButtonText:"Select button",mColumns:"all",bHeader:true,bFooter:true,fnMouseover:null,
-fnMouseout:null,fnClick:null,fnSelect:function(a){this.fnGetSelected().length==1?e(a).removeClass("DTTT_disabled"):e(a).addClass("DTTT_disabled")},fnComplete:null,fnInit:function(a){e(a).addClass("DTTT_disabled")}},select_all:{sAction:"text",sToolTip:"",sButtonClass:"DTTT_button_text",sButtonClassHover:"DTTT_button_text_hover",sButtonText:"Select all",mColumns:"all",bHeader:true,bFooter:true,fnMouseover:null,fnMouseout:null,fnClick:function(){this.fnSelectAll()},fnSelect:function(a){this.fnGetSelected().length==
-this.s.dt.fnRecordsDisplay()?e(a).addClass("DTTT_disabled"):e(a).removeClass("DTTT_disabled")},fnComplete:null,fnInit:null},select_none:{sAction:"text",sToolTip:"",sButtonClass:"DTTT_button_text",sButtonClassHover:"DTTT_button_text_hover",sButtonText:"Deselect all",mColumns:"all",bHeader:true,bFooter:true,fnMouseover:null,fnMouseout:null,fnClick:function(){this.fnSelectNone()},fnSelect:function(a){this.fnGetSelected().length!==0?e(a).removeClass("DTTT_disabled"):e(a).addClass("DTTT_disabled")},fnComplete:null,
-fnInit:function(a){e(a).addClass("DTTT_disabled")}},ajax:{sAction:"text",sFieldBoundary:"",sFieldSeperator:"\t",sNewLine:"\n",sAjaxUrl:"/xhr.php",sToolTip:"",sButtonClass:"DTTT_button_text",sButtonClassHover:"DTTT_button_text_hover",sButtonText:"Ajax button",mColumns:"all",bHeader:true,bFooter:true,bSelectedOnly:false,fnMouseover:null,fnMouseout:null,fnClick:function(a,b){a=this.fnGetTableData(b);e.ajax({url:b.sAjaxUrl,data:[{name:"tableData",value:a}],success:b.fnAjaxComplete,dataType:"json",type:"POST",
-cache:false,error:function(){alert("Error detected when sending table data to server")}})},fnSelect:null,fnComplete:null,fnInit:null,fnAjaxComplete:function(){alert("Ajax complete")}},collection:{sAction:"collection",sToolTip:"",sButtonClass:"DTTT_button_collection",sButtonClassHover:"DTTT_button_collection_hover",sButtonText:"Collection",fnMouseover:null,fnMouseout:null,fnClick:function(a,b){this._fnCollectionShow(a,b)},fnSelect:null,fnComplete:null,fnInit:null}};TableTools.DEFAULTS={sSwfPath:"media/swf/copy_cvs_xls_pdf.swf",
-sRowSelect:"none",sSelectedClass:"DTTT_selected",fnPreRowSelect:null,fnRowSelected:null,fnRowDeselected:null,aButtons:["copy","csv","xls","pdf","print"]};TableTools.prototype.CLASS="TableTools";TableTools.VERSION="2.0.1";TableTools.prototype.VERSION=TableTools.VERSION;typeof e.fn.dataTable=="function"&&typeof e.fn.dataTableExt.fnVersionCheck=="function"&&e.fn.dataTableExt.fnVersionCheck("1.7.0")?e.fn.dataTableExt.aoFeatures.push({fnInit:function(a){a=new TableTools(a.oInstance,typeof a.oInit.oTableTools!=
-"undefined"?a.oInit.oTableTools:{});TableTools._aInstances.push(a);return a.dom.container},cFeature:"T",sFeature:"TableTools"}):alert("Warning: TableTools 2 requires DataTables 1.7 or greater - www.datatables.net/download")})(jQuery,window,document);
+
+(function($, window, document) {
+
+/** 
+ * TableTools provides flexible buttons and other tools for a DataTables enhanced table
+ * @class TableTools
+ * @constructor
+ * @param {Object} oDT DataTables instance
+ * @param {Object} oOpts TableTools options
+ * @param {String} oOpts.sSwfPath ZeroClipboard SWF path
+ * @param {String} oOpts.sRowSelect Row selection options - 'none', 'single' or 'multi'
+ * @param {Function} oOpts.fnPreRowSelect Callback function just prior to row selection
+ * @param {Function} oOpts.fnRowSelected Callback function just after row selection
+ * @param {Function} oOpts.fnRowDeselected Callback function when row is deselected
+ * @param {Array} oOpts.aButtons List of buttons to be used
+ */
+TableTools = function( oDT, oOpts )
+{
+	/* Santiy check that we are a new instance */
+	if ( !this.CLASS || this.CLASS != "TableTools" )
+	{
+		alert( "Warning: TableTools must be initialised with the keyword 'new'" );
+	}
+	
+	
+	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+	 * Public class variables
+	 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+	
+	/**
+	 * @namespace Settings object which contains customisable information for TableTools instance
+	 */
+	this.s = {
+    /**
+     * Store 'this' so the instance can be retreieved from the settings object
+		 * @property that
+		 * @type     object
+		 * @default  this
+     */
+		"that": this,
+		
+		/** 
+		 * DataTables settings objects
+		 * @property dt
+		 * @type     object
+		 * @default  null
+		 */
+		"dt": null,
+		
+		/**
+		 * @namespace Print specific information
+		 */
+		"print": {
+			/** 
+			 * DataTables draw 'start' point before the printing display was shown
+  		 * @property saveStart
+			 *  @type     int
+  		 * @default  -1
+		 	 */
+		  "saveStart": -1,
+			
+			/** 
+			 * DataTables draw 'length' point before the printing display was shown
+  		 * @property saveLength
+			 *  @type     int
+  		 * @default  -1
+		 	 */
+		  "saveLength": -1,
+		
+			/** 
+			 * Page scrolling point before the printing display was shown so it can be restored
+  		 * @property saveScroll
+			 *  @type     int
+  		 * @default  -1
+		 	 */
+		  "saveScroll": -1,
+		
+			/** 
+			 * Wrapped function to end the print display (to maintain scope)
+  		 * @property funcEnd
+		 	 *  @type     Function
+  		 * @default  function () {}
+		 	 */
+		  "funcEnd": function () {}
+	  },
+	
+		/**
+		 * A unique ID is assigned to each button in each instance
+		 * @property buttonCounter
+		 *  @type     int
+		 * @default  0
+		 */
+	  "buttonCounter": 0,
+		
+		/**
+		 * @namespace Select rows specific information
+		 */
+		"select": {
+			/**
+			 * Select type - can be 'none', 'single' or 'multi'
+  		 * @property type
+			 *  @type     string
+  		 * @default  ""
+			 */
+			"type": "",
+			
+			/**
+			 * Array of nodes which are currently selected
+  		 * @property selected
+			 *  @type     array
+  		 * @default  []
+			 */
+			"selected": [],
+			
+			/**
+			 * Function to run before the selection can take place. Will cancel the select if the
+			 * function returns false
+  		 * @property preRowSelect
+			 *  @type     Function
+  		 * @default  null
+			 */
+			"preRowSelect": null,
+			
+			/**
+			 * Function to run when a row is selected
+  		 * @property postSelected
+			 *  @type     Function
+  		 * @default  null
+			 */
+			"postSelected": null,
+			
+			/**
+			 * Function to run when a row is deselected
+  		 * @property postDeselected
+			 *  @type     Function
+  		 * @default  null
+			 */
+			"postDeselected": null,
+			
+			/**
+			 * Indicate if all rows are selected (needed for server-side processing)
+  		 * @property all
+			 *  @type     boolean
+  		 * @default  false
+			 */
+			"all": false,
+			
+			/**
+			 * Class name to add to selected TR nodes
+  		 * @property selectedClass
+			 *  @type     String
+			 *  @default  ""
+			 */
+			"selectedClass": ""
+		},
+		
+		/**
+		 * Store of the user input customisation object
+		 * @property custom
+		 *  @type     object
+		 * @default  {}
+		 */
+		"custom": {},
+		
+		/**
+		 * SWF movie path
+		 * @property swfPath
+		 *  @type     string
+		 * @default  ""
+		 */
+		"swfPath": "",
+		
+		/**
+		 * Default button set
+		 * @property buttonSet
+		 *  @type     array
+		 * @default  []
+		 */
+		"buttonSet": [],
+		
+		/**
+		 * When there is more than one TableTools instance for a DataTable, there must be a 
+		 * master which controls events (row selection etc)
+		 * @property master
+		 *  @type     boolean
+		 * @default  false
+		 */
+		"master": false
+	};
+	
+	
+	/**
+	 * @namespace Common and useful DOM elements for the class instance
+	 */
+	this.dom = {
+		/**
+		 * DIV element that is create and all TableTools buttons (and their children) put into
+		 *  @property container
+		 *  @type     node
+		 *  @default  null
+		 */
+		"container": null,
+		
+		/**
+		 * The table node to which TableTools will be applied
+		 *  @property table
+		 *  @type     node
+		 *  @default  null
+		 */
+		"table": null,
+		
+		/**
+		 * @namespace Nodes used for the print display
+		 */
+		"print": {
+			/**
+			 * Nodes which have been removed from the display by setting them to display none
+			 *  @property hidden
+			 *  @type     array
+		 	 *  @default  []
+			 */
+		  "hidden": [],
+			
+			/**
+			 * The information display saying tellng the user about the print display
+			 *  @property message
+			 *  @type     node
+		 	 *  @default  null
+			 */
+		  "message": null
+	  },
+		
+		/**
+		 * @namespace Nodes used for a collection display. This contains the currently used collection
+		 */
+		"collection": {
+			/**
+			 * The div wrapper containing the buttons in the collection (i.e. the menu)
+			 *  @property collection
+			 *  @type     node
+		 	 *  @default  null
+			 */
+			"collection": null,
+			
+			/**
+			 * Background display to provide focus and capture events
+			 *  @property background
+			 *  @type     node
+		 	 *  @default  null
+			 */
+			"background": null
+		}
+	};
+	
+	
+	
+	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+	 * Public class methods
+	 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+	
+	/**
+	 * Retreieve the settings object from an instance
+	 *  @method fnSettings
+	 *  @returns {object} TableTools settings object
+	 */
+	this.fnSettings = function () {
+		return this.s;
+	};
+	
+	
+	/* Constructor logic */
+	if ( typeof oOpts == 'undefined' )
+	{
+		oOpts = {};
+	}
+	
+	this.s.dt = oDT.fnSettings();
+	this._fnConstruct( oOpts );
+	
+	return this;
+};
+
+
+
+TableTools.prototype = {
+	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+	 * Public methods
+	 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+	
+	/**
+	 * Retreieve the settings object from an instance
+	 *  @method fnGetSelected
+	 *  @returns {array} List of TR nodes which are currently selected
+	 */
+	"fnGetSelected": function ()
+	{
+		var masterS = this._fnGetMasterSettings();
+		return masterS.select.selected;
+	},
+	
+	/**
+	 * Check to see if a current row is selected or not
+	 *  @method fnGetSelected
+	 *  @param {Node} n TR node to check if it is currently selected or not
+	 *  @returns {Boolean} true if select, false otherwise
+	 */
+	"fnIsSelected": function ( n )
+	{
+		var selected = this.fnGetSelected();
+		for ( var i=0, iLen=selected.length ; i<iLen ; i++ )
+		{
+			if ( n == selected[i] )
+			{
+				return true;
+			}
+		}
+		return false;
+	},
+	
+	/**
+	 * Select all rows in the table
+	 *  @method  fnSelectAll
+	 *  @returns void
+	 */
+	"fnSelectAll": function ()
+	{
+		var masterS = this._fnGetMasterSettings();
+		masterS.that._fnRowSelectAll();
+	},
+	
+	
+	/**
+	 * Deselect all rows in the table
+	 *  @method  fnSelectNone
+	 *  @returns void
+	 */
+	"fnSelectNone": function ()
+	{
+		var masterS = this._fnGetMasterSettings();
+		masterS.that._fnRowDeselectAll();
+	},
+	
+	
+	/**
+	 * Get the title of the document - useful for file names. The title is retrieved from either
+	 * the configuration object's 'title' parameter, or the HTML document title
+	 *  @method  fnGetTitle
+	 *  @param   {Object} oConfig Button configuration object
+	 *  @returns {String} Button title
+	 */
+	"fnGetTitle": function( oConfig )
+	{
+		var sTitle = "";
+		if ( typeof oConfig.sTitle != 'undefined' && oConfig.sTitle !== "" ) {
+			sTitle = oConfig.sTitle;
+		} else {
+			var anTitle = document.getElementsByTagName('title');
+			if ( anTitle.length > 0 )
+			{
+				sTitle = anTitle[0].innerHTML;
+			}
+		}
+		
+		/* Strip characters which the OS will object to - checking for UTF8 support in the scripting
+		 * engine
+		 */
+		if ( "\u00A1".toString().length < 4 ) {
+			return sTitle.replace(/[^a-zA-Z0-9_\u00A1-\uFFFF\.,\-_ !\(\)]/g, "");
+		} else {
+			return sTitle.replace(/[^a-zA-Z0-9_\.,\-_ !\(\)]/g, "");
+		}
+	},
+	
+	
+	/**
+	 * Calculate a unity array with the column width by proportion for a set of columns to be
+	 * included for a button. This is particularly useful for PDF creation, where we can use the
+	 * column widths calculated by the browser to size the columns in the PDF.
+	 *  @method  fnCalcColRations
+	 *  @param   {Object} oConfig Button configuration object
+	 *  @returns {Array} Unity array of column ratios
+	 */
+	"fnCalcColRatios": function ( oConfig )
+	{
+		var
+			aoCols = this.s.dt.aoColumns,
+			aColumnsInc = this._fnColumnTargets( oConfig.mColumns ),
+			aColWidths = [],
+			iWidth = 0, iTotal = 0, i, iLen;
+		
+		for ( i=0, iLen=aColumnsInc.length ; i<iLen ; i++ )
+		{
+			if ( aColumnsInc[i] )
+			{
+				iWidth = aoCols[i].nTh.offsetWidth;
+				iTotal += iWidth;
+				aColWidths.push( iWidth );
+			}
+		}
+		
+		for ( i=0, iLen=aColWidths.length ; i<iLen ; i++ )
+		{
+			aColWidths[i] = aColWidths[i] / iTotal;
+		}
+		
+		return aColWidths.join('\t');
+	},
+	
+	
+	/**
+	 * Get the information contained in a table as a string
+	 *  @method  fnGetTableData
+	 *  @param   {Object} oConfig Button configuration object
+	 *  @returns {String} Table data as a string
+	 */
+	"fnGetTableData": function ( oConfig )
+	{
+		/* In future this could be used to get data from a plain HTML source as well as DataTables */
+		if ( this.s.dt )
+		{
+			return this._fnGetDataTablesData( oConfig );
+		}
+	},
+	
+	
+	/**
+	 * Pass text to a flash button instance, which will be used on the button's click handler
+	 *  @method  fnSetText
+	 *  @param   {Object} clip Flash button object
+	 *  @param   {String} text Text to set
+	 *  @returns void
+	 */
+	"fnSetText": function ( clip, text )
+	{
+		this._fnFlashSetText( clip, text );
+	},
+	
+	
+	/**
+	 * Resize the flash elements of the buttons attached to this TableTools instance - this is
+	 * useful for when initialising TableTools when it is hidden (display:none) since sizes can't
+	 * be calculated at that time.
+	 *  @method  fnResizeButtons
+	 *  @returns void
+	 */
+	"fnResizeButtons": function ()
+	{
+		for ( var cli in ZeroClipboard.clients )
+		{
+			if ( cli )
+			{
+				var client = ZeroClipboard.clients[cli];
+				if ( typeof client.domElement != 'undefined' &&
+				     client.domElement.parentNode == this.dom.container )
+				{
+					client.positionElement();
+				}
+			}
+		}
+	},
+	
+	
+	/**
+	 * Check to see if any of the ZeroClipboard client's attached need to be resized
+	 *  @method  fnResizeRequired
+	 *  @returns void
+	 */
+	"fnResizeRequired": function ()
+	{
+		for ( var cli in ZeroClipboard.clients )
+		{
+			if ( cli )
+			{
+				var client = ZeroClipboard.clients[cli];
+				if ( typeof client.domElement != 'undefined' &&
+				     client.domElement.parentNode == this.dom.container &&
+				     client.sized === false )
+				{
+					return true;
+				}
+			}
+		}
+		return false;
+	},
+	
+	
+	
+	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+	 * Private methods (they are of course public in JS, but recommended as private)
+	 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+	
+	/**
+	 * Constructor logic
+	 *  @method  _fnConstruct
+	 *  @param   {Object} oOpts Same as TableTools constructor
+	 *  @returns void
+	 *  @private 
+	 */
+	"_fnConstruct": function ( oOpts )
+	{
+		this._fnCustomiseSettings( oOpts );
+		
+		/* Container element */
+		this.dom.container = document.createElement('div');
+		this.dom.container.style.position = "relative";
+		this.dom.container.className = !this.s.dt.bJUI ? "DTTT_container" :
+			"DTTT_container ui-buttonset ui-buttonset-multi";
+		
+		/* Row selection config */
+		if ( this.s.select.type != 'none' )
+		{
+			this._fnRowSelectConfig();
+		}
+		
+		/* Buttons */
+		this._fnButtonDefinations( this.s.buttonSet, this.dom.container );
+	},
+	
+	
+	/**
+	 * Take the user defined settings and the default settings and combine them.
+	 *  @method  _fnCustomiseSettings
+	 *  @param   {Object} oOpts Same as TableTools constructor
+	 *  @returns void
+	 *  @private 
+	 */
+	"_fnCustomiseSettings": function ( oOpts )
+	{
+		/* Is this the master control instance or not? */
+		if ( typeof this.s.dt._TableToolsInit == 'undefined' )
+		{
+			this.s.master = true;
+			this.s.dt._TableToolsInit = true;
+		}
+		
+		/* We can use the table node from comparisons to group controls */
+		this.dom.table = this.s.dt.nTable;
+		
+		/* Clone the defaults and then the user options */
+		this.s.custom = $.extend( {}, TableTools.DEFAULTS, oOpts );
+		
+		/* Flash file location */
+		this.s.swfPath = this.s.custom.sSwfPath;
+		if ( typeof ZeroClipboard != 'undefined' )
+		{
+			ZeroClipboard.moviePath = this.s.swfPath;
+		}
+		
+		/* Table row selecting */
+		this.s.select.type = this.s.custom.sRowSelect;
+		this.s.select.preRowSelect = this.s.custom.fnPreRowSelect;
+		this.s.select.postSelected = this.s.custom.fnRowSelected;
+		this.s.select.postDeselected = this.s.custom.fnRowDeselected;
+		this.s.select.selectedClass = this.s.custom.sSelectedClass;
+		
+		/* Button set */
+		this.s.buttonSet = this.s.custom.aButtons;
+	},
+	
+	
+	/**
+	 * Take the user input arrays and expand them to be fully defined, and then add them to a given
+	 * DOM element
+	 *  @method  _fnButtonDefinations
+	 *  @param {array} buttonSet Set of user defined buttons
+	 *  @param {node} wrapper Node to add the created buttons to
+	 *  @returns void
+	 *  @private 
+	 */
+	"_fnButtonDefinations": function ( buttonSet, wrapper )
+	{
+		var buttonDef;
+		
+		for ( var i=0, iLen=buttonSet.length ; i<iLen ; i++ )
+		{
+			if ( typeof buttonSet[i] == "string" )
+			{
+				if ( typeof TableTools.BUTTONS[ buttonSet[i] ] == 'undefined' )
+				{
+					alert( "TableTools: Warning - unknown button type: "+buttonSet[i] );
+					continue;
+				}
+				buttonDef = $.extend( {}, TableTools.BUTTONS[ buttonSet[i] ], true );
+			}
+			else
+			{
+				if ( typeof TableTools.BUTTONS[ buttonSet[i].sExtends ] == 'undefined' )
+				{
+					alert( "TableTools: Warning - unknown button type: "+buttonSet[i].sExtends );
+					continue;
+				}
+				var o = $.extend( {}, TableTools.BUTTONS[ buttonSet[i].sExtends ], true );
+				buttonDef = $.extend( o, buttonSet[i], true );
+			}
+			
+			if ( this.s.dt.bJUI )
+			{
+				buttonDef.sButtonClass += " ui-button ui-state-default";
+				buttonDef.sButtonClassHover += " ui-button ui-state-default ui-state-hover";
+			}
+			
+			wrapper.appendChild( this._fnCreateButton( buttonDef ) );
+		}
+	},
+	
+	
+	/**
+	 * Create and configure a TableTools button
+	 *  @method  _fnCreateButton
+	 *  @param   {Object} oConfig Button configuration object
+	 *  @returns {Node} Button element
+	 *  @private 
+	 */
+	"_fnCreateButton": function ( oConfig )
+	{
+	  var nButton = this._fnButtonBase( oConfig );
+		
+    if ( oConfig.sAction == "print" )
+    {
+      this._fnPrintConfig( nButton, oConfig );
+    }
+    else if ( oConfig.sAction.match(/flash/) )
+    {
+      this._fnFlashConfig( nButton, oConfig );
+    }
+    else if ( oConfig.sAction == "text" )
+    {
+      this._fnTextConfig( nButton, oConfig );
+    }
+    else if ( oConfig.sAction == "collection" )
+    {
+      this._fnTextConfig( nButton, oConfig );
+			this._fnCollectionConfig( nButton, oConfig );
+    }
+		
+	  return nButton;
+  },
+	
+	
+	/**
+	 * Create the DOM needed for the button and apply some base properties. All buttons start here
+	 *  @method  _fnButtonBase
+	 *  @param   {o} oConfig Button configuration object
+	 *  @returns {Node} DIV element for the button
+	 *  @private 
+	 */
+	"_fnButtonBase": function ( o )
+	{
+		var
+		  nButton = document.createElement('button'),
+		  nSpan = document.createElement('span'),
+			masterS = this._fnGetMasterSettings();
+		
+		nButton.className = "DTTT_button "+o.sButtonClass;
+		nButton.setAttribute('id', "ToolTables_"+this.s.dt.sInstance+"_"+masterS.buttonCounter );
+		nButton.appendChild( nSpan );
+		nSpan.innerHTML = o.sButtonText;
+		
+		masterS.buttonCounter++;
+		
+		return nButton;
+	},
+	
+	
+	/**
+	 * Get the settings object for the master instance. When more than one TableTools instance is
+	 * assigned to a DataTable, only one of them can be the 'master' (for the select rows). As such,
+	 * we will typically want to interact with that master for global properties.
+	 *  @method  _fnGetMasterSettings
+	 *  @returns {Object} TableTools settings object
+	 *  @private 
+	 */
+	"_fnGetMasterSettings": function ()
+	{
+		if ( this.s.master )
+		{
+			return this.s;
+		}
+		else
+		{
+			/* Look for the master which has the same DT as this one */
+			var instances = TableTools._aInstances;
+			for ( var i=0, iLen=instances.length ; i<iLen ; i++ )
+			{
+				if ( this.dom.table == instances[i].s.dt.nTable )
+				{
+					return instances[i].s;
+				}
+			}
+		}
+	},
+	
+	
+	
+	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+	 * Button collection functions
+	 */
+	
+	/**
+	 * Create a collection button, when activated will present a drop downlist of other buttons
+	 *  @param   {Node} nButton Button to use for the collection activation
+	 *  @param   {Object} oConfig Button configuration object
+	 *  @returns void
+	 *  @private
+	 */
+	"_fnCollectionConfig": function ( nButton, oConfig )
+	{
+		var nHidden = document.createElement('div');
+		nHidden.style.display = "none";
+		nHidden.className = !this.s.dt.bJUI ? "DTTT_collection" :
+			"DTTT_collection ui-buttonset ui-buttonset-multi";
+		oConfig._collection = nHidden;
+		
+		this._fnButtonDefinations( oConfig.aButtons, nHidden );
+	},
+	
+	
+	/**
+	 * Show a button collection
+	 *  @param   {Node} nButton Button to use for the collection
+	 *  @param   {Object} oConfig Button configuration object
+	 *  @returns void
+	 *  @private
+	 */
+	"_fnCollectionShow": function ( nButton, oConfig )
+	{
+		var
+			that = this,
+			oPos = $(nButton).offset(),
+			nHidden = oConfig._collection,
+			iDivX = oPos.left,
+			iDivY = oPos.top + $(nButton).outerHeight(),
+			iWinHeight = $(window).height(), iDocHeight = $(document).height(),
+		 	iWinWidth = $(window).width(), iDocWidth = $(document).width();
+		
+		nHidden.style.position = "absolute";
+		nHidden.style.left = iDivX+"px";
+		nHidden.style.top = iDivY+"px";
+		nHidden.style.display = "block";
+		$(nHidden).css('opacity',0);
+		
+		var nBackground = document.createElement('div');
+		nBackground.style.position = "absolute";
+		nBackground.style.left = "0px";
+		nBackground.style.top = "0px";
+		nBackground.style.height = ((iWinHeight>iDocHeight)? iWinHeight : iDocHeight) +"px";
+		nBackground.style.width = ((iWinWidth>iDocWidth)? iWinWidth : iDocWidth) +"px";
+		nBackground.className = "DTTT_collection_background";
+		$(nBackground).css('opacity',0);
+		
+		document.body.appendChild( nBackground );
+		document.body.appendChild( nHidden );
+		
+		/* Visual corrections to try and keep the collection visible */
+		var iDivWidth = $(nHidden).outerWidth();
+		var iDivHeight = $(nHidden).outerHeight();
+		
+		if ( iDivX + iDivWidth > iDocWidth )
+		{
+			nHidden.style.left = (iDocWidth-iDivWidth)+"px";
+		}
+		
+		if ( iDivY + iDivHeight > iDocHeight )
+		{
+			nHidden.style.top = (iDivY-iDivHeight-$(nButton).outerHeight())+"px";
+		}
+	
+		this.dom.collection.collection = nHidden;
+		this.dom.collection.background = nBackground;
+		
+		/* This results in a very small delay for the end user but it allows the animation to be
+		 * much smoother. If you don't want the animation, then the setTimeout can be removed
+		 */
+		setTimeout( function () {
+			$(nHidden).animate({"opacity": 1}, 500);
+			$(nBackground).animate({"opacity": 0.25}, 500);
+		}, 10 );
+		
+		/* Event handler to remove the collection display */
+		$(nBackground).click( function () {
+			that._fnCollectionHide.call( that, null, null );
+		} );
+	},
+	
+	
+	/**
+	 * Hide a button collection
+	 *  @param   {Node} nButton Button to use for the collection
+	 *  @param   {Object} oConfig Button configuration object
+	 *  @returns void
+	 *  @private
+	 */
+	"_fnCollectionHide": function ( nButton, oConfig )
+	{
+		if ( oConfig !== null && oConfig.sExtends == 'collection' )
+		{
+			return;
+		}
+		
+		if ( this.dom.collection.collection !== null )
+		{
+			$(this.dom.collection.collection).animate({"opacity": 0}, 500, function (e) {
+				this.style.display = "none";
+			} );
+			
+			$(this.dom.collection.background).animate({"opacity": 0}, 500, function (e) {
+				this.parentNode.removeChild( this );
+			} );
+			
+			this.dom.collection.collection = null;
+			this.dom.collection.background = null;
+		}
+	},
+	
+	
+	
+	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+	 * Row selection functions
+	 */
+	
+	/**
+	 * Add event handlers to a table to allow for row selection
+	 *  @method  _fnRowSelectConfig
+	 *  @returns void
+	 *  @private 
+	 */
+	"_fnRowSelectConfig": function ()
+	{
+		if ( this.s.master )
+		{
+			var
+				that = this, 
+				i, iLen, 
+				aoOpenRows = this.s.dt.aoOpenRows;
+			
+			$(that.s.dt.nTable).addClass( 'DTTT_selectable' );
+			
+			$('tr', that.s.dt.nTBody).live( 'click', function(e) {
+				/* Sub-table must be ignored (odd that the selector won't do this with >) */
+				if ( this.parentNode != that.s.dt.nTBody )
+				{
+					return;
+				}
+				
+				/* Not interested in selecting 'opened' rows */
+				for ( i=0, iLen=aoOpenRows.length ; i<iLen ; i++ )
+				{
+					if ( this == aoOpenRows[i].nTr )
+					{
+						return;
+					}
+				}
+				
+				/* User defined selection function */
+				if ( that.s.select.preRowSelect !== null && !that.s.select.preRowSelect.call(that, e) )
+				{
+					return;
+				}
+				
+				/* And go */
+				if ( that.s.select.type == "single" )
+				{
+					that._fnRowSelectSingle.call( that, this );
+				}
+				else
+				{
+					that._fnRowSelectMulti.call( that, this );
+				}
+			} );
+			
+			/* Add a draw callback handler for when 'select' all is active and we are using server-side
+			 * processing, so TableTools will automatically select the new rows for us
+			 */
+			that.s.dt.aoDrawCallback.push( {
+				"fn": function () {
+					if ( that.s.select.all && that.s.dt.oFeatures.bServerSide )
+					{
+						that.fnSelectAll();
+					}
+				},
+				"sName": "TableTools_select"
+			} );
+		}
+	},
+	
+	
+	/**
+	 * Select or deselect a row based on its current state when only one row is allowed to be
+	 * selected at a time (i.e. if there is a row already selected, deselect it). If the selected
+	 * row is the one being passed in, just deselect and take no further action.
+	 *  @method  _fnRowSelectSingle
+	 *  @param   {Node} nNode TR element which is being 'activated' in some way
+	 *  @returns void
+	 *  @private 
+	 */
+	"_fnRowSelectSingle": function ( nNode )
+	{
+		if ( this.s.master )
+		{
+			/* Do nothing on the DataTables 'empty' result set row */
+			if ( $('td', nNode).hasClass(this.s.dt.oClasses.sRowEmpty) )
+			{
+				return;
+			}
+			
+			if ( $(nNode).hasClass(this.s.select.selectedClass) )
+			{
+				this._fnRowDeselect( nNode );
+			}
+			else
+			{
+				if ( this.s.select.selected.length !== 0 )
+				{
+					this._fnRowDeselectAll();
+				}
+				
+				this.s.select.selected.push( nNode );
+				$(nNode).addClass( this.s.select.selectedClass );
+				
+				if ( this.s.select.postSelected !== null )
+				{
+					this.s.select.postSelected.call( this, nNode );
+				}
+			}
+			
+			TableTools._fnEventDispatch( this, 'select', nNode );
+		}
+	},
+	
+	
+	/**
+	 * Select or deselect a row based on its current state when multiple rows are allowed to be
+	 * selected.
+	 *  @method  _fnRowSelectMulti
+	 *  @param   {Node} nNode TR element which is being 'activated' in some way
+	 *  @returns void
+	 *  @private 
+	 */
+	"_fnRowSelectMulti": function ( nNode )
+	{
+		if ( this.s.master )
+		{
+			/* Do nothing on the DataTables 'empty' result set row */
+			if ( $('td', nNode).hasClass(this.s.dt.oClasses.sRowEmpty) )
+			{
+				return;
+			}
+			
+			if ( $(nNode).hasClass(this.s.select.selectedClass) )
+			{
+				this._fnRowDeselect( nNode );
+			}
+			else
+			{
+				this.s.select.selected.push( nNode );
+				$(nNode).addClass( this.s.select.selectedClass );
+				
+				if ( this.s.select.postSelected !== null )
+				{
+					this.s.select.postSelected.call( this, nNode );
+				}
+			}
+			
+			TableTools._fnEventDispatch( this, 'select', nNode );
+		}
+	},
+	
+	
+	/**
+	 * Select all TR elements in the table. Note that this function will still operate in 'single'
+	 * select mode, which might not be what you desire (in which case, don't call this function!)
+	 *  @method  _fnRowSelectAll
+	 *  @returns void
+	 *  @private 
+	 */
+	"_fnRowSelectAll": function ( )
+	{
+		if ( this.s.master )
+		{
+			var n;
+			for ( var i=0, iLen=this.s.dt.aiDisplayMaster.length ; i<iLen ; i++ )
+			{
+				n = this.s.dt.aoData[ this.s.dt.aiDisplayMaster[i] ].nTr;
+				
+				if ( !$(n).hasClass(this.s.select.selectedClass) )
+				{
+					this.s.select.selected.push( n );
+					$(n).addClass( this.s.select.selectedClass );
+				}
+			}
+			
+			this.s.select.all = true;
+			TableTools._fnEventDispatch( this, 'select', null );
+		}
+	},
+	
+	
+	/**
+	 * Deselect all TR elements in the table. If nothing is currently selected, then no action is
+	 * taken.
+	 *  @method  _fnRowDeselectAll
+	 *  @returns void
+	 *  @private 
+	 */
+	"_fnRowDeselectAll": function ( )
+	{
+		if ( this.s.master )
+		{
+			for ( var i=this.s.select.selected.length-1 ; i>=0 ; i-- )
+			{
+				this._fnRowDeselect( i );
+			}
+			
+			this.s.select.all = false;
+			TableTools._fnEventDispatch( this, 'select', null );
+		}
+	},
+	
+	
+	/**
+	 * Deselect a single row, based on its index in the selected array, or a TR node (when the
+	 * index is then computed)
+	 *  @method  _fnRowDeselect
+	 *  @param   {int|Node} i Node or index of node in selected array, which is to be deselected
+	 *  @returns void
+	 *  @private 
+	 */
+	"_fnRowDeselect": function ( i )
+	{
+		if ( typeof i.nodeName != 'undefined' )
+		{
+			i = $.inArray( i, this.s.select.selected );
+		}
+		
+		var nNode = this.s.select.selected[i];
+		$(nNode).removeClass(this.s.select.selectedClass);
+		this.s.select.selected.splice( i, 1 );
+		
+		if ( this.s.select.postDeselected !== null )
+		{
+			this.s.select.postDeselected.call( this, nNode );
+		}
+		
+		this.s.select.all = false;
+	},
+	
+	
+	
+	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+	 * Text button functions
+	 */
+	
+	/**
+	 * Configure a text based button for interaction events
+	 *  @method  _fnTextConfig
+	 *  @param   {Node} nButton Button element which is being considered
+	 *  @param   {Object} oConfig Button configuration object
+	 *  @returns void
+	 *  @private 
+	 */
+	"_fnTextConfig": function ( nButton, oConfig )
+	{
+		var that = this;
+		
+		if ( oConfig.fnInit !== null )
+		{
+			oConfig.fnInit.call( this, nButton, oConfig );
+		}
+		
+		if ( oConfig.sToolTip !== "" )
+		{
+			nButton.title = oConfig.sToolTip;
+		}
+		
+	  $(nButton).hover( function () {
+			$(nButton).removeClass( oConfig.sButtonClass ).
+				addClass(oConfig.sButtonClassHover );
+			if ( oConfig.fnMouseover !== null )
+			{
+				oConfig.fnMouseover.call( this, nButton, oConfig, null );
+			}
+		}, function () {
+			$(nButton).removeClass( oConfig.sButtonClassHover ).
+				addClass( oConfig.sButtonClass );
+			if ( oConfig.fnMouseout !== null )
+			{
+				oConfig.fnMouseout.call( this, nButton, oConfig, null );
+			}
+		} );
+		
+		if ( oConfig.fnSelect !== null )
+		{
+			TableTools._fnEventListen( this, 'select', function (n) {
+				oConfig.fnSelect.call( that, nButton, oConfig, n );
+			} );
+		}
+		
+		$(nButton).click( function (e) {
+			e.preventDefault();
+			
+			if ( oConfig.fnClick !== null )
+			{
+				oConfig.fnClick.call( that, nButton, oConfig, null );
+			}
+			
+			/* Provide a complete function to match the behaviour of the flash elements */
+			if ( oConfig.fnComplete !== null )
+			{
+				oConfig.fnComplete.call( that, nButton, oConfig, null, null );
+			}
+			
+			that._fnCollectionHide( nButton, oConfig );
+		} );
+	},
+	
+	
+	
+	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+	 * Flash button functions
+	 */
+	
+	/**
+	 * Configure a flash based button for interaction events
+	 *  @method  _fnFlashConfig
+	 *  @param   {Node} nButton Button element which is being considered
+	 *  @param   {o} oConfig Button configuration object
+	 *  @returns void
+	 *  @private 
+	 */
+	"_fnFlashConfig": function ( nButton, oConfig )
+	{
+	  var that = this;
+		var flash = new ZeroClipboard.Client();
+		
+		if ( oConfig.fnInit !== null )
+		{
+			oConfig.fnInit.call( this, nButton, oConfig );
+		}
+		
+		flash.setHandCursor( true );
+		
+		if ( oConfig.sAction == "flash_save" )
+		{
+			flash.setAction( 'save' );
+			flash.setCharSet( (oConfig.sCharSet=="utf16le") ? 'UTF16LE' : 'UTF8' );
+			flash.setBomInc( oConfig.bBomInc );
+			flash.setFileName( oConfig.sFileName.replace('*', this.fnGetTitle(oConfig)) );
+		}
+		else if ( oConfig.sAction == "flash_pdf" )
+		{
+			flash.setAction( 'pdf' );
+			flash.setFileName( oConfig.sFileName.replace('*', this.fnGetTitle(oConfig)) );
+		}
+		else
+		{
+			flash.setAction( 'copy' );
+		}
+		
+		flash.addEventListener('mouseOver', function(client) {
+			$(nButton).removeClass( oConfig.sButtonClass ).
+				addClass(oConfig.sButtonClassHover );
+			
+			if ( oConfig.fnMouseover !== null )
+			{
+				oConfig.fnMouseover.call( that, nButton, oConfig, flash );
+			}
+		} );
+		
+		flash.addEventListener('mouseOut', function(client) {
+			$(nButton).removeClass( oConfig.sButtonClassHover ).
+				addClass(oConfig.sButtonClass );
+			
+			if ( oConfig.fnMouseout !== null )
+			{
+				oConfig.fnMouseout.call( that, nButton, oConfig, flash );
+			}
+		} );
+		
+		flash.addEventListener('mouseDown', function(client) {
+			if ( oConfig.fnClick !== null )
+			{
+				oConfig.fnClick.call( that, nButton, oConfig, flash );
+			}
+		} );
+		
+		flash.addEventListener('complete', function (client, text) {
+			if ( oConfig.fnComplete !== null )
+			{
+				oConfig.fnComplete.call( that, nButton, oConfig, flash, text );
+			}
+			that._fnCollectionHide( nButton, oConfig );
+		} );
+		
+		this._fnFlashGlue( flash, nButton, oConfig.sToolTip );
+	},
+	
+	
+	/**
+	 * Wait until the id is in the DOM before we "glue" the swf. Note that this function will call
+	 * itself (using setTimeout) until it completes successfully
+	 *  @method  _fnFlashGlue
+	 *  @param   {Object} clip Zero clipboard object
+	 *  @param   {Node} node node to glue swf to
+	 *  @param   {String} text title of the flash movie
+	 *  @returns void
+	 *  @private 
+	 */
+	"_fnFlashGlue": function ( flash, node, text )
+	{
+	  var that = this;
+	  var id = node.getAttribute('id');
+	  
+		if ( document.getElementById(id) )
+		{
+			flash.glue( node, text );
+			
+			/* Catch those who are using a TableTools 1 version of ZeroClipboard */
+			if ( flash.domElement.parentNode != flash.div.parentNode && 
+				   typeof that.__bZCWarning == 'undefined' )
+			{
+				that.s.dt.oApi._fnLog( this.s.dt, 0, "It looks like you are using the version of "+
+					"ZeroClipboard which came with TableTools 1. Please update to use the version that "+
+					"came with TableTools 2." );
+				that.__bZCWarning = true;
+			}
+		}
+		else
+		{
+			setTimeout( function () {
+				that._fnFlashGlue( flash, node, text );
+			}, 100 );
+		}
+	},
+	
+	
+	/**
+	 * Set the text for the flash clip to deal with
+	 * 
+	 * This function is required for large information sets. There is a limit on the 
+	 * amount of data that can be transfered between Javascript and Flash in a single call, so
+	 * we use this method to build up the text in Flash by sending over chunks. It is estimated
+	 * that the data limit is around 64k, although it is undocuments, and appears to be different
+	 * between different flash versions. We chunk at 8KiB.
+	 *  @method  _fnFlashSetText
+	 *  @param   {Object} clip the ZeroClipboard object
+	 *  @param   {String} sData the data to be set
+	 *  @returns void
+	 *  @private 
+	 */
+	"_fnFlashSetText": function ( clip, sData )
+	{
+		var asData = this._fnChunkData( sData, 8192 );
+		
+		clip.clearText();
+		for ( var i=0, iLen=asData.length ; i<iLen ; i++ )
+		{
+			clip.appendText( asData[i] );
+		}
+	},
+	
+	
+	
+	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+	 * Data retrieval functions
+	 */
+	
+	/**
+	 * Convert the mixed columns variable into a boolean array the same size as the columns, which
+	 * indicates which columns we want to include
+	 *  @method  _fnColumnTargets
+	 *  @param   {String|Array} mColumns The columns to be included in data retreieval. If a string
+	 *             then it can take the value of "visible" or "hidden" (to include all visible or
+	 *             hidden columns respectively). Or an array of column indexes
+	 *  @returns {Array} A boolean array the length of the columns of the table, which each value
+	 *             indicating if the column is to be included or not
+	 *  @private 
+	 */
+	"_fnColumnTargets": function ( mColumns )
+	{
+		var aColumns = [];
+		var dt = this.s.dt;
+		
+		if ( typeof mColumns == "object" )
+		{
+			for ( i=0, iLen=dt.aoColumns.length ; i<iLen ; i++ )
+			{
+				aColumns.push( false );
+			}
+			
+			for ( i=0, iLen=mColumns.length ; i<iLen ; i++ )
+			{
+				aColumns[ mColumns[i] ] = true;
+			}
+		}
+		else if ( mColumns == "visible" )
+		{
+			for ( i=0, iLen=dt.aoColumns.length ; i<iLen ; i++ )
+			{
+				aColumns.push( dt.aoColumns[i].bVisible ? true : false );
+			}
+		}
+		else if ( mColumns == "hidden" )
+		{
+			for ( i=0, iLen=dt.aoColumns.length ; i<iLen ; i++ )
+			{
+				aColumns.push( dt.aoColumns[i].bVisible ? false : true );
+			}
+		}
+		else /* all */
+		{
+			for ( i=0, iLen=dt.aoColumns.length ; i<iLen ; i++ )
+			{
+				aColumns.push( true );
+			}
+		}
+		
+		return aColumns;
+	},
+	
+	
+	/**
+	 * New line character(s) depend on the platforms
+	 *  @method  method
+	 *  @param   {Object} oConfig Button configuration object - only interested in oConfig.sNewLine
+	 *  @returns {String} Newline character
+	 */
+	"_fnNewline": function ( oConfig )
+	{
+		if ( oConfig.sNewLine == "auto" )
+		{
+			return navigator.userAgent.match(/Windows/) ? "\r\n" : "\n";
+		}
+		else
+		{
+			return oConfig.sNewLine;
+		}
+	},
+	
+	
+	/**
+	 * Get data from DataTables' internals and format it for output
+	 *  @method  _fnGetDataTablesData
+	 *  @param   {Object} oConfig Button configuration object
+	 *  @param   {String} oConfig.sFieldBoundary Field boundary for the data cells in the string
+	 *  @param   {String} oConfig.sFieldSeperator Field seperator for the data cells
+	 *  @param   {String} oConfig.sNewline New line options
+	 *  @param   {Mixed} oConfig.mColumns Which columns should be included in the output
+	 *  @param   {Boolean} oConfig.bHeader Include the header
+	 *  @param   {Boolean} oConfig.bFooter Include the footer
+	 *  @param   {Boolean} oConfig.bSelectedOnly Include only the selected rows in the output
+	 *  @returns {String} Concatinated string of data
+	 *  @private 
+	 */
+	"_fnGetDataTablesData": function ( oConfig )
+	{
+		var i, iLen, j, jLen;
+		var sData = '', sLoopData = '';
+		var dt = this.s.dt;
+		var regex = new RegExp(oConfig.sFieldBoundary, "g"); /* Do it here for speed */
+		var aColumnsInc = this._fnColumnTargets( oConfig.mColumns );
+		var sNewline = this._fnNewline( oConfig );
+		
+		/*
+		 * Header
+		 */
+		if ( oConfig.bHeader )
+		{
+			for ( i=0, iLen=dt.aoColumns.length ; i<iLen ; i++ )
+			{
+				if ( aColumnsInc[i] )
+				{
+					sLoopData = dt.aoColumns[i].sTitle.replace(/\n/g," ").replace( /<.*?>/g, "" );
+					sLoopData = this._fnHtmlDecode( sLoopData );
+					
+					sData += this._fnBoundData( sLoopData, oConfig.sFieldBoundary, regex ) +
+					 	oConfig.sFieldSeperator;
+				}
+			}
+			sData = sData.slice( 0, oConfig.sFieldSeperator.length*-1 );
+			sData += sNewline;
+		}
+		
+		/*
+		 * Body
+		 */
+		for ( j=0, jLen=dt.aiDisplay.length ; j<jLen ; j++ )
+		{
+			if ( typeof oConfig.bSelectedOnly && oConfig.bSelectedOnly && 
+				   !$(dt.aoData[ dt.aiDisplay[j] ].nTr).hasClass( this.s.select.selectedClass ) )
+			{
+				continue;
+			}
+			
+			/* Columns */
+			for ( i=0, iLen=dt.aoColumns.length ; i<iLen ; i++ )
+			{
+				if ( aColumnsInc[i] )
+				{
+					/* Convert to strings (with small optimisation) */
+					var mTypeData = dt.aoData[ dt.aiDisplay[j] ]._aData[ i ];
+					if ( typeof mTypeData == "string" )
+					{
+						/* Strip newlines, replace img tags with alt attr. and finally strip html... */
+						sLoopData = mTypeData.replace(/\n/g," ");
+						sLoopData =
+						 	sLoopData.replace(/<img.*?\s+alt\s*=\s*(?:"([^"]+)"|'([^']+)'|([^\s>]+)).*?>/gi,
+						 		'$1$2$3');
+						sLoopData = sLoopData.replace( /<.*?>/g, "" );
+					}
+					else
+					{
+						sLoopData = mTypeData+"";
+					}
+					
+					/* Trim and clean the data */
+					sLoopData = sLoopData.replace(/^\s+/, '').replace(/\s+$/, '');
+					sLoopData = this._fnHtmlDecode( sLoopData );
+					
+					/* Bound it and add it to the total data */
+					sData += this._fnBoundData( sLoopData, oConfig.sFieldBoundary, regex ) +
+					 	oConfig.sFieldSeperator;
+				}
+			}
+			sData = sData.slice( 0, oConfig.sFieldSeperator.length*-1 );
+			sData += sNewline;
+		}
+		
+		/* Remove the last new line */
+		sData.slice( 0, -1 );
+		
+		/*
+		 * Footer
+		 */
+		if ( oConfig.bFooter )
+		{
+			for ( i=0, iLen=dt.aoColumns.length ; i<iLen ; i++ )
+			{
+				if ( aColumnsInc[i] && dt.aoColumns[i].nTf !== null )
+				{
+					sLoopData = dt.aoColumns[i].nTf.innerHTML.replace(/\n/g," ").replace( /<.*?>/g, "" );
+					sLoopData = this._fnHtmlDecode( sLoopData );
+					
+					sData += this._fnBoundData( sLoopData, oConfig.sFieldBoundary, regex ) +
+					 	oConfig.sFieldSeperator;
+				}
+			}
+			sData = sData.slice( 0, oConfig.sFieldSeperator.length*-1 );
+		}
+		
+		/* No pointers here - this is a string copy :-) */
+		_sLastData = sData;
+		return sData;
+	},
+	
+	
+	/**
+	 * Wrap data up with a boundary string
+	 *  @method  _fnBoundData
+	 *  @param   {String} sData data to bound
+	 *  @param   {String} sBoundary bounding char(s)
+	 *  @param   {RegExp} regex search for the bounding chars - constructed outside for efficincy
+	 *             in the loop
+	 *  @returns {String} bound data
+	 *  @private 
+	 */
+	"_fnBoundData": function ( sData, sBoundary, regex )
+	{
+		if ( sBoundary === "" )
+		{
+			return sData;
+		}
+		else
+		{
+			return sBoundary + sData.replace(regex, "\\"+sBoundary) + sBoundary;
+		}
+	},
+	
+	
+	/**
+	 * Break a string up into an array of smaller strings
+	 *  @method  _fnChunkData
+	 *  @param   {String} sData data to be broken up
+	 *  @param   {Int} iSize chunk size
+	 *  @returns {Array} String array of broken up text
+	 *  @private 
+	 */
+	"_fnChunkData": function ( sData, iSize )
+	{
+		var asReturn = [];
+		var iStrlen = sData.length;
+		
+		for ( var i=0 ; i<iStrlen ; i+=iSize )
+		{
+			if ( i+iSize < iStrlen )
+			{
+				asReturn.push( sData.substring( i, i+iSize ) );
+			}
+			else
+			{
+				asReturn.push( sData.substring( i, iStrlen ) );
+			}
+		}
+		
+		return asReturn;
+	},
+	
+	
+	/**
+	 * Decode HTML entities
+	 *  @method  _fnHtmlDecode
+	 *  @param   {String} sData encoded string
+	 *  @returns {String} decoded string
+	 *  @private 
+	 */
+	"_fnHtmlDecode": function ( sData )
+	{
+		if ( sData.indexOf('&') == -1 )
+		{
+			return sData;
+		}
+		
+		var 
+			aData = this._fnChunkData( sData, 2048 ),
+			n = document.createElement('div'),
+			i, iLen, iIndex,
+			sReturn = "", sInner;
+		
+		/* nodeValue has a limit in browsers - so we chunk the data into smaller segments to build
+		 * up the string. Note that the 'trick' here is to remember than we might have split over
+		 * an HTML entity, so we backtrack a little to make sure this doesn't happen
+		 */
+		for ( i=0, iLen=aData.length ; i<iLen ; i++ )
+		{
+			/* Magic number 8 is because no entity is longer then strlen 8 in ISO 8859-1 */
+			iIndex = aData[i].lastIndexOf( '&' );
+			if ( iIndex != -1 && aData[i].length >= 8 && iIndex > aData[i].length - 8 )
+			{
+				sInner = aData[i].substr( iIndex );
+				aData[i] = aData[i].substr( 0, iIndex );
+			}
+			
+			n.innerHTML = aData[i];
+			sReturn += n.childNodes[0].nodeValue;
+		}
+		
+		return sReturn;
+	},
+	
+	
+	
+	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+	 * Printing functions
+	 */
+	
+	/**
+	 * Configure a button for printing
+	 *  @method  _fnPrintConfig
+	 *  @param   {Node} nButton Button element which is being considered
+	 *  @param   {Object} oConfig Button configuration object
+	 *  @returns void
+	 *  @private 
+	 */
+	"_fnPrintConfig": function ( nButton, oConfig )
+	{
+	  var that = this;
+		
+		if ( oConfig.fnInit !== null )
+		{
+			oConfig.fnInit.call( this, nButton, oConfig );
+		}
+
+	  $(nButton).hover( function () {
+			$(nButton).removeClass( oConfig.sButtonClass ).
+				addClass(oConfig.sButtonClassHover );
+		}, function () {
+			$(nButton).removeClass( oConfig.sButtonClassHover ).
+				addClass(oConfig.sButtonClass );
+		} );
+		
+		if ( oConfig.fnSelect !== null )
+		{
+			TableTools._fnEventListen( this, 'select', function (n) {
+				oConfig.fnSelect.call( that, nButton, oConfig, n );
+			} );
+		}
+		
+		$(nButton).click( function (e) {
+			e.preventDefault();
+			
+			that._fnPrintStart.call( that, e, oConfig);
+			
+			if ( oConfig.fnClick !== null )
+			{
+				oConfig.fnClick.call( that, nButton, oConfig, null );
+			}
+			
+			/* Provide a complete function to match the behaviour of the flash elements */
+			if ( oConfig.fnComplete !== null )
+			{
+				oConfig.fnComplete.call( that, nButton, oConfig, null, null );
+			}
+			
+			that._fnCollectionHide( nButton, oConfig );
+		} );
+  },
+  
+  /**
+   * Show print display
+   *  @method  _fnPrintStart
+   *  @param   {Event} e Event object
+	 *  @param   {Object} oConfig Button configuration object
+   *  @returns void
+	 *  @private 
+   */
+  "_fnPrintStart": function ( e, oConfig )
+	{
+	  var that = this;
+	  var oSetDT = this.s.dt;
+	  
+    /* Parse through the DOM hiding everything that isn't needed for the table */
+    this._fnPrintHideNodes( oSetDT.nTable );
+		
+    /* Show the whole table */
+    this.s.print.saveStart = oSetDT._iDisplayStart;
+    this.s.print.saveLength = oSetDT._iDisplayLength;
+
+		if ( oConfig.bShowAll )
+		{
+    	oSetDT._iDisplayStart = 0;
+    	oSetDT._iDisplayLength = -1;
+    	oSetDT.oApi._fnCalculateEnd( oSetDT );
+    	oSetDT.oApi._fnDraw( oSetDT );
+		}
+		
+		/* Adjust the display for scrolling which might be done by DataTables */
+		if ( oSetDT.oScroll.sX !== "" || oSetDT.oScroll.sY !== "" )
+		{
+			this._fnPrintScrollStart( oSetDT );
+		}
+		
+		/* Remove the other DataTables feature nodes - but leave the table! and info div */
+		var anFeature = oSetDT.aanFeatures;
+		for ( var cFeature in anFeature )
+		{
+			if ( cFeature != 'i' && cFeature != 't' && cFeature.length == 1 )
+			{
+			  for ( var i=0, iLen=anFeature[cFeature].length ; i<iLen ; i++ )
+			  {
+				  this.dom.print.hidden.push( {
+				  	"node": anFeature[cFeature][i],
+				  	"display": "block"
+				  } );
+				  anFeature[cFeature][i].style.display = "none";
+			  }
+			}
+		}
+		
+		/* Print class can be used for styling */
+		$(document.body).addClass( 'DTTT_Print' );
+    
+    /* Add a node telling the user what is going on */
+    if ( oConfig.sInfo !== "" )
+    {
+      var nInfo = document.createElement( "div" );
+      nInfo.className = "DTTT_print_info";
+      nInfo.innerHTML = oConfig.sInfo;
+      document.body.appendChild( nInfo );
+      
+      setTimeout( function() {
+      	$(nInfo).fadeOut( "normal", function() {
+      		document.body.removeChild( nInfo );
+      	} );
+      }, 2000 );
+    }
+    
+    /* Add a message at the top of the page */
+    if ( oConfig.sMessage !== "" )
+    {
+    	this.dom.print.message = document.createElement( "div" );
+    	this.dom.print.message.className = "DTTT_PrintMessage";
+    	this.dom.print.message.innerHTML = oConfig.sMessage;
+    	document.body.insertBefore( this.dom.print.message, document.body.childNodes[0] );
+    }
+    
+    /* Cache the scrolling and the jump to the top of the t=page */
+    this.s.print.saveScroll = $(window).scrollTop();
+    window.scrollTo( 0, 0 );
+    
+    this.s.print.funcEnd = function(e) {
+     that._fnPrintEnd.call( that, e ); 
+    };
+    $(document).bind( "keydown", null, this.s.print.funcEnd );
+  },
+  
+	
+	/**
+	 * Printing is finished, resume normal display
+	 *  @method  _fnPrintEnd
+	 *  @param   {Event} e Event object
+	 *  @returns void
+	 *  @private 
+	 */
+  "_fnPrintEnd": function ( e )
+	{
+		/* Only interested in the escape key */
+		if ( e.keyCode == 27 )
+		{
+			e.preventDefault();
+			
+		  var that = this;
+	    var oSetDT = this.s.dt;
+	    var oSetPrint = this.s.print;
+	    var oDomPrint = this.dom.print;
+	    
+			/* Show all hidden nodes */
+			this._fnPrintShowNodes();
+			
+			/* Restore DataTables' scrolling */
+			if ( oSetDT.oScroll.sX !== "" || oSetDT.oScroll.sY !== "" )
+			{
+				this._fnPrintScrollEnd();
+			}
+			
+			/* Restore the scroll */
+			window.scrollTo( 0, oSetPrint.saveScroll );
+			
+			/* Drop the print message */
+			if ( oDomPrint.message !== null )
+			{
+				document.body.removeChild( oDomPrint.message );
+				oDomPrint.message = null;
+			}
+			
+			/* Styling class */
+			$(document.body).removeClass( 'DTTT_Print' );
+			
+			/* Restore the table length */
+			oSetDT._iDisplayStart = oSetPrint.saveStart;
+			oSetDT._iDisplayLength = oSetPrint.saveLength;
+			oSetDT.oApi._fnCalculateEnd( oSetDT );
+			oSetDT.oApi._fnDraw( oSetDT );
+			
+			$(document).unbind( "keydown", this.s.print.funcEnd );
+			this.s.print.funcEnd = null;
+		}
+	},
+	
+	
+	/**
+	 * Take account of scrolling in DataTables by showing the full table
+	 *  @returns void
+	 *  @private 
+	 */
+	"_fnPrintScrollStart": function ()
+	{
+		var 
+			oSetDT = this.s.dt,
+			nScrollHeadInner = oSetDT.nScrollHead.getElementsByTagName('div')[0],
+			nScrollHeadTable = nScrollHeadInner.getElementsByTagName('table')[0],
+			nScrollBody = oSetDT.nTable.parentNode;
+
+		/* Copy the header in the thead in the body table, this way we show one single table when
+		 * in print view. Note that this section of code is more or less verbatim from DT 1.7.0
+		 */
+		var nTheadSize = oSetDT.nTable.getElementsByTagName('thead');
+		if ( nTheadSize.length > 0 )
+		{
+			oSetDT.nTable.removeChild( nTheadSize[0] );
+		}
+		
+		if ( oSetDT.nTFoot !== null )
+		{
+			var nTfootSize = oSetDT.nTable.getElementsByTagName('tfoot');
+			if ( nTfootSize.length > 0 )
+			{
+				oSetDT.nTable.removeChild( nTfootSize[0] );
+			}
+		}
+		
+		nTheadSize = oSetDT.nTHead.cloneNode(true);
+		oSetDT.nTable.insertBefore( nTheadSize, oSetDT.nTable.childNodes[0] );
+		
+		if ( oSetDT.nTFoot !== null )
+		{
+			nTfootSize = oSetDT.nTFoot.cloneNode(true);
+			oSetDT.nTable.insertBefore( nTfootSize, oSetDT.nTable.childNodes[1] );
+		}
+		
+		/* Now adjust the table's viewport so we can actually see it */
+		if ( oSetDT.oScroll.sX !== "" )
+		{
+			oSetDT.nTable.style.width = $(oSetDT.nTable).outerWidth()+"px";
+			nScrollBody.style.width = $(oSetDT.nTable).outerWidth()+"px";
+			nScrollBody.style.overflow = "visible";
+		}
+		
+		if ( oSetDT.oScroll.sY !== "" )
+		{
+			nScrollBody.style.height = $(oSetDT.nTable).outerHeight()+"px";
+			nScrollBody.style.overflow = "visible";
+    }
+	},
+	
+	
+	/**
+	 * Take account of scrolling in DataTables by showing the full table. Note that the redraw of
+	 * the DataTable that we do will actually deal with the majority of the hardword here
+	 *  @returns void
+	 *  @private 
+	 */
+	"_fnPrintScrollEnd": function ()
+	{
+		var 
+			oSetDT = this.s.dt,
+			nScrollBody = oSetDT.nTable.parentNode;
+		
+		if ( oSetDT.oScroll.sX !== "" )
+		{
+			nScrollBody.style.width = oSetDT.oApi._fnStringToCss( oSetDT.oScroll.sX );
+			nScrollBody.style.overflow = "auto";
+		}
+		
+		if ( oSetDT.oScroll.sY !== "" )
+		{
+			nScrollBody.style.height = oSetDT.oApi._fnStringToCss( oSetDT.oScroll.sY );
+			nScrollBody.style.overflow = "auto";
+		}
+	},
+	
+	
+	/**
+	 * Resume the display of all TableTools hidden nodes
+	 *  @method  _fnPrintShowNodes
+	 *  @returns void
+	 *  @private 
+	 */
+  "_fnPrintShowNodes": function ( )
+	{
+	  var anHidden = this.dom.print.hidden;
+	  
+		for ( var i=0, iLen=anHidden.length ; i<iLen ; i++ )
+		{
+			anHidden[i].node.style.display = anHidden[i].display;
+		}
+		anHidden.splice( 0, anHidden.length );
+	},
+	
+	
+	/**
+	 * Hide nodes which are not needed in order to display the table. Note that this function is
+	 * recursive
+	 *  @method  _fnPrintHideNodes
+	 *  @param   {Node} nNode Element which should be showing in a 'print' display
+	 *  @returns void
+	 *  @private 
+	 */
+  "_fnPrintHideNodes": function ( nNode )
+	{
+	  var anHidden = this.dom.print.hidden;
+	  
+		var nParent = nNode.parentNode;
+		var nChildren = nParent.childNodes;
+		for ( var i=0, iLen=nChildren.length ; i<iLen ; i++ )
+		{
+			if ( nChildren[i] != nNode && nChildren[i].nodeType == 1 )
+			{
+				/* If our node is shown (don't want to show nodes which were previously hidden) */
+				var sDisplay = $(nChildren[i]).css("display");
+			 	if ( sDisplay != "none" )
+				{
+					/* Cache the node and it's previous state so we can restore it */
+					anHidden.push( {
+						"node": nChildren[i],
+						"display": sDisplay
+					} );
+					nChildren[i].style.display = "none";
+				}
+			}
+		}
+		
+		if ( nParent.nodeName != "BODY" )
+		{
+			this._fnPrintHideNodes( nParent );
+		}
+	}
+};
+
+
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ * Static variables
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+/**
+ * Store of all instances that have been created of TableTools, so one can look up other (when
+ * there is need of a master)
+ *  @property _aInstances
+ *  @type     Array
+ *  @default  []
+ *  @private
+ */
+TableTools._aInstances = [];
+
+
+/**
+ * Store of all listeners and their callback functions
+ *  @property _aListeners
+ *  @type     Array
+ *  @default  []
+ */
+TableTools._aListeners = [];
+
+
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ * Static methods
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+/**
+ * Get an array of all the master instances
+ *  @method  fnGetMasters
+ *  @returns {Array} List of master TableTools instances
+ *  @static
+ */
+TableTools.fnGetMasters = function ()
+{
+	var a = [];
+	for ( var i=0, iLen=TableTools._aInstances.length ; i<iLen ; i++ )
+	{
+		if ( TableTools._aInstances[i].s.master )
+		{
+			a.push( TableTools._aInstances[i].s );
+		}
+	}
+	return a;
+};
+
+/**
+ * Get the master instance for a table node (or id if a string is given)
+ *  @method  fnGetInstance
+ *  @returns {Object} ID of table OR table node, for which we want the TableTools instance
+ *  @static
+ */
+TableTools.fnGetInstance = function ( node )
+{
+	if ( typeof node != 'object' )
+	{
+		node = document.getElementById(node);
+	}
+	
+	for ( var i=0, iLen=TableTools._aInstances.length ; i<iLen ; i++ )
+	{
+		if ( TableTools._aInstances[i].s.master && TableTools._aInstances[i].dom.table == node )
+		{
+			return TableTools._aInstances[i];
+		}
+	}
+	return null;
+};
+
+
+/**
+ * Add a listener for a specific event
+ *  @method  _fnEventListen
+ *  @param   {Object} that Scope of the listening function (i.e. 'this' in the caller)
+ *  @param   {String} type Event type
+ *  @param   {Function} fn Function
+ *  @returns void
+ *  @private
+ *  @static
+ */
+TableTools._fnEventListen = function ( that, type, fn )
+{
+	TableTools._aListeners.push( {
+		"that": that,
+		"type": type,
+		"fn": fn
+	} );
+};
+	
+
+/**
+ * An event has occured - look up every listener and fire it off. We check that the event we are
+ * going to fire is attached to the same table (using the table node as reference) before firing
+ *  @method  _fnEventDispatch
+ *  @param   {Object} that Scope of the listening function (i.e. 'this' in the caller)
+ *  @param   {String} type Event type
+ *  @param   {Node} node Element that the event occured on (may be null)
+ *  @returns void
+ *  @private
+ *  @static
+ */
+TableTools._fnEventDispatch = function ( that, type, node )
+{
+	var listeners = TableTools._aListeners;
+	for ( var i=0, iLen=listeners.length ; i<iLen ; i++ )
+	{
+		if ( that.dom.table == listeners[i].that.dom.table && listeners[i].type == type )
+		{
+			listeners[i].fn( node );
+		}
+	}
+};
+
+
+
+
+
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ * Constants
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+
+/**
+ * @namespace Default button configurations
+ */
+TableTools.BUTTONS = {
+	"csv": {
+		"sAction": "flash_save",
+		"sCharSet": "utf8",
+		"bBomInc": false,
+		"sFileName": "*.csv",
+		"sFieldBoundary": "'",
+		"sFieldSeperator": ",",
+		"sNewLine": "auto",
+		"sTitle": "",
+		"sToolTip": "",
+		"sButtonClass": "DTTT_button_csv",
+		"sButtonClassHover": "DTTT_button_csv_hover",
+		"sButtonText": "CSV",
+		"mColumns": "all", /* "all", "visible", "hidden" or array of column integers */
+		"bHeader": true,
+		"bFooter": true,
+		"bSelectedOnly": false,
+		"fnMouseover": null,
+		"fnMouseout": null,
+		"fnClick": function( nButton, oConfig, flash ) {
+			this.fnSetText( flash, this.fnGetTableData(oConfig) );
+		},
+		"fnSelect": null,
+		"fnComplete": null,
+		"fnInit": null
+	},
+	"xls": {
+		"sAction": "flash_save",
+		"sCharSet": "utf16le",
+		"bBomInc": true,
+		"sFileName": "*.csv",
+		"sFieldBoundary": "",
+		"sFieldSeperator": "\t",
+		"sNewLine": "auto",
+		"sTitle": "",
+		"sToolTip": "",
+		"sButtonClass": "DTTT_button_xls",
+		"sButtonClassHover": "DTTT_button_xls_hover",
+		"sButtonText": "Excel",
+		"mColumns": "all",
+		"bHeader": true,
+		"bFooter": true,
+		"bSelectedOnly": false,
+		"fnMouseover": null,
+		"fnMouseout": null,
+		"fnClick": function( nButton, oConfig, flash ) {
+			this.fnSetText( flash, this.fnGetTableData(oConfig) );
+		},
+		"fnSelect": null,
+		"fnComplete": null,
+		"fnInit": null
+	},
+	"copy": {
+		"sAction": "flash_copy",
+		"sFieldBoundary": "",
+		"sFieldSeperator": "\t",
+		"sNewLine": "auto",
+		"sToolTip": "",
+		"sButtonClass": "DTTT_button_copy",
+		"sButtonClassHover": "DTTT_button_copy_hover",
+		"sButtonText": "Copy",
+		"mColumns": "all",
+		"bHeader": true,
+		"bFooter": true,
+		"bSelectedOnly": false,
+		"fnMouseover": null,
+		"fnMouseout": null,
+		"fnClick": function( nButton, oConfig, flash ) {
+			this.fnSetText( flash, this.fnGetTableData(oConfig) );
+		},
+		"fnSelect": null,
+		"fnComplete": function(nButton, oConfig, flash, text) {
+			var
+				lines = text.split('\n').length,
+				len = this.s.dt.nTFoot === null ? lines-1 : lines-2,
+				plural = (len==1) ? "" : "s";
+			alert( 'Copied '+len+' row'+plural+' to the clipboard' );
+		},
+		"fnInit": null
+	},
+	"pdf": {
+		"sAction": "flash_pdf",
+		"sFieldBoundary": "",
+		"sFieldSeperator": "\t",
+		"sNewLine": "\n",
+		"sFileName": "*.pdf",
+		"sToolTip": "",
+		"sTitle": "",
+		"sButtonClass": "DTTT_button_pdf",
+		"sButtonClassHover": "DTTT_button_pdf_hover",
+		"sButtonText": "PDF",
+		"mColumns": "all",
+		"bHeader": true,
+		"bFooter": false,
+		"bSelectedOnly": false,
+		"fnMouseover": null,
+		"fnMouseout": null,
+		"sPdfOrientation": "portrait",
+		"sPdfSize": "A4",
+		"sPdfMessage": "",
+		"fnClick": function( nButton, oConfig, flash ) {
+			this.fnSetText( flash, 
+				"title:"+ this.fnGetTitle(oConfig) +"\n"+
+				"message:"+ oConfig.sPdfMessage +"\n"+
+				"colWidth:"+ this.fnCalcColRatios(oConfig) +"\n"+
+				"orientation:"+ oConfig.sPdfOrientation +"\n"+
+				"size:"+ oConfig.sPdfSize +"\n"+
+				"--/TableToolsOpts--\n" +
+				this.fnGetTableData(oConfig)
+			);
+		},
+		"fnSelect": null,
+		"fnComplete": null,
+		"fnInit": null
+	},
+	"print": {
+		"sAction": "print",
+		"sInfo": "<h6>Print view</h6><p>Please use your browser's print function to "+
+		  "print this table. Press escape when finished.",
+		"sMessage": "",
+		"bShowAll": true,
+		"sToolTip": "View print view",
+		"sButtonClass": "DTTT_button_print",
+		"sButtonClassHover": "DTTT_button_print_hover",
+		"sButtonText": "Print",
+		"fnMouseover": null,
+		"fnMouseout": null,
+		"fnClick": null,
+		"fnSelect": null,
+		"fnComplete": null,
+		"fnInit": null
+	},
+	"text": {
+		"sAction": "text",
+		"sToolTip": "",
+		"sButtonClass": "DTTT_button_text",
+		"sButtonClassHover": "DTTT_button_text_hover",
+		"sButtonText": "Text button",
+		"mColumns": "all",
+		"bHeader": true,
+		"bFooter": true,
+		"bSelectedOnly": false,
+		"fnMouseover": null,
+		"fnMouseout": null,
+		"fnClick": null,
+		"fnSelect": null,
+		"fnComplete": null,
+		"fnInit": null
+	},
+	"select": {
+		"sAction": "text",
+		"sToolTip": "",
+		"sButtonClass": "DTTT_button_text",
+		"sButtonClassHover": "DTTT_button_text_hover",
+		"sButtonText": "Select button",
+		"mColumns": "all",
+		"bHeader": true,
+		"bFooter": true,
+		"fnMouseover": null,
+		"fnMouseout": null,
+		"fnClick": null,
+		"fnSelect": function( nButton, oConfig ) {
+			if ( this.fnGetSelected().length !== 0 ) {
+				$(nButton).removeClass('DTTT_disabled');
+			} else {
+				$(nButton).addClass('DTTT_disabled');
+			}
+		},
+		"fnComplete": null,
+		"fnInit": function( nButton, oConfig ) {
+			$(nButton).addClass('DTTT_disabled');
+		}
+	},
+	"select_single": {
+		"sAction": "text",
+		"sToolTip": "",
+		"sButtonClass": "DTTT_button_text",
+		"sButtonClassHover": "DTTT_button_text_hover",
+		"sButtonText": "Select button",
+		"mColumns": "all",
+		"bHeader": true,
+		"bFooter": true,
+		"fnMouseover": null,
+		"fnMouseout": null,
+		"fnClick": null,
+		"fnSelect": function( nButton, oConfig ) {
+			var iSelected = this.fnGetSelected().length;
+			if ( iSelected == 1 ) {
+				$(nButton).removeClass('DTTT_disabled');
+			} else {
+				$(nButton).addClass('DTTT_disabled');
+			}
+		},
+		"fnComplete": null,
+		"fnInit": function( nButton, oConfig ) {
+			$(nButton).addClass('DTTT_disabled');
+		}
+	},
+	"select_all": {
+		"sAction": "text",
+		"sToolTip": "",
+		"sButtonClass": "DTTT_button_text",
+		"sButtonClassHover": "DTTT_button_text_hover",
+		"sButtonText": "Select all",
+		"mColumns": "all",
+		"bHeader": true,
+		"bFooter": true,
+		"fnMouseover": null,
+		"fnMouseout": null,
+		"fnClick": function( nButton, oConfig ) {
+			this.fnSelectAll();
+		},
+		"fnSelect": function( nButton, oConfig ) {
+			if ( this.fnGetSelected().length == this.s.dt.fnRecordsDisplay() ) {
+				$(nButton).addClass('DTTT_disabled');
+			} else {
+				$(nButton).removeClass('DTTT_disabled');
+			}
+		},
+		"fnComplete": null,
+		"fnInit": null
+	},
+	"select_none": {
+		"sAction": "text",
+		"sToolTip": "",
+		"sButtonClass": "DTTT_button_text",
+		"sButtonClassHover": "DTTT_button_text_hover",
+		"sButtonText": "Deselect all",
+		"mColumns": "all",
+		"bHeader": true,
+		"bFooter": true,
+		"fnMouseover": null,
+		"fnMouseout": null,
+		"fnClick": function( nButton, oConfig ) {
+			this.fnSelectNone();
+		},
+		"fnSelect": function( nButton, oConfig ) {
+			if ( this.fnGetSelected().length !== 0 ) {
+				$(nButton).removeClass('DTTT_disabled');
+			} else {
+				$(nButton).addClass('DTTT_disabled');
+			}
+		},
+		"fnComplete": null,
+		"fnInit": function( nButton, oConfig ) {
+			$(nButton).addClass('DTTT_disabled');
+		}
+	},
+	"ajax": {
+		"sAction": "text",
+		"sFieldBoundary": "",
+		"sFieldSeperator": "\t",
+		"sNewLine": "\n",
+		"sAjaxUrl": "/xhr.php",
+		"sToolTip": "",
+		"sButtonClass": "DTTT_button_text",
+		"sButtonClassHover": "DTTT_button_text_hover",
+		"sButtonText": "Ajax button",
+		"mColumns": "all",
+		"bHeader": true,
+		"bFooter": true,
+		"bSelectedOnly": false,
+		"fnMouseover": null,
+		"fnMouseout": null,
+		"fnClick": function( nButton, oConfig ) {
+			var sData = this.fnGetTableData(oConfig);
+			$.ajax( {
+				"url": oConfig.sAjaxUrl,
+				"data": [
+					{ "name": "tableData", "value": sData }
+				],
+				"success": oConfig.fnAjaxComplete,
+				"dataType": "json",
+				"type": "POST", 
+				"cache": false,
+				"error": function () {
+					alert( "Error detected when sending table data to server" );
+				}
+			} );
+		},
+		"fnSelect": null,
+		"fnComplete": null,
+		"fnInit": null,
+		"fnAjaxComplete": function( json ) {
+			alert( 'Ajax complete' );
+		}
+	},
+	"collection": {
+		"sAction": "collection",
+		"sToolTip": "",
+		"sButtonClass": "DTTT_button_collection",
+		"sButtonClassHover": "DTTT_button_collection_hover",
+		"sButtonText": "Collection",
+		"fnMouseover": null,
+		"fnMouseout": null,
+		"fnClick": function( nButton, oConfig ) {
+			this._fnCollectionShow(nButton, oConfig);
+		},
+		"fnSelect": null,
+		"fnComplete": null,
+		"fnInit": null
+	}
+};
+/*
+ *  on* callback parameters:
+ *  	1. node - button element
+ *  	2. object - configuration object for this button
+ *  	3. object - ZeroClipboard reference (flash button only)
+ *  	4. string - Returned string from Flash (flash button only - and only on 'complete')
+ */
+
+
+/**
+ * @namespace TableTools default settings for initialisation
+ */
+TableTools.DEFAULTS = {
+	"sSwfPath":         "media/swf/copy_cvs_xls_pdf.swf",
+	"sRowSelect":       "none",
+	"sSelectedClass":   "DTTT_selected",
+	"fnPreRowSelect":   null,
+	"fnRowSelected":    null,
+	"fnRowDeselected":  null,
+	"aButtons":         [ "copy", "csv", "xls", "pdf", "print" ]
+};
+
+
+/**
+ * Name of this class
+ *  @constant CLASS
+ *  @type     String
+ *  @default  TableTools
+ */
+TableTools.prototype.CLASS = "TableTools";
+
+
+/**
+ * TableTools version
+ *  @constant  VERSION
+ *  @type      String
+ *  @default   2.0.1
+ */
+TableTools.VERSION = "2.0.1";
+TableTools.prototype.VERSION = TableTools.VERSION;
+
+
+
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ * Initialisation
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+/*
+ * Register a new feature with DataTables
+ */
+if ( typeof $.fn.dataTable == "function" &&
+     typeof $.fn.dataTableExt.fnVersionCheck == "function" &&
+     $.fn.dataTableExt.fnVersionCheck('1.7.0') )
+{
+	$.fn.dataTableExt.aoFeatures.push( {
+		"fnInit": function( oDTSettings ) {
+			var oOpts = typeof oDTSettings.oInit.oTableTools != 'undefined' ? 
+				oDTSettings.oInit.oTableTools : {};
+			
+			var oTT = new TableTools( oDTSettings.oInstance, oOpts );
+			TableTools._aInstances.push( oTT );
+			
+			return oTT.dom.container;
+		},
+		"cFeature": "T",
+		"sFeature": "TableTools"
+	} );
+}
+else
+{
+	alert( "Warning: TableTools 2 requires DataTables 1.7 or greater - www.datatables.net/download");
+}
+
+})(jQuery, window, document);

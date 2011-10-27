@@ -1,0 +1,69 @@
+<html>
+<head>
+<meta name="Author" content="Jurgen F. Doreleijers, CMBI">
+<title>NRG-CING</title>
+<link media="screen" href="cing.css" type="text/css" rel="stylesheet"/>
+<!-- INSERT ADDITIONAL HEAD STRING HERE -->
+</head>
+<body>
+<div id="container">
+<div id="header">
+    <H1>NRG-CING</H1>
+    <a href="./index.html#_top" title="goto home page">Home</a>
+    <A HREF="./about.html" title="goto page with help about the NRG-CING front page">About</A>
+    <A HREF="./credits.html" title="goto page with credits">Credits</A>
+    <A HREF="./download.html" title="goto page with more resources to download">Download</A>
+    <a href="./contact.html" title="goto page with contact information">Contact</a>
+    <A HREF="./help.html" title="goto page with help">Help</A>
+    <br/>
+    <br/>
+    <A HREF="./help.html" title="goto NRG-CING help page">Help NRG-CING</A>
+    <A HREF="./helpCing.html" title="goto CING help page">Help CING</A>
+    <A HREF="#Glossary" title="goto this help page">Glossary</A>
+    <A HREF="./helpTutorials.html" title="goto Youtube screencasts page">Tutorials</A>
+<!-- end header --> </div>
+
+<div id="main">
+
+<H1 id="Glossary">Glossary</H1>
+
+<P>
+Below is a growing list of terms used inside the CING reports. Please ask us about missing information and we will add it to this glossary.
+</P>
+
+<table>
+<thead>
+    <tr>
+        <td width="20%">Key</td>
+        <td>Explanation</td>
+    </tr>
+</thead>
+<tr><td>csd</td><td>chemical shift difference</td></tr>
+<tr><td>cv</td><td>circular variance</td></tr>
+<tr><td>d1d2</td><td>This parameter describes the CA-CB vector of residue <i>i-1</i> with respect to the CA-CB vector of residue <i>i</i>. 
+            The plot of residue <i>i</i> gives two of those combined; i.e. (CA-CB)(<i>i-1</i>)-(CA-CB)(<i>i</i>) <i>versus</i> (CA-CB)(<i>i</i>)-(CA-CB)(<i>i+1</i>). 
+            Hence, it should be read as the conformation of residue i relative to its two neighbours i-1 and i+1. 
+            We still need to properly asses its usefulness for structure validation purposes, but limited manual 
+            assessment indicates it to be useful in identifying potential problem areas.</td></tr>
+<tr><td>distance class: intra-residual</td><td>Those distance restraints (DR) that are within the same residue</td></tr>
+<tr><td>distance class: sequential</td><td>DRs between direct neighbouring residues <i>i</i> and <i>i+1</i></td></tr>
+<tr><td>distance class: medium-range</td><td>DRs between residues <i>i</i> and <i>i+n</i> with n in the range [2,4]</td></tr>
+<tr><td>distance class: long-range</td><td>DRs between residues <i>i</i> and <i>i+n</i> with n over 4. This class includes the 
+            inter-chain DRs if present.</td></tr>
+<tr><td>distance class: ambiguous</td><td>DRs with more than one possible pair excluding consideration of ambiguity over stereospecific 
+            assignment (SSA).</td></tr>
+<tr><td>dr</td><td>distance restraints</td></tr>
+<tr><td>rmsd</td><td>root mean square deviation</td></tr>
+<tr><td>rog</td><td>red orange green. The ROG score is used to aid in identifying bad, poor, and normal entities such as residues, chains,
+            molecules.</td></tr>
+<tr><td>ssa</td><td>stereospecific assignment</td></tr>
+</table>
+</div><!-- end main --> 
+<br style="clear: both;"/>
+<div id="footer">
+<p>Last updated on:&nbsp;<!-- INSERT NEW DATE HERE --></p>
+<!-- end footer --></div>
+<!-- end container --></div>
+<!-- INSERT GOOGLE ANALYTICS TEMPLATE HERE -->
+</body>
+</html>

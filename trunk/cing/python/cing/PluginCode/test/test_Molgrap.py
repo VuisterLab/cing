@@ -6,6 +6,7 @@ from cing import cingDirTestsData
 from cing import cingDirTmp
 from cing import cingPythonCingDir
 from cing.Libs.NTutils import * #@UnusedWildImport
+from cing.Libs.disk import rmdir
 from cing.PluginCode.molgrap import Molgrap #@UnusedImport Keep to indicate dep and proper handeling.
 from cing.core.classes import Project
 from cing.core.constants import * #@UnusedWildImport
@@ -16,12 +17,15 @@ import unittest
 class AllChecks(TestCase):
 
     cingDirTmpTest = os.path.join( cingDirTmp, 'test_Molgrap' )
+    if os.path.exists( cingDirTmpTest ):
+        rmdir( cingDirTmpTest )
+    # end if
     mkdirs( cingDirTmpTest )
     os.chdir(cingDirTmpTest)
 
     def testMolgrapRunFromPdbFile(self):
 #        SETUP FIRST
-        #entryId = "1ai0" # Most complex molecular system in any PDB NMR entry
+#        entryId = "1ai0" # Most complex molecular system in any PDB NMR entry
 #        entryId = "1a4d" # Small much studied PDB NMR entry
 #        entryId = "1zwj" # X-ray entry of CESG interest.
         entryId = "1brv" # Small much studied PDB NMR entry

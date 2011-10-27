@@ -3,16 +3,17 @@ Adds html generation methods
 """
 from cing import authorList
 from cing import cingDirData
-from cing import cingPythonCingDir
 from cing import cingRevision
 from cing import cingRevisionUrl
 from cing import cingRoot
-from cing import cingVersion
-from cing import programName
 from cing.Libs.Imagery import convert2Web
 from cing.Libs.NTplot import * #@UnusedWildImport
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.Libs.find import find2 # Important to differ from NTutil's otherwise from string import find
+from cing.NRG import mapArchive2Base
+from cing.NRG.settings import archive_link_template
+from cing.NRG.settings import bmrb_link_template
+from cing.NRG.settings import pdb_link_template
 from cing.PluginCode.required.reqMatplib import MATPLIB_STR
 from cing.PluginCode.required.reqMolgrap import MOLGRAP_STR
 from cing.PluginCode.required.reqNih import * #@UnusedWildImport
@@ -609,7 +610,7 @@ def generateHtml( project, htmlOnly=False ):
         nTmessage(' and images.')
 
     project.html.generateHtml(htmlOnly=htmlOnly)
-    nTmessageNoEOL('==> Generating molecule HTML code')
+    nTmessage('==> Generating molecule HTML code')
     project.molecule.html.generateHtml(htmlOnly=htmlOnly)
     for chain in project.molecule.allChains():
         chain.html.generateHtml(htmlOnly=htmlOnly)
@@ -1239,8 +1240,6 @@ class HTMLfile:
             self.stream.write( self._generateTag( 'title', self.title ))
 
         relativePath = self.relativePath()
-
-        icon_emailSrc = os.path.join(relativePath, "icon_email.gif")
         # other util JS utilities
         # multiline popups by JavaScript
         # jQuery JS utilities
@@ -1251,7 +1250,7 @@ class HTMLfile:
             customTables.js
             dataTableMedia/js/jquery.dataTables.js
             dataTableMedia/js/TableTools.js
-            dataTableMedia/ZeroClipboard/ZeroClipboard.js
+            dataTableMedia/js/ZeroClipboard.js
             """
 
         importCssListStr = """
@@ -1318,52 +1317,80 @@ class HTMLfile:
         fprintf(self.stream, '%s%s', '\t' * self.indent,'<!-- end container -->')
         self.stream.write(self.closeTag('div'))
 
+        self.writeFooterDiv()
+        self.indent=0
+        # Text has to be right before the closing body tag.
+        # Otherwise JFD would have customized footer of subclass ProjectHTMLfile
+        if isinstance(self, ProjectHTMLfile):
+#            nTdebug("Writing google spy to project html footer")
+            self.stream.write(GOOGLE_ANALYTICS_TEMPLATE)
+        # end if
+        self.stream.write(self.closeTag('body'))
+        self.stream.write(self.closeTag('html'))
+        self.stream.close()
+    #end def
+
+    def writeFooterDiv(self, showAuthors=False):
         self.stream.write(self.openTag('div', id = 'footer'))
         # Append a default footer
         defaultFooter = NTlist()
         self._appendTag( defaultFooter, 'p', closeTag=False)
-        self._appendTag( defaultFooter, None, sprintf( ' %s version %s ', programName, cingVersion) )
-
-#        if not cingRevision:
-#            nTdebug("Trying to get CING revision; again...")
-#            cingRevision = getSvnRevision()
-
-#        nTdebug("CING revision [%s]" % cingRevision)
+#        self._appendTag( defaultFooter, None, sprintf( ' %s version %s ', programName, cingVersion) )
+#        NRG-CING validation report for PDB entry XXXX and BMRB entry YYYY using CING ( r1100 ).
+        mol = self.project.molecule
+        archive_id = getDeepByKeysOrAttributes(mol, ARCHIVE_ID_STR)
+        pdb_id = getDeepByKeysOrAttributes(mol, PDB_ENTRY_LIST_STR, 0) # Just use the first if multiple ones available.
+        bmrb_id = getDeepByKeysOrAttributes(mol, BMRB_ENTRY_LIST_STR, 0)
+        startText = 'Validation report'
+        if archive_id:            
+            baseName = mapArchive2Base[ archive_id ]
+            urlText = archive_link_template.replace('%a', baseName)
+            startText = "<a href='%(urlText)s'>%(baseName)s</A> validation report" % dict( urlText=urlText, baseName=baseName )
+        # end if
+        if pdb_id or bmrb_id:
+            startText += ' based on'
+            if pdb_id:
+                urlText = pdb_link_template.replace('%s', pdb_id)
+                startText += " PDB entry <a href='%(urlText)s'>%(pdb_id)s</A>" % dict( urlText=urlText, pdb_id=pdb_id )
+            # end if        
+            if bmrb_id:
+                if pdb_id:
+                    startText += " and"
+                # end if
+                urlText = bmrb_link_template.replace('%b', str(bmrb_id))
+                startText += " BMRB entry <a href='%(urlText)s'>%(bmrb_id)s</A>" % dict( urlText=urlText, bmrb_id=bmrb_id )
+            # end if
+        else:            
+            startText += ' for %s' % mol.name
+        # end if
+        startText += " using CING "
+        self._appendTag( defaultFooter, None, startText, closeTag=False)
         if cingRevision:
             cingRevisionUrlStr = cingRevisionUrl + repr(cingRevision)
             self._appendTag( defaultFooter, None, '(' , closeTag=False)
             self._appendTag( defaultFooter, 'a', 'r'+repr(cingRevision), href=cingRevisionUrlStr)
             self._appendTag( defaultFooter, None, ')' , openTag=False)
-
-        self._appendTag( defaultFooter, None, ' ' )
-        n = len(authorList)-1
-        for i,author in enumerate(authorList):
-            self._appendTag( defaultFooter, None, author[0] )
-            self._appendTag( defaultFooter, 'a', href=sprintf("mailto:%s", author[1]), closeTag=False)
-            self._appendTag( defaultFooter, 'img', src=icon_emailSrc)
-            self._appendTag( defaultFooter, 'a', openTag=False)
-            if i==(n-1):
-                self._appendTag( defaultFooter, None,' and ')
-            elif i<n:
-                self._appendTag( defaultFooter, None, ', ')
-        #end for
+        # end if
+        if showAuthors:
+            relativePath = self.relativePath()
+            icon_emailSrc = os.path.join(relativePath, "icon_email.gif")            
+            self._appendTag( defaultFooter, None, ' ' )
+            n = len(authorList)-1
+            for i,author in enumerate(authorList):
+                self._appendTag( defaultFooter, None, author[0] )
+                self._appendTag( defaultFooter, 'a', href=sprintf("mailto:%s", author[1]), closeTag=False)
+                self._appendTag( defaultFooter, 'img', src=icon_emailSrc)
+                self._appendTag( defaultFooter, 'a', openTag=False)
+                if i==(n-1):
+                    self._appendTag( defaultFooter, None,' and ')
+                elif i<n:
+                    self._appendTag( defaultFooter, None, ', ')
+            #end for
+        # end if
         self._appendTag( defaultFooter, 'p',openTag=False)
         self.stream.writelines(self._footer + defaultFooter)
         fprintf(self.stream, '%s%s', '\t' * self.indent,'<!-- end footer -->')
         self.stream.write(self.closeTag('div'))
-
-        self.indent=0
-
-        # Text has to be right before the closing body tag.
-        # Othersise JFD would have customized footer of subclass ProjectHTMLfile
-        if isinstance(self, ProjectHTMLfile):
-#            nTdebug("Writing google spy to project html footer")
-            self.stream.write(GOOGLE_ANALYTICS_TEMPLATE)
-
-        self.stream.write(self.closeTag('body'))
-        self.stream.write(self.closeTag('html'))
-
-        self.stream.close()
     #end def
 
     def tag( self, tag, *args, **kwds ):
@@ -1654,7 +1681,10 @@ class ProjectHTMLfile( HTMLfile ):
         html.htmlLocation = (fileName, HTMLfile.top) # Fake an object location; see below
 
         html.header('h1', 'Summary: ' + self.project.name )
-        html.insertHtmlLink(html.header, html, self.project, text='Home' )
+        html.insertHtmlLink(html.header, html, self.project, text='Home', title='goto Home of project')
+#        _navigateHtml( self.molecule )
+#        html.header('a', 'Home', href = self.relativePath(),                    title='goto Home of project')
+        html.header('a', 'Help', href = html.relativePath()+HTMLfile.help_html, title='goto page with help')
 
 #        htmlsum = HTMLfile( self.project.htmlPath( 'summary.html' ),title = 'Project summary' )
 #        htmlsum.htmlLocation = (self.project.htmlPath('summary.html'), '#_top') # Fake an object location; see below
@@ -1747,6 +1777,8 @@ class ProjectHTMLfile( HTMLfile ):
 
         self._resetCingContent()
         self.header('h1', 'Project: ' + self.project.name)
+#        obj.html.insertHtmlLink( obj.html.header, obj, obj.html.project, text = 'Home', title = 'goto Home of project' )
+        self.header('a', 'Home', href = self.relativePath(),                    title='goto Home of project')
 
         htmlMain = self.main
         # devide Page using Table; TODO: should be in css???
@@ -1760,7 +1792,8 @@ class ProjectHTMLfile( HTMLfile ):
         if hasattr(self, 'summary'):
             del(self.summary)
         self.summary = self._generateSummaryHtml()
-        self.insertHtmlLinkInTag( 'li', self.main, self.project, self.summary, text='Summary')
+        self.insertHtmlLinkInTag( 'li', self.main,  self.project, self.summary, text='Summary')
+        self.insertHtmlLinkInTag( 'a', self.header, self.project, self.summary, text='Summary', title='goto Summary of project')
 
         #Use a dummy object for referencing the text-files for now
         flatFiles = NTdict()
@@ -1789,9 +1822,8 @@ class ProjectHTMLfile( HTMLfile ):
         htmlMain('h1', 'Molecule ')
         htmlMain('ul', closeTag=False)
         self.insertHtmlLinkInTag( 'li', htmlMain, self.project, self.project.molecule,
-                                        text=self.project.molecule.name
-                                )
-
+                                        text=self.project.molecule.name )
+        self.insertHtmlLinkInTag( 'a', self.header, self.project, self.project.molecule, text='Molecule', title='goto Molecule')
         if hasattr(self.project.molecule, 'atomList'):
             self.insertHtmlLinkInTag( 'li', htmlMain, self.project, self.project.molecule.atomList, text='Assignments' )
 
@@ -1833,7 +1865,7 @@ class ProjectHTMLfile( HTMLfile ):
         pathMolGif     = self.project.htmlPath(molGifFileName)
         if not htmlOnly:
             if hasattr(plugins, MOLGRAP_STR) and plugins[ MOLGRAP_STR ].isInstalled:
-                nTdebug("ProjectHtmlFile.generateHtml: trying to create : " + pathMolGif)
+#                nTdebug("ProjectHtmlFile.generateHtml: trying to create : " + pathMolGif)
                 if self.project.molecule.export2gif(pathMolGif, project=self.project):
                     nTwarning("Failed to get the molecular image but using a default image instead")
                 # end if
@@ -1851,6 +1883,7 @@ class ProjectHTMLfile( HTMLfile ):
         #end if
 
         htmlMain('table', openTag=False)
+        self.header('a', 'Help', href = self.relativePath()+HTMLfile.help_html, title='goto page with help')
         self.render()
     #end def
 #end class
@@ -2091,6 +2124,8 @@ class MoleculeHTMLfile( HTMLfile ):
         """generate header html for this Molecule"""
         self.header('h1', 'Molecule '+self.molecule.cName(-1) )
         _navigateHtml( self.molecule )
+#        html.header('a', 'Home', href = html.relativePath(),                    title='goto Home of project')
+        self.header('a', 'Help', href = self.relativePath()+HTMLfile.help_html, title='goto page with help')
     #end def
 
     def _generateProcheckHtml(self, htmlOnly = False):
@@ -2507,9 +2542,7 @@ class ResidueHTMLfile( HTMLfile ):
         # generate header html for this residue
         self.header('h1', self.residue.cName(-1) )
         _navigateHtml( self.residue )
-
         self.header('a', 'Help', href = self.relativePath()+HTMLfile.help_html, title='goto page with help')
-
         #TODO: Remove styling from below, should be in css
         self.header( 'br' )
         self.header( 'br' )
@@ -4160,16 +4193,16 @@ def copyCingHtmlJsAndCssToDirectory(dstDir):
     """
     css and javascript now in HTML dir
     """
-    nTdebug("Starting %s" % getCallerName())
+#    nTdebug("Starting %s" % getCallerName())
     if not os.path.exists(dstDir):
         nTdebug("Creating new HTML dir: dstDir")
         os.mkdir(dstDir)
     # end if
     htmlPath = os.path.join(cingRoot,cingPaths.html) # copy needed css and other files/directories.
 
-    nTdebug("Listing: [%s]" % htmlPath )
+#    nTdebug("Listing: [%s]" % htmlPath )
     for f in os.listdir( htmlPath ):
-        nTdebug("Listing item: [%s]" % f)
+#        nTdebug("Listing item: [%s]" % f)
         htmlFile = os.path.join(htmlPath,f)
         if os.path.isfile(htmlFile):
             shutil.copy( htmlFile, dstDir )
@@ -4187,33 +4220,14 @@ def copyCingHtmlJsAndCssToDirectory(dstDir):
                 shutil.rmtree(dst)
             # end if
             shutil.copytree(htmlFile,  dst )
-            # TODO: exclude .svn items within subdir
             svnDirectoryList = find2(".svn", startdir=dst) # don't use the one from pylab.
             for f2 in svnDirectoryList:
 #                nTdebug("Considering removing directory: %s" % (f2))
                 if os.path.exists(f2):
-#                    nTdebug("Removing directory: %s" % f2)
+#                    nTdebug("Removing file: %s" % f2)
                     shutil.rmtree(f2)
                 # end if
             # end for
         # end if
     #end for
-    base_dir = os.path.join(cingPythonCingDir, "NRG")    
-    data_dir = os.path.join (base_dir, "data" )
-#    base_data_dir = os.path.join (data_dir, self.results_base )
-    
-#    fileListToCopy = [ 'direct.php' ]
-    fileListToCopy = []
-    nTmessage("Copy the php scripts: %s" % fileListToCopy)
-    for fileNameToCopy in fileListToCopy:
-        org_file = os.path.join(data_dir, fileNameToCopy)
-        new_file = os.path.join(dstDir, '..', fileNameToCopy)
-        nTdebug('Copy from %s to %s' % ( org_file, new_file))
-        shutil.copy(org_file, new_file)
-    # end for
-    nTmessage("Copy the overall index")
-    org_file = os.path.join(data_dir, 'redirect.html')
-    new_file = os.path.join(dstDir, '..', 'index.html')
-    nTdebug('Copy from %s to %s' % ( org_file, new_file))
-    shutil.copy(org_file, new_file)    
 # end def

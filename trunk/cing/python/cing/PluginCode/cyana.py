@@ -466,12 +466,12 @@ def cyana2cing( project, cyanaDirectory, convention=CYANA2, copy2sources=True, u
      
     Return list of sources or None on error.
     """
-    nTdebug("In %s found convention %s" % ( getCallerName(), convention))
+#    nTdebug("In %s found convention %s" % ( getCallerName(), convention))
     sources   = NTlist()
     sourceDir = project.mkdir( project.directories.sources, 'Cyana' )
 
     if useAllInDirectory:
-        nTdebug("Reseting all keywords in cyana2cing and determining the input from filename extensions.")
+#        nTdebug("Reseting all keywords in cyana2cing and determining the input from filename extensions.")
         kwds = {}
     # end if
     kwds.setdefault('seqFile',  None)
@@ -530,7 +530,7 @@ def cyana2cing( project, cyanaDirectory, convention=CYANA2, copy2sources=True, u
         # end for
     # end if
         
-    nTdebug("In %s found convention %s" % ( getCallerName(), convention))
+#    nTdebug("In %s found convention %s" % ( getCallerName(), convention))
     if not convention:
         convention = CYANA2
         if autoDetectFormat:
@@ -540,16 +540,16 @@ def cyana2cing( project, cyanaDirectory, convention=CYANA2, copy2sources=True, u
                 pdbFile = os.path.join( cyanaDirectory, kwds['pdbFile'] + '.pdb')
                 convention = autoDetectCyanaConvention(pdbFile)
                 if convention:
-                    NTmessage("Detected convention: %s" % convention)
+                    nTdebug("Detected convention: %s" % convention)
                 else:
-                    NTwarning("No CYANA like convention detected")
+                    nTwarning("No CYANA like convention detected")
             # end if
         # end if
     # end if
     if not coordinateConvention:
         coordinateConvention = convention
     # end if
-    
+   
     # look for pdb, initiate new Molecule instance.
     # This goes first so that peaks, upls and acos refer to this molecule
     if kwds['pdbFile']:
@@ -632,7 +632,7 @@ def initCyana(project, cyanaFolder, modelCount = None, convention=None, coordina
     Return True on success or None on failure
     cyanaFolder can be a directory or a .tgz.
     """
-    nTdebug("In %s found convention %s" % ( getCallerName(), convention))
+#    nTdebug("In %s found convention %s" % ( getCallerName(), convention))
     if not cyanaFolder:
         nTerror("cyanaFolder not specified")
         return None

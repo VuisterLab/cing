@@ -44,9 +44,12 @@ CIFZ2           = os.path.join(divDir,'mmCIF')
 PDBNMR2         = os.path.join(divDir,'nmr_restraints')
 
 # Url part of http://nmr.cmbi.ru.nl/NRG-CING
+# Is also used to derived in validateEntry.py the archive id from the input dir.
 results_base         = 'NRG-CING'
 results_base_redo    = 'NMR_REDO'
 results_base_recoord = 'RECOORD'
+results_baseList = [ results_base, results_base_redo, results_base_recoord ]
+
 #if not isProduction:
 #    results_base    = 'dev' + results_base
 results_dir     = os.path.join(dDir, results_base)
@@ -73,8 +76,10 @@ matchBmrbPdbDir = os.path.join(bmrbbase_dir,'matchBmrbPdb') # Switching to 3 lat
 
 # Replace % b with BMRB id.
 #           s with PDB id.
+#           a with archive id.
 bmrb_link_template = 'http://www.bmrb.wisc.edu/cgi-bin/explore.cgi?bmrbId=%b'
 pdb_link_template  = 'http://www.rcsb.org/pdb/explore/explore.do?structureId=%s'
+archive_link_template = 'http://nmr.cmbi.ru.nl/%a'
 
 # Front page
 entry_list_summary_file_name_base = 'entry_list_summary'
@@ -96,5 +101,3 @@ summaryHeaderTitleList = [
     'Number of chains including water',
     'Total number of residues'
 ]    
-
-

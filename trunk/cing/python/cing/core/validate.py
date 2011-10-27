@@ -627,16 +627,53 @@ def summaryForProject( project, toFile = True, ranges=None ):
         if not shiftx:
 #            nTmessage('runShiftx: not a single amino acid in the molecule so skipping this step.')
             incompleteItems.append( SHIFTX_STR )
-
     topMsg = sprintf( '%s CING SUMMARY project %s %s', dots, project.name, dots )
+    
+    # Block from storeCING2db keep synced.
+    p_assignmentCountMap = project.molecule.getAssignmentCountMap()
+    p_cs_count = p_assignmentCountMap.overallCount()
+    p_peak_count = project.peaks.lenRecursive(max_depth = 1)
+    p_distance_count = project.distances.lenRecursive(max_depth = 1)
+    p_dihedral_count = 0
+    for dihList in project.dihedrals:
+        if dihList.isFromTalos(): 
+            continue
+        # end if
+        p_dihedral_count += len(dihList)
+    # end for
+    p_rdc_count = project.rdcs.lenRecursive(max_depth = 1)
+    hasExperimentalData = p_distance_count or p_dihedral_count or p_rdc_count or p_peak_count or p_cs_count
+    bestMsg = '\nAll applicable programs/checks were performed'
+    if not hasExperimentalData:
+        bestMsg = '\nBecause there were no experimental data, this project was not fully validated. %s' % (  
+                   '\nAll applicable programs/checks for the coordinate data were performed.' )
+    else:
+        debugMsg = """
+            p_distance_count =  %(p_distance_count)5d 
+            p_dihedral_count =  %(p_dihedral_count)5d 
+            p_rdc_count      =  %(p_rdc_count)5d      
+            p_peak_count     =  %(p_peak_count)5d     
+            p_cs_count       =  %(p_cs_count)5d       
+        """ % dict( 
+                       p_distance_count= p_distance_count,
+                       p_dihedral_count= p_dihedral_count,
+                       p_rdc_count     = p_rdc_count,
+                       p_peak_count    = p_peak_count,
+                       p_cs_count      = p_cs_count            
+                    )
+        nTdebug(debugMsg)        
+    # end if
     if not incompleteItems:
-        topMsg += '\nAll applicable programs/checks were performed'
+        topMsg += bestMsg
 #    for checkId in incompleteItems:
     else:
-        topMsg += '\nWARNING: Program(s) or check(s) NOT performed: %s' % incompleteItems
+        topMsg += '\nWARNING: Some programs or checks were not performed: %s' % incompleteItems
 #        topMsg += '\n<font color=orange>WARNING:</font> This may affect the CING ROG scoring.'
         topMsg += '\nThis may affect the CING ROG scoring.'
-
+        if not hasExperimentalData:
+            topMsg += '\nBecause there were no experimental data, this project was also not fully validated.'
+        # end if
+    # end if
     msg = topMsg + '\n' + msg
 
     if toFile:
