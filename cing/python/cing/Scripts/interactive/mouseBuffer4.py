@@ -12,6 +12,6 @@ def createPinUp(pdb_id, extraArgListStr):
                     'pdb_id':pdb_id,'ch23':ch23, 'results_base': extraArgListStr}
     inputPath = os.path.join(htmlDir, 'mol.gif')
     outputPath = os.path.join(htmlDir, 'mol_pin.gif')
-    if convertImageMagick(inputPath, outputPath, options='-geometry 57x40'):
+    if convertImageMagick(inputPath, outputPath, options='-geometry 114x80'):
         print 'ERROR: failed for: ' + inputPath
 # end def

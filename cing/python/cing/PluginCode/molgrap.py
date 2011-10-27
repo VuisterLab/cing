@@ -8,6 +8,7 @@ from cing import cingPythonCingDir
 from cing import cingRoot
 from cing import issueListUrl
 from cing.Libs import disk
+from cing.Libs.Imagery import convertImageMagick
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.Libs.TypeChecking import check_string
 from cing.Libs.TypeChecking import check_type
@@ -260,24 +261,32 @@ class Molgrap(NTdict):
             output_text = output_text.replace(org[i], new[i])
         open(file_name_out, 'w').write(output_text)
 
-def export2gif(molecule, path, project = None):
+def export2gif(molecule, pathMolGif, project = None):
     """Return True on error but will still put a default image in."""
     check_type(molecule, 'Molecule')
-    check_string(path)
+    check_string(pathMolGif)
     if project:
         check_type(project, 'Project')
 #    nTdebug("Now in cing.Plugincode.molgrap#export2gif")
     m = Molgrap(project = project)
-    m.run(molecule, path)
-#    if os.path.exists(path):
-    if not os.path.exists(path):
+    m.run(molecule, pathMolGif)
+    failed = False
+    if not os.path.exists(pathMolGif):
+        failed = True
         src =  os.path.join( cingPythonCingDir, 'PluginCode', DATA_STR, 'UnknownImage.gif' )
-#        if os.path.exists(path): # disable when done testing.
-#            os.unlink(path)
-        nTmessage("copying default image from %s to %s" % (src, path))
-#        os.link(src, path) # us a real copy JFD: fails between 2 filesystems
-        disk.copy(src, path) # us a real copy
-#        os.symlink(src, path) # funny, the extension on mac fails to show up for this file only; other extensions are shown ok...
+#        if os.path.exists(pathMolGif): # disable when done testing.
+#            os.unlink(pathMolGif)
+        nTmessage("copying default image from %s to %s" % (src, pathMolGif))
+#        os.link(src, pathMolGif) # us a real copy JFD: fails between 2 filesystems
+        disk.copy(src, pathMolGif) # us a real copy
+#        os.symlink(src, pathMolGif) # funny, the extension on mac fails to show up for this file only; other extensions are shown ok...
+    # end if
+    pathMolGifPinup = pathMolGif[:-4] + '_pin.gif'
+    if convertImageMagick(pathMolGif, pathMolGifPinup, options='-geometry 114x80'):
+        nTerror("convertImageMagick failed for: " + pathMolGifPinup)
+    # end if
+    
+    if failed:
         return True
     return None
 
