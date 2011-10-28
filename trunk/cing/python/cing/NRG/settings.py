@@ -7,6 +7,9 @@ python $CINGROOT/python/cing/NRG/settings.py
 from cing.Libs.NTutils import nTdebug
 import os
 
+PLOT_STR = 'plot'
+PLOT_TREND_STR = 'plotTrend'
+
 # If on production machine then
 # -1- the urls will differ from localhost to nmr.cmbi.ru.nl or so.
 # -2- results base is tmpNRG-CING
@@ -56,9 +59,6 @@ results_dir     = os.path.join(dDir, results_base)
 big_dir         = results_dir                           # NRG data large in size.
 dir_star        = os.path.join(big_dir,'star')
 dir_link        = os.path.join(big_dir,'link')
-dir_plot        = os.path.join(big_dir,'plot')
-dir_plotTrending= os.path.join(big_dir,'plotTrend')
-
 
 dir_prep        = os.path.join(big_dir, 'prep')
 dir_C           = os.path.join(dir_prep, 'C')

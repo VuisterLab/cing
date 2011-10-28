@@ -67,7 +67,7 @@ jQuery(document).ready(function() {
 //        "bStateSave": true,
         "bAutoWidth": false, // recalculates the column widths on the fly but as this fails it's switched off.
         "sDom": 'iT<"clear"><lfr><"clear">tp',        
-        "sAjaxSource": '../../cgi-bin/DataTablesServer.py',
+        "sAjaxSource": '../../cgi-bin//cingRdbServer/DataTablesServer.py',
         "oLanguage": {
             "sSearch": "Search (e.g. 9pcy):",
             "sProcessing":  "Please wait...",
@@ -93,7 +93,7 @@ jQuery(document).ready(function() {
                 "sButtonText": "CSV",
                 "sButtonClass": "DTTT_button_csv",
                 "sButtonClassHover": "DTTT_button_csv_hover",
-                "sUrl": "../../cgi-bin/DataTablesServer.py"            
+                "sUrl": "../../cgi-bin/cingRdbServer/DataTablesServer.py"            
             } ]
         }        
     } );
