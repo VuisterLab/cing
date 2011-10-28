@@ -49,7 +49,7 @@ def runSqlForSchema(sqlFile, schemaId = CASD_DB_NAME, rootPath=None):
                                    redirectInputFromFile = fn
                                  )
     argumentListStr = '%s %s' % (db_name, user_name)
-    nTmessage('==> Running psql on schema %s ... ' % schemaId)
+    nTmessage('==> Running psql %s on schema %s ... ' % (sqlFile, schemaId))
     psqlProgram(argumentListStr)
     nTmessage('Done!')
 

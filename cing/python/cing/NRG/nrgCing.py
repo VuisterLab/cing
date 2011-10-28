@@ -6,9 +6,10 @@ indices that live on top of them. For weekly and for more mass updates.
 Execute like:
 
 $CINGROOT/python/cing/NRG/nrgCing.py [entry_code]
-     updateWeekly prepare runCing storeCING2db 
+     prepare runCing storeCING2db 
      createToposTokens getEntryInfo searchPdbEntries createToposTokens
-     updateFrontPages forEachStoredEntry
+     updateWeekly updateFrontPages updateCsvDumps
+     forEachStoredEntry
 
 $CINGROOT/python/cing/NRG/nrgCing.py 1brv prepare
 $CINGROOT/python/cing/NRG/nrgCing.py 1brv runCing
@@ -54,6 +55,7 @@ from cing.NRG.WhyNot import WhyNot
 from cing.NRG.WhyNot import WhyNotEntry
 from cing.NRG.nrgCingRdb import NrgCingRdb
 from cing.NRG.nrgCingRdb import getPdbIdList
+from cing.NRG.runSqlForSchema import runSqlForSchema
 from cing.NRG.settings import * #@UnusedWildImport
 from cing.Scripts.FC.utils import getBmrbCsCountsFromFile
 from cing.Scripts.doScriptOnEntryList import doFunctionOnEntryList
@@ -129,6 +131,7 @@ class NrgCing(Lister):
 
         self.results_base = results_base
         self.D = '/Library/WebServer/Documents' # pylint: disable=C0103
+        self.cgi_dir = '/Library/WebServer/CGI-Executables/cingRdbServer'
         self.results_dir = None
         self.data_dir = None
 #        self.results_host = 'localhost'
@@ -336,8 +339,8 @@ class NrgCing(Lister):
         pass
     # end def
 
-    def updateWeekly(self):
-        'Look for updates and update.'
+    def runWeekly(self):
+        'Called by updateWeekly doing actual CING validation runs.'
         #: If and only if new_hits_entry_list is empty and getTodoList is False; no entries will be attempted.
         self.getTodoList = True     # DEFAULT: True.
         # The variable below is local and can be used to update a specific batch.
@@ -349,8 +352,8 @@ class NrgCing(Lister):
 #            new_hits_entry_list = new_hits_entry_list[100:110]
         # end if        
 
-        nTmessage("In updateWeekly starting with:\n%r" % self)
-
+        nTmessage("In runWeekly now")
+        
         if self.isProduction:
             nTmessage("Updating matches between BMRB and PDB")
             try:
@@ -427,21 +430,63 @@ class NrgCing(Lister):
             if self.getEntryInfo():
                 nTerror("Failed to getEntryInfo")
                 return True
+            # end if       
+        # end if
+    # end def
+            
+    def updateWeekly(self):
+        'Look for updates and update.'
+        nTmessage("In updateWeekly starting with:\n%r" % self)
+        doUpdateFrontPages        = True # DEFAULT: True. 
+        doUpdateFrontPagePlots    = True # DEFAULT: True. 
+        doUpdateCsvDumps          = True # DEFAULT: True. 
+        doRunWeekly               = True # DEFAULT: True. 
+        doWriteEntryListOfList    = True # DEFAULT: True. 
+        doWriteWhyNotEntries      = True # DEFAULT: True. 
+        # Since this is live, it can be done first which is nice to see succeeding.
+        if doUpdateFrontPages:
+            nTmessage("-1- Updating the front pages")
+            if self.updateFrontPages():
+                nTerror("In updateWeekly failed updateFrontPages")
+                return True
+            # end if
+        # end if        
+        if doRunWeekly:
+            nTmessage("-2- Running weekly runs.")
+            if self.runWeekly(): # actual work.
+                nTerror("Failed to runWeekly")
+                return True
             # end if        
-        if self.writeEntryListOfList():
-            nTerror("Failed to writeEntryListOfList")
-            return True
-
-        if self.writeWhyNotEntries():
-            nTerror("Failed to writeWhyNotEntries")
-            return True
+        # end if
+        if doWriteEntryListOfList:
+            nTmessage("-3- Writing CSV files with entry lists.")
+            if self.writeEntryListOfList():
+                nTerror("Failed to writeEntryListOfList")
+                return True
+            # end if        
+        # end if
+        if doWriteWhyNotEntries:
+            nTmessage("-4- Writing WHY_NOT entries.")
+            if self.writeWhyNotEntries():
+                nTerror("Failed to writeWhyNotEntries")
+                return True
+            # end if
+        # end if
+        if doUpdateFrontPagePlots:
+            nTmessage("-5- Updating the front page plots")
+            if self.updateFrontPagePlots():
+                nTerror("In updateWeekly failed updateFrontPagePlots")
+                return True
+            # end if
         # end if        
-        if self.updateFrontPages():
-            nTerror("Failed to update index files.")
-            return True
-        # end if        
-    # end def run
-
+        if doUpdateCsvDumps:
+            nTmessage("-6- Updating the CSV dumps from the RDB.")
+            if self.updateCsvDumps():
+                nTerror("In updateWeekly failed updateCsvDumps")
+                return True
+            # end if
+        # end if                        
+    # end def
 
     def reportHeadAndTailEntries(self, timeTakenDict): # pylint: disable=R0201
         'Report the head and tail of all entries.'
@@ -1237,24 +1282,56 @@ class NrgCing(Lister):
         return file_content
     # end def
 
+    def updateFrontPagePlots(self):
+        """
+        Update the plots on the front page except the pretty plot webpages.
+        Return True on error.
+        """
+        crdb = NrgCingRdb(schema=self.schema_id) # Make sure to close it.
+        if not crdb:
+            nTerror("In %s RDB connection was not opened" % getCallerName())
+            return True
+        # end if        
+        for trending in [ 1, 0 ]: # DEFAULT: 1,0
+#        for trending in [ 0 ]:
+            if crdb.createPlots(doTrending = trending, results_dir = self.results_dir):
+                nTerror("Failed to createPlots.")
+                return True
+        # end for
+    # end def
+    
+    def updateCsvDumps(self):
+        """
+        Dumps the relational database to about 1 Gb of CSV files.
+        """
+        csvDumpDir = os.path.join( self.results_dir, 'pgsql' )
+        sqlFile = os.path.join( self.base_dir, 'sql', 'dumpNRG-CING.sql')
+        if runSqlForSchema(sqlFile, schemaId = self.schema_id, rootPath=csvDumpDir):
+            nTerror("Failed runSqlForSchema in updateCsvDumps")
+            return True
+    # end def
+    
     def updateFrontPages(self):
         """
         Create a overall summary table that shows an overview of the tables.
         Created on Oct 13, 2011        
         @author: tbeek
         """
-        nTdebug("Starting %s" % getCallerName())
+        nTmessage("Starting %s" % getCallerName())
         htmlDir = os.path.join(self.results_dir, "HTML")
-        if not os.path.isdir(htmlDir):
-            nTdebug("Creating html directory for NRG-CING.")
-            mkdirs(htmlDir)
+        if os.path.isdir(htmlDir):
+            nTdebug("Removing original html directory for NRG-CING.")
+            rmdir(htmlDir)
         # end if
+        nTmessage("Recreating html directory for NRG-CING with content.")
+        mkdirs(htmlDir)
 #        srcHtmlPath = os.path.join(cingRoot, cingPaths.html)        
         data_dir = os.path.join (self.base_dir, "data" )
         base_data_dir = os.path.join (data_dir, self.results_base )
         # Most crud can come in from the traditional method.
         copyCingHtmlJsAndCssToDirectory(htmlDir)
         
+        nTmessage("Adding frontpage-specific html.")
         fnList = """
             about.html 
             contact.html 
@@ -1303,6 +1380,19 @@ class NrgCing(Lister):
         nTmessage("Copy the overall index")
         org_file = os.path.join(data_dir, 'redirect.html')
         new_file = os.path.join(self.results_dir, 'index.html')
+        shutil.copy(org_file, new_file)
+        
+        nTmessage("Copy the python cgi server for TableTools\n")
+        cgi_file_name = 'DataTablesServer.py'
+        if not os.path.exists(self.cgi_dir):
+            nTerror("Please first create the server directory as expected at: %s" % self.cgi_dir)
+            return True
+        # end if
+        org_file = os.path.join(self.base_dir, 'server', cgi_file_name)
+        new_file = os.path.join(self.cgi_dir, cgi_file_name)
+        if os.path.exists(new_file): # remove because if it's a hard link the copy will fail.
+            os.unlink(new_file)
+        # end if
         shutil.copy(org_file, new_file)
     # end def
 
@@ -2207,7 +2297,7 @@ class NrgCing(Lister):
     def _getJumpBoxHtml(self):
         return '''
             <div style="width: 25em">
-            <FORM method="GET" action="../../cgi-bin/DataTablesServer.py" class="display">
+            <FORM method="GET" action="../../cgi-bin/cingRdbServer/DataTablesServer.py" class="display">
             Search by PDB ID (e.g. 9pcy):
             <INPUT type="hidden" name="database" value="pdb" align="left">
             <INPUT type="text" size="4" name="id" value="" title="Please provide the PDB identifier to obtain the validation report">
@@ -2260,11 +2350,7 @@ def runNrgCing( useClass = NrgCing,
     nTmessage('\nGoing to destination: %s with(out) entry_code %s with extra arguments %s' % (destination, entry_code, str(argListOther)))
 
     try:
-        if destination == 'updateWeekly':
-            if uClass.updateWeekly():
-                nTerror("Failed to updateWeekly")
-            # end if
-        elif destination == 'prepare':
+        if destination == 'prepare':
             convertMmCifCoor = 1 # always present so nicest fall back.
             convertMrRestraints = 0
             convertStarCS = 0
@@ -2329,9 +2415,21 @@ def runNrgCing( useClass = NrgCing,
             if uClass.findMissingEntries(): # in nmr_redo
                 nTerror("Failed to findMissingEntries")
             # end if
+        if destination == 'updateWeekly':
+            if uClass.updateWeekly():
+                nTerror("Failed to updateWeekly")
+            # end if
         elif destination == 'updateFrontPages':
             if uClass.updateFrontPages(): # in nmr_redo
                 nTerror("Failed to updateFrontPages")                
+            # end if
+        elif destination == 'updateCsvDumps':
+            if uClass.updateCsvDumps(): # in nmr_redo
+                nTerror("Failed to updateCsvDumps")                
+            # end if
+        elif destination == 'updateFrontPagePlots':
+            if uClass.updateFrontPagePlots(): # in nmr_redo
+                nTerror("Failed to updateFrontPagePlots")                
             # end if
         elif destination == 'forEachStoredEntry':
             if uClass.forEachStoredEntry(): # in nmr_redo

@@ -67,7 +67,7 @@ htmlHead = """
 <head>
 <meta name="Author" content="Jurgen F. Doreleijers, CMBI">
 <title>NRG-CING</title>
-<link media="screen" href="../NRG-CING/HTML/cing.css" type="text/css" rel="stylesheet"/>
+<link media="screen" href="../../NRG-CING/HTML/cing.css" type="text/css" rel="stylesheet"/>
 <!-- INSERT ADDITIONAL HEAD STRING HERE -->
 </head>
 """
@@ -220,7 +220,7 @@ class DataTablesServer:
         dbValue = self.cgi['database'].value
         if dbValue != 'pdb':
             log("ERROR: got a cgi database parameter but the value was not pdb but: %s\n" % str(dbValue))
-            print basicRedirectHtml % '../NRG-CING/HTML/index.html'
+            print basicRedirectHtml % '../../NRG-CING/HTML/index.html'
             return
         # end def
         pdb_id = ''
@@ -246,7 +246,7 @@ class DataTablesServer:
         # All well here.
         ch23 = pdb_id[1:3]
         # Superfast redirect without inbetween page.
-        refTag = "../NRG-CING/data/" + ch23 + "/"+pdb_id+"/"+pdb_id+".cing/" + pdb_id + "/HTML/index.html"
+        refTag = "../../NRG-CING/data/" + ch23 + "/"+pdb_id+"/"+pdb_id+".cing/" + pdb_id + "/HTML/index.html"
         print basicRedirectHtml % refTag
         return
     # end def

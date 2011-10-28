@@ -4918,18 +4918,21 @@ def bytesToFormattedString(size):
     return result
 # end def
 
+_patternValidPdbId = re.compile( '^\d\w\w\w$' )
+_patternInvalidPdbId = re.compile( '^\d\d\d\d$' )
 def is_pdb_code( chk_string ):
     """
     This function checks to see if the string is a reasonable candidate for a
     pdb entry code
     """
-    pattern = re.compile( '^\d\w\w\w$' )
-    match = pattern.match( chk_string )
+    match = _patternValidPdbId.match( chk_string )
     if match:
-        pattern = re.compile( '^\d\d\d\d$' )
-        match = pattern.match( chk_string )
+        match = _patternInvalidPdbId.match( chk_string )
         if match:
-            nTdebug("Currently no PDB ID has all digits.")
+            if chk_string == '1914': # This may change in the future.
+                return True
+            # end if
+            nTdebug("Currently only PDB ID 1914 has all digits; yet tested: [%s]. Assuming to be valid; please update code." % chk_string)
             return False
         # end if
         return True
