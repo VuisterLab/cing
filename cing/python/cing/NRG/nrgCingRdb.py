@@ -990,8 +990,8 @@ AND '{2}' <@ S.chain_type; -- contains at least one protein chain.
 #        e1 = {IS_SMALLER_THAN_STR: (CV_BACKBONE_STR, 0.9) } #@UnusedVariable
         from cing.NRG.rdbPlotList import plotList
         plotIdx = 0 # DEFAULT: 0
-        plotList = plotList[plotIdx:(plotIdx+1+1)] # DEFAULT: commented out and next line taken.
-#        plotList = plotList[plotIdx:] # important to take copy and leave original alone.
+#        plotList = plotList[plotIdx:(plotIdx+1+1)] # DEFAULT: commented out and next line taken.
+        plotList = plotList[plotIdx:] # important to take copy and leave original alone.
         for p in plotList:
             level, progId, chk_id, plotDict = p
             if doTrending:

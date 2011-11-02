@@ -68,6 +68,7 @@ from cing.Scripts.validateEntry import ARCHIVE_TYPE_BY_CH23
 from cing.Scripts.validateEntry import ARCHIVE_TYPE_BY_CH23_BY_ENTRY
 from cing.Scripts.validateEntry import PROJECT_TYPE_CCPN
 from cing.Scripts.validateEntry import PROJECT_TYPE_CING
+from glob import glob
 from shutil import * #@UnusedWildImport
 import commands
 import shutil
@@ -1297,8 +1298,194 @@ class NrgCing(Lister):
             if crdb.createPlots(doTrending = trending, results_dir = self.results_dir):
                 nTerror("Failed to createPlots.")
                 return True
+            # end if
         # end for
+        del crdb # Not needed but speed up GC.
+        if self.updateFrontPagePrettyPlots():
+            nTerror("Failed to updateFrontPagePrettyPlots.")
+            return True
+        # end if
     # end def
+    
+    def updateFrontPagePrettyPlots(self):
+        """
+        Create an indexing page with all images linked.
+        Return True on error.
+        """
+        for trending in [ 1, 0 ]: # DEFAULT: 1,0
+#        for trending in [ 0 ]:
+            inputDir = os.path.join(self.results_dir, PLOT_STR )
+            outputDir = os.path.join(self.results_dir, PPLOT_STR )
+            if trending:
+                inputDir = os.path.join(self.results_dir, PLOT_TREND_STR )
+                outputDir = os.path.join(self.results_dir, PPLOT_TREND_STR )
+            # end if            
+            if self.createPrettyPlots(inputDir, outputDir):
+                nTerror("Failed to createPrettyPlots.")
+                return True
+            # end if
+        # end for
+    # end def    
+    def createPrettyPlots(self, inputDir, outputDir, fnExtension = 'png'):
+        """
+        Create an indexing page with all images linked.
+        It is assumed here that the two directories are located in a shared parent directory
+        so that relative URL can be used like: ./plot/xxx.png
+        results_dir -> HTML
+                    -> plot (inputDir)
+                    -> pplot (outputDir)
+        
+        Extra copies of css will be copied to the outputDir
+        """
+        number_of_entries_per_row = 4
+        number_of_files_per_column = 2
+        imageWidth = 200    # 1600 org is four times as large
+        imageHeight = 150   # 1200
+        nTmessage("Updating index files for input directory: %s" % inputDir)
+        if os.path.exists(outputDir):
+#            nTmessage("Removing output directory: %s" % outputDir)
+            shutil.rmtree(outputDir)
+        # end if
+#        nTmessage("Creating output directory: %s" % outputDir)
+        os.mkdir(outputDir)
+#        nTdebug("Doing copyCingHtmlJsAndCssToDirectory")
+        copyCingHtmlJsAndCssToDirectory(outputDir)        
+#        htmlDir = os.path.join(cingRoot, "HTML")
+        fnMatchPattern = '*.' + fnExtension
+        image_fn_list = glob(os.path.join(inputDir,fnMatchPattern))        
+        inputDirBase = os.path.basename(inputDir)
+#        nTdebug("Got relative part of inputDir: %s" % inputDirBase) # e.g. plotTrend
+        image_code_list = []
+        for image_fn in image_fn_list:
+            _root, image_code, _ext = nTpath(image_fn)
+            image_code_list.append(image_code)
+        # end for        
+        ## Get the number of files required for building an index
+        number_of_images_all_present = len(image_code_list)
+        number_of_images_per_file = number_of_entries_per_row * number_of_files_per_column
+        ## Number of files with indexes in google style
+        number_of_files = int(number_of_images_all_present / number_of_images_per_file)
+        if number_of_images_all_present % number_of_images_per_file:
+            number_of_files += 1
+        # end if
+        nTmessage("Creating %s pages for %s image codes" % (number_of_files, number_of_images_all_present))
+#        nTmessage("Generating %s index html files" % (number_of_files))
+
+        file_name = os.path.join (self.base_dir, "data", self.results_base, "indexPplot.html")
+        file_content = open(file_name, 'r').read()
+        old_string = r"<!-- INSERT NEW TITLE HERE -->"
+        new_string = capitalizeFirst( inputDirBase )
+        file_content = string.replace(file_content, old_string, new_string)
+        old_string = r"<!-- INSERT NEW DATE HERE -->"
+        new_string = time.asctime()
+        file_content = string.replace(file_content, old_string, new_string)
+        old_string = r"<!-- INSERT FOOTER HERE -->"
+        file_content = string.replace(file_content, old_string, GOOGLE_ANALYTICS_TEMPLATE)
+        ## Count will track the number of entries done per index file
+        images_done_per_file = 0
+        ## Following variable will track all done sofar
+        images_done_all = 0
+        ## Tracking the number in the current row. Set for the rare case that there
+        ## are no entries at all. Otherwise it will be initialize on first pass.
+        num_in_row = 0
+        ## Tracking the index file number
+        file_id = 1
+        ## Text per row in an index file to insert
+        insert_text = ''
+        ## Repeat for all entries plus a dummy pass for writing the last index file
+        for image_code in image_code_list + [ None ]:
+            ## Finish this index file
+            ## The last index file will only be written once...
+            if images_done_per_file == number_of_images_per_file or images_done_all == number_of_images_all_present:
+                begin_image_count = number_of_images_per_file * (file_id - 1) + 1
+                end_image_count = min(number_of_images_per_file * file_id,
+                                           number_of_images_all_present)
+#                nTdebug("begin_image_count, end_image_count, number_of_images_all_present: %5d %5d %5d" % (
+#                    begin_image_count, end_image_count, number_of_images_all_present))
+                # image_code is just the base name of the file name.
+                new_string = "Images: %s-%s of %s." % (
+                        begin_image_count,
+                        end_image_count,
+                        number_of_images_all_present
+                        )
+                old_string = r"<!-- INSERT NEW RESULT STRING HERE -->"                
+                new_file_content = string.replace(file_content, old_string, new_string)
+                # Always end the row by adding dummy columns
+                if num_in_row != number_of_entries_per_row:
+                    insert_text += (number_of_entries_per_row - num_in_row) * 2 * r"<td>&nbsp;</td>" + r"</tr>"
+                # end if
+                ## Create the new index file from the example one by replacing a string
+                ## with the new content.
+                old_string = r"<!-- INSERT NEW ROWS HERE -->"
+                new_file_content = string.replace(new_file_content, old_string, insert_text)
+
+                first_string = '<a href="index_%s.html">First &lt; &lt;</a>' % 1
+                final_string  = '<a href="index_%s.html">Last &gt; &gt;</a>' % number_of_files
+                prev_string = ''
+                if file_id > 1:
+                    prev_string = '<a href="index_%s.html">Previous &lt;</a>' % ( file_id - 1)
+                # end if
+                next_string = ''
+                if file_id < number_of_files:
+                    next_string = '<a href="index_%s.html">> Next</a>' % ( file_id + 1)
+                # end if
+                first_link = max(1, file_id - number_of_files_per_column)
+                last_link = min(number_of_files, file_id + number_of_files_per_column - 1)
+                links_string = ''
+                for link in range(first_link, last_link + 1):
+                    ## List link but don't include a link out for the current file_id
+                    if link == file_id:
+                        links_string += ' <B>%s</B>' % link
+                    else:
+                        links_string += ' <a href="index_%s.html">%s</a>' % (
+                             link, link)
+                    # end if
+                # end for
+                old_string = r"<!-- INSERT NEW LINKS HERE -->"
+                new_string = 'Result pages: ' + ' '.join([first_string, prev_string, links_string, next_string, final_string])
+                new_file_content = string.replace(new_file_content, old_string, new_string)
+                ## Make the first index file name still index.html
+                new_file_name = os.path.join( outputDir, 'index_%s.html' % file_id)
+                if not file_id:
+                    new_file_name = os.path.join( outputDir, '/index.html' )
+                # end if 
+                writeTextToFile(new_file_name, new_file_content)   
+                images_done_per_file = 0
+                num_in_row = 0
+                insert_text = ""
+                file_id += 1
+            # end for
+            ## Build on current index file
+            ## The last iteration will not execute this block because of this clause
+            if images_done_all < number_of_images_all_present:
+                images_done_all += 1
+                images_done_per_file += 1
+                ## Get the html code right by abusing the formatting chars.
+                ## as in sprintf etc.
+                imageRelUrl = os.path.join( '..', inputDirBase, image_code + '.' + fnExtension)
+                tmp_string = """
+<td> <a href="%(imageRelUrl)s"> <img SRC="%(imageRelUrl)s" border="0" width="%(imageWidth)s" height="%(imageHeight)s"> </a> </td>""" % dict(
+                    imageRelUrl=imageRelUrl, imageWidth=imageWidth, imageHeight=imageHeight)
+                num_in_row = images_done_per_file % number_of_entries_per_row
+                if num_in_row == 0:
+                    num_in_row = number_of_entries_per_row
+                # end if
+                if num_in_row == 1:
+                    # Start new row
+                    tmp_string = "\n<tr>" + tmp_string
+                elif (num_in_row == number_of_entries_per_row):
+                    # End this row
+                    tmp_string = tmp_string + "\n</tr>"
+                # end if
+                insert_text += tmp_string
+            # end if
+        # end if
+        index_file_first = 'index_1.html'
+        index_file = os.path.join(outputDir, 'index.html')
+        ## Assume that a link that is already present is valid and will do the job
+#        nTdebug('Symlinking: %s %s' % (index_file_first, index_file))
+        symlink(index_file_first, index_file)        
+    # end def    
     
     def updateCsvDumps(self):
         """
@@ -1320,10 +1507,10 @@ class NrgCing(Lister):
         nTmessage("Starting %s" % getCallerName())
         htmlDir = os.path.join(self.results_dir, "HTML")
         if os.path.isdir(htmlDir):
-            nTdebug("Removing original html directory for NRG-CING.")
+#            nTdebug("Removing original html directory for NRG-CING.")
             rmdir(htmlDir)
         # end if
-        nTmessage("Recreating html directory for NRG-CING with content.")
+        nTmessage("Creating HTML directory for %s." % self.results_base)
         mkdirs(htmlDir)
 #        srcHtmlPath = os.path.join(cingRoot, cingPaths.html)        
         data_dir = os.path.join (self.base_dir, "data" )
@@ -2430,6 +2617,10 @@ def runNrgCing( useClass = NrgCing,
         elif destination == 'updateFrontPagePlots':
             if uClass.updateFrontPagePlots(): # in nmr_redo
                 nTerror("Failed to updateFrontPagePlots")                
+            # end if
+        elif destination == 'updateFrontPagePrettyPlots':
+            if uClass.updateFrontPagePrettyPlots(): # in nmr_redo
+                nTerror("Failed to updateFrontPagePrettyPlots")                
             # end if
         elif destination == 'forEachStoredEntry':
             if uClass.forEachStoredEntry(): # in nmr_redo

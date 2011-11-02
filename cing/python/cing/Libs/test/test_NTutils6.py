@@ -148,7 +148,23 @@ class AllChecks(TestCase):
         # end for
     # end def
         
-        
+
+    def test_capitalizeFirst(self):
+        inputList = '. a 1brv hello'.split()
+        expectedList = '. A 1brv Hello'.split()
+        for i, inputStr in enumerate(inputList):
+            try:
+                inputInt = int(inputStr)
+            except:
+#                nTtracebackError()
+                inputInt = inputStr # For testing purposes.
+            # end try
+            result = capitalizeFirst(inputInt)
+#            nTdebug("Found on iteration %s with input: %s the result %s and expected %s" % ( i, inputStr, result, expectedList[i]))
+            self.assertEqual( result, expectedList[i])
+        # end for
+    # end def
+                
 # end class
             
 def additionalTestRoutineByItself():
