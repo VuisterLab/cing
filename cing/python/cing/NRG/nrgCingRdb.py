@@ -992,6 +992,7 @@ AND '{2}' <@ S.chain_type; -- contains at least one protein chain.
         plotIdx = 0 # DEFAULT: 0
 #        plotList = plotList[plotIdx:(plotIdx+1+1)] # DEFAULT: commented out and next line taken.
         plotList = plotList[plotIdx:] # important to take copy and leave original alone.
+        plotProducedCount = 0
         for p in plotList:
             level, progId, chk_id, plotDict = p
             if doTrending:
@@ -1030,8 +1031,8 @@ AND '{2}' <@ S.chain_type; -- contains at least one protein chain.
                 titleStr += '\n'
             # end if
             titleStr += self.getTitleFromDict( plotDict )
-            titleStrNoEol = titleStr.replace('\n', ' ')
-            nTmessage("Plotting %10s %10s %15s, %s" % (level,progId,chk_id,titleStrNoEol))
+#            titleStrNoEol = titleStr.replace('\n', ' ')
+#            nTdebug("Plotting %10s %10s %15s, %s" % (level,progId,chk_id,titleStrNoEol))
             clf()
 
             xmin = getDeepByKeysOrAttributes( plotDict, USE_MIN_VALUE_STR)
@@ -1187,7 +1188,10 @@ AND '{2}' <@ S.chain_type; -- contains at least one protein chain.
                 fn += "." + fmt
 #                nTdebug("Writing " + fn)
                 savefig(fn) # Overwrites
+            # end for
+            plotProducedCount += 1
         # end for plot
+        nTmessage("Produced %s plots" % plotProducedCount)        
     # end def
 
 

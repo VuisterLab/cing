@@ -75,7 +75,7 @@ plotList = [
             [ RES_LEVEL, CING_STR, CS1H_COUNT_STR,      uR(d5,{MI: 0, MA: 25})  ],
             [ RES_LEVEL, CING_STR, CS13C_COUNT_STR,     uR(d5,{MI: 0, MA: 20})  ],
             [ RES_LEVEL, CING_STR, CS15N_COUNT_STR,     uR(d5,{MI: 0, MA: 4000})  ],
-#            [ RES_LEVEL, CING_STR, OMEGA_DEV_AV_ALL_STR,{} ],                       # TODO: code?
+#            [ RES_LEVEL, CING_STR, OMEGA_DEV_AV_ALL_STR,{} ],                       # ABSENT
             [ RES_LEVEL, CING_STR, CV_BACKBONE_STR,     uR({},   {MI: 0, MA: 1}) ],
             [ RES_LEVEL, CING_STR, CV_SIDECHAIN_STR,    uR({},   {MI: 0, MA: 1}) ],
             [ RES_LEVEL, CING_STR, CHK_RAMACH_STR,      uR({},   {MI:-3, MA: 3}) ],
@@ -108,10 +108,10 @@ plotList = [
             [ RES_LEVEL, WHATIF_STR, QUACHK_STR,        uR({},   {MI:-10, MA: 10}) ],   
             [ RES_LEVEL, WHATIF_STR, RAMCHK_STR,        uR({},   {MI:-2, MA: 3}) ],   
             [ RES_LEVEL, WHATIF_STR, ROTCHK_STR,        {}],   
-            [ RES_LEVEL, QSHIFT_STR, QCS_ALL_STR,       {} ], # TODO:
-            [ RES_LEVEL, QSHIFT_STR, QCS_BB_STR,        {} ],
-            [ RES_LEVEL, QSHIFT_STR, QCS_HVY_STR,       {} ],
-            [ RES_LEVEL, QSHIFT_STR, QCS_PRT_STR,       {} ],
+#            [ RES_LEVEL, QSHIFT_STR, QCS_ALL_STR,       {} ], # ABSENT
+#            [ RES_LEVEL, QSHIFT_STR, QCS_BB_STR,        {} ],
+#            [ RES_LEVEL, QSHIFT_STR, QCS_HVY_STR,       {} ],
+#            [ RES_LEVEL, QSHIFT_STR, QCS_PRT_STR,       {} ],
             [ RES_LEVEL, WATTOS_STR, NOE_COMPL4_STR   , uR(d5,   {MI: 0, MA: 100}) ],    #90
             [ RES_LEVEL, WATTOS_STR, NOE_COMPL_OBS_STR, uR(d5,   {MI: 0, MA: 100}) ],
             [ RES_LEVEL, WATTOS_STR, NOE_COMPL_EXP_STR, uR(d5,   {MI: 0, MA: 100}) ],
