@@ -9,7 +9,7 @@ $CINGROOT/python/cing/NRG/nrgCing.py [entry_code]
      prepare runCing storeCING2db 
      createToposTokens getEntryInfo searchPdbEntries createToposTokens
      updateWeekly updateFrontPages updateCsvDumps
-     forEachStoredEntry
+     forEachStoredEntry runWeekly
 
 $CINGROOT/python/cing/NRG/nrgCing.py 1brv prepare
 $CINGROOT/python/cing/NRG/nrgCing.py 1brv runCing
@@ -36,9 +36,11 @@ from cing.Libs.disk import globLast
 from cing.Libs.disk import rmdir
 from cing.Libs.html import GOOGLE_ANALYTICS_TEMPLATE
 from cing.Libs.html import copyCingHtmlJsAndCssToDirectory
+from cing.Libs.html import getStandardCingRevisionHtml
 from cing.NRG import ARCHIVE_NMR_REDO_ID
 from cing.NRG import ARCHIVE_NRG_ID
 from cing.NRG import ARCHIVE_RECOORD_ID
+from cing.NRG import mapArchive2Base
 from cing.NRG import mapArchive2Schema
 from cing.NRG.PDBEntryLists import getBmrbLinks
 from cing.NRG.PDBEntryLists import getBmrbNmrGridEntries
@@ -135,6 +137,7 @@ class NrgCing(Lister):
         self.cgi_dir = '/Library/WebServer/CGI-Executables/cingRdbServer'
         self.results_dir = None
         self.data_dir = None
+        self.htmlFooter = None
 #        self.results_host = 'localhost'
 #        if self.isProduction:
             # Needed for php script.
@@ -322,7 +325,13 @@ class NrgCing(Lister):
         self.data_dir = os.path.join(self.results_dir, DATA_STR)                
         self.schema_id = mapArchive2Schema[ self.archive_id ]
         self.log_dir = mapArchive2LogDir[ self.archive_id ]
-        
+        if 1:
+            cingRevisionUrlStr = getStandardCingRevisionHtml()
+            baseName = mapArchive2Base[ self.archive_id ]
+            urlText = archive_link_template.replace('%a', baseName)
+            startText = "<a href='%(urlText)s'>%(baseName)s</A>" % dict( urlText=urlText, baseName=baseName )
+        self.htmlFooter = startText + ' resource last updated on %s by CING (%s)' % ( time.asctime(), cingRevisionUrlStr )             
+
         os.chdir(self.results_dir)                 
         if False: # DEFAULT: False
             nTdebug("In updateDerivedResourceSettings (re-)setting:")        
@@ -405,7 +414,6 @@ class NrgCing(Lister):
                 return True
             # end if
         # end if
-
         if self.entry_list_todo and self.max_entries_todo:
             nTdebug("Now in updateWeekly starting to prepare")
             if self.prepare():
@@ -1376,10 +1384,9 @@ class NrgCing(Lister):
         old_string = r"<!-- INSERT NEW TITLE HERE -->"
         new_string = capitalizeFirst( inputDirBase )
         file_content = string.replace(file_content, old_string, new_string)
-        old_string = r"<!-- INSERT NEW DATE HERE -->"
-        new_string = time.asctime()
-        file_content = string.replace(file_content, old_string, new_string)
-        old_string = r"<!-- INSERT FOOTER HERE -->"
+        old_string = r"<!-- INSERT NEW FOOTER HERE -->"
+        file_content = string.replace(file_content, old_string, self.htmlFooter)
+        old_string = r"<!-- INSERT GOOGLE ANALYTICS TEMPLATE HERE -->"
         file_content = string.replace(file_content, old_string, GOOGLE_ANALYTICS_TEMPLATE)
         ## Count will track the number of entries done per index file
         images_done_per_file = 0
@@ -1548,9 +1555,8 @@ class NrgCing(Lister):
                 continue
             # end if
             file_content = open(srcFile, 'r').read()                    
-            old_string = r"<!-- INSERT NEW DATE HERE -->"
-            new_string = time.asctime()
-            file_content = string.replace(file_content, old_string, new_string)
+            old_string = r"<!-- INSERT NEW FOOTER HERE -->"
+            file_content = string.replace(file_content, old_string, self.htmlFooter)
             old_string = r"<!-- INSERT GOOGLE ANALYTICS TEMPLATE HERE -->"
             file_content = string.replace(file_content, old_string, GOOGLE_ANALYTICS_TEMPLATE)                        
             if fn != 'index.html':
@@ -2606,6 +2612,10 @@ def runNrgCing( useClass = NrgCing,
             if uClass.updateWeekly():
                 nTerror("Failed to updateWeekly")
             # end if
+        if destination == 'runWeekly':
+            if uClass.runWeekly():
+                nTerror("Failed to runWeekly")
+            # end if            
         elif destination == 'updateFrontPages':
             if uClass.updateFrontPages(): # in nmr_redo
                 nTerror("Failed to updateFrontPages")                

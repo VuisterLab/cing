@@ -1366,10 +1366,8 @@ class HTMLfile:
         startText += " using CING "
         self._appendTag( defaultFooter, None, startText, closeTag=False)
         if cingRevision:
-            cingRevisionUrlStr = cingRevisionUrl + repr(cingRevision)
-            self._appendTag( defaultFooter, None, '(' , closeTag=False)
-            self._appendTag( defaultFooter, 'a', 'r'+repr(cingRevision), href=cingRevisionUrlStr)
-            self._appendTag( defaultFooter, None, ')' , openTag=False)
+            cingRevisionUrlStr = '(%s)' % getStandardCingRevisionHtml()
+            self._appendTag( defaultFooter, None, cingRevisionUrlStr)
         # end if
         if showAuthors:
             relativePath = self.relativePath()
@@ -4231,3 +4229,8 @@ def copyCingHtmlJsAndCssToDirectory(dstDir):
         # end if
     #end for
 # end def
+def getStandardCingRevisionHtml():
+    cingRevisionUrlStr = cingRevisionUrl + str(cingRevision)
+    cingRevisionUrlStr = '<a href="%s">r%s</a>' % ( cingRevisionUrlStr, str(cingRevision))            
+    return cingRevisionUrlStr
+# end def    
