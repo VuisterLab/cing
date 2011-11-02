@@ -406,3 +406,13 @@ th {    /* Override the assumed default by Chrome et al. */
     font-weight: normal;
 }
 
+/* Trick from http://css-tricks.com/25-left-align-and-right-align-text-on-the-same-line/
+    Remember to clear afterwards: 
+    <div style="clear: both;"></div>
+*/
+.alignleft {
+    float: left;
+}
+.alignright {
+    float: right;
+}

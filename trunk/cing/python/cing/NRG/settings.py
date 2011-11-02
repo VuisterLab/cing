@@ -9,6 +9,8 @@ import os
 
 PLOT_STR = 'plot'
 PLOT_TREND_STR = 'plotTrend'
+PPLOT_STR = 'pplot'
+PPLOT_TREND_STR = 'pplotTrend'
 
 # If on production machine then
 # -1- the urls will differ from localhost to nmr.cmbi.ru.nl or so.

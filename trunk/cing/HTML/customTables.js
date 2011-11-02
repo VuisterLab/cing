@@ -69,7 +69,7 @@ jQuery(document).ready(function() {
         "sDom": 'iT<"clear"><lfr><"clear">tp',        
         "sAjaxSource": '../../cgi-bin//cingRdbServer/DataTablesServer.py',
         "oLanguage": {
-            "sSearch": "Search (e.g. 9pcy):",
+            "sSearch": "Filter (e.g. beta):",
             "sProcessing":  "Please wait...",
                             "sLengthMenu": 'Show <select>'+
                                 '<option value="5">5</option>'+

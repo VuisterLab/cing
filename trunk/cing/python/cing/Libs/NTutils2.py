@@ -616,3 +616,21 @@ def setToSingleCoreOperation():
         return
     nTmessage("Maintaining single core operations")
 # end def
+
+def capitalizeFirst(s):
+    if s == None:
+        return
+    # end if
+    if not isinstance(s, str):
+        nTcodeerror('Failed capitalizeFirst with non string argument: [%s]' % str(s))
+        return
+    # end if
+    if len(s) < 1:
+        return ''
+    # end if
+    firstChar = s[0].capitalize()
+    if len(s) == 1:
+        return firstChar
+    # end if
+    return firstChar + s[1:]
+# end def

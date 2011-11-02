@@ -25,7 +25,7 @@ plotList = [
             [ PROJECT_LEVEL, CING_STR, DISTANCE_COUNT_STR,uR(dict4,{MI: 0, MA: 40}) ], # 1
             [ PROJECT_LEVEL, CING_STR, DIHEDRAL_COUNT_STR,uR(dict4,{MI: 0, MA: 4}) ],
             [ PROJECT_LEVEL, CING_STR, RDC_COUNT_STR,     uR(dict4,{MI: 0, MA: 5}) ],
-            [ PROJECT_LEVEL, CING_STR, PEAK_COUNT_STR,dict4 ], # These will come later.
+#            [ PROJECT_LEVEL, CING_STR, PEAK_COUNT_STR,dict4 ],                          # These will come later.
             [ PROJECT_LEVEL, CING_STR, CS_COUNT_STR,      uR(dict4,{MI: 0, MA: 15}) ],
             [ PROJECT_LEVEL, CING_STR, CS1H_COUNT_STR,    uR(dict4,{MI: 0, MA: 10}) ],
             [ PROJECT_LEVEL, CING_STR, CS13C_COUNT_STR,   uR(dict4,{MI: 0, MA: 6}) ],
@@ -56,7 +56,7 @@ plotList = [
             [ PROJECT_LEVEL, WHATIF_STR, PLNCHK_STR,    uR(d5,{MI: 0, MA: 4}) ],
             [ PROJECT_LEVEL, WHATIF_STR, QUACHK_STR,    uR(d5,{MI:-8, MA: 8}) ],
             [ PROJECT_LEVEL, WHATIF_STR, RAMCHK_STR,    uR(d5,{MI:-10,MA: 5}) ],
-            [ PROJECT_LEVEL, WHATIF_STR, ROTCHK_STR,    uR(d5,{MI: 0, MA: 4000}) ], # not done
+#            [ PROJECT_LEVEL, WHATIF_STR, ROTCHK_STR,    uR(d5,{MI: 0, MA: 4000}) ], # not done
             [ PROJECT_LEVEL, PC_STR, pc_gf_STR       ,  uR({},   {MI:-3, MA: 1}) ],
             [ PROJECT_LEVEL, PC_STR, pc_gf_PHIPSI_STR,  uR({},   {MI:-3, MA: 1}) ],
             [ PROJECT_LEVEL, PC_STR, pc_gf_CHI12_STR ,  uR({},   {MI:-3, MA: 1}) ],
@@ -70,12 +70,12 @@ plotList = [
             [ RES_LEVEL, CING_STR, DISTANCE_COUNT_STR,  uR(d5,{MI: 0, MA: 400})  ],
             [ RES_LEVEL, CING_STR, DIHEDRAL_COUNT_STR,  uR(d5,{MI: 0, MA: 10})  ],
             [ RES_LEVEL, CING_STR, RDC_COUNT_STR,       uR(d5,{MI: 0, MA: 10})  ],
-            [ RES_LEVEL, CING_STR, PEAK_COUNT_STR,      uR(d5,{MI: 0, MA: 4000})  ], # These will come later.
+#            [ RES_LEVEL, CING_STR, PEAK_COUNT_STR,      uR(d5,{MI: 0, MA: 4000})  ], # These will come later.
             [ RES_LEVEL, CING_STR, CS_COUNT_STR,        uR(d5,{MI: 0, MA: 40})  ],
             [ RES_LEVEL, CING_STR, CS1H_COUNT_STR,      uR(d5,{MI: 0, MA: 25})  ],
             [ RES_LEVEL, CING_STR, CS13C_COUNT_STR,     uR(d5,{MI: 0, MA: 20})  ],
             [ RES_LEVEL, CING_STR, CS15N_COUNT_STR,     uR(d5,{MI: 0, MA: 4000})  ],
-            [ RES_LEVEL, CING_STR, OMEGA_DEV_AV_ALL_STR,{} ],                       # TODO: code?
+#            [ RES_LEVEL, CING_STR, OMEGA_DEV_AV_ALL_STR,{} ],                       # TODO: code?
             [ RES_LEVEL, CING_STR, CV_BACKBONE_STR,     uR({},   {MI: 0, MA: 1}) ],
             [ RES_LEVEL, CING_STR, CV_SIDECHAIN_STR,    uR({},   {MI: 0, MA: 1}) ],
             [ RES_LEVEL, CING_STR, CHK_RAMACH_STR,      uR({},   {MI:-3, MA: 3}) ],
@@ -101,8 +101,8 @@ plotList = [
             [ RES_LEVEL, WHATIF_STR, C12CHK_STR,        {}],   
             [ RES_LEVEL, WHATIF_STR, FLPCHK_STR,        uR({},   {MI: 0, MA: 4}) ],   
             [ RES_LEVEL, WHATIF_STR, INOCHK_STR,        {}],     
-            [ RES_LEVEL, WHATIF_STR, OMECHK_STR,        uR({},   {MI: 0, MA: 0.4}) ],    # ABSENT
-            [ RES_LEVEL, WHATIF_STR, PL2CHK_STR,        uR({},   {MI: 0, MA: 3}) ],    # ABSENT
+#            [ RES_LEVEL, WHATIF_STR, OMECHK_STR,        uR({},   {MI: 0, MA: 0.4}) ],    # ABSENT
+#            [ RES_LEVEL, WHATIF_STR, PL2CHK_STR,        uR({},   {MI: 0, MA: 3}) ],    # ABSENT
             [ RES_LEVEL, WHATIF_STR, PL3CHK_STR,        uR({},   {MI: 0, MA: 0.4}) ],   
             [ RES_LEVEL, WHATIF_STR, PLNCHK_STR,        uR({},   {MI: 0, MA: 10}) ],   
             [ RES_LEVEL, WHATIF_STR, QUACHK_STR,        uR({},   {MI:-10, MA: 10}) ],   
