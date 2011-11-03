@@ -55,7 +55,7 @@ def checkCingLogForErrors( entry_code, results_dir, log_dir, requiresLogFilePres
     return None on all is good.
     return True on error.
     '''
-    print 'Now in %s for entry_code %s' % ( getCallerName(), entry_code )
+#    print 'Now in %s for entry_code %s' % ( getCallerName(), entry_code )
     entryCodeChar2and3 = entry_code[1:3]
     logDir = os.path.join( results_dir, DATA_STR, entryCodeChar2and3, entry_code, log_dir )
     if not os.path.exists(logDir):
