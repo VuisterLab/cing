@@ -124,7 +124,7 @@ def getBmrbNmrGridEntriesDOCRDone():
 def writeEntryListToFile(fileName, entryList):
     "Returns True on failure"
     csvText = toCsv(entryList)
-    nTdebug("entryList: %s" % str(entryList))
+#    nTdebug("entryList: %s" % str(entryList))
     if not csvText:
         nTerror("Failed to get CSV for %s" % entryList)
         return True
