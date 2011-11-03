@@ -643,25 +643,27 @@ def summaryForProject( project, toFile = True, ranges=None ):
     # end for
     p_rdc_count = project.rdcs.lenRecursive(max_depth = 1)
     hasExperimentalData = p_distance_count or p_dihedral_count or p_rdc_count or p_peak_count or p_cs_count
-    bestMsg = '\nAll applicable programs/checks were performed'
+    bestMsg = '\nAll applicable programs/checks were performed.'
     if not hasExperimentalData:
         bestMsg = '\nBecause there were no experimental data, this project was not fully validated. %s' % (  
                    '\nAll applicable programs/checks for the coordinate data were performed.' )
     else:
-        debugMsg = """
-            p_distance_count =  %(p_distance_count)5d 
-            p_dihedral_count =  %(p_dihedral_count)5d 
-            p_rdc_count      =  %(p_rdc_count)5d      
-            p_peak_count     =  %(p_peak_count)5d     
-            p_cs_count       =  %(p_cs_count)5d       
-        """ % dict( 
-                       p_distance_count= p_distance_count,
-                       p_dihedral_count= p_dihedral_count,
-                       p_rdc_count     = p_rdc_count,
-                       p_peak_count    = p_peak_count,
-                       p_cs_count      = p_cs_count            
-                    )
-        nTdebug(debugMsg)        
+        if False: # DEFAULT: False
+            debugMsg = """
+                p_distance_count =  %(p_distance_count)5d 
+                p_dihedral_count =  %(p_dihedral_count)5d 
+                p_rdc_count      =  %(p_rdc_count)5d      
+                p_peak_count     =  %(p_peak_count)5d     
+                p_cs_count       =  %(p_cs_count)5d       
+            """ % dict( 
+                           p_distance_count= p_distance_count,
+                           p_dihedral_count= p_dihedral_count,
+                           p_rdc_count     = p_rdc_count,
+                           p_peak_count    = p_peak_count,
+                           p_cs_count      = p_cs_count            
+                        )
+            nTdebug(debugMsg)        
+        # end if
     # end if
     if not incompleteItems:
         topMsg += bestMsg

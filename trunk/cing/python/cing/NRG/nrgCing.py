@@ -9,7 +9,7 @@ $CINGROOT/python/cing/NRG/nrgCing.py [entry_code]
      prepare runCing storeCING2db 
      createToposTokens getEntryInfo searchPdbEntries createToposTokens
      updateWeekly updateFrontPages updateCsvDumps
-     forEachStoredEntry runWeekly
+     forEachStoredEntry forEachStoredEntryRunScript runWeekly
 
 $CINGROOT/python/cing/NRG/nrgCing.py 1brv prepare
 $CINGROOT/python/cing/NRG/nrgCing.py 1brv runCing
@@ -2381,17 +2381,22 @@ class NrgCing(Lister):
     
     def forEachStoredEntry(self):
         "Do a manual action on every entry in RDB."
-        f = createPinUp        
+        f = createPinUp   
+#        f = updateProjectHtml     
         extraArgList = (self.results_base,) # note that for length one tuples the comma is required.
+#        extraArgListStr = '/Library/WebServer/Documents/NRG-CING/data
         # NO CHANGES BELOW
-        nTmessage("Starting forEachStoredEntry")
-        
-        self.entry_list_todo = getPdbIdList(fromCing=True)
-        self.entry_list_todo = NTlist( *self.entry_list_todo )
-        if not self.entry_list_todo:
-            nTerror("Failed to get any entry from RDB")
-            return True
-        # end if
+        nTmessage("Starting forEachStoredEntry")        
+        if 0: # DEFAULT: True
+            self.entry_list_todo = getPdbIdList(fromCing=True)
+            self.entry_list_todo = NTlist( *self.entry_list_todo )
+            if not self.entry_list_todo:
+                nTerror("Failed to get any entry from RDB")
+                return True
+        else:
+            self.entry_list_todo = '1brv'.split()
+#            self.entry_list_todo = '1brv 2duw'.split()
+        # end if            
         nTmessage("Found entries in %s todo: %d" % (self.results_base, len(self.entry_list_todo)))
         # parameters for doScriptOnEntryList
         entryListFileName = os.path.join( self.results_dir, 'entry_list_todo.csv')
@@ -2401,9 +2406,43 @@ class NrgCing(Lister):
                             processes_max = self.processes_max,
                             max_time_to_wait = 60 * 60, # Largest entries take a bit longer than the initial 6 minutes; 2hyn etc.
                             start_entry_id = 0,
-                            max_entries_todo = 9999,
+                            max_entries_todo = 9, # DEFAULT: 99999
                             extraArgList = extraArgList)
-        nTmessage("Done with storeCING2db.")
+        nTmessage("Done with forEachStoredEntryRunScript.")
+    # end def
+        
+    def forEachStoredEntryRunScript(self):
+        "Do full script with output redirection on every entry in RDB."
+        pythonScriptFileName = os.path.join(cingDirScripts, 'interactive', 'updateProjectHtml.py')
+        extraArgList = ( str(cing.verbosity), )
+        # NO CHANGES BELOW
+        nTmessage("Starting forEachStoredEntry")        
+        if 0: # DEFAULT: True
+            self.entry_list_todo = getPdbIdList(fromCing=True)
+            self.entry_list_todo = NTlist( *self.entry_list_todo )
+            if not self.entry_list_todo:
+                nTerror("Failed to get any entry from RDB")
+                return True
+        else:
+#            self.entry_list_todo = '1brv'.split()
+            self.entry_list_todo = '1brv 2duw'.split()
+        # end if            
+        nTmessage("Found entries in %s todo: %d" % (self.results_base, len(self.entry_list_todo)))
+        # parameters for doScriptOnEntryList
+        entryListFileName = os.path.join( self.results_dir, 'entry_list_todo.csv')
+        writeEntryListToFile(entryListFileName, self.entry_list_todo)
+        if doScriptOnEntryList(pythonScriptFileName,
+                            entryListFileName,
+                            self.results_dir,
+                            processes_max = self.processes_max,
+                            max_time_to_wait = self.max_time_to_wait,
+                            start_entry_id = 0,
+                            max_entries_todo = 9, # DEFAULT: 99999                            
+                            extraArgList=extraArgList):
+            nTerror("Failed to doScriptOnEntryList")
+            return True
+        # end if                
+        nTmessage("Done with forEachStoredEntryRunScript.")
     # end def
         
     def replaceCoordinates(self):
@@ -2442,7 +2481,7 @@ class NrgCing(Lister):
                             self.results_dir,
                             processes_max = self.processes_max,
                             max_time_to_wait = self.max_time_to_wait,
-                            start_entry_id = 10,
+                            start_entry_id = 0,
                             max_entries_todo = 90,                            
                             extraArgList=extraArgList):
             nTerror("Failed to doScriptOnEntryList")
@@ -2617,25 +2656,29 @@ def runNrgCing( useClass = NrgCing,
                 nTerror("Failed to runWeekly")
             # end if            
         elif destination == 'updateFrontPages':
-            if uClass.updateFrontPages(): # in nmr_redo
+            if uClass.updateFrontPages():
                 nTerror("Failed to updateFrontPages")                
             # end if
         elif destination == 'updateCsvDumps':
-            if uClass.updateCsvDumps(): # in nmr_redo
+            if uClass.updateCsvDumps(): 
                 nTerror("Failed to updateCsvDumps")                
             # end if
         elif destination == 'updateFrontPagePlots':
-            if uClass.updateFrontPagePlots(): # in nmr_redo
+            if uClass.updateFrontPagePlots(): 
                 nTerror("Failed to updateFrontPagePlots")                
             # end if
         elif destination == 'updateFrontPagePrettyPlots':
-            if uClass.updateFrontPagePrettyPlots(): # in nmr_redo
+            if uClass.updateFrontPagePrettyPlots(): 
                 nTerror("Failed to updateFrontPagePrettyPlots")                
             # end if
         elif destination == 'forEachStoredEntry':
-            if uClass.forEachStoredEntry(): # in nmr_redo
+            if uClass.forEachStoredEntry():
                 nTerror("Failed to forEachStoredEntry")                
             # end if
+        elif destination == 'forEachStoredEntryRunScript':
+            if uClass.forEachStoredEntryRunScript():
+                nTerror("Failed to forEachStoredEntryRunScript")                
+            # end if            
         else:
             nTerror("Unknown destination: %s" % destination)
         # end if

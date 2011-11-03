@@ -100,7 +100,7 @@ class Vasco(NTdict):
             return True
         assignmentCountMap = getAssignmentCountMapForResList(proteinResidues)
         if not assignmentCountMap.overallCount():
-            nTmessage("Skipping Vasco because there is no chemical shift assignment.")
+#            nTdebug("Skipping Vasco because there is no chemical shift assignment.")
             return
 
         # Try the CING based check

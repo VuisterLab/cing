@@ -380,8 +380,8 @@ class Molecule( NTtree, ResidueList ):
         self.rogScore         = ROGscore()
         self.ranges           = None         # ranges used for superposition/rmsd calculations. None means all. 'auto' will be converted.
         self.archive_id        = None         # See doc in setArchiveId
-        self.bmrbEntryList    = []           # List of BMRB entries whose data occurs in this object.
-        self.pdbEntryList     = []           # List of PDB entries whose data occurs in this object.
+        self.bmrbEntryList    = NTlist()          # List of BMRB entries whose data occurs in this object.
+        self.pdbEntryList     = NTlist()          # List of PDB entries whose data occurs in this object.
 
 #        self.saveXML('chainCount','residueCount','atomCount')
 
@@ -964,7 +964,7 @@ class Molecule( NTtree, ResidueList ):
         Return an empty list when none could be detected or None on error.
         Doesn't set self attribute.
         """
-        bmrbEntryList = []
+        bmrbEntryList = NTlist()
         for i, resonanceSource in enumerate(self.resonanceSources):
             if not isinstance( resonanceSource, ResonanceList):
                 nTerror("ResonanceList expected but found for iteration %s: [%s], skipping." % (i, resonanceSource))
@@ -975,7 +975,7 @@ class Molecule( NTtree, ResidueList ):
                     nTdebug("BMRB ID: %s already in list: %s. Skip adding another." % (resonanceSource.bmrb_id,
                                                                                        str(resonanceSource.bmrb_id)))
                 else:
-                    nTdebug("Adding BMRB ID: %s to list: %s" % (resonanceSource.bmrb_id,str(resonanceSource.bmrb_id)))
+#                    nTdebug("Adding BMRB ID: %s to list: %s" % (resonanceSource.bmrb_id,str(resonanceSource.bmrb_id)))
                     bmrbEntryList.append(resonanceSource.bmrb_id)
                 # end if
             # end if
@@ -988,7 +988,7 @@ class Molecule( NTtree, ResidueList ):
         Denotes which archive if any this molecule is part of.
         E.g. archive_id can be NRG-CING or NMR_REDO.
         It will also set the related entry ids.
-        E.g. for bmrbEntryList = [ 4020, 4060 ]
+        E.g. for bmrbEntryList = NTlist( [4020, 4060 ] )
         """
         self.archive_id = archive_id
         if pdbEntryList:
@@ -996,8 +996,9 @@ class Molecule( NTtree, ResidueList ):
         else:        
             if is_pdb_code( self.name ):
                 pdb_id = self.name
-                nTmessage("Autodetected PDB entry ID: %s" % pdb_id)
-                self.pdbEntryList = [ pdb_id ]
+                nTdebug("Autodetected PDB entry ID: %s" % pdb_id)
+                self.pdbEntryList = NTlist()
+                self.pdbEntryList.append( pdb_id )
             else:
                 nTdebug("Failed to derive PDB entry ID from molecule name: %s" % self.name)
             # end if
@@ -1007,10 +1008,10 @@ class Molecule( NTtree, ResidueList ):
         else:        
             bmrbEntryList = self.getInvolvedBmrbIdList()            
             if bmrbEntryList:
-                self.bmrbEntryList = []
+                self.bmrbEntryList = NTlist()
                 for bmrb_id in bmrbEntryList:
                     if is_bmrb_code( bmrb_id ):
-                        nTmessage("Autodetected BMRB entry ID: %s" % bmrb_id)
+#                        nTdebug("Autodetected BMRB entry ID: %s" % bmrb_id)
                         self.bmrbEntryList.append( bmrb_id )
                     else:
                         nTerror("Skipping autoderived invalid BMRB entry ID: %s." % bmrb_id)
