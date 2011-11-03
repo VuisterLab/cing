@@ -1,6 +1,9 @@
 # Execute like:
-# cd $D/NRG-CING/data/br/1brv; python -u $CINGROOT/python/cing/Scripts/interactive/mouseBuffer5.py 1brv 9
+# cd $D/NRG-CING/data/br/1brv; python -u $CINGROOT/python/cing/Scripts/interactive/updateProjectHtml.py 1brv 9
+from cing import header
 from cing.Libs.NTutils import * #@UnusedWildImport
+from cing.Libs.helper import getStartMessage
+from cing.Libs.helper import getStopMessage
 from cing.NRG.Utils import getArchiveIdFromDirectoryName
 from cing.core.classes import Project
 
@@ -29,16 +32,16 @@ def updateProjectHtml(pdb_id, extraArgListStr):
 # end def
 
 if __name__ == '__main__':
-    # Needs to be executed in directory with cing project.
-#    pdb_id = '1brv'
+    # Give it a good header and footer for automated checking later on.
+    starttime = time.time()    
+    nTmessage( header )
+    nTmessage( getStartMessage())
     pdb_id = sys.argv[1]
     cing.verbosity = int( sys.argv[2] )
     nTmessage( 'Arguments: %s' % str(sys.argv) )
-#    pdb_id = '2duw'
-#    ch23 = pdb_id[1:3]
-#    extraArgListStr = '/Library/WebServer/Documents/NRG-CING/data/%(ch23)s/%(pdb_id)s' % dict ( ch23=ch23, pdb_id=pdb_id)
     if updateProjectHtml(pdb_id, ''):
         nTerror("Failed updateProjectHtml")
     # end if
+    nTmessage( getStopMessage(starttime))
 # end if
         

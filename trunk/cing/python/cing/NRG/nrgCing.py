@@ -32,7 +32,6 @@ from cing import * #@UnusedWildImport # pylint: disable=W0622
 from cing.Libs import disk
 from cing.Libs.NTgenUtils import * #@UnusedWildImport
 from cing.Libs.NTutils import * #@UnusedWildImport
-from cing.Libs.disk import globLast
 from cing.Libs.disk import rmdir
 from cing.Libs.html import GOOGLE_ANALYTICS_TEMPLATE
 from cing.Libs.html import copyCingHtmlJsAndCssToDirectory
@@ -62,7 +61,6 @@ from cing.NRG.settings import * #@UnusedWildImport
 from cing.Scripts.FC.utils import getBmrbCsCountsFromFile
 from cing.Scripts.doScriptOnEntryList import doFunctionOnEntryList
 from cing.Scripts.doScriptOnEntryList import doScriptOnEntryList
-from cing.Scripts.interactive.mouseBuffer4 import createPinUp
 from cing.Scripts.vCing.vCing import TEST_CING_STR
 from cing.Scripts.vCing.vCing import VALIDATE_ENTRY_NRG_STR
 from cing.Scripts.vCing.vCing import Vcing
@@ -583,7 +581,6 @@ class NrgCing(Lister):
 #        self.addInputModificationTimesFromBmrb() # TODO:
         # end if        
     # end def
-
 
     def getEntryInfo(self):
         """Returns True for error.
@@ -2381,10 +2378,13 @@ class NrgCing(Lister):
     
     def forEachStoredEntry(self):
         "Do a manual action on every entry in RDB."
-        f = createPinUp   
-#        f = updateProjectHtml     
-        extraArgList = (self.results_base,) # note that for length one tuples the comma is required.
-#        extraArgListStr = '/Library/WebServer/Documents/NRG-CING/data
+#        f = createPinUp
+        f = checkCingLogForErrors
+        log_dir = 'log_updateProjectHtml'
+        requiresLogFilePresent = True
+        maxErrors = 0
+#        extraArgList = (self.results_base, )
+        extraArgList = (self.results_dir, log_dir, requiresLogFilePresent, maxErrors )
         # NO CHANGES BELOW
         nTmessage("Starting forEachStoredEntry")        
         if 0: # DEFAULT: True
@@ -2424,8 +2424,8 @@ class NrgCing(Lister):
                 nTerror("Failed to get any entry from RDB")
                 return True
         else:
-#            self.entry_list_todo = '1brv'.split()
-            self.entry_list_todo = '1brv 2duw'.split()
+            self.entry_list_todo = '1brv'.split()
+#            self.entry_list_todo = '1brv 2duw'.split()
         # end if            
         nTmessage("Found entries in %s todo: %d" % (self.results_base, len(self.entry_list_todo)))
         # parameters for doScriptOnEntryList
