@@ -247,10 +247,11 @@ def doFunctionOnEntryList(
 
     job_list = []
     for _i, entry_code in enumerate(entryCodeList):
-        extraArgListStr = ''
-        if extraArgList:
-            extraArgListStr = ' '.join( extraArgList )
-        job = ( f, tuple([entry_code, extraArgListStr]) )
+#        extraArgListStr = ''
+#        if extraArgList:
+#            extraArgListStr = ' '.join( extraArgList )
+        argList = [entry_code] + list( extraArgList )
+        job = ( f, tuple( argList ) )
         job_list.append( job )
     f = ForkOff( processes_max       = processes_max, max_time_to_wait    = max_time_to_wait)
     done_entry_list = f.forkoff_start( job_list, delay_between_submitting_jobs )
