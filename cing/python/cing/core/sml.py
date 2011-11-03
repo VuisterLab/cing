@@ -5,7 +5,6 @@ from cing.core.classes import * #@UnusedWildImport
 from cing.core.constants import * #@UnusedWildImport
 from cing.core.database import * #@UnusedWildImport
 from cing.core.molecule import * #@UnusedWildImport
-
  
 SMLstarthandlers = {}
 SMLendhandlers   = {}
@@ -496,9 +495,8 @@ class SMLMoleculeHandler( SMLhandler ):
 
     def toSML(self, mol, stream=sys.stdout ):
         """
-        Write SML code for chain to stream
+        Write SML code for molecule to stream.
         """
-        # Generate a sequence list
         mol._sequence = NTlist()
         for res in mol.allResidues():
             mol._sequence.append( ( res.chain.name,
@@ -506,28 +504,24 @@ class SMLMoleculeHandler( SMLhandler ):
                                     res.resNum,
                                     res.Nterminal,
                                     res.Cterminal,
-                                    SMLsaveFormat
-                                   )
-                                )
- 
+                                    SMLsaveFormat ) ) 
         fprintf( stream, "%s  %r\n", self.startTag, mol.nameTuple(SMLsaveFormat) )
-
 #       Can add attributes here; update endHandler if needed
-#        for a in ['resonanceCount','resonanceSources','modelCount','ranges']:
-        for a in ['modelCount','ranges']:
-            if mol.has_key(a):
-                fprintf( stream, '%s = %r\n', a, mol[a] )
+        exportAttributeList = 'modelCount ranges archive_id'.split()
+        for a in exportAttributeList:
+            if not mol.has_key(a):
+                nTcodeerror('In %s' % getCallerName())
+                continue
+            # end if            
+            fprintf( stream, '%s = %r\n', a, mol[a] )
         #end for
-        fprintf( stream, '_sequence = ')
-        mol._sequence.toSML( stream )
-
-        fprintf( stream, 'chains = ')
-        mol.chains.toSML( stream )
-
-#       TODO: check because it might conflict with previous versions.
-        fprintf( stream, 'resonanceSources = ')
-        mol.resonanceSources.toSML( stream )
-
+        exportAttributeList = '_sequence chains resonanceSources bmrbEntryList pdbEntryList'.split()
+        for exportAttribute in exportAttributeList:
+#            nTdebug("Exporting molecule's %s" % exportAttribute)
+            fprintf( stream, '%s = ' % exportAttribute)
+            exportObject = mol[ exportAttribute ]
+            exportObject.toSML( stream )
+        # end for
         fprintf( stream, "%s\n", self.endTag )
     #end def
 #end class

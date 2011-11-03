@@ -940,7 +940,6 @@ Project: Top level Cing project class
     #end def
 
     def addLog(self):
-#        htmlHeader = """<html><head><title>CING: Common Interface for Structure Validation</title></head><body><PRE>\n"""
         # Get first available new log file name like:
         # 2jsx.cing/2jsx/Cing/Logs/2jsx_2011-02-10_20-09-31.html
         date_stamp = getDateTimeStampForFileName()

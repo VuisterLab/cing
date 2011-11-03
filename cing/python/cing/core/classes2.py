@@ -284,13 +284,13 @@ class ResonanceList(NTlist, ProjectListMember):
             bmrb_idStr = match.group(1)[3:]            
             self.bmrb_id = int(bmrb_idStr)
             if is_bmrb_code(self.bmrb_id):
-                nTdebug("-0- Autodetected BMRB ID %s from new name: %s" % (self.bmrb_id, self.name))
+#                nTdebug("-0- Autodetected BMRB ID %s from new name: %s" % (self.bmrb_id, self.name))
                 return self
             # end if
-            nTerror("-1- Failed to detect valid BMRB ID from new name: %s" % self.name)
+            nTerror("Failed to detect valid BMRB ID from new name: %s" % self.name)
             return self
         # end if
-        nTdebug("-2- No BMRB ID was matched from new name: %s" % self.name)
+#        nTdebug("-2- No BMRB ID was matched from new name: %s" % self.name)
 #        return self.projectList.rename(self.name, newName)
         return self
     #end def
