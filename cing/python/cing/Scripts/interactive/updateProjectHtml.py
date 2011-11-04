@@ -18,7 +18,7 @@ def updateProjectHtml(pdb_id, extraArgListStr):
         return True
     # end if
     archive_id = getArchiveIdFromDirectoryName( os.getcwd() )
-    # Autoderive also the related entries.
+    # Derives the related entry codes in PDB and BMRB.
     project.molecule.setArchiveId( archive_id )
     if True: # DEFAULT: True 
         nTmessage("Updating project html")
