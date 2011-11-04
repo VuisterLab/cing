@@ -964,20 +964,28 @@ class Molecule( NTtree, ResidueList ):
         Return an empty list when none could be detected or None on error.
         Doesn't set self attribute.
         """
+        nTdebug("Now in %s" % getCallerName())
         bmrbEntryList = NTlist()
         for i, resonanceSource in enumerate(self.resonanceSources):
+            nTdebug("Looking at resonanceSource %s" % resonanceSource)                            
             if not isinstance( resonanceSource, ResonanceList):
                 nTerror("ResonanceList expected but found for iteration %s: [%s], skipping." % (i, resonanceSource))
                 return True            
             #end if
-            if resonanceSource.bmrb_id:
-                if resonanceSource.bmrb_id in bmrbEntryList:
-                    nTdebug("BMRB ID: %s already in list: %s. Skip adding another." % (resonanceSource.bmrb_id,
-                                                                                       str(resonanceSource.bmrb_id)))
-                else:
-#                    nTdebug("Adding BMRB ID: %s to list: %s" % (resonanceSource.bmrb_id,str(resonanceSource.bmrb_id)))
-                    bmrbEntryList.append(resonanceSource.bmrb_id)
-                # end if
+            if not resonanceSource.bmrb_id:
+                nTdebug("No resonanceSource.bmrb_id yet. Trying autodetect with rename.")
+                resonanceSource.rename(resonanceSource.name)
+            # end if
+            if not resonanceSource.bmrb_id:
+                nTdebug("No resonanceSource.bmrb_id.")
+                return bmrbEntryList
+            # end if
+            if resonanceSource.bmrb_id in bmrbEntryList:
+                nTdebug("BMRB ID: %s already in list: %s. Skip adding another." % (resonanceSource.bmrb_id,
+                   str(resonanceSource.bmrb_id)))
+            else:
+                nTdebug("Adding BMRB ID: %s to list: %s" % (resonanceSource.bmrb_id,str(bmrbEntryList)))
+                bmrbEntryList.append(resonanceSource.bmrb_id)
             # end if
         #end for
         return bmrbEntryList
@@ -996,7 +1004,7 @@ class Molecule( NTtree, ResidueList ):
         else:        
             if is_pdb_code( self.name ):
                 pdb_id = self.name
-                nTdebug("Autodetected PDB entry ID: %s" % pdb_id)
+                nTmessage("Autodetected PDB entry ID: %s" % pdb_id)
                 self.pdbEntryList = NTlist()
                 self.pdbEntryList.append( pdb_id )
             else:
@@ -1018,7 +1026,7 @@ class Molecule( NTtree, ResidueList ):
                     # end if
                 # end for
             else:
-                nTdebug("Failed to derive any BMRB entry ID from resonance list name(s): %s" % self.name)
+                nTmessage("Failed to derive any BMRB entry ID from resonance list name(s) in molecule: %s" % self.name)
             # end if
         #end if BMRB
         

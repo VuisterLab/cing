@@ -2408,7 +2408,7 @@ class NrgCing(Lister):
                             start_entry_id = 0,
                             max_entries_todo = 9, # DEFAULT: 99999
                             extraArgList = extraArgList)
-        nTmessage("Done with forEachStoredEntryRunScript.")
+        nTmessage("Done with forEachStoredEntry.")
     # end def
         
     def forEachStoredEntryRunScript(self):
@@ -2424,7 +2424,7 @@ class NrgCing(Lister):
                 nTerror("Failed to get any entry from RDB")
                 return True
         else:
-            self.entry_list_todo = '1d8j'.split()
+            self.entry_list_todo = '1ahd 1ahl 1akk 1akp 1aml 1apc 1aps 1aq5 1arq 1arr 1ato 1atx 1auu 1ax3 1axh 1ayg'.split()
 #            self.entry_list_todo = '1brv 2duw'.split()
         # end if            
         nTmessage("Found entries in %s todo: %d" % (self.results_base, len(self.entry_list_todo)))
