@@ -2382,7 +2382,7 @@ class NrgCing(Lister):
         f = checkCingLogForErrors
         log_dir = 'log_updateProjectHtml'
         requiresLogFilePresent = True
-        maxErrors = 0
+        maxErrors = 3
 #        extraArgList = (self.results_base, )
         extraArgList = (self.results_dir, log_dir, requiresLogFilePresent, maxErrors )
         # NO CHANGES BELOW
@@ -2424,7 +2424,7 @@ class NrgCing(Lister):
                 nTerror("Failed to get any entry from RDB")
                 return True
         else:
-            self.entry_list_todo = '1brv'.split()
+            self.entry_list_todo = '1d8j'.split()
 #            self.entry_list_todo = '1brv 2duw'.split()
         # end if            
         nTmessage("Found entries in %s todo: %d" % (self.results_base, len(self.entry_list_todo)))

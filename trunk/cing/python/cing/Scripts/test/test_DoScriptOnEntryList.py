@@ -14,9 +14,9 @@ from cing.Scripts.validateEntry import PROJECT_TYPE_PDB
 from unittest import TestCase
 import unittest
 
-def sleepy(secconds, bogus):
-    nTdebug("Will sleep for %s" % secconds)
-    time.sleep(float(secconds))
+def sleepy(sleepTime, bogusArgumentList = [] ):
+    nTdebug("Will sleep for %s ignoring bogusArgumentList: %s" % (sleepTime, str(bogusArgumentList)))
+    time.sleep(float(sleepTime))
 # end def
 
 class AllChecks(TestCase):

@@ -1150,9 +1150,11 @@ class SMLNTListWithAttrHandler( SMLhandler ):
         rl = obj.newResonances(skipAtomResonanceCreation = True ) 
         for key in self.SML_SAVE_ATTRIBUTE_LIST:
             if not hasattr( rlTop, key ):
-                nTerror("Failed to read expected attribute in top object: %s" % key)
-                return
-            setattr(rl, key, getattr(rlTop,key))
+                nTwarning("Failed to read expected attribute in top object: %s. Set to None." % key)
+                setattr(rl, key, None)
+            else:
+                setattr(rl, key, getattr(rlTop,key))
+            # endif
 #        rl.addList(rlTop.theList) # not done yet.
 #        nTmessage("==> Restored %s" % rl)
         return rl

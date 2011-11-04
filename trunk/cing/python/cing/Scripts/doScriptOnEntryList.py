@@ -250,9 +250,15 @@ def doFunctionOnEntryList(
 #        extraArgListStr = ''
 #        if extraArgList:
 #            extraArgListStr = ' '.join( extraArgList )
-        argList = [entry_code] + list( extraArgList )
+        argList = [entry_code]
+        if isinstance(extraArgList, list) or isinstance(extraArgList, tuple):
+            argList += extraArgList
+        else:
+            nTmessage("Skipping non-List/Tuple extraArgList: %s" % str(extraArgList))
+        # end if
         job = ( f, tuple( argList ) )
         job_list.append( job )
+    # end for
     f = ForkOff( processes_max       = processes_max, max_time_to_wait    = max_time_to_wait)
     done_entry_list = f.forkoff_start( job_list, delay_between_submitting_jobs )
     done_entry_list.sort()
@@ -261,6 +267,8 @@ def doFunctionOnEntryList(
         idx = not_done_entry_list.index(id)
         if idx >= 0:
             del(not_done_entry_list[idx])
+        # end if
+    # end for
     nTmessage("In doScriptOnEntryList Finished list  : %s" % done_entry_list)
     nTmessage("In doScriptOnEntryList Unfinished list: %s" % not_done_entry_list)
     for id in not_done_entry_list:
@@ -268,4 +276,6 @@ def doFunctionOnEntryList(
         _do_cmd, cmdTuple = job
         cmd = cmdTuple[0]
         nTerror("In doFunctionOnEntryList failed forked: %s" % cmd)
+    # end for
+# end def
 

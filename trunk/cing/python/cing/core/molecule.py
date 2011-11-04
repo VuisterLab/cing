@@ -3135,9 +3135,15 @@ Return an Molecule instance or None on error
         self.red.clear()
         
         objectListOfLists = []
+#        nTdebug("self.resonanceSources: %s" % str(self.resonanceSources))
         objectListOfLists += self.resonanceSources      # CS
         objectListOfLists += self.subNodes( depth = 1 ) # chain
+#        nTdebug("objectListOfLists: %s" % str(objectListOfLists))
         for objectList in objectListOfLists:
+            if not hasattr(objectList, 'decriticize'):
+                nTwarning("Failed to find decriticize attribute in objectList: %s" % str(objectList))
+                return True
+            #end if
             if objectList.decriticize():
                 nTerror("Failed to decriticize %s in molecule#decriticize" % str(objectList))
                 return True
