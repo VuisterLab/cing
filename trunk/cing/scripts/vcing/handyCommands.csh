@@ -29,6 +29,12 @@ jd:nmr/tmpNRG-CING/ jobs
 [3]    Running                       sudo rsync -avr $D/pgdata $D/ >>& ~/rsyncpgdata.log
 sudo rsync -ave ssh jurgenfd@gb-ui-kun.els.sara.nl:/home/jurgenfd/D /Volumes/D/ >>& rsyncD.log
 
-snmr
+# On nmr (OSX).
 cd $D
 rsync -ave ssh jurgenfd@gb-ui-kun.els.sara.nl:/home/jurgenfd/D . >>& rsyncD.log
+rsync -ave ssh i@cvca.cmbi.ru.nl:/mnt/data/D
+rsync -av --delete --stats cingExtra -e ssh i@cvca.cmbi.ru.nl:/mnt/data/D
+rsync -avz --delete --stats /Volumes/tria3/NRG-CING -e ssh i@cvca.cmbi.ru.nl:/mnt/data/D >& rsync_NRG-CING_2011-11-14.log &
+
+rsync -av --delete --stats testDir -e ssh i@cvca.cmbi.ru.nl:/mnt/data/D
+rsync -ave ssh jd@nmr.cmbi.umcn.nl:\$D/Software .

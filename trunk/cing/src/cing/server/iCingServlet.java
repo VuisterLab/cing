@@ -27,6 +27,7 @@ import Wattos.Utils.InOut;
 import Wattos.Utils.OSExec;
 import Wattos.Utils.StringArrayList;
 import Wattos.Utils.Strings;
+import cing.Constants;
 import cing.client.Settings;
 import cing.client.Utils;
 
@@ -182,8 +183,8 @@ public class iCingServlet extends HttpServlet {
             writeJsonError(response, result, "Requested action unknown:  " + currentAction);
             return;
         }
-
-        pathUser = new File(Settings.SERVER_TMP_DIR, currentUserId);
+        String serverTmpDir = Constants.dRoot + "/" + Settings.RESULT_URL;
+        pathUser = new File(serverTmpDir, currentUserId);
         if (!pathUser.exists()) {
             if (!pathUser.mkdir()) {
                 writeJsonError(response, result, "Failed to mkdir for user at: [" + pathUser + "]");
@@ -440,12 +441,13 @@ public class iCingServlet extends HttpServlet {
 //            cing_options += " --noImagery";
 //        }
 
+        String cingWrapperScript = Constants.cingRoot + "/" + Settings.CING_WRAPPER_SCRIPT;
         /**
          * For the long command string it's real nice to have the overview layed out in a printf way
          */
         Parameters p = new Parameters(); // Printf parameters autoclearing after use.
         p.add(cmdCdProjectDir);
-        p.add(Settings.CING_WRAPPER_SCRIPT);
+        p.add(cingWrapperScript);
         p.add(cing_options);
         p.add(cmdRunZipper);
         p.add(cmdRunDone);

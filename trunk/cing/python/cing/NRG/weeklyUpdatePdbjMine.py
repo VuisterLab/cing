@@ -16,6 +16,12 @@ from cing.Libs.DBMS import DBMS
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.NRG import * #@UnusedWildImport
 
+try:
+    from cing.NRG.localConstants import tmpPdbj_dir
+except:
+    nTtracebackError()
+# end try
+
 #stream = open(logFile, 'a')
 #kwds = {'stream':stream, 'useDate':True, 'useProcessId':True, 'doubleToStandardStreams': True}
 #log_message = PrintWrap(verbose=verbosityOutput, **kwds)
@@ -27,9 +33,9 @@ from cing.NRG import * #@UnusedWildImport
 #nTmessageT("Hello new teed message")
 #sys.exit(0)
 
-tmp_dir = '/Users/jd/tmpPdbj'
 psqlLogFile = 'psqlUpdate.latest.log'
 psqlTmpCsvFile = 'psqlCmd.csv'
+
 
 def getNumberOfEntries():
     nTmessage("Getting overall number of entry count")
@@ -82,7 +88,7 @@ def getNumberOfEntries():
 def run():
     '''returns True on error'''
 
-    os.chdir(tmp_dir)
+    os.chdir(tmpPdbj_dir)
     logFile = '/Users/jd/Library/Logs/weeklyUpdatePdbjMine.log'
     if teeToFile(logFile):
         nTerror("Failed to start tea party to: %s" % logFile)
@@ -145,10 +151,10 @@ if __name__ == '__main__':
 #from cing.NRG import * #@UnusedWildImport
 #cing.verbosity = cing.verbosityDebug
 #
-#tmp_dir = '/Users/jd/tmpPdbj'
+#tmpPdbj_dir = '/Users/jd/tmpPdbj'
 #psqlTmpCsvFile = 'psqlCmd.csv'
 #
-#os.chdir(tmp_dir)
+#os.chdir(tmpPdbj_dir)
 #
 #dbms = DBMS()
 #relationNames = [ psqlTmpCsvFile ]

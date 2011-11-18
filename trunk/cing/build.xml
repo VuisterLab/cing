@@ -14,23 +14,25 @@
             <equals arg1="${isProduction}" arg2="1" />
             <then>
                 <echo message="Now in CING environment for production." />
-                <property name="home.web.port" value="${home.web.port.prod}" />
-                <property name="home.web.machine" value="${home.web.machine.prod}" />
-                <property name="home.web.machine.looped" value="${home.web.machine.looped.prod}" />
-                <property name="icing.webapp.dir" value="${icing.webapp.dir.prod}" />
+                <property name="home.web.port"              value="${home.web.port.prod}" />
+                <property name="home.web.machine"           value="${home.web.machine.prod}" />
+                <property name="home.web.machine.looped"    value="${home.web.machine.looped.prod}" />
+                <property name="home.web.user"              value="${home.web.user.prod}" />
+                <property name="home.web.dir"               value="${home.web.dir.prod}" />
+                <property name="icing.webapp.dir"           value="${icing.webapp.dir.prod}" />            	
             </then>
             <else>
                 <echo message="Now in CING environment for development." />
-                <property name="home.web.port" value="${home.web.port.dev}" />
-                <property name="home.web.machine" value="${home.web.machine.dev}" />
-                <property name="home.web.machine.looped" value="${home.web.machine.looped.dev}" />
-                <property name="icing.webapp.dir" value="${icing.webapp.dir.dev}" />
+                <property name="home.web.port"              value="${home.web.port.dev}" />
+                <property name="home.web.machine"           value="${home.web.machine.dev}" />
+                <property name="home.web.machine.looped"    value="${home.web.machine.looped.dev}" />
+                <property name="home.web.user"              value="${home.web.user.dev}" />
+                <property name="home.web.dir"               value="${home.web.dir.dev}" />
+                <property name="icing.webapp.dir"           value="${icing.webapp.dir.dev}" />
             </else>
         </if>
         <property name="home.web.url" value="${home.web.machine}/${ant.project.name}" />
         <property name="home.web.usermachine" value="${home.web.user}@${home.web.machine}" />
-
-
         <if>
             <not>
                 <available file="${build.classes.dir}" />
@@ -40,11 +42,10 @@
                 <mkdir dir="${build.classes.dir}" />
             </then>
         </if>
-
-
         <copy verbose="true" file="python/cing/valSets.cfg" todir="war/example" />
         <echo message="Synced configuration file to iCing examples." />
-
+        <echo message="Initiating CING revision" />
+        <antcall target="set_revision" />
     </target>
 
     <!--
@@ -87,4 +88,26 @@
     <zip destfile="${icing.war.file}" basedir="war"/>
   </target>
 
+    <target name="set_revision" >
+        <!-- <property name="cing_revision" value="9998" /> -->
+        <!-- Can't use errorproperty because Wattos doesn't split streams. --> 
+        <exec executable="java" outputproperty="cing_revision" resultproperty="cing_rev_result">        	        	
+            <arg value="Wattos.Utils.Programs.GetRevision"/>
+            <arg value="CINGROOT"/>
+        </exec>        
+        <echo message="Found output:        ${cing_revision}" />        
+        <echo message="cing_rev_result:     ${cing_rev_result}" />
+        <if>
+            <equals arg1="${cing_rev_result}" arg2="0" />
+            <then>
+                <echo message="Adjusting cing revision number to ${cing_revision}."/>
+                <replaceregexp file="${src.dir}/cing/client/Settings.java"
+                    match="String REVISION = (.*)" replace='String REVISION = "${cing_revision}";' byline="true" />
+            </then>
+            <else>
+                <echo message="Maintaining original cing revision number."/>
+            </else>
+        </if>
+    </target>
+    
 </project>
