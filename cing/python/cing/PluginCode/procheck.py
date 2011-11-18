@@ -617,7 +617,7 @@ B   7 U   999.900 999.900 999.900 999.900 999.900 999.900   0.000   1.932 999.90
 # 1b64 SER      82        34.36      this might be an installation bug as it's value in PDBe is normal.
                 if value and (field in gf_LIST_STR):
                     if value > PCgFactorMaxErrorValue:
-                        nTerror("A pc g-factor for %s of %s will be truncated to %s" % ( field, value, PCgFactorMaxErrorValue))
+                        nTwarning("A pc g-factor for %s of %s will be truncated to %s" % ( field, value, PCgFactorMaxErrorValue))
                         value = PCgFactorMaxErrorValue
                     # end if 
                 # end if

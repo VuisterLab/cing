@@ -1437,8 +1437,9 @@ def moleculeValidateAssignments( molecule  ):
                 # Check for protons with unassigned heavy atoms
                 if atm.isProton() and not atm.isPseudoAtom():
                     heavyAtm = atm.heavyAtom()
-                    if heavyAtm == None:
-                        nTerror("Failed to get heavy for atm: %s" % atm)
+                    if heavyAtm == None: # Happens for all non-standard residues protons.
+                        nTwarning("Failed to get heavy for atm: %s" % atm)
+                    # end if
                     elif not heavyAtm.isAssigned(resonanceListIdx=RESONANCE_LIST_IDX_ANY):
                         spinType = getDeepByKeys(heavyAtm, 'db', 'spinType')
                         if spinType:

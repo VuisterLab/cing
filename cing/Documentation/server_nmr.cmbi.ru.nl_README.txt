@@ -1,3 +1,75 @@
+New setup in server room FNWI.
+
+- BASIC OPERATIONS
+
+Configure apache: see 
+Access: https://draccmbi21.cmbi.ru.nl/index.html using root account.
+        draccmbi21 IP: 131.174.88.65
+Reboot: System -> Power -> Power Cycle system (cold boot).
+    
+cmbi21 IP: 131.174.88.69 met jurgenfd access.
+    ssh jurgenfd@cmbi21.cmbi.ru.nl
+CVCa   IP: 131.174.88.XXX
+    virt-install -h
+    su - (Use jurgenfd password)
+    tsclient works also with Mac OSX key bindings which fail with default virt-viewer.
+    vncviewer localhost:5900 works and using the F8 popup menu can send ctrl-alt-f1 thru 7 needed for swithing login screens.
+    
+# Copy data over:    
+    FAILS:
+    rsync -azv --delete --stats /Volumes/tria3/NRG-CING -e ssh i@cvca.cmbi.ru.nl:/mnt/data/D > & rsync_NRG-CING_log_b.txt &
+    WORKS:
+    Create a TB tgz and split it into 1G blocks (-b 1024m) using 3 characters postfix.
+    set x = NRG-CING
+    split -a 3 -b 1024m /Volumes/tria3/$x.tgz $x"_bin".
+    cat $x"_bin".* > $x"_new".tgz
+    diff $x.tgz $x"_new".tgz
+    rsync -av --delete --stats /Volumes/tria2/tmpNRGCING -e ssh i@cvca.cmbi.ru.nl:/mnt/data/D > & rsync_NRG-CING_log_2011-11-15.txt &
+    # In guest
+    cd $D
+    tar -xvzf NRG-CING_new.tgz > & tar_NRG-CING_new_log.txt &
+    # Back on nmr
+    cd $D/NRG-CING
+    tar -cvzf pgsql_2011-11-18.tgz pgsql
+    rsync -av --progress --stats pgsql_2011-11-18.tgz -e ssh i@cvca.cmbi.ru.nl:\$D/NRG-CING
+    # In guest
+    cd $D/NRG-CING
+Issues:
+- Server room access in weekend?
+- Four times a year a patch that takes less than half an hour of downtime.
+
+Closed issues:
+- Starting from VC 2011-11-01 which is a freshly updated Ubuntu 11.04 with 
+    PAE and LVM2 extensions to kernel.
+    - Converted from Mac OSX multiple vdmk files to single vdmk file:
+        "/Library/Application Support/VMware Fusion/vmware-vdiskmanager" -r VC.vmdk -t 4 CVCa.vdmk
+        Note that this file is excellent to restore from again inside Mac OSX VMware Fusion.
+        Just run the File -> New VM Assistent and start without iso and then select the vdmk file and
+            OS type. 
+                        
+- Adding five 1 Tb partitions that Linux can see a one disk.
+    
+- Set fixed IP address in 
+       
+    
+- Setting up a new VM on cmbi21 as root:
+    cd /var/lib/libvirt/images
+    # CVCa stands for CMBI Virtual Cing machine a.
+    qemu-img convert -O raw CVCa.vmdk CVCa.raw
+    # No idea why:\
+    chcon --reference VC.qcow2 CVCa.raw; ls -alrtZ
+    # Anything running
+    virsh list --all
+    # Save previous instance settings
+    virsh dumpxml VC > VC_vers20111107.xml
+    # Kill previous instance to virsh. Will not remove the VM image.
+    virsh undefine VC
+    # Install from converted image (.raw file)
+    virt-install --name CVCa --cpuset=auto --import --disk /var/lib/libvirt/images/CVCa.raw --accelerate \
+        --network network:default --ram 15000 --vnc --vcpus=8 --os-variant=ubuntumaverick
+    # Save settings again
+    virsh dumpxml CVCa > CVCA_vers20111107.xml
+    
 After a reboot make sure the following services run on the server:
 
 Jurgen's setup
@@ -17,3 +89,5 @@ Geerten's setup
 - proteins website: http://nmr.cmbi.ru.nl (checked from Madison).
 - mac fusion (check by hand by doing Finder->Connect to server-> https://proteins.dyndns.org/gDisk
     Unable to check from a remote site yet. Can't do a scp or a ssh to https://proteins.dyndns.org/gDisk
+
+    

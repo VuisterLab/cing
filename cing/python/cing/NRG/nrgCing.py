@@ -2396,6 +2396,8 @@ class NrgCing(Lister):
         else:
             self.entry_list_todo = '1brv'.split()
 #            self.entry_list_todo = '1brv 2duw'.split()
+            entryListFileName = os.path.join(self.results_dir, 'entry_list_toUpdateHtml.csv')
+            self.entry_list_todo = readLinesFromFile(entryListFileName)
         # end if            
         nTmessage("Found entries in %s todo: %d" % (self.results_base, len(self.entry_list_todo)))
         # parameters for doScriptOnEntryList
@@ -2424,8 +2426,10 @@ class NrgCing(Lister):
                 nTerror("Failed to get any entry from RDB")
                 return True
         else:
-            self.entry_list_todo = '1ahd 1ahl 1akk 1akp 1aml 1apc 1aps 1aq5 1arq 1arr 1ato 1atx 1auu 1ax3 1axh 1ayg'.split()
+#            self.entry_list_todo = '1ahd 1ahl 1akk 1akp 1aml 1apc 1aps 1aq5 1arq 1arr 1ato 1atx 1auu 1ax3 1axh 1ayg'.split()            
 #            self.entry_list_todo = '1brv 2duw'.split()
+            entryListFileName = os.path.join(self.results_dir, 'entry_list_toUpdateHtml.csv')
+            self.entry_list_todo = readLinesFromFile(entryListFileName)
         # end if            
         nTmessage("Found entries in %s todo: %d" % (self.results_base, len(self.entry_list_todo)))
         # parameters for doScriptOnEntryList

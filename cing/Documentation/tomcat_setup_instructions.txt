@@ -1,3 +1,10 @@
+* On Ubuntu 11.04 CVCa
+    sudo apt-get install tomcat6 tomcat6-examples tomcat6-docs tomcat6-admin
+    /var/lib/tomcat6/webapps/ROOT/index.html
+    setenv CATALINA_HOME /usr/share/tomcat6 
+    setenv CATALINA_BASE /var/lib/tomcat6
+    tail -f $CATALINA_BASE/logs/*
+    
 * Note  http://www.malisphoto.com/tips/tomcatonosx.html
     Has most up to date instructions.
     Do what it says but add a -m32 flag to CFLAGS before doing your make to the file Makedefs

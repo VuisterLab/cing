@@ -19,6 +19,10 @@ deleteListHomeI = """
 """.split()
 
 deleteListTmp = """
+    /var/www/RWP
+    /home/jd
+    /etc/rc*.d/*postgresql
+    /mnt/data/pgdata
 """
 
 def stripVc(deletePersonal = 0, deleteTmp = 1 ):

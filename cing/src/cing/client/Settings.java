@@ -6,39 +6,34 @@ import java.util.Arrays;
 /** Settings for both the client and server code */
 public interface Settings {
     /** Just the initial startup state; for client and server. Server debug is set in servlet from this value.
-     * Can NOT be left to true as it will be used by CING.
-     * */
+     * Can NOT be left to true as it will be used by CING.*/
     public static final boolean DO_DEBUG = false;
     /** Instead of messages to the iCing log window; show them on the stdout stream
      * The iCing log is not showing by default anymore so this parameter is needed.
      * */
     public static final boolean DEBUG2STDOUT = true;
-    /** The next statement should updated manually now.*/
-//    public static final String VERSION = "0.88"; discontinued as it is different here from CING and might lead to confusion.
-    /** The next statement should updated manually now. Can be automated by ant script querying svn info like for WATTOS project*/
-    public static final String REVISION = "1111";
+    /** The next statement is automatically updated. Don't even change spacing. Note there this is the current number and not the new one.*/
+    public static final String REVISION = "1114";
     /** URL for svn site specific for certain revision. */
     public static final String CING_REVISION_URL = "http://code.google.com/p/cing/source/detail?r=";
-    /** URL base for all secure work; really no different from regular IP but security added. */
+    /** URL base only used in iCingRobot.java it's derived in iCing on the client side. */
     public static final String DEFAULT_URL = "https://nmr.cmbi.ru.nl";
-//    public static final String DEFAULT_URL = "http://nmr.cmbi.ru.nl";
-    /** Remote procedure call port */
-//    public static final String DEFAULT_RPC_PORT = ":8080"; // unused
     /** URL base for secure iCing */
     public static final String DEFAULT_URL_PATH = "icing";
 //	#DEFAULT_URL_PATH = 'cing.iCing' # use for gwt embedded tomcat
     /** URL for NRG-CING. */
     public static final String NRG_CING_URL = "http://nmr.cmbi.ru.nl/NRG-CING";
     /** Local install location of CING */
-    public static final String CINGROOT = "/Users/jd/workspace35/cing";
+//    public static final String CINGROOT = "/Users/jd/workspace35/cing";
     /** Wrapper to take care of environment settings and some os specific things. */
-    public static final String CING_WRAPPER_SCRIPT = CINGROOT + "/scripts/cing/CingWrapper.csh";
+//    public static final String CING_WRAPPER_SCRIPT = CINGROOT + "/scripts/cing/CingWrapper.csh";
+    public static final String CING_WRAPPER_SCRIPT = "scripts/cing/CingWrapper.csh";
     /** Relative url of results from a CING run */
     public static final String RESULT_URL = "/tmp/cing";
     /** Directory with the web server root documents. */
-    public static final String SERVER_ROOT_DIR = "/Library/WebServer/Documents";
+//    public static final String SERVER_ROOT_DIR = "/Library/WebServer/Documents";
     /** Directory with the CING run results. */
-    public static final String SERVER_TMP_DIR = SERVER_ROOT_DIR + "/" + RESULT_URL;
+//    public static final String SERVER_TMP_DIR = SERVER_ROOT_DIR + "/" + RESULT_URL;
     /** 50 Mb ought to do it for now. The PDB file for 2k0e is 28 Mb. Which crashed the Servlet on Java out of memory. */
     public static final long FILE_UPLOAD_MAX_SIZE = 50 * 1024 * 1024;
     /** Name of file that indicates the CING run is done */

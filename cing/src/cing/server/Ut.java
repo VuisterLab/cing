@@ -106,10 +106,6 @@ public class Ut {
         /** See discussion http://code.google.com/p/cing/issues/detail?id=143
          * Looking for \<directory\>/memops/Implementation/\<projectName\>.xml
          */
-        
-        
-        
-        
         return null;
     }
 }

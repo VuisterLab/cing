@@ -81,7 +81,7 @@ installed in the "template1" database):
 You can populate the database by the "pg_restore" command.
 If you have downloaded the whole database dump, this can be done as:
 
-JFD: NB ===>
+JFD: NB ===> The file may be a tar file. Even a tar.gz file I come to see.
 % pg_restore -d pdbmlplus pdbmlplus.dump
 
 Alternatively, if you have downloaded the split dump files, do as:

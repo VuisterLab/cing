@@ -229,3 +229,8 @@ insert into nrgcing.cingentry(rev_first, name, bmrb_id, rog, distance_count, cs_
 ;
 
 update nrgcing.cingentry set bmrb_id = 9999;
+
+SELECT count(*) FROM brief_summary s;
+echo "SELECT count(*) FROM brief_summary s" | psql pdbmlplus pdbj
+
+
