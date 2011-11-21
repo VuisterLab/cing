@@ -81,6 +81,9 @@ sysctl -a | grep shmmax
 # Check log
 tail -f $PGDATA/serverlog &
 
+# Create regular users without superuser privileges.
+createuser wim
+createuser wouter
 
 
 ########### FOR OSX ###################

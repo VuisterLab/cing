@@ -1,5 +1,8 @@
 https://wiki.jenkins-ci.org/display/JENKINS/Running+Jenkins+behind+Apache
 
+# Note that Jenkins on Java 1.5 was not functioning right. It had many console messages like:
+NoClassDefFoundError: at hudson.model.Hudson.getComputer
+
 org.jenkins-ci.plist.plist
 
 # Use the .plist from $CINGROOT/scripts/cing for starting/stopping.
@@ -19,7 +22,6 @@ java -jar /Applications/Jenkins/jenkins.war --argumentsRealm.passwd.jurgenfd=XXX
 
 port install sloccount py26-lint py26-nose py26-coverage
     
-
 # Rename to version aspecifics for easy of code maintenance.
     cd /opt/local/bin
     sudo ln -s coverage-2.6    coverage

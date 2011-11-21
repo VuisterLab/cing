@@ -629,10 +629,10 @@ def plotHisBySsTypeResTypes():
                         suml2 = avl * n * n
                         if math.fabs(suml2 - suml) > 1:
                             # Perhaps because sum is misinterpreted?
-                            msg = "Math is off for suml != suml2: %s != $s" % (suml, suml2) # pylint: disable=E9905 
+                            msg = "Math is off for suml != suml2: %s != %s" % (suml, suml2) 
                             nTerror(msg)
                         if maxl > suml:
-                            msg = "Math is off for maxl > suml: %s != $s" % (maxl, suml)    # pylint: disable=E9905 
+                            msg = "Math is off for maxl > suml  : %s != %s" % (maxl, suml)    
                             nTerror(msg)
 
                         vL = []
