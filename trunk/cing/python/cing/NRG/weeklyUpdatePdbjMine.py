@@ -17,7 +17,7 @@ from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.NRG import * #@UnusedWildImport
 
 try:
-    from cing.NRG.localConstants import tmpPdbj_dir
+    from cing.NRG.localConstants import tmpPdbj_dir # pylint: disable=E0611 
 except:
     nTtracebackError()
 # end try

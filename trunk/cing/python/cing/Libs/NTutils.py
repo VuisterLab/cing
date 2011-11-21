@@ -2392,7 +2392,7 @@ class NTtree(NTdict):
 #end class
 
 
-class NTparameter(NTtree):
+class NTparameter(NTtree): # pylint: disable=R0904
     """
     Class to generate a parameter tree
 

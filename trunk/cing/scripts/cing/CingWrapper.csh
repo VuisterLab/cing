@@ -1,7 +1,9 @@
 #!/bin/tcsh -f
 
 # DESCRIPTION: Script that executes cing with given parameters but only after setting up the right shell environment except cwd.
-# EXAMPLE RUN: $CINGROOT/scripts/cing/CingWrapper.csh --name 1a4d --initCcpn 1a4d.tgz -v 9 --script doValidateiCing.py
+# EXAMPLE RUN: 
+# $CINGROOT/scripts/cing/CingWrapper.csh --name 1a4d --initCcpn 1a4d.tgz -v 9 --script doValidateiCing.py
+# $C/scripts/cing/CingWrapper.csh -v 9 --noProject --script $C/python/cing/Scripts/doNothing.py
 
 # INITIALIZATION
 # Set all parameters in script: cing.csh
@@ -10,10 +12,19 @@
 
 setenv UJ                 /Users/jd
 setenv WS                 $UJ/workspace35
+
+setenv cingScriptDir $0:h
+#echo "DEBUG: cingScriptDir: $cingScriptDir"
+if ( -e $cingScriptDir/localConstants.csh ) then
+    echo "DEBUG: sourcing $cingScriptDir/localConstants.csh"
+    source $cingScriptDir/localConstants.csh
+endif
+
 setenv CCPNMR_TOP_DIR     $WS/ccpn
 setenv CINGROOT           $WS/cing
 setenv WATTOSROOT         $WS/wattos
 setenv aquaroot           $WS/aquad
+setenv talosPath          $WS/talosplus/talos+
 setenv procheckroot       $UJ/progs/procheck
 # contains a single par file with references to single hard-code path $UJ/progs/molmolM.
 # TODO: move this dep into CING.
@@ -90,7 +101,6 @@ if ( $verbosityDebug) then
 endif
 source $procheckroot/setup.scr
 
-setenv  talosPath /Users/jd/workspace35/talosplus/talos+
 if ( $verbosityDebug) then
     echo "DEBUG: Initializing Talos+ from       $talosPath"
 endif
@@ -99,8 +109,8 @@ if ( $verbosityDebug) then
     echo "DEBUG: Initializing MOLMOL from       $MOLMOLHOME"
 endif
 
-if ( ! -e "/Users/jd/progs/molmolM/setup/PdbAtoms" ) then
-    echo "ERROR: failed to find dep"
+if ( ! -e "$MOLMOLHOME/setup/PdbAtoms" ) then
+    echo "ERROR: failed to find MolMol dep on PdbAtoms"
     exit 1
 endif
 
@@ -112,11 +122,6 @@ endif
 
 # short notation for $argv or even $argv[*] is $* but let's be verbose.
 cing $argv
-
-# Testing...
-#python $CINGROOT/python/cing/Libs/test/test_NTMoleculePlot.py
-#$MOLMOLHOME/molmol -t -f - < 1brv_1model_molmol_images.mac
-#pwd;ls;date
 
 if ( $verbosityDebug) then
     echo "DEBUG: Stopped  script $script on `date`"

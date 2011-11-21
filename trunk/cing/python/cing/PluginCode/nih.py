@@ -1215,8 +1215,9 @@ class TalosPlusResult( NTdict ):
         self.setdefault('psi', None)
         self.setdefault('count', 0)
         self.setdefault('classification', None)
-        self.setdefault('S2', NaN) #REMARK  Predicted order parameter (S2) from backbone chemical shifts for talosPlus.tab
-                                   #REMARK  from David Wishart's RCI method, JACS, 127(43), 14970-14971
+        self.setdefault('S2', NaN)
+#        REMARK  Predicted order parameter (S2) from backbone chemical shifts for talosPlus.tab
+#REMARK  from David Wishart's RCI method, JACS, 127(43), 14970-14971
         self.setdefault('ss_class', None)
         self.setdefault('ss_confidence', None)
     #end def
@@ -1534,8 +1535,8 @@ def restoreTalosPlus( project, tmp=None ):
     if not os.path.exists(smlFile):
         nTerror('restoreTalosPlus: file "%s" with talosPlus data not found', path)
         return True
-
-   # Restore the data
+    # end if
+    # Restore the data
     nTmessage('==> Restoring talos+ results')
     l=sML2obj( smlFile, project.molecule)
     if l==None:

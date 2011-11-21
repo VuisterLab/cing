@@ -29,11 +29,16 @@ CVCa   IP: 131.174.88.XXX
     cd $D
     tar -xvzf NRG-CING_new.tgz > & tar_NRG-CING_new_log.txt &
     # Back on nmr
-    cd $D/NRG-CING
+    # Backup current settings.
+    cd $D/NRG-CING    
     tar -cvzf pgsql_2011-11-18.tgz pgsql
-    rsync -av --progress --stats pgsql_2011-11-18.tgz -e ssh i@cvca.cmbi.ru.nl:\$D/NRG-CING
-    # In guest
+    # Create new dump
+    $C/python/cing/NRG/nrgCing.py updateCsvDumps
+    tar -cvzf pgsql_2011-11-21.tgz pgsql
+    rsync -av --progress --stats pgsql_2011-11-21.tgz -e ssh i@cvca.cmbi.ru.nl:\$D/NRG-CING
+    # In guest when users and all have been setup. Create and load the new data.
     cd $D/NRG-CING
+    python -u $CINGROOT/python/cing/NRG/runSqlForSchema.py nrgcing $CINGROOT/python/cing/NRG/sql/loadDB-CING_psql.sql $D/NRG-CING/pgsql >& loadDB-CING_log_2011-11-21.txt &
 Issues:
 - Server room access in weekend?
 - Four times a year a patch that takes less than half an hour of downtime.

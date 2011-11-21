@@ -125,9 +125,9 @@ class AllChecks(TestCase):
 #            self.assertTrue(project.save())
             self.assertFalse(project.validate(htmlOnly=True, doProcheck=False, doWhatif=False, doWattos=False, doQueeny=False))
             for r, res in enumerate(project.molecule.allResidues()):
-#                nTdebug("Working on %s" % res)
+                nTdebug("Working on %s" % res)
                 for c, valueToCheck in enumerate(keyList):
-                    if c == 2: # TODO: reenable this check when debugged.
+                    if c == 2: # TODO: re-enable this check when debugged.
                         continue
                     valueDetermined = getDeepByKeysOrAttributes(res, TALOSPLUS_STR, valueToCheck)
                     valueReference = valueKnownList[r][c] # r/c is for row/column

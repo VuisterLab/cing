@@ -14,7 +14,7 @@ from cing.core.molecule import Ensemble
 from numpy import linalg as LA
 import numpy as np
 
-class Projects( NTtree ):
+class Projects( NTtree ): # pylint: disable=R0904
     """
     Class to store multiple projects
     Bit dirty as We use the NTtree class, but append Project instances (NTdict-derived) as children
@@ -810,8 +810,8 @@ def getRanges( projects, cutoff = 1.7 ):
                 use2 = 1
             #printf('%-35s %-35s  %6.2f  %1d     %6.2f %6.2f   %6.2f  %1d     %2d\n',
             #       res.PHI, res.PSI, 2.0 - res.PHI.cv - res.PSI.cv, use1,
-             #      phi.cv, psi.cv, 2.0 - phi.cv - psi.cv, use2, use1-use2
-             #     )
+            #      phi.cv, psi.cv, 2.0 - phi.cv - psi.cv, use2, use1-use2
+            #     )
             if use1:
                 resList1.append(res.resNum)
             if use2:
