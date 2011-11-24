@@ -56,8 +56,14 @@ chothiaClassA = 'a'
 chothiaClassB = 'b'
 chothiaClassAB = 'a/b'
 chothiaClassC = 'c' # only coil
-mapChothia_class2Int = {chothiaClassA: 0, chothiaClassB : 1, chothiaClassAB : 2, chothiaClassC : 3, None: None}
+# Difference than string representation in CING api.
+chothiaClassDbA = 'alpha'
+chothiaClassDbB = 'beta'
+chothiaClassDbAB = 'a/b'
+chothiaClassDbC = 'coil'
 
+mapChothia_class2Int     = {chothiaClassA: 0,  chothiaClassB : 1,  chothiaClassAB : 2, chothiaClassC : 3, None: None}
+mapChothia_classId2DbStr = {0:chothiaClassDbA, 1:chothiaClassDbB , 2:chothiaClassDbAB, 3:chothiaClassDbC, None: None}
 # Only 20 AA and 5 NA; Nota Bena no variants.
 common20AAList = "ALA ARG ASN ASP CYS GLN GLU GLY HIS ILE LEU LYS MET PHE PRO SER THR TRP TYR VAL".split()
 commonAAList = common20AAList + "ASPH GLUH HISE CYSS".split() # do not put these into common20AAList
@@ -71,8 +77,15 @@ common20AADict = nTlist2dict(common20AAList)
 #terminalAtomDict.appendFromList( "H1 H2 H3 H' H'' HOP2 HOP3".split())
 
 def chothiaClassInt(chothiaClass):
-    """Integer value for fast lookup in db. Return None if class parameter is None"""
+    """Integer value for fast lookup in RDB. Return None if class parameter is None"""
     return mapChothia_class2Int[ chothiaClass ]
+# end def
+
+def chothiaId2DbStr(chothiaId):
+    """From integer value for fast lookup in RDB to string value that is used for the chothia_class_str in the RDB"""
+    return mapChothia_classId2DbStr[ chothiaId ]
+# end def
+
 
 def countDsspSecStructConsensus(resList):
     """Determine if molecule has at least one of alpha or beta protein regions.

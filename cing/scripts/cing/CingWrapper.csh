@@ -25,7 +25,7 @@ setenv CINGROOT           $WS/cing
 setenv WATTOSROOT         $WS/wattos
 setenv aquaroot           $WS/aquad
 setenv talosPath          $WS/talosplus/talos+
-setenv procheckroot       $UJ/progs/procheck
+setenv procheckroot       $WS/procheck
 # contains a single par file with references to single hard-code path $UJ/progs/molmolM.
 # TODO: move this dep into CING.
 setenv MOLMOLHOME         $UJ/progs/molmolM

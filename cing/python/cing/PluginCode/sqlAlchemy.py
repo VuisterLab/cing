@@ -7,6 +7,7 @@ from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.NRG import * #@UnusedWildImport
 from cing.PluginCode.required.reqOther import *
 import gc
+import numpy
 import warnings
 
 DB_TYPE_MYSQL = 'mysql'
@@ -25,7 +26,7 @@ if True: # for easy blocking of data, preventing the code to be resorted with im
         from sqlalchemy.schema import Table
         from sqlalchemy.sql.expression import func
         from sqlalchemy.exc import SAWarning
-
+        from psycopg2.extensions import register_adapter, AsIs
         versionTuple = sqlalchemy.__version__.split('.')
         if not (versionTuple[0] > '0' or versionTuple[1] >= '5'):
             switchOutput(True)
@@ -38,6 +39,11 @@ if True: # for easy blocking of data, preventing the code to be resorted with im
         switchOutput(True)
 #    nTdebug('Using SqlAlchemy')
 # end if
+
+# Hack from http://rehalcon.blogspot.com/2010/03/sqlalchemy-programmingerror-cant-adapt.html
+def adapt_numpy_float64(numpy_float64):
+    return AsIs(numpy_float64)
+register_adapter(numpy.float64, adapt_numpy_float64)
 
 class CgenericSql(NTdict): # pylint: disable=R0902
     "Class for connecting to any MySql database."

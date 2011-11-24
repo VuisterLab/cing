@@ -14,6 +14,8 @@ CVCa   IP: 131.174.88.XXX
     su - (Use jurgenfd password)
     tsclient works also with Mac OSX key bindings which fail with default virt-viewer.
     vncviewer localhost:5900 works and using the F8 popup menu can send ctrl-alt-f1 thru 7 needed for swithing login screens.
+    # Start GDM: by alias go (like startx) or by:
+        sudo service gdm start
     
 # Copy data over:    
     FAILS:
