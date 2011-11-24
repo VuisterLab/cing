@@ -2,7 +2,7 @@
 Unit test execute as:
 python $CINGROOT/python/cing/PluginCode/test/test_sqlAlchemy.py
 
-Fails if MySql backends are absent.
+Fails if MySql or Postgresql backends are absent.
 """
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.NRG import CASD_DB_NAME

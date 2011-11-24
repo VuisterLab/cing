@@ -1,4 +1,4 @@
-#!/opt/local/bin/python -u
+#!/usr/bin/env python
 
 # Script:    DataTables server-side script for Python and Python
 # Copyright: 2010 - Allan Jardine

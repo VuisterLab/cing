@@ -67,7 +67,7 @@ jQuery(document).ready(function() {
 //        "bStateSave": true,
         "bAutoWidth": false, // recalculates the column widths on the fly but as this fails it's switched off.
         "sDom": 'iT<"clear"><lfr><"clear">tp',        
-        "sAjaxSource": '../../cgi-bin//cingRdbServer/DataTablesServer.py',
+        "sAjaxSource": '../../cgi-bin/cingRdbServer/DataTablesServer.py',
         "oLanguage": {
             "sSearch": "Filter (e.g. beta):",
             "sProcessing":  "Please wait...",

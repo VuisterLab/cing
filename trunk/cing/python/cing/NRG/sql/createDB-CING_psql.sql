@@ -61,8 +61,8 @@ CREATE TABLE casdcing.cingentry
     symmetry                       VARCHAR(255) DEFAULT NULL, -- E.g. D2 by SYMMETRY_D2_STR
     ncs_symmetry                    FLOAT DEFAULT NULL, 
     dr_symmetry                     FLOAT DEFAULT NULL,
-    chothia_class                  INT DEFAULT NULL,     -- (10) alpha, beta, of a/b, a+b, or coil
-    chothia_class_str              VARCHAR(255) DEFAULT NULL,     -- (10) alpha, beta, of a/b, a+b, or coil
+    chothia_class                  INT DEFAULT NULL,              -- (10) alpha, beta, of a/b, a+b, or coil
+    chothia_class_str              VARCHAR(255) DEFAULT NULL,     --      alpha, beta, of a/b, a+b, or coil
     protein_count                  INT DEFAULT NULL,     -- Number of protein chains. Not necessarily unique so e.g. 1hue has 2 that are identical (homodimer).
     dna_count                      INT DEFAULT NULL,     -- The Sum should be the total number of chains; chain_count
     rna_count                      INT DEFAULT NULL,

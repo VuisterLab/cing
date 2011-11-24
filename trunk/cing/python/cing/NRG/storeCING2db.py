@@ -32,6 +32,7 @@ from cing.PluginCode.required.reqWattos import * #@UnusedWildImport
 from cing.PluginCode.required.reqWhatif import * #@UnusedWildImport
 from cing.PluginCode.sqlAlchemy import CsqlAlchemy
 from cing.core.classes import Project
+from cing.core.molecule import chothiaId2DbStr
 from cing.core.molecule import getAssignmentCountMapForResList
 from cing.core.parameters import directories
 from cing.main import getStartMessage
@@ -183,7 +184,7 @@ def doStoreCING2db( entry_code, archive_id, project = None):
 #            nTdebug("Modifying timestamp_last %s to %s" % (timestamp_last, datetime_seen) )
         # end if
     # end for
-
+    bmrb_id = getDeepByKeysOrAttributes(molecule, BMRB_ENTRY_LIST_STR, 0)
     ranges = getDeepByKeysOrAttributes(molecule,RANGES_STR)
     p_rmsd_backbone = getDeepByKeysOrAttributes(molecule, RMSD_STR, BACKBONE_AVERAGE_STR, VALUE_STR)
     p_rmsd_sidechain = getDeepByKeysOrAttributes(molecule, RMSD_STR, HEAVY_ATOM_AVERAGE_STR, VALUE_STR)
@@ -198,6 +199,7 @@ def doStoreCING2db( entry_code, archive_id, project = None):
         symmetry, ncsSymmetry, drSymmetry = symmetryResult
         
     chothia_class = molecule.chothiaClassInt()
+    chothia_class_str = chothiaId2DbStr(chothia_class) # Difference than string representation in CING api. 
     molTypeCountList = molecule.getMolTypeCountList()    
     p_protein_count = molTypeCountList[ mapMoltypeToInt[PROTEIN_STR] ]
     p_dna_count     = molTypeCountList[ mapMoltypeToInt[DNA_STR] ]
@@ -332,6 +334,7 @@ def doStoreCING2db( entry_code, archive_id, project = None):
     
     result = execute(centry.insert().values(
         pdb_id=pdb_id,
+        bmrb_id=bmrb_id,
         casd_id=casd_id,
         name=entry_code,
         rev_first = rev_first,
@@ -344,6 +347,7 @@ def doStoreCING2db( entry_code, archive_id, project = None):
         ncs_symmetry = ncsSymmetry, 
         dr_symmetry  = drSymmetry ,
         chothia_class=chothia_class,
+        chothia_class_str=chothia_class_str,
         
         protein_count        =  p_protein_count               ,
         dna_count            =  p_dna_count                   ,

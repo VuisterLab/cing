@@ -130,9 +130,10 @@ class NrgCing(Lister):
         # Dir as base in which all info and scripts like this one resides
         self.base_dir = os.path.join(cingPythonCingDir, "NRG")
 
-        self.results_base = results_base
-        self.D = '/Library/WebServer/Documents' # pylint: disable=C0103
-        self.cgi_dir = '/Library/WebServer/CGI-Executables/cingRdbServer'
+        self.results_base = results_base                
+        self.D = dDir # pylint: disable=C0103
+        self.cgi_dir = cgiDir
+        
         self.results_dir = None
         self.data_dir = None
         self.htmlFooter = None
@@ -328,6 +329,7 @@ class NrgCing(Lister):
             baseName = mapArchive2Base[ self.archive_id ]
             urlText = archive_link_template.replace('%a', baseName)
             startText = "<a href='%(urlText)s'>%(baseName)s</A>" % dict( urlText=urlText, baseName=baseName )
+        # endif
         self.htmlFooter = startText + ' resource last updated on %s by CING (%s)' % ( time.asctime(), cingRevisionUrlStr )             
 
         os.chdir(self.results_dir)                 
@@ -2651,11 +2653,11 @@ def runNrgCing( useClass = NrgCing,
             if uClass.findMissingEntries(): # in nmr_redo
                 nTerror("Failed to findMissingEntries")
             # end if
-        if destination == 'updateWeekly':
+        elif destination == 'updateWeekly':
             if uClass.updateWeekly():
                 nTerror("Failed to updateWeekly")
             # end if
-        if destination == 'runWeekly':
+        elif destination == 'runWeekly':
             if uClass.runWeekly():
                 nTerror("Failed to runWeekly")
             # end if            

@@ -4,14 +4,17 @@
     sudo vi /etc/apache2/httpd.conf              # User directives.
     sudo vi /etc/apache2/sites-available/default # DEFAULT site as virtual host.
     sudo /etc/init.d/apache2 restart
-    /var/www
+    
+    Root Web: /mnt/data/D
+    Root cgi: /mnt/data/cgi-bin
+    Log  dir: /var/log/apache2
     # Temporarily open for writing then close.
     sudo chmod go+rwx /var/www
     # Get logs.
     tail -f /var/log/apache2/*.log &
 For Geerten:
     DAV enabled but not DAV SVN module yet.
-    Add from nmr:/private/etc/apache2/other/geerten.conf to cvca:/etc/apache2/httpd.conf 
+    Add security for RWP/local directory from nmr:/private/etc/apache2/other/geerten.conf to cvca:/etc/apache2/sites-available/default
 For Jurgen:
     mkdir /home/jd/public_html
 For CGI:
