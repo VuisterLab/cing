@@ -27,6 +27,9 @@ print "pathByApache: %s\n" % (pathByApache)
 specialPathByApache = os.getenv("SPECIAL_PATH", "Unknown special path")
 print "special pathByApache: %s\n" % (specialPathByApache)
 
+dPathByApache = os.getenv("D", "Unknown D path")
+print "d pathByApache: %s\n" % (dPathByApache)
+
 log = sys.stderr.write
 log('Hello CGI, is this an error?\n')
 

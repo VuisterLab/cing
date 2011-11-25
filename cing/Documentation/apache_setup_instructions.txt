@@ -5,13 +5,18 @@
     sudo vi /etc/apache2/sites-available/default # DEFAULT site as virtual host.
     sudo /etc/init.d/apache2 restart
     
-    Root Web: /mnt/data/D
+    Root Web: /mnt/data/D                 # define for apache
     Root cgi: /mnt/data/cgi-bin
+    Root home:/mnt/data/servlet-cing-home 
     Log  dir: /var/log/apache2
     # Temporarily open for writing then close.
     sudo chmod go+rwx /var/www
     # Get logs.
     tail -f /var/log/apache2/*.log &
+    
+    For security details with https use ~jd/bin/ssh/README.txt and the below:
+    
+    
 For Geerten:
     DAV enabled but not DAV SVN module yet.
     Add security for RWP/local directory from nmr:/private/etc/apache2/other/geerten.conf to cvca:/etc/apache2/sites-available/default

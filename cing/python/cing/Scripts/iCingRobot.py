@@ -25,6 +25,7 @@ RESPONSE_DONE = 'done'
 
 #DEFAULT_URL = 'http://nmr.cmbi.ru.nl' # production without https security turned on
 DEFAULT_URL = 'https://nmr.cmbi.ru.nl' # production with https security turned on
+#DEFAULT_URL = 'https://cvca.cmbi.ru.nl' # production with https security turned on
 #DEFAULT_URL = 'http://localhost' # local tomcat instance
 #DEFAULT_URL = 'http://localhost' # local gwt embedded tomcat instance
 DEFAULT_RPC_PORT = ''
@@ -174,12 +175,12 @@ def iCingRobot():
     ## queries possible; do one at a time going down the list.
     ## After the run is started the status will let you know if the run is finished
     ## The log will show what the server is doing at any one time.
-    doSave  = 1 # Upload to iCing and show derived urls
-    doRun   = 0 # Start the run in Nijmegen
-    doStatus= 0 # Find out if the run finished
-    doLog   = 0 # Get the next piece of log file (may be empty)
-    doPname = 0 # Get the project name back. This is the entryId below.
-    doPurge = 0 # Remove data from server again.
+    doSave  = 1 # DEFAULT 1. Upload to iCing and show derived urls
+    doRun   = 0 # DEFAULT 0. Start the run in Nijmegen
+    doStatus= 0 # DEFAULT 0. Find out if the run finished
+    doLog   = 0 # DEFAULT 0. Get the next piece of log file (may be empty)
+    doPname = 0 # DEFAULT 0. Get the project name back. This is the entryId below.
+    doPurge = 0 # DEFAULT 0. Remove data from server again.
 
     # User id should be a short id (<without any special chars.)
 #    user_id = os.getenv("USER", "UnknownUser")

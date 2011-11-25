@@ -4,14 +4,15 @@
     setenv CATALINA_HOME /usr/share/tomcat6 
     setenv CATALINA_BASE /var/lib/tomcat6
     tail -f $CATALINA_BASE/logs/*
-    
+    user is tomcat6 which is made to have a loginable root dir at: $D/servlet-cing-home
 * Note  http://www.malisphoto.com/tips/tomcatonosx.html
     Has most up to date instructions.
     Do what it says but add a -m32 flag to CFLAGS before doing your make to the file Makedefs
     Thanks to http://crashingdaily.wordpress.com/2008/11/12/compiling-a-32-bit-jsvc-on-a-64-bit-machine/
     - Made many changes to Tomcat5.sh as suggested by tomcatonosx.html
-
-
+    /etc/init.d/tomcat6  restart
+    
+    
 
 * With macports:
 

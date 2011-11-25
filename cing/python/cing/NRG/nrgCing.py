@@ -2369,12 +2369,13 @@ class NrgCing(Lister):
         doScriptOnEntryList(pythonScriptFileName,
                             entryListFileName,
                             self.results_dir,
-                            processes_max = self.processes_max,
-                            max_time_to_wait = 60 * 60, # Largest entries take a bit longer than the initial 6 minutes; 2hyn etc.
-                            start_entry_id = 0,
-                            max_entries_todo = self.max_entries_todo,
-                            expectPdbEntryList = True,
-                            extraArgList = extraArgList)
+                            processes_max           = self.processes_max,
+                            max_time_to_wait        = 60 * 60, # Largest entries take a bit longer than the initial 6 minutes; 2hyn etc.
+                            start_entry_id          = 0,
+                            max_entries_todo        = self.max_entries_todo,
+                            expectPdbEntryList      = True,
+                            shuffleBeforeSelecting  = True,                            
+                            extraArgList            = extraArgList)
         nTmessage("Done with storeCING2db.")
     # end def
     
