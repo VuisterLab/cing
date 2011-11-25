@@ -290,7 +290,7 @@ class ResonanceList(NTlist, ProjectListMember):
             nTerror("Did not detect valid BMRB ID from new name: %s." % self.name)
             return self
         # end if
-        nTdebug("-2- No BMRB ID was matched from new name: %s" % self.name)
+#        nTdebug("-2- No BMRB ID was matched from new name: %s" % self.name)
 #        return self.projectList.rename(self.name, newName)
         return self
     #end def

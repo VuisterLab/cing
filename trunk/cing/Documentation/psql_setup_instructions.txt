@@ -20,7 +20,7 @@ wget ftp://ftp.postgresql.org/pub/source/v8.4.9/postgresql-8.4.9.tar.gz
 # Install many deps
 sudo apt-get install xml2 libxml2-dev bison flex libreadline-dev postgresql-client chkconfig pgadmin3 vim-nox sendmail mutt 
 # And for python bindings:
-sudo apt-get install psycopg2
+sudo apt-get install python-psycopg2
 
 # Edit for working with longer identifiers as described in 00README.txt from PDBj.
 vi src/include/pg_config_manual.h

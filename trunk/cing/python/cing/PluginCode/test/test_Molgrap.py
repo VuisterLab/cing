@@ -43,11 +43,11 @@ class AllChecks(TestCase):
         self.assertFalse(project.molecule.export2gif(pathGif, project=project))
         self.assertTrue(os.path.exists(pathGif))
         pathMolGifPinup = pathGif[:-4] + '_pin.gif'
-        self.assertTrue(os.path.exists(pathMolGifPinup))
-
-        
+        self.assertTrue(os.path.exists(pathMolGifPinup))                
         pathGifDefault =  os.path.join( cingPythonCingDir, 'PluginCode', DATA_STR, 'UnknownImage.gif' )
         self.assertFalse(os.path.getsize(pathGif) == os.path.getsize(pathGifDefault))
+        nTmessage("Created new molecular imagery at: %s" % self.cingDirTmpTest)
+    # end def
 
     def _testMolgrapRunFromCcpnFile(self):
 #        entryId = "1cjg" # Nucleic acid entry.

@@ -12,6 +12,10 @@
 
 setenv UJ                 /Users/jd
 setenv WS                 $UJ/workspace35
+# A home directory is needed for .matplotlib, .ccpn and perhaps others' settings?
+setenv HOME               /Library/WebServer/Documents/servlet-cing-home
+#setenv HOME               $UJ
+
 
 setenv cingScriptDir $0:h
 #echo "DEBUG: cingScriptDir: $cingScriptDir"
@@ -28,16 +32,11 @@ setenv talosPath          $WS/talosplus/talos+
 setenv procheckroot       $WS/procheck
 # contains a single par file with references to single hard-code path $UJ/progs/molmolM.
 # TODO: move this dep into CING.
-setenv MOLMOLHOME         $UJ/progs/molmolM
-
-# A home directory is needed for .matplotlib, .ccpn and perhaps others' settings?
-setenv HOME               /Library/WebServer/Documents/servlet-cing-home
-#setenv HOME               $UJ
+setenv MOLMOLHOME         $WS/molmolM
 
 # Possible improvement could be to have the debug flag below here be defined from
 # the iCing interface.
 set verbosityDebug = 1
-
 
 set script = CingWrapper.csh
 
