@@ -13,14 +13,11 @@
 setenv UJ                 /Users/jd
 setenv WS                 $UJ/workspace35
 # A home directory is needed for .matplotlib, .ccpn and perhaps others' settings?
+# E.g. the below would be appropriate for a tomcat6 user's home. 
 setenv HOME               /Library/WebServer/Documents/servlet-cing-home
-#setenv HOME               $UJ
-
 
 setenv cingScriptDir $0:h
-#echo "DEBUG: cingScriptDir: $cingScriptDir"
 if ( -e $cingScriptDir/localConstants.csh ) then
-    echo "DEBUG: sourcing $cingScriptDir/localConstants.csh"
     source $cingScriptDir/localConstants.csh
 endif
 
@@ -30,13 +27,12 @@ setenv WATTOSROOT         $WS/wattos
 setenv aquaroot           $WS/aquad
 setenv talosPath          $WS/talosplus/talos+
 setenv procheckroot       $WS/procheck
-# contains a single par file with references to single hard-code path $UJ/progs/molmolM.
-# TODO: move this dep into CING.
+# contains a par file with references to hard-code paths
 setenv MOLMOLHOME         $WS/molmolM
 
 # Possible improvement could be to have the debug flag below here be defined from
 # the iCing interface.
-set verbosityDebug = 1
+set verbosityDebug = 0
 
 set script = CingWrapper.csh
 

@@ -2225,8 +2225,8 @@ class MoleculePlotSet:
                             continue
                         yValueList = point
                         for resId, resValueListTupleX in enumerate(xValueList):
-                             # skip the residue location; it's not used in this variant of the code.
-#                            nTdebug("resId: %d" % resId)
+                            # skip the residue location; it's not used in this variant of the code.
+                            # nTdebug("resId: %d" % resId)
                             resValueListTupleY = yValueList[resId]
                             resValueListX = resValueListTupleX[NT_MOLECULE_PLOT_IDX_VALUE_LIST]
                             resValueListY = resValueListTupleY[NT_MOLECULE_PLOT_IDX_VALUE_LIST]

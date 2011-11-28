@@ -1,5 +1,7 @@
 # python -u $CINGROOT/python/cing/Scripts/interactive/mouseBuffer5.py
 from cing.Libs.Imagery import convertImageMagick
+from matplotlib.dates import date2num
+import datetime
 import os
 
 
@@ -15,3 +17,15 @@ def createPinUp(pdb_id, extraArgListStr):
     if convertImageMagick(inputPath, outputPath, options='-geometry 114x80'): # Dimension to match the one in molgrap.py
         print 'ERROR: failed for: ' + inputPath
 # end def
+
+yearIntMin = 1990 # inclusive start
+yearIntMax = 2014 # exclusive end
+yearIntBinSize = 2
+nbins = ( yearIntMax - yearIntMin ) / yearIntBinSize  # should match above. last bin will start at 2010
+dateDatMin = datetime.date(yearIntMin, 1, 1)
+dateDatMax = datetime.date(yearIntMax, 1, 1)
+dateMin = date2num(dateDatMin)
+dateMax = date2num(dateDatMax)
+binSizeTdel = datetime.timedelta(365*yearIntBinSize)
+halfBinSizeTdel = datetime.timedelta(365*yearIntBinSize/2.)
+

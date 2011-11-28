@@ -1,6 +1,7 @@
 """
 Create plots like the GreenVersusRed scatter by entry.
-Use: 
+Use:
+cd $D/NRG-CING 
 python -u $CINGROOT/python/cing/NRG/nrgCingRdb.py 
 """
 
@@ -1039,55 +1040,72 @@ AND '{2}' <@ S.chain_type; -- contains at least one protein chain.
             xmax = getDeepByKeysOrAttributes( plotDict, USE_MAX_VALUE_STR)
 
             if doTrending:
-                num_points_line = 100
+#                num_points_line = 100
                 y = floatNTlist
-                x = NTlist()
-                xDate = NTlist()
+                # Watch out we'll use different date formats. 
+                # The floats do not have a Postfix and are considered the standard.
+                # The datetime.date Type is the scale for plotting. In matplotlib speak this is the xxx
+                # Id  Postfix Type                 Description
+                # -1- Int     integer              For boundary year
+                # -2-         float                Epoch
+                # -3- Dat     datetime.date        Python format
+                # -4- Tdel    datetime.timedelta   Python format
+                x = NTlist() 
+                xDat = NTlist()
                 for i in range(len(floatNTlist)):
                     dateObject = floatValueLoL[i][5]
-                    x.append(date2num(dateObject))
-                    xDate.append(dateObject)
+                    xi = date2num(dateObject)
+                    x.append(xi)
+                    xDat.append(dateObject)
+#                    if i < 2:
+#                        nTdebug("dateObject: %s" % dateObject)
+#                        nTdebug("xi        : %s" % xi)
+#                    # endif
                 # end for list creation.
-                scatter(xDate, y, s=0.1) # Plot of the data and the fit
-                p = polyfit(x, y, 1)  # deg 1 means 2 parameters for a order 2 polynomial
-#                nTmessage("Fit with terms             : %s" % p)
+#                Transformed back later.
+                p = polyfit(x, y, 1)  # deg 1 means 2 parameters for a order 2 polynomial. The x coordinates are floats here. 
+                nTmessage("Fit with terms             : %s" % p)
                 trendFloat = p[0]*365.25
                 trendFloatStr = '%.3f' %  trendFloat
                 titleStr += ' trend %s per year' % trendFloatStr
-
-                t = [min(xDate), max(xDate)] # Only need 2 points for straight line!
+                t = [min(xDat), max(xDat)] # Only need 2 points for straight line!                            
+                yearIntMin = 1990 # inclusive start
+                yearIntMax = 2014 # exclusive end
+                yearIntBinSize = 2
+                nbins = ( yearIntMax - yearIntMin ) / yearIntBinSize  # should match above. last bin will start at 2010
+                dateDatMin = datetime.date(yearIntMin, 1, 1)
+                dateDatMax = datetime.date(yearIntMax, 1, 1)
+                dateMin = date2num(dateDatMin)
+                dateMax = date2num(dateDatMax)
+                binSizeTdel = datetime.timedelta(365*yearIntBinSize) #@UnusedVariable # pylint: disable=W0612
+                halfBinSizeTdel = datetime.timedelta(365*yearIntBinSize/2.)
+                # Combine all plotting to one section as to easily adjust order of plots.
+#                nTdebug("Setting xlimits to %s - %s" % (dateDatMin, dateDatMax))
+#                xlim(xmin=dateMin, xmax=dateMax)
+#                xticks( range(dateDatMin, dateDatMax, binSizeTdel)) #     
+                scatter(xDat, y, s=0.1, marker='o', facecolors='black', c='black')
                 plot(t, fitDatefuncD2(p, t), "r--", linewidth=1) # Plot of the data and the fit
                 if not onlyScatter:
                     # Now bin
-                    yearMin = 1990 # inclusive start
-                    yearMax = 2012 # exclusive end
-                    yearBinSize = 2
-                    nbins = ( yearMax - yearMin ) / yearBinSize  # should match above. last bin will start at 2010
-                    dateMin = datetime.date(yearMin, 1, 1)
-                    dateMax = datetime.date(yearMax, 1, 1)
-                    dateNumMin = date2num(dateMin)
-                    dateNumMax = date2num(dateMax)
-    #                dateNumSpan = dateNumMax - dateNumMin
-                    halfBinSize = datetime.timedelta(365*yearBinSize/2.)
-                    nTmessage("Date number min/max: %s %s" % (dateNumMin, dateNumMax))
+                    nTmessage("Date number min/max: %s %s" % (dateMin, dateMax))
                     if False: # test positions
-                        testX = [dateMin,dateMax]
+                        testX = [dateDatMin,dateDatMax]
                         testY = [-10.,0.]
                         plot(testX, testY)
                     # end if
     #                nr = 100 # number of records
-    #                x = np.random.random(nr) * dateNumSpan + dateNumMin
+    #                x = np.random.random(nr) * dateNumSpan + dateMin
                     x = np.array(x)
     #                y = np.random.random(nr) * 10
                     y = np.array(y)
                     print "x: %s" % x
                     print "y: %s" % y
-                    binned_valueList, numBins = bin_by(y, x, nbins=nbins, ymin=dateNumMin, ymax=dateNumMax)
+                    binned_valueList, numBins = bin_by(y, x, nbins=nbins, ymin=dateMin, ymax=dateMax)
                     bins = []
                     widths = []
                     dataAll = []
                     for i,bin in enumerate(numBins):
-                        bins.append(num2date(bin) + halfBinSize )
+                        bins.append(num2date(bin) + halfBinSizeTdel )
                         widths.append(datetime.timedelta(365)) # 1 year width for box. TODO: CHECK UNITS CODE FAILS HERE.
                         spread = binned_valueList[i]
                         spread.sort()
@@ -1101,8 +1119,7 @@ AND '{2}' <@ S.chain_type; -- contains at least one protein chain.
                     wiskLoL = boxplot(dataAll, positions=bins, widths=widths, sym=sym)
     #                scatter(x, y, s=0.1) # Plot of the data and the fit
                     print 'wiskLoL: %s' % wiskLoL
-#                    xlim(xmin=dateMin, xmax=dateMax)
-                # end if scatterOnly                
+                # end if scatterOnly            
                 # When trending the limits are for the y-axis.
                 if xmin != None:
                     ylim(ymin=xmin)
@@ -1785,7 +1802,7 @@ if __name__ == '__main__':
     # end if
     if 0:
         n.createPlotsCompareBetweenDb(other_schema=NMR_REDO_DB_SCHEMA)
-    if 1:
+    if 0:
         n.populateBmrbIds()
     # end if
     nTmessage("done with NrgCingRdb")

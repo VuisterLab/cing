@@ -4,6 +4,8 @@
 # Copyright: 2010 - Allan Jardine
 # License:   GPL v2 or BSD (3-point)
 # No big modules here please.
+
+# This module is not standard in python so needs to be available to the python apache uses.
 from psycopg2.extras import DictCursor
 from traceback import format_exc
 import cgi
