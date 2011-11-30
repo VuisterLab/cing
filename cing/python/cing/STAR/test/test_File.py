@@ -119,7 +119,7 @@ def testEntry(entry):
 
     nTdebug("Most likely the below check will fail because it depends on Wattos being installed")
     nTdebug("rewrite to Java formating for comparison")
-    cmd = "java -Xmx256m Wattos.Star.STARFilter %s %s ." % (pystarlibWrittenFile, wattosWrittenFile)
+    cmd = "%s Wattos.Star.STARFilter %s %s ." % (JVM_CMD_STD, pystarlibWrittenFile, wattosWrittenFile)
     logFileName = "wattos_STARFilter.log"
     wattosProgram = ExecuteProgram(cmd, redirectOutputToFile = logFileName)
     wattosExitCode = wattosProgram()
