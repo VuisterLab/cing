@@ -16,9 +16,9 @@ import unittest
 class AllChecks(TestCase):
     def test_queeny(self):
 
-        runQueeny = 1  # DEFAULT: 1
-        doStoreCheck = 1 # DEFAULT: 0 Requires sqlAlchemy
-        doValueCheck = 1 # DEFAULT: 1 Requires 1brv
+        runQueeny = 1           # DEFAULT: 1
+        doStoreCheck = False    # DEFAULT: False Requires sqlAlchemy
+        doValueCheck = 1        # DEFAULT: 1 Requires 1brv
         entryList = "1brv_cs_pk_2mdl".split() # DEFAULT because it contains many data types and is small/fast to run.
 #        entryList = "1a24 1a4d 1afp 1ai0 1b4y 1brv 1brv 1bus 1cjg 1hue 1ieh 1iv6 1kr8 2cka 2hgh 2jzn 2k0e 8psh".split()
 

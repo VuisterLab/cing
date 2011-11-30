@@ -3,8 +3,8 @@
 # $CINGROOT/scripts/cing/pdbCing.csh
 # Should be run from cron without output to cron.
 #
-if ( -e /Users/jd/cingStableSetings.csh ) then
-    source /Users/jd/cingStableSetings.csh
+if ( -e /Users/jd/cingStableSettings.csh ) then
+    source /Users/jd/cingStableSettings.csh
 endif
 
 ###################################################################

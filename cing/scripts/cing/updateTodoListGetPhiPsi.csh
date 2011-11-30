@@ -8,8 +8,8 @@
 # 5131 csv
 
 set tmpDirCing = cingTmp
-if ( -e /Users/jd/cingStableSetings.csh ) then
-    source /Users/jd/cingStableSetings.csh
+if ( -e /Users/jd/cingStableSettings.csh ) then
+    source /Users/jd/cingStableSettings.csh
     set tmpDirCing = cingTmpStable
 endif
 

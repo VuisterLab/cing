@@ -132,7 +132,7 @@ Example file:
         Returns dictObj or None on error.
         """
         line = SMLhandler.readline( fp )
-        while (line):
+        while line:
             n = len(line)
             if n > 0 and line[1]==self.endTag:
                 return self.endHandler( dictObj, obj )
@@ -144,7 +144,22 @@ Example file:
                 self.jumpToEndTag( fp )
                 return self.endHandler( dictObj, obj )
             elif n > 3:
-                dictObj[line[1]] = eval(' '.join(line[3:]))
+#                nTdebug("Generating over 255 arguments here in sml.dictHandler ?") # http://bugs.python.org/issue12844
+#                dictObj[line[1]] = eval(' '.join(line[3:])) # Original. Failing on 2kox with 640 models.
+                subLine = line[3:]
+#                nTdebug("subLine: %s" % str(subLine))
+                jLine = ' '.join(subLine)
+#                nTdebug("jLine: %s" % str(jLine))
+                lineStart = str( line[0][:80] )
+                if n > 250: # Real limit is 255
+                    nTdebug("Function eval will crash when over 255 elements: found: %s. Line start: %s" % ( (n-1),lineStart ))
+                # end if
+                try:
+                    dictObj[line[1]] = eval(jLine)                
+                except:
+                    nTwarning("Function eval crashed not restoring data from line starting with: %s" % lineStart )
+#                    nTtracebackError()
+                # end try
             else:
                 nTerror('SMLhandler.dictHandler: line %d, incomplete "%s"', fp.NR, line[0])
             #end if

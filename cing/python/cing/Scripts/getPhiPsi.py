@@ -19,7 +19,6 @@ from cing.Scripts.getPhiPsiWrapper import d1d2
 from cing.Scripts.getPhiPsiWrapper import dihedralComboTodo 
 # once executed all code there, hilarious locks until after an hour JFD realized.
 from cing.Scripts.getPhiPsiWrapper import subdir
-from cing.Scripts.localConstants import pdbz_dir
 from cing.core.classes import Project
 from cing.core.constants import * #@UnusedWildImport
 from cing.core.molecule import Chain
@@ -28,6 +27,12 @@ import yasara #@UnresolvedImport
 
 # Keep a copy of the CING project.
 doSave = False
+
+try:
+    from cing.Scripts.localConstants import pdbz_dir #@UnresolvedImport # pylint: disable=E0611
+except:
+    nTmessage("Missing localization module: cing.Scripts.localConstants")
+# end try
 
 if dihedralComboTodo == Ramachandran:
     DIHEDRAL_NAME_1 = 'PHI'
