@@ -4,8 +4,8 @@
 # Should be run from cron without output to cron.
 #
 
-if ( -e $UJ/cingStableSetings.csh ) then
-    source $UJ/cingStableSetings.csh
+if ( -e $UJ/cingStableSettings.csh ) then
+    source $UJ/cingStableSettings.csh
 endif
 
 ###################################################################
