@@ -3,8 +3,9 @@
 # $CINGROOT/scripts/cing/nrgCing.csh
 # Should be run from cron without output to cron.
 #
-if ( -e /Users/jd/cingStableSetings.csh ) then
-    source /Users/jd/cingStableSetings.csh
+
+if ( -e $UJ/cingStableSetings.csh ) then
+    source $UJ/cingStableSetings.csh
 endif
 
 ###################################################################
@@ -19,7 +20,7 @@ set date_string = (`date "+%Y_%m_%d-%H_%M_%S"`)
 
 set prog_string = $0:t:r
 #set log_dir     = $tmp_dir/$prog_string
-set log_dir     = /Library/WebServer/Documents/NRG-CING/log
+set log_dir     = $D/NRG-CING/log
 set log_file    = $log_dir/$prog_string"_$date_string".log
 
 mkdir -p $log_dir
@@ -36,7 +37,7 @@ echo "Trying to begin nrgCing.csh with [$$] and [$0]" |& tee $log_file
 # Need to add the x flag to grep to catch the process without having a controlling terminal.
 # a flag for all processes including cron's
 # ww for extra wide display showing the full command and parameters.
-ps -axww | grep "$0" | grep -v grep | grep -v $$ >>& $log_file
+ps axww | grep "$0" | grep -v grep | grep -v $$ >>& $log_file
 if ( ! $status ) then
     echo "ERROR: Stopping this job for another hasn't finished; see above list" >>& $log_file
     exit 1

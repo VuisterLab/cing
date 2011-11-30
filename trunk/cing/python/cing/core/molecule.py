@@ -977,7 +977,7 @@ class Molecule( NTtree, ResidueList ):
         Return an empty list when none could be detected or None on error.
         Doesn't set self attribute.
         """
-        nTdebug("Now in %s" % getCallerName())
+#        nTdebug("Now in %s" % getCallerName())
         bmrbEntryList = NTlist()
         for i, resonanceSource in enumerate(self.resonanceSources):
             nTdebug("Looking at resonanceSource %s" % resonanceSource)                            
@@ -1039,7 +1039,8 @@ class Molecule( NTtree, ResidueList ):
                     # end if
                 # end for
             else:
-                nTmessage("Failed to derive any BMRB entry ID from resonance list name(s) in molecule: %s" % self.name)
+#                nTdebug("Failed to derive any BMRB entry ID from resonance list name(s) in molecule: %s" % self.name)
+                pass
             # end if
         #end if BMRB
         

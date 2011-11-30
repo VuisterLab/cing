@@ -35,7 +35,7 @@ endif
 # Need to add the x flag to grep to catch the process without having a controlling terminal.
 # a flag for all processes including cron's
 # ww for extra wide display showing the full command and parameters.
-# ps -axww | grep "$0" | grep -v grep | grep -v $$ >>& $log_file
+# ps axww | grep "$0" | grep -v grep | grep -v $$ >>& $log_file
 # if ( ! $status ) then
 #     echo "ERROR: Stopping this job for another hasn't finished; see above list" >>& $log_file
 #     exit 1

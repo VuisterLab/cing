@@ -975,6 +975,8 @@ AND '{2}' <@ S.chain_type; -- contains at least one protein chain.
         '''
         m = self
         onlyScatter = True # Need to debug the whiskers etc.
+#        nTdebug("Setting tick padding to ridiculous values")
+#        rc( ('xtick.major','xtick.minor','ytick.major','ytick.minor'), pad=10)
         # NB The level of project is equivalent to the entry level in the database.
         # Sorted by project, program.
         localDir = os.path.join(results_dir, PLOT_STR )
@@ -986,13 +988,13 @@ AND '{2}' <@ S.chain_type; -- contains at least one protein chain.
             os.mkdir(localDir)
         # end if
         os.chdir(localDir)
-        nTmessage("Starting %s with doTrending %s, results_dir %s" % ( getCallerName(), doTrending, results_dir))
+        nTmessage("Starting %s with doTrending %s, results_dir %s, localDir %s" % ( getCallerName(), doTrending, results_dir, localDir))
 #        e0 = {IS_SMALLER_THAN_STR: (CV_BACKBONE_STR, 0.9), IS_TRUE: SEL1_STR } #@UnusedVariable
 #        e1 = {IS_SMALLER_THAN_STR: (CV_BACKBONE_STR, 0.9) } #@UnusedVariable
         from cing.NRG.rdbPlotList import plotList
         plotIdx = 0 # DEFAULT: 0
-#        plotList = plotList[plotIdx:(plotIdx+1+1)] # DEFAULT: commented out and next line taken.
-        plotList = plotList[plotIdx:] # important to take copy and leave original alone.
+        plotList = plotList[plotIdx:(plotIdx+1+0)] # DEFAULT: commented out and next line taken.
+#        plotList = plotList[plotIdx:] # important to take copy and leave original alone.
         plotProducedCount = 0
         for p in plotList:
             level, progId, chk_id, plotDict = p
@@ -1077,17 +1079,17 @@ AND '{2}' <@ S.chain_type; -- contains at least one protein chain.
                 dateDatMax = datetime.date(yearIntMax, 1, 1)
                 dateMin = date2num(dateDatMin)
                 dateMax = date2num(dateDatMax)
+                nTmessage("Date number min/max: %s %s" % (dateMin, dateMax))
                 binSizeTdel = datetime.timedelta(365*yearIntBinSize) #@UnusedVariable # pylint: disable=W0612
                 halfBinSizeTdel = datetime.timedelta(365*yearIntBinSize/2.)
                 # Combine all plotting to one section as to easily adjust order of plots.
+                scatter(xDat, y, s=0.5, marker='o', facecolors='k', edgecolors='k')
+#                plot(t, fitDatefuncD2(p, t), "r--", linewidth=1) # Plot of the data and the fit
 #                nTdebug("Setting xlimits to %s - %s" % (dateDatMin, dateDatMax))
-#                xlim(xmin=dateMin, xmax=dateMax)
+#                xlim(xmin=dateMin, xmax=dateMax, auto=True)
 #                xticks( range(dateDatMin, dateDatMax, binSizeTdel)) #     
-                scatter(xDat, y, s=0.1, marker='o', facecolors='black', c='black')
-                plot(t, fitDatefuncD2(p, t), "r--", linewidth=1) # Plot of the data and the fit
                 if not onlyScatter:
                     # Now bin
-                    nTmessage("Date number min/max: %s %s" % (dateMin, dateMax))
                     if False: # test positions
                         testX = [dateDatMin,dateDatMax]
                         testY = [-10.,0.]
@@ -1602,7 +1604,7 @@ AND '{2}' <@ S.chain_type; -- contains at least one protein chain.
                   'savefig.dpi':      dpi,
                   'savefig.figsize':  fig_size,
                    }
-        rcParams.update(params)
+        rcParams.update(params)        
         figure = gcf()
         figure.set_size_inches(  fig_size )
         savefig(fn)

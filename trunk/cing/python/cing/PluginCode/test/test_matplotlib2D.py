@@ -1,6 +1,6 @@
 """
 Unit test execute as:
-python $CINGROOT/python/cing/Libs/test/test_matplotlib2D.py
+python $CINGROOT/python/cing/PluginCode/test/test_matplotlib2D.py
 """
 from cing import cingDirTmp
 from cing.Libs.NTutils import * #@UnusedWildImport

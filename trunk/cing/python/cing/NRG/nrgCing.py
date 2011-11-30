@@ -123,7 +123,9 @@ class NrgCing(Lister):
         self.assumeAllAreDone = assumeAllAreDone
         # Can be as many as fail every time.
         self.entry_to_delete_count_max = 10 # DEFAULT: 10
-        self.delete_entry_with_badorno_prep = False # DEFAULT: False; set to True to clean up. Also requires entry_to_delete_count_max>0
+#        Allows debugging the prep stages. 
+#        Also requires entry_to_delete_count_max>0
+        self.delete_entry_with_badorno_prep = False # DEFAULT: False; set to True to clean up. 
         self.isProduction = isProduction        
         #: Only during production we do a write to WHY_NOT"
         self.ignoreUpdatesTemporarily = True # DEFAULT: False
@@ -275,7 +277,7 @@ class NrgCing(Lister):
         Return True on error.
         """
         self.entry_list_possible = NTlist()
-        if 0:
+        if False: # DEFAULT: False
             self.entry_list_possible += '1brv 1dum'.split()
             return
         # end if
@@ -297,7 +299,8 @@ class NrgCing(Lister):
         # end if
         nTmessage("Found %5d NMR entries." % len(self.entry_list_nmr) )
         nTmessage("Subtracting %d NMR entries that are known to fail because of issue(s)." % len(self.entry_list_bad_overall))
-        nTmessage("Subtracting: %s" % str(self.entry_list_bad_overall))
+        subtractListStr = str(self.entry_list_bad_overall)
+        nTmessage("Subtracting: %s ..." % subtractListStr[:80])
         
         # List of entries that might be in NRG but are invalid. NRG-CING will start from coordinates only.
         #        self.entry_list_bad_nrg_docr = NTlist() 
@@ -747,7 +750,7 @@ class NrgCing(Lister):
                             msg += " Will be removed from disk as well."
                             rmdir(entrySubDir)
                         else:
-                            msg += " Will not be removed from disk because self.delete_entry_with_badorno_prep prevented it."
+                            msg += " Will not be removed from disk because of setting: delete_entry_with_badorno_prep"
                         # end if
                         self.entry_list_missing_prep.append(entry_code)
                     else:
@@ -1768,9 +1771,9 @@ class NrgCing(Lister):
             #: This is only important for largest entries like 2ku2
     #        self.wattosMemory = '2g' # DEFAULT: 4g but reduced to 2 because -d32 was needed on OSX Lion currently.
     #        if not self.isProduction:
-    #            self.wattosMemory = '2g'  
-            wattosProg = "java -d32 -Djava.awt.headless=true -Xmx2g Wattos.CloneWars.UserInterface -at -verbosity %s" % cing.verbosity
-
+    #            self.wattosMemory = '2g'
+            # For x86 (32 bit) os not all 2g are available. For Ubuntu it seems to be less than 1800, trying 1500.  
+            wattosProg = "%s Wattos.CloneWars.UserInterface -at -verbosity %s" % ( JVM_CMD_STD, cing.verbosity )
             writeTextToFile(script_file_new, script_str)
             wattosProgram = ExecuteProgram(wattosProg, #rootPath = wattosDir,
                                      redirectOutputToFile=log_file,
@@ -1792,19 +1795,20 @@ class NrgCing(Lister):
             # end if
             os.unlink(script_file_new)
             if not os.path.exists(outputStarFile):
-                nTerror("%s found no output star f %s" % (entry_code, outputStarFile))
+                nTerror("%s found no output star file [%s]" % (entry_code, outputStarFile))
                 return True
             # end if
 
             nTmessage("  star2Ccpn")
             log_file = "%s_star2Ccpn.log" % entry_code
-            inputStarFile = "%s_C_wattos.str" % entry_code
+#            inputStarFile = "%s_C_wattos.str" % entry_code
+            inputStarFile = outputStarFile
             inputStarFileFull = os.path.join(c_entry_dir, inputStarFile)
             outputCcpnFile = "%s.tgz" % entry_code
             fcScript = os.path.join(cingDirScripts, 'FC', 'convertStar2Ccpn.py')
 
             if not os.path.exists(inputStarFileFull):
-                nTerror("%s previous step produced no star f." % entry_code)
+                nTerror("%s previous step produced no star file at %s." % (entry_code, inputStarFileFull))
                 return True
             # end if
 
@@ -2128,9 +2132,11 @@ class NrgCing(Lister):
 #            self.entry_list_todo = readLinesFromFile('/Users/jd/NRG/lists/bmrbPdbEntryList.csv')
             self.entry_list_todo = "1brv 1hkt 1mo7 1mo8 1ozi 1p9j 1pd7 1qjt 1vj6 1y7n 2fws 2fwu 2jsx".split()
             self.entry_list_todo = NTlist( *self.entry_list_todo )
-            if self.searchPdbEntries():
-                nTerror("Failed to searchPdbEntries")
-                return True
+            if False:
+                if self.searchPdbEntries():
+                    nTerror("Failed to searchPdbEntries")
+                    return True
+                # end if
             # end if
         # end if
         if not self.entry_list_todo:

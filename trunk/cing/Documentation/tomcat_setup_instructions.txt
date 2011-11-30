@@ -32,7 +32,7 @@
     FAILS: $CATALINA_HOME/bin/tomcatctl
 
     Add memory setting to startup to allow very large files (<=50Mb) to be submitted.
-    CATALINA_OPTS="-Xms1800m -Xmx1800m"
+    CATALINA_OPTS="-Xms1500m -Xmx1500m"
 
     Test by url like:
     https://nmr.cmbi.ru.nl/icing/serv/iCingServlet or:
@@ -57,7 +57,7 @@
     $CATALINA_HOME/bin/Tomcat5.sh stop
 
     Add memory setting to startup to allow very large files (<=50Mb) to be submitted.
-    CATALINA_OPTS="-Xms1800m -Xmx1800m"
+    CATALINA_OPTS="-Xms1500m -Xmx1500m"
 
     $CATALINA_HOME/bin/shutdown.sh (RETIRED)
     $CATALINA_HOME/bin/startup.sh

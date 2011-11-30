@@ -13,7 +13,7 @@
     <key>ProgramArguments</key>
     <array>
         <string>/usr/bin/java</string>
-        <string>-Xmx512m</string>
+        <string>-Xmx1500m</string>
         <string>-jar</string>
         <string>/Applications/Jenkins/jenkins.war</string>
         <string>--argumentsRealm.passwd.jurgenfd=XXXXXX</string>

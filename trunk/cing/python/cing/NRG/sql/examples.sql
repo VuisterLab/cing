@@ -39,8 +39,8 @@ limit 2;
 
 SELECT s.pdbid, p2.val
 FROM brief_summary s
-JOIN "//exptl/@method" p1 ON s.docid = p1.docid
-JOIN "//pdbx_SG_project/initial_of_center" p2 ON s.docid = p2.docid
+JOIN "//exptl/@method"                      p1 ON s.docid = p1.docid
+JOIN "//pdbx_SG_project/initial_of_center"  p2 ON s.docid = p2.docid
 WHERE p1.val LIKE '%NMR'
 LIMIT 10;
 
