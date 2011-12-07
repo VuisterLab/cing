@@ -51,6 +51,18 @@ from cing.NRG.WhyNot import FAILED_TO_BE_CONVERTED_NRG
 from cing.NRG.WhyNot import FAILED_TO_BE_VALIDATED_CING
 from cing.NRG.WhyNot import NOT_NMR_ENTRY
 from cing.NRG.WhyNot import NO_EXPERIMENTAL_DATA
+from cing.NRG.WhyNot import PROJECT_ID_BMRB
+from cing.NRG.WhyNot import PROJECT_ID_CCPN
+from cing.NRG.WhyNot import PROJECT_ID_CING
+from cing.NRG.WhyNot import PROJECT_ID_NRG
+from cing.NRG.WhyNot import PROJECT_ID_PDB
+from cing.NRG.WhyNot import PROJECT_ID_WATTOS
+from cing.NRG.WhyNot import PROJECT_ISSUE_URL_BMRB
+from cing.NRG.WhyNot import PROJECT_ISSUE_URL_CCPN
+from cing.NRG.WhyNot import PROJECT_ISSUE_URL_CING
+from cing.NRG.WhyNot import PROJECT_ISSUE_URL_NRG
+from cing.NRG.WhyNot import PROJECT_ISSUE_URL_PDB
+from cing.NRG.WhyNot import PROJECT_ISSUE_URL_WATTOS
 from cing.NRG.WhyNot import TO_BE_VALIDATED_BY_CING
 from cing.NRG.WhyNot import WhyNot
 from cing.NRG.WhyNot import WhyNotEntry
@@ -139,11 +151,6 @@ class NrgCing(Lister):
         self.results_dir = None
         self.data_dir = None
         self.htmlFooter = None
-#        self.results_host = 'localhost'
-#        if self.isProduction:
-            # Needed for php script.
-#            self.results_host = 'nmr.cmbi.ru.nl'
-#        self.results_url = 'http://' + self.results_host + '/' + self.results_base # NEW without trailing slash.
         self.max_entries_todo = max_entries_todo
         #: one day. 2p80 took the longest: 5.2 hours. But <Molecule "2ku1" (C:7,R:1659,A:36876,M:30)> is taking longer. 
         # 2ku2 is taking over 12 hrs now.                
@@ -232,18 +239,21 @@ class NrgCing(Lister):
         self.entry_list_bad_nrg_docr = NTlist() 
         self.entry_list_bad_overall = NTlist() # List of entries that NRG-CING should not even attempt.
 
-        # NRG issue 272 bad ccpn docr project
-        self.entry_list_bad_nrg_docr.addList( '1lcc 1lcd 2l2z 2neo'.split() ) 
-        # Issue 266:   FC created a CCPN project that fails to read in again.
-        self.entry_list_bad_overall.addList( '134d 177d 1gnc 1lcc 1lcd 1qch 1sae 1sah 1saj 1sak 1sal 3sak'.split() )
-        # Issue 310:    Queeny runs out of 2Gb memory for 2rqf 
-        self.entry_list_bad_overall.addList( '2rqf'.split() )
-        # Issue 311:   FC created a CCPN project that fails to read but different from issue 266.
-        self.entry_list_bad_overall.addList( '4a1m 2l4e 2l4f 2l60 2lgk 2lja 2ljd 2lje 2ljf'.split() )
+        self.map_issue_to_bad_entry_list = NTdict()
+        # NRG issue. Bad ccpn docr project
+        self.map_issue_to_bad_entry_list[(PROJECT_ID_NRG, 272)] = '1lcc 1lcd 2l2z 2neo'.split()        
+        # FC created a CCPN project that fails to read in again.
+        self.map_issue_to_bad_entry_list[(PROJECT_ID_CING, 266)] = '134d 177d 1gnc 1lcc 1lcd 1qch 1sae 1sah 1saj 1sak 1sal 3sak'.split() 
+        # Queeny runs out of 2Gb memory for 2rqf 
+        self.map_issue_to_bad_entry_list[(PROJECT_ID_CING, 310)] = '2rqf'.split() 
+        # CCPN issue. FC created a CCPN project that fails.
+        self.map_issue_to_bad_entry_list[(PROJECT_ID_CCPN, 3446961)] = '4a1m 2l4e 2l4f 2l60 2lgk 2lja 2ljd 2lje 2ljf'.split()
         # Issue 312:   FC doing a bad calculation in swapping for SSA.        
-        self.entry_list_bad_overall.addList( '1aj3 1d0w 1e0a 1f8h 1kft 1mek 1rkl 1w9r 1yyj 2ca7 2exg 2h2m 2j15 2jnc 2jxh 2kcc'.split() )
-        self.entry_list_bad_overall.addList( '2l4g 2xfm'.split() )
-        self.entry_list_bad_overall.addList( self.entry_list_bad_nrg_docr ) 
+        self.map_issue_to_bad_entry_list[(PROJECT_ID_CING, 312)] =\
+            '1aj3 1d0w 1e0a 1f8h 1kft 1mek 1rkl 1w9r 1yyj 2ca7 2exg 2h2m 2j15 2jnc 2jxh 2kcc 2l4g 2xfm'.split()
+        for key in self.map_issue_to_bad_entry_list:
+            self.entry_list_bad_overall.addList( self.map_issue_to_bad_entry_list[key] )
+        # end for
         self.entry_list_bad_overall.removeDuplicates() 
         self.entry_list_bad_overall.sort() # Sort in place. 
         
@@ -709,6 +719,9 @@ class NrgCing(Lister):
             nTmessage("Time taken by prepare statistics\n%s" % timeTakenList.statsFloat())
             self.reportHeadAndTailEntries(timeTakenDict)
         # end if
+        
+# SCAN CING
+        
         nTmessage("\nStarting to scan CING report/log (in order of hash by ch23).")
         timeTakenDict = NTdict()
         subDirList = os.listdir(DATA_STR)
@@ -727,6 +740,10 @@ class NrgCing(Lister):
                         nTerror("String doesn't look like a pdb code: " + entry_code)
                     # end if
                     continue
+                if entry_code in self.entry_list_bad_overall:
+#                    nTdebug("Skipping bad pdb code: " + entry_code)
+                    continue
+                # end if                
 #                nTdebug("Working on: " + entry_code)
 
                 entrySubDir = os.path.join(DATA_STR, subDir, entry_code)
@@ -744,7 +761,7 @@ class NrgCing(Lister):
                 # end if
 #                 Can't remove prep because that gives us no chance to inspect the failure.                
                 if not entry_code in self.entry_list_prep_done:
-                    msg = "Found entry %s in %s but no good prep done." % (entry_code, self.results_base )
+                    msg = "Found entry %s in %s file system but no good prep done." % (entry_code, self.results_base )
                     if len(self.entry_list_missing_prep) < self.entry_to_delete_count_max:
                         if self.delete_entry_with_badorno_prep:
                             msg += " Will be removed from disk as well."
@@ -1177,21 +1194,52 @@ class NrgCing(Lister):
 
         writeTheManyFiles = False
         why_not_db_comments_file = '%s.txt_done' % self.results_base
+        why_not2_db_comments_file = '%s.txt_comments' % self.results_base
         why_not_db_comments_dir = os.path.join(self.results_dir, "cmbi8", "comments")
         why_not_db_raw_dir = os.path.join(self.results_dir, "cmbi8", "raw")
 
-        if False:
-            nTmessage("Skipping create WHY_NOT list")
-            return
-        # end if
-
-        nTmessage("Create WHY_NOT list")
+        nTmessage("Create WHY_NOT lists")
         nTdebug("why_not_db_comments_dir: %s" % why_not_db_comments_dir)        
         nTdebug("why_not_db_raw_dir:      %s" % why_not_db_raw_dir)        
 
+
+        nTmessage("New why_not2 style annotations")
+#        self.map_issue_to_bad_entry_list[(PROJECT_ID_CING, 266)] = '134d 177d 1gnc 1lcc 1lcd 1qch 1sae 1sah 1saj 1sak 1sal 3sak'.split()
+        msg = ''
+        entryCount = 0
+        for keyTuple in self.map_issue_to_bad_entry_list.keys():
+            projectId, issueId = keyTuple
+            if projectId == PROJECT_ID_BMRB  :
+                issueUrl = PROJECT_ISSUE_URL_BMRB   + str(issueId) 
+            elif projectId == PROJECT_ID_CCPN  :
+                issueUrl = PROJECT_ISSUE_URL_CCPN   + str(issueId) 
+            elif projectId == PROJECT_ID_CING  :
+                issueUrl = PROJECT_ISSUE_URL_CING   + str(issueId) 
+            elif projectId == PROJECT_ID_NRG   :
+                issueUrl = PROJECT_ISSUE_URL_NRG    + str(issueId) 
+            elif projectId == PROJECT_ID_PDB   :
+                issueUrl = PROJECT_ISSUE_URL_PDB    + str(issueId) 
+            elif projectId == PROJECT_ID_WATTOS:
+                issueUrl = PROJECT_ISSUE_URL_WATTOS + str(issueId) 
+            else:
+                nTerror('Failed to find valid projectId got %s' % projectId)
+                continue
+            # end if
+            msg += 'COMMENT: Failed to process because of <a href="%s">issue %s</a> in the %s project.\n' % ( issueUrl, issueId, projectId )
+            for entry_code in self.map_issue_to_bad_entry_list[keyTuple]:
+                entryCount += 1
+                msg += '%s,%s\n' % (self.results_base, entry_code )
+            # end for
+        # end for
+        why_not2_db_comments_file = os.path.join(why_not_db_comments_dir, why_not2_db_comments_file)
+        writeTextToFile(why_not2_db_comments_file, msg)
+        nTmessage("Written %s why_not2 style entry comments for %s issues to file: %s" % (
+            len(self.map_issue_to_bad_entry_list.keys()), entryCount, why_not2_db_comments_file))
+        
+        nTmessage("New why_not2 style annotations")
         whyNot = WhyNot() # stupid why this needs to be fully specified.
         # Loop for speeding up the checks. Most are not nmr.
-        for entry_code in self.entry_list_pdb:
+        for entry_code in self.entry_list_nmr:
             whyNotEntry = WhyNotEntry(entry_code)
             whyNot[entry_code] = whyNotEntry
             whyNotEntry.comment = NOT_NMR_ENTRY
@@ -1250,13 +1298,13 @@ class NrgCing(Lister):
                     fp.close()
                 # end if
             # end for
-        # end if            
+        # end if
     # end def
             
     def _format_html(self, file_content):
         """
         Reformat the input HTML file content and return it.
-        """        
+        """
         old_string = r"<!-- INSERT JUMP BOX HERE -->"
         new_string = self._getJumpBoxHtml()
         file_content = string.replace(file_content, old_string, new_string)        
@@ -2691,7 +2739,11 @@ def runNrgCing( useClass = NrgCing,
         elif destination == 'forEachStoredEntryRunScript':
             if uClass.forEachStoredEntryRunScript():
                 nTerror("Failed to forEachStoredEntryRunScript")                
-            # end if            
+            # end if
+        elif destination == 'writeWhyNotEntries':
+            if uClass.writeWhyNotEntries():
+                nTerror("Failed to writeWhyNotEntries")                
+            # end if
         else:
             nTerror("Unknown destination: %s" % destination)
         # end if

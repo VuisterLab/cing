@@ -89,7 +89,7 @@ def run():
     '''returns True on error'''
 
     os.chdir(tmpPdbj_dir)
-    logFile = '/Users/jd/Library/Logs/weeklyUpdatePdbjMine.log'
+    logFile = 'weeklyUpdatePdbjMine.log'
     if teeToFile(logFile):
         nTerror("Failed to start tea party to: %s" % logFile)
         sys.exit(1)

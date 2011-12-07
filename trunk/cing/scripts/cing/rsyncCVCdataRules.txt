@@ -1,0 +1,15 @@
+# Lines starting with a pound are comments.
+# DEBUG: starting with a small directory that needs to be done completely.
+#
+- pgdata
+# CING reports will be synced using different rules.
+- D/CASD-NMR-CING
+- D/CASP-NMR-CING
+- D/NMR_REDO
+- D/NRG-CING
+- D/RECOORD
+- D/tmp
+#
+# Include the rest
+#
++ **

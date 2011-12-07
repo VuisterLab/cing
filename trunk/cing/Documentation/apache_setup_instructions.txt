@@ -33,6 +33,7 @@ For CGI:
     There's one in eclipse and fink but heck why not shrew up the one in mac os integrated.
     On leopard which has apache 2:
         vi /private/etc/apache2/httpd.conf
+        vi /private/etc/apache2/other/php5.conf
 
     Php support, needed for NRG-CING pdb code lookup:
         enable in config the line:

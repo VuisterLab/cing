@@ -298,8 +298,8 @@ DefPropBond 'prev_sel' 'selected'
 #            if random() > 0.7:
 #                molmolColor = MolmolColorDict['orange']
 #        SelectAtom '#1-5:10-20,25-30@N,CA,C'
-         # N, CA and C atoms of residues 10 to 20 and 25 to 30
-         # in molecules 1 to 5
+        # N, CA and C atoms of residues 10 to 20 and 25 to 30
+        # in molecules 1 to 5
         macroTxt += \
 """
 SelectAtom ':%d'
