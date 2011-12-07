@@ -34,6 +34,7 @@ from cing.Libs.NTgenUtils import * #@UnusedWildImport
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.Libs.disk import rmdir
 from cing.Libs.html import GOOGLE_ANALYTICS_TEMPLATE
+from cing.Libs.html import GOOGLE_PLUS_ONE_TEMPLATE
 from cing.Libs.html import copyCingHtmlJsAndCssToDirectory
 from cing.Libs.html import getStandardCingRevisionHtml
 from cing.NRG import ARCHIVE_NMR_REDO_ID
@@ -1438,6 +1439,8 @@ class NrgCing(Lister):
         file_content = string.replace(file_content, old_string, self.htmlFooter)
         old_string = r"<!-- INSERT GOOGLE ANALYTICS TEMPLATE HERE -->"
         file_content = string.replace(file_content, old_string, GOOGLE_ANALYTICS_TEMPLATE)
+        old_string = r"<!-- INSERT GOOGLE PLUS ONE TEMPLATE HERE -->"
+        file_content = string.replace(file_content, old_string, GOOGLE_PLUS_ONE_TEMPLATE)
         ## Count will track the number of entries done per index file
         images_done_per_file = 0
         ## Following variable will track all done sofar
@@ -1609,6 +1612,8 @@ class NrgCing(Lister):
             file_content = string.replace(file_content, old_string, self.htmlFooter)
             old_string = r"<!-- INSERT GOOGLE ANALYTICS TEMPLATE HERE -->"
             file_content = string.replace(file_content, old_string, GOOGLE_ANALYTICS_TEMPLATE)                        
+            old_string = r"<!-- INSERT GOOGLE PLUS ONE TEMPLATE HERE -->"
+            file_content = string.replace(file_content, old_string, GOOGLE_PLUS_ONE_TEMPLATE)                        
             if fn != 'index.html':
                 writeTextToFile(dstFile, file_content)
 #                nTdebug("-2- Added extra file %s." % dstFile)
