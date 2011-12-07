@@ -299,7 +299,8 @@ a.green:hover, a.green:active {
     width: 100%;
 /*  margin: 0.0em auto; /* Right And Left Margin Widths To Auto */
     text-align: center; /* Hack To Keep IE5 Windows Happy */;
-    height: 2.82em;
+/*    height: 2.82em; before adding Google plus button */
+    height: 3.5em;
     background: #f0f9f9;
     color: #000000;
     font-size: 1.01em;

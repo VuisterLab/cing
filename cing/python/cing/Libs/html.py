@@ -53,6 +53,20 @@ pageTracker._trackPageview();
 } catch(err) {}</script>
 """
 
+# Could be split but probably not worth while.
+# Gives a Standard (24px by 450 px wide) inline snippet.
+GOOGLE_PLUS_ONE_TEMPLATE = """
+<!-- Place this tag where you want the +1 button to render -->
+<g:plusone annotation="inline"></g:plusone>
+<!-- Place this render call where appropriate -->
+<script type="text/javascript">
+  (function() {
+    var po = document.createElement('script'); po.type = 'text/javascript'; po.async = true;
+    po.src = 'https://apis.google.com/js/plusone.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
+  })();
+</script>
+"""
 NO_CHAIN_TO_GO_TO = 'no chain to go to'
 
 image2DdihedralWidth  = 500
