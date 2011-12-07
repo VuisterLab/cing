@@ -9,6 +9,9 @@ Reboot: System -> Power -> Power Cycle system (cold boot).
     
 cmbi21 IP: 131.174.88.69 met jurgenfd access.
     ssh jurgenfd@cmbi21.cmbi.ru.nl
+    Patch:
+        yum clean all
+        yum update 
 CVCa   IP: 131.174.88.XXX
     virt-install -h
     su - (Use jurgenfd password)

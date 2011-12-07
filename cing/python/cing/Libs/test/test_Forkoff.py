@@ -20,7 +20,7 @@ def my_sleep(arg):
 
     ## Take first argument
     nTmessage("Sleeping for %s", arg)
-    time.sleep (arg)
+    time.sleep(arg)
     nTmessage("Going back to caller")
     return 0
 

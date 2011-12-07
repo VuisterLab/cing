@@ -1,0 +1,13 @@
+#
+# CING reports of archive e.g. CASD-NMR-CING.
+# Call like: 
+#   rsync -avvz --include-from=$CINGROOT/scripts/cing/rsyncCingArchive.txt -e ssh i@nmr.cmbi.ru.nl\:/mnt/data/D/CASD-NMR-CING/ CASD-NMR-CING
+#
+
++ data/*/*/*.cing.tgz
+- data/*/*/*.cing
+- data/*/*/*.tgz
+#
+# Include the rest
+#
++ **

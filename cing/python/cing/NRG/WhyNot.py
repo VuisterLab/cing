@@ -32,10 +32,26 @@
 #Boolean      : true
 #Comment      : No R-free set in experimental data
 #//
+from cing import issueListUrl
 from cing.Libs.NTutils import * #@UnusedWildImport
 
 booleanStrTrue = 'true'
 booleanStrFalse = 'false'
+
+PROJECT_ID_BMRB     = 'BMRB'
+PROJECT_ID_CCPN     = 'CCPN'
+PROJECT_ID_CING     = 'CING'
+PROJECT_ID_NRG      = 'NRG'
+PROJECT_ID_PDB      = 'PDB'
+PROJECT_ID_WATTOS   = 'WATTOS'
+
+# In future there might be better trackers.
+PROJECT_ISSUE_URL_BMRB      = issueListUrl
+PROJECT_ISSUE_URL_CCPN      = 'http://sourceforge.net/tracker/?func=detail&group_id=120914&atid=688631&aid='
+PROJECT_ISSUE_URL_CING      = issueListUrl
+PROJECT_ISSUE_URL_NRG       = 'http://code.google.com/p/nmrrestrntsgrid/issues/detail?id='
+PROJECT_ISSUE_URL_PDB       = issueListUrl
+PROJECT_ISSUE_URL_WATTOS    = 'http://code.google.com/p/wattos/issues/detail?id='
 
 NOT_NMR_ENTRY = "Not an NMR entry."
 NO_EXPERIMENTAL_DATA = "No experimental data."
@@ -55,9 +71,6 @@ class WhyNotEntry:
         self.comment = comment
 
 class WhyNot(dict):
-#    def __init__(self, *args, **kwds):
-#        dict.__init__(self, *args, **kwds)
-
     def __str__(self):
         result = ''
         keyList = self.keys()
@@ -77,18 +90,3 @@ Comment      : %s
 """ % (whyNotEntry.entryId, boolStr, whyNotEntry.comment,)
             result += entryText
         return result
-
-if __name__ == '__main__':
-    cing.verbosity = cing.verbosityDebug
-    whyNot = WhyNot()
-    for entryId in ['1brv', '9pcy']:
-        whyNotEntry = WhyNotEntry(entryId)
-        whyNot[entryId] = whyNotEntry
-        if entryId not in ['1brv']:
-            whyNotEntry.comment = NOT_NMR_ENTRY
-            whyNotEntry.exists = False
-            continue
-        whyNotEntry.comment = FAILED_TO_BE_VALIDATED_CING
-    whyNotStr = '%s' % whyNot
-    nTdebug("whyNotStr: ["+ whyNotStr +"]")
-    writeTextToFile("NRG-CING.txt", whyNotStr)

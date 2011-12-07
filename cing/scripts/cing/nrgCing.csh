@@ -30,26 +30,46 @@ if ( -e $log_file ) then
     exit 1
 endif
 
-echo "Trying to begin nrgCing.csh with [$$] and [$0]" |& tee $log_file
-
-# status on the final grep will be zero when it did grep something.
-# $$ is the process number of current shell.
-# Need to add the x flag to grep to catch the process without having a controlling terminal.
-# a flag for all processes including cron's
-# ww for extra wide display showing the full command and parameters.
-ps axww | grep "$0" | grep -v grep | grep -v $$ >>& $log_file
-if ( ! $status ) then
-    echo "ERROR: Stopping this job for another hasn't finished; see above list" >>& $log_file
-    exit 1
+if ( -e $UJ/cingStableSettings.csh ) then
+    echo "Sourced $UJ/cingStableSettings.csh"                                                   |& tee -a $log_file
 endif
 
-echo "Starting nrgCing.csh with [$$] and [$0]" |& tee $log_file
-# TODO: Remove next line when done.
-#exit 1
+echo "Trying to begin nrgCing.csh with [$$] and [$0]"                                           |& tee -a $log_file
 
-python -u $CINGROOT/python/cing/NRG/nrgCing.py updateWeekly >>& $log_file
+# Status on the final grep will be zero when it did grep something.
+# The x flag is to catch processes without having a controlling terminal.
+# -a flag for all processes including cron's
+# -ww for extra wide display showing the full command and parameters.
+# By crontab there is one more process in between. Luckily it is a different parent for each invocation
+# and not the (same) crontab process. 
+set myProces    = $0:t
+set myPid       = $$
+set pPid        = `ps o ppid= -p $$`
+echo "Checking for running processes given:"                                                    |& tee -a $log_file                                                
+echo " myProces         : $myProces"                                                            |& tee -a $log_file    
+echo " myPid            : $myPid"                                                               |& tee -a $log_file    
+echo " pPid             : $pPid"                                                                |& tee -a $log_file    
+#echo "## 2"                                                                                   
+#ps axww -o pid,ppid,stat,user,command| grep "$myProces"                                                                    
+#echo "## 3"                                                                                   
+#ps axww -o pid,ppid,stat,user,command| grep "$myProces" | grep -v grep | grep -v ps                                        
+#echo "## 4"                                                                                   
+ps axww -o pid,ppid,stat,user,command| grep "$myProces" | grep -v grep | grep -v ps | grep -v $myPid | grep -v $pPid |& tee -a $log_file   
+if ( ! $status ) then	                                                                      
+    echo "ERROR: Stopping this job for another hasn't finished; see above list"                 |& tee -a $log_file    
+    exit 1                                                                                    
+endif                                       
+#echo "DEBUG: sleeping 9999 before exiting."                                                       
+#sleep 9999                                                  
+#echo "DEBUG: good stopping any way now"                                                       
+#exit 0                                                                                        
+#echo "## 5"                                                                                   
+
+
+echo "Starting nrgCing.csh with [$$] and [$0]"                                                  |& tee -a $log_file
+python -u $CINGROOT/python/cing/NRG/nrgCing.py updateWeekly                                     >>& $log_file
 if ( $status ) then 
-    echo "ERROR: failed nrgCing.csh" |& tee $log_file
+    echo "ERROR: failed nrgCing.csh"                                                            |& tee -a $log_file
 endif
 
-echo "Finished" >>& $log_file
+echo "Finished"                                                                                 |& tee -a  $log_file
