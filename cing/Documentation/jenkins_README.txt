@@ -1,3 +1,23 @@
+######################################################################################################################
+# Installation under Ubuntu use:
+######################################################################################################################
+http://pkg.jenkins-ci.org/debian/
+and then configuration details are at:
+https://wiki.jenkins-ci.org/display/JENKINS/Installing+Jenkins+on+Ubuntu
+# Make sure not to install virtual hosts.
+# Add proxies instead to:
+/etc/apache2/httpd.conf 
+# configure to use port 8081 instead of the default 8080 which is already in use for tomcat.
+vi /etc/default/jenkins
+# Start
+sudo /etc/init.d/jenkins start
+# Log
+tail -f /var/log/jenkins/jenkins.log &
+# 
+######################################################################################################################
+# Installation on Mac:
+######################################################################################################################
+
 https://wiki.jenkins-ci.org/display/JENKINS/Running+Jenkins+behind+Apache
 
 # Note that Jenkins on Java 1.5 was not functioning right. It had many console messages like:

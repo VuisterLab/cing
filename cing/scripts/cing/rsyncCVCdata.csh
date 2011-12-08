@@ -23,7 +23,7 @@ if ( -e $UJ/cingStableSettings.csh ) then
 endif
 
 set C = $CINGROOT
-set targetList = ( CASD-NMR-CING )
+set targetList = ( CASD-NMR-CING CASP-NMR-CING NMR_REDO NRG-CING RECOORD )
 
 echo "Starting rsyncCVCdata.csh with [$$] and [$0]"
 echo "DEBUG: base_url           $base_url"
@@ -31,30 +31,30 @@ echo "DEBUG: target_dir         $target_dir"
 echo "Syncing"
 
 set x = testDir
-echo "-0- Syncing $x"
+printf "\n\n-0- Syncing $x\n"
 cd $target2_dir
 rsync         $rsyncOpt --include-from=$C/scripts/cing/rsyncTestDir.txt -e ssh $base_url/D/$x/ $x
 if ( $status ) then
     echo "ERROR: Failed the -0- Test rsync"
-    exit 1
+#    exit 1
 endif
 
 cd $target2_dir
 foreach x ( $targetList ) 
-    echo "-1- Syncing archive $x"
+    printf "\n\n-1- Syncing archive $x\n"
     rsync $rsyncOpt --include-from=$C/scripts/cing/rsyncCingArchive.txt -e ssh $base_url/D/$x/ $x
     if ( $status ) then
         echo "ERROR: Failed syncing the archive $x"
-        exit 2
+#        exit 2
     endif    
 end    
 
-echo "-2- Syncing main archive"
+printf "\n\n-2- Syncing main archive\n"
 cd $target_dir
 rsync    $rsyncOpt --include-from=$C/scripts/cing/rsyncCVCdataRules.txt -e ssh $base_url .
 if ( $status ) then
     echo "ERROR: Failed syncing the main archive"
-    exit 3
+#    exit 3
 endif
 
 echo "Done syncing."
