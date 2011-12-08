@@ -9,6 +9,8 @@
 - D/NRG-CING
 - D/RECOORD
 - D/tmp
+- D/servlet-cing-home/.bash_history
+- D/servlet-cing-home/.ipython/history
 #
 # Include the rest
 #

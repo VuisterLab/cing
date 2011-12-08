@@ -212,7 +212,7 @@ class NrgCing(Lister):
         self.entry_list_store_tried = NTlist()
         self.entry_list_store_crashed = NTlist()
         self.entry_list_store_failed = NTlist()
-        self.entry_list_store_in_db = NTlist()
+        self.entry_list_stored_in_db = NTlist()
         self.entry_list_store_not_in_db = NTlist()
         self.entry_list_store_done = NTlist()
 
@@ -866,26 +866,39 @@ class NrgCing(Lister):
             nTmessage("Time taken by validation statistics\n%s" % timeTakenList.statsFloat())
             self.reportHeadAndTailEntries(timeTakenDict)
         # end if
-        self.entry_list_store_in_db = crdb.getPdbIdList(fromCing=True)
-        if not self.entry_list_store_in_db:
+        self.entry_list_stored_in_db = crdb.getPdbIdList(fromCing=True)
+        if not self.entry_list_stored_in_db:
             nTerror("Failed to get any entry from schema %s RDB" % self.schema_id)
-            self.entry_list_store_in_db = NTlist()
+            self.entry_list_stored_in_db = NTlist()
         # end if
-        nTmessage("Found %s entries in schema %s RDB" % (len(self.entry_list_store_in_db), self.schema_id))
+        nTmessage("Found %s entries in schema %s RDB." % (len(self.entry_list_stored_in_db), self.schema_id))
 
         writeTextToFile("entry_list_nmr_redo.csv",      toCsv(self.entry_list_nmr_redo))
 
-        entry_dict_store_in_db = list2dict(self.entry_list_store_in_db)
+        entry_dict_store_in_db = list2dict(self.entry_list_stored_in_db)
 
         # Remove a few entries in RDB that are not done.
-        entry_list_in_db_not_done =  self.entry_list_store_in_db.difference(self.entry_list_done)
+        entry_list_in_db_not_done =  self.entry_list_stored_in_db.difference(self.entry_list_done)
         if entry_list_in_db_not_done:
             txt = str(entry_list_in_db_not_done)
             txt = txt[:80]
             nTmessage("There are %s entries in RDB that are not currently done: %s" % ( len(entry_list_in_db_not_done), txt) )
         else:
-            nTmessage("All entries in RDB are also done")
+            nTmessage("All entries in RDB are also done.")
         # end if
+        # Consider the entries not in the RDB database as not done.        
+        entry_list_done_but_not_in_db = self.entry_list_done.difference(self.entry_list_stored_in_db)
+        if entry_list_done_but_not_in_db:
+            txt = str(entry_list_done_but_not_in_db)
+            txt = txt[:80]
+            nTmessage("There are %s entries done but not in RDB: %s" % ( len(entry_list_done_but_not_in_db), txt) )
+            nTmessage("They will now be considered NOT done (by taking intersection)..")
+            self.entry_list_done = self.entry_list_done.intersection( self.entry_list_stored_in_db )
+            nTmessage("There are now %s entries done." % len(self.entry_list_done) )
+        else:
+            nTmessage("All entries done are also in RDB.")
+        # end if
+        
         entry_list_in_db_to_remove = NTlist( *entry_list_in_db_not_done )
         if len(entry_list_in_db_not_done) > self.entry_to_delete_count_max:
             entry_list_in_db_to_remove = entry_list_in_db_not_done[:self.entry_to_delete_count_max] # doesn't make it into a NTlist.
@@ -950,8 +963,11 @@ class NrgCing(Lister):
         # end for
 
         # Consider the entries updated as not done.
-        self.entry_list_done = self.entry_list_done.difference(self.entry_list_updated)
-        # Consider the entries updated as not done.
+        if self.entry_list_updated:
+            nTmessage("Found %s entries that need to be updated; considering them not done") 
+            self.entry_list_done = self.entry_list_done.difference(self.entry_list_updated)
+            nTmessage("There are now %s entries done." % len(self.entry_list_done) )
+        # end if
         if self.archive_id == ARCHIVE_NRG_ID:
             self.entry_list_nrgcing = self.entry_list_done
         elif self.archive_id == ARCHIVE_NMR_REDO_ID:
@@ -998,17 +1014,18 @@ class NrgCing(Lister):
         nTmessage("Found %4d entries that CING crashed (C)." % len(self.entry_list_crashed))
         nTmessage("Found %4d entries that CING stopped (S)." % len(self.entry_list_stopped))
         nTmessage("Found %4d entries that CING should update (U)." % len(self.entry_list_updated))
-        nTmessage("Found %4d entries that CING did (B=A-C-S-U)." % len(self.entry_list_done))
+        nTmessage("Found %4d entries that CING done but not in RDB (D)." % len(entry_list_done_but_not_in_db))
+        nTmessage("Found %4d entries that CING did (B=A-C-S-U-D)." % len(self.entry_list_done))
         nTmessage("Found %4d entries todo (A-B, to a max of %d)." % (len(self.entry_list_todo), self.max_entries_todo))
         nTmessage("Found %4d entries in %s made obsolete." % (len(self.entry_list_obsolete), self.results_base))
         nTmessage("Found %4d entries in %s without prep." % (len(self.entry_list_missing_prep), self.results_base))
-        nTmessage("Found %4d entries in RDB %s." % (len(self.entry_list_store_in_db), self.results_base))
 
         nTmessage("Found %4d entries that CING store tried." % len(self.entry_list_store_tried))
         nTmessage("Found %4d entries that CING store crashed." % len(self.entry_list_store_crashed))
         nTmessage("Found %4d entries that CING store failed." % len(self.entry_list_store_failed))
         nTmessage("Found %4d entries that CING store not in db." % len(self.entry_list_store_not_in_db))
-        nTmessage("Found %4d entries that CING store done." % len(self.entry_list_store_done))
+        nTmessage("Found %4d entries that CING store done (by log)." % len(self.entry_list_store_done))
+        nTmessage("Found %4d entries in RDB %s." % (len(self.entry_list_stored_in_db), self.results_base))
 
         nTmessage("Found %4d entries in NRG-CING." % len(self.entry_list_nrgcing))
         nTmessage("Found %4d entries in NMR_REDO." % len(self.entry_list_nmr_redo))
@@ -1858,6 +1875,7 @@ class NrgCing(Lister):
             inputStarFile = outputStarFile
             inputStarFileFull = os.path.join(c_entry_dir, inputStarFile)
             outputCcpnFile = "%s.tgz" % entry_code
+            outputCcpnDir = entry_code
             fcScript = os.path.join(cingDirScripts, 'FC', 'convertStar2Ccpn.py')
 
             if not os.path.exists(inputStarFileFull):
@@ -1895,6 +1913,12 @@ class NrgCing(Lister):
                 nTerror("%s found no output ccpn f %s" % (entry_code, outputCcpnFile))
                 return True
             # end if
+            if os.path.exists(outputCcpnDir):
+#                nTdebug("%s removing CCPN directory %s in cwd: %s" % (entry_code, outputCcpnDir, os.getcwd() ))
+                rmdir(outputCcpnDir)
+            else:
+                nTwarning("%s failed to find CCPN directory %s in cwd: %s" % (entry_code, outputCcpnDir, os.getcwd() ))
+            # end if        
             finalPhaseId = PHASE_C
         # end if convertMmCifCoor
         if convertMrRestraints:
@@ -2092,7 +2116,7 @@ class NrgCing(Lister):
             log_file = "%s_FC_assign.log" % entry_code
             fcScript = os.path.join(cingDirScripts, 'FC', 'utils.py')
             outputCcpnFile = "%s_assign.tgz" % entry_code
-
+            outputCcpnDir  = entry_code
             # Will save a copy to disk as well.
             convertProgram = ExecuteProgram("python -u %s" % fcScript, redirectOutputToFile=log_file)
 #                nTmessage("==> Running Wim Vranken's FormatConverter from script %s" % fcScript)
@@ -2123,6 +2147,12 @@ class NrgCing(Lister):
                 nTerror("%s found no output ccpn file %s" % (entry_code, outputCcpnFile))
                 filterAssignSucces = 0
             # end if
+            if os.path.exists(outputCcpnDir):
+#                nTdebug("%s removing CCPN directory %s in cwd: %s" % (entry_code, outputCcpnDir, os.getcwd() ))
+                rmdir(outputCcpnDir)
+            else:
+                nTwarning("%s failed to find CCPN directory %s in cwd: %s" % (entry_code, outputCcpnDir, os.getcwd() ))
+            # end if        
             if filterAssignSucces: # Only use filtering if successful but do continue if failed just skip this.
                 finalPhaseId = PHASE_F
             # end if
