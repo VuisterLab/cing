@@ -6,14 +6,19 @@ and then configuration details are at:
 https://wiki.jenkins-ci.org/display/JENKINS/Installing+Jenkins+on+Ubuntu
 # Make sure not to install virtual hosts.
 # Add proxies instead to:
-/etc/apache2/httpd.conf 
+sudo vi /etc/apache2/httpd.conf 
 # configure to use port 8081 instead of the default 8080 which is already in use for tomcat.
+# also add prefix and listen address.
 vi /etc/default/jenkins
 # Start
-sudo /etc/init.d/jenkins start
+sudo /etc/init.d/jenkins restart
 # Log
 tail -f /var/log/jenkins/jenkins.log &
 # 
+
+sudo apt-get remove python-coverage python-nose
+sudo easy_install nose
+
 ######################################################################################################################
 # Installation on Mac:
 ######################################################################################################################

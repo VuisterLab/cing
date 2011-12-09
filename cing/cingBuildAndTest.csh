@@ -9,6 +9,11 @@
 cd $0:h
 #ulimit -a -H
 
+if ( ! $?PYTHONPATH ) then
+    echo "DEBUG: initializing non-existing PYTHONPATH to ."
+    setenv PYTHONPATH .
+endif
+    
 echo "DEBUG: PATH       1: $PATH"
 echo "DEBUG: PYTHONPATH 1: $PYTHONPATH"
 # echo "DEBUG: CLASSPATH  1: $CLASSPATH"
