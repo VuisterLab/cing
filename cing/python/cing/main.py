@@ -289,23 +289,29 @@ def testQuiet():
     fn = 'cingTest.log'
     nTmessage("\nStarting quiet test in %s logged to %s\n" % (cingDirTmp, fn))
     os.chdir(cingDirTmp)
-
+    resultStatus = False 
     cmdCingTest = 'python -u $CINGROOT/python/cing/main.py --test -c %d -v 0 > %s 2>&1' % ( cing.ncpus, fn )
 #    nTmessage("In cing.main doing [%s]" % cmdCingTest)
     status, content = commands.getstatusoutput(cmdCingTest)
     if status:
         nTerror("Failed to finish CING test")
+        resultStatus = True
     else:
         nTmessage("Finished CING test\n")
-    if content:
+    # end if
+    if content:        
         nTerror("Unexpected output: [%s]" % content)
+        resultStatus = True
+    # end if
     resultList = []
     status = grep(fn, 'error', resultList=resultList, caseSensitive=False)
     if status == 0:
         nTerror("Found %d errors, please check the errors below and full log %s" % ( len(resultList), os.path.join(cingDirTmp,fn)))
         nTerror("Errors:\n%s" % '\n'.join(resultList))
+        resultStatus = True
     else:
         nTmessage("No problems were found")
+    # end if
     resultTestFileList = []
     status = grep(fn, 'tests in', resultList=resultTestFileList)
     nTmessage("Ran %d test files" % len(resultTestFileList))
@@ -315,7 +321,11 @@ def testQuiet():
         nTmessage("Ran %d tests ok\n" % len(resultList))
     else:
         nTerror("Failed to do a single test ok")
-        return True
+        resultStatus = True
+    # end if
+    if resultStatus:
+        nTerror("Overall failure of testQuiet.")
+    return resultStatus
 #end def
 
 def doPylintOverallSummary(pylintFileName='pylint.txt'):
