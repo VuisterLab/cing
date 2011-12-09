@@ -408,7 +408,7 @@ if __name__ == '__main__':
             parametersDict['aqpcPath'] = aqpcPath
         # end if
     else:
-        _nTmessage("Could not find 'aqua'")
+        _nTmessage("Could not find 'aqua'  (optional)")
         parametersDict['aqpcPath']  = PLEASE_ADD_EXECUTABLE_HERE
     # end if
 

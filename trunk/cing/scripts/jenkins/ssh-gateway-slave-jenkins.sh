@@ -7,22 +7,37 @@
 # Written by: mattkreadytalk@java.net ?
 # Original name: ssh-gateway-slave
 # Rewritten by: JFD.
+# Add to the node configuration where it reads:
+#       Launch method: "Launch slave via execution of command on the Master"
+#           Launch command:
+# for NMRpro:
+#       /home/i/workspace/cingStable/scripts/jenkins/ssh-gateway-slave-jenkins.sh www.cmbi.ru.nl jurgend nmrpro.cmbi.umcn.nl jd /Users/jd/workspace/jenkins/slave.jar
+# or for NMRproVC
+#       /home/i/workspace/cingStable/scripts/jenkins/ssh-gateway-slave-jenkins.sh www.cmbi.ru.nl jurgend  nmrvc.cmbi.umcn.nl  i   /home/i/workspace/jenkins/slave.jar
+#
 
-if [ $# -ne 2 ]
+if [ $# -ne 5 ]
 then
   echo "Usage: $0 <ssh-gateway> <ssh-target>"
   exit 1
 fi
 
 gateway=$1
-target=$2
+gatewayUser=$2
+target=$3
+targetUser=$4
+# Change this location you may. 
+#targetJarFile=/home/i/workspace/jenkins/slave.jar
+targetJarFile=$5
 jarFile="/home/i/workspace/jenkins/slave.jar"
-targetJarFile="/Users/jd/workspace35/jenkins/slave.jar"
-targetUser="jd"
 
-echo "DEBUG: gateway $gateway" 
-echo "DEBUG: target  $target"
-echo "DEBUG: jarFile $jarFile"
+echo "Setup ssh keys you did?"
+echo "DEBUG: gateway        $gateway" 
+echo "DEBUG: gatewayUser    $gatewayUser" 
+echo "DEBUG: target         $target"
+echo "DEBUG: targetUser     $targetUser"
+echo "DEBUG: jarFile        $jarFile"
+echo "DEBUG: targetJarFile  $targetJarFile"
  
 tunnelpid=0
 
@@ -49,7 +64,7 @@ done
 echo "DEBUG: opening port $port"
 
 # Create a tunnel
-ssh -N -L localhost:${port}:${target}:22 ${gateway} &
+ssh -N -L localhost:${port}:${target}:22 ${gatewayUser}@${gateway} &
 tunnelpid=$!
 
 # Give the tunnel some time
