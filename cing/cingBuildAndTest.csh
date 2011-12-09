@@ -13,10 +13,15 @@ if ( ! $?PYTHONPATH ) then
     echo "DEBUG: initializing non-existing PYTHONPATH to ."
     setenv PYTHONPATH .
 endif
-    
+
+if ( ! $?CLASSPATH ) then
+    echo "DEBUG: initializing non-existing CLASSPATH to ."
+    setenv CLASSPATH .
+endif
+
 echo "DEBUG: PATH       1: $PATH"
 echo "DEBUG: PYTHONPATH 1: $PYTHONPATH"
-# echo "DEBUG: CLASSPATH  1: $CLASSPATH"
+echo "DEBUG: CLASSPATH  1: $CLASSPATH"
 
 setenv CINGROOT $cwd
 

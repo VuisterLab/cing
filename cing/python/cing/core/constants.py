@@ -333,7 +333,7 @@ MAX_SIZE_XPLOR_RESTRAINT_LIST_NAME = 10
 #maxlength = 20 - len('viol.noe.')
 
 # 2 Gb fails on Ubuntu 11.4 but 1500 Mb works.
-JVM_MAX_MEM     = '1799m' # passed to Java using the -Xmx option. For now this is tied to 32 bitness.
+JVM_MAX_MEM     = '1499m' # passed to Java using the -Xmx option. For now this is tied to 32 bitness.
 JVM_TYPE        = '-d32'
 JVM_HEADNESS    = '-Djava.awt.headless=true'
 JVM_CMD_STD     = 'java -Xmx%s %s %s' % ( JVM_MAX_MEM, JVM_TYPE, JVM_HEADNESS )
