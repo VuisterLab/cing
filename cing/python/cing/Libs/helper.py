@@ -44,11 +44,11 @@ def _nTmessage(msg):
 # end def
 #-----------------------------------------------------------------------------------
 
-def getSvnRevision():
+def getSvnRevision( envRootDir = 'CINGROOT'):
     """Return the revision number (int) or None if the revision isn't known. It depends on svn being available on the system."""
 #    return None
     try:
-        cingSvnInfo, err = _NTgetoutput('svn info %s' % os.getenv("CINGROOT"))
+        cingSvnInfo, err = _NTgetoutput('svn info %s' % os.getenv(envRootDir))
         #_nTmessage("cingSvnInfo: " + cingSvnInfo)
         #_nTmessage("err: " + err)
         if not err:
