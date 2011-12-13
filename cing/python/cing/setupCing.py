@@ -397,7 +397,6 @@ if __name__ == '__main__':
     
     check_python()
     check_matplotlib()
-    check_ccpn()
     check_cython()
 
     if not cingRoot:
@@ -416,9 +415,40 @@ if __name__ == '__main__':
     parametersDict['cingPythonDir'] = cingPythonDir
     parametersDict['cingRoot']      = cingRoot
 
+    convertPath,err  = _NTgetoutput('which convert')
+    if not convertPath:
+        _nTwarning("Could not find 'convert' (from ImageMagick)")
+        parametersDict['convertPath']  = PLEASE_ADD_EXECUTABLE_HERE
+    else:
+        _nTmessage("........ Found 'convert'")
+        parametersDict['convertPath'] = strip(convertPath)
+    # end if
+
+    ghostscriptPath,err  = _NTgetoutput('which gs')
+    if not ghostscriptPath:
+        _nTwarning("Could not find 'ghostscript' (from ImageMagick)")
+        parametersDict['ghostscriptPath']  = PLEASE_ADD_EXECUTABLE_HERE
+    else:
+        _nTmessage("........ Found 'ghostscript'")
+        parametersDict['ghostscriptPath'] = strip(ghostscriptPath)
+    # end if
+
+    ps2pdfPath,err  = _NTgetoutput('which ps2pdf14')
+    if not ps2pdfPath:
+        _nTwarning("Could not find 'ps2pdf' (from Ghostscript)")
+        parametersDict['ps2pdfPath']  = PLEASE_ADD_EXECUTABLE_HERE
+    else:
+        ps2pdfPath = strip(ps2pdfPath)
+        parametersDict['ps2pdfPath'] = strip(ps2pdfPath)
+        _nTmessage("........ Found 'ps2pdf'        %s" % ps2pdfPath)        
+    # end if
+
+    _nTmessage("Optional install checks\n")
+    check_ccpn()
+
     xplorPath,err  = _NTgetoutput('which xplor')
     if not xplorPath:
-        _nTmessage("Could not find 'xplor'  (optional)")
+        _nTmessage("Could not find 'xplor'         (optional)")
         parametersDict['xplorPath']  = PLEASE_ADD_EXECUTABLE_HERE
     else:
         xplorPath = strip(xplorPath)
@@ -451,14 +481,14 @@ if __name__ == '__main__':
         if not os.path.exists(aqpcPath):
             _nTwarning("Found the system variable aquaroot but the script below wasn't found")
             _nTwarning( aqpcPath )
-            _nTwarning("Could not find 'aqua'  (optional)")
+            _nTwarning("Could not find 'aqua'      (optional)")
             parametersDict['aqpcPath']  = PLEASE_ADD_EXECUTABLE_HERE
         else:
             _nTmessage("........ Found 'aqua'          %s" % aqpcPath)
             parametersDict['aqpcPath'] = aqpcPath
         # end if
     else:
-        _nTmessage("Could not find 'aqua'  (optional)")
+        _nTmessage("Could not find 'aqua'      (optional)")
         parametersDict['aqpcPath']  = PLEASE_ADD_EXECUTABLE_HERE
     # end if
 
@@ -471,7 +501,7 @@ if __name__ == '__main__':
             whatifPath = defaultWhatifPath
     # end if
     if not whatifPath:
-        _nTmessage("Could not find 'what if'  (optional)")
+        _nTmessage("Could not find 'what if'       (optional)")
     else:
         whatifPath = strip(whatifPath)
         _nTmessage("........ Found 'what if'       %s" % whatifPath)
@@ -480,7 +510,7 @@ if __name__ == '__main__':
         head, _tail = os.path.split( whatifPath )
         dsspPath = os.path.join( head, 'dssp', 'DSSP.EXE' )
         if not os.path.exists(dsspPath):
-            _nTmessage("Could not find 'dssp'")
+            _nTmessage("Could not find 'dssp'          (optional)")
         else:
             _nTmessage("........ Found 'dssp'          %s" % dsspPath)
             parametersDict['dsspPath'] = dsspPath
@@ -497,43 +527,15 @@ if __name__ == '__main__':
         
 #    nTdebug("time: " + repr(time))
     if wattosRevision < 0: # time at: Mon Dec 10 15:56:33 CET 2007
-        _nTmessage("Could not find 'wattos'  (optional)")
+        _nTmessage("Could not find 'wattos'        (optional)")
 #        _nTmessage("Failed to get epoch time. This was a test of Wattos installation.'")
     else:        
         _nTmessage("........ Found 'wattos'        %s %s" % (str(wattosRevision), os.getenv(envRootDir)) )
     # end if
 
-    convertPath,err  = _NTgetoutput('which convert')
-    if not convertPath:
-        _nTwarning("Could not find 'convert' (from ImageMagick)")
-        parametersDict['convertPath']  = PLEASE_ADD_EXECUTABLE_HERE
-    else:
-        _nTmessage("........ Found 'convert'")
-        parametersDict['convertPath'] = strip(convertPath)
-    # end if
-
-    ghostscriptPath,err  = _NTgetoutput('which gs')
-    if not ghostscriptPath:
-        _nTwarning("Could not find 'ghostscript' (from ImageMagick)")
-        parametersDict['ghostscriptPath']  = PLEASE_ADD_EXECUTABLE_HERE
-    else:
-        _nTmessage("........ Found 'ghostscript'")
-        parametersDict['ghostscriptPath'] = strip(ghostscriptPath)
-    # end if
-
-    ps2pdfPath,err  = _NTgetoutput('which ps2pdf14')
-    if not ps2pdfPath:
-        _nTwarning("Could not find 'ps2pdf' (from Ghostscript)")
-        parametersDict['ps2pdfPath']  = PLEASE_ADD_EXECUTABLE_HERE
-    else:
-        ps2pdfPath = strip(ps2pdfPath)
-        parametersDict['ps2pdfPath'] = strip(ps2pdfPath)
-        _nTmessage("........ Found 'ps2pdf'        %s" % ps2pdfPath)        
-    # end if
-
     molmolPath,err  = _NTgetoutput('which molmol')
     if not molmolPath:
-        _nTmessage("Could not find 'molmol'  (optional)")
+        _nTmessage("Could not find 'molmol'        (optional)")
         parametersDict['molmolPath']  = PLEASE_ADD_EXECUTABLE_HERE
     else:
         molmolPath = strip(molmolPath)
@@ -543,7 +545,7 @@ if __name__ == '__main__':
 
     povrayPath,err  = _NTgetoutput('which povray')
     if not povrayPath:
-        _nTmessage("Could not find 'povray'  (optional)")
+        _nTmessage("Could not find 'povray'        (optional)")
         parametersDict['povrayPath']  = PLEASE_ADD_EXECUTABLE_HERE
     else:
         povrayPath = strip(povrayPath)
@@ -553,7 +555,7 @@ if __name__ == '__main__':
 
     talosPath,err  = _NTgetoutput('which talos+')
     if not talosPath:
-        _nTmessage("Could not find 'talos+'  (optional)")
+        _nTmessage("Could not find 'talos+'        (optional)")
         parametersDict['talosPath']  = PLEASE_ADD_EXECUTABLE_HERE
     else:
         talosPath = strip(talosPath)
@@ -591,7 +593,7 @@ if __name__ == '__main__':
         if not os.path.exists(pyMolBinPath):
             pyMolBinPath = None
     if not pyMolBinPath:
-        _nTmessage("Could not find 'pymol' (optional)")
+        _nTmessage("Could not find 'pymol'     (optional)")
 #        parametersDict['pyMolBinPath']  = PLEASE_ADD_EXECUTABLE_HERE
     else:
         pyMolBinPath = strip( pyMolBinPath )
@@ -626,7 +628,7 @@ if __name__ == '__main__':
         # end if
     # end if
     if not yasaraPath:
-        _nTmessage("Could not find 'yasara' code (optional)")
+        _nTmessage("Could not find 'yasara'        (optional)")
         parametersDict['yasaraPath']  = PLEASE_ADD_EXECUTABLE_HERE
     else:
         _nTmessage("........ Found 'yasara'        %s" % yasaraPath)
