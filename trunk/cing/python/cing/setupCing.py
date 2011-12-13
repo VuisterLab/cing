@@ -153,7 +153,10 @@ def check_python():
         _nTwarning('Failed to find good python.')
 
 def check_matplotlib():
-    'matplotlib needs to be at 0.98.3-1 or higher'
+    """
+    matplotlib needs to be at 0.98.3-1 or higher.
+    Version 0.99.3 fails to plot tick labels in a nicely distributed fashion see Issue 318:    Matplotlib is misbehaving
+    """
     try:
         from matplotlib.axis import XAxis
     except:
@@ -176,7 +179,26 @@ def check_matplotlib():
     except:
         _nTmessage('Could not find matplotlib (b) (optional)')
         return
-    _nTmessage("........ Found 'matplotlib'")
+    
+    #In [5]: matplotlib.__version__
+    #Out[5]: '0.99.3'    
+    versionTuple = matplotlib.__version__.split('.')
+    versionTupleReq = ( 0, 98, 3 )
+    versionTooLow = False
+    if versionTuple[0] < versionTupleReq[0]:
+        if versionTuple[1] < versionTupleReq[1]:
+            if versionTuple[2] < versionTupleReq[2]:
+                versionTooLow = True
+            # end if
+        # end if
+    # end if
+    if versionTooLow:
+        _nTmessage("Could not find matplotlib at version required (%s): found %s" % (str(versionTupleReq), str(versionTuple)))
+        return
+    # end if
+#    _nTmessage("DEBUG: Version found (%s) and version required (%s) comparison is: %s" % (
+#        str(versionTuple), str(versionTupleReq), versionTooLow))
+    _nTmessage("........ Found 'matplotlib'    %s" % matplotlib.__version__)
 
 
 def check_ccpn():
