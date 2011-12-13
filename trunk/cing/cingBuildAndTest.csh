@@ -78,6 +78,8 @@ echo
 
 # Still fails on some deps. So listing last in line.
 echo "Unit testing with the nose framework"
+echo "NB this step will produce plenty of errors that may safely be ignored"
+echo "The final test at the bottom is the only test that needs to be succesful."
 echo
 make nose
 echo
@@ -90,7 +92,13 @@ echo
 echo "Full regular cing test that needs to be successful (single core)"
 echo
 make test
+set overallStatus = $status
 echo
+if ( $overallStatus ) then
+    echo "ERROR overall test status from 'make test' failed."
+else
+    echo "Overall test status: OK"
+endif
 
 
 

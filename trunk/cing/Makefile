@@ -3,7 +3,7 @@
 # jfd 2011-06-17
 #
 
-all:	clean install cython sloccount pylint nose
+all:	clean install cython sloccount pylint nose test
 		
 clean:
 	@echo "Cleaning up CING installation"
@@ -55,5 +55,6 @@ nose:
 	
 test:
 	# This Makefile test -does- need to succeed for the make to be successful.
+	# That's why there is no minus character at the beginning of this command.
 	python -u python/cing/main.py --testQ
 

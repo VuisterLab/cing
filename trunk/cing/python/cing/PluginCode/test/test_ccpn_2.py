@@ -5,13 +5,22 @@ python $CINGROOT/python/cing/PluginCode/test/test_ccpn_2.py
 
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.Libs.disk import isRootDirectory
-from cing.PluginCode.Ccpn import Ccpn
-from cing.PluginCode.Ccpn import getProjectNameInFileName
-from cing.PluginCode.Ccpn import getRestraintBoundList
-from cing.PluginCode.Ccpn import modResDescriptorForTerminii
-from cing.PluginCode.Ccpn import patchCcpnResDescriptor
+from cing.PluginCode.required.reqCcpn import CCPN_STR
+from nose.plugins.skip import SkipTest
 from unittest import TestCase
 import unittest
+
+# Import using optional plugins.
+try:
+    from cing.PluginCode.Ccpn import Ccpn #@UnusedImport needed to throw a ImportWarning so that the test is handled properly.
+    from cing.PluginCode.Ccpn import getProjectNameInFileName
+    from cing.PluginCode.Ccpn import getRestraintBoundList
+    from cing.PluginCode.Ccpn import modResDescriptorForTerminii
+    from cing.PluginCode.Ccpn import patchCcpnResDescriptor
+except ImportWarning, extraInfo: # Disable after done debugging; can't use nTdebug yet.
+    print "Got ImportWarning %-10s Skipping unit check %s." % ( CCPN_STR, getCallerFileName() )
+    raise SkipTest(CCPN_STR)
+# end try
 
 class AllChecks(TestCase):
 

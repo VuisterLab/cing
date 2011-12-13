@@ -9,13 +9,28 @@ from cing.Libs.html import image2DdihedralWidth
 from cing.Libs.html import image2Ddihedralheight
 from cing.PluginCode.matplib import * #@UnusedWildImport
 from cing.PluginCode.required.reqWhatif import * #@UnusedWildImport
-from cing.PluginCode.dssp import Dssp #@UnusedImport needed to throw a ImportWarning so that the test is handled properly.
-from cing.PluginCode.Whatif import Whatif #@UnusedImport needed to throw a ImportWarning so that the test is handled properly.
 from cing.core.classes import Project
 from cing.core.constants import * #@UnusedWildImport
+from nose.plugins.skip import SkipTest
 from unittest import TestCase
 import unittest
 #from pylab import * # preferred importing. Includes nx imports. #@UnusedWildImport
+
+# Import using optional plugins.
+try:
+    from cing.PluginCode.Whatif import Whatif #@UnusedImport needed to throw a ImportWarning so that the test is handled properly.
+except ImportWarning, extraInfo: # Disable after done debugging; can't use nTdebug yet.
+    print "Got ImportWarning %-10s Skipping unit check %s." % ( WHATIF_STR, getCallerFileName() )
+    raise SkipTest(WHATIF_STR)
+# end try
+try:
+    from cing.PluginCode.dssp import Dssp #@UnusedImport needed to throw a ImportWarning so that the test is handled properly.
+except ImportWarning, extraInfo: # Disable after done debugging; can't use nTdebug yet.
+    print "Got ImportWarning %-10s Skipping unit check %s." % ( DSSP_STR, getCallerFileName() )
+    raise SkipTest(DSSP_STR)
+# end try
+
+
 
 class AllChecks(TestCase):
 

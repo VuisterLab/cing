@@ -5,12 +5,21 @@ python -u $CINGROOT/python/cing/PluginCode/test/test_Wattos.py
 from cing import cingDirTestsData
 from cing import cingDirTmp
 from cing.Libs.NTutils import * #@UnusedWildImport
-from cing.PluginCode.Ccpn import Ccpn #@UnusedImport needed to throw a ImportWarning so that the test is handled properly.
 from cing.PluginCode.Wattos import runWattos
+from cing.PluginCode.required.reqCcpn import CCPN_STR
 from cing.PluginCode.required.reqWattos import * #@UnusedWildImport
 from cing.core.classes import Project
+from nose.plugins.skip import SkipTest
 from unittest import TestCase
 import unittest
+
+# Import using optional plugins.
+try:
+    from cing.PluginCode.Ccpn import Ccpn #@UnusedImport needed to throw a ImportWarning so that the test is handled properly.
+except ImportWarning, extraInfo: # Disable after done debugging; can't use nTdebug yet.
+    print "Got ImportWarning %-10s Skipping unit check %s." % ( CCPN_STR, getCallerFileName() )
+    raise SkipTest(CCPN_STR)
+# end try
 
 class AllChecks(TestCase):
 
