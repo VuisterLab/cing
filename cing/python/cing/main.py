@@ -336,6 +336,9 @@ def doPylintOverallSummary(pylintFileName='pylint.txt'):
     pylintMsgCountMap = CountMap()
     lineList = readLinesFromFile(pylintFileName)
     for line in lineList:
+        if line.count("GtkWarning") or line.count("_gtk.Warning"):
+            nTdebug("Ignoring warnings from Gtk that have to do with running headless:\n%s" % line)
+            continue
         # Match the message id with a starting bracket 
         # an alpha
         # a 4 digit number 
