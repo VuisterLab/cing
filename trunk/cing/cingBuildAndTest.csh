@@ -1,10 +1,13 @@
-#!/bin/tcsh -e
+#!/bin/tcsh
 # Run with absolut path e.g.:
 #
 #        $CINGROOT/cingBuildAndTest.csh
 #
 # Used by Jenkins to build and test CING installation automatically on various platforms. 
 # Important to use shell setup from user; hence the above no -f option.
+# In OSX Lion a -e option fails the script right away so it's omitted.
+ 
+echo "Starting cingBuildAndTest.csh"
 
 cd $0:h
 #ulimit -a -H
@@ -34,10 +37,16 @@ unsetenv PYMOL_PATH
 unsetenv YASARA_PATH
 unsetenv CING_VARS
 
+if ( $?WATTOSROOT ) then
+    echo "DEBUG: WATTOSROOT 1: $WATTOSROOT"
+else
+    echo "DEBUG: WATTOSROOT 1: undefined (optional)"
+endif
+
 if ( $?CCPNMR_TOP_DIR ) then
     echo "DEBUG: CCPNMR_TOP_DIR 1: $CCPNMR_TOP_DIR"
 else
-    echo "DEBUG: CCPNMR_TOP_DIR 1: undefined"
+    echo "DEBUG: CCPNMR_TOP_DIR 1: undefined (optional)"
 endif
 
 echo "DEBUG: PYTHONPATH 2: $PYTHONPATH"

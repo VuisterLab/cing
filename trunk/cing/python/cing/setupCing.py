@@ -490,11 +490,8 @@ if __name__ == '__main__':
 
     wattosRevision = -1
     try:
-#        wattosAtTheReady,err  = _NTgetoutput('java Wattos.Utils.Programs.GetEpochTime')
-        wattosAtTheReady,err  = _NTgetoutput('java Wattos.Utils.Programs.GetRevision')
-#        _nTmessage("wattosAtTheReady: [%s]" % wattosAtTheReady)
-#        _nTmessage("err:              [%s]" % err)
-        wattosRevision = atoi(wattosAtTheReady)
+        envRootDir = 'WATTOSROOT'
+        wattosRevision = _getSvnRevision( envRootDir )        
     except:
         pass
     # end try
@@ -503,8 +500,7 @@ if __name__ == '__main__':
     if wattosRevision < 0: # time at: Mon Dec 10 15:56:33 CET 2007
         _nTmessage("Could not find 'wattos'  (optional)")
 #        _nTmessage("Failed to get epoch time. This was a test of Wattos installation.'")
-    else:
-        envRootDir = 'WATTOSROOT'
+    else:        
         _nTmessage("........ Found 'wattos'        %s %s" % (str(wattosRevision), os.getenv(envRootDir)) )
     # end if
 
@@ -650,4 +646,4 @@ if __name__ == '__main__':
     # end if
     
     _writeCingShellFile(isTcsh)
-    _nTmessage("TODO: configure MolProbity by running it's setup.sh") # TODO:
+#    _nTmessage("TODO: configure MolProbity by running it's setup.sh") # TODO:

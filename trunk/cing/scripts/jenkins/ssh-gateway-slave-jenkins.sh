@@ -13,12 +13,12 @@
 # for NMRpro:
 #       /home/i/workspace/cingStable/scripts/jenkins/ssh-gateway-slave-jenkins.sh www.cmbi.ru.nl jurgend nmrpro.cmbi.umcn.nl jd /Users/jd/workspace/jenkins/slave.jar
 # or for NMRproVC
-#       /home/i/workspace/cingStable/scripts/jenkins/ssh-gateway-slave-jenkins.sh www.cmbi.ru.nl jurgend  nmrvc.cmbi.umcn.nl  i   /home/i/workspace/jenkins/slave.jar
+#       /home/i/workspace/cingStable/scripts/jenkins/ssh-gateway-slave-jenkins.sh www.cmbi.ru.nl jurgend  vcnmr.cmbi.umcn.nl  i   /home/i/workspace/jenkins/slave.jar
 #
 
 if [ $# -ne 5 ]
 then
-  echo "Usage: $0 <ssh-gateway> <ssh-target>"
+  echo "Usage: $0  <ssh-gateway-user> <ssh-gateway-host>       <ssh-target-user> <ssh-target-host>       <jarFile>"
   exit 1
 fi
 
