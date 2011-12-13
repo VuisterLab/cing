@@ -62,6 +62,29 @@ def _nTmessage(msg):
     'Convenience method'
     print msg
 # end def
+def _getSvnRevision( envRootDir = 'CINGROOT'):
+    """Return the revision number (int) or None if the revision isn't known. It depends on svn being available on the system."""
+#    return None
+    try:
+        cingSvnInfo, err = _NTgetoutput('svn info %s' % os.getenv(envRootDir))
+        #_nTmessage("cingSvnInfo: " + cingSvnInfo)
+        #_nTmessage("err: " + err)
+        if not err:
+            cingSvnInfoList = cingSvnInfo.split('\n')
+            for cingSvnInfo in cingSvnInfoList:
+                if  cingSvnInfo.startswith('Revision:'):
+                    cingRevisionStr = cingSvnInfo.split()[ - 1]
+                    cingRevision = int(cingRevisionStr)
+                    return cingRevision
+                # end if
+            # end for
+        # end if
+    except:
+        pass
+#        _nTwarning("Failed to getSvnRevision()" )
+# end def
+
+
 #-----------------------------------------------------------------------------------
 
 # disabling some output that can safely be ignored
@@ -228,7 +251,9 @@ def check_ccpn():
 #        missing.append('ccpnmr.analysis')
 
     if gotRequiredCcpnModules:
-        _nTmessage("........ Found 'ccpn'")
+        envRootDir = 'CCPNMR_TOP_DIR'
+        ccpnRevison = _getSvnRevision( envRootDir )
+        _nTmessage("........ Found 'ccpn'          %s %s" % (ccpnRevison, os.getenv(envRootDir)))
     else:
         _nTmessage("Could not find 'ccpn' (optional)")
 
@@ -367,6 +392,10 @@ if __name__ == '__main__':
             print 'Failed to process argument(s) in sys.argv: [' + str(sys.argv) + ']'
         # end if
     # end if
+    envRootDir = 'CINGROOT'
+    cingRevison = _getSvnRevision()
+    _nTmessage("........ Found 'cing'          %s %s" % (cingRevison, os.getenv(envRootDir)) )       
+    
     check_python()
     check_matplotlib()
     check_ccpn()
@@ -475,7 +504,8 @@ if __name__ == '__main__':
         _nTmessage("Could not find 'wattos'  (optional)")
 #        _nTmessage("Failed to get epoch time. This was a test of Wattos installation.'")
     else:
-        _nTmessage("........ Found 'wattos'        r%s" % str(wattosRevision))         
+        envRootDir = 'WATTOSROOT'
+        _nTmessage("........ Found 'wattos'        %s %s" % (str(wattosRevision), os.getenv(envRootDir)) )
     # end if
 
     convertPath,err  = _NTgetoutput('which convert')
