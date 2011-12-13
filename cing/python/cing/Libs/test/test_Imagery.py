@@ -9,14 +9,17 @@ from cing.Libs.Imagery import convertImageMagick
 from cing.Libs.Imagery import joinPdfPagesByGhostScript
 from cing.Libs.Imagery import montage
 from cing.Libs.NTutils import * #@UnusedWildImport
+from cing.Libs.disk import rmdir
 from cing.core.parameters import cingPaths
+from nose.plugins.skip import SkipTest
 from unittest import TestCase
 import unittest
-from cing.Libs.disk import rmdir
 
 if not cingPaths.convert: # Requirement for test.
-    raise ImportWarning('convert')
-
+#    raise ImportWarning('convert')
+    print "Got ImportWarning %-10s Skipping unit check %s." % ( 'convert', getCallerFileName() )
+    raise SkipTest('convert')
+# end if
 class AllChecks(TestCase):
 
     # important to switch to temp space before starting to generate files for the project.

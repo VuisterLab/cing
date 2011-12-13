@@ -22,7 +22,6 @@ respective functionalities.
 
 # Please note the lack of imports here to cing specific code.
 # The idea is that this script runs without PYTHONPATH being set yet.
-from string import atoi
 from string import strip
 from subprocess import PIPE
 from subprocess import Popen

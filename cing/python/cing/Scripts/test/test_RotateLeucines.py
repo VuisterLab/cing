@@ -4,10 +4,19 @@ python -u $CINGROOT/python/cing/Scripts/test/test_RotateLeucines.py
 """
 from cing import cingDirTestsData #@UnusedImport
 from cing.Libs.NTutils import * #@UnusedWildImport
+from cing.PluginCode.required.reqYasara import YASARA_STR
 from cing.Scripts.rotateLeucines import * #@UnusedWildImport
-from cing.PluginCode.yasaraPlugin import yasaraShell #@UnusedImport needed to throw a ImportWarning so that the test is handled properly.
+from nose.plugins.skip import SkipTest
 from unittest import TestCase
 import unittest
+
+# Import using optional plugins.
+try:
+    from cing.PluginCode.yasaraPlugin import yasaraShell #@UnusedImport needed to throw a ImportWarning so that test is handled properly.
+except ImportWarning, extraInfo: # Disable after done debugging; can't use nTdebug yet.
+    print "Got ImportWarning %-10s Skipping unit check %s." % ( YASARA_STR, getCallerFileName() )
+    raise SkipTest(YASARA_STR)
+# end try
 
 class AllChecks(TestCase):
 

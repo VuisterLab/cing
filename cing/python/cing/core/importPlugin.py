@@ -30,7 +30,8 @@ def importPlugin( pluginName ):
 #            nTdebug("reloading same module just to see it change")
             reload( plugin.module )
         except ImportWarning, extraInfo: # Disable after done debugging; can't use nTdebug yet.
-            nTmessage("Skipping reload of an optional compound (please recode to use SkipTest): %s" % extraInfo)           
+            nTmessage("Skipping reload of an optional compound (please recode to use SkipTest): %s" % extraInfo)
+            # Internally we need to know if we're called by nosetests or by regular call.           
         except SkipTest, extraInfo:
             nTmessage("Skipping reload report of an optional compound: %s" % extraInfo)            
         except Exception:

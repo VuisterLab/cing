@@ -3,7 +3,7 @@ from cing import __author__
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.PluginCode.required.reqAnalysis import * #@UnusedWildImport
 from cing.PluginCode.required.reqCcpn import * #@UnusedWildImport
-from nose.plugins.skip import SkipTest
+#from nose.plugins.skip import SkipTest
 
 __author__ += 'Tim Stevens '
 
@@ -20,8 +20,8 @@ if True: # for easy blocking of data, preventing the code to be resorted with im
         # pylint: enable E0611
     except:
         switchOutput(True)
-#        raise ImportWarning(ANALYSIS_STR)
-        raise SkipTest(ANALYSIS_STR)        
+        raise ImportWarning(ANALYSIS_STR)
+#        raise SkipTest(ANALYSIS_STR)        
     finally: # finally fails in python below 2.5
         switchOutput(True)
 #    nTdebug('Imported plugin Analysis version %s' % version)

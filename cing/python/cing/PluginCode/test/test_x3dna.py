@@ -8,12 +8,21 @@ from cing import cingDirTestsData
 from cing import cingDirTmp
 from cing import osType
 from cing.Libs.NTutils import * #@UnusedWildImport
-from cing.PluginCode.Ccpn import Ccpn #@UnusedImport needed to throw a ImportWarning so that the test is handled properly.
+from cing.PluginCode.required.reqCcpn import CCPN_STR
 from cing.PluginCode.required.reqX3dna import X3DNA_STR
 from cing.core.classes import Project
+from nose.plugins.skip import SkipTest
 from unittest import TestCase
 import shutil
 import unittest
+
+# Import using optional plugins.
+try:
+    from cing.PluginCode.Ccpn import Ccpn #@UnusedImport needed to throw a ImportWarning so that the test is handled properly.
+except ImportWarning, extraInfo: # Disable after done debugging; can't use nTdebug yet.
+    print "Got ImportWarning %-10s Skipping unit check %s." % ( CCPN_STR, getCallerFileName() )
+    raise SkipTest(CCPN_STR)
+# end try
 
 class AllChecks(TestCase):
 

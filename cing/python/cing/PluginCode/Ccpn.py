@@ -38,6 +38,7 @@ if True: # for easy blocking of data, preventing the code to be resorted with im
     except:
         switchOutput(True)
         raise ImportWarning(CCPN_STR)
+#        raise SkipTest(CCPN_STR)        
     finally: # finally fails in python below 2.5
         switchOutput(True)
 #    nTmessage('Using Ccpn')
