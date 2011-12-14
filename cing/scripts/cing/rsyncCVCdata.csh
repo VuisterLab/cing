@@ -28,6 +28,7 @@ set targetList = ( CASD-NMR-CING CASP-NMR-CING NMR_REDO NRG-CING RECOORD )
 echo "Starting rsyncCVCdata.csh with [$$] and [$0]"
 echo "DEBUG: base_url           $base_url"
 echo "DEBUG: target_dir         $target_dir"
+echo "DEBUG: target2_dir        $target2_dir"
 echo "Syncing"
 
 set x = testDir

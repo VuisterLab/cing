@@ -11,6 +11,7 @@
 - D/tmp
 - D/servlet-cing-home/.bash_history
 - D/servlet-cing-home/.ipython/history
+- D/servlet-cing-home/.subversion
 #
 # Include the rest
 #
