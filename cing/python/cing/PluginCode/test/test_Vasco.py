@@ -10,11 +10,7 @@ from cing.NRG import ARCHIVE_NRG_ID
 from cing.NRG.storeCING2db import doStoreCING2db
 from cing.PluginCode.required.reqCcpn import CCPN_STR
 from cing.PluginCode.required.reqWattos import * #@UnusedWildImport
-from cing.Scripts.FC.utils import printSequenceFromCcpnProject
-from cing.Scripts.FC.utils import swapCheck
 from cing.core.classes import Project
-from memops.general.Io import loadProject
-from memops.general.Io import saveProject
 from nose.plugins.skip import SkipTest
 from shutil import rmtree
 from unittest import TestCase
@@ -24,6 +20,10 @@ import unittest
 try:
     from cing.PluginCode.Ccpn import Ccpn #@UnusedImport needed to throw a ImportWarning so that the test is handled properly.
     from cing.PluginCode.Vasco import Vasco #@UnusedImport needed to throw a ImportWarning so that the test is handled properly.
+    from cing.Scripts.FC.utils import printSequenceFromCcpnProject
+    from cing.Scripts.FC.utils import swapCheck
+    from memops.general.Io import loadProject
+    from memops.general.Io import saveProject
 except ImportWarning, extraInfo: # Disable after done debugging; can't use nTdebug yet.
     print "Got ImportWarning %-10s Skipping unit check %s." % ( CCPN_STR, getCallerFileName() )
     raise SkipTest(CCPN_STR)
