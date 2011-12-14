@@ -7,12 +7,21 @@ from cing import cingDirTmp
 from cing import cingPythonCingDir
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.Libs.disk import rmdir
-from cing.PluginCode.molgrap import Molgrap #@UnusedImport Keep to indicate dep and proper handeling.
+from cing.PluginCode.required.reqMolgrap import MOLGRAP_STR
 from cing.core.classes import Project
 from cing.core.constants import * #@UnusedWildImport
+from nose.plugins.skip import SkipTest
 from unittest import TestCase
 import shutil
 import unittest
+
+# Import using optional plugins.
+try:
+    from cing.PluginCode.molgrap import Molgrap #@UnusedImport Keep to indicate dep and proper handeling.
+except ImportWarning, extraInfo: # Disable after done debugging; can't use nTdebug yet.
+    print "Got ImportWarning %-10s Skipping unit check %s." % ( MOLGRAP_STR, getCallerFileName() )
+    raise SkipTest(MOLGRAP_STR)
+# end try
 
 class AllChecks(TestCase):
 

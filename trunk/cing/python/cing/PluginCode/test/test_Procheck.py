@@ -5,11 +5,20 @@ python $CINGROOT/python/cing/PluginCode/test/test_Procheck.py
 from cing import cingDirTestsData
 from cing import cingDirTmp
 from cing.Libs.NTutils import * #@UnusedWildImport
-from cing.PluginCode.procheck import Procheck #@UnusedImport Keep to indicate dep and proper handeling.
+from cing.PluginCode.required.reqProcheck import PROCHECK_STR
 from cing.core.classes import Project
 from cing.core.constants import * #@UnusedWildImport
+from nose.plugins.skip import SkipTest
 from unittest import TestCase
 import unittest
+
+# Import using optional plugins.
+try:
+    from cing.PluginCode.procheck import Procheck #@UnusedImport Keep to indicate dep and proper handeling.
+except ImportWarning, extraInfo: # Disable after done debugging; can't use nTdebug yet.
+    print "Got ImportWarning %-10s Skipping unit check %s." % ( PROCHECK_STR, getCallerFileName() )
+    raise SkipTest(PROCHECK_STR)
+# end try
 
 class AllChecks(TestCase):
 

@@ -78,7 +78,7 @@ echo
 
 # Still fails on some deps. So listing last in line.
 echo "Unit testing with the nose framework"
-echo "NB this step will produce plenty of errors that may safely be ignored"
+echo "NB this step might produce some problems that may safely be ignored."
 echo "The final test at the bottom is the only test that needs to be succesful."
 echo
 make nose
