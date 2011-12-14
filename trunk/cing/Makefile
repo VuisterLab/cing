@@ -48,13 +48,14 @@ nose:
 	# Write the .coverage and nosetest.xml
 	# Uses .coveragerc
 	-/bin/rm -f nosetests.xml coverage.xml .coverage
-	-nosetests --with-xunit --with-coverage --verbose --cover-package=cing --where=python/cing
+	nosetests --with-xunit --with-coverage --verbose --cover-package=cing --where=python/cing
 	# Convert .coverage to coverage.xml. 
 	#Needs Coverage.py, version 3.4+.  http://nedbatchelder.com/code/coverage
-	-coverage xml
+	coverage xml
 	
 test:
-	# This Makefile test -does- need to succeed for the make to be successful.
+	@echo "This test -does- need to succeed for the make to be successful."
+	@echo "It will only use one core so the output is easier to read and the Jenkins scheduler doesn't overload a slave."
 	# That's why there is no minus character at the beginning of this command.
-	python -u python/cing/main.py --testQ
+	python -u python/cing/main.py --testQ -c 1
 

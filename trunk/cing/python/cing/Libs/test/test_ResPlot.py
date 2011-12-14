@@ -1,3 +1,8 @@
+"""
+Unit test execute as:
+python $CINGROOT/python/cing/Libs/test/test_ResPlot.py
+"""
+
 from cing import cingDirTestsData
 from cing import cingDirTmp
 from cing.Libs.NTutils import * #@UnusedWildImport
@@ -17,7 +22,8 @@ except ImportWarning, extraInfo: # Disable after done debugging; can't use nTdeb
     raise SkipTest(WHATIF_STR)
 # end try
 try:
-    from cing.PluginCode.dssp import runDssp #@UnusedImport Added trigger import error . Needed for when whatif is but dssp isn't installed. 
+    from cing.PluginCode.dssp import runDssp #@UnusedImport Added trigger import error . 
+#    Needed for when whatif is but dssp isn't installed. 
 except ImportWarning, extraInfo: # Disable after done debugging; can't use nTdebug yet.
     print "Got ImportWarning %-10s Skipping unit check %s." % ( DSSP_STR, getCallerFileName() )
     raise SkipTest(DSSP_STR)
