@@ -1036,6 +1036,9 @@ def main():
         #end if
     #end if
     if options.ipython:
+        # The next import is missing in one OSX installation but is on all others.
+        # The new way of doing this would be the below but that still fails on all OSX installs but the one above.
+        # from IPython.frontend.terminal.embed import InteractiveShellEmbed 
         # pylint: disable=W0404 
         from IPython.Shell import IPShellEmbed # optional module; not required for CING proper.
         ipshell = IPShellEmbed(['-prompt_in1','CING \#> '],

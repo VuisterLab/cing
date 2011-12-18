@@ -203,9 +203,9 @@ sudo cp $CINGROOT/scripts/sql/PostgreSQL /Library/StartupItems/PostgreSQL/Postgr
 See doc at: http://www.postgresql.org/docs/8.4/interactive/backup-dump.html (end of page)
 # for custom (binary;compressed)
 # Replace nrgcing with pdbj.
-
-pg_dump --format=c --schema=nrgcing pdbmlplus > nrgcing.dump
-
+pg_dump -U pdbj --format=c --schema=nrgcing pdbmlplus > nrgcing.dump
+# Restore
+psql pdbmlplus < nrgcing.dump
 
 
 ## REPEAT AFTER ME: e.g. after nilling PGDATA and restarting.

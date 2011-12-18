@@ -272,8 +272,8 @@ def findMissingPdbjEntries():
     pdbRcsbEntryList = getPdbEntries()
     NTmessage("Found RCSB PDB entries count: %s" % len(pdbRcsbEntryList))
     host = 'localhost'
-    if False: # DEFAULT False
-        host = 'nmr.cmbi.umcn.nl'
+    if True: # DEFAULT True
+        host = 'nmr.cmbi.ru.nl'
     pdbjEntryList = getPdbIdList(fromCing=False, host=host)
     if not pdbRcsbEntryList:
         NTerror("Failed to find any entry in RCSB-PDB")

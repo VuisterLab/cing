@@ -1003,7 +1003,7 @@ class NrgCing(Lister):
         # end if
 
         nTmessage("Found %4d entries by NMR (A)." % len(self.entry_list_nmr))
-
+        nTmessage("Found %4d entries manually set to impossible (I)." % len(self.entry_list_bad_overall))
         nTmessage("Found %4d entries that CING prep tried." % len(self.entry_list_prep_tried))
         nTmessage("Found %4d entries that CING prep crashed." % len(self.entry_list_prep_crashed))
         nTmessage("Found %4d entries that CING prep failed." % len(self.entry_list_prep_failed))
@@ -1015,7 +1015,7 @@ class NrgCing(Lister):
         nTmessage("Found %4d entries that CING stopped (S)." % len(self.entry_list_stopped))
         nTmessage("Found %4d entries that CING should update (U)." % len(self.entry_list_updated))
         nTmessage("Found %4d entries that CING done but not in RDB (D)." % len(entry_list_done_but_not_in_db))
-        nTmessage("Found %4d entries that CING did (B=A-C-S-U-D)." % len(self.entry_list_done))
+        nTmessage("Found %4d entries that CING did (B=A-C-S-U-D-I)." % len(self.entry_list_done))
         nTmessage("Found %4d entries todo (A-B, to a max of %d)." % (len(self.entry_list_todo), self.max_entries_todo))
         nTmessage("Found %4d entries in %s made obsolete." % (len(self.entry_list_obsolete), self.results_base))
         nTmessage("Found %4d entries in %s without prep." % (len(self.entry_list_missing_prep), self.results_base))
