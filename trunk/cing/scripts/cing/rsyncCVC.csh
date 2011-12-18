@@ -14,5 +14,5 @@ echo "DEBUG: target_dir         $target_dir"
 
 echo "Syncing ALL CVC raw files"
 cd $target_dir
-rsync -avvvz --stats --include='CVCa**.raw' --exclude='*' -e ssh $base_url .
+rsync -avz --stats --include='CVCa**.raw' --exclude='*' -e ssh $base_url .
 echo "Done syncing."

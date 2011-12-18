@@ -20,7 +20,7 @@ CVCa   IP: 131.174.88.XXX
     # Start GDM: by alias go (like startx) or by:
         sudo service gdm start
     
-# Copy data over:    
+# Copy data over:
     FAILS:
     rsync -azv --delete --stats /Volumes/tria3/NRG-CING -e ssh i@cvca.cmbi.ru.nl:/mnt/data/D > & rsync_NRG-CING_log_b.txt &
     WORKS:

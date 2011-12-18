@@ -11,7 +11,7 @@ set target_dir       = /Volumes/tria3/backup/CVCdata
 # Use separate directory for exceptions so that the --delete switch works.
 set target2_dir      = /Volumes/tria3/backup/CVCdata2
 # Use triple -vvv for much higher verbosity when debugging.
-set rsyncOpt = "-avz --stats --delete --max-delete=100"
+set rsyncOpt = "-az --stats --delete --max-delete=100"
 setenv cingScriptDir $0:h
 set localC = $cingScriptDir/localConstants.csh
 if ( -e $localC ) then
