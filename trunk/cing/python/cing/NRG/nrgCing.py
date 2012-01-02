@@ -244,11 +244,9 @@ class NrgCing(Lister):
         # NRG issue. Bad ccpn docr project
         self.map_issue_to_bad_entry_list[(PROJECT_ID_NRG, 272)] = '1lcc 1lcd 2l2z 2neo'.split()        
         # FC created a CCPN project that fails to read in again.
-        self.map_issue_to_bad_entry_list[(PROJECT_ID_CING, 266)] = '134d 177d 1gnc 1lcc 1lcd 1qch 1sae 1sah 1saj 1sak 1sal 3sak'.split() 
+        self.map_issue_to_bad_entry_list[(PROJECT_ID_CING, 266)] = '134d 177d 1gnc 1lcc 1lcd 1qch 1sae 1sak 1sal 3sak'.split() 
         # Queeny runs out of 2Gb memory for 2rqf 
         self.map_issue_to_bad_entry_list[(PROJECT_ID_CING, 310)] = '2rqf'.split() 
-        # CCPN issue. FC created a CCPN project that fails.
-        self.map_issue_to_bad_entry_list[(PROJECT_ID_CCPN, 3446961)] = '4a1m 2l4e 2l4f 2l60 2lgk 2lja 2ljd 2lje 2ljf'.split()
         # Issue 312:   FC doing a bad calculation in swapping for SSA.        
         self.map_issue_to_bad_entry_list[(PROJECT_ID_CING, 312)] =\
             '1aj3 1d0w 1e0a 1f8h 1kft 1mek 1rkl 1w9r 1yyj 2ca7 2exg 2h2m 2j15 2jnc 2jxh 2kcc 2l4g 2xfm'.split()
@@ -988,6 +986,10 @@ class NrgCing(Lister):
         self.entry_list_todo = self.entry_list_todo.difference(self.entry_list_done)
         self.entry_list_todo = self.entry_list_todo.difference(self.entry_list_bad_overall)        
 
+        entry_list_bad_obsolete = self.entry_list_bad_overall.difference(self.entry_list_nmr)
+        if entry_list_bad_obsolete:
+            nTwarning("Please remove from entry_list_bad_overall the obsolete entries: %s" % str(entry_list_bad_obsolete))
+        # end if
         self.entry_list_untried = NTlist(*self.entry_list_nmr)
         self.entry_list_untried = self.entry_list_untried.difference(self.entry_list_tried)
         self.entry_list_untried = self.entry_list_untried.difference(self.entry_list_bad_overall)
@@ -1167,6 +1169,8 @@ class NrgCing(Lister):
         'Write all entry lists to csv files.'
 #        nTmessage("Writing the entry list of each list to file")
 
+
+        writeTextToFile("entry_list_bad_overall.csv",   toCsv(self.entry_list_bad_overall))
         writeTextToFile("entry_list_possible.csv",      toCsv(self.entry_list_possible))
         writeTextToFile("entry_list_pdb.csv",           toCsv(self.entry_list_pdb))
         writeTextToFile("entry_list_nmr.csv",           toCsv(self.entry_list_nmr))

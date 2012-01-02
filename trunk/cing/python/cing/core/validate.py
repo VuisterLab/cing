@@ -232,7 +232,8 @@ def criticizePeaks( project, toFile=True ):
 #end def
 
 def _criticizeChain( chain, valSets ):
-    """Convenience method
+    """
+    Convenience method
     """
     for color in [COLOR_GREEN,COLOR_ORANGE,COLOR_RED]:
         chain[color] = NTlist()
