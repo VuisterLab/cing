@@ -23,7 +23,6 @@ from cing.PluginCode.required.reqWhatif import * #@UnusedWildImport
 from cing.PluginCode.sqlAlchemy import CgenericSql
 from cing.PluginCode.sqlAlchemy import CsqlAlchemy
 from cing.PluginCode.sqlAlchemy import printResult
-from matplotlib import is_interactive
 from pylab import * #@UnusedWildImport # imports plt too now.
 from scipy import * #@UnusedWildImport
 from scipy import optimize
@@ -1433,78 +1432,6 @@ AND '{2}' <@ S.chain_type; -- contains at least one protein chain.
         # end for plot
     # end def
 
-    def createScatterPlotGreenVersusRed(self):
-        """This routine is a duplicate of the one developed afterwards/below.
-        """
-        cingDirTmpTest = os.path.join( cingDirTmp, getCallerName() )
-        mkdirs( cingDirTmpTest )
-        if os.chdir(cingDirTmpTest):
-            nTerror("Failed to change to test directory for files: " + cingDirTmpTest)
-        # end if
-        m = self
-        perEntryRog = m.perEntryRog
-        s = select([m.e1.c.pdb_id, m.r1.c.rog, 100.0 * func.count(m.r1.c.rog) / m.e1.c.res_count
-                     ], from_obj=[m.e1.join(m.r1)]
-                     ).group_by(m.e1.c.pdb_id, m.r1.c.rog, m.e1.c.res_count)
-        nTdebug("SQL: %s" % s)
-        result = m.execute(s).fetchall()
-        #nTdebug("ROG percentage per entry: %s" % result)
-
-        for row in result:
-        #    print row[0]
-            k = row[0]
-            if not perEntryRog.has_key(k):
-                perEntryRog[k] = nTfill(0.0, 3)
-            # end if
-            perEntryRog[k][int(row[1])] = float(row[2])
-        # end for
-
-        pdb_id_list = perEntryRog.keys()
-        color = nTfill(0.0, 3)
-        color[0] = NTlist() # green
-        color[1] = NTlist()
-        color[2] = NTlist()
-
-        for entry_id in pdb_id_list:
-            myList = perEntryRog[ entry_id ]
-            for i in range(3):
-                color[i].append(myList[i])
-            # end for
-        # end for
-        ps = NTplotSet()
-        p = ps.createSubplot(1, 1, 1)
-        p.title = 'NRG-CING'
-        p.xRange = (0, 100)
-        p.yRange = (0, 100)
-        p.setMinorTicks(5)
-        attr = fontVerticalAttributes()
-        attr.fontColor = 'green'
-        p.labelAxes((-0.08, 0.5), 'green(%)', attributes=attr)
-        attr = fontAttributes()
-        attr.fontColor = 'red'
-        p.labelAxes((0.45, -0.08), 'red(%)', attributes=attr)
-        p.label( (61,89), 'fine' )
-        p.label( (80,53), 'problematic' )
-        symbolColor = 'g'
-        symbolSize = 5
-        p.scatter(color[2], color[0], symbolSize, symbolColor, marker = '+')
-
-        offset = 15
-        lineWidth = 10
-        attributes = nTplotAttributes(lineWidth=lineWidth, color='green')
-        p.line([0,offset],[100 - offset, 100], attributes)
-        attributes = nTplotAttributes(lineWidth=lineWidth, color='red')
-        p.line([offset, 0], [100, 100 - offset], attributes)
-        fn = os.path.join(cingDirTmp, 'nrgcingPlot1.png')
-        ps.hardcopySize = (900,900)
-        if is_interactive():
-            ps.show()
-        else:
-            ps.hardcopy(fn)
-        # end if
-        nTdebug("Done plotting %s" % fn)
-    # end def
-
     def getAndPlotColorVsColor(self, doPlot = True):
         cingDirTmpTest = os.path.join( cingDirTmp, getCallerName() )
         mkdirs( cingDirTmpTest )
@@ -1791,9 +1718,6 @@ if __name__ == '__main__':
 #        m.plotQualityVsColor()
 #        m.plotQualityPcVsColor()
         n.getAndPlotColorVsColor(doPlot = True) # ROG Plot for paper.
-    # end if
-    if 0:
-        n.createScatterPlotGreenVersusRed()
     # end if
     if 0:
         pdbIdList = n.getPdbIdList()
