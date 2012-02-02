@@ -16,11 +16,12 @@ set mac_dir        = $7
 set try            = 1
 set mul            = 1
 #setenv MOLMOLHOME $6 needs to be set to a directory and done outside of Cing, e.g. in .cshrc
+set useHiRes       = 0 # DEFAULT: 0
 
 set mac_file       = $tmp_dir"/"$id"_"$mac_file
 set log_file       = $tmp_dir"/"$id"_"$log_file
 
-date
+#date
 #echo "DEBUG: 1"
 
 # check if we got the right amount of parameters
@@ -35,7 +36,7 @@ if ( ! -e $tmp_dir ) then
 endif
 
 if ( ! -e $pdb_file ) then
-   echo "ERROR: pdb file doesn't exist"
+   echo "ERROR: pdb file: $pdb_file doesn't exist in cwd: $cwd"
    goto error
 endif
 
@@ -94,6 +95,9 @@ if ( $size_cor <  100000 ) then
     set precision = 3
 endif
 
+if ( $useHiRes ) then
+    set precision = 3
+endif
 #echo "Assuming multiplication factor:   $mul"       >> $log_file
 echo "Precision for pov file:           $precision" >> $log_file
 #echo "DEBUG: 4"
@@ -229,7 +233,7 @@ endif
 # Don't remove input and log file if no pov file was created.
 # DEBUG: comment next line if you want to keep the files.
 if ( 1 ) then # DEFAULT: 1
-    \rm -f $mac_file $log_file
+    \rm -f $mac_file $log_file >& /dev/null
 endif
 
 exit 0
@@ -241,7 +245,8 @@ error:
     endif
     echo "ERROR: instead of rendering to pov file copied a default pov file."
     cp $molgrapDir/default_image.pov $tmp_dir/$id.pov
-    exit 0
+    # NEW: this used to be zero exit status but that's a bug I think.
+    exit 1
 
 usage:
     echo "# USE: molmol_image.csh pdb_file tmp_dir pdb_id scripts_dir back_ground_color molmolExecutable"

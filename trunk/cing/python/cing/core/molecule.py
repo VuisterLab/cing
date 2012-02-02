@@ -1374,14 +1374,16 @@ class Molecule( NTtree, ResidueList ):
         return len(residueList)
 
     def rangesContainsResidue( self, residue, ranges=None  ):
-        """Queries the self.selectedResidues in a slow way; scan.
+        """
+        Queries the self.selectedResidues in a slow way; scan.
         If ranges != None the the query is even slower because if will use the range.
         """
         selectedResidues = self.selectedResidues
         if ranges != None:
             selectedResidues = self.ranges2list(ranges)
+        # end if
         return residue in selectedResidues
-
+    # end def
 
     def ranges2list( self, ranges ):
         """

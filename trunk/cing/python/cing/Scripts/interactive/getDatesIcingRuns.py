@@ -4,7 +4,7 @@ This script can generate the input data for:
 $CINGROOT/Documentation/usage/perMonthRuns.numbers
 
 # on server as root
-python /Users/jd/workspace35/cingStable/python/cing/Scripts/interactive/getDates.py > t.txt
+python $C/python/cing/Scripts/interactive/getDatesIcingRuns.py > t.txt
 # on client
 scp -P 39676 localhost-nmr:/Users/jd/t.txt .
 # in Numbers

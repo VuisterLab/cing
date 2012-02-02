@@ -530,7 +530,7 @@ def doStoreCING2db( entry_code, archive_id, project = None):
         # end if
         for residue in chain.allResidues():
             if residue.hasProperties('HOH'): # In entry 1l0r the water had HOH but not water set.
-                nTwarning("Water residue %s almost slipped into RDB because it was in a non water chain. Skipping now." % residue)
+                nTwarning("Water residue %s almost slipped into RDB because it was in a non-water chain. Skipping now." % residue)
                 waterResidueCount += 1
                 continue
 #            if residue.resName == 'HOH':

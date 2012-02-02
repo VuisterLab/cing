@@ -188,9 +188,12 @@ class CsqlAlchemy(CgenericSql): # pylint: disable=R0902
         CgenericSql.__init__(self, db_type=db_type, host=host, user=user, passwd=passwd, 
                     unix_socket=unix_socket, db=db, schema=schema, echo=echo)
         # be explicit here to take advantage of code analysis.
-        self.tableNameList = ('cingentry cingchain cingresidue cingatom ' +
-                              'drlist dr ' +
-                              'cingresonancelist cingresonancelistperatomclass cingsummary entry_list_selection').split()
+        self.tableNameList = """
+            cingentry cingchain cingresidue cingatom 
+            drlist dr 
+            cingresonancelist cingresonancelistperatomclass 
+            cingsummary entry_list_selection residue_list_selection 
+        """.split()
 #        self.tableNameList = [ 'casdcing.'+x for x in self.tableNameList]
 #        self.entry = None
         self.cingentry = None
@@ -203,6 +206,7 @@ class CsqlAlchemy(CgenericSql): # pylint: disable=R0902
         self.cdr = None
         self.cingsummary = None
         self.entry_list_selection = None
+        self.residue_list_selection = None
 
         self.levelIdResidue = "residue"  # mirrors WI setup.
         self.levelIdAtom = "atom"
@@ -217,6 +221,10 @@ class CsqlAlchemy(CgenericSql): # pylint: disable=R0902
         # end if
         if self.entry_list_selection == None:
             nTerror("Failed to retrieve the entry_list_selection table")
+            return True
+        # end if
+        if self.residue_list_selection == None:
+            nTerror("Failed to retrieve the residue_list_selection table")
             return True
         # end if
     # end def
