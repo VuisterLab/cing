@@ -194,3 +194,26 @@ CREATE TABLE nrgcing.testtable
     pdb_id                         VARCHAR(255)
 );
 
+-- Following might be present even if no coordinates are.
+--FROM "pdbj"."/datablock/chem_compCategory/chem_comp/@id" AS P
+-- Unpopulated in PDBj
+-- FROM "pdbj"."/datablock/atom_siteCategory/atom_site/label_comp_id" AS P
+
+SELECT p.val, count(p.val)
+FROM "pdbj"."/datablock/chem_compCategory/chem_comp/@id" AS P
+where p.val = 'HOH'
+group by p.val
+order by count(p.val) desc
+LIMIT 1000
+
+-- Find the water containing NMR entries (only 65) for Joao.
+SELECT s.pdbid
+FROM
+   "pdbj".BRIEF_SUMMARY AS S JOIN 
+   "pdbj"."/datablock/chem_compCategory/chem_comp/@id" AS P ON S.DOCID = P.DOCID JOIN
+   "//exptl/@method" p1 ON s.docid = p1.docid
+WHERE p1.val LIKE '%NMR' AND
+p.val = 'HOH'
+group by s.pdbid
+order by s.pdbid asc
+LIMIT 100

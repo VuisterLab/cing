@@ -92,6 +92,7 @@ class NrgCingRdb():
             self.ccslpa = self.csql.cingresonancelistperatomclass
             self.csummary = self.csql.cingsummary
             self.centry_list_selection = self.csql.entry_list_selection
+            self.cresidue_list_selection = self.csql.residue_list_selection
 
             self.cs = self.csummary.alias()
             self.e1 = self.centry.alias()
@@ -101,6 +102,7 @@ class NrgCingRdb():
             self.a1 = self.catom.alias()
             # No further short cuts for chemical shift list info.
             self.s1 = self.centry_list_selection.alias()
+            self.s2 = self.cresidue_list_selection.alias()
             self.perEntryRog = NTdict()
         # end if
         if True:
@@ -134,6 +136,7 @@ class NrgCingRdb():
     
     def showCounts(self):
         m = self
+        nTmessage("Starting showCounts." )
         if True:
             tableList = [m.centry, m.cchain, m.cresidue, m.catom ]
 #            countList = [m.query(table).count() for table in tableList]
@@ -271,7 +274,20 @@ AND E.MODEL_COUNT > 9
 and cingsummary.weight > 3500.0 -- about 30 residues
 AND '{2}' <@ S.chain_type; -- contains at least one protein chain.
 """ % tuple( [self.schema] *3 )
-        for stmt in [ stmt1, stmt2, stmt3, stmt4]:
+        stmt5 = 'drop table if exists %s.residue_list_selection cascade;' % self.schema
+        # The full molecular weight; not just the polymers
+        stmt6 = """
+CREATE table %s.residue_list_selection AS
+SELECT r.residue_id, r.sel_1
+FROM nrgcing.CINGresidue r,
+nrgcing.cingentry e,
+nrgcing.entry_list_selection s1
+WHERE
+e.entry_id = r.entry_id AND
+e.pdb_id = s1.pdb_id;
+""" % tuple( [self.schema] *2 )
+        stmtList = [ stmt1, stmt2, stmt3, stmt4, stmt5, stmt6]
+        for stmt in stmtList:
 #            nTdebug("Executing: %s" % stmt)
             result = self.execute(stmt)
             printResult(result)
@@ -1590,14 +1606,30 @@ AND '{2}' <@ S.chain_type; -- contains at least one protein chain.
 
     def plotQualityPcVsColor(self):
         m = self
-        elementNameList = 'pc_rama_core pc_rama_allow pc_rama_gener pc_rama_disall'.split()
-        colorNameList = 'green orange red'.split()
+#        elementNameList = 'pc_rama_core pc_rama_allow pc_rama_gener pc_rama_disall'.split()
+        elementNameList = 'pc_rama_core'.split()
+        elementNameStrList = ['% Residues PC Core', '% Residues PC Allowed', '% Residues PC Generous', '% Residues PC Disallowed' ]
+#        colorNameList = 'green orange red'.split()
+        colorNameList = 'green'.split()
+        colorNameStrList = [ '% Residues Green', '% Residues Orange', '% Residues Red' ]
 
-        s = select([m.e1.c.pdb_id, m.e1.c.pc_rama_core, m.e1.c.pc_rama_allow, m.e1.c.pc_rama_gener, m.e1.c.pc_rama_disall
+        cingDirTmpTest = '/Users/jd/CMBI/Papers/CING_paper/FiguresTmp'
+        if not m.perEntryRog:
+            nTmessage("Get ROG percentages per entry.")
+            m.getAndPlotColorVsColor(doPlot = False)
+        # end if
+        mkdirs( cingDirTmpTest )
+        if os.chdir(cingDirTmpTest):
+            nTerror("Failed to change to test directory for files: " + cingDirTmpTest)
+        # end if
+        
+        s = select([m.e1.c.pdb_id, 
+                    m.e1.c.pc_rama_core, 
+                    m.e1.c.pc_rama_allow, 
+                    m.e1.c.pc_rama_gener, 
+                    m.e1.c.pc_rama_disall
                      ], and_(m.e1.c.pdb_id==m.s1.c.pdb_id,
-                             m.e1.c.pdb_id==m.e1.c.pdb_id,
-                             m.e1.c.wi_bbcchk > -15.0,
-                             m.e1.c.wi_bbcchk < 5.0,
+                             m.e1.c.pdb_id==m.e1.c.pdb_id
                              )
                      ).order_by(m.e1.c.pdb_id)
         nTdebug("SQL: %s" % s)
@@ -1619,24 +1651,43 @@ AND '{2}' <@ S.chain_type; -- contains at least one protein chain.
                     ySerie.append(m.perEntryRog[k][colorIdx])
                 # end for
                 strTitle = 'plotQualityPcVsColor_%s_%s' % ( elementNameList[elementIdx], colorNameList[colorIdx])
-                ps = NTplotSet() # closes any previous plots
-                ps.hardcopySize = (1000, 1000)
-                myplot = NTplot(title=strTitle)
-                ps.addPlot(myplot)
-
                 cla() # clear all.
-                _p = plt.plot(xSerie, ySerie, '+', color='blue')
-            #    xlim(0, 100)
-                ylim(0, 100)
-                xlabel(elementNameList[elementIdx])
-                ylabel('perc. residues %s' % colorNameList[colorIdx])
-
-                for fmt in ['.png', '.eps']:
-                    fn = strTitle + fmt
-                    nTdebug("Writing " + fn)
-                    ps.hardcopy(fn)
-                # end for
-            # end for
+                lw = 5.0
+                cl = 'black'
+                rc('lines', linewidth=lw, color=cl)     
+                rc('axes',  linewidth=lw )     
+                rc('grid',  linewidth=lw )     
+                rc('font', size=140)
+                xlim(0, 100)
+                ylim(0, 100)                
+                _p = plt.plot(xSerie, ySerie, 'o', color=cl, markerfacecolor=cl, markersize=15 )
+                xlabel(elementNameStrList[elementIdx])
+                ylabel(colorNameStrList[elementIdx])
+                a = gca()
+                attributesMatLibPlot = {'linewidth' :20.0}
+                line2D = Line2D([0, 100], [20, 20])
+                line2D.set(**attributesMatLibPlot)
+                a.add_line(line2D)
+                grid( linewidth=lw, linestyle='-',  color=cl )
+                fmt = '.eps'
+                fn = strTitle + fmt
+                nTdebug("Writing " + fn)
+                fig_width_pt = 4000
+                fig_height_pt = fig_width_pt
+                fig_width     = fig_width_pt*inches_per_pt  # width in inches
+                fig_height    = fig_height_pt*inches_per_pt # height in inches
+                fig_size      = [fig_width,fig_height]
+                params = {#'backend':          self.graphicsOutputFormat,
+                          'figure.dpi':       dpi,
+                          'figure.figsize':   fig_size,
+                          'savefig.dpi':      dpi,
+                          'savefig.figsize':  fig_size,
+                           }
+                rcParams.update(params)        
+                figure = gcf()
+                figure.set_size_inches(  fig_size )
+                savefig(fn)
+                    # end for
         # end for
     # end def
 # end class
@@ -1704,7 +1755,7 @@ if __name__ == '__main__':
 #        schema = NRG_DB_SCHEMA
     host = 'localhost'
     if 0: # DEFAULT 0
-        host = 'nmr.cmbi.umcn.nl'
+        host = 'nmr.cmbi.ru.nl'
     # end if
     n = NrgCingRdb( schema=schema, host = host )
 
@@ -1715,9 +1766,9 @@ if __name__ == '__main__':
         n.createScatterPlots()
     # end if
     if 0: # Default 0
-#        m.plotQualityVsColor()
-#        m.plotQualityPcVsColor()
-        n.getAndPlotColorVsColor(doPlot = True) # ROG Plot for paper.
+#        n.plotQualityVsColor()
+        n.plotQualityPcVsColor()
+#        n.getAndPlotColorVsColor(doPlot = True) # ROG Plot for paper.
     # end if
     if 0:
         pdbIdList = n.getPdbIdList()

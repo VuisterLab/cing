@@ -230,6 +230,27 @@ insert into nrgcing.cingentry(rev_first, name, bmrb_id, rog, distance_count, cs_
 
 update nrgcing.cingentry set bmrb_id = 9999;
 
+
+SELECT e.pdb_id,
+to_char( extract( year from b.deposition_date), 'FM9999') as deposition_date, 
+e.distance_count, e.dihedral_count, e.cs_count
+FROM nrgcing.cingentry e, brief_summary b
+WHERE
+e.pdb_id = b.pdbid AND
+b.release_date > '2011-01-01'
+order by e.distance_count asc limit 2000;
+
+COPY (
+	SELECT e.pdb_id
+	FROM nrgcing.cingentry e, brief_summary b
+	WHERE
+	e.pdb_id = b.pdbid AND
+	b.release_date > '2011-01-01'
+	order by e.pdb_id asc
+) TO '/tmp/entry_list_rerun.csv'
+
+    b.deposition_date > '2011-01-01'
+
 SELECT count(*) FROM brief_summary s;
 echo "SELECT count(*) FROM brief_summary s" | psql pdbmlplus pdbj
 echo "SELECT count(*) FROM nrgcing.cingentry" | psql pdbmlplus pdbj

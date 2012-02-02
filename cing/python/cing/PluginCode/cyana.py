@@ -243,9 +243,13 @@ DistanceRestraintList.export2cyana = exportDistancList2cyana
 
 
 def importUpl( project, uplFile, convention, lower = 0.0 ):
-    """Read Cyana upl file
-       return a DistanceRestraintList or None on error
     """
+    Read Cyana upl file
+    return a DistanceRestraintList or None on error
+    """
+    
+    #print 'Convention: ' + convention
+    
     maxErrorCount = 50
     errorCount = 0
 
@@ -303,14 +307,14 @@ def importUpl( project, uplFile, convention, lower = 0.0 ):
 #        nTdebug("atom 1: " + repr(atm1))
 #        nTdebug("atom 2: " + repr(atm2))
         upper = line.float(7)
-        if not upper:
-            nTerror("Skipping line without valid upper bound on line: [" + line.dollar[0]+']')
-            continue
-
         # ambiguous restraint, should be append to last one
         if upper == 0:
             result().appendPair( (atm1,atm2) )
             continue
+        if not upper:
+            nTerror("Skipping line without valid upper bound on line: [" + line.dollar[0]+']')
+            continue
+
 
 
         r = DistanceRestraint( atomPairs= [(atm1,atm2)], lower=lower, upper=upper )

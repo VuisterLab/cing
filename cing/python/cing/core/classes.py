@@ -2217,7 +2217,7 @@ ranges:  %s
 
     def getRanges( self, cutoff = 1.7 ):
         """
-        Get the ranges from phi, phi order parameters using all members.
+        Get the ranges from phi, psi order parameters using all members.
         As suggested by Alexandre in CASD-NMR meeting.
         """
         resList1 = NTlist()

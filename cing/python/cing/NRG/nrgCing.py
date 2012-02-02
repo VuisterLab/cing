@@ -368,8 +368,8 @@ class NrgCing(Lister):
         # The variable below is local and can be used to update a specific batch.
         new_hits_entry_list = [] # DEFAULT: [].define empty for checking new ones.
 #        new_hits_entry_list = string.split("")
-        if 0: # DEFAULT False; use for processing a specific batch.
-            entryListFileName = os.path.join(self.results_dir, 'entry_list_nmr_random_1-500.csv')
+        if False: # DEFAULT False; use for processing a specific batch.
+            entryListFileName = os.path.join(self.results_dir, 'list', 'entry_list_rerun.csv')
             new_hits_entry_list = readLinesFromFile(entryListFileName)
 #            new_hits_entry_list = new_hits_entry_list[100:110]
         # end if        
@@ -427,7 +427,7 @@ class NrgCing(Lister):
             # end if
         # end if
         if self.entry_list_todo and self.max_entries_todo:
-            nTdebug("Now in updateWeekly starting to prepare")
+            nTmessage("Now in updateWeekly starting to prepare")
             if self.prepare():
                 nTerror("Failed to prepare")
                 return True
@@ -2388,16 +2388,20 @@ class NrgCing(Lister):
             # end if
             permutationArgumentMap[permutationKey].append(entry_code)
         # end for#
-        nTdebug("Found entries in NMR          : %d (entry_list_nmr)"         %  len(self.entry_list_nmr))
-        nTdebug("Found entries in NRG DOCR     : %d (entry_list_nrg_docr)"    %  len(self.entry_list_nrg_docr))
-        nTdebug("Found entries in              : %d (matches_many2one)"       %  len(self.matches_many2one.keys()))
-        nTdebug("Found entries todo            : %d" % len(self.entry_list_todo))
+        nTmessage("Found entries in NMR          : %d (entry_list_nmr)"         %  len(self.entry_list_nmr))
+        nTmessage("Found entries in NRG DOCR     : %d (entry_list_nrg_docr)"    %  len(self.entry_list_nrg_docr))
+        nTmessage("Found entries in              : %d (matches_many2one)"       %  len(self.matches_many2one.keys()))
+        nTmessage("Found entries todo            : %d" % len(self.entry_list_todo))
 
-        nTdebug("Permutations:")
+        nTmessage("Permutations:")
         for permutationKey in permutationArgumentMap.keys():
-            nTdebug("Keys: %s split to: %s %s %s %s with number of entries %d" % (
-                permutationKey, convertMmCifCoor, convertMrRestraints, convertStarCS, 
-                filterCcpnAll, len(permutationArgumentMap[permutationKey])))
+            permutationKeyForFileName = permutationKey.replace(' ', '')
+            extraArgList = permutationKey.split()
+            convertMmCifCoor, convertMrRestraints, convertStarCS, filterCcpnAll = extraArgList
+            nTmessage("Keys: %s split to: %s %s %s %s with number of entries %d" % (
+                permutationKey, 
+                convertMmCifCoor, convertMrRestraints, convertStarCS, filterCcpnAll, 
+                len(permutationArgumentMap[permutationKey])))
         # end for
         
         for permutationKey in permutationArgumentMap.keys(): # strings

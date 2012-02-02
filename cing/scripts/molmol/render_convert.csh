@@ -12,6 +12,7 @@ set convert_path   = $6
 set log            = $tmp_dir/$id"_render_convert".log
 set tga_tmp        = $tmp_dir/$id.tga
 set testing        = 0
+set useHiRes       = 0 # DEFAULT 0
 
 # No changes below
 ###############################################
@@ -45,8 +46,15 @@ start:
 # -D turns rendering on screen off
 # +A0.3 turns on anti aliasing with threshold 0.3 on.
 
+set widthCount = 760
+set heightCount = 532
+if ( $useHiRes ) then
+    set widthCount = 1520
+    set heightCount = 1064
+endif
+
 set povray_dir = $povray_path:h
-$povray_path -L$povray_dir/include +A0.3 -D +I$pov_file +O$tga_tmp +W760 +H532 >& $log
+$povray_path -L$povray_dir/include +A0.3 -D +I$pov_file +O$tga_tmp +W$widthCount +H$heightCount >& $log
 #$povray_dir/povray -L$povray_dir/include +A0.3 -D +I$pov_file +O$tga_tmp +W3040 +H2128 >& $log
 set sts = $status
 if ( $sts ) then

@@ -12,7 +12,8 @@ set target_dir       = /Volumes/tria3/backup/CVCdata
 set target2_dir      = /Volumes/tria3/backup/CVCdata2
 # Use triple -vvv for much higher verbosity when debugging.
 # --ignore-errors tells --delete to go ahead and delete files even when there are I/O errors.
-set rsyncOpt = "-az --stats --delete --max-delete=100 --ignore-errors"
+# Increase to delete limit from 100 to 1000 after seeing a mishap where 80 or so were maintained.
+set rsyncOpt = "-az --stats --delete --max-delete=1000 --ignore-errors"
 setenv cingScriptDir $0:h
 set localC = $cingScriptDir/localConstants.csh
 if ( -e $localC ) then
