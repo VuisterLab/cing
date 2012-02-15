@@ -1,5 +1,5 @@
--- A temporary table to contain the percentages of residues r/o/g taking
--- into account the entry AND range selection.
+-- A temporary table to contain the percentages of residues rog.
+-- TODO: taking into account the entry AND range selection.
 drop TABLE IF EXISTS nrgcing.tmpentry; 
 CREATE TABLE nrgcing.tmpentry as (
     select c.entry_id as entry_id, c.rog as rog,
@@ -14,17 +14,18 @@ CREATE TABLE nrgcing.tmpentry as (
     order by e.entry_id, c.rog asc
 );
 
-
+-- Select pdb entries of sufficient badness that are large enough but also have
+-- enough data and all data types.
 SELECT e.pdb_id, e.res_count,
-to_char( extract( year from b.deposition_date), 'FM9999') as deposition_date, 
-to_char( te.cperc, 'FM999.0') as rog_perc0,
-e.distance_count, e.dihedral_count, e.cs_count
+    to_char( extract( year from b.deposition_date), 'FM9999') as deposition_date, 
+    to_char( te.cperc, 'FM999.0') as rog_perc0,
+    e.distance_count, e.dihedral_count, e.cs_count
 FROM nrgcing.cingentry e, brief_summary b, nrgcing.tmpentry te
 WHERE
 e.pdb_id = b.pdbid AND
 e.entry_id = te.entry_id AND
 te.rog = 0 AND
-te.cperc < 20 AND
+te.cperc < 101. AND -- Was 20.
 b.deposition_date > '2009-01-01' AND
 e.protein_count > 0 AND
 e.res_count > 100 AND
@@ -32,7 +33,7 @@ e.chain_count = 1 AND
 e.distance_count > 100 AND
 e.dihedral_count > 50 AND
 e.cs_count > 1000
-order by b.deposition_date desc limit 20;
+order by b.deposition_date desc limit 20000;
 
 -- Number of entries with descent size protein ensembles
 select count(*) 
@@ -40,7 +41,8 @@ from nrgcing.entry_list_selection;
 
 
 
-
+-- Alternative definition of the same as above 
+-- The only change is the group by line. Check for the effect later.
 CREATE TABLE nrgcing.tmpentry as (
     select e.entry_id as entry_id,
     c.rog as rog,
@@ -59,10 +61,11 @@ CREATE TABLE nrgcing.tmpentry as (
 );
 
 
-
-select r.entry_id as entry_id, count(*) as cred from
-nrgcing.cingresidue r
-where r.rog = 2 group by r.entry_id;
+-- Unused select
+select r.entry_id as entry_id, count(*) as cred 
+from nrgcing.cingresidue r
+where r.rog = 2 
+group by r.entry_id;
 
 
 
@@ -94,7 +97,6 @@ COPY (
 -- 3 7392 
 -- 4 7363 TAKEN.
 -- Gives average length:   7363 75.6176830096428086
-
 SELECT count(*), avg(temp.l) 
 from (
     SELECT e.pdb_id, c.name, count(*) as l

@@ -66,8 +66,10 @@ Closed issues:
     cd /var/lib/libvirt/images
     # CVCa stands for CMBI Virtual Cing machine a.
     qemu-img convert -O raw CVCa.vmdk CVCa.raw
-    # No idea why:\
-    chcon --reference VC.qcow2 CVCa.raw; ls -alrtZ
+    # No idea why:
+    chcon --reference VC.qcow2 CVCa.raw; 
+    # Unknown why these option.
+    ls -alrtZ
     # Anything running
     virsh list --all
     # Save previous instance settings
@@ -101,3 +103,86 @@ Geerten's setup
     Unable to check from a remote site yet. Can't do a scp or a ssh to https://proteins.dyndns.org/gDisk
 
     
+MAINTENANCE (security updates and all)
+# Shutdown the VM if not in use. As user i on nmr:
+sudo shutdown -h now
+# Wait for the VM to shutdown
+as root on cmbi21:
+yum clean all
+yum update 
+# and answer y (This installed 42 packages in 5 minutes) on Feb. 2, 2012.
+# Reboot the host OS as jurgenfd on host.
+sudo reboot --debug
+# This takes several minutes. And can be followed from the screen capture at:
+https://draccmbi21.cmbi.ru.nl
+# Update firmwares
+
+TODO: (when Dell is back up).
+Using our servicetag (Chassis Service Tag HM1J45J, Express Service Code  38338127047) at:
+(Service tag is unknown at the US dell site.)
+http://http://support.euro.dell.com -> enterprise
+ 
+look for new drivers and downloads.
+Compare the installed firmwares to the info from Dell OpenManage (Firefox): 
+
+https://cmbi21.cmbi.ru.nl:1311
+
+The firmwares that can be updated include:
+    bios
+    diskcontroller
+    drac (niet updaten vanuit drac console!)
+    lifecyclecontroller
+
+and opitonally:
+    disksfirmwares and networkcards if urgent
+NB
+Don't do all at once.
+First the host OS update then reboot and check functionality.
+Then firmwares.
+
+Day 1 Feb 6, 2012
+- Finding Firmware updates and putting them in:
+/root/dell/firmware. Make sure the .bin downloaded files are executable.
+Downgrading is possible. thru website downloadable packages.
+Installer ought to check the update applicability.
+Updates
+     Bios                  3.0     to 6.1.0
+     DRAC/ESM              1.7     to 1.8
+     Firmware              N/A
+     Lifecycle Controller  1.5.0.671 to 1.5.1.57 
+     Network               Not done. Usually not updated; just when critical or recommended.
+     OS                    Is done using yum inside host OS
+     Power                 Not done.
+     Removable Storage     Not done.
+     SAS Drive             Not done. The drive ids can be found from Storage-> Perc700/Conn 0/Enclosure/Physical Disks/Full View
+                            ST32000444SS
+     SAS RAID              H700 1210.1-001 -> 1210.2-004.     
+     Rest                  Not done because N/A.
+     
+Day 2 Feb 7, 2012
+Disable autorestart VMs for updates that will require reboot.
+    virsh autostart --disable CVCa
+   
+-1- First DRAC update
+    Use "screen" so hangups don't cause underlying update to hang up as well.
+    Check website DRAC after install. No restart required.
+    Got "Failed to access virtual USB Device" and version of DRAC persisted.
+    Detached the device from within DRAC and reapplied patch.
+    Log out from DRAC before trying to update it again.
+    2nd try was successful.
+-2- BIOS update 
+    Look at DRAC -> System -> Console Media -> Launch Virtual Console (fails on OSX in any browser).
+    Quota check is ok to fail.
+    Reboot takes about 3"
+-3- Dell Open Manage software
+    Need to stop several services by hand.
+        omconfig system webserver action = stop
+        /etc/init.d/dataeng stop (or alike)
+-4- Lifecycle controller 
+    Takes about 10".
+  
+Reenable autostart again. virsh autostart CVCa
+
+NB The DRAC remote console fails to download from Safari, Firefox, and Chrome.
+
+     

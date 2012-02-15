@@ -2,6 +2,11 @@
 Created on Nov 4, 2011
 
 @author: jd
+
+Execute like:
+
+python -u $C/python/cing/Scripts/vCing/stripVc.py
+
 '''
 from cing.Libs.NTutils import * #@UnusedWildImport
 from shutil import rmtree
@@ -25,7 +30,9 @@ deleteListTmp = """
     /mnt/data/pgdata
 """
 
-def stripVc(deletePersonal = 0, deleteTmp = 1 ):
+deleteListUsers = 'vincent wilmar  wim  wouter'.split()
+
+def stripVc(deletePersonal = 0, deleteTmp = 1, deleteUsers = 1 ):
     '''
     Remove resources that may be personal of nature. Such as Dropbox, commercial programs and ssh keys.
     Return True on error like not removing resources.
@@ -41,7 +48,7 @@ def stripVc(deletePersonal = 0, deleteTmp = 1 ):
     nTmessage("Will remove: %s" % deleteList)
     answer = None
     while answer not in ["y","n"]:
-        answer = raw_input("Please confirm you are about to remove all non-public resources; please enter y or n:")
+        answer = raw_input("WARNING: Please confirm you are about to remove all non-public resources; please enter y or n:")
     isOk = answer == "y"
     if not isOk:
         nTerror("Not removing resources.")
@@ -57,6 +64,8 @@ def stripVc(deletePersonal = 0, deleteTmp = 1 ):
         # end if
     # end for
     nTmessage("Removed all listed resources")
+    if deleteUsers:
+        pass
 # end def
 
 if __name__ == '__main__':

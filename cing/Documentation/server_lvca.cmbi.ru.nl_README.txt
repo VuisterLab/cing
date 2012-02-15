@@ -1,0 +1,25 @@
+-- Convert the raw file from Nijmegen to vdmk.
+   qemu-img convert -O raw CVCa.vmdk CVCa.raw    
+-- In VMware player create a new dummy VM.
+   -x- Set the networking mode to bridged.
+-- Attach new hd device to dummy VM with the path of the vdmk file.
+-- Booting is slow and certain devices are absent so can't be attached.
+    Use an option to continue at the boot for ignoring those mishaps. 
+    Not certain but we think it was the letter s.
+-- Changed passwords for users i and root so they differ from master copy.
+-- Register the MAC address the VMware player assigned to the VM. 
+-- Register a new IP address with University matched to the MAC.
+   10.1.182.220 for IP behind firewall.
+   143.210.184.210 in front of firewall (let's call that public)
+-- Set host name using 
+   vi /etc/hostname
+-- Reset IP:
+   vi /etc/network/interfaces
+       modify the address and the gateway lines.
+-- Restart the networking
+    /etc/init.d/networking restart    
+-- Check webserver status by browsing to: http://LVCa/icing/
+
+     
+
+-    
