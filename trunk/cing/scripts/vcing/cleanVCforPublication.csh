@@ -3,7 +3,7 @@
 # $CINGROOT/scripts/vcing/cleanVCforPublication
 # NB do not run this code on machines other than VC.
 
-TODO: finish.
+######################  TODO: finish. ############################
 
 set dirListToRemove = 
 ###################################################################

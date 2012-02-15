@@ -191,7 +191,8 @@ def doFunctionOnEntryList(
           extraArgList                   = None,
           start_entry_id                 = start_entry_id,
           max_entries_todo               = max_entries_todo,
-          shuffleBeforeSelecting         = False # fails for chain ids when included.
+          shuffleBeforeSelecting         = False, # fails for chain ids when included.
+          entryList                      = None # as an alternative to a file.
           ):
     """Return True on error"""
     
@@ -206,6 +207,7 @@ def doFunctionOnEntryList(
         nTdebug("start_entry_id               : %s" % start_entry_id               )        
         nTdebug("max_entries_todo             : %s" % max_entries_todo             )        
         nTdebug("shuffleBeforeSelecting       : %s" % shuffleBeforeSelecting       )
+        nTdebug("entryList                    : %s" % entryList)        
     # end if        
 #    if os.chdir(cingDirTmp):
 #        raise SetupError("Failed to change to directory for temporary test files: "+cingDirTmp)
@@ -213,21 +215,25 @@ def doFunctionOnEntryList(
     # Empty list means no filtering done.
     entryCodeListFilter = []
 #    entryCodeListFilter = string.split("1n62")
-
-    entryListFile = file(entryListFileName, 'r')
-    entryCodeList = []
-    entryCountTotal = 0
-    for line in entryListFile.readlines():
-        line = line.strip()
-        if line == '': # skip empty lines.
-            continue
-        entryCountTotal += 1
-        entryCode = line
-        if entryCode in entryCodeListFilter:
-            continue
-        entryCodeList.append( entryCode )
-    entryListFile.close()
-
+    if entryListFileName:
+        entryListFile = file(entryListFileName, 'r')
+        entryCodeList = []
+        entryCountTotal = 0
+        for line in entryListFile.readlines():
+            line = line.strip()
+            if line == '': # skip empty lines.
+                continue
+            entryCountTotal += 1
+            entryCode = line
+            if entryCode in entryCodeListFilter:
+                continue
+            entryCodeList.append( entryCode )
+        entryListFile.close()
+    else:
+        entryCodeList = entryList
+        entryCountTotal = len( entryList )
+    # end if
+    
     entryCountSelected = len( entryCodeList )
     # lastEntryId is id of last entry excluding the entry itself.
     lastEntryId = min(len(entryCodeList), start_entry_id+max_entries_todo)    

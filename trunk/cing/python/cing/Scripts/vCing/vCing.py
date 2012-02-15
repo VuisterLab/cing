@@ -74,7 +74,7 @@ class Vcing(Lister):
         self.toposPool = 'vCing' + pool_postfix_local
         if toposPool:
             self.toposPool = toposPool
-         # Interface found at NBIC's https://gforge.nbic.nl/plugins/scmsvn/viewcvs.php/clients/trunk/python/?root=topos
+        # Interface found at NBIC's https://gforge.nbic.nl/plugins/scmsvn/viewcvs.php/clients/trunk/python/?root=topos
 #        self.toposCmd = toposcmd(realm=self.toposRealm, pool=self.toposPool)
         self.toposProg = os.path.join(self.toposDir, "topos")
         self.toposProgCreateTokens = os.path.join(self.toposDir, "createTokens")

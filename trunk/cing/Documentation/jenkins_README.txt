@@ -14,8 +14,14 @@ vi /etc/default/jenkins
 sudo /etc/init.d/jenkins restart
 # Log
 tail -f /var/log/jenkins/jenkins.log &
-# 
+# Disable Jenkins
+# Found on http://superuser.com/questions/266040/how-do-you-disable-an-upstart-service-in-ubuntu-10-10
+chkconfig --list | grep -i jenk 
+# Next command will generate lots of warnings to be ignored.
+chkconfig -s jenkins off
+chkconfig --list | grep -i jenk 
 
+# Install deps such as:
 sudo apt-get remove python-coverage python-nose
 sudo easy_install nose
 
