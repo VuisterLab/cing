@@ -113,7 +113,6 @@ def teeToFile(logFile):
     Starts to tee the different verbosity messages to a possibly existing file.
     Return True on failure.
     '''
-#    logFile = '/Users/jd/Library/Logs/weeklyUpdatePdbjMine.log'
     stream = None
     try:
         stream = open(logFile, 'a')

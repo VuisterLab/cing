@@ -10,6 +10,9 @@ Execute from cron like (pay attention to correct CINGROOT translation on nmr it 
 Or from command line like:
 $CINGROOT/scripts/cing/CingWrapper.csh  --noProject --script $CINGROOT/python/cing/NRG/weeklyUpdatePdbjMine.py
 
+If the full archive needs to be reset use another script:
+$C/scripts/cing/manualUpdatePdbjMine.csh
+
 @author: jd
 '''
 from cing.Libs.DBMS import DBMS
