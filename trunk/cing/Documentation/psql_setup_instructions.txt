@@ -232,3 +232,9 @@ sudo su postgres
 # after downloading from pdbj & setting options in script:
 $CINGROOT/scripts/cing/manualUpdatePdbjMine.csh >& ~/manualUpdatePdbjMine_2.log &
 # takes 77 Gb
+
+# 2012-02-16
+# Trying restore over an existing database first now.
+# Does that work?????
+# See file $C/scripts/cing/manualUpdatePdbjMine.csh
+
