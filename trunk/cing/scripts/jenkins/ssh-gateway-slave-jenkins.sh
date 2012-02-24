@@ -14,6 +14,9 @@
 #       /home/i/workspace/cingStable/scripts/jenkins/ssh-gateway-slave-jenkins.sh www.cmbi.ru.nl jurgend nmrpro.cmbi.umcn.nl jd /Users/jd/workspace/jenkins/slave.jar
 # or for NMRproVC
 #       /home/i/workspace/cingStable/scripts/jenkins/ssh-gateway-slave-jenkins.sh www.cmbi.ru.nl jurgend  vcnmr.cmbi.umcn.nl  i   /home/i/workspace/jenkins/slave.jar
+# or for LVCa
+#       /home/i/workspace/cingStable/scripts/jenkins/ssh-gateway-slave-jenkins.sh 143.210.182.231     jurgen 10.1.182.220         i   /home/i/workspace/jenkins/slave.jar
+#       /home/i/workspace/cingStable/scripts/jenkins/ssh-gateway-slave-jenkins.sh gate1.nmrc.le.ac.uk jurgen lvca                 i   /home/i/workspace/jenkins/slave.jar
 #
 
 if [ $# -ne 5 ]

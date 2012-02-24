@@ -2661,6 +2661,9 @@ class DistanceRestraint(Restraint):
     STATUS_NOT_DEASSIGNED = 'not deassigned'
     STATUS_REMOVED_DUPLICATE = 'removed duplicate'
     STATUS_NOT_REMOVED_DUPLICATE = 'not removed duplicate'
+    # The maximum number of atom pairs expected before it will be treated normally.
+    # This is to prevent HADDOCK AIR restraints to slow CING to a crawl as per issue 324. 
+    MAX_ATOM_PAIRS_EXPECTED = 1000
 
 #    def __init__( self, atomPairs=[], lower=0.0, upper=0.0, **kwds ):
     def __init__(self, atomPairs = NTlist(), lower = None, upper = None, **kwds):
@@ -2769,10 +2772,18 @@ class DistanceRestraint(Restraint):
     #end def
 
     def simplify(self):
-        """Return True on error.
+        """
+        Return True on error.
 
         Routine is iterative itself because both sides may contain ambis to collapse and remove.
         """
+        atomPairCount = len(self.atomPairs)        
+        if atomPairCount > DistanceRestraint.MAX_ATOM_PAIRS_EXPECTED: # Happens for entry 2bgf as per issue 324.
+#            nTdebug('In %s; skipping restraint %s with %s atom pairs which is more than the maximum expected: %s' % (
+#                getCallerName(), self, atomPairCount, DistanceRestraint.MAX_ATOM_PAIRS_EXPECTED))
+            return self.STATUS_NOT_SIMPLIFIED
+        # end if
+        
         statusOverall = self.STATUS_NOT_SIMPLIFIED
         status = self.STATUS_SIMPLIFIED
         while status == self.STATUS_SIMPLIFIED:
@@ -2850,7 +2861,6 @@ class DistanceRestraint(Restraint):
         j stands for the index of the atomPair of the outer loop that might be removed upon simplification.
         i stands for the index of the atomPair of the inner loop that is compared to and that might be modified to include atoms from atomPair j.
         """
-
 #        nTdebug('Starting simplifyForFc for\n:%r' % ( self ) )
         atomPairIdxJ = len(self.atomPairs) # starting from the end.
         while atomPairIdxJ > 1:

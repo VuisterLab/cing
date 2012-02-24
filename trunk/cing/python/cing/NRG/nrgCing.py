@@ -13,6 +13,7 @@ $CINGROOT/python/cing/NRG/nrgCing.py [entry_code]
 
 $CINGROOT/python/cing/NRG/nrgCing.py 1brv prepare
 $CINGROOT/python/cing/NRG/nrgCing.py 1brv runCing
+$CINGROOT/python/cing/NRG/nrgCing.py 2l2e prepare 0 1
 
 As a cron job this will:
     - create a todo list
@@ -242,7 +243,7 @@ class NrgCing(Lister):
 
         self.map_issue_to_bad_entry_list = NTdict()
         # NRG issue. Bad ccpn docr project
-        self.map_issue_to_bad_entry_list[(PROJECT_ID_NRG, 272)] = '1lcc 1lcd 2l2z 2neo 2l2e 2l2w 2l2x 2l2y'.split()        
+        self.map_issue_to_bad_entry_list[(PROJECT_ID_NRG, 272)] = '1lcc 1lcd 2neo'.split()        
         # FC created a CCPN project that fails to read in again.
         self.map_issue_to_bad_entry_list[(PROJECT_ID_CING, 266)] = '134d 177d 1gnc 1lcc 1lcd 1qch 1sae 1sak 1sal 3sak'.split() 
         # Queeny runs out of 2Gb memory for 2rqf 
@@ -2217,7 +2218,7 @@ class NrgCing(Lister):
         if 0: # DEFAULT 0
             nTmessage("Going to use non-default entry_list_todo in runCing")
 #            self.entry_list_todo = readLinesFromFile('/Users/jd/NRG/lists/bmrbPdbEntryList.csv')
-            self.entry_list_todo = "1brv 1hkt 1mo7 1mo8 1ozi 1p9j 1pd7 1qjt 1vj6 1y7n 2fws 2fwu 2jsx".split()
+            self.entry_list_todo = "2l2e 2l2w 2l2x 2l2y 2l2z".split()
             self.entry_list_todo = NTlist( *self.entry_list_todo )
             if False:
                 if self.searchPdbEntries():

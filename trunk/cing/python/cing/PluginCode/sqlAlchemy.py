@@ -110,7 +110,7 @@ class CgenericSql(NTdict): # pylint: disable=R0902
         ntries = 0
         while ntries < maxTries:
             ntries += 1
-            nTdebug("Trying to connect to DB")
+#            nTdebug("Trying to connect to DB")
             try:
                 self.conn = self.engine.connect()
                 if self.conn:

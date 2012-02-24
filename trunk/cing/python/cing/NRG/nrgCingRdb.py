@@ -125,7 +125,7 @@ class NrgCingRdb():
         'Instead of waiting for gc or otherwise to close the connections.'
         nTmessage("Closing RDB connections for %s" % self)
         for c in [ self.jsql, self.csql]:
-            nTdebug("Closing %s" % c)
+#            nTdebug("Closing %s" % c)
             if not c:
                 nTdebug("Was not open to be closed %s" % c)
                 continue
@@ -232,7 +232,7 @@ class NrgCingRdb():
         Return True on error.
         If no entry was present then the return is still None.
         """
-        nTdebug("In %s entry_code: %s" % (getCallerName(), entry_code))
+        nTmessage("In %s entry_code: %s" % (getCallerName(), entry_code))
         result = self.execute(self.centry.delete().where(self.centry.c.pdb_id == entry_code))
 
         if not result.rowcount:
@@ -285,7 +285,7 @@ nrgcing.entry_list_selection s1
 WHERE
 e.entry_id = r.entry_id AND
 e.pdb_id = s1.pdb_id;
-""" % tuple( [self.schema] *2 )
+""" % tuple( [self.schema] *1 )
         stmtList = [ stmt1, stmt2, stmt3, stmt4, stmt5, stmt6]
         for stmt in stmtList:
 #            nTdebug("Executing: %s" % stmt)
