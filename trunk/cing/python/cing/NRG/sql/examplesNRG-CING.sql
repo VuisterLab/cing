@@ -387,3 +387,5 @@ update nrgcing.cingentry set chothia_class_str='a/b' where chothia_class = 2;
 update nrgcing.cingentry set chothia_class_str='coil' where chothia_class = 3; 
 
 update nrgcing.cingentry set bmrb_id=NULL where bmrb_id = 9; 
+
+ALTER TABLE nrgcing.cingresidue ADD COLUMN is_present BOOLEAN DEFAULT NULL;

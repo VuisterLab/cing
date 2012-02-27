@@ -1,18 +1,65 @@
--- A temporary table to contain the percentages of residues rog.
--- TODO: taking into account the entry AND range selection.
+-- Queries for analyses done for the CING paper.
+
+-- This is file: $C/python/cing/NRG/sql/CING_paper_queries.sql
+
+select
+e.name,
+e.ranges,
+e.sel_1 
+from
+nrgcing.cingentry e
+where
+e.name = '1ai0'
+order by
+e.name ASC
+limit 50;
+-- 1brv 1ai0 2kwk
+select
+e.name,
+c.name,
+r.number,
+r.name,
+r.rog,
+r.sel_1 
+from
+nrgcing.cingentry e,
+nrgcing.cingchain c,
+nrgcing.cingresidue r
+where
+e.entry_id = c.entry_id AND
+e.entry_id = r.entry_id AND
+e.name = '2kwk'
+--r.sel_1 = true
+order by
+e.name ASC,
+c.name ASC,
+r.number ASC
+limit 50;
+
+-- A derived table to contain the percentages of residues rog.
 drop TABLE IF EXISTS nrgcing.tmpentry; 
 CREATE TABLE nrgcing.tmpentry as (
-    select c.entry_id as entry_id, c.rog as rog,
-    ((100.0*c.ccount)/e.res_count) as cperc
-    from nrgcing.cingentry e,
+    select e.entry_id as entry_id,
+    e.name,
+    c.rog as rog,
+    c.ccount as count,
+    e.res_count as total_count,
+    round( (100.0*c.ccount)/e.res_count, 2) as cperc
+    from
+    nrgcing.cingentry e,
     (
-        select r2.entry_id as entry_id, r2.rog as rog, count(*) as ccount from
-        nrgcing.cingresidue r2
-        group by r2.entry_id, r2.rog
+        select r.entry_id as entry_id, r.rog as rog, count(*) as ccount from
+        nrgcing.cingresidue r
+        where r.sel_1 = true
+        group by r.entry_id, r.rog
     ) as c
-    where e.entry_id = c.entry_id    
-    order by e.entry_id, c.rog asc
+    where
+    e.entry_id = c.entry_id AND
+    e.name = '1brv'
+--    group by e.entry_id, c.ccount -- optional? 
+    order by e.entry_id asc
 );
+
 
 -- Select pdb entries of sufficient badness that are large enough but also have
 -- enough data and all data types.
@@ -41,26 +88,6 @@ from nrgcing.entry_list_selection;
 
 
 
--- Alternative definition of the same as above 
--- The only change is the group by line. Check for the effect later.
-CREATE TABLE nrgcing.tmpentry as (
-    select e.entry_id as entry_id,
-    c.rog as rog,
-    round( (100.0*c.ccount)/e.res_count, 2) as cperc
-    from
-    nrgcing.cingentry e,
-    (
-        select r2.entry_id as entry_id, r2.rog as rog, count(*) as ccount from
-        nrgcing.cingresidue r2
-        group by r2.entry_id, r2.rog
-    ) as c
-    where
-    e.entry_id = c.entry_id
-    group by e.entry_id, c.ccount 
-    order by e.entry_id asc
-);
-
-
 -- Unused select
 select r.entry_id as entry_id, count(*) as cred 
 from nrgcing.cingresidue r
@@ -71,6 +98,9 @@ group by r.entry_id;
 
 -- residue_list_selection is defined and created from nrgCingRdb.py:
 -- Find residues in entry selection and residue selection.
+-- On 2012-02-27 this was:
+-- 111052 false
+-- 587710 true
 select count(*), s2.sel_1 
 FROM nrgcing.residue_list_selection s2
 group by s2.sel_1;
@@ -85,7 +115,12 @@ COPY (
     WHERE
     e.pdb_id = s1.pdb_id
 ) TO '/tmp/nrgcing_ranges.csv' WITH CSV HEADER;
--- Gives 6383 rows/entries. Process with segmentAnalysisCingPaper.py
+-- Copy to development machine.
+--      cd /Users/jd/CMBI/Papers/CING/Data
+--      scp i@nmr.cmbi.ru.nl:/tmp/nrgcing_ranges.csv .
+-- On 2012-02-27 this was: 6461 rows/entries.
+--      wc nrgcing_ranges.csv
+-- Process with segmentAnalysisCingPaper.py
 
 -- Find number of chains in selected entries and selected residues
 -- Skipping chains that don't have selected residues anyway (such as water).
@@ -116,29 +151,29 @@ from (
     order by e.pdb_id, c.name asc
 ) as temp
 
--- Three-residue streches in range:
- 1cfa   B        3
- 1dxw   B        3
- 1jmq   B        3
- 1jsp   B        3
- 1k3n   B        3
- 1k3q   B        3
- 1k9r   B        3
- 1m0v   B        3
- 1mw4   B        3
- 1ozs   B        3
- 1wco   A        3
- 2ain   B        3
- 2aiz   B        3
- 2bbu   B        3
- 2dyf   B        3
- 2g46   B        3
- 2g46   D        3
- 2h3s   A        3
- 2ka9   C        3
- 2khh   B        3
- 2krb   B        3
- 2kwk   A        3 Residues 1-3 have s2.sel_1 set but aren't in range string. this is a bug.
+-- Three-residue streches in range: (shouldn't exist per auto range selection).
+-- 1cfa   B        3
+-- 1dxw   B        3
+-- 1jmq   B        3
+-- 1jsp   B        3
+-- 1k3n   B        3
+-- 1k3q   B        3
+-- 1k9r   B        3
+-- 1m0v   B        3
+-- 1mw4   B        3
+-- 1ozs   B        3
+-- 1wco   A        3
+-- 2ain   B        3
+-- 2aiz   B        3
+-- 2bbu   B        3
+-- 2dyf   B        3
+-- 2g46   B        3
+-- 2g46   D        3
+-- 2h3s   A        3
+-- 2ka9   C        3
+-- 2khh   B        3
+-- 2krb   B        3
+-- 2kwk   A        3 Residues 1-3 have s2.sel_1 set but aren't in range string. this is a bug.
 
  
 SELECT e.pdb_id, c.name, r.number

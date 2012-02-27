@@ -216,6 +216,7 @@ CREATE TABLE casdcing.cingresidue
     selection                 bigint DEFAULT NULL,
     is_common                      BOOLEAN DEFAULT NULL,
     is_termin                      BOOLEAN DEFAULT NULL,
+    is_present                     BOOLEAN DEFAULT NULL, -- See routine hasCoordinates (only 1 needed).
 --   whatif (averages over the ensemble of selected models)
     wi_acclst                      FLOAT DEFAULT NULL,
     wi_angchk                      FLOAT DEFAULT NULL,

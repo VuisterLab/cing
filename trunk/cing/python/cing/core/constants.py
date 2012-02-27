@@ -186,6 +186,7 @@ NAME_STR        = 'name'
 RES_NAME_STR    = 'resName'
 RES_NUMB_STR    = 'resNum'
 NUMBER_STR      = 'number'
+NAMEDICT_STR    = 'nameDict'
 
 ARCHIVE_ID_STR  = 'archive_id'
 PDB_ID_STR      = 'pdb_id'
