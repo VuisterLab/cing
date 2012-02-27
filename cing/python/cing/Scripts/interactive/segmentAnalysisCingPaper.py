@@ -4,8 +4,8 @@ from cing.Libs.DBMS import getRelationFromCsvFile
 from cing.Libs.NTutils import * #@UnusedWildImport
 
 def run():
-    relationName =  'nrgcing_ranges' 
-    fn = os.path.join( '/Users/jd', relationName + '.csv')
+    relationName =  'nrgcing_ranges'
+    fn = os.path.join( '/Users/jd/CMBI/Papers/CING/Data', relationName + '.csv')
     
     nchains = 7363
     nsegments = 0 

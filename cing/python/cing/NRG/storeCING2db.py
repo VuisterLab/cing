@@ -557,7 +557,10 @@ def doStoreCING2db( entry_code, archive_id, project = None):
 
             nameR = residue.resName
             numberR = residue.resNum
-            sel_1R = molecule.rangesContainsResidue(residue)
+            sel_1R = molecule.rangesContainsResidue(residue)            
+            is_commonR = residue.isCommon()
+            is_terminR  = residue.isNterminal() or residue.isCterminal()            
+            is_present_R = residue.hasCoordinates()
             dssp_id = getDsspSecStructConsensusId(residue)
 
 #            r_distance_count = residue.distanceRestraints.lenRecursive(max_depth = 1) # filled in partition restraints
@@ -662,7 +665,10 @@ def doStoreCING2db( entry_code, archive_id, project = None):
                 entry_id=entry_id,
                 chain_id=chain_id,
                 name=nameR,
-                sel_1=sel_1R,
+                sel_1=sel_1R,                
+                is_common=is_commonR,
+                is_termin=is_terminR,
+                is_present=is_present_R,
                 number=numberR,
                 dssp_id=dssp_id,
                 wi_acclst=r_wi_acclst,

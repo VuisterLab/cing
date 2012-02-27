@@ -64,10 +64,13 @@ chothiaClassDbC = 'coil'
 
 mapChothia_class2Int     = {chothiaClassA: 0,  chothiaClassB : 1,  chothiaClassAB : 2, chothiaClassC : 3, None: None}
 mapChothia_classId2DbStr = {0:chothiaClassDbA, 1:chothiaClassDbB , 2:chothiaClassDbAB, 3:chothiaClassDbC, None: None}
-# Only 20 AA and 5 NA; Nota Bena no variants.
+# Only 20 AA and 5 NA; No variants.
 common20AAList = "ALA ARG ASN ASP CYS GLN GLU GLY HIS ILE LEU LYS MET PHE PRO SER THR TRP TYR VAL".split()
+# The variants known to CING.
 commonAAList = common20AAList + "ASPH GLUH HISE CYSS".split() # do not put these into common20AAList
 commonNAList = "A T G C U".split()
+# The variants known to CING.
+commonNAList = commonNAList + "DA DT DG DC".split()
 commonResidueList = commonAAList + commonNAList
 
 common20AADict = nTlist2dict(common20AAList)
@@ -1380,8 +1383,10 @@ class Molecule( NTtree, ResidueList ):
         """
         selectedResidues = self.selectedResidues
         if ranges != None:
+#            nTdebug("In %s ranges are interpreted from %s" % (getCallerName(), ranges))
             selectedResidues = self.ranges2list(ranges)
         # end if
+#        nTdebug("In %s selectedResidues are: %s" % (getCallerName(), str(selectedResidues)))
         return residue in selectedResidues
     # end def
 
@@ -2857,14 +2862,20 @@ Return an Molecule instance or None on error
         short fragment (equal to or shorter than excludeFragmentSize).
 
         If the result is an empty selection then invert and return all.
+        
+        Residues without coordinates and water molecules are excluded.
         """
         debugRoutine = False
-
+        if debugRoutine:
+            nTdebug("Starting to debug: %s" % getCallerName())
+        # endif
         if self.modelCount < 2:
             if debugRoutine:
                 nTdebug("Without multiple models the cv can not be used for determining the ranges in rangesByCv. Currently %s model(s)" % 
                         self.modelCount)
+            # end if
             return ALL_RANGES_STR
+        # end if        
 
         residueList = NTlist()
         max_cv = 0.0
@@ -2875,21 +2886,26 @@ Return an Molecule instance or None on error
             if len(proteinResidues) == 0:
                 if debugRoutine:
                     nTdebug("Adding all residues of non-protein chain: %s" % ch)
+                # end if
                 residueList.addList( ch.allResidues() )
+            # endif                
             resList = ch.allResidues()
             n = len(resList)
             if not n:
                 continue
+            # endif                  
             cvList = NTlist()
             for r in resList:
                 cv = r.getDeepByKeys(CV_BACKBONE_STR)
                 if cv == None:
                     cv = 0.0
+                # end if                    
                 cvList.append( cv )
                 max_cv = max( max_cv, cv)
-
+            # end for
             if debugRoutine:
                 nTdebug("Found cvList list: %s" % ' '.join([ "%5.2f" % x for x in cvList ]))
+            # end if                
             cvListWindowAveraged = cvList
             # Do window averaging by numpy
             if False: # convolve will return a wrong sized array if cvList is smaller
@@ -2898,15 +2914,18 @@ Return an Molecule instance or None on error
                 cvListWindowAveraged=convolve(w/w.sum(),cvList,mode='same')
                 if debugRoutine:
                     nTdebug("data: %s" % str(cvList))
+                # end if                    
                 cvListWindowAveraged[0] = cvList[0] # Preserves up to the first derivative.
                 cvListWindowAveraged[n-1] = cvList[n-1]
-
                 # above works fine except for terminii.
                 if debugRoutine:
                     nTdebug("Filtd cvList list: %s" % ' '.join([ "%5.2f" % x for x in cvListWindowAveraged ]))
+                # end if
+            # end if                                    
             for i,r in enumerate(resList): # can be optimized by NTlist method
                 if cvListWindowAveraged[i] <= cvCutoff:
                     residueList.append(r)
+                # end if
             # end for
         if not residueList:
             nTwarning("No residues left in rangesByCv; max cvList of any residue: %s. Return all residues." % max_cv)
@@ -2920,14 +2939,16 @@ Return an Molecule instance or None on error
         if ranges == None:
             nTerror("Failed to get residueList2Ranges in rangesByCv")
             return None
-
+        # end if
         if includeGapSize:
             if debugRoutine:
                 nTdebug("Starting includeGapSize with ranges: %s" % ranges)
+            # end if                
             startStopList = self.ranges2StartStopList(ranges)
             if startStopList == None:
                 nTerror("Failed to get ranges2StartStopList in rangesByCv")
                 return None
+            # end if
             i = len(startStopList) - 2 # start of last segment
             while i >= 2:
                 j = i/2 #@UnusedVariable
@@ -2937,24 +2958,30 @@ Return an Molecule instance or None on error
                 if debugRoutine:
                     nTdebug("Trying to join 2 ranges [j=%s,i=%s] to a larger one by including residues between: %s %s diff %s" % (
                         j,i, res1,res2, resDifCount))
+                    # end if
                 if resDifCount == None:
                     if debugRoutine:
                         nTdebug("Failed to get residueNumberDifference in rangesByCv for residues[%s %s]" % (res1,res2))
+                    # end if
                     i -= 2
                     continue
                 if resDifCount > (includeGapSize+1):
                     if debugRoutine:
                         nTdebug("Skipping gap between: %s %s diff %s includeGapSize %s" % (res1,res2, resDifCount, includeGapSize))
+                    # end if
                     i -= 2
                     continue
+                # end if
                 # This routine can be use to join adjacent ranges. by virtue of condition "resDifCount == 1"
                 if debugRoutine:
                     nTdebug("By includeGapSize, joining 2 ranges (j-1,j) (%s,%s) to a larger one by including residues between" % (j-1,j))
+                    # end if
                 startStopList[i-1] = startStopList[i+1] # stop last segment
                 del startStopList[i+1] # delete stop in a way that deletes can't bite each other.
                 del startStopList[i] # delete start
                 if debugRoutine:
                     nTdebug("By includeGapSize, ranges modified to: %s" % self.startStopList2ranges(startStopList))
+                    # end if
                 i -= 2
             # end while
             ranges = self.startStopList2ranges(startStopList)
@@ -2963,36 +2990,66 @@ Return an Molecule instance or None on error
                 return None
             if debugRoutine:
                 nTdebug("Finishing includeGapSize with ranges: %s" % ranges)
+            # end if
         # end if
 
         if excludeFragmentSize:
             if debugRoutine:
                 nTdebug("Starting excludeFragmentSize with ranges: %s" % ranges)
+            # end if
             rangeListNew = []
             for rangeStr in ranges.split(','):
                 if debugRoutine:
                     nTdebug("In excludeFragmentSize looking at range: %s" % rangeStr)
+                # end if
                 residueListSingleRange = self.ranges2list(rangeStr)
                 if residueListSingleRange == None:
                     nTerror("Failed to get ranges2list in rangesByCv for single range: [%s] in rangesByCv" % rangeStr)
                     return None
+                # end if
                 if len(residueListSingleRange) <= excludeFragmentSize:
                     if debugRoutine:
                         nTdebug("Short fragment will be ignored in rangesByCv: [%s]" % rangeStr)
+                    # end if
                     continue
+                # end if
                 rangeListNew.append(rangeStr)
             # end for
             if not rangeListNew:
                 nTwarning(("No residues left in rangesByCv for ranges: [%s] in rangesByCv after sub selecting for excludeFragmentSize. "+
                           "Returning all residues.") % ranges)
                 return ALL_RANGES_STR
+            # end if
             ranges = ','.join(rangeListNew)
             if debugRoutine:
                 nTdebug("Finishing excludeFragmentSize with ranges: %s" % ranges)
-            return ranges # No need to construct this again. It wouldn't simplify the string.
+            # end if
+#            return ranges # No need to construct this again. It wouldn't simplify the string.
         # end if
-
-        ranges = self.residueList2Ranges(residueList)
+        
+        residueList = self.ranges2list(ranges)
+        # Exclude water and absent residues
+        residueList2 = NTlist()
+        for residue in residueList:
+            if residue.isWater():
+                nTdebug("Excluding water: %s" % residue)
+                continue
+            # end if
+            if not residue.hasCoordinates():
+                nTdebug("Excluding coordinateless residue: %s" % residue)
+                continue
+            # end if
+#            if debugRoutine:
+#                nTdebug("Including: %s" % residue)
+            # end if
+            residueList2.append(residue)
+        # end for
+        ranges = self.residueList2Ranges(residueList2)
+        if not residueList2:
+            nTwarning(("No residues left in rangesByCv for ranges: [%s] in rangesByCv after removing water and absent residues. "+
+                      "Returning all residues.") % ranges)
+            return ALL_RANGES_STR
+        # end if
         return ranges
 
     def superpose( self, ranges=None, backboneOnly=True, includeProtons = False, iterations=2, autoLimit=0.7 ):
@@ -3935,7 +3992,7 @@ Chain class: defines chain properties and methods
             elif residue.hasProperties(HOH_STR):                          # NB the difference betweeen HOH_STR and WATER_STR
                 molTypeResidueCountList[mapMoltypeToInt[WATER_STR]] += 1
             else:
-                nTwarning("Found uncommon mol type for %s" % residue)
+#                nTdebug("Found uncommon mol type for %s" % residue)
                 molTypeResidueCountList[mapMoltypeToInt[OTHER_STR]] += 1
             # end if
         # end for        
@@ -3948,6 +4005,14 @@ Chain class: defines chain properties and methods
         # end for
         return mapMoltypeToInt[OTHER_STR]
     #end def
+    
+    def isWater(self):
+        cIdxMolType = self.getIdxMolType()
+        if cIdxMolType == mapMoltypeToInt[WATER_STR]:
+            return True
+        # end if        
+        return False
+    # end def
     
     def getSymmetryDR( self, other, modelIdx = None ):
         """
@@ -4660,20 +4725,37 @@ Residue class: Defines residue properties
     #end def
 
     def isNterminal(self):
-        """Return True for N-terminal residue; ie. a residue with H1, H2, H3 atoms.
+        """
+        Return True for N-terminal residue; ie. a residue with H1, H2, H3 atoms.
         """
         return self.Nterminal
 
     def isCterminal(self):
-        """Return True for C-terminal residue; ie. a residue with OXT (O'') atom.
+        """
+        Return True for C-terminal residue; ie. a residue with OXT (O'') atom.
         """
         return self.Cterminal
 
-    def isCommon(self, resType):
-        """Return True if residue is one of the common 20 AA or 5 NA.
+    def isCommon(self, resType=None):
         """
+        Return True if residue is one of the common 20 AA or 5 NA.
+        """
+        if resType == None:
+            resType = getDeepByKeysOrAttributes( self, DB_STR, NAMEDICT_STR, IUPAC )                        
+        # end if
         return resType in commonResidueList
 
+    def isWater(self):
+        if self.chain.isWater():
+            return True
+        # end if
+        if self.hasProperties('HOH'): # In entry 1l0r the water had HOH but not water set.
+#            nTwarning("Water residue %s almost slipped in because it was in a non-water chain. Skipping now." % self)
+            return True
+        # end if
+        return False
+    # end def
+    
     def hasProperties(self, *properties):
         """
         Returns True if Residue has the argument properties, False otherwise.

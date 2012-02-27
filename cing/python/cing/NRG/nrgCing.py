@@ -243,9 +243,9 @@ class NrgCing(Lister):
 
         self.map_issue_to_bad_entry_list = NTdict()
         # NRG issue. Bad ccpn docr project
-        self.map_issue_to_bad_entry_list[(PROJECT_ID_NRG, 272)] = '1lcc 1lcd 2neo'.split()        
+        self.map_issue_to_bad_entry_list[(PROJECT_ID_NRG, 272)] = '1lcc 1lcd'.split()        
         # FC created a CCPN project that fails to read in again.
-        self.map_issue_to_bad_entry_list[(PROJECT_ID_CING, 266)] = '134d 177d 1gnc 1lcc 1lcd 1qch 1sae 1sak 1sal 3sak'.split() 
+        self.map_issue_to_bad_entry_list[(PROJECT_ID_CING, 266)] = '134d 177d 1gnc 1lcc 1lcd 1qch 1sae 1sak 1sal 2neo 3sak'.split() 
         # Queeny runs out of 2Gb memory for 2rqf 
         self.map_issue_to_bad_entry_list[(PROJECT_ID_CING, 310)] = '2rqf'.split() 
         # Issue 312:   FC doing a bad calculation in swapping for SSA.        
