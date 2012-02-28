@@ -1223,8 +1223,57 @@ class Molecule( NTtree, ResidueList ):
             return None
 #        nTdebug( 'rangeResidueList (just the inclusive boundaries): %s' % rangeResidueList)
         return rangeResidueList
-
-
+    # end def
+    
+    @staticmethod
+    def ranges2StartStopLoLStatic( ranges ):
+        """
+        Simple code without reference to exact molecule description.
+        Used e.g. by cing/Scripts/interactive/segmentAnalysisCingPaper.py
+        See test_RangeSelectionStatic code in test_molecule.
+        NB that this is a completely different data structure than the regular function.
+        
+        Return None on error.
+        """
+        segmentList = ranges.split(',')
+        result = []
+        for segment in segmentList:
+            if len(segment) < 1:
+                nTwarning("Ignoring empty string for segment in ranges: [%s]" % str(ranges))
+            # end if            
+            # Code block resembling the code in _rangesStr2list()            
+            chainId = Chain.defaultChainId # indicates no chain id present
+            firstChar = segment[0]
+            rangeStrClean = segment
+            if not (firstChar.isdigit() or firstChar == '-'):
+                if segment[1] != '.':
+                    nTerror("In %s; failed to parse ranges: %s" % (getCallerName(), ranges))
+                    return
+                rangeStrClean = segment[2:]
+                chainId = segment[0]
+            # end if
+#            nTdebug("rangeStrClean: [%s] chainId [%s]" % (rangeStrClean, chainId))
+            rangeIntList = asci2list(rangeStrClean, onlyStartStopIdx = True)
+            n = len(rangeIntList)
+            if n % 2:
+                nTerror("Failed to get even number of resulting start/stops in %s for %s" % (getCallerName(), ranges))
+                return
+            # end if
+            m = n / 2
+            if m < 1:
+                nTerror("Failed to get any resulting start/stops in %s for %s" % (getCallerName(), ranges))
+                return
+            # end if
+            for i in range(m):
+                offset = 2 * i
+                segmentItemResult = [ chainId, rangeIntList[offset], rangeIntList[offset+1] ]
+                result.append( segmentItemResult )
+            # end for
+        # end for
+#        nTdebug( 'result: %s' % result)
+        return result
+    # end def
+    
     def startStopList2ranges(self, startStopList):
         """
         Expand pairs start, stop to ranges
@@ -2859,7 +2908,7 @@ Return an Molecule instance or None on error
         are equal to or shorter than 'includeGapSize'. This prevents small gaps.
 
         Second the excludeFragmentSize parameter (DEFAULT: 4) will remove a
-        short fragment (equal to or shorter than excludeFragmentSize).
+        short fragment (equal to or shorter than excludeFragmentSize). Inclusive.
 
         If the result is an empty selection then invert and return all.
         
@@ -2991,8 +3040,15 @@ Return an Molecule instance or None on error
             if debugRoutine:
                 nTdebug("Finishing includeGapSize with ranges: %s" % ranges)
             # end if
-        # end if
-
+            # Possibly bad residues have been introduced. Omit them again.
+            rangesNew = self.omitWaterAndMissingResiduesFromRanges(ranges)
+            if rangesNew != ranges:
+                if debugRoutine:
+                    nTdebug("-1- Modified ranges from: %s to %s" % (ranges, rangesNew))
+                # end if
+            # end if
+            ranges = rangesNew
+        # end if includeGapSize
         if excludeFragmentSize:
             if debugRoutine:
                 nTdebug("Starting excludeFragmentSize with ranges: %s" % ranges)
@@ -3025,18 +3081,39 @@ Return an Molecule instance or None on error
                 nTdebug("Finishing excludeFragmentSize with ranges: %s" % ranges)
             # end if
 #            return ranges # No need to construct this again. It wouldn't simplify the string.
+        # end if excludeFragmentSize
+        rangesNew = self.omitWaterAndMissingResiduesFromRanges(ranges)
+        if rangesNew != ranges:
+            if debugRoutine:            
+                nTdebug("-2- Modified ranges from: %s to %s" % (ranges, rangesNew))
+            # end if
         # end if
-        
+        ranges = rangesNew
+        return ranges
+
+    def omitWaterAndMissingResiduesFromRanges(self, ranges):
+        """
+        Expands the ranges string to a list of residues and then excludes all
+        residues that are water or that have no atoms with coordinates.
+        """
+        debugRoutine = False
         residueList = self.ranges2list(ranges)
+        if debugRoutine:
+            nTdebug("In %s got: %s" % ( getCallerName(), str(residueList)))
+        # end if
         # Exclude water and absent residues
         residueList2 = NTlist()
         for residue in residueList:
             if residue.isWater():
-                nTdebug("Excluding water: %s" % residue)
+                if debugRoutine:
+                    nTdebug("Excluding water: %s" % residue)
+                # end if
                 continue
             # end if
             if not residue.hasCoordinates():
-                nTdebug("Excluding coordinateless residue: %s" % residue)
+                if debugRoutine:
+                    nTdebug("Excluding coordinateless residue: %s" % residue)
+                # end if
                 continue
             # end if
 #            if debugRoutine:
@@ -3046,12 +3123,16 @@ Return an Molecule instance or None on error
         # end for
         ranges = self.residueList2Ranges(residueList2)
         if not residueList2:
-            nTwarning(("No residues left in rangesByCv for ranges: [%s] in rangesByCv after removing water and absent residues. "+
-                      "Returning all residues.") % ranges)
+            nTwarning(("No residues left in %s for ranges: [%s] in rangesByCv after removing water and absent residues. "+
+                      "Returning all residues.") % (getCallerName(), ranges))
             return ALL_RANGES_STR
         # end if
-        return ranges
-
+        if debugRoutine:
+            nTdebug("%s returns: %s" % (getCallerName(), ranges))
+        # end if
+        return ranges               
+    # end def
+    
     def superpose( self, ranges=None, backboneOnly=True, includeProtons = False, iterations=2, autoLimit=0.7 ):
         """
         Superpose the coordinates of molecule

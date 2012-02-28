@@ -251,6 +251,38 @@ class AllChecks(TestCase):
         atomList = chain0.getRepresentingAtomListsPerResidue(chain1)
         nTdebug("atomList: %s" % str(atomList))
         self.assertEquals( len(atomList[0]), 4)
+    # end def
+    
+    def test_RangeSelectionStatic(self):
+        inputList = """
+            A.1
+            A.1-3
+            A.-2--1
+            A.-2-1
+            A.-3        
+            A.3-52,B.3-52
+            2-40,41
+            1-96,102-177
+            """.split()
+        expectedList = [
+            [ ['A', 1,  1],                    ],
+            [ ['A', 1,  3],                    ],
+            [ ['A',-2, -1],                    ],
+            [ ['A',-2,  1],                    ],
+            [ ['A',-3, -3],                    ],
+            [ ['A', 3, 52],     ['B', 3, 52]   ],
+            [ ['A', 2, 40],     ['A', 41, 41]  ],
+            [ ['A', 1, 96],     ['A', 102, 177]]
+        ]
+        cing.verbosity = verbosityDebug
+        
+        for i, ranges in enumerate(inputList):
+            nTdebug("\ntest_RangeSelectionStatic: %d %s" % (i, ranges))
+            startStopList = Molecule.ranges2StartStopLoLStatic(ranges)
+            nTdebug('startStopList: [%s]' % startStopList)
+            self.assertEqual( startStopList, expectedList[i] )
+        # end for
+    # end def
 
 if __name__ == "__main__":
     cing.verbosity = verbosityDebug

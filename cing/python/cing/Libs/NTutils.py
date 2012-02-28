@@ -3590,7 +3590,7 @@ def quote(inputString):
 #end def
 
 
-def asci2list(inputStr):
+def asci2list(inputStr, onlyStartStopIdx = False):
     """ Convert a string with "," and "-" (or :) to a list of integers
     eg. 1,2,5-8,11,20-40 or
         -20:-19,-2:-1,3:4
@@ -3607,6 +3607,8 @@ def asci2list(inputStr):
     -a-b   # 3 #
     -a--b  # 4 #
     a-b    # 5 # most common
+    
+    If onlyStartStopIdx is set then only pairs of start stop are returned.
     """
     result = NTlist()
 
@@ -3629,21 +3631,30 @@ def asci2list(inputStr):
 
                 if countDash == 0:
 #                    nTdebug("State 1 elm: [%s]" % elm)
-                    result.append(int(elm))
-                    continue # quicky
+                    intElm = int(elm)
+                    if not onlyStartStopIdx:
+                        result.append(intElm)
+                    else:
+                        result += [intElm, intElm]
+                    # end if                    
+                    continue
                 idxMinus = elm.index('-') # first occurance
-                if idxMinus == 0:
-                    if countDash == 1:
-#                        nTdebug("State 2 elm: [%s]" % elm)
-                        result.append(int(elm))
-                        continue # quicky
-
+                if idxMinus == 0 and countDash == 1:
+#                    nTdebug("State 2 elm: [%s]" % elm)
+                    intElm = int(elm)
+                    if not onlyStartStopIdx:
+                        result.append(intElm)
+                    else:
+                        result += [intElm, intElm]
+                    # end if                                        
+                    continue
+                # end if
 #                nTdebug("State 3-5 elm: [%s]" % elm)
                 # Only states 3-5 left which are all ranges and thus contain an int separating dash
                 offset = 0
                 if idxMinus == 0:
                     offset = 1
-
+                # end if
                 idxRangeDash = elm.index('-',offset) # The dash that separates the two ints,
                 start = elm[:idxRangeDash]
                 end = elm[idxRangeDash+1:]
@@ -3658,14 +3669,23 @@ def asci2list(inputStr):
 #            nTdebug("intList: [%s]" % str(tmpList))
             tmpListSize = len(tmpList)
             if tmpListSize == 1:
-                result.append(intList[0])
+                if not onlyStartStopIdx:
+                    result.append(intList[0])
+                else:
+                    result += [intList[0], intList[0]]
+                # end if
             elif tmpListSize == 2:
-                for i in range(intList[0], intList[1]+1):
-                    result.append(i)
+                if not onlyStartStopIdx:
+                    for i in range(intList[0], intList[1]+1):
+                        result.append(i)
+                    # end for
+                else:
+                    result += [intList[0], intList[1]]
+                # end if                
             else:
                 nTerror('asci2list: invalid construct "%s" caused a tmpListSize of %s skipping element: %s' % (inputStr, tmpListSize, elm))
             #end if
-        #end for
+        #end for elm
     except:
 #        NTtracebackError() # disable this verbose messaging after done debugging.
         nTerror('asci2list: failed to convert to int for construct "%s"' % inputStr)

@@ -14,12 +14,13 @@ def run():
         sys.exit(1)
     nTdebug("Set convenience variables")
     m = project.molecule
-    m.rangesByCv()
+    rangesNew = m.rangesByCv()
+    nTdebug("rangesNew: %s" % rangesNew)
 # end def
 
 if __name__ == "__main__":
     cing.verbosity = verbosityDebug
-    n = '1brv'
+    n = '2kua'
     run()
 # end if
     

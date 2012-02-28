@@ -272,6 +272,7 @@ WHERE e.pdb_id = S.pdbid
 AND e.pdb_id = cingsummary.pdb_id
 AND E.MODEL_COUNT > 9
 and cingsummary.weight > 3500.0 -- about 30 residues
+and e.res_count >= 30            --      30 residues
 AND '{2}' <@ S.chain_type; -- contains at least one protein chain.
 """ % tuple( [self.schema] *3 )
         stmt5 = 'drop table if exists %s.residue_list_selection cascade;' % self.schema
