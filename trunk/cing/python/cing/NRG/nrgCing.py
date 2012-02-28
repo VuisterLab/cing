@@ -2447,7 +2447,11 @@ class NrgCing(Lister):
         if 0: # DEFAULT: False
             nTmessage("Going to use non-default entry_list_todo in storeCING2db")
 #            self.entry_list_todo = '1jo4 1mag 1mic 1msh 1n2y 1ng8 1nt5 2kox'.split()
-            self.entry_list_todo = readLinesFromFile('/Users/jd/entry_list_of_interest.csv')
+#            self.entry_list_todo = readLinesFromFile('/Users/jd/entry_list_of_interest.csv')
+#            self.entry_list_todo = getPdbEntries(onlyNmr=True, mustHaveExperimentalNmrData=False)
+            crdb = NrgCingRdb(schema=self.schema_id) # Make sure to close it.
+            self.entry_list_todo = crdb.getPdbIdList(fromCing=True)
+            crdb.close()
 #            self.entry_list_todo = readLinesFromFile(os.path.join(self.results_dir, 'list', 'entry_list_tostore.csv'))
 #            self.entry_list_todo = readLinesFromFile(os.path.join('/Users/jd', 'entry_list_to_store.csv'))
             self.entry_list_todo = NTlist( *self.entry_list_todo )
@@ -2472,7 +2476,7 @@ class NrgCing(Lister):
                             start_entry_id          = 0,
                             max_entries_todo        = self.max_entries_todo,
                             expectPdbEntryList      = True,
-                            shuffleBeforeSelecting  = True,                            
+#                            shuffleBeforeSelecting  = False,                            
                             extraArgList            = extraArgList)
         nTmessage("Done with storeCING2db.")
     # end def

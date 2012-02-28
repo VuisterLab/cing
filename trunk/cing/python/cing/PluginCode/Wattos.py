@@ -205,7 +205,7 @@ Quit
                     "valeList": [ 0.009, 0.100 ],
                     }}
                     """
-        nTdetail("==> Processing the Wattos results into CING data model")
+#        nTdetail("==> Processing the Wattos results into CING data model")
         # Assemble the atom, residue and molecule specific checks
         # set the formats of each check easy printing
 #        self.molecule.setAllChildrenByKey( WHATIF_STR, None)

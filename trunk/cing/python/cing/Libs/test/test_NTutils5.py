@@ -138,6 +138,7 @@ class AllChecks(TestCase):
                       1,2,5-8,11,20-22
                       -20:-19,-2:-1,3:4
                     """.split()
+        # Next time don't use strings for comparisons between arrays are trivial.
         resultLoL = [
                                      '[1]',
                                      '[1, 2, 3]',
@@ -148,10 +149,24 @@ class AllChecks(TestCase):
                                      '[1, 2, 5, 6, 7, 8, 11, 20, 21, 22]',
                       '[-20, -19, -2, -1, 3, 4]',
                      ]
+        resultLoL2 = [
+                                     '[1, 1]',
+                                     '[1, 3]',
+                                     '[-3, 1]',
+                                     '[-2, -1]',
+                                     '[-2, 1]',
+                                     '[-3, -3]',
+                                     '[1, 1, 2, 2, 5, 8, 11, 11, 20, 22]',
+                                     '[-20, -19, -2, -1, 3, 4]',
+                     ]
+        cing.verbosity = cing.verbosityDebug
         for i, inputStr in enumerate(inputList):
-            nTdebug("testAsci2list: %d" % i)
+#            nTdebug("testAsci2list: %d" % i)
             resultStr = str(asci2list(inputStr))
             self.assertEquals( resultStr, resultLoL[i])
+            resultStr2 = str(asci2list(inputStr, onlyStartStopIdx=True))
+            self.assertEquals( resultStr2, resultLoL2[i])
+        # end for
         saveVerbosity = cing.verbosity
         cing.verbosity = cing.verbosityNothing
         result = asci2list('1--2') # will cause an error message and an empty return list.

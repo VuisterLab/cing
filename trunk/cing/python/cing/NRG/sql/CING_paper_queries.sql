@@ -2,6 +2,7 @@
 
 -- This is file: $C/python/cing/NRG/sql/CING_paper_queries.sql
 
+-- Testing with: 1brv 1ai0 2kwk
 select
 e.name,
 e.ranges,
@@ -9,11 +10,12 @@ e.sel_1
 from
 nrgcing.cingentry e
 where
-e.name = '1ai0'
+e.name in ( '2kwk', '1brv', '1ai0')
 order by
 e.name ASC
 limit 50;
--- 1brv 1ai0 2kwk
+
+-- And
 select
 e.name,
 c.name,
@@ -86,6 +88,15 @@ order by b.deposition_date desc limit 20000;
 select count(*) 
 from nrgcing.entry_list_selection;
 
+-- Check existence of a particular entry.
+select *
+FROM nrgcing.entry_list_selection es
+where es.pdb_id = '1gac'
+
+select e.pdb_id, e.res_count
+FROM nrgcing.cingentry e
+where e.pdb_id = '1gac'
+
 
 
 -- Unused select
@@ -97,6 +108,7 @@ group by r.entry_id;
 
 
 -- residue_list_selection is defined and created from nrgCingRdb.py:
+-- and it is simply the residues for which sel1 is true. (Quite trivial).
 -- Find residues in entry selection and residue selection.
 -- On 2012-02-27 this was:
 -- 111052 false
@@ -104,6 +116,15 @@ group by r.entry_id;
 select count(*), s2.sel_1 
 FROM nrgcing.residue_list_selection s2
 group by s2.sel_1;
+
+
+
+
+
+select * 
+from nrgcing.cingsummary cs
+where cs.pdb_id = '1gac'
+order by cs.pdb_id asc;
 
 -- Find number of segments in range per entry
 -- First create a quoted csv file.
@@ -120,11 +141,10 @@ COPY (
 --      scp i@nmr.cmbi.ru.nl:/tmp/nrgcing_ranges.csv .
 -- On 2012-02-27 this was: 6461 rows/entries.
 --      wc nrgcing_ranges.csv
--- Process with segmentAnalysisCingPaper.py
+-- Process with segmentAnalysisCingPaper.py and not the below sql because we do need a procedural language for this.
 
 -- Find number of chains in selected entries and selected residues
 -- Skipping chains that don't have selected residues anyway (such as water).
-
 -- Skipping chains that contain only 1 residue such as ions and simplest ligands
 -- Depending on cutoff we get total number of chains:
 -- 1 7426
@@ -134,21 +154,23 @@ COPY (
 -- Gives average length:   7363 75.6176830096428086
 SELECT count(*), avg(temp.l) 
 from (
-    SELECT e.pdb_id, c.name, count(*) as l
+    SELECT e.pdb_id, e.timestamp_last, c.name, count(*) as size
     FROM 
     nrgcing.cingentry e,
     nrgcing.cingchain c,
-    nrgcing.cingresidue r,
-    nrgcing.residue_list_selection s2
+    nrgcing.cingresidue r
+--    nrgcing.residue_list_selection s2
     WHERE
     e.entry_id = c.entry_id AND
-    c.chain_id = r.chain_id AND
-    r.residue_id = s2.residue_id AND
+    e.entry_id = r.entry_id AND
+--    r.residue_id = s2.residue_id AND
+    e.timestamp_last > '2012-02-26' AND
 --	e.pdb_id = '2kwk' AND
-    s2.sel_1 = true
-    group by e.pdb_id, c.name
-    having count(*) > 4
-    order by e.pdb_id, c.name asc
+    r.sel_1 = true
+    group by e.pdb_id, e.timestamp_last, c.name
+    having count(*) > -1
+    order by count(*) asc, e.pdb_id, c.name asc
+    limit 50
 ) as temp
 
 -- Three-residue streches in range: (shouldn't exist per auto range selection).
