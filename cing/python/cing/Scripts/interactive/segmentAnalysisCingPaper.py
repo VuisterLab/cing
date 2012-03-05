@@ -1,6 +1,9 @@
 # python -u $CINGROOT/python/cing/Scripts/interactive/segmentAnalysisCingPaper.py
 
 """
+-- Code on next line refers to cited numbers in the manuscript.
+[SQL003] 
+
 Result on 2012-02-27:
 nentries:                6460
 nchains:                 7735

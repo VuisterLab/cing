@@ -1,7 +1,31 @@
 ALSO SEE: $NRG/scripts/sql/prepare_database_mysql.sql and handy_commands.sql
-            http://lists.macosforge.org/pipermail/macports-users/2008-April/009780.html but not fully accurate.
             http://guide.macports.org/#reference.startupitems
             http://www.jasonrowland.com/2009/10/install-mysql5-on-snow-leopard-using-macports/
+
+=== Notes 2012-03-02 on Duvel ===
+* New setup with mysql 5.1 from mac ports. Start a regular and a root user window then.
+    As jd:
+    - sudo port install mysql5-server
+    - set mysqldatadir=/opt/local/var/db/mysql5/
+    As root (bash):
+    - export mysqldatadir=/opt/local/var/db/mysql5/
+    - rm -rf $mysqldatadir
+    - chown -R mysql:_mysql /opt/local/var/db
+    As jd:
+    - sudo -u _mysql mysql_install_db5
+    - sudo /opt/local/lib/mysql5/bin/mysqld_safe &
+    As root:
+    - cd $mysqldatadir;  tail -f *.err *.log &
+    As jd:
+    - /opt/local/lib/mysql5/bin/mysqladmin -u root password 4I4KMS
+    - mysql -u root -p'4I4KMS' mysql
+    - run db_setup.sql and the mentioned db_create.sql
+    - Start/stop: mysqlstart/mysqlstop
+    - Install per instructions in tomcat_setup_instructions.txt
+    - Run servlet-wattos-new-install target in buildEclipse.xml in the Wattos project to get the tomcat webapp up.
+    - Setup proxies in apache in /private/etc/apache2/other/cing.conf as described in apache_setup_instructions.txt.
+    
+
 
 * New setup with mysql 5.1 from mac ports. Start a regular and a root user window then.
     As jd:
@@ -21,9 +45,6 @@ ALSO SEE: $NRG/scripts/sql/prepare_database_mysql.sql and handy_commands.sql
     - mysql -u root -p'4I4KMS' mysql
     - run db_setup.sql and the mentioned db_create.sql
     - Start/stop: mysqlstart/mysqlstop
-
-
-
 
 * mysql on nmr OLD
     * To start mysqld at boot time you have to copy

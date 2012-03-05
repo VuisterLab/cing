@@ -2121,9 +2121,9 @@ class Molecule( NTtree, ResidueList ):
         chain0 = allChains[0]
         chain1 = allChains[1]
         if lAllChains == 2:
-            nTdebug("Double chains.")
+#            nTdebug("Double chains.")
             hasSameSequence = chain0.hasSameSequence(chain1)
-            nTdebug("hasSameSequence %s" % hasSameSequence)
+#            nTdebug("hasSameSequence %s" % hasSameSequence)
             if hasSameSequence == None:
                 nTerror("In %s hasSameSequence Failed" % getCallerName())
                 return result
@@ -2132,8 +2132,8 @@ class Molecule( NTtree, ResidueList ):
             ncsSymmetry = chain0.calculateRmsd( chain1, modelIdx = 0 ) # Only for first model
             drSymmetry = chain0.getSymmetryDR( chain1, modelIdx = 0 )
 
-            nTdebug("ncsSymmetry %s" % val2Str(ncsSymmetry, "%.2f", 8))
-            nTdebug("drSymmetry  %s" % val2Str(drSymmetry,  "%.2f", 8))
+#            nTdebug("ncsSymmetry %s" % val2Str(ncsSymmetry, "%.2f", 8))
+#            nTdebug("drSymmetry  %s" % val2Str(drSymmetry,  "%.2f", 8))
             if ncsSymmetry == None:
                 nTerror("In %s getNcsSymmetryPerResidue Failed" % getCallerName())
                 return None                
@@ -2146,7 +2146,7 @@ class Molecule( NTtree, ResidueList ):
                 result[0] = SYMMETRY_C2_STR
             return result
         # end if
-        nTdebug("Ignoring multimers with 3 or more chains for now.")
+#        nTdebug("Ignoring multimers with 3 or more chains for now.")
         return result
 
 
@@ -4015,7 +4015,7 @@ Chain class: defines chain properties and methods
     def hasSameSequence(self, other):
         seq0 = self.toSequence()
         seq1 = other.toSequence()
-        nTdebug("Comparing sequences: \n%s\n%s" % (seq0, seq1))
+#        nTdebug("Comparing sequences: \n%s\n%s" % (seq0, seq1))
         return seq0 == seq1
     #end def
             
@@ -4114,7 +4114,7 @@ Chain class: defines chain properties and methods
             nTwarning("In %s failed to get same size for representing atom lists %s and %s" % (getCallerName(), a0Size, a1Size))
             return None
         a0PairCount = a0Size / 2
-        nTdebug("In %s analyzing %s pairs" % (getCallerName(), a0PairCount))
+#        nTdebug("In %s analyzing %s pairs" % (getCallerName(), a0PairCount))
         if a0PairCount == 0:
             return 0.0
               
@@ -4323,7 +4323,7 @@ Chain class: defines chain properties and methods
         for r in rList:
             oneLetter = getDeepByKeysOrDefault(r, FASTA_UNCOMMON_RESIDUE_STR, 'db', 'shortName')
             if len(oneLetter) != 1:
-                nTwarning("Failed to get oneLetter for residue type of %s reset to %s" % (r, FASTA_UNCOMMON_RESIDUE_STR))
+#                nTdebug("Failed to get oneLetter for residue type of %s reset to %s" % (r, FASTA_UNCOMMON_RESIDUE_STR))
                 oneLetter = FASTA_UNCOMMON_RESIDUE_STR
             result += oneLetter
         return result

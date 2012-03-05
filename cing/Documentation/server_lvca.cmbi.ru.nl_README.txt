@@ -19,7 +19,7 @@
 -- Restart the networking
     /etc/init.d/networking restart    
 -- Check webserver status by browsing to: http://LVCa/icing/
-
+-- Disable i's crontab
      
      
 

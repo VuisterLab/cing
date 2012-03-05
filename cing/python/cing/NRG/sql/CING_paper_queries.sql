@@ -1,6 +1,48 @@
 -- Queries for analyses done for the CING paper.
 
 -- This is file: $C/python/cing/NRG/sql/CING_paper_queries.sql
+-- Code on next line refers to cited numbers in the manuscript.
+-- They are sequential in this file but not sequential in the manuscript.
+
+--[SQL001]
+-- residue_list_selection is defined and created from nrgCingRdb.py:
+-- and it is simply the residues for which sel1 is true. (Quite trivial).
+-- Find residues in entry selection and residue selection.
+-- On 2012-02-27 this was:
+-- 111052 false
+-- 587710 true
+-- On 2012-03-05 this was:
+--  92276 false
+-- 606615 true
+-- Put into ipython to  
+select count(*), s2.sel_1
+FROM nrgcing.residue_list_selection s2
+group by s2.sel_1;
+
+
+--[SQL002]
+select count(*) 
+FROM nrgcing.cingentry e;
+
+
+-- [SQL003]
+-- Find number of segments in range per entry
+-- First create a quoted csv file.
+COPY (
+    SELECT e.pdb_id, e.ranges
+    FROM 
+    nrgcing.cingentry e,
+    nrgcing.entry_list_selection s1
+    WHERE
+    e.pdb_id = s1.pdb_id
+) TO '/tmp/nrgcing_ranges.csv' WITH CSV HEADER;
+-- Copy to development machine.
+--      cd /Users/jd/CMBI/Papers/CING/Data
+--      scp i@nmr.cmbi.ru.nl:/tmp/nrgcing_ranges.csv .
+-- On 2012-02-27 this was: 6461 rows/entries.
+--      wc nrgcing_ranges.csv
+-- Process with segmentAnalysisCingPaper.py and not the below sql because we do need a procedural language for this.
+-- TODO: include only regular amino acids.
 
 -- Testing with: 1brv 1ai0 2kwk
 select
@@ -107,17 +149,6 @@ group by r.entry_id;
 
 
 
--- residue_list_selection is defined and created from nrgCingRdb.py:
--- and it is simply the residues for which sel1 is true. (Quite trivial).
--- Find residues in entry selection and residue selection.
--- On 2012-02-27 this was:
--- 111052 false
--- 587710 true
-select count(*), s2.sel_1 
-FROM nrgcing.residue_list_selection s2
-group by s2.sel_1;
-
-
 
 
 
@@ -126,22 +157,6 @@ from nrgcing.cingsummary cs
 where cs.pdb_id = '1gac'
 order by cs.pdb_id asc;
 
--- Find number of segments in range per entry
--- First create a quoted csv file.
-COPY (
-    SELECT e.pdb_id, e.ranges
-    FROM 
-    nrgcing.cingentry e,
-    nrgcing.entry_list_selection s1
-    WHERE
-    e.pdb_id = s1.pdb_id
-) TO '/tmp/nrgcing_ranges.csv' WITH CSV HEADER;
--- Copy to development machine.
---      cd /Users/jd/CMBI/Papers/CING/Data
---      scp i@nmr.cmbi.ru.nl:/tmp/nrgcing_ranges.csv .
--- On 2012-02-27 this was: 6461 rows/entries.
---      wc nrgcing_ranges.csv
--- Process with segmentAnalysisCingPaper.py and not the below sql because we do need a procedural language for this.
 
 -- Find number of chains in selected entries and selected residues
 -- Skipping chains that don't have selected residues anyway (such as water).

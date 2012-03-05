@@ -13,7 +13,7 @@ public interface Settings {
      * */
     public static final boolean DEBUG2STDOUT = true;
     /** The next statement is automatically updated. Don't even change spacing. Note there this is the current number and not the new one.*/
-    public static final String REVISION = "1117";
+    public static final String REVISION = "1130";
     /** URL for svn site specific for certain revision. */
     public static final String CING_REVISION_URL = "http://code.google.com/p/cing/source/detail?r=";
     /** URL base only used in iCingRobot.java it's derived in iCing on the client side. */

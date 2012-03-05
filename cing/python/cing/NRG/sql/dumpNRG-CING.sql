@@ -1,6 +1,6 @@
 -- * Run by command like:
 -- * psql --quiet pdbmlplus pdbj < $CINGROOT/python/cing/NRG/sql/dumpNRG-CING.sql
--- Then follow up by doing from Stella:
+-- Then follow up by doing from Duvel:
 -- scp -r -P 39676 localhost-nmr:$cwd .
 
 -- Or edit and execute:
