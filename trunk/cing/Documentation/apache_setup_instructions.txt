@@ -30,9 +30,10 @@ For CGI:
     nmr.cmbi.ru.nl-access_log
 
 * Mac's apache
-    There's one in eclipse and fink but heck why not shrew up the one in mac os integrated.
+    There's one in eclipse and fink but heck why not screw up the one in mac os integrated.
     On leopard which has apache 2:
         vi /private/etc/apache2/httpd.conf
+        vi /private/etc/apache2/other/cing.conf (also has NRG setup for MySql wattos1 database)
         vi /private/etc/apache2/other/php5.conf
 
     Php support, needed for NRG-CING pdb code lookup:

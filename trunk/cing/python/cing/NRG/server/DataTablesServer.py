@@ -158,7 +158,7 @@ class DataTablesServer:
         self.cadinality = 0
         # Who's calling
         if self.cgi.has_key('database'):
-            log( "Processing textbox query.\n" )
+#            log( "DEBUG: Processing textbox query.\n" )
             self.processSimpleTextBoxQuery()
             return
         # end if         
@@ -167,12 +167,12 @@ class DataTablesServer:
         
         if self.cgi.has_key('query_type') and self.cgi['query_type'].value == "normal":
             print "Content-Type: text/plain\n"
-            log( "Processing normal query.\n" )
+#            log( "DEBUG: Processing normal query.\n" )
             self.runQueries(usePaging=True)
             self.outputResult()
         else:
             print "Content-Disposition: attachment; filename=NRG-CING_summary_selection.csv;\n"
-            log( "Processing download query.\n" )
+#            log( "DEBUG: Processing download query.\n" )
 #            self.cgi['iDisplayLength'] = -1 # All filtered rows please
             self.runQueries(usePaging=False)
 #            log( "self.resultData: %s\n" % str(self.resultData) )
@@ -397,8 +397,13 @@ class DataTablesServer:
         
     def filtering( self ):
         "Create the 'WHERE' part of the SQL string"
-        filter = ""
-        if self.cgi.has_key('sSearch') and self.cgi['sSearch'].value != "":
+        filter = ""        
+        if self.cgi.has_key('sSearch'):
+            valueStr = self.cgi['sSearch'].value
+            if valueStr == "":
+                return filter
+            # end if
+            valueStr = valueStr.lower()
             filter = "WHERE "
             for i in range( len(_columns) ):
                 s = "to_char(%s,'999999')" % _columns[i]  
@@ -407,9 +412,12 @@ class DataTablesServer:
                 elif _columns[i] in _boolean_columns:
                     continue # skip booleans for now.
                 # end if
-#                log('Doing matching with: %s\n' % s)
-                filter += "%s LIKE '%%%s%%' OR " % (s, self.cgi['sSearch'].value)
+#                log('Doing filtering with: %s\n' % s)
+                filter += "%s LIKE '%%%s%%' OR " % (s, valueStr)
+            # end for
             filter = filter[:-3]
+        # end if
+#        log('-1- Doing filtering with: %s\n' % filter)        
         return filter
     # end def
         

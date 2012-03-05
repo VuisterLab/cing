@@ -46,6 +46,14 @@
         <echo message="Synced configuration file to iCing examples." />
         <echo message="Initiating CING revision" />
         <antcall target="set_revision" />
+        
+        <echo message="home.web.port          : ${home.web.port}" />          
+        <echo message="home.web.machine       : ${home.web.machine}" />       
+        <echo message="home.web.machine.looped: ${home.web.machine.looped}" />
+        <echo message="home.web.user          : ${home.web.user}" />          
+        <echo message="home.web.dir           : ${home.web.dir}" />
+        <echo message="home.web.local.dir     : ${home.web.local.dir}" />    	
+        <echo message="icing.webapp.dir       : ${icing.webapp.dir}" />       
     </target>
 
     <!--
@@ -62,8 +70,13 @@
 
     <target name="iweb-CING-install" depends="init">
         <echo message="Please insure that the iWeb sites have been compiled (saved and patched by tool) first. This ant target can alternatively be done from within iWeb." />
-        <echo message="Installing HTML to cing home: ${home.web.user}@${home.web.machine.looped}:${home.web.dir}" />
-        <scp todir="${home.web.user}@${home.web.machine.looped}:${home.web.dir}" keyfile="${home.web.keyfile}" knownhosts="${home.web.knownhosts}" passphrase="${home.web.passphrase}" port="${home.web.port}" verbose="true">
+        <echo message="Installing HTML from ${home.web.local.dir} to cing home: ${home.web.user}@${home.web.machine.looped}:${home.web.dir}" />
+        <scp todir="${home.web.user}@${home.web.machine.looped}:${home.web.dir}" 
+            keyfile="${home.web.keyfile}" 
+            knownhosts="${home.web.knownhosts}" 
+            passphrase="${home.web.passphrase}" 
+            port="${home.web.port}" 
+            verbose="false">
             <fileset dir="${home.web.local.dir}" />
         </scp>
         <!--
@@ -95,8 +108,8 @@
             <arg value="Wattos.Utils.Programs.GetRevision"/>
             <arg value="CINGROOT"/>
         </exec>        
-        <echo message="Found output:        ${cing_revision}" />        
-        <echo message="cing_rev_result:     ${cing_rev_result}" />
+        <echo message="Found output:        ${cing_revision}" />  
+        <!--        <echo message="cing_rev_result:     ${cing_rev_result}" /> -->        
         <if>
             <equals arg1="${cing_rev_result}" arg2="0" />
             <then>
