@@ -442,7 +442,7 @@ class NrgCing(Lister):
                 nTwarning("Using new_hits_entry_list with %d entries. (B)" % len(new_hits_entry_list))
                 self.entry_list_todo = NTlist(*new_hits_entry_list)
             # end if
-            nTdebug("Doing runCing only on entries for which prep is considered done.")
+            nTmessage("Doing runCing only on entries for which prep is considered done.")
             self.entry_list_todo = self.entry_list_todo.intersection( self.entry_list_prep_done )
             if self.runCing():
                 nTerror("Failed to runCing")
@@ -1222,8 +1222,8 @@ class NrgCing(Lister):
         why_not_db_raw_dir = os.path.join(self.results_dir, "cmbi8", "raw")
 
         nTmessage("Create WHY_NOT lists")
-        nTdebug("why_not_db_comments_dir: %s" % why_not_db_comments_dir)        
-        nTdebug("why_not_db_raw_dir:      %s" % why_not_db_raw_dir)        
+#        nTdebug("why_not_db_comments_dir: %s" % why_not_db_comments_dir)        
+#        nTdebug("why_not_db_raw_dir:      %s" % why_not_db_raw_dir)        
 
 
         nTmessage("New why_not2 style annotations")

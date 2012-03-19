@@ -110,6 +110,78 @@ class AllChecks(TestCase):
 
         nTmessage( mol.format() )
 
+    def test_GetMolTypeCountList(self):
+        cing.verbosity = verbosityDebug
+        entryId = 'test'
+        project = Project(entryId)
+        self.failIf(project.removeFromDisk())
+        project = Project.open(entryId, status='new')
+
+        mol = Molecule('test')
+        project.appendMolecule(mol)        
+        c = mol.addChain('A')
+        c.addResidue('ALA', 1, Nterminal = True)
+        c.addResidue('VAL', 2)
+        c.addResidue('PHE', 3)
+        c.addResidue('ARG', 4)
+        c.addResidue('GLU', 5, Cterminal = True)
+        c = mol.addChain('B')
+        c.addResidue('DG', 1, Nterminal = True)
+        c.addResidue('DA', 2)
+        c.addResidue('DT', 3)
+        c.addResidue('DC', 4, Cterminal = True)
+        c = mol.addChain('C')
+        
+        c.addResidue('RADE', 1, convention=INTERNAL_0, Nterminal = True)
+        c.addResidue('RGUA', 2, convention=INTERNAL_0, ) 
+#        c.addResidue('RTHY', 3, convention=INTERNAL_0, ) # TODO: fix because right now gets recognized as other.
+        c.addResidue('URA',  3, convention=INTERNAL_0, Cterminal = True)
+        c = mol.addChain('D')
+        for i in range(1,11):
+            c.addResidue('HOH', i )
+        # end for
+        c = mol.addChain('E') # Unknown residue to CING
+        c.addResidue('ACE', 1 )
+        c = mol.addChain('F') # Ions are also other
+        c.addResidue('CA2P', 1 )
+        for residue in mol.allResidues():
+            residue.addAllAtoms()
+        # end for
+        mol.updateAll()
+        nTmessage( mol.format() )
+        for c in mol.allChains():
+            nTmessage( c.format() )
+            nTmessage( "idxMolType: %s" % (c.getIdxMolType()))
+        # end for
+        
+
+        molTypeCountList = mol.getMolTypeCountList()    
+        p_protein_count = molTypeCountList[ mapMoltypeToInt[PROTEIN_STR] ]
+        p_dna_count     = molTypeCountList[ mapMoltypeToInt[DNA_STR] ]
+        p_rna_count     = molTypeCountList[ mapMoltypeToInt[RNA_STR] ]
+        p_water_count   = molTypeCountList[ mapMoltypeToInt[WATER_STR] ]
+        p_other_count   = molTypeCountList[ mapMoltypeToInt[OTHER_STR] ]
+        self.assertEqual(1, p_protein_count)
+        self.assertEqual(1, p_dna_count  )
+        self.assertEqual(1, p_rna_count  )
+        self.assertEqual(1, p_water_count)
+        self.assertEqual(2, p_other_count)
+        
+        molTypeResidueCountList = mol.getMolTypeResidueCountList()    
+        p_res_protein_count = molTypeResidueCountList[ mapMoltypeToInt[PROTEIN_STR] ]
+        p_res_dna_count     = molTypeResidueCountList[ mapMoltypeToInt[DNA_STR] ]
+        p_res_rna_count     = molTypeResidueCountList[ mapMoltypeToInt[RNA_STR] ]
+        p_res_water_count   = molTypeResidueCountList[ mapMoltypeToInt[WATER_STR] ]
+        p_res_other_count   = molTypeResidueCountList[ mapMoltypeToInt[OTHER_STR] ]
+        self.assertEqual(5, p_res_protein_count)
+        self.assertEqual(4, p_res_dna_count  )
+        self.assertEqual(3, p_res_rna_count  )
+        self.assertEqual(10, p_res_water_count)
+        self.assertEqual(2, p_res_other_count)
+        
+        nTmessage( "Done with %s" % getCallerName() )
+    # end def
+
     def test_RangeSelection(self):
         entryId = 'testEntry'
         project = Project(entryId)

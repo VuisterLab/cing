@@ -101,6 +101,12 @@ ALTER TABLE nrgcing.cingentry ADD COLUMN dih_c1_viol INT   DEFAULT NULL;
 ALTER TABLE nrgcing.cingentry ADD COLUMN dih_c3_viol INT   DEFAULT NULL;
 ALTER TABLE nrgcing.cingentry ADD COLUMN dih_c5_viol INT   DEFAULT NULL;
 
+ALTER TABLE nrgcing.cingentry ADD COLUMN res_protein_count INT   DEFAULT NULL;
+ALTER TABLE nrgcing.cingentry ADD COLUMN res_dna_count     INT   DEFAULT NULL;
+ALTER TABLE nrgcing.cingentry ADD COLUMN res_rna_count     INT   DEFAULT NULL;
+ALTER TABLE nrgcing.cingentry ADD COLUMN res_water_count   INT   DEFAULT NULL;
+ALTER TABLE nrgcing.cingentry ADD COLUMN res_other_count   INT   DEFAULT NULL;
+
 ALTER TABLE nrgcing.cingresidue ADD COLUMN phi_avg  FLOAT  DEFAULT NULL;
 ALTER TABLE nrgcing.cingresidue ADD COLUMN phi_cv   FLOAT  DEFAULT NULL;
 ALTER TABLE nrgcing.cingresidue ADD COLUMN psi_avg  FLOAT  DEFAULT NULL;

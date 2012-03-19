@@ -2813,6 +2813,23 @@ Return an Molecule instance or None on error
         # end if
         return molTypeCountList
 
+    def getMolTypeResidueCountList(self):
+        """
+        Return list of chain counts per molecule type.
+        See molTypeList. May be a list of zero values.
+        """
+        molTypeResCountList = [0] * 5
+        for chain in self.allChains():
+            idxChainMoltype = chain.getIdxMolType()
+            molTypeResCountList[ idxChainMoltype ] += len(chain.allResidues())
+        # end for
+        if self.residueCount != sum(molTypeResCountList):
+            nTerror("In %s found self.residueCount %s != sum(molTypeResCountList) %s" % ( self, 
+                self.residueCount, str(molTypeResCountList)))
+            nTerror("Returning potentially wrong result anyway")
+        # end if
+        return molTypeResCountList
+
     def hasNucleicAcid(self):
         for res in self.allResidues():
             if res.hasProperties('nucleic'):

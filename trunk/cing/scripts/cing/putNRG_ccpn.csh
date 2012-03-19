@@ -6,7 +6,8 @@
 #set CLIENT=jd@nmr.cmbi.umcn.nl
 set CLIENT=i@nmr.cmbi.ru.nl
 # trailing slash is important.
-set SOURCEDIR=/grunt/raid/docr/ccpn_tmp/data/recoord/
+#set SOURCEDIR=/grunt/raid/docr/ccpn_tmp/data/recoord/
+set SOURCEDIR=/raid/docr/ccpn_tmp/data/recoord/
 # your top level rsync directory needs to exist
 #set MIRRORDIR=/Library/WebServer/Documents/NRG-CING/recoordSync
 set MIRRORDIR=/mnt/data/D/NRG-CING/recoordSync

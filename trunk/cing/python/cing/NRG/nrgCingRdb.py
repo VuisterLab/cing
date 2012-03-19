@@ -149,10 +149,10 @@ class NrgCingRdb():
 #            nTmessage("pdbj schema contains %s entries." % )
         # end if
         if True:
-            tableList = [m.csummary, m.centry_list_selection]
+            tableList = [m.csummary, m.centry_list_selection, m.cresidue_list_selection ]
             countList = [m.query(table).count() for table in tableList]
             countStrTuple = tuple([locale.format('%.0f', value, True) for value in countList])
-            nTmessage("There are %s entries in summary and %s entries in selection." % countStrTuple)
+            nTmessage("There are %s entries in summary and %s entries in selection. And %s residues selected" % countStrTuple)
         # end if
     # end def
 
@@ -267,14 +267,10 @@ GROUP BY s.pdbid;
         stmt4 = """
 CREATE table %s.entry_list_selection AS
 SELECT e.pdb_id
-FROM %s.CINGENTRY E,  pdbj.brief_summary s, %s.cingsummary cingsummary
-WHERE e.pdb_id = S.pdbid
-AND e.pdb_id = cingsummary.pdb_id
-AND E.MODEL_COUNT > 9
-and cingsummary.weight > 3500.0 -- about 30 residues
-and e.res_count >= 30            --      30 residues
-AND '{2}' <@ S.chain_type; -- contains at least one protein chain.
-""" % tuple( [self.schema] *3 )
+FROM %s.CINGENTRY E
+WHERE E.MODEL_COUNT >= 10
+and e.res_protein_count   >= 30
+""" % tuple( [self.schema] *2 )
         stmt5 = 'drop table if exists %s.residue_list_selection cascade;' % self.schema
         # The full molecular weight; not just the polymers
         stmt6 = """
@@ -1760,6 +1756,9 @@ if __name__ == '__main__':
     # end if
     n = NrgCingRdb( schema=schema, host = host )
 
+    if 0: # DEFAULT 0
+        n.showCounts()
+    # end if
     if 0: # Default 0
         n.createPlots(doTrending = 1) # Main plots for NRG-CING front site.
     # end if
@@ -1771,16 +1770,13 @@ if __name__ == '__main__':
         n.plotQualityPcVsColor()
 #        n.getAndPlotColorVsColor(doPlot = True) # ROG Plot for paper.
     # end if
-    if 0:
+    if 0: # DEFAULT 0
         pdbIdList = n.getPdbIdList()
         nTmessage("Found %s pdb ids in db" % len(pdbIdList))
     # end if
-    if 0:
-        n.showCounts()
-    # end if
-    if 0:
+    if 0: # DEFAULT 0
         n.createPlotsCompareBetweenDb(other_schema=NMR_REDO_DB_SCHEMA)
-    if 0:
+    if 0: # DEFAULT 0
         n.populateBmrbIds()
     # end if
     nTmessage("done with NrgCingRdb")

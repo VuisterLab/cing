@@ -50,7 +50,7 @@ def storeCING2dbLoop(archive_id, entryList=None, expectPdbEntryList = True):
                         delay_between_submitting_jobs = 1,
                         max_time_to_wait = 60 * 15,
                         start_entry_id = 0,
-                        max_entries_todo = 1,
+                        max_entries_todo = 99,
                         expectPdbEntryList = expectPdbEntryList,
                         extraArgList = extraArgList)
 
@@ -60,8 +60,8 @@ if __name__ == '__main__':
 #    cing.ncpus = 6
     if 1:
         arch_id = ARCHIVE_NRG_ID
-        eList = '1brv'.split()
-    #    eList = '1a4d 1a24 1afp 1ai0 1b4y 1brv 1bus 1cjg 1d3z 1hkt 1hue 1ieh 1iv6 1jwe 1kr8 2hgh 2k0e'.split()
+#        eList = '1brv'.split()
+        eList = '1a4d 1a24 1afp 1ai0 1b4y 1brv 1bus 1cjg 1d3z 1hkt 1hue 1ieh 1iv6 1jwe 1kr8 2hgh 2k0e'.split()
     #    eList = []
     elif 0:
         arch_id = ARCHIVE_CASP_ID
