@@ -68,6 +68,11 @@ CREATE TABLE casdcing.cingentry
     rna_count                      INT DEFAULT NULL,
     water_count                    INT DEFAULT NULL,
     other_count                    INT DEFAULT NULL,
+    res_protein_count              INT DEFAULT NULL, -- The sum should be the total number of residues; res_count
+    res_dna_count                  INT DEFAULT NULL, -- The chain property determines this classification.
+    res_rna_count                  INT DEFAULT NULL,
+    res_water_count                INT DEFAULT NULL,
+    res_other_count                INT DEFAULT NULL,
     is_minimized                   BOOLEAN DEFAULT NULL, -- (20) (optimized) minimized structure only known for 1340 entries in PDB overall on Jan 2010.
     software_collection            VARCHAR(255) DEFAULT NULL, -- _pdbx_nmr_software.name etc. only 8,000 items estimated 1,000 entries available
     software_processing            VARCHAR(255) DEFAULT NULL,

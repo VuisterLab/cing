@@ -44,6 +44,68 @@ COPY (
 -- Process with segmentAnalysisCingPaper.py and not the below sql because we do need a procedural language for this.
 -- TODO: include only regular amino acids.
 
+
+--[SQL004]
+-- On 2012-03-16 this was:
+-- 80041
+SELECT count(*)
+FROM "pdbj".BRIEF_SUMMARY AS S;
+
+--[SQL005]
+-- On 2012-03-16 this was:
+-- X-RAY DIFFRACTION        70120
+-- SOLUTION NMR              9299 <=====
+-- ELECTRON MICROSCOPY        411
+-- NEUTRON DIFFRACTION         55
+-- SOLID-STATE NMR             54 <=====
+-- SOLUTION SCATTERING         45
+-- FIBER DIFFRACTION           37
+-- ELECTRON CRYSTALLOGRAPHY    32
+-- POWDER DIFFRACTION          18
+-- THEORETICAL MODEL            7
+-- EPR                          6
+-- INFRARED SPECTROSCOPY        4
+-- FLUORESCENCE TRANSFER        1
+SELECT p1.val, count(p1.val)
+FROM "pdbj".BRIEF_SUMMARY AS S
+JOIN "//exptl/@method" p1 ON s.docid = p1.docid
+--WHERE p1.val LIKE '%NMR' 
+group by p1.val
+order by count(p1.val) desc;
+
+--[SQL006]
+-- Number of entries with descent size protein ensembles.
+-- First run: python -u $CINGROOT/python/cing/NRG/nrgCingRdb.py 
+-- On 2012-03-16 this was:
+select count(*) 
+from nrgcing.entry_list_selection;
+
+--[SQL007]
+SELECT e.pdb_id, e.res_protein_count, res_dna_count, res_rna_count, res_water_count, res_other_count
+FROM nrgcing.CINGENTRY E
+WHERE 
+    E.MODEL_COUNT >= 1             -- At least 10 models
+--AND E.pdb_id = '1brv'
+AND E.pdb_id in ( '1a4d', '1a24', '1afp', '1ai0', '1b4y', '1brv', '1bus', '1cjg', '1d3z', '1hkt', '1hue', '1ieh', '1iv6', '1jwe', '1kr8', '2hgh', '2k0e' )
+order by e.pdb_id;
+
+-- Amino acid count per entry.
+select e.pdb_id, c.mol_type_idx, count(*) as res_count
+from 
+    nrgcing.CINGENTRY E, 
+    nrgcing.cingchain c,
+    nrgcing.CINGresidue r
+where 
+    e.entry_id = c.entry_id AND
+    c.chain_id = r.chain_id AND
+--    e.entry_id = r.entry_id and
+    e.pdb_id = '1hue'
+--    c.mol_type_idx = 0 -- Protein
+group by e.pdb_id, c.mol_type_idx
+limit 10;
+
+
+
 -- Testing with: 1brv 1ai0 2kwk
 select
 e.name,
@@ -126,9 +188,6 @@ e.dihedral_count > 50 AND
 e.cs_count > 1000
 order by b.deposition_date desc limit 20000;
 
--- Number of entries with descent size protein ensembles
-select count(*) 
-from nrgcing.entry_list_selection;
 
 -- Check existence of a particular entry.
 select *

@@ -207,8 +207,17 @@ def doStoreCING2db( entry_code, archive_id, project = None):
     p_water_count   = molTypeCountList[ mapMoltypeToInt[WATER_STR] ]
     p_other_count   = molTypeCountList[ mapMoltypeToInt[OTHER_STR] ]
 
+    molTypeResidueCountList = molecule.getMolTypeResidueCountList()    
+    p_res_protein_count = molTypeResidueCountList[ mapMoltypeToInt[PROTEIN_STR] ]
+    p_res_dna_count     = molTypeResidueCountList[ mapMoltypeToInt[DNA_STR] ]
+    p_res_rna_count     = molTypeResidueCountList[ mapMoltypeToInt[RNA_STR] ]
+    p_res_water_count   = molTypeResidueCountList[ mapMoltypeToInt[WATER_STR] ]
+    p_res_other_count   = molTypeResidueCountList[ mapMoltypeToInt[OTHER_STR] ]
+    if sum(molTypeResidueCountList) != molecule.residueCount:
+        nTerror("Count of residues doesn't add up to individual types of residues; ignored")
+    # end if
+    
     p_distance_count = project.distances.lenRecursive(max_depth = 1)
-
     p_distance_count_sequential      =  0
     p_distance_count_intra_residual  =  0
     p_distance_count_medium_range    =  0
@@ -354,6 +363,12 @@ def doStoreCING2db( entry_code, archive_id, project = None):
         rna_count            =  p_rna_count                   ,
         water_count          =  p_water_count                 ,
         other_count          =  p_other_count                 ,
+        
+        res_protein_count  = p_res_protein_count,   # The sum should be the total number of residues; res_count
+        res_dna_count      = p_res_dna_count    ,   # The chain property determines this classification.
+        res_rna_count      = p_res_rna_count    ,  
+        res_water_count    = p_res_water_count  ,  
+        res_other_count    = p_res_other_count  ,  
         
         ranges=ranges,
 #        omega_dev_av_all = p_omega_dev_av_all,

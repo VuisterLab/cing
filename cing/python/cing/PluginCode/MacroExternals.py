@@ -32,7 +32,15 @@ pyMolMacroFileHeader = """# Execute by issuing command  (without pound sign):
 """ + originatingProgramDeclaration
 
 yasaraMacroFileHeader = """# Execute by issuing command  (without pound sign):
-# ???? THIS_FILE_NAME
+# Inside YASARA having the molecule in the soup.
+# E.g. sequence:
+# Read the PDB file.
+# LoadPDB /home/i/2kq3/2kq3.pdb
+# Show only the backbone trace with secondary structure.  
+# Style Ribbon
+# Omit all but the first model.
+# DelObj 2-20
+# PlayMacro THIS_FILE_NAME_BASE
 """ + originatingProgramDeclaration
 
 def mkMacros(project):

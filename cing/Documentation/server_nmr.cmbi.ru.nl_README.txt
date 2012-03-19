@@ -1,5 +1,6 @@
 New setup in server room FNWI.
 
+this file: server_nmr.cmbi.ru.nl_README.txt
 - BASIC OPERATIONS
 
 Configure apache: see 
@@ -85,7 +86,7 @@ Closed issues:
 After a reboot make sure the following services run on the server:
 
 Jurgen's setup
-- CING website:     http://nmr.cmbi.ru.nl/cing (checked from Madison every 12").
+- CING website:    http://nmr.cmbi.ru.nl/cing (checked from Madison every 12").
 - iCing javascript https://nmr.cmbi.ru.nl/icing (checked from Madison).
 - iCing servlet    https://nmr.cmbi.ru.nl/icing/serv/iCingServlet (checked from Madison).
 - psql see psql_setup_instructions.txt
@@ -185,4 +186,8 @@ Reenable autostart again. virsh autostart CVCa
 
 NB The DRAC remote console fails to download from Safari, Firefox, and Chrome.
 
+MAINTENANCE nmr VM
+ - sudo su
+ - apt-get update
+ - apt-get upgrade
      
