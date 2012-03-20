@@ -535,7 +535,7 @@ def doStoreCING2db( entry_code, archive_id, project = None):
         )
         s = select([cchain.c.chain_id],and_(cchain.c.entry_id == entry_id, cchain.c.name == nameC))
         chain_id = execute(s).fetchall()[0][0]
-        nTdebug("Inserted chain id %s" % chain_id)
+#        nTdebug("Inserted chain id %s" % chain_id)
         chainIdHash[ chain ] = chain_id        
         chainCommittedCount += 1
         if cIdxMolType == mapMoltypeToInt[WATER_STR]:
@@ -1029,7 +1029,7 @@ def doStoreCING2db( entry_code, archive_id, project = None):
             # end for
             drCommittedCount += 1
         # end for
-        nTdebug("Committed %d dr %d drrows" % (drCommittedCount,drRowCommittedCount))
+#        nTdebug("Committed %d dr %d drrows" % (drCommittedCount,drRowCommittedCount))
         drlCommittedCount += 1        
     # end for
     nTmessage("Committed %d drl and overall %d dr %d drrows" % (drlCommittedCount,drCommittedCount,drRowCommittedCount))

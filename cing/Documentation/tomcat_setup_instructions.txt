@@ -20,7 +20,7 @@
     sudo port load tomcat6    
     NEW &&&&&&&&&&&&&&&&&&&&
     -Using Tomcat/6.0.29_0
-    # runs under as root (TODO: run under tomcat user as this poses a security risk)
+    # runs as root (TODO: run under tomcat user as this poses a security risk)
     export CATALINA_HOME=/opt/local/share/java/tomcat6
     setenv CATALINA_HOME /opt/local/share/java/tomcat6
 
@@ -29,6 +29,10 @@
     sudo $CATALINA_HOME/bin/catalina.sh start
     sudo $CATALINA_HOME/bin/catalina.sh stop
 
+    # ENABLE AUTOMATIC START
+    sudo launchctl   load /opt/local/etc/LaunchDaemons/org.macports.tomcat6/org.macports.tomcat6.plist
+    # DISABLE AUTOMATIC START
+    sudo launchctl unload /opt/local/etc/LaunchDaemons/org.macports.tomcat6/org.macports.tomcat6.plist
     FAILS: $CATALINA_HOME/bin/tomcatctl
 
     Add memory setting to startup to allow very large files (<=50Mb) to be submitted.
@@ -39,9 +43,10 @@
     http://localhost:8080/icing/icing/serv/iCingServlet
     should give:
     {"Result":"Denying iCingServlet.doGet. Try a POST.","ExitCode":"Error"}
-
+    http://localhost:8080/NRG/MRGridServlet
+    
     Add manager
-        sudo vi /opt/local/share/java/tomcat6/conf/tomcat-users.xml
+        sudo vi $CATALINA_HOME/conf/tomcat-users.xml
         <role rolename="manager"/>
         <user username="tomcat" password="s3cret" roles="manager"/>
 

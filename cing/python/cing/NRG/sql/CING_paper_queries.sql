@@ -81,6 +81,24 @@ select count(*)
 from nrgcing.entry_list_selection;
 
 --[SQL007]
+-- On 2012-03-16 this was:
+-- 1a24                 189             0             0               0               0
+-- 1a4d                   0             0            41               0               0
+-- 1afp                  51             0             0               0               0
+-- 1ai0                 306             0             0               4               8
+-- 1b4y                   0            30             0               0               0
+-- 1brv                  32             0             0               0               0
+-- 1bus                   0             0             0               0              57
+-- 1cjg                 124            44             0               0               0
+-- 1d3z                  76             0             0               0               0
+-- 1hkt                 106             0             0               0               0
+-- 1hue                 180             0             0               0               0
+-- 1ieh                 135             0             0               0               0
+-- 1iv6                  70            26             0               0               0
+-- 1jwe                 114             0             0               0               0
+-- 1kr8                   0             7             0               0               0
+-- 2hgh                  87             0            55               0               3
+-- 2k0e                 148             0             0               0               4
 SELECT e.pdb_id, e.res_protein_count, res_dna_count, res_rna_count, res_water_count, res_other_count
 FROM nrgcing.CINGENTRY E
 WHERE 
