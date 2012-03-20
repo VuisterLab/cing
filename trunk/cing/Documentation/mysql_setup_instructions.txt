@@ -13,14 +13,16 @@ ALSO SEE: $NRG/scripts/sql/prepare_database_mysql.sql and handy_commands.sql
     - chown -R mysql:_mysql /opt/local/var/db
     As jd:
     - sudo -u _mysql mysql_install_db5
+        # Bring up the database daemon and it will keep restarting.
+        # this is equivalent to JFD's Start/stop aliases: mysqlstart/mysqlstop
     - sudo /opt/local/lib/mysql5/bin/mysqld_safe &
+    - Shutdown 
     As root:
     - cd $mysqldatadir;  tail -f *.err *.log &
     As jd:
     - /opt/local/lib/mysql5/bin/mysqladmin -u root password 4I4KMS
     - mysql -u root -p'4I4KMS' mysql
     - run db_setup.sql and the mentioned db_create.sql
-    - Start/stop: mysqlstart/mysqlstop
     - Install per instructions in tomcat_setup_instructions.txt
     - Run servlet-wattos-new-install target in buildEclipse.xml in the Wattos project to get the tomcat webapp up.
     - Setup proxies in apache in /private/etc/apache2/other/cing.conf as described in apache_setup_instructions.txt.
