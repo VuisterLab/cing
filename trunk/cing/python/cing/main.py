@@ -128,6 +128,7 @@ format(peaks)
     formatall( project.molecule.A.VAL171.C )
 """
 #==============================================================================
+from IPython.config.loader import Config
 from cing import __author__ #@UnusedImport
 from cing import __copyright__ #@UnusedImport
 from cing import __credits__ #@UnusedImport
@@ -150,6 +151,7 @@ from cing.core.parameters import osType
 from cing.core.parameters import plugins
 from cing.core.sml import SMLversion
 from nose.plugins.skip import SkipTest # Dependency on nose can be removed in python 2.7 or later when UnitTest has similar functionality.
+import IPython
 import commands
 import unittest
 import webbrowser
@@ -1039,13 +1041,28 @@ def main():
         # The next import is missing in one OSX installation but is on all others.
         # The new way of doing this would be the below but that still fails on all OSX installs but the one above.
         # from IPython.frontend.terminal.embed import InteractiveShellEmbed 
-        # pylint: disable=W0404 
-        from IPython.Shell import IPShellEmbed # optional module; not required for CING proper.
-        ipshell = IPShellEmbed(['-prompt_in1','CING \#> '],
-                                banner='--------Dropping to IPython--------',
-                                exit_msg='--------Leaving IPython--------'
-                              )
-        ipshell()
+        # pylint: disable=W0404
+        # The next method started to fail in 2012 see issue 329
+#        if False: 
+#            from IPython.Shell import IPShellEmbed # optional module; not required for CING proper.
+#            ipshell = IPShellEmbed(['-prompt_in1','CING \#> '],
+#                                    banner='--------Dropping to IPython--------',
+#                                    exit_msg='--------Leaving IPython--------'
+#                                  )        
+#            ipshell()
+#        #end if
+        cfg = Config()
+#        cfg.InteractiveShellEmbed.prompt_in1='CING \#> ' # depreciated.
+#        cfg.InteractiveShellEmbed.prompt_out='CING \#: '
+        cfg.PromptManager.in_template =  'CING \#>  '
+        cfg.PromptManager.in2_template = 'CING \#>> '
+        cfg.PromptManager.out_template = 'CING \#:  '
+#        c.PromptManager.out_template = "[\#]<<< "        
+        IPython.embed(config=cfg,
+#                      display_banner=1,                       
+                      banner1 ='-------- Dropping to IPython --------',
+                      exit_msg='-------- Leaving IPython     --------',
+                      )
     #end if
     if project:
         if options.yasara:

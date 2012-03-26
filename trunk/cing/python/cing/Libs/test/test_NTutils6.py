@@ -164,8 +164,27 @@ class AllChecks(TestCase):
             self.assertEqual( result, expectedList[i])
         # end for
     # end def
-                
+
+    def test_Flatten(self):
+        inputLoL = [ 
+#                     [1],
+#                     [1,2],
+                     [[1],[2,3]],
+                    
+        ]
+        expectedLoL = [
+#                        [1],
+#                        [1,2],
+                        [1,2,3],
+        ]
+        for i, inputList in enumerate( inputLoL ):
+            result = flatten(inputList)
+#            nTdebug("Found on iteration %s with input: %s the result %s and expected %s" % ( i, inputStr, result, expectedList[i]))
+            self.assertEqual( result, expectedLoL[i])
+        # end for
+    # end def                
 # end class
+           
             
 def additionalTestRoutineByItself():
     return getCallerName()

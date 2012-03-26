@@ -17,7 +17,7 @@ import csv
 #with histograms for (combined) residue and sec. struct. types.
 #
 #Please note well that the values are per residue and that the value range is much
-#smaller than per molecule values. The per-molecule values are scaled by a sigma.
+#smaller than per the per molecule values. The per-molecule values are scaled by a sigma.
 #See formula 8 in Rob Hooft's paper:
 #
 #Hooft et al. Objectively judging the quality of a protein structure from a

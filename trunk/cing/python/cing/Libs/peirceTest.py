@@ -277,7 +277,7 @@ class Peirce:
         return (newValues,outliers)
     #end def
 
-# A bit of ugly object oriented programming follows to accomodate legacy way of handling.
+# A bit of ugly object oriented programming follows to accommodate legacy way of handling.
 p = Peirce()
 def peirceTest(valueList):
     return p.peirceTest(valueList)
