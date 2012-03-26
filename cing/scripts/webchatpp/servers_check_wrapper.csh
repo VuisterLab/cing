@@ -91,13 +91,13 @@ if ( $stat_failure || ($verbosity != "terse") ) then
         cat $tmphead $tmpout
         echo $subject
     else if ( $verbosity != "silent" ) then
-                if ( $verbosity == "verbose" ) then
-                    cat $tmphead $tmpout $logfile | $mail_exe -s "$subject" $mailto
-                    \rm -f $logfile
-                else
-                    cat $tmphead $tmpout | $mail_exe -s "$subject" $mailto
-                endif                
-            endif
+            if ( $verbosity == "verbose" ) then
+                cat $tmphead $tmpout $logfile | $mail_exe -s "$subject" $mailto
+                \rm -f $logfile
+            else
+                cat $tmphead $tmpout          | $mail_exe -s "$subject" $mailto
+            endif                
+        endif
     endif
 #    cat $tmphead $tmpout 
 endif

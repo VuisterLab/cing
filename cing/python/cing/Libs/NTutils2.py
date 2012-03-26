@@ -634,3 +634,12 @@ def capitalizeFirst(s):
     # end if
     return firstChar + s[1:]
 # end def
+
+def flatten(inputList):
+    'Very simple routine to prevent dependency on IPython.utils.data#flatten'
+    if not isinstance(inputList,list):
+        return inputList
+    # end if
+    result = reduce(lambda x,y: x+y,inputList)
+    return result
+# end def

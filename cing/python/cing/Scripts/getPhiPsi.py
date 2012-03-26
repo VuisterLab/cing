@@ -6,7 +6,6 @@ cd /Users/jd/tmp/cingTmp
 python $CINGROOT/python/cing/Scripts/getPhiPsi.py 1aba A
 """
 
-from IPython.genutils import flatten
 from cing import cingDirTestsData
 from cing import cingDirTmp
 from cing.Libs.NTutils import * #@UnusedWildImport
@@ -17,7 +16,6 @@ from cing.Scripts.getPhiPsiWrapper import Janin
 from cing.Scripts.getPhiPsiWrapper import Ramachandran
 from cing.Scripts.getPhiPsiWrapper import d1d2
 from cing.Scripts.getPhiPsiWrapper import dihedralComboTodo 
-# once executed all code there, hilarious locks until after an hour JFD realized.
 from cing.Scripts.getPhiPsiWrapper import subdir
 from cing.core.classes import Project
 from cing.core.constants import * #@UnusedWildImport

@@ -223,7 +223,7 @@ class HistogramsForPlotting():
         self.histJaninBySsAndCombinedResType = None             
         self.histd1BySs0AndResTypes           = None # Note the plural s in ResTypes it is hashed by not one but two residue types.
         self.histd1BySs1AndResTypes           = None # This one is hashed by the Ss of the preceding residue type.
-        # NB hasing is: ssType, resType, resTypePrev, resTypeNext (just adding resTypeNext wrt histd1BySsAndResTypes
+        # NB hashing:   ssType, resType, resTypePrev, resTypeNext (just adding resTypeNext wrt histd1BySsAndResTypes
         #               3        20        20        20 = 2400 tuples of 2 floats precalculated.
         self.histd1CtupleBySsAndResTypes    = None
         self.histd1ByResTypes               = None
@@ -248,13 +248,14 @@ class HistogramsForPlotting():
             self.histRamaBySsAndResType             = dbaseTemp[ 'histRamaBySsAndResType' ]
             self.histRamaCtupleBySsAndResType       = dbaseTemp[ 'histRamaCtupleBySsAndResType' ]
             self.histRamaBySsAndCombinedResType     = dbaseTemp[ 'histRamaBySsAndCombinedResType' ]
-        #    pprint(histRamaCombined)
+#            pprint(histRamaCombined) # DEFAULT: disabled
             dbase_file.close()
             #dbaseTemp.close()
-#            sumHist = core.sum(self.histRamaCombined, axis=None)
-#            nTdebug("Rama          sum: %d" % sumHist)
-#            sumHist = core.sum(self.histRamaBySsAndResType['H']['HIS'])
-#            nTdebug("Rama [H][HIS] sum: %d" % sumHist)
+#            if False: # DEFAULT: False
+#                sumHist = numpy.sum(self.histRamaCombined, axis=None)
+#                nTdebug("Rama          sum: %d" % sumHist)
+#                sumHist = numpy.sum(self.histRamaBySsAndResType['H']['HIS'])
+#                nTdebug("Rama [H][HIS] sum: %d" % sumHist)
 
         if True:
 #            nTdebug("Loading Janin histograms")
