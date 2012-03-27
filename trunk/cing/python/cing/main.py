@@ -750,7 +750,7 @@ def startIpythonShell(
     iPythonVersionType = getIpythonVersionType()
     if iPythonVersionType == None:
         nTerror("Failed to getIpythonVersionType")
-    elif iPythonVersionType == IPYTHON_VERSION_1:
+    elif iPythonVersionType == IPYTHON_VERSION_A:
         # The next import is missing in one OSX installation but is on all others.
         # The new way of doing this would be the below but that still fails on all OSX installs but the one above.
         # from IPython.frontend.terminal.embed import InteractiveShellEmbed 
@@ -758,11 +758,12 @@ def startIpythonShell(
         # pylint: disable=W0404
         # pylint: disable=E0611
         from IPython.Shell import IPShellEmbed #@UnresolvedImport
-        ipshell = IPShellEmbed(['-prompt_in1',in_template],
+        ipshell = IPShellEmbed(
+                               ['-prompt_in1',in_template], # Fails to be set correctly on ipython version 0.11.
                                 banner=banner, exit_msg=exit_msg
                               )        
         ipshell()
-    elif iPythonVersionType == IPYTHON_VERSION_2:
+    elif iPythonVersionType == IPYTHON_VERSION_B:
         # pylint: disable=W0404
         # pylint: disable=E0611
         from IPython.config.loader import Config  #@UnresolvedImport

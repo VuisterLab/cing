@@ -67,7 +67,7 @@ def getSvnRevision( envRootDir = 'CINGROOT'):
 #        _nTwarning("Failed to getSvnRevision()" )
 # end def
 
-def getIpythonVersionTuple():
+def getIpythonVersionTuple(reportAsIs = False):
     """
     Return a tuple of iPython version ids such as 
     (0, 10, 1) older or
@@ -76,6 +76,9 @@ def getIpythonVersionTuple():
     """
     iPythonVersion = None
     try:
+        if reportAsIs:
+            return IPython.__version__
+        # end if
         iPythonVersionStr = IPython.__version__.split('.')
         iPythonVersion = [ int(x) for x in iPythonVersionStr]
     except:        
@@ -87,11 +90,11 @@ def getIpythonVersionTuple():
 
 def getIpythonVersionType():
     """
-    Return IPYTHON_VERSION_1 or 2 
+    Return IPYTHON_VERSION_XXXX 
 
     Make sure they match the defs in constants.py
-    IPYTHON_VERSION_1 = 'iPythonVersion_1'
-    IPYTHON_VERSION_2 = 'iPythonVersion_2'
+    IPYTHON_VERSION_A = 'iPythonVersion_A'
+    IPYTHON_VERSION_B = 'iPythonVersion_B'
 
     Returns None on error.
     """
@@ -101,15 +104,15 @@ def getIpythonVersionType():
         return None
     # end if
     
-    c = compareVersionTuple(iPythonVersionTuple, (0,12))
+    c = compareVersionTuple(iPythonVersionTuple, (0,11))
     if c == None:
         _nTerror("Failed to compareVersionTuple")
         return None
     # end if
     if c >= 0:
-        return 'iPythonVersion_2'
+        return 'iPythonVersion_B'
     # end if
-    return 'iPythonVersion_1'
+    return 'iPythonVersion_A'
 # end def
 
 

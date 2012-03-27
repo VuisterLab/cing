@@ -27,7 +27,6 @@ from subprocess import PIPE
 from subprocess import Popen
 import os
 import sys
-#import warnings
 
 #-----------------------------------------------------------------------------------
 # Synchronize block with cing.Libs.helper.py
@@ -153,10 +152,6 @@ cingRoot = os.path.split(cingPythonDir)[0]
 #nTdebug("cingRoot        : " + cingRoot)
 ######################################################################################################
 
-######################################################################################################
-# This code is repeated in cing/setupCing.py and cing/Libs/NTutils.py please keep it sync-ed
-######################################################################################################
-
 def check_python():
     'Python needs to be at least 2 but below 3.'
     hasDep = True
@@ -169,11 +164,24 @@ def check_python():
         hasDep = False
     if hasDep:
         _nTmessage("........ Found 'python'        %-10s" % str(version))
-        
-        
     else:
         _nTwarning('Failed to find good python.')
-
+    # end if
+# end def
+    
+def check_ipython():
+    'iPython needs to exist.'
+    iPythonVersionStr = None
+    try:
+        import IPython
+        iPythonVersionStr = IPython.__version__
+    except:        
+        _nTerror('Failed to find any iPython.')
+    # end try    
+    _nTmessage("........ Found 'iPython'       %-10s" % str(iPythonVersionStr))
+    # end if
+# end def
+    
 def check_matplotlib():
     """
     matplotlib needs to be at 0.98.3-1 or higher.
@@ -399,6 +407,7 @@ if __name__ == '__main__':
     _nTmessage("........ Found 'cing'          %-10s %s" % (cingRevison, os.getenv(envRootDir)) )       
     
     check_python()
+    check_ipython()
     check_matplotlib()
     check_cython()
 
