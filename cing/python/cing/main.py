@@ -128,7 +128,6 @@ format(peaks)
     formatall( project.molecule.A.VAL171.C )
 """
 #==============================================================================
-from IPython.config.loader import Config
 from cing import __author__ #@UnusedImport
 from cing import __copyright__ #@UnusedImport
 from cing import __credits__ #@UnusedImport
@@ -151,7 +150,6 @@ from cing.core.parameters import osType
 from cing.core.parameters import plugins
 from cing.core.sml import SMLversion
 from nose.plugins.skip import SkipTest # Dependency on nose can be removed in python 2.7 or later when UnitTest has similar functionality.
-import IPython
 import commands
 import unittest
 import webbrowser
@@ -742,6 +740,43 @@ def yasara( project ):
     yasaraShell( project )
 #end def
 
+def startIpythonShell(
+        in_template =  'CING \#>  ',
+        in2_template = 'CING \#>> ',
+        out_template = 'CING \#:  ',
+        banner = '--------Dropping to IPython--------',
+        exit_msg='--------Leaving IPython--------'
+    ):
+    iPythonVersionType = getIpythonVersionType()
+    if iPythonVersionType == None:
+        nTerror("Failed to getIpythonVersionType")
+    elif iPythonVersionType == IPYTHON_VERSION_1:
+        # The next import is missing in one OSX installation but is on all others.
+        # The new way of doing this would be the below but that still fails on all OSX installs but the one above.
+        # from IPython.frontend.terminal.embed import InteractiveShellEmbed 
+        # The next method started to fail in 2012 see issue 329
+        # pylint: disable=W0404
+        # pylint: disable=E0611
+        from IPython.Shell import IPShellEmbed #@UnresolvedImport
+        ipshell = IPShellEmbed(['-prompt_in1',in_template],
+                                banner=banner, exit_msg=exit_msg
+                              )        
+        ipshell()
+    elif iPythonVersionType == IPYTHON_VERSION_2:
+        # pylint: disable=W0404
+        # pylint: disable=E0611
+        from IPython.config.loader import Config  #@UnresolvedImport
+        cfg = Config()
+        cfg.PromptManager.in_template =  in_template 
+        cfg.PromptManager.in2_template = in2_template
+        cfg.PromptManager.out_template = out_template
+        IPython.embed(config=cfg, banner1 =banner, exit_msg=exit_msg)
+    else:
+        nTerror("Got unexpected value %s from getIpythonVersionType" % str(iPythonVersionType))
+    # end if 
+#end def
+
+  
 def main():
     'Main entry point for all CING functionality. Use --help for a list of all options.'
     if not ( osType == OS_TYPE_MAC or
@@ -1038,31 +1073,7 @@ def main():
         #end if
     #end if
     if options.ipython:
-        # The next import is missing in one OSX installation but is on all others.
-        # The new way of doing this would be the below but that still fails on all OSX installs but the one above.
-        # from IPython.frontend.terminal.embed import InteractiveShellEmbed 
-        # pylint: disable=W0404
-        # The next method started to fail in 2012 see issue 329
-#        if False: 
-#            from IPython.Shell import IPShellEmbed # optional module; not required for CING proper.
-#            ipshell = IPShellEmbed(['-prompt_in1','CING \#> '],
-#                                    banner='--------Dropping to IPython--------',
-#                                    exit_msg='--------Leaving IPython--------'
-#                                  )        
-#            ipshell()
-#        #end if
-        cfg = Config()
-#        cfg.InteractiveShellEmbed.prompt_in1='CING \#> ' # depreciated.
-#        cfg.InteractiveShellEmbed.prompt_out='CING \#: '
-        cfg.PromptManager.in_template =  'CING \#>  '
-        cfg.PromptManager.in2_template = 'CING \#>> '
-        cfg.PromptManager.out_template = 'CING \#:  '
-#        c.PromptManager.out_template = "[\#]<<< "        
-        IPython.embed(config=cfg,
-#                      display_banner=1,                       
-                      banner1 ='-------- Dropping to IPython --------',
-                      exit_msg='-------- Leaving IPython     --------',
-                      )
+        startIpythonShell()
     #end if
     if project:
         if options.yasara:

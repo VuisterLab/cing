@@ -24,13 +24,13 @@ screenDump(project.name+'.png')
 #Hit ^D four times to leave Yasara and CING shells.
 """
 
-from IPython.config.loader import Config
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.PluginCode.required.reqWhatif import WHATIF_STR
 from cing.PluginCode.required.reqYasara import YASARA_STR
 from cing.core.constants import * #@UnusedWildImport
 from cing.core.molecule import Atom
 from cing.main import pformat
+from cing.main import startIpythonShell
 
 try:
 #    import yasara
@@ -248,26 +248,11 @@ def yasaraShell(project):
             HUD('obj', 'on')
     #end def
 
-    # start an ipython shell
-#    from IPython.Shell import IPShellEmbed
-    import IPython
-    IPython.embed()
-#    ipshell = IPShellEmbed(
-#                           ['-prompt_in1', sprintf('yasara (%s) \#> ', project.name)],
-#                           banner = '--------Dropping to yasara--------',
-#                           exit_msg = '--------Leaving yasara --------'
-#                          )
-#    ipshell()
-    cfg = Config()
-    cfg.PromptManager.in_template =  sprintf('yasara (%s) \#> ', project.name)
-#    cfg.PromptManager.in2_template = 'CING \#>> '
-#    cfg.PromptManager.out_template = 'CING \#:  '
-#        c.PromptManager.out_template = "[\#]<<< "        
-    IPython.embed(config=cfg,
-#                      display_banner=1,                       
-                  banner1 ='-------- Dropping to yasara --------',
-                  exit_msg='-------- Leaving yasara     --------',
-                  )
+    startIpythonShell(
+        in_template =  sprintf('yasara (%s) \#> ', project.name),
+        banner = '--------Dropping to yasara--------',
+        exit_msg='--------Leaving yasara--------'
+    )
 #end def yasaraShell
 
 methods  = [(yasaraShell, None),

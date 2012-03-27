@@ -4,6 +4,7 @@ Called from cing's main __init__.py and setupCing.py.
 """
 from subprocess import PIPE
 from subprocess import Popen
+import IPython
 import os
 import platform
 import sys
@@ -13,7 +14,7 @@ import urllib2
 #-----------------------------------------------------------------------------------
 # Synchronize block with cing.Libs.helper.py
 #-----------------------------------------------------------------------------------
-def _NTgetoutput( cmd ):
+def _nTgetoutput( cmd ):
     """Return output from command as (stdout,sterr) tuple"""
 #    inp,out,err = os.popen3( cmd )
     p = Popen(cmd, shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE, close_fds=True)
@@ -48,7 +49,7 @@ def getSvnRevision( envRootDir = 'CINGROOT'):
     """Return the revision number (int) or None if the revision isn't known. It depends on svn being available on the system."""
 #    return None
     try:
-        cingSvnInfo, err = _NTgetoutput('svn info %s' % os.getenv(envRootDir))
+        cingSvnInfo, err = _nTgetoutput('svn info %s' % os.getenv(envRootDir))
         #_nTmessage("cingSvnInfo: " + cingSvnInfo)
         #_nTmessage("err: " + err)
         if not err:
@@ -66,6 +67,98 @@ def getSvnRevision( envRootDir = 'CINGROOT'):
 #        _nTwarning("Failed to getSvnRevision()" )
 # end def
 
+def getIpythonVersionTuple():
+    """
+    Return a tuple of iPython version ids such as 
+    (0, 10, 1) older or
+    (0, 12) current.
+    Returns None on error.
+    """
+    iPythonVersion = None
+    try:
+        iPythonVersion = IPython.__version__.split('.')         
+    except:        
+        _nTwarning("Failed to getIpythonVersion()" )
+    # end try
+    return iPythonVersion
+# end def
+
+
+def getIpythonVersionType():
+    """
+    Return IPYTHON_VERSION_1 or 2 
+
+    Make sure they match the defs in constants.py
+    IPYTHON_VERSION_1 = 'iPythonVersion_1'
+    IPYTHON_VERSION_2 = 'iPythonVersion_2'
+
+    Returns None on error.
+    """
+    iPythonVersionTuple = getIpythonVersionTuple()
+    if iPythonVersionTuple == None:
+        _nTerror("Failed to getIpythonVersionTuple")
+        return None
+    # end if
+    
+    c = compareVersionTuple(iPythonVersionTuple, (0,12))
+    if c == None:
+        _nTerror("Failed to compareVersionTuple")
+        return None
+    # end if
+    if c >= 0:
+        return 'iPythonVersion_2'
+    # end if
+    return 'iPythonVersion_1'
+# end def
+
+
+def compareVersionTuple( t1, t2):
+    '''
+    Return 1,0,-1 for the normal comparison operator as in Java.
+
+    t1    t2    result
+    2   > 1     1
+    1   < 2     0
+    1   < 2    -1
+    1,2 > 1     1
+    Return None on error.
+    Example application: iPython version tuples such as '0.12'
+    See test_helper.py unit tests.
+    '''
+    if t1 == None:
+        _nTerror("Input 1 of compareIpythonVersionTuple is None" )
+        return None
+    # end if
+    if t2 == None:
+        _nTerror("Input 2 of compareIpythonVersionTuple is None" )
+        return None
+    # end if    
+    lt1 = len(t1)
+    lt2 = len(t2)
+    for i in range(max(lt1,lt2)):
+        if lt1 <= i:
+            if lt2 <= i:                
+                return 0
+            else:
+                return -1
+            # end if
+        # end if
+        if lt2 <= i:
+            return 1
+        # end if
+        v1 = t1[i]
+        v2 = t2[i]
+        if v1 == v2:
+            continue 
+        # end if
+        if v1 > v2:
+            return 1 
+        # end if
+        return -1
+    # end for
+    return 0
+# end def
+    
 def isInternetConnected():
     """Retrieves about 6 kbytes from google; takes 0.2 seconds on fast network."""
     url = 'http://www.google.com'
