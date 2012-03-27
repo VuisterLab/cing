@@ -76,7 +76,8 @@ def getIpythonVersionTuple():
     """
     iPythonVersion = None
     try:
-        iPythonVersion = IPython.__version__.split('.')         
+        iPythonVersionStr = IPython.__version__.split('.')
+        iPythonVersion = [ int(x) for x in iPythonVersionStr]
     except:        
         _nTwarning("Failed to getIpythonVersion()" )
     # end try
