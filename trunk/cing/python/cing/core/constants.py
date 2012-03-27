@@ -27,6 +27,9 @@ OS_TYPE_LINUX = 'linux'
 OS_TYPE_WINDOWS = 'windows' # unsupported.
 OS_TYPE_UNKNOWN = 'unknown'
 
+IPYTHON_VERSION_1 = 'iPythonVersion_1'
+IPYTHON_VERSION_2 = 'iPythonVersion_2'
+
 AQUA       = 'AQUA' # not uptodate with BMRB DG/G difference.
 IUPAC      = 'IUPAC'
 SPARKY     =  IUPAC
