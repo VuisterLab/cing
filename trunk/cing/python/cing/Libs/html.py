@@ -2228,7 +2228,7 @@ class MoleculeHTMLfile( HTMLfile ):
 
         if not htmlOnly:
             nTmessage("Creating CING html")
-            if createHtmlCing(project):
+            if createHtmlCing(project, ranges = ALL_RANGES_STR ):
                 nTerror('Failed to createHtmlCing')
                 return True
             #end if
@@ -2287,7 +2287,7 @@ class MoleculeHTMLfile( HTMLfile ):
         if not htmlOnly:
             nTmessage("Creating Whatif html")
             if hasattr(plugins, WHATIF_STR) and plugins[ WHATIF_STR ].isInstalled:
-                if project.createHtmlWhatif():
+                if project.createHtmlWhatif( ranges = ALL_RANGES_STR ):
                     nTerror('Failed to createHtmlWhatif')
                     return True
                 #end if
@@ -2347,7 +2347,7 @@ class MoleculeHTMLfile( HTMLfile ):
         nTmessage("Creating Wattos html")
         if not htmlOnly:
             if hasattr(plugins, WATTOS_STR) and plugins[ WATTOS_STR ].isInstalled:
-                if project.createHtmlWattos():
+                if project.createHtmlWattos( ranges = ALL_RANGES_STR ):
                     nTerror('Failed to createHtmlWattos')
                     return True
                 #end if
@@ -2407,7 +2407,7 @@ class MoleculeHTMLfile( HTMLfile ):
         nTmessage("Creating X3dna html")
         if not htmlOnly:
             if hasattr(plugins, X3DNA_STR) and plugins[ X3DNA_STR ].isInstalled:
-                if project.createHtmlX3dna():
+                if project.createHtmlX3dna( ranges = ALL_RANGES_STR ):
                     nTerror('Failed to createHtmlX3dna')
                     return True
                 #end if
