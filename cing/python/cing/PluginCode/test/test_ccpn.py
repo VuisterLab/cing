@@ -159,7 +159,7 @@ class AllChecks(TestCase):
 
             if True:
                 self.assertFalse(project.molecule.setRanges(ranges))
-#                nTdebug('In test_ccpn.py: ranges: %s' % str(project.molecule.ranges))
+                nTdebug('In test_ccpn.py: ranges: %s' % str(project.molecule.ranges))
                 project.molecule.rangesToMmCifRanges(ranges)
 
             if True:
