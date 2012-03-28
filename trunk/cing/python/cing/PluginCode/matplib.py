@@ -2410,7 +2410,6 @@ def makeDihedralHistogramPlot( project, residue, dihedralName, binsize = 5, html
 
     # AWSS
     # Let's check if for this 'angle' there is a dihedral restraint
-    aAv  = angle.cav
     width = 4.0
     dr = _matchDihedrals(residue, dihedralName)
     alpha=0.3
@@ -2439,6 +2438,19 @@ def makeDihedralHistogramPlot( project, residue, dihedralName, binsize = 5, html
         # end if
 
     # Always plot the cav line
+    # But as per Issue 328: Need to omit the outliers before calculating the average dihedral angles in 1D plot.
+#    nTdebug( 'angle.good: ' + repr(angle.good))
+    angle.good.limit(     plotparams.min, plotparams.max, byItem=1 )
+    angle.good.cAverage(  plotparams.min, plotparams.max, byItem=1 )
+#    nTdebug("good:      %s" % str(angle.good))
+#    nTdebug("      cav: %s" % angle.good.cav)
+            
+    if angle.good.cav == None:
+        nTerror("Failed to derive circular average from good values; falling back to cav of all values.")
+        aAv  = angle.cav
+    else:        
+        aAv  = angle.good.cav
+    # end if
     # pylint: disable=E1102
     plot.line( (aAv, 0), (aAv, ylimMax),
                lineAttributes(color=plotparams.average, width=width) )
