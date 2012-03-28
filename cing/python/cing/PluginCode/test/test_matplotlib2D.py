@@ -2,16 +2,30 @@
 Unit test execute as:
 python $CINGROOT/python/cing/PluginCode/test/test_matplotlib2D.py
 """
+from cing import cingDirTestsData
 from cing import cingDirTmp
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.Libs.numpyInterpolation import interp2_linear
 from cing.Libs.numpyInterpolation import interpn_linear
 from cing.Libs.numpyInterpolation import interpn_nearest
+from cing.PluginCode.matplib import NTplotSet
 from cing.PluginCode.matplib import gray_inv
+from cing.PluginCode.matplib import makeDihedralHistogramPlot
+from cing.PluginCode.required.reqCcpn import CCPN_STR
+from cing.core.classes import Project
 from matplotlib.pylab import * #@UnusedWildImport
+from nose.plugins.skip import SkipTest
 from numpy import * #@UnusedWildImport
 from unittest import TestCase
 import unittest
+
+# Import using optional plugins.
+try:
+    from cing.PluginCode.Ccpn import Ccpn #@UnusedImport needed to throw a ImportWarning so that the test is handled properly.
+except ImportWarning, extraInfo: # Disable after done debugging; can't use nTdebug yet.
+    print "Got ImportWarning %-10s Skipping unit check %s." % ( CCPN_STR, getCallerFileName() )
+    raise SkipTest(CCPN_STR)
+# end try
 
 class AllChecks(TestCase):
 
@@ -88,6 +102,38 @@ class AllChecks(TestCase):
         #               alpha=0)
         ))
         nTdebug( paletteStr )
+        
+    def test_makeDihedralHistogramPlot(self):
+        '''
+        See test_NTplot2 for simpler test
+        '''
+        cing.verbosity = verbosityDebug        
+        cingDirTmpTest = os.path.join( cingDirTmp, getCallerName() )
+        mkdirs( cingDirTmpTest )
+        self.failIf(os.chdir(cingDirTmpTest), msg =
+            "Failed to change to test directory for files: " + cingDirTmpTest)        
+#        entryId = "1brv_cs_pk_2mdl"        
+        entryId = "2kq3"        
+        project = Project.open(entryId, status = 'new')
+        inputArchiveDir = os.path.join(cingDirTestsData, "ccpn")
+        ccpnFile = os.path.join(inputArchiveDir, entryId + ".tgz")
+        self.assertTrue(project.initCcpn(ccpnFolder = ccpnFile ))
+        self.assertFalse( project.validateDihedrals() )
+#        residue = project.molecule.A.PRO172
+        residue = project.molecule.A.ASP19
+        # Dihedral plots
+        for dihed in residue.db.dihedrals.zap('name'):
+            if dihed in residue and residue[dihed]:
+#                d = residue[dihed] # List of values with outliers etc attached.
+#                nTdebug("Residue %s: generating dihedral %s plot", residue, dihed )
+                ps = makeDihedralHistogramPlot( project, residue, dihed )
+                tmpPath = os.path.join( dihed + '.png')
+                if ps and isinstance(ps, NTplotSet):
+                    ps.hardcopy( fileName = tmpPath )
+                #end if
+            #end if
+        #end for
+    # end def
 
 if __name__ == "__main__":
     cing.verbosity = verbosityDebug

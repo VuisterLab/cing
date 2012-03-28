@@ -35,7 +35,12 @@ def plotTestHistoDihedral():
     angleList.good.limit(     plotparams.min, plotparams.max, byItem=1 )
     angleList.good.cAverage(  plotparams.min, plotparams.max, byItem=1 )
     angleList.outliers.limit( plotparams.min, plotparams.max, byItem=1 )
+    angleList.outliers.cAverage(  plotparams.min, plotparams.max, byItem=1 )
 
+    for i,angleL in enumerate( [angleList, angleList.good, angleList.outliers] ):
+        nTdebug("angleL %d: %s" % (i, str(angleL)))
+        nTdebug("      cav: %s" % angleL.cav)
+    # end for
     xTicks = range(int(plotparams.min), int(plotparams.max+1), plotparams.ticksize)
 #        nTdebug("xTicks: " + repr(xTicks))
 #        figWidth  = 600
@@ -65,7 +70,9 @@ def plotTestHistoDihedral():
                     valueIndexPairList=angleList.outliers
                   )
 
-    aAv  = angleList.cav
+#    aAv  = angleList.cav
+    aAv  = angleList.good.cav
+    
     width = 4.0
     lower, upper = 45, 55
     alpha = 0.3
@@ -182,7 +189,6 @@ class NTplot2Checks(TestCase):
 #    return unittest.TestSuite(map(NTplot2Checks, tests))
 
 if __name__ == "__main__":
-    cing.verbosity = verbosityError
     cing.verbosity = verbosityDebug
 #    unittest.main('cing.Libs.test.test_NTplot2', 'NTplot2Checks_a')
     unittest.main()
