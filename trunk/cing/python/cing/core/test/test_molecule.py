@@ -135,7 +135,7 @@ class AllChecks(TestCase):
         c.addResidue('RGUA', 1, convention=INTERNAL_0, Nterminal = True)
         c.addResidue('RADE', 2, convention=INTERNAL_0, ) 
         c.addResidue('URA', 3, convention=INTERNAL_0, ) # not RTHY normally of course.
-        c.addResidue('RTHY', 4, convention=INTERNAL_0, ) # not RTHY normally of course.
+        c.addResidue('RTHY', 4, convention=INTERNAL_0, )
         c.addResidue('RCYT',  5, convention=INTERNAL_0, Cterminal = True)
         c = mol.addChain('D')
         for i in range(1,11):
@@ -185,6 +185,7 @@ class AllChecks(TestCase):
     # end def
 
     def test_RangeSelection(self):
+        cing.verbosity = verbosityDebug
         entryId = 'testEntry'
         project = Project(entryId)
         self.failIf(project.removeFromDisk())
@@ -324,7 +325,7 @@ class AllChecks(TestCase):
         chain1 = mol.allChains()[1]
         atomList = chain0.getRepresentingAtomListsPerResidue(chain1)
         nTdebug("atomList: %s" % str(atomList))
-        self.assertEquals( len(atomList[0]), 4)
+        self.assertEquals( len(atomList[0]), 5)
     # end def
     
     def test_RangeSelectionStatic(self):
