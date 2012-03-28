@@ -132,10 +132,11 @@ class AllChecks(TestCase):
         c.addResidue('DC', 4, Cterminal = True)
         c = mol.addChain('C')
         
-        c.addResidue('RADE', 1, convention=INTERNAL_0, Nterminal = True)
-        c.addResidue('RGUA', 2, convention=INTERNAL_0, ) 
-#        c.addResidue('RTHY', 3, convention=INTERNAL_0, ) # TODO: fix because right now gets recognized as other.
-        c.addResidue('URA',  3, convention=INTERNAL_0, Cterminal = True)
+        c.addResidue('RGUA', 1, convention=INTERNAL_0, Nterminal = True)
+        c.addResidue('RADE', 2, convention=INTERNAL_0, ) 
+        c.addResidue('URA', 3, convention=INTERNAL_0, ) # not RTHY normally of course.
+        c.addResidue('RTHY', 4, convention=INTERNAL_0, ) # not RTHY normally of course.
+        c.addResidue('RCYT',  5, convention=INTERNAL_0, Cterminal = True)
         c = mol.addChain('D')
         for i in range(1,11):
             c.addResidue('HOH', i )
@@ -154,7 +155,7 @@ class AllChecks(TestCase):
             nTmessage( "idxMolType: %s" % (c.getIdxMolType()))
         # end for
         
-
+        nTmessage("Count the molecule types")
         molTypeCountList = mol.getMolTypeCountList()    
         p_protein_count = molTypeCountList[ mapMoltypeToInt[PROTEIN_STR] ]
         p_dna_count     = molTypeCountList[ mapMoltypeToInt[DNA_STR] ]
@@ -167,6 +168,7 @@ class AllChecks(TestCase):
         self.assertEqual(1, p_water_count)
         self.assertEqual(2, p_other_count)
         
+        nTmessage("Count the residue types")
         molTypeResidueCountList = mol.getMolTypeResidueCountList()    
         p_res_protein_count = molTypeResidueCountList[ mapMoltypeToInt[PROTEIN_STR] ]
         p_res_dna_count     = molTypeResidueCountList[ mapMoltypeToInt[DNA_STR] ]
@@ -175,7 +177,7 @@ class AllChecks(TestCase):
         p_res_other_count   = molTypeResidueCountList[ mapMoltypeToInt[OTHER_STR] ]
         self.assertEqual(5, p_res_protein_count)
         self.assertEqual(4, p_res_dna_count  )
-        self.assertEqual(3, p_res_rna_count  )
+        self.assertEqual(5, p_res_rna_count  )
         self.assertEqual(10, p_res_water_count)
         self.assertEqual(2, p_res_other_count)
         
