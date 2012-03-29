@@ -87,6 +87,7 @@
 
 
     <target name="iCing-servlet-install" depends="init,war">
+        <echo message="TODO MANUALLY on server: sudo rm ${icing.webapp.dir}/icing.war" />
         <echo message="Ensure that the tomcat and apache are already setup. As well as the production staging area. Do gwt compile before calling." />
         <echo message="The gwt compile is done from the Eclipse 'GWT compile project' button (red, near the top-left)" />
         <echo message="toDir: ${home.web.user}@${home.web.machine.looped}:${icing.webapp.dir}" />
@@ -95,6 +96,9 @@
             keyfile="${home.web.keyfile}" knownhosts="${home.web.knownhosts}" passphrase="${home.web.passphrase}" verbose="true" port="${home.web.port}">
             <fileset file="${icing.war.file}" />
         </scp>
+        <echo message="TODO MANUALLY: sudo chown tomcat6:tomcat6 ${icing.webapp.dir}/icing.war" />
+        <echo message="TODO MANUALLY: check that the new war is deployed with: tail -f $CATALINA_BASE/logs/*" />      
+        <echo message="TODO MANUALLY: if not deployed force it to reload with: sudo /etc/init.d/tomcat6 restart" />      
     </target>
 
   <target name="war" description="Create a war file" depends="init">

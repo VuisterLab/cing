@@ -770,8 +770,8 @@ def startIpythonShell(
         cfg = Config()
         cfg.PromptManager.in_template =  in_template 
         cfg.PromptManager.in2_template = in2_template
-        cfg.PromptManager.out_template = out_template
-        IPython.embed(config=cfg, banner1 =banner, exit_msg=exit_msg)
+        cfg.PromptManager.out_template = out_template                
+        IPython.embed(config=cfg, banner1 =banner, exit_msg=exit_msg) #@UnresolvedImport # pylint: disable=E1101
     else:
         nTerror("Got unexpected value %s from getIpythonVersionType" % str(iPythonVersionType))
     # end if 

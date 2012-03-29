@@ -1,4 +1,4 @@
-# pylint: disable-all
+#@PydevCodeAnalysisIgnore # pylint: disable-all
 """
 ##################
 # Example script #
