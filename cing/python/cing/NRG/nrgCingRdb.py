@@ -5,12 +5,14 @@ cd $D/NRG-CING
 python -u $CINGROOT/python/cing/NRG/nrgCingRdb.py 
 """
 
+from cing import cingDirTestsData
 from cing import cingDirTmp
 from cing.Libs.DBMS import DBMS
 from cing.Libs.DBMS import Relation
 from cing.Libs.DBMS import getRelationFromCsvFile
 from cing.Libs.NTplot import * #@UnusedWildImport
 from cing.Libs.NTutils import * #@UnusedWildImport
+from cing.Libs.html import makeDihedralPlot
 from cing.NRG import * #@UnusedWildImport
 from cing.NRG.settings import * #@UnusedWildImport
 from cing.PluginCode.matplib import * #@UnusedWildImport
@@ -23,6 +25,7 @@ from cing.PluginCode.required.reqWhatif import * #@UnusedWildImport
 from cing.PluginCode.sqlAlchemy import CgenericSql
 from cing.PluginCode.sqlAlchemy import CsqlAlchemy
 from cing.PluginCode.sqlAlchemy import printResult
+from cing.core.classes import Project
 from pylab import * #@UnusedWildImport # imports plt too now.
 from scipy import * #@UnusedWildImport
 from scipy import optimize
@@ -1610,7 +1613,7 @@ e.pdb_id = s1.pdb_id;
         colorNameList = 'green'.split()
         colorNameStrList = [ '% Residues Green', '% Residues Orange', '% Residues Red' ]
 
-        cingDirTmpTest = '/Users/jd/CMBI/Papers/CING_paper/FiguresTmp'
+        cingDirTmpTest = '/Users/jd/CMBI/Papers/CING paper/FiguresTmp'
         if not m.perEntryRog:
             nTmessage("Get ROG percentages per entry.")
             m.getAndPlotColorVsColor(doPlot = False)
@@ -1627,6 +1630,7 @@ e.pdb_id = s1.pdb_id;
                     m.e1.c.pc_rama_disall
                      ], and_(m.e1.c.pdb_id==m.s1.c.pdb_id,
                              m.e1.c.pdb_id==m.e1.c.pdb_id
+#                             , m.e1.c.pdb_id=='2kq3'
                              )
                      ).order_by(m.e1.c.pdb_id)
         nTdebug("SQL: %s" % s)
@@ -1686,6 +1690,58 @@ e.pdb_id = s1.pdb_id;
                 savefig(fn)
                     # end for
         # end for
+    # end def
+
+    def plotDihedral2d(self):
+        'Plot for Leucine paper as per code PY0101'
+        m = self
+        entryId = '1brv'
+        resType = 'LEU' # also indicate below
+        dihedralName1 = CHI1_STR
+        dihedralName2 = CHI2_STR
+        titleStr = 'Well defined Leucines'
+#        sizePixels = 2000 # All fonts are scaled so will look too small if going larger with this parameter.
+        outputDir = '/Users/jd/CMBI/Papers/Leucine_Paper/Figures'
+        
+        
+        
+        nTdebug( 'Load view with predefined "well-defined" residues.')
+        leucine = Table('leucine', self.csql.metadata, autoload=True, schema=self.csql.schema)
+        # Plot the % red vs green for all in nrgcing
+        s = select([leucine.c.residue_id, m.r1.c.chi1_avg, m.r1.c.chi2_avg,
+                     ], and_(leucine.c.residue_id==m.r1.c.residue_id
+                             ),
+                     )
+        nTdebug("SQL: %s" % s)
+        result = m.execute(s).fetchall()
+
+        nTdebug("Found %s rows returned" % len(result))
+        d1 = []
+        d2 = []
+        for row in result:
+#            print row
+            d1.append(row[1])
+            d2.append(row[2])
+        # end for
+        fn = os.path.join(outputDir,'%s_%s_%s.eps' % (resType,dihedralName1,dihedralName2))
+        cingDirTmpTest = os.path.join( cingDirTmp, getCallerName() )
+        mkdirs( cingDirTmpTest )
+        os.chdir(cingDirTmpTest)
+        inputArchiveDir = os.path.join(cingDirTestsData, "ccpn")
+        ccpnFile = os.path.join(inputArchiveDir, entryId + ".tgz")
+        project = Project.open(entryId, status = 'new')
+        project.initCcpn(ccpnFolder = ccpnFile, modelCount=1)
+
+        mol = project.molecule
+        res = mol.A.LEU185 # Pick one without restraints or remove the restraints.
+        nTmessage( mol.format() )        
+        ps = makeDihedralPlot(project, [res], dihedralName1, dihedralName2, plotValues = False,
+                          plotTitle = titleStr,
+                          plotCav=False, htmlOnly=False)
+        
+        plot( d1, d2, 'k.', markersize=0.002 )                
+#        ps.hardcopySize = (sizePixels,sizePixels)        
+        ps.hardcopy(fn)
     # end def
 # end class
 
@@ -1755,7 +1811,6 @@ if __name__ == '__main__':
         host = 'nmr.cmbi.ru.nl'
     # end if
     n = NrgCingRdb( schema=schema, host = host )
-
     if 0: # DEFAULT 0
         n.showCounts()
     # end if
@@ -1765,7 +1820,7 @@ if __name__ == '__main__':
     if 0:
         n.createScatterPlots()
     # end if
-    if 0: # Default 0
+    if 0: # Default 0 For CING paper Figure 3.
 #        n.plotQualityVsColor()
         n.plotQualityPcVsColor()
 #        n.getAndPlotColorVsColor(doPlot = True) # ROG Plot for paper.
@@ -1778,6 +1833,9 @@ if __name__ == '__main__':
         n.createPlotsCompareBetweenDb(other_schema=NMR_REDO_DB_SCHEMA)
     if 0: # DEFAULT 0
         n.populateBmrbIds()
+    # end if
+    if 0: # Default 0 For Leu paper Figure.
+        n.plotDihedral2d()
     # end if
     nTmessage("done with NrgCingRdb")
 # end if

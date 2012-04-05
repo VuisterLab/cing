@@ -291,7 +291,7 @@ class HistogramsForPlotting():
 hPlot = HistogramsForPlotting()
 
 def makeDihedralPlot( project, residueList, dihedralName1, dihedralName2,
-                      plotTitle = None, plotCav = True, htmlOnly=False ):
+                      plotTitle = None, plotValues = True, plotCav = True, htmlOnly=False ):
     '''Return NTplotSet instance with plot of dihedralName1 vrs dihedralName2 or
        None on error
        Called with: eg ['PHI',  'PSI',  'Ramachandran', 'PHI_PSI']
@@ -308,20 +308,21 @@ def makeDihedralPlot( project, residueList, dihedralName1, dihedralName2,
     if not project:
         nTerror( 'in makeDihedralPlot called without project' )
         return None
+    # end if
     if not residueList:
         nTerror( 'makeDihedralPlot called without residues in list' )
         return None
-
+    # end if
     if not getDeepByKeysOrAttributes(plugins, MATPLIB_STR, IS_INSTALLED_STR):
         nTdebug('Skipping plots in html#makeDihedralPlot() because no matplib installed.')
         return None
-
+    # end if
     from cing.PluginCode.matplib import NTplot #@UnresolvedImport
     from cing.PluginCode.matplib import NTplotSet #@UnresolvedImport
 
     if hPlot.histRamaBySsAndCombinedResType == None:
         hPlot.initHist()
-
+    # end if
     # Set residue to first residue. For looping over multiple residues the var
     # res will be used.
     residue = residueList[0]
@@ -340,7 +341,7 @@ def makeDihedralPlot( project, residueList, dihedralName1, dihedralName2,
         return None
     if htmlOnly:
         return True # indicating success
-
+    # end if
     isSingleResiduePlot = len(residueList) == 1
 
     if not plotTitle:
@@ -348,14 +349,14 @@ def makeDihedralPlot( project, residueList, dihedralName1, dihedralName2,
             plotTitle = residue.cName(2)
         else:
             plotTitle = '%d residues'
-
-
-#    nTdebug("Creating a 2D dihedral angle plot for plotItem: %s %s %s", residue, dihedralName1, dihedralName2)
+        # end if
+    # end if
+    #nTdebug("Creating a 2D dihedral angle plot for plotItem: %s %s %s", residue, dihedralName1, dihedralName2)
 
     plotparams1 = project.plotParameters.getdefault(dihedralName1,'dihedralDefault')
     plotparams2 = project.plotParameters.getdefault(dihedralName2,'dihedralDefault')
 
-    ps =NTplotSet() # closes any previous plots
+    ps = NTplotSet() # closes any previous plots
     ps.hardcopySize = (image2DdihedralWidth,image2Ddihedralheight)
     plot = NTplot( title  = plotTitle,
       xRange = (plotparams1.min, plotparams1.max),
@@ -392,7 +393,7 @@ def makeDihedralPlot( project, residueList, dihedralName1, dihedralName2,
     else:
         nTcodeerror("makeDihedralPlot called for non Rama/Janin/d1d2")
         return None
-
+    # end if
     histList = []
     ssTypeList = histBySsAndResType.keys() #@UndefinedVariable
     ssTypeList.sort()
@@ -408,9 +409,11 @@ def makeDihedralPlot( project, residueList, dihedralName1, dihedralName2,
         if myHistList == None:
             nTdebug("Failed to get the d1d2 hist for %s" % residue)
             return None
+        # end if
         if len(myHistList) == 0:
 #            nTdebug("Found no histogram for %s" % residue)
             return None
+        # end if
         histList += myHistList # extend the list.
     else:
         for ssType in ssTypeList:
@@ -418,23 +421,27 @@ def makeDihedralPlot( project, residueList, dihedralName1, dihedralName2,
                 myHist = getDeepByKeys(histBySsAndResType,ssType,resName)
             else:
                 myHist = getDeepByKeys(histBySsAndCombinedResType,ssType)
+            # end if
             if myHist == None:
 #                nTdebug("Failed to get the non-d1d2 hist for %s" % residue) # happens for 1bus cPro
                 return None
-        #            nTdebug('Appending for ssType %s and resName %s' % ( ssType,resName ))
+            # end if            
+            nTdebug('Appending for ssType %s and resName %s' % ( ssType,resName ))
             histList.append(myHist)
+        # end for
+    # end if            
     if histList:
-#        nTdebug('Will do dihedralComboPlot')
+        nTdebug('Will do dihedralComboPlot')
         plot.dihedralComboPlot(histList, minPercentage =  minPercentage, maxPercentage = maxPercentage, scaleBy = scaleBy)
-
-
-
+    else:
+        nTdebug('Strange, no histList found in dihedralComboPlot')
+    # end if
     # Plot restraint ranges for single residue plots.
     for res in residueList:
         if isSingleResiduePlot:
             # res is equal to residue
             for useTalos in ( False, True ):
-#                nTdebug("Plotting with useTalos %s" % useTalos)
+                nTdebug("Plotting with useTalos %s" % useTalos)
                 dr1 = _matchDihedrals(res, dihedralName1,useTalos=useTalos)
                 dr2 = _matchDihedrals(res, dihedralName2,useTalos=useTalos)
 
@@ -482,12 +489,13 @@ def makeDihedralPlot( project, residueList, dihedralName1, dihedralName2,
         if not len(d1):
 #            nTdebug( 'in makeDihedralPlot dihedrals had no defining atoms for 1: %s or', dihedralName1 ) # happens in 1bus for cPro13.
             return None
+        # end if        
         if not len(d2):
 #            nTdebug( 'in makeDihedralPlot dihedrals had no defining atoms for 2: %s'   , dihedralName2 )
             return None
+        # end if        
         d1cav = d1.cav
         d2cav = d2.cav
-
         # Plot data points on top for painters algorithm without alpha blending.
         myPoint = plusPoint.copy()
         myPoint.pointColor = 'green'
@@ -496,9 +504,10 @@ def makeDihedralPlot( project, residueList, dihedralName1, dihedralName2,
         myPoint.pointEdgeWidth = 1.0
         if res.resName == 'GLY':
             myPoint.pointType = 'triangle'
+        # end if        
         if res.resName == 'PRO':
             myPoint.pointType = 'square'
-
+        # end if        
 #        if dihedralName1=='Cb4N' and dihedralName2=='Cb4C':
 #        if doingNewD1D2plot:
             # Plot individually.
@@ -516,8 +525,9 @@ def makeDihedralPlot( project, residueList, dihedralName1, dihedralName2,
 #                        myPoint.pointColor='green'
 #                plot.point( (d1Element, d2[i]), attributes=myPoint )
 #        else: # plot all at once.
-        plot.points( zip( d1, d2 ), attributes=myPoint )
-
+        if plotValues:
+            plot.points( zip( d1, d2 ), attributes=myPoint )
+        # end if
         # Plot the cav point for single residue plots.
         if isSingleResiduePlot and plotCav:
             myPoint = myPoint.copy()
@@ -526,7 +536,8 @@ def makeDihedralPlot( project, residueList, dihedralName1, dihedralName2,
             myPoint.pointColor = 'blue'
             myPoint.fill = False
             plot.point( (d1cav, d2cav),myPoint )
-
+        # end if        
+    # end for res         
     return ps
 #end def
 

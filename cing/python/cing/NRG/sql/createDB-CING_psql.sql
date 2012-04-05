@@ -169,14 +169,6 @@ CREATE INDEX entry_se4 ON casdcing.cingentry (sel_4);
 CREATE INDEX entry_se5 ON casdcing.cingentry (sel_5);
 CREATE INDEX entry_se6 ON casdcing.cingentry (selection);
 
--- mrfile
--- MySQL doesn't accept the SYSDATE default for date_modified so always present date on insert.
--- From MySQL manual:
--- For storage engines other than InnoDB, MySQL Server parses the FOREIGN KEY
--- syntax in CREATE TABLE statements, but does not use or store it.
--- The solution is to define the innodb tables as below.
-
-
 --    mol_type
 CREATE TABLE casdcing.cingchain
 (

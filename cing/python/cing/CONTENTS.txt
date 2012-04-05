@@ -17,3 +17,10 @@ localConstants.py       Settings that can be imported from python/cing/__init__.
 main.py                 The CING program.
 setupCing.py            Run to set up environment variables and check installation.
 valSets.cfg             Validation settings. Might be moved around.
+
+Pointers:               Reference to code for use in papers etc. Each domain can increment a hundred or so.
+PY0101                  Python  19,103 leucine side chain conformations of 6,383 NMR structures as extracted from the NRG-CING database.
+SQL001                  SQL     Find residues in entry selection and residue selection.
+TCSH001                 Shell   For Ramachandran and Janin counts.
+Etc.
+

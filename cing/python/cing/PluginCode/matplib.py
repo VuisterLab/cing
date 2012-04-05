@@ -124,6 +124,7 @@ mappingLineType2MatLibPlot = {
     NONE_LINE_TYPE:         ' '
     }
 
+DEFAULT_PLOT_ID = "Plot from NTplotSet"
 
 class FormatResTypesFormatter(Formatter):
     def __init__(self, molecule):
@@ -1025,15 +1026,15 @@ class NTplotSet( NTdict ):
             p = self.plotSet[plotId]
             p.updateSettings()
 
-    def getPlot(self, plotId):
+    def getPlot(self, plotId=DEFAULT_PLOT_ID):
         return self.plotSet[ plotId ]
 
-    def addPlot(self, ntPlot, plotId="Plot from NTplotSet"):
+    def addPlot(self, ntPlot, plotId=DEFAULT_PLOT_ID):
         """Just add a plot that has been precreated"""
         self.plotSet[plotId] = ntPlot
         return self.getPlot(plotId)
 
-    def createPlot(self, plotId="Plot from NTplotSet", *args):
+    def createPlot(self, plotId=DEFAULT_PLOT_ID, *args):
         ntPlot = NTplot(plotId=plotId)
         self.plotSet[plotId] = ntPlot
         ntPlot.axis = Axes( *args )

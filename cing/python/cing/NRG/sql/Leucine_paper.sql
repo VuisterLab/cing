@@ -1,12 +1,92 @@
 -- Count number of leu
 -- Result 66,423
 select count(*)
+--select e.pdb_id as pdb, c.name as c, r.number as num, r.name
 from "nrgcing"."cingresidue" r
+inner join "nrgcing"."cingchain"   c on r.chain_id = c.chain_id
+inner join "nrgcing"."cingentry"   e on c.entry_id = e.entry_id
+inner join "nrgcing"."entry_list_selection" s1 on s1.pdb_id = e.pdb_id
+where r.name = 'LEU' AND
+e.pdb_id = '1hue'
+order by e.pdb_id, c.name, r.number 
+limit 100;
+
+-- Ranges string for a particular entry
+select e.pdb_id as pdb, e.ranges
+from "nrgcing"."cingentry" e 
 where
-r.name = 'LEU';
--- Number of entries
+e.pdb_id IN ( '1brv','1hkt','1mo7','1mo8','1ozi','1p9j','1pd7','1qjt','1vj6','1y7n','2fws','2fwu','2jsx') 
+order by e.pdb_id 
+limit 100;
+
+-- Residues in ranges for a particular entry
+select e.pdb_id as pdb, c.name as c, r.number as num, r.name, r.sel_1
+from "nrgcing"."cingresidue" r
+inner join "nrgcing"."cingchain"   c on r.chain_id = c.chain_id
+inner join "nrgcing"."cingentry"   e on c.entry_id = e.entry_id
+inner join "nrgcing"."entry_list_selection" s1 on s1.pdb_id = e.pdb_id
+where r.sel_1 = true AND
+r.name = 'LEU'
+--e.pdb_id IN ( '1brv','1hkt','1mo7','1mo8','1ozi','1p9j','1pd7','1qjt','1vj6','1y7n','2fws','2fwu','2jsx') 
+order by e.pdb_id, c.name, r.number 
+limit 100000;
+
+-- SQL0102
+-- Number of entries with 10+ models and 30+ aa.
 select count(*)
-from "nrgcing"."cingentry" e;
+from "nrgcing"."entry_list_selection" e;
+
+-- SQL0103
+-- Count number of leu in well-defined ranges with an existing chi average value.
+-- There are 302 LEU for which the chi1 or 2 average value is a null. This might be a bug.   
+-- Result 19,103 (was 52,888 without filtering on r.distance_count and chi1/2 cvs)
+--  and 31,983 without filtering on  r.distance_count.
+--select e.pdb_id as pdb, c.name as c, r.number as num, r.name, r.chi1_avg, r.chi2_avg
+drop view if exists "nrgcing".leucine;
+create view "nrgcing".leucine as select r.residue_id
+FROM "nrgcing"."cingresidue" r
+inner join "nrgcing"."cingchain"   c on r.chain_id = c.chain_id
+inner join "nrgcing"."cingentry"   e on c.entry_id = e.entry_id
+inner join "nrgcing"."entry_list_selection" s1 on s1.pdb_id = e.pdb_id
+where 
+r.sel_1 = true AND
+r.name = 'LEU' AND
+r.distance_count >= 10 AND
+r.chi1_cv < 0.2 AND r.chi2_cv < 0.2 AND
+NOT (r.chi1_avg IS NULL OR r.chi2_avg IS NULL);
+--order by e.pdb_id, c.name, r.number 
+select count(*) from "nrgcing".leucine;
+
+
+-- SQL0101
+-- Count number of bad leu chi2 in t/g- and g-/g-.
+-- JFD checked that all leucine chi1 and 2's are in [0,360>
+-- Result: 19,103
+--In [1]: 100.*(767+952)/19103.
+--Out[1]: 8.9985866094330742
+--select e.pdb_id as pdb, c.name as c, r.number as num, r.name,
+select count(*)
+--to_char(r.chi1_avg,  'FM990.0') as chi1_avg,
+--to_char(r.chi1_cv,   'FM0.000')  as chi1_cv,
+--to_char(r.chi2_avg,  'FM990.0') as chi2_avg,
+--to_char(r.chi2_cv,   'FM0.000')  as chi2_cv
+FROM "nrgcing"."cingresidue" r
+inner join "nrgcing"."leucine"   le on le.residue_id = r.residue_id
+--inner join "nrgcing"."cingchain"   c on r.chain_id = c.chain_id
+--inner join "nrgcing"."cingentry"   e on c.entry_id = e.entry_id
+where
+-- t/g- result: 767
+--r.chi1_avg >= 120 AND r.chi1_avg <  240 AND r.chi2_avg >= 240 AND r.chi2_avg <  360
+-- g-/g- result: 952
+r.chi1_avg >= 240 AND r.chi1_avg <  360 AND r.chi2_avg >= 240 AND r.chi2_avg <  360
+
+--e.name in ( '1brv','1hkt','1mo7','1mo8','1ozi','1p9j','1pd7','1qjt','1vj6','1y7n','2fws','2fwu','2jsx')
+--AND (
+
+--)
+--order by e.pdb_id, c.name, r.number 
+--limit 1000;
+
 
 
 -- Count number of leu with CS for both Cdeltas (stereospecifically) and single conformer (low cv).

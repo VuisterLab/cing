@@ -6,8 +6,8 @@ Created on Nov 9, 2010
 Querying the database for some specific conditions.
 This script will open the file with input data and gives a file back with the input data and some extra information.
 
-Some of this imports aren't necessary. I just copied them from some scripts from Jurgen.
-I kept them all here in case of I'll need it another time.
+Some of the imports aren't necessary. I just copied them from some scripts from Jurgen.
+I kept them all here in case that I'll need it some another time.
 """
 from cing.Libs.NTplot import * #@UnusedWildImport
 from cing.Libs.NTutils import * #@UnusedWildImport
