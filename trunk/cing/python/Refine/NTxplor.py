@@ -25,7 +25,7 @@ readable
 Cluster issues
 """
 
-FAST_FOR_TESTING = 0 # DEFAULT 0 Use 1 for testing quickly. TODO: set to default value.
+FAST_FOR_TESTING = False # DEFAULT False Use 1 for testing quickly.
 #------------------------------------------------------------------------------
 timest = 0.003
 
@@ -1071,8 +1071,8 @@ minimize powell nstep=50 drop=10.  nprint=25 end
 
 
   {* ======================================== High-temperature dynamics.*}
-constraints interaction (all) (all)
-            weights * 1  angl 0.4  impr 0.1 vdw 0.002 end end
+constraints interaction (all) (all) weights * 1    
+    angl 0.4  impr 0.1 vdw 0.002 end end
 
 evaluate ($nstep1=int($high_steps * 2. / 3. ) )
 evaluate ($nstep2=int($high_steps * 1. / 3. ) )
@@ -1086,8 +1086,8 @@ end
   {* ============== Tilt the asymptote and increase weights on geometry.*}
 noe asymptote * 1.0  end
 
-constraints interaction
-           (all) (all) weights * 1  vdw 0.002  end end
+constraints interaction (all) (all) weights * 1  
+    vdw 0.002  end end
 
 {* Bring scaling factor for S-S bonds back *}
 parameter

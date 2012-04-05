@@ -18,7 +18,9 @@ import unittest
 class AllChecks(TestCase):
 
     def _test_refine(self):
-        'Running a full recalculation. This test is too big to run by default. Ignore any errors from it in a incomplete setup.'
+        '''
+        Running a full recalculation. This test is too big to run by default. Ignore any errors from it in a incomplete setup.
+        '''
         cing.verbosity = verbosityDebug
         testDirectly = False # For direct unit check see test_xplor.py 
         
@@ -35,7 +37,7 @@ class AllChecks(TestCase):
             targetList      = 'psf generateTemplate anneal analyze       parse         refine parse import'.split()[:numberOfStagesTodo]
             targetOptionLoL = '.   .                .      --useAnnealed --useAnnealed .      .     .     '.split()[:numberOfStagesTodo]
             modelCountAnneal, bestAnneal, best = 4, 3, 2
-        if 1:
+        if 1: # Further selection below.
             entryList  = "1dum 1brv     2fwu     2fws               1olg".split()
             rangesList = "cv   171-188  501-850  371-650            cv  ".split()
         else:

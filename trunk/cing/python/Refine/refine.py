@@ -32,6 +32,7 @@ from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.Libs.disk import copy
 from cing.Libs.forkoff import ForkOff
 from cing.core.classes import Project
+from cing.main import startIpythonShell
 
 TEMPLATE_FILE_NAME = 'template.pdb'
 PARAMETERS_NAME = 'parameters'
@@ -824,13 +825,8 @@ def run():
         else:
             nTmessage("Done after setup.")
     #end if
-
     if options.ipython:
-        from IPython.Shell import IPShellEmbed
-        ipshell = IPShellEmbed(['-prompt_in1', 'CING \#> '],
-                                banner='--------Dropping to IPython--------',
-                                exit_msg='--------Leaving IPython--------' )
-        ipshell()
+        startIpythonShell()
     #end if
 #end def
 

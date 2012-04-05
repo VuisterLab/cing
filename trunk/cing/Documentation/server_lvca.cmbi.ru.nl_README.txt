@@ -20,6 +20,7 @@
     /etc/init.d/networking restart    
 -- Check webserver status by browsing to: http://LVCa/icing/
 -- Disable i's crontab
+-- Remove the certificate for https protocol from server at 443 port.
      
      
 

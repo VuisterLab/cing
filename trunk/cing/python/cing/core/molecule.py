@@ -2371,7 +2371,8 @@ class Molecule( NTtree, ResidueList ):
     #end def
 
     def updateDihedrals( self, residueList = None)   :
-        """Calculate the dihedral angles for all residues
+        """
+        Calculate the dihedral angles for all residues
         Return True on error.
         """
 #        nTdebug('Calculating dihedral angles')
@@ -2591,7 +2592,6 @@ class Molecule( NTtree, ResidueList ):
 
            Return True on error. Note that an empty atom list is not an error perse.
         """
-
         msgHol = MsgHoL()
         for res in self.allResidues():
             res.addDihedralsAll(msgHol=msgHol)
