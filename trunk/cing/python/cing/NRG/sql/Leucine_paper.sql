@@ -13,7 +13,13 @@ limit 100;
 
 -- Ranges string for a particular entry
 select e.pdb_id as pdb, e.ranges
-from "nrgcing"."cingentry" e 
+from "nrgcing"."cingresidue" r
+inner join "nrgcing"."cingchain"   c on r.chain_id = c.chain_id
+inner join "nrgcing"."cingentry"   e on c.entry_id = e.entry_id
+inner join "nrgcing"."entry_list_selection" s1 on s1.pdb_id = e.pdb_id
+where r.name = 'LEU' AND
+e.pdb_id = '1hue'
+order by e.pdb_id, c.name, r.number 
 where
 e.pdb_id IN ( '1brv','1hkt','1mo7','1mo8','1ozi','1p9j','1pd7','1qjt','1vj6','1y7n','2fws','2fwu','2jsx') 
 order by e.pdb_id 
@@ -361,3 +367,42 @@ order by (a1.cs-a2.cs) ASC
  1pd7 | A |  35 | LEU  | CD1  | CD2  | 4.3  | 202.4    | 0.00
  1qjt | A |  48 | LEU  | CD1  | CD2  | 4.4  | 156.5    | 0.00
  1qjt | A |  79 | LEU  | CD1  | CD2  | 5.7  | 172.8    | 0.00
+
+ --SQL0201
+-- Select recent smallest entries with fixable leucine problems to use for test case.
+-- Requires delta carbon CS for validation.
+-- Result 324 candidate leucines but very few small entries.
+-- 2kio        33 2009-05-07      A   12 LEU  CD1  CD2  -1.0 270.2    0.00 Contains ambies.
+-- 2knx        51 2009-09-07      A   26 LEU  CD1  CD2  -2.5 292.2    0.00 Contains ambies.
+-- 2k0b        52 2008-01-31      A   32 LEU  CD1  CD2  4.2  286.9    0.07 Shouldn't be averaged as per CSD.
+-- 2rru        53 2011-06-09      A   34 LEU  CD1  CD2  2.8  307.7    0.00 Shouldn't be averaged as per CSD.
+-- 2lcz        54 2011-05-12      A  515 LEU  CD1  CD2  1.5  310.2    0.01
+-- 2loj <==    63 2012-01-24      A   50 LEU  CD1  CD2  -2.2 283.6    0.00 Nice one.
+-- 2loj        63 2012-01-24      A   61 LEU  CD1  CD2  -1.6 289.6    0.00
+-- 2lgq        67 2011-08-01      A   52 LEU  CD1  CD2  0.4  307.6    0.01
+-- 2lgq        67 2011-08-01      A   63 LEU  CD1  CD2  1.3  303.3    0.07
+-- 2kyu        69 2010-06-08      A   49 LEU  CD1  CD2  -2.7 330.9    0.00
+select e.pdb_id as pdb, e.res_count, b.deposition_date, c.name as c, r.number as num, r.name, a1.name, a2.name,
+to_char(a1.cs-a2.cs, 'FM990.0')  as csd,
+to_char(r.chi1_avg,  'FM990.0')  as chi1_avg,
+to_char(r.chi2_avg,  'FM990.0')  as chi2_avg,
+to_char(r.chi1_cv,   'FM0.000')  as chi1_cv,
+to_char(r.chi2_cv,   'FM0.000')  as chi2_cv
+FROM "nrgcing"."cingatom" a1
+inner join "nrgcing"."cingatom"   a2 on  a1.residue_id = a2.residue_id
+inner join "nrgcing"."cingresidue" r on a1.residue_id = r.residue_id
+inner join "nrgcing"."cingchain"   c on r.chain_id = c.chain_id
+inner join "nrgcing"."cingentry"   e on c.entry_id = e.entry_id
+inner join "nrgcing"."leucine"    le on le.residue_id = r.residue_id
+inner join brief_summary           b on e.pdb_id = b.pdbid
+where
+e.name in ( '1brv','1hkt','1mo7','1mo8','1ozi','1p9j','1pd7','1qjt','1vj6','1y7n','2fws','2fwu','2jsx', '2loj') AND
+e.res_count < 500 AND
+--b.deposition_date > '2008-01-01' AND
+a1.name = 'CD1' and a2.name = 'CD2' AND
+--a1.cs IS NOT NULL AND a2.cs IS NOT NULL AND
+--abs(a1.cs-a2.cs) > 0.01 AND
+r.chi2_avg IS NOT NULL AND r.chi2_cv IS NOT NULL 
+--AND
+--r.chi2_avg > 240
+order by e.res_count asc, e.pdb_id, r.number;

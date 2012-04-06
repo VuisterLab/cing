@@ -409,6 +409,8 @@ Project: Top level Cing project class
     Return Object or None on error.
 
     @TODO Now works for Molecule; Also implement for other project list object like PeakList, DistanceRestraintList, etc
+        
+        Also see function in this object: decodeResidueList
         """
         if nameTuple == None or not self.has_key(nameTuple[0]):
             return None
@@ -1305,6 +1307,29 @@ Project: Top level Cing project class
 #        nTmessage("Finished filterHighDistanceViol")
         return True # success
     # end def
+    
+    def decodeResidueList(self, resLot):
+        '''
+        Decode LoL to list of residues.
+        Input format example: (('A', 589),('A', 596),('A', 618))
+        '''
+        nTdebug("Now in %s called with %s" % (getCallerName(), resLot))
+        resList = []
+        mol = self.molecule
+        for resTuple in resLot:
+#            nTdebug("nameTuple: %s" % str(resTuple))
+            chainName, resNum = resTuple
+            nameTuple = (mol.name, chainName, resNum, None, None, None, INTERNAL)
+#            nTdebug("nameTuple: %s" % str(nameTuple))
+            res = self.decodeNameTuple( nameTuple )
+            if not res:
+                nTwarning("Failed to %s for %s %s in list %s; skipping" % (getCallerName(), chainName, resNum, str(resLot)))
+                continue
+            # end if
+            resList.append(res)
+        # end for        
+        return resList
+    # end def    
 # end class
 
 

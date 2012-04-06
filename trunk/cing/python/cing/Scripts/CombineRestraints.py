@@ -1,4 +1,7 @@
 '''
+Execute as:
+python -u $CINGROOT/python/cing/Scripts/CombineRestraints.py
+
 Created on May 2, 2011
 
 @author: Karen Berntsen
@@ -14,32 +17,41 @@ handle multimers.
 the restraints in you project. It is not possible to restore them!!
 '''
 
-
 from cing.Scripts.munkres import Munkres
 from cing.core.classes import * #@UnusedWildImport
 from cing.core.molecule import * #@UnusedWildImport
 from collections import defaultdict
 from itertools import combinations
 
-def addDihRestr(proj, lower, upper, leuNumberList):
+CHI1_LOW_DEFAULT  = 120.
+CHI2_LOW_DEFAULT  = 0.
+CHI2_UPP_DEFAULT  = 240.
+
+# The four (or twelve) chi dihedral angle values 
+CHI1_LIST = [300, 180] # g-/t, t/g+
+CHI2_LIST = [180,  60]
+#CHI1_LIST=[-60,-49,-41,-48,-53,-63,-75,-79,-78,-70,180,-169,-163,-162,-170,180,171,168,166,173]
+#CHI1_LIST=[-60, -60,-41,-53,-75,-78,180,-169,-162,180,168,173]
+#CHI1_LIST=[-60,-53,180,173]
+#CHI2_LIST=[-165,-173,180,169,161,154,157,167,180,-171,79,75,68,60,53,49,54,60,69,73]
+#CHI2_LIST=[180,-165,180,161,157,180, 60,  75,  60, 49, 60, 73]
+#CHI2_LIST=[180,161, 60, 73]
+ROTL_STR = 'rotl'
+CV_THRESHOLD_SELECTION = 0.1
+LEU_STR = 'LEU'
+
+def addDihRestr(proj, lower = CHI2_LOW_DEFAULT, upper = CHI2_UPP_DEFAULT, leuList=None):
     '''
-    Adding CHI2 dihedral restraints to leucines, specified in leuNumberList. lower and upper are the lower bound and upper bound of the restraint.
+    Adding CHI2 dihedral restraints to leucines, specified in leuList. lower and upper are the lower bound and upper bound of the restraint.
     The restraints will be put in a new restraint list
     '''
-    # molec = proj.molecule.A
-    leu = []
-    for r in leuNumberList:
-        leu.append(proj.molecules[0].residuesWithProperties('LEU')[r])
-    # end for
-    # leu = [molec.LEU589,molec.LEU596,molec.LEU618]
-    lower = 0
-    upper = 245
-    dihrestrlist = DihedralRestraintList(name='CHI2restr')
-    for r in leu:
+    nTmessage("Starting %s" % getCallerName())
+    dihrestrlist = DihedralRestraintList(name='Artificial')
+    for r in leuList:
         atoms = [r.CA, r.CB, r.CG, r.CD1]
-        dihedralrestraint = DihedralRestraint(atoms=atoms, lower=lower, upper=upper)
+        dihedralrestraint = DihedralRestraint(atoms=atoms, lower=CHI2_LOW_DEFAULT, upper=CHI2_UPP_DEFAULT)
         dihrestrlist.append(dihedralrestraint)
-        nTmessage('CHI2 restraint appended for %s' % r.name)
+        nTmessage('Restraint appended %s' % dihedralrestraint)
     #end for
     proj.dihedrals.append(dihrestrlist)
     proj.partitionRestraints()
@@ -49,20 +61,31 @@ def addDihRestr(proj, lower, upper, leuNumberList):
 def checkDoubleRestraints(proj, leu):
     '''
     After deassignment, some atomPairs occur twice in the distance restraint list. 
-    This script will delete the one with the highest upperbound.
+    This script will delete the one with the highest upper bound.
+    TODO: fix this code for when the atom pair elements are swapped. E.g.:
+            a,b == b,a for this purpose.
+            Can easily be done with findDuplicates
     '''
+    nTmessage("Starting %s" % getCallerName())
     nTmessage('Checking for double restraints after deassignment')
     delList = []
     drlist = leu.distanceRestraints
-    for i in range(len(drlist)):
+    for i,dr in enumerate(drlist):
         for j in range(i):
-            if not drlist[i].atomPairs == drlist[j].atomPairs:
+            dr2 = drlist[j]
+            ap = dr.atomPairs
+            ap2 = dr2.atomPairs
+#            nTdebug("Checking between: %s and %s" % (str(ap),str(ap2)))
+            if not ap == ap2:
+#                nTdebug("Skipping different atom pairs.")
                 continue
             #end if
-            if drlist[i].upper > drlist[j].upper:
-                delList.append(drlist[i])
+            if dr.upper > dr2.upper:
+#                nTdebug("Tagging first dr for removal.")
+                delList.append(dr)
             else:
-                delList.append(drlist[j])
+#                nTdebug("Tagging 2nd   dr for removal.")
+                delList.append(dr2)
             #end if
         #end for
     #end for
@@ -75,10 +98,14 @@ def checkDoubleRestraints(proj, leu):
 
 def checkRestraintsExistance(restraintlist, proj):
     '''
-    After deleting halve of the double restraints, this script will check whether the other halve is still there.
+    After deleting half of the double restraints, this script will check whether the other halve is still there.
     '''
-    nTmessage('Project contains still following restraints:')#Just a check
-    aplist = [] #list with unique atompairs in restraint list
+    nTmessage("Starting %s" % getCallerName())
+    if not restraintlist:
+        nTdebug('No restraints involving this leucine presented.')
+    # end if
+#    nTdebug('Project still contains and should contain the following leucine restraints:')
+    aplist = [] # list with unique atompairs in restraint list
     count = 0
     for dr in restraintlist:
         aplist.append(dr.atomPairs[0])
@@ -87,34 +114,40 @@ def checkRestraintsExistance(restraintlist, proj):
         for dr in proj.distances[0]:
             if ap == dr.atomPairs[0]:
                 count += 1
-                nTmessage('%s,id=%s' % (str(ap), str(dr.id)))
+#                nTdebug('%s,id=%s' % (str(ap), str(dr.id)))
             #end if
         #end for
     #end for                
     if count == 0:
         nTerror('No restraints found')
     #end if
-    return
 #end def
 
 def deassignHB(proj, leu):
     '''
     Deassigns HBs in specified leucines. It will replace the old restraint, in order to delete all the other information.
+    TODO: adapt for ambiguous restraints.
+    TODO: adapt for multiple DR lists.
+    Returns list of atomPairs involving SSA HBs.
     '''
-    nTmessage('Following restraint pairs with HBs of %s are deassigned:' % leu.name)
+    nTmessage('In %s looking at restraints with SSA HBs of %s with %s DRs in %s' % (
+        getCallerName(), leu, len(leu.distanceRestraints), proj))
     deassHBaplist = []
-#    atomIndexes=[0,1]
-    for dr in leu.distanceRestraints: #restraints in proj.distances[0] are automatically deassigned.
-        ap = dr.atomPairs[0]
+    for dr in leu.distanceRestraints: 
+#        nTdebug("Looking at: %s" % dr)
+        ap = dr.atomPairs[0] # TODO: adapt for ambiguous restraints by adding a loop here. 
         atom1 = ap[0]
         atom2 = ap[1]
         for ai in [0, 1]:
             atom = ap[ai]
-            if atom.residue.resNum != leu.resNum:
+#            if atom.residue.resNum != leu.resNum: # Fails for multimers.
+            if atom.residue != leu:
+#                nTdebug("Skipping this side of the DR not from this leucine.")
                 continue
             #end if
             atomname = atom.name
-            if not (atomname == 'HB2' or atomname == 'HB3'):
+            if not atomname.startswith('HB'):
+#                nTdebug("Skipping this side of the DR that has a LEU atom other than a beta hydrogen.")
                 continue
             #end if
             if ai == 0:
@@ -125,7 +158,7 @@ def deassignHB(proj, leu):
             newList = NTlist()
             deassHBaplist.append((atom1, atom2))
             newList.append((atom1, atom2))
-            nTmessage('%s -> %s' % (str(dr.atomPairs), str(newList)))
+            nTmessage('Deassigning: %-50s -> %-50s' % (str(dr.atomPairs), str(newList)))
             dr.atomPairs = newList
             if True: # coverage fails to understand the indentation of a break at the end of a loop.
                 break
@@ -134,9 +167,8 @@ def deassignHB(proj, leu):
         # end for
     # end for
     proj = checkDoubleRestraints(proj, leu)
-    # this above line is causing problems with coverage 3.5. Don't see why though.
-    proj.distances[0].analyze()
-    return (proj, deassHBaplist)
+    proj.distances[0].analyze() #TODO: adapt for multiple DR lists.
+    return deassHBaplist
 #end def
 
 def checkDeasrHB(n, deassHBaplist):
@@ -145,7 +177,7 @@ def checkDeasrHB(n, deassHBaplist):
     deassHBaplist is the list which is already deassigned
     and n is the list of restraints, which violate in trans and gauche+, which should be deassigned.
     '''
-    nTmessage('checkDeasrHB is running')
+    nTmessage("Starting %s" % getCallerName())
     atomIndexes = [0, 1]
     delList = []
     #l=len(deassHBaplist)
@@ -168,16 +200,22 @@ def checkDeasrHB(n, deassHBaplist):
 
 def classifyRestraints(prl, leu, threshold):
     """
-    This routine scans the restrains of leu in prl for violations in the second and third model. After thatl these restraints
-    are classified in four groups, violated in the second(tr), violated in the third(g+), violated in both(n) and not violated in both(u).
+    This routine scans the restraints of leu in prl for violations in the second and third model. These restraints
+    are then classified in four groups: 
+        1 violated in the second (t), 
+        2 violated in the third (g+), 
+        3 violated in both (n) and 
+        4 not violated in both(u).
     Threshold for the violation is the violation in the first original model with the Leucine rotated exactly in gp or tr.
     """
-    #All atoms and pseudoatoms in the leucine sidechain, which have different positions in different rotameric states:
+    nTmessage("Starting %s" % getCallerName())
+    # All atoms and pseudoatoms in the leucine side chain, which have different positions in different rotameric states:
+    # (all but CB)
     scall = ['HB2', 'HB3', 'MD1', 'MD2', 'QD', 'HG', 'CG', 'QB', 'HD11', 'HD12', 'HD13', 'HD21', 'HD22', 'HD23', 'CD1', 'CD2']
     #side chain atoms leucine list
-    n = [] #atom pairs of restraints which violates in tr and g+
-    u = [] #atom pairs of restraints which are unviolated in both tr and g+
-    trdict = {} #keys=atompairs of restraints which violate in tr, values=(upperbound,violation in tr)
+    n = [] #atom pairs of restraints which violates in t and g+
+    u = [] #atom pairs of restraints which are unviolated in both t and g+
+    trdict = {} #keys=atompairs of restraints which violate in t, values=(upperbound,violation in t)
     gpdict = {} #keys=atompairs of restraints which violate in gauche+, values=(upperbound,violation in gp)
     atomIndexes = [0, 1]
     modelCount = len(prl.models)
@@ -260,6 +298,7 @@ def classifyRestraints(prl, leu, threshold):
 def renameDicts(trdict, gpdict):
     '''Renames the dictionaries with distance restraint lists, called tr and g+, to dictionaries for the columns and the rows in a table,
     such that the amount of columns is never higher than the amount of rows.'''
+    nTmessage("Starting %s" % getCallerName())
     ltr = len(trdict)
     lgp = len(gpdict)
     if ltr > lgp:
@@ -274,6 +313,7 @@ def renameDicts(trdict, gpdict):
 
 def dictValues(vdict):
     '''Returns the dictionary, the sorted list of values and the length of this list.'''
+    nTmessage("Starting %s" % getCallerName())
     v = vdict.values()
     v.sort()
     lenv = len(v)
@@ -285,6 +325,7 @@ def reverseDict(vdict):
     Interchange of keys and values in a dictionary. 
     In case a value occurs twice, the dictionary will have two keys in a list for that value.
     '''
+    nTmessage("Starting %s" % getCallerName())
     rdict = defaultdict(list)
     for ii, jj in vdict.items():
         rdict[jj].append(ii)
@@ -311,6 +352,7 @@ def makeDifferenceTable(drlColumns, drlRows, lenDrlColumns, lenDrlRows):
     in the a-set and the b-set. So you can look up every difference in upper bound
     between two restraints, one of a and one of b.
     '''
+    nTmessage("Starting %s" % getCallerName())
     table = [ [ 0 for _i in range(lenDrlColumns) ] for _j in range(lenDrlRows) ] #table with only zeros
     for c in range(lenDrlColumns):
         for r in range(lenDrlRows):
@@ -332,6 +374,7 @@ def makeAllowedTable(table, drlColumns, drlRows, lenDrlColumns, lenDrlRows):
     a very high value (maxi).The values are enlarged by a factor 1000 so that
     the munkres algorithm can work with it.
     '''
+    nTmessage("Starting %s" % getCallerName())
     maxi = 9999999 #Munkres cannot work with float("infinity") and None objects
     allowedTable = [ [ 0 for _i in range(lenDrlColumns) ] for _j in range(lenDrlRows) ] #table with only zeros
     for c in range(lenDrlColumns):
@@ -365,7 +408,7 @@ def checkAllowedTable(allowedTable, table, maxi, n, lenDrlColumns, lenDrlRows, d
     This check happens before calculating the best combination, because the deletion of these columns/rows will lead to
     better combinations and less computation time.
     '''
-    nTmessage('Checks allowedTable')
+    nTmessage("Starting %s" % getCallerName())
     delListrows = []
     delListcolumns = []
     for r in range(lenDrlRows):
@@ -423,13 +466,18 @@ def checkAllowedTable(allowedTable, table, maxi, n, lenDrlColumns, lenDrlRows, d
 
 def interChange(a, b):
     '''interchanges (swaps) two objects of the same type.'''
+    nTdebug("Starting %s" % getCallerName())
     if type(b) == type(a):
         return b, a
     #end if
 # end def
 
 def transposeTable(table):
-    '''transposes a table, so the rows will be columns and the columns will be rows.'''
+    '''
+    Transposes a table, so the rows will be columns and the columns will be rows.
+    Returns an empty 1d array if the table is empty.
+    '''
+    nTmessage("Starting %s" % getCallerName())
     if not table:
         return []
     #end if    
@@ -821,12 +869,12 @@ def deassignRestraints(deassignList, proj, leu, delDeassRestr):
     return proj
 # end def
 
-def writeRestraintsForLeu(prl, proj, prlleu, projleu, threshold, deasHB):
+def massageRestraintsForLeu(prl, proj, prlleu, projleu, threshold, deasHB):
     '''
     This is an overall script which coordinates through all other functions.
-    prl=project created in rotateLeucines.py
-    proj=project you want to change
-    prlleu and projleu are the leucine objects in cing. They need to have the same residuenumber.
+    prl    =project created in rotateLeucines.py
+    proj   =project you want to change
+    prlleu and projleu are the leucine objects in cing.
     threshold is the threshold for the violations
     if deasHB=True, all HB's of the specified leucine will be deassigned.
     '''
@@ -834,8 +882,8 @@ def writeRestraintsForLeu(prl, proj, prlleu, projleu, threshold, deasHB):
         nTerror('Residuenumbers %s and %s are not the same.' % (prlleu.resNum, projleu.resNum))
     #end if        
     if deasHB == True: #if HB's needs to be deassigned
-        proj, _deassHBaplistproj = deassignHB(proj, projleu)
-        prl, _deassHBaplistprl = deassignHB(prl, prlleu)#just to be able to compare the two projects later on
+        _deassHBaplistproj = deassignHB(proj, projleu)
+        _deassHBaplistprl  = deassignHB(prl, prlleu)#just to be able to compare the two projects later on
     #end if
     n, _u, trdict, gpdict = classifyRestraints(prl, prlleu, threshold)
     drlColumnsdict, drlColumns, lenDrlColumns, drlRowsdict, drlRows, lenDrlRows = renameDicts(trdict, gpdict)
@@ -886,49 +934,54 @@ def writeRestraintsForLeu(prl, proj, prlleu, projleu, threshold, deasHB):
     return proj
 # end def
 
-def alterRestraintsForLeus(leuNumberList, proj, prl, threshold, deasHB, dihrCHI2):
+def alterRestraintsForLeus(leuList, proj, prl, threshold, deasHB, dihrCHI2):
     '''
-    This script rotates over all leucines and combines its restraints. After that, a CHI2restraint will be added to each of the 
-    specified leucines.
-    leuNumberList=list of indices which leucines should be taken. So if you have 5 leucines and you want the first and the fourth, 
-    leuNumberList=[1,4]
-    proj=project that you want to change
-    prl=copy of project with 3 models with leucines in different conformations, created in rotateLeucines.py
-    threshold gives the threshold value for the violations.
-    deasHB=True means that all HBs of the specified leucines will be deassigned.
-    dihrCHI2=True means that a dihedral restraint will be added to the leucines.
+    This script rotates over all leucines and combines its restraints. After that, a CHI2 restraint will be added to each of the 
+    specified leucines if specified.
+    
+    leuList     = list of which project 'proj' leucines should be taken.
+    proj        = project that you want to change
+    prl         = copy of project with 3 models with leucines in different conformations, created in rotateLeucines.py
+                    threshold gives the threshold value for the violations.
+    deasHB      = True means that all HBs of the specified leucines will be deassigned.
+    dihrCHI2    = True means that a dihedral restraint will be added to the leucines.
     '''
-    for i in leuNumberList:
-        prlleu = prl.molecules[0].residuesWithProperties('LEU')[i]
-        projleu = proj.molecules[0].residuesWithProperties('LEU')[i]
-        nTmessage('\nStart calculations for %s:' % prlleu.name)
-        proj = writeRestraintsForLeu(prl, proj, prlleu, projleu, threshold, deasHB)
+    for projleu in leuList:
+#        prlleu = prl.molecules[0].residuesWithProperties('LEU')[i]
+        prlleu = projleu.getMatchInOtherProject( prl )
+#        projleu = proj.molecules[0].residuesWithProperties('LEU')[i]
+        nTmessage('\nStart massageRestraintsForLeu for %s:' % str(prlleu))
+        proj = massageRestraintsForLeu(prl, proj, prlleu, projleu, threshold, deasHB)
     #end for
     if dihrCHI2 == True:
-        upper = 245
-        lower = 0
-        addDihRestr(proj, lower, upper, leuNumberList)
+        addDihRestr(proj, leuList=leuList)
     #end if
     return proj
 # end def        
 
 def runScript():
-    'Main entry point of this script.'
+    '''
+    Main entry point of this script.
+    See $C/python/cing/Scripts/test/test_combineRestraints.py for similar unit check.
+    '''
 #    proj_path='/Users/jd/workspace/'
     proj_path = '/home/i/tmp/karenVCdir'
     proj_name = 'H2_2Ca_64_100'
-    prl_name = 'H2_2Ca_64_100_3_rotleucines'
+    prl_name = proj_name + '_' + ROTL_STR 
+    
     proj = Project.open('%s/%s' % (proj_path, proj_name), status='old')
     prl = Project.open('%s/%s' % (proj_path, prl_name), status='old')
     leuNumberList = [0] #please define leunumbers.
     if prl_name.startswith('H2_2Ca_64_100'):
         leuNumberList = [2, 3, 4]
+    #end if
     threshold = 0 #minimal violation, necessary to classify the restraints.
     deasHB = True #first deassign all HBs in the specified leucines
     dihrCHI2 = True #add a dihedral restraint on the leucines.
     proj = alterRestraintsForLeus(leuNumberList, proj, prl, threshold, deasHB, dihrCHI2)
     if True:
         proj.save()
+    #end if
 # end def        
 
 if __name__ == '__main__':
