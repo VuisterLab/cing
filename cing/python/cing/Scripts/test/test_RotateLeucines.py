@@ -20,7 +20,11 @@ except ImportWarning, extraInfo: # Disable after done debugging; can't use nTdeb
 # end try
 
 class AllChecks(TestCase):
-    def test_rotateLeucinesInYasara(self):
+    def _test_rotateLeucinesInYasara(self):
+        '''
+        This unit test is by default disabled because we haven't figured out yet how to disable the output from
+        Yasara yet. 
+        '''
         cingDirTmpTest = os.path.join( cingDirTmp, getCallerName() )
         mkdirs( cingDirTmpTest )
         self.failIf(os.chdir(cingDirTmpTest), msg =
