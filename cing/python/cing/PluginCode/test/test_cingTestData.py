@@ -56,15 +56,15 @@ class AllChecks(TestCase):
                 inputArchiveDir = os.path.join('/Users/jd/ccpn_tmp/data/recoord', entryId)
             else:
                 inputArchiveDir = os.path.join(cingDirTestsData, "cing")
-
+            # end if
             cingFile = os.path.join(inputArchiveDir, entryId + ".cing.tgz")
             self.assertTrue( os.path.exists(cingFile), "Failed to find file: " + cingFile)
 
-            cingDirNew = os.path.join(cingDirTmp, entryId + ".cing")
+            cingDirNew = os.path.join(cingDirTestsData, entryId + ".cing")
             if os.path.exists(cingDirNew):
                 nTmessage("Removing old cing project directory: " + cingDirNew )
                 shutil.rmtree( cingDirNew )
-
+            # end if
             shutil.copy(cingFile, cingDirTmpTest)
             project = Project.open(entryId, status = 'old')
             self.assertTrue(project, 'Failed opening project: ' + entryId)
@@ -75,11 +75,15 @@ class AllChecks(TestCase):
                                                   doWhatif = doWhatif,
                                                   doWattos=doWattos,
                                                   validateFastest=validateFastest ))
+            # end if
             self.assertTrue(project.save())
             # Do not leave the old CCPN directory laying around since it might get added to by another test.
             if os.path.exists(entryId):
                 self.assertFalse(shutil.rmtree(entryId))
-
+            # end if
+        # end for
+    # end def
+# end class
 
 if __name__ == "__main__":
     cing.verbosity = verbosityDebug

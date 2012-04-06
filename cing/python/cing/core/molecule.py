@@ -4789,6 +4789,19 @@ Residue class: Defines residue properties
         return None
     #end def
 
+    def getMatchInOtherProject( self, otherProject):
+        """
+        Return Residue instances with the same chain and residue identifiers as this residue.
+        """
+        mol = otherProject.molecule
+        nameTuple = (mol.name, self.chain.name, self.resNum, None, None, None, INTERNAL)
+        res2 = otherProject.decodeNameTuple( nameTuple )
+        if not res2:
+            nTwarning("Failed to %s" % getCallerName())
+        # end if
+        return res2
+    #end def
+
     def getMinDistanceCalpha(self, other):
         """
         Returns the minimum distance between the C alphas in the ensemble of models.

@@ -14,26 +14,26 @@ from cing import cingDirTestsData
 from cing import cingDirTmp
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.Libs.disk import rmdir
+from cing.Scripts.CombineRestraints import CHI1_LIST
+from cing.Scripts.CombineRestraints import CHI1_LOW_DEFAULT
+from cing.Scripts.CombineRestraints import CHI2_LIST
+from cing.Scripts.CombineRestraints import CHI2_UPP_DEFAULT
+from cing.Scripts.CombineRestraints import CV_THRESHOLD_SELECTION
+from cing.Scripts.CombineRestraints import ROTL_STR
 from cing.core.classes import Project
 from yasaramodule import * #@UnusedWildImport
 import shutil
 import yasara #@UnresolvedImport 
 
-# The four (or twelve) chi dihedral angle values 
-CHI1_LIST = [300, 180]
-#CHI1_LIST=[-60,-49,-41,-48,-53,-63,-75,-79,-78,-70,180,-169,-163,-162,-170,180,171,168,166,173]
-#CHI1_LIST=[-60, -60,-41,-53,-75,-78,180,-169,-162,180,168,173]
-#CHI1_LIST=[-60,-53,180,173]
-CHI2_LIST = [180, 60]
-#CHI2_LIST=[-165,-173,180,169,161,154,157,167,180,-171,79,75,68,60,53,49,54,60,69,73]
-#CHI2_LIST=[180,-165,180,161,157,180, 60,  75,  60, 49, 60, 73]
-#CHI2_LIST=[180,161, 60, 73]
 
-def selectBadLeucineList(proj, cv, useAll=False):
+def selectBadLeucineList(proj, cv=CV_THRESHOLD_SELECTION, useAll=False):
     '''
     Finds a list of leucine residues that have an average chi 1 and 2 in the forbidden region.
     Return None on error.
     '''
+    nTmessage("Starting %s" % getCallerName())
+    nTmessage("Finds a list of leucine residues that have an average chi 1 and 2 in the forbidden region.")
+    
     leuList = []  # Residue object list.
     mol = proj.molecule
     leuSel = mol.residuesWithProperties('LEU')
@@ -51,7 +51,11 @@ def selectBadLeucineList(proj, cv, useAll=False):
             nTcodeerror("Code assumed the dihedral circular averages are always positive but exception found for leu: " % str(leu))
             return None
         # end if
-        if useAll or (chi1cav > 125 and chi2cav > 245 and chi1cv < cv and chi2cv < cv):
+        if not leu.hasCoordinates():
+            nTmessage("Skipping without coordinates: %s" % leu)
+            continue
+        # end if
+        if useAll or (chi1cav > CHI1_LOW_DEFAULT and chi2cav > CHI2_UPP_DEFAULT and chi1cv < cv and chi2cv < cv):
             leuList.append(leu)
         # end if
     # end for
@@ -120,6 +124,7 @@ def deleteDirs(proj_path, proj_name, molec_name):
 def changeCoordinates(proj_path, prl_name):
     '''
     Load the coordinates from the PDB file into CING project.
+    NB: also already saves the project.
     Return True on error.    
     '''
     prl = Project.open('%s/%s' % (proj_path, prl_name), status='old')
@@ -131,13 +136,13 @@ def changeCoordinates(proj_path, prl_name):
 
 def rotateLeucines(proj_path, proj_name, molec_name, leuList, modelCount):
     '''
-    Create a new project whose name is postfixed with '_rotleucines'.
+    Create a new project whose name is postfixed with ROTL_STR.
     Return True on error.
     '''
     yasara.info.mode = "txt"
     yasara.info.licenseshown = 0
     #yasara.Console('Off')
-    prl_name = '%s_rotleucines' % proj_name
+    prl_name = '%s_%s' % (proj_name, ROTL_STR)
     locOut = '%s/%s.cing' % (proj_path, prl_name)
     if os.path.exists(locOut):
         nTmessage("Removing previously existing directory: %s" % locOut)
@@ -156,11 +161,12 @@ def rotateLeucines(proj_path, proj_name, molec_name, leuList, modelCount):
     nTmessage("Done with rotateLeucines")
 # end def
 
-def runRotateLeucines(runDir, inputArchiveDir, entryId, cv=0.1, useAll=False):
+def runRotateLeucines(runDir, inputArchiveDir, entryId, cv=CV_THRESHOLD_SELECTION, useAll=False, useLeuList = None):
     '''
     Return True on error.
     If useAll is set then all leucines will be rotated.
     '''
+    nTmessage("Starting %s" % getCallerName())
     mkdirs(runDir)
     os.chdir(runDir)
     cingFile = os.path.join(inputArchiveDir, entryId + ".cing.tgz")
@@ -173,8 +179,18 @@ def runRotateLeucines(runDir, inputArchiveDir, entryId, cv=0.1, useAll=False):
         nTmessage("Removing old cing project directory: " + cingDirNew)
         shutil.rmtree(cingDirNew)
     # end if
-    shutil.copy(cingFile, runDir)
-    project = Project.open(entryId, status='old')
+    cingFileNew = os.path.join(runDir, entryId + ".cing.tgz")
+    if cingFile == cingFileNew:
+        nTdebug("Skipping copy because there is already a .cing.tgz that will be used.")
+    else:
+        shutil.copy(cingFile, runDir)
+    # end if
+    project = Project.open(entryId, status='old') # will work from .cing over .cing.tgz
+#    os.remove(cingFileNew)
+    if not os.path.exists(cingFileNew):
+        nTerror("The .tgz %s is missing." % cingFile)
+        return True
+    # end if
     molecule = project.molecule
     moleculeName = molecule.name
     if not project:
@@ -185,16 +201,28 @@ def runRotateLeucines(runDir, inputArchiveDir, entryId, cv=0.1, useAll=False):
         nTerror('Failed to export2PDB')
         return True
     # end if
-    leuList = selectBadLeucineList(project, cv, useAll=useAll)
+    #### BLOCK BEGIN repeated in test_combineRestraints
+    if not useAll and useLeuList:
+        leuList = project.decodeResidueList( useLeuList )
+        if not leuList:
+            nTerror('Failed to decodeResidueList')
+            return True
+        # end if            
+    else:
+        leuList = selectBadLeucineList(project, cv, useAll=useAll)
+    # end if
     if leuList == None:
         nTerror('Failed to selectBadLeucineList')
         return True
     # end if
+    #### BLOCK BEGIN
     modelCount = len(project.models)
     if rotateLeucines(runDir, entryId, moleculeName, leuList, modelCount):
         nTerror('Failed to rotateLeucines')
         return True
     # end if
+    project.close(save = True) # Save is already done.
+    del project # Garbage collect it out of memory.
 # end def
 
 if __name__ == '__main__':

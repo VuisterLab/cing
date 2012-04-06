@@ -1,3 +1,7 @@
+"""
+Unit test execute as:
+python $CINGROOT/python/cing/core/test/test_molecule.py
+"""
 from cing import cingDirTmp
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.core.classes import Project
@@ -181,7 +185,11 @@ class AllChecks(TestCase):
         self.assertEqual(10, p_res_water_count)
         self.assertEqual(2, p_res_other_count)
         
-        nTmessage( "Done with %s" % getCallerName() )
+        nTmessage("Select a list of residues.")
+        inputResList = (('A', 5),('B', 2),('A', 6),('X', 1)) # The last 2 are non-existing residues
+        # should give two warnings for a non-existing residue
+        resList = project.decodeResidueList( inputResList )
+        self.assertEqual(2, len(resList) )
     # end def
 
     def test_RangeSelection(self):
