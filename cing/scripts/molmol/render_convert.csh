@@ -1,7 +1,8 @@
 #!/bin/tcsh -f
 # USE: render_convert.csh pov_ray_file tmp_dir pdb_id
 # render a pov ray file and convert it to a number of sizes and formats
-# quite large
+# quite large.
+# This file is: $C/scripts/molmol/render_convert.csh
 
 set pov_file       = $1
 set tmp_dir        = $2

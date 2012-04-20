@@ -1,6 +1,11 @@
 '''
 Created on Feb 7, 2012
 
+Use to heat the room this script runs in.
+
+Unit test execute as:
+python -u $CINGROOT/python/cing/Scripts/spaceHeater.py
+
 @author: jd
 '''
 from cing.Libs.NTutils import * #@UnusedWildImport

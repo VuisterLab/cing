@@ -30,9 +30,10 @@ if ( -e $log_file ) then
     exit 1
 endif
 
-if ( -e $UJ/cingStableSettings.csh ) then
-    echo "Sourced $UJ/cingStableSettings.csh"                                                   |& tee -a $log_file
-endif
+# duplication of code TODO: check
+#if ( -e $UJ/cingStableSettings.csh ) then
+#    echo "Sourced $UJ/cingStableSettings.csh"                                                   |& tee -a $log_file
+#endif
 
 echo "Trying to begin nrgCing.csh with [$$] and [$0]"                                           |& tee -a $log_file
 

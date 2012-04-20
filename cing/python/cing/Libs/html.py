@@ -3776,10 +3776,6 @@ class RestraintListHTMLfile( HTMLfile ):
                             ('vSd'   , {'title':'Violation standard deviation.'}),
                             ('vMx'    , {'title':'Violation maximum value in any one model.'}),
 
-#                            ('c1'    , {'title':'Count of violations between 0.1 and 0.3 Ang.'}),
-#                            ('c3'    , {'title':'Count of violations between 0.3 and 0.5 Ang.'}),
-#                            ('c5'    , {'title':'Count of violations over 0.5 Ang.'}),
-
                             ('c1'    , {'title':'Count of violations over 0.1 Ang.'}),
                             ('c3'    , {'title':'Count of violations over 0.3 Ang.'}),
                             ('c5'    , {'title':'Count of violations over 0.5 Ang.'}),

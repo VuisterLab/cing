@@ -259,8 +259,8 @@ def doFunctionOnEntryList(
         argList = [entry_code]
         if isinstance(extraArgList, list) or isinstance(extraArgList, tuple):
             argList += extraArgList
-        else:
-            nTmessage("Skipping non-List/Tuple extraArgList: %s" % str(extraArgList))
+#        else:
+#            nTdebug("Skipping non-List/Tuple extraArgList: %s" % str(extraArgList))
         # end if
         job = ( f, tuple( argList ) )
         job_list.append( job )

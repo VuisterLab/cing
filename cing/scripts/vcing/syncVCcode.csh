@@ -18,7 +18,7 @@ limit coredumpsize 0    # Maximum size of core dump file
 set date_string = (`date "+%Y_%m_%d-%H_%M_%S"`)
 
 set prog_string = $0:t:r
-set log_file    = $prog_string"_$date_string".log
+set log_file    = $cwd/$prog_string"_$date_string".log
 
 if ( -e $log_file ) then
     echo "ERROR: failed $prog_string because log file already exists: $log_file"
@@ -26,11 +26,12 @@ if ( -e $log_file ) then
 endif
 
 # For vCloud the machines will be numbered but still start with the vc prefix
-set hostStart = ( `echo $HOST | gawk '{print tolower($0)}' | cut -c1-2` ) 
-if ( $hostStart != 'vc' ) then
+set hostStart = ( `echo $HOST | gawk '{print tolower($0)}' | cut -c1-2` )
+if ( $hostStart != 'vc' && $HOST != 'localhost.localdomain' && $HOST != 'localhost' ) then
     echo "ERROR: tried to run $prog_string on a non VC machine: $HOST"
     echo "ERROR: this is not recommended since it might do svn/cvs updates"
-    echo "DEBUG: The host string should have started with vc regardless of capitablization but was found to be: $hostStart"
+    echo "ERROR: The host string may start with vc regardless of capitablization but was found to be: $hostStart"
+    echo "ERROR: Alternatively the HOST variable may be 'localhost.localdomain' or just 'localhost'"
     exit 1
 endif
 
@@ -42,9 +43,10 @@ endif
 
 if ( -e $CCPNMR_TOP_DIR ) then
     cd $CCPNMR_TOP_DIR
-    echo "Doing CCPN csv update." | & tee -a $log_file
+    echo "Doing CCPN svn update." | & tee -a $log_file
     # ignore the unknown files existing only locally.
-    cvs -q -z3 -d:pserver:anonymous@ccpn.cvs.sourceforge.net:/cvsroot/ccpn update -r stable | grep -v '^?' | & tee -a $log_file
+#    cvs -q -z3 -d:pserver:anonymous@ccpn.cvs.sourceforge.net:/cvsroot/ccpn update -r stable | grep -v '^?' | & tee -a $log_file
+    svn --force --non-interactive --accept theirs-full update . | & tee -a $log_file
 endif
 
 if ( -e $WATTOSROOT ) then
