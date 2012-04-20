@@ -1,20 +1,16 @@
 #!/usr/bin/env python
-
-# Script for running Cing on a bunch (8?) of ccpn projects.
-# Do NOT run from $CINGROOT/scripts/vcing/startVC.csh
-# Use:
-# $CINGROOT/python/cing/Scripts/vCing/vCing.py runSlaveThread
-# $CINGROOT/python/cing/Scripts/vCing/vCing.py runSlave
-# $CINGROOT/python/cing/Scripts/vCing/vCing.py startMaster $D/NRG-CING/token_list_todo.txt
-# In order to test killing capabilities try (replacing 99999 by pid):
-# E.g. set pid = 4237 && kill -2 $pid && sleep 10 && kill -2 $pid
-# If all fails try something like:
-# ps -eF --cols 999 | grep -i runSlaveThread | grep -v grep | gawk '{print $2}' 
-# check to see you got the expected number of threads and finally put the kill behind like: | xargs kill -2
-
-# Author: Jurgen F. Doreleijers
-# Thu Oct 14 23:56:36 CEST 2010
-
+"""
+This is file: $C/python/cing/Scripts/vCing/vCing.py
+Script for running CING on a bunch (8?) of cores.
+Do NOT run from $CINGROOT/scripts/vcing/startVC.csh
+Use:
+$CINGROOT/python/cing/Scripts/vCing/vCing.py runSlaveThread
+$CINGROOT/python/cing/Scripts/vCing/vCing.py runSlave
+$CINGROOT/python/cing/Scripts/vCing/vCing.py addTokenListToTopos $D/NRG-CING/token_list_todo.txt
+For killing use the shootall script. 
+Author: Jurgen F. Doreleijers
+Thu Oct 14 23:56:36 CEST 2010
+"""
 from cing import cingDirScripts
 from cing import cingDirTmp
 from cing import cingPythonDir
@@ -28,10 +24,10 @@ from cing.Scripts.vCing.Utils import prepareMaster
 from cing.main import getStartMessage
 from cing.main import getStopMessage
 
-# Will be overriden by local settings.
-master_ssh_url_local = 'joe@nmr' #@UnusedVariable
-master_d_local = '/Volumes/joe/D' #@UnusedVariable
-pool_postfix_local = 'joe' #@UnusedVariable
+# Will be overridden by local settings.
+master_ssh_url_local    = 'i@nmr'
+master_d_local          = '/Volumes/joe/D'
+pool_postfix_local      = 'joe'
 try:
     from cing.Scripts.vCing.localConstants import * #@UnusedWildImport # pylint: disable=E0611
 except:
@@ -41,7 +37,7 @@ except:
 #    master_ssh_url = 'i@vc'
 
 cingDirNRG = os.path.join(cingPythonDir, 'cing', 'NRG')
-cingDirVC = os.path.join(cingDirScripts, 'Vcing')
+cingDirVC = os.path.join(cingDirScripts, 'vCing')
 
 VALIDATE_ENTRY_NRG_STR = 'validateEntryNrg'
 TEST_CING_STR          = 'testCing'
@@ -74,7 +70,8 @@ class Vcing(Lister):
         self.toposPool = 'vCing' + pool_postfix_local
         if toposPool:
             self.toposPool = toposPool
-        # Interface found at NBIC's https://gforge.nbic.nl/plugins/scmsvn/viewcvs.php/clients/trunk/python/?root=topos
+        # end if
+# Interface found at NBIC's https://gforge.nbic.nl/plugins/scmsvn/viewcvs.php/clients/trunk/python/?root=topos
 #        self.toposCmd = toposcmd(realm=self.toposRealm, pool=self.toposPool)
         self.toposProg = os.path.join(self.toposDir, "topos")
         self.toposProgCreateTokens = os.path.join(self.toposDir, "createTokens")
@@ -82,9 +79,14 @@ class Vcing(Lister):
         self.master_ssh_url = master_ssh_url_local
         if master_ssh_url:
             self.master_ssh_url = master_ssh_url
+        # end if
         self.master_d = master_d_local
         if master_d:
             self.master_d = master_d
+        # end if
+        # Don't change the below without modifying the settings in:
+        #  $C/python/cing/Scripts/vCing/localConstants.py
+        #  $C/scripts/vcing/localConstants.csh
         self.master_target_dir = self.master_d + '/tmp/vCingSlave/' + self.toposPool
         self.master_target_url = self.master_ssh_url + ':' + self.master_target_dir
 #        self.MASTER_SOURCE_SDIR = self.MASTER_D_URL + '/tmp/vCingSlave/' + self.toposPool
@@ -92,6 +94,7 @@ class Vcing(Lister):
         self.max_time_to_wait_per_job = max_time_to_wait_per_job      # 2p80 took the longest: 5.2 hours.
         self.time_sleep_when_no_token = 5 * 60                        # 5 minutes
         self.lockTimeOut = 5 * 60                                     # 5 minutes
+    # end def
 
     def cleanMaster(self):
         return self.prepareMaster(doClean=True)
@@ -103,6 +106,7 @@ class Vcing(Lister):
         Moved out of this setup so it can be run with a very limited CING install on gb-ui-kun.els.sara.nl
         """
         return prepareMaster(master_target_dir=self.master_target_dir, doClean=doClean)
+    # end def
 
 
     def addTokenListToTopos(self, fileName):
@@ -111,13 +115,7 @@ class Vcing(Lister):
         status, result = commands.getstatusoutput(cmdTopos)
         nTdebug("In addTokenListToTopos got status: %s and result (if any) [%s]" % (status, result))
         return status
-
-    def startMaster(self, tokenListFileName):
-        if self.addTokenListToTopos(tokenListFileName):
-            nTerror("In startMaster failed addTokenListToTopos")
-            return True
     # end def
-
 
     def refreshLock(self, lockname, lockTimeOut):
         cmdTopos = ' '.join([self.toposProg, 'refreshLock', self.toposPool, lockname, repr(lockTimeOut)])
@@ -142,6 +140,7 @@ class Vcing(Lister):
             if status:
                 nTmessage("In keepLockFresh got status: %s. This indicates that the token process finished." % status)
                 break
+            # end if
             if sleptTime > maxSleapingTime:
                 nTerror("refreshLock should have exited by itself but apparently not after: %s" % sleptTime)
                 break
@@ -156,10 +155,12 @@ class Vcing(Lister):
         status, tokeninfo = commands.getstatusoutput(cmdTopos)
         if status:
             return [status, None, None]
+        # end if
         resultList = tokeninfo.split()
         if len(resultList) != 2:
             nTerror("Failed to find tokeninfo as expected with 2 parts from: %s" % tokeninfo)
             return None
+        # end if        
         return [status] + resultList
     # end def
 
@@ -180,6 +181,7 @@ class Vcing(Lister):
             if not status:
                 nTdebug("Got token content on try: %d: [%s]" % (i, tokenContent))
                 return tokenContent
+            # end if
             nTwarning("Failed to get token on try: %d with output message: [%s]" % (i, tokenContent))
             # end if
             nTdebug("In getToken sleeping %s" % sleepTime)
@@ -196,6 +198,7 @@ class Vcing(Lister):
         status, result = commands.getstatusoutput(cmdTopos)
         if status:
             nTerror("Failed to deleteToken status: %s with result %s" % (status, result))
+        # end if
         return status
     # end def
 
@@ -206,6 +209,7 @@ class Vcing(Lister):
         status, result = commands.getstatusoutput(cmdTopos)
         if status:
             nTerror("Failed to deleteLock status: %s with result %s" % (status, result))
+        # end if
         return status
     # end def
 
@@ -213,6 +217,7 @@ class Vcing(Lister):
         tokenContentList = tokenContent.split()
         if len(tokenContentList) > 2:
             tokenContentList = tokenContentList[:2]
+        # end if
         logFile = '_'.join([token] + tokenContentList + [getRandomKey()]) + '.log'
         return logFile
     # end def
@@ -223,8 +228,9 @@ class Vcing(Lister):
             prefix = prefixError
         elif level_id == self.LEVEL_WARNING_STR:
             prefix = prefixWarning
+        # end if
         return prefix
-
+    # end def
 
     def slaveEndAndLog(self, level_id, token, tokenContent, msg):
         "Returns True for on error"
@@ -233,6 +239,7 @@ class Vcing(Lister):
         status = self.deleteToken(token)
         if status:
             nTerror("Failed in slaveEndAndLog to deleteToken with status: %s" % status)
+        # end if
         logFile = self.getLogFileName(token, tokenContent)
 
         prefix = self.getPrefixForLevel(level_id)
@@ -253,6 +260,7 @@ class Vcing(Lister):
         nTmessage("Now starting runSlaveThread")
         if False:
             time.sleep(self.max_time_to_wait)
+        # end if
         p = Process(max_time_to_wait_kill=self.max_time_to_wait)
 
         os.chdir(cingDirTmp)
@@ -270,6 +278,7 @@ class Vcing(Lister):
                 nTmessage("Nothing returned by self.nextTokenWithLock(). Sleeping for 5 minutes and trying again.")
                 time.sleep(self.time_sleep_when_no_token)
                 continue
+            # end if            
             time.sleep(2)
             pid = p.process_fork(self.keepLockFresh, [tokenLock, self.lockTimeOut])
             nTdebug("Created a background process [%s] keeping the lock" % pid)
@@ -294,6 +303,7 @@ class Vcing(Lister):
             if not cmdDict.has_key(cmdToken):
                 self.slaveEndAndLog(self.LEVEL_ERROR_STR, token, tokenContent, self.BAD_COMMAND_TOKEN_STR)
                 continue
+            # end if
             cmdReal = cmdDict[cmdToken]
             log_file_name = self.getLogFileName(token, tokenContent)
 #            cmdProgram = ExecuteProgram(cmdReal, rootPath=cingDirTmp, redirectOutputToFile=log_file_name)
@@ -306,12 +316,13 @@ class Vcing(Lister):
             cmdExitCode = 1
             if done_entry_list: # length will jobs done successfully.
                 cmdExitCode = 0
-
+            # end if
             fs = os.path.getsize(log_file_name)
             nTmessage("Payload returned with status: %s and log file size %s" % (cmdExitCode, fs))
             targetUrl = '/'.join([self.master_target_url, self.MASTER_TARGET_LOG])
             if putFileBySsh(log_file_name, targetUrl):
                 nTerror("In runSlaveThread failed putFileBySsh")
+            # end if
             if cmdExitCode:
                 nTerror("Failed payload")
                 if self.deleteLock(tokenLock):
@@ -323,14 +334,11 @@ class Vcing(Lister):
             self.slaveEndAndLog(self.LEVEL_MSG_STR, token, tokenContent, self.COMMAND_FINISHED_STR)
             tokensFinished += 1
         # end while
-    # end def
-
     #  if [ "$?" != "0" ]; then
     #    $TOPOS deleteLock $POOL ${tokeninfo[1]}
     #    echo "Wrong!"
     #    continue
     #  fi
-
         nTdebug("Should never get here.")
         nTerror("Code runSlaveThread should never stop in vCingSlave except when interrupted by user.")
     # end def
@@ -348,7 +356,7 @@ class Vcing(Lister):
         if os.chdir(cingDirTmp):
             nTerror("Failed to change to directory for temporary test files: %s" % cingDirTmp)
             return True
-
+        # end if
         _status, date_string = commands.getstatusoutput('date "+%Y-%m-%d_%H-%M-%S"') # gives only seconds.
         _status, epoch_string = commands.getstatusoutput('java Wattos.Utils.Programs.GetEpochTime')
         time_string = '%s_%s' % (date_string, epoch_string)
@@ -359,6 +367,7 @@ class Vcing(Lister):
         ncpus = cing.ncpus
         if False: # DEFAULT: False
             ncpus = 1
+        # end if
         for i in range(ncpus):
             date_stamp = getDateTimeStampForFileName()
             base_name = nTpath(__file__)[1]
@@ -367,7 +376,7 @@ class Vcing(Lister):
                 __file__, base_name, date_stamp, i)
             job = (do_cmd, (cmd,))
             job_list.append(job)
-
+        # end for
         delay_between_submitting_jobs = 60
         f = ForkOff(processes_max=ncpus, max_time_to_wait=self.max_time_to_wait)
         done_entry_list = f.forkoff_start(job_list, delay_between_submitting_jobs)
@@ -378,6 +387,8 @@ class Vcing(Lister):
             idx = not_done_entry_list.index(id)
             if idx >= 0:
                 del(not_done_entry_list[idx])
+            # end if
+        # end for
         nTmessage("In runSlave Finished list  : %s" % done_entry_list)
         nTmessage("In runSlave Unfinished list: %s" % not_done_entry_list)
         for id in not_done_entry_list:
@@ -385,7 +396,9 @@ class Vcing(Lister):
             _do_cmd, cmdTuple = job
             cmd = cmdTuple[0]
             nTerror("In runSlave Failed forked: %s" % cmd)
+        # end for
     # end def
+# end class
 
 if __name__ == "__main__":
     cing.verbosity = verbosityDebug
@@ -401,26 +414,35 @@ if __name__ == "__main__":
     argListOther = []
     if len(sys.argv) > startArgListOther:
         argListOther = sys.argv[startArgListOther:]
+    # end if
     nTmessage('\nGoing to destination: %s with(out) arguments %s' % (destination, str(argListOther)))
     try:
         if destination == 'runSlaveThread':
             if vc.runSlaveThread():
                 nTerror("Failed to runSlaveThread")
+            # end if
         elif destination == 'runSlave':
             if vc.runSlave():
                 nTerror("Failed to vCingSlave")
+            # end if
         elif destination == 'prepareMaster':
             if vc.prepareMaster():
                 nTerror("Failed to prepareMaster")
+            # end if
         elif destination == 'cleanMaster':
             if vc.cleanMaster():
                 nTerror("Failed to cleanMaster")
-        elif destination == 'startMaster':
+            # end if
+        elif destination == 'addTokenListToTopos':
             # Tokens already created by nrgCing.py
-            if vc.startMaster(argListOther[0]):
-                nTerror("Failed to startMaster")
+            if vc.addTokenListToTopos(argListOther[0]):
+                nTerror("Failed to addTokenListToTopos")
+            # end if
         else:
             nTerror("Unknown destination: %s" % destination)
         # end if
     finally:
         nTmessage(getStopMessage(cing.starttime))
+    # end try
+# end if main
+    

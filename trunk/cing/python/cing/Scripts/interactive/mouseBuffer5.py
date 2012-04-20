@@ -1,6 +1,6 @@
 # python -u $CINGROOT/python/cing/Scripts/interactive/mouseBuffer5.py
+from cing.Libs.NTutils import * #@UnusedWildImport
 from pylab import * #@UnusedWildImport # imports plt too now.
-import time
 
 clf()
 ion()
@@ -28,4 +28,39 @@ scatter(xDat, yDat, s=0.5, marker='o', facecolors='k', edgecolors='k')
 #                xticks( range(dateDatMin, dateDatMax, binSizeTdel)) #     
 plot( (1990,2012), (1990,2012) )
 time.sleep(1000)
+
+
+# For analyzing the leucine DRs and chi values for 2fwu
+p = None # Just for misleading pylint and pydev.
+# START
+#p = project
+m = p.molecule
+#p = chi1.atoms[0].residue.chain.molecule.project
+nmodels = m.modelCount
+res = m.A.LEU596
+chi1 = res.CHI1
+d = 10 # deviation
+t = 240# target
+a = t - d
+b = t + d
+drViolThreshold = 0.1
+chi1ViolModels = []
+
+for i in range(nmodels):
+    v = chi1[i]
+    if not (v > a and v < b):
+        continue
+    # end if
+    chi1ViolModels.append(i)
+    for dr in res.distanceRestraints:
+        dviol = dr.violations[i]
+        if dviol > drViolThreshold:
+            nTmessage("%-230s in model %s is: %8.3f" % (format(dr), i, dviol))
+        # end if
+    # end for dr
+# end for model
+
+disList = p.distances[0]
+dis1 = disList[1936]
+
 

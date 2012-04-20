@@ -40,6 +40,8 @@ ROTL_STR = 'rotl'
 CV_THRESHOLD_SELECTION = 0.1
 LEU_STR = 'LEU'
 
+scall = ['HB2', 'HB3', 'MD1', 'MD2', 'QD', 'HG', 'CG', 'QB', 'HD11', 'HD12', 'HD13', 'HD21', 'HD22', 'HD23', 'CD1', 'CD2']
+
 def addDihRestr(proj, lower = CHI2_LOW_DEFAULT, upper = CHI2_UPP_DEFAULT, leuList=None):
     '''
     Adding CHI2 dihedral restraints to leucines, specified in leuList. lower and upper are the lower bound and upper bound of the restraint.
@@ -158,7 +160,7 @@ def deassignHB(proj, leu):
             newList = NTlist()
             deassHBaplist.append((atom1, atom2))
             newList.append((atom1, atom2))
-            nTmessage('Deassigning: %-50s -> %-50s' % (str(dr.atomPairs), str(newList)))
+#            nTdebug('Deassigning: %-50s -> %-50s' % (str(dr.atomPairs), str(newList)))
             dr.atomPairs = newList
             if True: # coverage fails to understand the indentation of a break at the end of a loop.
                 break
@@ -200,49 +202,67 @@ def checkDeasrHB(n, deassHBaplist):
 
 def classifyRestraints(prl, leu, threshold):
     """
-    This routine scans the restraints of leu in prl for violations in the second and third model. These restraints
+    This routine scans the restraints of leu in prl for violations in the chi2 t and g+ models. These restraints
     are then classified in four groups: 
-        1 violated in the second (t), 
-        2 violated in the third (g+), 
-        3 violated in both (n) and 
-        4 not violated in both(u).
+        1 violated in the (t), 
+        2 violated in the (g+), 
+        3 violated in both (n) and
+        4 not violated in both (u).
     Threshold for the violation is the violation in the first original model with the Leucine rotated exactly in gp or tr.
+    The input should be an ensemble of models in which the first half is chi2 t and the second half g+.
+    Return None on error.
     """
     nTmessage("Starting %s" % getCallerName())
     # All atoms and pseudoatoms in the leucine side chain, which have different positions in different rotameric states:
     # (all but CB)
-    scall = ['HB2', 'HB3', 'MD1', 'MD2', 'QD', 'HG', 'CG', 'QB', 'HD11', 'HD12', 'HD13', 'HD21', 'HD22', 'HD23', 'CD1', 'CD2']
-    #side chain atoms leucine list
     n = [] #atom pairs of restraints which violates in t and g+
     u = [] #atom pairs of restraints which are unviolated in both t and g+
     trdict = {} #keys=atompairs of restraints which violate in t, values=(upperbound,violation in t)
     gpdict = {} #keys=atompairs of restraints which violate in gauche+, values=(upperbound,violation in gp)
     atomIndexes = [0, 1]
     modelCount = len(prl.models)
+    if modelCount % 2:
+        nTerror("Code in %s presumes even number of models present but found: %s" % (getCallerName(), modelCount))
+        return
+    # end if
     halfModelCount = modelCount / 2
-    thresholdModelCount = 10
-    trind = range(halfModelCount) #trans index
-    gpind = range(halfModelCount, modelCount, 1) #gauche+ index
-    #leu=prl.molecules[0].residuesWithProperties('LEU')[leunumber] #leucine g
+    thresholdModelCount = halfModelCount # Was 10.
+    trind = range(halfModelCount)                # trans index
+    gpind = range(halfModelCount, modelCount, 1) # gauche+ index
+
     nTmessage('Divide restraints into classes for %s' % leu.name)
-    drlleu = leu.distanceRestraints #distance restraints of leucine g
+    drlleu = leu.distanceRestraints #distance restraints of leucine
     for k in range(len(drlleu)):
         found = 0
         dr = drlleu[k] #distance restraint k of this leucine
-        for a in range(len(scall)): #loops over the atoms in scall
+        nTdebug('%s' % dr.format())
+        for a in range(len(scall)): #loops over the atoms in scall JFD: use hashmap instead?
             if found == 1:
                 break
             #end if
-            for ai in atomIndexes: #specifies first or second atom in atompair of restraint
-                if not dr.atomPairs[0][ai].atomsWithProperties('LEU', scall[a]):
+            ap = dr.atomPairs[0]
+            for ai in atomIndexes: 
+                #specifies first or second atom in atompair of restraint
+                #TODO: enable testing ambi restraints.
+                atom = ap[ai]
+                nTdebug('Comparing %s to %s' % (atom, scall[a]))
+                if not atom.atomsWithProperties('LEU', scall[a]):
+#                    nTdebug('Skipping test (1) for atom %s' % scall[a])
                     continue
                 #end if
-                if not dr.atomPairs[0][ai].residue.resNum == leu.resNum:
+                if not atom.residue.resNum == leu.resNum:
+#                    nTdebug('Skipping test (2) for atom %s' % scall[a])
                     continue
                 #end if
-                violCountTr = 0
+                if not atom.residue.chain.name == leu.chain.name:
+#                    nTdebug('Skipping test (3) for atom %s' % scall[a])
+                    continue
+                #end if
+#                nTdebug('Looking at violations for: %s' % atom)
+                # TRANS
+                violCountTr = 0 
                 violTr = 0
-                violTreshTr = dr.violations[0] #first model
+                violTreshTr = dr.violations[0] # first t model
                 #violMinTr=min(dr.violations[:halfModelCount])
                 #violTreshTr=violMinTr
                 for i in trind:
@@ -254,9 +274,10 @@ def classifyRestraints(prl, leu, threshold):
                 if violCountTr != 0:
                     violTr = violTr / violCountTr #average violation over all violated conformations
                 #end if
+                # GAUCH+
                 violCountGp = 0
                 violGp = 0
-                violTreshGp = dr.violations[halfModelCount]
+                violTreshGp = dr.violations[halfModelCount] # first g+ model
                 #violMinGp=min(dr.violations[halfModelCount:])
                 #violTreshGp=violMinGp
                 for i in gpind:
@@ -268,28 +289,35 @@ def classifyRestraints(prl, leu, threshold):
                 if violCountGp != 0:
                     violGp = violGp / violCountGp #average violation over all violated conformations
                 #end if
-                if violCountGp + violCountTr == 0:
-                    u.append(dr.atomPairs[0])
-                elif (violCountTr > (violCountGp + thresholdModelCount) and violTr > violGp):
-                    trdict[dr.atomPairs[0]] = (dr.upper, violTreshTr)
+                violCountBoth = violCountGp + violCountTr
+                nTdebug('violCountGp, violCountTr, violTr, violGp: %8.3f %8.3f %8.3f %8.3f' % (violCountGp, violCountTr, violTr, violGp))
+                if violCountBoth == 0:
+                    nTdebug('Classified to u')                    
+                    u.append(ap)
+                elif (violCountTr > (violCountGp + thresholdModelCount) and violTr > violGp): 
+                    nTdebug('Classified to t')                    
+                    trdict[ap] = (dr.upper, violTreshTr)
                 elif violCountGp > (violCountTr + thresholdModelCount) and violGp > violTr:
-                    gpdict[dr.atomPairs[0]] = (dr.upper, violTreshGp)
+                    nTdebug('Classified to g+')                    
+                    gpdict[ap] = (dr.upper, violTreshGp)
                 elif violCountGp < thresholdModelCount and violCountTr < thresholdModelCount:
                     #less than 10 violations is not enough to classify restraint.
-                    u.append(dr.atomPairs[0])
+                    nTdebug('Classified to u because failed the threshold model and restraint counts')                    
+                    u.append(ap)
                 else:
-                    n.append(dr.atomPairs[0])
+                    nTdebug('Classified to n.')                    
+                    n.append(ap)
                 #end if
                 found = 1
                 break
             #end for ai
-        #end for a
+        #end for ap
     #end for k (leu)
     tmplist = [trdict.keys(), gpdict.keys(), n, u]
     namelist = ['trans', 'gauche+', 'both', 'none']
     for i in range(4):
-        if tmplist[i]:
-            nTmessage('list violated in %s for %s contains %s restraints' % (namelist[i], leu.name, len(tmplist[i])))
+#        if tmplist[i]:
+        nTmessage('list violated in %s for %s contains %s restraints' % (namelist[i], leu.name, len(tmplist[i])))
         #end if
     #end for
     return(n, u, trdict, gpdict)
@@ -335,15 +363,18 @@ def reverseDict(vdict):
 
 def tablePrint(table, ln):
     'Just a handy script to print tables while debugging. Length is the number of characters per element in table'
-    string = ''
+    if not table:
+        return 'Empty table'
+    # end if    
+    result = ''
     fmt = '%-' + str(ln) + '.2f' #to be able to print the table aligned, this value has to depend on the len of an element in the table
     for r in table:
         for c in r:
-            string += fmt % c
+            result += fmt % c
         #end for
-        string += '\n'
+        result += '\n'
     #end for
-    return string
+    return result
 # end def
 
 def makeDifferenceTable(drlColumns, drlRows, lenDrlColumns, lenDrlRows):
@@ -367,6 +398,8 @@ def makeDifferenceTable(drlColumns, drlRows, lenDrlColumns, lenDrlRows):
 
 def makeAllowedTable(table, drlColumns, drlRows, lenDrlColumns, lenDrlRows):
     '''
+    KAREN SAYS: text below doesn't match actual coding
+    TODO: check.
     Every element in allowed table is the element in table minus the
     largest violation of the pair of restraints. If the violation is
     bigger than the difference, the value becomes negative. This combination
@@ -786,12 +819,13 @@ def deleteRestraints(delList, proj):
     Deletes the restraints in delList in project proj.
     '''
     delList = list(set(delList)) #sort delList and remove double elements
-    nTmessage('Following restraint pairs are removed:')
+    nTmessage('Now in: %s' % getCallerName())
+    firstDrList = proj.distances[0] 
     for i in delList:
-        for j in proj.distances[0]:
+        for j in firstDrList:
             if j == i:
-                proj.distances[0].remove(i)
-                nTmessage('%s,id=%s' % (str(i.atomPairs), str(i.id)))
+                firstDrList.remove(i)
+                nTmessage('Removed %s' % format(i))
             #end if
         #end for
     #end for
@@ -803,10 +837,10 @@ def appendRestraints(disRList, proj):
     '''
     Appends restraint in disRList to proj.
     '''
-    nTmessage('Following restraint pairs are written:')
+    nTmessage('Now in: %s' % getCallerName())
     for i in disRList:
         proj.distances[0].append(i)
-        nTmessage('%s,id=%s' % (str(i.atomPairs), str(i.id)))
+        nTmessage('Writing %s' % format(i))
     #end for
     proj.partitionRestraints()
     return proj
@@ -817,7 +851,7 @@ def deassignRestraints(deassignList, proj, leu, delDeassRestr):
     Deassigns restraints in deassignList. If they cannot be deassigned, they will be removed
     if delDeassRestr=True.
     '''
-    nTmessage('Following restraint pairs are deassigned:')
+    nTmessage('Now in: %s' % getCallerName())
     atomIndexes = [0, 1]
     for ap in deassignList: #deassign restraints in deassignList
         delRestr = 0
@@ -877,6 +911,7 @@ def massageRestraintsForLeu(prl, proj, prlleu, projleu, threshold, deasHB):
     prlleu and projleu are the leucine objects in cing.
     threshold is the threshold for the violations
     if deasHB=True, all HB's of the specified leucine will be deassigned.
+    Return True on error.
     '''
     if prlleu.resNum != projleu.resNum:
         nTerror('Residuenumbers %s and %s are not the same.' % (prlleu.resNum, projleu.resNum))
@@ -885,7 +920,13 @@ def massageRestraintsForLeu(prl, proj, prlleu, projleu, threshold, deasHB):
         _deassHBaplistproj = deassignHB(proj, projleu)
         _deassHBaplistprl  = deassignHB(prl, prlleu)#just to be able to compare the two projects later on
     #end if
-    n, _u, trdict, gpdict = classifyRestraints(prl, prlleu, threshold)
+    
+    resultClassification = classifyRestraints(prl, prlleu, threshold)
+    if not resultClassification:
+        nTerror("Failed classifyRestraints")
+        return True
+    # end if 
+    n, _u, trdict, gpdict = resultClassification
     drlColumnsdict, drlColumns, lenDrlColumns, drlRowsdict, drlRows, lenDrlRows = renameDicts(trdict, gpdict)
     invdrlColumnsdict = reverseDict(drlColumnsdict)
     invdrlRowsdict = reverseDict(drlRowsdict)
@@ -908,7 +949,7 @@ def massageRestraintsForLeu(prl, proj, prlleu, projleu, threshold, deasHB):
         munk = Munkres() #algorithm to make combinations of lowest costs
         _indexes = munk.compute(allowedTable)
     #end if
-    if allowedTable != [[]]: #checks wether there are allowed combinations.
+    if allowedTable != [[]]: #checks whether there are allowed combinations.
         indexes, totalValueNew = calculateIndexes(allowedTable, lenDrlColumns, lenDrlRows)
         #Code below was only used to set the indexes of the table by hand.
         #if projleu.resNum==589:
@@ -930,8 +971,7 @@ def massageRestraintsForLeu(prl, proj, prlleu, projleu, threshold, deasHB):
         proj = deleteRestraints(delList, proj)
         proj = appendRestraints(disRList, proj)
     #end if
-    proj = deassignRestraints(n, proj, projleu, delDeassRestr=True)
-    return proj
+    deassignRestraints(n, proj, projleu, delDeassRestr=True)
 # end def
 
 def alterRestraintsForLeus(leuList, proj, prl, threshold, deasHB, dihrCHI2):

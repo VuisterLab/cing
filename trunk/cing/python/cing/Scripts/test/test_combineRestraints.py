@@ -4,12 +4,12 @@ python -u $CINGROOT/python/cing/Scripts/test/test_combineRestraints.py
 """
 from cing import cingDirTestsData #@UnusedImport
 from cing.Libs.NTutils import * #@UnusedWildImport
+from cing.Libs.forkoff import do_cmd
 from cing.PluginCode.required.reqYasara import YASARA_STR
 from cing.Scripts.CombineRestraints import alterRestraintsForLeus
 from nose.plugins.skip import SkipTest
 from unittest import TestCase
 import unittest
-from cing.Libs.forkoff import do_cmd
 
 # Import using optional plugins.
 try:
@@ -29,7 +29,7 @@ class AllChecks(TestCase):
         
         Input is a CING project from the test data.
         '''
-        
+
         cingDirTmpTest = os.path.join(cingDirTmp, getCallerName())
         mkdirs(cingDirTmpTest)
         self.failIf(os.chdir(cingDirTmpTest), msg=
@@ -59,60 +59,72 @@ class AllChecks(TestCase):
  2fwu       159 2006-02-03      A 596 LEU  CD1  CD2  -0.5 220.3    318.1    0.002   0.002 chi2 > 240 
  2fwu       159 2006-02-03      A 642 LEU  CD1  CD2  -4.1 178.5    70.9     0.001   0.000
 """
-#        entryId = '2fwu'
+        entryId = '2fwu'
 #        entryId = '1brv'
-        entryId = '2loj'
-        modelCount = 1             # Not valid for starting from CING project.
-        doCcpn = True              # Test entry starting from CCPN project e.g. fromm NRG-CING.
+#        entryId = '2loj'
+#        entryId = 'H2_2Ca_64_100'
+        modelCount = 20            # DEFAULT: 20 Not valid for starting from CING project.
+        doCcpn = True              # Test entry starting from CCPN project e.g. from NRG-CING.
         threshold = 0              # minimal violation, necessary to classify the restraints.
         deasHB = True              # first deassign all HBs in the specified leucines
         dihrCHI2 = True            # add a dihedral restraint on the leucines.
-        useAll = 0             # DEFAULT: False. use all leucines regardless of state        
-        useLeuList = False         # If useAll is False and  useLeuList is False then the leucines will be automatically detected
-#                                        A list here needs to follow the format: (('A', 589),('A', 618)
-        doPrepCingProject = 1   # DEFAULT: True  # NB If False this script will prefer a restore from the virgin .tgz
-        doRunRotateLeucines = True # DEFAULT: True  # NB If False this script will prefer a restore from the virgin .tgz
+        useAll = False             # DEFAULT: False. use all leucines regardless of state        
+        useLeuList = False         # If useAll is False and useLeuList is False then the leucines will be automatically detected
+        doPrepCingProject = False   # DEFAULT: True  # NB If False this script will prefer a restore from the virgin .tgz
+        doRunRotateLeucines = False # DEFAULT: True  # NB If False this script will prefer a restore from the virgin .tgz
         # No changes needed below. ################################################################################################
-#        if entryId == '2fwu':
-#            useLeuList = (('A', 589),('A', 596),('A', 618))
+        if entryId == 'H2_2Ca_64_100' or entryId == '2fwu':
+            useLeuList = (('A', 589), ('A', 596), ('A', 618))
 #        elif entryId == '1brv':
 #            useLeuList = (('A', 180),('A', 185),)
 #        elif entryId == '2loj':            # Commented out will lead to automatic detection.
 #            useLeuList = (('A', 50),('A', 61),)
         # end if
+        
+        nTmessage("Starting %s" % getCallerName())
+        nTmessage("entryId             %s" % entryId            )
+        nTmessage("modelCount          %s" % modelCount         )
+        nTmessage("doCcpn              %s" % doCcpn             )
+        nTmessage("threshold           %s" % threshold          )
+        nTmessage("deasHB              %s" % deasHB             )
+        nTmessage("dihrCHI2            %s" % dihrCHI2           )
+        nTmessage("useAll              %s" % useAll             )
+        nTmessage("useLeuList          %s" % str(useLeuList))
+        nTmessage("doPrepCingProject   %s" % doPrepCingProject  )
+        nTmessage("doRunRotateLeucines %s" % doRunRotateLeucines)
         # project with rotated leucines (created with RotateLeucines).
         entry2Id = entryId + '_' + ROTL_STR
         # NO CHANGES NEEDED BELOW THIS LINE.
-        if not doCcpn:
-            inputCingArchiveDir = os.path.join(cingDirTestsData, "cing")
-        else:
-            nTmessage("Creating CING project first.")
+        if doCcpn:
+            nTmessage("Creating project from CCPN first.")
             if doPrepCingProject:
-                project = Project.open(entryId, status = 'new')
+                project = Project.open(entryId, status='new')
                 inputArchiveDir = os.path.join(cingDirTestsData, "ccpn")
                 ccpnFile = os.path.join(inputArchiveDir, entryId + ".tgz")
-                project.initCcpn(ccpnFolder = ccpnFile, modelCount=modelCount)
+                project.initCcpn(ccpnFolder=ccpnFile, modelCount=modelCount)
                 project.close()
                 del project
-                do_cmd('tar -czf %s.cing.tgz %s.cing' % ( entryId, entryId))
+                do_cmd('tar -czf %s.cing.tgz %s.cing' % (entryId, entryId))
             # end if
             inputCingArchiveDir = cingDirTmpTest # cwd.is input dir.
+        else:
+            inputCingArchiveDir = os.path.join(cingDirTestsData, "cing")
         # end if
         # Create a copy of the original cing project locally
         # Then duplicate the project to a cing project that has rotated leucines.
         # It will also close and GC the large objects for efficiency.
         if doRunRotateLeucines:
-            status = runRotateLeucines(cingDirTmpTest, inputCingArchiveDir, entryId, useAll = useAll, useLeuList = useLeuList)
-            self.assertFalse( status )
+            status = runRotateLeucines(cingDirTmpTest, inputCingArchiveDir, entryId, useAll=useAll, useLeuList=useLeuList)
+            self.assertFalse(status)
         # end if
         # Restore the 2 projects. The first project will be modified based on the info in the second project.
         proj1 = Project.open(entryId, status='old') # NB Will prefer a restore from the virgin .tgz 
         proj2 = Project.open(entry2Id, status='old')
-                
+        self.assertTrue(proj1 and proj2)            
         project = proj1
         #### BLOCK BEGIN repeated in rotateLeucines
         if not useAll and useLeuList:
-            leuList = project.decodeResidueList( useLeuList )
+            leuList = project.decodeResidueList(useLeuList)
             if not leuList:
                 nTerror('Failed to decodeResidueList')
                 return True

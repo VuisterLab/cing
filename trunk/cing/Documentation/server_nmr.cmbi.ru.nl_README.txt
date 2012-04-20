@@ -114,8 +114,9 @@ yum update
 # and answer y (This installed 42 packages in 5 minutes) on Feb. 2, 2012.
 # Reboot the host OS as jurgenfd on host.
 sudo reboot --debug
-# This takes several minutes. And can be followed from the screen capture at:
+# This takes several (~10) minutes. And can be followed from the screen capture at:
 https://draccmbi21.cmbi.ru.nl
+Make sure that the jnlp link when saved has the .jnlp extension. I had to rename it manually.
 # Update firmwares
 
 TODO: (when Dell is back up).
@@ -190,4 +191,7 @@ MAINTENANCE nmr VM
  - sudo su
  - apt-get update
  - apt-get upgrade
-     
+ - Some packages are held back because they are more invasive; e.g. kernel updates. The below will update them anyway.
+   This is a good time to consider the state of the backups.
+    apt-get dist-upgrade
+  

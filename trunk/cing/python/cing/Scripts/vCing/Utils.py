@@ -1,10 +1,12 @@
 #!/usr/bin/env python
+'''
+Execute like: $CINGROOT/python/cing/Scripts/vCing/Utils.py
+or execute from vCing.py
+'''
 
 from cing.Libs.disk import * #@UnusedWildImport
 
-MASTER_TARGET_DIR = '/home/jurgenfd/D'
-
-def prepareMaster(master_target_dir=MASTER_TARGET_DIR, doClean=False):
+def prepareMaster(master_target_dir, doClean=False):
     "Return True on error."
     cwd = os.getcwd()
     if not os.path.exists(master_target_dir):
@@ -30,6 +32,9 @@ def prepareMaster(master_target_dir=MASTER_TARGET_DIR, doClean=False):
     os.chdir(cwd)
 # end def
 
-if __name__ == "__main__":
-    if prepareMaster():
+if __name__ == "__main__":    
+    if prepareMaster(sys.argv[1]):
         print "ERROR: Failed to prepareMaster"
+    # end if
+# end if
+        

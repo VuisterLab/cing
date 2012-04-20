@@ -1,5 +1,6 @@
 #!/bin/bash
-
+# This is file: $C/scripts/vcing/topos/topos
+#echo "DEBUG: now in topos" 
 # manual of topos server is at:
 # https://docs.google.com/Doc?docid=0AV1_-ddi0ofuZGNtcnZueDNfNzRkcTRoNjV4dw
 
@@ -23,7 +24,12 @@
 #######################################################
 
 TOPOS_URL="https://topos.grid.sara.nl/4.1/"
-CURL="curl --silent --fail --insecure --user topos_example:none@none.nl"
+# Disable the silent and fail settings when somethings are ascrew.
+# --fail:           Fail silently (no output at all) on server errors.
+# --insecure        Perform "insecure" SSL connections
+# --tlsv1           (SSL) Forces curl to use TLS version 1 when negotiating with a remote TLS server
+#                    This is new since 2012-04-20. It used to work without.
+CURL="curl --silent --fail --insecure --tlsv1 --user topos_example:none@none.nl"
 
 EXIT_NOCOMMAND=-1
 EXIT_MISSINGPARAM=1
@@ -113,6 +119,7 @@ function nextToken {
 }
 
 function nextTokenWithLock {
+#  echo "DEBUG: now in nextTokenWithLock" 
   local poolName="$1"
   local timeout="$2"
   if [ -z $poolName ]; then
@@ -123,9 +130,14 @@ function nextTokenWithLock {
   fi
   # JFD mods:
   local headerFile="$( mktemp XXXXXX )"
+#  echo "DEBUG: using headerFile: $headerFile" 
 #  local headerFile="$( mktemp )"
   TOKEN=$( ${CURL} --header 'Accept: text/plain' --dump-header ${headerFile} "${TOPOS_URL}pools/${poolName}/nextToken?timeout=${timeout}" )
   if [ "$?" != "0" ]; then
+      # I've seen:
+      # curl: (35) error:14077458:SSL routines:SSL23_GET_SERVER_HELLO:reason(1112)
+    #	iLvc/cingTmp/ echo $status
+    #	35
     exit $EXIT_CURLERROR
   fi
 #  echo "JFD TOKEN: ${TOKEN}"

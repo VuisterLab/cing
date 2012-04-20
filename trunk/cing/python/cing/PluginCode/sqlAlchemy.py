@@ -34,6 +34,7 @@ if True: # for easy blocking of data, preventing the code to be resorted with im
             raise ImportWarning(SQL_STR)
     except:
         switchOutput(True)
+#        nTdebug('Failed to do a sqlalchemy import.')
         raise ImportWarning(SQL_STR)
     finally:
         switchOutput(True)

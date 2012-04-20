@@ -1,6 +1,6 @@
 """
 Unit test execute as:
-python $CINGROOT/python/cing/PluginCode/test/test_xplor_nih.py
+python $CINGROOT/python/cing/PluginCode/test/test_xplor.py
 
 For testing execution of cing inside of Xplor-NIH python interpreter with the data living outside of it.
 """

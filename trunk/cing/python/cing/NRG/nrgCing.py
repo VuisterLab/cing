@@ -2296,12 +2296,17 @@ class NrgCing(Lister):
         """
         tokenListFileName = os.path.join(self.results_dir, 'token_list_todo.txt')        
         # Sync below code with validateEntry#main
+#        vc = Vcing()
+        # Still testing.
 #        inputUrl = 'http://nmr.cmbi.ru.nl/NRG-CING/input' # NB cmbi.umcn.nl domain is not available inside cmbi weird.
-        inputUrl = 'ssh://jurgenfd@gb-ui-kun.els.sara.nl:/home/jurgenfd/D/%s/input' % self.results_base
+#        inputUrl = 'ssh://jurgenfd@gb-ui-kun.els.sara.nl:/home/jurgenfd/D/%s/input' % self.results_base
+#        inputUrl = 'ssh://%s:/home/jurgenfd/D/%s/input' % (XXXX, self.results_base)
+        inputUrl = '.'
 #        inputUrl = 'http://dodos.dyndns.org/NRG-CING/input' # NB cmbi.umcn.nl domain is not available inside cmbi weird.
 #        outputUrl = 'jd@nmr.cmbi.umcn.nl:/Library/WebServer/Documents/NRG-CING'
 #        outputUrl = 'jd@dodos.dyndns.org:/Library/WebServer/Documents/NRG-CING'
-        outputUrl = 'ssh://jurgenfd@gb-ui-kun.els.sara.nl:/home/jurgenfd/D/' + self.results_base
+#        outputUrl = 'ssh://' + vc.master_target_url
+        outputUrl = '.'
 #
         storeCING2db = 0
         ranges = CV_RANGES_STR
@@ -2315,6 +2320,12 @@ class NrgCing(Lister):
         """ % ( cing.verbosity,  inputUrl, outputUrl,
                 ARCHIVE_TYPE_BY_CH23, PROJECT_TYPE_CCPN,
                 storeCING2db, ranges, filterTopViolations, filterVasco )
+        
+        if False:  # DEFAULT: False Set for testing.
+            jobId = TEST_CING_STR
+            extraArgListTxt = ''
+        # end if
+        
         extraArgListStr = ' '.join( extraArgListTxt.split())
 
 
@@ -2327,9 +2338,9 @@ class NrgCing(Lister):
         self.entry_list_todo.addList(self.entry_list_nmr)
         self.entry_list_todo = self.entry_list_todo.difference(self.entry_list_done)
         if True: # DEFAULT: True
-            self.entry_list_todo = readLinesFromFile(os.path.join(self.results_dir, 'entry_list_nmr_random_8.csv'))
+#            self.entry_list_todo = readLinesFromFile(os.path.join(self.results_dir, 'entry_list_nmr_random_8.csv'))
 #            self.entry_list_todo = self.entry_list_todo[:19]
-#            self.entry_list_todo = "1brv".split() # Or other 10 residue entries:  1n6t 1p9f 1idv 1kuw 1n9u 1hff  1r4h
+            self.entry_list_todo = "1brv".split() # Or other 10 residue entries:  1n6t 1p9f 1idv 1kuw 1n9u 1hff  1r4h
             # invalids 1nxn 1gac 1t5n
             self.entry_list_todo = NTlist( *self.entry_list_todo )
         # end if

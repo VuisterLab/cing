@@ -1,0 +1,51 @@
+#! /bin/sh -e
+### BEGIN INIT INFO
+# Provides:          VCheadless
+# Required-Start:    $remote_fs $syslog
+# Required-Stop:     $remote_fs $syslog
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: Start and stop the VCheadless daemon
+### END INIT INFO
+
+# Modelled after x2goserver setup.
+# -1- Create a symbolic link file into default run level at the end. E.g.:
+#    sudo ln -s $C/scripts/vcing/VCheadless /etc/init.d/
+# -2- Enable automatic startup in specified run levels:
+#    sudo update-rc.d VCheadless defaults
+#    sudo update-rc.d VCheadless enable
+# -3- Disable in any run level:
+#    sudo update-rc.d VCheadless disable
+# -4- Stop the VC processes (will kill python as well). On reboot the above settings will be used.
+#   sudo $C/scripts/vcing/VCheadless stop    
+
+PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+IUSER=i
+C=/home/i/workspace/cing
+
+case "$1" in
+        start)
+                echo "Now in VCheadless with start"
+                su $IUSER --login --command '$C/scripts/vcing/startVC.csh' > /tmp/startVC.log 2>&1 & 
+                echo "Started startVC.csh."
+        ;;
+        stop)
+                echo "Now in VCheadless with stop"
+                # ignore on failure
+                shootall vCing.py       || true
+                shootall startVC.csh    || true
+        ;;
+        reload|force-reload|restart)
+                echo "Now in VCheadless with reload|force-reload|restart"
+                shootall vCing.py       || true
+                shootall startVC.csh    || true
+                su $IUSER --login --command '$C/scripts/vcing/startVC.csh' > /tmp/startVC.log 2>&1 & 
+        ;;
+        *)
+                N=/etc/init.d/VCheadless
+                echo "Usage: $N {start|stop|restart|force-reload}" >&2
+                exit 1
+        ;;
+esac
+
+exit 0

@@ -1,3 +1,4 @@
+-- This file is: $C/python/cing/NRG/sql/examples.sql
 -- Entry count 62635 on Thu Jan 21 10:41:06 CET 2010
 SELECT count(*) FROM brief_summary;
 
@@ -12,14 +13,28 @@ SELECT S.PDBID, P.VAL AS "resolution"
        "pdbj".BRIEF_SUMMARY AS S JOIN "pdbj"."//refine/ls_d_res_high" AS P ON S.DOCID = P.DOCID
   WHERE P.VAL <= 1.0
 
+-- count number of entries that have a software listed.  
+SELECT s.pdbid, count(p.VAL)
+  FROM
+       "pdbj".BRIEF_SUMMARY AS S JOIN 
+             "pdbj"."/datablock/pdbx_nmr_softwareCategory/pdbx_nmr_software/name" AS P ON S.DOCID = P.DOCID
+  JOIN "//exptl/@method" p1 ON s.docid = p1.docid
+    WHERE p1.val LIKE '%NMR' 
+    AND
+    s.pdbid != '2fwu'
+    AND    p.val LIKE 'CING'
+group by s.pdbid
+order by s.pdbid desc
+LIMIT 10000;
+
+  
 SELECT p.VAL AS "program", count(p.val)
   FROM
        "pdbj".BRIEF_SUMMARY AS S JOIN 
              "pdbj"."/datablock/pdbx_nmr_softwareCategory/pdbx_nmr_software/name" AS P ON S.DOCID = P.DOCID
   JOIN "//exptl/@method" p1 ON s.docid = p1.docid
     WHERE p1.val LIKE '%NMR' 
---    AND
---    s.pdbid = '1brv'
+    AND    p.val LIKE 'CING'
 group by p.val
 order by count(p.val) desc
 LIMIT 100
