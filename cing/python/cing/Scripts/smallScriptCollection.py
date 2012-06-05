@@ -8,7 +8,7 @@ To load:
 from cing.Scripts.smallScriptCollection import *
 
 To reload module copy 'n paste:
-reload cing.Scripts.smallScriptCollection
+reload(cing.Scripts.smallScriptCollection)
 
 Usually however execution from within Eclipse is still easiest.
 """

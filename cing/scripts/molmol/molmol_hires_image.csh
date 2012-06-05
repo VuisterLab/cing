@@ -3,6 +3,7 @@
 # USE: $C/scripts/molmol/molmol_hires_image.csh pdb_id
 # calls molmol_image.csh and render_convert.csh
 # to produce a hi-resolution gif.
+# Before using adjust the one parameter useHiRes in render_convert.csh
 
 echo "Starting molmol_hires_image.csh"
 set id             = $1

@@ -27,7 +27,8 @@ cing.verbosity = cing.verbosityDebug
 
 workLocally = 0 # fails on nmr now.
 
-localDir = '/Users/jd/Documents/Virtual Machines.localized'
+#localDir = '/Users/jd/Documents/Virtual Machines.localized'
+localDir = '/Users/jd/Documents/Virtual Machines'
 destBaseDir = '/Volumes/tria1'
 if workLocally:
     destBaseDir = '/'
