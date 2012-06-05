@@ -3390,9 +3390,9 @@ class DistanceRestraintList(RestraintList):
         self.ambiguous = NTlist()
 
         # Duplicate analysis
-        self.uniqueDistancesCount = 0        # count of all defined distance restraints
-        self.withoutDuplicates = NTlist() # list of all restraints without duplicates
-        self.withDuplicates = NTlist() # list of all restraints with duplicates
+        self.uniqueDistancesCount = 0       # count of all defined distance restraints
+        self.withoutDuplicates = NTlist()   # list of all restraints without duplicates
+        self.withDuplicates = NTlist()      # list of all restraints with duplicates
     #end def
 
     def criticize(self, project, toFile = True):
@@ -3524,17 +3524,21 @@ class DistanceRestraintList(RestraintList):
     #end def
 
     def findDuplicates(self):
-        """Find the duplicate entries in the list
         """
-        pairs = {}
+        Find the duplicate entries in the list.
+        TODO: check code with unit check.
+        Checked by hand for entry 1cjg on 2012-04-23
+        """
+        pairs = {} # Hashed by a sorted tuple of atom pairs. The value is a list of drs.        
         for dr in self:
             dr.atomPairs.sort() # improves matching for ambiguous restraints
             t = tuple(dr.atomPairs)
+            # Reminder: setdefault only creates the value [] if t doesn't exist yet.
             pairs.setdefault(t, [])
             pairs[t].append(dr)
         #end for
-        self.uniqueDistancesCount = len(pairs)
-
+        self.uniqueDistancesCount = len(pairs) # Number of different atom pairs.
+#        nTdebug("Found %d unique tuples of atom pairs (uniqueDistancesCount)" % self.uniqueDistancesCount)
         self.withoutDuplicates = NTlist()
         self.withDuplicates = NTlist()
         for drl in pairs.values():
@@ -3542,14 +3546,24 @@ class DistanceRestraintList(RestraintList):
                 self.withoutDuplicates.append(drl[0])
             else:
                 for d in drl:
-                    #print "***", d.format()
+#                    nTdebug("***%s" % d.format())
                     self.withDuplicates.append(d)
                 #end for
             #end if
         #end for
+#        nTdebug("For %s derived:\n%s" % (self, format(self)))
     #end def
 
     def format(self, allowHtml = False, showAll = False):  # pylint: disable=W0221
+        a = len(self)
+        b = len(self.withoutDuplicates)
+        c = self.uniqueDistancesCount
+        d = a - c
+        e = c - b
+        f = len(self.withDuplicates)
+        if b + f != a:
+            nTerror("Failed check in %s of b + f != a.")
+        # end if
         msg = sprintf(
 '''
 classes
@@ -3560,11 +3574,12 @@ classes
   ambiguous:          %4d
 
 counts
-  singly defined      %4d
-  multiple defined    %4d
-  total unique:       %4d
-  duplicates:         %4d
-  total all:          %4d
+  total all:          %4d (A)        All DRs
+  singly defined      %4d (B)        DRs for which no other DR has the same set of atom pairs.
+  multiple atom pairs:%4d (F=A-B)    
+  multiple defined    %4d (E=C-B)
+  total unique:       %4d (C=A-D)    Count of the set of unique atom pairs.
+  duplicates:         %4d (D=A-C)
 
 rmsd:              %7s +-%6s
 
@@ -3582,11 +3597,7 @@ ROG score:         %7s
                         len(self.longRange),
                         len(self.ambiguous),
 
-                        len(self.withoutDuplicates),
-                        self.uniqueDistancesCount - len(self.withoutDuplicates),
-                        self.uniqueDistancesCount,
-                        len(self) - self.uniqueDistancesCount,
-                        len(self),
+                        a, b, f, e, c, d,
 
                         val2Str(self.rmsdAv, "%7.3f", 7), val2Str(self.rmsdSd, "%6.3f", 6),
                         self.violCountLower, val2Str(self.violLowerMax, "%5.2f", 5),

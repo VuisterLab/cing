@@ -2,6 +2,10 @@
 Created on Aug 30, 2010
 
 @author: jd
+
+Test syntax with:
+python -u $CINGROOT/python/cing/NRG/rdbPlotList.py 
+
 '''
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.NRG.nrgCingRdb import * #@UnusedWildImport

@@ -123,6 +123,15 @@ group by e.pdb_id, c.mol_type_idx
 limit 10;
 
 
+--[SQL008]
+-- On 2012-06-05 this was:
+-- 499
+SELECT count(*)
+FROM 
+    nrgcing.CINGENTRY E
+where 
+    e.rdc_count > 0
+
 
 -- Testing with: 1brv 1ai0 2kwk
 select
