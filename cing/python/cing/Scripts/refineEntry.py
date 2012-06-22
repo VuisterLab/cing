@@ -3,12 +3,14 @@
 """
 Regular use: from nmr_redo.
 
+
 Execute like:
-cd /Library/WebServer/Documents/NMR_REDO/data/br/1brv
-$C/python/cing/Scripts/refineEntry.py 1brv 9 \
-file:///Library/WebServer/Documents/NRG-CING/data \
-       /Library/WebServer/Documents/NMR_REDO \
-. . BY_CH23_BY_ENTRY CING 1 auto 0 0
+
+set x = 2kq3
+set ch23 = ( `echo $x | cut -c2-3` )
+mkdir -p $D/NMR_REDO/data/$ch23/$x
+cd !$
+$C/python/cing/Scripts/refineEntry.py $x 9 file://$D/NRG-CING/data $D/NMR_REDO . . BY_CH23_BY_ENTRY CING 0 auto 0 0 >& $x"_ref".log &
 """
 
 from cing.Libs.NTutils import * #@UnusedWildImport

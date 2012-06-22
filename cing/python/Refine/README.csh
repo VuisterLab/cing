@@ -40,5 +40,7 @@ refine --project $x -n $stage --parse   --useAnnealed
 refine --project $x -n $stage --refine                  
 refine --project $x -n $stage --parse                   
 refine --project $x -n $stage --import  
+# Validate?
+cing                -n $x --validate
 
     
