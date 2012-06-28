@@ -18,7 +18,7 @@ The contents are the following:
 -  pdbmlplus.dump
     The dump file of the whole PDBj Mine database.
 -  split/pdbmlplus_split.{aa,ab,..}
-    The "pdbmlplus.dump" file split into 100MB chunks.
+    The "pdbmlplus.dump" file split into 100MB chunks. For a total of about 10 Gb compressed.
 -  weekly/pdbmlplus_weekly.yyyy-mm-dd.gz
     The weekly update of the week of yyyy-mm-dd (e.g., 2010-01-19).
 
