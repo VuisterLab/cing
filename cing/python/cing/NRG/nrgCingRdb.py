@@ -759,10 +759,10 @@ e.pdb_id = s1.pdb_id;
 
 
     def createScatterPlots(self):
-        ''' The code below can use settings in the form of a dictionary that influences the
-        plotting.
-
         '''
+        The code below can use settings in the form of a dictionary that influences the
+        plotting.
+        '''        
         m = self
         try:
             djaflsjlfjalskdjf #@UndefinedVariable # pylint: disable=W0104

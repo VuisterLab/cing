@@ -32,6 +32,7 @@ def to3StateDssp( strNTList ):
             n = DSSP_S
         result.append( n )
     return result
+# end def
 
 def getDsspSecStructConsensus( res ):
     """ Returns None for error, or one of ['H', 'S', ' ' ]
@@ -45,6 +46,8 @@ def getDsspSecStructConsensus( res ):
         result = secStructList.getConsensus(useLargest=True) # will set it if not present yet.
 #    nTdebug('secStruct res: %s %s %s', res, secStructList, secStruct)
     return result
+# end def
 
 def getDsspSecStructConsensusId( res ):
     return mapDssp2Int[getDsspSecStructConsensus(res)]
+# end def

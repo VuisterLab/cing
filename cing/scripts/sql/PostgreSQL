@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# From: http://ripary.com/postgresql.html
+# From: http://ripary.com/postgresql.html (no longer available)
 
 # Source common setup, including /etc/hostconfig
 . /etc/rc.common
@@ -9,9 +9,9 @@ pgsqlHost=(`hostname|/opt/local/bin/gawk -F'[.]' '{print tolower($1)}'| sed -e '
 
 export PGDATA=/pgdata
 if [ $pgsqlHost = 'stella' ]; then
-	export PGBIN=/Users/jd/opt/bin
+    export PGBIN=/Users/jd/opt/bin
 else
-	export PGBIN=/usr/local/pgsql/bin
+    export PGBIN=/usr/local/pgsql/bin
 fi
 
 StartService ( ) {

@@ -460,8 +460,8 @@ CREATE TABLE casdcing.dr
 CREATE INDEX dr_001 ON casdcing.dr (entry_id);
 CREATE INDEX dr_002 ON casdcing.dr (drlist_id);
 CREATE INDEX dr_003 ON casdcing.dr (number);
-CREATE INDEX dr_004 ON casdcing.dr (member_id);
-CREATE INDEX dr_005 ON casdcing.dr (member_logic_code);
+CREATE INDEX dr_004 ON casdcing.dr (item_id);
+CREATE INDEX dr_005 ON casdcing.dr (item_logic_code);
 CREATE INDEX dr_006 ON casdcing.dr (atom_id_1);
 CREATE INDEX dr_007 ON casdcing.dr (residue_id_1);
 CREATE INDEX dr_008 ON casdcing.dr (chain_id_1);

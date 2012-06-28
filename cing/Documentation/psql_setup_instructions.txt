@@ -89,6 +89,7 @@ createuser wim
 createuser wouter
 
 
+
 ########### FOR OSX ###################
 Read: http://shifteleven.com/articles/2008/03/21/installing-postgresql-on-leopard-using-macports
 
@@ -114,10 +115,20 @@ sudo tail -f $PGDATA/logfile
 -- 1 -- Use Fix in http://shifteleven.com/articles/2008/03/21/installing-postgresql-on-leopard-using-macports
 on: "The solution to the /dev/null error:"
 
+Create a user with group:
+- First via gui in OSX and then:
+sudo dscl . -create /Users/postgres UserShell /bin/bash
+sudo dscl . -create /Users/postgres NFSHomeDirectory /Users/postgres
+# Create group
+sudo dscl . -create /Groups/postgres
+# Add user to grup
+sudo dscl . -create /Groups/postgres GroupMembership postgres
+# Give an id; making sure it's not taken...
+sudo dscl . -create /Groups/postgres gid 505
+# Read out
+dscl . read /Groups/postgres
 sudo mkdir /Users/postgres
 sudo chown postgres:postgres /Users/postgres
-sudo dscl . -create /Users/postgres UserShell /bin/tcsh
-sudo dscl . -create /Users/postgres NFSHomeDirectory /Users/postgres
 
 --  2 -- Fix problem with getline. described here:
 http://www.stereoplex.com/2008/feb/select5/error-compiling-postgresql-83-on-leopard-rl_comple/
@@ -130,7 +141,11 @@ To create a database instance, after install do
  sudo mkdir -p $PGDATA
  sudo chown postgres:postgres $PGDATA
  sudo su postgres -c 'initdb -D $PGDATA'
- sudo su postgres -c 'cp ~jd/postgresql.conf $PGDATA'
+# sudo su postgres -c 'cp ~jd/postgresql.conf $PGDATA'
+
+# start the db:
+    sudo su postgres
+    pg_ctl -D $PGDATA -l logfile start
 
 Connect as postgres unix user:
   psql

@@ -954,9 +954,11 @@ def runWhatif( project, ranges=None, parseOnly=False ):
     """
 
     if cingPaths.whatif == None or cingPaths.whatif == PLEASE_ADD_EXECUTABLE_HERE:
-        nTmessage("No whatif installed so skipping this step")
-        return
-
+        if not parseOnly:
+            nTmessage("No whatif installed so skipping this step")
+            return
+        # end if
+    # end if
     if not project.molecule:
         nTerror("runWhatif: no molecule defined")
         return True

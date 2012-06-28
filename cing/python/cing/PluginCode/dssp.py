@@ -265,6 +265,8 @@ def restoreDssp(project, tmp = None):
 
     Return True on error
     """
+    nTmessage('==> Restoring dssp results')
+    
     if not project:
         nTerror('restoreDssp: no project defined')
         return True
