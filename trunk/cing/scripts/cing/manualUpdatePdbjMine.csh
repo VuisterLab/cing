@@ -11,9 +11,9 @@ exit 1
 # the 1.1G Jul  7 16:11 pdbmlplus_weekly.2010-02-09.gz is unknown for duration.
 # Source data comes from: ftp://ftp.pdbj.org/mine
 
-#set tmp_dir = /Users/jd/tmpPdbj
+set tmp_dir = /Users/jd/tmpPdbj
 #set tmp_dir = /home/i/tmpPdbj
-set tmp_dir = /mnt/data/tmpPdbj
+#set tmp_dir = /mnt/data/tmpPdbj
 ###################################################################
 
 cd $tmp_dir
