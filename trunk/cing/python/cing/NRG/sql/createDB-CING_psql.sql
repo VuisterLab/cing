@@ -230,8 +230,11 @@ CREATE TABLE casdcing.cingresidue
     wi_quachk                      FLOAT DEFAULT NULL,
     wi_ramchk                      FLOAT DEFAULT NULL,
     wi_rotchk                      FLOAT DEFAULT NULL,
---   dssp
-    dssp_id                        INT DEFAULT NULL,
+--   dssp consensus and percentages by group. See: cing.PluginCode.required.reqDssp
+    dssp_id                        INT DEFAULT NULL, 
+    dssp_h_percent                 FLOAT DEFAULT NULL, 
+    dssp_s_percent                 FLOAT DEFAULT NULL, 
+    dssp_c_percent                 FLOAT DEFAULT NULL,     
 --   procheck_nmr
     pc_gf                           FLOAT DEFAULT NULL,
     pc_gf_phipsi                    FLOAT DEFAULT NULL,

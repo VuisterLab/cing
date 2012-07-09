@@ -11,7 +11,7 @@ thisFile = '%s/python/UtilsAnalysis/deassign.py' % CINGROOT
 
 print "Now in $CINGROOT/python/UtilsAnalysis/deassign.py"
 if 'ccpnProject' not in locals():
-    top = top #@UndefinedVariable
+    top = top #@UndefinedVariable # pylint: disable=E0601
     ccpnProject = top.getProject()
 
 
@@ -35,11 +35,11 @@ violationCodes = {'xl': {'violation': 0.5, 'fraction': 0.00001},
                   'l': {'violation': 0.3, 'fraction': 0.5}}
 
 for _swapCheckRun in range(0,numSwapCheckRuns):
-  swapCheck.checkSwapsAndClean(violationCodes = violationCodes)
+    swapCheck.checkSwapsAndClean(violationCodes = violationCodes)
 
 if True:
     # Deassigns all:
     violationCodes = {'xl': {'violation': -999.9, 'fraction': 0.00001},
                       'l': {'violation': -999.9, 'fraction': 0.5}}
     for _swapCheckRun in range(0,numSwapCheckRuns):
-      swapCheck.checkSwapsAndClean(violationCodes = violationCodes)
+        swapCheck.checkSwapsAndClean(violationCodes = violationCodes)

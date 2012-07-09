@@ -11,6 +11,9 @@ python -u $CINGROOT/python/cing/NRG/storeCING2db.py T0538Org ARCHIVE_CASP
 cd /Library/WebServer/Documents/NRG-CING/data/br/1brv; \
 python -u $CINGROOT/python/cing/NRG/storeCING2db.py 1brv ARCHIVE_NRG
 
+cd /Library/WebServer/Documents/NRG-CING/data/cj/1cjg; \
+python -u $CINGROOT/python/cing/NRG/storeCING2db.py 1cjg ARCHIVE_NRG
+
 cd /Library/WebServer/Documents/NMR_REDO/data/br/1brv; \
 python -u $CINGROOT/python/cing/NRG/storeCING2db.py 1brv ARCHIVE_NMR_REDO
 
@@ -577,6 +580,7 @@ def doStoreCING2db( entry_code, archive_id, project = None):
             is_terminR  = residue.isNterminal() or residue.isCterminal()            
             is_present_R = residue.hasCoordinates()
             dssp_id = getDsspSecStructConsensusId(residue)
+            dssp_percent_list = getDsspPercentList(residue)
 
 #            r_distance_count = residue.distanceRestraints.lenRecursive(max_depth = 1) # filled in partition restraints
 #            r_dihedral_count = residue.dihedralRestraints.lenRecursive(max_depth = 1)
@@ -686,6 +690,9 @@ def doStoreCING2db( entry_code, archive_id, project = None):
                 is_present=is_present_R,
                 number=numberR,
                 dssp_id=dssp_id,
+                dssp_h_percent = dssp_percent_list[DSSP_ID_H],
+                dssp_s_percent = dssp_percent_list[DSSP_ID_S],
+                dssp_c_percent = dssp_percent_list[DSSP_ID_C],
                 wi_acclst=r_wi_acclst,
                 wi_angchk=r_wi_angchk,
                 wi_bbcchk=r_wi_bbcchk,
@@ -957,9 +964,9 @@ def doStoreCING2db( entry_code, archive_id, project = None):
             dr_has_analyze_error = bool(dr.error)            
             
             for item_id, atomPair in enumerate(dr.atomPairs, 1):
-                item_logic = None
+                item_logic_code = None
                 if len(dr.atomPairs) > 1:
-                    item_logic = 'OR'
+                    item_logic_code = 'OR'
                 atom1, atom2 = atomPair
                 residue1 = getDeepByKeysOrAttributes( atom1, '_parent')    
                 chain1 = getDeepByKeysOrAttributes( residue1, '_parent')    
@@ -979,7 +986,7 @@ def doStoreCING2db( entry_code, archive_id, project = None):
                     drlist_id=drl_id,
                     number=dr_number,
                     item_id = item_id,
-                    item_logic = item_logic,
+                    item_logic_code = item_logic_code,
                     atom_id_1 = atom_id_1,
                     residue_id_1 = residue_id_1,
                     chain_id_1 = chain_id_1,
