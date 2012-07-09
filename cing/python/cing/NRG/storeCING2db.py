@@ -8,7 +8,7 @@ python -u $CINGROOT/python/cing/NRG/storeCING2db.py NeR103ALyon2 ARCHIVE_CASD
 cd /Library/WebServer/Documents/CASP-NMR-CING/data/05/T0538Org; \
 python -u $CINGROOT/python/cing/NRG/storeCING2db.py T0538Org ARCHIVE_CASP
 
-cd /Library/WebServer/Documents/NRG-CING/data/br/1brv; \
+cd $D/NRG-CING/data/br/1brv; \
 python -u $CINGROOT/python/cing/NRG/storeCING2db.py 1brv ARCHIVE_NRG
 
 cd /Library/WebServer/Documents/NRG-CING/data/cj/1cjg; \

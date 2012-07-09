@@ -38,8 +38,13 @@ class AllChecks(TestCase):
 #        entryId = "1NK4_DNA" # Interest of Winston
 #        entryId = "complexfit_6_0627_DNA" # Interest of Winston
 #        entryId = "polxbinary" # Interest of Winston
-
-
+#        entryId = "cluster1_3_07072012" # Interest of Winston
+        convention = IUPAC # DEFAULT
+#        convention = CNS
+        max_dist_expectedOverall = 4.0 # DEFAULT
+#        max_dist_expectedOverall = 6.0
+#        ob_file_name = None
+        ob_file_name = os.path.join( cingDirLibs, NoeCompletenessAtomLib.STR_FILE_DIR, 'ob_custom_1.str')
 #        ranges = 'A.173-178'
         ranges = None
 
@@ -50,7 +55,7 @@ class AllChecks(TestCase):
         project = Project( entryId )
         self.failIf( project.removeFromDisk())
         project = Project.open( entryId, status='new' )
-        project.initPDB( pdbFile=pdbFilePath, convention = IUPAC )
+        project.initPDB( pdbFile=pdbFilePath, convention = convention )
 
         m = project.molecule
         nTdebug("m: %s" % m)
@@ -60,9 +65,9 @@ class AllChecks(TestCase):
         
         if doCompletenessCheck:
             resultCompleteness = doCompleteness( project,
-                 max_dist_expectedOverall = 4.0,
+                 max_dist_expectedOverall = max_dist_expectedOverall,
                  use_intra = True,
-                 ob_file_name = None, # Defaults to ob_standard.str
+                 ob_file_name = ob_file_name, # Defaults to ob_standard.str
 #                 ob_file_name = os.path.join( cingDirLibs, NoeCompletenessAtomLib.STR_FILE_DIR, ''ob_heavy.str'.str')
                  summaryFileNameCompleteness = "%s_compl_sum" % entryId,
                  write_dc_lists = True,
@@ -96,8 +101,6 @@ class AllChecks(TestCase):
                  resList = resList
             )
             self.assertTrue(resultHydrogenBondCheck)
-
-
     # end def
 # end class        
         

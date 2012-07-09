@@ -206,7 +206,7 @@ class NoeCompleteness( NTdict ):
 #            atom1 = self.atomList[r]
 #            residue1 = self.resList[r]
 #            atom1._parent
-            nTdebug("Getting precise distances starting from residue1 %s" % residue1)
+#            nTdebug("Getting precise distances starting from residue1 %s" % residue1)
             atom1List = NTlist()
             for atom1 in residue1.allAtoms():
                 if self.atomHash.has_key(atom1):
@@ -274,9 +274,9 @@ class NoeCompleteness( NTdict ):
                         valueTuple = (atom1, atom2, distance)
                         if distance > self.max_dist_expectedOverall:
                             pass
-        #                        nTdebug("Skipping distant atom pair %20s/%20s with distance %8.3f" % valueTuple)
+#                            nTdebug("Skipping distant atom pair %20s/%20s with distance %8.3f" % valueTuple)
                         else:
-        #                        nTdebug("Adding atom pair           %20s/%20s with distance %8.3f" % valueTuple)
+#                            nTdebug("Adding atom pair           %20s/%20s with distance %8.3f" % valueTuple)
                             setDeepByKeys(self.atomDistanceHoH, distance, atom1, atom2)
                         # end if
                     # end for

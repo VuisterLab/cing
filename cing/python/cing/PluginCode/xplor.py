@@ -90,9 +90,12 @@ def quoteAtomNameIfNeeded(atomNameXplor):
 def exportAtom2xplor( atom ):
     """returns string in xplor format"""
     atomNameXplor = atom.translate(XPLOR)
+    if atomNameXplor == None:
+        atomNameXplor = atom.name
+    # end if
     atomNameXplor = quoteAtomNameIfNeeded(atomNameXplor)
     chainId = atom.residue.chain.name
-    return sprintf( '(segi %s and resi %4d and name %-4s)',
+    return sprintf( '( segi %s and resi %4d and name %-4s )',
                       chainId,
                       atom.residue.resNum,
                       atomNameXplor
