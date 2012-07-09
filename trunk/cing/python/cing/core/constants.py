@@ -31,7 +31,7 @@ OS_TYPE_UNKNOWN = 'unknown'
 IPYTHON_VERSION_A = 'iPythonVersion_A'
 IPYTHON_VERSION_B = 'iPythonVersion_B' 
 
-AQUA       = 'AQUA' # not uptodate with BMRB DG/G difference.
+AQUA       = 'AQUA' # not up-to-date with BMRB DG/G difference.
 IUPAC      = 'IUPAC'
 SPARKY     =  IUPAC
 CYANA      = 'CYANA'

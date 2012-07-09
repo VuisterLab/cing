@@ -2463,6 +2463,7 @@ class NrgCing(Lister):
             crdb = NrgCingRdb(schema=self.schema_id) # Make sure to close it.
             self.entry_list_todo = crdb.getPdbIdList(fromCing=True)
             crdb.close()
+#            self.entry_list_todo = '1brv'.split()
 #            self.entry_list_todo = readLinesFromFile(os.path.join(self.results_dir, 'list', 'entry_list_tostore.csv'))
 #            self.entry_list_todo = readLinesFromFile(os.path.join('/Users/jd', 'entry_list_to_store.csv'))
             self.entry_list_todo = NTlist( *self.entry_list_todo )

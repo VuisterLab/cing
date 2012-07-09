@@ -322,7 +322,7 @@ d.drlist_id = dl.drlist_id AND (
     (d.atom_name_1  = 'HG' AND d.residue_name_1 = 'LEU' ) 
 OR  (d.atom_name_2  = 'HG' AND d.residue_name_2 = 'LEU' )
 ) AND
-d.member_logic_code IS NULL
+d.item_logic_code IS NULL
 order by e.name, dl.number, d.dr_id, d.member_id asc;
 
 -- Then the similar thing using 6 relations
@@ -345,7 +345,7 @@ a.residue_id  = r.residue_id AND
 a.chain_id  = c.chain_id AND 
 a.name = 'HG' AND 
 r.name = 'LEU' AND 
-d.member_logic_code IS NULL
+d.item_logic_code IS NULL
 order by e.name, dl.number, d.dr_id, d.member_id asc;
 
 SELECT e.name, r.cs_count,
