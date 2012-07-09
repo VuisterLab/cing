@@ -28,8 +28,10 @@ def to3StateDssp( strNTList ):
         n = DSSP_C
         if c == '3' or c == 'H':
             n = DSSP_H
+        # end if
         elif c == 'B' or c == 'E':
             n = DSSP_S
+        # end if
         result.append( n )
     return result
 # end def
@@ -51,3 +53,38 @@ def getDsspSecStructConsensus( res ):
 def getDsspSecStructConsensusId( res ):
     return mapDssp2Int[getDsspSecStructConsensus(res)]
 # end def
+
+
+def getDsspPercentList( res ):
+    """ 
+    Returns None for error, or a three item list with the percentage for each of the types.
+    For residues without dssp properties set it will return a three item list with all None's.
+    """
+    bogusResult = [ None, None, None ]
+    secStructList = res.getDeepByKeys(DSSP_STR,SECSTRUCT_STR)
+    if not secStructList:
+#        nTdebug('Failed to get dssp secStructList for %s' % res)
+        return bogusResult
+    # end if
+    result = [ 0., 0., 0. ] # Use floats for division later on.
+    secStructList = to3StateDssp( secStructList )
+    n = 0
+    for secStruct in secStructList:
+        secStructIdx = mapDssp2Int[secStruct]
+        if secStructIdx == None:
+            nTwarning('Found no map for secStruct: "%s" excluded' % secStruct)
+            continue
+        # end if
+        result[secStructIdx] += 1
+        n += 1
+    # end for
+    if n < 1:
+        nTwarning('Failed to find any valid secStruct for %s. Returning empties.' % res)
+        return bogusResult
+    # end for
+    # Use Python list comprehension grammar.
+    result = [ 100.*result[i]/n for i in range(len(result)) ]
+#    nTdebug('Returning in getDsspPercentList for %s with list: %s' % (res, str(result)))
+    return result
+# end def
+

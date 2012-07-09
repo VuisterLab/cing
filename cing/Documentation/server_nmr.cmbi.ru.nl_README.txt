@@ -192,6 +192,6 @@ MAINTENANCE nmr VM
  - apt-get update
  - apt-get upgrade
  - Some packages are held back because they are more invasive; e.g. kernel updates. The below will update them anyway.
-   This is a good time to consider the state of the backups.
+   This is a good time to consider the state of the backups. ;-)
     apt-get dist-upgrade
   

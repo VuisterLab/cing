@@ -115,6 +115,13 @@ ALTER TABLE nrgcing.cingresidue ADD COLUMN chi1_avg FLOAT  DEFAULT NULL;
 ALTER TABLE nrgcing.cingresidue ADD COLUMN chi1_cv  FLOAT  DEFAULT NULL;
 ALTER TABLE nrgcing.cingresidue ADD COLUMN chi2_avg FLOAT  DEFAULT NULL;
 ALTER TABLE nrgcing.cingresidue ADD COLUMN chi2_cv  FLOAT  DEFAULT NULL;
+-- See:
+--DSSP_H = 'H'
+--DSSP_S = 'S'
+--DSSP_C = ' '
+ALTER TABLE nrgcing.cingresidue ADD COLUMN dssp_h_percent  FLOAT  DEFAULT NULL;
+ALTER TABLE nrgcing.cingresidue ADD COLUMN dssp_s_percent  FLOAT  DEFAULT NULL;
+ALTER TABLE nrgcing.cingresidue ADD COLUMN dssp_c_percent  FLOAT  DEFAULT NULL;
 
 SELECT distinct e.pdb_id FROM "nrgcing"."cingresidue" r,  "nrgcing"."cingentry" e where
 r.entry_id = e.entry_id AND
