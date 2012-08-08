@@ -2,8 +2,9 @@
 
 == Mac version ==
 {{{
-Steps taken on nmr.cmbi.ru.nl (8 cores): OSX 10.5.7
-Order might matter.
+Steps taken on duvel.cmbi.ru.nl (4 core MacBook Pro 15-inch, Mid 2010): OSX 10.8
+8 GB RAM with SSD
+Order below matters.
 }}}
 
 == Install Mac Ports ==
@@ -11,20 +12,28 @@ Order might matter.
 Start from a clean install from:
 From http://www.macports.org/
 
+== Turn off spotlight to speed processing up ==
+{{{
+sudo launchctl unload  /System/Library/LaunchDaemons/com.apple.metadata.mds.plist
+}}}
+
 == Install mandatory deps ==
 
-=== gawk as test and also my whole .cshrc inits depend on it. ===
+=== Done in 5 minutes gawk as test and also my whole .cshrc inits depend on it  ===
 {{{
 sudo port install gawk
 }}}
 
-=== Start doing [https://trac.macports.org/wiki/howto/ParallelBuilding multiple] make jobs ===
+=== Optionally switch doing [https://trac.macports.org/wiki/howto/ParallelBuilding multiple] make jobs ===
 {{{
 sudo vi /opt/local/etc/macports/macports.conf
 }}}
+Set to zero:
+buildmakejobs           0
+
 With top you can see the load on the machine increasing from 1 to a max of 4 (on 8 cores) during subsequent builds.
 
-===Get python26 selected early on.===
+===Done in 5 minutes, set python26 selected early on ===
 {{{
 sudo port install python26 python_select 
 port select --set python python26  
@@ -35,6 +44,8 @@ This is going to install gcc so it will take about 5 hours. Mostly being stuck o
 {{{
 port install py26-matplotlib +tkinter +gtk2
 }}}
+
+Note that I had to force the activation since there were already installs in /Applications/MacPorts
 
 ===Done in 10 minutes. Smaller python deps.===
 {{{
