@@ -1,6 +1,10 @@
 """
 Adds methods:
     Molecule.export2gif()
+    
+Molmol fails to compile on Mountain Lion OSX as of 2012-08-08 on development machine.  
+Actually, this works again with XQuartz installed and symbolic links from
+/usr/X11R6 to /opt/X11R6 etc.  
 """
 from cing import cingDirMolmolScripts
 from cing import cingDirTmp

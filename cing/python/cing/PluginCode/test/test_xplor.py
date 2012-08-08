@@ -71,8 +71,9 @@ class AllChecks(TestCase):
         self.failIf(os.chdir(cingDirTmpTest), msg=
             "Failed to change to test directory for files: " + cingDirTmpTest)
         for i, entryId in enumerate(entryList):
-            if i != 1: # Selection of the entries.
+            if i != 0: # Selection of the entries.
                 continue
+            # end if
             inputArchiveDir = os.path.join(cingDirTestsData, "cing")
             cingDir =  entryId + ".cing"
             cingFileLocalTgz = entryId + ".cing.tgz"
