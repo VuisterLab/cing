@@ -42,14 +42,14 @@ port select --set python python26
 ===Now the matplotlib MONSTER ===
 This is going to install gcc so it will take about 5 hours. Mostly being stuck on [http://x4350.blogspot.com/2011/06/building-atlas-on-macports-takes.html atlas].
 {{{
-port install py26-matplotlib +tkinter +gtk2
+port install py27-matplotlib +tkinter +gtk2
 }}}
 
-Note that I had to force the activation since there were already installs in /Applications/MacPorts
+Note that I had to force the activation since there were already installs in /Applications/MacPorts. Starting on August 2012 with Lion, python26 failed to compile on objc or something so I switched to python27 everywhere here.
 
 ===Done in 10 minutes. Smaller python deps.===
 {{{
-port install py26-curl py26-mysql py26-sqlalchemy py26-psycopg2 py26-scipy
+port install py27-curl py27-mysql py27-sqlalchemy py27-psycopg2 py27-scipy
 }}}
 
 ===Done in 15 minutes OPTIONAL===
@@ -59,14 +59,14 @@ port install pymol xeyes
 
 ===Jenkins related installs, pretty fast. OPTIONAL===
 {{{
-port install sloccount py26-lint py26-nose py26-coverage
+port install sloccount py27-lint py27-nose py27-coverage
 }}}
 Rename to version aspecifics for easy of code maintenance.===
 {{{
     cd /opt/local/bin
-    sudo ln -s coverage-2.6    coverage
-    sudo ln -s nosetests-2.6   nosetests
-    sudo ln -s pylint-2.6      pylint
+    sudo ln -s coverage-2.7    coverage
+    sudo ln -s nosetests-2.7   nosetests
+    sudo ln -s pylint-2.7      pylint
 }}}
 
 ===More installs for CING (provides convert and ps2pdf)===
