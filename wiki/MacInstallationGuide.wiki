@@ -49,12 +49,12 @@ Note that I had to force the activation since there were already installs in /Ap
 
 ===Done in 10 minutes. Smaller python deps.===
 {{{
-port install py27-curl py27-mysql py27-sqlalchemy py27-psycopg2 py27-scipy
+port install py27-curl py27-mysql py27-sqlalchemy py27-psycopg2 py27-scipy py27-ipython
 }}}
 
 ===Done in 15 minutes OPTIONAL===
 {{{
-port install pymol xeyes
+port install pymol xeyes p7zip Pallet py27-readline szip unrar
 }}}
 
 ===Jenkins related installs, pretty fast. OPTIONAL===
