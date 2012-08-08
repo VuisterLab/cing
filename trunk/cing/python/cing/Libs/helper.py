@@ -230,6 +230,15 @@ def getOsType():
     return 'unknown'
 # end def
 
+def getOsRelease():
+    """Return the release string; unix style (not 10.8 but 12.0.0 at time of writing)."""
+    # system,node,release,version,machine,processor
+    unameList = platform.uname()
+    return unameList[2]
+# end def
+
+
+
 def getStartMessage(ncpus=None):
     """
     Copy catted from xplor
@@ -245,7 +254,8 @@ def getStartMessage(ncpus=None):
         ncpus = detectCPUs()
 #    ostype = os.getenv("OSTYPE", "Unknown os") #only works with (t)csh shell
     osType = getOsType()
-    on = "%s (%s/%s/%scores/%s)" % (machine, osType, platform.architecture()[0], ncpus, sys.version.split()[0])
+    osRelease = getOsRelease()
+    on = "%s (%s%s/%s/%scores/py%s)" % (machine, osType, osRelease, platform.architecture()[0], ncpus, sys.version.split()[0])
     at = time.asctime()
     pid = os.getpid()
     at = '(%d) ' %  pid + at

@@ -123,6 +123,10 @@ ALTER TABLE nrgcing.cingresidue ADD COLUMN dssp_h_percent  FLOAT  DEFAULT NULL;
 ALTER TABLE nrgcing.cingresidue ADD COLUMN dssp_s_percent  FLOAT  DEFAULT NULL;
 ALTER TABLE nrgcing.cingresidue ADD COLUMN dssp_c_percent  FLOAT  DEFAULT NULL;
 
+select avg(dssp_h_percent) as h, avg(dssp_s_percent) as s, avg(dssp_c_percent) as c from nrgcing.cingresidue where
+dssp_h_percent is not null 
+;
+
 SELECT distinct e.pdb_id FROM "nrgcing"."cingresidue" r,  "nrgcing"."cingentry" e where
 r.entry_id = e.entry_id AND
 r.number < -10 AND

@@ -6,7 +6,8 @@ Regular use: from nmr_redo.
 
 Execute like:
 
-set x = 2kq3
+#set x = 2kq3
+set x = 1brv
 set ch23 = ( `echo $x | cut -c2-3` )
 mkdir -p $D/NMR_REDO/data/$ch23/$x
 cd !$
