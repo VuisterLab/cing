@@ -8,7 +8,7 @@ Use case creating validation reports for NRG-CING at Sara's cloud with results b
   * Ensure there's enough space for receiving and subsequent unpacking. 10 gigs should do.
   * Clean up master
 {{{$CINGROOT/python/cing/Scripts/vCing/vCing.py cleanMaster
-ls /mnt/data/D/tmp/vCingSlave/*/log
+ls /mnt/data/D/tmp/vCingSlave
 }}}
   * Create tokens on any machine let's call it Duvel:
 {{{python -u $CINGROOT/python/cing/NRG/nrgCing.py createToposTokens}}}
