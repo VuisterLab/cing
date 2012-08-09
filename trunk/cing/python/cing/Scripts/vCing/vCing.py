@@ -40,12 +40,14 @@ cingDirNRG = os.path.join(cingPythonDir, 'cing', 'NRG')
 cingDirVC = os.path.join(cingDirScripts, 'vCing')
 
 VALIDATE_ENTRY_NRG_STR = 'validateEntryNrg'
+REFINE_ENTRY_STR       = 'refineEntryNrg'
 TEST_CING_STR          = 'testCing'
 
 # Possible targets are keyed from token to provide some security and brevity.
 cmdDict = {
 #           VALIDATE_ENTRY_NRG_STR: os.path.join(cingDirNRG, 'validateEntryForNrgByVC.py'),
            VALIDATE_ENTRY_NRG_STR: os.path.join(cingDirScripts, 'validateEntry.py'),
+           REFINE_ENTRY_STR:       os.path.join(cingDirScripts, 'refineEntry.py'),
            TEST_CING_STR:          os.path.join(cingDirVC, 'test', 'cingByVCtest.py'),
             }
 

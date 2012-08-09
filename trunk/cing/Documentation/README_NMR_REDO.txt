@@ -16,7 +16,7 @@ relate $WS/nmrrestrntsgrid/bmrb_pdb_match/results/recoord.csv intersection $D/NR
 Fast testing:
 In $C/python/cing/Scripts/refineEntry.py    set fastestTest
 In $C/python/Refine/NTxplor.py              set FAST_FOR_TESTING
-This will give a turn over on 1brv of less than 114 seconds on Duvel.
+This will give a turn over on 1brv of less than 114 seconds on Duvel with refineEntry.py 
 
 Test transfer over ssh to nmr:
 $CINGROOT/python/cing/Libs/test/test_network.py
