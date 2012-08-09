@@ -7,8 +7,10 @@ Use case creating validation reports for NRG-CING at Sara's cloud with results b
   * Create input in general
   * Ensure there's enough space for receiving and subsequent unpacking. 10 gigs should do.
   * Clean up master
-{{{$CINGROOT/python/cing/Scripts/vCing/vCing.py cleanMaster}}}
-  * Create tokens on any machine let's call her Stella:
+{{{$CINGROOT/python/cing/Scripts/vCing/vCing.py cleanMaster
+ls /mnt/data/D/tmp/vCingSlave/*/log
+}}}
+  * Create tokens on any machine let's call it Duvel:
 {{{python -u $CINGROOT/python/cing/NRG/nrgCing.py createToposTokens}}}
   * Fill topos with tokens on Stella (startMaster is a bad name it should have been named addTokenList):
 {{{$CINGROOT/python/cing/Scripts/vCing/vCing.py startMaster $D/NRG-CING/token_list_todo.txt}}}
