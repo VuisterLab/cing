@@ -19,7 +19,7 @@
 # python -u /Users/jd/workspace35/cingStable/python/cing/Scripts/validateEntry.py 2as0  \
 # file:///Users/jd/wattosTestingPlatform/pdb/data/structures/divided/pdb /Library/WebServer/Documents/PDB-CING . . BY_CH23 PDB
 
-# -2- VC use:
+# -2- VC use: --NO LONGER IN USE--
 9
 $CINGROOT/python/cing/NRG/validateEntryForNrgByVC.py 1brv \
 http://nmr.cmbi.ru.nl/NRG-CING/prep/C \
