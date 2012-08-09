@@ -4,9 +4,9 @@ Use case creating validation reports for NRG-CING at Sara's cloud with results b
 
 ===Short order of steps===
   * Start up one VC on the cloud
-  * Create input:
-  * Ensure there's enough space for receiving and subsequent unpacking.
-  * Clean up master on master
+  * Create input in general
+  * Ensure there's enough space for receiving and subsequent unpacking. 10 gigs should do.
+  * Clean up master
 {{{$CINGROOT/python/cing/Scripts/vCing/vCing.py cleanMaster}}}
   * Create tokens on any machine let's call her Stella:
 {{{python -u $CINGROOT/python/cing/NRG/nrgCing.py createToposTokens}}}
