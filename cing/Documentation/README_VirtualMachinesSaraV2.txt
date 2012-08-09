@@ -1,5 +1,5 @@
 To be transfered to http://code.google.com/p/cing/wiki/VirtualCingUsageSaraV2 when ready.
-
+This is file: $C/Documentation/README_VirtualMachinesSaraV2.txt 
 Select:
 
 Bus:    Virtio
@@ -34,8 +34,15 @@ DONE:
             # The primary network interface
             auto eth0
             iface eth0 inet dhcp
+-- Stopping NetworkManager
+    /etc/init.d/network-manager stop
+    stop network-manager.            
+    more /etc/resolv.conf # should show sara's dns's.    
+-- Remove NetworkManager package (Better to start work with server version of ubuntu; next time.)
+    dpkg --list | grep network          
+    dpkg --remove network-manager # need to do deps first.          
 -- Restart the networking
-    /etc/init.d/networking restart    
+    /etc/init.d/networking restart
 -- Check webserver status by browsing to: http://LVCa/icing/
 -- Disable i's crontab
 -- Remove the certificate for https protocol from server at 443 port.

@@ -23,7 +23,8 @@ limit filesize   500m   # Maximum size of any one file
 #limit datasize  1000m   # Maximum size of data (including stack)
 limit coredumpsize 0    # Maximum size of core dump file
 umask 2                 # The files created will be having special permissions.
-set initialSleep = 600 # DEFAULT: 120 # was too slow on Sara.
+set initialSleep = 120 # DEFAULT: 120. If this isnt enough then check network setup as described in 
+                       # $C/Documentation/README_VirtualMachinesSaraV2.txt 
 
 set date_string = (`date "+%Y-%m-%d_%H-%M-%S"`) # gives only seconds.
 # Get a precise date to distinguish between the many logs that different VCs might return to master.
