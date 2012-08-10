@@ -20,7 +20,7 @@ PDB  BMRB  Notes
 1d3z  6457 interest of VvB
 1hkt  4046 Structure from GWV (1996)
 1hue  4047 well known dimer to JFD
-1ieh  4969 all beta from WFV (2002)
+1ieh  4969 all beta from WFV (2002) 135 AA
 1iv6  5317 complex
 1otz       Large X-ray entry at 3.3 Ang., 60 chains.
 1uao       Smallest sheet of only 10 AA.

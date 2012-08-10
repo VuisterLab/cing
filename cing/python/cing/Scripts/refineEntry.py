@@ -16,7 +16,7 @@ set x = 1brv
 set ch23 = ( `echo $x | cut -c2-3` )
 mkdir -p $D/NMR_REDO/data/$ch23/$x
 cd !$
-$C/python/cing/Scripts/refineEntry.py $x 9 file://$D/NRG-CING/data $D/NMR_REDO . . BY_CH23_BY_ENTRY CING 0 auto 0 0 >& $x"_ref".log &
+$C/python/cing/Scripts/refineEntry.py $x 9 file://$D/NRG-CING/data $D/NMR_REDO . . BY_CH23_BY_ENTRY CING 0 auto 0 0 0 >& $x"_ref".log &
 
 or as remote slave. NB the 
     input directory name will be postfixed with  (          entryCodeChar2and3, entryId)
@@ -106,8 +106,13 @@ def mainRefineEntry(entryId, *extraArgList):
         filterVasco = int(filterVasco)
     else:
         filterVasco = 1 # Default should be True
+    # end if
     singleCoreOperation = getDeepByKeysOrAttributes(extraArgList, IDX_SINGLE_CORE_OPERATION )
-    
+    if singleCoreOperation:
+        singleCoreOperation = int(singleCoreOperation)
+    else:
+        singleCoreOperation = 0 # Default should be True
+    # end if
     if archiveType == ARCHIVE_TYPE_FLAT:
         pass # default
     elif archiveType == ARCHIVE_TYPE_BY_ENTRY:
