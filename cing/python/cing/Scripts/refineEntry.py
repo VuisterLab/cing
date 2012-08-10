@@ -22,11 +22,10 @@ or as remote slave. NB the
     input directory name will be postfixed with  (          entryCodeChar2and3, entryId)
     output directory name will be postfixed with (DATA_STR, entryCodeChar2and3, entryId)
 
-cd !$
- 
+cd /home/i/tmp/cingTmp 
 $C/python/cing/Scripts/refineEntry.py $x 9 \
     http://nmr.cmbi.ru.nl/NRG-CING/data i@nmr.cmbi.ru.nl:/mnt/data/D/NMR_REDO \
-    . . BY_CH23_BY_ENTRY CING 0 auto 0 0 >& $x"_ref".log &
+    . . BY_CH23_BY_ENTRY CING 0 auto 0 0 1 >& $x"_ref".log &
 
 """
 
@@ -42,7 +41,7 @@ def mainRefineEntry(entryId, *extraArgList):
     """inputDir may be a directory or a url. A url needs to start with http://.
     """
 
-    fastestTest = 1 # DEFAULT: False
+    fastestTest = False # DEFAULT: False
     modelCountAnneal, bestAnneal, best = 200, 50, 25    
     htmlOnly = False # default: False but enable it for faster runs without some actual data.
     doWhatif = True # disables whatif actual run

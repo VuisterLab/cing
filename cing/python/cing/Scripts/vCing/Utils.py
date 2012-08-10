@@ -5,6 +5,7 @@ or execute from vCing.py
 '''
 
 from cing.Libs.disk import * #@UnusedWildImport
+import commands
 
 def prepareMaster(master_target_dir, doClean=False):
     "Return True on error."
@@ -32,9 +33,35 @@ def prepareMaster(master_target_dir, doClean=False):
     os.chdir(cwd)
 # end def
 
-if __name__ == "__main__":    
-    if prepareMaster(sys.argv[1]):
-        print "ERROR: Failed to prepareMaster"
+def onEachSlave( cmd='uptime', slaveListFile="slaveList.py"):
+    slaveList = []
+    slaveList += [ '145.100.57.%s' % x for x in range(202,204) ]
+    slaveList += [ '145.100.57.%s' % x for x in [206,210,212] ]
+    # Disable some security checks.
+    sshOptionList = '-o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no'
+    sshOptionList += ' -q'
+    for slave in slaveList:
+        cmdComplete = 'ssh %(sshOptionList)s i@%(slave)s %(cmd)s' % {                                                             
+                'sshOptionList':sshOptionList, 'slave':slave, 'cmd':cmd}
+        status, result = commands.getstatusoutput(cmdComplete)
+        if not status:
+            print slave, result
+            continue
+        # end if
+        print slave, "ERROR: Failed command: %s with status: %s with result: %s" % (cmd, status, result)        
+    # end for    
+# end def
+    
+if __name__ == "__main__":
+    if False:    
+        if prepareMaster(sys.argv[1]):
+            print "ERROR: Failed to prepareMaster"
+        # end if
+    # end if
+    if 1:    
+        if onEachSlave():
+            print "ERROR: Failed to prepareMaster"
+        # end if
     # end if
 # end if
         

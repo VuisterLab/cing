@@ -14,9 +14,9 @@ relate $WS/nmrrestrntsgrid/bmrb_pdb_match/results/recoord.csv intersection $D/NR
 
 
 # Fast testing:
-In $C/python/cing/Scripts/refineEntry.py    set fastestTest
+In $C/python/cing/Scripts/refineEntry.py    set fastestTest and singleCoreOperation
 In $C/python/Refine/NTxplor.py              set FAST_FOR_TESTING
-This will give a turn over on 1brv of less than 114 seconds on Duvel with refineEntry.py 
+This will give a turn over on 1brv in ~50 seconds on Sara with refineEntry.py 
 
 # Test network on Sara VC
 ping www.google.com
@@ -31,5 +31,11 @@ $CINGROOT/python/cing/Libs/test/test_network.py
 sudo $C/scripts/vcing/VCheadless stop    
 sudo $C/scripts/vcing/VCheadless start
 
-# Check settings for Topos pool id.
-$C/python/cing/Scripts/vCing/localConstants.py
+# Check settings for Topos pool id on master & golden slave. 
+vi $C/python/cing/Scripts/vCing/localConstants.py
+
+# Clean golden copy of data
+cd /home/i/tmp/cingTmp
+rm -rfi *
+
+# From here on folow: http://code.google.com/p/cing/wiki/VirtualCingUsage

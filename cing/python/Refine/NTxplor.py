@@ -25,7 +25,7 @@ readable
 Cluster issues
 """
 
-FAST_FOR_TESTING = 1 # DEFAULT False Use 1 for testing quickly.
+FAST_FOR_TESTING = False # DEFAULT False Use 1 for testing quickly.
 #------------------------------------------------------------------------------
 timest = 0.003
 
