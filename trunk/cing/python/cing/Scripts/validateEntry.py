@@ -148,8 +148,13 @@ def main(entryId, *extraArgList):
         filterVasco = int(filterVasco)
     else:
         filterVasco = 1 # Default should be True
+    # end if
     singleCoreOperation = getDeepByKeysOrAttributes(extraArgList, IDX_SINGLE_CORE_OPERATION )
-
+    if singleCoreOperation:
+        singleCoreOperation = int(singleCoreOperation)
+    else:
+        singleCoreOperation = 0 # Default should be True
+    # end if
     if archiveType == ARCHIVE_TYPE_FLAT:
         pass # default
     elif archiveType == ARCHIVE_TYPE_BY_ENTRY:
