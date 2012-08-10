@@ -35,9 +35,15 @@ def prepareMaster(master_target_dir, doClean=False):
 
 def onEachSlave( cmd='uptime', slaveListFile="slaveList.py"):
     slaveList = []
-    slaveList += [ '145.100.57.%s' % x for x in range(202,204) ]
-    slaveList += [ '145.100.57.%s' % x for x in [206,210,212] ]
+    slaveList += [ '145.100.57.%s' % x for x in range(221,241) ]
+    coresTotal = 12*4 + 8*8 + 8*16
+    slaveList += [ '145.100.57.%s' % x for x in range(244,252) ]
+#    slaveList += [ '145.100.57.%s' % x for x in [221,210,212] ]
     # Disable some security checks.
+    n = len(slaveList)
+    print "there are %8d slaves" % n
+    print "there are %8d cores" % coresTotal
+    print "there are %8.3f cores/slave" % (coresTotal / n)
     sshOptionList = '-o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no'
     sshOptionList += ' -q'
     for slave in slaveList:
@@ -48,7 +54,8 @@ def onEachSlave( cmd='uptime', slaveListFile="slaveList.py"):
             print slave, result
             continue
         # end if
-        print slave, "ERROR: Failed command: %s with status: %s with result: %s" % (cmd, status, result)        
+        print slave, "ERROR: Failed command: %s with status: %s with result: %s, now sleeping a short while." % (cmd, status, result)
+        time.sleep(1000)        
     # end for    
 # end def
     

@@ -31,6 +31,12 @@ class AllChecks(TestCase):
 #        targetUrl = '/Users/jd'
         self.assertFalse( getFileBySsh( sourceUrl, '.', ntriesMax = 2 ))
     # end def
+    
+    def _test_get_local_ip_address(self):
+        ip = get_local_ip_address()
+        print 'IP is: %s' % ip
+        self.assertTrue( ip )
+    # end def
 # end class
 
 if __name__ == "__main__":

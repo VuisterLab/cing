@@ -39,3 +39,14 @@ cd /home/i/tmp/cingTmp
 rm -rfi *
 
 # From here on folow: http://code.google.com/p/cing/wiki/VirtualCingUsage
+
+# Started with old RECOORD set
+ 534    entry_list_recoord_nrgcing_shuffled.csv
+ 
+ Status R for recognized A for started work X for other S for solved
+        E for entry
+ Problems
+        1aj3 entries not present in nrgcing were apparently not filtered out yet.
+        1qbf ligand NH23 uncoded
+A       1m94 anneal failed. Got no results back except for the overall log. Implemented a reporting on IP so it can be backtraced.
+S       1uxc anneal failed on %CSTRAN-ERR: selection has to contain exactly one atom. Added exception to ignoreLineXplorList
