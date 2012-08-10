@@ -611,10 +611,10 @@ def lenRecursive(obj, max_depth = 5):
 def setToSingleCoreOperation():
     'Set the cing attribute .ncpus to 1'
     if cing.ncpus > 1:
-        nTmessage("Scaling back to single core operations")
+        nTmessage("Scaling back to single core operations.")
         cing.ncpus = 1
         return
-    nTmessage("Maintaining single core operations")
+    nTmessage("Maintaining single core operations.")
 # end def
 
 def capitalizeFirst(s):

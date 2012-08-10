@@ -7,7 +7,7 @@ Execute like:
 
 $CINGROOT/python/cing/NRG/nrgCing.py [entry_code]
      prepare runCing storeCING2db 
-     createToposTokens getEntryInfo searchPdbEntries createToposTokens
+     createToposTokens getEntryInfo searchPdbEntries
      updateWeekly updateFrontPages updateCsvDumps
      forEachStoredEntry forEachStoredEntryRunScript runWeekly
 
@@ -75,8 +75,8 @@ from cing.NRG.settings import * #@UnusedWildImport
 from cing.Scripts.FC.utils import getBmrbCsCountsFromFile
 from cing.Scripts.doScriptOnEntryList import doFunctionOnEntryList
 from cing.Scripts.doScriptOnEntryList import doScriptOnEntryList
+from cing.Scripts.vCing.vCing import REFINE_ENTRY_STR
 from cing.Scripts.vCing.vCing import TEST_CING_STR
-from cing.Scripts.vCing.vCing import VALIDATE_ENTRY_NRG_STR
 from cing.Scripts.vCing.vCing import Vcing
 from cing.Scripts.validateEntry import ARCHIVE_TYPE_BY_CH23
 from cing.Scripts.validateEntry import ARCHIVE_TYPE_BY_CH23_BY_ENTRY
@@ -2293,8 +2293,16 @@ class NrgCing(Lister):
 
     def createToposTokens(self, jobId = TEST_CING_STR):
         """Return True on error.
+    verbosity         
+    inputDir             outputDir
+    pdbConvention     restraintsConvention archiveType         projectType
+    storeCING2db      ranges               filterTopViolations filterVasco
+    singleCoreOperation
         """
-        tokenListFileName = os.path.join(self.results_dir, 'token_list_todo.txt')        
+
+#        jobId = TEST_CING_STR   # DEFAULT: TEST_CING_STR Set for testing.
+        jobId = REFINE_ENTRY_STR        
+        tokenListFileName = os.path.join(self.results_dir, 'token_list_todo.txt')
         # Sync below code with validateEntry#main
 #        vc = Vcing()
         # Still testing.
@@ -2309,26 +2317,36 @@ class NrgCing(Lister):
         outputUrl = '.'
 #
         storeCING2db = 0
-        ranges = CV_RANGES_STR
+#        ranges = CV_RANGES_STR
+        ranges = AUTO_RANGES_STR
         filterTopViolations = 1
         filterVasco = 1
-
+        archiveType = ARCHIVE_TYPE_BY_CH23
+        projectType = PROJECT_TYPE_CCPN
+        if jobId == REFINE_ENTRY_STR:
+            singleCoreOperation = 1
+            inputUrl  = 'http://nmr.cmbi.ru.nl/NRG-CING/data'            
+            outputUrl =      'i@nmr.cmbi.ru.nl:/mnt/data/D/NMR_REDO'
+            archiveType = ARCHIVE_TYPE_BY_CH23_BY_ENTRY
+            projectType = PROJECT_TYPE_CING
+            filterTopViolations = 0
+            filterVasco = 0            
+        # end if
         extraArgListTxt = """
             %s %s %s
             . . %s %s
             %s %s %s %s
         """ % ( cing.verbosity,  inputUrl, outputUrl,
-                ARCHIVE_TYPE_BY_CH23, PROJECT_TYPE_CCPN,
+                archiveType, projectType,
                 storeCING2db, ranges, filterTopViolations, filterVasco )
-        
-        if False:  # DEFAULT: False Set for testing.
-            jobId = TEST_CING_STR
+        if jobId == REFINE_ENTRY_STR:
+            extraArgListTxt += " %s " % singleCoreOperation
+        # end if
+        if jobId == TEST_CING_STR:            
             extraArgListTxt = ''
         # end if
         
         extraArgListStr = ' '.join( extraArgListTxt.split())
-
-
         nTdebug("tokenListFileName:       %s" % tokenListFileName)        
 
         nTmessage("Starting createToposTokens with extra params: [%s]" % extraArgListStr)
@@ -2338,9 +2356,10 @@ class NrgCing(Lister):
         self.entry_list_todo.addList(self.entry_list_nmr)
         self.entry_list_todo = self.entry_list_todo.difference(self.entry_list_done)
         if True: # DEFAULT: True
-#            self.entry_list_todo = readLinesFromFile(os.path.join(self.results_dir, 'entry_list_nmr_random_8.csv'))
-#            self.entry_list_todo = self.entry_list_todo[:19]
-            self.entry_list_todo = "1brv".split() # Or other 10 residue entries:  1n6t 1p9f 1idv 1kuw 1n9u 1hff  1r4h
+            self.entry_list_todo = readLinesFromFile(os.path.join(self.results_dir,'list/entry_list_recoord_nrgcing_shuffled.csv'))
+#            self.entry_list_todo = readLinesFromFile(os.path.join(self.results_dir, 'entry_list_dummy.csv'))
+#            self.entry_list_todo = self.entry_list_todo[:100]
+#            self.entry_list_todo = "1brv".split() # Or other 10 residue entries:  1n6t 1p9f 1idv 1kuw 1n9u 1hff  1r4h
             # invalids 1nxn 1gac 1t5n
             self.entry_list_todo = NTlist( *self.entry_list_todo )
         # end if
@@ -2739,7 +2758,7 @@ def runNrgCing( useClass = NrgCing,
                 nTerror("Failed to postProcessEntryAfterVc")
             # end if
         elif destination == 'createToposTokens':
-            if uClass.createToposTokens(jobId=VALIDATE_ENTRY_NRG_STR):
+            if uClass.createToposTokens():
 #            if uClass.createToposTokens():
                 nTerror("Failed to createToposTokens")
             # end if

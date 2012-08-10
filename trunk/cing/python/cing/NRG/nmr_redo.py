@@ -87,6 +87,8 @@ class NmrRedo(NrgCing):
     def refine(self):
         """On self.entry_list_todo.
         Return True on error.
+        
+        NB. On 2012-08-09 a cloud based method was implemented using nrgCing.py
         """
         entryListFileName = "entry_list_todo.csv"
         writeTextToFile(entryListFileName, toCsv(self.entry_list_todo))
