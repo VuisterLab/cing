@@ -107,7 +107,7 @@ def mainRefineEntry(entryId, *extraArgList):
     else:
         filterVasco = 1 # Default should be True
     singleCoreOperation = getDeepByKeysOrAttributes(extraArgList, IDX_SINGLE_CORE_OPERATION )
-
+    
     if archiveType == ARCHIVE_TYPE_FLAT:
         pass # default
     elif archiveType == ARCHIVE_TYPE_BY_ENTRY:
@@ -144,7 +144,14 @@ def mainRefineEntry(entryId, *extraArgList):
     # For NMR_REDO required as most efficient.
     if singleCoreOperation: 
         setToSingleCoreOperation()
-    
+    # end if
+    ip = get_local_ip_address()
+    if ip:
+        nTmessage('Found active IP address: %s' % ip)
+    else:
+        nTwarning('No IP address could be derived.')
+    # end if
+
     # presume the directory still needs to be created.
     cingEntryDir = entryId + ".cing"
 

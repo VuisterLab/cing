@@ -178,14 +178,15 @@ def analyzeWattosLog(logFile):
 # end def
 
 ignoreLineXplorList = [
-#    "No matching first patch found",       # Happens for generatePSF.
+#    "No matching first patch found",                           # Happens for generatePSF.
 #    "No matching LAST patch found",
-    "%POWELL-ERR: Line search abandoned",  # Happens for generateTemplate
-    "%POWELL-ERR: all atoms fixed. No action", # Happens for analyze_
-    "SET-ERR: error in selection - no atoms spec.", # Happens for e.g. when atoms do not match to xplor for the noe distance restraints.
+    "%POWELL-ERR: Line search abandoned",                       # Happens for generateTemplate
+    "%POWELL-ERR: all atoms fixed. No action",                  # Happens for analyze_
+    "SET-ERR: error in selection - no atoms spec.",             # Happens for e.g. when atoms do not match to xplor for the noes.
     "%NOE-ERR: problem at", # See above
-    "%PATCH-ERR:", # Happens for 2fwu when ions are tried to be patched as a regular AA.
-    "%NOESET-ERR: duplicate class name specified.", # Happens e.g. for 2kn9 for second restraint lists. Code runs fine though.    
+    "%PATCH-ERR:",                                              # Happens for 2fwu when ions are tried to be patched as a regular AA.
+    "%NOESET-ERR: duplicate class name specified.",             # Happens e.g. for 2kn9 for second restraint lists. Code runs fine though.
+    "%CSTRAN-ERR: selection has to contain exactly one atom.",  # Happens e.g. for 1uxc for 14 dihedrals    
 ]
 
 def analyzeXplorLog(logFile, extraIgnoreLineList=[], extraIgnoreCountList = []):

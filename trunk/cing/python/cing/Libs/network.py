@@ -1,9 +1,11 @@
 # Obtained thru Tim Stevens.
 
 from cing.Libs.NTutils import * #@UnusedWildImport
+from cing.Libs.helper import isInternetConnected
 import commands
 import mimetools
 import mimetypes
+import socket
 import urllib2
 
 
@@ -162,3 +164,20 @@ def getFileBySsh( sourceUrl, targetUrl, rsyncOptions = '', ntriesMax = 1):
     return True
 # end def
 
+def get_local_ip_address(target='google.com'):
+    'Return None on error or if internet connection is absent.'
+    ipaddr = None
+    if not isInternetConnected():
+        nTwarning("Failed to get IP address because no internet connection was detected.")
+        return ipaddr
+    # end if
+    try:
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s.connect((target, 8000))
+        ipaddr = s.getsockname()[0]
+        s.close()
+    except:
+        nTwarning("Failed to get IP address because no connection to [%s] could be established." % target)
+    # end try    
+    return ipaddr 
+# end def

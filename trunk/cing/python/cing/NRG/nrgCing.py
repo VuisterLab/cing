@@ -2323,8 +2323,9 @@ class NrgCing(Lister):
         filterVasco = 1
         archiveType = ARCHIVE_TYPE_BY_CH23
         projectType = PROJECT_TYPE_CCPN
+        singleCoreOperation = 0
         if jobId == REFINE_ENTRY_STR:
-            singleCoreOperation = 1
+#            singleCoreOperation = 1
             inputUrl  = 'http://nmr.cmbi.ru.nl/NRG-CING/data'            
             outputUrl =      'i@nmr.cmbi.ru.nl:/mnt/data/D/NMR_REDO'
             archiveType = ARCHIVE_TYPE_BY_CH23_BY_ENTRY
