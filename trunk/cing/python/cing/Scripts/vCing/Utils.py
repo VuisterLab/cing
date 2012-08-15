@@ -34,9 +34,18 @@ def prepareMaster(master_target_dir, doClean=False):
 # end def
 
 def onEachSlave( cmd='uptime', slaveListFile="slaveList.py"):
+    
     slaveList = []
-    slaveList += [ '145.100.58.%s' % x for x in range(28,36) ]
-    coresTotal = 0*4 + 8*8 + 0*16
+    slaveList += [ '145.100.58.%s' % x for x in range(37,40) ]
+    slaveList += [ '145.100.58.%s' % x for x in range(41,46) ]
+    slaveList += [ '145.100.58.%s' % x for x in range(47,51) ]
+    slaveList += [ '145.100.58.%s' % x for x in range(52,56) ]
+    slaveList += [ '145.100.58.%s' % x for x in range(57,61) ]
+    slaveList += [ '145.100.58.%s' % x for x in range(62,64) ]
+    slaveList += [ '145.100.58.%s' % x for x in range(65,78) ]
+    slaveList += [ '145.100.58.%s' % x for x in range(79,81) ]
+    slaveList += [ '145.100.58.%s' % x for x in range(85,97) ]
+    coresTotal = 12*4 + 5*8*8 + 0*16 - 3.0
 #    slaveList += [ '145.100.57.%s' % x for x in range(244,252) ]
 #    slaveList += [ '145.100.57.%s' % x for x in [221,210,212] ]
     # Disable some security checks.
@@ -46,21 +55,24 @@ def onEachSlave( cmd='uptime', slaveListFile="slaveList.py"):
     print "there are %8.3f cores/slave" % (coresTotal / n)
     sshOptionList = '-o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no'
     sshOptionList += ' -q'
+    i = 0
     for slave in slaveList:
+        i += 1
         cmdComplete = 'ssh %(sshOptionList)s i@%(slave)s %(cmd)s' % {                                                             
                 'sshOptionList':sshOptionList, 'slave':slave, 'cmd':cmd}
         status, result = commands.getstatusoutput(cmdComplete)
         if not status:
-            print slave, result
+            print "%3d %s %s" % (i, slave, result)
             continue
         # end if
-        print slave, "ERROR: Failed command: %s with status: %s with result: %s, now sleeping a short while." % (cmd, status, result)
-        time.sleep(1000)        
+        print "%3d %s %s" % (i, slave, "ERROR: Failed command: %s with status: %s with result: %s, now sleeping a short while." % (
+            cmd, status, result))
+        time.sleep(1)        
     # end for    
 # end def
     
 if __name__ == "__main__":
-    if False:    
+    if False:
         if prepareMaster(sys.argv[1]):
             print "ERROR: Failed to prepareMaster"
         # end if

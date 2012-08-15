@@ -426,12 +426,12 @@ def makeDihedralPlot( project, residueList, dihedralName1, dihedralName2,
 #                nTdebug("Failed to get the non-d1d2 hist for %s" % residue) # happens for 1bus cPro
                 return None
             # end if            
-            nTdebug('Appending for ssType %s and resName %s' % ( ssType,resName ))
+#            nTdebug('Appending for ssType %s and resName %s' % ( ssType,resName ))
             histList.append(myHist)
         # end for
     # end if            
     if histList:
-        nTdebug('Will do dihedralComboPlot')
+#        nTdebug('Will do dihedralComboPlot')
         plot.dihedralComboPlot(histList, minPercentage =  minPercentage, maxPercentage = maxPercentage, scaleBy = scaleBy)
     else:
         nTdebug('Strange, no histList found in dihedralComboPlot')
@@ -441,7 +441,7 @@ def makeDihedralPlot( project, residueList, dihedralName1, dihedralName2,
         if isSingleResiduePlot:
             # res is equal to residue
             for useTalos in ( False, True ):
-                nTdebug("Plotting with useTalos %s" % useTalos)
+#                nTdebug("Plotting with useTalos %s" % useTalos)
                 dr1 = _matchDihedrals(res, dihedralName1,useTalos=useTalos)
                 dr2 = _matchDihedrals(res, dihedralName2,useTalos=useTalos)
 

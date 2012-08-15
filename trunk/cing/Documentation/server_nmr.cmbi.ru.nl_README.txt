@@ -193,5 +193,6 @@ MAINTENANCE nmr VM
  - apt-get upgrade
  - Some packages are held back because they are more invasive; e.g. kernel updates. The below will update them anyway.
    This is a good time to consider the state of the backups. ;-)
+   Kernel nowadays has hand-coded extensions for 2Gb memory limit, called pae.
     apt-get dist-upgrade
   

@@ -1,3 +1,4 @@
+-- this is file: $C/python/cing/NRG/sql/examplesNRG-CING.sql 
 -- login by:
 -- psql pdbmlplus pdbj
 
