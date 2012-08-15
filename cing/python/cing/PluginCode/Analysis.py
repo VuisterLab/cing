@@ -65,9 +65,9 @@ class Analysis:
         nTmessage("Starting cing.PluginCode.Analysis#runRpf")
 
         if not hasattr(self.project, CCPN_LOWERCASE_STR):
-            nTdebug("Failed to find ccpn attribute project. Happens when no CCPN project was read first.") # TODO: change when cing to ccpn code works.
+#            nTdebug("Failed to find ccpn attribute project. Happens when no CCPN project was read first.") # TODO: change when cing to ccpn code works.
             return
-
+        # end if
         self.ccpnProject = self.project[ CCPN_LOWERCASE_STR ]
         ccpnProject = self.ccpnProject
         if not ccpnProject:

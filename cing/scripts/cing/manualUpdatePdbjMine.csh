@@ -32,7 +32,7 @@ if ( 1 ) then
     wget -r ftp://ftp.pdbj.org/mine/split >& $log_file
 
     date
-    echo "Dropping pdbj schema (Expect that this will take xx minutes)"
+    echo "Dropping pdbj schema (Expect that this will take 8 hours)"
     set prog_string = pg_restore
     set log_file    = $log_dir/$prog_string"_$date_string".log
     echo "DROP SCHEMA IF EXISTS pdbj CASCADE;" | psql pdbmlplus pdbj

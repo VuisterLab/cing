@@ -50,3 +50,13 @@ rm -rfi *
         1qbf ligand NH23 uncoded
 A       1m94 anneal failed. Got no results back except for the overall log. Implemented a reporting on IP so it can be backtraced.
 S       1uxc anneal failed on %CSTRAN-ERR: selection has to contain exactly one atom. Added exception to ignoreLineXplorList
+
+
+Considering to overcommit processes by a factor of 8.
+So a VM of 8 cores has 8 VCprocesses running that each will fork at some point 8 xplor calculations which occupy a single core each.
+The load will be a maximum of 64.
+Towards the end long running jobs will enjoy full cpu power.
+It will not help me finish the first jobs sooner.
+VMs with no load at the end can be shot.
+Wilmar mentions it might be too much of an overcommit.
+

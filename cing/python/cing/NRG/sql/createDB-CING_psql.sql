@@ -302,7 +302,8 @@ CREATE TABLE casdcing.cingresidue
     dih_c1_viol                    INT DEFAULT NULL,
     dih_c3_viol                    INT DEFAULT NULL,
     dih_c5_viol                    INT DEFAULT NULL,
-
+--    is_pressssssent                 BOOLEAN DEFAULT NULL, -- bogus column for testing.
+    
     FOREIGN KEY (chain_id)          REFERENCES casdcing.cingchain (chain_id) ON DELETE CASCADE,
     FOREIGN KEY (entry_id)          REFERENCES casdcing.cingentry (entry_id) ON DELETE CASCADE
 );

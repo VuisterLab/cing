@@ -31,10 +31,10 @@ class NmrRedo(NrgCing):
                  max_entries_todo=1,
                  max_time_to_wait=86400*2, # two days. 1d8v (263 residues) took the longest: about 26 hours. 
                  processes_max=None,
-                 prepareInput=False,
-                 writeWhyNot=True,
-                 writeTheManyFiles=False,
-                 updateIndices=True,
+#                 prepareInput=False,
+#                 writeWhyNot=True,
+#                 writeTheManyFiles=False,
+#                 updateIndices=True,
 #                 isProduction=True
                 ):
         kwds = NTdict( 
@@ -44,10 +44,10 @@ class NmrRedo(NrgCing):
                  max_time_to_wait=max_time_to_wait, # one day. 2p80 took the longest: 5.2 hours. 
 #                 But <Molecule "2ku1" (C:7,R:1659,A:36876,M:30)> is taking longer. 2ku2 is taking over 12 hrs now.
                  processes_max=processes_max,
-                 prepareInput=prepareInput,
-                 writeWhyNot=writeWhyNot,
-                 writeTheManyFiles=writeTheManyFiles,
-                 updateIndices=updateIndices,
+#                 prepareInput=prepareInput,
+#                 writeWhyNot=writeWhyNot,
+#                 writeTheManyFiles=writeTheManyFiles,
+#                 updateIndices=updateIndices,
 #                 isProduction=isProduction,
 )
         kwds = kwds.toDict()

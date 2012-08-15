@@ -1,3 +1,5 @@
+This is the file: $C/Documentation/psql_setup_instructions.txt
+
 Follow 00README.txt in pdbj_Mine directory from: ftp://ftp.pdbj.org/mine
 
 ########### FOR LINUX ###################

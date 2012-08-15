@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 """
 Create plots like the GreenVersusRed scatter by entry.
 Use:
@@ -1533,9 +1534,7 @@ e.pdb_id = s1.pdb_id;
 #        line2D.set_c('black')
         a.add_line(line2D)
         grid( linewidth=lw, linestyle='-',  color=cl )
-        fn = strTitle + '.eps'
-        nTdebug("Saving plot file: %s" % fn)
-#        ps.hardcopy(fn)
+
         fig_width_pt = 4000
         fig_height_pt = fig_width_pt
         fig_width     = fig_width_pt*inches_per_pt  # width in inches
@@ -1550,9 +1549,41 @@ e.pdb_id = s1.pdb_id;
         rcParams.update(params)        
         figure = gcf()
         figure.set_size_inches(  fig_size )
+        fn = strTitle + '.eps'
+        nTdebug("Saving plot file: %s" % fn)
         savefig(fn)
     # end def
     
+    def queryOnRogPercentages(self):
+        'Run after perEntryRog has been filled.'
+        m = self
+#        elementNameList = ['WI_Backbone', 'WI_Rama', 'PC_Backbone']
+        elementNameList = ['PC_Core_per']
+#        colorNameList = 'green orange red'.split()
+        colorNameList = 'green'.split()
+
+        s = select([m.e1.c.pdb_id, m.e1.c.pc_rama_core
+                     ], and_(m.e1.c.pdb_id==m.s1.c.pdb_id,
+                             m.e1.c.pc_rama_core > 20.0,
+                             m.e1.c.pc_rama_core < 40.0,
+                             )
+                     ).order_by(m.e1.c.pdb_id)
+        nTdebug("SQL: %s" % s)
+        result = m.execute(s).fetchall()
+        nTdebug("Entries returned: %s" % len(result))
+
+        for _elementIdx in range(len(elementNameList)):
+            for _colorIdx in range(len(colorNameList)):
+                for row in result:
+                    entryId = row[0]
+                    if not m.perEntryRog.has_key(entryId):
+                        continue
+                    # end if
+                    print row[0]
+                # end for
+            # end for
+        # end for
+    # end def
     
     def plotQualityVsColor(self):
         m = self
@@ -1821,9 +1852,9 @@ if __name__ == '__main__':
         n.createScatterPlots()
     # end if
     if 0: # Default 0 For CING paper Figure 3.
-#        n.plotQualityVsColor()
-        n.plotQualityPcVsColor()
-#        n.getAndPlotColorVsColor(doPlot = True) # ROG Plot for paper.
+#        n.plotQualityPcVsColor()
+        n.getAndPlotColorVsColor(doPlot = False) # ROG Plot for paper.
+        n.plotQualityVsColor()
     # end if
     if 0: # DEFAULT 0
         pdbIdList = n.getPdbIdList()

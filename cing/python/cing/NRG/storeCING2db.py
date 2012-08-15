@@ -100,7 +100,8 @@ def doStoreCING2db( entry_code, archive_id, project = None):
     if doReadProject:
         # presume the directory still needs to be created.
         cingEntryDir = entry_code + ".cing"
-        if not os.path.isdir(cingEntryDir):
+        cingEntryTgz = entry_code + ".cing.tgz"
+        if not ( os.path.isdir(cingEntryDir) or os.path.exists(cingEntryTgz)):
             nTerror("Failed to find input directory: %s" % cingEntryDir)
             return
         # end if.
@@ -770,7 +771,8 @@ def doStoreCING2db( entry_code, archive_id, project = None):
                 qcs_bb          = r_qcs_bb,
                 qcs_hvy         = r_qcs_hvy,
                 qcs_prt         = r_qcs_prt,
-                qcs_s2          = r_qcs_s2,
+                qcs_s2          = r_qcs_s2,                
+#                is_pressssssent = True,         # bogus column for demonstration.
                 rog=rogR
                 )
             )

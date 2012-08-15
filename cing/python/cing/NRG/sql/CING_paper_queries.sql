@@ -115,9 +115,9 @@ from
     nrgcing.CINGresidue r
 where 
     e.entry_id = c.entry_id AND
-    c.chain_id = r.chain_id AND
+    c.chain_id = r.chain_id
 --    e.entry_id = r.entry_id and
-    e.pdb_id = '1hue'
+--    e.pdb_id = '1hue'
 --    c.mol_type_idx = 0 -- Protein
 group by e.pdb_id, c.mol_type_idx
 limit 10;
@@ -314,14 +314,4 @@ s2.sel_1 = true
 order by e.pdb_id, c.name, r.number asc
 
 limit 200;
-
-
-
-
-
-
-
-
-gawk -f 'BEGIN{n=0}{'
-    limit 10;
 
