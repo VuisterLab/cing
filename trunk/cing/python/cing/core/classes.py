@@ -1859,7 +1859,9 @@ ranges:  %s
 
 
     def calcRmsds( self, ranges='auto' ):
-
+        """
+        Calculates the positional (coordinate) deviations between the different group ensembles.
+        """
         n = len(self)
 
         rmsds = NTlistOfLists( n, n, NTvalue(NaN, NaN, fmt='%6.2f +- %5.2f' ) )
