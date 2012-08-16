@@ -17,7 +17,7 @@ import numpy as np
 class Projects( NTtree ): # pylint: disable=R0904
     """
     Class to store multiple projects
-    Bit dirty as We use the NTtree class, but append Project instances (NTdict-derived) as children
+    Bit dirty as we use the NTtree class, but append Project instances (NTdict-derived) as children
     Emulate list like behavior by adding append method, 'id' and refs in dictionary: i.e. projects[0] gives first entry
     """
 
@@ -564,7 +564,7 @@ def printResidueScores( projects ):
 #end def
 
 def test( projects, stream=sys.stdout ):
-    # A hack to get residue specifc results
+    # A hack to get residue specific results
     selectedResidues = projects[0].molecule.setResiduesFromRanges('all')
 
     for res in selectedResidues:

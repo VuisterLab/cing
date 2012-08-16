@@ -146,9 +146,12 @@ class NrgCingRdb():
 #            countList = [m.query(table).count() for table in tableList]
             countList = []
             for table in tableList:
-                countList.append( m.query(table).count())
+                result = m.query(table).count()
+                countList.append( result )
             # end for
-            countStrTuple = tuple([locale.format('%.0f', value, True) for value in countList])
+            countStrTuple = tuple([
+                                   locale.format('%.0f', value, True) for value in countList
+            ])
             nTmessage(self.schema + " schema contains: %s entries %s chains %s residues %s atoms" % countStrTuple)
 #            nTmessage("pdbj schema contains %s entries." % )
         # end if
@@ -1475,10 +1478,9 @@ e.pdb_id = s1.pdb_id;
             # end if
             perEntryRog[k][int(row[1])] = float(row[2])
         # end for
-
         if not doPlot:
             return
-        # end for
+        # end if        
         pdb_id_list = perEntryRog.keys()
         color = nTfill(0.0, 3)
         color[0] = NTlist() # green
@@ -1573,13 +1575,17 @@ e.pdb_id = s1.pdb_id;
         nTdebug("Entries returned: %s" % len(result))
 
         for _elementIdx in range(len(elementNameList)):
-            for _colorIdx in range(len(colorNameList)):
+            for colorIdx in range(len(colorNameList)):
                 for row in result:
                     entryId = row[0]
                     if not m.perEntryRog.has_key(entryId):
                         continue
                     # end if
-                    print row[0]
+                    value = m.perEntryRog[entryId][colorIdx]
+                    if value < 40.:
+                        continue
+                    # end if
+                    print row, value
                 # end for
             # end for
         # end for
@@ -1660,7 +1666,7 @@ e.pdb_id = s1.pdb_id;
                     m.e1.c.pc_rama_gener, 
                     m.e1.c.pc_rama_disall
                      ], and_(m.e1.c.pdb_id==m.s1.c.pdb_id,
-                             m.e1.c.pdb_id==m.e1.c.pdb_id
+#                             m.e1.c.pdb_id==m.e1.c.pdb_id
 #                             , m.e1.c.pdb_id=='2kq3'
                              )
                      ).order_by(m.e1.c.pdb_id)
@@ -1854,7 +1860,7 @@ if __name__ == '__main__':
     if 0: # Default 0 For CING paper Figure 3.
 #        n.plotQualityPcVsColor()
         n.getAndPlotColorVsColor(doPlot = False) # ROG Plot for paper.
-        n.plotQualityVsColor()
+        n.queryOnRogPercentages()
     # end if
     if 0: # DEFAULT 0
         pdbIdList = n.getPdbIdList()
