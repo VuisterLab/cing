@@ -241,12 +241,12 @@ b.release_date > '2011-01-01'
 order by e.distance_count asc limit 2000;
 
 COPY (
-	SELECT e.pdb_id
-	FROM nrgcing.cingentry e, brief_summary b
-	WHERE
-	e.pdb_id = b.pdbid AND
-	b.release_date > '2011-01-01'
-	order by e.pdb_id asc
+    SELECT e.pdb_id
+    FROM nrgcing.cingentry e, brief_summary b
+    WHERE
+    e.pdb_id = b.pdbid AND
+    b.release_date > '2011-01-01'
+    order by e.pdb_id asc
 ) TO '/tmp/entry_list_rerun.csv'
 
     b.deposition_date > '2011-01-01'
@@ -254,5 +254,4 @@ COPY (
 SELECT count(*) FROM brief_summary s;
 echo "SELECT count(*) FROM brief_summary s" | psql pdbmlplus pdbj
 echo "SELECT count(*) FROM nrgcing.cingentry" | psql pdbmlplus pdbj
-
 
