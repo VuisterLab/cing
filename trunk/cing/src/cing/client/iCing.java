@@ -319,17 +319,24 @@ public class iCing implements EntryPoint, HistoryListener {
         validationOfNmrLabel.setStylePrimaryName("h2");
         verticalPanel.add(validationOfNmrLabel);
 
+        final Image weNmrLogo = new Image();
+        topPanel.add(weNmrLogo);
+        weNmrLogo.setSize("107", "40");
+        weNmrLogo.setUrl("images/logo_WeNMR.png");
+        topPanel.setCellVerticalAlignment(weNmrLogo, HasVerticalAlignment.ALIGN_MIDDLE);
+        topPanel.setCellHorizontalAlignment(weNmrLogo, HasHorizontalAlignment.ALIGN_RIGHT);
+
         final VerticalPanel verticalPanel_1 = new VerticalPanel();
         topPanel.add(verticalPanel_1);
         verticalPanel_1.setHorizontalAlignment(HasHorizontalAlignment.ALIGN_CENTER);
         verticalPanel_1.setVerticalAlignment(HasVerticalAlignment.ALIGN_MIDDLE);
         topPanel.setCellHorizontalAlignment(verticalPanel_1, HasHorizontalAlignment.ALIGN_RIGHT);
-
+        
         final HorizontalPanel horizontalPanel_1 = new HorizontalPanel();
         verticalPanel_1.add(horizontalPanel_1);
         horizontalPanel_1.setVerticalAlignment(HasVerticalAlignment.ALIGN_MIDDLE);
         horizontalPanel_1.setSpacing(5);
-
+        
         final Image imageI18n = new Image();
         horizontalPanel_1.add(imageI18n);
         imageI18n.setSize("16", "16");

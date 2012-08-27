@@ -315,3 +315,47 @@ order by e.pdb_id, c.name, r.number asc
 
 limit 200;
 
+-- Reviewer 1 point 3; new figure 5
+-- residues with coordinates and within cv range.
+-- r.sel_1 denotes it is in range.
+-- r.is_present checks for coordinates
+-- A derived table to contain the percentages of residues rog.
+drop TABLE IF EXISTS nrgcing.tmpentry2; 
+drop TABLE IF EXISTS nrgcing.tmpentry3; 
+CREATE TABLE nrgcing.tmpentry2 as (
+    select r1.entry_id as entry_id, r1.rog as rog, count(*) as ccount from
+    nrgcing.cingresidue r1
+    where r1.sel_1 = true AND r1.is_present = true
+    group by r1.entry_id, r1.rog
+)
+CREATE TABLE nrgcing.tmpentry3 as (
+    select r2.entry_id, count(*) as ccount from
+    nrgcing.cingresidue r2
+    where r2.sel_1 = true AND r2.is_present = true
+    group by r2.entry_id
+)
+
+drop TABLE IF EXISTS nrgcing.tmpentry4; 
+CREATE TABLE nrgcing.tmpentry4 as (
+select e.entry_id as entry_id,
+e.name,
+c1.rog as rog,
+c2.ccount as ccount,
+e.res_count as total_count,
+round( (100.0*c1.ccount)/c2.ccount, 1) as cperc
+from
+nrgcing.cingentry e,
+nrgcing.tmpentry2 c1,
+nrgcing.tmpentry3 c2
+where
+e.entry_id = c1.entry_id AND
+e.entry_id = c2.entry_id
+--(e.name = '1cl4' or e.name = '1m9o')
+order by e.entry_id asc, rog asc
+);
+
+select * from nrgcing.tmpentry4
+where (name = '1cl4' or name = '1m9o' or name = '2kq3') and
+rog = 0;
+
+ 
