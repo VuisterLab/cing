@@ -2301,7 +2301,7 @@ class NrgCing(Lister):
         """
 
 #        jobId = TEST_CING_STR   # DEFAULT: TEST_CING_STR Set for testing.
-        jobId = REFINE_ENTRY_STR        
+        jobId = REFINE_ENTRY_STR
         tokenListFileName = os.path.join(self.results_dir, 'token_list_todo.txt')
         # Sync below code with validateEntry#main
 #        vc = Vcing()
@@ -2351,7 +2351,7 @@ class NrgCing(Lister):
         nTdebug("tokenListFileName:       %s" % tokenListFileName)        
 
         nTmessage("Starting createToposTokens with extra params: [%s]" % extraArgListStr)
-        self.entry_list_nmr = readLinesFromFile(os.path.join(self.results_dir, 'entry_list_nmr.csv'))
+        self.entry_list_nmr  = readLinesFromFile(os.path.join(self.results_dir, 'entry_list_nmr.csv'))
         self.entry_list_done = readLinesFromFile(os.path.join(self.results_dir, 'entry_list_done.csv'))
         self.entry_list_todo = NTlist()
         self.entry_list_todo.addList(self.entry_list_nmr)
@@ -2360,7 +2360,7 @@ class NrgCing(Lister):
             self.entry_list_todo = readLinesFromFile(os.path.join(self.results_dir,'list/entry_list_recoord_nrgcing_shuffled.csv'))
 #            self.entry_list_todo = readLinesFromFile(os.path.join(self.results_dir, 'entry_list_dummy.csv'))
 #            self.entry_list_todo = self.entry_list_todo[:100]
-#            self.entry_list_todo = "1brv".split() # Or other 10 residue entries:  1n6t 1p9f 1idv 1kuw 1n9u 1hff  1r4h
+            self.entry_list_todo = "1brv 1m4e".split() # Or other 10 residue entries:  1n6t 1p9f 1idv 1kuw 1n9u 1hff  1r4h
             # invalids 1nxn 1gac 1t5n
             self.entry_list_todo = NTlist( *self.entry_list_todo )
         # end if
