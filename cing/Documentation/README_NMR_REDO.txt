@@ -14,7 +14,7 @@ relate $WS/nmrrestrntsgrid/bmrb_pdb_match/results/recoord.csv intersection $D/NR
 
 
 # Fast testing:
-In $C/python/cing/Scripts/refineEntry.py    set fastestTest and singleCoreOperation
+In $C/python/cing/Scripts/refineEntry.py    set fastestTest
 In $C/python/Refine/NTxplor.py              set FAST_FOR_TESTING
 This will give a turn over on 1brv in ~50 seconds on Sara with refineEntry.py 
 

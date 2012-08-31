@@ -36,16 +36,16 @@ def prepareMaster(master_target_dir, doClean=False):
 def onEachSlave( cmd='uptime', slaveListFile="slaveList.py"):
     
     slaveList = []
-    slaveList += [ '145.100.58.%s' % x for x in range(37,40) ]
-    slaveList += [ '145.100.58.%s' % x for x in range(41,46) ]
-    slaveList += [ '145.100.58.%s' % x for x in range(47,51) ]
-    slaveList += [ '145.100.58.%s' % x for x in range(52,56) ]
-    slaveList += [ '145.100.58.%s' % x for x in range(57,61) ]
-    slaveList += [ '145.100.58.%s' % x for x in range(62,64) ]
-    slaveList += [ '145.100.58.%s' % x for x in range(65,78) ]
-    slaveList += [ '145.100.58.%s' % x for x in range(79,81) ]
-    slaveList += [ '145.100.58.%s' % x for x in range(85,97) ]
-    coresTotal = 12*4 + 5*8*8 + 0*16 - 3.0
+    slaveList += [ '145.100.57.%s' % x for x in range(6,7) ]
+#    slaveList += [ '145.100.58.%s' % x for x in range(41,46) ]
+#    slaveList += [ '145.100.58.%s' % x for x in range(47,51) ]
+#    slaveList += [ '145.100.58.%s' % x for x in range(52,56) ]
+#    slaveList += [ '145.100.58.%s' % x for x in range(57,61) ]
+#    slaveList += [ '145.100.58.%s' % x for x in range(62,64) ]
+#    slaveList += [ '145.100.58.%s' % x for x in range(65,78) ]
+#    slaveList += [ '145.100.58.%s' % x for x in range(79,81) ]
+#    slaveList += [ '145.100.58.%s' % x for x in range(85,97) ]
+    coresTotal = 12*0 + 0*8*8 + 1*4
 #    slaveList += [ '145.100.57.%s' % x for x in range(244,252) ]
 #    slaveList += [ '145.100.57.%s' % x for x in [221,210,212] ]
     # Disable some security checks.
