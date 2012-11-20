@@ -2323,7 +2323,7 @@ class NrgCing(Lister):
         filterVasco = 1
         archiveType = ARCHIVE_TYPE_BY_CH23
         projectType = PROJECT_TYPE_CCPN
-        singleCoreOperation = 0
+        singleCoreOperation = 1 # changed for NMR_REDO; otherwise overload of processes will lead to memory errors
         if jobId == REFINE_ENTRY_STR:
 #            singleCoreOperation = 1
             inputUrl  = 'http://nmr.cmbi.ru.nl/NRG-CING/data'            
