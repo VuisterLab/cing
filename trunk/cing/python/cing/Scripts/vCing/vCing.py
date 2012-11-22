@@ -93,7 +93,8 @@ class Vcing(Lister):
         self.master_target_url = self.master_ssh_url + ':' + self.master_target_dir
 #        self.MASTER_SOURCE_SDIR = self.MASTER_D_URL + '/tmp/vCingSlave/' + self.toposPool
         self.max_time_to_wait = 365 * 24 * 60 * 60                    # a year in seconds
-        self.max_time_to_wait_per_job = max_time_to_wait_per_job      # 2p80 took the longest: 5.2 hours.
+#        self.max_time_to_wait_per_job = max_time_to_wait_per_job      # 2p80 took the longest: 5.2 hours.
+        self.max_time_to_wait_per_job = 86400*2, # two days
         self.time_sleep_when_no_token = 5 * 60                        # 5 minutes
         self.lockTimeOut = 5 * 60                                     # 5 minutes
     # end def
