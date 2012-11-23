@@ -14,6 +14,7 @@ Author: Jurgen F. Doreleijers, BMRB, September 2001
 from cing.Libs.NTutils import * #@UnusedWildImport
 import signal
 import types
+from datetime import datetime
 
 __author__    = "$Author$"
 ___revision__ = "$Revision$"
