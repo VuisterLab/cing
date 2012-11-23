@@ -23,6 +23,7 @@ from cing.NRG import * #@UnusedWildImport
 from cing.Scripts.vCing.Utils import prepareMaster
 from cing.main import getStartMessage
 from cing.main import getStopMessage
+from datetime import datetime
 
 # Will be overridden by local settings.
 master_ssh_url_local    = 'i@nmr'
@@ -138,6 +139,7 @@ class Vcing(Lister):
             time.sleep(sleepTime)
             sleptTime += sleepTime
             nTdebug("keepLockFresh doing a refreshLock")
+            nTdebug("Time is %s" % str(datetime.now()))
             status = self.refreshLock(lockname, lockTimeOut)
 #            nTdebug("In keepLockFresh got status: %s and result (if any) [%s]" % (status, result))
             if status:
@@ -279,18 +281,21 @@ class Vcing(Lister):
             exitCode, token, tokenLock = self.nextTokenWithLock(self.lockTimeOut)
             if exitCode:
                 nTmessage("Nothing returned by self.nextTokenWithLock(). Sleeping for 5 minutes and trying again.")
+                nTdebug("Time is %s" % str(datetime.now()))
                 time.sleep(self.time_sleep_when_no_token)
                 continue
             # end if            
             time.sleep(2)
             pid = p.process_fork(self.keepLockFresh, [tokenLock, self.lockTimeOut])
             nTdebug("Created a background process [%s] keeping the lock" % pid)
+            nTdebug("Time is %s" % str(datetime.now()))
             time.sleep(2)
             tokenContent = self.getToken(token)
             if tokenContent == None:
                 tokenContent = self.NO_TOKEN_CONTENT_STR
                 msg = "Failed to get token content. Deleting token."
                 nTerror(msg)
+                nTdebug("Time is %s" % str(datetime.now()))
                 self.slaveEndAndLog(self.LEVEL_ERROR_STR, token, tokenContent, msg)
                 continue
             # end if
@@ -300,6 +305,7 @@ class Vcing(Lister):
 
             # The script needs itself to send the results all included.
             nTmessage("Found tokenContent: %s" % tokenContent)
+            nTdebug("Time is %s" % str(datetime.now()))  
             tokenPartList = tokenContent.split()
             cmdToken = tokenPartList[0]
             parTokenListStr = ' '.join(tokenPartList[1:])
@@ -312,30 +318,36 @@ class Vcing(Lister):
 #            cmdProgram = ExecuteProgram(cmdReal, rootPath=cingDirTmp, redirectOutputToFile=log_file_name)
             cmdProgram = 'cd %s; %s %s > %s 2>&1' % (cingDirTmp, cmdReal, parTokenListStr, log_file_name)
             nTmessage("Running payload %s" % cmdProgram)
+            nTdebug("Time is %s" % str(datetime.now()))
             job = (do_cmd, (cmdProgram,))
             job_list = [ job ]
             f = ForkOff(max_time_to_wait=self.max_time_to_wait_per_job)
             done_entry_list = f.forkoff_start(job_list, delay_between_submitting_jobs=1)
             cmdExitCode = 1
-            if done_entry_list: # length will jobs done successfully.
+            if done_entry_list: # length will be jobs done successfully.
                 cmdExitCode = 0
             # end if
             fs = os.path.getsize(log_file_name)
             nTmessage("Payload returned with status: %s and log file size %s" % (cmdExitCode, fs))
+            nTdebug("Time is %s" % str(datetime.now()))
             targetUrl = '/'.join([self.master_target_url, self.MASTER_TARGET_LOG])
             if putFileBySsh(log_file_name, targetUrl):
                 nTerror("In runSlaveThread failed putFileBySsh")
+                nTdebug("Time is %s" % str(datetime.now()))
             # end if
             if cmdExitCode:
                 nTerror("Failed payload")
+                nTdebug("Time is %s" % str(datetime.now()))
                 if self.deleteLock(tokenLock):
                     nTerror("Failed to delete lock %s" % tokenLock)
+                    nTdebug("Time is %s" % str(datetime.now()))
                 # end if
                 self.slaveEndAndLog(self.LEVEL_ERROR_STR, token, tokenContent, self.COMMAND_FAILED_STR)
                 continue
             # end if
             self.slaveEndAndLog(self.LEVEL_MSG_STR, token, tokenContent, self.COMMAND_FINISHED_STR)
             tokensFinished += 1
+            nTdebug("Time is %s, finished token" % str(datetime.now()))
         # end while
     #  if [ "$?" != "0" ]; then
     #    $TOPOS deleteLock $POOL ${tokeninfo[1]}
