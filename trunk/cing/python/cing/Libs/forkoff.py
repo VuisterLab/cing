@@ -385,6 +385,7 @@ class Process:
             raise strMsg
         if self.verbosity > 2:
             nTmessage("Starting subprocess with pid: %s" % os.getpid())
+            nTdebug("Time is %s" % str(datetime.now()))
 #        if self.verbosity > 8:
 #            nTdebug("Setting gpid from [%s] to current pid" % os.getpgrp())
 

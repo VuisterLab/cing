@@ -656,6 +656,13 @@ end if
                 return True
             # end if
         # end if
+        
+        # We might have to wait for the log file to exist
+        if not os.path.exists(logFileName):
+            while not os.path.exists(logFileName):
+                nTdebug('The log %s does not exist (yet). We wait 2 seconds for the file to be created.')
+                time.sleep(2)
+            
         timeTaken, entryCrashed, nr_error, _nr_warning, _nr_message, _nr_debug = analyzeXplorLog(logFileName)
 
         # When reporting always show log file name because output to stderr easily gets mingled.

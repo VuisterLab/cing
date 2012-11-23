@@ -98,7 +98,7 @@ class NmrRedo(NrgCing):
         inputDir = 'file://' + self.nrgCing.results_dir + '/' + DATA_STR
         outputDir = self.results_dir
         storeCING2db =          "1" # DEFAULT: '1' All arguments need to be strings.
-        filterTopViolations =   '0' # DEFAULT: '1'
+        filterTopViolations =   '1' # DEFAULT: '1'
         filterVasco =           '0'
         singleCoreOperation =   '1'
         # Tune this to:
