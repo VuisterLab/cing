@@ -59,4 +59,5 @@ Towards the end long running jobs will enjoy full cpu power.
 It will not help me finish the first jobs sooner.
 VMs with no load at the end can be shot.
 Wilmar mentions it might be too much of an overcommit.
+Wouter: during NMR_REDO runs this seems to cause memory problems: processes are killed randomly by the system!
 
