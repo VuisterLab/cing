@@ -386,9 +386,14 @@ def anneal(config, project, parameters, doPrint=0):
         )
     done_list = f.forkoff_start(job_list, 0) # delay 0 second between jobs.
     nTmessage("Finished ids: %s", done_list)
+    notDone = parameters.modelCountAnneal - len(done_list) 
+    nTwarning("Failed to anneal %s", notDone) # We print how many models failed to anneal, and try to continue without them 
+    nTdebug("Only finished ids will be kept")
+    parameters.modelsAnneal = list2asci(done_list)         
+
+    
+    # Only if the list is empty, we want to return True    
     if not done_list:
-        notDone = parameters.modelCountAnneal - len(done_list) 
-        nTerror("Failed to anneal %s", notDone)
         return True
 #end def
 
