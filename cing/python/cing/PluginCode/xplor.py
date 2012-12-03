@@ -201,12 +201,20 @@ def exportDihList2xplor( drl, path)   :
         nTerror('exportDihList2xplor: unable to open "%s"\n', path )
         return None
     #end def
+    noneWarn = False
     for dr in drl:
-        fprintf( fp, '%s\n', dr.export2xplor() )
+        # We don't want to export the restraint if it has no value
+        # No upper or lower bound is as worse as not upper and lower bounds 
+        if dr.lower is not None and dr.upper is not None:
+            fprintf( fp, '%s\n', dr.export2xplor() )
+        else:
+            noneWarn = True
     #end for
 
     fp.close()
     nTmessage('==> Exported %s to "%s"', drl, path)
+    if noneWarn:
+        nTwarning('exportDihList2xplor: dihedral restraint(s) with value None not exported to xplor')
     #end if
     return drl
 #end def
