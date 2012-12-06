@@ -150,3 +150,26 @@ SELECT e.pdb_id, e.distance_count, e.dihedral_count
     AND e.dihedral_count > 50
     AND e.rdc_count = 0
 ;
+
+DROP TABLE IF EXISTS wt.first_set_comp CASCADE;
+CREATE TABLE wt.first_set_comp AS
+SELECT re.pdb_id,
+		ce.rog AS o_rog, re.rog AS re_rog,
+		ce.wi_quachk AS o_wi_quachk, re.wi_quachk AS re_wi_quachk, -- 1 st generation packing quality
+		ce.wi_nqachk AS o_wi_nqachk, re.wi_nqachk AS re_wi_nqachk, -- 2 nd generation packing quality
+		ce.wi_ramchk AS o_wi_ramchk, re.wi_ramchk AS re_wi_ramchk, -- ramachandran plot appearance
+		ce.wi_c12chk AS o_wi_c12chk, re.wi_c12chk AS re_wi_c12chk, -- chi-1/chi-2 rotamer normality
+		--ce.wi_rotchk AS o_wi_rotchk, re.wi_rotchk AS re_wi_rotchk, -- rotamer normality
+		ce.wi_bbcchk AS o_wi_bbcchk, re.wi_bbcchk AS re_wi_bbcchk, -- backbone normality
+		ce.dis_rms_all AS o_dis_rms_all, re.dis_rms_all AS re_dis_rms_all,
+		--ce.dis_av_all AS o_dis_av_all, re.dis_av_all AS re_dis_av_all,
+		--ce.dis_av_viol AS o_dis_av_viol, re.dis_av_viol AS re_dis_av_viol,
+		ce.dis_c5_viol AS o_dis_c5_viol, re.dis_c5_viol AS re_dis_c5_viol,
+		ce.dih_rms_all AS o_dih_rms_all, re.dih_rms_all AS re_dih_rms_all,
+		--ce.dih_av_all AS o_dih_av_all, re.dih_av_all AS re_dih_av_all,
+		--ce.dih_av_viol AS o_dih_av_viol, re.dih_av_viol AS re_dih_av_viol,
+		ce.dih_c5_viol AS o_dih_c5_viol, re.dih_c5_viol AS re_dih_c5_viol
+	FROM nrgcing.cingentry ce, nmr_redo.cingentry re
+	WHERE ce.pdb_id = re.pdb_id
+	ORDER BY re.name;
+--\copy wt.first_set_comp to '282_BB_comp.tab' csv header

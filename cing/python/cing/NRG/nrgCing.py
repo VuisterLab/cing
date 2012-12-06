@@ -2500,7 +2500,7 @@ class NrgCing(Lister):
 #        if not self.isProduction:
 #            archive_id=ARCHIVE_DEV_NRG_ID
         extraArgList = (self.archive_id,) # note that for length one tuples the comma is required.
-
+        
         doScriptOnEntryList(pythonScriptFileName,
                             entryListFileName,
                             self.results_dir,
@@ -2512,6 +2512,7 @@ class NrgCing(Lister):
 #                            shuffleBeforeSelecting  = False,                            
                             extraArgList            = extraArgList)
         nTmessage("Done with storeCING2db.")
+        
     # end def
     
     def forEachStoredEntry(self):

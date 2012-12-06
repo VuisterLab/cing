@@ -41,7 +41,7 @@ def mainRefineEntry(entryId, *extraArgList):
     """inputDir may be a directory or a url. A url needs to start with http://.
     """
 
-    fastestTest = 0 # DEFAULT: False
+    fastestTest = 1 # DEFAULT: False
     modelCountAnneal, bestAnneal, best = 200, 50, 25    
     htmlOnly = False # default: False but enable it for faster runs without some actual data.
     doWhatif = True # disables whatif actual run
@@ -235,8 +235,21 @@ def mainRefineEntry(entryId, *extraArgList):
 ####> MAIN UTILITY HERE
     if project.fullRedo(modelCountAnneal = modelCountAnneal, bestAnneal = bestAnneal, best = best):  
         nTerror("Failed fullAnnealAndRefine.")
+        
+        # Store the unfinished results
+        # We don't need a time stamp because we are interested 
+        # in the most recent unfinished (failed) run
+        directoryNameCing = entryId + ".cing"
+        startFileNameCing = directoryNameCing + ".tgz"
+        unfTgzFileNameCing = directoryNameCing + ".unf.tgz"
+        if not createTgz(unfTgzFileNameCing, directoryNameCing):
+            # If the new tgz file was created, delete the old tgz and dir
+            cleanCingTgzAndDir(startFileNameCing, directoryNameCing)
+            # We send the new tgz file from a higher level (constants) # TODO: change?
+        else: # do NOT remove old tgz nor dir
+            pass
+        # end if/else
         return True
-    
           
     
     if ranges != None:
@@ -270,29 +283,44 @@ def mainRefineEntry(entryId, *extraArgList):
     if tgzCing:
         directoryNameCing = entryId + ".cing"
         tgzFileNameCing = directoryNameCing + ".tgz"
-        if os.path.exists(tgzFileNameCing):
-            nTwarning("Overwriting: " + tgzFileNameCing)
-        cmd = "tar -czf %s %s" % (tgzFileNameCing, directoryNameCing)
-        nTdebug("cmd: %s" % cmd)
-#        do_cmd(cmd)
-        status, result = commands.getstatusoutput(cmd)
-        if status:
-            nTerror("Failed to tar status: %s with result %s" % (status, result))
-            return True
-        if isRemoteOutputDir:
-            if putFileBySsh(tgzFileNameCing, outputDir, ntriesMax = 2):
-                nTerror("Failed to send File By Scp status: %s with result %s" % (status, result))
-                nTerror("Maintaining results.")
-                return True
-            # end if
-            nTmessage("Removing tgz result: %s" % tgzFileNameCing)
-            os.remove(tgzFileNameCing)
-            nTmessage("Removing cing dir itself: %s" % directoryNameCing)
-            rmdir(directoryNameCing)
-        else: # do NOT remove local copy
-            pass
-        # end if/else
+        if not createTgz(tgzFileNameCing, directoryNameCing):
+            # If the tgz file was created, send it
+            if isRemoteOutputDir:
+                sendTgzAndClean(tgzFileNameCing, directoryNameCing, outputDir)
+            else: # do NOT remove local copy
+                pass
+            # end if/else
+        # end if
     # end if tgzCing
+# end def
+
+def createTgz(tgzName, dirName):
+    if os.path.exists(tgzName):
+        nTwarning("Overwriting: " + tgzName)
+    # end if
+    cmd = "tar -czf %s %s" % (tgzName, dirName)
+    nTdebug("cmd: %s" % cmd)
+#        do_cmd(cmd)
+    status, result = commands.getstatusoutput(cmd)
+    if status:
+        nTerror("Failed to tar status: %s with result %s" % (status, result))
+        return True
+    # end if
+#end def
+
+def sendTgzAndClean(tgzName, dirName, sendDir):
+    if putFileBySsh(tgzName, sendDir, ntriesMax = 2):
+        nTerror("Failed to send File By Scp. Maintaining results")
+        return True
+    # end if
+    cleanCingTgzAndDir(tgzName, dirName)
+# end def
+
+def cleanCingTgzAndDir(tgzName, dirName):
+    nTmessage("Removing tgz result: %s" % tgzName)
+    os.remove(tgzName)
+    nTmessage("Removing cing dir itself: %s" % dirName)
+    rmdir(dirName)
 # end def
 
 if __name__ == "__main__":
