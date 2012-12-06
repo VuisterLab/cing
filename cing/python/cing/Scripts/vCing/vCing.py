@@ -352,7 +352,7 @@ class Vcing(Lister):
             if(os.path.exists(unfTgzFileName)):
                 targetUrl = '/'.join([self.master_target_url, self.MASTER_TARGET_UNF])
                 # Send it to the master
-                if putFileBySsh(log_file_name, targetUrl):
+                if putFileBySsh(unfTgzFileName, targetUrl):
                     nTerror("In runSlaveThread failed putFileBySsh for unfinished cing tgz")
                     nTdebug("Time is %s" % str(datetime.now()))
                 # end if
