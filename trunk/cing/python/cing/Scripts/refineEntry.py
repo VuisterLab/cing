@@ -41,7 +41,7 @@ def mainRefineEntry(entryId, *extraArgList):
     """inputDir may be a directory or a url. A url needs to start with http://.
     """
 
-    fastestTest = 1 # DEFAULT: False
+    fastestTest = 0 # DEFAULT: False
     modelCountAnneal, bestAnneal, best = 200, 50, 25    
     htmlOnly = False # default: False but enable it for faster runs without some actual data.
     doWhatif = True # disables whatif actual run
