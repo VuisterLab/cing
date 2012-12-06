@@ -71,12 +71,12 @@ class NmrRedo(NrgCing):
 #            self.entry_list_todo += "1brv".split()
         if 1: # DEFAULT: 0
             nTmessage("Going to use specific entry_list_todo in prepare")
-            self.entry_list_todo = readLinesFromFile('/Library/WebServer/Documents/NRG-CING/list/entry_list_recoord_nrgcing_shuffled.csv')
-            self.entry_list_todo = NTlist( *self.entry_list_todo )
+#            self.entry_list_todo = readLinesFromFile('/Library/WebServer/Documents/NRG-CING/list/entry_list_recoord_nrgcing_shuffled.csv')
 #            self.entry_list_todo = readLinesFromFile(os.path.join(self.results_dir, 'entry_list_nmr_random_1-500.csv'))
-#            self.entry_list_todo = readLinesFromFile(os.path.join(self.results_dir, 'entry_list_prep_todo.csv'))
+            self.entry_list_todo = readLinesFromFile(os.path.join(self.results_dir, 'list/nmr_redo_test_290.csv'))
 #            self.entry_list_nmr = deepcopy(self.entry_list_todo)
 #            self.entry_list_nrg_docr = deepcopy(self.entry_list_todo)
+            self.entry_list_todo = NTlist( *self.entry_list_todo )
         if 0: # DEFAULT: False
             self.searchPdbEntries()
             self.entry_list_todo = readLinesFromFile(os.path.join(self.results_dir, 'entry_list_prep_todo.csv'))
@@ -127,5 +127,5 @@ class NmrRedo(NrgCing):
 # end class.
 
 if __name__ == '__main__':
-    max_entries_todo = 10 # DEFAULT: 10
+    max_entries_todo = 290 # DEFAULT: 10
     runNrgCing( useClass = NmrRedo, max_entries_todo = max_entries_todo )

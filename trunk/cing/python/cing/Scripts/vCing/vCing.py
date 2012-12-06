@@ -64,6 +64,7 @@ class Vcing(Lister):
 
     MASTER_TARGET_LOG = 'log' # Payload log
     MASTER_TARGET_LOG2 = 'log2' # For slave's log (just a one or two lines
+    MASTER_TARGET_UNF = 'unfinished'
     MASTER_TARGET_RESULT = 'result' # Payload result
 
     def __init__(self, master_ssh_url=None, master_d=None, cmdDict='', toposPool = None, max_time_to_wait_per_job = 60 * 60 * 6):
@@ -346,6 +347,19 @@ class Vcing(Lister):
                 continue
             # end if
             self.slaveEndAndLog(self.LEVEL_MSG_STR, token, tokenContent, self.COMMAND_FINISHED_STR)
+            # Check if unfinished cing tgz file exists
+            unfTgzFileName = tokenPartList[1] + ".cing.unf.tgz"
+            if(os.path.exists(unfTgzFileName)):
+                targetUrl = '/'.join([self.master_target_url, self.MASTER_TARGET_UNF])
+                # Send it to the master
+                if putFileBySsh(log_file_name, targetUrl):
+                    nTerror("In runSlaveThread failed putFileBySsh for unfinished cing tgz")
+                    nTdebug("Time is %s" % str(datetime.now()))
+                # end if
+                # Remove the unfinished cing tgz file from the slave
+                nTmessage("Removing tgz result: %s" % unfTgzFileName)
+                os.remove(unfTgzFileName)
+            # end if
             tokensFinished += 1
             nTdebug("Time is %s, finished token" % str(datetime.now()))
         # end while
