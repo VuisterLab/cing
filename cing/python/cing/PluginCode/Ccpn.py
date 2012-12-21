@@ -1596,7 +1596,7 @@ class Ccpn:
                 rdcRestraintList.append(rdcRestraint)
             # end for
             if len(rdcRestraintList) == 0:
-                nTdetail("Ccpn distance restraint list remained empty and will be removed")
+                nTdetail("Ccpn RDC restraint list remained empty and will be removed")
                 self.project.rdcs.delete(ccpnRdcListName)
 
         # end for

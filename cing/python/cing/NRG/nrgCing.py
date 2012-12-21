@@ -2361,7 +2361,7 @@ class NrgCing(Lister):
 #            self.entry_list_todo = readLinesFromFile(os.path.join(self.results_dir, 'entry_list_dummy.csv'))
 #            self.entry_list_todo = self.entry_list_todo[:100]
 #            self.entry_list_todo = "1brv 1m4e".split() # Or other 10 residue entries:  1n6t 1p9f 1idv 1kuw 1n9u 1hff  1r4h
-            self.entry_list_todo = readLinesFromFile(os.path.join(self.results_dir,'../NMR_REDO/list/nmr_redo_test_1_100.csv'))
+            self.entry_list_todo = readLinesFromFile(os.path.join(self.results_dir,'list/nmr_redo_3188_7Dec.csv'))
             # invalids 1nxn 1gac 1t5n
             self.entry_list_todo = NTlist( *self.entry_list_todo )
         # end if

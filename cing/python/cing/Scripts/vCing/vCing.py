@@ -140,15 +140,17 @@ class Vcing(Lister):
             time.sleep(sleepTime)
             sleptTime += sleepTime
             nTdebug("keepLockFresh doing a refreshLock")
-            nTdebug("Time is %s" % str(datetime.now()))
+            #nTdebug("Time is %s" % str(datetime.now()))
             status = self.refreshLock(lockname, lockTimeOut)
 #            nTdebug("In keepLockFresh got status: %s and result (if any) [%s]" % (status, result))
             if status:
                 nTmessage("In keepLockFresh got status: %s. This indicates that the token process finished." % status)
+                nTdebug("Time is %s" % str(datetime.now()))
                 break
             # end if
             if sleptTime > maxSleapingTime:
                 nTerror("refreshLock should have exited by itself but apparently not after: %s" % sleptTime)
+                nTdebug("Time is %s" % str(datetime.now()))
                 break
             # end if
         # end while
@@ -282,7 +284,7 @@ class Vcing(Lister):
             exitCode, token, tokenLock = self.nextTokenWithLock(self.lockTimeOut)
             if exitCode:
                 nTmessage("Nothing returned by self.nextTokenWithLock(). Sleeping for 5 minutes and trying again.")
-                nTdebug("Time is %s" % str(datetime.now()))
+                #nTdebug("Time is %s" % str(datetime.now()))
                 time.sleep(self.time_sleep_when_no_token)
                 continue
             # end if            

@@ -104,7 +104,17 @@ SELECT s.pdbid AS pdbid, SUM(p2.val * p3.val) AS weight
   WHERE p1.val = 'polymer'
   GROUP BY s.pdbid;
   
+-- list chain types in nrgcing
+  SELECT s.chain_type, count(s.chain_type)
+  FROM nrgcing.cingentry e, pdbj.brief_summary s
+  WHERE e.pdb_id = s.pdbid
+  --AND NOT '{2}' <@ s.chain_type -- about 1000 entries
+  GROUP BY s.chain_type
+  ORDER BY s.chain_type
+; -- 1: peptide (protein_D)? 2: protein  3: dna  4: rna  5: saccharide  6:   7: hybrid (rna/dna)
+  
   -- create table entry_list_selection again
+  -- First 290 entries at BitBrains
 DROP TABLE IF EXISTS wt.entry_list_selection CASCADE;
 CREATE TABLE wt.entry_list_selection AS
 SELECT e.pdb_id
@@ -118,7 +128,7 @@ SELECT e.pdb_id
     AND e.symmetry = 'SYMMETRY_C1' -- only monomers
     AND e.name NOT IN (SELECT name FROM wt.enWiUnComRes) -- no entries that have uncommon residues
     AND s.docid NOT IN (SELECT distinct docid FROM pdbj."//pdbx_nmr_software/name" n WHERE n.val LIKE '%HADDOCK%') -- exclude haddock entries
-    AND s.deposition_date > (current_date - interval '3 years')
+    AND s.deposition_date > (current_date - interval '3 years') -- at the time if execution: after 2009-11-16
     AND e.distance_count between 500 and 4000
     AND e.dihedral_count between 60 and 300
     AND e.rdc_count = 0
@@ -132,24 +142,45 @@ SELECT e.pdb_id
 --    	)
 ORDER BY e.pdb_id;
 
-DROP TABLE IF EXISTS wt.entry_list_selection_info CASCADE;
-CREATE TABLE wt.entry_list_selection_info AS
-SELECT e.pdb_id, e.distance_count, e.dihedral_count
+-- Big run 3188_7Dec
+DROP TABLE IF EXISTS wt.entry_list_selection CASCADE;
+CREATE TABLE wt.entry_list_selection AS
+SELECT e.pdb_id
   FROM nrgcing.cingentry e, pdbj.brief_summary s, wt.polweight pw
   WHERE e.pdb_id = s.pdbid
     AND e.pdb_id = pw.pdbid
-    AND e.model_count > 9
-    AND pw.weight > 3500.0 -- about 30 residues
+    --AND e.model_count > 9
+    --AND pw.weight > 3500.0 -- about 30 residues
     AND '{2}' <@ s.chain_type -- contains at least one protein chain.
-    AND e.is_multimeric IS FALSE -- no multiple chains (what if structures have ions in different chains? now exclude)
-    AND e.symmetry = 'SYMMETRY_C1' -- only monomers
+    AND e.is_multimeric IS FALSE -- no multiple chains (what if structures have ions in different chains? now exclude) -- about 860 entries excluded
+    AND e.symmetry = 'SYMMETRY_C1' -- only monomers -- another 150 entries excluded
     AND e.name NOT IN (SELECT name FROM wt.enWiUnComRes) -- no entries that have uncommon residues
     AND s.docid NOT IN (SELECT distinct docid FROM pdbj."//pdbx_nmr_software/name" n WHERE n.val LIKE '%HADDOCK%') -- exclude haddock entries
-    AND s.deposition_date > (current_date - interval '3 years')
-    AND e.distance_count > 50
-    AND e.dihedral_count > 50
-    AND e.rdc_count = 0
-;
+    --AND s.deposition_date > (current_date - interval '3 years') -- at the time if execution: after 2009-11-16
+    AND (e.distance_count > 50 OR e.dihedral_count > 0)
+    AND e.rdc_count = 0 -- about 230 entries excluded
+    AND e.pdb_id NOT IN (SELECT distinct pdb_id FROM nmr_redo.cingentry)
+ORDER BY e.pdb_id;
+--\copy wt.entry_list_selection to nmr_redo_3188_7Dec.csv
+
+DROP TABLE IF EXISTS wt.entry_list_selection_info CASCADE;
+CREATE TABLE wt.entry_list_selection_info AS
+SELECT e.pdb_id, e.distance_count, e.dihedral_count, e.model_count, pw.weight, s.chain_type, e.is_multimeric, e.symmetry
+  FROM nrgcing.cingentry e, pdbj.brief_summary s, wt.polweight pw
+  WHERE e.pdb_id = s.pdbid
+    AND e.pdb_id = pw.pdbid
+    --AND e.model_count > 9
+    --AND pw.weight > 3500.0 -- about 30 residues
+    AND '{2}' <@ s.chain_type -- contains at least one protein chain.
+    AND e.is_multimeric IS FALSE -- no multiple chains (what if structures have ions in different chains? now exclude) -- about 860 entries excluded
+    AND e.symmetry = 'SYMMETRY_C1' -- only monomers -- another 150 entries excluded
+    AND e.name NOT IN (SELECT name FROM wt.enWiUnComRes) -- no entries that have uncommon residues
+    AND s.docid NOT IN (SELECT distinct docid FROM pdbj."//pdbx_nmr_software/name" n WHERE n.val LIKE '%HADDOCK%') -- exclude haddock entries
+    --AND s.deposition_date > (current_date - interval '3 years') -- at the time if execution: after 2009-11-16
+    AND (e.distance_count > 50 OR e.dihedral_count > 0)
+    AND e.rdc_count = 0 -- about 230 entries excluded
+    AND e.pdb_id NOT IN (SELECT distinct pdb_id FROM nmr_redo.cingentry)
+ORDER BY e.pdb_id;
 
 DROP TABLE IF EXISTS wt.first_set_comp CASCADE;
 CREATE TABLE wt.first_set_comp AS
@@ -173,3 +204,26 @@ SELECT re.pdb_id,
 	WHERE ce.pdb_id = re.pdb_id
 	ORDER BY re.name;
 --\copy wt.first_set_comp to '282_BB_comp.tab' csv header
+
+DROP TABLE IF EXISTS wt.comp CASCADE;
+CREATE TABLE wt.comp AS
+SELECT re.pdb_id,
+		ce.rog AS o_rog, re.rog AS re_rog,
+		ce.wi_quachk AS o_wi_quachk, re.wi_quachk AS re_wi_quachk, -- 1 st generation packing quality
+		ce.wi_nqachk AS o_wi_nqachk, re.wi_nqachk AS re_wi_nqachk, -- 2 nd generation packing quality
+		ce.wi_ramchk AS o_wi_ramchk, re.wi_ramchk AS re_wi_ramchk, -- ramachandran plot appearance
+		ce.wi_c12chk AS o_wi_c12chk, re.wi_c12chk AS re_wi_c12chk, -- chi-1/chi-2 rotamer normality
+		--ce.wi_rotchk AS o_wi_rotchk, re.wi_rotchk AS re_wi_rotchk, -- rotamer normality
+		ce.wi_bbcchk AS o_wi_bbcchk, re.wi_bbcchk AS re_wi_bbcchk, -- backbone normality
+		ce.dis_rms_all AS o_dis_rms_all, re.dis_rms_all AS re_dis_rms_all,
+		--ce.dis_av_all AS o_dis_av_all, re.dis_av_all AS re_dis_av_all,
+		--ce.dis_av_viol AS o_dis_av_viol, re.dis_av_viol AS re_dis_av_viol,
+		ce.dis_c5_viol AS o_dis_c5_viol, re.dis_c5_viol AS re_dis_c5_viol,
+		ce.dih_rms_all AS o_dih_rms_all, re.dih_rms_all AS re_dih_rms_all,
+		--ce.dih_av_all AS o_dih_av_all, re.dih_av_all AS re_dih_av_all,
+		--ce.dih_av_viol AS o_dih_av_viol, re.dih_av_viol AS re_dih_av_viol,
+		ce.dih_c5_viol AS o_dih_c5_viol, re.dih_c5_viol AS re_dih_c5_viol
+	FROM nrgcing.cingentry ce, nmr_redo.cingentry re
+	WHERE ce.pdb_id = re.pdb_id
+	ORDER BY re.name;
+--\copy wt.comp to '282_BB_comp.tab' csv header

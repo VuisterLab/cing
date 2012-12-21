@@ -27,6 +27,7 @@ Other notes:
 from Refine.NTxplor import * #@UnusedWildImport
 from Refine.Utils import * #@UnusedWildImport
 from Refine.configure import config
+from cing.PluginCode.required.reqNih import TALOSPLUS_LIST_STR
 from cing.Libs.AwkLike import AwkLike
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.Libs.disk import copy
@@ -136,17 +137,24 @@ def doSetup(config, project, basePath, options):
     nTmessage('==> Exporting %s to %s for refinement', project, basePath)
 
     for drl in project.distances:
-        drl.renameToXplorCompatible()
-        xplor.noeRestraints.append(refineNoeParameters(drl.name))
-        fname = xplor.joinPath(xplor.directories.tables, drl.name + '.tbl')
-        drl.export2xplor(fname)
+        if drl.status == 'keep':
+            drl.renameToXplorCompatible()
+            xplor.noeRestraints.append(refineNoeParameters(drl.name))
+            fname = xplor.joinPath(xplor.directories.tables, drl.name + '.tbl')
+            drl.export2xplor(fname)
+        #end if
     #end for
 
     for drl in project.dihedrals:
-        drl.renameToXplorCompatible()
-        xplor.dihedralRestraints.append(refineDihedralParameters(drl.name))
-        fname = xplor.joinPath(xplor.directories.tables, drl.name + '.tbl')
-        drl.export2xplor(fname)
+        if ((drl.name == TALOSPLUS_LIST_STR) & (drl.status != 'noRefine')) :
+            drl.status = 'noRefine'
+        #end if
+        if drl.status == 'keep':
+            drl.renameToXplorCompatible()
+            xplor.dihedralRestraints.append(refineDihedralParameters(drl.name))
+            fname = xplor.joinPath(xplor.directories.tables, drl.name + '.tbl')
+            drl.export2xplor(fname)
+        #end if
     #end for
 
     # export structures in Xplor-PDB format

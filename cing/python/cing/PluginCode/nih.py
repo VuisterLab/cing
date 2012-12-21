@@ -1545,7 +1545,7 @@ def restoreTalosPlus( project, tmp=None ):
     return
 #end def
 
-def talosPlus2restraints( project, name=TALOSPLUS_LIST_STR, status='keep', errorFactor=2.0 ):
+def talosPlus2restraints( project, name=TALOSPLUS_LIST_STR, status='noRefine', errorFactor=2.0 ):
     """
     Convert talos+ results to a CING dihedral restraint list
     """
