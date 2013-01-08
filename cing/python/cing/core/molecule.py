@@ -6634,7 +6634,12 @@ coordinates: %s"""  , dots, self, dots
         record.z          = coor[2]
         record.tempFactor = coor.Bfac
         record.occupancy  = coor.occupancy
-        record.segID      = chainId + '   '
+        
+        if convention == IUPAC:
+            record.segID      = '    '
+        else:
+            record.segID      = chainId + '   '
+        #endif
 
         return record
     #end def
