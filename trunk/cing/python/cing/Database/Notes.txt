@@ -685,3 +685,8 @@ Changed to sml description of residues.
 Updated INTERNAL_1 directory using mkINTERNAL_1.py script
 Changed to INTERNAL_1 definitions
 
+- 8 Jan 2013 WGT
+Updated Xplor N-terminal and C-terminal name conventions using updateXplorConv script
+N-terminal H1/2/3 changed to HT1/2/3
+C-terminal O changed to OT1
+C-terminal OXT changed to OT2 
