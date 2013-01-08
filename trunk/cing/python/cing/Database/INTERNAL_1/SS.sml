@@ -1,4 +1,4 @@
-<SML> 0.24
+<SML> 0.25
 
 #=======================================================================
 #             	name     convention
@@ -164,7 +164,7 @@
 		topology   = [(0, 'C')]
 		real       = []
 		pseudo     = None
-		nameDict   = {'INTERNAL_0': 'O', 'BMRBd': 'O', 'CYANA': 'O', 'CYANA2': 'O', 'INTERNAL_1': 'O', 'IUPAC': 'O', 'AQUA': 'O', 'PDB': 'O', 'XPLOR': 'O'}
+		nameDict   = {'INTERNAL_0': 'O', 'BMRBd': 'O', 'CYANA': 'O', 'CYANA2': 'O', 'INTERNAL_1': 'O', 'IUPAC': 'O', 'AQUA': 'O', 'PDB': 'O', 'XPLOR': 'O,OT1'}
 		aliases    = []
 		type       = 'O_BYL'
 		spinType   = '16O'

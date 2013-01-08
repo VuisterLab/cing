@@ -694,8 +694,8 @@ def export2PDB(project, tmp = None):
             fname = project.path(project.directories.PDB, mol.name + '.pdb')
             nTdetail('==> Exporting to PDB file "%s"', fname)
             pdbFile = mol.toPDB(fileName = fname, convention = IUPAC)
-#            pdbFile.save(fname)
-            del(pdbFile)
+            pdbFile.save(fname)
+            #del(pdbFile)
             return fname
         #end if
     #end for

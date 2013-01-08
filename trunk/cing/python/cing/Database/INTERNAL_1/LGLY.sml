@@ -1,4 +1,4 @@
-<SML> 0.24
+<SML> 0.25
 
 #=======================================================================
 #             	name     convention
@@ -136,7 +136,7 @@
 		topology   = []
 		real       = []
 		pseudo     = None
-		nameDict   = {'INTERNAL_0': 'O', 'BMRBd': None, 'CYANA': 'O', 'CYANA2': 'O', 'INTERNAL_1': 'O', 'IUPAC': None, 'AQUA': None, 'PDB': None, 'XPLOR': None}
+		nameDict   = {'INTERNAL_0': 'O', 'BMRBd': None, 'CYANA': 'O', 'CYANA2': 'O', 'INTERNAL_1': 'O', 'IUPAC': None, 'AQUA': None, 'PDB': None, 'XPLOR': 'O,OT1'}
 		aliases    = ['O', "O'"]
 		type       = 'PSEUD'
 		spinType   = '16O'
@@ -150,7 +150,7 @@
 		topology   = [(0, 'N')]
 		real       = []
 		pseudo     = None
-		nameDict   = {'INTERNAL_0': 'H2', 'INTERNAL_1': 'H2', 'IUPAC': 'H2', 'CCPN': 'H2', 'XPLOR': 'H2'}
+		nameDict   = {'INTERNAL_0': 'H2', 'INTERNAL_1': 'H2', 'IUPAC': 'H2', 'CCPN': 'H2', 'XPLOR': 'HT3'}
 		aliases    = []
 		type       = 'H_AMI'
 		spinType   = '1H'
@@ -178,7 +178,7 @@
 		topology   = [(0, 'C')]
 		real       = []
 		pseudo     = None
-		nameDict   = {'INTERNAL_0': 'OXT', 'INTERNAL_1': 'OXT', 'IUPAC': "OXT,O''", 'CCPN': "O''", 'XPLOR': 'OXT'}
+		nameDict   = {'INTERNAL_0': 'OXT', 'INTERNAL_1': 'OXT', 'IUPAC': "OXT,O''", 'CCPN': "O''", 'XPLOR': 'OT2'}
 		aliases    = ['OXT', "O''"]
 		type       = 'O_BYL'
 		spinType   = '16O'
