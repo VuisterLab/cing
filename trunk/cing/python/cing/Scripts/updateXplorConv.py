@@ -14,7 +14,7 @@ from cing.core.database import saveToSML
 cing.verbosity = cing.verbosityDebug
 
 if __name__ == '__main__':
-    if 0: # DEFAULT: 1 disable only when needed.
+    if 1: # DEFAULT: 1 disable only when needed.
         nTwarning("Don't execute this script %s by accident. It damages CING." % getCallerFileName())
         sys.exit(1)
     # end if
@@ -23,7 +23,7 @@ if __name__ == '__main__':
 
     for rdef in NTdb.residuesWithProperties('protein'):
         nTdebug("Xplor N-terminal and C-terminal atom name translations changed for %s",rdef)
-        for name1, namex in [('H1','HT1'), ('H2','HT2'), ('H2','HT3'), ('OXT','OT2'), ('O','O,OT1')]:
+        for name1, namex in [('H1','HT1'), ('H2','HT2'), ('H3','HT3'), ('OXT','OT2'), ('O','O,OT1')]:
             if name1 in rdef:
                 rdef[name1].nameDict['XPLOR'] = namex
             #end if
