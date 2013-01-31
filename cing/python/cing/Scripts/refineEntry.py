@@ -232,6 +232,17 @@ def mainRefineEntry(entryId, *extraArgList):
         return True
         # end if
     # end if
+    
+    # Mutate LYSx to LYS residues
+    if len(project.molecule.residuesWithProperties('LYSx')) > 0:
+        nTdebug("%d LYSx residues will be mutated to LYS",len(project.molecule.residuesWithProperties('LYSx')))
+        for res in project.molecule.residuesWithProperties('LYSx'):
+            res.mutate('LYS')
+        # end for
+    # end if    
+    project.save()
+
+
 
 ####> MAIN UTILITY HERE
     if project.fullRedo(modelCountAnneal = modelCountAnneal, bestAnneal = bestAnneal, best = best):  
