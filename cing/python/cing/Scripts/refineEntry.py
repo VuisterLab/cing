@@ -233,13 +233,19 @@ def mainRefineEntry(entryId, *extraArgList):
         # end if
     # end if
     
-    # Mutate LYSx to LYS residues
+    # Mutate LYSx to LYS and ARGx to ARG residues
     if len(project.molecule.residuesWithProperties('LYSx')) > 0:
         nTdebug("%d LYSx residues will be mutated to LYS",len(project.molecule.residuesWithProperties('LYSx')))
         for res in project.molecule.residuesWithProperties('LYSx'):
             res.mutate('LYS')
         # end for
     # end if    
+    if len(project.molecule.residuesWithProperties('ARGx')) > 0:
+        nTdebug("%d ARGx residues will be mutated to ARG",len(project.molecule.residuesWithProperties('ARGx')))
+        for res in project.molecule.residuesWithProperties('ARGx'):
+            res.mutate('ARG')
+        # end for
+    # end if   
     project.save()
 
 
