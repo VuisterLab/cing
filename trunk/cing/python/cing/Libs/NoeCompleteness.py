@@ -171,7 +171,7 @@ class NoeCompleteness( NTdict ):
     
         for r in range(n): # rows by columns; rc
             residue1 = self.resList[r]
-            nTdebug("Caching distances starting from %s" % residue1)            
+#            nTdebug("Caching distances starting from %s" % residue1)            
             residue1Radius = getDeepByKeysOrAttributes(self.resRadiusHash, residue1)
             if not residue1Radius:
                 residue1Radius = 0.0

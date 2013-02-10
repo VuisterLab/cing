@@ -358,4 +358,11 @@ select * from nrgcing.tmpentry4
 where (name = '1cl4' or name = '1m9o' or name = '2kq3') and
 rog = 0;
 
- 
+--# Nice example for Sid
+SELECT e.pdb_id, e.timestamp_last
+FROM nrgcing.cingentry e
+WHERE
+e.timestamp_last = '2012-09-01'
+limit 50;
+
+

@@ -2,9 +2,11 @@
 # However, the new code is not automatically tested for that protocol.
 # This is due to too many complications going from cing to xplor coordinates.
 
+# This is file: $C/python/Refine/README.csh
+
 #WORKFLOW marked ORG for originally used.
 
-set x = 2kq3
+set x = 1brv
 set stage = $x"_redo"
 set ranges = auto
 # Derived but may be overriden.

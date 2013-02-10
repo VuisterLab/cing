@@ -7,8 +7,8 @@
 -- Notes:
 -- * Setup commands are specific for database type: PostgreSQL
 -- * Run by command like:
--- * psql --quiet casdcing casdcing1 < $CINGROOT/scripts/sql/createDB-CING_psql.sql
--- * psql --quiet pdbmlplus pdbj < $CINGROOT/scripts/sql/createDB-CING_psql.sql
+-- * psql --quiet casdcing casdcing1 < $CINGROOT/python/cing/NRG/sql/createDB-CING_psql.sql
+-- * psql --quiet pdbmlplus pdbj     < $CINGROOT/python/cing/NRG/sql/createDB-CING_psql.sql
 --
 -- Or edit and execute:
 -- python -u $CINGROOT/python/cing/NRG/runSqlForSchema.py devnrgcing    $CINGROOT/python/cing/NRG/sql/createDB-CING_psql.sql    .

@@ -1,6 +1,7 @@
 !$Revision: 1.1 $
 !$Date: 2007/06/05 15:13:52 $
 !$RCSfile: generate_water.inp,v $
+! this is file: $C/python/Refine/explicit_solvent/generate_water.inp
 
 ! generate_water.inp
 ! soaks a protein structure in a layer of water
