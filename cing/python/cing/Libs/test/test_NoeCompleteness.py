@@ -32,19 +32,20 @@ class AllChecks(TestCase):
         doCompletenessCheck         = True  # DEFAULT True
         doTheoreticalDihedralCheck  = True  # DEFAULT True
         doHydrogenBondCheck         = True  # DEFAULT True
-        entryId = "1brv" # Testing entry with just 2 models.
+        entryId = "1brv" # DEFAULT Testing entry with just 2 models.
 #        entryId = "1nk4" # Interest of Winston
 #        entryId = "1jve" # Interest of Winston
 #        entryId = "1NK4_DNA" # Interest of Winston
 #        entryId = "complexfit_6_0627_DNA" # Interest of Winston
 #        entryId = "polxbinary" # Interest of Winston
 #        entryId = "cluster1_3_07072012" # Interest of Winston
-        convention = IUPAC # DEFAULT
-#        convention = CNS
+        convention = IUPAC # DEFAULT e.g. for 1brv?
+#        convention = CNS # e.g. for cluster1_3_07072012
         max_dist_expectedOverall = 4.0 # DEFAULT
-#        max_dist_expectedOverall = 6.0
+#        max_dist_expectedOverall = 2.0 # Fast check.
+#        max_dist_expectedOverall = 6.0 # Winston's
 #        ob_file_name = None
-        ob_file_name = os.path.join( cingDirLibs, NoeCompletenessAtomLib.STR_FILE_DIR, 'ob_custom_1.str')
+        ob_file_name = os.path.join( cingDirLibs, NoeCompletenessAtomLib.STR_FILE_DIR, 'ob_custom_2.str')
 #        ranges = 'A.173-178'
         ranges = None
 
