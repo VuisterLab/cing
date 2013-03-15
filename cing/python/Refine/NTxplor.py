@@ -877,7 +877,7 @@ end loop heat
 
 ! refinement at high T:
 constraints
-interaction (not resname ANI) (not resname ANI) weights * 1 dihed 3 end
+interaction (not resname ANI) (not resname ANI) weights * 1 dihed 2 end
 interaction ( resname ANI) ( resname ANI) weights * 1 end
 end
 
@@ -895,7 +895,7 @@ dynamics verlet
 end
 
 constraints
-interaction (not resname ANI) (not resname ANI) weights * 1 dihed 4 end
+interaction (not resname ANI) (not resname ANI) weights * 1 dihed 3 end
 interaction ( resname ANI) ( resname ANI) weights * 1  end
 end
 

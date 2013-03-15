@@ -91,8 +91,8 @@ def mainRefineEntry(entryId, *extraArgList):
     entryCodeChar2and3 = entryId[1:3]
     cing.verbosity = int( extraArgList[IDX_VERBOSITY] )
     inputDir = extraArgList[IDX_INPUT]
-    #outputDir = os.path.join(extraArgList[IDX_OUTPUT], DATA_STR, entryCodeChar2and3, entryId)
-    outputDir = os.path.join(extraArgList[IDX_OUTPUT], "dihed_test", entryCodeChar2and3, entryId)
+    outputDir = os.path.join(extraArgList[IDX_OUTPUT], DATA_STR, entryCodeChar2and3, entryId)
+    #outputDir = os.path.join(extraArgList[IDX_OUTPUT], "dihed_test", entryCodeChar2and3, entryId)
     pdbConvention = extraArgList[IDX_PDB] #@UnusedVariable
     restraintsConvention = extraArgList[IDX_RESTRAINTS]
     archiveType = extraArgList[IDX_ARCHIVE] # Only used for deriving the input location not the output.
