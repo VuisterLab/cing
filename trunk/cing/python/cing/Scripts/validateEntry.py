@@ -294,6 +294,11 @@ def main(entryId, *extraArgList):
         nTerror("Failed to validate project read")
         return True
     # end if filterVasco
+    
+    # Write a single PDB file containing all models 
+    # according to IUPAC conventions 
+    project.export2PDB()
+    
     project.save()
 
     if storeCING2db and archive_id:
