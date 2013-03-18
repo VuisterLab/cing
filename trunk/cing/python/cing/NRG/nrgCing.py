@@ -75,7 +75,7 @@ from cing.NRG.settings import * #@UnusedWildImport
 from cing.Scripts.FC.utils import getBmrbCsCountsFromFile
 from cing.Scripts.doScriptOnEntryList import doFunctionOnEntryList
 from cing.Scripts.doScriptOnEntryList import doScriptOnEntryList
-from cing.Scripts.vCing.vCing import REFINE_ENTRY_STR
+from cing.Scripts.vCing.vCing import REFINE_ENTRY_STR, VALIDATE_ENTRY_NRG_STR
 from cing.Scripts.vCing.vCing import TEST_CING_STR
 from cing.Scripts.vCing.vCing import Vcing
 from cing.Scripts.validateEntry import ARCHIVE_TYPE_BY_CH23
@@ -2301,7 +2301,8 @@ class NrgCing(Lister):
         """
 
 #        jobId = TEST_CING_STR   # DEFAULT: TEST_CING_STR Set for testing.
-        jobId = REFINE_ENTRY_STR
+        #jobId = REFINE_ENTRY_STR
+        jobId = VALIDATE_ENTRY_NRG_STR
         tokenListFileName = os.path.join(self.results_dir, 'token_list_todo.txt')
         # Sync below code with validateEntry#main
 #        vc = Vcing()
@@ -2323,15 +2324,23 @@ class NrgCing(Lister):
         filterVasco = 1
         archiveType = ARCHIVE_TYPE_BY_CH23
         projectType = PROJECT_TYPE_CCPN
-        singleCoreOperation = 1 # changed for NMR_REDO; otherwise overload of processes will lead to memory errors
+        singleCoreOperation = 0
         if jobId == REFINE_ENTRY_STR:
-#            singleCoreOperation = 1
             inputUrl  = 'http://nmr.cmbi.ru.nl/NRG-CING/data'            
             outputUrl =      'i@nmr.cmbi.ru.nl:/mnt/data/D/NMR_REDO'
             archiveType = ARCHIVE_TYPE_BY_CH23_BY_ENTRY
             projectType = PROJECT_TYPE_CING
             filterTopViolations = 0
-            filterVasco = 0            
+            filterVasco = 0
+            singleCoreOperation = 1  # otherwise overload of processes will lead to memory errors for NMR_REDO            
+        # end if
+        # To re-run validation routines
+        if jobId == VALIDATE_ENTRY_NRG_STR:
+            inputUrl  = 'http://nmr.cmbi.ru.nl/NRG-CING/data'            
+            outputUrl =      'i@nmr.cmbi.ru.nl:/mnt/data/D/NRG-CING'
+            archiveType = ARCHIVE_TYPE_BY_CH23_BY_ENTRY
+            projectType = PROJECT_TYPE_CING
+            singleCoreOperation = 1            
         # end if
         extraArgListTxt = """
             %s %s %s
@@ -2340,7 +2349,7 @@ class NrgCing(Lister):
         """ % ( cing.verbosity,  inputUrl, outputUrl,
                 archiveType, projectType,
                 storeCING2db, ranges, filterTopViolations, filterVasco )
-        if jobId == REFINE_ENTRY_STR:
+        if (jobId == REFINE_ENTRY_STR) or (jobId == VALIDATE_ENTRY_NRG_STR):
             extraArgListTxt += " %s " % singleCoreOperation
         # end if
         if jobId == TEST_CING_STR:            
@@ -2361,7 +2370,7 @@ class NrgCing(Lister):
 #            self.entry_list_todo = readLinesFromFile(os.path.join(self.results_dir, 'entry_list_dummy.csv'))
 #            self.entry_list_todo = self.entry_list_todo[:100]
 #            self.entry_list_todo = "1brv 1m4e".split() # Or other 10 residue entries:  1n6t 1p9f 1idv 1kuw 1n9u 1hff  1r4h
-            self.entry_list_todo = readLinesFromFile(os.path.join(self.results_dir,'list/nmr_redo_3188_7Dec.csv'))
+            self.entry_list_todo = readLinesFromFile(os.path.join(self.results_dir,'list/revalidate.csv'))
             # invalids 1nxn 1gac 1t5n
             self.entry_list_todo = NTlist( *self.entry_list_todo )
         # end if
