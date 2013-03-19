@@ -1678,8 +1678,9 @@ class NrgCing(Lister):
 
         doRemoves = 0 # DEFAULT 0 enable to clean up.
         doLog = 1 # DEFAULT 1 disable for testing.
-        doTgz = 1 # DEFAULT 1 disable for testing.
-        doCopyTgz = 1
+        doTgz = 0 # DEFAULT 1 disable for testing.
+        doCopyTgz = 0
+        extractTgzOnly = 1 # DEFAULT 0 enable if tgz is already in correct dir (disable doTgz and doCopyTgz in that case)
 
 #            'Initialize the Vcing class'
         nTmessage("Setting up Vcing")
@@ -1687,7 +1688,7 @@ class NrgCing(Lister):
         nTmessage("Starting with %r" % vc)
 
         entryCodeChar2and3 = entry_code[1:3]
-        entryDir = os.path.join(self.data_dir , entryCodeChar2and3, entry_code)
+        entryDir = os.path.join(self.results_dir+'-NEW', DATA_STR, entryCodeChar2and3, entry_code)
         if not os.path.exists(entryDir):
             nTerror("Skipping %s because dir %s was not found." % (entry_code, entryDir))
             return True
@@ -1761,6 +1762,16 @@ class NrgCing(Lister):
                 os.remove(tgzFileNameCing)
             # end if
         # end if doTgz
+        if extractTgzOnly:
+            tgzFileNameCing = entry_code + ".cing.tgz"
+            cmd = "tar -xzf %s" % tgzFileNameCing
+            nTdebug("cmd: %s" % cmd)
+            status, result = commands.getstatusoutput(cmd)
+            if status:
+                nTerror("Failed to untar status: %s with result %s" % (status, result))
+                return True
+            # end if
+        # end if extractTgzOnly
     # end def
 
     def prepareEntry(self, entry_code,
@@ -2275,7 +2286,8 @@ class NrgCing(Lister):
         self.entry_list_todo = self.entry_list_todo.difference(self.entry_list_done)
         if 1: # Default 1 for now.
             nTmessage("Going to use non-default entry_list_todo in postProcessAfterVc")
-            self.entry_list_todo = readLinesFromFile(os.path.join(self.results_dir, 'entry_list_good_tgz_after_7.csv'))
+#            self.entry_list_todo = readLinesFromFile(os.path.join(self.results_dir, 'entry_list_good_tgz_after_7.csv'))
+            self.entry_list_todo = readLinesFromFile(os.path.join(self.results_dir,'list/entry_list_test20.csv'))
 #            self.entry_list_todo = '1brv 9pcy'.split()
             self.entry_list_todo = NTlist( *self.entry_list_todo )
         # end if
@@ -2301,7 +2313,7 @@ class NrgCing(Lister):
         """
 
 #        jobId = TEST_CING_STR   # DEFAULT: TEST_CING_STR Set for testing.
-        #jobId = REFINE_ENTRY_STR
+#        jobId = REFINE_ENTRY_STR
         jobId = VALIDATE_ENTRY_NRG_STR
         tokenListFileName = os.path.join(self.results_dir, 'token_list_todo.txt')
         # Sync below code with validateEntry#main
@@ -2337,7 +2349,7 @@ class NrgCing(Lister):
         # To re-run validation routines
         if jobId == VALIDATE_ENTRY_NRG_STR:
             inputUrl  = 'http://nmr.cmbi.ru.nl/NRG-CING/data'            
-            outputUrl =      'i@nmr.cmbi.ru.nl:/mnt/data/D/NRG-CING'
+            outputUrl =      'i@nmr.cmbi.ru.nl:/mnt/data/D/NRG-CING-NEW'
             archiveType = ARCHIVE_TYPE_BY_CH23_BY_ENTRY
             projectType = PROJECT_TYPE_CING
             singleCoreOperation = 1            
@@ -2366,11 +2378,13 @@ class NrgCing(Lister):
         self.entry_list_todo.addList(self.entry_list_nmr)
         self.entry_list_todo = self.entry_list_todo.difference(self.entry_list_done)
         if True: # DEFAULT: True
-#            self.entry_list_todo = readLinesFromFile(os.path.join(self.results_dir,'list/entry_list_recoord_nrgcing_shuffled.csv'))
+            self.entry_list_todo = readLinesFromFile(os.path.join(self.results_dir,'list/entry_list_test20.csv'))
 #            self.entry_list_todo = readLinesFromFile(os.path.join(self.results_dir, 'entry_list_dummy.csv'))
 #            self.entry_list_todo = self.entry_list_todo[:100]
-#            self.entry_list_todo = "1brv 1m4e".split() # Or other 10 residue entries:  1n6t 1p9f 1idv 1kuw 1n9u 1hff  1r4h
-            self.entry_list_todo = readLinesFromFile(os.path.join(self.results_dir,'list/revalidate.csv'))
+#            self.entry_list_todo = "2lt9".split() 
+#            Or other 10 residue entries:  
+#            self.entry_list_todo = "1brv 1m4e 1n6t 1p9f 1idv 1kuw 1n9u 1hff 1r4h".split()
+#            self.entry_list_todo = readLinesFromFile(os.path.join(self.results_dir,'list/nmr_redo_3188_7Dec.csv'))
             # invalids 1nxn 1gac 1t5n
             self.entry_list_todo = NTlist( *self.entry_list_todo )
         # end if
