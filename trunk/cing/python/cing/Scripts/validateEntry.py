@@ -256,8 +256,8 @@ def main(entryId, *extraArgList):
 
     if projectType == PROJECT_TYPE_CING:
         # Needs to be copied because the open method doesn't take a directory argument..
-        fullFileNameTgz = os.path.join(inputDir, fileNameTgz)
-        shutil.copy(fullFileNameTgz, '.')
+#        fullFileNameTgz = os.path.join(inputDir, fileNameTgz)
+#        shutil.copy(fullFileNameTgz, '.')
         project = Project.open(entryId, status='old')
         if not project:
             nTerror("Failed to init old project")
