@@ -1,0 +1,12 @@
+NAME = NOE restraints
+TYPE = DIST
+FILE = noe
+//
+NAME = Hydrogen bond restraints
+TYPE = DIST
+FILE = hbonds
+//
+NAME = Dihedral angle restraints
+TYPE = DIHE
+FILE = dihedral
+//

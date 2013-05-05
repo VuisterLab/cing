@@ -1,0 +1,442 @@
+
+======================================================================================================
+|   CING: python NMR/molecule package, version 0.46 alfa                        (c) GWV 2004-2007    |
+======================================================================================================
+==> Importing database file "/Volumes/Users/geerten/Desktop/cing_0.46/cing/Database/dbTable.24May2007" ... done
+==> Creating translation dictionaries ... done
+==> Imported plugin "/Volumes/Users/geerten/Desktop/cing_0.46/cing/PluginCode/BMRB.pyc"
+==> Imported plugin "/Volumes/Users/geerten/Desktop/cing_0.46/cing/PluginCode/cyana.pyc"
+==> Imported plugin "/Volumes/Users/geerten/Desktop/cing_0.46/cing/PluginCode/generatePeaks.pyc"
+==> Imported plugin "/Volumes/Users/geerten/Desktop/cing_0.46/cing/PluginCode/nih.pyc"
+==> Imported plugin "/Volumes/Users/geerten/Desktop/cing_0.46/cing/PluginCode/pdb.pyc"
+==> Imported plugin "/Volumes/Users/geerten/Desktop/cing_0.46/cing/PluginCode/sparky.pyc"
+==> Imported plugin "/Volumes/Users/geerten/Desktop/cing_0.46/cing/PluginCode/validate.pyc"
+==> Imported plugin "/Volumes/Users/geerten/Desktop/cing_0.46/cing/PluginCode/xeasy.pyc"
+==> Imported plugin "/Volumes/Users/geerten/Desktop/cing_0.46/cing/PluginCode/xplor.pyc"
+------------------------------------------------------------------------------------------------------
+==============================================================================
+usage: cing.py [options]       use -h or --help for listing
+
+options:
+  --version             show program's version number and exit
+  -h, --help            show this help message and exit
+  --doc                 Print more documentation to stdout
+  --docdoc              Print full documentation to stdout
+  -n PROJECTNAME, --name=PROJECTNAME
+                        NAME of the project (required)
+  --new                 Start new project
+  --old                 Open a old project
+  --init=SEQUENCEFILE[,CONVENTION]
+                        Initialise from SEQUENCEFILE[,CONVENTION]
+  --initPDB=PDBFILE[,CONVENTION]
+                        Initialise from PDBFILE[,CONVENTION]
+  --xeasy=SEQFILE,PROTFILE,CONVENTION
+                        Import shifts from xeasy SEQFILE,PROTFILE,CONVENTION
+  --xeasyPeaks=SEQFILE,PROTFILE,PEAKFILE,CONVENTION
+                        Import peaks from xeasy
+                        SEQFILE,PROTFILE,PEAKFILE,CONVENTION
+  --merge               Merge resonances
+  --generatePeaks=EXP_NAME,AXIS_ORDER
+                        Generate EXP_NAME peaks with AXIS_ORDER from the
+                        resonance data
+  --script=SCRIPTFILE   Run script from SCRIPTFILE
+  --ipython             Start ipython interpreter
+  --validate            Do validation
+  -q, --quiet           quiet: no/less messages to stdout (default: not quiet)
+  --nosave              Don't save on exit (default: save)
+
+--------------------------------------------------------------------------------
+cing.py: commandline interface to the cing utilities:
+--------------------------------------------------------------------------------
+
+Some examples; all assume a project named 'test':
+
+- To start a new Project:
+cing.py --name test --new
+
+- To start a new Project from a xeasy seq file:
+cing.py --name test --init AD.seq,CYANA 
+
+- To start a new Project from a xeasy seq file and load an xeasy prot file:
+cing.py --name test --init AD.seq,CYANA --xeasy AD.seq,AD.prot,CYANA
+
+- To start a new Project from a CCPN project:
+cing.py --name test --initCCPN ccpn_project.xml
+
+- To start a new Project from a xeasy seq file via CCPN formatConverter and CCPN project:
+cing.py -name test --initXEASY_FC AD.seq,CYANA
+
+- To open an existing Project:
+cing.py --name test 
+
+- To open an existing Project and load an xeasy prot file:
+cing.py --name test --xeasy AD.seq,AD.prot,CYANA
+
+- To open an existing Project and start an interactive python interpreter:
+cing.py --name test --ipython
+
+- To open an existing Project and run a script MYSCRIPT.py:
+cing.py --name test --script MYSCRIPT.py
+
+--------------------------------------------------------------------------------
+Some simple script examples:
+--------------------------------------------------------------------------------
+
+== merging several prot files ==
+project.initResonances()      # removes all resonances from the project
+project.importXeasy( 'N15.seq', 'N15.prot', 'CYANA' )
+project.importXeasy( 'C15.seq', 'C15.prot', 'CYANA' )
+project.importXeasy( 'aro.seq', 'aro.prot', 'CYANA' )
+project.mergeResonances( status='reduce'  )
+
+== Generating a peak file from shifts ==
+project.listPredefinedExperiments() # list all predefined experiments
+peaks = project.generatePeaks('hncaha','HN:HA:N')
+format(peaks)
+
+
+
+-------------------------------------------------------------------------------
+Project: Top level Cing project class
+-------------------------------------------------------------------------------
+
+  Project  -> molecules[Molecule-1, Molecule-2, ...] # Molecules name list
+           -> molecule <-> ... (See Molecule)        # 'Current' molecule
+  
+           -> peakLists[<Peaklist [<Peak>, ...]>]
+          <-> distances[<DistanceRestraintList[<DistanceRestraint>, ...]>]
+          <-> dihedrals[<DihedralRestraintList[<DihedralRestraint>, ...]>]
+
+           -> parameters
+           -> directories
+           -> cingPaths
+           -> plotParameters
+           -> plugins
+  _____________________________________________________________________________
+                  
+    Methods:
+
+    to open a project:
+        project = Project.open( name, status = 'old' )    Open an existing project
+        project = Project.open( name, status = 'new' )    Open a new project
+        project = Project.open( name, status = 'create' ) Open an existing project 
+                                                          if it exists or new project
+                                                          otherwise
+
+    to initialize a Molecule:
+        project.initializeMolecule( sequenceFile, convention )   
+                                                
+                                    convention = CYANA, CYANA2, INTERNAL, LOOSE
+
+    to save a project:
+        project.save()
+
+    to export:
+        project.export()
+
+    to export and save:
+        project.close()
+        
+    to initialize the resonance lists:
+        project.initResonances()
+
+    to merge the resonance lists:
+        project.mergeResonances( order=None, status='reduce' )
+                                status='reduce' results in reducing the resonances 
+                                list to one merged entry 
+
+    to define and add a new PeakList to project:
+        peakList = project.newPeakList( name, status='keep' ):
+
+    to define and add a new DistanceRestraintList to project:
+        distanceRestraintList = project.distances.new( name, status='keep' ):
+
+    
+-------------------------------------------------------------------------------
+Plugin /Volumes/Users/geerten/Desktop/cing_0.46/cing/PluginCode/BMRB.pyc
+-------------------------------------------------------------------------------
+
+Adds init/import of BMRB format
+
+
+Methods:
+        
+
+        
+
+-------------------------------------------------------------------------------
+Plugin /Volumes/Users/geerten/Desktop/cing_0.46/cing/PluginCode/cyana.pyc
+-------------------------------------------------------------------------------
+
+Adds CYANA import/export methods
+
+
+Methods:
+  Project.importUpl( uplFile, convention, lower ):
+        import uplFile
+        convention = CYANA or CYANA2
+        return a DistanceRestraintList or None on error
+        
+  Project.importAco( acoFile, convention ):
+        Read Cyana acoFile       
+        convention = CYANA or CYANA2
+        return a DihedralRestraintList or None on error
+        
+  Project.export2cyana():
+        Export restraints in CYANA and CYANA2 formats
+  
+  DihedralRestraint.export2cyana( convention ):
+        Return string with distanceRestraint (dr) in cyana format or None on error
+        convention = CYANA or CYANA2
+
+  DihedralRestraintList.export2cyana( path, convention verbose=True ):
+        Export a dihedralRestraintList (drl) to cyana format:
+        convention = CYANA or CYANA2
+        return drl or None on error
+
+
+-------------------------------------------------------------------------------
+Plugin /Volumes/Users/geerten/Desktop/cing_0.46/cing/PluginCode/generatePeaks.pyc
+-------------------------------------------------------------------------------
+
+Adds methods to generate peaks
+
+Methods:
+    generatePeaks( project, experimentName, axisOrder=None, onlyAssigned = True, skipResidues = [] )         
+
+    listPredefinedExperiments()
+
+
+----------- Experiment: CBCACONH -----------
+dimensions: 3
+axis: 'HN' or 'H'
+axis: 'N'
+axis: 'CA' or 'CB' or 'CACB'
+----------- Experiment: CCH -----------
+dimensions: 3
+axis: 'C'
+axis: 'C2' or 'CH'
+axis: 'H'
+----------- Experiment: CCONH -----------
+dimensions: 3
+axis: 'HN' or 'H'
+axis: 'N'
+axis: 'C'
+----------- Experiment: HAHBCONH -----------
+dimensions: 3
+axis: 'HN' or 'H'
+axis: 'N'
+axis: 'HA' or 'HB' or 'HAHB'
+----------- Experiment: HNCA -----------
+dimensions: 3
+axis: 'HN' or 'H'
+axis: 'N'
+axis: 'CA'
+----------- Experiment: HNCACB -----------
+dimensions: 3
+axis: 'HN' or 'H'
+axis: 'N'
+axis: 'CA' or 'CB' or 'CACB'
+----------- Experiment: HNCAHA -----------
+dimensions: 3
+axis: 'HN' or 'H'
+axis: 'N'
+axis: 'HA'
+----------- Experiment: HNCOCA -----------
+dimensions: 3
+axis: 'HN' or 'H'
+axis: 'N'
+axis: 'CA'
+----------- Experiment: CBCACONH -----------
+dimensions: 3
+axis: 'HN' or 'H'
+axis: 'N'
+axis: 'CA' or 'CB' or 'CACB'
+----------- Experiment: HAHBCONH -----------
+dimensions: 3
+axis: 'HN' or 'H'
+axis: 'N'
+axis: 'HA' or 'HB' or 'HAHB'
+----------- Experiment: N15_HSQC -----------
+dimensions: 2
+axis: 'HN' or 'H'
+axis: 'N'
+
+
+-------------------------------------------------------------------------------
+Plugin /Volumes/Users/geerten/Desktop/cing_0.46/cing/PluginCode/nih.pyc
+-------------------------------------------------------------------------------
+
+Adds export/import to NIH files 
+
+
+Methods:
+        
+  export2NIH():
+        Export resonances talos format
+        
+
+-------------------------------------------------------------------------------
+Plugin /Volumes/Users/geerten/Desktop/cing_0.46/cing/PluginCode/pdb.pyc
+-------------------------------------------------------------------------------
+
+Adds initialise/import/export from/to PDB files
+
+
+Methods:
+    Molecule.importFromPDB( pdbFile, convention='PDB', verbose=True ):
+        Import coordinates from pdbFile
+        convention eq PDB, CYANA, CYANA2 or XPLOR
+        return molecule or None on error
+    
+    Project.initPDB( pdbFile, convention ):
+        initialise from pdbFile, import coordinates          
+        convention = PDB, CYANA, CYANA2 or XPLOR
+        
+    Project.importPDB( pdbFile, convention ):
+        import coordinates from pdbFile          
+        convention = PDB, CYANA, CYANA2 or XPLOR
+        
+    Project.export2PDB( pdbFile ):
+        export to pdbFile          
+
+
+-------------------------------------------------------------------------------
+Plugin /Volumes/Users/geerten/Desktop/cing_0.46/cing/PluginCode/sparky.pyc
+-------------------------------------------------------------------------------
+
+Adds export to sparky files 
+
+
+Methods:
+        
+  export2Sparky():
+        Export resonances and peaks in sparky format
+        
+
+-------------------------------------------------------------------------------
+Plugin /Volumes/Users/geerten/Desktop/cing_0.46/cing/PluginCode/validate.pyc
+-------------------------------------------------------------------------------
+
+Adds validation methods
+
+
+Methods:
+  validate( verbose = True )         
+                
+
+-------------------------------------------------------------------------------
+Plugin /Volumes/Users/geerten/Desktop/cing_0.46/cing/PluginCode/xeasy.pyc
+-------------------------------------------------------------------------------
+
+Adds import/export of xeasy files in CYANA/XEASY or CYANA2 format
+
+
+Methods:
+        
+  importXeasy( seqFile, protFile, convention ):
+        Import shifts from Xeasy protFile           
+
+  importXeasyPeaks( seqFile, protFile, peakFile, convention ):
+        Import peaks from Xeasy peakFile; requires matching seqFile,protFile 
+        returns PeakList instance or None on error
+        
+  export2Xeasy( ):
+        Export to Xeasy in CYANA/XEASY and CYANA2 formats
+        
+
+-------------------------------------------------------------------------------
+Plugin /Volumes/Users/geerten/Desktop/cing_0.46/cing/PluginCode/xplor.pyc
+-------------------------------------------------------------------------------
+
+Adds export2xplor methods to: 
+DistanceRestraint , DistanceRestraintList, DihedralRestraint, DihedralRestraintList,
+Atom, Molecule and Project classes.
+
+    DistanceRestraint.export2xplor()
+
+    DistanceRestraintList.export2xplor( path, verbose )
+
+    DihedralRestraint.export2xplor()
+
+    DihedralRestraintList.export2xplor( path, verbose )
+
+    Atom.export2xplor()
+
+    Molecule.export2xplor( path, verbose )
+ 
+    Project.export2xplor():
+        exports Molecules in xplor nomenclature
+        exports DistanceRestraintLists in xplor format
+        
+ 
+!!NEED to Check periodicity in dihedrals
+                
+
+
+-------------------------------------------------------------------------------
+Molecule class: defines the holder for molecule items
+-------------------------------------------------------------------------------
+    
+                                     Coordinate
+                                       ^
+                                       |
+                                       v
+  Molecule <-> Chain <-> Residue <-> Atom <-> Resonance <- Peak
+                            |          |
+                            v          v
+              NTdb <-> ResidueDef <-> AtomDef
+  _____________________________________________________________________________
+                  
+    Molecule.chains     List of Chain instances; equivalent to Molecule._children
+    
+    Chain.molecule      Parent Molecule instance
+    Chain.residues      List of Residue instances; equivalent to Chain._children
+  
+    Residue.chain       Parent Chain instance
+    Residue.atoms       List of Atom instances; equivalent to Residue._children
+    Residue.db          Points to database ResidueDef instance
+  
+    Atom.residue        Parent Residue instance
+    Atom.resonances     List of Resonances instances
+    Atom.coordinates    List of Coordinate instances
+    Atom.db             Points to database AtomDef instance
+  
+    Resonance.atom      Points to Atom instance 
+  
+    Coordinate.atom     Points to Atom instance 
+
+    Peak.resonances     List of Resonance instances 
+                        corresponding with dimensions of peak
+  _____________________________________________________________________________
+
+    Initiating attributes:
+        name                    : Molecule name
+      
+    Derived attributes:
+        chains                  : NTlist of Chain instances (identical to _children)
+        residueCount            : Number of Residue instances
+        chainCount              : Number of Chain instances
+        
+    Attributes inherited from NTtree:
+        _parent                 : None
+        _children               : NTlist of children NTtree instances.
+ 
+    Methods:
+        allChains()             : Returns a list of all chains objects of molecule.
+        allResidues()           : Returns a list of all residue objects of molecule.
+        allAtoms()              : Returns a list of all atom objects of molecule.
+        
+    Methods inherited from NTtree:
+        _Cname( depth )         : Returns name expanded to depth
+        addChild( child )       :
+        sister( relativeIndex ) :
+        traverse()              :
+        
+    Methods inherited from NTstruct:
+        format()                : Return a formatted string of with values of selected fields.
+        printAttr(stream)       : Print a list of all attributes and their values.       
+        
+    all dict methods
+          
+ 

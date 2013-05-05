@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+
+<!-- Note this file needs to be owned by root and should not be a symbolic link. In the cing workspace this is merely 
+a copy to show the dependency. 
+-->
+
+<plist version="1.0">
+<dict> 
+    <key>Disabled</key>
+    <false/>
+    <key>Label</key>
+    <string>org.apache.commons.jsvc</string>
+    <key>ProgramArguments</key>
+    <array>
+        <string>bin/Tomcat5.sh</string>
+        <string>start</string>
+    </array>
+    <key>RunAtLoad</key>
+    <true/>
+    <key>WorkingDirectory</key>
+    <!-- JFD mods: from /Library/Tomcat/Home to /Library/Tomcat -->
+    <string>/Library/Tomcat</string>
+</dict>
+</plist>

@@ -1,0 +1,291 @@
+data_theoretical_dihedral_observable_info
+
+save_file_characteristics
+   _Saveframe_category   file_characteristics
+
+   _File_version         1.0
+   _Author              "Jurgen F. Doreleijers"
+
+   loop_
+      _Date
+      _Details
+
+       2011-06-07 "First creation from CING lib" 
+
+   stop_
+
+save_
+
+
+save_theoretical_dihedral__observable_info
+   _Saveframe_category   theoretical_dihedral_observable_info
+
+   _Details             
+;
+The listed residues/atom combination is considered observable in by NMR 
+;
+
+   loop_
+      _Comp_ID
+      _Dih_ID
+            
+            ALA  PHI       
+            ALA  PSI       
+            ALA  OMEGA     
+            ARGx PHI       
+            ARGx PSI       
+            ARGx CHI1      
+            ARGx CHI2      
+            ARGx CHI3      
+            ARGx CHI4      
+            ARGx OMEGA     
+            ARG  PHI       
+            ARG  PSI       
+            ARG  CHI1      
+            ARG  CHI2      
+            ARG  CHI3      
+            ARG  CHI4      
+            ARG  OMEGA     
+            ASN  PHI       
+            ASN  PSI       
+            ASN  CHI1      
+            ASN  CHI2      
+            ASN  OMEGA     
+            ASPH PHI       
+            ASPH PSI       
+            ASPH CHI1      
+            ASPH CHI2      
+            ASPH CHI32     
+            ASPH OMEGA     
+            ASP  PHI       
+            ASP  PSI       
+            ASP  CHI1      
+            ASP  CHI2      
+            ASP  OMEGA     
+            CYSS PHI       
+            CYSS PSI       
+            CYSS CHI1      
+            CYSS OMEGA     
+            CYS  PHI       
+            CYS  PSI       
+            CYS  CHI1      
+            CYS  CHI2      
+            CYS  OMEGA     
+            GLN  PHI       
+            GLN  PSI       
+            GLN  CHI1      
+            GLN  CHI2      
+            GLN  CHI3      
+            GLN  OMEGA     
+            GLUH PHI       
+            GLUH PSI       
+            GLUH CHI1      
+            GLUH CHI2      
+            GLUH CHI3      
+            GLUH CHI42     
+            GLUH OMEGA     
+            GLU  PHI       
+            GLU  PSI       
+            GLU  CHI1      
+            GLU  CHI2      
+            GLU  CHI3      
+            GLU  OMEGA     
+            GLY  PHI       
+            GLY  PSI       
+            GLY  OMEGA     
+            HISE PHI       
+            HISE PSI       
+            HISE CHI1      
+            HISE CHI2      
+            HISE OMEGA     
+            HISH PHI       
+            HISH PSI       
+            HISH CHI1      
+            HISH CHI2      
+            HISH OMEGA     
+            HIS  PHI       
+            HIS  PSI       
+            HIS  CHI1      
+            HIS  CHI2      
+            HIS  OMEGA     
+            ILE  PHI       
+            ILE  PSI       
+            ILE  CHI1      
+            ILE  CHI2      
+            ILE  OMEGA     
+            LEU  PHI       
+            LEU  PSI       
+            LEU  CHI1      
+            LEU  CHI2      
+            LEU  OMEGA     
+            LYSx PHI       
+            LYSx PSI       
+            LYSx CHI1      
+            LYSx CHI2      
+            LYSx CHI3      
+            LYSx CHI4      
+            LYSx CHI5      
+            LYSx OMEGA     
+            LYS  PHI       
+            LYS  PSI       
+            LYS  CHI1      
+            LYS  CHI2      
+            LYS  CHI3      
+            LYS  CHI4      
+            LYS  CHI5      
+            LYS  OMEGA     
+            MET  PHI       
+            MET  CHI1      
+            MET  PSI       
+            MET  CHI2      
+            MET  CHI3      
+            MET  OMEGA     
+            PHE  PHI       
+            PHE  PSI       
+            PHE  CHI1      
+            PHE  CHI2      
+            PHE  OMEGA     
+            cPRO PHI       
+            cPRO PSI       
+            cPRO OMEGA     
+            cPRO CHI1      
+            cPRO CHI2      
+            PRO  PHI       
+            PRO  PSI       
+            PRO  OMEGA     
+            PRO  CHI1      
+            PRO  CHI2      
+            SER  PHI       
+            SER  PSI       
+            SER  CHI1      
+            SER  CHI2      
+            SER  OMEGA     
+            THR  PHI       
+            THR  PSI       
+            THR  CHI1      
+            THR  CHI2      
+            THR  OMEGA     
+            TRP  PHI       
+            TRP  PSI       
+            TRP  CHI1      
+            TRP  CHI2      
+            TRP  OMEGA     
+            TYR  PHI       
+            TYR  PSI       
+            TYR  CHI1      
+            TYR  CHI2      
+            TYR  CHI6      
+            TYR  OMEGA     
+            VAL  PHI       
+            VAL  PSI       
+            VAL  CHI1      
+            VAL  OMEGA     
+            DA   ALPHA     
+            DA   BETA      
+            DA   GAMMA     
+            DA   DELTA     
+            DA   EPSILON   
+            DA   ZETA      
+            DA   NU0       
+            DA   NU1       
+            DA   NU2       
+            DA   NU3       
+            DA   NU4       
+            DA   CHI       
+            A    ALPHA     
+            A    BETA      
+            A    GAMMA     
+            A    DELTA     
+            A    EPSILON   
+            A    ZETA      
+            A    NU0       
+            A    NU1       
+            A    NU2       
+            A    NU3       
+            A    NU4       
+            A    CHI       
+            DC   ALPHA     
+            DC   BETA      
+            DC   GAMMA     
+            DC   DELTA     
+            DC   EPSILON   
+            DC   ZETA      
+            DC   NU0       
+            DC   NU1       
+            DC   NU2       
+            DC   NU3       
+            DC   NU4       
+            DC   CHI       
+            C    ALPHA     
+            C    BETA      
+            C    GAMMA     
+            C    DELTA     
+            C    EPSILON   
+            C    ZETA      
+            C    NU0       
+            C    NU1       
+            C    NU2       
+            C    NU3       
+            C    NU4       
+            C    CHI       
+            DG   ALPHA     
+            DG   BETA      
+            DG   GAMMA     
+            DG   DELTA     
+            DG   EPSILON   
+            DG   ZETA      
+            DG   NU0       
+            DG   NU1       
+            DG   NU2       
+            DG   NU3       
+            DG   NU4       
+            DG   CHI       
+            G    ALPHA     
+            G    BETA      
+            G    GAMMA     
+            G    DELTA     
+            G    EPSILON   
+            G    ZETA      
+            G    NU0       
+            G    NU1       
+            G    NU2       
+            G    NU3       
+            G    NU4       
+            G    CHI       
+            DT   ALPHA     
+            DT   BETA      
+            DT   GAMMA     
+            DT   DELTA     
+            DT   EPSILON   
+            DT   ZETA      
+            DT   NU0       
+            DT   NU1       
+            DT   NU2       
+            DT   NU3       
+            DT   NU4       
+            DT   CHI       
+            U    ALPHA     
+            U    BETA      
+            U    GAMMA     
+            U    DELTA     
+            U    EPSILON   
+            U    ZETA      
+            U    NU0       
+            U    NU1       
+            U    NU2       
+            U    NU3       
+            U    NU4       
+            U    CHI       
+            LGLY PHI       
+            LGLY PSI       
+            LGLY OMEGA     
+#            SS   PHI       
+#            SS   PSI       
+#            SS   OMEGA     
+#            CA2P LB        
+#            ZN   LB        
+
+   stop_
+
+save_
+

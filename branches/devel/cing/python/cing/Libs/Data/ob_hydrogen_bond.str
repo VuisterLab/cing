@@ -1,0 +1,148 @@
+data_completeness_observable_info
+
+save_file_characteristics
+   _Saveframe_category   file_characteristics
+
+   _File_version         1.0
+   _Author              "Jurgen F. Doreleijers"
+
+   loop_
+      _Date
+      _Details
+
+       2004-01-30 "First creation from CING lib" 
+
+   stop_
+
+save_
+
+
+save_completeness_observable_info
+   _Saveframe_category   completeness_observable_info
+
+   _Details             
+;
+The listed residues/atom combination is a very quick and dirty for SOME
+hydrogen bonds by request of Winston for DNA base pairing. Others were added for 
+testing.
+
+PLEASE CHECK.
+;
+
+   loop_
+      _Comp_ID
+      _Atom_ID
+
+       ALA  H    
+       ARG  H    
+       ASN  H    
+       ASP  H    
+       ASPH H    
+       CYS  H    
+       CYSS H    
+       GLN  H    
+       GLU  H    
+       GLUH H    
+       GLY  H    
+       HIS  H    
+       ILE  H    
+       LEU  H    
+       LYS  H    
+       MET  H    
+       PHE  H    
+       SER  H    
+       THR  H    
+       TRP  H    
+       TYR  H    
+       VAL  H    
+       
+       ALA  O    
+       ARG  O    
+       ASN  O    
+       ASP  O    
+       ASPH O    
+       CYS  O    
+       CYSS O    
+       GLN  O    
+       GLU  O    
+       GLUH O    
+       GLY  O    
+       HIS  O    
+       ILE  O    
+       LEU  O    
+       LYS  O    
+       MET  O    
+       PHE  O    
+       PRO  O     
+      cPRO  O     
+       SER  O    
+       THR  O    
+       TRP  O    
+       TYR  O    
+       VAL  O    
+       
+       
+
+       A  H61  
+       A  H62  
+       A  H2   
+       A  N1   
+       C  H41  
+       C  H42  
+       C  N3  
+       C  O2  
+       G  H21  
+       G  H22  
+       G  H1   
+       G  O6   
+       T  H3   
+       T  O2   
+       T  O4   
+       U  H3   
+       U  O2   
+       U  O4   
+
+       DA  H61  
+       DA  H62  
+       DA  H2   
+       DA  N1   
+       DC  H41  
+       DC  H42  
+       DC  N3  
+       DC  O2  
+       DG  H21  
+       DG  H22  
+       DG  H1   
+       DG  O6   
+       DT  H3   
+       DT  O2   
+       DT  O4   
+       DU  H3   
+       DU  O2   
+       DU  O4   
+
+
+       ADE  H61  
+       ADE  H62  
+       ADE  H2   
+       ADE  N1   
+       CYT  H41  
+       CYT  H42  
+       CYT  N3  
+       CYT  O2  
+       GUA  H21  
+       GUA  H22  
+       GUA  H1   
+       GUA  O6   
+       THY  H3   
+       THY  O2   
+       THY  O4   
+       URA  H3   
+       URA  O2   
+       URA  O4   
+
+
+   stop_
+
+save_
+
