@@ -1,1 +1,0 @@
-See: http://code.google.com/p/cing/wiki/VirtualCingUsageCmbi
