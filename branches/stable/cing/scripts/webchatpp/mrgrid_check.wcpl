@@ -1,0 +1,5 @@
+print "Checked NMR Restraints Grid\n";
+GET http://restraintsgrid.bmrb.wisc.edu/NRG/MRGridServlet
+  EXPECT OK 
+  EXPECT (! /ERROR/)
+  EXPECT /NMR Restraints Grid/ 

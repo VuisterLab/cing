@@ -1,0 +1,1 @@
+Contains coordinate/experimental data from xplor-nih-2.23/eginput/gb1_rdc

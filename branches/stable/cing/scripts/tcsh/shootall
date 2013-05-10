@@ -1,0 +1,51 @@
+#!/bin/tcsh
+# Author: Jurgen F. Doreleijers
+# $C/scripts/tcsh/shootall [pattern]
+# E.g. $C/scripts/tcsh/shootall sleep
+# would kill all sleep processes.
+# NB. this command kills watch out. Think twice.
+# Try out first manually: ps -ef | grep [pattern]
+set pattern = $1
+
+#echo "DEBUG: Trying to shootall with [$$] and [$0]"            
+#echo "DEBUG: pattern: $pattern"
+
+# Status on the final grep will be zero when it did grep something.
+# The x flag is to catch processes without having a controlling terminal.
+# -a flag for all processes including cron's
+# -ww for extra wide display showing the full command and parameters.
+# By crontab there is one more process in between. Luckily it is a different parent for each invocation
+# and not the (same) crontab process.
+set myProces    = $0:t
+set myPid       = $$
+set pPid        = `ps o ppid= -p $$`
+#echo "DEBUG: Checking for running processes given:"                                                                                                   
+#echo "DEBUG: myProces         : $myProces"                                                               
+#echo "DEBUG: myPid            : $myPid"                                                                  
+#echo "DEBUG: pPid             : $pPid"                                                                   
+#echo "## 2"                                                                                   
+#ps axww -o pid,ppid,stat,user,command| grep "$pattern"                                                                    
+#echo "## 3"                                                                                   
+#ps axww -o pid,ppid,stat,user,command| grep "$pattern" | grep -v grep | grep -v ps                                        
+#echo "## 4"                                                                                   
+#ps axww -o pid,ppid,stat,user,command| grep "$pattern" | grep -v grep | grep -v ps | grep -v $myPid
+#echo "## 5"                                                                                   
+set list = ( `ps axww -o pid,ppid,stat,user,command| grep "$pattern" | grep -v grep | grep -v ps | grep -v $myPid | gawk '{print $1}' `)
+#echo "DEBUG: Found $#list process(es) to kill: $list"
+
+if ( $#list == 0 ) then
+    echo "[shootall] No matching processes found for $pattern."
+    exit 0
+endif
+
+echo "[shootall] Shooting $#list matching processes found for $pattern."
+@ count = 0
+foreach pid ( $list )
+    @ count = $count + 1
+    # Get the command without the header normally present in ps output.
+    set command = (`ps -o command $pid|gawk '{if (NR>1) print}' `)
+    echo "[shootall] Killing process $count with command: $command and pid: $pid"
+    kill $pid
+end
+
+#echo "DEBUG: Finished"            

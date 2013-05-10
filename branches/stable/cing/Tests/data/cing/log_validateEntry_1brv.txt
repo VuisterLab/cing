@@ -1,0 +1,121 @@
+======================================================================================================
+| CING: Common Interface for NMR structure Generation version 0.9 (r860)        AW,JFD,GWV 2004-2010 |
+======================================================================================================
+User: jd         on: stella.cmbi.umcn.nl (darwin/32bit/2cores/2.6.6) at: (19797) Mon Oct 25 14:49:04 2010
+DEBUG: Using:
+DEBUG: inputDir:             file:///Library/WebServer/Documents/NRG-CING/recoordSync/1brv
+DEBUG: outputDir:            /Library/WebServer/Documents/NRG-CING/data/br/1brv
+DEBUG: pdbConvention:        .
+DEBUG: restraintsConvention: .
+DEBUG: archiveType:          BY_ENTRY
+DEBUG: projectType:          CCPN
+DEBUG: modelCount:           2
+DEBUG: storeCING2db:         1
+copying file: //Library/WebServer/Documents/NRG-CING/recoordSync/1brv/1brv.tgz to: 1brv.tgz
+Moving CCPN directory from [linkNmrStarData] to [1brv]
+==> Importing data from Ccpn project "1brv"
+Limiting the number of imported models to: 2
+Non-standard (residues and their) atoms added:
+GLU : [ 189]
+==> Calculating rmsd's (residues: 158-189, models: 0-1)
+==> Ccpn molecule '1brv' imported
+==> Ccpn project imported
+-------------------------------------------------------
+==> Saving <Project 1brv>
+==> Saved <Molecule "1brv" (C:1,R:32,A:669,M:2)> to "1brv.cing/Data/Molecules/1brv.molecule"
+==> Saving <DistanceRestraintList "distance_constraint_list" (keep,264)> to 1brv.cing/Data/Restraints/distance_constraint_list.distances
+==> Saving <DihedralRestraintList "dihedral_constraint_list" (keep,29)> to 1brv.cing/Data/Restraints/dihedral_constraint_list.dihedrals
+==> Running shiftx
+==> Calculating Q-factors for chemical shift
+==> Calculating secondary structure by DSSP
+==> Analyzing restraints
+==> validateRestraints, output to 1brv.cing/1brv/Cing/restraints.txt
+==> checkSaltbridges, output to 1brv.cing/1brv/Cing/saltbridges.txt
+==> Calculating rmsd's (residues: 158-189, models: 0-1)
+==> Disulfide analysis, output to 1brv.cing/1brv/Cing/disulfides.txt
+==> Analyzing <DistanceRestraintList "distance_constraint_list" (keep,264)>, output to 1brv.cing/1brv/Cing/distance_constraint_list.txt
+==> Analyzing <DihedralRestraintList "dihedral_constraint_list" (keep,29)>, output to 1brv.cing/1brv/Cing/dihedral_constraint_list.txt
+==> Criticizing project: output to "1brv.cing/1brv/Cing/ROG.txt"
+Skipping adding procheck results since no results available or no protein residues or...
+==> summary, output to 1brv.cing/1brv/Cing/summary.txt
+==> Generating Macros
+Skipping adding procheck results since no results available or no protein residues or...
+==> Initializing HTML objects
+==> Generating CING HTML code.
+0...
+0..
+Creating Procheck html
+0.........1.......
+Creating Wattos html
+0
+Html for chain A and its residues
+0.........1.........2.........3.
+Html for dihedrals by Project and Residue
+Html for atoms and models
+Html for peaks and restraints
+0.
+==> Rendering HTML pages
+Done with overall validation
+-------------------------------------------------------
+==> Saving <Project 1brv>
+==> Saved <Molecule "1brv" (C:1,R:32,A:669,M:2)> to "1brv.cing/Data/Molecules/1brv.molecule"
+==> Saving <DistanceRestraintList "distance_constraint_list" (keep,264)> to 1brv.cing/Data/Restraints/distance_constraint_list.distances
+==> Saving <DihedralRestraintList "dihedral_constraint_list" (keep,29)> to 1brv.cing/Data/Restraints/dihedral_constraint_list.dihedrals
+DEBUG: Starting doStoreCING2db using:
+DEBUG: entry_code:           1brv
+DEBUG: ranges:               None
+DEBUG: archive_id:           ARCHIVE_NRG
+DEBUG: user_name:            pdbj
+DEBUG: db_name:              pdbmlplus
+DEBUG: schema:               nrgcing
+DEBUG: doReadProject:        False
+DEBUG: Initializing csqlAlchemy with user/db: pdbj/pdbmlplus
+DEBUG: Initializing cgenericSql with user/db: pdbj/pdbmlplus
+DEBUG: Using connectionString postgres://pdbj:4I4KMS@localhost/pdbmlplus
+ERROR: Traceback (most recent call last):
+  File "/Users/jd/workspace35/cing/python/cing/Scripts/validateEntry.py", line 265, in main
+    if doStoreCING2db( entryId, ARCHIVE_NRG_ID, project=project):
+  File "/Users/jd/workspace35/cing/python/cing/NRG/storeCING2db.py", line 111, in doStoreCING2db
+    if csql.connect():
+  File "/Users/jd/workspace35/cing/python/cing/PluginCode/sqlAlchemy.py", line 90, in connect
+    self.conn = self.engine.connect()
+  File "/opt/local/Library/Frameworks/Python.framework/Versions/2.6/lib/python2.6/site-packages/sqlalchemy/engine/base.py", line 1221, in connect
+    return self.Connection(self, **kwargs)
+  File "/opt/local/Library/Frameworks/Python.framework/Versions/2.6/lib/python2.6/site-packages/sqlalchemy/engine/base.py", line 531, in __init__
+    self.__connection = connection or engine.raw_connection()
+  File "/opt/local/Library/Frameworks/Python.framework/Versions/2.6/lib/python2.6/site-packages/sqlalchemy/engine/base.py", line 1276, in raw_connection
+    return self.pool.unique_connection()
+  File "/opt/local/Library/Frameworks/Python.framework/Versions/2.6/lib/python2.6/site-packages/sqlalchemy/pool.py", line 119, in unique_connection
+    return _ConnectionFairy(self).checkout()
+  File "/opt/local/Library/Frameworks/Python.framework/Versions/2.6/lib/python2.6/site-packages/sqlalchemy/pool.py", line 304, in __init__
+    rec = self._connection_record = pool.get()
+  File "/opt/local/Library/Frameworks/Python.framework/Versions/2.6/lib/python2.6/site-packages/sqlalchemy/pool.py", line 161, in get
+    return self.do_get()
+  File "/opt/local/Library/Frameworks/Python.framework/Versions/2.6/lib/python2.6/site-packages/sqlalchemy/pool.py", line 642, in do_get
+    con = self.create_connection()
+  File "/opt/local/Library/Frameworks/Python.framework/Versions/2.6/lib/python2.6/site-packages/sqlalchemy/pool.py", line 122, in create_connection
+    return _ConnectionRecord(self)
+  File "/opt/local/Library/Frameworks/Python.framework/Versions/2.6/lib/python2.6/site-packages/sqlalchemy/pool.py", line 198, in __init__
+    self.connection = self.__connect()
+  File "/opt/local/Library/Frameworks/Python.framework/Versions/2.6/lib/python2.6/site-packages/sqlalchemy/pool.py", line 261, in __connect
+    connection = self.__pool._creator()
+  File "/opt/local/Library/Frameworks/Python.framework/Versions/2.6/lib/python2.6/site-packages/sqlalchemy/engine/strategies.py", line 80, in connect
+    raise exc.DBAPIError.instance(None, None, e)
+OperationalError: (OperationalError) could not connect to server: Connection refused
+	Is the server running on host "localhost" and accepting
+	TCP/IP connections on port 5432?
+could not connect to server: Connection refused
+	Is the server running on host "localhost" and accepting
+	TCP/IP connections on port 5432?
+could not connect to server: Connection refused
+	Is the server running on host "localhost" and accepting
+	TCP/IP connections on port 5432?
+ None None
+
+ERROR: Failed to store CING project's data due to above traceback error.
+Doing command: tar -czf 1brv.cing.tgz 1brv.cing
+CING started at : Mon Oct 25 14:49:00 2010
+CING stopped at : Mon Oct 25 14:49:18 2010
+CING took       : 17.824 s
+
+
