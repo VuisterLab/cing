@@ -1,0 +1,20 @@
+Priority for updating NRG-CING
+
+Priority of an entry is in the range [0,9] and is a float.
+
+Once a week we do the X highest ranking entries. X=40 now.
+When one resource updates all entries we limit the weekly load
+to higher priorities using this automatic priority scheduling.
+
+We may keep a few cores doing the lower scoring updates running in the cloud.
+
+9   Missing
+8   Missing NRG
+7   Missing or different matched BMRB
+6   Update PDB
+5   Update NRG
+4   Update BMRB
+1.x Update CING software (x = delta revision id / 1000)
+0.x CCPN software
+
+

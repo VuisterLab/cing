@@ -1,0 +1,686 @@
+TITLE  brsvg/regine cluster
+USER   Jurgen
+LAST   Doreleijers
+FNPEAX brsvg.pkr
+FNPATS brsvg.pat
+FNDBAS /usr/ruuci2/people/jurgen/regine/prot_dna_94.rdb
+FNSETS brsvg.prop
+FNXYZ  brsv1.xyz
+UNIQUE      26    546     71      1
+BUILDU      26
+REFRAT     2.1000E+07    3.5000E+00
+CUTOFC        1.00000
+MAXAPP      10
+SPEC         2      1   1024
+  FILE /usr/ruuci12/people/jurgen/regine/tocsy1.4
+  NAME tocsy1
+  SOLV H2O
+  EXPM      296.00000       4.40000
+  NCHN    1024   1024
+  NADR    1024   1024
+  PBOX       3      3
+  MBND       9
+  IDIR       2      1
+  IOFF     280      0
+  CPLX       0      0
+  FREQ      500.13000     500.13904
+  SWID     6250.00000    6250.00000
+  RPPM        4.75000       4.75000
+  RCHN      511.00000     511.00000
+  RTOL        0.05000       0.05000
+  BOXS        0.10000       0.10000
+  NUCS  H H
+  MAGT  J
+  MIXT       70.00000
+  NOED        0.60000
+  CNTR       4     3    32     8    12     2.5000E+05     1.0000E+09
+  ICLO     491    163
+  ICHI     900    409
+  SKIP       1      1
+  PMLO        0.00270       5.99477
+  PMHI        4.99408       8.99687
+ENDSPC
+SPEC         2      4   1024
+  FILE tocsy4.5
+  NAME tocsy4
+  SOLV H2O
+  EXPM      285.00000       4.50000
+  NCHN    1024   2048
+  NADR    1024   2048
+  PBOX       3      3
+  MBND       9
+  IDIR       2      1
+  IOFF       0      0
+  CPLX       0      0
+  FREQ      500.13000     500.13904
+  SWID     6250.00000    5555.55566
+  RPPM        4.75000       4.75000
+  RCHN      512.00000    1024.00000
+  RTOL        0.02000       0.02000
+  BOXS        0.10000       0.10000
+  NUCS  H H
+  MAGT  J
+  MIXT       80.00000
+  NOED      999.00000
+  CNTR       4     3    30     8    12     1.5000E+05     1.0000E+09
+  ICLO     164    240
+  ICHI     901   1900
+  SKIP       1      1
+  PMLO        0.00270      -0.00128
+  PMHI        8.99694       9.00229
+ENDSPC
+SPEC         2      5   1024
+  FILE noe3
+  NAME noe3
+  SOLV H2O
+  EXPM      285.00000       4.40000
+  NCHN    1024   2048
+  NADR    1024   2048
+  PBOX       3      3
+  MBND       0
+  IDIR       2      1
+  IOFF       0      0
+  CPLX       0      0
+  FREQ      500.13901     500.13901
+  SWID     6250.00000    6250.00000
+  RPPM        4.84900       4.85900
+  RCHN      512.00000    1024.00000
+  RTOL        0.02000       0.02000
+  BOXS        0.10000       0.10000
+  NUCS  H H
+  MAGT  N
+  MIXT      100.00000
+  NOED        5.00000
+  CNTR       4     1    30     2    12     1.5000E+05     1.0000E+09
+  ICLO     164    329
+  ICHI     909   1820
+  SKIP       1      1
+  PMLO        0.00416       0.00195
+  PMHI        9.09587       9.09976
+ENDSPC
+SPEC         2      6   1024
+  FILE doc1
+  NAME doc1
+  SOLV D2O
+  EXPM      285.00000       4.50000
+  NCHN     512   2048
+  NADR     512   2048
+  PBOX       3      3
+  MBND       9
+  IDIR       2      1
+  IOFF       0      0
+  CPLX       0      0
+  FREQ      500.13000     500.13000
+  SWID     6250.00000    6250.00000
+  RPPM        4.88900       4.88900
+  RCHN      256.00000    1024.00000
+  RTOL        0.02000       0.02000
+  BOXS        0.10000       0.10000
+  NUCS  H H
+  MAGT  J
+  MIXT       70.00000
+  NOED      999.00000
+  CNTR       1     1     1    10    12     6.0000E+04     1.4000E+00
+  ICLO      83    334
+  ICHI     456   1825
+  SKIP       1      1
+  PMLO        0.00746       0.00135
+  PMHI        9.11154       9.09933
+ENDSPC
+SPEC         2      7   1024
+  FILE toc1
+  NAME toc1
+  SOLV H2O
+  EXPM      298.00000       4.50000
+  NCHN    1024   2048
+  NADR    1024   2048
+  PBOX       3      3
+  MBND       9
+  IDIR       2      1
+  IOFF       0      0
+  CPLX       0      0
+  FREQ      500.13901     500.13901
+  SWID     6250.00000    6250.00000
+  RPPM        4.76000       4.76000
+  RCHN      512.00000    1024.00000
+  RTOL        0.05000       0.05000
+  BOXS        0.10000       0.10000
+  NUCS  H H
+  MAGT  J
+  MIXT       70.00000
+  NOED      999.00000
+  CNTR       2     1    20    10    20     2.0000E+05     1.4000E+00
+  ICLO     156    313
+  ICHI     902   1804
+  SKIP       1      1
+  PMLO        0.00058       0.00058
+  PMHI        9.10450       9.09839
+ENDSPC
+SPEC         2      8   1024
+  FILE ../nmr/data/transf/noe6
+  NAME noe6
+  SOLV H2O
+  EXPM      285.00000       4.60000
+  NCHN    1024   2048
+  NADR    1024   2048
+  PBOX       3      3
+  MBND       0
+  IDIR       2      1
+  IOFF     359      0
+  CPLX       0      0
+  FREQ      750.09998     750.09998
+  SWID    10000.00000   10000.00000
+  RPPM        4.88900       4.88900
+  RCHN      512.00000    1024.00000
+  RTOL        0.02000       0.02000
+  BOXS        0.10000       0.10000
+  NUCS  H H
+  MAGT  N
+  MIXT      200.00000
+  NOED       12.00000
+  CNTR       2     1    20    10    20     6.0000E+04     1.4000E+00
+  ICLO     189    377
+  ICHI     888   1775
+  SKIP       1      1
+  PMLO       -0.00618       0.00033
+  PMHI        9.09417       9.10068
+ENDSPC
+SPEC         2      9   1024
+  FILE toc6
+  NAME toc6
+  SOLV H2O
+  EXPM      285.00000       4.60000
+  NCHN    1024   2048
+  NADR    1024   2048
+  PBOX       3      3
+  MBND       9
+  IDIR       2      1
+  IOFF       0      0
+  CPLX       0      0
+  FREQ      750.09998     750.09998
+  SWID    10000.00000   10000.00000
+  RPPM        4.88200       4.88900
+  RCHN      512.00000    1024.00000
+  RTOL        0.03000       0.03000
+  BOXS        0.10000       0.10000
+  NUCS  H H
+  MAGT  J
+  MIXT       70.00000
+  NOED      999.00000
+  CNTR       2     1    20    10    12     3.0000E+05     1.4000E+00
+  ICLO     188    377
+  ICHI     887   1775
+  SKIP       1      1
+  PMLO       -0.00016       0.00033
+  PMHI        9.10019       9.10068
+ENDSPC
+SPEC         1     10   1024
+  FILE d1
+  NAME d1
+  SOLV D2O
+  EXPM      285.00000       4.80000
+  NCHN    2048
+  NADR    2048
+  PBOX       3
+  MBND 
+  IDIR       1
+  IOFF       0
+  CPLX       0
+  FREQ      500.13904
+  SWID     6250.00000
+  RPPM        4.88900
+  RCHN     1024.00000
+  RTOL        0.05000
+  BOXS        0.10000
+  NUCS  H
+  MAGT 
+  MIXT 
+  NOED 
+  CNTR       1     3     1    10    20     1.0000E+06     1.0000E+07
+  ICLO       0
+  ICHI    1989
+  SKIP       1
+  PMLO       -0.99926
+  PMHI       11.13726
+ENDSPC
+SPEC         2     13   1024
+  FILE noe0
+  NAME noe0
+  SOLV H2O
+  EXPM      298.00000       2.80000
+  NCHN    1024   2048
+  NADR    1024   2048
+  PBOX       3      3
+  MBND       0
+  IDIR       2      1
+  IOFF       0      0
+  CPLX       0      0
+  FREQ      500.13901     500.13901
+  SWID     6250.00000    6250.00000
+  RPPM        4.76000       4.76000
+  RCHN      512.00000    1024.00000
+  RTOL        0.05000       0.05000
+  BOXS        0.10000       0.10000
+  NUCS  H H
+  MAGT  N
+  MIXT      200.00000
+  NOED       12.00000
+  CNTR       2     1    20    10    20     3.0000E+05     1.4000E+00
+  ICLO     492    313
+  ICHI     615    739
+  SKIP       1      1
+  PMLO        3.50303       6.49902
+  PMHI        5.00407       9.09839
+ENDSPC
+SPEC         2     14   1024
+  FILE sqc3
+  NAME sqc3
+  SOLV D2O
+  EXPM      298.00000       4.15000
+  NCHN    1024   2048
+  NADR    1024   2048
+  PBOX       3      3
+  MBND       0
+  IDIR       1      2
+  IOFF       0      0
+  CPLX       0      0
+  FREQ      125.77274     500.13904
+  SWID    18518.51758    6250.00000
+  RPPM        0.00000       0.00000
+  RCHN        0.00000       0.00000
+  RTOL        0.05000       0.05000
+  BOXS        0.10000       0.10000
+  NUCS  H H
+  MAGT  N
+  MIXT       50.00000
+  NOED      999.00000
+  CNTR       1     3     1    10    20     1.0000E+06     1.0000E+07
+  ICLO       0      0
+  ICHI     127    127
+  SKIP       1      1
+  PMLO        0.00000       0.00000
+  PMHI       10.00000      10.00000
+ENDSPC
+SPEC         2     15   1024
+  FILE sqc3
+  NAME sqc3
+  SOLV D2O
+  EXPM      298.00000       4.15000
+  NCHN    1024   2048
+  NADR    1024   2048
+  PBOX       3      3
+  MBND       1
+  IDIR       1      2
+  IOFF       0      0
+  CPLX       0      0
+  FREQ      125.77274     500.13904
+  SWID    18518.51758    6250.00000
+  RPPM       74.00000       4.76000
+  RCHN      512.00000    1024.00000
+  RTOL        0.05000       0.05000
+  BOXS        0.10000       0.10000
+  NUCS  C H
+  MAGT  J
+  MIXT      999.00000
+  NOED      999.00000
+  CNTR       1     3     1    10    20     1.0000E+06     1.0000E+07
+  ICLO       0      0
+  ICHI     127    127
+  SKIP       1      1
+  PMLO        0.00000       0.00000
+  PMHI       10.00000      10.00000
+ENDSPC
+SPEC         2     16   1024
+  FILE doe2
+  NAME doe2
+  SOLV D2O
+  EXPM      285.00000       4.15000
+  NCHN     512   1024
+  NADR     512   1024
+  PBOX       3      3
+  MBND       0
+  IDIR       2      1
+  IOFF       0      0
+  CPLX       0      0
+  FREQ      500.13901     500.13904
+  SWID     6250.00000    6250.00000
+  RPPM        4.88900       4.88900
+  RCHN      256.00000     512.00000
+  RTOL        0.05000       0.05000
+  BOXS        0.10000       0.10000
+  NUCS  H H
+  MAGT  N
+  MIXT      200.00000
+  NOED        9.00000
+  CNTR       2     1    20    10    20     3.0000E+05     1.4000E+00
+  ICLO      83    167
+  ICHI     456    913
+  SKIP       1      1
+  PMLO        0.00754      -0.00466
+  PMHI        9.11146       9.09925
+ENDSPC
+SPEC         2     17   1024
+  FILE dos2
+  NAME dos2
+  SOLV D2O
+  EXPM      286.14999       4.55000
+  NCHN    1024   4096
+  NADR    1024   4096
+  PBOX       3      3
+  MBND       3
+  IDIR       2      1
+  IOFF       0      0
+  CPLX       0      0
+  FREQ      499.91199     499.91199
+  SWID     6250.00000    6250.00000
+  RPPM        4.84900       4.85900
+  RCHN      512.00000    2048.00000
+  RTOL        0.05000       0.05000
+  BOXS        0.10000       0.10000
+  NUCS  H H
+  MAGT  J
+  MIXT      999.00000
+  NOED      999.00000
+  CNTR       2     2    20     2     1     6.0000E+04    -1.2000E+00
+  ICLO     164    659
+  ICHI     909   3640
+  SKIP       1      1
+  PMLO        0.00196      -0.00025
+  PMHI        9.09779       9.09864
+ENDSPC
+SPEC         2     18   1024
+  FILE toc2
+  NAME toc2
+  SOLV H2O
+  EXPM      285.00000       4.40000
+  NCHN    1024   2048
+  NADR    1024   2048
+  PBOX       3      3
+  MBND       9
+  IDIR       2      1
+  IOFF       0      0
+  CPLX       0      0
+  FREQ      500.13000     500.13000
+  SWID     6250.00000    5555.55566
+  RPPM        4.88900       4.88900
+  RCHN      512.00000    1024.00000
+  RTOL        0.05000       0.05000
+  BOXS        0.10000       0.10000
+  NUCS  H H
+  MAGT  J
+  MIXT       15.00000
+  NOED      999.00000
+  CNTR       2     1    20    10    20     5.0000E+05     1.4000E+00
+  ICLO     167    248
+  ICHI     913   1925
+  SKIP       1      1
+  PMLO       -0.00475       0.00203
+  PMHI        9.09933       9.09797
+ENDSPC
+SPEC         1     19   1024
+  FILE ../nmr/data/transf/1d7
+  NAME 1d7
+  SOLV H2O
+  EXPM      285.14999       4.60000
+  NCHN   16384
+  NADR   16384
+  PBOX       3
+  MBND 
+  IDIR       1
+  IOFF       0
+  CPLX       0
+  FREQ      750.00000
+  SWID    10000.00000
+  RPPM        9.04800
+  RCHN     3161.85400
+  RTOL        0.05000
+  BOXS        0.10000
+  NUCS  H
+  MAGT 
+  MIXT 
+  NOED 
+  CNTR       1     3     1    10    20     1.0000E+06     1.0000E+07
+  ICLO    2606
+  ICHI   15509
+  SKIP       1
+  PMLO       -1.00013
+  PMHI        9.50036
+ENDSPC
+SPEC         2     20   1024
+  FILE ../nmr/data/transf/nb4
+  NAME nb4
+  SOLV H2O
+  EXPM      285.14999       4.50000
+  NCHN    1024   2048
+  NADR    1024   2048
+  PBOX       3      3
+  MBND       0
+  IDIR       2      1
+  IOFF       0      0
+  CPLX       0      0
+  FREQ      750.09998     750.09998
+  SWID    10000.00000   10000.00000
+  RPPM        0.00000       0.00000
+  RCHN      891.59003    1784.04395
+  RTOL        0.05000       0.05000
+  BOXS        0.10000       0.10000
+  NUCS  H H
+  MAGT  N
+  MIXT      200.00000
+  NOED       12.00000
+  CNTR       2     1    20     2    20     4.0000E+04     1.4000E+00
+  ICLO     185    371
+  ICHI     907   1815
+  SKIP       1      1
+  PMLO       -0.20062      -0.20151
+  PMHI        9.19917       9.19828
+ENDSPC
+SPEC         2     21   1024
+  FILE ../nmr/data/transf/toc8
+  NAME toc8
+  SOLV H2O
+  EXPM      285.14999       4.50000
+  NCHN    1024   2048
+  NADR    1024   2048
+  PBOX       3      3
+  MBND       9
+  IDIR       2      1
+  IOFF       0      0
+  CPLX       0      0
+  FREQ      750.09998     750.09998
+  SWID    10000.00000   10000.00000
+  RPPM        0.00000       0.00000
+  RCHN      891.59003    1784.04395
+  RTOL        0.05000       0.05000
+  BOXS        0.10000       0.10000
+  NUCS  H H
+  MAGT  J
+  MIXT       30.00000
+  NOED      999.00000
+  CNTR       2     1    15     2    20     1.0000E+05     1.4000E+00
+  ICLO     185    371
+  ICHI     907   1815
+  SKIP       1      1
+  PMLO       -0.20062      -0.20151
+  PMHI        9.19917       9.19828
+ENDSPC
+SPEC         2     22   1024
+  FILE ../nmr/data/transf/sqc4
+  NAME sqc4
+  SOLV H2O
+  EXPM      285.14999       4.50000
+  NCHN    1024   2048
+  NADR    1024   2048
+  PBOX       3      3
+  MBND       1
+  IDIR       2      1
+  IOFF       0      0
+  CPLX       0      0
+  FREQ      188.62285     750.11359
+  SWID    14925.37305   10000.00000
+  RPPM       43.81000       0.00000
+  RCHN      512.00000    1783.79102
+  RTOL      100.00000       0.05000
+  BOXS        0.10000       0.10000
+  NUCS  C H
+  MAGT  J
+  MIXT      999.00000
+  NOED      999.00000
+  CNTR       2     1    20     2    20     5.0000E+03     1.4000E+00
+  ICLO       0    386
+  ICHI    1023   1815
+  SKIP       1      1
+  PMLO        0.07727      -0.20151
+  PMHI       79.12813       9.10047
+ENDSPC
+SPEC         2     23   1024
+  FILE ../nmr/data/transf/dq1
+  NAME dq1
+  SOLV H2O
+  EXPM      285.14999       4.50000
+  NCHN    2048   8192
+  NADR    2048   8192
+  PBOX       3      3
+  MBND       3
+  IDIR       2      1
+  IOFF       0      0
+  CPLX       0      0
+  FREQ      750.11401     750.11401
+  SWID    10000.00000   10000.00000
+  RPPM        0.00000       0.00000
+  RCHN     1783.00000    7138.00000
+  RTOL        0.05000       0.05000
+  BOXS        0.10000       0.10000
+  NUCS  H H
+  MAGT  J
+  MIXT      999.00000
+  NOED      999.00000
+  CNTR       2     2    20     2     1     2.0000E+04    -1.2000E+00
+  ICLO    1600   7000
+  ICHI    2000   8100
+  SKIP       1      1
+  PMLO        0.31245     -13.18159
+  PMHI        2.91622     -11.39150
+ENDSPC
+SPEC         2     24   1024
+  FILE ../nmr/data/transf/nb1
+  NAME nb1
+  SOLV H2O
+  EXPM      285.14999       4.50000
+  NCHN    1024   2048
+  NADR    1024   2048
+  PBOX       3      3
+  MBND       0
+  IDIR       2      1
+  IOFF       0      0
+  CPLX       0      0
+  FREQ      750.09998     750.09998
+  SWID    10000.00000   10000.00000
+  RPPM        0.00000       0.00000
+  RCHN      891.59003    1784.04395
+  RTOL        0.05000       0.05000
+  BOXS        0.10000       0.10000
+  NUCS  H H
+  MAGT  N
+  MIXT       25.00000
+  NOED        9.00000
+  CNTR       2     1    20     2    20     4.0000E+04     1.4000E+00
+  ICLO     185    371
+  ICHI     907   1815
+  SKIP       1      1
+  PMLO       -0.20062      -0.20151
+  PMHI        9.19917       9.19828
+ENDSPC
+SPEC         2     25   1024
+  FILE ../nmr/data/transf/nb2
+  NAME nb2
+  SOLV H2O
+  EXPM      285.14999       4.50000
+  NCHN    1024   2048
+  NADR    1024   2048
+  PBOX       3      3
+  MBND       0
+  IDIR       2      1
+  IOFF       0      0
+  CPLX       0      0
+  FREQ      750.09998     750.09998
+  SWID    10000.00000   10000.00000
+  RPPM        0.00000       0.00000
+  RCHN      891.59003    1784.04395
+  RTOL        0.05000       0.05000
+  BOXS        0.10000       0.10000
+  NUCS  H H
+  MAGT  N
+  MIXT       50.00000
+  NOED       12.00000
+  CNTR       2     1    20     2    20     4.0000E+04     1.4000E+00
+  ICLO     185    371
+  ICHI     907   1815
+  SKIP       1      1
+  PMLO       -0.20062      -0.20151
+  PMHI        9.19917       9.19828
+ENDSPC
+SPEC         2     26   1024
+  FILE nb3
+  NAME nb3
+  SOLV H2O
+  EXPM      285.14999       4.50000
+  NCHN    1024   2048
+  NADR    1024   2048
+  PBOX       3      3
+  MBND       0
+  IDIR       2      1
+  IOFF       0      0
+  CPLX       0      0
+  FREQ      750.09998     750.09998
+  SWID    10000.00000   10000.00000
+  RPPM        0.00000       0.00000
+  RCHN      891.59003    1784.04395
+  RTOL        0.05000       0.05000
+  BOXS        0.10000       0.10000
+  NUCS  H H
+  MAGT  N
+  MIXT      100.00000
+  NOED       12.00000
+  CNTR       2     1    20     2    20     4.0000E+04     1.4000E+00
+  ICLO       0      0
+  ICHI     127    127
+  SKIP       1      1
+  PMLO        0.00000       0.00000
+  PMHI       10.00000      10.00000
+ENDSPC
+SEQNCE      32
+       Asn  r1           1     2
+       His  r2           1     3
+       Gln  r3           1     4
+       Asp  r4           1     5
+       His  r5           1     6
+       Asn  r6           1     7
+       Asn  r7           1     8
+       Phe  r8           1     9
+       Gln  r9           1    10
+       Thr  r10          1    11
+       Leu  r11          1    12
+       Pro  r12          1    13
+       Tyr  r13          1    14
+       Val  r14          1    15
+       Pro  r15          1    16
+       Cys  r16          1    17
+       Ser  r17          1    18
+       Thr  r18          1    19
+       Cys  r19          1    20
+       Glu  r20          1    21
+       Gly  r21          1    22
+       Asn  r22          1    23
+       Leu  r23          1    24
+       Ala  r24          1    25
+       Cys  r25          1    26
+       Leu  r26          1    27
+       Ser  r27          1    28
+       Leu  r28          1    29
+       Cys  r29          1    30
+       His  r30          1    31
+       Ile  r31          1    32
+       Glu  r32          0
+COMMNT began cluster at 12/12/94                                             
+ENDCLU

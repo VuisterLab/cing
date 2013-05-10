@@ -1,0 +1,1 @@
+Now maintained in $CINGROOT/Documentation/oceans12_README.txt

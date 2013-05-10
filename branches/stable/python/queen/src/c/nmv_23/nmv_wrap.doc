@@ -1,0 +1,35 @@
+nmv_wrap.c
+
+[ Python Module : nmv ]
+
+
+initialize_matrix()
+        [ returns void  ]
+
+clear_matrix()
+        [ returns void  ]
+
+free_memory()
+        [ returns void  ]
+
+xplor_read(filename)
+        [ returns int  ]
+
+cvar.eflag
+        [ Global : int eflag ]
+
+uncertainty(iatom,jatom)
+        [ returns float  ]
+
+atom_uncertainty(iatom)
+        [ returns float  ]
+
+total_uncertainty()
+        [ returns float  ]
+
+lower_bound(iatom,jatom)
+        [ returns float  ]
+
+upper_bound(iatom,jatom)
+        [ returns float  ]
+

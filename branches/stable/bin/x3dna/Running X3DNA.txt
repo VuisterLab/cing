@@ -1,0 +1,64 @@
+# Find the base pairs is done with find_pair, this creates an input file for the program analyze
+find_pair pde0128.pdb pde0128.inp
+
+# The program analyze then creates a file with a detailed analysis of the structure:
+
+analyze pde0128.inp 
+# Output
+pde0128.out    # Contains all parameters (propeller, slide, roll, twist, backbone torsions etc.)
+				# we can make plots from the values on a per bp basis, as well as H-bonding images
+
+# additional output
+auxiliary.par  	# not clear yet
+bp_step.par		# Base pair step parameters, can be used for rendering
+bp_helical.par	# Base pair helical parameters, can be used for rendering
+
+# Both can be used with rebuild to create Calladine-Drew schematic images 
+
+# The trick here is to create the proper orientation for display
+# We can use frame_mol for this.....?
+
+# First create an alchemy file
+rebuild bp_step.par temp2.alc #[for one block per base-pair] 
+rebuild -block2 bp_step.par temp2.alc #[for one block per base] 
+# Now create an image, use s as scale factor
+alc2img -al -s=18 temp2.alc temp2.ps 	# postscript
+alc2img -ral -s=50 temp2.alc temp2.r3d	# Raster3D
+
+pdb2img  # tried it, but gives some errors
+
+# Rendering in Raster3D (not sure if this is needed...)
+cat temp2.r3d | render -png temp2.png
+
+
+
+cf_7methods.par  # PArameters derived using older methods, not needed for our purposes
+ref_frames.dat
+poc_haxis.r3d    # NOt created
+stacking.pdb     # PDB file containing stacked basepairs
+# can be used to create images using
+mstack2img '-tlcdo -s=25' stacking.pdb 1 11 bdl084_
+
+hstacking.pdb  # NO clue yet
+        
+dcmnfile # removes all the auxiliary files from the file system
+
+# Use pymol for rendering??
+
+
+
+Analysis   [Back to Top]
+Using a high-resolution B-DNA dodecamer, bdl084 (Shui et al. (1998), Biochemistry, 37, pp. 8341-8355), as an example, the input and output files for the analysis program (analyze) are as follows:
+	•	Input
+	1.	bdl084.pdb: structure file in PDB format downloaded from the NDB/PDB
+	2.	bdl084.inp: input file describing base-pairing patterns in the original PDB file, generated as follows: find_pair -t bdl084.pdb bdl084.inp
+	•	Output (generated with: analyze bdl084.inp)
+	1.	bdl084.out: detailed listing of various parameters
+	2.	auxiliary.par: auxiliary parameters including phosphorus-phosphorus distance matrix, etc. Fixed file name: overwritten each time unless changed to a new name
+	3.	bp_helical.par: base-pair and helical parameters (x-displacement, etc.) in a format suitable for rebuilding routines (e.g., rebuild)
+	4.	bp_step.par: base-pair and step parameters (Roll, Slide etc.) in a format suitable for rebuilding routines
+	5.	cf_7methods.par: parameters of the seven most frequently used nucleic acid analysis programs-CEHS, CompDNA, Curves, FreeHelix, NGEOM, NUPARM, RNA-calculated based on the standard reference frame. Note that the numerical values are very similar
+	6.	ref_frames.dat: position and orientation of each base-pair reference frame, useful for re-orienting the structure with frame_mol
+	7.	poc_haxis.r3d: global linear helical axis with average radii of P, O4' and C1' atoms for input to Raster3D.
+	8.	hstacking.pdb: multiple structures in PDB format composed of each dinucleotide step with reference to its middle helical frame
+	9.	stacking.pdb: multiple structures in PDB format composed of each dinucleotide step with reference to its middle step frame. Used for generating "standardized" stacking diagrams

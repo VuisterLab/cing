@@ -1,0 +1,1257 @@
+HEADER    GLYCOPROTEIN                            29-MAR-96   1BRV              
+TITLE     SOLUTION NMR STRUCTURE OF THE IMMUNODOMINANT REGION OF                
+TITLE    2 PROTEIN G OF BOVINE RESPIRATORY SYNCYTIAL VIRUS, 48                  
+TITLE    3 STRUCTURES                                                           
+COMPND    MOL_ID: 1;                                                            
+COMPND   2 MOLECULE: PROTEIN G;                                                 
+COMPND   3 CHAIN: A;                                                            
+COMPND   4 FRAGMENT: IMMUNODOMINANT REGION, RESIDUES 158 - 189;                 
+COMPND   5 SYNONYM: BRSV-G REGION;                                              
+COMPND   6 ENGINEERED: YES                                                      
+SOURCE    MOL_ID: 1;                                                            
+SOURCE   2 ORGANISM_SCIENTIFIC: BOVINE RESPIRATORY SYNCYTIAL VIRUS;             
+SOURCE   3 STRAIN: 391-2                                                        
+KEYWDS    ATTACHMENT PROTEIN G OF BOVINE RESPIRATORY SYNCYTIAL VIRUS,           
+KEYWDS   2 IMMUNOGLOBULIN-BINDING PROTEIN, TRANSMEMBRANE, GLYCOPROTEIN          
+EXPDTA    NMR, 48 STRUCTURES                                                    
+AUTHOR    J.F.DORELEIJERS,J.P.M.LANGEDIJK,K.HARD,J.A.C.RULLMANN,                
+AUTHOR   2 R.BOELENS,W.M.SCHAAPER,J.T.VAN OIRSCHOT,R.KAPTEIN                    
+REVDAT   2   01-APR-03 1BRV    1       JRNL                                     
+REVDAT   1   05-JUN-97 1BRV    0                                                
+JRNL        AUTH   J.F.DORELEIJERS,J.P.LANGEDIJK,K.HARD,R.BOELENS,              
+JRNL        AUTH 2 J.A.RULLMANN,W.M.SCHAAPER,J.T.VAN OIRSCHOT,                  
+JRNL        AUTH 3 R.KAPTEIN                                                    
+JRNL        TITL   SOLUTION STRUCTURE OF THE IMMUNODOMINANT REGION OF           
+JRNL        TITL 2 PROTEIN G OF BOVINE RESPIRATORY SYNCYTIAL VIRUS.             
+JRNL        REF    BIOCHEMISTRY                  V.  35 14684 1996              
+JRNL        REFN   ASTM BICHAW  US ISSN 0006-2960                               
+REMARK   1                                                                      
+REMARK   1 REFERENCE 1                                                          
+REMARK   1  AUTH   J.P.LANGEDIJK,W.M.SCHAAPER,R.H.MELOEN,                       
+REMARK   1  AUTH 2 J.T.VAN OIRSCHOT                                             
+REMARK   1  TITL   PROPOSED THREE-DIMENSIONAL MODEL FOR THE                     
+REMARK   1  TITL 2 ATTACHMENT PROTEIN G OF RESPIRATORY SYNCYTIAL VIRUS          
+REMARK   1  REF    J.GEN.VIROL.                  V.  77  1249 1996              
+REMARK   1  REFN   ASTM JGVIAY  US ISSN 0022-1317                               
+REMARK   2                                                                      
+REMARK   2 RESOLUTION. NOT APPLICABLE.                                          
+REMARK   3                                                                      
+REMARK   3 REFINEMENT.                                                          
+REMARK   3   PROGRAM     : DISCOVER                                             
+REMARK   3   AUTHORS     : BIOSYM                                               
+REMARK   3                                                                      
+REMARK   3  OTHER REFINEMENT REMARKS: NULL                                      
+REMARK   4                                                                      
+REMARK   4 1BRV COMPLIES WITH FORMAT V. 3.0, 1-DEC-2006                         
+REMARK   4                                                                      
+REMARK   4 THIS IS THE REMEDIATED VERSION OF THIS PDB ENTRY.                    
+REMARK   4 REMEDIATED DATA FILE REVISION 3.100 (2007-03-16)                     
+REMARK 210                                                                      
+REMARK 210 EXPERIMENTAL DETAILS                                                 
+REMARK 210  EXPERIMENT TYPE                : NMR                                
+REMARK 210  TEMPERATURE           (KELVIN) : 285                                
+REMARK 210  PH                             : 4.6                                
+REMARK 210  IONIC STRENGTH                 : NULL                               
+REMARK 210  PRESSURE                       : NULL                               
+REMARK 210  SAMPLE CONTENTS                : NULL                               
+REMARK 210                                                                      
+REMARK 210  NMR EXPERIMENTS CONDUCTED      : TOCSY, NOESY, HSQC, DQF-COSY       
+REMARK 210  SPECTROMETER FIELD STRENGTH    : 750 MHZ, 500 MHZ                   
+REMARK 210  SPECTROMETER MODEL             : NULL                               
+REMARK 210  SPECTROMETER MANUFACTURER      : VARIAN, BRUKER                     
+REMARK 210                                                                      
+REMARK 210  STRUCTURE DETERMINATION.                                            
+REMARK 210   SOFTWARE USED                 : REGINE, DGII, DISCOVER             
+REMARK 210   METHOD USED                   : SEE REMARK 3                       
+REMARK 210                                                                      
+REMARK 210 CONFORMERS, NUMBER CALCULATED   : 50                                 
+REMARK 210 CONFORMERS, NUMBER SUBMITTED    : 48                                 
+REMARK 210 CONFORMERS, SELECTION CRITERIA  : ERROR FUNCTION DGII                
+REMARK 210                                                                      
+REMARK 210 BEST REPRESENTATIVE CONFORMER IN THIS ENSEMBLE : NULL                
+REMARK 210                                                                      
+REMARK 210 REMARK: NULL                                                         
+REMARK 215                                                                      
+REMARK 215 NMR STUDY                                                            
+REMARK 215 THE COORDINATES IN THIS ENTRY WERE GENERATED FROM SOLUTION           
+REMARK 215 NMR DATA.  PROTEIN DATA BANK CONVENTIONS REQUIRE THAT                
+REMARK 215 CRYST1 AND SCALE RECORDS BE INCLUDED, BUT THE VALUES ON              
+REMARK 215 THESE RECORDS ARE MEANINGLESS.                                       
+REMARK 465                                                                      
+REMARK 465 MISSING RESIDUES                                                     
+REMARK 465 THE FOLLOWING RESIDUES WERE NOT LOCATED IN THE                       
+REMARK 465 EXPERIMENT. (M=MODEL NUMBER; RES=RESIDUE NAME; C=CHAIN               
+REMARK 465 IDENTIFIER; SSSEQ=SEQUENCE NUMBER; I=INSERTION CODE.)                
+REMARK 465                                                                      
+REMARK 465   M RES C SSSEQI                                                     
+REMARK 465   1 ASN A   158                                                      
+REMARK 465   1 HIS A   159                                                      
+REMARK 465   1 GLN A   160                                                      
+REMARK 465   1 ASP A   161                                                      
+REMARK 465   1 HIS A   162                                                      
+REMARK 465   1 ASN A   163                                                      
+REMARK 465   1 ASN A   164                                                      
+REMARK 465   1 PHE A   165                                                      
+REMARK 465   1 GLN A   166                                                      
+REMARK 465   1 THR A   167                                                      
+REMARK 465   1 LEU A   168                                                      
+REMARK 465   1 PRO A   169                                                      
+REMARK 465   1 TYR A   170                                                      
+REMARK 465   2 ASN A   158                                                      
+REMARK 465   2 HIS A   159                                                      
+REMARK 465   2 GLN A   160                                                      
+REMARK 465   2 ASP A   161                                                      
+REMARK 465   2 HIS A   162                                                      
+REMARK 465   2 ASN A   163                                                      
+REMARK 465   2 ASN A   164                                                      
+REMARK 465   2 PHE A   165                                                      
+REMARK 465   2 GLN A   166                                                      
+REMARK 465   2 THR A   167                                                      
+REMARK 465   2 LEU A   168                                                      
+REMARK 465   2 PRO A   169                                                      
+REMARK 465   2 TYR A   170                                                      
+REMARK 465   3 ASN A   158                                                      
+REMARK 465   3 HIS A   159                                                      
+REMARK 465   3 GLN A   160                                                      
+REMARK 465   3 ASP A   161                                                      
+REMARK 465   3 HIS A   162                                                      
+REMARK 465   3 ASN A   163                                                      
+REMARK 465   3 ASN A   164                                                      
+REMARK 465   3 PHE A   165                                                      
+REMARK 465   3 GLN A   166                                                      
+REMARK 465   3 THR A   167                                                      
+REMARK 465   3 LEU A   168                                                      
+REMARK 465   3 PRO A   169                                                      
+REMARK 465   3 TYR A   170                                                      
+REMARK 465   4 ASN A   158                                                      
+REMARK 465   4 HIS A   159                                                      
+REMARK 465   4 GLN A   160                                                      
+REMARK 465   4 ASP A   161                                                      
+REMARK 465   4 HIS A   162                                                      
+REMARK 465   4 ASN A   163                                                      
+REMARK 465   4 ASN A   164                                                      
+REMARK 465   4 PHE A   165                                                      
+REMARK 465   4 GLN A   166                                                      
+REMARK 465   4 THR A   167                                                      
+REMARK 465   4 LEU A   168                                                      
+REMARK 465   4 PRO A   169                                                      
+REMARK 465   4 TYR A   170                                                      
+REMARK 465   5 ASN A   158                                                      
+REMARK 465   5 HIS A   159                                                      
+REMARK 465   5 GLN A   160                                                      
+REMARK 465   5 ASP A   161                                                      
+REMARK 465   5 HIS A   162                                                      
+REMARK 465   5 ASN A   163                                                      
+REMARK 465   5 ASN A   164                                                      
+REMARK 465   5 PHE A   165                                                      
+REMARK 465   5 GLN A   166                                                      
+REMARK 465   5 THR A   167                                                      
+REMARK 465   5 LEU A   168                                                      
+REMARK 465   5 PRO A   169                                                      
+REMARK 465   5 TYR A   170                                                      
+REMARK 465   6 ASN A   158                                                      
+REMARK 465   6 HIS A   159                                                      
+REMARK 465   6 GLN A   160                                                      
+REMARK 465   6 ASP A   161                                                      
+REMARK 465   6 HIS A   162                                                      
+REMARK 465   6 ASN A   163                                                      
+REMARK 465   6 ASN A   164                                                      
+REMARK 465   6 PHE A   165                                                      
+REMARK 465   6 GLN A   166                                                      
+REMARK 465   6 THR A   167                                                      
+REMARK 465   6 LEU A   168                                                      
+REMARK 465   6 PRO A   169                                                      
+REMARK 465   6 TYR A   170                                                      
+REMARK 465   7 ASN A   158                                                      
+REMARK 465   7 HIS A   159                                                      
+REMARK 465   7 GLN A   160                                                      
+REMARK 465   7 ASP A   161                                                      
+REMARK 465   7 HIS A   162                                                      
+REMARK 465   7 ASN A   163                                                      
+REMARK 465   7 ASN A   164                                                      
+REMARK 465   7 PHE A   165                                                      
+REMARK 465   7 GLN A   166                                                      
+REMARK 465   7 THR A   167                                                      
+REMARK 465   7 LEU A   168                                                      
+REMARK 465   7 PRO A   169                                                      
+REMARK 465   7 TYR A   170                                                      
+REMARK 465   8 ASN A   158                                                      
+REMARK 465   8 HIS A   159                                                      
+REMARK 465   8 GLN A   160                                                      
+REMARK 465   8 ASP A   161                                                      
+REMARK 465   8 HIS A   162                                                      
+REMARK 465   8 ASN A   163                                                      
+REMARK 465   8 ASN A   164                                                      
+REMARK 465   8 PHE A   165                                                      
+REMARK 465   8 GLN A   166                                                      
+REMARK 465   8 THR A   167                                                      
+REMARK 465   8 LEU A   168                                                      
+REMARK 465   8 PRO A   169                                                      
+REMARK 465   8 TYR A   170                                                      
+REMARK 465   9 ASN A   158                                                      
+REMARK 465   9 HIS A   159                                                      
+REMARK 465   9 GLN A   160                                                      
+REMARK 465   9 ASP A   161                                                      
+REMARK 465   9 HIS A   162                                                      
+REMARK 465   9 ASN A   163                                                      
+REMARK 465   9 ASN A   164                                                      
+REMARK 465   9 PHE A   165                                                      
+REMARK 465   9 GLN A   166                                                      
+REMARK 465   9 THR A   167                                                      
+REMARK 465   9 LEU A   168                                                      
+REMARK 465   9 PRO A   169                                                      
+REMARK 465   9 TYR A   170                                                      
+REMARK 465  10 ASN A   158                                                      
+REMARK 465  10 HIS A   159                                                      
+REMARK 465  10 GLN A   160                                                      
+REMARK 465  10 ASP A   161                                                      
+REMARK 465  10 HIS A   162                                                      
+REMARK 465  10 ASN A   163                                                      
+REMARK 465  10 ASN A   164                                                      
+REMARK 465  10 PHE A   165                                                      
+REMARK 465  10 GLN A   166                                                      
+REMARK 465  10 THR A   167                                                      
+REMARK 465  10 LEU A   168                                                      
+REMARK 465  10 PRO A   169                                                      
+REMARK 465  10 TYR A   170                                                      
+REMARK 465  11 ASN A   158                                                      
+REMARK 465  11 HIS A   159                                                      
+REMARK 465  11 GLN A   160                                                      
+REMARK 465  11 ASP A   161                                                      
+REMARK 465  11 HIS A   162                                                      
+REMARK 465  11 ASN A   163                                                      
+REMARK 465  11 ASN A   164                                                      
+REMARK 465  11 PHE A   165                                                      
+REMARK 465  11 GLN A   166                                                      
+REMARK 465  11 THR A   167                                                      
+REMARK 465  11 LEU A   168                                                      
+REMARK 465  11 PRO A   169                                                      
+REMARK 465  11 TYR A   170                                                      
+REMARK 465  12 ASN A   158                                                      
+REMARK 465  12 HIS A   159                                                      
+REMARK 465  12 GLN A   160                                                      
+REMARK 465  12 ASP A   161                                                      
+REMARK 465  12 HIS A   162                                                      
+REMARK 465  12 ASN A   163                                                      
+REMARK 465  12 ASN A   164                                                      
+REMARK 465  12 PHE A   165                                                      
+REMARK 465  12 GLN A   166                                                      
+REMARK 465  12 THR A   167                                                      
+REMARK 465  12 LEU A   168                                                      
+REMARK 465  12 PRO A   169                                                      
+REMARK 465  12 TYR A   170                                                      
+REMARK 465  13 ASN A   158                                                      
+REMARK 465  13 HIS A   159                                                      
+REMARK 465  13 GLN A   160                                                      
+REMARK 465  13 ASP A   161                                                      
+REMARK 465  13 HIS A   162                                                      
+REMARK 465  13 ASN A   163                                                      
+REMARK 465  13 ASN A   164                                                      
+REMARK 465  13 PHE A   165                                                      
+REMARK 465  13 GLN A   166                                                      
+REMARK 465  13 THR A   167                                                      
+REMARK 465  13 LEU A   168                                                      
+REMARK 465  13 PRO A   169                                                      
+REMARK 465  13 TYR A   170                                                      
+REMARK 465  14 ASN A   158                                                      
+REMARK 465  14 HIS A   159                                                      
+REMARK 465  14 GLN A   160                                                      
+REMARK 465  14 ASP A   161                                                      
+REMARK 465  14 HIS A   162                                                      
+REMARK 465  14 ASN A   163                                                      
+REMARK 465  14 ASN A   164                                                      
+REMARK 465  14 PHE A   165                                                      
+REMARK 465  14 GLN A   166                                                      
+REMARK 465  14 THR A   167                                                      
+REMARK 465  14 LEU A   168                                                      
+REMARK 465  14 PRO A   169                                                      
+REMARK 465  14 TYR A   170                                                      
+REMARK 465  15 ASN A   158                                                      
+REMARK 465  15 HIS A   159                                                      
+REMARK 465  15 GLN A   160                                                      
+REMARK 465  15 ASP A   161                                                      
+REMARK 465  15 HIS A   162                                                      
+REMARK 465  15 ASN A   163                                                      
+REMARK 465  15 ASN A   164                                                      
+REMARK 465  15 PHE A   165                                                      
+REMARK 465  15 GLN A   166                                                      
+REMARK 465  15 THR A   167                                                      
+REMARK 465  15 LEU A   168                                                      
+REMARK 465  15 PRO A   169                                                      
+REMARK 465  15 TYR A   170                                                      
+REMARK 465  16 ASN A   158                                                      
+REMARK 465  16 HIS A   159                                                      
+REMARK 465  16 GLN A   160                                                      
+REMARK 465  16 ASP A   161                                                      
+REMARK 465  16 HIS A   162                                                      
+REMARK 465  16 ASN A   163                                                      
+REMARK 465  16 ASN A   164                                                      
+REMARK 465  16 PHE A   165                                                      
+REMARK 465  16 GLN A   166                                                      
+REMARK 465  16 THR A   167                                                      
+REMARK 465  16 LEU A   168                                                      
+REMARK 465  16 PRO A   169                                                      
+REMARK 465  16 TYR A   170                                                      
+REMARK 465  17 ASN A   158                                                      
+REMARK 465  17 HIS A   159                                                      
+REMARK 465  17 GLN A   160                                                      
+REMARK 465  17 ASP A   161                                                      
+REMARK 465  17 HIS A   162                                                      
+REMARK 465  17 ASN A   163                                                      
+REMARK 465  17 ASN A   164                                                      
+REMARK 465  17 PHE A   165                                                      
+REMARK 465  17 GLN A   166                                                      
+REMARK 465  17 THR A   167                                                      
+REMARK 465  17 LEU A   168                                                      
+REMARK 465  17 PRO A   169                                                      
+REMARK 465  17 TYR A   170                                                      
+REMARK 465  18 ASN A   158                                                      
+REMARK 465  18 HIS A   159                                                      
+REMARK 465  18 GLN A   160                                                      
+REMARK 465  18 ASP A   161                                                      
+REMARK 465  18 HIS A   162                                                      
+REMARK 465  18 ASN A   163                                                      
+REMARK 465  18 ASN A   164                                                      
+REMARK 465  18 PHE A   165                                                      
+REMARK 465  18 GLN A   166                                                      
+REMARK 465  18 THR A   167                                                      
+REMARK 465  18 LEU A   168                                                      
+REMARK 465  18 PRO A   169                                                      
+REMARK 465  18 TYR A   170                                                      
+REMARK 465  19 ASN A   158                                                      
+REMARK 465  19 HIS A   159                                                      
+REMARK 465  19 GLN A   160                                                      
+REMARK 465  19 ASP A   161                                                      
+REMARK 465  19 HIS A   162                                                      
+REMARK 465  19 ASN A   163                                                      
+REMARK 465  19 ASN A   164                                                      
+REMARK 465  19 PHE A   165                                                      
+REMARK 465  19 GLN A   166                                                      
+REMARK 465  19 THR A   167                                                      
+REMARK 465  19 LEU A   168                                                      
+REMARK 465  19 PRO A   169                                                      
+REMARK 465  19 TYR A   170                                                      
+REMARK 465  20 ASN A   158                                                      
+REMARK 465  20 HIS A   159                                                      
+REMARK 465  20 GLN A   160                                                      
+REMARK 465  20 ASP A   161                                                      
+REMARK 465  20 HIS A   162                                                      
+REMARK 465  20 ASN A   163                                                      
+REMARK 465  20 ASN A   164                                                      
+REMARK 465  20 PHE A   165                                                      
+REMARK 465  20 GLN A   166                                                      
+REMARK 465  20 THR A   167                                                      
+REMARK 465  20 LEU A   168                                                      
+REMARK 465  20 PRO A   169                                                      
+REMARK 465  20 TYR A   170                                                      
+REMARK 465  21 ASN A   158                                                      
+REMARK 465  21 HIS A   159                                                      
+REMARK 465  21 GLN A   160                                                      
+REMARK 465  21 ASP A   161                                                      
+REMARK 465  21 HIS A   162                                                      
+REMARK 465  21 ASN A   163                                                      
+REMARK 465  21 ASN A   164                                                      
+REMARK 465  21 PHE A   165                                                      
+REMARK 465  21 GLN A   166                                                      
+REMARK 465  21 THR A   167                                                      
+REMARK 465  21 LEU A   168                                                      
+REMARK 465  21 PRO A   169                                                      
+REMARK 465  21 TYR A   170                                                      
+REMARK 465  22 ASN A   158                                                      
+REMARK 465  22 HIS A   159                                                      
+REMARK 465  22 GLN A   160                                                      
+REMARK 465  22 ASP A   161                                                      
+REMARK 465  22 HIS A   162                                                      
+REMARK 465  22 ASN A   163                                                      
+REMARK 465  22 ASN A   164                                                      
+REMARK 465  22 PHE A   165                                                      
+REMARK 465  22 GLN A   166                                                      
+REMARK 465  22 THR A   167                                                      
+REMARK 465  22 LEU A   168                                                      
+REMARK 465  22 PRO A   169                                                      
+REMARK 465  22 TYR A   170                                                      
+REMARK 465  23 ASN A   158                                                      
+REMARK 465  23 HIS A   159                                                      
+REMARK 465  23 GLN A   160                                                      
+REMARK 465  23 ASP A   161                                                      
+REMARK 465  23 HIS A   162                                                      
+REMARK 465  23 ASN A   163                                                      
+REMARK 465  23 ASN A   164                                                      
+REMARK 465  23 PHE A   165                                                      
+REMARK 465  23 GLN A   166                                                      
+REMARK 465  23 THR A   167                                                      
+REMARK 465  23 LEU A   168                                                      
+REMARK 465  23 PRO A   169                                                      
+REMARK 465  23 TYR A   170                                                      
+REMARK 465  24 ASN A   158                                                      
+REMARK 465  24 HIS A   159                                                      
+REMARK 465  24 GLN A   160                                                      
+REMARK 465  24 ASP A   161                                                      
+REMARK 465  24 HIS A   162                                                      
+REMARK 465  24 ASN A   163                                                      
+REMARK 465  24 ASN A   164                                                      
+REMARK 465  24 PHE A   165                                                      
+REMARK 465  24 GLN A   166                                                      
+REMARK 465  24 THR A   167                                                      
+REMARK 465  24 LEU A   168                                                      
+REMARK 465  24 PRO A   169                                                      
+REMARK 465  24 TYR A   170                                                      
+REMARK 465  25 ASN A   158                                                      
+REMARK 465  25 HIS A   159                                                      
+REMARK 465  25 GLN A   160                                                      
+REMARK 465  25 ASP A   161                                                      
+REMARK 465  25 HIS A   162                                                      
+REMARK 465  25 ASN A   163                                                      
+REMARK 465  25 ASN A   164                                                      
+REMARK 465  25 PHE A   165                                                      
+REMARK 465  25 GLN A   166                                                      
+REMARK 465  25 THR A   167                                                      
+REMARK 465  25 LEU A   168                                                      
+REMARK 465  25 PRO A   169                                                      
+REMARK 465  25 TYR A   170                                                      
+REMARK 465  26 ASN A   158                                                      
+REMARK 465  26 HIS A   159                                                      
+REMARK 465  26 GLN A   160                                                      
+REMARK 465  26 ASP A   161                                                      
+REMARK 465  26 HIS A   162                                                      
+REMARK 465  26 ASN A   163                                                      
+REMARK 465  26 ASN A   164                                                      
+REMARK 465  26 PHE A   165                                                      
+REMARK 465  26 GLN A   166                                                      
+REMARK 465  26 THR A   167                                                      
+REMARK 465  26 LEU A   168                                                      
+REMARK 465  26 PRO A   169                                                      
+REMARK 465  26 TYR A   170                                                      
+REMARK 465  27 ASN A   158                                                      
+REMARK 465  27 HIS A   159                                                      
+REMARK 465  27 GLN A   160                                                      
+REMARK 465  27 ASP A   161                                                      
+REMARK 465  27 HIS A   162                                                      
+REMARK 465  27 ASN A   163                                                      
+REMARK 465  27 ASN A   164                                                      
+REMARK 465  27 PHE A   165                                                      
+REMARK 465  27 GLN A   166                                                      
+REMARK 465  27 THR A   167                                                      
+REMARK 465  27 LEU A   168                                                      
+REMARK 465  27 PRO A   169                                                      
+REMARK 465  27 TYR A   170                                                      
+REMARK 465  28 ASN A   158                                                      
+REMARK 465  28 HIS A   159                                                      
+REMARK 465  28 GLN A   160                                                      
+REMARK 465  28 ASP A   161                                                      
+REMARK 465  28 HIS A   162                                                      
+REMARK 465  28 ASN A   163                                                      
+REMARK 465  28 ASN A   164                                                      
+REMARK 465  28 PHE A   165                                                      
+REMARK 465  28 GLN A   166                                                      
+REMARK 465  28 THR A   167                                                      
+REMARK 465  28 LEU A   168                                                      
+REMARK 465  28 PRO A   169                                                      
+REMARK 465  28 TYR A   170                                                      
+REMARK 465  29 ASN A   158                                                      
+REMARK 465  29 HIS A   159                                                      
+REMARK 465  29 GLN A   160                                                      
+REMARK 465  29 ASP A   161                                                      
+REMARK 465  29 HIS A   162                                                      
+REMARK 465  29 ASN A   163                                                      
+REMARK 465  29 ASN A   164                                                      
+REMARK 465  29 PHE A   165                                                      
+REMARK 465  29 GLN A   166                                                      
+REMARK 465  29 THR A   167                                                      
+REMARK 465  29 LEU A   168                                                      
+REMARK 465  29 PRO A   169                                                      
+REMARK 465  29 TYR A   170                                                      
+REMARK 465  30 ASN A   158                                                      
+REMARK 465  30 HIS A   159                                                      
+REMARK 465  30 GLN A   160                                                      
+REMARK 465  30 ASP A   161                                                      
+REMARK 465  30 HIS A   162                                                      
+REMARK 465  30 ASN A   163                                                      
+REMARK 465  30 ASN A   164                                                      
+REMARK 465  30 PHE A   165                                                      
+REMARK 465  30 GLN A   166                                                      
+REMARK 465  30 THR A   167                                                      
+REMARK 465  30 LEU A   168                                                      
+REMARK 465  30 PRO A   169                                                      
+REMARK 465  30 TYR A   170                                                      
+REMARK 465  31 ASN A   158                                                      
+REMARK 465  31 HIS A   159                                                      
+REMARK 465  31 GLN A   160                                                      
+REMARK 465  31 ASP A   161                                                      
+REMARK 465  31 HIS A   162                                                      
+REMARK 465  31 ASN A   163                                                      
+REMARK 465  31 ASN A   164                                                      
+REMARK 465  31 PHE A   165                                                      
+REMARK 465  31 GLN A   166                                                      
+REMARK 465  31 THR A   167                                                      
+REMARK 465  31 LEU A   168                                                      
+REMARK 465  31 PRO A   169                                                      
+REMARK 465  31 TYR A   170                                                      
+REMARK 465  32 ASN A   158                                                      
+REMARK 465  32 HIS A   159                                                      
+REMARK 465  32 GLN A   160                                                      
+REMARK 465  32 ASP A   161                                                      
+REMARK 465  32 HIS A   162                                                      
+REMARK 465  32 ASN A   163                                                      
+REMARK 465  32 ASN A   164                                                      
+REMARK 465  32 PHE A   165                                                      
+REMARK 465  32 GLN A   166                                                      
+REMARK 465  32 THR A   167                                                      
+REMARK 465  32 LEU A   168                                                      
+REMARK 465  32 PRO A   169                                                      
+REMARK 465  32 TYR A   170                                                      
+REMARK 465  33 ASN A   158                                                      
+REMARK 465  33 HIS A   159                                                      
+REMARK 465  33 GLN A   160                                                      
+REMARK 465  33 ASP A   161                                                      
+REMARK 465  33 HIS A   162                                                      
+REMARK 465  33 ASN A   163                                                      
+REMARK 465  33 ASN A   164                                                      
+REMARK 465  33 PHE A   165                                                      
+REMARK 465  33 GLN A   166                                                      
+REMARK 465  33 THR A   167                                                      
+REMARK 465  33 LEU A   168                                                      
+REMARK 465  33 PRO A   169                                                      
+REMARK 465  33 TYR A   170                                                      
+REMARK 465  34 ASN A   158                                                      
+REMARK 465  34 HIS A   159                                                      
+REMARK 465  34 GLN A   160                                                      
+REMARK 465  34 ASP A   161                                                      
+REMARK 465  34 HIS A   162                                                      
+REMARK 465  34 ASN A   163                                                      
+REMARK 465  34 ASN A   164                                                      
+REMARK 465  34 PHE A   165                                                      
+REMARK 465  34 GLN A   166                                                      
+REMARK 465  34 THR A   167                                                      
+REMARK 465  34 LEU A   168                                                      
+REMARK 465  34 PRO A   169                                                      
+REMARK 465  34 TYR A   170                                                      
+REMARK 465  35 ASN A   158                                                      
+REMARK 465  35 HIS A   159                                                      
+REMARK 465  35 GLN A   160                                                      
+REMARK 465  35 ASP A   161                                                      
+REMARK 465  35 HIS A   162                                                      
+REMARK 465  35 ASN A   163                                                      
+REMARK 465  35 ASN A   164                                                      
+REMARK 465  35 PHE A   165                                                      
+REMARK 465  35 GLN A   166                                                      
+REMARK 465  35 THR A   167                                                      
+REMARK 465  35 LEU A   168                                                      
+REMARK 465  35 PRO A   169                                                      
+REMARK 465  35 TYR A   170                                                      
+REMARK 465  36 ASN A   158                                                      
+REMARK 465  36 HIS A   159                                                      
+REMARK 465  36 GLN A   160                                                      
+REMARK 465  36 ASP A   161                                                      
+REMARK 465  36 HIS A   162                                                      
+REMARK 465  36 ASN A   163                                                      
+REMARK 465  36 ASN A   164                                                      
+REMARK 465  36 PHE A   165                                                      
+REMARK 465  36 GLN A   166                                                      
+REMARK 465  36 THR A   167                                                      
+REMARK 465  36 LEU A   168                                                      
+REMARK 465  36 PRO A   169                                                      
+REMARK 465  36 TYR A   170                                                      
+REMARK 465  37 ASN A   158                                                      
+REMARK 465  37 HIS A   159                                                      
+REMARK 465  37 GLN A   160                                                      
+REMARK 465  37 ASP A   161                                                      
+REMARK 465  37 HIS A   162                                                      
+REMARK 465  37 ASN A   163                                                      
+REMARK 465  37 ASN A   164                                                      
+REMARK 465  37 PHE A   165                                                      
+REMARK 465  37 GLN A   166                                                      
+REMARK 465  37 THR A   167                                                      
+REMARK 465  37 LEU A   168                                                      
+REMARK 465  37 PRO A   169                                                      
+REMARK 465  37 TYR A   170                                                      
+REMARK 465  38 ASN A   158                                                      
+REMARK 465  38 HIS A   159                                                      
+REMARK 465  38 GLN A   160                                                      
+REMARK 465  38 ASP A   161                                                      
+REMARK 465  38 HIS A   162                                                      
+REMARK 465  38 ASN A   163                                                      
+REMARK 465  38 ASN A   164                                                      
+REMARK 465  38 PHE A   165                                                      
+REMARK 465  38 GLN A   166                                                      
+REMARK 465  38 THR A   167                                                      
+REMARK 465  38 LEU A   168                                                      
+REMARK 465  38 PRO A   169                                                      
+REMARK 465  38 TYR A   170                                                      
+REMARK 465  39 ASN A   158                                                      
+REMARK 465  39 HIS A   159                                                      
+REMARK 465  39 GLN A   160                                                      
+REMARK 465  39 ASP A   161                                                      
+REMARK 465  39 HIS A   162                                                      
+REMARK 465  39 ASN A   163                                                      
+REMARK 465  39 ASN A   164                                                      
+REMARK 465  39 PHE A   165                                                      
+REMARK 465  39 GLN A   166                                                      
+REMARK 465  39 THR A   167                                                      
+REMARK 465  39 LEU A   168                                                      
+REMARK 465  39 PRO A   169                                                      
+REMARK 465  39 TYR A   170                                                      
+REMARK 465  40 ASN A   158                                                      
+REMARK 465  40 HIS A   159                                                      
+REMARK 465  40 GLN A   160                                                      
+REMARK 465  40 ASP A   161                                                      
+REMARK 465  40 HIS A   162                                                      
+REMARK 465  40 ASN A   163                                                      
+REMARK 465  40 ASN A   164                                                      
+REMARK 465  40 PHE A   165                                                      
+REMARK 465  40 GLN A   166                                                      
+REMARK 465  40 THR A   167                                                      
+REMARK 465  40 LEU A   168                                                      
+REMARK 465  40 PRO A   169                                                      
+REMARK 465  40 TYR A   170                                                      
+REMARK 465  41 ASN A   158                                                      
+REMARK 465  41 HIS A   159                                                      
+REMARK 465  41 GLN A   160                                                      
+REMARK 465  41 ASP A   161                                                      
+REMARK 465  41 HIS A   162                                                      
+REMARK 465  41 ASN A   163                                                      
+REMARK 465  41 ASN A   164                                                      
+REMARK 465  41 PHE A   165                                                      
+REMARK 465  41 GLN A   166                                                      
+REMARK 465  41 THR A   167                                                      
+REMARK 465  41 LEU A   168                                                      
+REMARK 465  41 PRO A   169                                                      
+REMARK 465  41 TYR A   170                                                      
+REMARK 465  42 ASN A   158                                                      
+REMARK 465  42 HIS A   159                                                      
+REMARK 465  42 GLN A   160                                                      
+REMARK 465  42 ASP A   161                                                      
+REMARK 465  42 HIS A   162                                                      
+REMARK 465  42 ASN A   163                                                      
+REMARK 465  42 ASN A   164                                                      
+REMARK 465  42 PHE A   165                                                      
+REMARK 465  42 GLN A   166                                                      
+REMARK 465  42 THR A   167                                                      
+REMARK 465  42 LEU A   168                                                      
+REMARK 465  42 PRO A   169                                                      
+REMARK 465  42 TYR A   170                                                      
+REMARK 465  43 ASN A   158                                                      
+REMARK 465  43 HIS A   159                                                      
+REMARK 465  43 GLN A   160                                                      
+REMARK 465  43 ASP A   161                                                      
+REMARK 465  43 HIS A   162                                                      
+REMARK 465  43 ASN A   163                                                      
+REMARK 465  43 ASN A   164                                                      
+REMARK 465  43 PHE A   165                                                      
+REMARK 465  43 GLN A   166                                                      
+REMARK 465  43 THR A   167                                                      
+REMARK 465  43 LEU A   168                                                      
+REMARK 465  43 PRO A   169                                                      
+REMARK 465  43 TYR A   170                                                      
+REMARK 465  44 ASN A   158                                                      
+REMARK 465  44 HIS A   159                                                      
+REMARK 465  44 GLN A   160                                                      
+REMARK 465  44 ASP A   161                                                      
+REMARK 465  44 HIS A   162                                                      
+REMARK 465  44 ASN A   163                                                      
+REMARK 465  44 ASN A   164                                                      
+REMARK 465  44 PHE A   165                                                      
+REMARK 465  44 GLN A   166                                                      
+REMARK 465  44 THR A   167                                                      
+REMARK 465  44 LEU A   168                                                      
+REMARK 465  44 PRO A   169                                                      
+REMARK 465  44 TYR A   170                                                      
+REMARK 465  45 ASN A   158                                                      
+REMARK 465  45 HIS A   159                                                      
+REMARK 465  45 GLN A   160                                                      
+REMARK 465  45 ASP A   161                                                      
+REMARK 465  45 HIS A   162                                                      
+REMARK 465  45 ASN A   163                                                      
+REMARK 465  45 ASN A   164                                                      
+REMARK 465  45 PHE A   165                                                      
+REMARK 465  45 GLN A   166                                                      
+REMARK 465  45 THR A   167                                                      
+REMARK 465  45 LEU A   168                                                      
+REMARK 465  45 PRO A   169                                                      
+REMARK 465  45 TYR A   170                                                      
+REMARK 465  46 ASN A   158                                                      
+REMARK 465  46 HIS A   159                                                      
+REMARK 465  46 GLN A   160                                                      
+REMARK 465  46 ASP A   161                                                      
+REMARK 465  46 HIS A   162                                                      
+REMARK 465  46 ASN A   163                                                      
+REMARK 465  46 ASN A   164                                                      
+REMARK 465  46 PHE A   165                                                      
+REMARK 465  46 GLN A   166                                                      
+REMARK 465  46 THR A   167                                                      
+REMARK 465  46 LEU A   168                                                      
+REMARK 465  46 PRO A   169                                                      
+REMARK 465  46 TYR A   170                                                      
+REMARK 465  47 ASN A   158                                                      
+REMARK 465  47 HIS A   159                                                      
+REMARK 465  47 GLN A   160                                                      
+REMARK 465  47 ASP A   161                                                      
+REMARK 465  47 HIS A   162                                                      
+REMARK 465  47 ASN A   163                                                      
+REMARK 465  47 ASN A   164                                                      
+REMARK 465  47 PHE A   165                                                      
+REMARK 465  47 GLN A   166                                                      
+REMARK 465  47 THR A   167                                                      
+REMARK 465  47 LEU A   168                                                      
+REMARK 465  47 PRO A   169                                                      
+REMARK 465  47 TYR A   170                                                      
+REMARK 465  48 ASN A   158                                                      
+REMARK 465  48 HIS A   159                                                      
+REMARK 465  48 GLN A   160                                                      
+REMARK 465  48 ASP A   161                                                      
+REMARK 465  48 HIS A   162                                                      
+REMARK 465  48 ASN A   163                                                      
+REMARK 465  48 ASN A   164                                                      
+REMARK 465  48 PHE A   165                                                      
+REMARK 465  48 GLN A   166                                                      
+REMARK 465  48 THR A   167                                                      
+REMARK 465  48 LEU A   168                                                      
+REMARK 465  48 PRO A   169                                                      
+REMARK 465  48 TYR A   170                                                      
+DBREF  1BRV A  158   189  UNP    P22261   VGLG_BRSVC     158    189             
+SEQRES   1 A   32  ASN HIS GLN ASP HIS ASN ASN PHE GLN THR LEU PRO TYR          
+SEQRES   2 A   32  VAL PRO CYS SER THR CYS GLU GLY ASN LEU ALA CYS LEU          
+SEQRES   3 A   32  SER LEU CYS HIS ILE GLU                                      
+HELIX    1  H1 CYS A  173  CYS A  176  1                                   4    
+HELIX    2  H2 LEU A  180  LEU A  185  1                                   6    
+TURN     1  T1 CYS A 176  ASN A 179                                             
+SSBOND   1 CYS A  173    CYS A  186                                             
+SSBOND   2 CYS A  176    CYS A  182                                             
+CRYST1    1.000    1.000    1.000  90.00  90.00  90.00 P 1           1          
+ORIGX1      1.000000  0.000000  0.000000        0.00000                         
+ORIGX2      0.000000  1.000000  0.000000        0.00000                         
+ORIGX3      0.000000  0.000000  1.000000        0.00000                         
+SCALE1      1.000000  0.000000  0.000000        0.00000                         
+SCALE2      0.000000  1.000000  0.000000        0.00000                         
+SCALE3      0.000000  0.000000  1.000000        0.00000                         
+MODEL        1                                                                  
+ATOM      1  N   VAL A 171       3.148   2.384   5.854  1.00  0.00           N  
+ATOM      2  CA  VAL A 171       3.495   2.127   4.420  1.00  0.00           C  
+ATOM      3  C   VAL A 171       2.427   1.356   3.559  1.00  0.00           C  
+ATOM      4  O   VAL A 171       2.123   1.866   2.480  1.00  0.00           O  
+ATOM      5  CB  VAL A 171       4.938   1.541   4.174  1.00  0.00           C  
+ATOM      6  CG1 VAL A 171       5.507   2.026   2.823  1.00  0.00           C  
+ATOM      7  CG2 VAL A 171       6.023   1.845   5.227  1.00  0.00           C  
+ATOM      8  HA  VAL A 171       3.465   3.113   3.981  1.00  0.00           H  
+ATOM      9  HB  VAL A 171       4.856   0.437   4.118  1.00  0.00           H  
+ATOM     10 HG11 VAL A 171       4.753   1.986   2.020  1.00  0.00           H  
+ATOM     11 HG12 VAL A 171       5.833   3.082   2.862  1.00  0.00           H  
+ATOM     12 HG13 VAL A 171       6.365   1.423   2.473  1.00  0.00           H  
+ATOM     13 HG21 VAL A 171       6.175   2.933   5.352  1.00  0.00           H  
+ATOM     14 HG22 VAL A 171       5.744   1.435   6.215  1.00  0.00           H  
+ATOM     15 HG23 VAL A 171       6.997   1.396   4.958  1.00  0.00           H  
+ATOM     16  N   PRO A 172       1.878   0.162   3.927  1.00  0.00           N  
+ATOM     17  CA  PRO A 172       0.906  -0.611   3.099  1.00  0.00           C  
+ATOM     18  C   PRO A 172      -0.287   0.182   2.484  1.00  0.00           C  
+ATOM     19  O   PRO A 172      -0.898   1.022   3.151  1.00  0.00           O  
+ATOM     20  CB  PRO A 172       0.448  -1.697   4.096  1.00  0.00           C  
+ATOM     21  CG  PRO A 172       1.597  -1.849   5.094  1.00  0.00           C  
+ATOM     22  CD  PRO A 172       2.141  -0.430   5.234  1.00  0.00           C  
+ATOM     23  HA  PRO A 172       1.481  -1.099   2.286  1.00  0.00           H  
+ATOM     24  HB2 PRO A 172      -0.468  -1.382   4.636  1.00  0.00           H  
+ATOM     25  HB3 PRO A 172       0.206  -2.649   3.589  1.00  0.00           H  
+ATOM     26  HG2 PRO A 172       1.275  -2.277   6.061  1.00  0.00           H  
+ATOM     27  HG3 PRO A 172       2.380  -2.515   4.680  1.00  0.00           H  
+ATOM     28  HD2 PRO A 172       1.604   0.193   5.980  1.00  0.00           H  
+ATOM     29  HD3 PRO A 172       3.222  -0.385   5.473  1.00  0.00           H  
+ATOM     30  N   CYS A 173      -0.632  -0.092   1.220  1.00  0.00           N  
+ATOM     31  CA  CYS A 173      -1.678   0.656   0.474  1.00  0.00           C  
+ATOM     32  C   CYS A 173      -3.117   0.621   1.088  1.00  0.00           C  
+ATOM     33  O   CYS A 173      -3.799   1.651   1.062  1.00  0.00           O  
+ATOM     34  CB  CYS A 173      -1.526   0.263  -0.993  1.00  0.00           C  
+ATOM     35  SG  CYS A 173      -0.637   1.510  -1.923  1.00  0.00           S  
+ATOM     36  H   CYS A 173      -0.142  -0.869   0.763  1.00  0.00           H  
+ATOM     37  HA  CYS A 173      -1.418   1.718   0.472  1.00  0.00           H  
+ATOM     38  HB2 CYS A 173      -0.883  -0.607  -1.141  1.00  0.00           H  
+ATOM     39  HB3 CYS A 173      -2.514   0.080  -1.407  1.00  0.00           H  
+ATOM     40  N   SER A 174      -3.543  -0.500   1.706  1.00  0.00           N  
+ATOM     41  CA  SER A 174      -4.768  -0.517   2.565  1.00  0.00           C  
+ATOM     42  C   SER A 174      -4.780   0.424   3.823  1.00  0.00           C  
+ATOM     43  O   SER A 174      -5.824   0.630   4.442  1.00  0.00           O  
+ATOM     44  CB  SER A 174      -5.054  -1.966   3.015  1.00  0.00           C  
+ATOM     45  OG  SER A 174      -4.100  -2.446   3.970  1.00  0.00           O  
+ATOM     46  H   SER A 174      -2.881  -1.288   1.665  1.00  0.00           H  
+ATOM     47  HA  SER A 174      -5.602  -0.169   1.949  1.00  0.00           H  
+ATOM     48  HB2 SER A 174      -6.064  -2.000   3.472  1.00  0.00           H  
+ATOM     49  HB3 SER A 174      -5.092  -2.640   2.141  1.00  0.00           H  
+ATOM     50  HG  SER A 174      -4.113  -1.823   4.708  1.00  0.00           H  
+ATOM     51  N   THR A 175      -3.608   0.934   4.218  1.00  0.00           N  
+ATOM     52  CA  THR A 175      -3.424   1.881   5.351  1.00  0.00           C  
+ATOM     53  C   THR A 175      -3.118   3.362   4.904  1.00  0.00           C  
+ATOM     54  O   THR A 175      -3.378   4.287   5.676  1.00  0.00           O  
+ATOM     55  CB  THR A 175      -2.380   1.292   6.352  1.00  0.00           C  
+ATOM     56  OG1 THR A 175      -1.050   1.316   5.834  1.00  0.00           O  
+ATOM     57  CG2 THR A 175      -2.673  -0.158   6.787  1.00  0.00           C  
+ATOM     58  H   THR A 175      -2.816   0.646   3.626  1.00  0.00           H  
+ATOM     59  HA  THR A 175      -4.383   1.930   5.902  1.00  0.00           H  
+ATOM     60  HB  THR A 175      -2.396   1.928   7.261  1.00  0.00           H  
+ATOM     61  HG1 THR A 175      -1.098   1.219   4.871  1.00  0.00           H  
+ATOM     62 HG21 THR A 175      -3.718  -0.269   7.137  1.00  0.00           H  
+ATOM     63 HG22 THR A 175      -2.550  -0.861   5.940  1.00  0.00           H  
+ATOM     64 HG23 THR A 175      -1.997  -0.492   7.588  1.00  0.00           H  
+ATOM     65  N   CYS A 176      -2.585   3.610   3.683  1.00  0.00           N  
+ATOM     66  CA  CYS A 176      -2.413   4.967   3.102  1.00  0.00           C  
+ATOM     67  C   CYS A 176      -3.779   5.648   2.729  1.00  0.00           C  
+ATOM     68  O   CYS A 176      -3.963   6.844   2.960  1.00  0.00           O  
+ATOM     69  CB  CYS A 176      -1.448   4.723   1.917  1.00  0.00           C  
+ATOM     70  SG  CYS A 176       0.143   4.150   2.538  1.00  0.00           S  
+ATOM     71  H   CYS A 176      -2.620   2.822   3.031  1.00  0.00           H  
+ATOM     72  HA  CYS A 176      -1.916   5.626   3.841  1.00  0.00           H  
+ATOM     73  HB2 CYS A 176      -1.819   4.029   1.170  1.00  0.00           H  
+ATOM     74  HB3 CYS A 176      -1.272   5.606   1.280  1.00  0.00           H  
+ATOM     75  N   GLU A 177      -4.712   4.876   2.135  1.00  0.00           N  
+ATOM     76  CA  GLU A 177      -6.130   5.252   1.886  1.00  0.00           C  
+ATOM     77  C   GLU A 177      -6.434   6.598   1.167  1.00  0.00           C  
+ATOM     78  O   GLU A 177      -7.282   7.399   1.570  1.00  0.00           O  
+ATOM     79  CB  GLU A 177      -6.964   5.037   3.191  1.00  0.00           C  
+ATOM     80  CG  GLU A 177      -7.065   3.589   3.739  1.00  0.00           C  
+ATOM     81  CD  GLU A 177      -7.806   2.598   2.841  1.00  0.00           C  
+ATOM     82  OE1 GLU A 177      -7.292   2.010   1.895  1.00  0.00           O  
+ATOM     83  OE2 GLU A 177      -9.108   2.443   3.203  1.00  0.00           O  
+ATOM     84  H   GLU A 177      -4.351   3.981   1.796  1.00  0.00           H  
+ATOM     85  HA  GLU A 177      -6.459   4.500   1.155  1.00  0.00           H  
+ATOM     86  HB2 GLU A 177      -6.552   5.695   3.983  1.00  0.00           H  
+ATOM     87  HB3 GLU A 177      -7.994   5.415   3.040  1.00  0.00           H  
+ATOM     88  HG2 GLU A 177      -6.055   3.188   3.933  1.00  0.00           H  
+ATOM     89  HG3 GLU A 177      -7.553   3.599   4.730  1.00  0.00           H  
+ATOM     90  HE2 GLU A 177      -9.504   1.808   2.607  1.00  0.00           H  
+ATOM     91  N   GLY A 178      -5.752   6.785   0.037  1.00  0.00           N  
+ATOM     92  CA  GLY A 178      -5.865   8.025  -0.757  1.00  0.00           C  
+ATOM     93  C   GLY A 178      -4.728   9.062  -0.646  1.00  0.00           C  
+ATOM     94  O   GLY A 178      -4.767  10.068  -1.356  1.00  0.00           O  
+ATOM     95  H   GLY A 178      -4.860   6.281   0.066  1.00  0.00           H  
+ATOM     96  HA2 GLY A 178      -5.922   7.707  -1.808  1.00  0.00           H  
+ATOM     97  HA3 GLY A 178      -6.815   8.530  -0.551  1.00  0.00           H  
+ATOM     98  N   ASN A 179      -3.706   8.829   0.199  1.00  0.00           N  
+ATOM     99  CA  ASN A 179      -2.522   9.700   0.277  1.00  0.00           C  
+ATOM    100  C   ASN A 179      -1.544   9.171  -0.758  1.00  0.00           C  
+ATOM    101  O   ASN A 179      -0.889   8.137  -0.585  1.00  0.00           O  
+ATOM    102  CB  ASN A 179      -1.873   9.583   1.670  1.00  0.00           C  
+ATOM    103  CG  ASN A 179      -0.957  10.747   2.007  1.00  0.00           C  
+ATOM    104  OD1 ASN A 179       0.189  10.813   1.581  1.00  0.00           O  
+ATOM    105  ND2 ASN A 179      -1.440  11.710   2.738  1.00  0.00           N  
+ATOM    106  H   ASN A 179      -3.640   7.852   0.503  1.00  0.00           H  
+ATOM    107  HA  ASN A 179      -2.773  10.732  -0.034  1.00  0.00           H  
+ATOM    108  HB2 ASN A 179      -2.615   9.413   2.475  1.00  0.00           H  
+ATOM    109  HB3 ASN A 179      -1.237   8.674   1.615  1.00  0.00           H  
+ATOM    110 HD21 ASN A 179      -2.400  11.589   3.072  1.00  0.00           H  
+ATOM    111 HD22 ASN A 179      -0.775  12.460   2.935  1.00  0.00           H  
+ATOM    112  N   LEU A 180      -1.432   9.906  -1.841  1.00  0.00           N  
+ATOM    113  CA  LEU A 180      -0.643   9.431  -2.972  1.00  0.00           C  
+ATOM    114  C   LEU A 180       0.892   9.213  -2.782  1.00  0.00           C  
+ATOM    115  O   LEU A 180       1.494   8.383  -3.459  1.00  0.00           O  
+ATOM    116  CB  LEU A 180      -1.055  10.373  -4.115  1.00  0.00           C  
+ATOM    117  CG  LEU A 180      -2.237   9.939  -4.988  1.00  0.00           C  
+ATOM    118  CD1 LEU A 180      -2.682  11.075  -5.921  1.00  0.00           C  
+ATOM    119  CD2 LEU A 180      -1.959   8.672  -5.819  1.00  0.00           C  
+ATOM    120  H   LEU A 180      -2.081  10.694  -1.923  1.00  0.00           H  
+ATOM    121  HA  LEU A 180      -1.061   8.418  -3.048  1.00  0.00           H  
+ATOM    122  HB2 LEU A 180      -1.225  11.399  -3.711  1.00  0.00           H  
+ATOM    123  HB3 LEU A 180      -0.209  10.437  -4.770  1.00  0.00           H  
+ATOM    124  HG  LEU A 180      -3.028   9.739  -4.269  1.00  0.00           H  
+ATOM    125 HD11 LEU A 180      -2.950  11.990  -5.360  1.00  0.00           H  
+ATOM    126 HD12 LEU A 180      -1.893  11.354  -6.645  1.00  0.00           H  
+ATOM    127 HD13 LEU A 180      -3.577  10.795  -6.509  1.00  0.00           H  
+ATOM    128 HD21 LEU A 180      -1.689   7.805  -5.190  1.00  0.00           H  
+ATOM    129 HD22 LEU A 180      -2.844   8.368  -6.408  1.00  0.00           H  
+ATOM    130 HD23 LEU A 180      -1.129   8.821  -6.536  1.00  0.00           H  
+ATOM    131  N   ALA A 181       1.475   9.933  -1.825  1.00  0.00           N  
+ATOM    132  CA  ALA A 181       2.838   9.678  -1.317  1.00  0.00           C  
+ATOM    133  C   ALA A 181       2.938   8.331  -0.514  1.00  0.00           C  
+ATOM    134  O   ALA A 181       3.763   7.490  -0.860  1.00  0.00           O  
+ATOM    135  CB  ALA A 181       3.235  10.911  -0.497  1.00  0.00           C  
+ATOM    136  H   ALA A 181       0.757  10.474  -1.344  1.00  0.00           H  
+ATOM    137  HA  ALA A 181       3.511   9.610  -2.185  1.00  0.00           H  
+ATOM    138  HB1 ALA A 181       3.199  11.833  -1.104  1.00  0.00           H  
+ATOM    139  HB2 ALA A 181       2.572  11.050   0.378  1.00  0.00           H  
+ATOM    140  HB3 ALA A 181       4.266  10.804  -0.114  1.00  0.00           H  
+ATOM    141  N   CYS A 182       2.072   8.098   0.499  1.00  0.00           N  
+ATOM    142  CA  CYS A 182       1.959   6.791   1.221  1.00  0.00           C  
+ATOM    143  C   CYS A 182       1.712   5.560   0.300  1.00  0.00           C  
+ATOM    144  O   CYS A 182       2.440   4.566   0.327  1.00  0.00           O  
+ATOM    145  CB  CYS A 182       0.940   7.042   2.327  1.00  0.00           C  
+ATOM    146  SG  CYS A 182       0.908   5.697   3.521  1.00  0.00           S  
+ATOM    147  H   CYS A 182       1.256   8.721   0.466  1.00  0.00           H  
+ATOM    148  HA  CYS A 182       2.839   6.537   1.771  1.00  0.00           H  
+ATOM    149  HB2 CYS A 182       1.106   8.002   2.824  1.00  0.00           H  
+ATOM    150  HB3 CYS A 182      -0.055   7.117   1.895  1.00  0.00           H  
+ATOM    151  N   LEU A 183       0.704   5.703  -0.551  1.00  0.00           N  
+ATOM    152  CA  LEU A 183       0.381   4.775  -1.646  1.00  0.00           C  
+ATOM    153  C   LEU A 183       1.513   4.504  -2.707  1.00  0.00           C  
+ATOM    154  O   LEU A 183       1.576   3.413  -3.271  1.00  0.00           O  
+ATOM    155  CB  LEU A 183      -0.823   5.490  -2.292  1.00  0.00           C  
+ATOM    156  CG  LEU A 183      -2.202   5.479  -1.626  1.00  0.00           C  
+ATOM    157  CD1 LEU A 183      -3.185   6.267  -2.508  1.00  0.00           C  
+ATOM    158  CD2 LEU A 183      -2.768   4.057  -1.461  1.00  0.00           C  
+ATOM    159  H   LEU A 183       0.187   6.587  -0.447  1.00  0.00           H  
+ATOM    160  HA  LEU A 183       0.078   3.807  -1.217  1.00  0.00           H  
+ATOM    161  HB2 LEU A 183      -0.527   6.514  -2.567  1.00  0.00           H  
+ATOM    162  HB3 LEU A 183      -0.995   5.046  -3.230  1.00  0.00           H  
+ATOM    163  HG  LEU A 183      -2.033   5.979  -0.657  1.00  0.00           H  
+ATOM    164 HD11 LEU A 183      -3.178   5.911  -3.557  1.00  0.00           H  
+ATOM    165 HD12 LEU A 183      -4.225   6.171  -2.161  1.00  0.00           H  
+ATOM    166 HD13 LEU A 183      -2.948   7.343  -2.537  1.00  0.00           H  
+ATOM    167 HD21 LEU A 183      -2.100   3.411  -0.873  1.00  0.00           H  
+ATOM    168 HD22 LEU A 183      -3.744   4.050  -0.943  1.00  0.00           H  
+ATOM    169 HD23 LEU A 183      -2.906   3.548  -2.434  1.00  0.00           H  
+ATOM    170  N   SER A 184       2.363   5.503  -3.000  1.00  0.00           N  
+ATOM    171  CA  SER A 184       3.580   5.320  -3.861  1.00  0.00           C  
+ATOM    172  C   SER A 184       4.719   4.467  -3.195  1.00  0.00           C  
+ATOM    173  O   SER A 184       5.379   3.681  -3.878  1.00  0.00           O  
+ATOM    174  CB  SER A 184       4.122   6.692  -4.329  1.00  0.00           C  
+ATOM    175  OG  SER A 184       3.185   7.377  -5.160  1.00  0.00           O  
+ATOM    176  H   SER A 184       2.177   6.316  -2.395  1.00  0.00           H  
+ATOM    177  HA  SER A 184       3.284   4.765  -4.774  1.00  0.00           H  
+ATOM    178  HB2 SER A 184       4.400   7.324  -3.463  1.00  0.00           H  
+ATOM    179  HB3 SER A 184       5.058   6.549  -4.904  1.00  0.00           H  
+ATOM    180  HG  SER A 184       2.460   7.661  -4.578  1.00  0.00           H  
+ATOM    181  N   LEU A 185       4.964   4.630  -1.881  1.00  0.00           N  
+ATOM    182  CA  LEU A 185       5.904   3.755  -1.102  1.00  0.00           C  
+ATOM    183  C   LEU A 185       5.451   2.289  -0.825  1.00  0.00           C  
+ATOM    184  O   LEU A 185       6.273   1.425  -0.499  1.00  0.00           O  
+ATOM    185  CB  LEU A 185       6.203   4.431   0.275  1.00  0.00           C  
+ATOM    186  CG  LEU A 185       6.573   5.930   0.343  1.00  0.00           C  
+ATOM    187  CD1 LEU A 185       6.729   6.386   1.802  1.00  0.00           C  
+ATOM    188  CD2 LEU A 185       7.845   6.267  -0.449  1.00  0.00           C  
+ATOM    189  H   LEU A 185       4.317   5.286  -1.419  1.00  0.00           H  
+ATOM    190  HA  LEU A 185       6.831   3.585  -1.651  1.00  0.00           H  
+ATOM    191  HB2 LEU A 185       5.302   4.300   0.907  1.00  0.00           H  
+ATOM    192  HB3 LEU A 185       6.995   3.849   0.784  1.00  0.00           H  
+ATOM    193  HG  LEU A 185       5.712   6.477  -0.086  1.00  0.00           H  
+ATOM    194 HD11 LEU A 185       5.809   6.200   2.388  1.00  0.00           H  
+ATOM    195 HD12 LEU A 185       7.558   5.864   2.317  1.00  0.00           H  
+ATOM    196 HD13 LEU A 185       6.931   7.471   1.870  1.00  0.00           H  
+ATOM    197 HD21 LEU A 185       7.734   6.009  -1.519  1.00  0.00           H  
+ATOM    198 HD22 LEU A 185       8.078   7.347  -0.408  1.00  0.00           H  
+ATOM    199 HD23 LEU A 185       8.729   5.721  -0.070  1.00  0.00           H  
+ATOM    200  N   CYS A 186       4.147   2.039  -0.912  1.00  0.00           N  
+ATOM    201  CA  CYS A 186       3.548   0.801  -0.461  1.00  0.00           C  
+ATOM    202  C   CYS A 186       3.726  -0.590  -1.148  1.00  0.00           C  
+ATOM    203  O   CYS A 186       4.066  -0.789  -2.316  1.00  0.00           O  
+ATOM    204  CB  CYS A 186       2.044   1.151  -0.432  1.00  0.00           C  
+ATOM    205  SG  CYS A 186       1.257   0.888  -2.035  1.00  0.00           S  
+ATOM    206  H   CYS A 186       3.613   2.902  -0.780  1.00  0.00           H  
+ATOM    207  HA  CYS A 186       3.966   0.719   0.554  1.00  0.00           H  
+ATOM    208  HB2 CYS A 186       1.615   0.492   0.319  1.00  0.00           H  
+ATOM    209  HB3 CYS A 186       1.747   2.139  -0.069  1.00  0.00           H  
+ATOM    210  N   HIS A 187       3.303  -1.548  -0.323  1.00  0.00           N  
+ATOM    211  CA  HIS A 187       3.143  -2.974  -0.667  1.00  0.00           C  
+ATOM    212  C   HIS A 187       1.627  -3.177  -1.036  1.00  0.00           C  
+ATOM    213  O   HIS A 187       0.729  -2.737  -0.302  1.00  0.00           O  
+ATOM    214  CB  HIS A 187       3.566  -3.848   0.552  1.00  0.00           C  
+ATOM    215  CG  HIS A 187       4.807  -3.453   1.351  1.00  0.00           C  
+ATOM    216  ND1 HIS A 187       4.784  -2.490   2.352  1.00  0.00           N  
+ATOM    217  CD2 HIS A 187       6.095  -3.650   0.877  1.00  0.00           C  
+ATOM    218  CE1 HIS A 187       6.111  -2.159   2.359  1.00  0.00           C  
+ATOM    219  NE2 HIS A 187       6.987  -2.824   1.540  1.00  0.00           N  
+ATOM    220  H   HIS A 187       3.441  -1.266   0.654  1.00  0.00           H  
+ATOM    221  HA  HIS A 187       3.792  -3.247  -1.514  1.00  0.00           H  
+ATOM    222  HB2 HIS A 187       2.747  -3.882   1.262  1.00  0.00           H  
+ATOM    223  HB3 HIS A 187       3.672  -4.886   0.211  1.00  0.00           H  
+ATOM    224  HD2 HIS A 187       6.262  -4.210  -0.026  1.00  0.00           H  
+ATOM    225  HE1 HIS A 187       6.413  -1.264   2.882  1.00  0.00           H  
+ATOM    226  HE2 HIS A 187       7.931  -2.538   1.256  1.00  0.00           H  
+ATOM    227  N   ILE A 188       1.322  -3.887  -2.133  1.00  0.00           N  
+ATOM    228  CA  ILE A 188      -0.089  -4.021  -2.627  1.00  0.00           C  
+ATOM    229  C   ILE A 188      -0.737  -5.306  -2.007  1.00  0.00           C  
+ATOM    230  O   ILE A 188      -0.405  -6.445  -2.348  1.00  0.00           O  
+ATOM    231  CB  ILE A 188      -0.137  -3.939  -4.193  1.00  0.00           C  
+ATOM    232  CG1 ILE A 188       0.407  -2.606  -4.802  1.00  0.00           C  
+ATOM    233  CG2 ILE A 188      -1.536  -4.229  -4.801  1.00  0.00           C  
+ATOM    234  CD1 ILE A 188      -0.330  -1.304  -4.433  1.00  0.00           C  
+ATOM    235  H   ILE A 188       2.125  -4.154  -2.710  1.00  0.00           H  
+ATOM    236  HA  ILE A 188      -0.679  -3.145  -2.305  1.00  0.00           H  
+ATOM    237  HB  ILE A 188       0.525  -4.746  -4.550  1.00  0.00           H  
+ATOM    238 HG12 ILE A 188       1.469  -2.481  -4.516  1.00  0.00           H  
+ATOM    239 HG13 ILE A 188       0.432  -2.691  -5.905  1.00  0.00           H  
+ATOM    240 HG21 ILE A 188      -2.305  -3.521  -4.439  1.00  0.00           H  
+ATOM    241 HG22 ILE A 188      -1.530  -4.168  -5.906  1.00  0.00           H  
+ATOM    242 HG23 ILE A 188      -1.892  -5.246  -4.552  1.00  0.00           H  
+ATOM    243 HD11 ILE A 188      -1.391  -1.317  -4.743  1.00  0.00           H  
+ATOM    244 HD12 ILE A 188      -0.299  -1.110  -3.348  1.00  0.00           H  
+ATOM    245 HD13 ILE A 188       0.138  -0.429  -4.923  1.00  0.00           H  
+ATOM    246  N   GLU A 189      -1.677  -5.079  -1.078  1.00  0.00           N  
+ATOM    247  CA  GLU A 189      -2.365  -6.130  -0.299  1.00  0.00           C  
+ATOM    248  C   GLU A 189      -3.852  -5.764  -0.007  1.00  0.00           C  
+ATOM    249  O   GLU A 189      -4.277  -4.631   0.213  1.00  0.00           O  
+ATOM    250  CB  GLU A 189      -1.560  -6.479   0.994  1.00  0.00           C  
+ATOM    251  CG  GLU A 189      -0.949  -5.341   1.870  1.00  0.00           C  
+ATOM    252  CD  GLU A 189      -1.882  -4.216   2.311  1.00  0.00           C  
+ATOM    253  OE1 GLU A 189      -1.836  -3.076   1.860  1.00  0.00           O  
+ATOM    254  OE2 GLU A 189      -2.768  -4.618   3.260  1.00  0.00           O  
+ATOM    255  H   GLU A 189      -1.819  -4.105  -0.825  1.00  0.00           H  
+ATOM    256  HA  GLU A 189      -2.408  -7.021  -0.936  1.00  0.00           H  
+ATOM    257  HB2 GLU A 189      -2.177  -7.136   1.637  1.00  0.00           H  
+ATOM    258  HB3 GLU A 189      -0.720  -7.133   0.685  1.00  0.00           H  
+ATOM    259  HG2 GLU A 189      -0.484  -5.774   2.774  1.00  0.00           H  
+ATOM    260  HG3 GLU A 189      -0.111  -4.871   1.322  1.00  0.00           H  
+ATOM    261  HE2 GLU A 189      -3.332  -3.862   3.473  1.00  0.00           H  
+TER     262      GLU A 189                                                      
+ENDMDL                                                                          
+MODEL        2                                                                  
+ATOM      1  N   VAL A 171       4.901   0.542   3.705  1.00  0.00           N  
+ATOM      2  CA  VAL A 171       4.518  -0.401   2.606  1.00  0.00           C  
+ATOM      3  C   VAL A 171       3.080  -1.069   2.546  1.00  0.00           C  
+ATOM      4  O   VAL A 171       2.793  -1.667   1.501  1.00  0.00           O  
+ATOM      5  CB  VAL A 171       5.731  -1.369   2.367  1.00  0.00           C  
+ATOM      6  CG1 VAL A 171       6.014  -2.359   3.523  1.00  0.00           C  
+ATOM      7  CG2 VAL A 171       5.703  -2.179   1.056  1.00  0.00           C  
+ATOM      8  HA  VAL A 171       4.447   0.267   1.747  1.00  0.00           H  
+ATOM      9  HB  VAL A 171       6.606  -0.706   2.227  1.00  0.00           H  
+ATOM     10 HG11 VAL A 171       6.184  -1.836   4.482  1.00  0.00           H  
+ATOM     11 HG12 VAL A 171       5.173  -3.060   3.680  1.00  0.00           H  
+ATOM     12 HG13 VAL A 171       6.918  -2.970   3.336  1.00  0.00           H  
+ATOM     13 HG21 VAL A 171       5.568  -1.521   0.181  1.00  0.00           H  
+ATOM     14 HG22 VAL A 171       6.649  -2.728   0.891  1.00  0.00           H  
+ATOM     15 HG23 VAL A 171       4.890  -2.930   1.031  1.00  0.00           H  
+ATOM     16  H1  VAL A 171       5.110   0.015   4.559  1.00  0.00           H  
+ATOM     17  H2  VAL A 171       5.777   1.020   3.465  1.00  0.00           H  
+ATOM     18  N   PRO A 172       2.108  -0.985   3.499  1.00  0.00           N  
+ATOM     19  CA  PRO A 172       0.739  -1.527   3.306  1.00  0.00           C  
+ATOM     20  C   PRO A 172      -0.238  -0.439   2.734  1.00  0.00           C  
+ATOM     21  O   PRO A 172      -0.729   0.425   3.471  1.00  0.00           O  
+ATOM     22  CB  PRO A 172       0.436  -2.017   4.736  1.00  0.00           C  
+ATOM     23  CG  PRO A 172       1.184  -1.067   5.681  1.00  0.00           C  
+ATOM     24  CD  PRO A 172       2.355  -0.513   4.864  1.00  0.00           C  
+ATOM     25  HA  PRO A 172       0.735  -2.411   2.636  1.00  0.00           H  
+ATOM     26  HB2 PRO A 172      -0.648  -2.075   4.953  1.00  0.00           H  
+ATOM     27  HB3 PRO A 172       0.830  -3.046   4.860  1.00  0.00           H  
+ATOM     28  HG2 PRO A 172       0.529  -0.240   6.003  1.00  0.00           H  
+ATOM     29  HG3 PRO A 172       1.521  -1.576   6.603  1.00  0.00           H  
+ATOM     30  HD2 PRO A 172       2.395   0.596   4.860  1.00  0.00           H  
+ATOM     31  HD3 PRO A 172       3.324  -0.895   5.234  1.00  0.00           H  
+ATOM     32  N   CYS A 173      -0.549  -0.493   1.423  1.00  0.00           N  
+ATOM     33  CA  CYS A 173      -1.517   0.431   0.744  1.00  0.00           C  
+ATOM     34  C   CYS A 173      -2.940   0.577   1.397  1.00  0.00           C  
+ATOM     35  O   CYS A 173      -3.527   1.664   1.346  1.00  0.00           O  
+ATOM     36  CB  CYS A 173      -1.519   0.023  -0.733  1.00  0.00           C  
+ATOM     37  SG  CYS A 173      -0.562   1.067  -1.835  1.00  0.00           S  
+ATOM     38  H   CYS A 173       0.007  -1.132   0.839  1.00  0.00           H  
+ATOM     39  HA  CYS A 173      -1.120   1.448   0.731  1.00  0.00           H  
+ATOM     40  HB2 CYS A 173      -1.038  -0.942  -0.897  1.00  0.00           H  
+ATOM     41  HB3 CYS A 173      -2.545  -0.030  -1.073  1.00  0.00           H  
+ATOM     42  N   SER A 174      -3.453  -0.484   2.050  1.00  0.00           N  
+ATOM     43  CA  SER A 174      -4.655  -0.403   2.939  1.00  0.00           C  
+ATOM     44  C   SER A 174      -4.648   0.641   4.106  1.00  0.00           C  
+ATOM     45  O   SER A 174      -5.698   0.961   4.664  1.00  0.00           O  
+ATOM     46  CB  SER A 174      -4.913  -1.817   3.508  1.00  0.00           C  
+ATOM     47  OG  SER A 174      -3.857  -2.264   4.368  1.00  0.00           O  
+ATOM     48  H   SER A 174      -2.830  -1.300   2.039  1.00  0.00           H  
+ATOM     49  HA  SER A 174      -5.515  -0.112   2.334  1.00  0.00           H  
+ATOM     50  HB2 SER A 174      -5.869  -1.820   4.070  1.00  0.00           H  
+ATOM     51  HB3 SER A 174      -5.055  -2.540   2.684  1.00  0.00           H  
+ATOM     52  HG  SER A 174      -3.891  -1.721   5.163  1.00  0.00           H  
+ATOM     53  N   THR A 175      -3.465   1.138   4.472  1.00  0.00           N  
+ATOM     54  CA  THR A 175      -3.264   2.176   5.521  1.00  0.00           C  
+ATOM     55  C   THR A 175      -3.030   3.629   4.960  1.00  0.00           C  
+ATOM     56  O   THR A 175      -3.236   4.602   5.688  1.00  0.00           O  
+ATOM     57  CB  THR A 175      -2.124   1.699   6.475  1.00  0.00           C  
+ATOM     58  OG1 THR A 175      -0.845   1.796   5.853  1.00  0.00           O  
+ATOM     59  CG2 THR A 175      -2.278   0.249   6.981  1.00  0.00           C  
+ATOM     60  H   THR A 175      -2.669   0.726   3.964  1.00  0.00           H  
+ATOM     61  HA  THR A 175      -4.185   2.236   6.133  1.00  0.00           H  
+ATOM     62  HB  THR A 175      -2.125   2.373   7.356  1.00  0.00           H  
+ATOM     63  HG1 THR A 175      -0.875   1.261   5.046  1.00  0.00           H  
+ATOM     64 HG21 THR A 175      -3.291   0.074   7.390  1.00  0.00           H  
+ATOM     65 HG22 THR A 175      -2.149  -0.478   6.154  1.00  0.00           H  
+ATOM     66 HG23 THR A 175      -1.536  -0.003   7.753  1.00  0.00           H  
+ATOM     67  N   CYS A 176      -2.599   3.792   3.688  1.00  0.00           N  
+ATOM     68  CA  CYS A 176      -2.459   5.102   3.010  1.00  0.00           C  
+ATOM     69  C   CYS A 176      -3.834   5.729   2.602  1.00  0.00           C  
+ATOM     70  O   CYS A 176      -4.051   6.926   2.793  1.00  0.00           O  
+ATOM     71  CB  CYS A 176      -1.485   4.776   1.856  1.00  0.00           C  
+ATOM     72  SG  CYS A 176       0.086   4.231   2.554  1.00  0.00           S  
+ATOM     73  H   CYS A 176      -2.684   2.961   3.096  1.00  0.00           H  
+ATOM     74  HA  CYS A 176      -1.972   5.824   3.695  1.00  0.00           H  
+ATOM     75  HB2 CYS A 176      -1.844   4.046   1.134  1.00  0.00           H  
+ATOM     76  HB3 CYS A 176      -1.299   5.631   1.187  1.00  0.00           H  
+ATOM     77  N   GLU A 177      -4.739   4.918   2.019  1.00  0.00           N  
+ATOM     78  CA  GLU A 177      -6.166   5.264   1.751  1.00  0.00           C  
+ATOM     79  C   GLU A 177      -6.470   6.562   0.944  1.00  0.00           C  
+ATOM     80  O   GLU A 177      -7.329   7.380   1.288  1.00  0.00           O  
+ATOM     81  CB  GLU A 177      -6.989   5.137   3.072  1.00  0.00           C  
+ATOM     82  CG  GLU A 177      -7.026   3.726   3.716  1.00  0.00           C  
+ATOM     83  CD  GLU A 177      -7.793   3.657   5.031  1.00  0.00           C  
+ATOM     84  OE1 GLU A 177      -8.984   3.376   5.116  1.00  0.00           O  
+ATOM     85  OE2 GLU A 177      -7.007   3.939   6.104  1.00  0.00           O  
+ATOM     86  H   GLU A 177      -4.354   4.012   1.740  1.00  0.00           H  
+ATOM     87  HA  GLU A 177      -6.503   4.466   1.075  1.00  0.00           H  
+ATOM     88  HB2 GLU A 177      -6.602   5.874   3.804  1.00  0.00           H  
+ATOM     89  HB3 GLU A 177      -8.033   5.455   2.882  1.00  0.00           H  
+ATOM     90  HG2 GLU A 177      -7.467   2.990   3.022  1.00  0.00           H  
+ATOM     91  HG3 GLU A 177      -5.998   3.372   3.908  1.00  0.00           H  
+ATOM     92  HE2 GLU A 177      -7.550   3.888   6.889  1.00  0.00           H  
+ATOM     93  N   GLY A 178      -5.775   6.689  -0.188  1.00  0.00           N  
+ATOM     94  CA  GLY A 178      -5.876   7.888  -1.046  1.00  0.00           C  
+ATOM     95  C   GLY A 178      -4.773   8.962  -0.917  1.00  0.00           C  
+ATOM     96  O   GLY A 178      -4.806   9.946  -1.655  1.00  0.00           O  
+ATOM     97  H   GLY A 178      -4.877   6.205  -0.112  1.00  0.00           H  
+ATOM     98  HA2 GLY A 178      -5.862   7.524  -2.084  1.00  0.00           H  
+ATOM     99  HA3 GLY A 178      -6.849   8.372  -0.916  1.00  0.00           H  
+ATOM    100  N   ASN A 179      -3.782   8.778  -0.024  1.00  0.00           N  
+ATOM    101  CA  ASN A 179      -2.623   9.679   0.083  1.00  0.00           C  
+ATOM    102  C   ASN A 179      -1.601   9.140  -0.901  1.00  0.00           C  
+ATOM    103  O   ASN A 179      -0.963   8.102  -0.691  1.00  0.00           O  
+ATOM    104  CB  ASN A 179      -2.021   9.599   1.500  1.00  0.00           C  
+ATOM    105  CG  ASN A 179      -1.144  10.788   1.854  1.00  0.00           C  
+ATOM    106  OD1 ASN A 179       0.027  10.855   1.501  1.00  0.00           O  
+ATOM    107  ND2 ASN A 179      -1.688  11.770   2.516  1.00  0.00           N  
+ATOM    108  H   ASN A 179      -3.696   7.806   0.292  1.00  0.00           H  
+ATOM    109  HA  ASN A 179      -2.882  10.699  -0.260  1.00  0.00           H  
+ATOM    110  HB2 ASN A 179      -2.787   9.423   2.282  1.00  0.00           H  
+ATOM    111  HB3 ASN A 179      -1.363   8.704   1.485  1.00  0.00           H  
+ATOM    112 HD21 ASN A 179      -2.676  11.661   2.760  1.00  0.00           H  
+ATOM    113 HD22 ASN A 179      -1.053  12.546   2.710  1.00  0.00           H  
+ATOM    114  N   LEU A 180      -1.433   9.871  -1.977  1.00  0.00           N  
+ATOM    115  CA  LEU A 180      -0.614   9.376  -3.074  1.00  0.00           C  
+ATOM    116  C   LEU A 180       0.916   9.159  -2.834  1.00  0.00           C  
+ATOM    117  O   LEU A 180       1.537   8.331  -3.494  1.00  0.00           O  
+ATOM    118  CB  LEU A 180      -0.994  10.297  -4.238  1.00  0.00           C  
+ATOM    119  CG  LEU A 180      -2.188   9.889  -5.110  1.00  0.00           C  
+ATOM    120  CD1 LEU A 180      -2.609  11.029  -6.050  1.00  0.00           C  
+ATOM    121  CD2 LEU A 180      -1.942   8.610  -5.931  1.00  0.00           C  
+ATOM    122  H   LEU A 180      -2.029  10.698  -2.069  1.00  0.00           H  
+ATOM    123  HA  LEU A 180      -1.035   8.366  -3.162  1.00  0.00           H  
+ATOM    124  HB2 LEU A 180      -1.121  11.339  -3.859  1.00  0.00           H  
+ATOM    125  HB3 LEU A 180      -0.141  10.283  -4.883  1.00  0.00           H  
+ATOM    126  HG  LEU A 180      -2.987   9.711  -4.392  1.00  0.00           H  
+ATOM    127 HD11 LEU A 180      -2.842  11.958  -5.496  1.00  0.00           H  
+ATOM    128 HD12 LEU A 180      -1.820  11.276  -6.786  1.00  0.00           H  
+ATOM    129 HD13 LEU A 180      -3.519  10.772  -6.623  1.00  0.00           H  
+ATOM    130 HD21 LEU A 180      -1.701   7.740  -5.294  1.00  0.00           H  
+ATOM    131 HD22 LEU A 180      -2.831   8.326  -6.526  1.00  0.00           H  
+ATOM    132 HD23 LEU A 180      -1.102   8.731  -6.642  1.00  0.00           H  
+ATOM    133  N   ALA A 181       1.476   9.878  -1.863  1.00  0.00           N  
+ATOM    134  CA  ALA A 181       2.832   9.623  -1.329  1.00  0.00           C  
+ATOM    135  C   ALA A 181       2.919   8.333  -0.446  1.00  0.00           C  
+ATOM    136  O   ALA A 181       3.804   7.512  -0.674  1.00  0.00           O  
+ATOM    137  CB  ALA A 181       3.265  10.854  -0.542  1.00  0.00           C  
+ATOM    138  H   ALA A 181       0.750  10.442  -1.422  1.00  0.00           H  
+ATOM    139  HA  ALA A 181       3.511   9.504  -2.185  1.00  0.00           H  
+ATOM    140  HB1 ALA A 181       3.253  11.755  -1.177  1.00  0.00           H  
+ATOM    141  HB2 ALA A 181       2.606  11.014   0.332  1.00  0.00           H  
+ATOM    142  HB3 ALA A 181       4.293  10.708  -0.163  1.00  0.00           H  
+ATOM    143  N   CYS A 182       2.006   8.145   0.535  1.00  0.00           N  
+ATOM    144  CA  CYS A 182       1.870   6.864   1.295  1.00  0.00           C  
+ATOM    145  C   CYS A 182       1.652   5.617   0.386  1.00  0.00           C  
+ATOM    146  O   CYS A 182       2.308   4.581   0.509  1.00  0.00           O  
+ATOM    147  CB  CYS A 182       0.809   7.132   2.354  1.00  0.00           C  
+ATOM    148  SG  CYS A 182       0.764   5.804   3.565  1.00  0.00           S  
+ATOM    149  H   CYS A 182       1.179   8.743   0.415  1.00  0.00           H  
+ATOM    150  HA  CYS A 182       2.732   6.632   1.886  1.00  0.00           H  
+ATOM    151  HB2 CYS A 182       0.951   8.107   2.827  1.00  0.00           H  
+ATOM    152  HB3 CYS A 182      -0.174   7.185   1.891  1.00  0.00           H  
+ATOM    153  N   LEU A 183       0.739   5.785  -0.563  1.00  0.00           N  
+ATOM    154  CA  LEU A 183       0.496   4.853  -1.666  1.00  0.00           C  
+ATOM    155  C   LEU A 183       1.691   4.583  -2.640  1.00  0.00           C  
+ATOM    156  O   LEU A 183       1.833   3.468  -3.140  1.00  0.00           O  
+ATOM    157  CB  LEU A 183      -0.726   5.467  -2.351  1.00  0.00           C  
+ATOM    158  CG  LEU A 183      -2.107   5.338  -1.708  1.00  0.00           C  
+ATOM    159  CD1 LEU A 183      -3.131   6.009  -2.633  1.00  0.00           C  
+ATOM    160  CD2 LEU A 183      -2.523   3.865  -1.511  1.00  0.00           C  
+ATOM    161  H   LEU A 183       0.209   6.664  -0.495  1.00  0.00           H  
+ATOM    162  HA  LEU A 183       0.236   3.891  -1.232  1.00  0.00           H  
+ATOM    163  HB2 LEU A 183      -0.502   6.505  -2.626  1.00  0.00           H  
+ATOM    164  HB3 LEU A 183      -0.833   4.999  -3.282  1.00  0.00           H  
+ATOM    165  HG  LEU A 183      -2.009   5.893  -0.757  1.00  0.00           H  
+ATOM    166 HD11 LEU A 183      -3.085   5.595  -3.660  1.00  0.00           H  
+ATOM    167 HD12 LEU A 183      -4.163   5.862  -2.281  1.00  0.00           H  
+ATOM    168 HD13 LEU A 183      -2.952   7.097  -2.718  1.00  0.00           H  
+ATOM    169 HD21 LEU A 183      -1.810   3.300  -0.888  1.00  0.00           H  
+ATOM    170 HD22 LEU A 183      -3.506   3.766  -1.020  1.00  0.00           H  
+ATOM    171 HD23 LEU A 183      -2.574   3.319  -2.472  1.00  0.00           H  
+ATOM    172  N   SER A 184       2.531   5.595  -2.891  1.00  0.00           N  
+ATOM    173  CA  SER A 184       3.834   5.416  -3.605  1.00  0.00           C  
+ATOM    174  C   SER A 184       4.915   4.595  -2.804  1.00  0.00           C  
+ATOM    175  O   SER A 184       5.836   4.051  -3.420  1.00  0.00           O  
+ATOM    176  CB  SER A 184       4.381   6.795  -4.030  1.00  0.00           C  
+ATOM    177  OG  SER A 184       5.536   6.650  -4.860  1.00  0.00           O  
+ATOM    178  H   SER A 184       2.251   6.429  -2.353  1.00  0.00           H  
+ATOM    179  HA  SER A 184       3.644   4.841  -4.534  1.00  0.00           H  
+ATOM    180  HB2 SER A 184       3.613   7.367  -4.585  1.00  0.00           H  
+ATOM    181  HB3 SER A 184       4.632   7.407  -3.142  1.00  0.00           H  
+ATOM    182  HG  SER A 184       6.064   5.930  -4.489  1.00  0.00           H  
+ATOM    183  N   LEU A 185       4.842   4.539  -1.458  1.00  0.00           N  
+ATOM    184  CA  LEU A 185       5.682   3.616  -0.624  1.00  0.00           C  
+ATOM    185  C   LEU A 185       5.227   2.131  -0.695  1.00  0.00           C  
+ATOM    186  O   LEU A 185       6.053   1.214  -0.624  1.00  0.00           O  
+ATOM    187  CB  LEU A 185       5.725   4.086   0.863  1.00  0.00           C  
+ATOM    188  CG  LEU A 185       6.030   5.574   1.149  1.00  0.00           C  
+ATOM    189  CD1 LEU A 185       5.891   5.881   2.648  1.00  0.00           C  
+ATOM    190  CD2 LEU A 185       7.422   6.001   0.656  1.00  0.00           C  
+ATOM    191  H   LEU A 185       3.998   4.996  -1.071  1.00  0.00           H  
+ATOM    192  HA  LEU A 185       6.702   3.554  -1.023  1.00  0.00           H  
+ATOM    193  HB2 LEU A 185       4.745   3.851   1.323  1.00  0.00           H  
+ATOM    194  HB3 LEU A 185       6.446   3.453   1.416  1.00  0.00           H  
+ATOM    195  HG  LEU A 185       5.259   6.154   0.605  1.00  0.00           H  
+ATOM    196 HD11 LEU A 185       4.880   5.637   3.023  1.00  0.00           H  
+ATOM    197 HD12 LEU A 185       6.613   5.309   3.260  1.00  0.00           H  
+ATOM    198 HD13 LEU A 185       6.057   6.953   2.861  1.00  0.00           H  
+ATOM    199 HD21 LEU A 185       7.526   5.857  -0.436  1.00  0.00           H  
+ATOM    200 HD22 LEU A 185       7.612   7.073   0.846  1.00  0.00           H  
+ATOM    201 HD23 LEU A 185       8.233   5.428   1.143  1.00  0.00           H  
+ATOM    202  N   CYS A 186       3.912   1.908  -0.794  1.00  0.00           N  
+ATOM    203  CA  CYS A 186       3.333   0.592  -0.959  1.00  0.00           C  
+ATOM    204  C   CYS A 186       3.102   0.132  -2.439  1.00  0.00           C  
+ATOM    205  O   CYS A 186       3.306   0.832  -3.434  1.00  0.00           O  
+ATOM    206  CB  CYS A 186       1.999   0.665  -0.198  1.00  0.00           C  
+ATOM    207  SG  CYS A 186       0.908   1.887  -0.804  1.00  0.00           S  
+ATOM    208  H   CYS A 186       3.362   2.743  -0.989  1.00  0.00           H  
+ATOM    209  HA  CYS A 186       4.015  -0.092  -0.447  1.00  0.00           H  
+ATOM    210  HB2 CYS A 186       1.495  -0.286  -0.298  1.00  0.00           H  
+ATOM    211  HB3 CYS A 186       2.021   0.846   0.874  1.00  0.00           H  
+ATOM    212  N   HIS A 187       2.584  -1.090  -2.529  1.00  0.00           N  
+ATOM    213  CA  HIS A 187       2.148  -1.725  -3.793  1.00  0.00           C  
+ATOM    214  C   HIS A 187       0.602  -1.542  -3.904  1.00  0.00           C  
+ATOM    215  O   HIS A 187      -0.154  -1.955  -3.017  1.00  0.00           O  
+ATOM    216  CB  HIS A 187       2.544  -3.219  -3.789  1.00  0.00           C  
+ATOM    217  CG  HIS A 187       4.004  -3.554  -3.518  1.00  0.00           C  
+ATOM    218  ND1 HIS A 187       4.495  -3.649  -2.229  1.00  0.00           N  
+ATOM    219  CD2 HIS A 187       5.005  -3.192  -4.411  1.00  0.00           C  
+ATOM    220  CE1 HIS A 187       5.776  -3.241  -2.463  1.00  0.00           C  
+ATOM    221  NE2 HIS A 187       6.200  -2.994  -3.742  1.00  0.00           N  
+ATOM    222  H   HIS A 187       2.741  -1.626  -1.671  1.00  0.00           H  
+ATOM    223  HA  HIS A 187       2.655  -1.264  -4.657  1.00  0.00           H  
+ATOM    224  HB2 HIS A 187       1.938  -3.731  -3.056  1.00  0.00           H  
+ATOM    225  HB3 HIS A 187       2.244  -3.662  -4.740  1.00  0.00           H  
+ATOM    226  HD2 HIS A 187       4.741  -2.817  -5.384  1.00  0.00           H  
+ATOM    227  HE1 HIS A 187       6.311  -2.835  -1.621  1.00  0.00           H  
+ATOM    228  HE2 HIS A 187       6.987  -2.400  -4.027  1.00  0.00           H  
+ATOM    229  N   ILE A 188       0.127  -0.969  -5.012  1.00  0.00           N  
+ATOM    230  CA  ILE A 188      -1.319  -0.617  -5.185  1.00  0.00           C  
+ATOM    231  C   ILE A 188      -2.040  -1.787  -5.944  1.00  0.00           C  
+ATOM    232  O   ILE A 188      -1.754  -2.077  -7.109  1.00  0.00           O  
+ATOM    233  CB  ILE A 188      -1.483   0.787  -5.873  1.00  0.00           C  
+ATOM    234  CG1 ILE A 188      -0.755   1.964  -5.145  1.00  0.00           C  
+ATOM    235  CG2 ILE A 188      -2.977   1.177  -6.060  1.00  0.00           C  
+ATOM    236  CD1 ILE A 188      -0.490   3.208  -6.014  1.00  0.00           C  
+ATOM    237  H   ILE A 188       0.852  -0.715  -5.686  1.00  0.00           H  
+ATOM    238  HA  ILE A 188      -1.784  -0.488  -4.190  1.00  0.00           H  
+ATOM    239  HB  ILE A 188      -1.035   0.675  -6.873  1.00  0.00           H  
+ATOM    240 HG12 ILE A 188      -1.307   2.258  -4.233  1.00  0.00           H  
+ATOM    241 HG13 ILE A 188       0.233   1.634  -4.767  1.00  0.00           H  
+ATOM    242 HG21 ILE A 188      -3.535   0.424  -6.649  1.00  0.00           H  
+ATOM    243 HG22 ILE A 188      -3.505   1.287  -5.094  1.00  0.00           H  
+ATOM    244 HG23 ILE A 188      -3.096   2.130  -6.607  1.00  0.00           H  
+ATOM    245 HD11 ILE A 188       0.084   2.956  -6.925  1.00  0.00           H  
+ATOM    246 HD12 ILE A 188      -1.421   3.710  -6.334  1.00  0.00           H  
+ATOM    247 HD13 ILE A 188       0.109   3.957  -5.461  1.00  0.00           H  
+ATOM    248  N   GLU A 189      -2.996  -2.444  -5.266  1.00  0.00           N  
+ATOM    249  CA  GLU A 189      -3.717  -3.626  -5.802  1.00  0.00           C  
+ATOM    250  C   GLU A 189      -4.840  -3.244  -6.813  1.00  0.00           C  
+ATOM    251  O   GLU A 189      -5.819  -2.550  -6.544  1.00  0.00           O  
+ATOM    252  CB  GLU A 189      -4.284  -4.454  -4.608  1.00  0.00           C  
+ATOM    253  CG  GLU A 189      -3.272  -5.211  -3.696  1.00  0.00           C  
+ATOM    254  CD  GLU A 189      -2.385  -4.333  -2.812  1.00  0.00           C  
+ATOM    255  OE1 GLU A 189      -2.818  -3.541  -1.981  1.00  0.00           O  
+ATOM    256  OE2 GLU A 189      -1.065  -4.478  -3.098  1.00  0.00           O  
+ATOM    257  H   GLU A 189      -3.021  -2.238  -4.266  1.00  0.00           H  
+ATOM    258  HA  GLU A 189      -2.987  -4.265  -6.331  1.00  0.00           H  
+ATOM    259  HB2 GLU A 189      -4.941  -3.813  -3.985  1.00  0.00           H  
+ATOM    260  HB3 GLU A 189      -4.972  -5.219  -5.017  1.00  0.00           H  
+ATOM    261  HG2 GLU A 189      -3.825  -5.884  -3.017  1.00  0.00           H  
+ATOM    262  HG3 GLU A 189      -2.637  -5.880  -4.308  1.00  0.00           H  
+ATOM    263  HE2 GLU A 189      -0.596  -3.753  -2.671  1.00  0.00           H  
+TER     264      GLU A 189                                                      
+ENDMDL                                                                          
+END                                                                             

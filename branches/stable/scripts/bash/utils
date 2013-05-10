@@ -1,0 +1,30 @@
+#!/bin/bash
+
+OS_TYPE=`uname`
+
+returnValue= # global for fixing bash inabilities.
+
+function crossMkTempFile {
+    baseScript=`basename $1`
+#    if [ OS_TYPE = 'Darwin' ]; then
+#        returnValue="$( mktemp -t ${baseScript} )"
+#    else
+        returnValue="$( mktemp -t ${baseScript}.XXXXXXXXXXX )"
+#    fi
+}
+
+function crossMkTempDir {
+    baseScript=`basename $1`
+    returnValue="$( mktemp -d -t ${baseScript} )"
+}
+
+# TESTING
+if [ 0 = 1 ]; then
+    crossMkTempDir $0
+    tmp_dir=$returnValue
+    echo "tmp_dir: $tmp_dir"
+
+    crossMkTempFile $0
+    tmp_file=$returnValue
+    echo "tmp_file: $tmp_file"
+fi

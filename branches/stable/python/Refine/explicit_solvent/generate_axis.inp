@@ -1,0 +1,16 @@
+remarks
+remarks
+
+topology
+  @/mnt/home15/cc/cspronk/SOFTWARE/waterrefine/toppar/top_axis_aria.pro
+end
+
+segment  name=""
+ chain
+   coor @axis.pdb
+ end
+end
+
+write structure output=axis.psf end
+
+stop
