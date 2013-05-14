@@ -1,0 +1,26 @@
+Multiple NMR structures are handled by a Perl script called "nmr_strs",
+which calls "analyze" (or "cehs") to analyze each structure sequentially.
+The PDB NMR structure format is assumed. Specifically, each structure has
+the following format:
+
+MODEL    SERIAL-NUMBER
+............
+ATOM RECORDS
+............
+ENDMDL
+
+The input file is in the same format as for "analyze" (and "cehs"), with the
+output file name (2nd line) as the prefix for each structure analyzed (see
+1hrz.inp for an example).
+
+By modifying the Perl script "nmr_strs", there should be no big problems to
+analyze other kinds of multiple structures, e.g., those from MD simulations.
+
+============================================================================
+
+The best representative structure defined by "REMARK 210" (or the first if
+NULL or not defined) can be extracted as follows, using PDB entry 230d as an
+example:     ex_str -nmrb 230d.pdb 230d_rep.pdb
+
+The ensemble image can be generated using script "nmr_ensemble" as follows:
+                     nmr_ensemble -s=42 -i=230d.jpg 230d.pdb

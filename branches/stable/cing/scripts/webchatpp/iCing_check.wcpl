@@ -1,0 +1,12 @@
+print "Checked iCing servers\n";
+GET http://nmr.cmbi.ru.nl/icing
+  EXPECT OK 
+GET https://nmr.cmbi.ru.nl/icing
+  EXPECT OK 
+GET https://nmr.cmbi.ru.nl/icing/iCing.html
+  EXPECT OK 
+  EXPECT (! /ERROR/)
+  EXPECT /iCing: a web interface to CING/
+GET https://nmr.cmbi.ru.nl/icing/serv/iCingServlet
+  EXPECT OK 
+

@@ -1,0 +1,55 @@
+data_completeness_observable_info
+
+save_file_characteristics
+   _Saveframe_category   file_characteristics
+
+   _File_version         1.0
+   _Author              "Jurgen F. Doreleijers"
+
+   loop_
+      _Date
+      _Details
+
+       2004-01-30 "First creation from Aqua lib" 
+
+   stop_
+
+save_
+
+
+save_completeness_observable_info
+   _Saveframe_category   completeness_observable_info
+
+   _Details             
+;
+The listed residues/atom combination only considers amide protons.
+;
+
+   loop_
+      _Comp_ID
+      _Atom_ID
+
+       ALA  H 
+       ARG  H 
+       ASN  H 
+       ASP  H 
+       CYS  H 
+       GLN  H 
+       GLU  H 
+       GLY  H 
+       HIS  H 
+       ILE  H 
+       LEU  H 
+       LYS  H 
+       MET  H 
+       PHE  H 
+       SER  H 
+       THR  H 
+       TRP  H 
+       TYR  H 
+       VAL  H 
+
+   stop_
+
+save_
+

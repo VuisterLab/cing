@@ -1,0 +1,23 @@
+atom bb_p 'name = "C" | name = "CA" | name = "N"'
+atom bb_d 'name = "P" | name = "O[35]?" | name = "C[345]?"'
+atom bb 'bb_p | bb_d'
+atom proton 'name = "H*"'
+atom ca 'name = "CA"'
+atom pseudo 'name = "Q*"'
+atom lonepair 'name = "LP*"'
+atom heavy '! (proton | pseudo | lonepair)'
+atom sc '! bb & name != "HN"  & name != "H" & name != "HA*" & name != "O"'
+atom heavysc 'sc & heavy'
+
+atom phos 'name = "P" | name = "O[P35]?"' 
+atom base 'name = "C[245678]" | name = "N[1234679]" | name = "O[246]" | name = "H[123568]" | name = "H[2467][123]"'
+atom sugar '! (phos | base | pseudo)'
+
+bond bb 'atom1.bb & atom2.bb'
+bond heavy 'atom1.heavy & atom2.heavy'
+bond sc 'atom1.sc | atom2.sc'
+bond heavysc 'sc & heavy'
+
+bond phos 'atom1.phos & atom2.phos'
+bond base 'atom1.base & atom2.base'
+bond sugar 'atom1.sugar | atom2.sugar'

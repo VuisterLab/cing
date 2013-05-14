@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<orgPdbCompositeQuery version="1.0">
+ <queryRefinement>
+  <queryRefinementLevel>0</queryRefinementLevel>
+  <orgPdbQuery>
+    <version>B0907</version>
+    <queryType>org.pdb.query.simple.ExpTypeQuery</queryType>
+    <description>Experimental Method Search : Experimental Method=SOLUTION NMR</description>
+    <runtimeMilliseconds>383</runtimeMilliseconds>
+    <mvStructure.expMethod.value>SOLUTION NMR</mvStructure.expMethod.value>
+  </orgPdbQuery>
+ </queryRefinement>
+ <queryRefinement>
+  <queryRefinementLevel>1</queryRefinementLevel>
+  <conjunctionType>or</conjunctionType>
+  <orgPdbQuery>
+    <version>B0907</version>
+    <queryType>org.pdb.query.simple.ExpTypeQuery</queryType>
+    <description>Experimental Method Search : Experimental Method=SOLID-STATE NMR</description>
+    <runtimeMilliseconds>20</runtimeMilliseconds>
+    <mvStructure.expMethod.value>SOLID-STATE NMR</mvStructure.expMethod.value>
+  </orgPdbQuery>
+ </queryRefinement>
+</orgPdbCompositeQuery>
