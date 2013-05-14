@@ -11,7 +11,7 @@ set pdb_file       = $id.pdb
 set tmp_dir        = .
 set molgrapDir     = $C/scripts/molmol
 set backcolor      = cing_turqoise
-set executableMm   = $WS/molmol/molmol
+set executableMm   = $WS/molmolM/molmol
 set mac_dir        = $molgrapDir
 
 

@@ -1560,7 +1560,6 @@ class RangeIcon(Polygon):
         verts = [ a,b,c,d ]
         vertsAsArray = np.asarray(verts, np.float_) #@UndefinedVariable
         self._path = Path(vertsAsArray)
-        self._closed = False # hack to avoid python 2.6 matplotlib error
         self.set_closed(True)
 
 #        nTdebug("Created a Rectangle at position %s with width, height: %s, %s" % ( startPoint, width, height ))
@@ -1594,7 +1593,6 @@ class RangeIconPoly(Polygon):
 
         vertsAsArray = np.asarray(verts, np.float_) #@UndefinedVariable
         self._path = Path(vertsAsArray)
-        self._closed = False # hack to avoid python 2.6 matplotlib error
         self.set_closed(True)
 
 # pylint: disable=R0904
@@ -1628,7 +1626,6 @@ class CoilIcon(RangeIcon):
 
         vertsAsArray = np.asarray(verts, np.float_) #@UndefinedVariable
         self._path = Path(vertsAsArray)
-        self._closed = False # hack to avoid python 2.6 matplotlib error
         self.set_closed(True)
     # end def
 # end class
@@ -1680,7 +1677,6 @@ class StrandIcon(RangeIcon):
 
         vertsAsArray = np.asarray(verts, np.float_) #@UndefinedVariable
         self._path = Path(vertsAsArray)
-        self._closed = False # hack to avoid python 2.6 matplotlib error
         self.set_closed(True)
     # end def
 # end class

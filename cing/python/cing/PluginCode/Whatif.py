@@ -17,13 +17,14 @@ from cing.core.parameters import plugins
 from glob import glob
 from shutil import copy
 from string import upper
+import fileinput
 
 #if cingPaths.whatif == None or cingPaths.whatif == PLEASE_ADD_EXECUTABLE_HERE:
 #    nTdebug("No whatif installed.")
 #    raise ImportWarning(WHATIF_STR)
 #nTmessage('Using Whatif')
 
-scriptFileName = "whatif.script"
+scriptFileName = "whatif_$modelNumberString.script"
 
 class WhatifResult( NTdict ):
     """
@@ -169,6 +170,7 @@ $mv OUTPUT.TXT wsvacc_$modelNumberString.log
 # nolog
 
 $mv check.db check_$modelNumberString.db
+$mv pdbout.txt pdbout_$modelNumberString.txt
 
 # Initialize the soup
 %inisou
@@ -954,9 +956,11 @@ def runWhatif( project, ranges=None, parseOnly=False ):
     """
 
     if cingPaths.whatif == None or cingPaths.whatif == PLEASE_ADD_EXECUTABLE_HERE:
-        nTmessage("No whatif installed so skipping this step")
-        return
-
+        if not parseOnly:
+            nTmessage("No whatif installed so skipping this step")
+            return
+        # end if
+    # end if
     if not project.molecule:
         nTerror("runWhatif: no molecule defined")
         return True
@@ -1043,15 +1047,19 @@ def runWhatif( project, ranges=None, parseOnly=False ):
             if not pdbFile:
                 nTerror("runWhatif: Failed to write a temporary file with a model's coordinate")
                 return True
-
-        scriptComplete = Whatif.scriptBegin
-        for model in models:
+            
+            # We need to make a script for each model
+            scriptComplete = Whatif.scriptBegin
             modelNumberString = sprintf('%03d', model)
             modelFileName = 'model_'+modelNumberString+".pdb"
             scriptModel = Whatif.scriptPerModel.replace("$pdb_file", modelFileName)
             scriptModel = scriptModel.replace("$modelNumberString", modelNumberString)
             scriptComplete += scriptModel
-        scriptComplete += Whatif.scriptQuit
+            scriptComplete += Whatif.scriptQuit
+            scriptModelFileName = scriptFileName.replace("$modelNumberString", modelNumberString)
+            scriptFullFileName =  os.path.join( whatifDir, scriptModelFileName )
+            open(scriptFullFileName,"w").write(scriptComplete)
+            
         # Let's ask the user to be nice and not kill us
         # estimate to do (400/7) residues per minutes as with entry 1bus on dual core intel Mac.
         totalNumberOfResidues = mol.modelCount * numberOfResidues
@@ -1066,23 +1074,25 @@ def runWhatif( project, ranges=None, parseOnly=False ):
 #        if totalNumberOfResidues < 100:
 #            nTmessage("It takes much longer per residue for a small molecule/ensemble")
 
-        scriptFullFileName =  os.path.join( whatifDir, scriptFileName )
-        open(scriptFullFileName,"w").write(scriptComplete)
-        whatifProgram = ExecuteProgram( whatifExecutable, rootPath = whatifDir,
-                                        redirectOutput = True, redirectInputFromDummy = True )
-        # The last argument becomes a necessary redirection into fouling What If into
-        # thinking it's running interactively.
-        now = time.time()
-        whatifExitCode = whatifProgram("script", scriptFileName )
-#        nTdebug("Took number of seconds: " + sprintf("%8.1f", time.time() - now))
-        whatifStatus.exitCode  = whatifExitCode
-        whatifStatus.time      = sprintf("%.1f", time.time() - now)
-#        nTdebug('runWhatif: exitCode %s,  time: %s', whatifStatus.exitCode, whatifStatus.time)
-        whatifStatus.keysformat()
-
-        if whatifExitCode:
-            nTerror("runWhatif: Failed whatif checks with exit code: " + repr(whatifExitCode))
-            return True
+        # Run a separate WHAT IF instance for each model
+        for model in models:
+            whatifProgram = ExecuteProgram( whatifExecutable, rootPath = whatifDir,
+                                            redirectOutput = True, redirectInputFromDummy = True )
+            # The last argument becomes a necessary redirection into fouling What If into
+            # thinking it's running interactively.
+            now = time.time()
+            modelNumberString = sprintf('%03d', model)
+            scriptModelFileName = scriptFileName.replace("$modelNumberString", modelNumberString)
+            whatifExitCode = whatifProgram("script", scriptModelFileName )
+    #        nTdebug("Took number of seconds: " + sprintf("%8.1f", time.time() - now))
+            whatifStatus.exitCode  = whatifExitCode
+            whatifStatus.time      = sprintf("%.1f", time.time() - now)
+    #        nTdebug('runWhatif: exitCode %s,  time: %s', whatifStatus.exitCode, whatifStatus.time)
+            whatifStatus.keysformat()
+    
+            if whatifExitCode:
+                nTerror("runWhatif: Failed whatif checks with exit code: " + repr(whatifExitCode))
+                return True
 
         whatifStatus.completed = True
 #        nTdebug("Setting what if status completed to %s" % whatifStatus.completed)
@@ -1127,8 +1137,22 @@ def runWhatif( project, ranges=None, parseOnly=False ):
         nTerror("runWhatif: Failed to process check db")
         return True
 
-#    pathPdbOut = os.path.join(path, 'pdbout.txt' ) has only one model!
-    pathPdbOut = os.path.join(path, 'DO_WHATIF.out0' )
+    
+    # Concatenate all pdbout.txt files to a file that can be processed
+    pathPdbOut = os.path.join(path, 'pdbout.txt' )
+    pdboutFiles = list()
+    for model in models:
+        modelNumberString = sprintf('%03d', model)
+        pdboutName = os.path.join(path, "pdbout_$modelNumberString.txt".replace("$modelNumberString", modelNumberString))
+        pdboutFiles.append(pdboutName)
+    
+    for model in models:
+        with open(pathPdbOut, 'w') as fout:
+            for line in fileinput.input(pdboutFiles):
+                fout.write(line)
+    
+    
+    # pathPdbOut = os.path.join(path, 'DO_WHATIF.out0' ) contains only the output for the last model
     if not os.path.exists(pathPdbOut): # Happened for 1ao2 on production machine; not on development...
         nTerror("Path does not exist: %s" % (pathPdbOut))
         return True
@@ -1196,15 +1220,15 @@ def removeTempFiles( whatifDir ):
 #    whatifDir        = project.mkdir( mol.name, molDirectories.whatif  )
 #    nTdebug("Removing temporary files generated by What If")
     try:
-        # do NOT remove pdbout.txt.
-        # Now pdbout.txt is no longer parsed, it may be removed I guess unless we want it again for fixing an issue
+        # Remove pdbout.txt but not the pdbout files for each model 
+        # Now DO_WHATIF.out0 is no longer parsed, it may be removed I guess unless we want it again for fixing an issue
         # on this but then we need all not just the last model.
-        removeListLocal = [scriptFileName, "DSSPOUT", "TOPOLOGY.FIL", "PDBFILE.PDB", "PDBFILE", "pdbout.tex", 'fort.79', 'DONE']
+        removeListLocal = ["pdbout.txt", "DO_WHATIF.out0", "DSSPOUT", "TOPOLOGY.FIL", "PDBFILE.PDB", "PDBFILE", "pdbout.tex", 'fort.79', 'DONE']
         removeList = []
         for fn in removeListLocal:
             removeList.append( os.path.join(whatifDir, fn) )
 
-        for extension in '*.eps *.pdb *.OUT *.LOG *.DAT *.SCC *.sty *.FIG *.ATM DAVADRUG.* PRODRUG.*'.split():
+        for extension in '*.script *.eps *.pdb *.OUT *.LOG *.DAT *.SCC *.sty *.FIG *.ATM DAVADRUG.* PRODRUG.*'.split():
             for fn in glob(os.path.join(whatifDir,extension)):
                 removeList.append(fn)
         for fn in removeList:
@@ -1223,9 +1247,9 @@ def restoreWhatif( project, tmp=None ):
     """
     Optionally restore whatif results
     """
-    if project.whatifStatus.completed:
-        nTmessage('==> Restoring whatif results')
-        project.runWhatif(parseOnly=True)
+#    if project.whatifStatus.completed:
+#        nTmessage('==> Restoring whatif results')
+#        project.runWhatif(parseOnly=True)
 #end def
 
 

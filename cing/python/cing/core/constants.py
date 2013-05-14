@@ -341,7 +341,7 @@ MAX_SIZE_XPLOR_RESTRAINT_LIST_NAME = 10
 JVM_MAX_MEM     = '1499m' # passed to Java using the -Xmx option. For now this is tied to 32 bitness.
 JVM_TYPE        = '-d32'
 JVM_HEADNESS    = '-Djava.awt.headless=true'
-JVM_CMD_STD     = '/local/tmp/jdk1.6.0_41/bin/java -Xmx%s %s %s' % ( JVM_MAX_MEM, JVM_TYPE, JVM_HEADNESS )
+JVM_CMD_STD     = 'java -Xmx%s %s %s' % ( JVM_MAX_MEM, JVM_TYPE, JVM_HEADNESS )
 #JVM_CMD_STD     = 'echo helloJvm; which java; ' + JVM_CMD_STD # DEFAULT OFF
     
 DEFAULT_SML_HANDLER_STRING = 'Default handler from SMLhandled'

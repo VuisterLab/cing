@@ -1,13 +1,3 @@
-CREATE TABLE persoon
-(
-    persoon_id                        INT              NOT NULL PRIMARY KEY
-);
-
-insert into persoon(persoon_id) values (0);
-
-drop table persoon;
-
-
 
 
 -- select the vacuum settings on/off.

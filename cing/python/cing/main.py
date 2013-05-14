@@ -780,8 +780,6 @@ def startIpythonShell(
   
 def main():
     'Main entry point for all CING functionality. Use --help for a list of all options.'
-    #import sys
-    #print sys.path
     if not ( osType == OS_TYPE_MAC or
              osType == OS_TYPE_LINUX ):
         nTerror("CING only runs on mac or linux.")

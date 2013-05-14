@@ -4,33 +4,65 @@ Follow 00README.txt in pdbj_Mine directory from: ftp://ftp.pdbj.org/mine
 
 ########### FOR LINUX ###################
 setenv PGBIN  /usr/local/pgsql/bin/
-setenv PGDATA /home/kss16/workspace/pgdata
+# Actual cluster files (was /usr/local/pgsql/data)
+setenv PGDATA /mnt/data/pgdata
+# Installed from.
+setenv PGBASE $WS/postgresql-8.4.9
+setenv PGHOST localhost
+
+# Uninstall package manager's postgresql copies:
+sudo apt-get purge postgresql postgresql-common postgresql-client-8.4 postgresql-client-common
+# check removal by:
 dpkg -l | grep post
 
-echo "SHOW config_file;" | psql -h localhost postgres lampuser
-echo "SHOW config_file;" | psql postgres lampuser
+# Following install instructions from: http://www.postgresql.org/docs/8.4/interactive/install-requirements.html
+# Download
+wget ftp://ftp.postgresql.org/pub/source/v8.4.9/postgresql-8.4.9.tar.gz
+# Untar
+# Install many deps
+sudo apt-get install xml2 libxml2-dev bison flex libreadline-dev postgresql-client chkconfig pgadmin3 vim-nox sendmail mutt 
+# And for python bindings:
+sudo apt-get install python-psycopg2
+
+# Edit for working with longer identifiers as described in 00README.txt from PDBj.
+vi src/include/pg_config_manual.h
+./configure --with-libxml
+make
+sudo make install
+# Add dynamic loading path. 
+sudo /sbin/ldconfig /usr/local/pgsql/lib
+
+# Create new user with good pass as root:
+set x = postgres
+useradd -d /home/$x -m $x
+passwd $x
 
 
-
-
-
-#sudo su postgres
-#   initdb -D $PGDATA
-#sudo cp ~jd/postgresql.conf $PGDATA
-#sudo cp ~jd/pg_hba.conf     $PGDATA
-#sudo tail -f $PGDATA/logfile &
-#sudo SystemStarter stop PostgreSQL
-#sudo SystemStarter start PostgreSQL
-#sudo su postgres
-#  createdb pdbmlplus
-#  createlang plpgsql pdbmlplus
-#  psql
-#    create role pdbj LOGIN CREATEDB SUPERUSER;
-#    create role jd LOGIN CREATEDB SUPERUSER;
-#    create role akinjo LOGIN CREATEDB SUPERUSER;
-#    create role nrgcing1 LOGIN CREATEDB SUPERUSER;
-#    create role casdcing1 LOGIN CREATEDB SUPERUSER;
-#     after downloading from pdbj & setting options in script:
+# Create data dir not on a nfs mounted station.
+initdb -D $PGDATA
+# Start server manually
+postgres -D $PGDATA
+# Test server as user i
+echo "SHOW config_file;" | psql -h localhost postgres postgres
+# Stop server by allowing it to properly shutdown.
+kill -TERM `head -1 $PGDATA/postmaster.pid`
+# Setup TCP access for local network
+vi $PGDATA/pg_hba.conf 
+# Automate startup by rc commands.
+# Work from example file given linux to file postgres.
+sudo su
+cd /etc/init.d
+cp $PGBASE/contrib/start-scripts/linux postgresql
+chmod a+rx postgresql
+vi postgresql
+# Add it to the appropriate run levels with: (as described in postgresql script).
+# Will throw plenty warnings. Just ignored. 
+chkconfig --add postgresql
+# Check all services. So that it shows up in at least run level 5.
+chkconfig -l
+# Check in detail:
+ls -al /etc/rc5.d/S*postgresql 
+#->  lrwxrwxrwx 1 root root 20 2011-11-16 16:22 /etc/rc5.d/S02postgresql -> ../init.d/postgresql
 
 # Test starting this way:
 ./postgresql stop
@@ -215,5 +247,11 @@ sudo su postgres
     create role nrgcing1 LOGIN CREATEDB SUPERUSER;
     create role casdcing1 LOGIN CREATEDB SUPERUSER;
 # after downloading from pdbj & setting options in script:
-
 $CINGROOT/scripts/cing/manualUpdatePdbjMine.csh >& ~/manualUpdatePdbjMine_2.log &
+# takes 77 Gb
+
+# 2012-02-16
+# Trying restore over an existing database first now.
+# Does that work?????
+# See file $C/scripts/cing/manualUpdatePdbjMine.csh
+
