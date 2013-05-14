@@ -1125,7 +1125,7 @@ DATA ATOMNAMES HA CA CB C N HN
         for ac in res.allAtoms():
             atomName = ac.translate(IUPAC)
             if (ac.isAssigned(resonanceListIdx=RESONANCE_LIST_IDX_ANY) and ( atomName in talosNuclei)):
-                shift = ac.shift(resonanceListIdx=RESONANCE_LIST_IDX_ANY) # save the shift, because Gly QA pseudo atom does get expanded
+                shift = ac.shift() # save the shift, because Gly QA pseudo atom does get expanded
                 for ra in ac.realAtoms():
                     atomName = ra.translate(IUPAC)
                     # Translate to TalosPlus
