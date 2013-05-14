@@ -57,7 +57,7 @@ FROM nrgcing.cingresidue r
 WHERE
 r.name NOT IN ( select name from nrgcing.normalResidue )
 order by r.name
-)              TO '/Users/jd/tmp/tmpSql/distinctLigands.csv' WITH CSV HEADER;
+)              TO '/tmp/distinctLigands.csv' WITH CSV HEADER;
 
 COPY ( 
 SELECT e.name as entry, c.name as chain, r.number, r.name, r.distance_count
@@ -71,7 +71,7 @@ r.entry_id = e.entry_id AND
 r.distance_count > 0 AND
 r.name NOT IN ( select name from nrgcing.normalResidue )
 order by e.name, c.name, r.number, r.name, r.distance_count
-)              TO '/Users/jd/tmp/tmpSql/ligandsWithDrs.csv' WITH CSV HEADER;
+)              TO '/tmp/ligandsWithDrs.csv' WITH CSV HEADER;
 
 COPY ( 
 SELECT distinct e.name
@@ -85,7 +85,7 @@ r.entry_id = e.entry_id AND
 r.distance_count > 0 AND
 r.name NOT IN ( select name from nrgcing.normalResidue )
 order by e.name
-)              TO '/Users/jd/tmp/tmpSql/entriesWithLigandsWithDrs.csv' WITH CSV HEADER;
+)              TO '/tmp/entriesWithLigandsWithDrs.csv' WITH CSV HEADER;
 
 SELECT 'Distinct entries with ligand with DRs count: ' || count( distinct e.name )
 FROM 

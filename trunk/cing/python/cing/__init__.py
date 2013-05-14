@@ -22,6 +22,14 @@ setupCing.py            Run to set up environment variables and check installati
 valSets.cfg             Validation settings. Might be moved around.
 
 """
+#import sys
+#print sys.path
+
+#try:
+#    import nose
+#except:
+#    print "No nose: that's strange, everyone has to semll something"
+
 
 from cing.Libs.helper import *
 

@@ -3,7 +3,7 @@
 # USE: molmol_image.csh pdb_file tmp_dir pdb_id
 # make a pov ray file in a temporary directory as these files can become
 # quite large
-#echo "DEBUG: 0"
+echo "DEBUG: 0"
 set mac_file       = molmol_images.mac
 set log_file       = molmol_images.log
 set pdb_file       = $1
@@ -20,20 +20,23 @@ set useHiRes       = 0 # DEFAULT: 0
 
 set mac_file       = $tmp_dir"/"$id"_"$mac_file
 set log_file       = $tmp_dir"/"$id"_"$log_file
+echo "var is $#"
 
 #date
-#echo "DEBUG: 1"
+echo "DEBUG: 1"
 
 # check if we got the right amount of parameters
 if ( $# != 7 ) then
    echo "ERROR: Not the right number of arguments: got $# in stead of 7"
    goto usage
 endif
+echo "DEBUG: 2a"
 
 if ( ! -e $tmp_dir ) then
    echo "ERROR: temporary dir doesn't exist"
    goto error
 endif
+echo "DEBUG: 2b"
 
 if ( ! -e $pdb_file ) then
    echo "ERROR: pdb file: $pdb_file doesn't exist in cwd: $cwd"
@@ -41,6 +44,7 @@ if ( ! -e $pdb_file ) then
 endif
 
 # Clean up
+echo "DEBUG: 2c"
 if ( -e $mac_file ) then
    \rm $mac_file
 endif
@@ -55,7 +59,7 @@ if ( 1 ) then
     echo "molmol_image.csh found id         :" $id       >> $log_file
     date                                                 >> $log_file
 endif
-#echo "DEBUG: 2"
+echo "DEBUG: 2"
 
 start:
 # Make the MOLMOL macro
