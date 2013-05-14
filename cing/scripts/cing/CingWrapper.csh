@@ -10,11 +10,11 @@
 # Application: iCing. Basically needed because it can't run under say jd's user account.
 
 
-setenv UJ                 /Users/jd
-setenv WS                 $UJ/workspace35
+setenv UJ                 /local/
+setenv WS                 $UJ/workspace
 # A home directory is needed for .matplotlib, .ccpn and perhaps others' settings?
 # E.g. the below would be appropriate for a tomcat6 user's home. 
-setenv HOME               /Library/WebServer/Documents/servlet-cing-home
+setenv HOME               /tmp/servlet-cing-home
 
 setenv cingScriptDir $0:h
 if ( -e $cingScriptDir/localConstants.csh ) then
@@ -28,7 +28,7 @@ setenv aquaroot           $WS/aquad
 setenv talosPath          $WS/talosplus/talos+
 setenv procheckroot       $WS/procheck
 # contains a par file with references to hard-code paths
-setenv MOLMOLHOME         $WS/molmolM
+setenv MOLMOLHOME         $WS/molmol
 
 # Possible improvement could be to have the debug flag below here be defined from
 # the iCing interface.

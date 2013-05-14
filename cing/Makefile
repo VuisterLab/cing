@@ -3,7 +3,8 @@
 # jfd 2011-06-17
 #
 
-all:	clean install cython sloccount pylint nose test
+#all:	clean install cython sloccount pylint nose test
+all:	install cython sloccount pylint nose test
 		
 clean:
 	@echo "Cleaning up CING installation"
