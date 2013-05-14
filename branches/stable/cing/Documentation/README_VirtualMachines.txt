@@ -1,1 +1,0 @@
-- See wiki: http://code.google.com/p/cing/w/edit/VirtualCingTheMakingOf 
