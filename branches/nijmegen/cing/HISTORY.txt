@@ -1,0 +1,241 @@
+0.764: 1 July 2008: GWV
+    - Rewrote RMSD calculation routine (much, much quicker); now part of molecule class (moved RmsdResult, Ensemble, Model, etc
+      classes as well).
+    - Ranges used for superpose are stored as molecule attribute and used for rmsd calculations on restoring the molecule instance.
+    - Fixed bug using script option on command line.
+    - changed numpy.arange import in NTplot to Numeric.
+    - worked on the refine routines.
+    - Improved the Makefile
+    - main: --shiftx, --superpose options
+
+0.76: 23 Jun 2008: GWV
+    - project.molecules is now a _ProjectList instance (used to be a NTlist instance with names)
+      molecule names are stored now in moleculeNames attribute
+      preferentially used the names() method of molecules, peaks, distances and rdcs to get the names of the list
+      to loop over all molecule instances:
+        for mol in project.molecules:
+    - All project objects (like a Molecule or PeakList) have an attribute 'objectPath' which contains the full CING path and is used as default
+      for saving;
+      i.e. myMolecule.save() should work
+    - project.version is a float (used for version comparison)
+    - new project.reports: NTlist instance: to hold the validation report names (not yet implemented, but who knows!?)
+    - Defined a 7-element name tuple:
+
+        (moleculeName, chainName, resNum, atomName, modelIndex, resonanceIndex, convention)
+
+      Allows referencing of an object at the Project level:
+
+      hence
+
+      Project.decodeNameTuple( nameTuple ); also works from the Molecule level: Molecule.DecodeNameTuple( nameTuple )
+
+      Implemented for Molecule, Chain, Residue, Chain, Atom, Resonance, Coordinate
+      TODO: Peak, PeakList, etc...
+
+      The 4-element nameTuple still works from the Molecule level!
+
+    - Hash in molecule.nameTuple
+    - SML >=0.2: recursion implemented.
+    - New Molecule storage in one file using SML routines; conversion routines implemented.
+    - PeakList storage updated using SML >0.2. Employs the 7-element nameTuple format.
+    - Peak class updated: now has NTvalue for height and error; likewise for volume; hasHeight() and hasVolume() methods
+    - Resonances have NaN as undefined, rather then NOSHIFT.
+    - Molecule.resonanceSources: a simple list to store the source from which the resonances were derived; e.g. all-final.prot
+    - All SML routines in file sml.py; prevent circular imports; one import in cing.__init__ (this file) needed to activate.
+    - NTaverage returns NaN for n=0, n=1.
+    - NTvalue uses NaN as initiating (value, error)
+    - Improved output using NTdetail.
+
+Version 0.751: 1 May 2008:
+    - Added superposing algorithm mostly in cython.
+    - Added chi1/2 plots labeled Janin plots
+
+Version 0.75: 17 Apr 2008:
+    - Optimized the coordinate storage class for speed through cython now.
+    - Temp dir now set in $CINGROOT/python/localConstants.py or __init__.py by default.
+
+Version 0.74: 25 Mar 2008:
+    - Optimized the coordinate storage class for speed.
+    - Added water to topology.
+    - Added user settings in a standard localConstants.py
+    - Improved processing of X-ray structures as done by getPhiPsi.py script
+    - Added trivial parallelization of running over multiple molecules.
+
+Version 0.73:  3 Mar 2008:
+    - Started to look into incorporating Queen. Need Swig update.
+    - Created test code for drawing residue plots with secondary structure
+        icons above it ala Procheck_NMR.
+
+Version 0.72: 12 Jan 2008:
+    - Added extensive test cases. Call all by cing --test.
+	- Added integration with Aqua, Molmol, Povray, convert and ps2pdf
+	- Started migration to matlibplot away from biggles. Needs more testing.
+
+Version 0.71: 05 Dec 2007:
+    - reformatted the version/copyright formatting
+    - redid the determination of the CINGROOT and checks in setup.py
+    - added --test option to main.py but needs beautification;-)
+    - renamed NTstruct to NTdict (including in the dbTable)
+    - exercised the feature request system in sf.net.
+    - Changed DOS eol in cing/__init__.py to Unix.
+
+Version 0.70: 03 Dec 2007:
+    - Reorganized for easy integration with Eclipse/PyDev
+    - Removed wild imports to accommodate the imports as PyDev suggests.
+    - Organized import statements by PyDev.
+    - Replaced many variable names to dummy if their values aren't used anymore after assignment.
+        This is then no longer flagged by PyDev as a potential bug.
+    - Moved version.py to __init__.py
+    - Renamed main script from cing.py to main.py to prevent possible name space clashes.
+    - Removed cing.par for now.
+    - Removed development.py
+    - Moved history from __init__.py to here.
+    - Removed simple brackets as in: "if (verbose):"
+    - Added What If to setup.py and reorganized.
+    - Moved main development to sourceforge.net
+    - Reorganized python code so that all falls under Python cing package with
+        just one path to be added to PYTHONPATH namely CINGROOT/python.
+    - Introduced some java library code for working with Wattos.
+    - Removed shiftx.osx binary as it was not used in on JFD's Mac OS X machine.
+    - Introduced some test data for entry 1brv; see cing.PluginCode.test.test_all.py
+    - Failed to get cing.PluginCode.validate.py working completely.
+    - Failed to get cing.PluginCode.ccpn.py working as it references the old ccpn
+        api (branch 4?).
+
+Version 0.520: 16 Oct 2007: Merged version GV and Alan
+    classes.py:
+         - <a class="red"...</a> solution
+         - new method insertHtmlLinkInTag()
+    cing.css:
+         - new entries for #main class
+    ccpn.py:
+         - fix bug about atoms when importing distance restraints
+         - removed old Ccpn stuff
+    validate.py:
+         - using pseudo atoms for shift average in validateAssignments()
+         - moved findHtmlLocation() to classes.py
+         - fixed html output code according W3C
+         - started to modify Residues html pages
+    cing.py:
+         - removed old Ccpn stuff
+
+Version 0.513: 16 October 2007:
+- included IPython library
+- Fixed a serious bug in export routine to toPDB from atom properties that caused the first model to be skipped in lieu off
+  the last model.
+
+Version 0.512: 15 October 2007:
+- Completed the procheck ranges option and import of results routines.
+
+Version 0.51: 10 October 2007
+- classes.py:
+    - new SML storage approach (import SMLhandler)
+    - new RDCRestraint and RDCRestraintList classes implemented (to be tested)
+    - class ProjectList has 2 new methods save/restore, 2 new initialising
+      arguments and fixed appdend()
+    - Project.export() has a new verbose approach
+    - move class Peak from molecule.py to classes.py
+    - all ProjectList (eg. Peaks, Distances etc.) classes has a SMLhandler
+    - removed residue and angle attributes (no longer mandatories)
+    - new retrieveDefinition method to return a known dihedral angle
+    - new calculateAverage method for class DihedralRestraint
+- molecule.py:
+    - speed up of restore of Molecule as well as less memory usage
+    - new attribute dihedralDict for Molecule
+- pdb.py:
+    - skip cyana pseudo residues
+- validate.py:
+    - new text output approach (method mprintf)
+    - generating Html for Restraints, Peaks and main project.
+- NTutils.py:
+    - new methods minItem, maxItem for class NTlist
+    - class NTvalue inherit from NTdict now (not NTstruct anymore) and has more
+      arithmetic operators (==, !=, >, >=, <, <=)
+    - fixed some calls Value to NTvalue in class NTvalue
+    - new function list2asci
+- cyana2cing.py:
+    - parser.add_option has "export"
+- sml.py:
+    - new file with class SMLhandler
+- xplor.py:
+    - delta adjusted to delta*0.5
+- cing.py:
+    - little change in function formatall()
+- TODO:
+    - implement importFromCcpnRdcRestraints() in ccpn.py
+    - remove initCCPN (old implementation) from cing.py
+    - define a testing code way.
+
+Version 0.50: 20 September 2007
+- New structure for directories
+
+Version 0.48: 23 August 2007
+- Version for overhaul validation
+- classes.py:
+    - peakLists is gone. Now it's 'peaks'
+    - new method to class Project: self.mkdir(dir)
+    - new paramenter 'restore': if False, only project description is loaded
+    - newPeakList, appendPeakList are obsolete
+    - verbose in ProjectList.new()
+    - new method to class ProjectList: self.toFile(), for internal storage
+    - new parameters (in __init__) and methods for class DistanceRestraints:
+      calculateAverage, listViolatingModels, _names
+    - new parameters (in __init__) and methods for class DistanceRestraintList:
+      append, analyze, sort
+    - new htmlObjects (NTlist)
+    - new method 'path" (returns where Cing is installed): better change this
+      name!!!
+- validade.py:
+    - new setupValidation (validateDistanceRestraints)
+    - validateAssignments expanded
+    - new findHtmlLocation()
+    - new setupHtml
+    - new renderHtml
+- NTutils.py:
+    - class NTlist has new methods: min, max, sumsq, sum, limit
+- parameters.py:
+    - new project directory structure
+    - new dict htmlDirectories
+- molecule.py:
+    - updateDihedrals is now updateAll
+    - new methods residuesWithProperties, atomsWithProperties in classes
+      Molecule, Chain, Residue and atomsWithProperties in Atom; hasProperties in
+      classes Atom and Residue
+    - new behaviour for method distance in class Atom
+    - new method meanCoordinates and realAtom in class Atom
+
+Version 0.47: 12 June 2007
+- improved setup.py to enable CING for bash users
+- CCPN import/export by Alan
+- Many more things
+
+Version 0.46: 23 May 2007
+- Fixed serious bug Molecule.decodeNameTuple which generated errors of CYANA
+  Lys+/ARG+ import/conversion.
+- --validate option in cing.py
+- Update of dbTable
+- Changed Analysis directory to Validation/Cing
+
+Version 0.45
+- Fixed refinement stuff, related to PSF generation
+- Smaller bugs
+
+Version 0.44
+- implemented isProton, isCarbon, isNitrogen methods of Atom class.
+- peakList or peak attribute xeasyColor
+- exporting peaksList with xeasyIndices in steps of 10000
+- exporting prot file with xeasyIndices [1,n] for each molecule
+- Fixed database topology error MET QE
+- Changed database PHE/TYR QR real definition, removed pseudo for QD/QE
+  now is more like the VAL QQG or LEU QQD defs.
+- Cosmetic stuff on the output
+
+version 0.43
+- Wim Franken's integration with CCPN stuff.
+
+Version 0.42
+- Implemented importUpl, importAco methods of Project class
+- Integrated refine stuff
+- New setup for PYTHONPATH and the like: setup.py script generates
+  cing.csh script.
+"""

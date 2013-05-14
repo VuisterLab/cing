@@ -1,0 +1,34 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>How to install CING for development on Eclipse</title>
+</head>
+<body>
+Install the requirements: Last updated on June 26th, 2009<br><br>
+<ol><li><b>Setup Eclipse</b><BR>
+Always start from command line instead of Dock/Taskbar so that it gets your environment settings such as
+PRODIR for the PROCHECK_NMR installation.<br>
+CING is being developed on Eclipse 3.4 with PyDev Extensions for automatic code analysis and organization.
+ShellEd can be used in eclipse but version 1.0.3 fails whereas 1.0.2 works fine.<LI><b>Setup SVN  archive</b><BR>
+Register with google code to get a user account. Configure Eclipse for SVN; for 3.4 follow instructions from: http://blog.punchbarrel.com/2008/06/30/using-the-new-subversion-integration-in-eclipse-ganymede/<br>Check out the CING project from SVN in Eclipse. <br>
+This is a two wizard step process; first the SVN then the Pydev wizard.<br><br>
+<img src="svn_setup.png">
+<Br>
+<li><b>Project tree</b>
+<br>The project tree with the python code expanded should look something like:<br>
+<img src="project_overview.png">
+<Br>
+<li><b>PYTHONPATH inside Eclipse</b>
+<br>Add the local python dir to your PYTHONPATH inside Eclipse. The CCPN is mandatory
+but the Wattos python dir is really optional.
+<BR>
+<img src="python_path_setup.png"><br>
+<li><b>svn executable bit setting</b>
+<br>Use the svn properties browser to set the executable bit as per below.
+<BR>
+<img src="svn executable bit setting.png"><br>
+</ol>
+
+</body>
+</html>

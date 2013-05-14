@@ -1,0 +1,10 @@
+# Lines starting with a pound are comments.
+# DEBUG: starting with a small directory that needs to be done completely.
+#
+# CING reports will be synced using different rules.
+- worse
+- bad
+#
+# Include the rest
+#
++ **

@@ -1,0 +1,87 @@
+ ASSIGN  (resid 173  and name N   ) (resid 173  and name CA  )
+         (resid 173  and name CB  ) (resid 173  and name SG  )  1.00 -60.00 40.00 2
+
+ ASSIGN  (resid 174  and name N   ) (resid 174  and name CA  )
+         (resid 174  and name CB  ) (resid 174  and name OG  )  1.00  60.00 40.00 2
+
+ ASSIGN  (resid 176  and name N   ) (resid 176  and name CA  )
+         (resid 176  and name CB  ) (resid 176  and name SG  )  1.00 -60.00 40.00 2
+
+ ASSIGN  (resid 179  and name N   ) (resid 179  and name CA  )
+         (resid 179  and name CB  ) (resid 179  and name CG  )  1.00 180.00 40.00 2
+
+ ASSIGN  (resid 180  and name N   ) (resid 180  and name CA  )
+         (resid 180  and name CB  ) (resid 180  and name CG  )  1.00 -60.00 40.00 2
+
+ ASSIGN  (resid 182  and name N   ) (resid 182  and name CA  )
+         (resid 182  and name CB  ) (resid 182  and name SG  )  1.00 180.00 40.00 2
+
+ ASSIGN  (resid 183  and name N   ) (resid 183  and name CA  )
+         (resid 183  and name CB  ) (resid 183  and name CG  )  1.00 -60.00 40.00 2
+
+ ASSIGN  (resid 186  and name N   ) (resid 186  and name CA  )
+         (resid 186  and name CB  ) (resid 186  and name SG  )  1.00  60.00 40.00 2
+
+ ASSIGN  (resid 187  and name N   ) (resid 187  and name CA  )
+         (resid 187  and name CB  ) (resid 187  and name CG  )  1.00 -60.00 40.00 2
+
+ ASSIGN  (resid 186  and name C   ) (resid 187  and name N   )
+         (resid 187  and name CA  ) (resid 187  and name C   )  1.00 -120.00 20.00 2
+
+ ASSIGN  (resid 187  and name C   ) (resid 188  and name N   )
+         (resid 188  and name CA  ) (resid 188  and name C   )  1.00 -120.00 20.00 2
+
+ ASSIGN  (resid 171  and name CA  ) (resid 171  and name C   )
+         (resid 172  and name N   ) (resid 172  and name CA  )  1.00 180.00  2.00 2
+
+ ASSIGN  (resid 172  and name CA  ) (resid 172  and name C   )
+         (resid 173  and name N   ) (resid 173  and name CA  )  1.00 180.00  2.00 2
+
+ ASSIGN  (resid 173  and name CA  ) (resid 173  and name C   )
+         (resid 174  and name N   ) (resid 174  and name CA  )  1.00 180.00  2.00 2
+
+ ASSIGN  (resid 174  and name CA  ) (resid 174  and name C   )
+         (resid 175  and name N   ) (resid 175  and name CA  )  1.00 180.00  2.00 2
+
+ ASSIGN  (resid 175  and name CA  ) (resid 175  and name C   )
+         (resid 176  and name N   ) (resid 176  and name CA  )  1.00 180.00  2.00 2
+
+ ASSIGN  (resid 176  and name CA  ) (resid 176  and name C   )
+         (resid 177  and name N   ) (resid 177  and name CA  )  1.00 180.00  2.00 2
+
+ ASSIGN  (resid 177  and name CA  ) (resid 177  and name C   )
+         (resid 178  and name N   ) (resid 178  and name CA  )  1.00 180.00  2.00 2
+
+ ASSIGN  (resid 178  and name CA  ) (resid 178  and name C   )
+         (resid 179  and name N   ) (resid 179  and name CA  )  1.00 180.00  2.00 2
+
+ ASSIGN  (resid 179  and name CA  ) (resid 179  and name C   )
+         (resid 180  and name N   ) (resid 180  and name CA  )  1.00 180.00  2.00 2
+
+ ASSIGN  (resid 180  and name CA  ) (resid 180  and name C   )
+         (resid 181  and name N   ) (resid 181  and name CA  )  1.00 180.00  2.00 2
+
+ ASSIGN  (resid 181  and name CA  ) (resid 181  and name C   )
+         (resid 182  and name N   ) (resid 182  and name CA  )  1.00 180.00  2.00 2
+
+ ASSIGN  (resid 182  and name CA  ) (resid 182  and name C   )
+         (resid 183  and name N   ) (resid 183  and name CA  )  1.00 180.00  2.00 2
+
+ ASSIGN  (resid 183  and name CA  ) (resid 183  and name C   )
+         (resid 184  and name N   ) (resid 184  and name CA  )  1.00 180.00  2.00 2
+
+ ASSIGN  (resid 184  and name CA  ) (resid 184  and name C   )
+         (resid 185  and name N   ) (resid 185  and name CA  )  1.00 180.00  2.00 2
+
+ ASSIGN  (resid 185  and name CA  ) (resid 185  and name C   )
+         (resid 186  and name N   ) (resid 186  and name CA  )  1.00 180.00  2.00 2
+
+ ASSIGN  (resid 186  and name CA  ) (resid 186  and name C   )
+         (resid 187  and name N   ) (resid 187  and name CA  )  1.00 180.00  2.00 2
+
+ ASSIGN  (resid 187  and name CA  ) (resid 187  and name C   )
+         (resid 188  and name N   ) (resid 188  and name CA  )  1.00 180.00  2.00 2
+
+ ASSIGN  (resid 188  and name CA  ) (resid 188  and name C   )
+         (resid 189  and name N   ) (resid 189  and name CA  )  1.00 180.00  2.00 2
+

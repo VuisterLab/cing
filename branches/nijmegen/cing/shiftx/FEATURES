@@ -1,0 +1,5 @@
+this is modified on top of removeH_May2004 version of shiftx
+
+Ignore all the hydrogen coordinate when read in the pdb file(strip off all the hydrogen)
+Then use add_hydrogen to add both backbone and side chain hydrogen.
+
