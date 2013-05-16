@@ -13,6 +13,7 @@ GV:  16 Sep 2007: added cingBinPath and profitPath
 JFD: 27 Nov 2007: removed again.
 GV:  13 Jun 2008: Added CYTHON path and refine, cyana2cing and cython aliases
 JFD: 26 May 2009: Added pyMol path
+RHF: 16 May 2013: Commented out chemod for cing.csh - broke if not file owner
 
 Uses 'which xplor/$prodir/procheck_nmr.scr/DO_WHATIF.COM' to determine initial
 xplor/procheck/what if executables; make sure they are in your
@@ -366,7 +367,10 @@ def _writeCingShellFile(isTcsh): # pylint: disable=W0621
     fp = open(cname,'w')
     fp.write(text)
     fp.close()
-    os.chmod(cname, 0755)
+    
+    # Commented out as I do nto have permission for this, and anyway 
+    # mod is 775, which should be OK.
+    #os.chmod(cname, 0755)
 
     print ''
     print '==> Please check/modify %s <===' % (cname)
