@@ -238,7 +238,14 @@ def printCingUrls(programHoH):
 
 
 # NB TODO: reorganize this data into a class so it can be properly imported from the many other scripts.
-dbms = getCASD_NMR_DBMS()
+
+
+# NBNB this code breaks whenever Geeretns home directoryis not accessible!!!
+# NBNB should be replaced with functions off resultData.json
+# NBNB commented out for now, but htis will break things elsewhere.
+#
+#NBNB TODO FIXME!!!
+"""dbms = getCASD_NMR_DBMS()
 sheetName = 'Overview1'
 participantTable = dbms.tables['%s-Participant' % sheetName]
 participationTable = dbms.tables['%s-Participation' % sheetName]
@@ -251,6 +258,7 @@ rangesPsvsList = targetTable.getColumnByIdx(6)
 programHoH = convertToProgram(participationTable)
 mapEntrycodeNew2EntrycodeAndCity = getMapEntryNew(entryList, cityList)
 nTdebug("Read dbms with tables: %s" % dbms.tables.keys())
+"""
 #print labList
 #print programHoH
 #print getRangesForTarget('ET109Ared')
