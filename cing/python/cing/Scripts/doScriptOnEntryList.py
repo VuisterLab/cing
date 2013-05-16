@@ -94,9 +94,9 @@ def doScriptOnEntryList(pythonScriptFileName,
     
     else:
       #Non-PDB
-      entryCodeList = [x for x in entryCodeList if x not in entryCodeListFilter]
+      entryCodeList = [x for x in entryList if x not in entryCodeListFilter]
       entryCountSelected = len(entryCodeList)
-      chainCodeList = [''] * entryCountTotal
+      chainCodeList = [''] * entryCountSelected
     
     
     # lastEntryId is id of last entry excluding the entry itself.
