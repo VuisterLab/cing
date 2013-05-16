@@ -8,7 +8,7 @@ from cing.Scripts.validateEntry import PROJECT_TYPE_CCPN
 from cing.core import constants as cingConstants
 from cing.NRG import CasdScripts
 import cing
-import os
+import os, json
 
 cing.verbosity = cing.verbosityDebug
 #cing.verbosity = cing.verbosityDefault
