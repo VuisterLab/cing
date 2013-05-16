@@ -19,7 +19,7 @@ startDir = os.path.join(cingDataDir, CASD_NMR_BASE_NAME)
 inputDirCASD_NMR = os.path.join(startDir, cingConstants.DATA_STR)
 #inputDirCASD_NMR = 'file:///Users/jd/%s/data' % CASD_NMR_BASE_NAME
 #cingDirNRG = os.path.join(cingPythonDir, 'cing', 'NRG' )
-pythonScriptFileName = os.path.join(cingDirNRG,  'cing', 'NRG', 'validateEntryForCasd.py')
+pythonScriptFileName = os.path.join(cingPythonDir,  'cing', 'NRG', 'validateEntryForCasd.py')
 #pythonScriptFileName = os.path.join(cingDirNRG, 'storeCASDCING2db.py')
 
 #if 1:
