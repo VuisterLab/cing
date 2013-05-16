@@ -53,6 +53,29 @@ def casdFileDir(entryName):
   else:
     return None
     
+  
+def getEntryName(info, isOriginal=False):
+  """ Get entry name from info dictionary. 
+  if isOriginal get name of CASD input (...._Org)
+  
+  NBNB copy of function in ccpn/python/nijmegen/CASD/Util.py
+  NBNB must be consolidated
+  """
+  mainId = info.get('PDBcode')
+  if mainId:
+    mainId = mainId.lower()
+  else:
+    mainId = info['Target']
+  
+  if isOriginal or 'Program' not in info:
+    #Original data - put in Org
+    return mainId + '_Org'
+  
+  else:
+    entryID = info.get('EntryID', '???')
+    group = info.get('Group', '????')
+    return '%s_%s_%s' % (mainId, group, entryID, )
+  
 
 
 if __name__ == '__main__':

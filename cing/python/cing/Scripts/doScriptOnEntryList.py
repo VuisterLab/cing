@@ -43,7 +43,8 @@ def doScriptOnEntryList(pythonScriptFileName,
           start_entry_id                 = start_entry_id,
           max_entries_todo               = max_entries_todo,
           expectPdbEntryList             = True,
-          shuffleBeforeSelecting         = False # fails for chain ids when included.
+          shuffleBeforeSelecting         = False, # fails for chain ids when included.
+          entryList                      = () # as an alternative to a file.
           ):
     """Return True on error"""
     
@@ -67,34 +68,37 @@ def doScriptOnEntryList(pythonScriptFileName,
     # Empty list means no filtering done.
     entryCodeListFilter = []
 #    entryCodeListFilter = string.split("1n62")
-
-    entryListFile = file(entryListFileName, 'r')
-    entryCodeList = []
-    chainCodeList = []
-    entryCountTotal = 0
-    for line in entryListFile.readlines():
-        line = line.strip()
-        if line == '': # skip empty lines.
-            continue
-        entryCountTotal += 1
-        if expectPdbEntryList:
-            entryCode = line[0:4].lower()
-        else:
-            entryCode = line
-        if entryCode in entryCodeListFilter:
-            continue
-        entryCodeList.append( entryCode )
-        # get it only when present or ignore it. Watch for number of arguments changes.
-        # the python script will only see entry_code and extraArgListStr
-        chainCode = ''
-        if expectPdbEntryList:
-            if len(line) > 4:
-                chainCode = line[4].upper()
-#        nTdebug('Using chainCode: [%s]' % chainCode )
-        chainCodeList.append(chainCode)
-    entryListFile.close()
-
-    entryCountSelected = len( entryCodeList )
+    
+    if entryListFileName:
+      entryList = [line.strip() for line in open(entryListFileName)]
+    entryList = [x for x in entryList if x]
+    entryCountTotal = len(entryList)
+    
+    if expectPdbEntryList:
+      chainCodeList = []
+      entryCodeList = []
+      for ss in entryList:
+      
+        entryCode = ss[:4].lower()
+        if entryCode not in entryCodeListFilter:
+          
+          if len(ss) > 4:
+            chainCode = ss[4].upper()
+          else:
+            chainCode = ''
+ 
+          entryCodeList.append(entryCode)
+          chainCodeList.append(chainCode)
+          
+      entryCountSelected = len(entryCodeList)
+    
+    else:
+      #Non-PDB
+      entryCodeList = [x for x in entryCodeList if x not in entryCodeListFilter]
+      entryCountSelected = len(entryCodeList)
+      chainCodeList = [''] * entryCountTotal
+    
+    
     # lastEntryId is id of last entry excluding the entry itself.
     lastEntryId = min(len(entryCodeList), start_entry_id+max_entries_todo)    
     if shuffleBeforeSelecting:
