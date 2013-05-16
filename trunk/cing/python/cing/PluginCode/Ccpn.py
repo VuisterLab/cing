@@ -311,12 +311,14 @@ class Ccpn:
         return True
 
 
-    def importFromCcpn(self, modelCount = None):
+    def importFromCcpn(self, modelCount = None, nmrCalcName='CING'):
         '''Descrn: Import data from Ccpn into a Cing instance.
                    Check if either instance has attribute .cing or .ccpn,
                    respectively.
            Inputs: Ccpn Implementation.Project, Cing.Project instance.
            When modelCount is not None it will limit the number of models imported.
+           nmrCalcName is used to select the NmrCalcStore to search for runs.
+
            Output: None on error.
         '''
 
@@ -326,7 +328,8 @@ class Ccpn:
 
         nTmessage('==> Importing data from Ccpn project "%s"', self.ccpnProject.name)
 
-        if not self.importFromCcpnMolecule(modelCount = modelCount):
+        if not self.importFromCcpnMolecule(modelCount=modelCount, 
+                                           nmrCalcName=nmrCalcName):
             nTerror("Failed to importFromCcpnMolecule")
             return None
 
@@ -377,7 +380,7 @@ class Ccpn:
             return True
         return False
 
-    def importFromCcpnMolecule(self, modelCount = None):
+    def importFromCcpnMolecule(self, modelCount = None, nmrCalcName='CING'):
         '''Descrn: Import MolSystems (Molecules) from Ccpn.Project instance and
                    append it to Cing.Project instance, including chains, residues
                    and atoms.
@@ -385,11 +388,12 @@ class Ccpn:
                    or both, since it'll check if instances has attribute .ccpn or
                    .cing, respectively.
            When modelCount is not None it will limit the number of models imported.
+           nmrCalcName is used to select the NmrCalcStore to search for runs.
            Output: True or None on error.
         '''
 
         if hasattr(self.ccpnProject, self.CCPN_CING_RUN): # Fails for NRG-CING but a nice feature for use from within Analysis etc.
-            nmrCalcStore = self.ccpnProject.findFirstNmrCalcStore(name='CING')
+            nmrCalcStore = self.ccpnProject.findFirstNmrCalcStore(name=nmrCalcName)
             if nmrCalcStore:
                 run = nmrCalcStore.findFirstRun(status='pending') or nmrCalcStore.findFirstRun()
 
@@ -2451,10 +2455,11 @@ def removeCcpnReferences(self):
     except:
         nTerror("Failed removeCcpnReferences")
 
-def initCcpn(project, ccpnFolder, modelCount = None):
+def initCcpn(project, ccpnFolder, modelCount=None, nmrCalcName='CING'):
     '''Descrn: Adds to the Cing Project instance from a Ccpn folder project.
        Inputs: Cing.Project instance, Ccpn project XML file or a gzipped tar file such as .tgz or .tar.gz
        When modelCount is not None it will limit the number of models imported.
+       nmrCalcName is used to select the NmrCalcStore to search for runs.
        Output: Cing.Project or None on error.
     '''
     # work horse class.
@@ -2462,7 +2467,7 @@ def initCcpn(project, ccpnFolder, modelCount = None):
         nTerror('initCcpn: ccpnFolder "%s" does not exist', ccpnFolder)
         return None
     ccpn = Ccpn(project = project, ccpnFolder = ccpnFolder )
-    if not ccpn.importFromCcpn(modelCount = modelCount):
+    if not ccpn.importFromCcpn(modelCount=modelCount, nmrCalcName=nmrCalcName):
         nTerror("initCcpn: Failed importFromCcpn")
         return None
     return project
