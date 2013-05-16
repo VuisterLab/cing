@@ -153,7 +153,7 @@ def mainCasd(entryId, *extraArgList):
             return True
     elif projectType == PROJECT_TYPE_CCPN:
         project = Project.open(entryId, status='new')
-        if not project.initCcpn(ccpnFolder=fileNameTgz, modelCount=modelCount)
+        if not project.initCcpn(ccpnFolder=fileNameTgz, modelCount=modelCount):
                                 #nmrCalcName='CING'):
                                 #nmrCalcName='CASD-NMR'):
             nTerror("Failed to init project from ccpn")
