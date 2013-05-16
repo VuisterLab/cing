@@ -59,7 +59,11 @@ def mainCasd(entryId, *extraArgList):
         inputDir = os.path.join(inputDir, entryCodeChar2and3)
     elif archiveType == ARCHIVE_TYPE_BY_CH23_BY_ENTRY:
         inputDir = os.path.join(inputDir, entryCodeChar2and3, entryId)
-
+    
+    
+    # NBNB TODO
+    # Temporarily removed, pending proper fixing of ranges
+    '''
     targetId = getTargetForFullEntryName(entryId)
     if not targetId:
         nTerror("Failed to getTargetForFullEntryName for entryId: %s" % entryId)
@@ -68,7 +72,9 @@ def mainCasd(entryId, *extraArgList):
     if ranges == None:
         nTerror("Failed to getRangesForTarget for targetId: %s" % targetId)
         return True
-
+    '''
+    # NBNB TODO FIXME!!!
+    ranges = 'auto'
 
     nTdebug("Using:")
     nTdebug("inputDir:             %s" % inputDir)

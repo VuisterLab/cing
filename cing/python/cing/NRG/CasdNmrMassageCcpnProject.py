@@ -259,6 +259,7 @@ programHoH = convertToProgram(participationTable)
 mapEntrycodeNew2EntrycodeAndCity = getMapEntryNew(entryList, cityList)
 nTdebug("Read dbms with tables: %s" % dbms.tables.keys())
 """
+entryList = []
 #print labList
 #print programHoH
 #print getRangesForTarget('ET109Ared')
