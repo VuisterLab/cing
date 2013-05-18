@@ -391,13 +391,17 @@ class Ccpn:
            nmrCalcName is used to select the NmrCalcStore to search for runs.
            Output: True or None on error.
         '''
+        nTmessage('==> %s selecting NmrCalcStore %s from: %s' % (hasattr(self.ccpnProject, self.CCPN_CING_RUN), nmrCalcName, 
+                                                                 self.ccpnProject.sortedNmrCalcStores()))
 
         if hasattr(self.ccpnProject, self.CCPN_CING_RUN): # Fails for NRG-CING but a nice feature for use from within Analysis etc.
             nmrCalcStore = self.ccpnProject.findFirstNmrCalcStore(name=nmrCalcName)
             if nmrCalcStore:
                 run = nmrCalcStore.findFirstRun(status='pending') or nmrCalcStore.findFirstRun()
+                nTmessage('==> Using nmrCalcStore %s, run %s' % (nmrCalcName, run and (run.serial, run.status)))
 
             else:
+                nTmessage('==> no nmrCalcStore named %s' % nmrCalcName)
                 run = None
 
             self.ccpnCingRun = ccpnCalc = run

@@ -60,8 +60,9 @@ class CasdNmrCing(Lister):
         self.data_dir_local = "dataCASD-NMR"
 
 #        self.results_base = 'eNMRworkshop2'
+        cingDataDir = os.environ.get('CINGDATAROOT')
         self.results_base = CASD_NMR_BASE_NAME
-        self.results_base_dir = os.path.join('/Library/WebServer/Documents', self.results_base)
+        self.results_base_dir = os.path.join(cingDataDir, self.results_base)
         self.results_dir = self.results_base_dir
 
         self.data_dir = os.path.join(self.results_base_dir, DATA_STR)
@@ -729,8 +730,15 @@ if __name__ == '__main__':
 #    new_hits_entry_list         = string.split("2jqv 2jnb 2jnv 2jvo 2jvr 2jy7 2jy8 2oq9 2osq 2osr 2otr 2rn9 2rnb")
 
     ## Initialize the project
-    m = CasdNmrCing(max_entries_todo=max_entries_todo, max_time_to_wait=max_time_to_wait, writeWhyNot=writeWhyNot, 
-                    updateIndices=updateIndices, isProduction=isProduction)
+    #m = CasdNmrCing(max_entries_todo=max_entries_todo, max_time_to_wait=max_time_to_wait, writeWhyNot=writeWhyNot, 
+    #                updateIndices=updateIndices, isProduction=isProduction)
 #    m.getCingEntriesTriedAndDone()
-    m.update(new_hits_entry_list,doCheckAnnotation=doCheckAnnotation)
-    nTmessage("Finished creating the CASD-NMR CING indices")
+    #m.update(new_hits_entry_list,doCheckAnnotation=doCheckAnnotation)
+    #nTmessage("Finished creating the CASD-NMR CING indices")
+    
+    # RAsmus - just checking log files;
+    m = CasdNmrCing(max_entries_todo=500, max_time_to_wait=12000)
+    ltried, ldone, lcrashed = m.getCingEntriesTriedAndDone()
+    print 'TRIED:', ltried
+    print 'DONE :', ldone
+    print 'CRASH:', lcrashed

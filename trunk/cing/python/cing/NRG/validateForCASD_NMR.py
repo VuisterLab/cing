@@ -37,8 +37,9 @@ resultFile = os.path.join(inputDirCASD_NMR, 'resultData.json')
 resultData = json.load(open(resultFile))
 
 # Get all entries for CASD 2013
-#entryList = [CasdScripts.getEntryName(dd) for dd in resultData if dd['EntryID'] > 120]
-entryList = ['2m2e_Lyon_263',]
+entryList = [CasdScripts.getEntryName(dd) for dd in resultData 
+             if dd['EntryID'] > 120]
+#entryList = ['2m2e_Lyon_263',]
 
 outputDir = startDir
 
@@ -54,7 +55,7 @@ doScriptOnEntryList(pythonScriptFileName,
                     max_time_to_wait = max_time_to_wait, # 1y4o took more than 600. This is one of the optional arguments.
                     # 1ai0 took over 20 min; let's set this to 1 hour
                     start_entry_id = 0,
-                    max_entries_todo = 4,
+                    max_entries_todo = 200,
                     expectPdbEntryList = False,
                     entryList = entryList,
                     extraArgList = extraArgList)
