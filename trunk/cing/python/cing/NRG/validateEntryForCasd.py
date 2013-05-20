@@ -17,7 +17,8 @@ def mainCasd(entryId, *extraArgList):
     doProcheck = True
     doWattos = True
     doTalos = True
-    doStoreCheck = True # DEFAULT: True Requires sqlAlchemy
+#    doStoreCheck = True # DEFAULT: True Requires sqlAlchemy
+    doStoreCheck = False # DEFAULT: True Requires sqlAlchemy
     tgzCing = True # default: True # Create a tgz for the cing project. In case of a CING project input it will be overwritten.
     modelCount = None # default setting is None
     if fastestTest:
@@ -208,7 +209,7 @@ def mainCasd(entryId, *extraArgList):
 #        fileNameTgz = entryId + '.tgz'
 #        os.unlink(fileNameTgz) # temporary ccpn tgz
         pass
-#        rmdir(entryId) # temporary ccpn dir
+        rmdir(entryId) # temporary ccpn dir
 
     if tgzCing:
         directoryNameCing = entryId + ".cing"

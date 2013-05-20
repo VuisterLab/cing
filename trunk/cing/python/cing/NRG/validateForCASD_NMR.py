@@ -32,14 +32,17 @@ pythonScriptFileName = os.path.join(cingPythonDir,  'cing', 'NRG', 'validateEntr
 #    writeEntryListToFile(entryListFileName, entryList)
 
 
-# get mster results file
-resultFile = os.path.join(inputDirCASD_NMR, 'resultData.json')
-resultData = json.load(open(resultFile))
+# get master results file
+calcDataFile = os.path.join(inputDirCASD_NMR, 'calcData.json')
+calcData = json.load(open(calcDataFile))
 
 # Get all entries for CASD 2013
-#entryList = [CasdScripts.getEntryName(dd) for dd in resultData 
-#             if dd['EntryID'] > 120]
-entryList = ['2m2e_Lyon_263',]
+#entryList = list(calcData.keys())
+#
+entryList = [tt[0] for tt in sorted(calcData.items()) 
+            if tt[1].get('PDBcode') == '2M2E']
+entryList.remove('2m2e_Lyon_263')
+#entryList = ['2m2e_Lyon_263',]
 
 outputDir = startDir
 
