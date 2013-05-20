@@ -12,7 +12,7 @@ def mainCasd(entryId, *extraArgList):
 
     fastestTest = False # default: False
 #    ranges=AUTO_STR # default is None retrieved from DBMS csv files.
-    htmlOnly = True # default: False but enable it for faster runs without some actual data.
+    htmlOnly = False # default: False but enable it for faster runs without some actual data.
     doWhatif = True # disables whatif actual run
     doProcheck = True
     doWattos = True
@@ -208,7 +208,7 @@ def mainCasd(entryId, *extraArgList):
     if projectType == PROJECT_TYPE_CCPN:
 #        fileNameTgz = entryId + '.tgz'
 #        os.unlink(fileNameTgz) # temporary ccpn tgz
-        pass
+#        pass
         rmdir(entryId) # temporary ccpn dir
 
     if tgzCing:
