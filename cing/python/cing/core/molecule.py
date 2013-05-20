@@ -1073,7 +1073,7 @@ class Molecule( NTtree, ResidueList ):
         if rangesReset != ranges:
             nTmessage("==> Ranges reset from: %s to %s" % ( ranges, rangesReset ))
             self.ranges = rangesReset
-        nTmessage("In setRanges called from %s with ranges [%] setting to: [%s]" % 
+        nTmessage("In setRanges called from %s with ranges [%s] setting to: [%s]" % 
                   (getCallerName(), ranges, rangesReset))
         
 
