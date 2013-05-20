@@ -70,33 +70,33 @@ def doScriptOnEntryList(pythonScriptFileName,
 #    entryCodeListFilter = string.split("1n62")
     
     if entryListFileName:
-      entryList = [line.strip() for line in open(entryListFileName)]
+        entryList = [line.strip() for line in open(entryListFileName)]
     entryList = [x for x in entryList if x]
     entryCountTotal = len(entryList)
     
     if expectPdbEntryList:
-      chainCodeList = []
-      entryCodeList = []
-      for ss in entryList:
-      
-        entryCode = ss[:4].lower()
-        if entryCode not in entryCodeListFilter:
-          
-          if len(ss) > 4:
-            chainCode = ss[4].upper()
-          else:
-            chainCode = ''
+        chainCodeList = []
+        entryCodeList = []
+        for ss in entryList:
  
-          entryCodeList.append(entryCode)
-          chainCodeList.append(chainCode)
+            entryCode = ss[:4].lower()
+            if entryCode not in entryCodeListFilter:
+ 
+                if len(ss) > 4:
+                    chainCode = ss[4].upper()
+                else:
+                    chainCode = ''
+ 
+                entryCodeList.append(entryCode)
+                chainCodeList.append(chainCode)
           
-      entryCountSelected = len(entryCodeList)
+        entryCountSelected = len(entryCodeList)
     
     else:
-      #Non-PDB
-      entryCodeList = [x for x in entryList if x not in entryCodeListFilter]
-      entryCountSelected = len(entryCodeList)
-      chainCodeList = [''] * entryCountSelected
+        #Non-PDB
+        entryCodeList = [x for x in entryList if x not in entryCodeListFilter]
+        entryCountSelected = len(entryCodeList)
+        chainCodeList = [''] * entryCountSelected
     
     
     # lastEntryId is id of last entry excluding the entry itself.

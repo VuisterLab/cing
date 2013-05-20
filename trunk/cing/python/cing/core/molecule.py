@@ -3149,7 +3149,7 @@ Return an Molecule instance or None on error
         # end for
         ranges = self.residueList2Ranges(residueList2)
         if not residueList2:
-            nTwarning(("No residues left in %s for ranges: [%s] in omitWaterAndMissingResiduesFromRanges after removing water and absent residues. "+
+            nTwarning(("No residues left in %s for ranges: [%s] after omitWaterAndMissingResiduesFromRanges . "+
                       "Returning all residues.") % (getCallerName(), ranges))
             return ALL_RANGES_STR
         # end if

@@ -40,8 +40,8 @@ calcData = json.load(open(calcDataFile))
 #entryList = list(calcData.keys())
 #
 entryList = [tt[0] for tt in sorted(calcData.items()) 
-            if tt[1].get('PDBcode') == '2M2E']
-entryList.remove('2m2e_Lyon_263')
+            if tt[1].get('PDBcode') == '2M5O']
+#entryList.remove('2m2e_Lyon_263')
 #entryList = ['2m2e_Lyon_263',]
 
 outputDir = startDir
