@@ -37,9 +37,9 @@ resultFile = os.path.join(inputDirCASD_NMR, 'resultData.json')
 resultData = json.load(open(resultFile))
 
 # Get all entries for CASD 2013
-entryList = [CasdScripts.getEntryName(dd) for dd in resultData 
-             if dd['EntryID'] > 120]
-#entryList = ['2m2e_Lyon_263',]
+#entryList = [CasdScripts.getEntryName(dd) for dd in resultData 
+#             if dd['EntryID'] > 120]
+entryList = ['2m2e_Lyon_263',]
 
 outputDir = startDir
 
@@ -50,7 +50,7 @@ max_time_to_wait = 60 * 60 * 6 # 2p80 took the longest: 5.2 hours.
 doScriptOnEntryList(pythonScriptFileName,
                     None,
                     startDir,
-                    processes_max = 4,
+                    processes_max = 2,
                     delay_between_submitting_jobs = 5, # why is this so long? because of time outs at tang?
                     max_time_to_wait = max_time_to_wait, # 1y4o took more than 600. This is one of the optional arguments.
                     # 1ai0 took over 20 min; let's set this to 1 hour

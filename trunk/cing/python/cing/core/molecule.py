@@ -260,6 +260,7 @@ def selectFitAtoms( fitResidues, backboneOnly=True, includeProtons = False ):
     c0 = r0.getParent()
     m0 = c0.getParent()
     modelCount = m0.modelCount
+#    nTdebug("selectFitAtoms: n models: is %s" % modelCount)
     if modelCount <= 0:
         return NoneObject
     #end if
@@ -276,6 +277,7 @@ def selectFitAtoms( fitResidues, backboneOnly=True, includeProtons = False ):
     for res in fitResidues:
         for a in res.allAtoms():
             if len(a.coordinates) != modelCount:
+                #nTdebug("Rejecting atom: coordinate count wrong: %s" % len(a.coordinates))
                 continue
             if ( (not includeProtons and a.isProton()) ):
                 continue
@@ -286,7 +288,7 @@ def selectFitAtoms( fitResidues, backboneOnly=True, includeProtons = False ):
             #end if
         #end for
     #end for
-#    nTdebug("Atom list to be fitted (len:%s):\n%s" % (len(fitted), fitted))
+#    nTdebug("Atom list to be fitted (len:%s):\n      %s" % (len(fitted), fitted))
     return fitted
 #end def
 
@@ -1071,6 +1073,9 @@ class Molecule( NTtree, ResidueList ):
         if rangesReset != ranges:
             nTmessage("==> Ranges reset from: %s to %s" % ( ranges, rangesReset ))
             self.ranges = rangesReset
+        nTmessage("In setRanges called from %s with ranges [%] setting to: [%s]" % 
+                  (getCallerName(), ranges, rangesReset))
+        
 
     def setResiduesFromRanges(self, ranges=None, autoLimit=LIMIT_RANGES):
         """
@@ -1106,7 +1111,7 @@ class Molecule( NTtree, ResidueList ):
             if rangesReset == None:
                 nTerror("Failed rangesByCv in setResiduesFromRanges")
                 return None
-#            nTdebug("In setResiduesFromRanges used: cv to get ranges: %s" % rangesReset)
+            nTdebug("In setResiduesFromRanges used: cv to get ranges: %s" % rangesReset)
             selectedResidues = self.ranges2list(rangesReset)
             if selectedResidues == None:
                 nTerror("Failed ranges2list (A) in setResiduesFromRanges")
@@ -1138,6 +1143,7 @@ class Molecule( NTtree, ResidueList ):
             nTerror("In setResiduesFromRanges failed to setResiduesFromRanges because result is not a list; not propagating this error.")
             return None
 
+#        nTmessage("setResiduesFromRanges: %s" % selectedResidues)
         self.selectedResidues = selectedResidues
         return selectedResidues
     #end def
@@ -1151,6 +1157,7 @@ class Molecule( NTtree, ResidueList ):
         Return string otherwise.
         An empty list is expressed as EMPTY_RANGES_STR which is a dot.
         '''
+        
         result = ''
         if residueList == None:
             nTerror("In residueList2Ranges no input residueList.")
@@ -1357,7 +1364,8 @@ class Molecule( NTtree, ResidueList ):
         Only convert a residue ranges string, e.g. 'A.-10--2,B3'
         See unit test in test_molecule.py
         """
-        if type(ranges) != str:
+        #if type(ranges) != str:
+        if not isinstance(ranges, basestring):
             nTerror('Error Molecule._rangesStr2list: ranges type [%s] should have been a string' % type(ranges) )
             return None
 
@@ -1461,7 +1469,8 @@ class Molecule( NTtree, ResidueList ):
         if ranges == None or len(ranges) == 0:
             return self.allResidues()
 
-        if type(ranges) == str:
+        if isinstance(ranges, basestring):
+        #if type(ranges) == str:
             return self._rangesStr2list(ranges)
 
         if isinstance( ranges, list ):
@@ -3113,7 +3122,7 @@ Return an Molecule instance or None on error
         Expands the ranges string to a list of residues and then excludes all
         residues that are water or that have no atoms with coordinates.
         """
-        debugRoutine = False
+        debugRoutine = True
         residueList = self.ranges2list(ranges)
         if debugRoutine:
             nTdebug("In %s got: %s" % ( getCallerName(), str(residueList)))
@@ -3140,7 +3149,7 @@ Return an Molecule instance or None on error
         # end for
         ranges = self.residueList2Ranges(residueList2)
         if not residueList2:
-            nTwarning(("No residues left in %s for ranges: [%s] in rangesByCv after removing water and absent residues. "+
+            nTwarning(("No residues left in %s for ranges: [%s] in omitWaterAndMissingResiduesFromRanges after removing water and absent residues. "+
                       "Returning all residues.") % (getCallerName(), ranges))
             return ALL_RANGES_STR
         # end if

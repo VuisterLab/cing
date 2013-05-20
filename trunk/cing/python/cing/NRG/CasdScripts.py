@@ -4,17 +4,20 @@ Created on May 13, 2013
 @author: rhf
 '''
 
-import os
+from cing.core import constants as cingConstants
+from cing.NRG import CASD_NMR_BASE_NAME
+import os, json
 
 # Set default locations
 # NBNB should be moved to Constants file later
-casdNmrDir = os.environ.get('CASD_HOME')
-if not casdNmrDir:
-  raise Exception("Environment variable CASD_HOME not set")
-allDataDir = os.path.join(casdNmrDir, 'data')
+cingDataDir = os.environ.get('CINGDATAROOT')
+casdNmrDir = os.path.join(cingDataDir, CASD_NMR_BASE_NAME)
+allDataDir = os.path.join(casdNmrDir, cingConstants.DATA_STR)
 topTmpDir = os.path.join(casdNmrDir, 'tmpdata')
 if not os.path.exists(topTmpDir):
   os.makedirs(topTmpDir)
+calcDataFile = os.path.join(allDataDir, 'calcData.json')
+calcData = json.load(open(calcDataFile))
 
 def dirToCasdTree(path=None, trialRun=False):
   """ Runner function: execute casdFileToTree for all files in dir
@@ -52,7 +55,15 @@ def casdFileDir(entryName):
     return os.path.join(allDataDir, entryName[1:3], entryName)
   else:
     return None
-    
+
+def getRangesForEntry(entryId, default='all'):
+  """
+  """
+  info = calcData.get(entryId, {})
+  if info:
+    ranges = info.get("Defined Residues", default)
+  #
+  return ranges
   
 def getEntryName(info, isOriginal=False):
   """ Get entry name from info dictionary. 
