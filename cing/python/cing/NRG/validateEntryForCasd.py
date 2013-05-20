@@ -4,13 +4,15 @@ from cing.NRG.CasdNmrMassageCcpnProject import * #@UnusedWildImport
 from cing.Scripts.validateEntry import * #@UnusedWildImport
 from cing.core.constants import * #@UnusedWildImport
 
+from cing.NRG import CasdScripts
+
 def mainCasd(entryId, *extraArgList):
     """inputDir may be a directory or a url. A url needs to start with http://.
     """
 
-    fastestTest = 1 # default: False
+    fastestTest = False # default: False
 #    ranges=AUTO_STR # default is None retrieved from DBMS csv files.
-    htmlOnly = False # default: False but enable it for faster runs without some actual data.
+    htmlOnly = True # default: False but enable it for faster runs without some actual data.
     doWhatif = True # disables whatif actual run
     doProcheck = True
     doWattos = True
@@ -26,7 +28,7 @@ def mainCasd(entryId, *extraArgList):
         doWattos = False
         doTalos = False
     fORCE_REDO = True
-    fORCE_RETRIEVE_INPUT = True
+    fORCE_RETRIEVE_INPUT = False
 
 
     nTmessage(header)
@@ -60,21 +62,7 @@ def mainCasd(entryId, *extraArgList):
     elif archiveType == ARCHIVE_TYPE_BY_CH23_BY_ENTRY:
         inputDir = os.path.join(inputDir, entryCodeChar2and3, entryId)
     
-    
-    # NBNB TODO
-    # Temporarily removed, pending proper fixing of ranges
-    '''
-    targetId = getTargetForFullEntryName(entryId)
-    if not targetId:
-        nTerror("Failed to getTargetForFullEntryName for entryId: %s" % entryId)
-        return True
-    ranges = getRangesForTarget(targetId)
-    if ranges == None:
-        nTerror("Failed to getRangesForTarget for targetId: %s" % targetId)
-        return True
-    '''
-    # NBNB TODO FIXME!!!
-    ranges = 'auto'
+    ranges = CasdScripts.getRangesForEntry(entryId)
 
     nTdebug("Using:")
     nTdebug("inputDir:             %s" % inputDir)
@@ -158,6 +146,9 @@ def mainCasd(entryId, *extraArgList):
                                 #nmrCalcName='CASD-NMR'):
             nTerror("Failed to init project from ccpn")
             return True
+        
+        # Temporary debug
+#        project.saveCcpn(os.path.join('/home/rf118/tmpdata/',entryId))
     elif projectType == PROJECT_TYPE_PDB:
         project = Project.open(entryId, status='new')
 #        pdbFileFormats = [ entryId + ".pdb", "pdb" + entryId + ".ent.gz" ]
@@ -191,6 +182,8 @@ def mainCasd(entryId, *extraArgList):
 
 #    project.save()
 #    project.molecule.ranges = ranges # JFD: this doesn't seem to be set there exactly.
+    
+#    nTdebug("mainCasd: Molecule starts with ranges %s" % project.molecule.ranges)
     project.molecule.superpose(ranges=ranges)
     if True:
         if project.validate(htmlOnly=htmlOnly, ranges=ranges, doProcheck=doProcheck, doWhatif=doWhatif,
@@ -214,7 +207,8 @@ def mainCasd(entryId, *extraArgList):
     if projectType == PROJECT_TYPE_CCPN:
 #        fileNameTgz = entryId + '.tgz'
 #        os.unlink(fileNameTgz) # temporary ccpn tgz
-        rmdir(entryId) # temporary ccpn dir
+        pass
+#        rmdir(entryId) # temporary ccpn dir
 
     if tgzCing:
         directoryNameCing = entryId + ".cing"

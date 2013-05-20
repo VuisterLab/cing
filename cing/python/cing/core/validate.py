@@ -28,6 +28,8 @@ Atom:
     shiftx, shiftx.av, shiftx.sd: NTlist instance with shiftx predictions, average and sd
 """
 
+import time
+
 from cing.Libs.Geometry import violationAngle
 from cing.Libs.NTplot import ssIdxToType
 from cing.Libs.NTutils import * #@UnusedWildImport
@@ -116,24 +118,49 @@ def validate( project, ranges=None, parseOnly=False, htmlOnly=False,
             doShiftx = False
     if validateFastest or validateImageLess:
         htmlOnly = True
-
+    
+    t0 = tx = time.time()
 #    nTdebug('Starting validate#validate with toFile True')
     if doShiftx and getDeepByKeysOrAttributes(plugins, SHIFTX_STR, IS_INSTALLED_STR):
         project.runShiftx(parseOnly=parseOnly)
+    tt = time.time()
+    print 'Time for runShiftx', tt -tx
+    tx = tt
     if getDeepByKeysOrAttributes(plugins, DSSP_STR, IS_INSTALLED_STR):
         project.runDssp(parseOnly=parseOnly)
+    tt = time.time()
+    print 'Time for runDssp', tt -tx
+    tx = tt
     if doWhatif and getDeepByKeysOrAttributes(plugins, WHATIF_STR, IS_INSTALLED_STR):
         project.runWhatif(ranges=ranges, parseOnly=parseOnly)
+    tt = time.time()
+    print 'Time for runWhatif', tt -tx
+    tx = tt
     if doProcheck and getDeepByKeysOrAttributes(plugins, PROCHECK_STR, IS_INSTALLED_STR):
         project.runProcheck(ranges=ranges, parseOnly=parseOnly)
+    tt = time.time()
+    print 'Time for runProcheck', tt -tx
+    tx = tt
     if doWattos and getDeepByKeysOrAttributes(plugins, WATTOS_STR, IS_INSTALLED_STR):
         project.runWattos(parseOnly=parseOnly)
+    tt = time.time()
+    print 'Time for runWattos', tt -tx
+    tx = tt
     if doQueeny:
         project.runQueeny()
+    tt = time.time()
+    print 'Time for runQueeny', tt -tx
+    tx = tt
     if doTalos and getDeepByKeysOrAttributes(plugins, NIH_STR, IS_INSTALLED_STR):
         project.runTalosPlus(parseOnly=parseOnly)
+    tt = time.time()
+    print 'Time for runTalosPlus', tt -tx
+    tx = tt
     if doSuperpose:
         project.superpose(ranges=ranges)
+    tt = time.time()
+    print 'Time for superpose', tt -tx
+    tx = tt
 
     if filterVasco:
         if not getDeepByKeysOrAttributes(plugins, VASCO_STR, IS_INSTALLED_STR):
@@ -144,17 +171,38 @@ def validate( project, ranges=None, parseOnly=False, htmlOnly=False,
         else:
             if not project.runVasco():
                 nTerror("Failed to filterVasco but will continue with validation.")
+            tt = time.time()
+            print 'Time for runVasco', tt -tx
+            tx = tt
             # end if
         # end if
     # end if
     if filterTopViolations:
         if not project.filterHighRestraintViol():
             nTerror("Failed to filterHighRestraintViol but will continue with validation.")
+        tt = time.time()
+        print 'Time for filterHighRestraintViol', tt -tx
+        tx = tt
 
     project.runCingChecks(toFile=True, ranges=ranges)
+    tt = time.time()
+    print 'Time for runCingChecks', tt -tx
+    tx = tt
     project.setupHtml()
+    tt = time.time()
+    print 'Time for setupHtml', tt -tx
+    tx = tt
     project.generateHtml(htmlOnly = htmlOnly)
+    tt = time.time()
+    print 'Time for generateHtml', tt -tx
+    tx = tt
     project.renderHtml()
+    tt = time.time()
+    print 'Time for renderHtml', tt -tx
+    tx = tt
+    tt = time.time()
+    print 'Time for cing operations', tt -tx
+    print 'Time for total vaidation', tt -t0
     nTmessage("Done with overall validation")
 
 

@@ -18,19 +18,32 @@ from cing.NRG import CASD_NMR_BASE_NAME
 from cing.NRG.PDBEntryLists import writeEntryListToFile
 from cing.core.constants import * #@UnusedWildImport
 from glob import glob1
-import tarfile
+import tarfile, json
 
 __author__ = "Wim Vranken <wim@ebi.ac.uk> Jurgen Doreleijers <jurgenfd@gmail.com>"
 #    inputDir = os.path.join(cingDirTestsData, "ccpn")
-try:
-    from cing.NRG.localConstants import baseDir #@UnresolvedImport # pylint: disable=E0611
-except:
+#try:
+#    from cing.NRG.localConstants import baseDir #@UnresolvedImport # pylint: disable=E0611
+#except:
     #baseDir = '/Users/jd/CASD-NMR-CING'
-    baseDir = '/Volumes/UserHome/geerten/Data/CASD-NMR-CING'
+#    baseDir = '/Volumes/UserHome/geerten/Data/CASD-NMR-CING'
 
 #dataOrgDir = os.path.join(baseDir, DATA_STR)
-dataDir = os.path.join(baseDir, DATA_STR)
-startDir = '/Library/WebServer/Documents/' + CASD_NMR_BASE_NAME
+#dataDir = os.path.join(baseDir, DATA_STR)
+#startDir = '/Library/WebServer/Documents/' + CASD_NMR_BASE_NAME
+
+
+# NBNB TBD this file is partly fixed and probably broken.
+# Anyway it is broken already because the haousekeepign fiel system ic changed
+# the file lcoations ahve changed, etc.
+# NBNB FIX OR PENSION OFF.
+# See CasdScripts.py for alternatives
+
+cingDataDir = os.environ.get('CINGDATAROOT')
+dataDir = os.path.join(cingDataDir, CASD_NMR_BASE_NAME, DATA_STR)
+inputDir = dataDir
+calcDataFile = os.path.join(dataDir, 'calcData.json')
+calcData = json.load(open(calcDataFile))
 
 colorByLab = {
     'Cheshire': 'green',
@@ -81,7 +94,7 @@ def getCASD_NMR_DBMS():
     return dbms
 
 def createLayOutArchive():
-    inputDir = '/Users/jd/CASD-NMR-CING/casdNmrDbDivided'
+    #inputDir = '/Users/jd/CASD-NMR-CING/casdNmrDbDivided'
     os.chdir(inputDir)
     for entryCode in entryList[:]:
 #    for entryCode in entryList[0:1]:
@@ -92,7 +105,7 @@ def createLayOutArchive():
             mkdirs(entryDir)
 
 def copyFromCasdNmr2CcpnArchive():
-    inputDir = '/Users/jd/CASD-NMR-CING/casdNmrDbDivided'
+    #inputDir = '/Users/jd/CASD-NMR-CING/casdNmrDbDivided'
     programHoH = convertToProgram(participationTable)
     os.chdir(inputDir)
     for entryCode in entryList:
@@ -133,7 +146,7 @@ def copyFromCasdNmr2CcpnArchive():
 
 
 def redoLayOutArchiveWim():
-    inputDir = '/Users/jd/Downloads/casdNmrCcpn'
+    #inputDir = '/Users/jd/Downloads/casdNmrCcpn'
     os.chdir(inputDir)
     for entryCode in entryList[:]:
 #    for entryCode in entryList[0:1]:
@@ -277,6 +290,6 @@ if __name__ == '__main__':
 #    redoLayOutArchiveWim()
 #    nTmessage("entryList: %s" % str(entryList))
     target = 'CGR26A'
-    result = getFullEntryNameListForTarget(target, programHoH)
-    nTmessage("result: %s" % str(result))
+    #result = getFullEntryNameListForTarget(target, programHoH)
+    #nTmessage("result: %s" % str(result))
 

@@ -34,7 +34,7 @@ if True: # for easy blocking of data, preventing the code to be resorted with im
         from ccp.util.Validation import getResidueValidation
         from memops.api.Implementation import MemopsRoot
         from memops.api.Implementation import AppDataString
-        from memops.general.Io import loadProject
+        from memops.general import Io as memopsIo
     except:
         switchOutput(True)
         raise ImportWarning(CCPN_STR)
@@ -225,7 +225,7 @@ class Ccpn:
         self.project.ccpnFolder = os.path.abspath(ccpnFolder)
 
         switchOutput(False) # let's skip the note on stdout of changed hard-coded directories
-        self.ccpnProject = loadProject(ccpnFolder)
+        self.ccpnProject = memopsIo.loadProject(ccpnFolder)
         switchOutput(True)
         if not self.ccpnProject:
             nTerror(" ccpn project from folder '%s' not loaded", ccpnFolder)
@@ -369,7 +369,6 @@ class Ccpn:
 
         self.project.addHistory(sprintf('Imported CCPN project'))
         self.project.updateProject()
-
         return True # To distinguish success from failure.
     # end def importFromCcpn
 
@@ -391,14 +390,14 @@ class Ccpn:
            nmrCalcName is used to select the NmrCalcStore to search for runs.
            Output: True or None on error.
         '''
-        nTmessage('==> %s selecting NmrCalcStore %s from: %s' % (hasattr(self.ccpnProject, self.CCPN_CING_RUN), nmrCalcName, 
-                                                                 self.ccpnProject.sortedNmrCalcStores()))
+#        nTmessage('==> %s selecting NmrCalcStore %s from: %s' % (hasattr(self.ccpnProject, self.CCPN_CING_RUN), nmrCalcName, 
+#                                                                 self.ccpnProject.sortedNmrCalcStores()))
 
         if hasattr(self.ccpnProject, self.CCPN_CING_RUN): # Fails for NRG-CING but a nice feature for use from within Analysis etc.
             nmrCalcStore = self.ccpnProject.findFirstNmrCalcStore(name=nmrCalcName)
             if nmrCalcStore:
                 run = nmrCalcStore.findFirstRun(status='pending') or nmrCalcStore.findFirstRun()
-                nTmessage('==> Using nmrCalcStore %s, run %s' % (nmrCalcName, run and (run.serial, run.status)))
+#                nTmessage('==> Using nmrCalcStore %s, run %s' % (nmrCalcName, run and (run.serial, run.status)))
 
             else:
                 nTmessage('==> no nmrCalcStore named %s' % nmrCalcName)
@@ -704,14 +703,15 @@ class Ccpn:
                         ccpnCoordResidueList.append(ccpnCoordResidue)
 
                 for ccpnAtom in ccpnResidue.sortedAtoms():
-                    atomName = ccpnAtom.chemAtom.name
+                    #atomName = ccpnAtom.chemAtom.name
+                    atomName = ccpnAtom.name # faster and equivalent
 
                     # Luckily no need for residue names here.
                     cingNameTuple = (matchingConvention, chain.name, resNumber, atomName)
                     atom = self.molecule.decodeNameTuple(cingNameTuple)
 
                     if not atom:
-#                        nTdebug('Creating non-standard atom %s' % repr(cingNameTuple))
+                        nTdebug('Creating non-standard atom %s' % repr(cingNameTuple))
                         cingResNameTuple = (INTERNAL, chain.name, resNumber, None)
                         res = self.molecule.decodeNameTuple(cingResNameTuple)
                         if not res:
@@ -741,7 +741,7 @@ class Ccpn:
                         if not ccpnCoordAtom:
                             # GV says: do not know why we would have this error, as we have matched the atom objects
                             #TODO: issue 128 or 129 JFD: It usually happens for H in N-term, which CING is not mapping yet. GV will fix.
-#                            nTdebug('CING %s not found in CCPN: %s', atom, ccpnAtom)
+                            nTdebug('CING %s not found in CCPN: %s', atom, ccpnAtom)
                             continue
                         # end if
 
@@ -755,12 +755,15 @@ class Ccpn:
                                     break
                                 ccpnCoord = ccpnCoordAtom.findFirstCoord(model = ccpnModel)
                                 if not ccpnCoord: # as in entry 1agg GLU1.H2 and 3.
-#                                    nTwarning("Skipping coordinate for CING failed to find coordinate for model %d for atom %s" % (
-#i, atom)) 
+                                    nTwarning("Skipping coordinate for CING failed to find coordinate for model %d for atom %s" % (
+                                              i, atom)) 
 # happens for 2xfm  <Atom A.VAL280.HG11> and many others.
                                     continue
                                 atom.addCoordinate(ccpnCoord.x, ccpnCoord.y, ccpnCoord.z, ccpnCoord.bFactor, ocuppancy=ccpnCoord.occupancy)
                             # end for
+                        else:
+                            nTwarning("No coordinates for atom %s" % (atom))
+                            
                         # end if
                     # end for
                 # end for
@@ -770,7 +773,7 @@ class Ccpn:
         if self.allowNonStandardResidue:
             msg += " added:\n"
         else:
-            msg += " skiped:\n"
+            msg += " skipped:\n"
 
         if unmatchedAtomByResDict:
             msg += unmatchedAtomByResDictToString(unmatchedAtomByResDict)
@@ -778,7 +781,7 @@ class Ccpn:
                 nTmessage(msg)
             else:
                 nTerror(msg)
-
+        
         return self.molecule
     # end def _match2Cing
 
@@ -958,7 +961,7 @@ class Ccpn:
         doneSetShifts = False
         ccpnCalc = self.ccpnCingRun
         if ccpnCalc:
-            nTdebug("Using ccpnCalc object")
+#            nTdebug("Using ccpnCalc object")
             ccpnMolSys = self.molecule.ccpn
             for measurementData in ccpnCalc.findAllData(className = self.CCPN_RUN_MEASUREMENT,
                                                         ioRole = 'input'):
@@ -1157,7 +1160,10 @@ class Ccpn:
 #                    nTdebug("Using peakList %s" % peakList)
                     peakLists.append(peakList)
         # No ccpnCalc or ccpnCalc is empty
-        if not peakLists:
+        #if not peakLists:
+        
+        # NBNB Rasmus 19 May 2013. Change: If ccpnCalc is present it MUST be followed.
+        else:
 #            nTdebug("In %s no peakLists yet" % getCallerName())
             for experiment in self.ccpnNmrProject.sortedExperiments():
 #                nTdebug("Using experiment %s" % experiment)
@@ -2496,10 +2502,12 @@ def saveCcpn(project, ccpnFolder, ccpnTgzFile = None):
     # end if
 
     switchOutput(False)
-    status = ccpnProject.saveModified() # TODO: can't change from original ccpnFolder
+    #status = ccpnProject.saveModified() # TODO: can't change from original ccpnFolder
+    # Fixed problem Rasmus May 2013
+    status = memopsIo.saveProject(ccpnProject, ccpnFolder, removeExisting=True)
     switchOutput(True)
-    if status:
-        nTerror("Failed ccpnProject.saveModified in " + getCallerName())
+    if not status:
+        nTerror("Failed memopsIo.saveProject in " + getCallerName())
         return None
 
     nTmessage("Saved ccpn project to folder: %s" % ccpnFolder)
