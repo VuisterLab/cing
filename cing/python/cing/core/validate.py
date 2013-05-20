@@ -123,44 +123,44 @@ def validate( project, ranges=None, parseOnly=False, htmlOnly=False,
 #    nTdebug('Starting validate#validate with toFile True')
     if doShiftx and getDeepByKeysOrAttributes(plugins, SHIFTX_STR, IS_INSTALLED_STR):
         project.runShiftx(parseOnly=parseOnly)
-    tt = time.time()
-    print 'Time for runShiftx', tt -tx
-    tx = tt
+#    tt = time.time()
+#    nTmessage('Time for runShiftx %s' % (tt -tx))
+#    tx = tt
     if getDeepByKeysOrAttributes(plugins, DSSP_STR, IS_INSTALLED_STR):
         project.runDssp(parseOnly=parseOnly)
-    tt = time.time()
-    print 'Time for runDssp', tt -tx
-    tx = tt
+#    tt = time.time()
+#    nTmessage('Time for runDssp %s' % (tt -tx))
+#    tx = tt
     if doWhatif and getDeepByKeysOrAttributes(plugins, WHATIF_STR, IS_INSTALLED_STR):
         project.runWhatif(ranges=ranges, parseOnly=parseOnly)
-    tt = time.time()
-    print 'Time for runWhatif', tt -tx
-    tx = tt
+#    tt = time.time()
+#    nTmessage('Time for runWhatif %s' % (tt -tx))
+#    tx = tt
     if doProcheck and getDeepByKeysOrAttributes(plugins, PROCHECK_STR, IS_INSTALLED_STR):
         project.runProcheck(ranges=ranges, parseOnly=parseOnly)
-    tt = time.time()
-    print 'Time for runProcheck', tt -tx
-    tx = tt
+#    tt = time.time()
+#    nTmessage('Time for runProcheck %s' % (tt -tx))
+#    tx = tt
     if doWattos and getDeepByKeysOrAttributes(plugins, WATTOS_STR, IS_INSTALLED_STR):
         project.runWattos(parseOnly=parseOnly)
-    tt = time.time()
-    print 'Time for runWattos', tt -tx
-    tx = tt
+#    tt = time.time()
+#    nTmessage('Time for runWattos %s' % (tt -tx))
+#    tx = tt
     if doQueeny:
         project.runQueeny()
-    tt = time.time()
-    print 'Time for runQueeny', tt -tx
-    tx = tt
+#    tt = time.time()
+#    nTmessage('Time for runQueeny %s' % (tt -tx))
+#    tx = tt
     if doTalos and getDeepByKeysOrAttributes(plugins, NIH_STR, IS_INSTALLED_STR):
         project.runTalosPlus(parseOnly=parseOnly)
-    tt = time.time()
-    print 'Time for runTalosPlus', tt -tx
-    tx = tt
+#    tt = time.time()
+#    nTmessage('Time for runTalosPlus %s' % (tt -tx))
+#    tx = tt
     if doSuperpose:
         project.superpose(ranges=ranges)
-    tt = time.time()
-    print 'Time for superpose', tt -tx
-    tx = tt
+#    tt = time.time()
+#    nTmessage('Time for superpose %s' % (tt -tx))
+#    tx = tt
 
     if filterVasco:
         if not getDeepByKeysOrAttributes(plugins, VASCO_STR, IS_INSTALLED_STR):
@@ -171,39 +171,38 @@ def validate( project, ranges=None, parseOnly=False, htmlOnly=False,
         else:
             if not project.runVasco():
                 nTerror("Failed to filterVasco but will continue with validation.")
-            tt = time.time()
-            print 'Time for runVasco', tt -tx
-            tx = tt
+#            tt = time.time()
+#            nTmessage('Time for runVasco %s' % (tt -tx))
+#            tx = tt
             # end if
         # end if
     # end if
     if filterTopViolations:
         if not project.filterHighRestraintViol():
             nTerror("Failed to filterHighRestraintViol but will continue with validation.")
-        tt = time.time()
-        print 'Time for filterHighRestraintViol', tt -tx
-        tx = tt
+#        tt = time.time()
+#        nTmessage('Time for filterHighRestraintViol %s' % (tt -tx))
+#        tx = tt
 
     project.runCingChecks(toFile=True, ranges=ranges)
-    tt = time.time()
-    print 'Time for runCingChecks', tt -tx
-    tx = tt
+#    tt = time.time()
+#    nTmessage('Time for runCingChecks %s' % (tt -tx))
+#    tx = tt
     project.setupHtml()
     tt = time.time()
-    print 'Time for setupHtml', tt -tx
+#    nTmessage('Time for setupHtml %s' % (tt -tx))
     tx = tt
     project.generateHtml(htmlOnly = htmlOnly)
     tt = time.time()
-    print 'Time for generateHtml', tt -tx
+    nTmessage('Time for generateHtml %s' % (tt -tx))
     tx = tt
     project.renderHtml()
+#    tt = time.time()
+#    nTmessage('Time for renderHtml %s' % (tt -tx))
+#    tx = tt
     tt = time.time()
-    print 'Time for renderHtml', tt -tx
-    tx = tt
-    tt = time.time()
-    print 'Time for cing operations', tt -tx
-    print 'Time for total vaidation', tt -t0
-    nTmessage("Done with overall validation")
+#    nTmessage('Time for cing operations %s' % (tt -tx))
+    nTmessage("Done overall validation, time was %s" % (tt -t0))
 
 
 def criticizePeaks( project, toFile=True ):
