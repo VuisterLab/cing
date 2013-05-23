@@ -2502,7 +2502,7 @@ def saveCcpn(project, ccpnFolder, ccpnTgzFile = None):
     # end if
 
     switchOutput(False)
-    #status = ccpnProject.saveModified() # TODO: can't change from original ccpnFolder
+    #status = ccpnProject.saveModified() # DONE: can't change from original ccpnFolder
     # Fixed problem Rasmus May 2013
     status = memopsIo.saveProject(ccpnProject, ccpnFolder, removeExisting=True)
     switchOutput(True)
