@@ -59,7 +59,7 @@ def plotRmsdBox(target):
     
     x,rmsd=results.getValues(target, 'rmsd')    
     x2,rmsdToTarget=results.getValues(target, 'rmsdToTarget')
-    bp = ax1.boxplot([rmsd,rmsdToTarget], notch=False, sym='+', vert=True, whis=1.5)
+    bp = ax1.boxplot([rmsd,rmsdToTarget[1:]], notch=False, sym='+', vert=True, whis=1.5) # skip the original in rmsdToTarget as this has 0.0 by definition
     plt.setp(bp['boxes'], color='black', lw=2)
     plt.setp(bp['whiskers'], color='black', lw=2)
     plt.setp(bp['caps'], color='black', lw=2)
@@ -81,7 +81,7 @@ def plotRmsdBoxAll():
     values = []
     for target in results.targets:        
         x,rmsdToTarget=results.getValues(target, 'rmsdToTarget')
-        values.append( rmsdToTarget )
+        values.append( rmsdToTarget[1:] ) # skip the original Targets as these al have 0.0
     bp = ax1.boxplot(values, notch=False, sym='+', vert=True, whis=1.5)
     plt.setp(bp['boxes'], color='black', lw=2)
     plt.setp(bp['whiskers'], color='black', lw=2)
@@ -233,6 +233,41 @@ def plotAll():
         plotQuality(target)
     #end for
     show = True
+#end def
+
+def mkHtml():
+    html = """<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>CASD-NMR 2013</title>
+<link media="screen" href="cing.css" type="text/css" rel="stylesheet"/>
+</head>
+<body>
+<div id="container">
+	<div id="header">
+		<h1>Cing reports</h1>
+	<!-- end header -->	</div>
+%s
+<div id="footer">
+	<p>Validation reports for CASD-NMR using CING (<a href="http://code.google.com/p/cing/source/detail?r=1240">r1240</a>)	</p>
+<!-- end footer --></div>
+</body>
+</html>
+"""
+    b = '<h1>Cing reports</h1>\n'
+    for target in results.targets:
+        b = b + '<h2>%s</h2>\n <ul>' % target
+        for entry in results.byTarget[target]:
+            path = entry.path(entry.entryName, 'HTML', 'index.html')
+            b = b + '<li><a href="%s">%s</a></li>\n' % (path, entry.entryName)
+        #end for
+        b = b + '</ul>'
+    #end for
+    code = html % b
+    
+    f = open( dataPath / 'index.html', 'w')
+    f.write( code )
+    f.close()
 #end def
 
 
