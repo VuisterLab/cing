@@ -17,7 +17,9 @@ import matplotlib.pyplot as plt
 
 #cing.verbosity = 9
 
-dataPath = NTpath('/Users/geerten/data/CASD-NMR-2013/data')
+rootPath= NTpath('/Users/geerten/data/CASD-NMR-2013')
+dataPath = rootPath / 'data'
+analysisPath = rootPath / 'analysis'
 
 collumns = ['group', 'method', 'entryName', 'peaklist', 'RDCdata', 'truncated', 'submitted', 'target', 'comment']
 EntryInfo = """
@@ -201,17 +203,18 @@ Utrecht	CS-Rosetta	2m5o_Utrecht_287	CS-only	False	False	2013-04-07	HR2876C	Restr
 """
 
 ranges = NTdict(
-    HR6470A = '12-58',   # cv: 5-58; limited by Utrecht_121
-    HR6430A = '14-99',   # cv: 12-99; limited by Utrecht_150
-    HR5460A = '12-158',  # cv: 11-158; limited by Utrecht_168
+    HR6470A = '12-58',   # cv: 5-58; limited by: Utrecht_121
+    HR6430A = '14-99',   # cv: 12-99; limited by: Utrecht_150
+    HR5460A = '12-158',  # cv: 11-158; limited by: Utrecht_168
     OR36    = '2-128',   # cv: 2-128
-    OR135   = '4-75',    # cv: 4-75
-    StT322  = '36-62',   # cv: 7-63; exceptions: Cheshire_231: 38-63, Munich_218, Munich_220: 26-62
-    YR313A  = '17-97',   # cv: 1-115; exceptions: Cheshire_327: 17-115, Munich_245: 16-111, Seattle_282: 1-97
-    HR2876B = '12-107',  # cv: 12-107
-    HR8254A = '553-613', # cv: 551-621; limited by Utrecht_269
-    HR2876C = '17-93',   # cv: 17-95; limited by Utrecht_287
+    OR135   = '4-73',    # cv: 4-75; limited by Munich_209
+    StT322  = '36-62',   # cv: 7-63; limited by: Cheshire_231: 38-63, Munich_218, Munich_220: 26-62
+    YR313A  = '17-97',   # cv: 1-115; limited by: Cheshire_327: 17-115, Munich_245: 16-111, Seattle_282: 1-97
+    HR2876B = '12-105',  # cv: 12-107; limited by: Munich_244
+    HR8254A = '553-612', # cv: 551-621; limited by: Utrecht_269: 553-613, Munich_264, Munich_265: 551-612 
+    HR2876C = '17-93',   # cv: 17-95; limited by: Utrecht_287
 )
+ranges.keysformat()
 
 cingPars = 'cing_red cing_orange cing_green pc_core pc_allowed pc_disallowed pc_generous pc_gf WI_ramachandran WI_bbNormality WI_janin'.split()
 entryPars = 'idx rmsd nmodels rmsdToTarget ranges'.split()
@@ -430,7 +433,7 @@ class ResultsList(NTlist):
     @staticmethod
     def restore(path=None):
         if path == None:
-            path = dataPath / 'results.xml'
+            path = analysisPath / 'results.xml'
         tmp = xML2obj(path)
         if not tmp:
             return 1
@@ -642,7 +645,7 @@ def parseEntryInfo():
     # fill the results dictionary
     entryIdx = 1
     for line in AwkLikeS(EntryInfo, commentString='#', minNF=5):
-        entry = Entry(dataPath=dataPath, comment=None)
+        entry = Entry(dataPath=resultsPath, comment=None)
         #extract the field
         for idx,field in enumerate(collumns):
             #print idx,field, line.NF
