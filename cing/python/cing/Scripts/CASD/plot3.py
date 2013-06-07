@@ -215,6 +215,129 @@ def plotStatsMethods():
     doShow(fig, 'stats_' + 'methods')
 #end def
 
+def plotByMethodBox(par, title, ylabel):
+    fig = plt.figure()
+    ax1 = fig.add_subplot(111)
+    
+    _tmp = NTvalue(0.0, 0.0)
+    
+    values = []
+    for method in results.methods:
+        l = len(results.byMethod[method])
+        v = np.zeros(l)
+        for i,e in enumerate(results.byMethod[method]):
+            #print par, type(e[par]), type(_tmp)
+            if par in e:
+                if type(e[par]) == type(_tmp):
+                    v[i] = float(e[par].value)
+                else:
+                    v[i] = float(e[par])
+            #end if
+        #end for
+        values.append( v )
+    #end for
+        
+    bp = ax1.boxplot(values, notch=False, sym='+', vert=True, whis=1.5)
+    plt.setp(bp['boxes'], color='black', lw=2)
+    plt.setp(bp['whiskers'], color='black', lw=2)
+    plt.setp(bp['caps'], color='black', lw=2)
+    plt.setp(bp['medians'], color='blue', lw=2)
+    plt.setp(bp['fliers'], color='red', marker='D', lw=2,  markersize=8)
+    
+    plt.title(title)
+    xtickNames = plt.setp(ax1, xticklabels=results.methods)
+    plt.setp(xtickNames, rotation=90, fontsize=12)
+    plt.ylabel(ylabel, fontsize=14)
+    ax1.grid(True)
+    doShow(fig,'byMethodsBox_'+par)
+#end def
+
+def plotQualVrsRmsdWI(allEntries=True):
+    fig = plt.figure()
+    ax1 = fig.add_subplot(111)
+    
+    _tmp = NTvalue(0.0, 0.0)
+    
+    l = len(results)
+    rmsd = np.zeros(l)
+    if allEntries:
+        entries = results[10:]
+    else:
+        entries = []
+        for method in ['CYANA', 'UNIO', 'ARIA', 'ASDP-CNS', 'Ponderosa']:
+            for e in results.byMethod[method]:
+                entries.append(e)
+    #end if
+    for par,color in [('WI_ramachandran','red'),('WI_janin','blue')]:
+        values = np.zeros(l)
+        for i,e in enumerate(entries):
+            #print i,e
+            rmsd[i] = float(e.rmsdToTarget.value)
+            values[i] = float(e[par].value)
+        #end for
+        tmp=ax1.plot(rmsd,values)
+        plt.setp(tmp, color=color, label=par, ls=' ', marker='s', markersize=8)        
+    #end for
+    plt.xlabel('rmsd to target', fontsize=14)
+    plt.ylabel('Z-score', fontsize=14)
+    ax1.grid(True)
+    doShow(fig,'qualVrsRmsd_WI_'+ str(allEntries) )
+#end def    
+
+def plotQualVrsRmsdCING(allEntries=True):
+    fig = plt.figure()
+    ax1 = fig.add_subplot(111)
+    
+    _tmp = NTvalue(0.0, 0.0)
+    
+    l = len(results)
+    rmsd = np.zeros(l)
+    if allEntries:
+        entries = results[10:]
+    else:
+        entries = []
+        for method in ['CYANA', 'UNIO', 'ARIA', 'ASDP-CNS', 'Ponderosa']:
+            for e in results.byMethod[method]:
+                entries.append(e)
+    #end if
+    for par,color in [('cing_red','red'),('cing_green','green')]:
+        values = np.zeros(l)
+        for i,e in enumerate(entries):
+            #print i,e
+            rmsd[i] = float(e.rmsdToTarget.value)
+            values[i] = float(e[par])
+        #end for
+        tmp=ax1.plot(rmsd,values)
+        plt.setp(tmp, color=color, label=par, ls=' ', marker='s', markersize=8)        
+    #end for
+    plt.xlabel('rmsd to target', fontsize=14)
+    plt.ylabel('fraction (%)', fontsize=14)
+    ax1.grid(True)
+    doShow(fig,'qualVrsRmsd_CING_'+str(allEntries))
+#end def
+
+def plotQualVrsRmsdCINGdiff():
+    fig = plt.figure()
+    ax1 = fig.add_subplot(111)
+    
+    _tmp = NTvalue(0.0, 0.0)
+    
+    l = len(results)
+    rmsd = np.zeros(l)
+    values = np.zeros(l)
+    for i,e in enumerate(results[10:]):
+            #print i,e
+        rmsd[i] = float(e.rmsdToTarget.value)
+        values[i] = float(e['cing_green']-e['cing_red'])
+    #end for
+    tmp=ax1.plot(rmsd,values)
+    plt.setp(tmp, color='violet', label='diff', ls=' ', marker='s', markersize=8)        
+    #end for
+    plt.ylabel('green-red (%)', fontsize=14)
+    ax1.grid(True)
+    doShow(fig,'qualVrsRmsd_CINGdiff')
+#end def
+
 def plotAll():
     global show
     show = False
@@ -223,9 +346,16 @@ def plotAll():
     plotStatsGroups()
     plotStatsMethods()
     plotRmsdBoxAll()
+    plotByMethodBox(rmsdToTarget, 'RMSDs to target')
+    plotMatches()
+    plotByMethodBox('WI_ramachandran','WhatIf Ramachandran Z-score', 'Z-score')
+    plotByMethodBox('WI_janin','WhatIf Janin Z-score', 'Z-sore')
+    plotByMethodBox('cing_red', 'CING red', 'fraction (%)')
+    plotByMethodBox('cing_green', 'CING green','fraction (%)')
+
     
-    for t in results.targets:
-        print t    
+    for target in results.targets:
+        print target    
         plotRmsd(target)
         plotRmsdBox(target)
         plotROG(target)
@@ -233,6 +363,68 @@ def plotAll():
         plotQuality(target)
     #end for
     show = True
+#end def
+
+def findMatches():
+    # find refined/unrefined matches
+    matches = []
+    for group in results.groups:
+        for e1 in results.byGroup[group]:
+            for e2 in results.byGroup[group]:
+                if (e1 != e2 and
+                    e1.group == e2.group and
+                    e1.target == e2.target and
+                    e1.RDCdata == e2.RDCdata and
+                    e1.truncated == e2.truncated and
+                    #((e1.peaklist == 'Refined' and e2.peaklist=='Unrefined') or
+                    # (e1.peaklist == 'Unrefined' and e2.peaklist=='Refined')
+                    #) 
+                    (e1.peaklist == 'Refined' and e2.peaklist=='Unrefined') # only take one of the two combinations
+                    ):
+                    matches.append((e1,e2))
+                    #print 'match'
+                #end if
+            #end for
+        #end for
+    return matches
+#end def
+
+def plotMatches():
+    fig = plt.figure()
+    ax1 = fig.add_subplot(111)
+    plt.title('Refined vrs Unrefined peak lists')
+    
+    m = findMatches()
+    l = len(m)
+    refined = np.zeros(l)
+    refined_errs = np.zeros(l)
+    unrefined = np.zeros(l)
+    unrefined_errs = np.zeros(l)
+    for i,e in enumerate(m):
+        refined[i] = e[0].rmsdToTarget.value
+        refined_errs[i] = e[0].rmsdToTarget.error
+        unrefined[i] = e[1].rmsdToTarget.value
+        unrefined_errs[i] = e[1].rmsdToTarget.error
+    #end for
+    
+    plotline, caplines, barlinecols = ax1.errorbar(refined, unrefined, xerr=refined_errs, yerr=unrefined_errs, color='black', lw=2)    
+    plt.setp(plotline, color='black', ls=' ')    
+#    plt.setp(caplines, color='black', label='rmsd to target')    
+#    tmp = ax1.errorbar(refined, unrefined, xerr=refined_errs)    
+#    plt.setp(tmp, color='black', label='rmsd to target', ls=' ', marker='s', markersize=8)
+    xmax = max(refined)+1.0
+    plt.xlim(0, xmax)
+    plt.ylim(0, max(unrefined)+1.0)
+    
+    x=np.arange(0,xmax,0.01)
+    y=x
+    tmp = ax1.plot(x,y)
+    plt.setp(tmp, color='blue', lw=1)    
+   
+    ax1.grid(True)
+    plt.ylabel('rmsd unrefined', fontsize=14)
+    plt.xlabel('rmsd refined', fontsize=14)
+    doShow(fig,'rmsd_refined_unrefined')
 #end def
 
 def mkHtml():
