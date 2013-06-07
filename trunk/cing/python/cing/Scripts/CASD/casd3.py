@@ -218,6 +218,7 @@ ranges.keysformat()
 
 cingPars = 'cing_red cing_orange cing_green pc_core pc_allowed pc_disallowed pc_generous pc_gf WI_ramachandran WI_bbNormality WI_janin'.split()
 entryPars = 'idx rmsd nmodels rmsdToTarget ranges'.split()
+
 class Entry( NTdict ):
     def __init__(self, dataPath, **kwds):
         NTdict.__init__(self)
@@ -319,6 +320,10 @@ WI_bbNormality:  %(WI_bbNormality)s
 WI_janin:        %(WI_janin)s
 """ % self
         return s
+    #end def
+    
+    def toJson(self, path):
+        pass
     #end def
     
     def toXML(self, depth = 0, stream = sys.stdout, indent = '\t', lineEnd = '\n'):
@@ -691,15 +696,6 @@ def reorder( results ):
         res.append(e)
     return res
 #end def
-
-#parseEntryInfo()
-#t0 = results.targets[0]
-#e1 = results.byKey[(t0,'Org')]
-#print e1
-#e2 = results.byTarget[t0][5]
-#print e2
-#e1.readProject()
-#e2.readProject()
 
 
 
