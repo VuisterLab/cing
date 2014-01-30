@@ -181,16 +181,11 @@ pymol.finish_launching()
     # JFD has not found the command to actually set the values to e.g. the b-factor to use that to color/store.
     for res in project.molecule.allResidues():
         pyMolColor = res.rogScore.colorLabel # no translation needed for red, orange, green.
-        if True:
-            if random() > 0.7:
-                pyMolColor = 'red'
-            if random() > 0.7:
-                pyMolColor = 'orange'
         pyMolColorQuoted = "'" + pyMolColor + "'"
         macroTxt += "cmd.color( %-8s, 'chain %2s and resi %4d')\n" % (pyMolColorQuoted, res.chain.name, res.resNum)
     #end for
 
-    # Make it into a selfcontained script for testing.
+    # Make it into a self contained script for testing.
     if True:
         macroTxt = scriptPdbLoad + macroTxt
 
