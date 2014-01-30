@@ -140,10 +140,10 @@ Project: Top level Cing project class
 
         NTdict.__init__(self, __CLASS__ = 'Project')
 
-        self.version = cingVersion       
+        self.version = cingVersion
         self.root = root
         self.name = name.strip()
-        self.created = time.asctime()      
+        self.created = time.asctime()
         self.molecule = None # Current Molecule instance
 
         self.moleculeNames = NTlist() # list to store molecule names for save and restore
@@ -155,7 +155,7 @@ Project: Top level Cing project class
         self.dihedralByProjectListNames = NTlist() # list to store  names for save and restore
         self.dihedralByResidue = NTtree( DIHEDRAL_BY_RESIDUE_STR ) # Used to be set in DihedralByResidueHTMLfile but that's too late.
         self.reports = NTlist() # list with validation reports names
-
+#
         self.history = History()
         self.contentIsRestored = False # True if Project.restore() has been called
         self.storedInCcpnFormat = False
@@ -239,7 +239,7 @@ Project: Top level Cing project class
         self.saveXML('version',
                       'name', 'created',
                       'moleculeNames',
-                      'peakListNames', 'distanceListNames', 'dihedralListNames', 'rdcListNames', 
+                      'peakListNames', 'distanceListNames', 'dihedralListNames', 'rdcListNames',
                       'coplanarListNames', 'dihedralByProjectListNames', 'dihedralByResidue',
                       'storedInCcpnFormat',
                       'reports',
@@ -409,7 +409,7 @@ Project: Top level Cing project class
     Return Object or None on error.
 
     @TODO Now works for Molecule; Also implement for other project list object like PeakList, DistanceRestraintList, etc
-        
+
         Also see function in this object: decodeResidueList
         """
         if nameTuple == None or not self.has_key(nameTuple[0]):
@@ -442,7 +442,7 @@ Project: Top level Cing project class
         # end for
     # end def
 
-        
+
     def open(name, status = 'create', restore = True):
         """Static method open returns a new/existing Project instance depending on status.
 
@@ -608,7 +608,7 @@ Project: Top level Cing project class
         # have to use cing.verbosity to work?
         if os.path.exists(tmpdir) and cing.verbosity != cing.verbosityDebug:
             removedir(tmpdir)
-        for d in directories.values():            
+        for d in directories.values():
 #            nTdebug('dir: %r' % d)
             pr.mkdir(d)
         #end for
@@ -841,7 +841,7 @@ Project: Top level Cing project class
         """Append molecule to project.molecules; generate required internal directories.
         Return molecule or None on error.
         """
-        if not molecule: 
+        if not molecule:
             return None
 
         # Store names and references and append
@@ -1088,7 +1088,7 @@ Project: Top level Cing project class
                                 ]:
             result += self._list2string(self[item], firstString, 2) + '\n'
         #end for
-        result += self.footer() # Project.footer defaults to NTdict 
+        result += self.footer() # Project.footer defaults to NTdict
         return result
     #end def
 
@@ -1108,7 +1108,7 @@ Project: Top level Cing project class
     # Convenience methods calls to validate.py.
     def initPDB(self, pdbFile, convention = IUPAC, name = None, nmodels = None, update = True, allowNonStandardResidue = True):
         """Initializes from a pdb file."""
-        return initPDB(self, pdbFile, convention = convention, name = name, nmodels = nmodels, update = update, 
+        return initPDB(self, pdbFile, convention = convention, name = name, nmodels = nmodels, update = update,
                        allowNonStandardResidue = allowNonStandardResidue)
 
     def importPDB(self, pdbFile, convention = IUPAC, nmodels = None):
@@ -1145,32 +1145,32 @@ Project: Top level Cing project class
 
     def criticize(self, toFile = True):
         return criticize(self, toFile = toFile)
-    
+
     def decriticize(self):
         """
         Reset all Rog score objects in this project.
-        
+
         Return True on error and None on success.
         """
-    
+
 #        nTdebug("Now in project#decriticize")
-        
+
         self.rogScore.reset()
         # Project lists of lists
         projectLoL = []
-        projectLoL += self.allRestraintLists() # distances, etc.        
-        projectLoL += self.peaks     
+        projectLoL += self.allRestraintLists() # distances, etc.
+        projectLoL += self.peaks
         for projectList in projectLoL:
             if projectList.decriticize():
                 nTerror("Failed to decriticize %s in project#decriticize" % str(projectList))
                 return True
             #end if
         # end for
-            
+
         if self.molecule:
             if self.molecule.decriticize():
                 nTerror("Failed to decriticize %s in project#decriticize" % str(self.molecule))
-                return True                
+                return True
             #end if
         #end if
     #end def
@@ -1208,9 +1208,9 @@ Project: Top level Cing project class
         Remove the largest violating distance restraints that meet a certain cutoff.
         Violation are not averaged over models for this purpose.
         Writes the removed restraints to a file.
-    
+
         Return False on error.
-    
+
         restraintLoL   Defaults to p.distances
         cutoff         Tolerance above which to delete.
         maxRemov       Maximum number of violations to remove. Largest violations will be removed.
@@ -1307,7 +1307,7 @@ Project: Top level Cing project class
 #        nTmessage("Finished filterHighDistanceViol")
         return True # success
     # end def
-    
+
     def decodeResidueList(self, resLot):
         '''
         Decode LoL to list of residues.
@@ -1327,9 +1327,9 @@ Project: Top level Cing project class
                 continue
             # end if
             resList.append(res)
-        # end for        
+        # end for
         return resList
-    # end def    
+    # end def
 # end class
 
 
@@ -1341,7 +1341,7 @@ class XMLProjectHandler(XMLhandler):
 
     def handle(self, node):
         attrs = self.handleDictElements(node)
-        if attrs == None: 
+        if attrs == None:
             return None
         result = Project(name = attrs['name'])
 
@@ -1899,7 +1899,7 @@ ranges:  %s
 
     def printScore( self, name, rogScore ):
         clist = rogScore.colorCommentList.zap(1)
-        if len(clist) == 0: 
+        if len(clist) == 0:
             clist.append('---')
         printf('%-20s%-10s %s\n', name, rogScore, clist[0])
         for c in clist[1:]:
@@ -1916,7 +1916,7 @@ ranges:  %s
         for p in self:
             p.cingSummary = p.getCingSummaryDict()
         # end for
-        
+
         self.printTitle('Overall scores target '+self.name, 20*(n+1), stream)
     #    line = dots20*(n+1)
     #   fprintf( stream, '%s\n    Overall scores %s\n%s\n\n', line, self.name, line )
@@ -2269,10 +2269,10 @@ ranges:  %s
                 psi.cAverage()
 
                 use1 = 0
-                if (2.0 - res.PHI.cv - res.PSI.cv > cutoff): 
+                if (2.0 - res.PHI.cv - res.PSI.cv > cutoff):
                     use1 = 1
                 use2 = 0
-                if (2.0 - phi.cv - psi.cv > cutoff): 
+                if (2.0 - phi.cv - psi.cv > cutoff):
                     use2 = 1
                 #printf('%-35s %-35s  %6.2f  %1d     %6.2f %6.2f   %6.2f  %1d     %2d\n',
                 #      res.PHI, res.PSI, 2.0 - res.PHI.cv - res.PSI.cv, use1,
@@ -2457,13 +2457,13 @@ class Peak(NTdict, Lister):
     #end def
 
     def isAssigned(self, axis):
-        if axis >= self.dimension: 
+        if axis >= self.dimension:
             return False
-        if axis >= len(self.resonances): 
+        if axis >= len(self.resonances):
             return False
-        if self.resonances[axis] == None: 
+        if self.resonances[axis] == None:
             return False
-        if self.resonances[axis].atom == None: 
+        if self.resonances[axis].atom == None:
             return False
         return True
     #end def
@@ -2570,7 +2570,7 @@ class PeakList(NTlist, ProjectListMember):
         Create a SML file
         Return self or None on error
         """
-        if not path: 
+        if not path:
             path = self.objectPath
         if self.SMLhandler.toFile(self, path) != self:
             nTerror('PeakList.save: failed creating "%s"', path)
@@ -2620,12 +2620,12 @@ class Restraint(NTdict):
     def __str__(self):
         return '<%s %d>' % (self.__CLASS__, self.id)
     #end def
-    
+
     def decriticize(self):
 #        nTdebug("Now in Restraint#%s" % getCallerName())
         self.rogScore.reset()
     #end def
-    
+
     def getModelCount(self):
         """Iterate over the atoms until an atom is found that returns not a None for getModelCount.
         Return 0 if it doesn't have any models or None on error.
@@ -2689,7 +2689,7 @@ class DistanceRestraint(Restraint):
     STATUS_REMOVED_DUPLICATE = 'removed duplicate'
     STATUS_NOT_REMOVED_DUPLICATE = 'not removed duplicate'
     # The maximum number of atom pairs expected before it will be treated normally.
-    # This is to prevent HADDOCK AIR restraints to slow CING to a crawl as per issue 324. 
+    # This is to prevent HADDOCK AIR restraints to slow CING to a crawl as per issue 324.
     MAX_ATOM_PAIRS_EXPECTED = 1000
 
 #    def __init__( self, atomPairs=[], lower=0.0, upper=0.0, **kwds ):
@@ -2705,7 +2705,7 @@ class DistanceRestraint(Restraint):
         self.violCountLower = 0    # Lower-bound violations
         self.violUpperMax = 0.0    # Max violation over upper bound
         self.violLowerMax = 0.0    # Max violation over lower bound
-        
+
         self.duplicates = NTlist() # NTlist instance with DistanceRestraint instances considered duplicates; TODO: check this code
         self.error = False    # Indicates if an error was encountered when analyzing restraint
 
@@ -2804,13 +2804,13 @@ class DistanceRestraint(Restraint):
 
         Routine is iterative itself because both sides may contain ambis to collapse and remove.
         """
-        atomPairCount = len(self.atomPairs)        
+        atomPairCount = len(self.atomPairs)
         if atomPairCount > DistanceRestraint.MAX_ATOM_PAIRS_EXPECTED: # Happens for entry 2bgf as per issue 324.
 #            nTdebug('In %s; skipping restraint %s with %s atom pairs which is more than the maximum expected: %s' % (
 #                getCallerName(), self, atomPairCount, DistanceRestraint.MAX_ATOM_PAIRS_EXPECTED))
             return self.STATUS_NOT_SIMPLIFIED
         # end if
-        
+
         statusOverall = self.STATUS_NOT_SIMPLIFIED
         status = self.STATUS_SIMPLIFIED
         while status == self.STATUS_SIMPLIFIED:
@@ -3364,7 +3364,7 @@ class DistanceRestraint(Restraint):
     #end def
 #end class
 
-# Too many ancestors (8/7) pylint: disable=R0901 
+# Too many ancestors (8/7) pylint: disable=R0901
 class DistanceRestraintList(RestraintList):
     """
     Class based on NTlist that holds distanceRestraints.
@@ -3375,7 +3375,7 @@ class DistanceRestraintList(RestraintList):
     def __init__(self, name, status = 'keep'):
         RestraintList.__init__(self, name, status = status)
         self.__CLASS__ = DRL_LEVEL
-        self.hBond = False       # hBond: fix to keep information about hBond restraints from CCPN 
+        self.hBond = False       # hBond: fix to keep information about hBond restraints from CCPN
         self.violCountLower = 0   # Total lower-bound violations over 0.1 A
         self.violCount1 = 0
         self.violCount3 = 0
@@ -3501,7 +3501,7 @@ class DistanceRestraintList(RestraintList):
             elif c == 3:
                 self.longRange.append(dr)
             #end if
-            if dr.isAmbiguous(): 
+            if dr.isAmbiguous():
                 self.ambiguous.append(dr)
         #end for
 
@@ -3531,7 +3531,7 @@ class DistanceRestraintList(RestraintList):
         TODO: check code with unit check.
         Checked by hand for entry 1cjg on 2012-04-23
         """
-        pairs = {} # Hashed by a sorted tuple of atom pairs. The value is a list of drs.        
+        pairs = {} # Hashed by a sorted tuple of atom pairs. The value is a list of drs.
         for dr in self:
             dr.atomPairs.sort() # improves matching for ambiguous restraints
             t = tuple(dr.atomPairs)
@@ -3578,7 +3578,7 @@ classes
 counts
   total all:          %4d (A)        All DRs
   singly defined      %4d (B)        DRs for which no other DR has the same set of atom pairs.
-  multiple atom pairs:%4d (F=A-B)    
+  multiple atom pairs:%4d (F=A-B)
   multiple defined    %4d (E=C-B)
   total unique:       %4d (C=A-D)    Count of the set of unique atom pairs.
   duplicates:         %4d (D=A-C)
@@ -3847,11 +3847,11 @@ class DihedralRestraint(Restraint):
 #                nTdebug("self.violations %s" % self.violations)
 
                 fv = math.fabs(vList[jSelected])
-                if fv > 1.0: 
+                if fv > 1.0:
                     self.violCount1 += 1
-                if fv > 3.0: 
+                if fv > 3.0:
                     self.violCount3 += 1
-                if fv > 5.0: 
+                if fv > 5.0:
                     self.violCount5 += 1
                 if fv > self.violMax:
                     self.violMax = fv
@@ -3931,15 +3931,15 @@ class DihedralRestraint(Restraint):
     #end def
 #end class
 
-# Too many ancestors (8/7) pylint: disable=R0901 
+# Too many ancestors (8/7) pylint: disable=R0901
 class DihedralRestraintList(RestraintList):
     'List of dihedral angle restraints.'
 #    export2cyana = exportDihedralRestraint2cyana
-    
+
     def __init__(self, name, status = 'keep'):
         RestraintList.__init__(self, name, status = status)
         self.__CLASS__ = ACL_LEVEL
-    #end def    
+    #end def
 
     def criticize(self, project, toFile = True):
         """
@@ -4156,7 +4156,7 @@ class RDCRestraint(DistanceRestraint):
     #end def
 #end class
 
-# Too many ancestors (8/7) pylint: disable=R0901 
+# Too many ancestors (8/7) pylint: disable=R0901
 class RDCRestraintList(RestraintList):
     """List of RDCRestraint"""
 
@@ -4352,7 +4352,7 @@ class XMLHistoryHandler(XMLhandler):
 
     def handle(self, node):
         items = self.handleMultipleElements(node)
-        if items == None: 
+        if items == None:
             return None
         result = History()
         for item in items:
