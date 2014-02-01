@@ -18,7 +18,7 @@ from cing.Libs.AwkLike import AwkLike
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.core.classes import Peak
 from cing.core.classes import PeakList
-from cing.core.constants import * #@UnusedWildImport
+from cing.constants import * #@UnusedWildImport
 from cing.core.database import NTdb
 from cing.core.database import translateAtomName
 
@@ -213,14 +213,14 @@ class Xeasy( NTdict ):
 
                 # preserve the Xeasy peak id
                 peakId = f.int( cur )
-                if (peakId == None): 
+                if (peakId == None):
                     return None
                 cur += 1
 
                 peakpos = []
                 for _i in range(X_AXIS, dimension):
                     p = f.float( cur )
-                    if (p == None): 
+                    if (p == None):
                         return None
                     peakpos.append( p )
                     cur += 1
@@ -228,11 +228,11 @@ class Xeasy( NTdict ):
 
                 cur += 2 # skip two fields
                 height = f.float( cur )
-                if height == None: 
+                if height == None:
                     return None
                 cur += 1
                 heightError = f.float( cur )
-                if heightError == None: 
+                if heightError == None:
                     return None
                 cur += 1
 
@@ -241,7 +241,7 @@ class Xeasy( NTdict ):
                 cur += 2 # skip two fields
                 for _i in range(X_AXIS, dimension):
                     aIndex = f.int( cur )
-                    if aIndex == None: 
+                    if aIndex == None:
                         return None
                     cur += 1
                     # 0 means unassigned according to Xeasy convention
@@ -439,7 +439,7 @@ def importXeasy( project, seqFile, protFile, convention ):
         nTerror('importXeasy: undefined protFile' )
         return None
     #end if
-    
+
     if not os.path.exists( seqFile ):
         nTerror('importXeasy: seqFile "%s" not found', seqFile )
         return None
@@ -448,19 +448,19 @@ def importXeasy( project, seqFile, protFile, convention ):
         nTerror('importXeasy: protFile "%s" not found', protFile )
         return None
     #end if
-    
+
     if not project.molecule:
         nTerror('importXeasy: No molecule defined' )
         return None
     #end if
-    
+
     #       Parse the seq file and prot file
     project.xeasy = Xeasy( seqFile, protFile, convention = convention   )
     #       Append the shifts to molecule
     project.xeasy.appendShifts( project.molecule   )
-    
+
     project.addHistory( sprintf('Imported Xeasy shifts from "%s"', protFile ) )
-    
+
     if project.xeasy.error:
         # GWV please check. Did you mean to show an error here?
         # I just kept it to the message level and changed the token error to problem.

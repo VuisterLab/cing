@@ -2,10 +2,9 @@
 Create the macros that external programs such as Yasara, Molmol, and PyMol
 can read to work on CING data.
 """
-from cing import header
+import cing
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.PluginCode.required.reqProcheck import * #@UnusedWildImport
-from cing.main import getStartMessage
 
 try:
     import yasaramodule as yasara #@UnresolvedImport
@@ -20,7 +19,7 @@ loadTestingFile = True
 
 originatingProgramDeclaration = """Created by:
 %s
-%s""" % (header, getStartMessage())
+%s""" % (cing.cingDefinitions.getHeaderString(), cing.systemDefinitions.getStartMessage())
 originatingProgramDeclaration = toPoundedComment(originatingProgramDeclaration)
 
 molmolMacroFileHeader = """# Execute by issuing command (without pound sign):
@@ -36,7 +35,7 @@ yasaraMacroFileHeader = """# Execute by issuing command  (without pound sign):
 # E.g. sequence:
 # Read the PDB file.
 # LoadPDB /home/i/2kq3/2kq3.pdb
-# Show only the backbone trace with secondary structure.  
+# Show only the backbone trace with secondary structure.
 # Style Ribbon
 # Omit all but the first model.
 # DelObj 2-20
@@ -222,7 +221,7 @@ def makePyMolByResidueMacro(project, keys,
     """From http://pymolwiki.org/index.php/Color#Reassigning_B-Factors_and_Coloring
     http://pymolwiki.org/index.php/Command_Line_Options
     """
-#    nTdebug('makePyMolByResidueMacro: keys: %s, minValue: %s maxValue: %s reverseColorScheme: %s', keys, minValue, 
+#    nTdebug('makePyMolByResidueMacro: keys: %s, minValue: %s maxValue: %s reverseColorScheme: %s', keys, minValue,
 #maxValue, reverseColorScheme)
 
     # Just for testing:
@@ -388,7 +387,7 @@ def makeMolmolByResidueMacro(project, keys,
                             path = None
                            ):
 
-#    nTdebug('makeMolmolByResidueMacro: keys: %s, minValue: %s maxValue: %s reverseColorScheme: %s', 
+#    nTdebug('makeMolmolByResidueMacro: keys: %s, minValue: %s maxValue: %s reverseColorScheme: %s',
 #keys, minValue, maxValue, reverseColorScheme)
     macroTxt = \
 """%s

@@ -1,4 +1,6 @@
-from cing import osType
+import cing
+import cing.constants as constants
+import cing.definitions as cdefs
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.PluginCode.required.reqCcpn import CCPN_STR
 import platform
@@ -6,7 +8,6 @@ import platform
 #-----------------------------------------------------------------------------
 # Global program parameters (non-user)
 #-----------------------------------------------------------------------------
-
 
 # These directories get created. They are defined relative to project root path,
 # available through Project.rootPath( name ) method, or can be joined relative
@@ -104,22 +105,22 @@ if cingPaths.convert:
 
 shiftxExecutable = PLEASE_ADD_EXECUTABLE_HERE
 _platformArchitecture = platform.architecture()[0]
-if osType == OS_TYPE_LINUX:
+if cing.systemDefinitions.osType == OS_TYPE_LINUX:
     if _platformArchitecture == '64bit':
         shiftxExecutable = 'shiftx_linux64'
     elif _platformArchitecture == '32bit':
         shiftxExecutable = 'shiftx_linux'
-elif osType == OS_TYPE_MAC:
+elif cing.systemDefinitions.osType == OS_TYPE_MAC:
     shiftxExecutable = 'shiftx'
 
 cingPaths.shiftx = os.path.join(cing.cingRoot, cingPaths.bin, shiftxExecutable)
 
 cingPaths.x3dna = None
-if osType == OS_TYPE_MAC:
+if cing.systemDefinitions.osType == OS_TYPE_MAC:
     cingPaths.x3dna = os.path.join(cing.cingRoot, cingPaths.bin, 'x3dna' )
 
 cingPaths.MolProbity = None
-if osType == OS_TYPE_MAC:
+if cing.systemDefinitions.osType == OS_TYPE_MAC:
     cingPaths.MolProbity = os.path.join(cing.cingRoot, cingPaths.bin, 'molprobity' )
 
 if cingPaths.classpath:

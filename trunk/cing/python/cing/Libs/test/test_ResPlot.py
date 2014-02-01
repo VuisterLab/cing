@@ -8,7 +8,7 @@ from cing import cingDirTmp
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.PluginCode.matplib import * #@UnusedWildImport
 from cing.core.classes import Project
-from cing.core.constants import * #@UnusedWildImport
+from cing.constants import * #@UnusedWildImport
 from nose.plugins.skip import SkipTest
 from unittest import TestCase
 import os #@Reimport
@@ -22,8 +22,8 @@ except ImportWarning, extraInfo: # Disable after done debugging; can't use nTdeb
     raise SkipTest(WHATIF_STR)
 # end try
 try:
-    from cing.PluginCode.dssp import runDssp #@UnusedImport Added trigger import error . 
-#    Needed for when whatif is but dssp isn't installed. 
+    from cing.PluginCode.dssp import runDssp #@UnusedImport Added trigger import error .
+#    Needed for when whatif is but dssp isn't installed.
 except ImportWarning, extraInfo: # Disable after done debugging; can't use nTdebug yet.
     print "Got ImportWarning %-10s Skipping unit check %s." % ( DSSP_STR, getCallerFileName() )
     raise SkipTest(DSSP_STR)

@@ -6,7 +6,7 @@ from cing import cingDirTestsData
 from cing import cingDirTmp
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.core.classes import Project
-from cing.core.constants import * #@UnusedWildImport
+from cing.constants import * #@UnusedWildImport
 from cing.core.molecule import Coordinate
 from cing.core.molecule import Model
 from unittest import TestCase
@@ -78,7 +78,7 @@ class AllChecks(TestCase):
         self.assertAlmostEquals(             rmsd, 2.566, places=3 )
         self.assertAlmostEquals( coordList[0].e.x, 2.427, places=3 )
         self.assertAlmostEquals( coordList[2].e.z, 3.099, places=3 )
-        
+
     #end def
 
 if __name__ == "__main__":

@@ -6,14 +6,12 @@ cd $D/NRG-CING/prep/F/br/1brv ; python $CINGROOT/python/cing/Scripts/FC/utils.py
     $D/NRG-CING/prep/S/br/1brv/1brv.tgz 1brv_assign.tgz swapCheck
 """
 
+import cing
 from ccp.format.nmrStar.projectIO import NmrStarProjectFile
 from ccpnmr.format.converters.PseudoPdbFormat import PseudoPdbFormat
 from ccpnmr.format.process.stereoAssignmentSwap import StereoAssignmentCleanup
-from cing import header
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.Libs.forkoff import do_cmd
-from cing.Libs.helper import getStartMessage
-from cing.Libs.helper import getStopMessage
 from cing.Libs.pdb import defaultPrintChainCode
 from cing.PluginCode.BMRB import bmrbAtomType2spinTypeCingMap
 from cing.Scripts.FC.constants import * #@UnusedWildImport
@@ -117,7 +115,7 @@ def swapCheck(nmrConstraintStore,structureEnsemble,numSwapCheckRuns=1):
 
 #    violationCodes = {'xl':                                             {'violation': 1.0,  'fraction': 0.00001},
 #                       'l':                                             {'violation': 0.5,  'fraction': 0.5},
-#                       StereoAssignmentCleanup.VIOLATION_CODE_S_STR:    {'violation': 0.001,'fraction': -999.9} 
+#                       StereoAssignmentCleanup.VIOLATION_CODE_S_STR:    {'violation': 0.001,'fraction': -999.9}
 # required for reporting smaller violations.
 #                       }
 
@@ -255,8 +253,8 @@ def getBmrbCsCountsFromFile(inputStarFile):
 if __name__ == '__main__':
     cing.verbosity = verbosityDebug
 
-    nTmessage(header)
-    nTmessage(getStartMessage())
+    nTmessage(cing.cingDefinitions.getHeaderString())
+    nTmessage(cing.systemDefinitions.getStartMessage())
 
     destination = sys.argv[1]
     hasPdbId = False
@@ -288,5 +286,5 @@ if __name__ == '__main__':
     except:
         nTtracebackError()
     finally:
-        nTmessage(getStopMessage(cing.starttime))
+        nTmessage(cing.systemDefinitions.getStopMessage())
 

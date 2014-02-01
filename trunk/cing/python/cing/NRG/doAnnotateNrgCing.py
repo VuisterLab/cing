@@ -4,7 +4,7 @@ Execute like:
 python -u $CINGROOT/python/cing/NRG/doAnnotateNrgCing.py $x $y
 '''
 
-from cing import header
+import cing
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.Libs.forkoff import do_cmd
 from cing.NRG.PDBEntryLists import getBmrbLinks
@@ -14,9 +14,7 @@ from cing.NRG.shiftPresetDict import presetDict
 from cing.Scripts.FC.convertStar2Ccpn import importStarChemicalShifts
 from cing.Scripts.FC.utils import swapCheck
 from cing.core.classes import Project
-from cing.core.constants import * #@UnusedWildImport
-from cing.main import getStartMessage
-from cing.main import getStopMessage
+from cing.constants import * #@UnusedWildImport
 from memops.general.Io import loadProject
 from memops.general.Io import saveProject
 from shutil import rmtree
@@ -34,8 +32,8 @@ nrgPlusDir = os.path.join(results_dir, 'nrgPlus')
 
 def annotateEntry(entry_code, bmrb_id, *extraArgList):
     'Return True on error'
-    nTmessage(header)
-    nTmessage(getStartMessage())
+    nTmessage(cing.cingDefinitions.getHeaderString())
+    nTmessage(cing.systemDefinitions.getStartMessage())
 
     expectedArgumentList = []
     expectedNumberOfArguments = len(expectedArgumentList)
@@ -142,7 +140,7 @@ def annotateEntry(entry_code, bmrb_id, *extraArgList):
 #            nTmessage('found ccpnMolSystem: %s' % ccpnMolSystem)
 #    print 'status: %s' % ccpnMolSystem.setCode(projectName) # impossible; reported to ccpn team.
 
-    importStarChemicalShifts(ccpnProject, inputStarDir, guiRoot, allowPopups=allowPopups, minimalPrompts=minimalPrompts, 
+    importStarChemicalShifts(ccpnProject, inputStarDir, guiRoot, allowPopups=allowPopups, minimalPrompts=minimalPrompts,
                              verbose=verbose, **presets)
 
     if doSwapCheck:
@@ -215,7 +213,7 @@ def runAbunch():
             nTtracebackError()
             status = True
         finally:
-            nTmessage(getStopMessage(cing.starttime))
+            nTmessage(cing.systemDefinitions.getStopMessage())
             if status:
                 nTerror("Failed to annotateEntry for arguments: %s" % str( sys.argv))
 
@@ -228,7 +226,7 @@ if __name__ == "__main__":
 #        nTtracebackError()
 #        status = True
 #    finally:
-#        nTmessage(getStopMessage(cing.starttime))
+#        nTmessage(cing.systemDefinitions.getStopMessage())
 #        if status:
 #            nTerror("Failed to annotateEntry for arguments: %s" % str( sys.argv))
 #            sys.exit(1)

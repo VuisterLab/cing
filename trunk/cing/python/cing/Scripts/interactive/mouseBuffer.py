@@ -4,15 +4,13 @@
 # %run /Users/jd/workspace35/cing/python/cing/NRG/tmpStoreNRGCING2db.py 1brv .
 #
 # NB this script fails if the MySql backend is not installed.
-from cing import header
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.PluginCode.required.reqDssp import * #@UnusedWildImport
 from cing.PluginCode.required.reqWattos import * #@UnusedWildImport
 from cing.PluginCode.required.reqWhatif import * #@UnusedWildImport
 from cing.PluginCode.sqlAlchemy import CsqlAlchemy
 from cing.core.classes import Project
-from cing.core.constants import * #@UnusedWildImport
-from cing.main import getStartMessage
+from cing.constants import * #@UnusedWildImport
 
 cing.verbosity = verbosityDebug
 
@@ -20,8 +18,8 @@ cing.verbosity = verbosityDebug
 #inputDir may be a directory or a url.
 #Returns True on error.
 
-nTmessage(header)
-nTmessage(getStartMessage())
+nTmessage(cing.cingDefinitions.getHeaderString())
+nTmessage(cing.systemDefinitions.getStartMessage())
 
 pdb_id = '1brv'
 inputDir = '.'

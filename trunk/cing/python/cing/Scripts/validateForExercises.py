@@ -12,8 +12,8 @@ from cing import cingDirTestsData
 from cing.Scripts.doScriptOnEntryList import doScriptOnEntryList
 from cing.Scripts.validateEntry import ARCHIVE_TYPE_FLAT
 from cing.Scripts.validateEntry import PROJECT_TYPE_CING
-from cing.core.constants import CV_RANGES_STR
-from cing.core.constants import DATA_STR
+from cing.constants import CV_RANGES_STR
+from cing.constants import DATA_STR
 import cing
 import os
 
@@ -33,7 +33,7 @@ pdbConvention         = '.'
 restraintsConvention  = '.'
 
 storeCING2db = "0"
-filterTopViolations = '0' 
+filterTopViolations = '0'
 filterVasco = '0'
 
 extraArgList = ( str(cing.verbosity),

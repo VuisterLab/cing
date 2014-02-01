@@ -1,4 +1,4 @@
-from cing import header
+import cing
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.Libs.disk import rmdir
 from cing.Libs.forkoff import do_cmd
@@ -6,9 +6,7 @@ from cing.NRG import ARCHIVE_CASP_ID
 from cing.NRG.storeCING2db import doStoreCING2db
 from cing.Scripts.validateEntry import retrieveTgzFromUrl
 from cing.core.classes import Project
-from cing.core.constants import * #@UnusedWildImport
-from cing.main import getStartMessage
-from cing.main import getStopMessage
+from cing.constants import * #@UnusedWildImport
 from shutil import rmtree
 import shutil
 #from cing.NRG.CasdNmrMassageCcpnProject import getRangesForTarget
@@ -58,8 +56,8 @@ def main(entryId, *extraArgList):
     force_retrieve_input = True
 
 
-    nTmessage(header)
-    nTmessage(getStartMessage())
+    nTmessage(cing.cingDefinitions.getHeaderString())
+    nTmessage(cing.systemDefinitions.getStartMessage())
 
     expectedArgumentList = [ 'inputDir', 'outputDir', 'pdbConvention', 'restraintsConvention', 'archiveType','projectType','storeCING2db']
     expectedNumberOfArguments = len(expectedArgumentList)
@@ -256,4 +254,4 @@ if __name__ == "__main__":
     try:
         status = main(*sys.argv[1:])
     finally:
-        nTmessage(getStopMessage(cing.starttime))
+        nTmessage(cing.systemDefinitions.getStopMessage())

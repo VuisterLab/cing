@@ -7,7 +7,7 @@ from cing import cingDirTmp
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.core.classes import DistanceRestraint
 from cing.core.classes import Project
-from cing.core.constants import * #@UnusedWildImport
+from cing.constants import * #@UnusedWildImport
 from cing.core.molecule import Molecule
 from cing.main import formatall
 from unittest import TestCase
@@ -19,7 +19,7 @@ class AllChecks(TestCase):
     mkdirs( cingDirTmpTest )
     os.chdir(cingDirTmpTest)
 
-    
+
     def __init__(self, *args, **kwds):
         TestCase.__init__(self, *args, **kwds)
         self.project = None
@@ -31,7 +31,7 @@ class AllChecks(TestCase):
         self.r6 = None
         self.r7 = None
         self.r8 = None
-          
+
     def createSimpleFastProject(self):
         'create simple fast project'
         entryId = 'test'
@@ -91,7 +91,7 @@ class AllChecks(TestCase):
         _x = "dr after 4: %s" % formatall(distanceRestraint)
 
     def test_simplifyForFcFeature_2(self):
-        'test simplify Specifically For Fc Feature 2'        
+        'test simplify Specifically For Fc Feature 2'
         # disfunctional as of yet
         self.createSimpleFastProject()
         _distanceRestraintList = self.project.distances.new(DR_LEVEL, status = 'keep')
@@ -175,7 +175,7 @@ class AllChecks(TestCase):
 #        nTdebug("after: %r" % distanceRestraint  )
 
     def test_CombiToPseudoQuadruple(self):
-        ' test combination to Pseudo 4 some.'        
+        ' test combination to Pseudo 4 some.'
 #        'Simulate 1a24 1254.00     A    3    TYR    QR    A    8    GLN    QB'
         self.createSimpleFastProject()
 

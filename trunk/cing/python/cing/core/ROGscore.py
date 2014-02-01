@@ -1,5 +1,5 @@
 from cing.Libs.NTutils import * #@UnusedWildImport
-from cing.core.constants import * #@UnusedWildImport
+from cing.constants import * #@UnusedWildImport
 
 #Attribute name in e.g. residue object.
 rogScoreStr = 'rogScore'
@@ -202,7 +202,7 @@ class XMLROGscoreHandler( XMLhandler ):
 
     def handle(self, node):
         attrs = self.handleDictElements(node)
-        if attrs == None: 
+        if attrs == None:
             return None
         result = ROGscore()
         result.update(attrs)

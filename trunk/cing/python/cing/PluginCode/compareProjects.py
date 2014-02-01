@@ -9,7 +9,7 @@ Routines to compare different Project instances
 from cing import Project
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.Libs.disk import copydir
-from cing.core.constants import * #@UnusedWildImport
+from cing.constants import * #@UnusedWildImport
 from cing.core.molecule import Ensemble
 from numpy import linalg as LA
 import numpy as np
@@ -529,7 +529,7 @@ def printRestraintScores( projects, stream=sys.stdout ):
 
 def printScore( name, rogScore ):
     clist = rogScore.colorCommentList.zap(1)
-    if len(clist) == 0: 
+    if len(clist) == 0:
         clist.append('---')
     printf('%-20s%-10s %s\n', name, rogScore, clist[0])
     for c in clist[1:]:
@@ -803,10 +803,10 @@ def getRanges( projects, cutoff = 1.7 ):
             psi.cAverage()
 
             use1 = 0
-            if (2.0 - res.PHI.cv - res.PSI.cv > cutoff): 
+            if (2.0 - res.PHI.cv - res.PSI.cv > cutoff):
                 use1 = 1
             use2 = 0
-            if (2.0 - phi.cv - psi.cv > cutoff): 
+            if (2.0 - phi.cv - psi.cv > cutoff):
                 use2 = 1
             #printf('%-35s %-35s  %6.2f  %1d     %6.2f %6.2f   %6.2f  %1d     %2d\n',
             #       res.PHI, res.PSI, 2.0 - res.PHI.cv - res.PSI.cv, use1,

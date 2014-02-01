@@ -1,7 +1,7 @@
 """
 Adds x3dna method to analyze DNA structures. The x3dna program is included as binaries for Mac OSX in the bin directory.
 """
-from cing import osType
+import cing
 from cing.Libs.NTplot import * #@UnusedWildImport
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.PluginCode.required.reqMatplib import MATPLIB_STR
@@ -13,7 +13,7 @@ from cing.core.parameters import plugins
 from cing.core.parameters import validationSubDirectories
 
 useModule = True
-if osType == OS_TYPE_MAC: # only installed for mac os currently.
+if cing.systemDefinitions.osType == OS_TYPE_MAC: # only installed for mac os currently.
     if not os.path.exists(cingPaths.x3dna): # cingPaths.x3dna gets set in __init__ for MAC.
         nTdebug("Missing x3dna directory which is a dep for x3dna; currently only tested for mac and disabled for other os")
         useModule = False
@@ -358,7 +358,7 @@ class X3dna(NTdict):
 #                nTdebug("Working on entity: %s" % entity)
                 valueList = getDeepByKeysOrDefault(x3dnaCoplanar, nTfill(None, self.modelCount), entity)
                 valueList[modelNum] = results[coplanarIdStr][entity]
-#                nTdebug("Set value for coplanarIdStr %s entity %s modelNum: %s to be: %s" % (coplanarIdStr, 
+#                nTdebug("Set value for coplanarIdStr %s entity %s modelNum: %s to be: %s" % (coplanarIdStr,
 #entity, modelNum, valueList[modelNum]))
             # end for entity
         # end for coplanar

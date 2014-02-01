@@ -1,4 +1,5 @@
-# YASARA BioTools
+# From YASARA BioTools
+# GWV 20130528: Added path routines
 # Visit www.yasara.org for more...
 # Copyright by Elmar Krieger
 from glob import glob
@@ -51,7 +52,7 @@ def copy(srcfilename,dstfilename,timespreserved=1,mod=None):
         # copy2 CAN FAIL ON FAT PARTITIONS
         try:
             shutil.copy2(srcfilename,dstfilename)
-        except: 
+        except:
             timespreserved=0
     if not timespreserved:
         try:
@@ -73,7 +74,7 @@ def copydir(srcpath,dstpath,mod=None):
     for srcfilename in filelist:
         dstfilename=os.path.join(dstpath,os.path.basename(srcfilename))
         copy(srcfilename,dstfilename)
-        if (mod!=None): 
+        if (mod!=None):
             chmod(dstfilename,mod)
 
 # GET ALL FILES MATCHING A PATH+WILDCARD
@@ -82,11 +83,11 @@ def matchfilelist(path):
     path=os.path.split(path)
     wildcard=path[1]
     path=path[0]
-    if (path==""): 
+    if (path==""):
         path="."
-    try: 
+    try:
         files=os.listdir(path)
-    except: 
+    except:
         return(None)
     matchfilelist=[]
     # CYCLE THROUGH ALL THE FILES
@@ -109,7 +110,7 @@ def replace(srcfilename,dstfilename,mod):
 # GET SIZE OF FILE
 # ================
 def filesize(filename):
-    if (not os.path.exists(filename)): 
+    if (not os.path.exists(filename)):
         return(0)
     return(os.stat(filename)[6])
 
@@ -117,17 +118,17 @@ def filesize(filename):
 # ==================
 def incfilename(filename):
     i=len(filename)-1
-    while (i>0 and filename[i] not in digits): 
+    while (i>0 and filename[i] not in digits):
         i=i-1
     while (i>=0):
         num=ord(filename[i])
-        if (num<48 or num>57): 
+        if (num<48 or num>57):
             break
         num=num+1
-        if (num==58): 
+        if (num==58):
             num=48
         filename=filename[:i]+chr(num)+filename[i+1:]
-        if (num!=48): 
+        if (num!=48):
             break
         i=i-1
     return(filename)
@@ -143,9 +144,9 @@ def makedirs(path,permissions=0755):
 # GET THE MODIFICATION TIME OF A FILE
 # ===================================
 def modtime(filename):
-    if (not os.path.exists(filename)): 
+    if (not os.path.exists(filename)):
         return(0)
-    else: 
+    else:
         return(os.path.getmtime(filename))
 
 # GET ALL MODIFICATION TIMES FOR A LIST OF FILES
@@ -153,7 +154,7 @@ def modtime(filename):
 def modtimes(filelist):
     timelist=[]
     for filename in filelist:
-        if (not os.path.exists(filename)): 
+        if (not os.path.exists(filename)):
             timelist.append(0)
         else: timelist.append(os.path.getmtime(filename))
     return(timelist)
@@ -161,7 +162,7 @@ def modtimes(filelist):
 # CHECK IF TWO FILES ARE THE SAME
 # ===============================
 def havesamecontent(filename1,filename2):
-    if (not os.path.exists(filename1) or not os.path.exists(filename2)): 
+    if (not os.path.exists(filename1) or not os.path.exists(filename2)):
         return(0)
     content1=open(filename1,"r").read()
     content2=open(filename2,"r").read()
@@ -172,7 +173,7 @@ def havesamecontent(filename1,filename2):
 def tmpfilename(filename):
     dotpos=filename.rfind(".")
     slashpos=filename.rfind(os.sep)
-    if (dotpos==-1 or dotpos<slashpos): 
+    if (dotpos==-1 or dotpos<slashpos):
         dotpos=len(filename)
     filename=filename[:dotpos]+"_tmp%d"%os.getpid()+filename[dotpos:]
     return(filename)
@@ -186,17 +187,17 @@ def pathexists(path):
     path=os.path.split(path)
     wildcard=path[1]
     path=path[0]
-    if (path==""): 
+    if (path==""):
         path="."
-    try: 
+    try:
         files=os.listdir(path)
-    except: 
+    except:
         return(0)
     # DELETE ALL LIST ENTRIES THAT DO NOT MATCH THE WILDCARD GIVEN IN PATH
     for name in files:
         # CHECK IF FILENAME MATCHES WILDCARD
         #   INCLUDING A POSSIBLE _MOD APPENDIX (LIKE EMBL DSSP FILES)
-        if (fnmatch.fnmatch(name,wildcard)): 
+        if (fnmatch.fnmatch(name,wildcard)):
             return(1)
     return(0)
 
@@ -210,11 +211,11 @@ def dirlist(path,all=0):
     path=os.path.normpath(os.path.normcase(path))
     # CREATE LIST OF ALL THE FILENAMES IN THE DIRECTORY SPECIFIED BY PATH
     (path,wildcard)=os.path.split(path)
-    if (path==""): 
+    if (path==""):
         path="."
-    try: 
+    try:
         filelist=os.listdir(path)
-    except: 
+    except:
         return([])
     # CYCLE THROUGH ALL FILES AND CHECK IF THEY MATCH WILDCARD
     i=0
@@ -240,11 +241,11 @@ def recursivedirlist(path):
     pathlist=[]
     # CREATE LIST OF ALL THE FILENAMES IN THE DIRECTORY SPECIFIED BY PATH
     (dir,wildcard)=os.path.split(path)
-    if (dir==""): 
+    if (dir==""):
         dir="."
-    try: 
+    try:
         filenamelist=os.listdir(dir)
-    except: 
+    except:
         return([])
     # CYCLE THROUGH ALL FILES AND CHECK IF THEY MATCH WILDCARD
     for filename in filenamelist:
@@ -268,10 +269,10 @@ def recursivedirlist(path):
 # =============
 def remove(filename):
     if (type(filename)==type([])):
-        for filename2 in filename: 
+        for filename2 in filename:
             remove(filename2)
     else:
-        if (filename!=None and os.path.exists(filename)): 
+        if (filename!=None and os.path.exists(filename)):
             os.remove(filename)
 
 # RENAME A FILE
@@ -284,7 +285,7 @@ def rename(filenamesrc,filenamedst):
 # =========================
 def removematch(path):
     if (type(path)==type([])):
-        for pathname in path: 
+        for pathname in path:
             removematch(pathname)
     else:
         # NORMALIZE PATH, IMPORTANT TO CONVERT UNIX FORWARD TO WINDOWS BACKWARD SLASHES
@@ -293,17 +294,17 @@ def removematch(path):
         path=os.path.split(path)
         wildcard=path[1]
         dir=path[0]
-        if (dir==""): 
+        if (dir==""):
             dir="."
-        try: 
+        try:
             files=os.listdir(dir)
-        except: 
+        except:
             return(0)
         # DELETE ALL LIST ENTRIES THAT DO NOT MATCH THE WILDCARD GIVEN IN PATH
         for name in files:
             # CHECK IF FILENAME MATCHES WILDCARD
             #   INCLUDING A POSSIBLE _MOD APPENDIX (LIKE EMBL DSSP FILES)
-            if (fnmatch.fnmatch(name,wildcard)): 
+            if (fnmatch.fnmatch(name,wildcard)):
                 remove(os.path.join(dir,name))
     return(0)
 
@@ -321,25 +322,25 @@ def copymodtime(srcfilename,dstfilename):
 # ============
 def chmod(path,mods):
     if (type(path)==type([])):
-        for pathname in path: 
+        for pathname in path:
             chmod(pathname,mods)
     else:
-        try: 
+        try:
             os.chmod(path,mods)
-        except: 
+        except:
             print "Could not change permissions for ",path
 
 # DELETE AN ENTIRE DIRECTORY INCLUDING ALL THE FILES
 # ==================================================
 def rmdir(path):
-    if (os.path.exists(path)): 
+    if (os.path.exists(path)):
         shutil.rmtree(path,1)
 
 # REMOVE FILE EXTENSION
 # =====================
 def rmext(filename):
     dotpos=filename.rfind(".")
-    if (dotpos!=-1): 
+    if (dotpos!=-1):
         filename=filename[:dotpos]
     return(filename)
 
@@ -347,7 +348,7 @@ def rmext(filename):
 # ==================
 def ext(filename):
     dotpos=filename.rfind(".")
-    if (dotpos!=-1): 
+    if (dotpos!=-1):
         return(filename[dotpos+1:])
     return("")
 
@@ -356,7 +357,7 @@ def ext(filename):
 def countpresent(filenamelist):
     count=0
     for filename in filenamelist:
-        if (os.path.exists(filename)): 
+        if (os.path.exists(filename)):
             count=count+1
     return(count)
 
@@ -365,7 +366,7 @@ def countpresent(filenamelist):
 # - srcpath IS A WILDCARD MATCHING THE FILES TO UPDATE
 # - dstdir IS THE NAME OF THE DESTINATION DIRECTORY
 def updatedir(srcpath,dstdir,contentchecked=1,recursive=0,obsoleted=0,mod=None,excludelist=[]):
-    if (os.path.isdir(srcpath)): 
+    if (os.path.isdir(srcpath)):
         srcpath=os.path.join(srcpath,"*")
     srcfilelist=dirlist(srcpath,recursive)
     srcbaselist=[]
@@ -386,7 +387,7 @@ def updatedir(srcpath,dstdir,contentchecked=1,recursive=0,obsoleted=0,mod=None,e
         dstfilelist=dirlist(os.path.join(dstdir,os.path.basename(srcpath)))
         for dstfilename in dstfilelist:
             dstbasename=os.path.basename(dstfilename)
-            if (dstbasename not in srcbaselist): 
+            if (dstbasename not in srcbaselist):
                 remove(dstfilename)
 
 # ZIP A FILE
@@ -796,3 +797,105 @@ def isRootDirectory(f):
         return True
     return False
 # end def
+
+#--------------------------------------------------------------------------------------------------------------
+def splitall(thePath):
+    allParts = []
+    while True:
+        parts = os.path.split(thePath)
+        if parts[0] == thePath:
+            allParts.insert(0, parts[0])
+            break
+        elif parts[1] == thePath:
+            allParts.insert(0, parts[1])
+            break
+        else:
+            thePath = parts[0]
+            allParts.insert(0, parts[1])
+        #end if
+    return allParts
+#end if
+
+_translate = {"..": os.pardir}
+class Path( str ):
+    """Path routines, adapted from: Python Cookbook, A. Martelli and D. Ascher (eds), O'Reilly 2002, pgs 140-142
+    Features:
+    - newpath = path1 / path2 + ext
+    - slicing to address elements of path
+    - tilde expansion
+    - several os.path methods
+    - iteration over files in self (if directory)
+    - recursive walk using os.walk
+    - split3 method: returns (directory, basename, extension) triple
+    """
+    def __str__( self ):
+        p = os.path.normpath(self)
+        return os.path.expanduser(p)
+        #return os.path.normpath(self)
+    def __div__(self, other):
+        other = _translate.get(other, other)
+        return Path(os.path.join(str(self),str(other)))
+    def __add__(self, other):
+        other = _translate.get(other, other)
+        return Path(str(self)+str(other))
+    def __len__( self ):
+        return len(splitall(str(self)))
+    def __getslice__( self, start, stop ):
+        parts = splitall(str(self))[start:stop]
+        if len(parts) > 0:
+            return Path(os.path.join(*parts))
+        else:
+            return Path('')
+    def __getitem__(self, i):
+        return Path(splitall(str(self))[i])
+    def exists( self ):
+        return os.path.exists(str(self))
+    def isdir( self ):
+        return os.path.isdir(str(self))
+    def isfile( self ):
+        return os.path.isfile(str(self))
+    def islink( self ):
+        return os.path.islink(str(self))
+    def glob(self):
+        return [Path(f) for f in glob(str(self ))]
+    def makedirs(self):
+        mkdirs(str(self))
+    def rmdir(self):
+        rmdir(str(self))
+    def remove(self):
+        remove(str(self))
+    def abspath( self ):
+        return os.path.abspath(str(self))
+    def relpath( self, start='' ):
+        return Path(os.path.relpath(str(self),start))
+    def splitext( self ):
+        f,ext = os.path.splitext(str(self))
+        return (Path(f), ext)
+    def split3(self):
+        "Return directory, basename, extension triple so that directory/basename+extension == self"
+        if len(self) == 0:     # empty path
+            return '', '', ''
+        else:
+            b, ext = self.splitext()
+            return b[:-1], b[-1:], ext
+    #end def
+    def walk( self, topdown=True, onerror=None ):
+        "Call os.walk() on self"
+        return os.walk(str(self), topdown, onerror )
+    def listdir( self ):
+        if self.exists() and self.isdir():
+            files = []
+            for f in os.listdir(str(self)):
+                files.append( self / f )
+            return files
+        else:
+            return []
+        #end if
+    #end def
+    def __iter__(self):
+        for f in self.listdir():
+            yield f
+        #end for
+    #end def
+#end class
+#--------------------------------------------------------------------------------------------------------------

@@ -29,9 +29,9 @@ VCsecret            = 'a/b/c' # Overriden locally. @UnusedVariable Only used in 
 
 try:
     from cing.NRG.localConstants import * #@UnusedWildImport # pylint: disable=E0611
-    nTdebug("Loaded NRG localConstants.py.")
+    nTdebug("NRG/settings: Loaded NRG localConstants.py.")
 except:
-    nTdebug("Consider creating a localConstants.py file with a different 'user' location.")
+    nTdebug("NRG/settings: Consider creating a localConstants.py file with a different 'user' location.")
 
 platform_dir    = os.path.join(UJ,'wattosTestingPlatform')  # For BMRB, and PDB and mmCIF formatted entries data. @UnusedVariable
 pdbbase_dir     = os.path.join(platform_dir,'pdb')          # For PDB and mmCIF formatted entries data. @UnusedVariable
@@ -102,4 +102,4 @@ summaryHeaderTitleList = [
     'Chothia definition for alpha,beta,alpha/beta,coil,None',
     'Number of chains including water',
     'Total number of residues'
-]    
+]

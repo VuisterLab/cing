@@ -4,7 +4,7 @@ Linux in the bin directory.
 """
 from cing.Libs.AwkLike import AwkLike
 from cing.Libs.NTutils import * #@UnusedWildImport
-from cing.core.constants import * #@UnusedWildImport
+from cing.constants import * #@UnusedWildImport
 from cing.core.parameters import cingPaths
 from cing.core.parameters import validationSubDirectories
 from glob import glob
@@ -407,7 +407,7 @@ def _calcQshift( atmList ):
     else:
         qshift=NaN
     # end if
-    
+
     return qshift
 #end def
 
@@ -437,11 +437,11 @@ protons:    %(protons)6.3f"""
                         )
 
         for a in atms:
-            if a.isBackbone(): 
+            if a.isBackbone():
                 bb.append(a)
-            if a.isProton(): 
+            if a.isProton():
                 protons.append(a)
-            else: 
+            else:
                 heavy.append(a)
         #end for
 

@@ -9,7 +9,7 @@ for Sanne Nabuurs.
 from cing.PluginCode.matplib import NTplot
 from cing.PluginCode.matplib import NTplotSet
 from cing.core.classes import Project
-from cing.core.constants import * #@UnusedWildImport
+from cing.constants import * #@UnusedWildImport
 from cing.core.molecule import nTdistanceOpt
 from matplotlib.pyplot import * #@UnusedWildImport
 from numpy import * #@UnusedWildImport

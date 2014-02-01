@@ -39,7 +39,7 @@ Atom, Molecule and Project classes.
 from Refine.refine import * #@UnusedWildImport
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.core.classes import * #@UnusedWildImport
-from cing.core.constants import * #@UnusedWildImport
+from cing.constants import * #@UnusedWildImport
 from cing.core.molecule import * #@UnusedWildImport
 
 
@@ -115,16 +115,16 @@ def exportDistanceRestraint2xplor( distanceRestraint ):
         return
     dminus = distanceRestraint.upper
     if distanceRestraint.lower != None:
-        dminus = distanceRestraint.upper-distanceRestraint.lower                
+        dminus = distanceRestraint.upper-distanceRestraint.lower
     s = sprintf('assi ')
     for i,atmList in enumerate( distanceRestraint.atomPairs ):
         if len(atmList) != 2:
-            nTerror("Skipping restraint because bad number of atom selections. Expected 2 but found: %s in: %s", 
+            nTerror("Skipping restraint because bad number of atom selections. Expected 2 but found: %s in: %s",
                     distanceRestraint, len(atmList))
             return
-        
+
         if i != 0:
-            s += sprintf( '\n  or ')                    
+            s += sprintf( '\n  or ')
         for atm in atmList:
             atomSelStr = atm.export2xplor()
             if atomSelStr == None:
@@ -148,7 +148,7 @@ def exportDisList2xplor( drl, path)   :
     """Export a distanceRestraintList (DRL) to xplor format:
        return drl or None on error
     """
-    msgHol = MsgHoL()    
+    msgHol = MsgHoL()
     fp = open( path, 'w' )
     if not fp:
         nTerror('exportDisList2xplor: unable to open "%s"\n', path )
@@ -204,7 +204,7 @@ def exportDihList2xplor( drl, path)   :
     noneWarn = False
     for dr in drl:
         # We don't want to export the restraint if it has no value
-        # No upper or lower bound is as worse as not upper and lower bounds 
+        # No upper or lower bound is as worse as not upper and lower bounds
         if dr.lower is not None and dr.upper is not None:
             fprintf( fp, '%s\n', dr.export2xplor() )
         else:
@@ -237,11 +237,11 @@ def exportMolecule2xplor( molecule, path, chainName = None, model = None):
             exportMolecule2xplor( molecule, path, chainName = chain.name)
 #        nTdebug("Finished writing all chains.")
         return
-    
+
     modelList = range(molecule.modelCount)
     if model != None:
         modelList = [ model ]
-        
+
     for model in modelList:
         pdbFile = molecule.toPDB( model=model, convention = XPLOR, chainName = chainName)
         if not pdbFile:
@@ -456,9 +456,9 @@ def getDrFromXplorMemory( project, convention ):
 
 def fullRedo(project, modelCountAnneal = 200, bestAnneal = 50, best = 25):
     'Return True on error.'
-        
+
     nTmessage("==> Recalculating and refining a new ensemble in cing.PluginCode.xplor#%s" % getCallerName())
-    
+
     if 0: # DEFAULT: 0
         modelCountAnneal, bestAnneal, best = 4,3,2
     if project == None:
@@ -466,21 +466,21 @@ def fullRedo(project, modelCountAnneal = 200, bestAnneal = 50, best = 25):
         return True
     #end if
 
-    
+
     parser = getRefineParser() # Get some defaults assumed to exist in the setup.
     (options, _args) = parser.parse_args([''])
     options.name = '%s_redo' % project.name
 #    options.sort = 'Enoe'
     options.modelsAnneal = '0-%d' % (modelCountAnneal-1) # Needs to be specified because default is to use modelCount from project
     options.modelCountAnneal = modelCountAnneal
-    options.bestAnneal = bestAnneal 
+    options.bestAnneal = bestAnneal
     options.best = best
     options.superpose = 'cv'
     options.overwrite=1
-        
+
     basePath = project.path(project.directories.refine, options.name)
     nTmessage("basePath: " + basePath)
-    
+
     nTmessage("==> Reading configuration")
     nTmessage('refinePath:     %s', config.refinePath)
     nTmessage('xplor:          %s', config.XPLOR)
@@ -493,8 +493,8 @@ def fullRedo(project, modelCountAnneal = 200, bestAnneal = 50, best = 25):
         return True
     #end if
 #end def
-        
-        
+
+
 #-----------------------------------------------------------------------------
 # register the functions in the project class
 methods  = [(newMoleculeFromXplor, None),
