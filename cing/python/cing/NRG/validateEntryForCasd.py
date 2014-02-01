@@ -1,8 +1,9 @@
+import cing
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.Libs.forkoff import do_cmd
 from cing.NRG.CasdNmrMassageCcpnProject import * #@UnusedWildImport
 from cing.Scripts.validateEntry import * #@UnusedWildImport
-from cing.core.constants import * #@UnusedWildImport
+from cing.constants import * #@UnusedWildImport
 
 from cing.NRG import CasdScripts
 
@@ -32,8 +33,8 @@ def mainCasd(entryId, *extraArgList):
     fORCE_RETRIEVE_INPUT = False
 
 
-    nTmessage(header)
-    nTmessage(getStartMessage())
+    nTmessage(cing.cingDefinitions.getHeaderString())
+    nTmessage(cing.systemDefinitions.getStartMessage())
 
     expectedArgumentList = [ 'inputDir', 'outputDir', 'pdbConvention', 'restraintsConvention', 'archiveType', 'projectType' ]
     expectedNumberOfArguments = len(expectedArgumentList)
@@ -62,7 +63,7 @@ def mainCasd(entryId, *extraArgList):
         inputDir = os.path.join(inputDir, entryCodeChar2and3)
     elif archiveType == ARCHIVE_TYPE_BY_CH23_BY_ENTRY:
         inputDir = os.path.join(inputDir, entryCodeChar2and3, entryId)
-    
+
     ranges = CasdScripts.getRangesForEntry(entryId)
 
     nTdebug("Using:")
@@ -147,7 +148,7 @@ def mainCasd(entryId, *extraArgList):
                                 #nmrCalcName='CASD-NMR'):
             nTerror("Failed to init project from ccpn")
             return True
-        
+
         # Temporary debug
 #        project.saveCcpn(os.path.join('/home/rf118/tmpdata/',entryId))
     elif projectType == PROJECT_TYPE_PDB:
@@ -183,7 +184,7 @@ def mainCasd(entryId, *extraArgList):
 
 #    project.save()
 #    project.molecule.ranges = ranges # JFD: this doesn't seem to be set there exactly.
-    
+
 #    nTdebug("mainCasd: Molecule starts with ranges %s" % project.molecule.ranges)
     project.molecule.superpose(ranges=ranges)
     if True:
@@ -227,4 +228,4 @@ if __name__ == "__main__":
     try:
         status = mainCasd(*sys.argv[1:])
     finally:
-        nTmessage(getStopMessage(cing.starttime))
+        nTmessage(cing.systemDefinitions.getStopMessage())

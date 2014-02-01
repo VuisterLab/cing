@@ -7,22 +7,20 @@ Use:
 $CINGROOT/python/cing/Scripts/vCing/vCing.py runSlaveThread
 $CINGROOT/python/cing/Scripts/vCing/vCing.py runSlave
 $CINGROOT/python/cing/Scripts/vCing/vCing.py addTokenListToTopos $D/NRG-CING/token_list_todo.txt
-For killing use the shootall script. 
+For killing use the shootall script.
 Author: Jurgen F. Doreleijers
 Thu Oct 14 23:56:36 CEST 2010
 """
+import cing
 from cing import cingDirScripts
 from cing import cingDirTmp
 from cing import cingPythonDir
 from cing import cingRoot
-from cing import header
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.Libs.forkoff import * #@UnusedWildImport
 from cing.Libs.network import * #@UnusedWildImport
 from cing.NRG import * #@UnusedWildImport
 from cing.Scripts.vCing.Utils import prepareMaster
-from cing.main import getStartMessage
-from cing.main import getStopMessage
 from datetime import datetime
 
 # Will be overridden by local settings.
@@ -131,7 +129,7 @@ class Vcing(Lister):
     # end def
 
     def keepLockFresh(self, lockname, lockTimeOut):
-        maxSleapingTime = self.max_time_to_wait_per_job + 100 
+        maxSleapingTime = self.max_time_to_wait_per_job + 100
         # process will be killed outside first so we give it some extra time here for it to be reaped.
         sleepTime = lockTimeOut / 2 + 1
         sleptTime = 0
@@ -168,7 +166,7 @@ class Vcing(Lister):
         if len(resultList) != 2:
             nTerror("Failed to find tokeninfo as expected with 2 parts from: %s" % tokeninfo)
             return None
-        # end if        
+        # end if
         return [status] + resultList
     # end def
 
@@ -287,7 +285,7 @@ class Vcing(Lister):
                 #nTdebug("Time is %s" % str(datetime.now()))
                 time.sleep(self.time_sleep_when_no_token)
                 continue
-            # end if            
+            # end if
             time.sleep(2)
             pid = p.process_fork(self.keepLockFresh, [tokenLock, self.lockTimeOut])
             nTdebug("Created a background process [%s] keeping the lock" % pid)
@@ -303,12 +301,12 @@ class Vcing(Lister):
                 continue
             # end if
             tokensTried += 1
-            nTmessage("In %d/%d/%d (finished/total/iterations) got token %s with lock: %s" % (tokensFinished, 
+            nTmessage("In %d/%d/%d (finished/total/iterations) got token %s with lock: %s" % (tokensFinished,
                         tokensTried, iterationsTried, token, tokenLock))
 
             # The script needs itself to send the results all included.
             nTmessage("Found tokenContent: %s" % tokenContent)
-            nTdebug("Time is %s" % str(datetime.now()))  
+            nTdebug("Time is %s" % str(datetime.now()))
             tokenPartList = tokenContent.split()
             cmdToken = tokenPartList[0]
             parTokenListStr = ' '.join(tokenPartList[1:])
@@ -434,8 +432,8 @@ class Vcing(Lister):
 if __name__ == "__main__":
     cing.verbosity = verbosityDebug
 
-    nTmessage(header)
-    nTmessage(getStartMessage())
+    nTmessage(cing.cingDefinitions.getHeaderString())
+    nTmessage(cing.systemDefinitions.getStartMessage())
 
     vc = Vcing(cmdDict=cmdDict)
     nTmessage("Starting with %r" % vc)
@@ -473,7 +471,7 @@ if __name__ == "__main__":
             nTerror("Unknown destination: %s" % destination)
         # end if
     finally:
-        nTmessage(getStopMessage(cing.starttime))
+        nTmessage(cing.systemDefinitions.getStopMessage())
     # end try
 # end if main
-    
+

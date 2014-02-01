@@ -27,7 +27,7 @@ screenDump(project.name+'.png')
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.PluginCode.required.reqWhatif import WHATIF_STR
 from cing.PluginCode.required.reqYasara import YASARA_STR
-from cing.core.constants import * #@UnusedWildImport
+from cing.constants import * #@UnusedWildImport
 from cing.core.molecule import Atom
 from cing.main import pformat
 from cing.main import startIpythonShell

@@ -3,7 +3,7 @@ from cing import cingDirTmp
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.Libs.html import HTMLfile
 from cing.core.classes import Project
-from cing.core.constants import * #@UnusedWildImport
+from cing.constants import * #@UnusedWildImport
 from cing.core.molecule import Ensemble
 from cing.core.molecule import Molecule
 from cing.core.parameters import htmlDirectories

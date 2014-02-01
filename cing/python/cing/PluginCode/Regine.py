@@ -16,7 +16,7 @@ Format input:
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.core.classes import Peak
 from cing.core.classes import PeakList
-from cing.core.constants import * #@UnusedWildImport
+from cing.constants import * #@UnusedWildImport
 
 class Regine(Lister):
 
@@ -110,7 +110,7 @@ class Regine(Lister):
 #        nTdebug("atom = decodeNameTuple(XPLOR, chainName, resNum, atomName): %s = %s %s %s [%s]" % (
 #                 atom, XPLOR, chainName, resNum, atomName))
         if not atom:
-#            nTwarning("Failed to find loc: [%s],[%s],[%s]" % (resId, resNum, atomName)) 
+#            nTwarning("Failed to find loc: [%s],[%s],[%s]" % (resId, resNum, atomName))
 # TODO check; message disabled for improving other debugging.
             return None
         return atom.resonances()

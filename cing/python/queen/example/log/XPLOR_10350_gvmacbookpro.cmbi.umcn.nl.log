@@ -1,0 +1,1163 @@
+		       XPLOR-NIH version 2.9.7-custom 
+ 
+ C.D. Schwieters, J.J.  Kuszewski,       based on X-PLOR 3.851 by A.T. Brunger 
+ N. Tjandra, and G.M. Clore 
+ J. Magn. Res., 160, 66-74 (2003).       http://nmr.cit.nih.gov/xplor-nih 
+
+ User: geerten      on: darwin/ppc      at: 08-Apr-09 11:06:24
+ X-PLOR>structure 
+ STRUcture> @/Users/geerten/Programs/queen/example/data/sequence/protein.psf 
+ ASSFIL: file /Users/geerten/Programs/queen/example/data/sequence/protein.psf opened.
+ STRUcture>PSF 
+ REMARKS FILENAME="/home/snabuurs/projects/queen/1bus/data/sequence/protein.psf"
+ REMARKS  TOPH19.pep -MACRO for protein sequence
+ REMARKS DATE:14-Aug-03  19:07:51       created by user:
+ XPLOR: current counts (number in parenthesis is maximum)
+ NATOM=        834(MAXA=        1600)  NBOND=        841(MAXB=        1600)
+ NTHETA=      1514(MAXT=        1600)  NGRP=          58(MAXGRP=       100)
+ NPHI=        1304(MAXP=        1600)  NIMPHI=       432(MAXIMP=       800)  
+ NDON=         117(MAXPAD=       200)  NACC=          79(MAXPAD=       200)
+ NNB=          144(MAXNB=        200) 
+ STRUcture>end 
+ X-PLOR>evaluate ($par_nonbonded=PROLSQ) 
+ Assuming literal string "PROLSQ"
+ EVALUATE: symbol $PAR_NONBONDED set to "PROLSQ" (string)
+ X-PLOR>parameter 
+ PARRDR> @/Users/geerten/Programs/queen/parameters/parallhdg5.3.pro 
+ ASSFIL: file /Users/geerten/Programs/queen/parameters/parallhdg5.3.pro opened.
+ PARRDR>remark   file protein-allhdg-ucl.param  version UCL  date 07-JUL-01 
+ PARRDR>remark   for file protein-allhdg-ucl.top  version UCL  date 14-MAR-00 
+ PARRDR>remark   for file protein-allhdg-dih-ucl.top  version UCL  date 07-JUL-01 
+ PARRDR>remark   Geometric energy function parameters for distance geometry and 
+ PARRDR>remark   simulated annealing. 
+ PARRDR>remark   Original author: Michael Nilges, EMBL Heidelberg 
+ PARRDR>remark   Modifications: Mark A. Williams, UCL London 
+ PARRDR>remark   last modification: NBFIX for hydrogens in OPLSX nonbonded term. MN, 30-01-04 
+ PARRDR> 
+ PARRDR>set echo off message off end 
+ %epsilon=-ERR: real number expected:
+  NONBonded  H       $VE 
+                     ^^^
+ %1:4-epsilon=-ERR: real number expected:
+  NONBonded  H       $VE $VR_HH   $VE 
+                                  ^^^
+ %epsilon=-ERR: real number expected:
+  NONBonded  HA      $VE 
+                     ^^^
+ %1:4-epsilon=-ERR: real number expected:
+  NONBonded  HA      $VE $VR_H    $VE 
+                                  ^^^
+ %epsilon=-ERR: real number expected:
+  NONBonded  HC      $VE 
+                     ^^^
+ %1:4-epsilon=-ERR: real number expected:
+  NONBonded  HC      $VE $VR_HH   $VE 
+                                  ^^^
+ %epsilon=-ERR: real number expected:
+  NONBonded  C       $VE 
+                     ^^^
+ %sigma=-ERR: real number expected:
+  NONBonded  C       $VE $VR_C_SP2 
+                         ^^^^^^^^^
+ %1:4-epsilon=-ERR: real number expected:
+  NONBonded  C       $VE $VR_C_SP2    $VE 
+                                      ^^^
+ %epsilon=-ERR: real number expected:
+  NONBonded  CCIS    $VE 
+                     ^^^
+ %sigma=-ERR: real number expected:
+  NONBonded  CCIS    $VE $VR_C_SP2 
+                         ^^^^^^^^^
+ %1:4-epsilon=-ERR: real number expected:
+  NONBonded  CCIS    $VE $VR_C_SP2    $VE 
+                                      ^^^
+ %epsilon=-ERR: real number expected:
+  NONBonded  C5      $VE 
+                     ^^^
+ %1:4-epsilon=-ERR: real number expected:
+  NONBonded  C5      $VE $VR_C    $VE 
+                                  ^^^
+ %1:4-sigma=-ERR: real number expected:
+  NONBonded  C5      $VE $VR_C    $VE $VR14_C 
+                                      ^^^^^^^
+ %epsilon=-ERR: real number expected:
+  NONBonded  C5W     $VE 
+                     ^^^
+ %1:4-epsilon=-ERR: real number expected:
+  NONBonded  C5W     $VE $VR_C    $VE 
+                                  ^^^
+ %1:4-sigma=-ERR: real number expected:
+  NONBonded  C5W     $VE $VR_C    $VE $VR14_C 
+                                      ^^^^^^^
+ %epsilon=-ERR: real number expected:
+  NONBonded  CF      $VE 
+                     ^^^
+ %1:4-epsilon=-ERR: real number expected:
+  NONBonded  CF      $VE $VR_C    $VE 
+                                  ^^^
+ %1:4-sigma=-ERR: real number expected:
+  NONBonded  CF      $VE $VR_C    $VE $VR14_C 
+                                      ^^^^^^^
+ %epsilon=-ERR: real number expected:
+  NONBonded  CW      $VE 
+                     ^^^
+ %1:4-epsilon=-ERR: real number expected:
+  NONBonded  CW      $VE $VR_C    $VE 
+                                  ^^^
+ %1:4-sigma=-ERR: real number expected:
+  NONBonded  CW      $VE $VR_C    $VE $VR14_C 
+                                      ^^^^^^^
+ %epsilon=-ERR: real number expected:
+  NONBonded  CY      $VE 
+                     ^^^
+ %1:4-epsilon=-ERR: real number expected:
+  NONBonded  CY      $VE $VR_C    $VE 
+                                  ^^^
+ %1:4-sigma=-ERR: real number expected:
+  NONBonded  CY      $VE $VR_C    $VE $VR14_C 
+                                      ^^^^^^^
+ %epsilon=-ERR: real number expected:
+  NONBonded  CY2     $VE 
+                     ^^^
+ %1:4-epsilon=-ERR: real number expected:
+  NONBonded  CY2     $VE $VR_C    $VE 
+                                  ^^^
+ %1:4-sigma=-ERR: real number expected:
+  NONBonded  CY2     $VE $VR_C    $VE $VR14_C 
+                                      ^^^^^^^
+ %epsilon=-ERR: real number expected:
+  NONBonded  CH1E    $VE 
+                     ^^^
+ %1:4-epsilon=-ERR: real number expected:
+  NONBonded  CH1E    $VE $VR_C    $VE 
+                                  ^^^
+ %1:4-sigma=-ERR: real number expected:
+  NONBonded  CH1E    $VE $VR_C    $VE $VR14_C 
+                                      ^^^^^^^
+ %epsilon=-ERR: real number expected:
+  NONBonded  CH2E    $VE 
+                     ^^^
+ %1:4-epsilon=-ERR: real number expected:
+  NONBonded  CH2E    $VE $VR_C    $VE 
+                                  ^^^
+ %1:4-sigma=-ERR: real number expected:
+  NONBonded  CH2E    $VE $VR_C    $VE $VR14_C 
+                                      ^^^^^^^
+ %epsilon=-ERR: real number expected:
+  NONBonded  CH2G    $VE 
+                     ^^^
+ %1:4-epsilon=-ERR: real number expected:
+  NONBonded  CH2G    $VE $VR_C    $VE 
+                                  ^^^
+ %1:4-sigma=-ERR: real number expected:
+  NONBonded  CH2G    $VE $VR_C    $VE $VR14_C 
+                                      ^^^^^^^
+ %epsilon=-ERR: real number expected:
+  NONBonded  CH2P    $VE 
+                     ^^^
+ %1:4-epsilon=-ERR: real number expected:
+  NONBonded  CH2P    $VE $VR_C    $VE 
+                                  ^^^
+ %1:4-sigma=-ERR: real number expected:
+  NONBonded  CH2P    $VE $VR_C    $VE $VR14_C 
+                                      ^^^^^^^
+ %epsilon=-ERR: real number expected:
+  NONBonded  CH3E    $VE 
+                     ^^^
+ %1:4-epsilon=-ERR: real number expected:
+  NONBonded  CH3E    $VE $VR_C    $VE 
+                                  ^^^
+ %1:4-sigma=-ERR: real number expected:
+  NONBonded  CH3E    $VE $VR_C    $VE $VR14_C 
+                                      ^^^^^^^
+ %epsilon=-ERR: real number expected:
+  NONBonded  CR1E    $VE 
+                     ^^^
+ %1:4-epsilon=-ERR: real number expected:
+  NONBonded  CR1E    $VE $VR_C    $VE 
+                                  ^^^
+ %1:4-sigma=-ERR: real number expected:
+  NONBonded  CR1E    $VE $VR_C    $VE $VR14_C 
+                                      ^^^^^^^
+ %epsilon=-ERR: real number expected:
+  NONBonded  CR1H    $VE 
+                     ^^^
+ %1:4-epsilon=-ERR: real number expected:
+  NONBonded  CR1H    $VE $VR_C    $VE 
+                                  ^^^
+ %1:4-sigma=-ERR: real number expected:
+  NONBonded  CR1H    $VE $VR_C    $VE $VR14_C 
+                                      ^^^^^^^
+ %epsilon=-ERR: real number expected:
+  NONBonded  CR1W    $VE 
+                     ^^^
+ %1:4-epsilon=-ERR: real number expected:
+  NONBonded  CR1W    $VE $VR_C    $VE 
+                                  ^^^
+ %1:4-sigma=-ERR: real number expected:
+  NONBonded  CR1W    $VE $VR_C    $VE $VR14_C 
+                                      ^^^^^^^
+ %epsilon=-ERR: real number expected:
+  NONBonded  CRHH    $VE 
+                     ^^^
+ %1:4-epsilon=-ERR: real number expected:
+  NONBonded  CRHH    $VE $VR_C    $VE 
+                                  ^^^
+ %1:4-sigma=-ERR: real number expected:
+  NONBonded  CRHH    $VE $VR_C    $VE $VR14_C 
+                                      ^^^^^^^
+ %epsilon=-ERR: real number expected:
+  NONBonded  CRH     $VE 
+                     ^^^
+ %1:4-epsilon=-ERR: real number expected:
+  NONBonded  CRH     $VE $VR_C    $VE 
+                                  ^^^
+ %1:4-sigma=-ERR: real number expected:
+  NONBonded  CRH     $VE $VR_C    $VE $VR14_C 
+                                      ^^^^^^^
+ %epsilon=-ERR: real number expected:
+  NONBonded  N       $VE 
+                     ^^^
+ %1:4-epsilon=-ERR: real number expected:
+  NONBonded  N       $VE $VR_N    $VE 
+                                  ^^^
+ %1:4-sigma=-ERR: real number expected:
+  NONBonded  N       $VE $VR_N    $VE $VR14_N 
+                                      ^^^^^^^
+ %epsilon=-ERR: real number expected:
+  NONBonded  NC2     $VE 
+                     ^^^
+ %1:4-epsilon=-ERR: real number expected:
+  NONBonded  NC2     $VE $VR_N    $VE 
+                                  ^^^
+ %1:4-sigma=-ERR: real number expected:
+  NONBonded  NC2     $VE $VR_N    $VE $VR14_N 
+                                      ^^^^^^^
+ %epsilon=-ERR: real number expected:
+  NONBonded  NH1     $VE 
+                     ^^^
+ %1:4-epsilon=-ERR: real number expected:
+  NONBonded  NH1     $VE $VR_N    $VE 
+                                  ^^^
+ %1:4-sigma=-ERR: real number expected:
+  NONBonded  NH1     $VE $VR_N    $VE $VR14_N 
+                                      ^^^^^^^
+ %epsilon=-ERR: real number expected:
+  NONBonded  NH2     $VE 
+                     ^^^
+ %1:4-epsilon=-ERR: real number expected:
+  NONBonded  NH2     $VE $VR_N    $VE 
+                                  ^^^
+ %1:4-sigma=-ERR: real number expected:
+  NONBonded  NH2     $VE $VR_N    $VE $VR14_N 
+                                      ^^^^^^^
+ %epsilon=-ERR: real number expected:
+  NONBonded  NH3     $VE 
+                     ^^^
+ %1:4-epsilon=-ERR: real number expected:
+  NONBonded  NH3     $VE $VR_N    $VE 
+                                  ^^^
+ %1:4-sigma=-ERR: real number expected:
+  NONBonded  NH3     $VE $VR_N    $VE $VR14_N 
+                                      ^^^^^^^
+ %epsilon=-ERR: real number expected:
+  NONBonded  NP      $VE 
+                     ^^^
+ %1:4-epsilon=-ERR: real number expected:
+  NONBonded  NP      $VE $VR_N    $VE 
+                                  ^^^
+ %1:4-sigma=-ERR: real number expected:
+  NONBonded  NP      $VE $VR_N    $VE $VR14_N 
+                                      ^^^^^^^
+ %epsilon=-ERR: real number expected:
+  NONBonded  NR      $VE 
+                     ^^^
+ %1:4-epsilon=-ERR: real number expected:
+  NONBonded  NR      $VE $VR_N    $VE 
+                                  ^^^
+ %1:4-sigma=-ERR: real number expected:
+  NONBonded  NR      $VE $VR_N    $VE $VR14_N 
+                                      ^^^^^^^
+ %epsilon=-ERR: real number expected:
+  NONBonded  O       $VE 
+                     ^^^
+ %1:4-epsilon=-ERR: real number expected:
+  NONBonded  O       $VE $VR_O    $VE 
+                                  ^^^
+ %epsilon=-ERR: real number expected:
+  NONBonded  OC      $VE 
+                     ^^^
+ %1:4-epsilon=-ERR: real number expected:
+  NONBonded  OC      $VE $VR_O    $VE 
+                                  ^^^
+ %epsilon=-ERR: real number expected:
+  NONBonded  OH1     $VE 
+                     ^^^
+ %1:4-epsilon=-ERR: real number expected:
+  NONBonded  OH1     $VE $VR_O    $VE 
+                                  ^^^
+ %epsilon=-ERR: real number expected:
+  NONBonded  S       $VE 
+                     ^^^
+ %1:4-epsilon=-ERR: real number expected:
+  NONBonded  S       $VE $VR_S    $VE 
+                                  ^^^
+ %epsilon=-ERR: real number expected:
+  NONBonded  SM      $VE 
+                     ^^^
+ %1:4-epsilon=-ERR: real number expected:
+  NONBonded  SM      $VE $VR_S    $VE 
+                                  ^^^
+ %epsilon=-ERR: real number expected:
+  NONBonded  SH1E    $VE 
+                     ^^^
+ %1:4-epsilon=-ERR: real number expected:
+  NONBonded  SH1E    $VE $VR_S    $VE 
+                                  ^^^
+ X-PLOR>noe 
+ NOE>  averaging * sum 
+ NOE>  nres=2020 
+ NOE: allocating space for    2020 restraints.
+ NOE>  ASSI  (RESI     1 AND NAME  HT2) 
+ SELRPN:      1 atoms have been selected out of    834
+ SELRPN>      (RESI     2 AND NAME   HN)      4.000 4.000 0.000 
+ SELRPN:      1 atoms have been selected out of    834
+ NOE>  ASSI  (RESI     4 AND NAME  HG*) 
+ SELRPN:      6 atoms have been selected out of    834
+ SELRPN>      (RESI    23 AND NAME  HD2)      7.400 7.400 0.000 
+ SELRPN:      1 atoms have been selected out of    834
+ NOE>  ASSI  (RESI     4 AND NAME  HG*) 
+ SELRPN:      6 atoms have been selected out of    834
+ SELRPN>      (RESI    37 AND NAME  HE#)      9.800 9.800 0.000 
+ SELRPN:      2 atoms have been selected out of    834
+ NOE>  ASSI  (RESI     4 AND NAME  HG*) 
+ SELRPN:      6 atoms have been selected out of    834
+ SELRPN>      (RESI    50 AND NAME   HN)      7.400 7.400 0.000 
+ SELRPN:      1 atoms have been selected out of    834
+ NOE>  ASSI  (RESI     4 AND NAME  HG*) 
+ SELRPN:      6 atoms have been selected out of    834
+ SELRPN>      (RESI    50 AND NAME  HD*)      9.800 9.800 0.000 
+ SELRPN:      6 atoms have been selected out of    834
+ NOE>  ASSI  (RESI     5 AND NAME   HA) 
+ SELRPN:      1 atoms have been selected out of    834
+ SELRPN>      (RESI     6 AND NAME   HN)      3.000 3.000 0.000 
+ SELRPN:      1 atoms have been selected out of    834
+ NOE>  ASSI  (RESI     6 AND NAME   HA) 
+ SELRPN:      1 atoms have been selected out of    834
+ SELRPN>      (RESI     7 AND NAME   HN)      3.000 3.000 0.000 
+ SELRPN:      1 atoms have been selected out of    834
+ NOE>  ASSI  (RESI     6 AND NAME   HA) 
+ SELRPN:      1 atoms have been selected out of    834
+ SELRPN>      (RESI     9 AND NAME   CG)      7.000 7.000 0.000 
+ SELRPN:      1 atoms have been selected out of    834
+ NOE>  ASSI  (RESI     6 AND NAME   HA) 
+ SELRPN:      1 atoms have been selected out of    834
+ SELRPN>      (RESI     9 AND NAME   HN)      4.000 4.000 0.000 
+ SELRPN:      1 atoms have been selected out of    834
+ NOE>  ASSI  (RESI     6 AND NAME   HN) 
+ SELRPN:      1 atoms have been selected out of    834
+ SELRPN>      (RESI     7 AND NAME   HN)      4.000 4.000 0.000 
+ SELRPN:      1 atoms have been selected out of    834
+ NOE>  ASSI  (RESI     7 AND NAME   HA) 
+ SELRPN:      1 atoms have been selected out of    834
+ SELRPN>      (RESI    10 AND NAME   HN)      4.000 4.000 0.000 
+ SELRPN:      1 atoms have been selected out of    834
+ NOE>  ASSI  (RESI     7 AND NAME   HN) 
+ SELRPN:      1 atoms have been selected out of    834
+ SELRPN>      (RESI     7 AND NAME  HB#)      3.600 3.600 0.000 
+ SELRPN:      3 atoms have been selected out of    834
+ NOE>  ASSI  (RESI     7 AND NAME   HN) 
+ SELRPN:      1 atoms have been selected out of    834
+ SELRPN>      (RESI     8 AND NAME   HN)      4.000 4.000 0.000 
+ SELRPN:      1 atoms have been selected out of    834
+ NOE>  ASSI  (RESI     7 AND NAME   HN) 
+ SELRPN:      1 atoms have been selected out of    834
+ SELRPN>      (RESI    38 AND NAME  HB#)      6.000 6.000 0.000 
+ SELRPN:      2 atoms have been selected out of    834
+ NOE>  ASSI  (RESI     8 AND NAME   HN) 
+ SELRPN:      1 atoms have been selected out of    834
+ SELRPN>      (RESI     8 AND NAME  HB#)      3.600 3.600 0.000 
+ SELRPN:      2 atoms have been selected out of    834
+ NOE>  ASSI  (RESI     8 AND NAME   HN) 
+ SELRPN:      1 atoms have been selected out of    834
+ SELRPN>      (RESI     9 AND NAME   HN)      4.000 4.000 0.000 
+ SELRPN:      1 atoms have been selected out of    834
+ NOE>  ASSI  (RESI     8 AND NAME  HB#) 
+ SELRPN:      2 atoms have been selected out of    834
+ SELRPN>      (RESI     9 AND NAME   CZ)      8.000 8.000 0.000 
+ SELRPN:      1 atoms have been selected out of    834
+ NOE>  ASSI  (RESI     9 AND NAME   CG) 
+ SELRPN:      1 atoms have been selected out of    834
+ SELRPN>      (RESI    14 AND NAME  HG*)      9.400 9.400 0.000 
+ SELRPN:      6 atoms have been selected out of    834
+ NOE>  ASSI  (RESI     9 AND NAME   CG) 
+ SELRPN:      1 atoms have been selected out of    834
+ SELRPN>      (RESI    35 AND NAME   HA)      7.000 7.000 0.000 
+ SELRPN:      1 atoms have been selected out of    834
+ NOE>  ASSI  (RESI     9 AND NAME   CZ) 
+ SELRPN:      1 atoms have been selected out of    834
+ SELRPN>      (RESI    14 AND NAME  HG*)      9.400 9.400 0.000 
+ SELRPN:      6 atoms have been selected out of    834
+ NOE>  ASSI  (RESI     9 AND NAME   CZ) 
+ SELRPN:      1 atoms have been selected out of    834
+ SELRPN>      (RESI    35 AND NAME   HA)      7.000 7.000 0.000 
+ SELRPN:      1 atoms have been selected out of    834
+ NOE>  ASSI  (RESI     9 AND NAME   CZ) 
+ SELRPN:      1 atoms have been selected out of    834
+ SELRPN>      (RESI    35 AND NAME   HN)      7.000 7.000 0.000 
+ SELRPN:      1 atoms have been selected out of    834
+ NOE>  ASSI  (RESI     9 AND NAME   CZ) 
+ SELRPN:      1 atoms have been selected out of    834
+ SELRPN>      (RESI    35 AND NAME  HB#)      8.000 8.000 0.000 
+ SELRPN:      2 atoms have been selected out of    834
+ NOE>  ASSI  (RESI     9 AND NAME   HA) 
+ SELRPN:      1 atoms have been selected out of    834
+ SELRPN>      (RESI    14 AND NAME  HG*)      7.400 7.400 0.000 
+ SELRPN:      6 atoms have been selected out of    834
+ NOE>  ASSI  (RESI     9 AND NAME   HN) 
+ SELRPN:      1 atoms have been selected out of    834
+ SELRPN>      (RESI    10 AND NAME   HN)      3.000 3.000 0.000 
+ SELRPN:      1 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    10 AND NAME   HN) 
+ SELRPN:      1 atoms have been selected out of    834
+ SELRPN>      (RESI    10 AND NAME  HB#)      3.600 3.600 0.000 
+ SELRPN:      2 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    10 AND NAME   HN) 
+ SELRPN:      1 atoms have been selected out of    834
+ SELRPN>      (RESI    11 AND NAME   HN)      3.000 3.000 0.000 
+ SELRPN:      1 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    11 AND NAME   HA) 
+ SELRPN:      1 atoms have been selected out of    834
+ SELRPN>      (RESI    12 AND NAME   HA)      4.000 4.000 0.000 
+ SELRPN:      1 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    11 AND NAME   HN) 
+ SELRPN:      1 atoms have been selected out of    834
+ SELRPN>      (RESI    11 AND NAME  HB#)      3.600 3.600 0.000 
+ SELRPN:      2 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    11 AND NAME   HN) 
+ SELRPN:      1 atoms have been selected out of    834
+ SELRPN>      (RESI    14 AND NAME  HG*)      7.400 7.400 0.000 
+ SELRPN:      6 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    11 AND NAME  HB#) 
+ SELRPN:      2 atoms have been selected out of    834
+ SELRPN>      (RESI    14 AND NAME   HN)      6.000 6.000 0.000 
+ SELRPN:      1 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    11 AND NAME  HB#) 
+ SELRPN:      2 atoms have been selected out of    834
+ SELRPN>      (RESI    14 AND NAME  HG*)      8.400 8.400 0.000 
+ SELRPN:      6 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    13 AND NAME   HN) 
+ SELRPN:      1 atoms have been selected out of    834
+ SELRPN>      (RESI    13 AND NAME  HB#)      3.600 3.600 0.000 
+ SELRPN:      2 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    13 AND NAME   HN) 
+ SELRPN:      1 atoms have been selected out of    834
+ SELRPN>      (RESI    14 AND NAME   HN)      3.000 3.000 0.000 
+ SELRPN:      1 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    13 AND NAME   HN) 
+ SELRPN:      1 atoms have been selected out of    834
+ SELRPN>      (RESI    14 AND NAME  HG*)      7.400 7.400 0.000 
+ SELRPN:      6 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    14 AND NAME   HA) 
+ SELRPN:      1 atoms have been selected out of    834
+ SELRPN>      (RESI    15 AND NAME   HN)      3.000 3.000 0.000 
+ SELRPN:      1 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    14 AND NAME   HN) 
+ SELRPN:      1 atoms have been selected out of    834
+ SELRPN>      (RESI    14 AND NAME   HB)      3.000 3.000 0.000 
+ SELRPN:      1 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    14 AND NAME   HN) 
+ SELRPN:      1 atoms have been selected out of    834
+ SELRPN>      (RESI    15 AND NAME   HN)      4.000 4.000 0.000 
+ SELRPN:      1 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    14 AND NAME  HG*) 
+ SELRPN:      6 atoms have been selected out of    834
+ SELRPN>      (RESI    15 AND NAME   HN)      7.400 7.400 0.000 
+ SELRPN:      1 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    15 AND NAME   CG) 
+ SELRPN:      1 atoms have been selected out of    834
+ SELRPN>      (RESI    16 AND NAME  HB#)      8.000 8.000 0.000 
+ SELRPN:      2 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    15 AND NAME   HN) 
+ SELRPN:      1 atoms have been selected out of    834
+ SELRPN>      (RESI    15 AND NAME  HB#)      3.600 3.600 0.000 
+ SELRPN:      2 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    16 AND NAME   HA) 
+ SELRPN:      1 atoms have been selected out of    834
+ SELRPN>      (RESI    17 AND NAME   HN)      2.500 2.500 0.000 
+ SELRPN:      1 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    16 AND NAME   HN) 
+ SELRPN:      1 atoms have been selected out of    834
+ SELRPN>      (RESI    16 AND NAME  HB#)      3.600 3.600 0.000 
+ SELRPN:      2 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    16 AND NAME  HB#) 
+ SELRPN:      2 atoms have been selected out of    834
+ SELRPN>      (RESI    35 AND NAME   HN)      6.000 6.000 0.000 
+ SELRPN:      1 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    16 AND NAME  HB#) 
+ SELRPN:      2 atoms have been selected out of    834
+ SELRPN>      (RESI    36 AND NAME   HN)      6.000 6.000 0.000 
+ SELRPN:      1 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    18 AND NAME   HN) 
+ SELRPN:      1 atoms have been selected out of    834
+ SELRPN>      (RESI    19 AND NAME   HN)      4.000 4.000 0.000 
+ SELRPN:      1 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    19 AND NAME   HA) 
+ SELRPN:      1 atoms have been selected out of    834
+ SELRPN>      (RESI    20 AND NAME   HN)      2.500 2.500 0.000 
+ SELRPN:      1 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    19 AND NAME   HN) 
+ SELRPN:      1 atoms have been selected out of    834
+ SELRPN>      (RESI    33 AND NAME  ND2)      6.000 6.000 0.000 
+ SELRPN:      1 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    19 AND NAME  HB#) 
+ SELRPN:      2 atoms have been selected out of    834
+ SELRPN>      (RESI    33 AND NAME  ND2)      7.000 7.000 0.000 
+ SELRPN:      1 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    20 AND NAME   HA) 
+ SELRPN:      1 atoms have been selected out of    834
+ SELRPN>      (RESI    21 AND NAME   HN)      2.500 2.500 0.000 
+ SELRPN:      1 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    20 AND NAME  HB#) 
+ SELRPN:      2 atoms have been selected out of    834
+ SELRPN>      (RESI    23 AND NAME  HD2)      6.000 6.000 0.000 
+ SELRPN:      1 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    21 AND NAME   HA) 
+ SELRPN:      1 atoms have been selected out of    834
+ SELRPN>      (RESI    22 AND NAME  HD#)      4.000 4.000 0.000 
+ SELRPN:      2 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    21 AND NAME   HN) 
+ SELRPN:      1 atoms have been selected out of    834
+ SELRPN>      (RESI    22 AND NAME  HD#)      5.000 5.000 0.000 
+ SELRPN:      2 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    21 AND NAME   HN) 
+ SELRPN:      1 atoms have been selected out of    834
+ SELRPN>      (RESI    33 AND NAME   HA)      4.000 4.000 0.000 
+ SELRPN:      1 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    21 AND NAME   HN) 
+ SELRPN:      1 atoms have been selected out of    834
+ SELRPN>      (RESI    33 AND NAME  HB#)      6.000 6.000 0.000 
+ SELRPN:      2 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    21 AND NAME  HB#) 
+ SELRPN:      2 atoms have been selected out of    834
+ SELRPN>      (RESI    33 AND NAME   HA)      6.000 6.000 0.000 
+ SELRPN:      1 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    21 AND NAME  HB#) 
+ SELRPN:      2 atoms have been selected out of    834
+ SELRPN>      (RESI    34 AND NAME   HN)      6.000 6.000 0.000 
+ SELRPN:      1 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    21 AND NAME  ND2) 
+ SELRPN:      1 atoms have been selected out of    834
+ SELRPN>      (RESI    23 AND NAME  HE1)      6.000 6.000 0.000 
+ SELRPN:      1 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    21 AND NAME  ND2) 
+ SELRPN:      1 atoms have been selected out of    834
+ SELRPN>      (RESI    34 AND NAME   HN)      6.000 6.000 0.000 
+ SELRPN:      1 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    22 AND NAME   HA) 
+ SELRPN:      1 atoms have been selected out of    834
+ SELRPN>      (RESI    23 AND NAME   HN)      2.500 2.500 0.000 
+ SELRPN:      1 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    22 AND NAME   HA) 
+ SELRPN:      1 atoms have been selected out of    834
+ SELRPN>      (RESI    30 AND NAME HG2#)      6.000 6.000 0.000 
+ SELRPN:      3 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    22 AND NAME   HA) 
+ SELRPN:      1 atoms have been selected out of    834
+ SELRPN>      (RESI    32 AND NAME  HA#)      5.000 5.000 0.000 
+ SELRPN:      2 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    22 AND NAME  HB#) 
+ SELRPN:      2 atoms have been selected out of    834
+ SELRPN>      (RESI    30 AND NAME HG2#)      7.000 7.000 0.000 
+ SELRPN:      3 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    22 AND NAME  HB#) 
+ SELRPN:      2 atoms have been selected out of    834
+ SELRPN>      (RESI    55 AND NAME   HA)      6.000 6.000 0.000 
+ SELRPN:      1 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    23 AND NAME   HA) 
+ SELRPN:      1 atoms have been selected out of    834
+ SELRPN>      (RESI    24 AND NAME   HN)      2.500 2.500 0.000 
+ SELRPN:      1 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    23 AND NAME   HA) 
+ SELRPN:      1 atoms have been selected out of    834
+ SELRPN>      (RESI    50 AND NAME  HD*)      7.400 7.400 0.000 
+ SELRPN:      6 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    23 AND NAME   HA) 
+ SELRPN:      1 atoms have been selected out of    834
+ SELRPN>      (RESI    53 AND NAME   HA)      4.000 4.000 0.000 
+ SELRPN:      1 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    23 AND NAME   HA) 
+ SELRPN:      1 atoms have been selected out of    834
+ SELRPN>      (RESI    54 AND NAME   HN)      4.000 4.000 0.000 
+ SELRPN:      1 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    23 AND NAME   HN) 
+ SELRPN:      1 atoms have been selected out of    834
+ SELRPN>      (RESI    30 AND NAME HG2#)      6.000 6.000 0.000 
+ SELRPN:      3 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    23 AND NAME   HN) 
+ SELRPN:      1 atoms have been selected out of    834
+ SELRPN>      (RESI    31 AND NAME   HN)      4.000 4.000 0.000 
+ SELRPN:      1 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    23 AND NAME  HB#) 
+ SELRPN:      2 atoms have been selected out of    834
+ SELRPN>      (RESI    50 AND NAME  HD*)      8.400 8.400 0.000 
+ SELRPN:      6 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    23 AND NAME  HD2) 
+ SELRPN:      1 atoms have been selected out of    834
+ SELRPN>      (RESI    37 AND NAME  HE#)      7.400 7.400 0.000 
+ SELRPN:      2 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    23 AND NAME  HD2) 
+ SELRPN:      1 atoms have been selected out of    834
+ SELRPN>      (RESI    50 AND NAME  HD*)      7.400 7.400 0.000 
+ SELRPN:      6 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    23 AND NAME  HE1) 
+ SELRPN:      1 atoms have been selected out of    834
+ SELRPN>      (RESI    33 AND NAME   HA)      5.000 5.000 0.000 
+ SELRPN:      1 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    23 AND NAME  HE1) 
+ SELRPN:      1 atoms have been selected out of    834
+ SELRPN>      (RESI    34 AND NAME   HA)      5.000 5.000 0.000 
+ SELRPN:      1 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    23 AND NAME  HE1) 
+ SELRPN:      1 atoms have been selected out of    834
+ SELRPN>      (RESI    34 AND NAME   HN)      5.000 5.000 0.000 
+ SELRPN:      1 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    23 AND NAME  HE1) 
+ SELRPN:      1 atoms have been selected out of    834
+ SELRPN>      (RESI    34 AND NAME  HB#)      6.000 6.000 0.000 
+ SELRPN:      2 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    24 AND NAME   HA) 
+ SELRPN:      1 atoms have been selected out of    834
+ SELRPN>      (RESI    25 AND NAME   HN)      2.500 2.500 0.000 
+ SELRPN:      1 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    24 AND NAME   HA) 
+ SELRPN:      1 atoms have been selected out of    834
+ SELRPN>      (RESI    30 AND NAME   HA)      4.000 4.000 0.000 
+ SELRPN:      1 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    24 AND NAME   HN) 
+ SELRPN:      1 atoms have been selected out of    834
+ SELRPN>      (RESI    24 AND NAME  HB#)      3.600 3.600 0.000 
+ SELRPN:      2 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    24 AND NAME   HN) 
+ SELRPN:      1 atoms have been selected out of    834
+ SELRPN>      (RESI    50 AND NAME  HD*)      7.400 7.400 0.000 
+ SELRPN:      6 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    24 AND NAME   HN) 
+ SELRPN:      1 atoms have been selected out of    834
+ SELRPN>      (RESI    52 AND NAME   HN)      4.000 4.000 0.000 
+ SELRPN:      1 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    24 AND NAME   HN) 
+ SELRPN:      1 atoms have been selected out of    834
+ SELRPN>      (RESI    53 AND NAME   HA)      4.000 4.000 0.000 
+ SELRPN:      1 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    25 AND NAME   HN) 
+ SELRPN:      1 atoms have been selected out of    834
+ SELRPN>      (RESI    29 AND NAME   HN)      4.000 4.000 0.000 
+ SELRPN:      1 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    25 AND NAME  HA#) 
+ SELRPN:      2 atoms have been selected out of    834
+ SELRPN>      (RESI    37 AND NAME   CZ)      8.000 8.000 0.000 
+ SELRPN:      1 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    25 AND NAME  HA#) 
+ SELRPN:      2 atoms have been selected out of    834
+ SELRPN>      (RESI    48 AND NAME HG2#)      7.000 7.000 0.000 
+ SELRPN:      3 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    25 AND NAME  HA#) 
+ SELRPN:      2 atoms have been selected out of    834
+ SELRPN>      (RESI    50 AND NAME   HA)      5.000 5.000 0.000 
+ SELRPN:      1 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    26 AND NAME   HA) 
+ SELRPN:      1 atoms have been selected out of    834
+ SELRPN>      (RESI    28 AND NAME   HN)      4.000 4.000 0.000 
+ SELRPN:      1 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    26 AND NAME   HA) 
+ SELRPN:      1 atoms have been selected out of    834
+ SELRPN>      (RESI    51 AND NAME  HB#)      6.000 6.000 0.000 
+ SELRPN:      2 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    26 AND NAME   HN) 
+ SELRPN:      1 atoms have been selected out of    834
+ SELRPN>      (RESI    26 AND NAME  HB#)      3.600 3.600 0.000 
+ SELRPN:      2 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    26 AND NAME   HN) 
+ SELRPN:      1 atoms have been selected out of    834
+ SELRPN>      (RESI    27 AND NAME   HN)      4.000 4.000 0.000 
+ SELRPN:      1 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    26 AND NAME   HN) 
+ SELRPN:      1 atoms have been selected out of    834
+ SELRPN>      (RESI    48 AND NAME   HB)      5.000 5.000 0.000 
+ SELRPN:      1 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    26 AND NAME   HN) 
+ SELRPN:      1 atoms have been selected out of    834
+ SELRPN>      (RESI    48 AND NAME HG2#)      6.000 6.000 0.000 
+ SELRPN:      3 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    26 AND NAME   HN) 
+ SELRPN:      1 atoms have been selected out of    834
+ SELRPN>      (RESI    49 AND NAME   HN)      4.000 4.000 0.000 
+ SELRPN:      1 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    26 AND NAME  HB#) 
+ SELRPN:      2 atoms have been selected out of    834
+ SELRPN>      (RESI    37 AND NAME  HE#)      8.400 8.400 0.000 
+ SELRPN:      2 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    27 AND NAME   HN) 
+ SELRPN:      1 atoms have been selected out of    834
+ SELRPN>      (RESI    28 AND NAME   HN)      3.000 3.000 0.000 
+ SELRPN:      1 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    27 AND NAME   HN) 
+ SELRPN:      1 atoms have been selected out of    834
+ SELRPN>      (RESI    29 AND NAME   HN)      4.000 4.000 0.000 
+ SELRPN:      1 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    27 AND NAME   HN) 
+ SELRPN:      1 atoms have been selected out of    834
+ SELRPN>      (RESI    48 AND NAME HG2#)      6.000 6.000 0.000 
+ SELRPN:      3 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    28 AND NAME   HN) 
+ SELRPN:      1 atoms have been selected out of    834
+ SELRPN>      (RESI    29 AND NAME   HN)      3.000 3.000 0.000 
+ SELRPN:      1 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    29 AND NAME   HA) 
+ SELRPN:      1 atoms have been selected out of    834
+ SELRPN>      (RESI    30 AND NAME   HN)      3.000 3.000 0.000 
+ SELRPN:      1 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    29 AND NAME   HN) 
+ SELRPN:      1 atoms have been selected out of    834
+ SELRPN>      (RESI    29 AND NAME  HB#)      3.600 3.600 0.000 
+ SELRPN:      2 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    30 AND NAME   HA) 
+ SELRPN:      1 atoms have been selected out of    834
+ SELRPN>      (RESI    30 AND NAME HG2#)      3.100 3.100 0.000 
+ SELRPN:      3 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    30 AND NAME HG2#) 
+ SELRPN:      3 atoms have been selected out of    834
+ SELRPN>      (RESI    31 AND NAME   HN)      6.000 6.000 0.000 
+ SELRPN:      1 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    30 AND NAME HG2#) 
+ SELRPN:      3 atoms have been selected out of    834
+ SELRPN>      (RESI    32 AND NAME  HA#)      7.000 7.000 0.000 
+ SELRPN:      2 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    30 AND NAME HG2#) 
+ SELRPN:      3 atoms have been selected out of    834
+ SELRPN>      (RESI    55 AND NAME   HA)      6.000 6.000 0.000 
+ SELRPN:      1 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    30 AND NAME HG2#) 
+ SELRPN:      3 atoms have been selected out of    834
+ SELRPN>      (RESI    55 AND NAME   HN)      6.000 6.000 0.000 
+ SELRPN:      1 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    30 AND NAME HG2#) 
+ SELRPN:      3 atoms have been selected out of    834
+ SELRPN>      (RESI    55 AND NAME  HB#)      7.000 7.000 0.000 
+ SELRPN:      2 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    30 AND NAME HG2#) 
+ SELRPN:      3 atoms have been selected out of    834
+ SELRPN>      (RESI    56 AND NAME   HN)      6.000 6.000 0.000 
+ SELRPN:      1 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    31 AND NAME   HN) 
+ SELRPN:      1 atoms have been selected out of    834
+ SELRPN>      (RESI    31 AND NAME  HB#)      3.600 3.600 0.000 
+ SELRPN:      2 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    31 AND NAME  HB#) 
+ SELRPN:      2 atoms have been selected out of    834
+ SELRPN>      (RESI    36 AND NAME  HB#)      7.000 7.000 0.000 
+ SELRPN:      3 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    31 AND NAME  HB#) 
+ SELRPN:      2 atoms have been selected out of    834
+ SELRPN>      (RESI    37 AND NAME  HE#)      8.400 8.400 0.000 
+ SELRPN:      2 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    31 AND NAME  HE#) 
+ SELRPN:      2 atoms have been selected out of    834
+ SELRPN>      (RESI    36 AND NAME  HB#)      8.400 8.400 0.000 
+ SELRPN:      3 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    31 AND NAME  HE#) 
+ SELRPN:      2 atoms have been selected out of    834
+ SELRPN>      (RESI    37 AND NAME   HA)      7.400 7.400 0.000 
+ SELRPN:      1 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    31 AND NAME  HE#) 
+ SELRPN:      2 atoms have been selected out of    834
+ SELRPN>      (RESI    40 AND NAME  HB#)      8.400 8.400 0.000 
+ SELRPN:      3 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    31 AND NAME  HE#) 
+ SELRPN:      2 atoms have been selected out of    834
+ SELRPN>      (RESI    48 AND NAME HG2#)      8.400 8.400 0.000 
+ SELRPN:      3 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    32 AND NAME   HN) 
+ SELRPN:      1 atoms have been selected out of    834
+ SELRPN>      (RESI    33 AND NAME   HN)      4.000 4.000 0.000 
+ SELRPN:      1 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    32 AND NAME   HN) 
+ SELRPN:      1 atoms have been selected out of    834
+ SELRPN>      (RESI    36 AND NAME  HB#)      6.000 6.000 0.000 
+ SELRPN:      3 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    33 AND NAME   HA) 
+ SELRPN:      1 atoms have been selected out of    834
+ SELRPN>      (RESI    34 AND NAME   HN)      2.500 2.500 0.000 
+ SELRPN:      1 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    33 AND NAME   HN) 
+ SELRPN:      1 atoms have been selected out of    834
+ SELRPN>      (RESI    34 AND NAME   HN)      4.000 4.000 0.000 
+ SELRPN:      1 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    33 AND NAME   HN) 
+ SELRPN:      1 atoms have been selected out of    834
+ SELRPN>      (RESI    36 AND NAME   HN)      4.000 4.000 0.000 
+ SELRPN:      1 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    33 AND NAME   HN) 
+ SELRPN:      1 atoms have been selected out of    834
+ SELRPN>      (RESI    36 AND NAME  HB#)      6.000 6.000 0.000 
+ SELRPN:      3 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    33 AND NAME   HN) 
+ SELRPN:      1 atoms have been selected out of    834
+ SELRPN>      (RESI    37 AND NAME   HN)      4.000 4.000 0.000 
+ SELRPN:      1 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    33 AND NAME  HB#) 
+ SELRPN:      2 atoms have been selected out of    834
+ SELRPN>      (RESI    34 AND NAME   HN)      3.500 3.500 0.000 
+ SELRPN:      1 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    33 AND NAME  HB#) 
+ SELRPN:      2 atoms have been selected out of    834
+ SELRPN>      (RESI    35 AND NAME   HN)      6.000 6.000 0.000 
+ SELRPN:      1 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    34 AND NAME   HA) 
+ SELRPN:      1 atoms have been selected out of    834
+ SELRPN>      (RESI    37 AND NAME   HN)      4.000 4.000 0.000 
+ SELRPN:      1 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    34 AND NAME   HA) 
+ SELRPN:      1 atoms have been selected out of    834
+ SELRPN>      (RESI    37 AND NAME  HB#)      6.000 6.000 0.000 
+ SELRPN:      2 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    34 AND NAME   HN) 
+ SELRPN:      1 atoms have been selected out of    834
+ SELRPN>      (RESI    35 AND NAME   HN)      3.000 3.000 0.000 
+ SELRPN:      1 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    34 AND NAME  HB#) 
+ SELRPN:      2 atoms have been selected out of    834
+ SELRPN>      (RESI    35 AND NAME   HN)      4.000 4.000 0.000 
+ SELRPN:      1 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    35 AND NAME   HA) 
+ SELRPN:      1 atoms have been selected out of    834
+ SELRPN>      (RESI    38 AND NAME   HN)      4.000 4.000 0.000 
+ SELRPN:      1 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    35 AND NAME   HN) 
+ SELRPN:      1 atoms have been selected out of    834
+ SELRPN>      (RESI    36 AND NAME   HN)      3.000 3.000 0.000 
+ SELRPN:      1 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    35 AND NAME  HB#) 
+ SELRPN:      2 atoms have been selected out of    834
+ SELRPN>      (RESI    36 AND NAME   HN)      4.000 4.000 0.000 
+ SELRPN:      1 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    36 AND NAME   HA) 
+ SELRPN:      1 atoms have been selected out of    834
+ SELRPN>      (RESI    39 AND NAME   HN)      4.000 4.000 0.000 
+ SELRPN:      1 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    36 AND NAME   HA) 
+ SELRPN:      1 atoms have been selected out of    834
+ SELRPN>      (RESI    39 AND NAME  HB#)      6.000 6.000 0.000 
+ SELRPN:      2 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    36 AND NAME   HN) 
+ SELRPN:      1 atoms have been selected out of    834
+ SELRPN>      (RESI    37 AND NAME   HN)      3.000 3.000 0.000 
+ SELRPN:      1 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    36 AND NAME  HB#) 
+ SELRPN:      3 atoms have been selected out of    834
+ SELRPN>      (RESI    37 AND NAME   HN)      4.000 4.000 0.000 
+ SELRPN:      1 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    36 AND NAME  HB#) 
+ SELRPN:      3 atoms have been selected out of    834
+ SELRPN>      (RESI    39 AND NAME   HN)      6.000 6.000 0.000 
+ SELRPN:      1 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    37 AND NAME   HA) 
+ SELRPN:      1 atoms have been selected out of    834
+ SELRPN>      (RESI    40 AND NAME   HN)      4.000 4.000 0.000 
+ SELRPN:      1 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    37 AND NAME   HA) 
+ SELRPN:      1 atoms have been selected out of    834
+ SELRPN>      (RESI    40 AND NAME  HB#)      6.000 6.000 0.000 
+ SELRPN:      3 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    37 AND NAME   HN) 
+ SELRPN:      1 atoms have been selected out of    834
+ SELRPN>      (RESI    37 AND NAME  HB#)      3.100 3.100 0.000 
+ SELRPN:      2 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    37 AND NAME   HN) 
+ SELRPN:      1 atoms have been selected out of    834
+ SELRPN>      (RESI    38 AND NAME   HN)      3.000 3.000 0.000 
+ SELRPN:      1 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    37 AND NAME  HE#) 
+ SELRPN:      2 atoms have been selected out of    834
+ SELRPN>      (RESI    38 AND NAME   HN)      7.400 7.400 0.000 
+ SELRPN:      1 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    37 AND NAME  HE#) 
+ SELRPN:      2 atoms have been selected out of    834
+ SELRPN>      (RESI    41 AND NAME  HG*)      9.800 9.800 0.000 
+ SELRPN:      6 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    37 AND NAME  HE#) 
+ SELRPN:      2 atoms have been selected out of    834
+ SELRPN>      (RESI    48 AND NAME HG2#)      8.400 8.400 0.000 
+ SELRPN:      3 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    37 AND NAME  HE#) 
+ SELRPN:      2 atoms have been selected out of    834
+ SELRPN>      (RESI    49 AND NAME   HA)      7.400 7.400 0.000 
+ SELRPN:      1 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    37 AND NAME  HE#) 
+ SELRPN:      2 atoms have been selected out of    834
+ SELRPN>      (RESI    50 AND NAME   HN)      7.400 7.400 0.000 
+ SELRPN:      1 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    37 AND NAME  HE#) 
+ SELRPN:      2 atoms have been selected out of    834
+ SELRPN>      (RESI    50 AND NAME  HD*)      9.800 9.800 0.000 
+ SELRPN:      6 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    38 AND NAME   HA) 
+ SELRPN:      1 atoms have been selected out of    834
+ SELRPN>      (RESI    41 AND NAME   HB)      5.000 5.000 0.000 
+ SELRPN:      1 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    38 AND NAME   HA) 
+ SELRPN:      1 atoms have been selected out of    834
+ SELRPN>      (RESI    41 AND NAME   HN)      4.000 4.000 0.000 
+ SELRPN:      1 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    38 AND NAME   HA) 
+ SELRPN:      1 atoms have been selected out of    834
+ SELRPN>      (RESI    41 AND NAME  HG*)      7.400 7.400 0.000 
+ SELRPN:      6 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    38 AND NAME   HN) 
+ SELRPN:      1 atoms have been selected out of    834
+ SELRPN>      (RESI    39 AND NAME   HN)      3.000 3.000 0.000 
+ SELRPN:      1 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    39 AND NAME   HA) 
+ SELRPN:      1 atoms have been selected out of    834
+ SELRPN>      (RESI    42 AND NAME   HN)      4.000 4.000 0.000 
+ SELRPN:      1 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    39 AND NAME   HN) 
+ SELRPN:      1 atoms have been selected out of    834
+ SELRPN>      (RESI    39 AND NAME  HB#)      3.600 3.600 0.000 
+ SELRPN:      2 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    39 AND NAME   HN) 
+ SELRPN:      1 atoms have been selected out of    834
+ SELRPN>      (RESI    40 AND NAME   HN)      3.000 3.000 0.000 
+ SELRPN:      1 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    39 AND NAME  HB#) 
+ SELRPN:      2 atoms have been selected out of    834
+ SELRPN>      (RESI    40 AND NAME   HA)      6.000 6.000 0.000 
+ SELRPN:      1 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    40 AND NAME   HA) 
+ SELRPN:      1 atoms have been selected out of    834
+ SELRPN>      (RESI    43 AND NAME   HN)      4.000 4.000 0.000 
+ SELRPN:      1 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    40 AND NAME   HN) 
+ SELRPN:      1 atoms have been selected out of    834
+ SELRPN>      (RESI    41 AND NAME   HN)      3.000 3.000 0.000 
+ SELRPN:      1 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    40 AND NAME   HN) 
+ SELRPN:      1 atoms have been selected out of    834
+ SELRPN>      (RESI    42 AND NAME   HN)      4.000 4.000 0.000 
+ SELRPN:      1 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    40 AND NAME  HB#) 
+ SELRPN:      3 atoms have been selected out of    834
+ SELRPN>      (RESI    41 AND NAME   HN)      4.000 4.000 0.000 
+ SELRPN:      1 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    40 AND NAME  HB#) 
+ SELRPN:      3 atoms have been selected out of    834
+ SELRPN>      (RESI    48 AND NAME HD1#)      7.000 7.000 0.000 
+ SELRPN:      3 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    41 AND NAME   HA) 
+ SELRPN:      1 atoms have been selected out of    834
+ SELRPN>      (RESI    44 AND NAME   HN)      4.000 4.000 0.000 
+ SELRPN:      1 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    41 AND NAME   HA) 
+ SELRPN:      1 atoms have been selected out of    834
+ SELRPN>      (RESI    48 AND NAME   HB)      5.000 5.000 0.000 
+ SELRPN:      1 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    41 AND NAME   HB) 
+ SELRPN:      1 atoms have been selected out of    834
+ SELRPN>      (RESI    42 AND NAME   HN)      3.000 3.000 0.000 
+ SELRPN:      1 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    41 AND NAME   HN) 
+ SELRPN:      1 atoms have been selected out of    834
+ SELRPN>      (RESI    41 AND NAME   HB)      2.500 2.500 0.000 
+ SELRPN:      1 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    41 AND NAME   HN) 
+ SELRPN:      1 atoms have been selected out of    834
+ SELRPN>      (RESI    42 AND NAME   HN)      3.000 3.000 0.000 
+ SELRPN:      1 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    41 AND NAME   HN) 
+ SELRPN:      1 atoms have been selected out of    834
+ SELRPN>      (RESI    48 AND NAME HG2#)      6.000 6.000 0.000 
+ SELRPN:      3 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    41 AND NAME  HG*) 
+ SELRPN:      6 atoms have been selected out of    834
+ SELRPN>      (RESI    42 AND NAME   HA)      7.400 7.400 0.000 
+ SELRPN:      1 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    41 AND NAME  HG*) 
+ SELRPN:      6 atoms have been selected out of    834
+ SELRPN>      (RESI    46 AND NAME   HN)      7.400 7.400 0.000 
+ SELRPN:      1 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    41 AND NAME  HG*) 
+ SELRPN:      6 atoms have been selected out of    834
+ SELRPN>      (RESI    46 AND NAME  HA#)      8.400 8.400 0.000 
+ SELRPN:      2 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    41 AND NAME  HG*) 
+ SELRPN:      6 atoms have been selected out of    834
+ SELRPN>      (RESI    48 AND NAME   HB)      7.400 7.400 0.000 
+ SELRPN:      1 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    41 AND NAME  HG*) 
+ SELRPN:      6 atoms have been selected out of    834
+ SELRPN>      (RESI    49 AND NAME   HA)      7.400 7.400 0.000 
+ SELRPN:      1 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    42 AND NAME   HN) 
+ SELRPN:      1 atoms have been selected out of    834
+ SELRPN>      (RESI    42 AND NAME  HB#)      3.600 3.600 0.000 
+ SELRPN:      2 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    42 AND NAME   HN) 
+ SELRPN:      1 atoms have been selected out of    834
+ SELRPN>      (RESI    43 AND NAME   HN)      4.000 4.000 0.000 
+ SELRPN:      1 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    43 AND NAME   HN) 
+ SELRPN:      1 atoms have been selected out of    834
+ SELRPN>      (RESI    43 AND NAME  HB#)      3.100 3.100 0.000 
+ SELRPN:      2 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    43 AND NAME   HN) 
+ SELRPN:      1 atoms have been selected out of    834
+ SELRPN>      (RESI    44 AND NAME   HN)      4.000 4.000 0.000 
+ SELRPN:      1 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    44 AND NAME   HA) 
+ SELRPN:      1 atoms have been selected out of    834
+ SELRPN>      (RESI    48 AND NAME HG2#)      6.000 6.000 0.000 
+ SELRPN:      3 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    44 AND NAME   HN) 
+ SELRPN:      1 atoms have been selected out of    834
+ SELRPN>      (RESI    44 AND NAME  HB#)      3.600 3.600 0.000 
+ SELRPN:      2 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    44 AND NAME   HN) 
+ SELRPN:      1 atoms have been selected out of    834
+ SELRPN>      (RESI    45 AND NAME   HN)      4.000 4.000 0.000 
+ SELRPN:      1 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    44 AND NAME  HB#) 
+ SELRPN:      2 atoms have been selected out of    834
+ SELRPN>      (RESI    48 AND NAME HD1#)      7.000 7.000 0.000 
+ SELRPN:      3 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    44 AND NAME  HB#) 
+ SELRPN:      2 atoms have been selected out of    834
+ SELRPN>      (RESI    48 AND NAME HG2#)      7.000 7.000 0.000 
+ SELRPN:      3 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    45 AND NAME   HN) 
+ SELRPN:      1 atoms have been selected out of    834
+ SELRPN>      (RESI    46 AND NAME   HN)      4.000 4.000 0.000 
+ SELRPN:      1 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    46 AND NAME   HN) 
+ SELRPN:      1 atoms have been selected out of    834
+ SELRPN>      (RESI    47 AND NAME   HN)      3.000 3.000 0.000 
+ SELRPN:      1 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    47 AND NAME   HN) 
+ SELRPN:      1 atoms have been selected out of    834
+ SELRPN>      (RESI    47 AND NAME  HB#)      3.600 3.600 0.000 
+ SELRPN:      2 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    47 AND NAME   HN) 
+ SELRPN:      1 atoms have been selected out of    834
+ SELRPN>      (RESI    48 AND NAME   HN)      4.000 4.000 0.000 
+ SELRPN:      1 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    48 AND NAME   HA) 
+ SELRPN:      1 atoms have been selected out of    834
+ SELRPN>      (RESI    48 AND NAME HD1#)      4.000 4.000 0.000 
+ SELRPN:      3 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    48 AND NAME   HA) 
+ SELRPN:      1 atoms have been selected out of    834
+ SELRPN>      (RESI    48 AND NAME HG2#)      3.100 3.100 0.000 
+ SELRPN:      3 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    48 AND NAME   HA) 
+ SELRPN:      1 atoms have been selected out of    834
+ SELRPN>      (RESI    49 AND NAME   HN)      3.000 3.000 0.000 
+ SELRPN:      1 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    48 AND NAME   HB) 
+ SELRPN:      1 atoms have been selected out of    834
+ SELRPN>      (RESI    48 AND NAME HD1#)      3.100 3.100 0.000 
+ SELRPN:      3 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    48 AND NAME HG2#) 
+ SELRPN:      3 atoms have been selected out of    834
+ SELRPN>      (RESI    49 AND NAME   HN)      5.000 5.000 0.000 
+ SELRPN:      1 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    49 AND NAME   HA) 
+ SELRPN:      1 atoms have been selected out of    834
+ SELRPN>      (RESI    50 AND NAME   HN)      3.000 3.000 0.000 
+ SELRPN:      1 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    49 AND NAME  HB#) 
+ SELRPN:      2 atoms have been selected out of    834
+ SELRPN>      (RESI    50 AND NAME   HN)      4.000 4.000 0.000 
+ SELRPN:      1 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    50 AND NAME   HA) 
+ SELRPN:      1 atoms have been selected out of    834
+ SELRPN>      (RESI    50 AND NAME  HD*)      4.200 4.200 0.000 
+ SELRPN:      6 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    50 AND NAME   HA) 
+ SELRPN:      1 atoms have been selected out of    834
+ SELRPN>      (RESI    51 AND NAME   HN)      2.500 2.500 0.000 
+ SELRPN:      1 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    50 AND NAME   HN) 
+ SELRPN:      1 atoms have been selected out of    834
+ SELRPN>      (RESI    50 AND NAME  HB#)      3.600 3.600 0.000 
+ SELRPN:      2 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    50 AND NAME  HD*) 
+ SELRPN:      6 atoms have been selected out of    834
+ SELRPN>      (RESI    51 AND NAME   HN)      7.400 7.400 0.000 
+ SELRPN:      1 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    50 AND NAME  HD*) 
+ SELRPN:      6 atoms have been selected out of    834
+ SELRPN>      (RESI    53 AND NAME   HA)      7.400 7.400 0.000 
+ SELRPN:      1 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    51 AND NAME   HN) 
+ SELRPN:      1 atoms have been selected out of    834
+ SELRPN>      (RESI    51 AND NAME  HB#)      3.600 3.600 0.000 
+ SELRPN:      2 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    51 AND NAME   HN) 
+ SELRPN:      1 atoms have been selected out of    834
+ SELRPN>      (RESI    52 AND NAME   HN)      3.000 3.000 0.000 
+ SELRPN:      1 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    52 AND NAME   HA) 
+ SELRPN:      1 atoms have been selected out of    834
+ SELRPN>      (RESI    53 AND NAME   HN)      3.000 3.000 0.000 
+ SELRPN:      1 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    52 AND NAME  HE1) 
+ SELRPN:      1 atoms have been selected out of    834
+ SELRPN>      (RESI    56 AND NAME   HA)      5.000 5.000 0.000 
+ SELRPN:      1 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    53 AND NAME   HA) 
+ SELRPN:      1 atoms have been selected out of    834
+ SELRPN>      (RESI    54 AND NAME   HN)      2.500 2.500 0.000 
+ SELRPN:      1 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    55 AND NAME   HA) 
+ SELRPN:      1 atoms have been selected out of    834
+ SELRPN>      (RESI    56 AND NAME   HN)      2.500 2.500 0.000 
+ SELRPN:      1 atoms have been selected out of    834
+ NOE>  ASSI  (RESI    55 AND NAME  HB#) 
+ SELRPN:      2 atoms have been selected out of    834
+ SELRPN>      (RESI    56 AND NAME   HN)      4.000 4.000 0.000 
+ SELRPN:      1 atoms have been selected out of    834
+ NOE>end 
+ X-PLOR> 
+ X-PLOR>coord disp=refe @/Users/geerten/Programs/queen/example/data/sequence/protein.pdb 
+ COOR: coordinates read into REFE set
+ ASSFIL: file /Users/geerten/Programs/queen/example/data/sequence/protein.pdb opened.
+ COOR>REMARK FILENAME="/home/snabuurs/projects/queen/1bus/data/sequence/protein.pdb" 
+ COOR>REMARK   file protein-allhdg-ucl.param  version UCL  date 07-JUL-01 
+ COOR>REMARK   for file protein-allhdg-ucl.top  version UCL  date 14-MAR-00 
+ COOR>REMARK   for file protein-allhdg-dih-ucl.top  version UCL  date 07-JUL-01 
+ COOR>REMARK   Geometric energy function parameters for distance geometry and 
+ COOR>REMARK   simulated annealing. 
+ COOR>REMARK   Original author: Michael Nilges, EMBL Heidelberg 
+ COOR>REMARK   Modifications: Mark A. Williams, UCL London 
+ COOR>REMARK DATE:14-Aug-03  19:08:10       created by user: 
+ COOR>ATOM      1  HA1 GLY     1      -7.233   0.914  -0.069  1.00  0.00 
+ COOR>ATOM      2  HA2 GLY     1      -6.063   0.426  -1.285  1.00  0.00 
+ X-PLOR>flags 
+ FLAGS>  exclude * include bond angle improper vdw noe cdih 
+ FLAGS>end 
+ X-PLOR>mmdg 
+ MMDG>  refe=para 
+ MMDG>  shortest-path-algorithm=auto 
+ MMDG>  writebounds=/Users/geerten/Programs/queen/example/log/d_10350.mtx 
+ ASSFIL: file /Users/geerten/Programs/queen/example/log/d_10350.mtx opened.
+ MMDG>end 
+ DGSMOOT: number of connections:  6036
+ DGSMOOT: using sparse matrix bound smoothing algorithm.
+ DGSMOOT: max. size of network (upper, lower):   166   25
+ MMDG: writing smoothed bounds matrices to binary file. 
+        No metrization or embedding performed. 
+ X-PLOR>stop 
+ HEAP:   maximum use=  1882313 current use=  1060957
+ X-PLOR: total CPU time=      1.3200 s
+ X-PLOR: entry time at 11:06:24 08-Apr-09
+ X-PLOR: exit time at 11:06:24 08-Apr-09

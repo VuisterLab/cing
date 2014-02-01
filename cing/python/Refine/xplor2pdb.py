@@ -14,7 +14,7 @@ from cing.Libs.PyMMLib import MODEL
 from cing.Libs.PyMMLib import PDBFile
 from cing.Libs.PyMMLib import REMARK
 from cing.Libs.PyMMLib import TER
-from cing.core.constants import * #@UnusedWildImport
+from cing.constants import * #@UnusedWildImport
 from cing.core.database import NTdb
 
 version = "%prog 1.1 alpha"

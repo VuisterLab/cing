@@ -23,7 +23,7 @@ Speed check: 103.609s for pdbParser.importCoordinates: <Molecule "pdb2k0e" (C:1,
 """
 from cing.Libs import PyMMLib
 from cing.Libs.NTutils import * #@UnusedWildImport
-from cing.core.constants import * #@UnusedWildImport
+from cing.constants import * #@UnusedWildImport
 from cing.core.database import NTdb
 from cing.core.molecule import Molecule
 from cing.core.molecule import getNextAvailableChainId
@@ -92,7 +92,7 @@ class pdbParser:
         self.patchAtomNames = patchAtomNames
         self.skipWaters = skipWaters
         self.allowNonStandardResidue = allowNonStandardResidue
-        self.matchGame = MatchGame(convention=convention, patchAtomNames = patchAtomNames, 
+        self.matchGame = MatchGame(convention=convention, patchAtomNames = patchAtomNames,
                                    skipWaters = skipWaters, allowNonStandardResidue = allowNonStandardResidue)
 
         if not os.path.exists(pdbFile):
@@ -140,7 +140,7 @@ class pdbParser:
                 self.modelCount += 1
 
             if recordName == "ATOM" or recordName == "HETATM":
-                
+
                 # Not all PDB files have chainID's !@%^&*
                 # They do; if none returned then take the space that is always present!
                 # JFD adds: take a look at 1ai0

@@ -30,7 +30,7 @@ from cing.Libs.NTutils import nTfill
 from cing.Libs.NTutils import readTextFromFile
 from cing.Libs.NTutils import sprintf
 from cing.Libs.fpconst import isNaN
-from cing.core.constants import * #@UnusedWildImport
+from cing.constants import * #@UnusedWildImport
 from random import randint
 from random import seed
 from traceback import format_exc
@@ -197,7 +197,7 @@ def switchOutput( showOutput, doStdOut=True, doStdErr=False):
 class MsgHoL(NTdict):
     def __init__(self):
         NTdict.__init__(self)
-        self[ ERROR_ID ] =  NTlist()        
+        self[ ERROR_ID ] =  NTlist()
         self[ WARNING_ID ] =  NTlist()
         self[ MESSAGE_ID ] =  NTlist()
         self[ DEBUG_ID ] =  NTlist()
@@ -572,7 +572,7 @@ def transpose(a):
     m = len(a)
     n = len(a[0])
     at = []
-    for i in range(n): 
+    for i in range(n):
         at.append([0.0]*m)
     for i in range(m):
         for j in range(n):
@@ -588,10 +588,10 @@ def lenRecursive(obj, max_depth = 5):
     if not isinstance(obj, (list, tuple, dict)):
         nTerror("In lenRecursive the input was not a dict or list instance but was a %s" % str(obj))
         return None
-    count = 0    
+    count = 0
     eList = obj
     if isinstance(obj, dict):
-        eList = obj.values()        
+        eList = obj.values()
     for element in eList:
         if element == None:
             count += 1
@@ -600,10 +600,10 @@ def lenRecursive(obj, max_depth = 5):
             new_depth = max_depth - 1
             if new_depth < 0:
                 count += 1 # still count but do not go to infinity and beyond
-                continue 
+                continue
             count += lenRecursive(element, new_depth)
             continue
-        count += 1        
+        count += 1
     # end for
     return count
 # end def

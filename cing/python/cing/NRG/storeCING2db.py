@@ -23,7 +23,7 @@ python -u $CINGROOT/python/cing/NRG/storeCING2db.py 1brv ARCHIVE_RECOORD
 NB this script fails if the Postgresql backend is not installed. Which is exactly why it's kept out of CING's core routines.
 """
 
-from cing import header
+import cing
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.Libs.helper import getSvnRevision
 from cing.NRG import * #@UnusedWildImport
@@ -38,8 +38,6 @@ from cing.core.classes import Project
 from cing.core.molecule import chothiaId2DbStr
 from cing.core.molecule import getAssignmentCountMapForResList
 from cing.core.parameters import directories
-from cing.main import getStartMessage
-from cing.main import getStopMessage
 from sqlalchemy.sql.expression import and_
 from sqlalchemy.sql.expression import select
 
@@ -64,8 +62,8 @@ def doStoreCING2db( entry_code, archive_id, project = None):
         nTerror("Expected valid schema for archive_id: %s" % archive_id)
         return True
     # end if
-        
-    if archive_id in  [ ARCHIVE_NRG_ID, ARCHIVE_DEV_NRG_ID, ARCHIVE_PDB_ID, 
+
+    if archive_id in  [ ARCHIVE_NRG_ID, ARCHIVE_DEV_NRG_ID, ARCHIVE_PDB_ID,
                         ARCHIVE_NMR_REDO_ID, ARCHIVE_NMR_REDOA_ID, ARCHIVE_RECOORD_ID, ARCHIVE_RECOORDA_ID]:
         pdb_id = entry_code
         if pdb_id == None:
@@ -115,12 +113,12 @@ def doStoreCING2db( entry_code, archive_id, project = None):
 
 
 #    echo = 'debug'
-    echo = False # Default no echo. Can be True or 'debug'    
+    echo = False # Default no echo. Can be True or 'debug'
     csql = CsqlAlchemy(user=user_name, db=db_name,schema=schema, echo=echo)
     if csql.connect(maxTries=5, retryInitialDelaySeconds = 60., retryDelayFactor = 4. ):
         nTerror("Failed to connect to DB.")
         return True
-    # end if    
+    # end if
     csql.autoload()
 
     execute = csql.conn.execute
@@ -201,17 +199,17 @@ def doStoreCING2db( entry_code, archive_id, project = None):
     symmetryResult = molecule.getSymmetry()
     if symmetryResult != None:
         symmetry, ncsSymmetry, drSymmetry = symmetryResult
-        
+
     chothia_class = molecule.chothiaClassInt()
-    chothia_class_str = chothiaId2DbStr(chothia_class) # Difference than string representation in CING api. 
-    molTypeCountList = molecule.getMolTypeCountList()    
+    chothia_class_str = chothiaId2DbStr(chothia_class) # Difference than string representation in CING api.
+    molTypeCountList = molecule.getMolTypeCountList()
     p_protein_count = molTypeCountList[ mapMoltypeToInt[PROTEIN_STR] ]
     p_dna_count     = molTypeCountList[ mapMoltypeToInt[DNA_STR] ]
     p_rna_count     = molTypeCountList[ mapMoltypeToInt[RNA_STR] ]
     p_water_count   = molTypeCountList[ mapMoltypeToInt[WATER_STR] ]
     p_other_count   = molTypeCountList[ mapMoltypeToInt[OTHER_STR] ]
 
-    molTypeResidueCountList = molecule.getMolTypeResidueCountList()    
+    molTypeResidueCountList = molecule.getMolTypeResidueCountList()
     p_res_protein_count = molTypeResidueCountList[ mapMoltypeToInt[PROTEIN_STR] ]
     p_res_dna_count     = molTypeResidueCountList[ mapMoltypeToInt[DNA_STR] ]
     p_res_rna_count     = molTypeResidueCountList[ mapMoltypeToInt[RNA_STR] ]
@@ -220,7 +218,7 @@ def doStoreCING2db( entry_code, archive_id, project = None):
     if sum(molTypeResidueCountList) != molecule.residueCount:
         nTerror("Count of residues doesn't add up to individual types of residues; ignored")
     # end if
-    
+
     p_distance_count = project.distances.lenRecursive(max_depth = 1)
     p_distance_count_sequential      =  0
     p_distance_count_intra_residual  =  0
@@ -254,7 +252,7 @@ def doStoreCING2db( entry_code, archive_id, project = None):
 #    p_dihedral_count = project.dihedrals.lenRecursive() # Note Talos derived would be counted this way.
     p_dihedral_count = 0
     for dihList in project.dihedrals:
-        if dihList.isFromTalos(): 
+        if dihList.isFromTalos():
             continue
         p_dihedral_count += len(dihList)
     # end for
@@ -297,7 +295,7 @@ def doStoreCING2db( entry_code, archive_id, project = None):
     for r in project.molecule.allResidues():
         for i, rdbItemName in enumerate(projectItemList):
             v = r.getDeepByKeys(rdbItemName)
-            if v != None:                
+            if v != None:
                 rdbItemList[i] += v
 #    nTdebug("rdbItemList: %s (before potential nilling)" % str(rdbItemList))
     if rdbItemList[0] < 0.001:
@@ -305,7 +303,7 @@ def doStoreCING2db( entry_code, archive_id, project = None):
     # end if
 #    nTdebug("rdbItemList: %s" % str(rdbItemList))
     p_queen_information, p_queen_uncertainty1, p_queen_uncertainty2 = rdbItemList
-    
+
     # WI
     p_wi_bbcchk = molecule.getDeepAvgByKeys(WHATIF_STR, BBCCHK_STR, VALUE_LIST_STR)
     p_wi_bmpchk = molecule.getDeepAvgByKeys(WHATIF_STR, BMPCHK_STR, VALUE_LIST_STR) # not used
@@ -344,7 +342,7 @@ def doStoreCING2db( entry_code, archive_id, project = None):
     # Overall rog
     rogC = molecule.rogScore.rogInt()
     rog_str = molecule.rogScore.colorLabel
-    
+
     result = execute(centry.insert().values(
         pdb_id=pdb_id,
         bmrb_id=bmrb_id,
@@ -357,23 +355,23 @@ def doStoreCING2db( entry_code, archive_id, project = None):
 
         is_multimeric=is_multimeric,
         symmetry=symmetry,
-        ncs_symmetry = ncsSymmetry, 
+        ncs_symmetry = ncsSymmetry,
         dr_symmetry  = drSymmetry ,
         chothia_class=chothia_class,
         chothia_class_str=chothia_class_str,
-        
+
         protein_count        =  p_protein_count               ,
         dna_count            =  p_dna_count                   ,
         rna_count            =  p_rna_count                   ,
         water_count          =  p_water_count                 ,
         other_count          =  p_other_count                 ,
-        
+
         res_protein_count  = p_res_protein_count,   # The sum should be the total number of residues; res_count
         res_dna_count      = p_res_dna_count    ,   # The chain property determines this classification.
-        res_rna_count      = p_res_rna_count    ,  
-        res_water_count    = p_res_water_count  ,  
-        res_other_count    = p_res_other_count  ,  
-        
+        res_rna_count      = p_res_rna_count    ,
+        res_water_count    = p_res_water_count  ,
+        res_other_count    = p_res_other_count  ,
+
         ranges=ranges,
 #        omega_dev_av_all = p_omega_dev_av_all,
         cv_backbone      = p_cv_backbone     ,
@@ -385,7 +383,7 @@ def doStoreCING2db( entry_code, archive_id, project = None):
         chain_count =molecule.chainCount,
         atom_count  =molecule.atomCount,
         model_count =molecule.modelCount,
-        
+
         distance_count=p_distance_count,
         distance_count_sequential      = p_distance_count_sequential    ,
         distance_count_intra_residual  = p_distance_count_intra_residual,
@@ -540,7 +538,7 @@ def doStoreCING2db( entry_code, archive_id, project = None):
         s = select([cchain.c.chain_id],and_(cchain.c.entry_id == entry_id, cchain.c.name == nameC))
         chain_id = execute(s).fetchall()[0][0]
 #        nTdebug("Inserted chain id %s" % chain_id)
-        chainIdHash[ chain ] = chain_id        
+        chainIdHash[ chain ] = chain_id
         chainCommittedCount += 1
         if cIdxMolType == mapMoltypeToInt[WATER_STR]:
             nTdebug("Not storing water residues for this water chain id %s" % chain_id)
@@ -556,7 +554,7 @@ def doStoreCING2db( entry_code, archive_id, project = None):
 #                waterResidueCount += 1
 #                NTcodeerror("Water residue %s almost slipped into RDB because it doesn't have the water property set. Skipping." % residue)
 #                continue
-                        
+
 #            nTmessage("Residue: %s" % residue)
             # CING
     #        print m.C.ASN46.distanceRestraints
@@ -576,9 +574,9 @@ def doStoreCING2db( entry_code, archive_id, project = None):
 
             nameR = residue.resName
             numberR = residue.resNum
-            sel_1R = molecule.rangesContainsResidue(residue)            
+            sel_1R = molecule.rangesContainsResidue(residue)
             is_commonR = residue.isCommon()
-            is_terminR  = residue.isNterminal() or residue.isCterminal()            
+            is_terminR  = residue.isNterminal() or residue.isCterminal()
             is_present_R = residue.hasCoordinates()
             dssp_id = getDsspSecStructConsensusId(residue)
             dssp_percent_list = getDsspPercentList(residue)
@@ -685,7 +683,7 @@ def doStoreCING2db( entry_code, archive_id, project = None):
                 entry_id=entry_id,
                 chain_id=chain_id,
                 name=nameR,
-                sel_1=sel_1R,                
+                sel_1=sel_1R,
                 is_common=is_commonR,
                 is_termin=is_terminR,
                 is_present=is_present_R,
@@ -771,7 +769,7 @@ def doStoreCING2db( entry_code, archive_id, project = None):
                 qcs_bb          = r_qcs_bb,
                 qcs_hvy         = r_qcs_hvy,
                 qcs_prt         = r_qcs_prt,
-                qcs_s2          = r_qcs_s2,                
+                qcs_s2          = r_qcs_s2,
 #                is_pressssssent = True,         # bogus column for demonstration.
                 rog=rogR
                 )
@@ -784,7 +782,7 @@ def doStoreCING2db( entry_code, archive_id, project = None):
                   cresidue.c.number == numberR
                   ))
             residue_id = execute(s).fetchall()[0][0]
-            residueIdHash[ residue ] = residue_id        
+            residueIdHash[ residue ] = residue_id
             residueCommittedCount += 1
 #            nTdebug("Inserted residue %s" % residue_id)
             for atom in residue.allAtoms():
@@ -859,7 +857,7 @@ def doStoreCING2db( entry_code, archive_id, project = None):
                         cs = a_cs,
                         cs_err = a_cs_err,
                         cs_ssa = a_cs_ssa,
-                        queen_information  = a_queen_information ,                        
+                        queen_information  = a_queen_information ,
                         queen_uncertainty1 = a_queen_uncertainty1,
                         queen_uncertainty2 = a_queen_uncertainty2,
                         rog=a_rog
@@ -883,7 +881,7 @@ def doStoreCING2db( entry_code, archive_id, project = None):
                 # end try
             # end for atom
         # end for residue
-    # end for chain    
+    # end for chain
     nTmessage("Committed %d chains %d residues %d atoms" % (chainCommittedCount,residueCommittedCount,atomCommittedCount))
 #    nTdebug("Memorized %d chains %d residues %d atoms" % (len(chainIdHash.keys()),len(residueIdHash.keys()),len(atomIdHash.keys())))
     if chainCommittedCount != molecule.chainCount:
@@ -897,12 +895,12 @@ def doStoreCING2db( entry_code, archive_id, project = None):
     # end if
     if (atomCommittedCount + waterResidueCount*WATER_ATOM_COUNT) != molecule.atomCount:
         msg = "atomCommittedCount %s + waterResidueCount (%s) *3 (=%s) != molecule.atomCount %s" % (
-            atomCommittedCount,                     waterResidueCount, 
+            atomCommittedCount,                     waterResidueCount,
             atomCommittedCount + WATER_ATOM_COUNT * waterResidueCount,
             molecule.atomCount)
         nTerror(msg)
     # end if
-    
+
     drlCommittedCount = 0
     drCommittedCount = 0
     drRowCommittedCount = 0
@@ -917,13 +915,13 @@ def doStoreCING2db( entry_code, archive_id, project = None):
             entry_id=entry_id,
             name=drl_name,
             number=drl_number,
-            
-            viol_count1       = drl.violCount1,    
-            viol_count3       = drl.violCount3,    
-            viol_count5       = drl.violCount5,    
-            viol_max          = drl.violMax   ,    
-            viol_upper_max    = drl.violUpperMax,    
-            viol_lower_max    = drl.violLowerMax,    
+
+            viol_count1       = drl.violCount1,
+            viol_count3       = drl.violCount3,
+            viol_count5       = drl.violCount5,
+            viol_max          = drl.violMax   ,
+            viol_upper_max    = drl.violUpperMax,
+            viol_lower_max    = drl.violLowerMax,
 
             intra_residual_count     = len( drl.intraResidual ),
             sequential_count         = len( drl.sequential  ),
@@ -935,54 +933,54 @@ def doStoreCING2db( entry_code, archive_id, project = None):
             with_duplicates_count    = len( drl.withDuplicates    ),
             rog = drl_rog
             )
-        )        
+        )
         s = select([cdrlist.c.drlist_id],and_(cdrlist.c.entry_id == entry_id, cdrlist.c.number == drl_number))
         drl_id = execute(s).fetchall()[0][0]
 #        drlIdHash[ drl ] = drl_id
-        drlCommittedCount += 1        
+        drlCommittedCount += 1
         for dr_number,dr in enumerate(drl, 1):
             if not dr:
                 nTerror("Failed to get dr from drl: %s" % drl)
                 continue
             dr_rog = dr.rogScore.rogInt()
 
-#            dr_target            = dr.target           
-            dr_lower             = dr.lower            
-            dr_upper             = dr.upper            
-#            dr_contribution      = dr.contribution     
-            dr_viol_count1       = dr.violCount1      
-            dr_viol_count3       = dr.violCount3      
-            dr_viol_count5       = dr.violCount5      
-            dr_viol_max          = dr.violMax         
-            dr_viol_av           = dr.violAv          
-            dr_viol_sd           = dr.violSd          
-            dr_av                = dr.av               
-            dr_sd                = dr.sd               
-            dr_min               = dr.min              
-            dr_max               = dr.max              
-            dr_viol_count_lower  = dr.violCountLower 
-            dr_viol_upper_max    = dr.violUpperMax   
-            dr_viol_lower_max    = dr.violLowerMax   
-            dr_has_analyze_error = bool(dr.error)            
-            
+#            dr_target            = dr.target
+            dr_lower             = dr.lower
+            dr_upper             = dr.upper
+#            dr_contribution      = dr.contribution
+            dr_viol_count1       = dr.violCount1
+            dr_viol_count3       = dr.violCount3
+            dr_viol_count5       = dr.violCount5
+            dr_viol_max          = dr.violMax
+            dr_viol_av           = dr.violAv
+            dr_viol_sd           = dr.violSd
+            dr_av                = dr.av
+            dr_sd                = dr.sd
+            dr_min               = dr.min
+            dr_max               = dr.max
+            dr_viol_count_lower  = dr.violCountLower
+            dr_viol_upper_max    = dr.violUpperMax
+            dr_viol_lower_max    = dr.violLowerMax
+            dr_has_analyze_error = bool(dr.error)
+
             for item_id, atomPair in enumerate(dr.atomPairs, 1):
                 item_logic_code = None
                 if len(dr.atomPairs) > 1:
                     item_logic_code = 'OR'
                 atom1, atom2 = atomPair
-                residue1 = getDeepByKeysOrAttributes( atom1, '_parent')    
-                chain1 = getDeepByKeysOrAttributes( residue1, '_parent')    
+                residue1 = getDeepByKeysOrAttributes( atom1, '_parent')
+                chain1 = getDeepByKeysOrAttributes( residue1, '_parent')
                 atom_id_1       = getDeepByKeysOrAttributes(atomIdHash, atom1)
-                residue_id_1    = getDeepByKeysOrAttributes(residueIdHash, residue1)    
-                chain_id_1      = getDeepByKeysOrAttributes(chainIdHash, chain1)                    
+                residue_id_1    = getDeepByKeysOrAttributes(residueIdHash, residue1)
+                chain_id_1      = getDeepByKeysOrAttributes(chainIdHash, chain1)
 
-                residue2 = getDeepByKeysOrAttributes( atom2, '_parent')    
-                chain2 = getDeepByKeysOrAttributes( residue2, '_parent')    
+                residue2 = getDeepByKeysOrAttributes( atom2, '_parent')
+                chain2 = getDeepByKeysOrAttributes( residue2, '_parent')
                 atom_id_2       = getDeepByKeysOrAttributes(atomIdHash, atom2)
-                residue_id_2    = getDeepByKeysOrAttributes(residueIdHash, residue2)    
+                residue_id_2    = getDeepByKeysOrAttributes(residueIdHash, residue2)
                 chain_id_2      = getDeepByKeysOrAttributes(chainIdHash, chain2)
-                
-                                    
+
+
                 result = execute(cdr.insert().values(
                     entry_id=entry_id,
                     drlist_id=drl_id,
@@ -995,17 +993,17 @@ def doStoreCING2db( entry_code, archive_id, project = None):
                     atom_id_2 = atom_id_2,
                     residue_id_2 = residue_id_2,
                     chain_id_2 = chain_id_2,
-                    
-                    atom_name_1     = getDeepByKeysOrAttributes(atom1, NAME_STR),    
-                    residue_num_1   = getDeepByKeysOrAttributes(residue1, RES_NUMB_STR),    
-                    residue_name_1  = getDeepByKeysOrAttributes(residue1, RES_NAME_STR),    
-                    chain_name_1    = getDeepByKeysOrAttributes(chain1, NAME_STR),                        
-                    
-                    atom_name_2     = getDeepByKeysOrAttributes(atom2, NAME_STR),    
-                    residue_num_2   = getDeepByKeysOrAttributes(residue2, RES_NUMB_STR),    
-                    residue_name_2  = getDeepByKeysOrAttributes(residue2, RES_NAME_STR),    
-                    chain_name_2    = getDeepByKeysOrAttributes(chain2, NAME_STR),                        
-                                        
+
+                    atom_name_1     = getDeepByKeysOrAttributes(atom1, NAME_STR),
+                    residue_num_1   = getDeepByKeysOrAttributes(residue1, RES_NUMB_STR),
+                    residue_name_1  = getDeepByKeysOrAttributes(residue1, RES_NAME_STR),
+                    chain_name_1    = getDeepByKeysOrAttributes(chain1, NAME_STR),
+
+                    atom_name_2     = getDeepByKeysOrAttributes(atom2, NAME_STR),
+                    residue_num_2   = getDeepByKeysOrAttributes(residue2, RES_NUMB_STR),
+                    residue_name_2  = getDeepByKeysOrAttributes(residue2, RES_NAME_STR),
+                    chain_name_2    = getDeepByKeysOrAttributes(chain2, NAME_STR),
+
 #                    target            = dr_target           ,
                     lower             = dr_lower            ,
                     upper             = dr_upper            ,
@@ -1024,13 +1022,13 @@ def doStoreCING2db( entry_code, archive_id, project = None):
                     viol_upper_max    = dr_viol_upper_max   ,
                     viol_lower_max    = dr_viol_lower_max   ,
                     has_analyze_error = dr_has_analyze_error,
-                        
+
                     rog=dr_rog
                     )
                 )
-                s = select([cdr.c.dr_id],and_(cdr.c.entry_id == entry_id, 
-                                              cdr.c.drlist_id == drl_id, 
-                                              cdr.c.number == dr_number, 
+                s = select([cdr.c.dr_id],and_(cdr.c.entry_id == entry_id,
+                                              cdr.c.drlist_id == drl_id,
+                                              cdr.c.number == dr_number,
                                               cdr.c.item_id == item_id))
                 dr_id = execute(s).fetchall()[0][0]
                 drIdHash[ dr_id ] = dr_id # bogus statement
@@ -1039,7 +1037,7 @@ def doStoreCING2db( entry_code, archive_id, project = None):
             drCommittedCount += 1
         # end for
 #        nTdebug("Committed %d dr %d drrows" % (drCommittedCount,drRowCommittedCount))
-        drlCommittedCount += 1        
+        drlCommittedCount += 1
     # end for
     nTmessage("Committed %d drl and overall %d dr %d drrows" % (drlCommittedCount,drCommittedCount,drRowCommittedCount))
 #    project.close(save=False) # needed ???
@@ -1052,11 +1050,11 @@ if __name__ == "__main__":
     cing.verbosity = verbosityDebug
 
     # Assume CING didn't already printed this.
-    nTmessage(header)
-    nTmessage(getStartMessage())
+    nTmessage(cing.cingDefinitions.getHeaderString())
+    nTmessage(cing.systemDefinitions.getStartMessage())
     try:
         status = doStoreCING2db(*sys.argv[1:])
         if status:
             nTerror("Failed script: storeCING2db.py")
     finally:
-        nTmessage(getStopMessage(cing.starttime))
+        nTmessage(cing.systemDefinitions.getStopMessage())

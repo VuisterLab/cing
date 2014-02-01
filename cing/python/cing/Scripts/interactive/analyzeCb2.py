@@ -7,7 +7,7 @@
 """
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.PluginCode.required.reqWhatif import * #@UnusedWildImport
-from cing.core.constants import * #@UnusedWildImport
+from cing.constants import * #@UnusedWildImport
 from cing.core.molecule import Dihedral
 
 project = p #@UndefinedVariable
@@ -63,10 +63,10 @@ for res in project.molecule.A.allResidues():
                             angles.append( 0.0 )
                     #end for
                     if bb<20.0: # Arbitrary 20 bb occurences as cuttoff for now
-                        fprintf(fpBad,'%4d   %7.2f  %7.2f  %7.2f  %s  %s %s\n', res.resNum, d1[i], d2[i], bb, angles.format("%7.2f  "), 
+                        fprintf(fpBad,'%4d   %7.2f  %7.2f  %7.2f  %s  %s %s\n', res.resNum, d1[i], d2[i], bb, angles.format("%7.2f  "),
                                 res, res.dssp.consensus)
                     else:
-                        fprintf(fpGood,'%4d   %7.2f  %7.2f  %7.2f  %s  %s %s\n', res.resNum, d1[i], d2[i], bb, angles.format("%7.2f  "), 
+                        fprintf(fpGood,'%4d   %7.2f  %7.2f  %7.2f  %s  %s %s\n', res.resNum, d1[i], d2[i], bb, angles.format("%7.2f  "),
                                 res, res.dssp.consensus)
             #end if
         #end if

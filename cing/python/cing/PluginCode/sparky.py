@@ -9,7 +9,7 @@ Methods:
 
 """
 from cing.Libs.NTutils import * #@UnusedWildImport
-from cing.core.constants import * #@UnusedWildImport
+from cing.constants import * #@UnusedWildImport
 from cing.core.molecule import allAtoms
 from cing.core.parameters import directories
 

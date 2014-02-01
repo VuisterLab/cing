@@ -6,7 +6,7 @@ from cing.Libs.AwkLike import AwkLike
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.PluginCode.required.reqDssp import DSSP_STR
 from cing.PluginCode.required.reqProcheck import SECSTRUCT_STR
-from cing.core.constants import * #@UnusedWildImport
+from cing.constants import * #@UnusedWildImport
 from cing.core.parameters import PLEASE_ADD_EXECUTABLE_HERE
 from cing.core.parameters import cingPaths
 from glob import glob
@@ -266,7 +266,7 @@ def restoreDssp(project, tmp = None):
     Return True on error
     """
     nTmessage('==> Restoring dssp results')
-    
+
     if not project:
         nTerror('restoreDssp: no project defined')
         return True

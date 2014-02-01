@@ -2,6 +2,8 @@
 import os, sys
 
 import cing
+import cing.constants as constants
+import cing.definitions as cdefs
 
 from memops.gui.Button          import Button #@UnresolvedImport
 from memops.gui.RadioButtons    import RadioButtons #@UnresolvedImport
@@ -167,9 +169,9 @@ class CingGui(BasePopup):
                                              )
         self.projOptionsSelect.grid(row=srow,column=0,rowspan=len(self.projectOptions),columnspan=2, sticky='w')
 
-        if self.options.name: 
+        if self.options.name:
             text = self.options.name
-        else: 
+        else:
             text=''
         # end if
         self.projEntry = Entry(frame, bd=1, text=text, returnCallback=self.updateGui)
@@ -693,13 +695,13 @@ class CingGui(BasePopup):
 
     def openProject(self ):
         projOption = self.projOptionsSelect.get()
-        if projOption == self.projectOptions[0]: 
+        if projOption == self.projectOptions[0]:
             self.openOldProject()
-        elif projOption == self.projectOptions[1]: 
+        elif projOption == self.projectOptions[1]:
             self.initPdb()
         # end if
 
-        if self.project: 
+        if self.project:
             self.project.gui = self
         # end if
         self.updateGui()
@@ -711,7 +713,7 @@ class CingGui(BasePopup):
             nTerror('Error: file "%s" does not exist\n', fName)
         #end if
 
-        if self.project: 
+        if self.project:
             self.closeProject()
         # end if
         self.project = cing.Project.open( name=fName, status='old', verbose=False )
@@ -727,7 +729,7 @@ class CingGui(BasePopup):
     #end def
 
     def closeProject(self):
-        if self.project: 
+        if self.project:
             self.project.close()
         # end if
         self.project = None

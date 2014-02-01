@@ -4,9 +4,9 @@ python $CINGROOT/python/cing/PluginCode/test/test_x3dna.py
 
 Open the ???.r3d files in pymol or so; they're nice.
 """
+import cing
 from cing import cingDirTestsData
 from cing import cingDirTmp
-from cing import osType
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.PluginCode.required.reqCcpn import CCPN_STR
 from cing.PluginCode.required.reqX3dna import X3DNA_STR
@@ -27,7 +27,7 @@ except ImportWarning, extraInfo: # Disable after done debugging; can't use nTdeb
 class AllChecks(TestCase):
 
     def test_x3dna(self):
-        if osType != OS_TYPE_MAC: # only installed for mac os currently.
+        if cing.systemDefinitions.osType != OS_TYPE_MAC: # only installed for mac os currently.
             return
         try:
             from cing.PluginCode.x3dna import createHtmlX3dna

@@ -2,21 +2,27 @@
 Implementation of the CING API's main classes.
 Split into 3 for better performance.
 """
+import cing
+import cing.constants as constants
+import cing.definitions as cdefs
 
 from ConfigParser import ConfigParser
 from cing import cingPythonCingDir
 from cing import cingRoot
 from cing import cingVersion
-from cing import header
 from cing import issueListUrl
 from cing.Libs.Geometry import violationAngle
 from cing.Libs.NTutils import * #@UnusedWildImport
-from cing.Libs.cython.superpose import NTcVector #@UnresolvedImport @UnusedImport
-from cing.Libs.cython.superpose import Rm6dist #@UnresolvedImport
+try:
+    from cing.Libs.cython.superpose import NTcVector #@UnresolvedImport @UnusedImport
+except ImportError:
+    pass
+try:
+    from cing.Libs.cython.superpose import Rm6dist #@UnresolvedImport
+except ImportError:
+    pass
 from cing.Libs.disk import copydir
 from cing.Libs.disk import remove
-from cing.Libs.helper import getStartMessage
-from cing.Libs.helper import getStopMessage
 from cing.Libs.html import DihedralByProjectList
 from cing.Libs.html import addPreTagLines
 from cing.Libs.html import generateHtml
@@ -30,7 +36,7 @@ from cing.PluginCode.required.reqWhatif import summaryCheckIdList
 from cing.STAR.File import File
 from cing.core.CingSummary import CingSummary
 from cing.core.classes2 import * #@UnusedWildImport
-from cing.core.constants import * #@UnusedWildImport
+from cing.constants import * #@UnusedWildImport
 from cing.core.molecule import Atom
 from cing.core.molecule import Ensemble
 from cing.core.molecule import Molecule
@@ -59,16 +65,15 @@ from glob import glob
 from glob import glob1
 from shutil import rmtree
 import tarfile
-__version__ = cing.__version__
-__date__ = cing.__date__
-__author__ = cing.__author__
-__copyright__ = cing.__copyright__
-__credits__ = cing.__credits__
+
+__version__   = cdefs.__version__
+__date__      = cdefs.__date__
+__author__    = cdefs.__author__
+__copyright__ = cdefs.__copyright__
+__credits__   = cdefs.__credits__
 
 projects = NTlist()
 
-#: CRV stands for CRiteria Value CRS stands for CRiteria String
-CRV_NONE = "-999.9"
 
 #-----------------------------------------------------------------------------
 # Cing classes and routines
@@ -155,7 +160,7 @@ Project: Top level Cing project class
         self.dihedralByProjectListNames = NTlist() # list to store  names for save and restore
         self.dihedralByResidue = NTtree( DIHEDRAL_BY_RESIDUE_STR ) # Used to be set in DihedralByResidueHTMLfile but that's too late.
         self.reports = NTlist() # list with validation reports names
-#
+
         self.history = History()
         self.contentIsRestored = False # True if Project.restore() has been called
         self.storedInCcpnFormat = False
@@ -232,8 +237,7 @@ Project: Top level Cing project class
         self.rogScore = ROGscore()
         self.summaryDict = CingSummary()
 
-        self.valSets = NTdict()
-        self.readValidationSettings(fn = None)
+        self.valSets = cdefs.validationSettings
         self.nosave = False
 
         self.saveXML('version',
@@ -249,66 +253,66 @@ Project: Top level Cing project class
     #end def
 
 
-    def readValidationSettings(self, fn = None):
-        """Reads the validation settings from installation first and then overwrite any if a filename is given.
-        This ensures that all settings needed are present but can be overwritten. It decouples development from
-        production.
-        """
-
-        validationConfigurationFile = os.path.join(cingPythonCingDir, VAL_SETS_CFG_DEFAULT_FILENAME)
-#        nTdebug("Using system validation configuration file: " + validationConfigurationFile)
-        self._readValidationSettingsFromfile(validationConfigurationFile)
-        validationConfigurationFile = None
-
-        if fn:
-            validationConfigurationFile = fn
-#            nTdebug("Using validation configuration file: " + validationConfigurationFile)
-        elif os.path.exists(VAL_SETS_CFG_DEFAULT_FILENAME):
-            validationConfigurationFile = VAL_SETS_CFG_DEFAULT_FILENAME
-#            nTdebug("Using local validation configuration file: " + validationConfigurationFile)
-        if validationConfigurationFile:
-            self._readValidationSettingsFromfile(validationConfigurationFile)
-
-    #end def
-
-    def _readValidationSettingsFromfile(self, fn):
-        """Return True on error.   """
-        if not fn:
-            nTcodeerror("No input filename given at: _readValidationSettingsFromfile")
-            return True
-
-        if not os.path.exists(fn):
-            nTcodeerror("Input file does not exist at: " + fn)
-            return True
-
-#        nTdebug("Reading validation file: " + fn)
-        config = ConfigParser()
-        config.readfp(open(fn))
-        for item in config.items('DEFAULT'):
-            key = item[0].upper()  # upper only.
-            try:
-                if item[1] == CRV_NONE:
-                    value = None
-                else:
-                    value = float(item[1])
-            except ValueError:
-                try:
-                    value = bool(item[1])
-                except:
-                    value = item[1]
-            valueStr = repr(value)
-            if self.valSets.has_key(key):
-                valueFromStr = repr(self.valSets[key])
-                if valueStr == valueFromStr:
-                    continue  # no print
-#                nTdebug("Replacing value for key " + key + " from " + valueFromStr + " with " + valueStr)
-            else:
-#                nTdebug("Adding              key " + key + " with value: " + valueStr)
-                pass
-            self.valSets[key] = value # name value pairs.
-        #end for
-        self.valSets.keysformat()
-    #end def
+#    def readValidationSettings(self, fn = None):
+#        """Reads the validation settings from installation first and then overwrite any if a filename is given.
+#        This ensures that all settings needed are present but can be overwritten. It decouples development from
+#        production.
+#        """
+#
+#        validationConfigurationFile = os.path.join(cingPythonCingDir, VAL_SETS_CFG_DEFAULT_FILENAME)
+##        nTdebug("Using system validation configuration file: " + validationConfigurationFile)
+#        self._readValidationSettingsFromfile(validationConfigurationFile)
+#        validationConfigurationFile = None
+#
+#        if fn:
+#            validationConfigurationFile = fn
+##            nTdebug("Using validation configuration file: " + validationConfigurationFile)
+#        elif os.path.exists(VAL_SETS_CFG_DEFAULT_FILENAME):
+#            validationConfigurationFile = VAL_SETS_CFG_DEFAULT_FILENAME
+##            nTdebug("Using local validation configuration file: " + validationConfigurationFile)
+#        if validationConfigurationFile:
+#            self._readValidationSettingsFromfile(validationConfigurationFile)
+#
+#    #end def
+#
+#    def _readValidationSettingsFromfile(self, fn):
+#        """Return True on error.   """
+#        if not fn:
+#            nTcodeerror("No input filename given at: _readValidationSettingsFromfile")
+#            return True
+#
+#        if not os.path.exists(fn):
+#            nTcodeerror("Input file does not exist at: " + fn)
+#            return True
+#
+##        nTdebug("Reading validation file: " + fn)
+#        config = ConfigParser()
+#        config.readfp(open(fn))
+#        for item in config.items('DEFAULT'):
+#            key = item[0].upper()  # upper only.
+#            try:
+#                if item[1] == CRV_NONE:
+#                    value = None
+#                else:
+#                    value = float(item[1])
+#            except ValueError:
+#                try:
+#                    value = bool(item[1])
+#                except:
+#                    value = item[1]
+#            valueStr = repr(value)
+#            if self.valSets.has_key(key):
+#                valueFromStr = repr(self.valSets[key])
+#                if valueStr == valueFromStr:
+#                    continue  # no print
+##                nTdebug("Replacing value for key " + key + " from " + valueFromStr + " with " + valueStr)
+#            else:
+##                nTdebug("Adding              key " + key + " with value: " + valueStr)
+#                pass
+#            self.valSets[key] = value # name value pairs.
+#        #end for
+#        self.valSets.keysformat()
+#    #end def
 
     def getCingSummaryDict(self):
         """Get a CING summary dict from self
@@ -950,8 +954,8 @@ Project: Top level Cing project class
         stream2 = open(logFilePath, 'w')
 #        nTdebug("Opening %s" % logFilePath )
         addStreamnTmessageList(stream2)
-        fprintf(stream2,header+'\n')
-        fprintf(stream2,getStartMessage()+'\n')
+        fprintf(stream2,cing.cingDefinitions.getHeaderString()+'\n')
+        fprintf(stream2,cing.systemDefinitions.getStartMessage()+'\n')
 #        nTdebug("Opened %s (should now show up in log too)" % logFilePath )
     #end def
 
@@ -961,7 +965,7 @@ Project: Top level Cing project class
             nTdebug("Strange in project.removeLog stream2 was already closed.")
             return
         stream2 = nTdebug.stream2
-        fprintf(stream2, getStopMessage(cing.starttime)+'\n')
+        fprintf(stream2, cing.systemDefinitions.getStopMessage()+'\n')
         removeStreamnTmessageList()
 #        nTdebug("Closed stream2 (should now NOT show up in log too)" )
     #end def

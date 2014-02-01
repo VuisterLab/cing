@@ -13,7 +13,7 @@ from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.PluginCode.required.reqNih import NIH_STR
 from cing.PluginCode.required.reqNih import TALOSPLUS_LIST_STR
 from cing.core.classes import DihedralRestraint
-from cing.core.constants import * #@UnusedWildImport
+from cing.constants import * #@UnusedWildImport
 from cing.core.parameters import PLEASE_ADD_EXECUTABLE_HERE
 from cing.core.parameters import cingPaths
 from cing.core.sml import sML2obj
@@ -493,7 +493,7 @@ NIHheaderDefs = NTdict()
 for l in AwkLikeS( NIHheaderDefinitionString, minNF = 3 ):
     if (l.dollar[1] == '#define'):
         #print '>>', l.dollar[0]
-        if l.NF > 5: 
+        if l.NF > 5:
             comment = ' '.join(l.dollar[5:l.NF])
         else: comment = None
         NIHheaderDefs[l.dollar[2]] = int(l.dollar[3])   # store value
@@ -847,7 +847,7 @@ nrows:    %d''', self.tabFile, self.columnDefs.zap('name'), self.nrows
     def column( self, cName ):
         """Return list of values of column cName or None on error
         """
-        if cName not in self: 
+        if cName not in self:
             return None
 
         col = NTlist()
@@ -950,14 +950,14 @@ nrows:    %d''', self.tabFile, self.columnDefs.zap('name'), self.nrows
 
         fprintf(     stream, 'VARS    ' )
         for c in self.columnDefs:
-            if not c.hide: 
+            if not c.hide:
                 fprintf( stream, '%s ', c.name )
         #end for
         fprintf( stream, '\n' )
 
         fprintf(     stream, 'FORMAT  ' )
         for c in self.columnDefs:
-            if not c.hide: 
+            if not c.hide:
                 fprintf( stream, '%s ', c.fmt )
         #end for
         fprintf( stream, '\n' )
@@ -1241,7 +1241,7 @@ class SMLTalosPlusResultHandler( SMLhandler ):
     def handle(self, line, fp, molecule=None):
         # The handle restores the attributes of TalosPlus object
         # Needs a valid molecule
-        if molecule == None: 
+        if molecule == None:
             return None
         tPlus = TalosPlusResult()
         return self.dictHandler(tPlus, fp, molecule)
@@ -1250,7 +1250,7 @@ class SMLTalosPlusResultHandler( SMLhandler ):
     def endHandler(self, tPlus, molecule=None):
         # Restore linkage
         # Needs a valid molecule
-        if molecule == None: 
+        if molecule == None:
             return None
         res = molecule.decodeNameTuple(tPlus.residue)
         if res == None:

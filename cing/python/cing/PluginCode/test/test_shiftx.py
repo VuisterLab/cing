@@ -5,7 +5,7 @@ from cing import cingDirTmp
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.PluginCode.required.reqShiftx import SHIFTX_STR
 from cing.core.classes import Project
-from cing.core.constants import * #@UnusedWildImport
+from cing.constants import * #@UnusedWildImport
 from nose.plugins.skip import SkipTest
 from unittest import TestCase
 import unittest

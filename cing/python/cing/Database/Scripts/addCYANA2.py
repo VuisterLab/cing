@@ -1,4 +1,4 @@
-from cing.core.constants import * #@UnusedWildImport
+from cing.constants import * #@UnusedWildImport
 from cing.core.database import NTdb
 
 for res in NTdb:

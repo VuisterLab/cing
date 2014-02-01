@@ -1,4 +1,4 @@
-from cing import header
+import cing
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.Libs.forkoff import do_cmd
 from cing.NRG.CasdNmrMassageCcpnProject import dataDir
@@ -10,9 +10,7 @@ from cing.Scripts.FC.convertXplor2Ccpn import importXplorCoorAndRes
 from cing.Scripts.FC.utils import importPseudoPdb
 from cing.Scripts.FC.utils import swapCheck
 from cing.core.classes import Project
-from cing.core.constants import * #@UnusedWildImport
-from cing.main import getStartMessage
-from cing.main import getStopMessage
+from cing.constants import * #@UnusedWildImport
 from memops.general.Io import loadProject
 from memops.general.Io import saveProject
 from shutil import copytree
@@ -21,8 +19,8 @@ import Tkinter
 import tarfile
 
 def annotateEntry(entryCodeNew, *extraArgList):
-    nTmessage(header)
-    nTmessage(getStartMessage())
+    nTmessage(cing.cingDefinitions.getHeaderString())
+    nTmessage(cing.systemDefinitions.getStopMessage())
 
     expectedArgumentList = []
     expectedNumberOfArguments = len(expectedArgumentList)
@@ -137,11 +135,11 @@ def annotateEntry(entryCodeNew, *extraArgList):
     if replaceCoordinates or replaceRestraints:
         if programId == CYANA:
             importCyanaCoorAndRes(ccpnProject, inputAuthorDir, guiRoot,
-                replaceCoordinates=replaceCoordinates, replaceRestraints=replaceRestraints, 
+                replaceCoordinates=replaceCoordinates, replaceRestraints=replaceRestraints,
                 allowPopups=allowPopups, minimalPrompts=minimalPrompts, verbose=verbose, **presets)
         elif programId == XPLOR:
             importXplorCoorAndRes(ccpnProject, inputAuthorDir, guiRoot,
-                replaceCoordinates=replaceCoordinates, replaceRestraints=replaceRestraints, 
+                replaceCoordinates=replaceCoordinates, replaceRestraints=replaceRestraints,
                 allowPopups=allowPopups, minimalPrompts=minimalPrompts, verbose=verbose, **presets)
         elif programId == PDB:
             importPseudoPdb(ccpnProject, inputAuthorDir, guiRoot,
@@ -188,4 +186,4 @@ if __name__ == "__main__":
     except:
         nTtracebackError()
     finally:
-        nTmessage(getStopMessage(cing.starttime))
+        nTmessage(cing.systemDefinitions.getStopMessage())
