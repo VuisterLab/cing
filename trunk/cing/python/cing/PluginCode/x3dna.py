@@ -9,8 +9,8 @@ from cing.PluginCode.required.reqX3dna import * #@UnusedWildImport
 from cing.core.classes import Coplanar
 from cing.core.classes import CoplanarList
 from cing.core.parameters import cingPaths
-from cing.core.parameters import plugins
-from cing.core.parameters import validationSubDirectories
+from cing import plugins
+from cing.definitions import validationDirectories
 
 useModule = True
 if cing.systemDefinitions.osType == OS_TYPE_MAC: # only installed for mac os currently.
@@ -166,7 +166,7 @@ class X3dna(NTdict):
         Return x3dna path from active molecule of project
         Creates directory if does not exist
         """
-        return self.project.validationPath(validationSubDirectories['x3dna'], *args)
+        return self.project.validationPath(validationDirectories['x3dna'], *args)
 
 
     def doX3dna(self):

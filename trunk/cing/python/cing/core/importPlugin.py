@@ -1,28 +1,29 @@
+from cing.Libs.Adict import Adict
+from cing.Libs.disk import Path
 from cing.definitions import cingDefinitions
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.core.classes import Project
-from cing.core.parameters import plugins
+from cing import plugins
 from nose.plugins.skip import SkipTest
 
 # NB This routine gets executed before main.py gets a chance to set the verbosity.
 #     If you need to debug this; (getting debug messages) then set verbosity = 9 in the localConstants.py file in
 #     CINGROOT/python/cing directory
 
-#nTdebug("This is nTdebug in importPlugin.py")
+#class PlugIns( cing.Libs.Adict.Adict ):
+# CANNOT wrap into a class because imports get circular as cing.plugins needs to be defined earlier
+##end class
 
 #-----------------------------------------------------------------------------
 # import the plugins
 #-----------------------------------------------------------------------------
-def importPlugin( pluginName ):
+def importPlugin( pluginCodeModule, pluginName ):
     """
     Import the plugin pluginName present in PluginCode directory.
     Adds reference to global plugins dict
     Returns None on error
     """
     isInstalled = False
-
-    pluginCodeModule = cingDefinitions.pluginCode
-#    moduleName = cingPaths.plugins + '.' + pluginName
     if plugins.has_key(pluginName):
         try:
             plugin = plugins[pluginName]
@@ -67,16 +68,23 @@ def importPlugin( pluginName ):
         #end if
     #end if
 
-    plugin = NTdict( module = pluginModule, name = pluginName, isInstalled = isInstalled )
+    plugin = Adict( module = pluginModule, name = pluginName, isInstalled = isInstalled, version = None )
     plugins[pluginName] = plugin
 
     if plugin.isInstalled:
-        # update the methods, saves, restores and exports
+        # update the version, methods, saves, restores and exports, add them to Project class
+        if hasattr(plugin.module, 'version'):
+            plugin.version = getattr(plugin.module, 'version')
+        else:
+            # old code
+            plugin.version = 0.95
         for attributeName in ['methods', 'saves', 'restores', 'exports']:
             plugin[attributeName] = []
-            if attributeName in dir(plugin.module):
+            if hasattr(plugin.module, attributeName):
                 for function, other in getattr(plugin.module, attributeName):
+                    # add the functions to the Project class
                     setattr( Project, function.__name__, function )
+                    # store the function in the plugin for later usage on Project.save() and Project.restore()
                     plugin[attributeName].append( (function, other) )
                 #end for
             #end if
@@ -85,11 +93,13 @@ def importPlugin( pluginName ):
     return plugin
 #end def
 
-# do all *.py files in plugin directory excluding __init__
-# GWV 30 Jan 2014: using CingDefinitions class instance
-for _p in (cingDefinitions.pluginCodePath / '*.py').glob():
-    _d,_pname,_e = _p.split3()
-    #print '>>',_pname
-    if _pname != '__init__':
-        importPlugin( _pname )
-#end for
+def importPlugins():
+    # do all *.py files in plugin directory excluding __init__
+    # GWV 30 Jan 2014: using CingDefinitions class instance
+    for _p in (cingDefinitions.pluginPath / '*.py').glob():
+        _d,_pname,_e = _p.split3()
+        #print '>>',_pname
+        if _pname != '__init__':
+            importPlugin( cingDefinitions.pluginCode, _pname )
+    #end for
+#end def

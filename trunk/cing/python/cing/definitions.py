@@ -1,10 +1,14 @@
+import os
+import sys
+import platform
+import time
+
+from ConfigParser import ConfigParser
+
 import cing.Libs.helper as helper
 import cing.Libs.disk as disk
 import cing.constants as constants
 import cing.Libs.Adict as Adict
-import os
-import sys
-from ConfigParser import ConfigParser
 
 
 #-----------------------------------------------------------------------------
@@ -35,7 +39,45 @@ except:
 #-----------------------------------------------------------------------------
 # System definitions
 #-----------------------------------------------------------------------------
-systemDefinitions = helper.SystemDefinitions()
+class SystemDefinitions(Adict.Adict):
+    """A class to store system definitions and system related data
+    """
+    def __init__(self):
+        Adict.Adict.__init__(self)
+        self.osType = helper.getOsType()
+        self.osRelease = helper.getOsRelease()
+        self.osArchitecture = platform.architecture()[0]
+        self.nCPU = helper.detectCPUs()
+        self.internetConnected = helper.isInternetConnected()
+        self.startTime = time.time()
+        self.pid = os.getpid()
+        self.user = os.getenv("USER", "Unknown user")
+        self.host = os.getenv("HOST", "Unknown host") #only works with (t)csh shell
+    #end def
+
+    def elapsedTime(self):
+        return time.time() - self.startTime
+
+    def ascTime(self, timePoint=None):
+        if timePoint:
+            return time.asctime(time.localtime(timePoint))
+        else:
+            return time.asctime(time.localtime(self.startTime))
+
+    def getStartMessage(self):
+        on = "%s (%s%s/%s/%scores/py%s)" % (self.host, self.osType, self.osRelease, self.osArchitecture, self.nCPU, sys.version.split()[0])
+        at = '(pid:%d) ' %  self.pid + self.ascTime()
+        return "User: %-10s on: %-42s at: %32s" % (self.user, on, at)
+
+    def getStopMessage(self):
+        now = time.time()
+        return 'Started at: %s\nStopped at: %s\nTook      : %.1f seconds' % (self.ascTime(),self.ascTime(now), now-self.startTime)
+
+    def __str__(self):
+        return '<SystemDefinitions: osType=%s, osRelease=%s, osArchitecture=%s, nCPU=%s, internetConnected=%s, host=%s, startTime=%s, pid=%s, user=%s>' % \
+                (self.osType, self.osRelease, self.osArchitecture, self.nCPU, self.internetConnected, self.host, self.ascTime(), self.pid, self.user)
+#end class
+systemDefinitions = SystemDefinitions()
 
 #-----------------------------------------------------------------------------
 # General CING definitions
@@ -45,14 +87,17 @@ class CingDefinitions(Adict.Adict):
         Adict.Adict.__init__(self)
         self.programName     = constants.CING
         self.longProgramName = 'CING: Common Interface for NMR structure Generation version'
-        self.version         = 1.0
+        self.version         = 1.01
         self.date            = '30 Jan 2014'
 
-        self.codePath        = disk.Path(__file__)[:-1] # all relative from this path
+        self.codePath        = disk.Path(__file__)[:-1] # all relative from this path, also assures a Path object
         self.rootPath        = self.codePath[:-2]
         self.libPath         = self.codePath / 'Libs'
-        self.pluginCodePath  = self.codePath / 'PluginCode'
+        self.pluginPath      = self.codePath / 'PluginCode'
         self.pluginCode      = 'cing.PluginCode' # used in importPluging
+
+        self.binPath         = self.rootPath / 'bin'
+        self.htmlPath        = self.rootPath / 'HTML'
 
         self.tmpdir          = disk.Path('/tmp') / "cing.tmpdir." + str(systemDefinitions.pid)
         # The TMPDIR environment variable will override the default above but not the one that
@@ -111,7 +156,89 @@ class CingDefinitions(Adict.Adict):
 cingDefinitions = CingDefinitions()
 
 #-----------------------------------------------------------------------------
-# General CING settings
+# Directory definitions
+#-----------------------------------------------------------------------------
+
+# These directories get created. They are defined relative to project root path,
+# available through Project.rootPath( name ) method, or can be joined relative
+# to project root by Project.path( *args ) method.
+directories = Adict.Adict(
+    data       = 'Data',
+    molecules  = 'Data/Molecules',
+    peaklists  = 'Data/Peaklists',
+    restraints = 'Data/Restraints',
+    ccpn       = 'Data/Ccpn',
+    sources    = 'Data/Sources',
+    database   = 'Data/Database',
+    plugins    = 'Data/Plugins',
+    logs       = 'Logs',
+    export     = 'Export',
+    xeasy      = 'Export/Xeasy',
+    xeasy2     = 'Export/Xeasy2',
+    nih        = 'Export/NIH',
+    sparky     = 'Export/Sparky',
+    PDB        = 'Export/PDB',
+    xplor      = 'Export/Xplor',
+    aqua       = 'Export/Aqua',
+    queen      = 'Queen',
+    refine     = 'Refine',
+    tmp        = 'Temp'
+)
+
+# These directories get created upon opening/appending a molecule to project
+validationDirectories = Adict.Adict(
+    # Directories generated
+    procheck   = 'Procheck',
+    dssp       = 'Dssp',
+    whatif     = 'Whatif',
+    wattos     = 'Wattos',
+    x3dna      = 'X3DNA',
+    analysis   = 'Cing',
+    shiftx     = 'Shiftx',
+    ccpn       = 'Ccpn',
+    html       = 'HTML',
+    macros     = 'Macros',
+    jmol       = 'Macros/Jmol',
+    pymol      = 'Macros/pyMol',
+    yasara     = 'Macros/Yasara',
+    molmol     = 'Macros/Molmol'
+)
+
+# These directories get generated below the HLML root of a molecule
+htmlDirectories = Adict.Adict(
+    molecule    = 'Molecule',
+#    atoms       = 'Atoms',
+    models      = 'Molecule/Models',
+    restraints  = 'Restraints',
+    dihedrals   = 'Dihedrals',
+    peaks       = 'Peaks'
+)
+
+# These files and directories are just definitions
+cingPaths = Adict.Adict(
+    project      = 'project.sml',
+#    plugins      = 'PluginCode',  # OBSOLETE: to be replaced by cingDefinitions.pluginPath
+    scripts      = 'Scripts',
+#    bin          = 'bin',       # OBSOLETE: to be replaced by cingDefinitions.binPath
+    html         = 'HTML',
+    css          = 'cing.css',
+    xplor        = os.getenv('xplorPath'),
+    procheck_nmr = os.getenv('procheckPath'),
+    aqpc         = os.getenv('aqpcPath'),
+    whatif       = os.getenv('whatifPath'),
+    dssp         = os.getenv('dsspPath'),
+    convert      = os.getenv('convertPath'),
+    ghostscript  = os.getenv('ghostscriptPath'),
+    ps2pdf       = os.getenv('ps2pdfPath'),
+    molmol       = os.getenv('molmolPath'),
+    povray       = os.getenv('povrayPath'),
+    talos        = os.getenv('talosPath'),
+    classpath    = os.getenv('CLASSPATH')   #No idea where this is used for
+)
+
+
+#-----------------------------------------------------------------------------
+# Validation settings
 #-----------------------------------------------------------------------------
 class ValidationSettings(Adict.Adict):
 
@@ -167,24 +294,47 @@ class ValidationSettings(Adict.Adict):
 validationSettings = ValidationSettings().readFromFile()
 #-----------------------------------------------------------------------------
 
-def getInfoMessage():
-    """Get all the info there is to get
-    """
-    l = max(map(len, cingDefinitions.keys()+systemDefinitions.keys()))
-    fmt = '{key:%s} : {value}\n' % l
-    #print '>>', fmt
-
-    result = '-'*80 +'\n'
-    result += cingDefinitions.formatItems(fmt)
-    result += systemDefinitions.formatItems(fmt)
-    result += '-'*80
-    return result
-#end def
-
+#-----------------------------------------------------------------------------
 # pydoc settings
+#-----------------------------------------------------------------------------
 __version__            = cingDefinitions.version
 __date__               = cingDefinitions.date
 __copyright_years__    = '2004-' + cingDefinitions.date.split()[-1] # Never have to update this again...
 __author__             = cingDefinitions.getAuthorsString()
 __copyright__          = cingDefinitions.copyright
 __credits__            = cingDefinitions.credits + '  ' + __copyright__
+
+#-----------------------------------------------------------------------------
+# Adaptations. TODO: cleanup
+#-----------------------------------------------------------------------------
+for key in cingPaths.keys():
+    if cingPaths[ key ] == constants.PLEASE_ADD_EXECUTABLE_HERE:
+        cingPaths[ key ] = None
+
+if cingPaths.convert:
+    cingPaths[ 'montage' ] = cingPaths.convert.replace('convert','montage')
+
+# shiftx
+if systemDefinitions.osType == constants.OS_TYPE_LINUX and systemDefinitions.osArchitecture == '64bit':
+    cingPaths.shiftx = cingDefinitions.binPath / 'shiftx_linux64'
+elif systemDefinitions.osType == constants.OS_TYPE_LINUX and systemDefinitions.osArchitecture == '32bit':
+    cingPaths.shiftx = cingDefinitions.binPath / 'shiftx_linux'
+elif systemDefinitions.osType == constants.OS_TYPE_MAC:
+    cingPaths.shiftx = cingDefinitions.binPath / 'shiftx'
+else:
+    cingPaths.shiftx = None
+
+# x3dna
+if systemDefinitions.osType == constants.OS_TYPE_MAC:
+    cingPaths.x3dna = cingDefinitions.binPath / 'x3dna'
+else:
+    cingPaths.x3dna = None
+
+# molprobity
+if systemDefinitions.osType == constants.OS_TYPE_MAC:
+    cingPaths.MolProbity = cingDefinitions.binPath / 'molprobity'
+else:
+    cingPaths.MolProbity = None
+
+if cingPaths.classpath:
+    cingPaths.classpath = cingPaths.classpath.split(':')

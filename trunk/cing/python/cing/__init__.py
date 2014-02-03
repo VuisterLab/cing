@@ -29,7 +29,7 @@ import sys
 
 #import cing.Libs.helper as helper
 #import cing.Libs.disk as disk
-#import cing.constants as constants
+import cing.constants as constants
 import cing.definitions as cdefs
 
 __version__         = cdefs.__version__
@@ -42,21 +42,21 @@ __credits__         = cdefs.__credits__
 #-----------------------------------------------------------------------------
 # Verbosity
 #-----------------------------------------------------------------------------
-verbosityNothing  = cdefs.verbosityNothing # Even errors will be suppressed
-verbosityError    = cdefs.verbosityError   # show only errors
-verbosityWarning  = cdefs.verbosityWarning # show errors and warnings
-verbosityOutput   = cdefs.verbosityOutput  # and regular output DEFAULT
-verbosityDetail   = cdefs.verbosityDetail  # show more details
-verbosityDebug    = cdefs.verbosityDebug   # add debugging info (not recommended for casual user)
-verbosityDefault  = cdefs.verbosityDefault
-verbosity         = cdefs.cingDefinitions.verbosity
-
+verbosityNothing    = cdefs.verbosityNothing # Even errors will be suppressed
+verbosityError      = cdefs.verbosityError   # show only errors
+verbosityWarning    = cdefs.verbosityWarning # show errors and warnings
+verbosityOutput     = cdefs.verbosityOutput  # and regular output DEFAULT
+verbosityDetail     = cdefs.verbosityDetail  # show more details
+verbosityDebug      = cdefs.verbosityDebug   # add debugging info (not recommended for casual user)
+verbosityDefault    = cdefs.verbosityDefault
+verbosity           = cdefs.cingDefinitions.verbosity
 
 #-----------------------------------------------------------------------------
 # System and cing definitions
 #-----------------------------------------------------------------------------
 from cing.definitions import systemDefinitions
 from cing.definitions import cingDefinitions
+from cing.definitions import cingPaths
 
 #-----------------------------------------------------------------------------
 # create tmp directory
@@ -123,8 +123,10 @@ NaNstring              = "."
 
 from cing.Libs.NTutils      import *
 from cing.Libs.AwkLike      import AwkLike
+from cing.Libs.Adict        import Adict
+#from cing.constants        import * # already defined above as 'constants'
 
-#from cing.core.constants    import *
+plugins = Adict() # Filled  later-on
 
 from cing.core.classes      import Project
 from cing.core.classes      import Peak,              PeakList
@@ -136,25 +138,38 @@ from cing.core.classes      import RDCRestraint,      RDCRestraintList
 # functional imports: Order matters!
 #---------------------------------------------------------------------------------------------
 
-# Try a Yasara import
-# GV: We could change this by defining yasaradir in the CING setup
-try:
-    from yasara import yasaradir #@UnresolvedImport # JFD: why not add the functionality from the plugin ?
-    if os.path.exists(yasaradir):
-        sys.path.append(os.path.join(yasaradir,'pym'))
-        sys.path.append(os.path.join(yasaradir,'plg'))
-    else:
-        nTcodeerror('Yasara directory "%s" as defined in yasara.py module not found', yasaradir)
-        exit(1)
-except:
-    yasaradir = None
-#end try
+#OBSOLETE: should get better implementation
+## Try a Yasara import
+## GV: We could change this by defining yasaradir in the CING setup
+#try:
+#    from yasara import yasaradir #@UnresolvedImport # JFD: why not add the functionality from the plugin ?
+#    if os.path.exists(yasaradir):
+#        sys.path.append(os.path.join(yasaradir,'pym'))
+#        sys.path.append(os.path.join(yasaradir,'plg'))
+#    else:
+#        nTcodeerror('Yasara directory "%s" as defined in yasara.py module not found', yasaradir)
+#        exit(1)
+#except:
+#    yasaradir = None
+##end try
 
-from cing.core.molecule     import *
-from cing.core.importPlugin import importPlugin # This imports all plugins
-from cing.core.sml          import obj2SML      # This also initializes the SMLhandler methods
-from cing.core.sml          import sML2obj      # This also initializes the SMLhandler methods
+# Molecule
+from cing.core.molecule     import *             #TODO: ugly, need to be explicit
 
+# Plugins
+from cing.core.importPlugin import importPlugins
+importPlugins()                                  # This imports all plugins
 
+# SML
+from cing.core.sml          import obj2SML       # This also initializes the SMLhandler methods
+from cing.core.sml          import sML2obj       # This also initializes the SMLhandler methods
+
+# database
 from cing.core.database     import NTdb #@Reimport
 NTdb._restoreFromSML()                          # This initializes the database
+
+# convenience
+from cing.main import getInfoMessage as gi
+from cing.Libs.Adict import formatDictItems as fd
+
+

@@ -3300,6 +3300,21 @@ class XMLNTdictHandler(XMLhandler):
     #end def
 #end class
 
+#class XMLAdictHandler(XMLhandler):
+#    """Adict handler class"""
+#    def __init__(self):
+#        XMLhandler.__init__(self, name='Adict')
+#    #end def
+#
+#    def handle(self, node):
+#        attrs = self.handleDictElements(node)
+#        if attrs == None:
+#            return None
+#        result = NTdict()
+#        result.update(attrs)
+#        return result
+#    #end def
+##end class
 
 class XMLNTtreeHandler(XMLhandler):
     """NTtree handler class"""
@@ -4082,7 +4097,7 @@ represent the full range of C's unsigned (long) integers.
     #end def
 #end class
 
-
+#DEPRECIATED: use routines from disk.py instead
 def removedir(path):
     """Recursive remove path"""
     while (1):
@@ -4107,6 +4122,7 @@ def removedir(path):
     #end while
 #end def
 
+#DEPRECIATED: use routines from disk.py instead
 def nTpath(path):
 
     """Return a triple (directory, basename, extension) from path"
@@ -4119,6 +4135,7 @@ def nTpath(path):
     return dname, f[0], f[1]
 #end def
 
+#DEPRECIATED: use routines from disk.py instead
 def getFileName(path):
     """Return a basename.extension from path"
     May be empty:
@@ -4132,6 +4149,7 @@ Out[12]: ('/', 'a')
     return d[1]
 #end def
 
+#DEPRECIATED: use routines from disk.py instead
 def nTmkdir(path):
 
     """ creates missing directories for the given path and
@@ -4155,6 +4173,7 @@ def nTmkdir(path):
     return normpath(path)
 #end def
 
+#DEPRECIATED:
 def showNTobject(nTobject=None):
     '''Used to conflict with matplotlib show so renamed.
     Haven't seen a usage for this in the CING api.
@@ -4325,6 +4344,7 @@ def findvisitor((matches, pattern), thisdir, nameshere):
             matches.append(fullpath)
 # end def
 
+#DEPRECIATED: use routines from disk.py instead
 def findFiles(pattern, startdir, exclude=[]): # pylint: disable=W0102
     """
     Find files matching pattern, based upon os.walk

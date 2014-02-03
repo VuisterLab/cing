@@ -24,8 +24,7 @@ from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.Libs.disk import copy
 from cing.PluginCode.required.reqProcheck import * #@UnusedWildImport
 from cing.constants import * #@UnusedWildImport
-from cing.core.parameters import PLEASE_ADD_EXECUTABLE_HERE
-from cing.core.parameters import cingPaths
+from cing.definitions import cingPaths
 from glob import glob
 
 

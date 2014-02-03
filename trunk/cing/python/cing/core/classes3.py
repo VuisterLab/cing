@@ -6,6 +6,9 @@ Simple class that doesn't import NTutils or sml in order to avoid cyclic behavio
 from cing.constants import * #@UnusedWildImport
 #from cing.core.sml import SMLhandler
 
+DEFAULT_SML_HANDLER_STRING = 'Default handler from SMLhandled'
+
+
 #class GumboObject(): # pylint: disable=R0903
 class SMLhandled(): # pylint: disable=R0903
     '''

@@ -6,7 +6,7 @@ from cing.Libs.AwkLike import AwkLike
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.constants import * #@UnusedWildImport
 from cing.core.parameters import cingPaths
-from cing.core.parameters import validationSubDirectories
+from cing.definitions import validationDirectories
 from glob import glob
 from math import sqrt
 
@@ -15,7 +15,7 @@ if True: # block
     useModule = True
     # TODO: test if the binary is actually applicable to the system os.
     if not os.path.exists( cingPaths.shiftx ):
-        nTmessage("Missing shiftx which is a dep for shiftx")
+        nTmessage("Missing shiftx which is a dependency for shiftx")
         useModule = False
     if not useModule:
         raise ImportWarning('shiftx')
@@ -28,7 +28,7 @@ def shiftxPath(project, *args):
     Return shiftx path from active molecule of project
     Creates directory if does not exist
     """
-    return project.validationPath(validationSubDirectories['shiftx'], *args)
+    return project.validationPath(validationDirectories['shiftx'], *args)
 #end def
 
 def parseShiftxOutput( fileName, molecule, chainId ):

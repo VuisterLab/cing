@@ -1595,7 +1595,7 @@ class NrgCing(Lister):
         # end if
         nTmessage("Creating HTML directory for %s." % self.results_base)
         mkdirs(htmlDir)
-#        srcHtmlPath = os.path.join(cingRoot, cingPaths.html)
+#        srcHtmlPath =   cdefs.cingDefinitions.htmlPath
         data_dir = os.path.join (self.base_dir, "data" )
         base_data_dir = os.path.join (data_dir, self.results_base )
         # Most crud can come in from the traditional method.
