@@ -5,7 +5,7 @@ from cing.PluginCode.required.reqMatplib import MATPLIB_STR
 from cing.PluginCode.required.reqWattos import * #@UnusedWildImport
 from cing.STAR.File import File
 from cing.core.parameters import cingPaths
-from cing.core.parameters import plugins
+from cing import plugins
 
 
 if True: # block
@@ -374,7 +374,7 @@ def _runWattos(project, ranges=None, tmp = None, parseOnly=False):
         if not os.path.exists(fullname):
             nTerror("Failed to create file [%s] in nmrStar.toNmrStarFile" % fullname)
             return None
-        
+
         scriptComplete = wattos.scriptTemplate
         scriptComplete = scriptComplete.replace("INPUT_STR_FILE", fileName)
         scriptComplete = scriptComplete.replace("VERBOSITY", repr(cing.verbosity))

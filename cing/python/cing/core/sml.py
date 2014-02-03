@@ -1,3 +1,4 @@
+from cing.Libs.Adict import Adict
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.Libs.fpconst import NaN as nan #@UnresolvedImport @UnusedImport ? need for restoring the project ?
 from cing.PluginCode.required.reqVasco import * #@UnusedWildImport
@@ -383,6 +384,7 @@ class SMLNTdictHandler( SMLhandler ):
         Write key value pairs of theDict to stream for restoring later with fromFile method
         Returns theDict or None on error.
         """
+#        nTdebug("Now in SMLAdictHandler#toSML" )
         fprintf( stream, '%s\n', self.startTag )
         for key,value in theDict.iteritems():
             fprintf( stream, '%s = ', key )
@@ -398,6 +400,39 @@ class SMLNTdictHandler( SMLhandler ):
 #end class
 NTdict.SMLhandler = SMLNTdictHandler()
 
+# Make SMLhandlers for Adict
+class SMLAdictHandler( SMLhandler ):
+
+    def __init__(self):
+        SMLhandler.__init__( self, name = 'Adict' )
+    #end def
+
+    def handle(self, line, fp, obj=None):
+#        nTdebug("Now in SMLAdictHandler#handle at line: %s" % str(line))
+        dictObj = Adict()
+        return self.dictHandler(dictObj, fp, obj)
+    #end def
+
+    def toSML(self, theDict, stream=sys.stdout, *args, **kwds):
+        """
+        Write key value pairs of theDict to stream for restoring later with fromFile method
+        Returns theDict or None on error.
+        """
+#        nTdebug("Now in SMLAdictHandler#toSML" )
+        fprintf( stream, '%s\n', self.startTag )
+        for key,value in theDict.iteritems():
+            fprintf( stream, '%s = ', key )
+            if hasattr(value,'SMLhandler') and value.SMLhandler != None:
+                value.SMLhandler.toSML( value, stream, *args, **kwds )
+            else:
+                fprintf( stream, '%r\n', value )
+            #end if
+        #end for
+        fprintf( stream, '%s\n', self.endTag )
+        return theDict
+    #end def
+#end class
+Adict.SMLhandler = SMLAdictHandler()
 
 # Make SMLhandlers for NTvalue
 # Needed because it's a subclass of NTdict
@@ -434,6 +469,29 @@ class SMLNTvalueHandler( SMLhandler ):
 #end class
 NTvalue.SMLhandler = SMLNTvalueHandler()
 
+class SMLHistoryHandler( SMLhandler ):
+
+    def __init__(self):
+        SMLhandler.__init__( self, name = 'History' )
+    #end def
+
+    def handle(self, line, fp, project=None):
+        h = History()
+        if not self.listHandler(h, fp, project):
+            return None
+        if project:
+            project.history = h
+        return h
+    #end def
+
+    def toSML(self, h, fp):
+        fprintf( fp, '%s\n', self.startTag )
+        for item in h:
+            fprintf( fp, '%r\n', item )
+        fprintf( fp, '%s\n', self.endTag )
+    #end def
+#end class
+History.SMLhandler = SMLHistoryHandler()
 
 class SMLMoleculeHandler( SMLhandler ):
 
@@ -1532,7 +1590,7 @@ class SMLAtomDefHandler( SMLhandler ):
 AtomDef.SMLhandler = SMLAtomDefHandler()
 
 
-def obj2SML( obj, smlFile, **kwds ):
+def obj2sml( obj, smlFile, **kwds ):
     """
     Generate SML file from object.
     Return obj or None on error
@@ -1541,8 +1599,10 @@ def obj2SML( obj, smlFile, **kwds ):
         return None
     return obj
 #end def
+#LEGACY:
+obj2SML = obj2sml
 
-def sML2obj( smlFile, externalObject=None ):
+def sml2obj( smlFile, externalObject=None ):
     """
     Generate obj from smlFile
     """
@@ -1550,6 +1610,8 @@ def sML2obj( smlFile, externalObject=None ):
     obj = smlhandler.fromFile(smlFile, externalObject)
     return obj
 #end def
+#LEGACY:
+sML2obj= sml2obj
 
 #-----------------------------------------------------------------------------
 # Two handy (?) routines

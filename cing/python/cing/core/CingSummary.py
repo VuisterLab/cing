@@ -1,7 +1,7 @@
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.PluginCode.required.reqProcheck import * #@UnusedWildImport
 from cing.PluginCode.required.reqWhatif import * #@UnusedWildImport
-from cing.core.parameters import plugins
+from cing import plugins
 from cing.Libs.fpconst import NaN
 
 
@@ -112,7 +112,7 @@ class CingSummary( NTdict ):
             self.CING_residueROG.append( (residue.cName(-1), residue.rogScore) )
         #end for
         total = reduce(lambda x, y: x+y+0.0, rog) # total expressed as a float because of 0.0
-        for i, _x in enumerate(rog): 
+        for i, _x in enumerate(rog):
             rog[i] = rog[i]*100.0/total
         self.cing_red    = round(rog[0],1)
         self.cing_orange = round(rog[1],1)
@@ -160,7 +160,7 @@ class CingSummary( NTdict ):
         """
         return (drl.name, drl.status,
                 len(drl), len(drl.intraResidual), len(drl.sequential),len(drl.mediumRange),len(drl.longRange),len(drl.ambiguous),
-                NTvalue(drl.rmsdAv, drl.rmsdSd, fmt='%.4f +/ %.4f'), drl.violCountLower, 
+                NTvalue(drl.rmsdAv, drl.rmsdSd, fmt='%.4f +/ %.4f'), drl.violCountLower,
                 drl.violCount1, drl.violCount3, drl.violCount5, str(drl.rogScore)
                )
     #end def
@@ -206,7 +206,7 @@ class XMLCingSummaryHandler( XMLhandler ):
 
     def handle(self, node):
         attrs = self.handleDictElements(node)
-        if attrs == None: 
+        if attrs == None:
             return None
         result = CingSummary()
         result.update(attrs)

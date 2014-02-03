@@ -57,7 +57,8 @@ from cing.core.molecule import Chain
 from cing.core.molecule import Molecule
 from cing.core.molecule import Residue
 from cing.core.parameters import plotParameters
-from cing.core.parameters import plugins
+from cing.definitions import validationDirectories
+from cing import plugins
 from numpy.lib.index_tricks import ogrid
 from numpy.lib.twodim_base import histogram2d
 
@@ -728,7 +729,7 @@ def summaryForProject( project, toFile = True, ranges=None ):
     msg = topMsg + '\n' + msg
 
     if toFile:
-        fname = project.path(mol.name, project.moleculeDirectories.analysis,'summary.txt')
+        fname = project.path(mol.name, validationDirectories.analysis,'summary.txt')
         fp = open( fname, 'w' )
         nTmessage( '==> summary, output to %s', fname)
 #        nTdebug(" msg: " + msg)
@@ -763,6 +764,7 @@ def partitionRestraints( project ):
                 if not (atm1 and atm2): # Not observed yet.
                     nTerror("Found distance restraint without atom1 or 2. For restraint: %s" % restraint)
                     continue
+                #print '>>', atm1, atm2
                 atm1.residue.distanceRestraints.add( restraint ) #AWSS
                 atm2.residue.distanceRestraints.add( restraint ) #AWSS
             #end for
@@ -900,7 +902,7 @@ def validateRestraints( project, toFile = True):
 #    nTdebug(msg)
     if toFile:
         #project.mkdir(project.directories.analysis, project.molecule.name)
-        fname = project.path(project.molecule.name, project.moleculeDirectories.analysis,'restraints.txt')
+        fname = project.path(project.molecule.name, validationDirectories.analysis,'restraints.txt')
         fp = open( fname, 'w' )
         nTmessage( '==> validateRestraints, output to %s', fname)
         fprintf(fp, msg)
@@ -935,7 +937,7 @@ def checkForSaltbridges( project, cutoff = 0.5, toFile=False)   :
 
     if toFile: # This output could easily be cached before write at once.
         #project.mkdir(project.directories.analysis, project.molecule.name)
-        fname = project.path(project.molecule.name, project.moleculeDirectories.analysis,'saltbridges.txt')
+        fname = project.path(project.molecule.name, validationDirectories.analysis,'saltbridges.txt')
         fp = open( fname, 'w' )
         nTmessage( '==> checkSaltbridges, output to %s', fname)
     else:

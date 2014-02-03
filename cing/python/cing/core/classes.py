@@ -11,6 +11,8 @@ from cing import cingPythonCingDir
 from cing import cingRoot
 from cing import cingVersion
 from cing import issueListUrl
+from cing import plugins
+from cing.Libs.Adict import Adict
 from cing.Libs.Geometry import violationAngle
 from cing.Libs.NTutils import * #@UnusedWildImport
 try:
@@ -22,6 +24,7 @@ try:
 except ImportError:
     pass
 from cing.Libs.disk import copydir
+from cing.Libs.disk import Path
 from cing.Libs.disk import remove
 from cing.Libs.html import DihedralByProjectList
 from cing.Libs.html import addPreTagLines
@@ -42,12 +45,11 @@ from cing.core.molecule import Ensemble
 from cing.core.molecule import Molecule
 from cing.core.molecule import nTdihedralOpt
 from cing.core.molecule import nTdistanceOpt #@UnusedImport
-from cing.core.parameters import cingPaths
-from cing.core.parameters import directories
+from cing.definitions import cingPaths
+from cing.definitions import directories
+from cing.definitions import validationDirectories
 from cing.core.parameters import moleculeDirectories
 from cing.core.parameters import plotParameters
-from cing.core.parameters import plugins
-from cing.core.parameters import validationSubDirectories
 from cing.core.validate import checkForSaltbridges
 from cing.core.validate import criticize
 from cing.core.validate import criticizePeaks
@@ -97,7 +99,6 @@ Project: Top level Cing project class
            -> directories
            -> cingPaths
            -> plotParameters
-           -> plugins
   _____________________________________________________________________________
 
     Methods:
@@ -149,6 +150,7 @@ Project: Top level Cing project class
         self.root = root
         self.name = name.strip()
         self.created = time.asctime()
+
         self.molecule = None # Current Molecule instance
 
         self.moleculeNames = NTlist() # list to store molecule names for save and restore
@@ -164,9 +166,10 @@ Project: Top level Cing project class
         self.history = History()
         self.contentIsRestored = False # True if Project.restore() has been called
         self.storedInCcpnFormat = False
+        self.storedinXml = True # Project.xml file
 
+        self.statusObjectNameList = 'procheckStatus dsspStatus whatifStatus wattosStatus vascoStatus shiftxStatus x3dnaStatus'.split()
         self.procheckStatus = NTdict(completed = False, parsed = False, ranges = None)
-
         self.whatifStatus = NTdict(completed = False, parsed = False)
         self.wattosStatus = NTdict(completed = False, parsed = False)
         self.vascoStatus = NTdict(completed = False, parsed = False)
@@ -175,15 +178,17 @@ Project: Top level Cing project class
         self.status = NTdict() # General status dict for external programs
 
 #        store a reference to the global things we might need
-        self.gui = None # Reference to CingGui instance
+#        self.gui = None # Reference to CingGui instance
+        #LEGACY: GWV: 20140202 bad idea mixing code with data
         self.directories = directories
         self.moleculeDirectories = moleculeDirectories
-        self.validationSubDirectories = validationSubDirectories
+        self.validationDirectories = validationDirectories
         self.cingPaths = cingPaths
         self.plotParameters = plotParameters
-        self.plugins = plugins
+        self.valSets = cdefs.validationSettings
+#OBSOLETE:
+#        self.plugins = plugins
 
-        self.statusObjectNameList = 'procheckStatus dsspStatus whatifStatus wattosStatus vascoStatus shiftxStatus x3dnaStatus'.split()
         # These Project lists are dynamic and will be filled  on restoring a project
         # They also maintain some internal settings
         # new( name ), append( instance), save(), restore() and path( name ) and names() comprise core functionality
@@ -229,30 +234,28 @@ Project: Top level Cing project class
 #        self.dihedralByResidue = None # done above.
 
 
-        # store reference to self
-        #self[name] = self
+        # Path's related stuff
         self.objectPath = self.path(cingPaths.project)
-#        self.makeObjectPaths() # generates the objectPaths dict from the nameLists
 
         self.rogScore = ROGscore()
         self.summaryDict = CingSummary()
 
-        self.valSets = cdefs.validationSettings
         self.nosave = False
-
-        self.saveXML('version',
-                      'name', 'created',
-                      'moleculeNames',
-                      'peakListNames', 'distanceListNames', 'dihedralListNames', 'rdcListNames',
-                      'coplanarListNames', 'dihedralByProjectListNames', 'dihedralByResidue',
-                      'storedInCcpnFormat',
-                      'reports',
-                      'history',
-                      'procheckStatus', 'whatifStatus', 'wattosStatus', 'shiftxStatus', 'status'
-                    )
+        self.saveKeys = [
+                         'version',
+                         'name', 'created',
+                         'moleculeNames',
+                         'peakListNames', 'distanceListNames', 'dihedralListNames', 'rdcListNames',
+                         'coplanarListNames', 'dihedralByProjectListNames', 'dihedralByResidue',
+                         'storedInCcpnFormat',
+                         'reports',
+                         'history',
+                         'procheckStatus', 'whatifStatus', 'wattosStatus', 'shiftxStatus', 'status'
+                         ]
+        self.saveXML(*self.saveKeys)
     #end def
 
-
+#OBSOLETE:
 #    def readValidationSettings(self, fn = None):
 #        """Reads the validation settings from installation first and then overwrite any if a filename is given.
 #        This ensures that all settings needed are present but can be overwritten. It decouples development from
@@ -322,16 +325,17 @@ Project: Top level Cing project class
         return self.summaryDict
     #end def
 
-    #-------------------------------------------------------------------------
-    # Path stuff
-    #-------------------------------------------------------------------------
+#-------------------------------------------------------------------------
+# Path stuff
+#-------------------------------------------------------------------------
 
     def path(self, *args):
         """Return joined args as path relative to root of project
         """
-        return os.path.normpath(os.path.join(self.root, *args))
+        return Path(os.path.normpath(os.path.join(self.root, *args)))
     #end def
 
+    @staticmethod
     def rootPath(pathName):
         """Static method returning Root,name of project from pathName
 
@@ -353,11 +357,10 @@ Project: Top level Cing project class
 #            exit(1) # no more hard exits for we might call this from GUI or so wrappers
             return None, None
 
-        rootp = os.path.join(root, name + '.cing')
+        rootp = Path(os.path.join(root, name + '.cing'))
 #        nTdebug("rootp, name: [%s] [%s]" % (rootp, name))
         return rootp, name
     #end def
-    rootPath = staticmethod(rootPath)
 
     def mkdir(self, *args):
         """Make a directory relative to to root of project from joined args.
@@ -365,9 +368,9 @@ Project: Top level Cing project class
            Return the result
         """
         d = self.path(*args)
-        if not os.path.exists(d):
+        if not d.exists():
 #            nTdebug( "project.mkdir: %s" % d )
-            os.makedirs(d)
+            d.makedirs()
         return d
     #end def
 
@@ -420,21 +423,23 @@ Project: Top level Cing project class
             return None
         return self[nameTuple[0]].decodeNameTuple(nameTuple)
 
-    #-------------------------------------------------------------------------
-    # actions exists/open/restore/save/close/export/updateProject
-    #-------------------------------------------------------------------------
+#-------------------------------------------------------------------------
+# actions exists/open/restore/save/close/export/updateProject
+#-------------------------------------------------------------------------
 
-    def exists(name):
-        """Static method exists check for presence of Project directory derived from name
-            returns True or False
-        """
-        rootp, _n = Project.rootPath(name)
-        if os.path.exists(rootp):
-            return True
-        return False
-    #end def
-    exists = staticmethod(exists)
+#OBSOLETE: uses exists() on all path objects
+#    def exists(name):
+#        """Static method exists check for presence of Project directory derived from name
+#            returns True or False
+#        """
+#        rootp, _n = Project.rootPath(name)
+#        if os.path.exists(rootp):
+#            return True
+#        return False
+#    #end def
+#    exists = staticmethod(exists)
 
+#LEGACY:
     def setStatusObjects(self, parsed=None, completed = None):
         'Only update the parameter that is not None (True or False)'
 #             = 'procheckStatus dsspStatus whatifStatus wattosStatus vascoStatus shiftxStatus x3dnaStatus'.split()
@@ -444,13 +449,47 @@ Project: Top level Cing project class
             if completed != None:
                 setDeepByKeys(self, completed, statusObjectName, COMPLETED_STR)
         # end for
-    # end def
+    #end def
 
+    def getStatusDict(self, key, **defaults ):
+        """Return statusDict for key, initialise with defaults if not exist
+        add keys from defaults if not exist
+        add keys from minimals if not exist
+        update type to Adict
+        return None on error
+        """
+        mTuple = None
+        if self.molecule != None:
+            mTuple = self.molecule.nameTuple()
+
+        minimals = Adict(
+                  version      = 0.95,            # denotes all older versions
+                  directory    = None,
+                  smlFile      = None,
+                  savedInData  = False,           # to track the if sml file was stored in Data/Plugins
+                  savedAsSml   = False,
+                  completed    = False,
+                  parsed       = False,
+                  molecule     = mTuple,
+        )
+        sdict = self.status.setdefault(key, defaults)
+        if sdict == None:
+            nTerror('Project.getStatusDict: key %s returned None, reverting to default values', key)
+            sdict = defaults
+        #end if
+        # convert to Adict
+        sdict = Adict( sdict )
+        self.status[key] = sdict
+        # update keys
+        sdict.setdefaultKeys(defaults)
+        sdict.setdefaultKeys(minimals)
+        return sdict
+    #end def
 
     def open(name, status = 'create', restore = True):
         """Static method open returns a new/existing Project instance depending on status.
 
-           status == 'new': open a new project 'name'
+           status == 'new': open a new project 'name', overwrite when exists
            status == 'old: open existing project 'name'
                       project data is restored when restore == True.
            status == 'create': if project name if exists open as old, open as new otherwise.
@@ -514,13 +553,29 @@ Project: Top level Cing project class
                 return None
             #end if
 
-            # Restore Project info from xml-file
-            pfile = os.path.join(root, cingPaths.project)
-            if not os.path.exists(pfile):
+            # Restore Project info from xml/sml-file
+            from cing.core.sml import sml2obj
+            pfile = root / cingPaths.project
+            # Check if we need an sml or xml file
+            f,e = pfile.splitext()
+            if (f+'.sml').exists():
+                pfile = f+'.sml'
+                nTdebug('Project.open: restoring from %s', pfile)
+                pr = Project(name)
+                pr.update(sml2obj(pfile))
+                pr.storedinXml = False
+            elif (f+'.xml').exists():
+                pfile = f+'.xml'
+                nTdebug('Project.open: restoring from %s', pfile)
+                #GWV: 20140203: cannot do an update method() as above for sml -> errors in partioning restraints. Do not understand
+                pr = xML2obj(pfile)
+                pr.storedinXml = True
+            else:
+                # Neither one found
                 nTerror('Project.open: missing Project file "%s"', pfile)
                 return None
             #end if
-            pr = xML2obj(pfile)
+
             if pr == None:
                 nTerror('Project.open: error parsing Project file "%s"', pfile)
                 return None
@@ -532,6 +587,7 @@ Project: Top level Cing project class
 
             pr.contentIsRestored = False
 
+            #LEGACY:
             pr.setStatusObjects(parsed=False)
 
             try:
@@ -540,6 +596,7 @@ Project: Top level Cing project class
             except:
                 pass
 
+            #LEGACY:
             if pr.version <= 0.75:
                 nTmessage('Project.Open: converting from CING version %s', pr.version)
 #                nTdebug('Project.open: conversion: old project settings\n%s', pr.format())
@@ -670,9 +727,18 @@ Project: Top level Cing project class
 
         self.molecule.superpose(ranges = ranges, backboneOnly = backboneOnly,
                                    includeProtons = includeProtons, iterations = iterations
-                                  )
+                               )
         return self.molecule.rmsd
     #end def
+
+    def save2sml(self):
+        "Save project as SML file"
+        from cing.core.sml import obj2sml
+        path = self.path() / 'project.sml'
+        # get key, value pairs to save
+        p = Adict([(k,self[k]) for k in self.saveKeys ])
+        obj2sml( p, path )
+        self.storedinXml = False
 
     def save(self):
         """
@@ -697,7 +763,7 @@ Project: Top level Cing project class
         #end for
 
         # Call Plugin registered functions
-        for p in self.plugins.values():
+        for p in cing.plugins.values():
             if (not p) or (not hasattr(p, 'saves')) or (not p.saves):
                 pass
 #                nTdebug("Skipping save for disabled plugin: %s" % p)
@@ -710,10 +776,12 @@ Project: Top level Cing project class
 
         # Update version number since it is now saved with this cingVersion
         self.version = cingVersion
-        # Save the project data to xml file
-        if obj2XML(self, path = self.objectPath) != self:
-            nTerror('Project.save: writing Project file "%s" failed', self.objectPath)
-        #end if
+        # Save the project data
+        #OBSOLETE:
+        #if obj2XML(self, path = self.objectPath) != self:
+        #    nTerror('Project.save: writing Project file "%s" failed', self.objectPath)
+        ##end if
+        self.save2sml()
 
         self.addHistory('Saved project')
         return True
@@ -752,10 +820,11 @@ Project: Top level Cing project class
 #            l.criticize(self) now in criticize of validate plugin
 
         # Plugin registered functions
-        for p in self.plugins.values():
+        for p in plugins.values():
             if p.isInstalled:
+                nTdebug("Project.restore: %s" % p.module)
                 for f, obj in p.restores:
-#                    nTdebug("Restoring object [%s] with function [%s]" % (f,o))
+                    nTdebug("Project.restore: Restoring with %s( %s, %s )" % (f,self,obj))
                     f(self, obj)
                 #end for
             #end if
@@ -824,7 +893,7 @@ Project: Top level Cing project class
         nTmessage('' + dots * 5 + '')
         nTmessage('==> Exporting %s', self)
 
-        for p in self.plugins.values():
+        for p in cing.plugins.values():
             for f, obj in p.exports:
                 f(self, obj)
             #end for
@@ -851,14 +920,14 @@ Project: Top level Cing project class
         # Store names and references and append
         self.molecule = molecule
         self.molecules.append(molecule)
-        self.createMoleculeDirectories(molecule)
+        self.createValidationDirectories(molecule)
         return self.molecule
     #end def
 
-    def createMoleculeDirectories(self, molecule):
+    def createValidationDirectories(self, molecule):
         """generate the required directories for export and HTML data."""
         # generate the required directories for export and HTML data
-        for d in moleculeDirectories.values():
+        for d in validationDirectories.values():
             self.mkdir(molecule.name, d)
         #end for
     #end def
@@ -1302,7 +1371,7 @@ Project: Top level Cing project class
 
         txt = restraintList.format(showAll=True)
         if toFile:
-            fileName = self.path(self.molecule.name, self.moleculeDirectories.analysis, fileName)
+            fileName = self.path(self.molecule.name, validationDirectories.analysis, fileName)
             nTmessage( '==> %s, removed %s restraints and written to %s' % ( getCallerName(), len(restraintList), fileName))
             writeTextToFile(fileName, txt)
         else:
@@ -4368,7 +4437,7 @@ class XMLHistoryHandler(XMLhandler):
 #register this handler
 historyhandler = XMLHistoryHandler()
 
-
+#DEPRECIATED:
 def path(*args):
     """
     Return a path from arguments relative to cing root

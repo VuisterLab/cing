@@ -1,6 +1,7 @@
 'Gumbo stuff. Its what is in the soup today'
 # pylint: disable=C0302
 from cing import issueListUrl
+from cing.Libs import disk
 from cing.Libs import PyMMLib
 from cing.Libs.AwkLike import AwkLikeS
 from cing.Libs.Geometry import to_0_360
@@ -1618,13 +1619,20 @@ class Molecule( NTtree, ResidueList ):
             path = self.objectPath
         if not path:
             nTerror('Molecule.save: undefined path')
-        if os.path.exists(path):
-            removedir(path)
-        os.makedirs(path)
+
+        #GWV: 20140202 odd error with makedirs on save of existing project; changed to disk routines
+        path = disk.Path(path)
+        if path.exists():
+            if not path.isdir():
+                nTerror('Molecule.save: strange, path %s is not a directory as expected. Returning None', path)
+            nTdebug('Molecule.save: removing %s', path)
+            path.rmdir()
+        #end if
+        path.makedirs()
 
         # save special db entries
-        dbpath = os.path.join(path,'Database')
-        os.makedirs(dbpath)
+        dbpath = path / 'Database'
+        dbpath.makedirs()
         dblist = NTlist()
         for res in self.allResidues():
             if res.db.shouldBeSaved and res.db not in dblist:
@@ -1653,6 +1661,10 @@ class Molecule( NTtree, ResidueList ):
         #end if
 
         dbpath = os.path.join( path, 'Database')
+        if (not os.path.exists( dbpath )):
+            nTerror('Molecule.open: Database path "%s" not found\n', dbpath)
+            return None
+        #end if
         database.restoreFromSML( dbpath, database.NTdb )
 
         fpath = os.path.join(path,'molecule.sml')
@@ -2344,7 +2356,7 @@ class Molecule( NTtree, ResidueList ):
             return True
         # end if
         nTmessage( "Molecule: %s" % self.format() )
-        self.project.createMoleculeDirectories(self.project.molecule)
+        self.project.createValidationDirectories(self.project.molecule)
     # end def
 
     def updateTopology( self)   :

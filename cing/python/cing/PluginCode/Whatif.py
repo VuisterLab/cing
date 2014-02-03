@@ -12,9 +12,8 @@ from cing.Libs.disk import removeEmptyFiles
 from cing.PluginCode.required.reqMatplib import MATPLIB_STR
 from cing.PluginCode.required.reqWhatif import * #@UnusedWildImport
 from cing.constants import * #@UnusedWildImport
-from cing.core.parameters import PLEASE_ADD_EXECUTABLE_HERE
-from cing.core.parameters import cingPaths
-from cing.core.parameters import plugins
+from cing.definitions import cingPaths
+from cing import plugins
 from glob import glob
 from shutil import copy
 from string import upper

@@ -1,21 +1,11 @@
 """
-Nomenclature database constants descriptors:
-AQUA         AQUA nomenclature
-CNS          CNS nomenclature; amounts to XPLOR
-CYANA        CYANA 1.x nomenclature
-CYANA2       CYANA 2.x nomenclature
-DYANA        DYANA nomenclature; amounts to CYANA
-INTERNAL     Current internal nomenclature (INTERNAL_0 or INTERNAL_1)
-IUPAC        IUPAC Nomenclature
-PDB          Old (PDB2) nomenclature
-SPARKY       Sparky nomenclature, amounts to IUPAC
-XEASY        Xeasy nomenclature; amounts to CYANA
-XPLOR        XPLOR nomenclature
-
-Axes descriptors:
-X_AXIS, Y_AXIS, Z_AXIS, A_AXIS
+Constants definitions
 """
 
+CING       = 'CING'
+CING_STR   = CING
+
+# OS related
 OS_TYPE_MAC = 'darwin'
 OS_TYPE_LINUX = 'linux'
 OS_TYPE_WINDOWS = 'windows' # unsupported.
@@ -25,33 +15,36 @@ OS_TYPE_UNKNOWN = 'unknown'
 IPYTHON_VERSION_A = 'iPythonVersion_A'
 IPYTHON_VERSION_B = 'iPythonVersion_B'
 
-AQUA       = 'AQUA' # not up-to-date with BMRB DG/G difference.
-IUPAC      = 'IUPAC'
-SPARKY     =  IUPAC
-CYANA      = 'CYANA'
-XEASY      = CYANA
-DYANA      = CYANA
-CYANA2     = 'CYANA2'
-XPLOR      = 'XPLOR'
-CNS        =  XPLOR
-PDB        = 'PDB'
+# Nomenclature systems
+AQUA       = 'AQUA'         # AQUA nomenclature; not up-to-date with BMRB DG/G difference.
+IUPAC      = 'IUPAC'        # IUPAC Nomenclature
+SPARKY     =  IUPAC         # Sparky nomenclature, amounts to IUPAC
+CYANA      = 'CYANA'        # CYANA 1.x nomenclature
+XEASY      = CYANA          # Xeasy nomenclature; amounts to CYANA
+DYANA      = CYANA          # DYANA nomenclature; amounts to CYANA
+CYANA2     = 'CYANA2'       # CYANA 2.x nomenclature
+XPLOR      = 'XPLOR'        # XPLOR nomenclature
+CNS        =  XPLOR         # CNS nomenclature; amounts to XPLOR
+PDB        = 'PDB'          # Old (PDB2) nomenclature
 INTERNAL_0 = 'INTERNAL_0'   # INTERNAL_0 is the first convention used: was based upon DYANA/CYANA1.x convention (Gly has HA1/2)
 INTERNAL_1 = 'INTERNAL_1'   # INTERNAL_1 is the second convention used: IUPAC for IUPAC defined atoms, CYANA2 for non-IUPAC atoms
-INTERNAL   = INTERNAL_1
+INTERNAL   = INTERNAL_1     # Current internal nomenclature (INTERNAL_0 or INTERNAL_1)
+LOOSE      = 'LOOSE'        # "free' format
+CCPN       = 'CCPN'         # CCPN nomenclature
+nomenClatureConventions = [INTERNAL_0, INTERNAL_1, AQUA, IUPAC, CYANA, CYANA2, XPLOR, PDB, CCPN]
 
-LOOSE      = 'LOOSE'
-
-CCPN       = 'CCPN'
-
-nomenClatureConventions = [INTERNAL_0, INTERNAL_1, AQUA, IUPAC, CYANA, CYANA2, XPLOR, PDB]
-
-CING       = 'CING'
-CING_STR   = CING
+# axes
+X_AXIS = 0
+Y_AXIS = 1
+Z_AXIS = 2
+A_AXIS = 3
 
 ERROR_ID = "ERROR"
 WARNING_ID = "WARNING"
 MESSAGE_ID = "MESSAGE"
 DEBUG_ID = "DEBUG"
+STEREO_ASSIGN_FILENAME_STR = 'stereo_assign.str'
+PLEASE_ADD_EXECUTABLE_HERE = "PLEASE_ADD_EXECUTABLE_HERE" # Keep the below in sync with the one in setupCing.py
 
 CONSENSUS_STR = 'consensus'
 MAX_TRIES_UNIQUE_NAME = 99999
@@ -74,10 +67,7 @@ COMPLETED_STR = 'completed'
 dots   = '-----------'               #: 11 dashes
 dots20 = '--------------------'      #: 20 dashes inlined for efficiency?
 
-X_AXIS = 0
-Y_AXIS = 1
-Z_AXIS = 2
-A_AXIS = 3
+
 
 SYMMETRY_C1_STR = 'SYMMETRY_C1' # No symmetry or undetermined. Use None for unknown.
 SYMMETRY_C2_STR = 'SYMMETRY_C2' # Homodimer such as 1hue
@@ -340,8 +330,6 @@ JVM_HEADNESS    = '-Djava.awt.headless=true'
 JVM_CMD_STD     = '/usr/bin/java -Xmx%s %s %s' % ( JVM_MAX_MEM, JVM_TYPE, JVM_HEADNESS )
 #JVM_CMD_STD     = 'echo helloJvm; which java; ' + JVM_CMD_STD # DEFAULT OFF
 
-DEFAULT_SML_HANDLER_STRING = 'Default handler from SMLhandled'
-
 #: Don't report on the next atoms
 #: Add these to CING lib later. For now, it's just clobbering the output to report on them.
 ATOM_LIST_TO_IGNORE_REPORTING = []
@@ -366,4 +354,4 @@ WATER_ATOM_COUNT = 4 # Including QH.
 CCPN_STR = "Ccpn"
 CCPN_LOWERCASE_STR = 'ccpn'
 
-STEREO_ASSIGN_FILENAME_STR = 'stereo_assign.str'
+

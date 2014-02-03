@@ -48,12 +48,12 @@ def _nTmessage(msg):
 #-----------------------------------------------------------------------------------
 
 def getSvnRevision( path ):
-    """Return the revision number (int) or None if the revision isn't known. It depends on svn being available on the system."""
-#    return None
+    """Return the revision number (int) or -1 if the revision isn't known.
+    It depends on (proper) svn being available on the system."""
     try:
         cingSvnInfo, err = _nTgetoutput('svn info %s' % path)
-        _nTmessage("cingSvnInfo: " + cingSvnInfo)
-        _nTmessage("err: " + err)
+        #_nTmessage("cingSvnInfo: " + cingSvnInfo)
+        #_nTmessage("err: " + err)
         if not err:
             cingSvnInfoList = cingSvnInfo.split('\n')
             for cingSvnInfo in cingSvnInfoList:
@@ -67,6 +67,7 @@ def getSvnRevision( path ):
     except:
         pass
 #        _nTwarning("Failed to getSvnRevision()" )
+    return -1
 # end def
 
 def getIpythonVersionTuple(reportAsIs = False):
@@ -239,43 +240,3 @@ def getOsRelease():
     return unameList[2]
 # end def
 
-
-class SystemDefinitions(Adict.Adict):
-    """A class to store system definitions and system related data
-    """
-    def __init__(self):
-        Adict.Adict.__init__(self)
-        self.osType = getOsType()
-        self.osRelease = getOsRelease()
-        self.osArchitecture = platform.architecture()[0]
-        self.nCPU = detectCPUs()
-        self.internetConnected = isInternetConnected()
-        self.startTime = time.time()
-        self.pid = os.getpid()
-        self.user = os.getenv("USER", "Unknown user")
-        self.host = os.getenv("HOST", "Unknown host") #only works with (t)csh shell
-    #end def
-
-    def elapsedTime(self):
-        return time.time() - self.startTime
-
-    def ascTime(self, timePoint=None):
-        if timePoint:
-            return time.asctime(time.localtime(timePoint))
-        else:
-            return time.asctime(time.localtime(self.startTime))
-    #end def
-
-    def getStartMessage(self):
-        on = "%s (%s%s/%s/%scores/py%s)" % (self.host, self.osType, self.osRelease, self.osArchitecture, self.nCPU, sys.version.split()[0])
-        at = '(pid:%d) ' %  self.pid + self.ascTime()
-        return "User: %-10s on: %-42s at: %32s" % (self.user, on, at)
-
-    def getStopMessage(self):
-        now = time.time()
-        return 'Started at: %s\nStopped at: %s\nTook      : %.1f seconds' % (self.ascTime(),self.ascTime(now), now-self.startTime)
-
-    def __str__(self):
-        return '<SystemData: osType=%s, osRelease=%s, osArchitecture=%s, nCPU=%s, internetConnected=%s, host=%s, startTime=%s, pid=%s, user=%s>' % \
-                (self.osType, self.osRelease, self.osArchitecture, self.nCPU, self.internetConnected, self.host, self.ascTime(), self.pid, self.user)
-#end class

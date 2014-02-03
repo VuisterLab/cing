@@ -121,7 +121,6 @@ project.mergeResonances( status='reduce'  )
 == Generating a peak file from shifts ==
 project.listPredefinedExperiments() # list all predefined experiments
 peaks = project.generatePeaks('hncaha','HN:HA:N')
-format(peaks)
 
 == Print list of parameters:
     formatall( project.molecule.A.residues[0].procheck ) # Adjust for your mols
@@ -140,14 +139,15 @@ from cing import cingDirTmp
 from cing import cingPythonCingDir
 from cing import cingPythonDir
 from cing import cingVersion
+from cing.Libs.Adict import formatDictItems
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.Libs.disk import rmdir
 from cing.Libs.forkoff import ForkOff
 from cing.Libs.helper import * #@UnusedWildImport
 from cing.core.classes import Project
 from cing.core.molecule import Molecule
-from cing.core.parameters import cingPaths
-from cing.core.parameters import plugins
+from cing.definitions import cingPaths
+from cing import plugins
 from cing.core.sml import SMLversion
 from nose.plugins.skip import SkipTest # Dependency on nose can be removed in python 2.7 or later when UnitTest has similar functionality.
 import commands
@@ -158,13 +158,9 @@ import webbrowser
 # Support routines
 #------------------------------------------------------------------------------------
 
+#DEPRECIATED: use python format strings instead
 def pformat( obj ):
     'Convenience method.'
-#$%^%^&&*(()
-#
-# JURGEN: do NOT touch this routine! Only for interactive usage
-#
-#%%^$&*$($()
 #    print '>>', obj
     if hasattr(obj,'format'):
         print obj.format()
@@ -173,13 +169,9 @@ def pformat( obj ):
     #end if
 #end def
 
+#DEPRECIATED: use python format strings instead
 def pformatall( obj, *args, **kwds ):
     'Convenience method.'
-#$%^%^&&*(()
-#
-# JURGEN: do NOT touch this routine! Only for interactive usage
-#
-#%%^$&*$($()
 #    print '>>', obj
     if hasattr(obj,'formatAll'):
         print obj.formatAll(*args, **kwds)
@@ -188,13 +180,17 @@ def pformatall( obj, *args, **kwds ):
     #end if
 #end def
 
-def format(obj): # pylint: disable=W0622
-    """Returns the formatted object representation"""
-#    print '>>', obj
-    if hasattr(obj, 'format'):
-        return obj.format()
-    return  "%s" % obj
-#end def
+#OBSOLETE: conflict with python format functions
+#def format(obj): # pylint: disable=W0622
+#    """Returns the formatted object representation"""
+##    print '>>', obj
+#    if hasattr(obj, 'format'):
+#        return obj.format()
+#    return  "%s" % obj
+##end def
+
+def pfd( object ):
+    print formatDictItems( object )
 
 def verbosity(value):
     """Set CING verbosity
@@ -206,6 +202,7 @@ def verbosity(value):
 #end def
 
 
+#DEPRECIATED: use python format strings instead
 def formatall(obj):
     """Returns the formatted obj representation"""
     result = ""
@@ -225,6 +222,26 @@ def formatall(obj):
         return result
     return format(obj)
 #end def
+
+def getInfoMessage():
+    """Get all the info there is to get
+    """
+    l = max(map(len, cdefs.cingDefinitions.keys()+cdefs.systemDefinitions.keys()+cing.plugins.keys()))
+    fmt = '{key:%s} : {value}\n' % l
+    fmt2 = '{key:%s} : {value.module}\n' % l
+    #print '>>', fmt, fmt2
+
+    result = '-'*100 +'\n'
+    result += '--- cingDefinitions ---\n'
+    result += cdefs.cingDefinitions.formatItems(fmt)
+    result += '--- systemDefinitions ---\n'
+    result += cdefs.systemDefinitions.formatItems(fmt)
+    result += '--- Plugins ---\n'
+    result += cing.plugins.formatItems(fmt2)
+    result += '-'*100
+    return result
+#end def
+
 
 args = []
 kwds = {}
@@ -782,7 +799,7 @@ def main():
     nTmessage(cing.cingDefinitions.getHeaderString())
     nTmessage(cing.systemDefinitions.getStartMessage())
 
-    nTdebug(cdefs.getInfoMessage())
+    nTdebug(getInfoMessage())
 
 #    _tmp = NTdict()
 #    _tmp2 = eval(str(options)) # options is not a dict, prints like a dict??
@@ -843,7 +860,7 @@ def main():
     #end if
 
     if options.info:
-        nTmessage(cdef.getInfoMessage())
+        nTmessage(getInfoMessage())
         sys.exit(0)
     #end if
 
@@ -876,6 +893,7 @@ def main():
     # START
     #------------------------------------------------------------------------------------
 
+#OBSOLETE:
     # GUI
 #    if options.gui:
 #        import Tkinter
