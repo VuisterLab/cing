@@ -18,7 +18,7 @@ from cing.Libs.html import addPreTagLines
 from cing.Libs.html import hPlot
 from cing.NRG import archiveIdPdbBased
 from cing.PluginCode.required.reqDssp import * #@UnusedWildImport
-from cing.PluginCode.required.reqNih import TALOSPLUS_STR
+from cing.constants import TALOSPLUS_STR
 from cing.PluginCode.required.reqVasco import * #@UnusedWildImport
 from cing.core import database
 from cing.core.classes2 import * #@UnusedWildImport

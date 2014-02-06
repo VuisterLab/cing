@@ -21,17 +21,6 @@ from cing.core.sml import obj2SML
 
 version = cingDefinitions.version
 
-#OBSOLETE:
-#if True: # block
-#    useModule = True
-#    if cingPaths.talos == None or cingPaths.talos == PLEASE_ADD_EXECUTABLE_HERE:
-##        nTmessage("Missing talos which is a dep for nih plugin")
-#        useModule = False
-#    if not useModule:
-#        raise ImportWarning(NIH_STR)
-##    nTmessage('Using ' + NIH_STR)
-## end block
-
 
 
 NIHheaderDefinitionString = """
@@ -1313,6 +1302,9 @@ def _importTalosPlus( project, predFile, ssFile=None ):
                                     classification = row.CLASS,
                                     ss_class = None,
                                     ss_confidence = NaN,
+                                    Q_H = NaN,
+                                    Q_E = NaN,
+                                    Q_L = NaN
                                     )
 
         if talosPlus.classification == 'None':
@@ -1330,15 +1322,24 @@ def _importTalosPlus( project, predFile, ssFile=None ):
     ssdict = dict( H = 'Helix', E='Extended', L='Coil' ) # X is translated to None
     if ssFile:
         table = _importTableFile( ssFile, molecule )
+        #print '>>', table
         for row in table:
-            row.residue.talosPlus.Q_H = row.Q_H    # Helix
-            row.residue.talosPlus.Q_E = row.Q_E    # Extended
-            row.residue.talosPlus.Q_L = row.Q_L    # Loop
-            if ssdict.has_key(row.SS_CLASS):
-                row.residue.talosPlus.ss_class = ssdict[row.SS_CLASS]
+            #print '>>', row
+            #print '>>', row.residue
+            #print '>>', row.residue.talosPlus
+
+
+            if ('residue' in row) and ('talosPlus' in row.residue):
+                row.residue.talosPlus.Q_H = row.Q_H    # Helix
+                row.residue.talosPlus.Q_E = row.Q_E    # Extended
+                row.residue.talosPlus.Q_L = row.Q_L    # Loop
+                if ssdict.has_key(row.SS_CLASS):
+                    row.residue.talosPlus.ss_class = ssdict[row.SS_CLASS]
+                else:
+                    row.residue.talosPlus.ss_class = None
+                row.residue.talosPlus.ss_confidence = row.CONFIDENCE
             else:
-                row.residue.talosPlus.ss_class = None
-            row.residue.talosPlus.ss_confidence = row.CONFIDENCE
+                nTerror('_importTalosPlus: %s: row: %s', ssFile, row)
         #end for
     #end if
 #end def
@@ -1378,7 +1379,7 @@ def _findTalosOutputFiles( path, talosDefs ):
     #end if
     # Multiple predSS names found
     talosDefs.predSSFile = None
-    for tFile in 'pred.ss.tab predSS.tab'.split():
+    for tFile in 'predSS.tab pred.ss.tab'.split():
         pFile = path / tFile
         if pFile.exists():
             #print '>found>', pFile
@@ -1431,13 +1432,14 @@ def runTalosPlus(project, tmp=None, parseOnly=False):
         path = project.validationPath( talosDefs.directory )
         if not path:
             return True
-        if not path.exists():
-            path.makedirs()
+        if path.exists():
+            nTdebug('runTalosPlus: removing %s with prior data', path)
+            path.rmdir()
+        path.makedirs()
 
         talosDefs.completed = False
         talosDefs.parsed = False
         talosDefs.present = False
-        talosDefs.saved = False
 
         # Exporting the shifts
         fileName = os.path.join(path, talosDefs.tableFile )
@@ -1450,7 +1452,7 @@ def runTalosPlus(project, tmp=None, parseOnly=False):
                                        redirectOutput = True
                                      )
         nTmessageNoEOL('==> Running talos+ ... ')
-        talosProgram('-in ' + talosDefs.tableFile)
+        talosProgram( '-in ' + talosDefs.tableFile + ' -sum ' + talosDefs.predFile )
         nTmessage('Done!')
 
         if _findTalosOutputFiles( path, talosDefs ):
@@ -1461,38 +1463,38 @@ def runTalosPlus(project, tmp=None, parseOnly=False):
     # end if parse only.
 
     # Importing the results
-    if importTalosPlus( project ):
-        nTerror("RunTalosPlus: Failed importTalosPlus")
+    if parseTalosPlus( project ):
+        nTerror("RunTalosPlus: Failed parseTalosPlus")
         return True
     if talosPlus2restraints( project ):
         nTerror("RunTalosPlus: Failed talosPlus2restraints")
         return True
-#    if saveTalosPlus( project ):
-#        nTerror("RunTalosPlus: Failed saveTalosPlus")
-#        return True
+    if saveTalosPlus( project ):
+        nTerror("RunTalosPlus: Failed saveTalosPlus")
+        return True
 
     project.history( 'Ran talos+ on %s' % (project.molecule,) )
     return False
 #end def
 
 
-def importTalosPlus( project, tmp=None ):
+def parseTalosPlus( project, tmp=None ):
     """Import talosPlus results.
     Return True on error.
     """
     if project == None:
-        nTmessage("importTalosPlus: No project defined")
+        nTmessage("parseTalosPlus: No project defined")
         return True
 
     talosDefs = project.getStatusDict(TALOSPLUS_STR, **talosDefaults())
 
     if not talosDefs.completed:
-        nTmessage("importTalosPlus: No talos+ was run")
+        nTmessage("parseTalosPlus: No talos+ was run")
         return True
 
     path = project.validationPath( talosDefs.directory )
     if not path:
-        nTerror('importTalosPlus: directory "%s" with talosPlus data not found', path)
+        nTerror('parseTalosPlus: directory "%s" with talosPlus data not found', path)
         return True
 
     if _findTalosOutputFiles( path, talosDefs ):
@@ -1500,12 +1502,12 @@ def importTalosPlus( project, tmp=None ):
 
     predFile = path / talosDefs.predFile
     if not predFile.exists() or predFile.isdir():
-        nTerror('importTalosPlus: file "%s" with talosPlus predictions not found', predFile)
+        nTerror('parseTalosPlus: file "%s" with talosPlus predictions not found', predFile)
         return True
 
     predSSFile = path / talosDefs.predSSFile
     if not predSSFile.exists() or predSSFile.isdir():
-        nTerror('importTalosPlus: file "%s" with talosPlus SS predictions not found', predSSFile)
+        nTerror('parseTalosPlus: file "%s" with talosPlus SS predictions not found', predSSFile)
         return True
 
     if _importTalosPlus( project, predFile, predSSFile ):
@@ -1647,7 +1649,7 @@ def export2nih( project, tmp=None ):
 
 # register the functions
 methods  = [(runTalosPlus,None),
-            (importTalosPlus,None),
+            (parseTalosPlus,None),
             (talosPlus2restraints,None)
            ]
 saves    = [(saveTalosPlus, None)]

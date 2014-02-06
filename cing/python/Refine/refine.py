@@ -15,7 +15,7 @@ python $CINGROOT/python/Refine/refine.py
  - Import into cing (version >= 0.70);
  JFD April 2011
    Adding anneal.
-   
+
 Notes on usage in the READMEs here.
 
 Other notes:
@@ -27,7 +27,7 @@ Other notes:
 from Refine.NTxplor import * #@UnusedWildImport
 from Refine.Utils import * #@UnusedWildImport
 from Refine.configure import config
-from cing.PluginCode.required.reqNih import TALOSPLUS_LIST_STR
+from cing.constants import TALOSPLUS_LIST_STR
 from cing.Libs.AwkLike import AwkLike
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.Libs.disk import copy
@@ -56,7 +56,7 @@ def importFrom(config, project, parameters):
     Import data from parameters.basePath/XXX directory as new molecule.
     The input can be from the Refined or from the Annealed directory.
 
-    Use parameters.bestModels or xxx 
+    Use parameters.bestModels or xxx
 
     Will do a project level save when done successfully.
     Return Molecule or None on error
@@ -70,15 +70,15 @@ def importFrom(config, project, parameters):
 
     bestModels = parameters.bestModels
     if getDeepByKeysOrAttributes( parameters, USE_ANNEALED_STR):
-        bestModels = parameters.models    
+        bestModels = parameters.models
     models = asci2list(bestModels)
-    nTdebug( 'inPath:         %s' % inPath) 
-    nTdebug( 'bestModels:     %s' % bestModels) 
-    nTdebug( 'models:         %s' % models) 
-    
+    nTdebug( 'inPath:         %s' % inPath)
+    nTdebug( 'bestModels:     %s' % bestModels)
+    nTdebug( 'models:         %s' % models)
+
     xplor_path = xplor.joinPath(inPath, xplor.baseName)
     project.molecule.replaceCoordinatesByPdb(xplor_path, name = xplor.name, useModels = bestModels, convention = 'XPLOR' )
-    
+
     if getDeepByKeysOrAttributes(parameters, 'superpose'):
         project.molecule.superpose(ranges=parameters.superpose)
 
@@ -102,7 +102,7 @@ def doSetup(config, project, basePath, options):
     #end if
 
     xplor = Xplor(config, basePath=basePath, project=project) # generates the directories and initialize parameter setup
-    
+
     # Set some defaults
     optionNameList = 'modelsAnneal models bestModels'.split()
     modelCount = project.molecule.modelCount
@@ -168,7 +168,7 @@ def doSetup(config, project, basePath, options):
     nTmessage('==> -B- Exporting all models  of %s to XPLOR PDB-files (%s)', project.molecule, path)
     project.molecule.export2xplor(path)
 
-    
+
     # PSF file
     xplor.psfFile = project.molecule.name + '.psf'
     # Set the patches for the psf file
@@ -185,7 +185,7 @@ def doSetup(config, project, basePath, options):
     elif disulfide_bridges:
         nTmessage("==> Located disulfide bridges %s" % str(disulfide_bridges))
     for (res1, res2) in disulfide_bridges:
-        xplor.patchDISU.append( ((res1.chain.name, res1.resNum), 
+        xplor.patchDISU.append( ((res1.chain.name, res1.resNum),
                                  (res2.chain.name, res2.resNum)))
 
     parfile = xplor.joinPath(PARAMETERS_FILE_NAME)
@@ -225,7 +225,7 @@ def generateTemplate(config, project, parameters, doPrint=0):
          parameters,
          project = project,
          # JFD: noting that these molecules aren't meant to be the same as the chains in a CING project. At least I'm not certain.
-         molecules=[ 
+         molecules=[
                          NTdict(
                             pdbFile=TEMPLATE_FILE_NAME,
                             selectionCode='(all)'
@@ -247,17 +247,17 @@ def analyze(config, project, parameters, doPrint=0 ):
     '''Analyze a run
     Returns True on failure.
     '''
-    nTmessage("\n-- analyze --")         
+    nTmessage("\n-- analyze --")
 
     inPath     = config.directories.converted
     modelList  = asci2list(parameters.models)
     if getDeepByKeysOrAttributes( parameters, USE_ANNEALED_STR):
         inPath     = config.directories.annealed
         modelList  = asci2list(parameters.modelsAnneal)
-        
-    nTdebug( 'inPath:         %s' % inPath) 
-    nTdebug( 'modelList:      %s' % modelList) 
-        
+
+    nTdebug( 'inPath:         %s' % inPath)
+    nTdebug( 'modelList:      %s' % modelList)
+
     # first create the jobs, run later
     analyzeJobs = []
     for i in modelList:
@@ -301,9 +301,9 @@ def analyze(config, project, parameters, doPrint=0 ):
     done_list = f.forkoff_start(job_list, 0) # delay 0 second between jobs.
     nTmessage("Finished ids: %s", done_list)
     if not done_list:
-        notDone = parameters.modelCountAnneal - len(done_list) 
+        notDone = parameters.modelCountAnneal - len(done_list)
         nTerror("Failed to analyze %s", notDone)
-        return True    
+        return True
 #end def
 
 
@@ -347,10 +347,10 @@ def refine(config, project, parameters, doPrint=0):
     done_list = f.forkoff_start(job_list, 0) # delay 0 second between jobs.
     nTmessage("Finished ids: %s", done_list)
     if not done_list:
-        notDone = parameters.modelCountAnneal - len(done_list) 
+        notDone = parameters.modelCountAnneal - len(done_list)
         nTerror("Failed to refine %s", notDone)
         return True
-    
+
 #end def
 
 
@@ -394,13 +394,13 @@ def anneal(config, project, parameters, doPrint=0):
         )
     done_list = f.forkoff_start(job_list, 0) # delay 0 second between jobs.
     nTmessage("Finished ids: %s", done_list)
-    notDone = parameters.modelCountAnneal - len(done_list) 
+    notDone = parameters.modelCountAnneal - len(done_list)
     if notDone > 0:
-        nTwarning("Failed to anneal %s", notDone) # We print how many models failed to anneal, and try to continue without them 
+        nTwarning("Failed to anneal %s", notDone) # We print how many models failed to anneal, and try to continue without them
         nTdebug("Only finished ids will be kept")
-    parameters.modelsAnneal = list2asci(done_list)         
-    
-    # Only if the list is empty, we want to return True    
+    parameters.modelsAnneal = list2asci(done_list)
+
+    # Only if the list is empty, we want to return True
     if not done_list:
         return True
 #end def
@@ -413,7 +413,7 @@ def parseOutput(config, project, parameters ):
 
     Return None on error or results on success.
     """
-    nTmessage("\n-- parseOutput --")    
+    nTmessage("\n-- parseOutput --")
 
     xplor = Xplor(config, parameters, project=project, outPath=config.directories.refined)
 
@@ -424,32 +424,32 @@ def parseOutput(config, project, parameters ):
     bestModels = parameters.best                    # Integer
     allPreviousModels = parameters.models           # String
     allPreviousModelCount = parameters.bestAnneal   # Integer
-    
+
     if getDeepByKeysOrAttributes( parameters, USE_ANNEALED_STR):
         logFileNameFmt = 'anneal_%d.log'
         resultFileName = 'parsedAnnealOutput.txt'
         bestModelsFileNameFmt = 'best%dModelsAnneal.txt'
         bestModelsParameterName = 'models'
         bestModels = parameters.bestAnneal
-        allPreviousModels = parameters.modelsAnneal 
+        allPreviousModels = parameters.modelsAnneal
         allPreviousModelCount = parameters.modelCountAnneal
 
-    nTdebug( 'logFileNameFmt:         %s' % logFileNameFmt) 
-    nTdebug( 'resultFileName:         %s' % resultFileName) 
-    nTdebug( 'bestModelsFileNameFmt:  %s' % bestModelsFileNameFmt) 
-    nTdebug( 'bestModelsParameterName:%s' % bestModelsParameterName) 
-    nTdebug( 'bestModels:             %s (int)'     % bestModels) 
+    nTdebug( 'logFileNameFmt:         %s' % logFileNameFmt)
+    nTdebug( 'resultFileName:         %s' % resultFileName)
+    nTdebug( 'bestModelsFileNameFmt:  %s' % bestModelsFileNameFmt)
+    nTdebug( 'bestModelsParameterName:%s' % bestModelsParameterName)
+    nTdebug( 'bestModels:             %s (int)'     % bestModels)
     nTdebug( 'allPreviousModels:      %s (string)"' % allPreviousModels)
     nTdebug( 'allPreviousModelCount:  %s (int)'     % allPreviousModelCount)
-     
+
     results = NTlist()
-    keys = ['model', 'eTotal', 
-            'Enoe', 'NOErmsd', 'NOEnumber', 
-            'NOEbound1', 'NOEviol1', 
+    keys = ['model', 'eTotal',
+            'Enoe', 'NOErmsd', 'NOEnumber',
+            'NOEbound1', 'NOEviol1',
             'NOEbound2', 'NOEviol2',
             'DIHEDrmsd', 'DIHEDnumber', 'DIHEDbound', 'DIHEDviol'
            ]
-    
+
     # parse all output files
     for i in asci2list(allPreviousModels):
 
@@ -460,7 +460,7 @@ def parseOutput(config, project, parameters ):
         for key in keys:
             data[key] = None
         data.model = i
-        
+
         foundEnergy = 0
         foundNOE1 = 0
         foundNOE2 = 0
@@ -518,7 +518,7 @@ def parseOutput(config, project, parameters ):
     elif allPreviousModelCount != resultCount:
         nTwarning("Got more results (%s) than expected input (%s). Will use all results." % (bestModels,resultCount))
     # end if
-    
+
     # sort the results
     if parameters.sortField in keys:
 #        nTdebug("Now sorting on field: %s" % parameters.sortField)
@@ -526,7 +526,7 @@ def parseOutput(config, project, parameters ):
 #            myComp = CompareDict(parameters.sortField)
 #            results.sort(myComp)
 #        else:
-        NTsort( results, parameters.sortField, inplace=True )            
+        NTsort( results, parameters.sortField, inplace=True )
     else:
         parameters.sortField = None
     #endif
@@ -535,7 +535,7 @@ def parseOutput(config, project, parameters ):
     resultFile = open(xplor.joinPath(resultFileName), 'w')
     msg = '\n=== Results: sorted on "%s" ===' % parameters.sortField
     nTmessage( msg )
-    fprintf(resultFile, msg + '\n')    
+    fprintf(resultFile, msg + '\n')
     fmt = '%-11s '
     for k in keys:
         nTmessageNoEOL(fmt % str(k))
@@ -552,9 +552,9 @@ def parseOutput(config, project, parameters ):
         nTmessage('')
         fprintf(resultFile, '\n')
     #end for
-                
+
     # best results to put in parameter file.
-    resultCountBest = min( resultCount, bestModels )      
+    resultCountBest = min( resultCount, bestModels )
     if resultCountBest > 0:
         msgLine = '\n=== Averages best %d models ===' % resultCountBest
         nTmessage(msgLine)
@@ -591,11 +591,11 @@ def parseOutput(config, project, parameters ):
 def fullAnnealAndRefine( config, project, options ):
     """
     Calling fullAnneal and then fullRefine
-    Return None on error or parameters on success.        
+    Return None on error or parameters on success.
     """
-    nTmessage("\n-- %s --" % getCallerName())   
- 
-    options.fullAnnealAndRefine = True # Might have been set before but e.g. not from PluginCode.        
+    nTmessage("\n-- %s --" % getCallerName())
+
+    options.fullAnnealAndRefine = True # Might have been set before but e.g. not from PluginCode.
 
     parameters = fullAnneal(config, project, options)
     if not parameters:
@@ -623,8 +623,8 @@ def fullRefine( config, project, parameters, options ):
     basePath = os.path.join( refinePath, options.name)
     nTmessage('==> basePath: %s', basePath)
     nTdebug('==> options: %s' % str(options))
-    
-    
+
+
     if parameters:
         nTdebug("Using previously provided parameters.")
     else:
@@ -632,9 +632,9 @@ def fullRefine( config, project, parameters, options ):
         if not parameters:
             nTerror("Failed setup")
             return
-        # end if        
+        # end if
     # end if
-    
+
     # Since the original options might have been to use Annealed this might need to be disabled.
     parameters[ USE_ANNEALED_STR ] = False
 
@@ -654,9 +654,9 @@ def fullRefine( config, project, parameters, options ):
         if not parseOutput(config, project, parameters):
             nTerror("Failed parseOutput")
             return
-        # end if        
+        # end if
     # end if
-    
+
     if refine(config, project, parameters ):
         nTerror("Failed refine")
         return
@@ -678,7 +678,7 @@ def fullRefine( config, project, parameters, options ):
 def fullAnneal( config, project, options  ):
     """
     Recalculate the coordinates.
-    Return None on error or parameters on success.    
+    Return None on error or parameters on success.
     """
 
     nTmessage("\n-- %s --" % getCallerName())
@@ -693,7 +693,7 @@ def fullAnneal( config, project, options  ):
         nTerror("Failed setup")
         return
     # end if
-    
+
     if generatePSF(config, project, parameters):
         nTerror("Failed generatePSF")
         return
@@ -718,7 +718,7 @@ def fullAnneal( config, project, options  ):
     if options.fullAnnealAndRefine:
         nTmessage("Skipping parseOutput and importFrom because we'll jump straight into refine now.")
         return parameters
-    # end if    
+    # end if
     if not importFrom(config, project, parameters):
         nTerror("Failed importFrom")
         return
@@ -792,19 +792,19 @@ def run():
         #------------------------------------------------------------------------------
         if not parameters:
 #            nTdebug('==> will read parameters')
-            parameters = getParameters( basePath, 'parameters')    
+            parameters = getParameters( basePath, 'parameters')
         #    nTdebug('==> parameters\n%s\n', str(parameters))
             nTmessage('==> Read parameters')
-        # end if    
+        # end if
         setParametersFromOptions(project, options, parameters) # Do here for the first time and every time refine is called.
         nTmessage('==> Done transferring some options from commandline to parameters (again)')
-        
+
         parameters.basePath = basePath
         if parameters.name != options.name:
             nTwarning("parameters.name (%s) != options.name (%s)" % ( parameters.name, options.name) )
         # end if
     # end if
-    
+
     #------------------------------------------------------------------------------
     # Action selection
     #------------------------------------------------------------------------------

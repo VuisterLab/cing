@@ -4,6 +4,7 @@ Adds html generation methods
 import cing
 import cing.constants as constants
 import cing.definitions as cdefs
+from cing.constants import *
 from cing import authorList
 from cing import cingDirData
 from cing import cingRevision
@@ -19,7 +20,7 @@ from cing.NRG.settings import bmrb_link_template
 from cing.NRG.settings import pdb_link_template
 from cing.PluginCode.required.reqMatplib import MATPLIB_STR
 from cing.PluginCode.required.reqMolgrap import MOLGRAP_STR
-from cing.PluginCode.required.reqNih import * #@UnusedWildImport
+from cing.constants import * #@UnusedWildImport
 from cing.PluginCode.required.reqNmrStar import * #@UnusedWildImport
 from cing.PluginCode.required.reqWattos import * #@UnusedWildImport
 from cing.PluginCode.required.reqWhatif import * #@UnusedWildImport

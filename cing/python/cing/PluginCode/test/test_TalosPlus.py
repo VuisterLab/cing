@@ -5,8 +5,8 @@ python $CINGROOT/python/cing/PluginCode/test/test_TalosPlus.py
 from cing import cingDirTestsData
 from cing import cingDirTmp
 from cing.Libs.NTutils import * #@UnusedWildImport
-from cing.PluginCode.required.reqCcpn import CCPN_STR
-from cing.PluginCode.required.reqNih import TALOSPLUS_STR
+from cing.constants import CCPN_STR
+from cing.constants import TALOSPLUS_STR
 from cing.core.classes import Project
 from cing.core.parameters import cingPaths
 from nose.plugins.skip import SkipTest
