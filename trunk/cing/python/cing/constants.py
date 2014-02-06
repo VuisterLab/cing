@@ -350,8 +350,22 @@ mapMoltypeToInt = {PROTEIN_STR: 0, DNA_STR : 1, RNA_STR : 2, WATER_STR : 3, OTHE
 
 WATER_ATOM_COUNT = 4 # Including QH.
 
+#----------------------------------------------------------------------
 #required items for CCPN plugin
+#----------------------------------------------------------------------
 CCPN_STR = "Ccpn"
 CCPN_LOWERCASE_STR = 'ccpn'
+
+#----------------------------------------------------------------------
+# Talos, from reqNih
+#----------------------------------------------------------------------
+TALOSPLUS_STR = "talosPlus" # key to the entities (status, atoms, residues, etc)
+                            # under which the results will be stored
+#NIH_STR = "nih" # key to the plugin
+TALOSPLUS_CLASS_STR = 'classification'
+NUMBER_OF_SD_TALOS = 2
+
+# Needs to be one word for otherwise the restore failed.
+TALOSPLUS_LIST_STR = "talos_plus_predicted_dihedrals"
 
 

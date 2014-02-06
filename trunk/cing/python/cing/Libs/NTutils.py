@@ -3300,21 +3300,6 @@ class XMLNTdictHandler(XMLhandler):
     #end def
 #end class
 
-#class XMLAdictHandler(XMLhandler):
-#    """Adict handler class"""
-#    def __init__(self):
-#        XMLhandler.__init__(self, name='Adict')
-#    #end def
-#
-#    def handle(self, node):
-#        attrs = self.handleDictElements(node)
-#        if attrs == None:
-#            return None
-#        result = NTdict()
-#        result.update(attrs)
-#        return result
-#    #end def
-##end class
 
 class XMLNTtreeHandler(XMLhandler):
     """NTtree handler class"""

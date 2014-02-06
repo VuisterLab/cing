@@ -34,7 +34,7 @@ from cing.Libs.html import setupHtml
 from cing.Libs.pdb import export2PDB
 from cing.Libs.pdb import importPDB
 from cing.Libs.pdb import initPDB
-from cing.PluginCode.required.reqNih import TALOSPLUS_LIST_STR
+from cing.constants import TALOSPLUS_LIST_STR
 from cing.PluginCode.required.reqWhatif import summaryCheckIdList
 from cing.STAR.File import File
 from cing.core.CingSummary import CingSummary
@@ -166,7 +166,7 @@ Project: Top level Cing project class
         self.history = History()
         self.contentIsRestored = False # True if Project.restore() has been called
         self.storedInCcpnFormat = False
-        self.storedinXml = True # Project.xml file
+        self.restoredFromXml = True # Project settings restored from project.xml file
 
         self.statusObjectNameList = 'procheckStatus dsspStatus whatifStatus wattosStatus vascoStatus shiftxStatus x3dnaStatus'.split()
         self.procheckStatus = NTdict(completed = False, parsed = False, ranges = None)
@@ -252,70 +252,8 @@ Project: Top level Cing project class
                          'history',
                          'procheckStatus', 'whatifStatus', 'wattosStatus', 'shiftxStatus', 'status'
                          ]
-        self.saveXML(*self.saveKeys)
+        #self.saveXML(*self.saveKeys)
     #end def
-
-#OBSOLETE:
-#    def readValidationSettings(self, fn = None):
-#        """Reads the validation settings from installation first and then overwrite any if a filename is given.
-#        This ensures that all settings needed are present but can be overwritten. It decouples development from
-#        production.
-#        """
-#
-#        validationConfigurationFile = os.path.join(cingPythonCingDir, VAL_SETS_CFG_DEFAULT_FILENAME)
-##        nTdebug("Using system validation configuration file: " + validationConfigurationFile)
-#        self._readValidationSettingsFromfile(validationConfigurationFile)
-#        validationConfigurationFile = None
-#
-#        if fn:
-#            validationConfigurationFile = fn
-##            nTdebug("Using validation configuration file: " + validationConfigurationFile)
-#        elif os.path.exists(VAL_SETS_CFG_DEFAULT_FILENAME):
-#            validationConfigurationFile = VAL_SETS_CFG_DEFAULT_FILENAME
-##            nTdebug("Using local validation configuration file: " + validationConfigurationFile)
-#        if validationConfigurationFile:
-#            self._readValidationSettingsFromfile(validationConfigurationFile)
-#
-#    #end def
-#
-#    def _readValidationSettingsFromfile(self, fn):
-#        """Return True on error.   """
-#        if not fn:
-#            nTcodeerror("No input filename given at: _readValidationSettingsFromfile")
-#            return True
-#
-#        if not os.path.exists(fn):
-#            nTcodeerror("Input file does not exist at: " + fn)
-#            return True
-#
-##        nTdebug("Reading validation file: " + fn)
-#        config = ConfigParser()
-#        config.readfp(open(fn))
-#        for item in config.items('DEFAULT'):
-#            key = item[0].upper()  # upper only.
-#            try:
-#                if item[1] == CRV_NONE:
-#                    value = None
-#                else:
-#                    value = float(item[1])
-#            except ValueError:
-#                try:
-#                    value = bool(item[1])
-#                except:
-#                    value = item[1]
-#            valueStr = repr(value)
-#            if self.valSets.has_key(key):
-#                valueFromStr = repr(self.valSets[key])
-#                if valueStr == valueFromStr:
-#                    continue  # no print
-##                nTdebug("Replacing value for key " + key + " from " + valueFromStr + " with " + valueStr)
-#            else:
-##                nTdebug("Adding              key " + key + " with value: " + valueStr)
-#                pass
-#            self.valSets[key] = value # name value pairs.
-#        #end for
-#        self.valSets.keysformat()
-#    #end def
 
     def getCingSummaryDict(self):
         """Get a CING summary dict from self
@@ -362,6 +300,7 @@ Project: Top level Cing project class
         return rootp, name
     #end def
 
+#DEPRECIATED: use project.path() with Path methods instead
     def mkdir(self, *args):
         """Make a directory relative to to root of project from joined args.
            Check for presence.
@@ -407,6 +346,24 @@ Project: Top level Cing project class
         """
         return self.moleculePath('html', *args)
     #end def
+
+    def _updateProjectPaths(self):
+        """Check for (and make if needed) all project related directory paths
+        """
+        if not self.root.exists():
+            self.root.makedirs()
+        # Check the subdirectories
+        tmpdir = self.path(directories.tmp)
+        if tmpdir.exists():
+            tmpdir.rmdir()
+            tmpdir.makedirs()
+        for d in directories.values():
+            dir = self.path() / d
+            if not dir.exists():
+                dir.makedirs()
+        #end for
+    #end def
+#-------------------------------------------------------------------------
 
     def decodeNameTuple(self, nameTuple):
         """Decode the 7-element nameTuple:
@@ -463,14 +420,15 @@ Project: Top level Cing project class
             mTuple = self.molecule.nameTuple()
 
         minimals = Adict(
-                  version      = 0.95,            # denotes all older versions
-                  directory    = None,
-                  smlFile      = None,
-                  savedInData  = False,           # to track the if sml file was stored in Data/Plugins
-                  savedAsSml   = False,
+                  runVersion   = 0.95,      # 0.95; denotes all older versions
+                  saveVersion  = 0.95,      # 0.95; denotes all older versions
+                  directory    = None,      # directory relative to project.validationPath()
+                  smlFile      = None,      # path relative to project.path()
                   completed    = False,
                   parsed       = False,
-                  molecule     = mTuple,
+                  saved        = False,
+                  present      = False,
+                  molecule     = None,      # molecule tuple
         )
         sdict = self.status.setdefault(key, defaults)
         if sdict == None:
@@ -486,6 +444,7 @@ Project: Top level Cing project class
         return sdict
     #end def
 
+    @staticmethod
     def open(name, status = 'create', restore = True):
         """Static method open returns a new/existing Project instance depending on status.
 
@@ -505,15 +464,15 @@ Project: Top level Cing project class
             root, dummy = Project.rootPath(name)
             if not root:
                 return None
-            if os.path.exists(root):
-                removedir(root)
+            if root.exists():
+                root.rmdir()
             #end if
-            os.mkdir(root)
+            #root.makedirs()
             pr = Project(name)
+            pr._updateProjectPaths()
             pr.addHistory('New project')
-            # Save the project data
-            obj2XML(pr, path = pr.objectPath)
-#            nTdebug('New project %s', pr)
+            # Save the project settings
+            pr._save2sml()
 
         elif (status == 'create'):
             root, dummy = Project.rootPath(name)
@@ -548,28 +507,25 @@ Project: Top level Cing project class
             if not root:
                 nTerror('Project.open: unable to open Project "%s" because root is [%s].', name, root)
                 return None
-            if not os.path.exists(root):
+            if not root.exists():
                 nTerror('Project.open: unable to open Project "%s" because root [%s] was not found.', name, root)
                 return None
             #end if
 
-            # Restore Project info from xml/sml-file
+            # Restore Project info from sml-file
             from cing.core.sml import sml2obj
             pfile = root / cingPaths.project
-            # Check if we need an sml or xml file
+            # Check if we find an sml or xml file
             f,e = pfile.splitext()
             if (f+'.sml').exists():
                 pfile = f+'.sml'
                 nTdebug('Project.open: restoring from %s', pfile)
                 pr = Project(name)
                 pr.update(sml2obj(pfile))
-                pr.storedinXml = False
+                pr.restoredFromXml = False
             elif (f+'.xml').exists():
-                pfile = f+'.xml'
-                nTdebug('Project.open: restoring from %s', pfile)
-                #GWV: 20140203: cannot do an update method() as above for sml -> errors in partioning restraints. Do not understand
-                pr = xML2obj(pfile)
-                pr.storedinXml = True
+                from cing.Legacy.Legacy100.upgrade100 import upgradeToSml
+                return upgradeToSml(name,restore)
             else:
                 # Neither one found
                 nTerror('Project.open: missing Project file "%s"', pfile)
@@ -583,18 +539,16 @@ Project: Top level Cing project class
             # This allows renaming/relative addressing at the shell level
             pr.root = root
             pr.name = newName
-            pr.objectPath = pfile
-
+            pr._updateProjectPaths()
+            # No content present
             pr.contentIsRestored = False
-
+            for key in pr.status.keys():
+                status = pr.getStatusDict(key)
+                status.present = False
             #LEGACY:
             pr.setStatusObjects(parsed=False)
 
-            try:
-                # <= 0.75 version have string
-                pr.version = float(pr.version.strip('abcdefghijklmnopqrtsuvw ()!@#$%^&*').split()[0])
-            except:
-                pass
+            nTdebug('Project.open: read %s, software version %.3f', pfile, pr.version)
 
             #LEGACY:
             if pr.version <= 0.75:
@@ -652,6 +606,11 @@ Project: Top level Cing project class
                 pr.restore()
                 # Save to consolidate
                 pr.save()
+
+            # version <= 1.00
+            elif pr.version <= 1.00:
+                from cing.Legacy.Legacy100.upgrade100 import upgrade100
+                return upgrade100(pr,restore=restore)
             #end if
 
             # Optionally restore the content
@@ -664,22 +623,21 @@ Project: Top level Cing project class
             return None
         #end if
 
-        # Check the subdirectories
-        tmpdir = pr.path(directories.tmp)
-        # have to use cing.verbosity to work?
-        if os.path.exists(tmpdir) and cing.verbosity != cing.verbosityDebug:
-            removedir(tmpdir)
-        for d in directories.values():
-#            nTdebug('dir: %r' % d)
-            pr.mkdir(d)
-        #end for
+#        # Check the subdirectories
+#        tmpdir = pr.path(directories.tmp)
+#        # have to use cing.verbosity to work?
+#        if os.path.exists(tmpdir) and cing.verbosity != cing.verbosityDebug:
+#            removedir(tmpdir)
+#        for d in directories.values():
+##            nTdebug('dir: %r' % d)
+#            pr.mkdir(d)
+#        #end for
 
         pr.addLog()
 
         projects.append(pr)
         return pr
     #end def
-    open = staticmethod(open)
 
     def close(self, save = True):
         """
@@ -731,14 +689,13 @@ Project: Top level Cing project class
         return self.molecule.rmsd
     #end def
 
-    def save2sml(self):
-        "Save project as SML file"
+    def _save2sml(self):
+        "Save project settings as SML file"
         from cing.core.sml import obj2sml
-        path = self.path() / 'project.sml'
+        path = self.path() / cdefs.cingPaths.project
         # get key, value pairs to save
         p = Adict([(k,self[k]) for k in self.saveKeys ])
         obj2sml( p, path )
-        self.storedinXml = False
 
     def save(self):
         """
@@ -769,6 +726,7 @@ Project: Top level Cing project class
 #                nTdebug("Skipping save for disabled plugin: %s" % p)
             else:
                 for f, obj in p.saves:
+                    nTdebug("Project.save: Saving with %s( %s, %s )" % (f,self,obj))
 #                    nTdebug("Save for plugin: %s with %s on object %s" % (p,f,obj))
                     f(self, obj)
             #end for
@@ -781,7 +739,7 @@ Project: Top level Cing project class
         #if obj2XML(self, path = self.objectPath) != self:
         #    nTerror('Project.save: writing Project file "%s" failed', self.objectPath)
         ##end if
-        self.save2sml()
+        self._save2sml()
 
         self.addHistory('Saved project')
         return True
@@ -822,7 +780,7 @@ Project: Top level Cing project class
         # Plugin registered functions
         for p in plugins.values():
             if p.isInstalled:
-                nTdebug("Project.restore: %s" % p.module)
+                #nTdebug("Project.restore: %s" % p.module)
                 for f, obj in p.restores:
                     nTdebug("Project.restore: Restoring with %s( %s, %s )" % (f,self,obj))
                     f(self, obj)
@@ -1614,6 +1572,8 @@ class ProjectList(NTlist):
 
 # Routines to compare different Project instances this is therefore completely different from the ProjectList
 # class where no such relation can be assumed.
+
+#GWV: to check relevance and usefullness
 
 class ProjectTree( NTtree ): # pylint: disable=R0904
     """

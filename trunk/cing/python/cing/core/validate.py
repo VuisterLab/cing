@@ -42,7 +42,6 @@ from cing.Libs.numpyInterpolation import interpn_linear
 from cing.Libs.peirceTest import peirceTest
 from cing.PluginCode.required.reqDssp import DSSP_STR
 from cing.PluginCode.required.reqDssp import getDsspSecStructConsensus
-from cing.PluginCode.required.reqNih import NIH_STR
 from cing.PluginCode.required.reqProcheck import PROCHECK_STR
 from cing.PluginCode.required.reqShiftx import SHIFTX_STR
 from cing.PluginCode.required.reqVasco import VASCO_STR
@@ -152,7 +151,7 @@ def validate( project, ranges=None, parseOnly=False, htmlOnly=False,
 #    tt = time.time()
 #    nTmessage('Time for runQueeny %s' % (tt -tx))
 #    tx = tt
-    if doTalos and getDeepByKeysOrAttributes(plugins, NIH_STR, IS_INSTALLED_STR):
+    if doTalos and getDeepByKeysOrAttributes(plugins, TALOSPLUS_STR, IS_INSTALLED_STR):
         project.runTalosPlus(parseOnly=parseOnly)
 #    tt = time.time()
 #    nTmessage('Time for runTalosPlus %s' % (tt -tx))

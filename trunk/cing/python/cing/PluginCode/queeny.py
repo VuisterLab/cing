@@ -7,11 +7,17 @@ Residues obtain attribute 'information' with information value that is averaged 
 
 """
 
+import cing
+from cing.definitions import cingDefinitions
+
+from cing.Libs.Adict import Adict
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.Libs.cython.superpose import Rm6dist
 from cing.PluginCode.required.reqQueeny import * #@UnusedWildImport
-from cing.core.sml import sML2obj
-from cing.core.sml import obj2SML
+from cing.core.sml import sml2obj
+from cing.core.sml import obj2sml
+
+version= cingDefinitions.version
 
 storedPropList = [QUEENY_UNCERTAINTY1_STR, QUEENY_UNCERTAINTY2_STR, QUEENY_INFORMATION_STR ]
 
@@ -82,7 +88,7 @@ class Queeny( Odict ):
         return Odict.__getitem__(self, key)
     #end def
 
-    # W0222 Signature differs from overridden method 
+    # W0222 Signature differs from overridden method
     # pylint: disable=W0222
     def setdefault(self, key, defaultValue):
         if key[0] > key[1]:
@@ -568,12 +574,14 @@ class Queeny( Odict ):
 #end class
 
 def queenyDefaults():
-    d = NTdict( directory  = 'Queeny',
+    d = Adict( directory  = 'Queeny',
                 smlFile    = 'queeny.sml',
                 molecule   = None,
                 completed  = False,
+                parsed     = False,
+                present    = False,
+                saved      = False,
               )
-    d.keysformat()
     return d
 #end def
 
@@ -605,10 +613,8 @@ def _runQueeny( project, tmp=None ):
         nTmessage("==> runQueeny: No distance restraints defined.")
         return True
 
-    project.status.queeny = queenyDefaults()
-    queenyDefs = project.status.queeny # temp variable for shorter typing
-    queenyDefs.molecule = project.molecule.nameTuple()
 
+    queenyDefs.molecule = project.molecule.nameTuple()
 
     path = project.validationPath( queenyDefs.directory )
     if not path:
@@ -620,6 +626,8 @@ def _runQueeny( project, tmp=None ):
     project.saveQueeny()
 
     queenyDefs.completed = True
+    queenyDefs.present = True
+    queenyDefs.runVersion = version
 
     del(q)
 
@@ -637,20 +645,23 @@ def saveQueeny( project, tmp=None ):
         nTmessage("saveQueeny: No project defined")
         return True
 
-    if QUEENY_STR not in project.status:
-#        nTdebug("saveQueeny: No talos+ was run")
-        return False # just no data, not an error
+    if project.molecule == None:
+        nTmessage("saveQueeny: No molecule defined")
+        return True
 
-    queenyDefs = project.status.queeny
+    queenyDefs = project.getStatusDict(QUEENY_STR, **queenyDefaults())
+
+    if not queenyDefs.completed:
+        return # Return gracefully
 
     path = project.validationPath( queenyDefs.directory )
     if not path:
         nTerror('saveQueeny: directory "%s" with talosPlus data not found', path)
         return True
 
-    if project.molecule == None:
-        nTmessage("saveQueeny: No molecule defined")
-        return True
+    smlFile = os.path.join(path, queenyDefs.smlFile )
+
+
 
     myList = NTlist()
     for res in project.molecule.allResidues():
@@ -662,8 +673,7 @@ def saveQueeny( project, tmp=None ):
                     myList.append( (atm.nameTuple(), storedProp, atm[storedProp]))
         #end for
     #end for
-    smlFile = os.path.join(path, queenyDefs.smlFile )
-    obj2SML( myList, smlFile)
+    obj2sml( myList, smlFile)
 #    nTdebug('==> Saved queeny results to "%s"', smlFile)
     return False
 #end def
@@ -681,33 +691,32 @@ def restoreQueeny( project, tmp=None ):
 
     if project.molecule == None:
         return False # Gracefully returns
-    for storedProp in storedPropList:
-        for res in project.molecule.allResidues():
-            res[storedProp] = 0.0
-        for atm in project.molecule.allAtoms():
-            atm[storedProp] = 0.0
 
-    project.status.setdefault(QUEENY_STR,queenyDefaults())
-    project.status.keysformat()
+    queenyDefs = project.getStatusDict(QUEENY_STR, **queenyDefaults())
 
-    if not project.status.queeny.completed:
+    if not queenyDefs.completed:
         return # Return gracefully
 
-    queenyDefs = project.status.queeny # short cur for less typing
     path = project.validationPath( queenyDefs.directory)
     if not path:
         nTerror('restoreQueeny: directory "%s" with queeny data not found', path)
         return True
 
-    smlFile = os.path.join(path, queenyDefs.smlFile )
-    if not os.path.exists(smlFile):
+    smlFile = path / queenyDefs.smlFile
+    if not smlFile.exists():
         nTerror('restoreQueeny: file "%s" with queeny data not found', path)
         return True
 
     # Restore the data
-    nTmessage('==> Restoring queeny results')
-    myList=sML2obj( smlFile, project.molecule)
+    for storedProp in storedPropList:
+        for res in project.molecule.allResidues():
+            res[storedProp] = 0.0
+        for atm in project.molecule.allAtoms():
+            atm[storedProp] = 0.0
+    #end for
+    myList=sml2obj( smlFile, project.molecule)
     if myList==None:
+        nTerror('Failed restoring Queeny results from %s (code version %s)', smlFile, queenyDefs.saveVersion)
         return True
 
     try:
@@ -721,7 +730,7 @@ def restoreQueeny( project, tmp=None ):
             if not obj:
                 atomName = nameTuple[3]
                 if not (atomName in ATOM_LIST_TO_IGNORE_REPORTING):
-                    nTerror('restoreQueeny: error decoding "%s"', nameTuple) 
+                    nTerror('restoreQueeny: error decoding "%s"', nameTuple)
                     # Was reporting terminal atoms eg. in "('1buq', 'A', 39, 'H2', None, None, 'INTERNAL_1')"
             else:
                 obj[storedProp] = info
@@ -729,6 +738,10 @@ def restoreQueeny( project, tmp=None ):
         nTtracebackError()
         nTerror("Failed to restore Queeny results.")
         return True
+
+    #success
+    queenyDefs.present = True
+    nTmessage('Restored Queeny results from %s (code version %s)', smlFile, queenyDefs.saveVersion)
     return False
 #end def
 #-----------------------------------------------------------------------------

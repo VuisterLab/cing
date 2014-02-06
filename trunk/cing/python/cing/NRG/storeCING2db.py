@@ -24,11 +24,11 @@ NB this script fails if the Postgresql backend is not installed. Which is exactl
 """
 
 import cing
+from cing.constants import * #@UnusedWildImport
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.Libs.helper import getSvnRevision
 from cing.NRG import * #@UnusedWildImport
 from cing.PluginCode.required.reqDssp import * #@UnusedWildImport
-from cing.PluginCode.required.reqNih import * #@UnusedWildImport
 from cing.PluginCode.required.reqProcheck import * #@UnusedWildImport
 from cing.PluginCode.required.reqQueeny import * #@UnusedWildImport
 from cing.PluginCode.required.reqWattos import * #@UnusedWildImport
