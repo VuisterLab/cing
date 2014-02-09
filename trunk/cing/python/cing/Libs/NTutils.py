@@ -2181,8 +2181,11 @@ class NTtree(NTdict):
         return '<%s %s>' % (self._className(), self.name)
 
     def __repr__( self ):  #pylint: disable=W0221
-        return '<%s %s (%d)>' % (self.__CLASS__, self.cName( -1 ), self.__OBJECTID__)
+        return '<%s:%s>' % (self._className(), self.cName( -1 ))
     #end def
+
+    def asPid(self):
+        return repr(self)
 
     def _decodeTreeName(self, nodeNames ):
         """

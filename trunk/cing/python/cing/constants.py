@@ -368,4 +368,36 @@ NUMBER_OF_SD_TALOS = 2
 # Needs to be one word for otherwise the restore failed.
 TALOSPLUS_LIST_STR = "talos_plus_predicted_dihedrals"
 
+#----------------------------------------------------------------------
+# queeny, from reqQueeny
+#----------------------------------------------------------------------
+QUEENY_STR       = "queeny" # key to the entities (atoms, residues, etc under which the results will be stored
+
+QUEENY_UNCERTAINTY1_STR = 'uncertainty1'  # Key used for residue's and atom's uncertainty after topology triangulation
+QUEENY_UNCERTAINTY2_STR = 'uncertainty2'  # Key used for residue's and atom's uncertainty after restraint triangulation
+QUEENY_INFORMATION_STR  = 'information'   # Key used for residue's and atom's information, calculated from uncertainty1 and uncertainty2
+
+# RDB requires a little bit more specific qualifier
+RDB_QUEENY_UNCERTAINTY1_STR = 'queen_uncertainty1'
+RDB_QUEENY_UNCERTAINTY2_STR = 'queen_uncertainty2'
+RDB_QUEENY_INFORMATION_STR = 'queen_information'
+
+#----------------------------------------------------------------------
+# Anticipated v3 definitions
+#----------------------------------------------------------------------
+VALIDATION_KEY = 'validation'
+OBJECT_KEY     = 'object'
+KEY_KEY        = 'key'
+TALOSPLUS_KEY  = 'talosPlus'
+QUEENY_KEY     = 'queeny'
+
+
+TYPE_QUEENY    = 'queeny'
+TYPE_WHATIF    = 'whatif'
+TYPE_MOLECULE  = 'Molecule'
+TYPE_CHAIN     = 'Chain'
+TYPE_RESIDUE   = 'Residue'
+TYPE_ATOM      = 'Atom'
+
+
 

@@ -462,9 +462,9 @@ class Molecule( NTtree, ResidueList ):
             self.name,self.chainCount,self.residueCount,self.atomCount,self.modelCount)
     #end def
 
-    def __repr__(self):
-        return sprintf('<Molecule %s>', self.cName(-1))
-    #end def
+#    def __repr__(self):
+#        return sprintf('<Molecule %s>', self.cName(-1))
+#    #end def
 
     def setAllChildrenByKey(self, key, value):
         "Set chain,res, and atom children's keys to value"
@@ -4482,10 +4482,10 @@ Residue class: Defines residue properties
                            self.footer( )
     #end def
 
-    def __repr__(self):
+#    def __repr__(self):
 #        return sprintf('<Residue %s>', self.cName(-1))
-        return self.__str__()
-    #end def
+#        return self.__str__()
+#    #end def
 
     def __str__(self):
 #        return sprintf('<Residue %s>', self.cName(-1))

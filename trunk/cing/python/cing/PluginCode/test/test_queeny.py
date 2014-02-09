@@ -4,11 +4,10 @@ python $CINGROOT/python/cing/PluginCode/test/test_queeny.py
 """
 from cing import cingDirTestsData
 from cing import cingDirTmp
+from cing.constants import *
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.NRG import * #@UnusedWildImport
 from cing.NRG.storeCING2db import doStoreCING2db
-from cing.PluginCode.required.reqCcpn import CCPN_STR
-from cing.PluginCode.required.reqQueeny import * #@UnusedWildImport
 from cing.core.classes import Project
 from nose.plugins.skip import SkipTest
 from unittest import TestCase

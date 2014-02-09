@@ -6,6 +6,9 @@ import cing
 import cing.constants as constants
 import cing.definitions as cdefs
 
+from cing.core import pid
+from cing.Libs import io
+
 from ConfigParser import ConfigParser
 from cing import cingPythonCingDir
 from cing import cingRoot
@@ -26,6 +29,7 @@ except ImportError:
 from cing.Libs.disk import copydir
 from cing.Libs.disk import Path
 from cing.Libs.disk import remove
+from cing.Libs.disk import modtime
 from cing.Libs.html import DihedralByProjectList
 from cing.Libs.html import addPreTagLines
 from cing.Libs.html import generateHtml
@@ -54,6 +58,7 @@ from cing.core.validate import checkForSaltbridges
 from cing.core.validate import criticize
 from cing.core.validate import criticizePeaks
 from cing.core.validate import fixStereoAssignments
+from cing.core.validate import getValidationResult
 from cing.core.validate import partitionRestraints
 from cing.core.validate import runCingChecks
 from cing.core.validate import summaryForProject
@@ -149,7 +154,9 @@ Project: Top level Cing project class
         self.version = cingVersion
         self.root = root
         self.name = name.strip()
-        self.created = time.asctime()
+        self.created = io.now()
+        self.lastSaved = io.now()
+        self.convention = constants.INTERNAL
 
         self.molecule = None # Current Molecule instance
 
@@ -175,7 +182,7 @@ Project: Top level Cing project class
         self.vascoStatus = NTdict(completed = False, parsed = False)
         self.shiftxStatus = NTdict(completed = False, parsed = False)
         self.x3dnaStatus  = NTdict(completed = False, parsed = False)
-        self.status = NTdict() # General status dict for external programs
+        self.status = Adict() # General status dict for external programs
 
 #        store a reference to the global things we might need
 #        self.gui = None # Reference to CingGui instance
@@ -243,7 +250,7 @@ Project: Top level Cing project class
         self.nosave = False
         self.saveKeys = [
                          'version',
-                         'name', 'created',
+                         'name', 'created','lastSaved','convention',
                          'moleculeNames',
                          'peakListNames', 'distanceListNames', 'dihedralListNames', 'rdcListNames',
                          'coplanarListNames', 'dihedralByProjectListNames', 'dihedralByResidue',
@@ -365,6 +372,7 @@ Project: Top level Cing project class
     #end def
 #-------------------------------------------------------------------------
 
+#DEPRECIATED: should start using Pid's instead
     def decodeNameTuple(self, nameTuple):
         """Decode the 7-element nameTuple:
 
@@ -379,6 +387,32 @@ Project: Top level Cing project class
         if nameTuple == None or not self.has_key(nameTuple[0]):
             return None
         return self[nameTuple[0]].decodeNameTuple(nameTuple)
+    #end def
+
+    def getByPid(self, thePid):
+        """Decode object by pid, in anticipation of version 3
+        return object or None on error
+        """
+        if thePid == None:
+            return None
+
+        if thePid[0] == '<' and thePid[-1] == '>':
+            thePid = pid.Pid(thePid[1:-1])
+        else:
+            thePid = pid.Pid(thePid)
+
+        object = self
+        for p in thePid[1:]:
+            #print '>>', p, object
+            if p not in object:
+                return None
+            object = object[p]
+        #end for
+        if thePid[0] != object.__class__.__name__:
+            nTerror('Project.getByPid: type %s does not match object %r', p[0], object)
+            return None
+        return object
+    #end def
 
 #-------------------------------------------------------------------------
 # actions exists/open/restore/save/close/export/updateProject
@@ -420,15 +454,17 @@ Project: Top level Cing project class
             mTuple = self.molecule.nameTuple()
 
         minimals = Adict(
-                  runVersion   = 0.95,      # 0.95; denotes all older versions
-                  saveVersion  = 0.95,      # 0.95; denotes all older versions
-                  directory    = None,      # directory relative to project.validationPath()
-                  smlFile      = None,      # path relative to project.path()
-                  completed    = False,
-                  parsed       = False,
-                  saved        = False,
-                  present      = False,
-                  molecule     = None,      # molecule tuple
+                         date         = io.Time(1360158182.7),   # Wed Feb  6 13:43:02 2013
+                         runVersion   = 0.95,               # 0.95; denotes all older versions
+                         saveVersion  = 0.95,               # 0.95; denotes all older versions
+                         directory    = None,               # directory relative to project.validationPath()
+                         smlFile      = None,               # path relative to project.path()
+                         completed    = False,              # True: Program was run successfully
+                         parsed       = False,              # True: Program output was parsed successfully; i.e parse can be called if completed == True -> implies present = True
+                         present      = False,              # True: Program data are in the datamodel
+                         saved        = False,              # True: Data have been saved to sml in Data/Plugins; i.e. restore can be called
+                         molecule     = None,               # molecule pid
+                         convention   = constants.INTERNAL  # convention; always handy to have
         )
         sdict = self.status.setdefault(key, defaults)
         if sdict == None:
@@ -689,6 +725,53 @@ Project: Top level Cing project class
         return self.molecule.rmsd
     #end def
 
+    def _savePluginData(self, key, **kwds):
+        """
+        Save Plugin data to sml file.
+        Uses getStatusDict method for settings
+        Update statusDict with kwds before saving
+
+        Return True on error
+        """
+        defs = self.getStatusDict(key)
+
+        if not defs.present:
+            return False# Return gracefully
+
+        if self.molecule == None:
+            nTmessage("Project._savePluginData: No molecule defined")
+            return True
+
+        smlFile = self.path() / cdefs.directories.plugins / defs.smlFile
+
+        myList = NTlist()
+        # first element of list is the settings
+        myList.append( defs )
+        # next elememts are QueenyDefs instances
+        for obj in [self.molecule] + \
+                    self.molecule.allChains() + \
+                    self.molecule.allResidues() + \
+                    self.molecule.allAtoms():
+            qDict = getValidationResult(obj, key)
+            if qDict != None:
+                myList.append(qDict)
+            #end for
+        #end for
+
+        # set values before writing to file or they get lost
+        defs.update(kwds)
+        # Import her to prevent circular  imports
+        from cing.core import sml
+        obj = sml.obj2sml( myList, smlFile)
+        if obj == None:
+            nTerror('Project._savePluginData: error saving %s results to "%s"', key, smlFile)
+            defs.saved = False
+            return True
+
+        nTdetail('==> Saved %s results to "%s"', key, smlFile)
+        return False
+    #end def
+
     def _save2sml(self):
         "Save project settings as SML file"
         from cing.core.sml import obj2sml
@@ -696,11 +779,11 @@ Project: Top level Cing project class
         # get key, value pairs to save
         p = Adict([(k,self[k]) for k in self.saveKeys ])
         obj2sml( p, path )
+    #end def
 
     def save(self):
         """
         Save project data;
-
         Return True on success.
         """
         nTmessage('' + dots * 5 + '')
@@ -710,13 +793,15 @@ Project: Top level Cing project class
         for mol in self.molecules:
             mol.save(mol.objectPath)
         self.moleculeNames = self.molecules.names()
-        self.saveXML('moleculeNames')
+        #OBSOLETE:
+        #self.saveXML('moleculeNames')
 
         # Save the molecules and lists
         for pl in [self.peaks, self.distances, self.dihedrals, self.rdcs, self.coplanars]:
             self[pl.nameListKey] = pl.save() # Save returns a list of name; store these in project
             # Patch for XML bug
-            self.saveXML(pl.nameListKey)
+            #OBSOLETE:
+            #self.saveXML(pl.nameListKey)
         #end for
 
         # Call Plugin registered functions
@@ -732,8 +817,9 @@ Project: Top level Cing project class
             #end for
         #end for
 
-        # Update version number since it is now saved with this cingVersion
+        # Update version number and convention since it is now saved with this cingVersion
         self.version = cingVersion
+        self.convention = constants.INTERNAL
         # Save the project data
         #OBSOLETE:
         #if obj2XML(self, path = self.objectPath) != self:
@@ -743,6 +829,47 @@ Project: Top level Cing project class
 
         self.addHistory('Saved project')
         return True
+    #end def
+
+    def _restorePluginData( self, key, **kwds ):
+        """
+        Restore Plugin data from sml file.
+        Uses getStatusDict method for settings
+        Restore statusDict value with those in the file
+        Update statusDict with **kwds
+
+        Return True on error
+        """
+
+        if self.molecule == None:
+            return False # Gracefully returns
+
+        defs = self.getStatusDict(key)
+
+        if (not defs.saved):
+            return False # Return gracefully
+
+        smlFile = self.path() / cdefs.directories.plugins / defs.smlFile
+        if not smlFile.exists():
+            nTerror('Project._restorePluginData: file "%s" with % data not found', smlFile, key)
+            return True
+        # end if
+
+        # Restore the data
+        # Import here to prevent circular imports
+        from cing.core import sml
+
+        myList = sml.sml2obj( smlFile, self )
+        if myList==None:
+            nTerror('Project._restorePluginData: Restoring %s results from %s (code version %s)', key, smlFile, defs.saveVersion)
+            defs.present = False
+            return True
+        # first element is stored definitions
+        defs.update(myList[0])
+        defs.update(kwds)
+
+        nTmessage('==> Restored %s results from %s (code version %s)', key, smlFile, defs.saveVersion)
+        return False
     #end def
 
     def restore(self):
@@ -1089,7 +1216,7 @@ Project: Top level Cing project class
     #end def
 
     def __repr__(self): # pylint: disable=W0221
-        return str(self)
+        return '<Project:%s>' % self.name
 
     def _list2string(self, theList, firstString, maxItems):
         result = firstString
@@ -1108,15 +1235,16 @@ Project: Top level Cing project class
 
     def format(self): # pylint: disable=W0221
         result = self.header() + '\n' + \
-                            'created:    %(created)s\n'
+                                  'created:    %(created)s\n' \
+                                  'last saved: %(lastSaved)s\n'
         result = result % self
         for firstString, item in [('molecules:  ', 'molecules'),
-                                 ('peaks:      ', 'peaks'),
-                                 ('distances:  ', 'distances'),
-                                 ('dihedrals:  ', 'dihedrals'),
-                                 ('rdcs:       ', 'rdcs'),
-                                 ('coplanars:  ', 'coplanars'),
-                                ]:
+                                  ('peaks:      ', 'peaks'),
+                                  ('distances:  ', 'distances'),
+                                  ('dihedrals:  ', 'dihedrals'),
+                                  ('rdcs:       ', 'rdcs'),
+                                  ('coplanars:  ', 'coplanars'),
+                                 ]:
             result += self._list2string(self[item], firstString, 2) + '\n'
         #end for
         result += self.footer() # Project.footer defaults to NTdict
