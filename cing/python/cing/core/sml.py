@@ -1,4 +1,5 @@
 from cing.Libs.Adict import Adict
+from cing.Libs.io import Time
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.Libs.fpconst import NaN as nan #@UnresolvedImport @UnusedImport ? need for restoring the project ?
 from cing.PluginCode.required.reqVasco import * #@UnusedWildImport
@@ -153,12 +154,12 @@ Example file:
 #                nTdebug("jLine: %s" % str(jLine))
                 lineStart = str( line[0][:80] )
                 if n > 250: # Real limit is 255
-                    nTdebug("Function eval will crash when over 255 elements: found: %s. Line start: %s" % ( (n-1),lineStart ))
+                    nTdebug("SMLhandler:dictHandler: Function eval will crash when over 255 elements: found: %s. Line start: %s" % ( (n-1),lineStart ))
                 # end if
                 try:
                     dictObj[line[1]] = eval(jLine)
                 except:
-                    nTwarning("Function eval crashed not restoring data from line starting with: %s" % lineStart )
+                    nTwarning("SMLhandler:dictHandler: Function eval crashed not restoring data from line starting with: %s" % lineStart )
 #                    nTtracebackError()
                 # end try
             else:
@@ -335,6 +336,80 @@ Example file:
 # <SML> and </SML> tags
 smlhandler = SMLhandler(name='SML')
 
+class SMLAnyDictHandler( SMLhandler ):
+    """General dict encoding class
+    startAttributes: list of attribute names to be used for initiation
+    encodeKeys: keys to encode with asPid( value ) method
+    decodeKeys: keys do decode with getByPid( value ) method
+    endHandler: function called with (dictObj, extraObject) arguments
+    """
+    def __init__(self, cls, clsName,
+                 startAttributes = [],
+                 encodeKeys = [],
+                 decodeKeys = [],
+                 endHandler = None):
+        self._cls = cls
+        # cannot use cls.__class__.__name__ because only instances have these attributes, not the class definition
+        self._clsName = clsName
+        self._startAttributes = startAttributes
+        self._encodeKeys = encodeKeys
+        self._decodeKeys = decodeKeys
+        self._endHandler = endHandler
+        SMLhandler.__init__(self, self._clsName)
+    #end def
+
+    def handle(self, line, fp, obj=None):
+        dictObj = self._cls()
+        return self.dictHandler(dictObj, fp, obj)
+    #end def
+
+    def endHandler(self, dictObj, obj=None):
+        """
+        This method:
+        - Decodes any keys defined in _decodeKeys using getByPid method
+        - Calls endHandler(dictObj, obj) to fit specific needs in the actual class.
+        Should return dictObj or None on error
+        """
+        for key,value in dictObj.iteritems():
+            if key in self._decodeKeys:
+                try:
+                    obj[key] = obj.getByPid( value )
+                except AttributeError:
+                    nTerror('SMLAnyDictHandler.endHandler: getting key "%s" from object "%s"; no getByPid attribute', key, obj)
+        if self._endHandler != None:
+            return self._endHandler( dictObj, obj )
+        return dictObj
+    #end def
+
+    def toSML(self, dictObj, stream=sys.stdout, *args, **kwds):
+        """
+        Write key value pairs of theDict to stream for restoring later with fromFile method
+        Returns theDict or None on error.
+        """
+#        nTdebug("Now in SMLAnyDictHandler#toSML" )
+        fprintf( stream, '%s\n', self.startTag )
+        for key,value in dictObj.iteritems():
+            #print '>>', key, value
+            fprintf( stream, '%s = ', key )
+            if key in self._encodeKeys:
+                if value != None and hasattr(value,'asPid') and value.asPid != None:
+                    val = value.asPid()
+                else:
+                    nTerror('SMLAnyDictHandler.toSML: cannot encode value "%s" of key "%s"', value, key)
+                    val = value
+                #end if
+                fprintf( stream, '%r\n', val )
+            elif hasattr(value,'SMLhandler') and value.SMLhandler != None:
+                value.SMLhandler.toSML( value, stream, *args, **kwds )
+            else:
+                fprintf( stream, '%r\n', value )
+            #end if
+        #end for
+        fprintf( stream, '%s\n', self.endTag )
+        return dictObj
+    #end def
+#end class
+
 # Make SML handler for NTlist
 class SMLNTlistHandler( SMLhandler ):
 
@@ -432,7 +507,7 @@ class SMLAdictHandler( SMLhandler ):
         return theDict
     #end def
 #end class
-Adict.SMLhandler = SMLAdictHandler()
+Adict.SMLhandler = SMLAnyDictHandler(Adict, 'Adict')
 
 # Make SMLhandlers for NTvalue
 # Needed because it's a subclass of NTdict

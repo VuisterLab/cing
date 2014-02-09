@@ -139,7 +139,7 @@ from cing import cingDirTmp
 from cing import cingPythonCingDir
 from cing import cingPythonDir
 from cing import cingVersion
-from cing.Libs.Adict import formatDictItems
+from cing.Libs import io
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.Libs.disk import rmdir
 from cing.Libs.forkoff import ForkOff
@@ -190,7 +190,7 @@ def pformatall( obj, *args, **kwds ):
 ##end def
 
 def pfd( object ):
-    print formatDictItems( object )
+    print io.formatDictItems( object )
 
 def verbosity(value):
     """Set CING verbosity

@@ -30,7 +30,6 @@ from cing.Libs.helper import getSvnRevision
 from cing.NRG import * #@UnusedWildImport
 from cing.PluginCode.required.reqDssp import * #@UnusedWildImport
 from cing.PluginCode.required.reqProcheck import * #@UnusedWildImport
-from cing.PluginCode.required.reqQueeny import * #@UnusedWildImport
 from cing.PluginCode.required.reqWattos import * #@UnusedWildImport
 from cing.PluginCode.required.reqWhatif import * #@UnusedWildImport
 from cing.PluginCode.sqlAlchemy import CsqlAlchemy

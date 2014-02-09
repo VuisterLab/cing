@@ -5,6 +5,7 @@ import time
 
 from ConfigParser import ConfigParser
 
+from cing.Libs import io
 import cing.Libs.helper as helper
 import cing.Libs.disk as disk
 import cing.constants as constants
@@ -49,7 +50,7 @@ class SystemDefinitions(Adict.Adict):
         self.osArchitecture = platform.architecture()[0]
         self.nCPU = helper.detectCPUs()
         self.internetConnected = helper.isInternetConnected()
-        self.startTime = time.time()
+        self.startTime = io.now()
         self.pid = os.getpid()
         self.user = os.getenv("USER", "Unknown user")
         self.host = os.getenv("HOST", "Unknown host") #only works with (t)csh shell
@@ -58,20 +59,20 @@ class SystemDefinitions(Adict.Adict):
     def elapsedTime(self):
         return time.time() - self.startTime
 
-    def ascTime(self, timePoint=None):
-        if timePoint:
-            return time.asctime(time.localtime(timePoint))
-        else:
-            return time.asctime(time.localtime(self.startTime))
+#    def ascTime(self, timePoint=None):
+#        if timePoint:
+#            return time.asctime(time.localtime(timePoint))
+#        else:
+#            return time.asctime(time.localtime(self.startTime))
 
     def getStartMessage(self):
         on = "%s (%s%s/%s/%scores/py%s)" % (self.host, self.osType, self.osRelease, self.osArchitecture, self.nCPU, sys.version.split()[0])
-        at = '(pid:%d) ' %  self.pid + self.ascTime()
+        at = '(pid:%d) %s' %  (self.pid, self.startTime)
         return "User: %-10s on: %-42s at: %32s" % (self.user, on, at)
 
     def getStopMessage(self):
-        now = time.time()
-        return 'Started at: %s\nStopped at: %s\nTook      : %.1f seconds' % (self.ascTime(),self.ascTime(now), now-self.startTime)
+        now = io.now()
+        return 'Started at: %s\nStopped at: %s\nTook      : %.1f seconds' % (self.startTime, now, now-self.startTime)
 
     def __str__(self):
         return '<SystemDefinitions: osType=%s, osRelease=%s, osArchitecture=%s, nCPU=%s, internetConnected=%s, host=%s, startTime=%s, pid=%s, user=%s>' % \
@@ -121,7 +122,7 @@ class CingDefinitions(Adict.Adict):
                                ]
 
         self.copyright       = 'Copyright (c) 2004-2014: Department of Biochemistry, University of Leicester, UK'
-        self.credits         = 'More info at http://nmr.le.ru.nl'
+        self.credits         = 'More info at http://nmr.le.ac.uk'
 
         self.verbosity       = verbosity
     #end def

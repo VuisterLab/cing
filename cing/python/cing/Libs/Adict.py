@@ -1,11 +1,7 @@
 from collections import OrderedDict
 import sys
 
-def formatDictItems(theDict, fmt='{key:20} : {value!s}\n'):
-    """Use format on key,value pairs of items of theDict
-    """
-    return ''.join( [fmt.format(key=k,value=v) for k,v in theDict.items()] )
-#end def
+from cing.Libs import io
 
 class Adict( OrderedDict ):
     """A dict that maps keys onto attributes; as NTdict, but cleaner (?) and less overhead?
@@ -100,7 +96,7 @@ class Adict( OrderedDict ):
                 self[key] = value
 
     def formatItems(self, fmt='{key:20} : {value!s}\n'):
-        return formatDictItems(self, fmt)
+        return io.formatDictItems(self, fmt)
 
     def __format__(self, fmt=None):
         if fmt == None or fmt=='':
@@ -109,7 +105,8 @@ class Adict( OrderedDict ):
     #end def
 
     def __str__(self):
-        clsName = str(self.__class__)[8:-2].split('.')[-1:][0]
+#        clsName = str(self.__class__)[8:-2].split('.')[-1:][0]
+        clsName = self.__class__.__name__
         items = self.formatItems('{key}={value!s}, ')[:-2]
         s = '<%s (oid=%d): %s>' % (clsName, self.getOid(), items)
         ls = len(s)
@@ -120,37 +117,4 @@ class Adict( OrderedDict ):
         else:
             return s
     #end def
-
-    def toSML(self, stream=sys.stdout):
-        if hasattr( self, 'SMLhandler'):
-            handler = getattr(self,'SMLhandler')
-            handler.toSML(self, stream)
-        else:
-            nTerror('Adict.toSML: no SMLhandler defined')
-        #end if
-    #end def
-
-#    def toXML(self, depth=0, stream=sys.stdout, indent='  ', lineEnd='\n'):
-#        """
-#        Write XML-representation of keys/attributes of self to stream
-#        """
-#        nTindent(depth, stream, indent)
-#        fprintf(stream, "<%s>", self.__class__.__name__)
-#        fprintf(stream, lineEnd)
-#
-#        for a in keys:
-#            nTindent(depth+1, stream, indent)
-#            fprintf(stream, "<Attr name=%s>", quote(a))
-#            fprintf(stream, lineEnd)
-#
-#            nTtoXML(self[a], depth+2, stream, indent, lineEnd)
-#
-#            nTindent(depth+1, stream, indent)
-#            fprintf(stream, "</Attr>")
-#            fprintf(stream, lineEnd)
-#        #end for
-#        nTindent(depth, stream, indent)
-#        fprintf(stream, "</%s>", self.__CLASS__)
-#        fprintf(stream, lineEnd)
-#    #end def
 #end class

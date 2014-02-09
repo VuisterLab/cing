@@ -2,12 +2,13 @@
 """
 Create plots like the GreenVersusRed scatter by entry.
 Use:
-cd $D/NRG-CING 
-python -u $CINGROOT/python/cing/NRG/nrgCingRdb.py 
+cd $D/NRG-CING
+python -u $CINGROOT/python/cing/NRG/nrgCingRdb.py
 """
 
 from cing import cingDirTestsData
 from cing import cingDirTmp
+from cing.constants import * #@UnusedWildImport
 from cing.Libs.DBMS import DBMS
 from cing.Libs.DBMS import Relation
 from cing.Libs.DBMS import getRelationFromCsvFile
@@ -19,7 +20,6 @@ from cing.NRG.settings import * #@UnusedWildImport
 from cing.PluginCode.matplib import * #@UnusedWildImport
 from cing.PluginCode.required.reqDssp import * #@UnusedWildImport
 from cing.PluginCode.required.reqProcheck import * #@UnusedWildImport
-from cing.PluginCode.required.reqQueeny import * #@UnusedWildImport
 from cing.PluginCode.required.reqVasco import * #@UnusedWildImport
 from cing.PluginCode.required.reqWattos import * #@UnusedWildImport
 from cing.PluginCode.required.reqWhatif import * #@UnusedWildImport
@@ -136,8 +136,8 @@ class NrgCingRdb():
             # end if
             c.close()
         # end for
-    # end def                
-    
+    # end def
+
     def showCounts(self):
         m = self
         nTmessage("Starting showCounts." )
@@ -196,17 +196,17 @@ class NrgCingRdb():
         pdbIdList = NTlist( *pdbIdList )
         return pdbIdList
     # end def
-    
+
     def getSummaryRelation(self):
         "For generating front page table."
         table = self.centry
         columnName = PDB_ID_STR
         nTdebug("Using table: %s" % table)
         try: # rev_first will become image column
-            s = select([table.c['name'],    
-                        table.c['pdb_id'],       
-                        table.c['bmrb_id'],       
-                        table.c['rog'],         table.c['distance_count'], 
+            s = select([table.c['name'],
+                        table.c['pdb_id'],
+                        table.c['bmrb_id'],
+                        table.c['rog'],         table.c['distance_count'],
                         table.c['cs_count'],table.c['chothia_class'], table.c['chain_count'], table.c['res_count'] ])
             nTdebug("SQL: %s" % s)
             resultTable = self.execute(s).fetchall()
@@ -228,12 +228,12 @@ class NrgCingRdb():
             return None
         # end if
         dbms = DBMS()
-        resultRelation = Relation('summary', dbms, columnList=summaryHeaderList, lol=resultTable)                            
-        nTdebug('resultTable first 80 chars: %s' % str(resultTable)[:80])        
+        resultRelation = Relation('summary', dbms, columnList=summaryHeaderList, lol=resultTable)
+        nTdebug('resultTable first 80 chars: %s' % str(resultTable)[:80])
 #        nTdebug("Retrieved resultTable: %s" % str(resultTable))
         return resultRelation
     # end def
-    
+
     def removeEntry(self, entry_code):
         """
         Return True on error.
@@ -297,14 +297,14 @@ e.pdb_id = s1.pdb_id;
             printResult(result)
         # end for
     # end def
-    
+
     def populateBmrbIds(self):
         nTmessage("Inserting BMRB ids from CSV file to RDB.")
         os.chdir(matchBmrbPdbDir)
         csvFileName = "newMany2OneTable.csv"
         relation = getRelationFromCsvFile( csvFileName, containsHeaderRow=True)
         rowIdxList = range( relation.sizeRows() )
-#        rowIdxList = rowIdxList[:1000]          
+#        rowIdxList = rowIdxList[:1000]
         for rowIdx in rowIdxList:
             pdb_id = relation.getValueString( rowIdx, 0)
             bmrb_id = relation.getValueString( rowIdx, 1)
@@ -314,7 +314,7 @@ e.pdb_id = s1.pdb_id;
 #            printResult(result)
         # end for
     # end def
-    
+
 
 
     def getDbTable( self, level ):
@@ -418,7 +418,7 @@ e.pdb_id = s1.pdb_id;
         first element being a tuple with elements (entry_id, chain_id, res_num, atom_num) [entry_name, chain_id, res_id, atom_id] and
         second element being a float
         third optional element being the deposition date needed for trending.
-        
+
         The result may also be an empty list.
         '''
         m = self
@@ -494,7 +494,7 @@ e.pdb_id = s1.pdb_id;
                 # end for columnNameForTruth
             # end for truth
         # end if filterForTruth
-        
+
         if filterForOtherValueEqual:
             filterForOtherValueEqualColList = []
             filterForOtherValueEqualValList = []
@@ -572,7 +572,7 @@ e.pdb_id = s1.pdb_id;
                 return
             # end try
         # end if
-        if replaceUniqueIdByNaturalId:        
+        if replaceUniqueIdByNaturalId:
             chainIdChainNameResultDict = NTdict()
             resIdResNumberResultDict = NTdict()
             atomIdAtomNameResultDict = NTdict()
@@ -715,7 +715,7 @@ e.pdb_id = s1.pdb_id;
                     nTdebug("Unexpected zero value for %s %s" % (entry_id, entry_name))
                     continue
                 # end if
-            # end if            
+            # end if
             if filterForTruth:
                 skipItem = False
 #                nTdebug("doing filterForTruth")
@@ -726,7 +726,7 @@ e.pdb_id = s1.pdb_id;
                     if not foundKey:
                         skipItem = True
                         break
-                    # end if                    
+                    # end if
                 # end for
                 if skipItem:
                     continue
@@ -766,7 +766,7 @@ e.pdb_id = s1.pdb_id;
         '''
         The code below can use settings in the form of a dictionary that influences the
         plotting.
-        '''        
+        '''
         m = self
         try:
             djaflsjlfjalskdjf #@UndefinedVariable # pylint: disable=W0104
@@ -919,7 +919,7 @@ e.pdb_id = s1.pdb_id;
             clf()
             doSymbolByEntry = getDeepByKeysOrAttributes( plotDict, SYMBOL_BY_ENTRY)
             if not doSymbolByEntry:
-                scatter(x=floatValueLoL2[0], y=floatValueLoL2[1], s=10, c='b', marker='o', 
+                scatter(x=floatValueLoL2[0], y=floatValueLoL2[1], s=10, c='b', marker='o',
                         cmap=None, norm=None, vmin=None, vmax=None, alpha=None, linewidths=None )
             else:
                 floatValueLoLoL = []
@@ -988,7 +988,7 @@ e.pdb_id = s1.pdb_id;
 
 
     def createPlots(self, doTrending = False, results_dir = '.'):
-        ''' 
+        '''
         The code below can use settings in the form of a dictionary that influences the plotting.
         doTrending shows history on x-axis.
         '''
@@ -1063,7 +1063,7 @@ e.pdb_id = s1.pdb_id;
             if doTrending:
 #                num_points_line = 100
                 y = floatNTlist
-                # Watch out we'll use different date formats. 
+                # Watch out we'll use different date formats.
                 # The floats do not have a Postfix and are considered the standard.
                 # The datetime.date Type is the scale for plotting. In matplotlib speak this is the xxx
                 # Id  Postfix Type                 Description
@@ -1071,7 +1071,7 @@ e.pdb_id = s1.pdb_id;
                 # -2-         float                Epoch
                 # -3- Dat     datetime.date        Python format
                 # -4- Tdel    datetime.timedelta   Python format
-                x = NTlist() 
+                x = NTlist()
                 xDat = NTlist()
                 for i in range(len(floatNTlist)):
                     dateObject = floatValueLoL[i][5]
@@ -1084,12 +1084,12 @@ e.pdb_id = s1.pdb_id;
 #                    # endif
                 # end for list creation.
 #                Transformed back later.
-                p = polyfit(x, y, 1)  # deg 1 means 2 parameters for a order 2 polynomial. The x coordinates are floats here. 
+                p = polyfit(x, y, 1)  # deg 1 means 2 parameters for a order 2 polynomial. The x coordinates are floats here.
                 nTmessage("Fit with terms             : %s" % p)
                 trendFloat = p[0]*365.25
                 trendFloatStr = '%.3f' %  trendFloat
                 titleStr += ' trend %s per year' % trendFloatStr
-                t = [min(xDat), max(xDat)] # Only need 2 points for straight line!                            
+                t = [min(xDat), max(xDat)] # Only need 2 points for straight line!
                 yearIntMin = 1990 # inclusive start
                 yearIntMax = 2014 # exclusive end
                 yearIntBinSize = 2
@@ -1106,7 +1106,7 @@ e.pdb_id = s1.pdb_id;
 #                plot(t, fitDatefuncD2(p, t), "r--", linewidth=1) # Plot of the data and the fit
 #                nTdebug("Setting xlimits to %s - %s" % (dateDatMin, dateDatMax))
 #                xlim(xmin=dateMin, xmax=dateMax, auto=True)
-#                xticks( range(dateDatMin, dateDatMax, binSizeTdel)) #     
+#                xticks( range(dateDatMin, dateDatMax, binSizeTdel)) #
                 if not onlyScatter:
                     # Now bin
                     if False: # test positions
@@ -1140,7 +1140,7 @@ e.pdb_id = s1.pdb_id;
                     wiskLoL = boxplot(dataAll, positions=bins, widths=widths, sym=sym)
     #                scatter(x, y, s=0.1) # Plot of the data and the fit
                     print 'wiskLoL: %s' % wiskLoL
-                # end if scatterOnly            
+                # end if scatterOnly
                 # When trending the limits are for the y-axis.
                 if xmin != None:
                     ylim(ymin=xmin)
@@ -1152,7 +1152,7 @@ e.pdb_id = s1.pdb_id;
                 # end if
                 xlabel('Deposition Date')
                 ylabel(chk_id_unique)
-                
+
             else: # else not trending.
                 # Histogram the data
                 normed = 0 # Default zero
@@ -1229,7 +1229,7 @@ e.pdb_id = s1.pdb_id;
             # end for
             plotProducedCount += 1
         # end for plot
-        nTmessage("Produced %s plots" % plotProducedCount)        
+        nTmessage("Produced %s plots" % plotProducedCount)
     # end def
 
 
@@ -1238,7 +1238,7 @@ e.pdb_id = s1.pdb_id;
         Comparisons.
         '''
         other = NrgCingRdb(host=self.csql.host, user=self.csql.user, db=self.csql.db, schema=other_schema)
-        from cing.NRG.localPlotList import plotList # pylint: disable=E0611 
+        from cing.NRG.localPlotList import plotList # pylint: disable=E0611
 #        d0List = [{PLOT_IDENTITY_LINE: 1}, {IS_TRUE:[ SEL2_STR ]}, {}] # Overall, x and y axis dictionary settings.
 #        d1List = [{}, {IS_TRUE:SEL1_STR}, {IS_TRUE:[ SEL1_STR, SEL2_STR ]}] # Overall, x and y axis dictionary settings.
 #        d0 = { USE_MIN_VALUE_STR: 0 }
@@ -1258,15 +1258,15 @@ e.pdb_id = s1.pdb_id;
             level, progId, chk_id, _plotDictList = plotParameterList
             plotDictList = [ {}, {}, {} ]
             plotDict = plotDictList[0]
-            plotDict[PLOT_IDENTITY_LINE] = True 
+            plotDict[PLOT_IDENTITY_LINE] = True
 #            plotDict[IS_TRUE] = SEL1_STR # Select only residues that fall in cv range in both schemas.
 #            plotDict[IS_TRUE] = SEL2_STR # Select only residues that have 25 models.
 #            plotDict[IS_TRUE] = [ SEL1_STR ]
 #            plotDict[IS_TRUE] = [ SEL1_STR, SEL2_STR ]
 
             floatValueLoLoL = []
-            chk_id_unique = level + "-" 
-            chk_id_unique += '.'.join([progId, chk_id])            
+            chk_id_unique = level + "-"
+            chk_id_unique += '.'.join([progId, chk_id])
             level_number = self.getLevelNumber(level) # project is 3.
             nTdebug("level_number %d" % level_number)
             naturalIdsToFloatMap2 = NTdict()
@@ -1285,7 +1285,7 @@ e.pdb_id = s1.pdb_id;
                 plotDictAxisList[dim][REPLACE_BY_NATURAL_IDS] = True # Needed because the regular ids are only unique within schema.
                 if dim == 0:
                     plotDictAxisList[dim][IS_TRUE] = [ SEL1_STR, SEL2_STR ]
-                else:  
+                else:
                     plotDictAxisList[dim][IS_TRUE] = [ SEL1_STR, SEL2_STR ] # Overall, x and y axis dictionary settings.
                 # end if
                 nTdebug("Using plotDictAxisList for dim %d of %s" % ( dim, plotDictAxisList[dim]))
@@ -1295,7 +1295,7 @@ e.pdb_id = s1.pdb_id;
                         nTerror("Failed getFloatLoLFromDb of %s for %s" % (chk_id, selfOrOther.schema))
                     else:
                         nTwarning("No results from getFloatLoLFromDb of %s for %s" % (chk_id, selfOrOther.schema))
-                    # end if                        
+                    # end if
                     continueWithPlot = False
                     break
                 # end if
@@ -1323,13 +1323,13 @@ e.pdb_id = s1.pdb_id;
             if not continueWithPlot:
                 continue
             # end if
-            floatValueLoL2 = [[],[]]            
+            floatValueLoL2 = [[],[]]
             floatValueList2_x = floatValueLoL2[0]
             floatValueList2_y = floatValueLoL2[1]
-            
+
             floatValueLoL_x = floatValueLoLoL[0]
             floatValueLoL_x_size = len(floatValueLoL_x)
-            
+
             for row_idx in range(floatValueLoL_x_size):
                 floatValueL_x = floatValueLoL_x[row_idx]
 #                nTdebug("floatValueL_x: %s" % str(floatValueL_x))
@@ -1381,9 +1381,9 @@ e.pdb_id = s1.pdb_id;
                 titleStr += '\n' + self.getTitleFromDict(plotDict)
             # end if
             clf()
-            scatter(x=floatValueLoL2[0], y=floatValueLoL2[1], s=10, c='b', marker='o', 
+            scatter(x=floatValueLoL2[0], y=floatValueLoL2[1], s=10, c='b', marker='o',
                     cmap=None, norm=None, vmin=None, vmax=None, alpha=None, linewidths=None )
-            
+
             if minList[0] != None:
                 xlim(xmin=minList[0])
             # end if
@@ -1402,11 +1402,11 @@ e.pdb_id = s1.pdb_id;
 
             nTdebug("Title:\n%s" % titleStr)
             title(titleStr, fontsize='small')
-            
-            if getDeepByKeysOrAttributes( plotDict, PLOT_IDENTITY_LINE): 
-                minV = min(minValueList) 
+
+            if getDeepByKeysOrAttributes( plotDict, PLOT_IDENTITY_LINE):
+                minV = min(minValueList)
                 maxV = max(maxValueList)
-                nTdebug("Plotting from %s to %s" %( minV, maxV ))            
+                nTdebug("Plotting from %s to %s" %( minV, maxV ))
                 plot( (minV, maxV), (minV, maxV))
             # end if
             fn = "plotHist_%s" % chk_id_unique
@@ -1421,21 +1421,21 @@ e.pdb_id = s1.pdb_id;
                 r = Relation(fn, dbms, columnList=['x', 'y'])
                 ta = transpose(floatValueLoL2)
                 r.fromLol(ta)
-                r.writeCsvFile(os.path.join('csv', fn +'.csv'))            
-            # end if            
+                r.writeCsvFile(os.path.join('csv', fn +'.csv'))
+            # end if
             if doDiffHist:
                 nTmessage("Plotting difference histogram.")
                 clf()
                 a = floatValueLoL2
                 n = len(a[0])
-                
+
                 d = [a[1][i]-a[0][i] for i in range(n) ]
                 dNtList = NTlist(*d)
                 _av, _sd, m = dNtList.average()
                 if n != m:
                     nTerror("Failed doDiffHist")
                     continue
-                # end if                
+                # end if
 #                normed = True
                 n, _bins, _patches = hist(d, bins=80, facecolor='green', alpha=0.75)
                 # Draw a line to fit.
@@ -1448,7 +1448,7 @@ e.pdb_id = s1.pdb_id;
                 fn = "diffHist_%s" % chk_id_unique
                 nTdebug("Writing png for: " + fn)
                 savefig(fn+".png")
-            # end if                
+            # end if
         # end for plot
     # end def
 
@@ -1481,7 +1481,7 @@ e.pdb_id = s1.pdb_id;
         # end for
         if not doPlot:
             return
-        # end if        
+        # end if
         pdb_id_list = perEntryRog.keys()
         color = nTfill(0.0, 3)
         color[0] = NTlist() # green
@@ -1510,9 +1510,9 @@ e.pdb_id = s1.pdb_id;
         cla() # clear all.
         lw = 5.0
         cl = 'black'
-        rc('lines', linewidth=lw, color=cl)     
-        rc('axes',  linewidth=lw )     
-        rc('grid',  linewidth=lw )     
+        rc('lines', linewidth=lw, color=cl)
+        rc('axes',  linewidth=lw )
+        rc('grid',  linewidth=lw )
         rc('font', size=140)
 
         _p = plt.plot(color[2], color[0], 'o', color=cl, markerfacecolor=cl, markersize=20 )
@@ -1549,20 +1549,20 @@ e.pdb_id = s1.pdb_id;
                   'savefig.dpi':      dpi,
                   'savefig.figsize':  fig_size,
                    }
-        rcParams.update(params)        
+        rcParams.update(params)
         figure = gcf()
         figure.set_size_inches(  fig_size )
         fn = strTitle + '.eps'
         nTdebug("Saving plot file: %s" % fn)
         savefig(fn)
     # end def
-    
+
     def getPerEntryRog(self):
         'Sets self.perEntryRog'
         m = self
-        perEntryRog = m.perEntryRog         
+        perEntryRog = m.perEntryRog
         m.t4 = m.csql.loadTable("tmpentry4") # generated by hand in CING_paper_queries.sql.
-        
+
         # Plot the % red vs green for all in nrgcing
         s = select([m.t4.c.name, m.t4.c.rog, m.t4.c.cperc])
         nTdebug("SQL: %s" % s)
@@ -1581,7 +1581,7 @@ e.pdb_id = s1.pdb_id;
         nTdebug("ROG per residue calculated for number of entries: %s" % len(entryList))
         nTdebug("ROG per residue: %s" % m)
     # end def
-        
+
     def queryOnRogPercentages(self):
         'Run after perEntryRog has been filled.'
         m = self
@@ -1616,7 +1616,7 @@ e.pdb_id = s1.pdb_id;
             # end for
         # end for
     # end def
-    
+
     def plotQualityVsColor(self):
         m = self
         elementNameList = ['WI_Backbone', 'WI_Rama', 'PC_Backbone']
@@ -1683,16 +1683,16 @@ e.pdb_id = s1.pdb_id;
             m.getPerEntryRog()
         # end if
         # overwrite any present that might be generated from different method.
-        mkdirs( cingDirTmpTest )        
-        
+        mkdirs( cingDirTmpTest )
+
         if os.chdir(cingDirTmpTest):
             nTerror("Failed to change to test directory for files: " + cingDirTmpTest)
         # end if
-        
-        s = select([m.e1.c.pdb_id, 
-                    m.e1.c.pc_rama_core, 
-                    m.e1.c.pc_rama_allow, 
-                    m.e1.c.pc_rama_gener, 
+
+        s = select([m.e1.c.pdb_id,
+                    m.e1.c.pc_rama_core,
+                    m.e1.c.pc_rama_allow,
+                    m.e1.c.pc_rama_gener,
                     m.e1.c.pc_rama_disall
                      ], and_(m.e1.c.pdb_id==m.s1.c.pdb_id,
 #                             m.e1.c.pdb_id==m.e1.c.pdb_id
@@ -1721,12 +1721,12 @@ e.pdb_id = s1.pdb_id;
                 cla() # clear all.
                 lw = 5.0
                 cl = 'black'
-                rc('lines', linewidth=lw, color=cl)     
-                rc('axes',  linewidth=lw )     
-                rc('grid',  linewidth=lw )     
+                rc('lines', linewidth=lw, color=cl)
+                rc('axes',  linewidth=lw )
+                rc('grid',  linewidth=lw )
                 rc('font', size=140)
                 xlim(0, 100)
-                ylim(0, 100)                
+                ylim(0, 100)
                 _p = plt.plot(xSerie, ySerie, 'o', color=cl, markerfacecolor=cl, markersize=15 )
                 xlabel(elementNameStrList[elementIdx])
                 ylabel(colorNameStrList[elementIdx])
@@ -1750,7 +1750,7 @@ e.pdb_id = s1.pdb_id;
                           'savefig.dpi':      dpi,
                           'savefig.figsize':  fig_size,
                            }
-                rcParams.update(params)        
+                rcParams.update(params)
                 figure = gcf()
                 figure.set_size_inches(  fig_size )
                 savefig(fn)
@@ -1768,9 +1768,9 @@ e.pdb_id = s1.pdb_id;
         titleStr = 'Well defined Leucines'
 #        sizePixels = 2000 # All fonts are scaled so will look too small if going larger with this parameter.
         outputDir = '/Users/jd/CMBI/Papers/Leucine_Paper/Figures'
-        
-        
-        
+
+
+
         nTdebug( 'Load view with predefined "well-defined" residues.')
         leucine = Table('leucine', self.csql.metadata, autoload=True, schema=self.csql.schema)
         # Plot the % red vs green for all in nrgcing
@@ -1800,13 +1800,13 @@ e.pdb_id = s1.pdb_id;
 
         mol = project.molecule
         res = mol.A.LEU185 # Pick one without restraints or remove the restraints.
-        nTmessage( mol.format() )        
+        nTmessage( mol.format() )
         ps = makeDihedralPlot(project, [res], dihedralName1, dihedralName2, plotValues = False,
                           plotTitle = titleStr,
                           plotCav=False, htmlOnly=False)
-        
-        plot( d1, d2, 'k.', markersize=0.002 )                
-#        ps.hardcopySize = (sizePixels,sizePixels)        
+
+        plot( d1, d2, 'k.', markersize=0.002 )
+#        ps.hardcopySize = (sizePixels,sizePixels)
         ps.hardcopy(fn)
     # end def
 # end class
