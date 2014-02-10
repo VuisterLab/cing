@@ -5,11 +5,11 @@ import time
 
 from ConfigParser import ConfigParser
 
+from cing      import constants
+from cing.Libs import Adict
+from cing.Libs import disk
+from cing.Libs import helper
 from cing.Libs import io
-import cing.Libs.helper as helper
-import cing.Libs.disk as disk
-import cing.constants as constants
-import cing.Libs.Adict as Adict
 
 
 #-----------------------------------------------------------------------------

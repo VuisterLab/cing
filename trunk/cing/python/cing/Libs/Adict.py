@@ -1,9 +1,10 @@
 from collections import OrderedDict
-import sys
+#import sys
 
 from cing.Libs import io
 
-class Adict( OrderedDict ):
+
+class Adict(OrderedDict):
     """A dict that maps keys onto attributes; as NTdict, but cleaner (?) and less overhead?
     methods setattrOnly, getattrOnly and delattrOnly allow for 'oldstyle' non-key-mapped attributes
     """
@@ -25,6 +26,7 @@ class Adict( OrderedDict ):
     #------------------------------------------------------------------
     # Basic functionality
     #------------------------------------------------------------------
+
     def __getattr__(self, attr):
         """Implement basic functionality:
            Keys can be referenced as in dictionary methods, or as an attribute.
@@ -36,7 +38,7 @@ class Adict( OrderedDict ):
             return self.getattrOnly(attr)
 
         if not attr in self:
-            raise AttributeError( 'Attribute (keyed) "%s" not found.' % attr )
+            raise AttributeError('Attribute (keyed) "%s" not found.' % attr)
         return self[attr]
     #end def
 
@@ -47,7 +49,7 @@ class Adict( OrderedDict ):
         #print '>> in __setattr__', attr, value
         # preserve OrderedDict implementation attributes
         if attr.startswith('_Ordered'):
-            OrderedDict.__setattr__( self, attr, value )
+            OrderedDict.__setattr__(self, attr, value)
         else:
             self[attr] = value
     #end def
@@ -59,7 +61,7 @@ class Adict( OrderedDict ):
         #print '>> in __delattr__', attr
         # preserve OrderedDict implementation attributes
         if attr in self.__dict__.keys():
-            OrderedDict.__delattr__( self, attr )
+            OrderedDict.__delattr__(self, attr)
         else:
             del(self[attr])
     #end def
@@ -69,7 +71,7 @@ class Adict( OrderedDict ):
         """
         # OrderedDict does not have a __getattr__ method
         if not attr in self.__dict__:
-            raise AttributeError( 'Attribute (only): "%s" not found.' % attr )
+            raise AttributeError('Attribute (only): "%s" not found.' % attr)
         return self.__dict__[attr]
     #end def
 
@@ -82,7 +84,7 @@ class Adict( OrderedDict ):
     def delattrOnly(self, attr):
         """'delete 'Old-style' attribute, not mapped to key
         """
-        del( self.__dict__[attr] )
+        del(self.__dict__[attr])
     #end def
 
     def getOid(self):
@@ -90,8 +92,8 @@ class Adict( OrderedDict ):
         return self.getattrOnly(Adict.OID_STRING)
 
     def setdefaultKeys(self, fromDict):
-        "Set keys of fromDict not present in self to values fromDict"
-        for key,value in fromDict.iteritems():
+        """Set keys of fromDict not present in self to values fromDict"""
+        for key, value in fromDict.iteritems():
             if key not in self:
                 self[key] = value
 
@@ -99,16 +101,16 @@ class Adict( OrderedDict ):
         return io.formatDictItems(self, fmt)
 
     def __format__(self, fmt=None):
-        if fmt == None or fmt=='':
+        if fmt is None or fmt == '':
             return str(self)
         return fmt.format(**self)
     #end def
 
     def __str__(self):
 #        clsName = str(self.__class__)[8:-2].split('.')[-1:][0]
-        clsName = self.__class__.__name__
+        clsname = self.__class__.__name__
         items = self.formatItems('{key}={value!s}, ')[:-2]
-        s = '<%s (oid=%d): %s>' % (clsName, self.getOid(), items)
+        s = '<%s (oid=%d): %s>' % (clsname, self.getOid(), items)
         ls = len(s)
         # restrict the length to MAX_STR_LENGTH
         if ls > Adict.MAX_STR_LENGTH:

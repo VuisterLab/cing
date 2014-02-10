@@ -29,7 +29,7 @@ import sys
 
 #import cing.Libs.helper as helper
 #import cing.Libs.disk as disk
-import cing.constants as constants
+#import cing.constants as constants
 import cing.definitions as cdefs
 
 __version__         = cdefs.__version__
