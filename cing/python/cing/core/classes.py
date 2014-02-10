@@ -58,7 +58,6 @@ from cing.core.validate import checkForSaltbridges
 from cing.core.validate import criticize
 from cing.core.validate import criticizePeaks
 from cing.core.validate import fixStereoAssignments
-from cing.core.validate import getValidationResult
 from cing.core.validate import partitionRestraints
 from cing.core.validate import runCingChecks
 from cing.core.validate import summaryForProject
@@ -68,6 +67,9 @@ from cing.core.validate import validateDihedralCombinations
 from cing.core.validate import validateDihedrals
 from cing.core.validate import validateModels
 from cing.core.validate import validateRestraints
+from cing.core import validation
+
+
 from glob import glob
 from glob import glob1
 from shutil import rmtree
@@ -738,7 +740,7 @@ Project: Top level Cing project class
         if not defs.present:
             return False# Return gracefully
 
-        if self.molecule == None:
+        if self.molecule is None:
             nTmessage("Project._savePluginData: No molecule defined")
             return True
 
@@ -752,8 +754,8 @@ Project: Top level Cing project class
                     self.molecule.allChains() + \
                     self.molecule.allResidues() + \
                     self.molecule.allAtoms():
-            qDict = getValidationResult(obj, key)
-            if qDict != None:
+            qDict = validation.getValidationResult(obj, key)
+            if qDict is not None:
                 myList.append(qDict)
             #end for
         #end for
@@ -763,7 +765,7 @@ Project: Top level Cing project class
         # Import her to prevent circular  imports
         from cing.core import sml
         obj = sml.obj2sml( myList, smlFile)
-        if obj == None:
+        if obj is None:
             nTerror('Project._savePluginData: error saving %s results to "%s"', key, smlFile)
             defs.saved = False
             return True
@@ -841,7 +843,7 @@ Project: Top level Cing project class
         Return True on error
         """
 
-        if self.molecule == None:
+        if self.molecule is None:
             return False # Gracefully returns
 
         defs = self.getStatusDict(key)
@@ -860,7 +862,7 @@ Project: Top level Cing project class
         from cing.core import sml
 
         myList = sml.sml2obj( smlFile, self )
-        if myList==None:
+        if myList is None:
             nTerror('Project._restorePluginData: Restoring %s results from %s (code version %s)', key, smlFile, defs.saveVersion)
             defs.present = False
             return True

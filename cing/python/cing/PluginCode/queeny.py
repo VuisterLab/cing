@@ -10,7 +10,7 @@ Residues obtain attribute 'information' with information value that is averaged 
 import cing
 from cing import constants
 from cing import definitions as cdefs
-from cing.core import validate
+from cing.core import validation
 from cing.core import sml
 from cing.Libs import io
 
@@ -21,6 +21,7 @@ from cing.Libs.cython.superpose import Rm6dist
 # versions < 0.95 not logged with version number
 # cing versions >1.0 first ones to include this
 version = cdefs.cingDefinitions.version
+
 
 class DmElement():
     "Distance Matrix element for Queeny"
@@ -62,6 +63,7 @@ class DmElement():
         return
     #end def
 #end class
+
 
 class Queeny( Odict ):
     """
@@ -635,11 +637,11 @@ def _runQueeny( project, tmp=None ):
     return False
 #end def
 
-class QueenyResult( validate.ValidationResult ):
+class QueenyResult(validation.ValidationResult):
     """Class to store queeny results
     """
     def __init__(self, **kwds):
-        validate.ValidationResult.__init__( self, **kwds)
+        validation.ValidationResult.__init__( self, **kwds)
         self.setdefault(constants.QUEENY_UNCERTAINTY1_STR, 0.0)
         self.setdefault(constants.QUEENY_UNCERTAINTY2_STR, 0.0)
         self.setdefault(constants.QUEENY_INFORMATION_STR, 0.0)
@@ -650,19 +652,19 @@ class QueenyResult( validate.ValidationResult ):
         # Restore linkage
         # Needs a valid project
         # Adds to validation
-        if project == None:
+        if project is None:
             return None
         if constants.OBJECT_KEY in qDict:
             object = project.getByPid(qDict[constants.OBJECT_KEY])
-        if object == None:
+        if object is None:
             nTerror('QueenyResult.endHandler: invalid residue Pid %s, ==> skipped', qDict[constants.OBJECT_KEY])
             return None
         #end if
         #LEGACY:
-        for storedProp in [constants.QUEENY_UNCERTAINTY1_STR, constants.QUEENY_UNCERTAINTY2_STR, constants.QUEENY_INFORMATION_STR ]:
+        for storedProp in [constants.QUEENY_UNCERTAINTY1_STR, constants.QUEENY_UNCERTAINTY2_STR, constants.QUEENY_INFORMATION_STR]:
             object[storedProp] = qDict[storedProp]
         #v3:
-        validate.setValidationResult(object, constants.QUEENY_KEY, qDict)
+        validation.setValidationResult(object, constants.QUEENY_KEY, qDict)
         return qDict
     #end def
 #end class
@@ -672,57 +674,47 @@ QueenyResult.SMLhandler = sml.SMLAnyDictHandler(QueenyResult,'QueenyResult',
                                                 encodeKeys = [constants.OBJECT_KEY],
                                                 endHandler = QueenyResult.endHandler,
                                                )
-#def _values2dict(object, level):
-#    'Return a dict with properties values from object. Level: TYPE_RESIDUE or TYPE_ATOM'
-#
-#    result = Adict(pid = '<%s:%s>' % (constants.TYPE_QUEENY,
-#                                      object.cName(-1)),
-#                   objectPid = object.asPid()
-#                  )
-#    for storedProp in [constants.QUEENY_UNCERTAINTY1_STR, constants.QUEENY_UNCERTAINTY2_STR, constants.QUEENY_INFORMATION_STR ]:
-#        result[storedProp] = object.setdefault(storedProp, 0.0)
-#    return result
-##end def
 
-def saveQueeny( project, tmp=None ):
+
+def saveQueeny(project, tmp=None):
     """
     Save queeny results to sml file
     Returns True on error.
     Returns False on success.
     """
-    if project == None:
+    if project is None:
         nTmessage("saveQueeny: No project defined")
         return True
 
-    if project.molecule == None:
+    if project.molecule is None:
         nTmessage("saveQueeny: No molecule defined")
         return True
     # save the data
-    return project._savePluginData(constants.QUEENY_KEY, saved=True, saveVersion = version)
+    return project._savePluginData(constants.QUEENY_KEY, saved=True, saveVersion=version)
 #end def
 
 
-def restoreQueeny( project, tmp=None ):
+def restoreQueeny(project, tmp=None):
     """
     Restore queeny results from sml file.
     Return True on error
     """
-    if project == None:
+    if project is None:
         nTmessage("restoreQueeny: No project defined")
         return True
 
-    if project.molecule == None:
+    if project.molecule is None:
         return False # Gracefully returns
 
     # Reset the data
     for obj in project.molecule.allResidues() + project.molecule.allAtoms():
-        validate.setValidationResult(obj, constants.QUEENY_KEY, None)
+        validation.setValidationResult(obj, constants.QUEENY_KEY, None)
         #LEGACY:
         for storedProp in [constants.QUEENY_UNCERTAINTY1_STR, constants.QUEENY_UNCERTAINTY2_STR, constants.QUEENY_INFORMATION_STR ]:
            obj[storedProp] = 0.0
     #end for
     #restore the data
-    return project._restorePluginData(constants.QUEENY_KEY, present = True)
+    return project._restorePluginData(constants.QUEENY_KEY, present=True)
 #end def
 #-----------------------------------------------------------------------------
 

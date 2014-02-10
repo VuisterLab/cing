@@ -5,7 +5,7 @@ Adds Talos+ related methods
 import cing
 from cing import constants
 from cing.core import sml
-from cing.core import validate
+from cing.core import validation
 from cing.Libs import io
 
 from cing.Libs.Adict import Adict
@@ -1189,12 +1189,12 @@ def _importTableFile( tabFile, molecule ):
 
 TALOSPLUS_FILE = 'talosPlus.sml'
 
-class TalosPlusResult( validate.ValidationResult ):
+class TalosPlusResult( validation.ValidationResult ):
     """Class to store talos+ results
     """
     def __init__(self, *args, **kwds):
 
-        validate.ValidationResult.__init__( self, *args, **kwds)
+        validation.ValidationResult.__init__( self, *args, **kwds)
         self.setdefault('residue', None)
         self.setdefault('phi', None)
         self.setdefault('psi', None)
@@ -1208,7 +1208,6 @@ class TalosPlusResult( validate.ValidationResult ):
     #end def
 
     def format(self, fmt=None):
-
         if fmt == None:
             fmt = '%(residue)-18s  phi= %(phi)-15s  psi= %(psi)-15s  (%(count)2s predictions, classified as ' +\
                   '"%(classification)-4s")  S2= %(S2)4.2f   Sec.Struct.: %(ss_class)-8s ' +\
@@ -1223,11 +1222,11 @@ class TalosPlusResult( validate.ValidationResult ):
         # Restore linkage
         # Needs a valid project
         # Adds to validation
-        if project == None:
+        if project is None:
             return None
         if constants.OBJECT_KEY in qDict:
             object = project.getByPid(qDict[constants.OBJECT_KEY])
-        if object == None:
+        if object is None:
             nTerror('TalosPlusResult.endHandler: invalid residue Pid %s, ==> skipped Residue', tPlus[constants.OBJECT_KEY])
             return None
         #end if
@@ -1236,7 +1235,7 @@ class TalosPlusResult( validate.ValidationResult ):
         tPlus.residue = object
         object.talosPlus = tPlus
         #v3:
-        validate.setValidationResult(object, constants.TALOSPLUS_KEY, tPlus)
+        validation.setValidationResult(object, constants.TALOSPLUS_KEY, tPlus)
         return tPlus
     #end def
 #end class
@@ -1325,7 +1324,7 @@ def _resetTalosPlus(talosDefs, molecule):
     """
     for res in molecule.allResidues():
         res.talosPlus = None
-        validate.setValidationResult(res, constants.TALOSPLUS_KEY, None)
+        validation.setValidationResult(res, constants.TALOSPLUS_KEY, None)
     #end for
     talosDefs.present = False
 #end def
@@ -1379,6 +1378,7 @@ def _findTalosOutputFiles( path, talosDefs ):
     return False
 #end def
 
+
 def runTalosPlus(project, tmp=None, parseOnly=False):
     """Perform a talos+ analysis; parses the results; put into new CING dihedral restraint list; and
     saves the results.
@@ -1386,15 +1386,15 @@ def runTalosPlus(project, tmp=None, parseOnly=False):
     Returns True on error.
     Returns False when talos is absent or when all is fine.
     """
-    if project == None:
+    if project is None:
         nTerror("RunTalosPlus: No project defined")
         return True
 
-    if cingPaths.talos == None:
+    if cingPaths.talos is None:
         nTmessage('RunTalosPlus: talosPlus executable not defined; check your cing.csh/cing.sh setup ')
         return True
 
-    if project.molecule == None:
+    if project.molecule is None:
         nTmessage("RunTalosPlus: No molecule defined")
         return True
 
@@ -1408,12 +1408,12 @@ def runTalosPlus(project, tmp=None, parseOnly=False):
         # JFD: This doesn't catch all cases.
         return False
 
-    talosDefs = project.getStatusDict(TALOSPLUS_KEY, **talosDefaults())
+    talosDefs = project.getStatusDict(constants.TALOSPLUS_KEY, **talosDefaults())
 
     if not parseOnly:
 
         talosDefs.molecule = repr(project.molecule)
-        talosDefs.directory = TALOSPLUS_KEY
+        talosDefs.directory = constants.TALOSPLUS_KEY
 
         path = project.validationPath( talosDefs.directory )
         if not path:
@@ -1478,7 +1478,7 @@ def parseTalosPlus( project, tmp=None ):
         nTmessage("parseTalosPlus: No molecule defined")
         return True
 
-    talosDefs = project.getStatusDict(TALOSPLUS_KEY, **talosDefaults())
+    talosDefs = project.getStatusDict(constants.TALOSPLUS_KEY, **talosDefaults())
 
     if not talosDefs.completed:
         nTmessage("parseTalosPlus: No talos+ was run")
@@ -1511,30 +1511,31 @@ def parseTalosPlus( project, tmp=None ):
     return False
 #end def
 
-def saveTalosPlus( project, tmp=None ):
+
+def saveTalosPlus(project, tmp=None):
     """
     Save talos+ results to sml file
     Returns True on error.
     Returns None on success.
     """
-    if project == None:
+    if project is None:
         nTmessage("saveTalosPlus: No project defined")
         return True
 
-    if project.molecule == None:
+    if project.molecule is None:
         nTmessage("saveTalosPlus: No molecule defined")
         return True
     # save the data
-    return project._savePluginData(constants.TALOSPLUS_KEY, saved=True, saveVersion = version)
+    return project._savePluginData(constants.TALOSPLUS_KEY, saved=True, saveVersion=version)
 #end def
 
+
 # pylint: disable=C0102
-def restoreTalosPlus( project, tmp=None ):
+def restoreTalosPlus(project, tmp=None):
     """
     Restore talos+ results from sml file.
     Return True on error
     """
-
     if project == None:
         nTmessage("restoreTalosPlus: No project defined")
         return True
@@ -1543,11 +1544,12 @@ def restoreTalosPlus( project, tmp=None ):
         return False # Gracefully returns
 
     # Reset the data
-    talosDefs = project.getStatusDict(TALOSPLUS_KEY, **talosDefaults())
+    talosDefs = project.getStatusDict(constants.TALOSPLUS_KEY, **talosDefaults())
     _resetTalosPlus(talosDefs, project.molecule)
     #restore the data
-    return project._restorePluginData(constants.TALOSPLUS_KEY, present = True)
+    return project._restorePluginData(constants.TALOSPLUS_KEY, present=True)
 #end def
+
 
 def talosPlus2restraints( project, name=TALOSPLUS_LIST_STR, status='noRefine', errorFactor=2.0 ):
     """

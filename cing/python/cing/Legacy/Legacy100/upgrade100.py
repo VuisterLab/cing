@@ -6,7 +6,7 @@ from cing import constants
 from cing import definitions as cdefs
 from cing.PluginCode import queeny
 
-from cing.core import validate
+from cing.core import validation
 from cing.core import sml
 from cing.core.classes import Project
 from cing.core.molecule import Molecule
@@ -138,7 +138,7 @@ def restoreQueeny100( project, tmp=None ):
         qDict = queeny.QueenyResult()
         for storedProp in [constants.QUEENY_UNCERTAINTY1_STR, constants.QUEENY_UNCERTAINTY2_STR, constants.QUEENY_INFORMATION_STR ]:
             qDict[storedProp] = obj[storedProp]
-        validate.setValidationResult(obj, constants.QUEENY_KEY, qDict)
+        validation.setValidationResult(obj, constants.QUEENY_KEY, qDict)
     #end for
     queenyDefs.present = True
     nTmessage('restoreQueeny100: Restored Queeny results from %s (code version %s)', smlFile, queenyDefs.saveVersion)
