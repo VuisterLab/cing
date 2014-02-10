@@ -1,11 +1,9 @@
 #summary Step by step instruction on Mac
 
 == Mac version ==
-{{{
 Steps taken on duvel.cmbi.ru.nl (4 core MacBook Pro 15-inch, Mid 2010): OSX 10.9.1
 8 GB RAM with SSD
 Order below can matter.
-}}}
 
 == Install Mac Ports ==
 
