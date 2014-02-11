@@ -640,36 +640,44 @@ def _runQueeny( project, tmp=None ):
 class QueenyResult(validation.ValidationResult):
     """Class to store queeny results
     """
+    KEY = constants.QUEENY_KEY
+    UNCERTAINTY1 = constants.QUEENY_UNCERTAINTY1_STR
+    UNCERTAINTY2 = constants.QUEENY_UNCERTAINTY2_STR
+    INFORMATION  = constants.QUEENY_INFORMATION_STR
+
     def __init__(self, **kwds):
         validation.ValidationResult.__init__( self, **kwds)
-        self.setdefault(constants.QUEENY_UNCERTAINTY1_STR, 0.0)
-        self.setdefault(constants.QUEENY_UNCERTAINTY2_STR, 0.0)
-        self.setdefault(constants.QUEENY_INFORMATION_STR, 0.0)
+        self.setdefault(QueenyResult.UNCERTAINTY1, 0.0)
+        self.setdefault(QueenyResult.UNCERTAINTY2, 0.0)
+        self.setdefault(QueenyResult.INFORMATION, 0.0)
     #end def
 
     @staticmethod
     def endHandler(qDict, project=None):
         # Restore linkage
         # Needs a valid project
+        # Needs a valid object key
         # Adds to validation
         if project is None:
             return None
-        if constants.OBJECT_KEY in qDict:
-            object = project.getByPid(qDict[constants.OBJECT_KEY])
-        if object is None:
+        if constants.OBJECT_KEY not in qDict:
+            nTerror('QueenyResult.endHandler: object key not found ==> skipped item')
+            return None
+        theObject = project.getByPid(qDict[constants.OBJECT_KEY])
+        if theObject is None:
             nTerror('QueenyResult.endHandler: invalid residue Pid %s, ==> skipped', qDict[constants.OBJECT_KEY])
             return None
         #end if
-        #LEGACY:
-        for storedProp in [constants.QUEENY_UNCERTAINTY1_STR, constants.QUEENY_UNCERTAINTY2_STR, constants.QUEENY_INFORMATION_STR]:
-            object[storedProp] = qDict[storedProp]
         #v3:
-        validation.setValidationResult(object, constants.QUEENY_KEY, qDict)
+        validation.setValidationResult(theObject, constants.QUEENY_KEY, qDict)
+        #LEGACY:
+        for storedProp in [QueenyResult.UNCERTAINTY1, QueenyResult.UNCERTAINTY2, QueenyResult.INFORMATION]:
+            theObject[storedProp] = qDict[storedProp]
         return qDict
     #end def
 #end class
 
-#register TalosPlus SML handler
+#register QueenyResult SML handler
 QueenyResult.SMLhandler = sml.SMLAnyDictHandler(QueenyResult,'QueenyResult',
                                                 encodeKeys = [constants.OBJECT_KEY],
                                                 endHandler = QueenyResult.endHandler,

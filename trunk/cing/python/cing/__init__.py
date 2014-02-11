@@ -171,5 +171,6 @@ NTdb._restoreFromSML()                          # This initializes the database
 # convenience
 from cing.main import getInfoMessage as gi
 from cing.Libs.io import formatDictItems as fd
+from cing.core.importPlugin import importPlugin
 
 
