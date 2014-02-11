@@ -20,7 +20,7 @@ from cing.Libs.cython.superpose import Rm6dist
 
 # versions < 0.95 not logged with version number
 # cing versions >1.0 first ones to include this
-version = cdefs.cingDefinitions.version
+__version__ = cdefs.cingDefinitions.version
 
 
 class DmElement():
@@ -630,7 +630,7 @@ def _runQueeny( project, tmp=None ):
     queenyDefs.completed = True
     queenyDefs.present = True
     queenyDefs.saved = False
-    queenyDefs.runVersion = version
+    queenyDefs.runVersion = __version__
 
     del(q)
 
@@ -698,7 +698,7 @@ def saveQueeny(project, tmp=None):
         nTmessage("saveQueeny: No molecule defined")
         return True
     # save the data
-    return project._savePluginData(constants.QUEENY_KEY, saved=True, saveVersion=version)
+    return project._savePluginData(constants.QUEENY_KEY, saved=True, saveVersion=__version__)
 #end def
 
 

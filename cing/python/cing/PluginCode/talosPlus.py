@@ -20,7 +20,7 @@ from cing.definitions import directories
 
 # versions < 0.95 not logged with version number
 # cing versions >1.0 first ones to include this
-version = cingDefinitions.version
+__version__ = cingDefinitions.version
 
 
 
@@ -1403,81 +1403,79 @@ def runTalosPlus(project, tmp=None, parseOnly=False):
     Returns True on error.
     Returns False when talos is absent or when all is fine.
     """
+    #LEGACY:
+    if parseOnly:
+        return parseTalosPlus(project)
+
     if project is None:
-        nTerror("RunTalosPlus: No project defined")
+        nTerror("runTalosPlus: No project defined")
         return True
 
     if cingPaths.talos is None:
-        nTmessage('RunTalosPlus: talosPlus executable not defined; check your setup ')
-        return True
+        nTmessage('runTalosPlus: no talosPlus executable, skipping')
+        return False # Gracefully return
 
     if project.molecule is None:
-        nTmessage("RunTalosPlus: No molecule defined")
+        nTmessage("runTalosPlus: No molecule defined")
         return True
 
     residues = project.molecule.residuesWithProperties('protein')
     if not residues:
-        nTmessage('RunTalosPlus: no amino acid defined')
+        nTmessage('runTalosPlus: no amino acid defined')
         return False
 
     if len( project.molecule.resonanceSources ) == 0:
-        nTmessage("==> RunTalosPlus: No resonances defined so no sense in running.")
+        nTmessage("==> runTalosPlus: No resonances defined so no sense in running.")
         # JFD: This doesn't catch all cases.
         return False
 
     talosDefs = project.getStatusDict(constants.TALOSPLUS_KEY, **talosDefaults())
 
-    if not parseOnly:
+    talosDefs.molecule = project.molecule.asPid()
+    talosDefs.directory = constants.TALOSPLUS_KEY
 
-        talosDefs.molecule = repr(project.molecule)
-        talosDefs.directory = constants.TALOSPLUS_KEY
+    path = project.validationPath( talosDefs.directory )
+    if not path:
+        return True
+    if path.exists():
+        nTdebug('runTalosPlus: removing %s with prior data', path)
+        path.rmdir()
+    path.makedirs()
 
-        path = project.validationPath( talosDefs.directory )
-        if not path:
-            return True
-        if path.exists():
-            nTdebug('runTalosPlus: removing %s with prior data', path)
-            path.rmdir()
-        path.makedirs()
+    startTime = io.now()
 
-        startTime = io.now()
+    talosDefs.completed = False
+    talosDefs.parsed = False
+    _resetTalosPlus(talosDefs, project.molecule)
+    talosDefs.saved = False
 
-        talosDefs.completed = False
-        talosDefs.parsed = False
-        _resetTalosPlus(talosDefs, project.molecule)
-        talosDefs.saved = False
+    # Exporting the shifts
+    fileName = os.path.join(path, talosDefs.tableFile )
+    if exportShifts2TalosPlus(  project, fileName=fileName ):
+        nTwarning("runTalosPlus: Failed to exportShifts2TalosPlus; this is normal for empty CS list.")
+        return False
 
-        # Exporting the shifts
-        fileName = os.path.join(path, talosDefs.tableFile )
-        if exportShifts2TalosPlus(  project, fileName=fileName ):
-            nTwarning("RunTalosPlus: Failed to exportShifts2TalosPlus; this is normal for empty CS list.")
-            return False
+    # running TalosPlus
+    talosProgram = ExecuteProgram(cingPaths.talos, rootPath=path,
+                                  redirectOutput=True
+                                 )
+    nTmessageNoEOL('==> Running talos+ ... ')
+    talosProgram( '-in ' + talosDefs.tableFile + ' -sum ' + talosDefs.predFile )
+    nTmessage('Done!')
 
-        # running TalosPlus
-        talosProgram = ExecuteProgram( cingPaths.talos, rootPath = path,
-                                       redirectOutput = True
-                                     )
-        nTmessageNoEOL('==> Running talos+ ... ')
-        talosProgram( '-in ' + talosDefs.tableFile + ' -sum ' + talosDefs.predFile )
-        nTmessage('Done!')
+    if _findTalosOutputFiles(path, talosDefs):
+        return True
 
-        if _findTalosOutputFiles( path, talosDefs ):
-            return True
-
-        talosDefs.date = io.now()
-        talosDefs.completed=True
-        talosDefs.runVersion = version
-        talosDefs.molecule = project.molecule.asPid()
-        talosDefs.remark = 'TalosPlus on %s completed in %.1f seconds on %s; data in %s' % \
-                           (project.molecule, talosDefs.date-startTime, talosDefs.date, path)
-    # end if parse only.
+    talosDefs.date = io.now()
+    talosDefs.completed=True
+    talosDefs.runVersion = __version__
+    talosDefs.molecule = project.molecule.asPid()
+    talosDefs.remark = 'TalosPlus on %s completed in %.1f seconds on %s; data in %s' % \
+                       (project.molecule, talosDefs.date-startTime, talosDefs.date, path)
 
     # Importing the results
     if parseTalosPlus(project):
-        nTerror("RunTalosPlus: Failed parseTalosPlus")
-        return True
-    if talosPlus2restraints(project):
-        nTerror("RunTalosPlus: Failed talosPlus2restraints")
+        nTerror("runTalosPlus: Failed parseTalosPlus")
         return True
 
     project.history(talosDefs.remark)
@@ -1504,12 +1502,12 @@ def parseTalosPlus( project, tmp=None ):
         nTmessage("parseTalosPlus: No talos+ was run")
         return True
 
-    path = project.validationPath( talosDefs.directory )
+    path = project.validationPath(talosDefs.directory)
     if not path:
         nTerror('parseTalosPlus: directory "%s" with talosPlus data not found', path)
         return True
 
-    if _findTalosOutputFiles( path, talosDefs ):
+    if _findTalosOutputFiles(path, talosDefs):
         return True
 
     predFile = path / talosDefs.predFile
@@ -1523,11 +1521,16 @@ def parseTalosPlus( project, tmp=None ):
         return True
 
     _resetTalosPlus(talosDefs, project.molecule)
-    if _importTalosPlus( project, predFile, predSSFile ):
+    if _importTalosPlus(project, predFile, predSSFile):
         return True
 
     talosDefs.parsed = True
     talosDefs.present = True
+
+    if talosPlus2restraints(project):
+        nTerror("parseTalosPlus: Failed talosPlus2restraints")
+        return True
+
     return False
 #end def
 
@@ -1546,7 +1549,7 @@ def saveTalosPlus(project, tmp=None):
         nTmessage("saveTalosPlus: No molecule defined")
         return True
     # save the data
-    return project._savePluginData(constants.TALOSPLUS_KEY, saved=True, saveVersion=version)
+    return project._savePluginData(constants.TALOSPLUS_KEY, saved=True, saveVersion=__version__)
 #end def
 
 

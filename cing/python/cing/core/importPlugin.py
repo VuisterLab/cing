@@ -1,9 +1,9 @@
-from cing.Libs.Adict import Adict
-from cing.Libs.disk import Path
-from cing.definitions import cingDefinitions
-from cing.Libs.NTutils import * #@UnusedWildImport
-from cing.core.classes import Project
 from cing import plugins
+from cing import definitions as cdefs
+from cing.Libs import Adict
+from cing.Libs import NTutils as ntu
+
+from cing.core.classes import Project
 from nose.plugins.skip import SkipTest
 
 # NB This routine gets executed before main.py gets a chance to set the verbosity.
@@ -28,53 +28,53 @@ def importPlugin( pluginCodeModule, pluginName ):
         try:
             plugin = plugins[pluginName]
 #            nTdebug("reloading same module just to see it change")
-            reload( plugin.module )
+            reload(plugin.module)
         except ImportWarning, extraInfo: # Disable after done debugging; can't use nTdebug yet.
-            nTmessage("importPlugin: Skipping reload of an optional compound (please recode to use SkipTest): %s" % extraInfo)
+            ntu.nTmessage("importPlugin: Skipping reload of an optional compound (please recode to use SkipTest): %s" % extraInfo)
             # Internally we need to know if we're called by nosetests or by regular call.
         except SkipTest, extraInfo:
-            nTmessage("importPlugin: Skipping reload report of an optional compound: %s" % extraInfo)
+            ntu.nTmessage("importPlugin: Skipping reload report of an optional compound: %s" % extraInfo)
         except Exception:
-            nTtracebackError()
-            nTexception('importPlugin: A reload failed for ' + pluginName)
+            ntu.nTtracebackError()
+            ntu.nTexception('importPlugin: A reload failed for ' + pluginName)
             return None
 #    module = __import__( moduleName, globals(), locals(), [] )
-#    nTmessage('==> Attempting import plugin ' + pluginName )
+#    ntu.nTmessage('==> Attempting import plugin ' + pluginName )
 # by the manuals words:
 # "However, when a non-empty fromlist argument is given, the module named by name is returned."
     pluginCodeModulePackage = None
     try:
         #JFD changed from default to zero which means to only try absolute imports.
-        pluginCodeModulePackage = __import__( pluginCodeModule, globals(), locals(), [pluginName])
+        pluginCodeModulePackage = __import__(pluginCodeModule, globals(), locals(), [pluginName])
         isInstalled = True
-        nTdebug( "importPlugin: Installed plugin: [%s]" % pluginName )
+        ntu.nTdebug("importPlugin: Installed plugin: [%s]" % pluginName)
     except ImportWarning:
-        nTdebug( "importPlugin: Skipping import of an optional plugin: [%s] (please recode to use SkipTest)" % pluginName )
+        ntu.nTdebug("importPlugin: Skipping import of an optional plugin: [%s] (please recode to use SkipTest)" % pluginName)
         isInstalled = False
     except SkipTest:
-        nTdebug("importPlugin: Skipping import of an optional plugin: [%s]" % pluginName )
+        ntu.nTdebug("importPlugin: Skipping import of an optional plugin: [%s]" % pluginName)
     except:
-        nTtracebackError()
-        nTerror( 'importPlugin: Failed to import pluginCodeModule: [%s]' % pluginName)
+        ntu.nTtracebackError()
+        ntu.nTerror('importPlugin: Failed to import pluginCodeModule: [%s]' % pluginName)
         return None
     #end try
 
     pluginModule = None
     if isInstalled:
         if not hasattr(pluginCodeModulePackage, pluginName):
-            nTerror("importPlugin: Expected an attribute pluginName: " + pluginName + " for package: " + repr(pluginCodeModulePackage))
+            ntu.nTerror("importPlugin: Expected an attribute pluginName: " + pluginName + " for package: " + repr(pluginCodeModulePackage))
             return None
-        pluginModule = getattr( pluginCodeModulePackage, pluginName )
+        pluginModule = getattr(pluginCodeModulePackage, pluginName)
         #end if
     #end if
 
-    plugin = Adict( module = pluginModule, name = pluginName, isInstalled = isInstalled, version = None )
+    plugin = Adict.Adict(module = pluginModule, name = pluginName, isInstalled = isInstalled, version = None)
     plugins[pluginName] = plugin
 
     if plugin.isInstalled:
         # update the version, methods, saves, restores and exports, add them to Project class
-        if hasattr(plugin.module, 'version'):
-            plugin.version = getattr(plugin.module, 'version')
+        if hasattr(plugin.module, '__version__'):
+            plugin.version = getattr(plugin.module, '__version__')
         else:
             # old code
             plugin.version = 0.95
@@ -83,9 +83,9 @@ def importPlugin( pluginCodeModule, pluginName ):
             if hasattr(plugin.module, attributeName):
                 for function, other in getattr(plugin.module, attributeName):
                     # add the functions to the Project class
-                    setattr( Project, function.__name__, function )
+                    setattr(Project, function.__name__, function)
                     # store the function in the plugin for later usage on Project.save() and Project.restore()
-                    plugin[attributeName].append( (function, other) )
+                    plugin[attributeName].append((function, other))
                 #end for
             #end if
         #end for
@@ -96,10 +96,10 @@ def importPlugin( pluginCodeModule, pluginName ):
 def importPlugins():
     # do all *.py files in plugin directory excluding __init__
     # GWV 30 Jan 2014: using CingDefinitions class instance
-    for _p in (cingDefinitions.pluginPath / '*.py').glob():
+    for _p in (cdefs.cingDefinitions.pluginPath / '*.py').glob():
         _d,_pname,_e = _p.split3()
         #print '>>',_pname
         if _pname != '__init__':
-            importPlugin( cingDefinitions.pluginCode, _pname )
+            importPlugin(cdefs.cingDefinitions.pluginCode, _pname)
     #end for
 #end def
