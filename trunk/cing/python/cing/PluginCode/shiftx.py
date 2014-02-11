@@ -243,8 +243,8 @@ def runShiftx(project, parseOnly=False, model=None):
         return parseShiftx(project)
 
     if cdefs.cingPaths.shiftx is None:
-        nTerror('runShiftx: no shiftx executable')
-        return True
+        nTmessage('runShiftx: no shiftx executable, skipping')
+        return False # Gracefully return
 
     if project.molecule == None:
         nTerror('runShiftx: no molecule defined')
