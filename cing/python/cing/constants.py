@@ -382,22 +382,17 @@ RDB_QUEENY_UNCERTAINTY1_STR = 'queen_uncertainty1'
 RDB_QUEENY_UNCERTAINTY2_STR = 'queen_uncertainty2'
 RDB_QUEENY_INFORMATION_STR = 'queen_information'
 
+
 #----------------------------------------------------------------------
-# Anticipated v3 definitions
+# v3 key definitions
 #----------------------------------------------------------------------
-VALIDATION_KEY = 'validation'
-OBJECT_KEY     = 'object'
-KEY_KEY        = 'key'
+OBJECT_KEY     = 'object' # ValidationResult key for pointing at object
+
+# keys of different ValidationResult types
 TALOSPLUS_KEY  = 'talosPlus'
 QUEENY_KEY     = 'queeny'
+SHIFTX_KEY     = 'shiftx'
 
-
-TYPE_QUEENY    = 'queeny'
-TYPE_WHATIF    = 'whatif'
-TYPE_MOLECULE  = 'Molecule'
-TYPE_CHAIN     = 'Chain'
-TYPE_RESIDUE   = 'Residue'
-TYPE_ATOM      = 'Atom'
 
 
 

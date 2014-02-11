@@ -1187,24 +1187,39 @@ def _importTableFile( tabFile, molecule ):
     return table
 #end def
 
-TALOSPLUS_FILE = 'talosPlus.sml'
 
 class TalosPlusResult( validation.ValidationResult ):
-    """Class to store talos+ results
+    """Class to store Talos+ results
+Reference: Shen et al., 2009, J. Biomol. NMR 44, 213-223
+Reference: Predicted order parameter (S2) from backbone chemical shifts for talosPlus.tab
+           from David Wishart's RCI method, JACS, 127(43), 14970-14971
     """
+    KEY            = constants.TALOSPLUS_KEY
+    PHI            = 'phi'
+    PSI            = 'psi'
+    COUNT          = 'count'
+    CLASSIFICATION = 'classification'
+    S2             = 'S2'
+    SS_CLASS       = 'ss_class'
+    SS_CONFIDENCE  = 'ss_confidence'
+    Q_H            = 'Q_H'
+    Q_E            = 'Q_E'
+    Q_L            = 'Q_L'
+
     def __init__(self, *args, **kwds):
 
         validation.ValidationResult.__init__( self, *args, **kwds)
-        self.setdefault('residue', None)
-        self.setdefault('phi', None)
-        self.setdefault('psi', None)
-        self.setdefault('count', 0)
-        self.setdefault('classification', None)
-        self.setdefault('S2', NaN)
-#REMARK  Predicted order parameter (S2) from backbone chemical shifts for talosPlus.tab
-#REMARK  from David Wishart's RCI method, JACS, 127(43), 14970-14971
-        self.setdefault('ss_class', None)
-        self.setdefault('ss_confidence', None)
+        self.setdefault(TalosPlusResult.PHI, None)
+        self.setdefault(TalosPlusResult.PSI, None)
+        self.setdefault(TalosPlusResult.COUNT, 0)
+        self.setdefault(TalosPlusResult.CLASSIFICATION, None)
+        self.setdefault(TalosPlusResult.S2, NaN)
+        self.setdefault(TalosPlusResult.SS_CLASS, None)
+        self.setdefault(TalosPlusResult.SS_CONFIDENCE, None)
+        self.setdefault(TalosPlusResult.Q_E, NaN)
+        self.setdefault(TalosPlusResult.Q_H, NaN)
+        self.setdefault(TalosPlusResult.Q_L, NaN)
+        self.setdefault('residue', None) #LEGACY:
     #end def
 
     def format(self, fmt=None):
@@ -1224,18 +1239,20 @@ class TalosPlusResult( validation.ValidationResult ):
         # Adds to validation
         if project is None:
             return None
-        if constants.OBJECT_KEY in qDict:
-            object = project.getByPid(qDict[constants.OBJECT_KEY])
-        if object is None:
+        if constants.OBJECT_KEY not in tPlus:
+            nTerror('TalosPlusResult.endHandler: object key not found ==> skipped item')
+            return None
+        theObject = project.getByPid(tPlus[constants.OBJECT_KEY])
+        if theObject is None:
             nTerror('TalosPlusResult.endHandler: invalid residue Pid %s, ==> skipped Residue', tPlus[constants.OBJECT_KEY])
             return None
         #end if
+        #v3:
+        validation.setValidationResult(theObject, constants.TALOSPLUS_KEY, tPlus)
         #LEGACY:
         # redundant for now with 'object', added just below
-        tPlus.residue = object
-        object.talosPlus = tPlus
-        #v3:
-        validation.setValidationResult(object, constants.TALOSPLUS_KEY, tPlus)
+        tPlus.residue = theObject
+        theObject.talosPlus = tPlus
         return tPlus
     #end def
 #end class
@@ -1268,21 +1285,17 @@ def _importTalosPlus( project, predFile, ssFile=None ):
     for row in table:
 
         #print '>', row, row.residue
-        talosPlus = TalosPlusResult(
-                                    residue = row.residue,
-                                    phi = NTvalue( row.PHI, row.DPHI, '%6.1f +- %4.1f'),
-                                    psi = NTvalue( row.PSI, row.DPSI, '%6.1f +- %4.1f'),
-                                    S2  = row.S2,
-                                    count = row.COUNT,
-                                    classification = row.CLASS,
-                                    ss_class = None,
-                                    ss_confidence = NaN,
-                                    Q_H = NaN,
-                                    Q_E = NaN,
-                                    Q_L = NaN
-                                    )
+        talosPlus = TalosPlusResult()
+        talosPlus.residue = row.residue
+        talosPlus.phi = NTvalue( row.PHI, row.DPHI, '%6.1f +- %4.1f')
+        talosPlus.psi = NTvalue( row.PSI, row.DPSI, '%6.1f +- %4.1f')
+        talosPlus.S2  = row.S2
+        talosPlus.count = row.COUNT
+        talosPlus.classification = row.CLASS
 
-        if talosPlus.classification == 'None':
+        if talosPlus.classification == 'None' or \
+           talosPlus.phi.value == 9999.00 or \
+           talosPlus.psi.value == 9999.00:
             talosPlus.phi.value = NaN
             talosPlus.phi.error = NaN
             talosPlus.psi.value = NaN
@@ -1290,6 +1303,8 @@ def _importTalosPlus( project, predFile, ssFile=None ):
             talosPlus.S2 = NaN # pylint: disable=C0103
         #end if
 
+        validation.setValidationResult(row.residue, constants.TALOSPLUS_KEY, talosPlus)
+        #LEGACY:
         row.residue.talosPlus = talosPlus
     #end for
 
@@ -1300,21 +1315,22 @@ def _importTalosPlus( project, predFile, ssFile=None ):
         #print '>>', table
         for row in table:
             #print '>>', row
-            #print '>>', row.residue
-            #print '>>', row.residue.talosPlus
 
-
-            if ('residue' in row) and ('talosPlus' in row.residue):
-                row.residue.talosPlus.Q_H = row.Q_H    # Helix
-                row.residue.talosPlus.Q_E = row.Q_E    # Extended
-                row.residue.talosPlus.Q_L = row.Q_L    # Loop
-                if ssdict.has_key(row.SS_CLASS):
-                    row.residue.talosPlus.ss_class = ssdict[row.SS_CLASS]
+            if ('residue' in row):
+                tPlus = validation.getValidationResult(row.residue, constants.TALOSPLUS_KEY)
+                if tPlus is not None:
+                    tPlus.Q_H = row.Q_H    # Helix
+                    tPlus.Q_E = row.Q_E    # Extended
+                    tPlus.Q_L = row.Q_L    # Loop
+                    if row.SS_CLASS in ssdict:
+                        tPlus.ss_class = ssdict[row.SS_CLASS]
+                    else:
+                        tPlus.ss_class = None
+                    tPlus.ss_confidence = row.CONFIDENCE
                 else:
-                    row.residue.talosPlus.ss_class = None
-                row.residue.talosPlus.ss_confidence = row.CONFIDENCE
-            else:
-                nTerror('_importTalosPlus: %s: row: %s', ssFile, row)
+                    nTerror('_importTalosPlus: %s: row: %s', ssFile, row)
+                #end if
+            #end if
         #end for
     #end if
 #end def
@@ -1323,6 +1339,7 @@ def _resetTalosPlus(talosDefs, molecule):
     """Reset the talosPlus references in the data
     """
     for res in molecule.allResidues():
+        #LEGACY:
         res.talosPlus = None
         validation.setValidationResult(res, constants.TALOSPLUS_KEY, None)
     #end for
@@ -1333,11 +1350,11 @@ def _resetTalosPlus(talosDefs, molecule):
 def talosDefaults():
     return Adict(
                   version      = 0.95,
-                  directory    = TALOSPLUS_KEY,
+                  directory    = constants.TALOSPLUS_KEY,
                   tableFile    = 'talosPlus.tab', # file generated by CING
                   predFile     = 'pred.tab',      # file with predictions returned by Talos(+)
                   predSSFile   = 'predSS.tab',    # file with sec struct returned by Talos(+): pred.ss.tab also encountered
-                  smlFile      = TALOSPLUS_FILE,
+                  smlFile      = constants.TALOSPLUS_KEY + '.sml',
                   molecule     = None,
                   completed    = False,
                   parsed       = False,
@@ -1391,7 +1408,7 @@ def runTalosPlus(project, tmp=None, parseOnly=False):
         return True
 
     if cingPaths.talos is None:
-        nTmessage('RunTalosPlus: talosPlus executable not defined; check your cing.csh/cing.sh setup ')
+        nTmessage('RunTalosPlus: talosPlus executable not defined; check your setup ')
         return True
 
     if project.molecule is None:
@@ -1423,6 +1440,8 @@ def runTalosPlus(project, tmp=None, parseOnly=False):
             path.rmdir()
         path.makedirs()
 
+        startTime = io.now()
+
         talosDefs.completed = False
         talosDefs.parsed = False
         _resetTalosPlus(talosDefs, project.molecule)
@@ -1448,20 +1467,21 @@ def runTalosPlus(project, tmp=None, parseOnly=False):
         talosDefs.date = io.now()
         talosDefs.completed=True
         talosDefs.runVersion = version
+        talosDefs.molecule = project.molecule.asPid()
+        talosDefs.remark = 'TalosPlus on %s completed in %.1f seconds on %s; data in %s' % \
+                           (project.molecule, talosDefs.date-startTime, talosDefs.date, path)
     # end if parse only.
 
     # Importing the results
-    if parseTalosPlus( project ):
+    if parseTalosPlus(project):
         nTerror("RunTalosPlus: Failed parseTalosPlus")
         return True
-    if talosPlus2restraints( project ):
+    if talosPlus2restraints(project):
         nTerror("RunTalosPlus: Failed talosPlus2restraints")
         return True
-    if saveTalosPlus( project ):
-        nTerror("RunTalosPlus: Failed saveTalosPlus")
-        return True
 
-    project.history( 'Ran talos+ on %s' % (project.molecule,) )
+    project.history(talosDefs.remark)
+    nTmessage('==> %s', talosDefs.remark)
     return False
 #end def
 

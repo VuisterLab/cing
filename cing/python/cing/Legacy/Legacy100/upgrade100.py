@@ -39,7 +39,7 @@ def upgradeToSml( name, restore  ):
         #GWV: 20140203: cannot do an update method() -> errors in partioning restraints. Do not understand
         pr = xML2obj(pfile)
 
-        if pr == None:
+        if pr is None:
             nTerror('upgradeToSml: parsing from project file "%s" failed', pfile)
             return None
 
@@ -57,6 +57,10 @@ def upgradeToSml( name, restore  ):
         status = Adict()
         status.update(pr.status)
         pr.status = status
+        # update the shiftx status
+        s = pr.getStatusDict(constants.SHIFTX_KEY)
+        s.update(pr.shiftxStatus)
+        del(pr['shiftxStatus'])
 
         pr._save2sml()
         disk.rename(pfile, pfile + '.save')
@@ -68,6 +72,7 @@ def upgradeToSml( name, restore  ):
         return None
     #end if
 #end def
+
 
 def restoreQueeny100( project, tmp=None ):
     """
@@ -87,7 +92,6 @@ def restoreQueeny100( project, tmp=None ):
     if not queenyDefs.completed: # old definition
         ntDebug('restoreQueeny100: no queeny completed')
         return False # Return gracefully
-    queenyDefs.molecule = project.molecule.asPid()
 
     path = project.validationPath( queenyDefs.directory)
     if not path:
@@ -145,9 +149,66 @@ def restoreQueeny100( project, tmp=None ):
     return False
 #end def
 
+
+def restoreShiftx100(project):
+    """
+    Restore shiftx results by parsing files.
+
+    Return True on error
+    """
+    if project is None:
+        nDebug("restoreShiftx100: No project defined")
+        return True
+
+    if project.molecule == None:
+        return True # Gracefully returns
+
+    defs = project.getStatusDict(constants.SHIFTX_KEY)
+
+    # Older versions; initialize the required keys of shiftx Status from xml file
+    if project.version < 0.881:
+
+        path = project.validationPath(cdefs.validationsDirectories.shiftx)
+        if not path:
+            nTerror('restoreShiftx100: directory "%s" with shiftx data not found', path)
+            return True
+        xmlFile = project.path() / 'content.xml'
+
+        if not xmlFile.exists():
+            nTerror('restoreShiftx100: Shiftx results xmlFile "%s" not found', xmlFile)
+            return True
+        #end if
+
+        shiftxResult = xML2obj(xmlFile)
+        if not shiftxResult:
+            nTerror('restoreShiftx100: restoring Shiftx results from xmlFile "%s" failed', xmlFile)
+            return None
+
+        defs.update(shiftxResult)
+        defs.completed = True
+    #end if
+
+    #update some of the settings
+    del(defs['moleculeName'])
+    defs.directory = disk.Path(defs.path)[-1:]
+    del(defs['path'])
+    defs.smlFile = constants.SHIFTX_KEY + '.sml'
+    defs.saveVersion = defs.version
+    defs.runVersion = defs.version
+    del(defs['version'])
+    del(defs['contentFile'])
+
+    if not defs.completed:
+        nDebug('restoreShiftx100: shiftx not completed')
+        return True
+
+    return project.parseShiftx()
+#end defs
+
+
 def restoreTalosPlus100(project):
     """
-    Restore talos+ results from sml file.
+    Restore talos+ results by parsing files.
 
     Return True on error
     """
@@ -163,10 +224,9 @@ def restoreTalosPlus100(project):
     if not talosDefs.completed:
         nDebug('restoreTalosPlus100: talosPlus not completed')
         return True
-    talosDefs.molecule = repr(project.molecule)
 
-    for res in project.molecule.allResidues():
-        res.talosPlus = None
+    # for res in project.molecule.allResidues():
+    #     res.talosPlus = None
 
 #    if not talosDefs.parsed:
 #        nDebug('restoreTalosPlus100: talosPlus not parsed')
@@ -227,6 +287,11 @@ def upgrade100(project, restore):
         return None
     project.saveQueeny()
 
+    # Now patch shiftx
+    if restoreShiftx100(project):
+        nTerror('upgrade100: restoring shiftx data failed')
+        return None
+    project.saveShiftx()
 
     # Plugin registered functions
     for p in cing.plugins.values():

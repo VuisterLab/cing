@@ -177,12 +177,12 @@ Project: Top level Cing project class
         self.storedInCcpnFormat = False
         self.restoredFromXml = True # Project settings restored from project.xml file
 
-        self.statusObjectNameList = 'procheckStatus dsspStatus whatifStatus wattosStatus vascoStatus shiftxStatus x3dnaStatus'.split()
+        self.statusObjectNameList = 'procheckStatus dsspStatus whatifStatus wattosStatus vascoStatus x3dnaStatus'.split()
         self.procheckStatus = NTdict(completed = False, parsed = False, ranges = None)
         self.whatifStatus = NTdict(completed = False, parsed = False)
         self.wattosStatus = NTdict(completed = False, parsed = False)
         self.vascoStatus = NTdict(completed = False, parsed = False)
-        self.shiftxStatus = NTdict(completed = False, parsed = False)
+        #self.shiftxStatus = NTdict(completed = False, parsed = False)
         self.x3dnaStatus  = NTdict(completed = False, parsed = False)
         self.status = Adict() # General status dict for external programs
 
@@ -259,7 +259,7 @@ Project: Top level Cing project class
                          'storedInCcpnFormat',
                          'reports',
                          'history',
-                         'procheckStatus', 'whatifStatus', 'wattosStatus', 'shiftxStatus', 'status'
+                         'procheckStatus', 'whatifStatus', 'wattosStatus', 'status'
                          ]
         #self.saveXML(*self.saveKeys)
     #end def
@@ -451,9 +451,9 @@ Project: Top level Cing project class
         update type to Adict
         return None on error
         """
-        mTuple = None
-        if self.molecule != None:
-            mTuple = self.molecule.nameTuple()
+        mpid = None
+        if self.molecule is not None:
+            mpid = self.molecule.asPid()
 
         minimals = Adict(
                          date         = io.Time(1360158182.7),   # Wed Feb  6 13:43:02 2013
@@ -465,11 +465,12 @@ Project: Top level Cing project class
                          parsed       = False,              # True: Program output was parsed successfully; i.e parse can be called if completed == True -> implies present = True
                          present      = False,              # True: Program data are in the datamodel
                          saved        = False,              # True: Data have been saved to sml in Data/Plugins; i.e. restore can be called
-                         molecule     = None,               # molecule pid
-                         convention   = constants.INTERNAL  # convention; always handy to have
+                         molecule     = mpid,               # molecule pid
+                         convention   = constants.INTERNAL, # convention; always handy to have
+                         remark       = None
         )
         sdict = self.status.setdefault(key, defaults)
-        if sdict == None:
+        if sdict is None:
             nTerror('Project.getStatusDict: key %s returned None, reverting to default values', key)
             sdict = defaults
         #end if
@@ -479,6 +480,12 @@ Project: Top level Cing project class
         # update keys
         sdict.setdefaultKeys(defaults)
         sdict.setdefaultKeys(minimals)
+        if sdict.remark is None:
+            if sdict.completed:
+                sdict.remark = '%s completed' % key
+            else:
+                sdict.remark = '%s not completed' % key
+        #end if
         return sdict
     #end def
 
@@ -735,33 +742,39 @@ Project: Top level Cing project class
 
         Return True on error
         """
-        defs = self.getStatusDict(key)
 
+        defs = self.getStatusDict(key)
         if not defs.present:
-            return False# Return gracefully
+            defs.saved = False
+            nTdebug('Project._savePluginData: data not present; returning')
+            return False # Return gracefully
 
         if self.molecule is None:
-            nTmessage("Project._savePluginData: No molecule defined")
+            nTmessage("Project._savePluginData: No molecule defined; returning")
+            defs.saved = False
             return True
 
-        smlFile = self.path() / cdefs.directories.plugins / defs.smlFile
+        # set values before doing anything or they get lost
+        defs.update(kwds)
+        defs.convention = constants.INTERNAL # asPid routines will return values
+                                             # in INTERNAL convention
 
+        smlFile = self.path() / cdefs.directories.plugins / defs.smlFile
+        # Assemble elements to be saved
         myList = NTlist()
         # first element of list is the settings
         myList.append( defs )
-        # next elememts are QueenyDefs instances
+        # next elements are ResultDefs instances
         for obj in [self.molecule] + \
                     self.molecule.allChains() + \
                     self.molecule.allResidues() + \
                     self.molecule.allAtoms():
-            qDict = validation.getValidationResult(obj, key)
-            if qDict is not None:
-                myList.append(qDict)
+            vDict = validation.getValidationResult(obj, key)
+            if vDict is not None:
+                myList.append(vDict)
             #end for
         #end for
 
-        # set values before writing to file or they get lost
-        defs.update(kwds)
         # Import her to prevent circular  imports
         from cing.core import sml
         obj = sml.obj2sml( myList, smlFile)
@@ -775,7 +788,7 @@ Project: Top level Cing project class
     #end def
 
     def _save2sml(self):
-        "Save project settings as SML file"
+        """Save project settings as SML file"""
         from cing.core.sml import obj2sml
         path = self.path() / cdefs.cingPaths.project
         # get key, value pairs to save
@@ -844,16 +857,18 @@ Project: Top level Cing project class
         """
 
         if self.molecule is None:
+            nTdebug('Project._restorePluginData: no molecule; returning')
             return False # Gracefully returns
 
         defs = self.getStatusDict(key)
 
         if (not defs.saved):
+            nTdebug('Project._restorePluginData: data not saved; returning')
             return False # Return gracefully
 
         smlFile = self.path() / cdefs.directories.plugins / defs.smlFile
         if not smlFile.exists():
-            nTerror('Project._restorePluginData: file "%s" with % data not found', smlFile, key)
+            nTerror('Project._restorePluginData: file "%s" with %s data not found', smlFile, key)
             return True
         # end if
 

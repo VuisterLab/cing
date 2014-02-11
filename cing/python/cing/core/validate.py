@@ -681,7 +681,9 @@ def summaryForProject( project, toFile = True, ranges=None ):
     # don't mark nucleic acid only entries at all.
     if mol.hasAminoAcid():
 #        shiftx = getDeepByKeys(mol, SHIFTX_STR) # modded by GWV in revision 624.
-        shiftx = project.shiftxStatus.completed
+#       modded by GWV again in revision 15xx
+        shifxDefs = project.getStatusDict(constants.SHIFTX_KEY)
+        shiftx = shifxDefs.completed
         if not shiftx:
 #            nTmessage('runShiftx: not a single amino acid in the molecule so skipping this step.')
             incompleteItems.append( SHIFTX_STR )
