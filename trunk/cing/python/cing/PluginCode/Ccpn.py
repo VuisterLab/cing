@@ -22,8 +22,8 @@ import string
 import tarfile
 
 if True: # for easy blocking of data, preventing the code to be resorted with imports above.
-    from cing.PluginCode.required.reqCcpn import * #@UnusedWildImport
-    switchOutput(False)
+    #from cing.PluginCode.required.reqCcpn import * #@UnusedWildImport
+    #switchOutput(False)
     try:
         import ccpnmr #@UnusedImport
         from ccp.general.Util import createMoleculeTorsionDict
@@ -36,11 +36,11 @@ if True: # for easy blocking of data, preventing the code to be resorted with im
         from memops.api.Implementation import AppDataString
         from memops.general import Io as memopsIo
     except:
-        switchOutput(True)
+        #switchOutput(True)
         raise ImportWarning(CCPN_STR)
 #        raise SkipTest(CCPN_STR)
-    finally: # finally fails in python below 2.5
-        switchOutput(True)
+    #finally: # finally fails in python below 2.5
+        #switchOutput(True)
 #    nTmessage('Using Ccpn')
 
 class Ccpn:
@@ -368,7 +368,6 @@ class Ccpn:
         nTmessage('==> Ccpn project imported')
 
         self.project.addHistory(sprintf('Imported CCPN project'))
-        self.project.updateProject()
         return True # To distinguish success from failure.
     # end def importFromCcpn
 
@@ -474,7 +473,6 @@ class Ccpn:
             self.project.molecule.updateAll()
             nTmessage("==> Ccpn molecule '%s' imported", moleculeName)
         # end for
-        self.project.updateProject()
 
         return True
     # end def importFromCcpnMolecule
@@ -2490,9 +2488,9 @@ def saveCcpn(project, ccpnFolder, ccpnTgzFile = None):
     '''
     if project.has_key('ccpn'):
         ccpnProject = project.ccpn
-        nTmessage('saveCcpn: Saving any changes to original CCPN project')
+        nTmessage('==> saveCcpn: Saving any changes to %s', ccpnFolder)
     else:
-        nTmessage('saveCcpn: Creating new CCPN project')
+        nTmessage('==> saveCcpn: Creating new CCPN project %s', ccpnFolder)
         # work horse class.
         ccpn = Ccpn(project = project, ccpnFolder = ccpnFolder)
         if not ccpn.createCcpn():
@@ -2504,13 +2502,16 @@ def saveCcpn(project, ccpnFolder, ccpnTgzFile = None):
     switchOutput(False)
     #status = ccpnProject.saveModified() # DONE: can't change from original ccpnFolder
     # Fixed problem Rasmus May 2013
-    status = memopsIo.saveProject(ccpnProject, ccpnFolder, removeExisting=True)
+    try:
+        status = memopsIo.saveProject(ccpnProject, ccpnFolder, removeExisting=True)
+    except:
+        pass
     switchOutput(True)
     if not status:
         nTerror("Failed memopsIo.saveProject in " + getCallerName())
         return None
 
-    nTmessage("Saved ccpn project to folder: %s" % ccpnFolder)
+    nTdetail("==> Saved ccpn project to folder: %s" % ccpnFolder)
 
     if ccpnTgzFile:
         cmd = "tar -czf %s %s" % (ccpnTgzFile, ccpnFolder)

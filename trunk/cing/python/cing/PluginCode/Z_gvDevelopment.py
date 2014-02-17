@@ -26,6 +26,179 @@ try:
 except:
     pass
 
+class ResidueRange(list):
+    """
+    Implement a range selection of residues with easy string representation
+    """
+    FROM_STRING = 'fromString'
+    FROM_CV     = 'fromCV'
+    FROM_S2     = 'fromS2'
+
+    def __init__(self, molecule):
+        list.__init__(self)
+        self.molecule = molecule
+        self.method = None #
+
+    def clear(self):
+        """Remove all elements"""
+        del self[:]
+
+    def filter(self):
+        """Remove all waters and residues without coordinates
+        """
+        for res in self:
+            if not res.hasCoordimates() or res.isWater():
+                self.remove(res)
+        #end for
+    #end def
+
+    def select(self, rangesString, filter=True):
+        """
+        select residues on the basis of rangesString
+        Only convert a residue ranges string, e.g. 'A.-10--2,B.3'
+
+        return True on error
+        Adapted from code in Molecule class
+        """
+        #GWV 20130524: convert unicode to string as procheckStatus.ranges field sometimes?? is stored in unicode
+        if type(rangesString) == unicode:
+            rangesString = str(rangesString)
+        if type(rangesString) != str:
+            nTerror('ResidueRange.select: ranges type [%s] should have been a string' % type(ranges) )
+            return True
+        rangesString = rangesString.strip()
+
+        # clear self
+        self.clear()
+
+        # everything
+        if rangesString == '*' or rangesString == 'all':
+            [self.append(res) for res in self.molecule.allResidues()]
+            self.method = ResidueRange.FROM_STRING
+            return False
+        #selections
+        for substr in rangesString.split(','):
+            self._parseSubstring(substr.strip())
+        if filter:
+            self.filter()
+        self.method = ResidueRange.FROM_STRING
+        return False
+    #end def
+
+    def _parseSubstring(self, substr):
+        """Parse [ChainId.]range
+        """
+        s = substr.split('.')
+        if len(s) == 1:
+            # No chain identifiers
+            substr = substr.strip()
+            for chain in self.molecule.allChains():
+                for resId in asci2list(substr):
+                    if resId in chain:
+                        self.append(chain[resId])
+                #end for
+            #end for
+        else:
+            # single chain
+            chainId = s[0].strip()
+            substr = s[1].strip()
+            if chainId in self.molecule:
+                chain = self.molecule[chainId]
+                for resId in asci2list(substr):
+                    if resId in chain:
+                        self.append(chain[resId])
+            #end if
+        #end if
+    #end def
+
+    def selectByCV(self, cvCutoff = 0.2):
+        """Select residue on the basis of CV criterium;
+        Prevents small gaps and isolated fragments
+        uses Jurgen routine in Molecule class
+        NB: orderParameter = 1.0 - CV
+        Return True on error
+        """
+        s = self.molecule.rangesByCv(cvCutoff=cvCutoff)
+        if s is None:
+            return True
+        self.select(s)
+        self.method = ResidueRange.FROM_CV
+        return False
+    #end def
+
+    def __str__(self):
+        """Return a string representation of the residues in list
+        """
+        if len(self) == 0:
+            return ''
+        elif len(self) == 1:
+            return str(self[0].resNum)
+        # more then one
+        startStop = []
+        startRes = self[0]
+        for i, res in enumerate(self[1:]): #already shifted by 1!
+            #print res, self[i], self[i].sibling(1)
+            # check for non consequtive residues or different chains
+            if self[i].sibling(1) != res or  \
+               res.chain != startRes.chain:
+                startStop.append((startRes, self[i]))
+                startRes = res
+            #end if
+        #end for
+        startStop.append((startRes, self[-1]))
+        # construct the string from start-stop elements
+        s = '%s:' % self.method
+        for start,stop in startStop:
+            s += '%s.%s-%s,' % (start.chain.name, start.resNum, stop.resNum)
+        return s[:-1]
+    #end def
+
+    def _fragments(self):
+        """Return fragments of self as a list of (start,stop) index tuples"""
+        startStop = []
+        startResIdx = 0
+        for i, res in enumerate(self[1:]): #already shifted by 1!
+            #print res, self[i], self[i].sibling(1)
+            # check for non consequtive residues or different chains
+            if self[i].sibling(1) != res or  \
+               res.chain != chain.residues[startResIdx]:
+                startStop.append((startResIdx, i))
+                startResIdx = i
+            #end if
+        #end for
+        startStop.append((startResIdx, len(self)-1))
+        return startStop
+    #end def
+
+    @staticmethod
+    def fromString(molecule, selectString):
+        """
+        Return an instance from selectString
+        """
+        if molecule is None:
+            return None
+        r = ResidueRange(molecule)
+        r.select(selectString)
+        return r
+    #end def
+
+    @staticmethod
+    def fromCV(molecule, cvCutoff=0.2):
+        if molecule is None:
+            return None
+        r = ResidueRange(molecule)
+        if r.selectByCV(cvCutoff=cvCutoff):
+            return None
+        return r
+    #end def
+#end class
+
+
+def testRangeClass(project, range):
+    return ResidueRange.fromString(project.molecule, range)
+#end def
+
+
 def export2yasara( project, tmp=None ):
     """Export coordinates and restraints to yasara for further analysis; i.e. waterrefinement
 
@@ -922,11 +1095,12 @@ def getResidueValidation(validStore, residue, context, keyword):
 # register the functions
 methods  = [(procheck_old, None),
             (mkJmolByResidueROGMacro,None),
-            (mkJmolMacros,None)
+            (mkJmolMacros,None),
+            (testRangeClass,None),
            ]
 #saves    = []
 #restores = []
 exports  = [
-            (export2yasara,None)
+            (export2yasara,None),
            ]
 

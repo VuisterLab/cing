@@ -5,15 +5,26 @@ Constants definitions
 CING       = 'CING'
 CING_STR   = CING
 
+
 # OS related
 OS_TYPE_MAC = 'darwin'
 OS_TYPE_LINUX = 'linux'
 OS_TYPE_WINDOWS = 'windows' # unsupported.
 OS_TYPE_UNKNOWN = 'unknown'
 
+
 # 0.11+ is iPython version 2.
 IPYTHON_VERSION_A = 'iPythonVersion_A'
 IPYTHON_VERSION_B = 'iPythonVersion_B'
+
+
+ERROR_ID = "ERROR"
+WARNING_ID = "WARNING"
+MESSAGE_ID = "MESSAGE"
+DEBUG_ID = "DEBUG"
+STEREO_ASSIGN_FILENAME_STR = 'stereo_assign.str'
+PLEASE_ADD_EXECUTABLE_HERE = "PLEASE_ADD_EXECUTABLE_HERE" # Keep the below in sync with the one in setupCing.py
+
 
 # Nomenclature systems
 AQUA       = 'AQUA'         # AQUA nomenclature; not up-to-date with BMRB DG/G difference.
@@ -33,18 +44,21 @@ LOOSE      = 'LOOSE'        # "free' format
 CCPN       = 'CCPN'         # CCPN nomenclature
 nomenClatureConventions = [INTERNAL_0, INTERNAL_1, AQUA, IUPAC, CYANA, CYANA2, XPLOR, PDB, CCPN]
 
+
 # axes
 X_AXIS = 0
 Y_AXIS = 1
 Z_AXIS = 2
 A_AXIS = 3
 
-ERROR_ID = "ERROR"
-WARNING_ID = "WARNING"
-MESSAGE_ID = "MESSAGE"
-DEBUG_ID = "DEBUG"
-STEREO_ASSIGN_FILENAME_STR = 'stereo_assign.str'
-PLEASE_ADD_EXECUTABLE_HERE = "PLEASE_ADD_EXECUTABLE_HERE" # Keep the below in sync with the one in setupCing.py
+
+# Projects; used in openProject routine
+PROJECT_OLD = 'old'
+PROJECT_NEW = 'new'
+PROJECT_CREATE = 'create'
+PROJECT_NEWFROMCCPN = 'newFromCcpn' #use new CCPN file to initialise data
+PROJECT_OLDFROMCCPN = 'oldFromCcpn' #use the stored CCPN data for restoring
+
 
 CONSENSUS_STR = 'consensus'
 MAX_TRIES_UNIQUE_NAME = 99999

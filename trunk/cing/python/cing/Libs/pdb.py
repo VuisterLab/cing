@@ -662,7 +662,6 @@ def initPDB(project, pdbFile, convention = IUPAC, name = None, nmodels = None, u
 #        project.molecule.updateAll()
     #end if
     project.addHistory(sprintf('New molecule from PDB-file "%s"', pdbFile))
-    project.updateProject()
     return molecule
 #end def
 
@@ -678,7 +677,6 @@ def importPDB(project, pdbFile, convention = IUPAC, nmodels = None):
         return None
 
     project.addHistory(sprintf('importPDB from "%s"', pdbFile))
-    project.updateProject()
     nTmessage('%s', project.molecule.format())
     #end if
     return pdbFile

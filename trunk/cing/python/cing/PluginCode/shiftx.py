@@ -48,7 +48,7 @@ def shifxDefaults():
     defs.saved        = False
     defs.saveVersion  = __version__
     defs.runVersion   = __version__
-    defs.models       = None
+    defs.models       = []
     defs.baseName     = 'model_%03d'
     defs.directory    = constants.SHIFTX_KEY
     defs.smlFile      = constants.SHIFTX_KEY + '.sml'

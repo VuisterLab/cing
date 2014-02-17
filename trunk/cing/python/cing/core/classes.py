@@ -74,6 +74,7 @@ from glob import glob
 from glob import glob1
 from shutil import rmtree
 import tarfile
+import zipfile
 
 __version__   = cdefs.__version__
 __date__      = cdefs.__date__
@@ -149,7 +150,7 @@ Project: Top level Cing project class
 
     def __init__(self, name):
 
-        root, name = Project.rootPath(name)
+        root, name, ext = Project.rootPath(name)
 
         NTdict.__init__(self, __CLASS__ = 'Project')
 
@@ -284,29 +285,41 @@ Project: Top level Cing project class
 
     @staticmethod
     def rootPath(pathName):
-        """Static method returning Root,name of project from pathName
+        """Static method returning root,name,ext of project from pathName
+        root will be name.cing
+        extension will be .tgz (if name had .tgz extension) or .sml or .xml
 
         name can be:
             simple_name_string
             directory.cing
             directory.cing/
-            directory.cing/project.xml
+            directory.cing/project.sml
+            name.tgz
+            name.cing.tgz
+            name.zip
+            name.cing.zip
 
         GWV  6 Dec 2007: to allow for relative paths.
         JFD 17 Apr 2008: fixed bugs caused by returning 2 values.
+        GWV 17 Feb 2014: also allow for .tgz and .zip extension
         """
-        root, name, ext = nTpath(pathName)
-        if name == '' or name == 'project': # indicate we had a full path
-            root, name, ext = nTpath(root)
-        #end if
-        if (len(ext) > 0 and ext != '.cing'):
-            nTerror('FATAL: unable to parse "%s"; invalid extention "%s"\n', pathName, ext)
+        root, name, ext = Path(pathName).split3()
+        # tgz file
+        if (ext=='.tgz' or ext=='.zip') and len(name) > 0:
+            root, name, _dummy = Project.rootPath(root / name)
+            return root, name, ext
+        # full path
+        elif name == 'project':
+            root, name, _dummy = Project.rootPath(root)
+            return root, name, ext
+        # anything else
+        elif len(name) > 0:
+            return Path(root.strip()) / name+'.cing', name, '.sml'
+        # we should not be here
+        else:
+            nTerror('Project.rootPath: unable to parse "%s"', pathName)
 #            exit(1) # no more hard exits for we might call this from GUI or so wrappers
-            return None, None
-
-        rootp = Path(os.path.join(root, name + '.cing'))
-#        nTdebug("rootp, name: [%s] [%s]" % (rootp, name))
-        return rootp, name
+            return None, None, None
     #end def
 
 #DEPRECIATED: use project.path() with Path methods instead
@@ -362,10 +375,12 @@ Project: Top level Cing project class
         if not self.root.exists():
             self.root.makedirs()
         # Check the subdirectories
+        # 'global' cing directory
         tmpdir = self.path(directories.tmp)
         if tmpdir.exists():
             tmpdir.rmdir()
-            tmpdir.makedirs()
+        tmpdir.makedirs()
+        # project related directories
         for d in directories.values():
             dir = self.path() / d
             if not dir.exists():
@@ -490,7 +505,7 @@ Project: Top level Cing project class
     #end def
 
     @staticmethod
-    def open(name, status = 'create', restore = True):
+    def open(name, status = constants.PROJECT_CREATE, restore = True):
         """Static method open returns a new/existing Project instance depending on status.
 
            status == 'new': open a new project 'name', overwrite when exists
@@ -504,9 +519,9 @@ Project: Top level Cing project class
         global projects
 
         #print '>>', name, status
-
-        if (status == 'new'):
-            root, dummy = Project.rootPath(name)
+        status = status.strip()
+        if status == constants.PROJECT_NEW:
+            root, dummy, ext = Project.rootPath(name)
             if not root:
                 return None
             if root.exists():
@@ -519,36 +534,94 @@ Project: Top level Cing project class
             # Save the project settings
             pr._save2sml()
 
-        elif (status == 'create'):
-            root, dummy = Project.rootPath(name)
+        elif status == constants.PROJECT_CREATE:
+            root, dummy, ext = Project.rootPath(name)
             if not root:
                 return None
             if os.path.exists(root):
-                return Project.open(name, 'old', restore = restore)
+                return Project.open(name, constants.PROJECT_OLD, restore = restore)
             else:
-                return Project.open(name, 'new', restore = restore)
+                return Project.open(name, constants.PROJECT_NEW, restore = restore)
             #end if
 
-        elif status == 'old':
-            possibleTgz = name + ".cing.tgz"
-            possibleProjectDir = name + '.cing'
-            if os.path.exists(possibleTgz) and not os.path.exists(possibleProjectDir):
-#                nTdebug("Unpacking possibleTgz: " + possibleTgz)
-                tar = tarfile.open(possibleTgz, "r:gz")
+        elif status == constants.PROJECT_NEWFROMCCPN:
+            pr = Project.open(name, constants.PROJECT_NEW)
+            if pr is None:
+                return None
+            p = pr.initCcpn(ccpnFolder=name)
+            if p is None:
+                return None
+            ccpnPath = pr.path() / cdefs.directories.ccpn
+            ccpnPath.makedirs()
+            p = pr.saveCcpn(ccpnFolder=ccpnPath)
+            if p is None:
+                return None
+            pr.storedInCcpnFormat = True
+            pr.save()
+            pr._callPluginRestores()
+            pr.runCingChecks(toFile=False)
+            pr.contentIsRestored = True
+
+        elif status == constants.PROJECT_OLDFROMCCPN:
+            pr = Project.open(name, constants.PROJECT_OLD, restore=False)
+            if pr is None:
+                return None
+            if not pr.storedInCcpnFormat:
+                io.error('Project.open: restoring from ccpn: data are not available\n')
+                return None
+            ccpnPath = pr.path() / cdefs.directories.ccpn
+            p = pr.initCcpn(ccpnFolder=ccpnPath)
+            if p is None:
+                return None
+            pr._callPluginRestores()
+            pr.runCingChecks(toFile=False)
+            pr.contentIsRestored = True
+
+        elif status == constants.PROJECT_OLD:
+            root, newName, ext = Project.rootPath(name)
+            if ext == '.tgz':
+                tarPath = Path(name)
+                if not tarPath.exists():
+                    io.error('Project.open: tarfile "{0}" does not exist\n', tarPath)
+                    return None
+                if root.exists():
+                    root.rmdir()
+                #root.makedirs()
+
+                io.debug('Project.open: unpacking {0}\n', tarPath)
+                tar = tarfile.open(tarPath, "r:gz")
                 for itar in tar:
                     tar.extract(itar.name, '.') # itar is a TarInfo object
 #                    nTdebug("extracted: " + itar.name)
                 tar.close()
-                if not os.path.exists(possibleProjectDir):
+                if not root.exists():
                     nTerror('Project.open: Failed to find project in .tgz file. Unable to open Project "%s"', name)
                     return None
-#            else:
-#                if not os.path.exists(possibleTgz):
-#                    nTdebug("No " + possibleTgz + " found.")
-#                    nTdebug("Skipping .tgz because there's already a .cing")
-#                else:
+                return Project.open(root, status=status, restore=restore)
+            elif ext == '.zip':
+                zipPath = Path(name)
+                if not zipPath.exists():
+                    io.error('Project.open: zipfile "{0}" does not exist\n', zipPath)
+                    return None
+                if root.exists():
+                    root.rmdir()
+                #root.makedirs()
 
-            root, newName = Project.rootPath(name)
+                io.debug('Project.open: unpacking {0}\n', zipPath)
+                with zipfile.ZipFile(zipPath,'r') as z:
+                    for f in z.namelist():
+                        if not f.startswith('__MACOSX'):
+                            z.extract(f)
+                    #end for
+                #end with
+                if not root.exists():
+                    nTerror('Project.open: Failed to find project in .zip file. Unable to open Project "%s"', name)
+                    return None
+                return Project.open(root, status=status, restore=restore)
+            #end if
+
+            # 'proper' project from here on
+            name = newName
             if not root:
                 nTerror('Project.open: unable to open Project "%s" because root is [%s].', name, root)
                 return None
@@ -563,14 +636,13 @@ Project: Top level Cing project class
             # Check if we find an sml or xml file
             f,e = pfile.splitext()
             if (f+'.sml').exists():
-                pfile = f+'.sml'
-                nTdebug('Project.open: restoring from %s', pfile)
                 pr = Project(name)
-                pr.update(sml2obj(pfile))
-                pr.restoredFromXml = False
+                if pr._restoreFromSml():
+                    io.error('Project.open: error restoring project data\n')
+                    return None
             elif (f+'.xml').exists():
                 from cing.Legacy.Legacy100.upgrade100 import upgradeToSml
-                return upgradeToSml(name,restore)
+                return upgradeToSml(root,restore)
             else:
                 # Neither one found
                 nTerror('Project.open: missing Project file "%s"', pfile)
@@ -662,24 +734,12 @@ Project: Top level Cing project class
             if restore and not pr.contentIsRestored:
                 pr.restore()
             #end if
-            nTmessage('Finished restoring project %s', pr)
+            #nTmessage('Finished restoring project %s', pr)
         else:
             nTerror('ERROR Project.open: invalid status option "%s"', status)
             return None
         #end if
-
-#        # Check the subdirectories
-#        tmpdir = pr.path(directories.tmp)
-#        # have to use cing.verbosity to work?
-#        if os.path.exists(tmpdir) and cing.verbosity != cing.verbosityDebug:
-#            removedir(tmpdir)
-#        for d in directories.values():
-##            nTdebug('dir: %r' % d)
-#            pr.mkdir(d)
-#        #end for
-
         pr.addLog()
-
         projects.append(pr)
         return pr
     #end def
@@ -789,17 +849,32 @@ Project: Top level Cing project class
 
     def _save2sml(self):
         """Save project settings as SML file"""
-        from cing.core.sml import obj2sml
+        from cing.core import sml
         path = self.path() / cdefs.cingPaths.project
         # get key, value pairs to save
         p = Adict([(k,self[k]) for k in self.saveKeys ])
-        obj2sml( p, path )
+        return sml.obj2sml( p, path )
+    #end def
+
+    def _restoreFromSml(self):
+        """Restore project settings from sml project file
+        Returns True on error
+        """
+        from cing.core import sml
+        path = self.path() / cdefs.cingPaths.project
+        nTdebug('Project._restoreFromSml: restoring from %s', path)
+        p = sml.sml2obj(path)
+        if p is None:
+            return True
+        self.update(p)
+        self.restoredFromXml = False
+        return False
     #end def
 
     def save(self):
         """
         Save project data;
-        Return True on success.
+        Return True on error.
         """
         nTmessage('' + dots * 5 + '')
         nTmessage('==> Saving %s', self)
@@ -840,10 +915,11 @@ Project: Top level Cing project class
         #if obj2XML(self, path = self.objectPath) != self:
         #    nTerror('Project.save: writing Project file "%s" failed', self.objectPath)
         ##end if
-        self._save2sml()
+        if self._save2sml():
+            return True
 
         self.addHistory('Saved project')
-        return True
+        return False
     #end def
 
     def _restorePluginData( self, key, **kwds ):
@@ -889,6 +965,23 @@ Project: Top level Cing project class
         return False
     #end def
 
+    def _callPluginRestores(self):
+        """Call plugin restores to restore data
+        """
+        # Plugin registered functions
+        for p in cing.plugins.values():
+            if p.isInstalled:
+                #nTdebug("Project.restore: %s" % p.module)
+                for f, obj in p.restores:
+                    nTdebug("Project._restorePlugins: Restoring with %s( %s, %s )",
+                             f, self,obj
+                           )
+                    f(self, obj)
+                #end for
+            #end if
+        #end for
+    #end def
+
     def restore(self):
         """
         Restore the project: molecules and lists
@@ -922,19 +1015,10 @@ Project: Top level Cing project class
 #            l.criticize(self) now in criticize of validate plugin
 
         # Plugin registered functions
-        for p in plugins.values():
-            if p.isInstalled:
-                #nTdebug("Project.restore: %s" % p.module)
-                for f, obj in p.restores:
-                    nTdebug("Project.restore: Restoring with %s( %s, %s )" % (f,self,obj))
-                    f(self, obj)
-                #end for
-            #end if
-        #end for
-        #nTdebug("In classes#restore() doing runCingChecks without output generation.")
+        nTdebug('Project.restore: calling plugins')
+        self._callPluginRestores()
         self.runCingChecks(toFile=False)
         self.contentIsRestored = True
-        self.updateProject()
     #end def
 
     def removeCcpnReferences(self):
@@ -1002,12 +1086,13 @@ Project: Top level Cing project class
         #end for
     #end def
 
-    def updateProject(self):
-        """Do all administrative things after actions
-        """
-        if self.molecule:
-            self[self.molecule.name] = self.molecule
-    #end def
+    #OBSOLETE:
+    # def updateProject(self):
+    #     """Do all administrative things after actions
+    #     """
+    #     if self.molecule:
+    #         self[self.molecule.name] = self.molecule
+    # #end def
 
     #-------------------------------------------------------------------------
     # actions Molecule
@@ -1019,8 +1104,11 @@ Project: Top level Cing project class
         if not molecule:
             return None
 
+        #nTdebug('Project.appendMolecule: appending %s', molecule)
         # Store names and references and append
         self.molecule = molecule
+        #self[molecule.name] = molecule #this should not be done because
+        # the line below takes care of this
         self.molecules.append(molecule)
         self.createValidationDirectories(molecule)
         return self.molecule
@@ -1060,11 +1148,11 @@ Project: Top level Cing project class
         pathName = self.molecules.path(name)
         mol = Molecule.open(pathName)
 
-        if mol:
-            mol.status = 'keep'
-            self.appendMolecule(mol)
-        #end if
-        self.molecule = mol
+        if mol is None:
+            return None
+
+        mol.status = 'keep'
+        self.appendMolecule(mol)
         return mol
     #end def
 
@@ -1508,7 +1596,7 @@ Project: Top level Cing project class
     # end def
 # end class
 
-
+#LEGACY:
 class XMLProjectHandler(XMLhandler):
     """Project handler class"""
     def __init__(self):
@@ -4522,6 +4610,7 @@ class History(NTlist):
 #end class
 
 
+#LEGACY:
 class XMLHistoryHandler(XMLhandler):
     """History handler class"""
     def __init__(self):

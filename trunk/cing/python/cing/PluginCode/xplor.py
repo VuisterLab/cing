@@ -314,6 +314,7 @@ def newMoleculeFromXplor( project, path, name, models=None ):
     #end for
 
     project.molecule.updateAll()
+    project[molecule.name] = molecule
 
     project.addHistory( sprintf('New molecule "%s" from XPLOR files %s (%d models)\n', name, path, molecule.modelCount ) )
     project.updateProject()

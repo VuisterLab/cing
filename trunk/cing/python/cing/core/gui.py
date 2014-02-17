@@ -588,7 +588,7 @@ class CingGui(BasePopup):
 
         if len(fileName) > 0:
                 # Put text into entry,name widgets
-            dummy,name = cing.Project.rootPath(fileName)
+            dummy,name, ext = cing.Project.rootPath(fileName)
             self.projEntry.configure(state='normal')
             self.projEntry.set(fileName)
 
