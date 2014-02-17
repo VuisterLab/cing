@@ -208,7 +208,6 @@ def main(entryId, *extraArgList):
 #    if True: # Default is False for this is specific to CASD-NMR
 #        nTmessage("Renaming molecule name to entry id: %s" % entryId)
 #        project.molecule.name = entryId # insufficient since all data is already initialized to disk.
-#        project.updateProject()
 #        project.molecule.rename( entryId )
 
 #    project.save()

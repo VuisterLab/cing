@@ -161,8 +161,8 @@ cingDefinitions = CingDefinitions()
 #-----------------------------------------------------------------------------
 
 # These directories get created. They are defined relative to project root path,
-# available through Project.rootPath( name ) method, or can be joined relative
-# to project root by Project.path( *args ) method.
+# can be joined relative to project root by Project.path( *args ) method or
+# via myProject.path() / directories.xyz syntax of the Path class.
 directories = Adict.Adict(
     data       = 'Data',
     molecules  = 'Data/Molecules',
@@ -170,7 +170,7 @@ directories = Adict.Adict(
     restraints = 'Data/Restraints',
     ccpn       = 'Data/Ccpn',
     sources    = 'Data/Sources',
-    database   = 'Data/Database',
+#    database   = 'Data/Database',
     plugins    = 'Data/Plugins',
     logs       = 'Logs',
     export     = 'Export',

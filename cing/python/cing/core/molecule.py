@@ -1651,10 +1651,12 @@ class Molecule( NTtree, ResidueList ):
         return self
     #end def
 
+    @staticmethod
     def open( path )   :
         """Static method to restore molecule from SML file path
            returns Molecule instance or None on error
         """
+        nTdebug('Molecule.open: reading from %s', path)
         if (not os.path.exists( path )):
             nTerror('Molecule.open: path "%s" not found\n', path)
             return None
@@ -1686,8 +1688,8 @@ class Molecule( NTtree, ResidueList ):
 
         return mol
     #end def
-    open = staticmethod(open)
 
+    @staticmethod
     def openMol_094( path )   :
         """Static method to restore molecule from SML file path: 0.75< version <= 0.90
            returns Molecule instance or None on error
@@ -1712,8 +1714,8 @@ class Molecule( NTtree, ResidueList ):
 
         return mol
     #end def
-    openMol_094 = staticmethod(openMol_094)
 
+    @staticmethod
     def openMol_075( path )   :
         """Static method to restore molecule from directory path
            implements the <=0.75 storage model
@@ -1759,7 +1761,6 @@ class Molecule( NTtree, ResidueList ):
 
         return mol
     #end def
-    openMol_075 = staticmethod(openMol_075)
 
     def _check(self):
         # check for potential atoms with incomplete resonances
@@ -2348,9 +2349,9 @@ class Molecule( NTtree, ResidueList ):
             msg = "Renamed molecule to " + self.name
             self.project.addHistory(msg)
             nTmessage( msg )
+            self.project[self.name] = self
         # end if
 
-        self.project.updateProject()
         if self.project.decriticize():
             nTerror("Failed to project.decriticize() in molecule#replaceCoordinatesByPdb")
             return True

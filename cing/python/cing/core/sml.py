@@ -792,7 +792,9 @@ class SMLAtomHandler( SMLhandler ):
         nameTuple = eval(' '.join(line[2:]))
         atm = molecule.decodeNameTuple(nameTuple)
         if atm == None: # TODO: check this code.
-            # Could not find anything: to maintain compatibility of all Jurgen's old stuff; try to add it on the fly.
+            # Could not find anything:
+            # to maintain compatibility of all Jurgen's old stuff:
+            # try to add it on the fly.
 #            nTdebug('SMLAtomHandler.handle: line %d, could not properly decode nameTuple %s', fp.NR, str(nameTuple))
             resTuple = list(nameTuple)
             resTuple[3] = None
@@ -844,10 +846,11 @@ class SMLAtomHandler( SMLhandler ):
         """
         fprintf( stream, "%s  %r\n", self.startTag, atm.nameTuple(SMLsaveFormat) )
 #       Can add attributes here; update endHandler if needed
-        for a in ['shiftx']:
-            if atm.has_key(a):
-                fprintf( stream, '%s = %r\n', a, atm[a] )
-        #end for
+#version >=1.01: diabled as shiftx data are now in separate sml file
+#        for a in ['shiftx']:
+#            if atm.has_key(a):
+#                fprintf( stream, '%s = %r\n', a, atm[a] )
+#        #end for
 
         # coordinates; only write when present
         if len(atm.coordinates) > 0:
@@ -1668,14 +1671,25 @@ AtomDef.SMLhandler = SMLAtomDefHandler()
 def obj2sml( obj, smlFile, **kwds ):
     """
     Generate SML file from object.
+    Return True on error
+    """
+    if smlhandler.toFile(obj, smlFile, **kwds) == None:
+        return True
+    return False
+#end def
+
+
+#LEGACY:
+def obj2SML( obj, smlFile, **kwds ):
+    """
+    Generate SML file from object.
     Return obj or None on error
     """
     if smlhandler.toFile(obj, smlFile, **kwds) == None:
         return None
     return obj
 #end def
-#LEGACY:
-obj2SML = obj2sml
+
 
 def sml2obj( smlFile, externalObject=None ):
     """

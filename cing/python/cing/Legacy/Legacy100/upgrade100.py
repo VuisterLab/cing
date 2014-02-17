@@ -11,19 +11,22 @@ from cing.core import sml
 from cing.core.classes import Project
 from cing.core.molecule import Molecule
 from cing.Libs import io
+import cing.Libs.NTutils as ntu
 from cing.Libs.NTutils import nTdebug
 from cing.Libs.NTutils import nTmessage
+from cing.Libs.NTutils import nTerror
 from cing.Libs.NTutils import xML2obj
 from cing.Libs import disk
 from cing.Libs.Adict import Adict
 
 
 def upgradeToSml( name, restore  ):
-
-
+    """Upgrade the project.xml to project.sml file
+    Convert several parameters to new Adict types
+    """
     nTdebug('upgradeToSml: restoring %s', name)
 
-    root, newName = Project.rootPath(name)
+    root, newName, ext = Project.rootPath(name)
     if not root:
         nTerror('upgradeToSml: unable to open Project "%s" because root is [%s].', name, root)
         return None
@@ -90,7 +93,7 @@ def restoreQueeny100( project, tmp=None ):
     queenyDefs = project.getStatusDict(constants.QUEENY_KEY)
 
     if not queenyDefs.completed: # old definition
-        ntDebug('restoreQueeny100: no queeny completed')
+        nTdebug('restoreQueeny100: no queeny completed')
         return False # Return gracefully
 
     path = project.validationPath( queenyDefs.directory)
@@ -122,18 +125,18 @@ def restoreQueeny100( project, tmp=None ):
                 nameTuple,storedProp,info = tupleInfo
             else: # Old version with multiple data items
                 nameTuple,info = tupleInfo
-                storedProp = QUEENY_INFORMATION_STR
+                storedProp = constants.QUEENY_INFORMATION_STR
             obj = project.molecule.decodeNameTuple(nameTuple)
             if not obj:
                 atomName = nameTuple[3]
-                if not (atomName in ATOM_LIST_TO_IGNORE_REPORTING):
+                if not (atomName in constants.ATOM_LIST_TO_IGNORE_REPORTING):
                     nTerror('restoreQueeny100: error decoding "%s"', nameTuple)
                     # Was reporting terminal atoms eg. in "('1buq', 'A', 39, 'H2', None, None, 'INTERNAL_1')"
                 return True
             #end if
             obj[storedProp] = info
     except:
-        nTtracebackError()
+        ntu.nTtracebackError()
         nTerror("restoreQueeny100: Failed to restore Queeny results.")
         return True
     #success
@@ -157,7 +160,7 @@ def restoreShiftx100(project):
     Return True on error
     """
     if project is None:
-        nDebug("restoreShiftx100: No project defined")
+        nTdebug("restoreShiftx100: No project defined")
         return True
 
     if project.molecule == None:
@@ -199,7 +202,7 @@ def restoreShiftx100(project):
     del(defs['contentFile'])
 
     if not defs.completed:
-        nDebug('restoreShiftx100: shiftx not completed')
+        nTdebug('restoreShiftx100: shiftx not completed')
         return True
 
     return project.parseShiftx()
@@ -213,7 +216,7 @@ def restoreTalosPlus100(project):
     Return True on error
     """
     if project == None:
-        nDebug("restoreTalosPlus100: No project defined")
+        nTdebug("restoreTalosPlus100: No project defined")
         return True
 
     if project.molecule == None:
@@ -222,7 +225,7 @@ def restoreTalosPlus100(project):
     talosDefs = project.getStatusDict('talosPlus')
 
     if not talosDefs.completed:
-        nDebug('restoreTalosPlus100: talosPlus not completed')
+        nTdebug('restoreTalosPlus100: talosPlus not completed')
         return True
 
     # for res in project.molecule.allResidues():
@@ -258,7 +261,9 @@ def upgrade100(project, restore):
     """
     nTmessage('*** upgrade100: upgrading %s from version %s ***', project, project.version)
     verbosity = cing.verbosity
-    cing.verbosity = cing.verbosityWarning
+    # make sure we get all if we heave debug on
+    if cing.verbosity < cing.verbosityDebug:
+        cing.verbosity = cing.verbosityWarning
 
     # Molecules
     for molName in project.moleculeNames:
@@ -268,6 +273,7 @@ def upgrade100(project, restore):
             mol.status = 'keep'
             project.appendMolecule(mol)
         #end if
+        nTdebug('upgrade100: restored %s', mol)
     #end for
 
     # restore the lists
@@ -294,15 +300,8 @@ def upgrade100(project, restore):
     project.saveShiftx()
 
     # Plugin registered functions
-    for p in cing.plugins.values():
-        if p.isInstalled:
-            #nTdebug("upgrade100: %s" % p.module)
-            for f, obj in p.restores:
-                nTdebug("upgrade100: Restoring with %s( %s, %s )" % (f,project,obj))
-                f(project, obj)
-            #end for
-        #end if
-    #end for
+    nTdebug('upgrade100: calling plugins')
+    project._callPluginRestores()
 
     # save to consolidate
     project.save()
