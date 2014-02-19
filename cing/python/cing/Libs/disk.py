@@ -856,8 +856,19 @@ class Path( str ):
         return os.path.isfile(str(self))
     def islink( self ):
         return os.path.islink(str(self))
-    def glob(self):
-        return [Path(f) for f in glob(str(self ))]
+    def glob(self, pattern=None):
+        """Apply glob on self if pattern == None, or
+        append pattern to self first when self is a directory
+        return list of Path objects or empty list on error
+        """
+        if pattern is None:
+            return [Path(f) for f in glob(str(self))]
+        else:
+            if self.isdir():
+                return [Path(f) for f in glob(str(self / pattern))]
+        # No result if we are here
+        return []
+    #end def
     def makedirs(self):
         mkdirs(str(self))
     def rmdir(self):
@@ -884,13 +895,8 @@ class Path( str ):
         return os.walk(str(self), topdown, onerror )
     def listdir( self ):
         if self.exists() and self.isdir():
-            files = []
-            for f in os.listdir(str(self)):
-                files.append( self / f )
-            return files
-        else:
-            return []
-        #end if
+            return [self/f for f in os.listdir(str(self))]
+        return []
     #end def
     def __iter__(self):
         for f in self.listdir():
