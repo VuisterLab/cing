@@ -1,184 +1,245 @@
-from cing.Libs.NTutils import * #@UnusedWildImport
+"""
+New AwkLike implementation
+GWV 2 Oct 2013
+
+"""
+import sys
+import os
+from cing.Libs import NTutils as ntu
+from cing.Libs import fpconst
+
 
 # pylint: disable=R0902
-class AwkLike:
+class _AwkLike(list):
     """
-    Awk-like functionality
+    Base class Awk-like functionality
 
     defines:
         NR
         NF
-        FILENAME
-        dollar[0 , ... , NF]
+        self[0 , ... , NF]
+        parsing and checking for conditions
 
-        use as:
-
-     for line in AwkLike('myfile'):
-         if line.NF > 1:
-             print line.dollar[0], line.dollar[1]
-
-        JFD adds: iterations routine
-        fails on parsing entry 1o9l whatif's pdbout.txt when called in a naive way.
-        If the number of fields is less than required it runs out of recursion depth.
-        Workaround, don't filter here but outside the loop.
     """
 
-    def __init__(self, filename=None, minLength = -1, commentString = None, minNF = -1,
-                 skipHeaderLines = 0, separator = None ):
-        self.f = sys.stdin
-        self.FILENAME = 'stdin' # pylint: disable=C0103
+    def __init__(self, minLength = -1, commentString = None, minNF = -1,
+                 skipHeaderLines = 0, separator = None):
+        list.__init__(self)
         self.minLength = minLength
         self.commentString = commentString
         self.minNF = minNF
         self.skipHeaderLines = skipHeaderLines
-
+        self.separator = separator
         self.NR = 0 # pylint: disable=C0103
         self.NF = 0 # pylint: disable=C0103
-        self.dollar = []
-        self.separator = separator
-        
-        if filename:
-            self.FILENAME = filename
-            if not os.path.exists(filename):
-                nTerror("Failed to find: [%s]" % filename)
-            else:
-                self.f = open(filename,'r')
-        # end if
+    #end def
 
-
-
-    def __iter__( self ):
+    def __iter__(self):
         return self
 
-    def next( self ):
-        """iterations routine
-        JFD fails on parsing entry 1o9l whatif's pdbout.txt when called in a naive way.
-        If the number of fields is less than required it runs out of recursion depth.
-        Workaround, don't filter here but outside the loop.
-        """
-        if not self.f:
-            raise StopIteration
+    def next(self):
+        pass
 
-        self.line = self.f.readline()
-        self.dollar = [self.line[:-1]] # -1 for excluding line terminator.
-#        print 'line:        [' + repr(self.line)  + ']'
-        if len(self.line):
-            self.NR += 1
-            for f in self.line.split(self.separator):
+    def _parseLine(self, line):
+        """Return -1 on error
+           Return 0 on skip
+           Return 1 on parse
+        """
+        #print '>>', line
+        #print '>>', len(self), self
+
+        #check if we need to remove the previous elements
+        if len(self) > 0:
+            del self[:]
+        #end if
+
+        # set self[0] to line
+        self.append(line)
+        self.NR += 1
+        self.NF = 0
+
+        l = len(self[0])
+        if l > 0:
+            for f in self[0].split(self.separator):
                 # Skip everything after the comment?
                 if self.commentString and f.startswith(self.commentString):
 #                    nTdebug("Skipping fields after comment on line: [%s]" % self.line)
 #                    nTdebug("   parsed so far: %s" % repr(self.dollar) )
                     break
 #                nTdebug("Appending to parsed: [%s]" % f)
-                self.dollar.append( f )
-            self.NF = len(self.dollar)-1
-            if self.minLength >= 0:
-                if len(self.dollar[0]) < self.minLength:
-#                    nTdebug("Skipping line with less than required number of characters: [%s]" % self.line)
-                    return self.next()
-            if self.minNF > 0:
-                if self.NF < self.minNF:
-#                    nTdebug("Skipping line with less than required number of fields: [%s]" % self.line)
-                    return self.next()
-            if self.commentString:
-                if self.isComment( self.commentString ):
-#                    nTdebug("Skipping comment line: [%]" % self.line)
-                    return self.next()
-            if self.skipHeaderLines >= self.NR:
-#                nTdebug('skipping header line [%d] which is less than or equal to [%s]' % (
-#                    self.NR, self.skipHeaderLines))
-                return self.next()
-            return self
+                self.append(f)
+                self.NF += 1
+            #end for
+        #end if
+
+        #print l, self.NR, self.NF, self.minLength
+
+        # test conditions
+        if self.minLength >= 0 and l < self.minLength:
+            return 0
+        elif self.minLength >= 0 and l >= self.minLength:
+            return 1
+        elif self.skipHeaderLines >= self.NR:
+            return 0
+        elif self.minNF > 0 and self.NF < self.minNF:
+            return 0
+        elif self.commentString and self.isComment( self.commentString ):
+            return 0
+        elif self.minLength < 0 and l >= 0:
+            return 1
+        #end if
+        #print 'returning -1'
+        return -1
+    #end def
+
+    def float(self, field):
+        """Return field converted to float or NaN on error """
+        try:
+            return float(self[ field ])
+        except ValueError:
+            ntu.nTerror('AwkLike: expected float for "%s" (file: %s, line %d: "%s")',
+                        self[field],
+                        self.FILENAME,
+                        self.NR,
+                        self[0]
+                        )
+        except IndexError:
+            ntu.nTerror('AwkLike: invalid field number "%d" (file: %s, line %d: "%s")',
+                        field,
+                        self.FILENAME,
+                        self.NR,
+                        self[0]
+                        )
+        return fpconst.NaN
+    #end def
+
+    def int(self, field):
+        """Return field converted to int or NaN on error"""
+        try:
+            return int(self[ field ])
+        except ValueError:
+            ntu.nTerror('AwkLike: expected integer for "%s" (file: %s, line %d: "%s")',
+                        self[field],
+                        self.FILENAME,
+                        self.NR,
+                        self[0]
+                        )
+        except IndexError:
+            ntu.nTerror('AwkLike: invalid field number "%d" (file: %s, line %d: "%s")',
+                        field,
+                        self.FILENAME,
+                        self.NR,
+                        self[0]
+                        )
+        return fpconst.NaN
+    #end def
+
+    def printit(self):
+        ntu.nTmessage( '==> FILENAME=%s NR=%d NF=%d' % (self.FILENAME, self.NR, self.NF) )
+        for i, field in self.enumerate(): # can't use enumerate as that will loop throught the 'lines'
+            ntu.nTmessage('%2d >%s<' % (i, self[i]))
+    #end def
+
+    def isComment(self, commentString = '#'):
+        """check for commentString on start of line
+           return True or False
+        """
+        if self[0].strip().startswith(commentString):
+            return True
+        return False
+
+    def isEmpty(self):
+        return self.NF == 0
+
+    def enumerate(self):
+        for i in range(len(self)): # can't use enumerate() as that will loop throught the 'lines'
+            yield((i, self[i]))
+    #end def
+
+    #backward compatibility: implement 'dollar' list
+    # see evernote:///view/369088/s4/64797df2-2641-459c-bc13-d0da3802c8cf/64797df2-2641-459c-bc13-d0da3802c8cf/
+    @property
+    def dollar(self):
+        return self
+    #end def
+#end class
+
+#
+#==============================================================================
+#
+class AwkLike(_AwkLike):
+    """
+    Awk-like functionality, reading from file
+
+    """
+
+    def __init__(self, filename=None, minLength = -1, commentString = None, minNF = -1,
+                 skipHeaderLines = 0, separator = None):
+
+        _AwkLike.__init__(self, minLength = minLength, commentString = commentString, minNF = minNF,
+                          skipHeaderLines = skipHeaderLines, separator = separator)
+        self.f = None
+
+        if filename == None:
+            self.f = sys.stdin
+            self.FILENAME = 'stdin' # pylint: disable=C0103
+        else:
+            self.FILENAME = filename
+            if not os.path.exists(filename):
+                ntu.nTerror("Failed to find: [%s]" % filename)
+                self.f = None
+            else:
+                self.f = open(filename,'r')
+        #end if
+    #end def
+
+    def __iter__(self):
+        """iterations routine
+        """
+        if not self.f:
+            raise StopIteration
+
+        for line in self.f:
+            if line[-1:] == '\n':
+                line = line[:-1] # strip any \n
+            returnVal = self._parseLine( line )
+            if returnVal < 0:
+                self.close()
+                raise StopIteration
+            elif returnVal == 0:
+                pass
+            else:
+                yield(self)
+            #end if
+        #end for
         self.close()
         raise StopIteration
     #end def
 
-
-    def close( self ):
+    def close(self):
         """internal routine"""
         if not self.f:
-            nTerror("Can't close the file because it was not present.")
+            ntu.nTerror("Can't close the file because it was not present.")
             return
         self.f.close()
         self.f = None
+    #end if
+#end class
 
-    def float( self, field ):
-        """Return field converted to float """
-        try:
-            return float( self.dollar[ field ] )
-        except ValueError:
-            nTerror('AwkLike: expected float for "%s" (file: %s, line %d: "%s")',
-                    self.dollar[field],
-                    self.FILENAME,
-                    self.NR,
-                    self.dollar[0]
-                    )
-        except IndexError:
-            nTerror('AwkLike: invalid field number "%d" (file: %s, line %d: "%s")',
-                    field,
-                    self.FILENAME,
-                    self.NR,
-                    self.dollar[0]
-                    )
-    def int( self, field ):
-        """Return field converted to int """
-        try:
-            return int( self.dollar[ field ] )
-        except ValueError:
-            nTerror('AwkLike: expected integer for "%s" (file: %s, line %d: "%s")',
-                    self.dollar[field],
-                    self.FILENAME,
-                    self.NR,
-                    self.dollar[0]
-                    )
-        except IndexError:
-            nTerror('AwkLike: invalid field number "%d" (file: %s, line %d: "%s")',
-                    field,
-                    self.FILENAME,
-                    self.NR,
-                    self.dollar[0]
-                    )
-
-    def printit( self ):
-        nTmessage( '==>%s NR=%d NF=%d' % (self.FILENAME, self.NR, self.NF))
-        i=0
-        for field in self.dollar:
-            nTmessage( '%3d >%s<' % (i, field) )
-            i += 1
-        return 0
-
-    def isComment( self, commentString = '#'):
-        """check for commentString on start of line
-           return None or 1
-        """
-        if self.dollar[0].strip().startswith( commentString ):
-            return 1
-        return None
-
-    def isEmpty( self ):
-        return self.NF == 0
 #
 #==============================================================================
 #
-class AwkLikeS:
+class AwkLikeS( _AwkLike ):
     """
         Awk-like functionality on string
 
-        defines:
-            NR
-            NF
-            FILENAME = 'string'
-            dollar[0 ... NF]
-
-        use as:
-
-        for line in AwkLikeS('myString'):
-            if line.NF > 1:
-                print line.dollar[0], line.dollar[1]
     """
 
-    def __init__(self, str, minLength = -1, commentString = None, minNF = -1):
+    def __init__(self, str, minLength = -1, commentString = None, minNF = -1,
+                 skipHeaderLines = 0, separator = None):
+
+        _AwkLike.__init__(self, minLength = minLength, commentString = commentString, minNF = minNF,
+                 skipHeaderLines = skipHeaderLines, separator = separator)
 
         if (not str) or (len(str)<=0):
             self.lines = None
@@ -186,111 +247,51 @@ class AwkLikeS:
 
         self.lines = str.splitlines()
         self.MAX_NR = len( self.lines) # pylint: disable=C0103
-
-        self.minLength = minLength
-        self.commentString = commentString
-        self.minNF = minNF
-
-        self.NR = 0 # pylint: disable=C0103
-        self.NF = 0 # pylint: disable=C0103
-        self.dollar = []
         self.FILENAME = 'string' # pylint: disable=C0103
-
-    def __iter__( self ):
-        return self
-
-    def next( self ):
-        """iterations routine"""
-        if (not self.lines) or (self.NR >= self.MAX_NR):
-            raise StopIteration
-#            return None
-
-        else:
-            self.line = self.lines[self.NR]
-
-            self.dollar = [self.line]
-            for f in self.line.split():
-                self.dollar.append( f )
-            #end for
-            self.NF = len(self.dollar)-1
-            self.NR += 1
-
-            # check if we need to skip this line
-            if (self.minLength >= 0 and len(self.dollar[0]) < self.minLength):
-                return self.next()
-            #end if
-            if (self.minNF > 0 and self.NF < self.minNF):
-                return self.next()
-            #end if
-            if (self.commentString != None and self.isComment( self.commentString )):
-                return self.next()
-            #end if
-
-            return self
-        #end if
     #end def
 
-    def float( self, field ):
-        """Return field converted to float """
-        try:
-            return float( self.dollar[ field ] )
-        except ValueError:
-            nTerror('AwkLike: expected float for "%s" (file: %s, line %d: "%s")',
-                    self.dollar[field],
-                    self.FILENAME,
-                    self.NR,
-                    self.dollar[0]
-                    )
-        except IndexError:
-            nTerror('AwkLike: invalid field number "%d" (file: %s, line %d: "%s")',
-                    field,
-                    self.FILENAME,
-                    self.NR,
-                    self.dollar[0]
-                    )
-        #end try
-        return None
+    def __iter__(self):
+        for line in self.lines:
+            returnVal = self._parseLine(line)
+            if returnVal == -1:
+                raise StopIteration
+            elif returnVal == 0:
+                pass
+            else:
+                yield(self)
+            #end if
+        #end for
+    #end def
+#end class
 
-    def int( self, field ):
-        """Return field converted to int """
-        try:
-            return int( self.dollar[ field ] )
-        except ValueError:
-            nTerror('AwkLike: expected integer for "%s" (file: %s, line %d: "%s")',
-                    self.dollar[field],
-                    self.FILENAME,
-                    self.NR,
-                    self.dollar[0]
-                    )
-        except IndexError:
-            nTerror('AwkLike: invalid field number "%d" (file: %s, line %d: "%s")',
-                    field,
-                    self.FILENAME,
-                    self.NR,
-                    self.dollar[0]
-                    )
-        #end try
-        return None
-
-    def printit( self ):
-        print '%s ==> NR=%d NF=%d' % (self.FILENAME, self.NR, self.NF)
-        i=0
-        for field in self.dollar:
-            print '%3d >%s<' % (i, field)
-            i += 1
-        return 0
-
-    def isComment( self, commentString = '#'):
-        """check for commentString on start of line
-           return 0 or 1
-        """
-        if self.dollar[0].startswith( commentString ):
-            return 1
-        return 0
-
-    def isEmpty( self ):
-        return (self.NF == 0)
 #
 #==============================================================================
 #
 
+## testing only here
+if __name__ == '__main__':
+
+    txt = """
+# From YASARA BioTools
+# GWV 20130528: Added path routines
+# Visit www.yasara.org for more...
+# Copyright by Elmar Krieger
+from glob import glob
+from glob import glob1
+from optparse import OptionParser
+from string import digits
+import fnmatch
+import os
+import re
+import shutil
+import sys
+import time
+import zipfile
+10 1 2
+x 10 5
+
+
+# This program is free soft"""
+
+    for line in AwkLikeS(txt):
+        print line
