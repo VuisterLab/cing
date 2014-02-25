@@ -96,7 +96,7 @@ def importPlugin( pluginCodeModule, pluginName ):
 def importPlugins():
     # do all *.py files in plugin directory excluding __init__
     # GWV 30 Jan 2014: using CingDefinitions class instance
-    for _p in (cdefs.cingDefinitions.pluginPath / '*.py').glob():
+    for _p in cdefs.cingDefinitions.pluginPath.glob('*.py'):
         _d,_pname,_e = _p.split3()
         #print '>>',_pname
         if _pname != '__init__':

@@ -1,22 +1,25 @@
 from nose import with_setup
-import cing
 import os
 
+import cing
 from cing import definitions as cdefs
 from cing import constants
 from cing.core import classes
 from cing.core import molecule
 from cing.Libs import io
+from cing.core import validation
 
 project = None
+
+TEST = 'test'
 
 def setup_DummyProject():
     global project
     os.chdir(cdefs.cingDefinitions.tmpdir)
     print('Now in %s' % cdefs.cingDefinitions.tmpdir)
-    project = cing.openProject('test', constants.PROJECT_NEW)
-    # creat a molecule
-    mol = molecule.Molecule('test')
+    project = cing.openProject(TEST, constants.PROJECT_NEW)
+    # create a molecule
+    mol = molecule.Molecule(TEST)
     project.appendMolecule(mol)
     c = mol.addChain('A')
     c.addResidue('ALA', 1, Nterminal = True)
@@ -49,15 +52,18 @@ def setup_DummyProject():
     mol.updateAll()
     io.message('{0}\n',mol.format())
 
+
 def teardown_project():
     global project
     if project is not None:
         project.close(save=False)
 
+
 def test_projectNotPresent():
     print('Forced error:')
     project = classes.Project.open('notPresent','old')
     assert project is None
+
 
 def test_rootPath():
     root,name,ext = classes.Project.rootPath('test')
@@ -75,6 +81,7 @@ def test_rootPath():
     assert name == 'test'
     assert ext == '.tgz'
 
+
 @with_setup(setup_DummyProject,teardown_project)
 def test_openSaveProject():
     assert project is not None
@@ -82,8 +89,28 @@ def test_openSaveProject():
     # this will test the save routines
     assert project.save() == False
     # this will test the restore routines
-    p = project.open('test','old')
+    p = project.open(TEST,constants.PROJECT_OLD)
     assert p is not None
     assert p.created == 10.0
+
+
+@with_setup(setup_DummyProject,teardown_project)
+def test_pluginRoutines():
+    assert project is not None
+    pdefs = project.getStatusDict(TEST)
+    assert pdefs is not None
+
+    vobj = validation.ValidationResult()
+    vobj.value = 10
+    validation.setValidationResult(project.molecule,TEST,vobj)
+    pdefs.present = True
+    result = project._savePluginData(TEST, saved=True)
+    assert result == False
+
+    result = project._restorePluginData(TEST)
+    assert result == False
+    vobj = validation.getValidationResult(project.molecule,TEST)
+    assert vobj is not None
+    assert vobj.value == 10
 
 

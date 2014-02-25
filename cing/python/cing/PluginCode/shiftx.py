@@ -341,7 +341,7 @@ def runShiftx(project, parseOnly=False, model=None):
     #end for
 
     #cleanup
-    for pdbfile in (path / '*.pdb').glob():
+    for pdbfile in path.glob('*.pdb'):
         pdbfile.remove()
 
     # Restore the 'default' state

@@ -413,10 +413,8 @@ Project: Top level Cing project class
         if thePid == None:
             return None
 
-        if thePid[0] == '<' and thePid[-1] == '>':
-            thePid = pid.Pid(thePid[1:-1])
-        else:
-            thePid = pid.Pid(thePid)
+        # assure a Pid object
+        thePid = pid.Pid(str(thePid))
 
         object = self
         for p in thePid[1:]:
@@ -2755,7 +2753,7 @@ class Peak(NTdict, Lister):
                          self.peakIndex, self.dimension,
                          self.positions.format('%8.2f'),
                          self.height, self.volume,
-                         self.resonances.zap('atom').format('%-20s')
+                         self.resonances.zap('atom')
                        )
     #end def
 

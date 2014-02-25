@@ -2,6 +2,7 @@
 # pylint: disable=C0302
 from cing import issueListUrl
 from cing.Libs import disk
+from cing.Libs import NTutils as ntu
 from cing.Libs import PyMMLib
 from cing.Libs.AwkLike import AwkLikeS
 from cing.Libs.Geometry import to_0_360
@@ -23,7 +24,7 @@ from cing.PluginCode.required.reqVasco import * #@UnusedWildImport
 from cing.core import database
 from cing.core.classes2 import * #@UnusedWildImport
 from cing.constants import * #@UnusedWildImport
-from cing.core.database import AtomDef
+#from cing.core.database import AtomDef
 from cing.core.parameters import plotParameters
 from numpy import convolve
 from numpy import linalg as LA
@@ -4493,6 +4494,11 @@ Residue class: Defines residue properties
         return sprintf('<Residue %s>', self.toString())
     #end def
 
+#    def asPid(self):
+#        thePid = ntu.NTtree.asPid(self)
+#        return thePid.modify(3, str(self.resNum))
+#    #end def
+
     def toString(self, showChainId=True, showResidueType=True):
         """A unique compact string identifier.e.g B.LYS282"""
         if showChainId:
@@ -5751,7 +5757,7 @@ Atom class: Defines object for storing atom properties
             if db:
                 self.db = db
             else:
-                self.db = AtomDef( atomName, **patches ) # TODO: check if absense of residue defs within here cause problems.
+                self.db = database.AtomDef( atomName, **patches ) # TODO: check if absense of residue defs within here cause problems.
         #end if
     #end def
 
@@ -5759,6 +5765,11 @@ Atom class: Defines object for storing atom properties
 #        return self.cName( 1 )
         return '<%s %s>' % ( self._className(), self.cName(2) ) # Include chain id as well as residue id.
     #end def
+
+#    def asPid(self):
+#        thePid = ntu.NTtree.asPid(self)
+#        return thePid.modify(3, str(self._parent.resNum))
+#    #end def
 
     def format(self): # pylint: disable=W0221
         return sprintf("""%s %s %s

@@ -1,5 +1,9 @@
 """
-v3: key validation classes and functions, separate from validation
+v3: key validation classes and functions, separate from validate which contains the
+v1 stuff
+
+        <obj> <-> <validationResultContainer> -> <ValidationResult> -> <obj>
+keys: validation   object               'userKeys'               object
 """
 
 from cing import constants
@@ -67,6 +71,11 @@ class ValidationResult(Adict.Adict):
         return s
     #end def
 #end class
+#If neded, should be in sml.py because circular imports otherwise
+#ValidationResult.SMLhandler = sml.SMLAnyDictHandler(ValidationResult,'ValidationResult',
+#                                                    encodeKeys = [constants.OBJECT_KEY],
+#                                                    decodeKeys = [constants.OBJECT_KEY]
+#                                                   )
 
 
 def hasValidationResult(theObject,key):
