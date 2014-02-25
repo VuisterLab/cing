@@ -1,7 +1,7 @@
 from nose import with_setup
-import cing
 import os
 
+import cing
 from cing import definitions as cdefs
 from cing import constants
 from cing.core import classes
@@ -134,7 +134,7 @@ targets['2k0e'] = Adict(
 
 def setup_EmptyProject():
     global project
-    project = classes.Project.open(target, constants.PROJECT_NEW)
+    project = classes.Project.open('test', constants.PROJECT_NEW)
 
 def teardown_project():
     project.nosave = True

@@ -5,6 +5,8 @@ Nijmegen Tools utilities
 import cing
 import cing.constants as constants
 import cing.definitions as cdefs
+from cing.core import pid
+
 from cing import NaNstring
 from cing import verbosityDebug
 from cing import verbosityDefault #@UnusedImport actually used by wild imports of this module (NTutils)
@@ -2185,7 +2187,7 @@ class NTtree(NTdict):
     #end def
 
     def asPid(self):
-        return repr(self)
+        return pid.Pid('%s:%s' % (self._className(), self.cName( -1 )))
 
     def _decodeTreeName(self, nodeNames ):
         """

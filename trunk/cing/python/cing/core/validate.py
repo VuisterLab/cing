@@ -930,6 +930,7 @@ def checkForSaltbridges( project, cutoff = 0.5, toFile=False)   :
     Returns a NTlist with saltbridge summaries.
 
     Optionally print output to file in analysis directory of project.
+
     """
 
 #    nTdebug("Starting checkForSaltbridges with toFile:%s" % toFile)
@@ -1913,7 +1914,7 @@ def validateModels( self)   :
         return True
     if not self.molecule.modelCount:
         nTwarning("validateModels: no model for molecule %s defined", self.molecule)
-        return None
+        return True
 
     backbone = ['PHI','PSI','OMEGA']
 

@@ -80,8 +80,8 @@ class Pid( str ):
         return makePid(*tmp)
     #end def
     
-    def __len__( self ):
-        return len(_split(self))
+    def __len__(self):
+        return len(self._split())
     #end def
     
     def __getslice__( self, start, stop ):
@@ -133,7 +133,8 @@ class Pid( str ):
         if len(args) >= 2:
             tmp =':'.join( args[0:2] )
             tmp2 = [tmp] + list(args[2:]) # don't know why args is tuple and thus I have to use
-                                          # the list operator to avoid TypeError: can only concatenate list (not "tuple") to list?
+                                          # the list operator to avoid TypeError:
+                                          # can only concatenate list (not "tuple") to list?
             return '.'.join(tmp2)
         elif len(args) >= 1:
             return args[0]
