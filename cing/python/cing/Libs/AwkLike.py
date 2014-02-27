@@ -170,7 +170,6 @@ class _AwkLike(list):
 class AwkLike(_AwkLike):
     """
     Awk-like functionality, reading from file
-
     """
 
     def __init__(self, filename=None, minLength = -1, commentString = None, minNF = -1,
@@ -186,42 +185,64 @@ class AwkLike(_AwkLike):
         else:
             self.FILENAME = filename
             if not os.path.exists(filename):
-                ntu.nTerror("Failed to find: [%s]" % filename)
+                ntu.nTerror('AwkLike: Failed to find file "%s"' % filename)
                 self.f = None
             else:
                 self.f = open(filename,'r')
         #end if
     #end def
 
+    def _readLine(self):
+        """Read the next line
+        return line or None on EOF
+        """
+        if self.f is None:
+            return None
+        line = self.f.readline()
+        if len(line) == 0:
+            return None
+        if line[-1:] == '\n':
+                return line[:-1] # strip any \n
+        return line
+    #end def
+
     def __iter__(self):
         """iterations routine
         """
-        if not self.f:
+        return self
+    #end def
+
+    def next(self):
+        """Get the next element"""
+        if self.f is None:
             raise StopIteration
 
-        for line in self.f:
-            if line[-1:] == '\n':
-                line = line[:-1] # strip any \n
-            returnVal = self._parseLine( line )
-            if returnVal < 0:
-                self.close()
-                raise StopIteration
-            elif returnVal == 0:
-                pass
-            else:
-                yield(self)
-            #end if
-        #end for
-        self.close()
-        raise StopIteration
+        line = self._readLine()
+        if line is None:
+            self.close()
+            raise StopIteration
+
+        returnVal = self._parseLine( line )
+        if returnVal < 0:
+            self.close()
+            raise StopIteration
+        elif returnVal == 0:
+            return self.next()
+        else:
+            return self
+        #end if
     #end def
 
     def close(self):
         """internal routine"""
-        if not self.f:
-            ntu.nTerror("Can't close the file because it was not present.")
+        if self.FILENAME is None:
+            ntu.nTerror('AwkLike.close: Cannot close file')
             return
-        self.f.close()
+        if self.f is None:
+            ntu.nTerror('AwkLike.close: Cannot close "%s"', self.FILENAME)
+            return
+        if self.f is not sys.stdin:
+            self.f.close()
         self.f = None
     #end if
 #end class
@@ -248,19 +269,27 @@ class AwkLikeS( _AwkLike ):
         self.lines = str.splitlines()
         self.MAX_NR = len( self.lines) # pylint: disable=C0103
         self.FILENAME = 'string' # pylint: disable=C0103
+        self._lineCounter = -1  # Used in iterations
     #end def
 
     def __iter__(self):
-        for line in self.lines:
-            returnVal = self._parseLine(line)
-            if returnVal == -1:
-                raise StopIteration
-            elif returnVal == 0:
-                pass
-            else:
-                yield(self)
-            #end if
-        #end for
+        self._lineCounter = 0
+        return self
+    #end def
+
+    def next(self):
+        if self._lineCounter < 0:
+            raise StopIteration
+        if self._lineCounter >= self.MAX_NR:
+            raise StopIteration
+        returnVal = self._parseLine(self.lines[self._lineCounter])
+        self._lineCounter += 1
+        if returnVal == -1:
+            raise StopIteration
+        elif returnVal == 0:
+            return self.next()
+        else:
+            return self
     #end def
 #end class
 
@@ -272,10 +301,7 @@ class AwkLikeS( _AwkLike ):
 if __name__ == '__main__':
 
     txt = """
-# From YASARA BioTools
 # GWV 20130528: Added path routines
-# Visit www.yasara.org for more...
-# Copyright by Elmar Krieger
 from glob import glob
 from glob import glob1
 from optparse import OptionParser
@@ -295,3 +321,7 @@ x 10 5
 
     for line in AwkLikeS(txt):
         print line
+        if len(line) >= 2 and line[2] == 'This':
+            print 'doing 2 next'
+            line.next()
+            print line
