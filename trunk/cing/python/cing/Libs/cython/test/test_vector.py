@@ -1,11 +1,15 @@
+"""
+Unit test execute as:
+python $CINGROOT/python/cing/Libs/cython/test/test_vector.py
+"""
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.Libs.cython.superpose  import NTcVector #@UnresolvedImport
 from cing.core.molecule import Coordinate #@UnusedImport
 from cing.core.molecule import CoordinateOld #@UnusedImport
 from cing.core.molecule import nTdihedralOpt
 from unittest import TestCase
-import profile
-import pstats
+import profile #@UnusedImport
+import pstats #@UnusedImport
 import unittest #@UnusedImport
 
 class AllChecks(TestCase):
@@ -29,11 +33,11 @@ class AllChecks(TestCase):
 
     def testSuperposeChains(self):
         pass
-    
+
 if __name__ == "__main__":
-    cing.verbosity = verbosityDebug
-    profile.run('unittest.main()', 'fooprof')
-    p = pstats.Stats('fooprof')
+#     cing.verbosity = verbosityDebug
+#     profile.run('unittest.main()', 'fooprof')
+#     p = pstats.Stats('fooprof')
 #    p.sort_stats('time').print_stats(10)
-    p.sort_stats('cumulative').print_stats(20)
-#    unittest.main()
+#     p.sort_stats('cumulative').print_stats(20)
+    unittest.main() # or just use this line to test without profiling.
