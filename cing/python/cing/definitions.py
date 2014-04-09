@@ -117,7 +117,7 @@ class CingDefinitions(Adict.Adict):
         self.issueUrl        = 'http://code.google.com/p/cing/issues/detail?id='
 
         self.authors         = [  ('Geerten W. Vuister',          'gv29@le.ac.uk'),
-                                  ('Jurgen F. Doreleijers',       'jurgend@cmbi.ru.nl'),
+                                  ('Jurgen F. Doreleijers',       'jurgenfd@gmail.com'),
                                   ('Alan Wilter Sousa da Silva',  'alanwilter@gmail.com'),
                                ]
 
