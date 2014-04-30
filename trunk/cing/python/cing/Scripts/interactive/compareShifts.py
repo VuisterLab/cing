@@ -18,7 +18,7 @@ from math import fabs
 #------------------------------------------------------------------------------------------
 # Parameters
 #------------------------------------------------------------------------------------------
-hydrogenFactor = 5.0 # weight of 1H delta shift relative to 13C/15N
+hydrogenFactor = 7.0 # weight of 1H delta shift relative to 13C/15N
 
 #------------------------------------------------------------------------------------------
 # Routines
@@ -33,6 +33,8 @@ def compareAtms(atm1, atm2):
         if (atm1.db.spinType == '1H'):
             delta *= hydrogenFactor
         #end if
+
+        #expand the delta shift to real atoms
         if atm1.isPseudoAtom():
             atms = atm1.realAtoms()
         else:
@@ -46,15 +48,15 @@ def compareAtms(atm1, atm2):
 #end def
 
 
-def mkYasaraMacro( mol, attr, path ):
+def mkYasaraMacro(mol, attr, path):
     """Create a Yasara macro using attr
     """
-    nTmessage('==> Creating macro %s\n', path )
-    yasara = open( path, 'w')
+    nTmessage('==> Creating macro %s\n', path)
+    yasara = open(path, 'w')
 
-    fprintf( yasara,  'Console off\n' )
-    fprintf( yasara,  'ColorAtom All,Gray\n' )
-    fprintf( yasara,  'PropAtom All,-999\n' )
+    fprintf(yasara, 'Console off\n')
+    fprintf(yasara, 'ColorAtom All,Gray\n')
+    fprintf(yasara, 'PropAtom All,-999\n')
 
     for atm in mol.allAtoms():
         an = atm.translate('PDB')
@@ -67,18 +69,18 @@ def mkYasaraMacro( mol, attr, path ):
 #            print '>',atm[attr]
             a = 1.0 - atm[attr]
             a = max( a, 0.0 )
-            fprintf( yasara,  'PropAtom residue %d atom %s,%.2f\n', atm.residue.resNum, an, a )
+            fprintf(yasara, 'PropAtom residue %d atom %s,%.2f\n', atm.residue.resNum, an, a)
         #end if
     #end for
 
-    fprintf( yasara,  'Console off\n' )
-    fprintf( yasara,  'ColorAll Property\n' )
-    fprintf( yasara,  'Console on\n' )
+    fprintf(yasara, 'Console off\n')
+    fprintf(yasara, 'ColorAll Property\n')
+    fprintf(yasara, 'Console on\n')
     yasara.close()
 #end def
 
 
-def average( atm ):
+def average(atm):
     """Average value of atom with those of assigned neighbors"""
     if atm.has_key('deltaAverage'): del(atm['deltaAverage'])
     values = NTlist()
@@ -97,7 +99,8 @@ def average( atm ):
 
 def mapMolecule(molA, molB):
     """
-    Map mol, chains, residues and atoms
+    Map mol, chains, residues and atoms instances between molA and molB.
+    set a map attribute for all of these: None indicates no map found.
     """
     molA.map = molB
     molB.map = molA
@@ -109,13 +112,14 @@ def mapMolecule(molA, molB):
 
     for objA in molA.allChains() + molA.allResidues() + molA.allAtoms():
         pidA = objA.asPid()
+        # create the corresponding pid for objB
         pidB = pidA.modify(1,molB.name)
         if pidA[0] == 'Atom':
-            # change residue to look for matching atoms; to circumvent mutations
+            # change residue to look for matching atoms; to deal with mutations in the sequence
             resNum = objA._parent.resNum
             pidB = pid.makePid('Atom', molB.name, 'A', molB.A[resNum].name, pidA[4])
-            #print '>>', pidA, pidB
         #end if
+        # see if objB exists
         objB = molB.project.getByPid(pidB)
         if objB is not None:
             objA.map = objB
@@ -128,9 +132,9 @@ def mapMolecule(molA, molB):
 def compare( project1, project2 ):
     """Compare the shifts of all equivalent atoms.
     """
-    if project1.molecule is None:
+    if project1 is None or project1.molecule is None:
         return True
-    if project2.molecule is None:
+    if project2 is None or project2.molecule is None:
         return True
 
     mol1 = project1.molecule
@@ -164,6 +168,8 @@ def printShifts(project):
     """
     fname = 'shifts-{0}-{1}.txt'.format(project.name, project.molecule.map.project.name)
     with open(fname,'w') as fp:
+        fp.write('# atom  resNum shift(%s)  shift(%s)  delta  deltaAverage\n' %
+                 (project.name, project.molecule.map.project.name))
         for atm in project.molecule.allAtoms():
             delta = atm.setdefault('delta', fpconst.NaN)
             deltaAverage = atm.setdefault('deltaAverage', fpconst.NaN)
@@ -171,9 +177,9 @@ def printShifts(project):
                 shift2 = fpconst.NaN
             else:
                 shift2 = atm.map.shift()
-            msg = '{0:20s}  {1:7.3f}  {2:7.3f}  {3:7.3f}  {4:7.3f}\n'.format(
-                        atm, atm.shift(), shift2, delta, deltaAverage)
-            io.message(msg)
+            msg = '{0:20s} {1:4d}  {2:7.3f}  {3:7.3f}  {4:7.3f}  {5:7.3f}\n'.format(
+                        atm, atm.residue.resNum, atm.shift(), shift2, delta, deltaAverage)
+            #io.message(msg)
             fp.write(msg)
         #end for
     #end with
@@ -189,6 +195,7 @@ def openProject(path, status):
     p.molecule.mergeResonances(append=False)
     return p
 #end def
+
 
 def calibrateShifts(project):
     """
@@ -228,32 +235,55 @@ def calibrateShifts(project):
 # compare(pCaM10V514, pCaM10)
 # printShifts(pCaM10V514)
 
-initialize = True
-if initialize:
+#switch on or off
+if True:
     #fedir
-    cam10v = openProject('CaM10V514_03112013.ccpn',constants.PROJECT_NEWFROMCCPN)
-    ##cam10v = openProject('CaM10V514_20022014.ccpn',constants.PROJECT_NEWFROMCCPN)
-    cam1v = openProject('CaMWTV514_16022014.ccpn',constants.PROJECT_NEWFROMCCPN)
-
+    cam10v5 = openProject('20140327CaM10V514',constants.PROJECT_NEWFROMCCPN)
+    cam1v5 = openProject('20140401CaM1V514',constants.PROJECT_NEWFROMCCPN)
+    # deassign cam1v5 Arg37.C
+    cam1v5.molecule.A[37].C.resonances().value = fpconst.NaN
     #ben
-    ##cam10 = openProject('CaM10.ccpn',constants.PROJECT_NEWFROMCCPN)
-    cam10 = openProject('CaM10_140219.ccpn',constants.PROJECT_NEWFROMCCPN)
-    for atm in cam10.molecule.allAtoms():
-         if (atm.name=='CA' or atm.name=='CB') and atm.isAssigned():
-             atm.resonances[0].value -= 0.975
-    cam1 = openProject('CaM1.ccpn',constants.PROJECT_NEWFROMCCPN)
+    cam10 = openProject('20140407Cam10',constants.PROJECT_NEWFROMCCPN)
+    cam1 = openProject('20140407Cam1',constants.PROJECT_NEWFROMCCPN)
+
+    cam10v6 = openProject('20140403Cam10V611',constants.PROJECT_NEWFROMCCPN)
+    cam1v6 = openProject('20140403CaM1V611',constants.PROJECT_NEWFROMCCPN)
+
 #end if
 
-#CaM10
-#compare(cam10v,cam10)
-#printShifts(cam10v)
+#switch on or off
+if True:
+    #CaM10 V5
+    compare(cam10v5,cam10)
+    printShifts(cam10v5)
 
-#CaM1
-#compare(cam1v,cam1)
-#printShifts(cam1v)
+    #CaM1 V5
+    compare(cam1v5,cam1)
+    printShifts(cam1v5)
 
-#Fedir
-compare(cam1v,cam10v)
-printShifts(cam1v)
+    #Fedir
+    compare(cam1v5,cam10v5)
+    printShifts(cam1v5)
 
+    #Ben
+    compare(cam1, cam10)
+    printShifts(cam1)
+
+    #CaM10 V6
+    compare(cam10v6,cam10)
+    printShifts(cam10v6)
+
+    #CaM1 V6
+    compare(cam1v6,cam1)
+    printShifts(cam1v6)
+
+    #CaM1 V5/V6
+    compare(cam1v5,cam1v6)
+    printShifts(cam1v5)
+
+    #CaM1 V5/V6
+    compare(cam10v5,cam10v6)
+    printShifts(cam10v5)
+
+#end if
 

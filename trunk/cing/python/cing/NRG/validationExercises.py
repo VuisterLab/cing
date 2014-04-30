@@ -123,8 +123,8 @@ class ValidationExercises(Lister):
                 return 0
 
             try:
-                _header_read = reader.next()
-#                nTdebug("read header: %s" % header_read)
+                _header_read = reader.next
+                #                nTdebug("read header: %s" % header_read)
                 for row in reader:
                     bmrb_code = row[0]
                     pdb_code = row[1]

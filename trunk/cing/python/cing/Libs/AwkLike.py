@@ -22,16 +22,17 @@ class _AwkLike(list):
 
     """
 
-    def __init__(self, minLength = -1, commentString = None, minNF = -1,
-                 skipHeaderLines = 0, separator = None):
+    def __init__(self, minLength=-1, commentString=None, minNF=-1,
+                 skipHeaderLines=0, separator=None):
         list.__init__(self)
         self.minLength = minLength
         self.commentString = commentString
         self.minNF = minNF
         self.skipHeaderLines = skipHeaderLines
         self.separator = separator
-        self.NR = 0 # pylint: disable=C0103
-        self.NF = 0 # pylint: disable=C0103
+        self.NR = 0  # pylint: disable=C0103
+        self.NF = 0  # pylint: disable=C0103
+        self.FILENAME = None
     #end def
 
     def __iter__(self):
@@ -83,7 +84,7 @@ class _AwkLike(list):
             return 0
         elif self.minNF > 0 and self.NF < self.minNF:
             return 0
-        elif self.commentString and self.isComment( self.commentString ):
+        elif self.commentString and self.isComment(self.commentString):
             return 0
         elif self.minLength < 0 and l >= 0:
             return 1
@@ -95,7 +96,7 @@ class _AwkLike(list):
     def float(self, field):
         """Return field converted to float or NaN on error """
         try:
-            return float(self[ field ])
+            return float(self[field])
         except ValueError:
             ntu.nTerror('AwkLike: expected float for "%s" (file: %s, line %d: "%s")',
                         self[field],
@@ -116,7 +117,7 @@ class _AwkLike(list):
     def int(self, field):
         """Return field converted to int or NaN on error"""
         try:
-            return int(self[ field ])
+            return int(self[field])
         except ValueError:
             ntu.nTerror('AwkLike: expected integer for "%s" (file: %s, line %d: "%s")',
                         self[field],
@@ -135,12 +136,12 @@ class _AwkLike(list):
     #end def
 
     def printit(self):
-        ntu.nTmessage( '==> FILENAME=%s NR=%d NF=%d' % (self.FILENAME, self.NR, self.NF) )
-        for i, field in self.enumerate(): # can't use enumerate as that will loop throught the 'lines'
+        ntu.nTmessage('==> FILENAME=%s NR=%d NF=%d' % (self.FILENAME, self.NR, self.NF))
+        for i, field in self.enumerate():  # can't use enumerate as that will loop through the 'lines'
             ntu.nTmessage('%2d >%s<' % (i, self[i]))
     #end def
 
-    def isComment(self, commentString = '#'):
+    def isComment(self, commentString='#'):
         """check for commentString on start of line
            return True or False
         """
@@ -152,7 +153,7 @@ class _AwkLike(list):
         return self.NF == 0
 
     def enumerate(self):
-        for i in range(len(self)): # can't use enumerate() as that will loop throught the 'lines'
+        for i in range(len(self)):  # can't use enumerate() as that will loop throught the 'lines'
             yield((i, self[i]))
     #end def
 
@@ -164,6 +165,7 @@ class _AwkLike(list):
     #end def
 #end class
 
+
 #
 #==============================================================================
 #
@@ -172,23 +174,23 @@ class AwkLike(_AwkLike):
     Awk-like functionality, reading from file
     """
 
-    def __init__(self, filename=None, minLength = -1, commentString = None, minNF = -1,
-                 skipHeaderLines = 0, separator = None):
+    def __init__(self, filename=None, minLength=-1, commentString=None, minNF=-1,
+                 skipHeaderLines=0, separator=None):
 
-        _AwkLike.__init__(self, minLength = minLength, commentString = commentString, minNF = minNF,
-                          skipHeaderLines = skipHeaderLines, separator = separator)
+        _AwkLike.__init__(self, minLength=minLength, commentString=commentString, minNF=minNF,
+                          skipHeaderLines=skipHeaderLines, separator=separator)
         self.f = None
 
-        if filename == None:
+        if filename is None:
             self.f = sys.stdin
-            self.FILENAME = 'stdin' # pylint: disable=C0103
+            self.FILENAME = 'stdin'  # pylint: disable=C0103
         else:
             self.FILENAME = filename
             if not os.path.exists(filename):
                 ntu.nTerror('AwkLike: Failed to find file "%s"' % filename)
                 self.f = None
             else:
-                self.f = open(filename,'r')
+                self.f = open(filename, 'r')
         #end if
     #end def
 
@@ -202,7 +204,7 @@ class AwkLike(_AwkLike):
         if len(line) == 0:
             return None
         if line[-1:] == '\n':
-                return line[:-1] # strip any \n
+                return line[:-1]  # strip any \n
         return line
     #end def
 
@@ -222,7 +224,7 @@ class AwkLike(_AwkLike):
             self.close()
             raise StopIteration
 
-        returnVal = self._parseLine( line )
+        returnVal = self._parseLine(line)
         if returnVal < 0:
             self.close()
             raise StopIteration
@@ -247,29 +249,31 @@ class AwkLike(_AwkLike):
     #end if
 #end class
 
+
 #
 #==============================================================================
 #
-class AwkLikeS( _AwkLike ):
+class AwkLikeS(_AwkLike):
     """
         Awk-like functionality on string
 
     """
 
-    def __init__(self, str, minLength = -1, commentString = None, minNF = -1,
-                 skipHeaderLines = 0, separator = None):
+    def __init__(self, string, minLength=-1, commentString=None, minNF=-1,
+                 skipHeaderLines=0, separator=None):
 
-        _AwkLike.__init__(self, minLength = minLength, commentString = commentString, minNF = minNF,
-                 skipHeaderLines = skipHeaderLines, separator = separator)
+        _AwkLike.__init__(self, minLength=minLength, commentString=commentString, minNF=minNF,
+                 skipHeaderLines=skipHeaderLines, separator=separator)
 
-        if (not str) or (len(str)<=0):
-            self.lines = None
-            return None
-
-        self.lines = str.splitlines()
-        self.MAX_NR = len( self.lines) # pylint: disable=C0103
-        self.FILENAME = 'string' # pylint: disable=C0103
-        self._lineCounter = -1  # Used in iterations
+        if (not string) or (len(string) <= 0):
+            self.lines = []
+            self.MAX_NR = 0
+        else:
+            self.lines = string.splitlines()
+            self.MAX_NR = len(self.lines)  # pylint: disable=C0103
+        #end if
+        self.FILENAME = 'string'  # pylint: disable=C0103
+        self._lineCounter = -1    # Used in iterations
     #end def
 
     def __iter__(self):
@@ -319,9 +323,9 @@ x 10 5
 
 # This program is free soft"""
 
-    for line in AwkLikeS(txt):
-        print line
-        if len(line) >= 2 and line[2] == 'This':
+    for l in AwkLikeS(txt):
+        print l
+        if len(l) >= 2 and l[2] == 'This':
             print 'doing 2 next'
-            line.next()
-            print line
+            l.next()
+            print l

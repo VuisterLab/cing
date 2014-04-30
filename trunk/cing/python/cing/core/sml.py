@@ -794,7 +794,7 @@ class SMLAtomHandler( SMLhandler ):
         if atm == None: # TODO: check this code.
             # Could not find anything:
             # to maintain compatibility of all Jurgen's old stuff:
-            # try to add it on the fly.
+            #  try to add it on the fly.
 #            nTdebug('SMLAtomHandler.handle: line %d, could not properly decode nameTuple %s', fp.NR, str(nameTuple))
             resTuple = list(nameTuple)
             resTuple[3] = None

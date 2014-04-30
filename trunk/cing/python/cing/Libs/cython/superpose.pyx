@@ -93,7 +93,6 @@ cdef class NTcVector:
     def __next__( NTcVector self ):
         if (self.iterCount < 0 or self.iterCount == VECTOR_SIZE):
             raise StopIteration
-            return None
         #end if
         self.iterCount = self.iterCount+1
         return self.e[self.iterCount-1]
@@ -341,12 +340,10 @@ cdef class NTcMatrix:
         except:
             stderr.write( "_"*BARLENGTH +"\n!!! Error NTcMatrix: invalid indexTuple >%s<.\n" % str(indexTuple) )
             raise IndexError
-            return None
         #end try
         if (l != 2):
             stderr.write( "_"*BARLENGTH +"\n!!! Error NTcMatrix: invalid indexTuple >%s<.\n" % str(indexTuple) )
             raise IndexError
-            return None
         #end if
         i = indexTuple[0]
         j = indexTuple[1]
