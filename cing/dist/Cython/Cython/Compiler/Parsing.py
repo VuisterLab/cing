@@ -14,7 +14,7 @@ from Errors import error, InternalError
 def p_ident(s, message = "Expected an identifier"):
     if s.sy == 'IDENT':
         name = s.systring
-        s.next()
+        s.next
         return name
     else:
         s.error(message)
@@ -23,10 +23,10 @@ def p_ident_list(s):
     names = []
     while s.sy == 'IDENT':
         names.append(s.systring)
-        s.next()
+        s.next
         if s.sy != ',':
             break
-        s.next()
+        s.next
     return names
 
 #------------------------------------------
@@ -42,7 +42,7 @@ def p_binop_expr(s, ops, p_sub_expr):
     while s.sy in ops:
         op = s.sy
         pos = s.position()
-        s.next()
+        s.next
         n2 = p_sub_expr(s)
         n1 = ExprNodes.binop_node(pos, op, n1, n2)
     return n1
@@ -53,10 +53,10 @@ def p_simple_expr(s):
     pos = s.position()
     expr = p_or_test(s)
     if s.sy == 'if':
-        s.next()
+        s.next
         test = p_or_test(s)
         if s.sy == 'else':
-            s.next()
+            s.next
             other = p_test(s)
             return ExprNodes.CondExprNode(pos, test=test, true_val=expr, false_val=other)
         else:
@@ -80,7 +80,7 @@ def p_rassoc_binop_expr(s, ops, p_subexpr):
     if s.sy in ops:
         pos = s.position()
         op = s.sy
-        s.next()
+        s.next
         n2 = p_rassoc_binop_expr(s, ops, p_subexpr)
         n1 = ExprNodes.binop_node(pos, op, n1, n2)
     return n1
@@ -96,7 +96,7 @@ def p_and_test(s):
 def p_not_test(s):
     if s.sy == 'not':
         pos = s.position()
-        s.next()
+        s.next
         return ExprNodes.NotNode(pos, operand = p_not_test(s))
     else:
         return p_comparison(s)
@@ -128,19 +128,19 @@ def p_cascaded_cmp(s):
 
 def p_cmp_op(s):
     if s.sy == 'not':
-        s.next()
+        s.next
         s.expect('in')
         op = 'not_in'
     elif s.sy == 'is':
-        s.next()
+        s.next
         if s.sy == 'not':
-            s.next()
+            s.next
             op = 'is_not'
         else:
             op = 'is'
     else:
         op = s.sy
-        s.next()
+        s.next
     if op == '<>':
         op = '!='
     return op
@@ -187,11 +187,11 @@ def p_factor(s):
     if sy in ('+', '-', '~'):
         op = s.sy
         pos = s.position()
-        s.next()
+        s.next
         return ExprNodes.unop_node(pos, op, p_factor(s))
     elif sy == '&':
         pos = s.position()
-        s.next()
+        s.next
         arg = p_factor(s)
         return ExprNodes.AmpersandNode(pos, operand = arg)
     elif sy == "<":
@@ -204,11 +204,11 @@ def p_factor(s):
 def p_typecast(s):
     # s.sy == "<"
     pos = s.position()
-    s.next()
+    s.next
     base_type = p_c_base_type(s)
     declarator = p_c_declarator(s, empty = 1)
     if s.sy == '?':
-        s.next()
+        s.next
         typecheck = 1
     else:
         typecheck = 0
@@ -223,7 +223,7 @@ def p_typecast(s):
 def p_sizeof(s):
     # s.sy == ident "sizeof"
     pos = s.position()
-    s.next()
+    s.next
     s.expect('(')
     if looking_at_type(s) or looking_at_dotted_name(s):
         base_type = p_c_base_type(s)
@@ -244,7 +244,7 @@ def p_power(s):
         n1 = p_trailer(s, n1)
     if s.sy == '**':
         pos = s.position()
-        s.next()
+        s.next
         n2 = p_factor(s)
         n1 = ExprNodes.binop_node(pos, '**', n1, n2)
     return n1
@@ -258,7 +258,7 @@ def p_trailer(s, node1):
     elif s.sy == '[':
         return p_index(s, node1)
     else: # s.sy == '.'
-        s.next()
+        s.next
         name = p_ident(s)
         return ExprNodes.AttributeNode(pos, 
             obj = node1, attribute = name)
@@ -269,7 +269,7 @@ def p_trailer(s, node1):
 def p_call(s, function):
     # s.sy == '('
     pos = s.position()
-    s.next()
+    s.next
     positional_args = []
     keyword_args = []
     star_arg = None
@@ -277,7 +277,7 @@ def p_call(s, function):
     while s.sy not in ('*', '**', ')'):
         arg = p_simple_expr(s)
         if s.sy == '=':
-            s.next()
+            s.next
             if not arg.is_name:
                 s.error("Expected an identifier before '='",
                     pos = arg.pos)
@@ -292,17 +292,17 @@ def p_call(s, function):
             positional_args.append(arg)
         if s.sy != ',':
             break
-        s.next()
+        s.next
     if s.sy == '*':
-        s.next()
+        s.next
         star_arg = p_simple_expr(s)
         if s.sy == ',':
-            s.next()
+            s.next
     if s.sy == '**':
-        s.next()
+        s.next
         starstar_arg = p_simple_expr(s)
         if s.sy == ',':
-            s.next()
+            s.next
     s.expect(')')
     if not (keyword_args or star_arg or starstar_arg):
         return ExprNodes.SimpleCallNode(pos,
@@ -340,7 +340,7 @@ def p_call(s, function):
 def p_index(s, base):
     # s.sy == '['
     pos = s.position()
-    s.next()
+    s.next
     subscripts = p_subscript_list(s)
     if len(subscripts) == 1 and len(subscripts[0]) == 2:
         start, stop = subscripts[0]
@@ -360,7 +360,7 @@ def p_index(s, base):
 def p_subscript_list(s):
     items = [p_subscript(s)]
     while s.sy == ',':
-        s.next()
+        s.next
         if s.sy == ']':
             break
         items.append(p_subscript(s))
@@ -380,11 +380,11 @@ def p_subscript(s):
         start = p_slice_element(s, (':',))
         if s.sy != ':':
             return [start]
-        s.next()
+        s.next
         stop = p_slice_element(s, (':', ',', ']'))
         if s.sy != ':':
             return [start, stop]
-        s.next()
+        s.next
         step = p_slice_element(s, (':', ',', ']'))
         return [start, stop, step]
 
@@ -430,7 +430,7 @@ def p_atom(s):
     pos = s.position()
     sy = s.sy
     if sy == '(':
-        s.next()
+        s.next
         if s.sy == ')':
             result = ExprNodes.TupleNode(pos, args = [])
         else:
@@ -445,19 +445,19 @@ def p_atom(s):
         return p_backquote_expr(s)
     elif sy == 'INT':
         value = s.systring
-        s.next()
+        s.next
         return ExprNodes.IntNode(pos, value = value)
     elif sy == 'LONG':
         value = s.systring
-        s.next()
+        s.next
         return ExprNodes.LongNode(pos, value = value)
     elif sy == 'FLOAT':
         value = s.systring
-        s.next()
+        s.next
         return ExprNodes.FloatNode(pos, value = value)
     elif sy == 'IMAG':
         value = s.systring[:-1]
-        s.next()
+        s.next
         return ExprNodes.ImagNode(pos, value = value)
     elif sy == 'STRING' or sy == 'BEGIN_STRING':
         kind, value = p_cat_string_literal(s)
@@ -467,7 +467,7 @@ def p_atom(s):
             return ExprNodes.StringNode(pos, value = value)
     elif sy == 'IDENT':
         name = s.systring
-        s.next()
+        s.next
         if name == "None":
             return ExprNodes.NoneNode(pos)
         elif name == "True":
@@ -477,7 +477,7 @@ def p_atom(s):
         else:
             return p_name(s, name)
     elif sy == 'NULL':
-        s.next()
+        s.next
         return ExprNodes.NullNode(pos)
     else:
         s.error("Expected an identifier or literal")
@@ -532,7 +532,7 @@ def p_string_literal(s):
     # Returns (kind, value) where kind in ('', 'c', 'r', 'u')
     if s.sy == 'STRING':
         value = unquote(s.systring)
-        s.next()
+        s.next
         return value
     # s.sy == 'BEGIN_STRING'
     pos = s.position()
@@ -542,7 +542,7 @@ def p_string_literal(s):
         kind = ''
     chars = []
     while 1:
-        s.next()
+        s.next
         sy = s.sy
         #print "p_string_literal: sy =", sy, repr(s.systring) ###
         if sy == 'CHARS':
@@ -592,7 +592,7 @@ def p_string_literal(s):
             s.error(
                 "Unexpected token %r:%r in string literal" %
                     (sy, s.systring))
-    s.next()
+    s.next
     value = ''.join(chars)
     #print "p_string_literal: value =", repr(value) ###
     return kind, value
@@ -646,7 +646,7 @@ def unquote(s):
 def p_list_maker(s):
     # s.sy == '['
     pos = s.position()
-    s.next()
+    s.next
     if s.sy == ']':
         s.expect(']')
         return ExprNodes.ListNode(pos, args = [])
@@ -665,7 +665,7 @@ def p_list_maker(s):
     else:
         exprs = [expr]
         if s.sy == ',':
-            s.next()
+            s.next
             exprs += p_simple_expr_list(s)
         s.expect(']')
         return ExprNodes.ListNode(pos, args = exprs)
@@ -681,7 +681,7 @@ def p_list_iter(s):
 def p_list_for(s):
     # s.sy == 'for'
     pos = s.position()
-    s.next()
+    s.next
     kw = p_for_bounds(s)
     kw['else_clause'] = None
     kw['body'] = p_list_iter(s)
@@ -690,7 +690,7 @@ def p_list_for(s):
 def p_list_if(s):
     # s.sy == 'if'
     pos = s.position()
-    s.next()
+    s.next
     test = p_test(s)
     return Nodes.IfStatNode(pos, 
         if_clauses = [Nodes.IfClauseNode(pos, condition = test, body = p_list_iter(s))],
@@ -701,13 +701,13 @@ def p_list_if(s):
 def p_dict_maker(s):
     # s.sy == '{'
     pos = s.position()
-    s.next()
+    s.next
     items = []
     while s.sy != '}':
         items.append(p_dict_item(s))
         if s.sy != ',':
             break
-        s.next()
+        s.next
     s.expect('}')
     return ExprNodes.DictNode(pos, key_value_pairs = items)
     
@@ -720,7 +720,7 @@ def p_dict_item(s):
 def p_backquote_expr(s):
     # s.sy == '`'
     pos = s.position()
-    s.next()
+    s.next
     arg = p_expr(s)
     s.expect('`')
     return ExprNodes.BackquoteNode(pos, arg = arg)
@@ -731,14 +731,14 @@ def p_simple_expr_list(s):
         exprs.append(p_simple_expr(s))
         if s.sy != ',':
             break
-        s.next()
+        s.next
     return exprs
 
 def p_expr(s):
     pos = s.position()
     expr = p_simple_expr(s)
     if s.sy == ',':
-        s.next()
+        s.next
         exprs = [expr] + p_simple_expr_list(s)
         return ExprNodes.TupleNode(pos, args = exprs)
     else:
@@ -754,7 +754,7 @@ def p_testlist(s):
     if s.sy == ',':
         exprs = [expr]
         while s.sy == ',':
-            s.next()
+            s.next
             exprs.append(p_test(s))
         return ExprNodes.TupleNode(pos, args = exprs)
     else:
@@ -771,14 +771,14 @@ expr_terminators = (')', ']', '}', ':', '=', 'NEWLINE')
 def p_global_statement(s):
     # assume s.sy == 'global'
     pos = s.position()
-    s.next()
+    s.next
     names = p_ident_list(s)
     return Nodes.GlobalNode(pos, names = names)
 
 def p_expression_or_assignment(s):
     expr_list = [p_expr(s)]
     while s.sy == '=':
-        s.next()
+        s.next
         expr_list.append(p_expr(s))
     if len(expr_list) == 1:
         if re.match("[+*/\%^\&|-]=", s.sy):
@@ -786,7 +786,7 @@ def p_expression_or_assignment(s):
             if not isinstance(lhs, (ExprNodes.AttributeNode, ExprNodes.IndexNode, ExprNodes.NameNode) ):
                 error(lhs.pos, "Illegal operand for inplace operation.")
             operator = s.sy[0]
-            s.next()
+            s.next
             rhs = p_expr(s)
             return Nodes.InPlaceAssignmentNode(lhs.pos, operator = operator, lhs = lhs, rhs = rhs)
         expr = expr_list[0]
@@ -850,7 +850,7 @@ def find_parallel_assignment_size(input):
 def p_print_statement(s):
     # s.sy == 'print'
     pos = s.position()
-    s.next()
+    s.next
     if s.sy == '>>':
         s.error("'print >>' not yet implemented")
     args = []
@@ -858,7 +858,7 @@ def p_print_statement(s):
     if s.sy not in ('NEWLINE', 'EOF'):
         args.append(p_simple_expr(s))
         while s.sy == ',':
-            s.next()
+            s.next
             if s.sy in ('NEWLINE', 'EOF'):
                 ewc = 1
                 break
@@ -869,7 +869,7 @@ def p_print_statement(s):
 def p_del_statement(s):
     # s.sy == 'del'
     pos = s.position()
-    s.next()
+    s.next
     args = p_simple_expr_list(s)
     return Nodes.DelStatNode(pos, args = args)
 
@@ -883,19 +883,19 @@ def p_pass_statement(s, with_newline = 0):
 def p_break_statement(s):
     # s.sy == 'break'
     pos = s.position()
-    s.next()
+    s.next
     return Nodes.BreakStatNode(pos)
 
 def p_continue_statement(s):
     # s.sy == 'continue'
     pos = s.position()
-    s.next()
+    s.next
     return Nodes.ContinueStatNode(pos)
 
 def p_return_statement(s):
     # s.sy == 'return'
     pos = s.position()
-    s.next()
+    s.next
     if s.sy not in statement_terminators:
         value = p_expr(s)
     else:
@@ -905,17 +905,17 @@ def p_return_statement(s):
 def p_raise_statement(s):
     # s.sy == 'raise'
     pos = s.position()
-    s.next()
+    s.next
     exc_type = None
     exc_value = None
     exc_tb = None
     if s.sy not in statement_terminators:
         exc_type = p_simple_expr(s)
         if s.sy == ',':
-            s.next()
+            s.next
             exc_value = p_simple_expr(s)
             if s.sy == ',':
-                s.next()
+                s.next
                 exc_tb = p_simple_expr(s)
     if exc_type or exc_value or exc_tb:
         return Nodes.RaiseStatNode(pos, 
@@ -929,10 +929,10 @@ def p_import_statement(s):
     # s.sy in ('import', 'cimport')
     pos = s.position()
     kind = s.sy
-    s.next()
+    s.next
     items = [p_dotted_name(s, as_allowed = 1)]
     while s.sy == ',':
-        s.next()
+        s.next
         items.append(p_dotted_name(s, as_allowed = 1))
     stats = []
     for pos, target_name, dotted_name, as_name in items:
@@ -959,19 +959,19 @@ def p_import_statement(s):
 def p_from_import_statement(s):
     # s.sy == 'from'
     pos = s.position()
-    s.next()
+    s.next
     (dotted_name_pos, _, dotted_name, _) = \
         p_dotted_name(s, as_allowed = 0)
     if s.sy in ('import', 'cimport'):
         kind = s.sy
-        s.next()
+        s.next
     else:
         s.error("Expected 'import' or 'cimport'")
     if s.sy == '*':
         s.error("'import *' not supported")
     imported_names = [p_imported_name(s)]
     while s.sy == ',':
-        s.next()
+        s.next
         imported_names.append(p_imported_name(s))
     if kind == 'cimport':
         for (name_pos, name, as_name) in imported_names:
@@ -1011,7 +1011,7 @@ def p_dotted_name(s, as_allowed):
     as_name = None
     names = [target_name]
     while s.sy == '.':
-        s.next()
+        s.next
         names.append(p_ident(s))
     if as_allowed:
         as_name = p_as_name(s)
@@ -1019,7 +1019,7 @@ def p_dotted_name(s, as_allowed):
 
 def p_as_name(s):
     if s.sy == 'IDENT' and s.systring == 'as':
-        s.next()
+        s.next
         return p_ident(s)
     else:
         return None
@@ -1027,10 +1027,10 @@ def p_as_name(s):
 def p_assert_statement(s):
     # s.sy == 'assert'
     pos = s.position()
-    s.next()
+    s.next
     cond = p_simple_expr(s)
     if s.sy == ',':
-        s.next()
+        s.next
         value = p_simple_expr(s)
     else:
         value = None
@@ -1041,10 +1041,10 @@ statement_terminators = (';', 'NEWLINE', 'EOF')
 def p_if_statement(s):
     # s.sy == 'if'
     pos = s.position()
-    s.next()
+    s.next
     if_clauses = [p_if_clause(s)]
     while s.sy == 'elif':
-        s.next()
+        s.next
         if_clauses.append(p_if_clause(s))
     else_clause = p_else_clause(s)
     return Nodes.IfStatNode(pos,
@@ -1059,7 +1059,7 @@ def p_if_clause(s):
 
 def p_else_clause(s):
     if s.sy == 'else':
-        s.next()
+        s.next
         return p_suite(s)
     else:
         return None
@@ -1067,7 +1067,7 @@ def p_else_clause(s):
 def p_while_statement(s):
     # s.sy == 'while'
     pos = s.position()
-    s.next()
+    s.next
     test = p_simple_expr(s)
     body = p_suite(s)
     else_clause = p_else_clause(s)
@@ -1078,7 +1078,7 @@ def p_while_statement(s):
 def p_for_statement(s):
     # s.sy == 'for'
     pos = s.position()
-    s.next()
+    s.next
     kw = p_for_bounds(s)
     kw['body'] = p_suite(s)
     kw['else_clause'] = p_else_clause(s)
@@ -1087,11 +1087,11 @@ def p_for_statement(s):
 def p_for_bounds(s):
     target = p_for_target(s)
     if s.sy == 'in':
-        s.next()
+        s.next
         iterator = p_for_iterator(s)
         return { 'target': target, 'iterator': iterator }
     elif s.sy == 'from':
-        s.next()
+        s.next
         bound1 = p_bit_expr(s)
         rel1 = p_for_from_relation(s)
         name2_pos = s.position()
@@ -1119,14 +1119,14 @@ def p_for_bounds(s):
 def p_for_from_relation(s):
     if s.sy in inequality_relations:
         op = s.sy
-        s.next()
+        s.next
         return op
     else:
         s.error("Expected one of '<', '<=', '>' '>='")
 
 def p_for_from_step(s):
     if s.sy == 'by':
-        s.next()
+        s.next
         step = p_bit_expr(s)
         return step
     else:
@@ -1138,13 +1138,13 @@ def p_for_target(s):
     pos = s.position()
     expr = p_bit_expr(s)
     if s.sy == ',':
-        s.next()
+        s.next
         exprs = [expr]
         while s.sy != 'in':
             exprs.append(p_bit_expr(s))
             if s.sy != ',':
                 break
-            s.next()
+            s.next
         return ExprNodes.TupleNode(pos, args = exprs)
     else:
         return expr
@@ -1157,7 +1157,7 @@ def p_for_iterator(s):
 def p_try_statement(s):
     # s.sy == 'try'
     pos = s.position()
-    s.next()
+    s.next
     body = p_suite(s)
     except_clauses = []
     else_clause = None
@@ -1165,7 +1165,7 @@ def p_try_statement(s):
         while s.sy == 'except':
             except_clauses.append(p_except_clause(s))
         if s.sy == 'else':
-            s.next()
+            s.next
             else_clause = p_suite(s)
         body = Nodes.TryExceptStatNode(pos,
             body = body, except_clauses = except_clauses,
@@ -1174,7 +1174,7 @@ def p_try_statement(s):
             return body
         # try-except-finally is equivalent to nested try-except/try-finally
     if s.sy == 'finally':
-        s.next()
+        s.next
         finally_clause = p_suite(s)
         return Nodes.TryFinallyStatNode(pos,
             body = body, finally_clause = finally_clause)
@@ -1184,13 +1184,13 @@ def p_try_statement(s):
 def p_except_clause(s):
     # s.sy == 'except'
     pos = s.position()
-    s.next()
+    s.next
     exc_type = None
     exc_value = None
     if s.sy != ':':
         exc_type = p_simple_expr(s)
         if s.sy == ',':
-            s.next()
+            s.next
             exc_value = p_simple_expr(s)
     body = p_suite(s)
     return Nodes.ExceptClauseNode(pos,
@@ -1198,7 +1198,7 @@ def p_except_clause(s):
 
 def p_include_statement(s, level):
     pos = s.position()
-    s.next() # 'include'
+    s.next  # 'include'
     _, include_file_name = p_string_literal(s)
     s.expect_newline("Syntax error in include statement")
     if s.compile_time_eval:
@@ -1218,11 +1218,11 @@ def p_include_statement(s, level):
 
 def p_with_statement(s):
     pos = s.position()
-    s.next() # 'with'
+    s.next  # 'with'
 #	if s.sy == 'IDENT' and s.systring in ('gil', 'nogil'):
     if s.sy == 'IDENT' and s.systring == 'nogil':
         state = s.systring
-        s.next()
+        s.next
         body = p_suite(s)
         return Nodes.GILStatNode(pos, state = state, body = body)
     else:
@@ -1265,7 +1265,7 @@ def p_simple_statement_list(s):
         stats = [stat]
         while s.sy == ';':
             #print "p_simple_statement_list: maybe more to follow" ###
-            s.next()
+            s.next
             if s.sy in ('NEWLINE', 'EOF'):
                 break
             stats.append(p_simple_statement(s))
@@ -1283,7 +1283,7 @@ def p_compile_time_expr(s):
 def p_DEF_statement(s):
     pos = s.position()
     denv = s.compile_time_env
-    s.next() # 'DEF'
+    s.next  # 'DEF'
     name = p_ident(s)
     s.expect('=')
     expr = p_compile_time_expr(s)
@@ -1300,7 +1300,7 @@ def p_IF_statement(s, level, cdef_flag, visibility, api):
     denv = s.compile_time_env
     result = None
     while 1:
-        s.next() # 'IF' or 'ELIF'
+        s.next  # 'IF' or 'ELIF'
         expr = p_compile_time_expr(s)
         s.compile_time_eval = current_eval and bool(expr.compile_time_value(denv))
         body = p_suite(s, level, cdef_flag, visibility, api = api)
@@ -1310,7 +1310,7 @@ def p_IF_statement(s, level, cdef_flag, visibility, api):
         if s.sy != 'ELIF':
             break
     if s.sy == 'ELSE':
-        s.next()
+        s.next
         s.compile_time_eval = current_eval
         body = p_suite(s, level, cdef_flag, visibility, api = api)
         if current_eval:
@@ -1335,11 +1335,11 @@ def p_statement(s, level, cdef_flag = 0, visibility = 'private', api = 0):
         overridable = 0
         if s.sy == 'cdef':
             cdef_flag = 1
-            s.next()
+            s.next
         if s.sy == 'cpdef':
             cdef_flag = 1
             overridable = 1
-            s.next()
+            s.next
         if cdef_flag:
             if level not in ('module', 'module_pxd', 'function', 'c_class', 'c_class_pxd'):
                 s.error('cdef statement not allowed here')
@@ -1405,7 +1405,7 @@ def p_suite(s, level = 'other', cdef_flag = 0,
     doc = None
     stmts = []
     if s.sy == 'NEWLINE':
-        s.next()
+        s.next
         s.expect_indent()
         if with_doc or with_pseudo_doc:
             doc = p_doc_string(s)
@@ -1439,7 +1439,7 @@ def p_c_base_type(s, self_flag = 0):
 def p_calling_convention(s):
     if s.sy == 'IDENT' and s.systring in calling_convention_words:
         result = s.systring
-        s.next()
+        s.next
         return result
     else:
         return ""
@@ -1449,7 +1449,7 @@ calling_convention_words = ("__stdcall", "__cdecl")
 def p_c_complex_base_type(s):
     # s.sy == '('
     pos = s.position()
-    s.next()
+    s.next
     base_type = p_c_base_type(s)
     declarator = p_c_declarator(s, empty = 1)
     s.expect(')')
@@ -1469,16 +1469,16 @@ def p_c_simple_base_type(s, self_flag):
         signed, longness = p_sign_and_longness(s)
         if s.sy == 'IDENT' and s.systring in basic_c_type_names:
             name = s.systring
-            s.next()
+            s.next
         else:
             name = 'int'
     elif s.looking_at_type_name() or looking_at_dotted_name(s):
         #print "p_c_simple_base_type: looking_at_type_name at", s.position()
         name = s.systring
-        s.next()
+        s.next
         while s.sy == '.':
             module_path.append(name)
-            s.next()
+            s.next
             name = p_ident(s)
     else:
         #print "p_c_simple_base_type: not looking at type at", s.position()
@@ -1498,7 +1498,7 @@ def looking_at_base_type(s):
 def looking_at_dotted_name(s):
     if s.sy == 'IDENT':
         name = s.systring
-        s.next()
+        s.next
         result = s.sy == '.'
         s.put_back('IDENT', name)
         return result
@@ -1524,7 +1524,7 @@ def p_sign_and_longness(s):
             longness = -1
         elif s.systring == 'long':
             longness += 1
-        s.next()
+        s.next
     return signed, longness
 
 def p_opt_cname(s):
@@ -1543,7 +1543,7 @@ def p_c_declarator(s, empty = 0, is_type = 0, cmethod_flag = 0, assignable = 0,
     # a function, it's a C method of an extension type.
     pos = s.position()
     if s.sy == '(':
-        s.next()
+        s.next
         if s.sy == ')' or looking_at_type(s):
             base = Nodes.CNameDeclaratorNode(pos, name = "", cname = None)
             result = p_c_func_declarator(s, pos, base, cmethod_flag)
@@ -1561,14 +1561,14 @@ def p_c_declarator(s, empty = 0, is_type = 0, cmethod_flag = 0, assignable = 0,
         if s.sy == '[':
             result = p_c_array_declarator(s, result)
         else: # sy == '('
-            s.next()
+            s.next
             result = p_c_func_declarator(s, pos, result, cmethod_flag)
         cmethod_flag = 0
     return result
 
 def p_c_array_declarator(s, base):
     pos = s.position()
-    s.next() # '['
+    s.next  # '['
     if s.sy != ']':
         dim = p_expr(s)
     else:
@@ -1594,12 +1594,12 @@ def p_c_simple_declarator(s, empty, is_type, cmethod_flag, assignable, nonempty)
     pos = s.position()
     calling_convention = p_calling_convention(s)
     if s.sy == '*':
-        s.next()
+        s.next
         base = p_c_declarator(s, empty, is_type, cmethod_flag, assignable, nonempty)
         result = Nodes.CPtrDeclaratorNode(pos, 
             base = base)
     elif s.sy == '**': # scanner returns this as a single token
-        s.next()
+        s.next
         base = p_c_declarator(s, empty, is_type, cmethod_flag, assignable, nonempty)
         result = Nodes.CPtrDeclaratorNode(pos,
             base = Nodes.CPtrDeclaratorNode(pos,
@@ -1612,10 +1612,10 @@ def p_c_simple_declarator(s, empty, is_type, cmethod_flag, assignable, nonempty)
                 s.add_type_name(name)
             if empty:
                 error(s.position(), "Declarator should be empty")
-            s.next()
+            s.next
             cname = p_opt_cname(s)
             if s.sy == '=' and assignable:
-                s.next()
+                s.next
                 rhs = p_simple_expr(s)
         else:
             if nonempty:
@@ -1629,14 +1629,14 @@ def p_c_simple_declarator(s, empty, is_type, cmethod_flag, assignable, nonempty)
 
 def p_nogil(s):
     if s.sy == 'IDENT' and s.systring == 'nogil':
-        s.next()
+        s.next
         return 1
     else:
         return 0
 
 def p_with_gil(s):
     if s.sy == 'with':
-        s.next()
+        s.next
         s.expect_keyword('gil')
         return 1
     else:
@@ -1646,21 +1646,21 @@ def p_exception_value_clause(s):
     exc_val = None
     exc_check = 0
     if s.sy == 'except':
-        s.next()
+        s.next
         if s.sy == '*':
             exc_check = 1
-            s.next()
+            s.next
         elif s.sy == '+':
             exc_check = '+'
-            s.next()
+            s.next
             if s.sy == 'IDENT':
                 name = s.systring
-                s.next()
+                s.next
                 exc_val = p_name(s, name)
         else:
             if s.sy == '?':
                 exc_check = 1
-                s.next()
+                s.next
             exc_val = p_simple_expr(s)
     return exc_val, exc_check
 
@@ -1691,7 +1691,7 @@ def p_c_arg_list(s, in_pyfunc, cmethod_flag = 0, nonempty_declarators = 0,
             nonempty = nonempty_declarators, kw_only = kw_only))
         if s.sy != ',':
             break
-        s.next()
+        s.next
         is_self_arg = 0
     return args
 
@@ -1709,21 +1709,21 @@ def p_c_arg_decl(s, in_pyfunc, cmethod_flag = 0, nonempty = 0, kw_only = 0):
     base_type = p_c_base_type(s, cmethod_flag)
     declarator = p_c_declarator(s, nonempty = nonempty)
     if s.sy == 'not':
-        s.next()
+        s.next
         if s.sy == 'IDENT' and s.systring == 'None':
-            s.next()
+            s.next
         else:
             s.error("Expected 'None'")
         if not in_pyfunc:
             error(pos, "'not None' only allowed in Python functions")
         not_none = 1
     if s.sy == '=':
-        s.next()
+        s.next
         if 'pxd' in s.level:
             if s.sy not in ['*', '?']:
                 error(pos, "default values cannot be specified in pxd files, use ? or *")
             default = 1
-            s.next()
+            s.next
         else:
             default = p_simple_expr(s)
     return Nodes.CArgDeclNode(pos,
@@ -1735,7 +1735,7 @@ def p_c_arg_decl(s, in_pyfunc, cmethod_flag = 0, nonempty = 0, kw_only = 0):
 
 def p_api(s):
     if s.sy == 'IDENT' and s.systring == 'api':
-        s.next()
+        s.next
         return 1
     else:
         return 0
@@ -1751,7 +1751,7 @@ def p_cdef_statement(s, level, visibility = 'private', api = 0,
     if (visibility == 'extern') and s.sy == 'from':
             return p_cdef_extern_block(s, level, pos)
     elif s.sy == 'import':
-        s.next()
+        s.next
         return p_cdef_extern_block(s, level, pos)
     elif s.sy == ':':
         return p_cdef_block(s, level, visibility, api)
@@ -1787,7 +1787,7 @@ def p_cdef_extern_block(s, level, pos):
     include_file = None
     s.expect('from')
     if s.sy == '*':
-        s.next()
+        s.next
     else:
         _, include_file = p_string_literal(s)
     body = p_suite(s, level, cdef_flag = 1, visibility = 'extern')
@@ -1801,10 +1801,10 @@ struct_union_or_enum = (
 
 def p_c_enum_definition(s, pos, level, visibility, typedef_flag = 0):
     # s.sy == ident 'enum'
-    s.next()
+    s.next
     if s.sy == 'IDENT':
         name = s.systring
-        s.next()
+        s.next
         s.add_type_name(name)
         cname = p_opt_cname(s)
     else:
@@ -1816,7 +1816,7 @@ def p_c_enum_definition(s, pos, level, visibility, typedef_flag = 0):
     if s.sy != 'NEWLINE':
         p_c_enum_line(s, items)
     else:
-        s.next() # 'NEWLINE'
+        s.next  # 'NEWLINE'
         s.expect_indent()
         while s.sy not in ('DEDENT', 'EOF'):
             p_c_enum_line(s, items)
@@ -1829,12 +1829,12 @@ def p_c_enum_line(s, items):
     if s.sy != 'pass':
         p_c_enum_item(s, items)
         while s.sy == ',':
-            s.next()
+            s.next
             if s.sy in ('NEWLINE', 'EOF'):
                 break
             p_c_enum_item(s, items)
     else:
-        s.next()
+        s.next
     s.expect_newline("Syntax error in enum item list")
 
 def p_c_enum_item(s, items):
@@ -1843,7 +1843,7 @@ def p_c_enum_item(s, items):
     cname = p_opt_cname(s)
     value = None
     if s.sy == '=':
-        s.next()
+        s.next
         value = p_simple_expr(s)
     items.append(Nodes.CEnumDefItemNode(pos, 
         name = name, cname = cname, value = value))
@@ -1851,13 +1851,13 @@ def p_c_enum_item(s, items):
 def p_c_struct_or_union_definition(s, pos, level, visibility, typedef_flag = 0):
     # s.sy == ident 'struct' or 'union'
     kind = s.systring
-    s.next()
+    s.next
     name = p_ident(s)
     cname = p_opt_cname(s)
     s.add_type_name(name)
     attributes = None
     if s.sy == ':':
-        s.next()
+        s.next
         s.expect('NEWLINE')
         s.expect_indent()
         attributes = []
@@ -1866,7 +1866,7 @@ def p_c_struct_or_union_definition(s, pos, level, visibility, typedef_flag = 0):
                 attributes.append(
                     p_c_func_or_var_declaration(s, level = 'other', pos = s.position()))
             else:
-                s.next()
+                s.next
                 s.expect_newline("Expected a newline")
         s.expect_dedent()
     else:
@@ -1884,13 +1884,13 @@ def p_visibility(s, prev_visibility):
         if prev_visibility != 'private' and visibility != prev_visibility:
             s.error("Conflicting visibility options '%s' and '%s'"
                 % (prev_visibility, visibility))
-        s.next()
+        s.next
     return visibility
     
 def p_c_modifiers(s):
     if s.sy == 'IDENT' and s.systring in ('inline',):
         modifier = s.systring
-        s.next()
+        s.next
         return [modifier] + p_c_modifiers(s)
     return []
 
@@ -1919,7 +1919,7 @@ def p_c_func_or_var_declaration(s, level, pos, visibility = 'private', api = 0,
         #    error(s.pos, "'api' not allowed with variable declaration")
         declarators = [declarator]
         while s.sy == ',':
-            s.next()
+            s.next
             if s.sy == 'NEWLINE':
                 break
             declarator = p_c_declarator(s, cmethod_flag = cmethod_flag, assignable = 1, nonempty = 1)
@@ -1937,7 +1937,7 @@ def p_c_func_or_var_declaration(s, level, pos, visibility = 'private', api = 0,
 def p_ctypedef_statement(s, level, visibility = 'private', api = 0):
     # s.sy == 'ctypedef'
     pos = s.position()
-    s.next()
+    s.next
     visibility = p_visibility(s, visibility)
     if s.sy == 'class':
         return p_c_class_definition(s, level, pos,
@@ -1959,7 +1959,7 @@ def p_ctypedef_statement(s, level, visibility = 'private', api = 0):
 def p_def_statement(s):
     # s.sy == 'def'
     pos = s.position()
-    s.next()
+    s.next
     name = p_ident(s)
     #args = []
     s.expect('(');
@@ -1967,17 +1967,17 @@ def p_def_statement(s):
     star_arg = None
     starstar_arg = None
     if s.sy == '*':
-        s.next()
+        s.next
         if s.sy == 'IDENT':
             star_arg = p_py_arg_decl(s)
         if s.sy == ',':
-            s.next()
+            s.next
             args.extend(p_c_arg_list(s, in_pyfunc = 1,
                 nonempty_declarators = 1, kw_only = 1))
         elif s.sy != ')':
             s.error("Syntax error in Python function argument list")
     if s.sy == '**':
-        s.next()
+        s.next
         starstar_arg = p_py_arg_decl(s)
     s.expect(')')
     if p_nogil(s):
@@ -1995,10 +1995,10 @@ def p_py_arg_decl(s):
 def p_class_statement(s):
     # s.sy == 'class'
     pos = s.position()
-    s.next()
+    s.next
     class_name = p_ident(s)
     if s.sy == '(':
-        s.next()
+        s.next
         base_list = p_simple_expr_list(s)
         s.expect(')')
     else:
@@ -2012,17 +2012,17 @@ def p_class_statement(s):
 def p_c_class_definition(s, level, pos, 
         visibility = 'private', typedef_flag = 0, api = 0):
     # s.sy == 'class'
-    s.next()
+    s.next
     module_path = []
     class_name = p_ident(s)
     while s.sy == '.':
-        s.next()
+        s.next
         module_path.append(class_name)
         class_name = p_ident(s)
     if module_path and visibility != 'extern':
         error(pos, "Qualified class name only allowed for 'extern' C class")
     if module_path and s.sy == 'IDENT' and s.systring == 'as':
-        s.next()
+        s.next
         as_name = p_ident(s)
     else:
         as_name = class_name
@@ -2032,10 +2032,10 @@ def p_c_class_definition(s, level, pos,
     base_class_module = None
     base_class_name = None
     if s.sy == '(':
-        s.next()
+        s.next
         base_class_path = [p_ident(s)]
         while s.sy == '.':
-            s.next()
+            s.next
             base_class_path.append(p_ident(s))
         if s.sy == ',':
             s.error("C class may only have one base class")
@@ -2094,20 +2094,20 @@ def p_c_class_options(s):
         if s.sy != 'IDENT':
             break
         if s.systring == 'object':
-            s.next()
+            s.next
             objstruct_name = p_ident(s)
         elif s.systring == 'type':
-            s.next()
+            s.next
             typeobj_name = p_ident(s)
         if s.sy != ',':
             break
-        s.next()
+        s.next
     s.expect(']', "Expected 'object' or 'type'")
     return objstruct_name, typeobj_name
 
 def p_property_decl(s):
     pos = s.position()
-    s.next() # 'property'
+    s.next  # 'property'
     name = p_ident(s)
     doc, body = p_suite(s, 'property', with_doc = 1)
     return Nodes.PropertyNode(pos, name = name, doc = doc, body = body)

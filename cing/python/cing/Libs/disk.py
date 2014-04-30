@@ -630,11 +630,11 @@ def follow(file, delay=1.0):
     >>> generator = follow(fo)
     >>> f.write('Line 1\\n')
     >>> f.flush()
-    >>> generator.next()
+    >>> generator.next
     'Line 1'
     >>> f.write('Line 2\\n')
     >>> f.flush()
-    >>> generator.next()
+    >>> generator.next
     'Line 2'
     >>> f.close()
     >>> fo.close()
