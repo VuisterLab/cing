@@ -19,13 +19,14 @@ from cing.Libs.Adict import Adict
 from cing.Libs.Geometry import violationAngle
 from cing.Libs.NTutils import * #@UnusedWildImport
 try:
-    from cing.Libs.cython.superpose import NTcVector #@UnresolvedImport @UnusedImport
+    import pyximport
+    pyximport.install()
+    import cing.Libs.cython.superpose as superpose
+#    from cing.Libs.cython.superpose import NTcVector #@UnresolvedImport @UnusedImport
+#    from cing.Libs.cython.superpose import Rm6dist #@UnresolvedImport
 except ImportError:
     pass
-try:
-    from cing.Libs.cython.superpose import Rm6dist #@UnresolvedImport
-except ImportError:
-    pass
+
 from cing.Libs.disk import copydir
 from cing.Libs.disk import Path
 from cing.Libs.disk import remove
@@ -3520,7 +3521,7 @@ class DistanceRestraint(Restraint):
                         i = 0
                         if len(a2.coordinates) == modelCount:
                             for i in models:
-                                self.distances[i] += Rm6dist(a1.coordinates[i].e, a2.coordinates[i].e)
+                                self.distances[i] += superpose.Rm6dist(a1.coordinates[i].e, a2.coordinates[i].e)
                             #end for
                         else:
 #                            self.distances[0] = 0.0

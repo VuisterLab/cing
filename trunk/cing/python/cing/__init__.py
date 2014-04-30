@@ -24,8 +24,8 @@ valSets.cfg             Validation settings. Might be moved around.
 
 """
 
-import os
-import sys
+#import os
+#import sys
 
 #import cing.Libs.helper as helper
 #import cing.Libs.disk as disk
@@ -49,7 +49,7 @@ verbosityOutput     = cdefs.verbosityOutput  # and regular output DEFAULT
 verbosityDetail     = cdefs.verbosityDetail  # show more details
 verbosityDebug      = cdefs.verbosityDebug   # add debugging info (not recommended for casual user)
 verbosityDefault    = cdefs.verbosityDefault
-verbosity           = cdefs.cingDefinitions.verbosity
+from cing.definitions import verbosity
 
 #-----------------------------------------------------------------------------
 # System and cing definitions
@@ -138,21 +138,6 @@ from cing.core.classes      import RDCRestraint,      RDCRestraintList
 # functional imports: Order matters!
 #---------------------------------------------------------------------------------------------
 
-#OBSOLETE: should get better implementation
-## Try a Yasara import
-## GV: We could change this by defining yasaradir in the CING setup
-#try:
-#    from yasara import yasaradir #@UnresolvedImport # JFD: why not add the functionality from the plugin ?
-#    if os.path.exists(yasaradir):
-#        sys.path.append(os.path.join(yasaradir,'pym'))
-#        sys.path.append(os.path.join(yasaradir,'plg'))
-#    else:
-#        nTcodeerror('Yasara directory "%s" as defined in yasara.py module not found', yasaradir)
-#        exit(1)
-#except:
-#    yasaradir = None
-##end try
-
 # Molecule
 from cing.core.molecule     import *             #TODO: ugly, need to be explicit
 
@@ -161,8 +146,8 @@ from cing.core.importPlugin import importPlugins
 importPlugins()                                  # This imports all plugins
 
 # SML
-from cing.core.sml          import obj2SML       # This also initializes the SMLhandler methods
-from cing.core.sml          import sML2obj       # This also initializes the SMLhandler methods
+from cing.core.sml          import obj2sml       # This also initializes the SMLhandler methods
+from cing.core.sml          import sml2obj       # This also initializes the SMLhandler methods
 
 # database
 from cing.core.database     import NTdb #@Reimport

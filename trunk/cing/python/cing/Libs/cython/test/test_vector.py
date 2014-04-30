@@ -3,7 +3,18 @@ Unit test execute as:
 python $CINGROOT/python/cing/Libs/cython/test/test_vector.py
 """
 from cing.Libs.NTutils import * #@UnusedWildImport
-from cing.Libs.cython.superpose  import NTcVector #@UnresolvedImport
+try:
+    import pyximport
+    pyximport.install()
+    import cing.Libs.cython.superpose as superpose
+# GWV 20140501: changed calls
+#    from cing.Libs.cython.superpose import NTcMatrix
+#    from cing.Libs.cython.superpose import NTcVector
+#    from cing.Libs.cython.superpose import calculateRMSD
+#    from cing.Libs.cython.superpose import superposeVectors
+#    from cing.Libs.cython.superpose import Rm6dist #@UnresolvedImport
+except ImportError:
+    pass
 from cing.core.molecule import Coordinate #@UnusedImport
 from cing.core.molecule import CoordinateOld #@UnusedImport
 from cing.core.molecule import nTdihedralOpt
@@ -15,7 +26,7 @@ import unittest #@UnusedImport
 class AllChecks(TestCase):
 
     def testVector0(self):
-        v = NTcVector(0.0,1.0,2.0)
+        v = superpose.NTcVector(0.0,1.0,2.0)
         nTdebug("v: %r or %s" % (v,v) )
 
     def testVector(self):

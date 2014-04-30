@@ -11,10 +11,20 @@ from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.Libs.PyMMLib import ATOM
 from cing.Libs.PyMMLib import HETATM
 from cing.Libs.PyMMLib import PDBFile
-from cing.Libs.cython.superpose import NTcMatrix
-from cing.Libs.cython.superpose import NTcVector
-from cing.Libs.cython.superpose import calculateRMSD
-from cing.Libs.cython.superpose import superposeVectors
+try:
+    import pyximport
+    pyximport.install()
+    import cing.Libs.cython.superpose as superpose
+# GWV 20140501: changed calls
+#    from cing.Libs.cython.superpose import NTcMatrix
+#    from cing.Libs.cython.superpose import NTcVector
+#    from cing.Libs.cython.superpose import calculateRMSD
+#    from cing.Libs.cython.superpose import superposeVectors
+#    from cing.Libs.cython.superpose import Rm6dist #@UnresolvedImport
+except ImportError:
+    pass
+
+
 from cing.Libs.html import addPreTagLines
 from cing.Libs.html import hPlot
 from cing.NRG import archiveIdPdbBased
@@ -3287,7 +3297,7 @@ Return an Molecule instance or None on error
                             Vbb.append(atm.coordinates[0].e)
                             nTcodeerror("TODO: fix Residue#removeAtom.")
                     #end for
-                    res.rmsd.backbone[i] = calculateRMSD(Vbb,Vmean)
+                    res.rmsd.backbone[i] = superpose.calculateRMSD(Vbb,Vmean)
 
                     if res.rmsd.included:
                         self.rmsd.backbone[i] += (res.rmsd.backbone[i]**2)*res.rmsd.backboneCount
@@ -3309,7 +3319,7 @@ Return an Molecule instance or None on error
                             Vhv.append(atm.coordinates[0].e)
                             nTcodeerror("TODO: fix Residue#removeAtom.")
                     #end for
-                    res.rmsd.heavyAtoms[i] = calculateRMSD(Vhv,Vmean)
+                    res.rmsd.heavyAtoms[i] = superpose.calculateRMSD(Vhv,Vmean)
 
                     if res.rmsd.included:
                         self.rmsd.heavyAtoms[i] += (res.rmsd.heavyAtoms[i]**2)*res.rmsd.heavyAtomsCount
@@ -3684,7 +3694,7 @@ class Ensemble( NTlist ):
 #end class
 
 
-class Model( NTcMatrix ):
+class Model( superpose.NTcMatrix ):
     """
     Model class, rotation translation 4x4  superpose
     Contains a list of fitCooridinates and
@@ -3715,13 +3725,13 @@ class Model( NTcMatrix ):
             return NaN
         #end if
 
-        smtx = superposeVectors( v1, v2 )
+        smtx = superpose.superposeVectors( v1, v2 )
         #copy the result to self
         smtx.copy( self )
 
         # transform and calculate rmsd
         self.transform()
-        self.rmsd = calculateRMSD( v1, v2 )
+        self.rmsd = superpose.calculateRMSD( v1, v2 )
         return self.rmsd
     #end def
 
@@ -3737,7 +3747,7 @@ class Model( NTcMatrix ):
             nTerror("Model.calculateRMSD: unequal length fitCoordinates (%s and %s)", self, other)
             return -1.0
         #end if
-        self.rmsd = calculateRMSD( v1, v2 )
+        self.rmsd = superpose.calculateRMSD( v1, v2 )
         return self.rmsd
     #end def
 
@@ -3823,7 +3833,7 @@ class Model( NTcMatrix ):
         'Generate a string representation.'
         s = sprintf('%s %s %s\n', dots, str(self), dots)
         s = s + "rmsd:  %10.3f\n" %  (self.rmsd, )
-        s = s + "matrix:\n%s\n" % (NTcMatrix.__str__(self), )
+        s = s + "matrix:\n%s\n" % (superpose.NTcMatrix.__str__(self), )
         return s
     #end def
 #end class
@@ -5530,7 +5540,7 @@ e.g.
     DEFAULT_OCCUPANCY = 1.0
 
     def __init__( self, x=0.0, y=0.0, z=0.0, Bfac=DEFAULT_BFACTOR, occupancy=DEFAULT_OCCUPANCY, atom = None ): # pylint: disable=C0103
-        self.e         = NTcVector( x, y, z )
+        self.e         = superpose.NTcVector( x, y, z )
         self.Bfac      = Bfac # pylint: disable=C0103
         self.occupancy = occupancy
         self.atom      = atom
@@ -5581,7 +5591,7 @@ e.g.
     # map integers and x,y,z
     def __getitem__(self, item):
         if isinstance( item, int ):
-            return NTcVector.__getitem__(self.e, item)
+            return superpose.NTcVector.__getitem__(self.e, item)
         elif  item == 'x':
             return self.e[0]
         elif  item == 'y':
@@ -5594,7 +5604,7 @@ e.g.
 
     def __setitem__(self, item, value):
         if isinstance( item, int ):
-            NTcVector.__setitem__( self.e, item, value )
+            superpose.NTcVector.__setitem__( self.e, item, value )
         elif  item == 'x':
             self.e[0] = value
         elif  item == 'y':
