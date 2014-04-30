@@ -43,7 +43,18 @@ from cing.Libs import io
 from cing.Libs.Geometry import violationAngle
 from cing.Libs.NTplot import ssIdxToType
 from cing.Libs.NTutils import * #@UnusedWildImport
-from cing.Libs.cython.superpose import NTcVector #@UnresolvedImport
+try:
+    import pyximport
+    pyximport.install()
+    import cing.Libs.cython.superpose as superpose
+# GWV 20140501: changed calls
+#    from cing.Libs.cython.superpose import NTcMatrix
+#    from cing.Libs.cython.superpose import NTcVector
+#    from cing.Libs.cython.superpose import calculateRMSD
+#    from cing.Libs.cython.superpose import superposeVectors
+#    from cing.Libs.cython.superpose import Rm6dist #@UnresolvedImport
+except ImportError:
+    pass
 from cing.Libs.html import addPreTagLines
 from cing.Libs.html import hPlot
 from cing.Libs.html import removePreTagLines
@@ -1132,7 +1143,7 @@ Arbitrarily set the criteria for ion-pair (r,theta) to be within
     # get the vectors c1, c1a, c2, c2a for each model and compute the result
     for model in range( modelCount ):
         #c1 is geometric mean of centroid atms
-        c1 = NTcVector(0,0,0)
+        c1 = superpose.NTcVector(0,0,0)
         for atmName in centroids[residue1.db.shortName]:
             atm = residue1[atmName]
             c1 += atm.coordinates[model].e
@@ -1147,7 +1158,7 @@ Arbitrarily set the criteria for ion-pair (r,theta) to be within
             break
 
         #c2 is geometric mean of centroid atms
-        c2 = NTcVector(0,0,0)
+        c2 = superpose.NTcVector(0,0,0)
         for atmName in centroids[residue2.db.shortName]:
             atm = residue2[atmName]
             c2 += atm.coordinates[model].e

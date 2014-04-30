@@ -111,12 +111,10 @@ CING_SHELL_TEMPLATE = \
 # No changes needed below this line.
 #############################################
 %(export)s  CINGROOT%(equals)s%(cingRoot)s
-%(export)s  CYTHON%(equals)s%(cingRoot)s/dist/Cython
 %(export)s  PYMOL_PATH%(equals)s%(pyMolPath)s
 
 # Adding each component individually to PYTHONPATH
 %(export)s  CING_VARS%(equals)s$CINGROOT/python
-%(export)s  CING_VARS%(equals)s${CING_VARS}:$CYTHON
 %(export)s  CING_VARS%(equals)s${CING_VARS}:$PYMOL_PATH/modules
 %(export)s  CING_VARS%(equals)s${CING_VARS}:%(yasaraPath)s/pym:%(yasaraPath)s/plg
 
@@ -131,7 +129,6 @@ alias cing%(equals)s'python -u $CINGROOT/python/cing/main.py'
 alias queen%(equals)s'python -u $CINGROOT/python/queen/main.py'
 alias cyana2cing%(equals)s'python -u $CINGROOT/python/cyana2cing/cyana2cing.py'
 alias refine%(equals)s'python -u $CINGROOT/python/Refine/refine.py'
-alias cython%(equals)s'$CYTHON/bin/cython'
 
 '''
 # make the addition conditional to presence like for tcsh.
@@ -379,12 +376,6 @@ def _writeCingShellFile(isTcsh): # pylint: disable=W0621
     print '    %s %s' % ( sourceCommand, cname)
     print ''
     print ''
-    print '==> Note by JFD'
-    print ' There is another dependency; cython. Please install it and run:'
-    print ' cd $CINGROOT/python/cing/Libs/cython; python compile.py build_ext --inplace'
-    print ' After installing cython; rerun setupCing.py or manually update the settings file.'
-    print ' We have included the Cython distribution needed so add to your PYTHONPATH for now:'
-    print ' $CINGROOT/dist/Cython (later it will be added by the cing.[c]sh created.'
 
 #end def
 #------------------------------------------------------------------------------------

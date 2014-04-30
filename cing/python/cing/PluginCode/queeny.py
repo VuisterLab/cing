@@ -16,7 +16,18 @@ from cing.Libs import io
 
 from cing.Libs.Adict import Adict
 from cing.Libs.NTutils import * #@UnusedWildImport
-from cing.Libs.cython.superpose import Rm6dist
+try:
+    import pyximport
+    pyximport.install()
+    import cing.Libs.cython.superpose as superpose
+# GWV 20140501: changed calls
+#    from cing.Libs.cython.superpose import NTcMatrix
+#    from cing.Libs.cython.superpose import NTcVector
+#    from cing.Libs.cython.superpose import calculateRMSD
+#    from cing.Libs.cython.superpose import superposeVectors
+#    from cing.Libs.cython.superpose import Rm6dist #@UnresolvedImport
+except ImportError:
+    pass
 
 # versions < 0.95 not logged with version number
 # cing versions >1.0 first ones to include this
@@ -303,7 +314,7 @@ class Queeny( Odict ):
                     #end if
 
                     for i in models:
-                        rm6distances[pair] += Rm6dist(a1.coordinates[i].e, a2.coordinates[i].e)
+                        rm6distances[pair] += superpose.Rm6dist(a1.coordinates[i].e, a2.coordinates[i].e)
                     #end for models
                 #end for a2
             #end for a1

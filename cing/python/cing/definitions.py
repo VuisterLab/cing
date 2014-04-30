@@ -205,7 +205,7 @@ validationDirectories = Adict.Adict(
     molmol     = 'Macros/Molmol'
 )
 
-# These directories get generated below the HLML root of a molecule
+# These directories get generated below the HTML root of a molecule
 htmlDirectories = Adict.Adict(
     molecule    = 'Molecule',
 #    atoms       = 'Atoms',
@@ -234,7 +234,7 @@ cingPaths = Adict.Adict(
     molmol       = os.getenv('molmolPath'),
     povray       = os.getenv('povrayPath'),
     talos        = os.getenv('talosPath'),
-    classpath    = os.getenv('CLASSPATH')   #No idea where this is used for
+    classpath    = os.getenv('CLASSPATH')   # Watto's related
 )
 
 
