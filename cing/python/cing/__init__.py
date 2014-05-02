@@ -33,9 +33,10 @@ from cing import constants
 import cing.definitions as cdefs
 
 __version__         = cdefs.__version__
-__date__            = cdefs.__date__
+__revision__        = '$Revision$'
+__date__            = '$Date$'
 __copyright_years__ = cdefs.__copyright_years__
-__author__          = cdefs.__author__
+__author__          = '$Author$'
 __copyright__       = cdefs.__copyright__
 __credits__         = cdefs.__credits__
 
