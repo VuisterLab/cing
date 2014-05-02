@@ -2,7 +2,7 @@
 Add some Yasara commands to cing.
 
 #Example commands to get to CING ipython prompt using a project with a molecule loaded already.
-cd $CINGROOT/Tests/data/cing
+cd $CINGROOT/data/Tests/cing
 cing --name 1brv --old --ipython
 
 #Example commands possible from CING ipython prompt:

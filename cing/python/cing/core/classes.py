@@ -4453,7 +4453,7 @@ class RDCRestraintList(RestraintList):
                 modelCount = self[0].atomPairs[0][0].residue.chain.molecule.modelCount
         #end if
 
-        if not modelCount: # JFD notes eg reading $CINGROOT/Tests/data/ccpn/2hgh.tgz
+        if not modelCount: # JFD notes eg reading $CINGROOT/data/Tests/ccpn/2hgh.tgz
             nTerror('RDCRestraintList.analyze: "%s" modelCount 0', self.name)
             return (None, None, None, None, None)
         #end if

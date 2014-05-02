@@ -102,7 +102,7 @@ cingRoot               = cingDefinitions.rootPath # os.path.split(cingPythonDir)
 
 cingDirTests           = cingRoot / "Tests"
 cingDirMolmolScripts   = cingRoot / "scripts"  / "molmol"
-cingDirTestsData       = cingDirTests / "data"
+cingDirTestsData       = cingRoot / "data" / "Tests"
 cingDirScripts         = cingPythonCingDir / "Scripts"
 cingDirLibs            = cingPythonCingDir / "Libs"
 cingDirData            = cingRoot / "data"

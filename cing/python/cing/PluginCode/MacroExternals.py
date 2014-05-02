@@ -165,7 +165,7 @@ pymol.finish_launching()
 """
     # Just for testing:
     pdbCode = '1brv'
-    scriptPdbLoad = "cmd.load('/Users/jd/workspace35/cing/Tests/data/pdb/%s/pdb%s.ent')" % (pdbCode, pdbCode)
+    scriptPdbLoad = "cmd.load('/Users/jd/workspace35/cing/data/Tests/pdb/%s/pdb%s.ent')" % (pdbCode, pdbCode)
 
     macroTxt = \
 """
@@ -204,7 +204,7 @@ pymol.finish_launching()
 def makePyMolReadPdbMacro(project, path = None):
     # Just for testing:
     pdbCode = '1brv'
-    scriptPdbLoad = "load /Users/jd/workspace35/cing/Tests/data/pdb/%s/pdb%s.ent" % (pdbCode, pdbCode)
+    scriptPdbLoad = "load /Users/jd/workspace35/cing/data/Tests/pdb/%s/pdb%s.ent" % (pdbCode, pdbCode)
     macroTxt = pyMolMacroFileHeader + '\n' + scriptPdbLoad +'\n'
 
     if path:
@@ -227,7 +227,7 @@ def makePyMolByResidueMacro(project, keys,
     # Just for testing:
     pdbCode = '1brv'
     if loadTestingFile:
-        scriptPdbLoad = "load /Users/jd/workspace35/cing/Tests/data/pdb/%s/pdb%s.ent" % (pdbCode, pdbCode)
+        scriptPdbLoad = "load /Users/jd/workspace35/cing/data/Tests/pdb/%s/pdb%s.ent" % (pdbCode, pdbCode)
 
     macroTxt = \
 """
@@ -288,7 +288,7 @@ def makeMolmolByResidueROGMacro(project, path = None):
 
 # Coloring residues by CING ROG scores.
 
-ReadPdb /Users/jd/workspace35/cing/Tests/data/pdb/1brv/pdb1brv.ent
+ReadPdb /Users/jd/workspace35/cing/data/Tests/pdb/1brv/pdb1brv.ent
 
 DefPropAtom 'prev_sel' 'selected'
 DefPropBond 'prev_sel' 'selected'
@@ -394,7 +394,7 @@ def makeMolmolByResidueMacro(project, keys,
 
 # Scaling colors to MinValue, MaxValue, ReverseColorScheme: minValue, maxValue, reverseColorScheme
 
-ReadPdb /Users/jd/workspace35/cing/Tests/data/pdb/1brv/pdb1brv.ent
+ReadPdb /Users/jd/workspace35/cing/data/Tests/pdb/1brv/pdb1brv.ent
 
 DefPropAtom 'prev_sel' 'selected'
 DefPropBond 'prev_sel' 'selected'
