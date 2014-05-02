@@ -26,7 +26,7 @@ entryListFileName     = os.path.join(cingDirScripts, DATA_STR, 'entryCodeListPro
 
 # parameters for validateEntry
 #inputDir              = '/Volumes/proteins/var/www/html/Education/Validation/HTML/Exercise_1/Data/'
-#inputDir              = '/Users/jd/Sites/cing/in/Tests/data/cyana'
+#inputDir              = '/Users/jd/Sites/cing/in/data/Tests/cyana'
 inputDir              = os.path.join(cingDirTestsData, "cing" )
 outputDir             = startDir
 pdbConvention         = '.'

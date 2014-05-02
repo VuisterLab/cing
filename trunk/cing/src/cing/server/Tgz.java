@@ -5,7 +5,7 @@ import java.io.File;
 /**
  * 
  * Was going to include the ice untarring but it fails for long filenames. Giving up issue 
-jd:stella/jars/ java com.ice.tar.tar -tvf $CINGROOT/Tests/data/ccpn/basp2.tgz
+jd:stella/jars/ java com.ice.tar.tar -tvf $CINGROOT/data/Tests/ccpn/basp2.tgz
 com.ice.tar.InvalidHeaderException: bad header in block 0 record 0, header magic is not 'ustar' or unix-style zeros, it is '75-83-657642-1121', or (dec) 75, -83, -65, 76, 42, -1, 121
     at com.ice.tar.TarInputStream.getNextEntry(Unknown Source)
     at com.ice.tar.TarArchive.listContents(Unknown Source)

@@ -2,7 +2,7 @@
 Reads a Regine .pkr peak list.
 
 Example input is in
-$CINGROOT/Tests/data//org/1brv/brsvg.pkr
+$CINGROOT/data/Tests/org/1brv/brsvg.pkr
 
 Format input:
 # .pkr

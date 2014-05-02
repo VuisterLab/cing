@@ -219,7 +219,7 @@ CREATE table nrgcing.aa
 (
     name                           VARCHAR(25)
 );
-COPY nrgcing.aa      FROM '/Users/jd/workspace35/cing/Tests/data/cing/aa.csv'    CSV HEADER;
+COPY nrgcing.aa      FROM '/Users/jd/workspace35/cing/data/Tests/cing/aa.csv'    CSV HEADER;
 
 -- find unique residue names
 SELECT r.name, e.name, count( r.name )
