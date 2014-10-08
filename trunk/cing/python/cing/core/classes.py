@@ -5,9 +5,11 @@ Split into 3 for better performance.
 import cing
 import cing.constants as constants
 import cing.definitions as cdefs
-
 from cing.core import pid
-from cing.Libs import io
+#from cing.Libs import io
+import cing.Libs.io as io
+#import cing.Libs.jsonTools as jsonTools
+#import cing.Libs.xmlTools as xmlTools
 
 from ConfigParser import ConfigParser
 from cing import cingPythonCingDir
@@ -22,10 +24,11 @@ try:
     import pyximport
     pyximport.install()
     import cing.Libs.cython.superpose as superpose
-#    from cing.Libs.cython.superpose import NTcVector #@UnresolvedImport @UnusedImport
-#    from cing.Libs.cython.superpose import Rm6dist #@UnresolvedImport
+    from cing.Libs.cython.superpose import NTcVector #@UnresolvedImport @UnusedImport
+    from cing.Libs.cython.superpose import Rm6dist #@UnresolvedImport
 except ImportError:
     pass
+
 
 from cing.Libs.disk import copydir
 from cing.Libs.disk import Path
@@ -164,11 +167,11 @@ Project: Top level Cing project class
 
         self.molecule = None # Current Molecule instance
 
-        self.moleculeNames = NTlist() # list to store molecule names for save and restore
-        self.peakListNames = NTlist() # list to store peaklist names for save and restore
-        self.distanceListNames = NTlist() # list to store distancelist names names for save and restore
-        self.dihedralListNames = NTlist() # list to store dihedrallist names for save and restore
-        self.rdcListNames = NTlist() # list to store rdclist names for save and restore
+        self.moleculeNames = [] # list to store molecule names for save and restore
+        self.peakListNames = [] # list to store peaklist names for save and restore
+        self.distanceListNames = [] # list to store distancelist names names for save and restore
+        self.dihedralListNames = [] # list to store dihedrallist names for save and restore
+        self.rdcListNames = [] # list to store rdclist names for save and restore
         self.coplanarListNames = NTlist() # list to store  names for save and restore
         self.dihedralByProjectListNames = NTlist() # list to store  names for save and restore
         self.dihedralByResidue = NTtree( DIHEDRAL_BY_RESIDUE_STR ) # Used to be set in DihedralByResidueHTMLfile but that's too late.
@@ -179,6 +182,8 @@ Project: Top level Cing project class
         self.storedInCcpnFormat = False
         self.restoredFromXml = True # Project settings restored from project.xml file
 
+        self.status = Adict() # General status dict for external programs
+        #LEGACY
         self.statusObjectNameList = 'procheckStatus dsspStatus whatifStatus wattosStatus vascoStatus x3dnaStatus'.split()
         self.procheckStatus = NTdict(completed = False, parsed = False, ranges = None)
         self.whatifStatus = NTdict(completed = False, parsed = False)
@@ -186,7 +191,6 @@ Project: Top level Cing project class
         self.vascoStatus = NTdict(completed = False, parsed = False)
         #self.shiftxStatus = NTdict(completed = False, parsed = False)
         self.x3dnaStatus  = NTdict(completed = False, parsed = False)
-        self.status = Adict() # General status dict for external programs
 
 #        store a reference to the global things we might need
 #        self.gui = None # Reference to CingGui instance
@@ -263,7 +267,6 @@ Project: Top level Cing project class
                          'history',
                          'procheckStatus', 'whatifStatus', 'wattosStatus', 'status'
                          ]
-        #self.saveXML(*self.saveKeys)
     #end def
 
     def getCingSummaryDict(self):
@@ -425,7 +428,7 @@ Project: Top level Cing project class
             object = object[p]
         #end for
         if thePid[0] != object.__class__.__name__:
-            nTerror('Project.getByPid: type %s does not match object %r', p[0], object)
+            io.error('Project.getByPid: type {r} does not match object {1!r}', p[0], object)
             return None
         return object
     #end def
@@ -448,7 +451,8 @@ Project: Top level Cing project class
 
 #LEGACY:
     def setStatusObjects(self, parsed=None, completed = None):
-        'Only update the parameter that is not None (True or False)'
+        """Only update the parameter that is not None (True or False)
+        """
 #             = 'procheckStatus dsspStatus whatifStatus wattosStatus vascoStatus shiftxStatus x3dnaStatus'.split()
         for statusObjectName in self.statusObjectNameList:
             if parsed != None:
@@ -477,7 +481,7 @@ Project: Top level Cing project class
                          smlFile      = None,               # path relative to project.path()
                          completed    = False,              # True: Program was run successfully
                          parsed       = False,              # True: Program output was parsed successfully; i.e parse can be called if completed == True -> implies present = True
-                         present      = False,              # True: Program data are in the datamodel
+                         present      = False,              # True: Program data are in the cing datamodel
                          saved        = False,              # True: Data have been saved to sml in Data/Plugins; i.e. restore can be called
                          molecule     = mpid,               # molecule pid
                          convention   = constants.INTERNAL, # convention; always handy to have
@@ -485,7 +489,7 @@ Project: Top level Cing project class
         )
         sdict = self.status.setdefault(key, defaults)
         if sdict is None:
-            nTerror('Project.getStatusDict: key %s returned None, reverting to default values', key)
+            io.error('Project.getStatusDict: key %s returned None, reverting to default values\n', key)
             sdict = defaults
         #end if
         # convert to Adict
@@ -531,7 +535,7 @@ Project: Top level Cing project class
             pr._updateProjectPaths()
             pr.addHistory('New project')
             # Save the project settings
-            pr._save2sml()
+            pr._save2json()
 
         elif status == constants.PROJECT_CREATE:
             root, dummy, ext = Project.rootPath(name)
@@ -594,7 +598,7 @@ Project: Top level Cing project class
 #                    nTdebug("extracted: " + itar.name)
                 tar.close()
                 if not root.exists():
-                    nTerror('Project.open: Failed to find project in .tgz file. Unable to open Project "%s"', name)
+                    io.error('Project.open: Failed to find project in .tgz file. Unable to open Project "{0}"\n', name)
                     return None
                 return Project.open(root, status=status, restore=restore)
             elif ext == '.zip':
@@ -614,7 +618,7 @@ Project: Top level Cing project class
                     #end for
                 #end with
                 if not root.exists():
-                    nTerror('Project.open: Failed to find project in .zip file. Unable to open Project "%s"', name)
+                    io.error('Project.open: Failed to find project in .zip file. Unable to open Project "{0}"\n', name)
                     return None
                 return Project.open(root, status=status, restore=restore)
             #end if
@@ -622,34 +626,34 @@ Project: Top level Cing project class
             # 'proper' project from here on
             name = newName
             if not root:
-                nTerror('Project.open: unable to open Project "%s" because root is [%s].', name, root)
+                io.error('Project.open: unable to open Project "{0}" because root is [{1}]\n', name, root)
                 return None
             if not root.exists():
-                nTerror('Project.open: unable to open Project "%s" because root [%s] was not found.', name, root)
+                io.error('Project.open: unable to open Project "{0}" because root [{1}] was not found\n', name, root)
                 return None
             #end if
 
-            # Restore Project info from sml-file
-            from cing.core.sml import sml2obj
+            # Restore Project info from xml/json-file
+            from cing.Libs.jsonTools import json2obj
             pfile = root / cingPaths.project
-            # Check if we find an sml or xml file
+            # Check if we find an json or xml file
             f,e = pfile.splitext()
-            if (f+'.sml').exists():
-                pr = Project(name)
-                if pr._restoreFromSml():
+            if (f+'.json').exists():
+                pr = Project._restoreFromJson(f+'.json')
+                if pr is None:
                     io.error('Project.open: error restoring project data\n')
                     return None
             elif (f+'.xml').exists():
-                from cing.Legacy.Legacy100.upgrade100 import upgradeToSml
-                return upgradeToSml(root,restore)
+                from cing.Legacy.Legacy100.upgrade100 import upgradeProject2Json
+                return upgradeProject2Json(root,restore)
             else:
                 # Neither one found
-                nTerror('Project.open: missing Project file "%s"', pfile)
+                io.error('Project.open: missing Project file "{0}"\n', pfile)
                 return None
             #end if
 
             if pr == None:
-                nTerror('Project.open: error parsing Project file "%s"', pfile)
+                io.error('Project.open: error parsing Project file "{0}"\n', pfile)
                 return None
             #end if
             # This allows renaming/relative addressing at the shell level
@@ -664,65 +668,16 @@ Project: Top level Cing project class
             #LEGACY:
             pr.setStatusObjects(parsed=False)
 
-            nTdebug('Project.open: read %s, software version %.3f', pfile, pr.version)
+            io.debug('Project.open: read {0}, software version {1:.3f}\n', pfile, pr.version)
 
             #LEGACY:
             if pr.version <= 0.75:
-                nTmessage('Project.Open: converting from CING version %s', pr.version)
-#                nTdebug('Project.open: conversion: old project settings\n%s', pr.format())
-
-                # 0.75 version had moleculeNames stored in molecules attribute
-                # >=0.76 version molecules is a ProjectList instance
-                pr.moleculeNames = pr.molecules
-                if 'molecules' in pr.__SAVEXML__:
-                    pr.__SAVEXML__.remove('molecules')
-                pr.saveXML('moleculeNames')
-
-                # store the xmlFile and reopen to have correct settings
-                if obj2XML(pr, path = pfile) != pr:
-                    nTerror('Project.Open: conversion from version %s failed on write', pr.version)
-                    return None
-                pr = xML2obj(pfile)
-                if pr == None:
-                    nTerror('Project.Open: conversion from version %s failed on read', pr.version)
-                    return None
-
-                for molName in pr.moleculeNames:
-                    pathName = pr.path(directories.molecules, molName) # old reference, versions 0.48-0.75
-                    if pr.version <= 0.48:
-                        pathName = pr.path('Molecules', molName) # old reference
-                    # end if
-#                    nTdebug('Project.open: trying molecule conversion from %s', pathName)
-                    if not os.path.exists(pathName):
-                        nTerror('Project.open: old molecule pathName "%s" does not exist.', pathName)
-                        return None
-                    mol = Molecule.openMol_075(pathName)
-                    if not mol:
-                        nTerror('Project.Open: conversion from version %s failed on molecule %s', pr.version, molName)
-                        return None
-                    removedir(pathName)
-                    # Save molecule to new format
-                    mol.save(pr.molecules.path(molName))
-                #end for
-
-                # restore
-                pr.restore()
-                # Save to consolidate
-                pr.save()
-
+                from cing.Legacy.Legacy075.upgrade075 import upgrade075
+                return upgrade075(pr, restore=restore)
             # changed for allowing to store special database entries.
             elif round(pr.version*1000) < 950: # i.e. versions 0.94 and lower
-                for molName in pr.moleculeNames:
-                    pathName = pr.molecules.path(molName)
-                    mol = Molecule.openMol_094(pathName+'.molecule')
-                    mol.save(pathName)
-                    remove(pathName+'.molecule')
-                #end for
-                # restore
-                pr.restore()
-                # Save to consolidate
-                pr.save()
-
+                from cing.Legacy.Legacy095.upgrade095 import upgrade095
+                return upgrade095(pr,restore=restore)
             # version <= 1.00
             elif pr.version <= 1.00:
                 from cing.Legacy.Legacy100.upgrade100 import upgrade100
@@ -846,28 +801,35 @@ Project: Top level Cing project class
         return False
     #end def
 
-    def _save2sml(self):
-        """Save project settings as SML file"""
-        from cing.core import sml
+    # def _save2sml(self):
+    #     """Save project settings as SML file"""
+    #     from cing.core import sml
+    #     path = self.path() / cdefs.cingPaths.project
+    #     # get key, value pairs to save
+    #     p = Adict([(k,self[k]) for k in self.saveKeys ])
+    #     return sml.obj2sml( p, path )
+    # #end def
+
+
+    def _save2json(self):
+        """Save project settings as json file"""
         path = self.path() / cdefs.cingPaths.project
         # get key, value pairs to save
-        p = Adict([(k,self[k]) for k in self.saveKeys ])
-        return sml.obj2sml( p, path )
+        jsonTools.set_encoder_options('json',indent=4)
+        return jsonTools.obj2json( self, path )
     #end def
 
-    def _restoreFromSml(self):
-        """Restore project settings from sml project file
+    @staticmethod
+    def _restoreFromJson(path):
+        """Restore project settings from json project file
         Returns True on error
         """
-        from cing.core import sml
-        path = self.path() / cdefs.cingPaths.project
-        nTdebug('Project._restoreFromSml: restoring from %s', path)
-        p = sml.sml2obj(path)
+        io.debug('Project._restoreFromJson: restoring from {0}\n', path)
+        p = jsonTools.json2obj(path)
         if p is None:
-            return True
-        self.update(p)
-        self.restoredFromXml = False
-        return False
+            return None
+        p.restoredFromXml = False
+        return p
     #end def
 
     def save(self):
@@ -914,7 +876,7 @@ Project: Top level Cing project class
         #if obj2XML(self, path = self.objectPath) != self:
         #    nTerror('Project.save: writing Project file "%s" failed', self.objectPath)
         ##end if
-        if self._save2sml():
+        if self._save2json():
             return True
 
         self.addHistory('Saved project')
@@ -1595,28 +1557,6 @@ Project: Top level Cing project class
     # end def
 # end class
 
-#LEGACY:
-class XMLProjectHandler(XMLhandler):
-    """Project handler class"""
-    def __init__(self):
-        XMLhandler.__init__(self, name = 'Project')
-    #end def
-
-    def handle(self, node):
-        attrs = self.handleDictElements(node)
-        if attrs == None:
-            return None
-        result = Project(name = attrs['name'])
-
-        # update the attrs values
-        result.update(attrs)
-
-        return result
-    #end def
-#end class
-
-#register this handler
-projecthandler = XMLProjectHandler()
 
 class ProjectList(NTlist):
     """Generic Project list class: the list of lists of the project; e.g. molecules, peaks, ...
@@ -4593,42 +4533,8 @@ class History(NTlist):
     #end def
 
     format = __str__
-
-    def toXML(self, depth = 0, stream = sys.stdout, indent = '\t', lineEnd = '\n'):
-        nTindent(depth, stream, indent)
-        fprintf(stream, "<History>")
-        fprintf(stream, lineEnd)
-
-        for a in self:
-            nTtoXML(a, depth + 1, stream, indent, lineEnd)
-        #end for
-        nTindent(depth, stream, indent)
-        fprintf(stream, "</History>")
-        fprintf(stream, lineEnd)
-    #end def
 #end class
 
-
-#LEGACY:
-class XMLHistoryHandler(XMLhandler):
-    """History handler class"""
-    def __init__(self):
-        XMLhandler.__init__(self, name = 'History')
-    #end def
-
-    def handle(self, node):
-        items = self.handleMultipleElements(node)
-        if items == None:
-            return None
-        result = History()
-        for item in items:
-            result.append(item)
-        return result
-    #end def
-#end class
-
-#register this handler
-historyhandler = XMLHistoryHandler()
 
 #DEPRECIATED:
 def path(*args):

@@ -4,6 +4,8 @@ from cing.PluginCode.required.reqWhatif import * #@UnusedWildImport
 from cing import plugins
 from cing.Libs.fpconst import NaN
 
+import cing.Libs.xmlTools as xmlTools
+
 
 # pylint: disable=R0902
 class CingSummary( NTdict ):
@@ -178,7 +180,7 @@ class CingSummary( NTdict ):
         """Save CingSummary object as XML file.
         Return True on error
         """
-        result = obj2XML( self, path=path )
+        result = xmlTools.obj2XML( self, path=path )
         if result == None:
             nTerror('CingSummary.save: saving to "%s"', path)
             return True
@@ -194,26 +196,27 @@ class CingSummary( NTdict ):
             nTerror('CingSummary.restore: path "%s" does not exist', path)
             return True
         #end if
-        return xML2obj(path = path)
+        return xmlTools.xML2obj(path = path)
     #end def
 #end class
 
-class XMLCingSummaryHandler( XMLhandler ):
+class XMLCingSummaryHandler( xmlTools.XMLhandler ):
     """CingSummary handler class"""
+
+
     def __init__(self):
-        XMLhandler.__init__(self, name='CingSummary')
+        xmlTools.XMLhandler.__init__(self, name='CingSummary')
     #end def
 
     def handle(self, node):
         attrs = self.handleDictElements(node)
         if attrs == None:
             return None
-        result = CingSummary()
+        result = cing.core.CingSummary.CingSummary()
         result.update(attrs)
         return result
     #end def
 #end class
-
-
 # Initiate an instance
 xmlcingsummarydicthandler = XMLCingSummaryHandler()
+

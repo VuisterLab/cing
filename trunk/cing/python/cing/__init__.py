@@ -23,6 +23,9 @@ setupCing.py            Run to set up environment variables and check installati
 valSets.cfg             Validation settings. Might be moved around.
 
 """
+#-----------------------------------------------------------------------------
+# Imports
+#-----------------------------------------------------------------------------
 
 #import os
 #import sys
@@ -32,6 +35,9 @@ valSets.cfg             Validation settings. Might be moved around.
 from cing import constants
 import cing.definitions as cdefs
 
+#-----------------------------------------------------------------------------
+# pydoc settings
+#-----------------------------------------------------------------------------
 __version__         = cdefs.__version__
 __revision__        = '$Revision$'
 __date__            = '$Date$'
@@ -58,6 +64,7 @@ from cing.definitions import verbosity
 from cing.definitions import systemDefinitions
 from cing.definitions import cingDefinitions
 from cing.definitions import cingPaths
+from cing.definitions import directories
 
 #-----------------------------------------------------------------------------
 # create tmp directory
@@ -108,7 +115,7 @@ cingDirLibs            = cingPythonCingDir / "Libs"
 cingDirData            = cingRoot / "data"
 cingDirTmp             = cingDefinitions.tmpdir
 
-NaNstring              = "."
+NaNstring              = constants.NaNstring
 
 #-----------------------------------------------------------------------------
 ###### end legacy definitions
@@ -122,7 +129,7 @@ NaNstring              = "."
 # track imports well if not correct.
 #---------------------------------------------------------------------------------------------
 
-from cing.Libs.NTutils      import *
+from cing.Libs.NTutils      import *               #TODO: ugly, need to be explicit
 from cing.Libs.AwkLike      import AwkLike
 from cing.Libs.Adict        import Adict
 from cing.Libs              import io
@@ -154,7 +161,14 @@ from cing.core.sml          import sml2obj       # This also initializes the SML
 from cing.core.database     import NTdb #@Reimport
 NTdb._restoreFromSML()                          # This initializes the database
 
+# json handlers
+__import__('cing.core.jsonHandlers')
+# xml handlers
+__import__('cing.core.xmlHandlers')
+
+#---------------------------------------------------------------------------------------------
 # convenience
+#---------------------------------------------------------------------------------------------
 from cing.main import getInfoMessage as gi
 from cing.Libs.io import formatDictItems as fd
 from cing.core.importPlugin import importPlugin

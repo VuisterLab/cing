@@ -53,12 +53,13 @@ A_AXIS = 3
 
 
 # Projects; used in openProject routine
-PROJECT_OLD = 'old'
-PROJECT_NEW = 'new'
-PROJECT_CREATE = 'create'
+PROJECT_OLD         = 'old'
+PROJECT_NEW         = 'new'
+PROJECT_CREATE      = 'create'
 PROJECT_NEWFROMCCPN = 'newFromCcpn' #use new CCPN file to initialise data
 PROJECT_OLDFROMCCPN = 'oldFromCcpn' #use the stored CCPN data for restoring
 
+NaNstring           = "."
 
 CONSENSUS_STR = 'consensus'
 MAX_TRIES_UNIQUE_NAME = 99999

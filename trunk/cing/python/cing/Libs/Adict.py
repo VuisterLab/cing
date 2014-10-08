@@ -2,6 +2,7 @@ from collections import OrderedDict
 #import sys
 
 from cing.Libs import io
+import cing.Libs.jsonTools as jsonTools
 
 
 class Adict(OrderedDict):
@@ -70,7 +71,8 @@ class Adict(OrderedDict):
         """Get 'Old-style' attribute, not mapped to key
         """
         # OrderedDict does not have a __getattr__ method
-        if not attr in self.__dict__:
+        #print ">>", self.__dict__.keys()
+        if not attr in self.__dict__.keys():
             raise AttributeError('Attribute (only): "%s" not found.' % attr)
         return self.__dict__[attr]
     #end def
@@ -119,4 +121,37 @@ class Adict(OrderedDict):
         else:
             return s
     #end def
+
+    # def __getstate__(self):
+    #     print "__getstate__>>", self.__class__.__name__
+    #     state = {}
+    #     state['items'] = []
+    #     for k in self.keys():
+    #         state['items'].append( (k,self[k]) )
+    #     return state
+    #
+    # def __setstate__(self,state):
+    #     print "setstate >>", self.__class__.__name__, state
+    #     self.__init__()
+    #     for key,value in state['items']:
+    #         self[key] = value
+    # #end def
 #end class
+
+class AdictJsonHandler(jsonTools.handlers.BaseHandler):
+    """Handler for the Adict class
+    """
+    def flatten(self, obj, data):
+        data['items'] = []
+        for k in obj.keys():
+            data['items'].append( (k,jsonTools.encode(obj[k])) )
+        return data
+
+    def restore(self, obj):
+        #print "restore>", obj
+        a = Adict()
+        for key,value in obj['items']:
+            a[key] = jsonTools.decode(value)
+        return a
+#end class
+jsonTools.handlers.register(Adict,AdictJsonHandler)
