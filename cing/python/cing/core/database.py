@@ -90,6 +90,9 @@ from cing.Libs.AwkLike import AwkLike
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.constants import * #@UnusedWildImport
 
+import cing.Libs.xmlTools as xmlTools
+import cing.Libs.disk as disk
+
 
 DEFAULT_PSEUDO_ATOM_ID_UNDEFINED             = 0 # Not mandatory in dbTable.
 DEFAULT_PSEUDO_ATOM_ID_CH2_OR_NH2            = 1
@@ -1300,33 +1303,27 @@ def saveToSML( rDefList, rootPath, convention=INTERNAL ):
     Save ResidueDefs of rDefList as SML files in rootPath; optionally translate to convention
     """
     #print '>>', rootPath
-    fileList = NTlist()
     for rdef in rDefList:
         fname = rdef.translate(convention) +'.sml'
-        fileList.append(fname)
         path = os.path.join(rootPath, fname)
 #        nTdebug('saveToSML: saving %s to"%s"', rdef, path)
         #obj2SML( rdef, path, convention=convention) cannot use, because it will generate circular imports!
         rdef.SMLhandler.toFile( rdef, path, convention=convention )
     #end for
-    # save a content file
-    obj2XML( fileList,path=os.path.join(rootPath, 'content.xml') )
 #end def
 
 def restoreFromSML( rootPath, mDef, convention=INTERNAL ):
     """
     restore ResidueDefs from SML files in rootPath to a MolDef instance mDef
     """
-    path = os.path.join(rootPath, 'content.xml')
-    fileList = xML2obj( path=path )
-    if fileList == None:
-        nTerror('restoreFromSML: unable to open "%s"', path)
+    path = disk.Path(str(rootPath))
+    if not path.exists():
+        nTerror('restoreFromSML: path "%s" not found', path)
         return None
     #end if
-    for rfile in fileList:
-        path = os.path.join(rootPath, rfile)
-#        nTdebug('restoreSML: restoring from "%s"', path)
-        mDef.appendResidueDefFromSMLfile( path)
+    for rfile in path.glob('*.sml'):
+#        nTdebug('restoreSML: restoring from "%s"', rfile)
+        mDef.appendResidueDefFromSMLfile(rfile)
     #end for
 #end def
 
