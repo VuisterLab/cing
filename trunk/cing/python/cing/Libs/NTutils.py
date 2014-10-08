@@ -734,21 +734,21 @@ Sum                %s""" % (
 #        return htmlLine
 #    #end def
 
-    # def toXML(self, depth=0, stream=sys.stdout, indent='\t', lineEnd='\n'):
-    #     """
-    #     Write XML-representation of elements of self to stream
-    #     """
-    #     nTindent(depth, stream, indent)
-    #     fprintf(stream, "<NTlist>")
-    #     fprintf(stream, lineEnd)
-    #
-    #     for a in self:
-    #         xmlTools.nTtoXML(a, depth+1, stream, indent, lineEnd)
-    #     #end for
-    #     nTindent(depth, stream, indent)
-    #     fprintf(stream, "</NTlist>")
-    #     fprintf(stream, lineEnd)
-    # #end def
+    def toXML(self, depth=0, stream=sys.stdout, indent='\t', lineEnd='\n'):
+        """
+        Write XML-representation of elements of self to stream
+        """
+        xmlTools.nTindent(depth, stream, indent)
+        fprintf(stream, "<NTlist>")
+        fprintf(stream, lineEnd)
+
+        for a in self:
+            xmlTools.nTtoXML(a, depth+1, stream, indent, lineEnd)
+        #end for
+        xmlTools.nTindent(depth, stream, indent)
+        fprintf(stream, "</NTlist>")
+        fprintf(stream, lineEnd)
+    #end def
 
     def toSML(self, stream=sys.stdout):
         'Write by looked-up handler if available. An implementing class needs to have one defined it in order to be allowed to be called.'
@@ -1168,21 +1168,21 @@ class NTset(NTlist):
         return string
     #end def
 
-    # def toXML(self, depth=0, stream=sys.stdout, indent='\t', lineEnd='\n'):
-    #     """
-    #     Write XML-representation of elements of self to stream
-    #     """
-    #     nTindent(depth, stream, indent)
-    #     fprintf(stream, "<NTset>")
-    #     fprintf(stream, lineEnd)
-    #
-    #     for a in self:
-    #         xmlTools.nTtoXML(a, depth+1, stream, indent, lineEnd)
-    #     #end for
-    #     nTindent(depth, stream, indent)
-    #     fprintf(stream, "</NTset>")
-    #     fprintf(stream, lineEnd)
-    # #end def
+    def toXML(self, depth=0, stream=sys.stdout, indent='\t', lineEnd='\n'):
+        """
+        Write XML-representation of elements of self to stream
+        """
+        xmlTools.nTindent(depth, stream, indent)
+        fprintf(stream, "<NTset>")
+        fprintf(stream, lineEnd)
+
+        for a in self:
+            xmlTools.nTtoXML(a, depth+1, stream, indent, lineEnd)
+        #end for
+        xmlTools.nTindent(depth, stream, indent)
+        fprintf(stream, "</NTset>")
+        fprintf(stream, lineEnd)
+    #end def
 #end class
 
 
@@ -1971,39 +1971,39 @@ class NTdict(dict):
     #------------------------------------------------------------------
     # XML routines
     #------------------------------------------------------------------
-#     def toXML(self, depth=0, stream=sys.stdout, indent='  ', lineEnd='\n'):
-#         """
-#         Write XML-representation of keys/attributes of self (defined by the
-#         saveXML or saveAllXML methods) to stream
-#         """
-#         nTindent(depth, stream, indent)
-#         fprintf(stream, "<%s>", self.__CLASS__)
-#         fprintf(stream, lineEnd)
-# #       print node
-#
-#         # check for what we need to write out
-#         if (self.__SAVEALLXML__):
-#             keys = self.keys()
-#         elif (self.__SAVEXML__ != None):
-#             keys = self.__SAVEXML__
-#         else:
-#             keys = []
-#         #end if
-#
-#         for a in keys:
-#             nTindent(depth+1, stream, indent)
-#             fprintf(stream, "<Attr name=%s>", quote(a))
-#             fprintf(stream, lineEnd)
-#
-#             xmlTools.nTtoXML(self[a], depth+2, stream, indent, lineEnd)
-#
-#             nTindent(depth+1, stream, indent)
-#             fprintf(stream, "</Attr>")
-#             fprintf(stream, lineEnd)
-#         #end for
-#         nTindent(depth, stream, indent)
-#         fprintf(stream, "</%s>", self.__CLASS__)
-#         fprintf(stream, lineEnd)
+    def toXML(self, depth=0, stream=sys.stdout, indent='  ', lineEnd='\n'):
+        """
+        Write XML-representation of keys/attributes of self (defined by the
+        saveXML or saveAllXML methods) to stream
+        """
+        xmlTools.nTindent(depth, stream, indent)
+        fprintf(stream, "<%s>", self.__CLASS__)
+        fprintf(stream, lineEnd)
+#       print node
+
+        # check for what we need to write out
+        if (self.__SAVEALLXML__):
+            keys = self.keys()
+        elif (self.__SAVEXML__ != None):
+            keys = self.__SAVEXML__
+        else:
+            keys = []
+        #end if
+
+        for a in keys:
+            xmlTools.nTindent(depth+1, stream, indent)
+            fprintf(stream, "<Attr name=%s>", quote(a))
+            fprintf(stream, lineEnd)
+
+            xmlTools.nTtoXML(self[a], depth+2, stream, indent, lineEnd)
+
+            xmlTools.nTindent(depth+1, stream, indent)
+            fprintf(stream, "</Attr>")
+            fprintf(stream, lineEnd)
+        #end for
+        xmlTools.nTindent(depth, stream, indent)
+        fprintf(stream, "</%s>", self.__CLASS__)
+        fprintf(stream, lineEnd)
     #end def
 
     def saveXML(self, *attrs):
