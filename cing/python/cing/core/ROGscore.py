@@ -1,5 +1,6 @@
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.constants import * #@UnusedWildImport
+import cing.Libs.xmlTools as xmlTools
 
 #Attribute name in e.g. residue object.
 rogScoreStr = 'rogScore'
@@ -150,6 +151,24 @@ class ROGscore(NTdict):
     #end def
 #end class
 
+class XMLROGscoreHandler( xmlTools.XMLhandler ):
+    """ROCscore XML handler class"""
+    def __init__(self):
+        xmlTools.XMLhandler.__init__(self, name='ROGscore')
+    #end def
+
+    def handle(self, node):
+        attrs = self.handleDictElements(node)
+        if attrs == None:
+            return None
+        result = cing.core.ROGscore()
+        result.update(attrs)
+        return result
+    #end def
+#end class
+# Initiate an instance
+xmlrogscorehandler = XMLROGscoreHandler()
+
 
 class CingResult( NTdict ):
     """
@@ -193,21 +212,3 @@ valueList = %s
                        self.comment, self.alternate, self.valueList
                       )
 #end class
-
-class XMLROGscoreHandler( XMLhandler ):
-    """ROCscore XML handler class"""
-    def __init__(self):
-        XMLhandler.__init__(self, name='ROGscore')
-    #end def
-
-    def handle(self, node):
-        attrs = self.handleDictElements(node)
-        if attrs == None:
-            return None
-        result = ROGscore()
-        result.update(attrs)
-        return result
-    #end def
-#end class
-# Initiate an instance
-xmlrogscorehandler = XMLROGscoreHandler()

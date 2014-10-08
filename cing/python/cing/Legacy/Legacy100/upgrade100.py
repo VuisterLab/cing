@@ -15,35 +15,36 @@ import cing.Libs.NTutils as ntu
 from cing.Libs.NTutils import nTdebug
 from cing.Libs.NTutils import nTmessage
 from cing.Libs.NTutils import nTerror
-from cing.Libs.NTutils import xML2obj
+
 from cing.Libs import disk
 from cing.Libs.Adict import Adict
+import cing.Libs.xmlTools as xmlTools
 
 
-def upgradeToSml( name, restore  ):
-    """Upgrade the project.xml to project.sml file
+def upgradeProject2Json( name, restore  ):
+    """Upgrade the project from project.xml to project.json file
     Convert several parameters to new Adict types
     """
-    nTdebug('upgradeToSml: restoring %s', name)
+    io.debug('upgradeToJson: restoring {0}\n', name)
 
     root, newName, ext = Project.rootPath(name)
     if not root:
-        nTerror('upgradeToSml: unable to open Project "%s" because root is [%s].', name, root)
+        io.error('upgradeToJson: unable to open Project "{0}" because root is [{1}]\n', name, root)
         return None
     if not root.exists():
-        nTerror('upgradeToSml: unable to open Project "%s" because root [%s] was not found.', name, root)
+        io.error('upgradeToJson: unable to open Project "{0}" because root [{1}] was not found\n', name, root)
         return None
     #end if
 
     pfile = root / 'project.xml' # Name in all versions <= 1.0
     # Check if we find the xml file
     if pfile.exists():
-        nTmessage('==> Upgrading cing project; please stand by')
+        io.message('==> Upgrading cing project; please stand by\n')
         #GWV: 20140203: cannot do an update method() -> errors in partioning restraints. Do not understand
-        pr = xML2obj(pfile)
+        pr = xmlTools.xML2obj(pfile)
 
         if pr is None:
-            nTerror('upgradeToSml: parsing from project file "%s" failed', pfile)
+            io.error('upgradeToJson: parsing from project file "{0}" failed\n', pfile)
             return None
 
         try:
@@ -56,22 +57,29 @@ def upgradeToSml( name, restore  ):
         pr.created = io.Time.fromString(pr.created)
         pr.lastSaved = io.Time(disk.modtime(pfile))
 
+        # change types of names list
+        for listName in 'moleculeNames peakListNames distanceListNames dihedralListNames rdcListNames'.split():
+            if listName in pr:
+                pr[listName] = list(pr[listName])
+
         # convert status type to Adict
         status = Adict()
-        status.update(pr.status)
+        for key in pr.status.keys():
+            status[key] = pr.getStatusDict(key, **pr.status[key].toDict())
         pr.status = status
         # update the shiftx status
+
         s = pr.getStatusDict(constants.SHIFTX_KEY)
         s.update(pr.shiftxStatus)
         del(pr['shiftxStatus'])
 
-        pr._save2sml()
+        pr._save2json()
         disk.rename(pfile, pfile + '.save')
         #now we should be able to open it again
-        return Project.open( name, status = 'old', restore = restore )
+        return Project.open( name, status = constants.PROJECT_OLD, restore = restore )
 
     else:
-        nTerror('upgradeToSml: missing Project file "%s"', pfile)
+        io.error('upgradeToJson: missing Project file "{0}"\n', pfile)
         return None
     #end if
 #end def
@@ -182,7 +190,7 @@ def restoreShiftx100(project):
             return True
         #end if
 
-        shiftxResult = xML2obj(xmlFile)
+        shiftxResult = xmlTools.xML2obj(xmlFile)
         if not shiftxResult:
             nTerror('restoreShiftx100: restoring Shiftx results from xmlFile "%s" failed', xmlFile)
             return None
@@ -285,19 +293,19 @@ def upgrade100(project, restore):
     if restoreTalosPlus100(project):
         nTerror('upgrade100: restoring talosPlus data failed')
         return None
-    project.saveTalosPlus()
-
-    # Now patch queeny
-    if restoreQueeny100(project):
-        nTerror('upgrade100: restoring queeny data failed')
-        return None
-    project.saveQueeny()
-
-    # Now patch shiftx
-    if restoreShiftx100(project):
-        nTerror('upgrade100: restoring shiftx data failed')
-        return None
-    project.saveShiftx()
+    # project.saveTalosPlus()
+    #
+    # # Now patch queeny
+    # if restoreQueeny100(project):
+    #     nTerror('upgrade100: restoring queeny data failed')
+    #     return None
+    # project.saveQueeny()
+    #
+    # # Now patch shiftx
+    # if restoreShiftx100(project):
+    #     nTerror('upgrade100: restoring shiftx data failed')
+    #     return None
+    # project.saveShiftx()
 
     # Plugin registered functions
     nTdebug('upgrade100: calling plugins')

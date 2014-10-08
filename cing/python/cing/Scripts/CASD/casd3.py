@@ -11,6 +11,11 @@ from cing.Libs.AwkLike import AwkLikeS
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.Libs.disk import NTpath
 from cing.core.classes import ProjectTree
+from cing.Libs.xmlTools import nTtoXML
+from cing.Libs.xmlTools import xML2obj
+from cing.Libs.xmlTools import XMLhandler
+from cing.Libs.xmlTools import obj2XML
+
 
 import numpy as np
 import matplotlib.pyplot as plt

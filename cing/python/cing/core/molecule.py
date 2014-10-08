@@ -15,12 +15,11 @@ try:
     import pyximport
     pyximport.install()
     import cing.Libs.cython.superpose as superpose
-# GWV 20140501: changed calls
-#    from cing.Libs.cython.superpose import NTcMatrix
-#    from cing.Libs.cython.superpose import NTcVector
-#    from cing.Libs.cython.superpose import calculateRMSD
-#    from cing.Libs.cython.superpose import superposeVectors
-#    from cing.Libs.cython.superpose import Rm6dist #@UnresolvedImport
+    from cing.Libs.cython.superpose import NTcMatrix
+    from cing.Libs.cython.superpose import NTcVector
+    from cing.Libs.cython.superpose import calculateRMSD
+    from cing.Libs.cython.superpose import superposeVectors
+    from cing.Libs.cython.superpose import Rm6dist #@UnresolvedImport
 except ImportError:
     pass
 
@@ -50,19 +49,6 @@ import numpy
 #==============================================================================
 AtomIndex = 1
 _DEFAULT_CHAIN_ID = 'A' # Use Chain.defaultChainId which is public.
-
-# version <= 0.91: old sequence.dat defs
-# version 0.92: xml-sequence storage, xml-stereo storage
-# Superseded by SML routines >0.93
-# 0.94 storage of molecule specific database stuff
-NTmolParameters = NTdict(
-    version        = 0.92,
-    contentFile    = 'content.xml',
-    sequenceFile   = 'sequence.xml',
-    resonanceFile  = 'resonances.dat',
-    coordinateFile = 'coordinates.dat',
-    stereoFile     = 'stereo.xml'
-)
 
 chothiaClassA = 'a'
 chothiaClassB = 'b'
@@ -417,10 +403,10 @@ class Molecule( NTtree, ResidueList ):
 
         # save the content definitions; depreciated since version 0.75
         # Maintained for compatibility
-        self.content = NTdict( name = self.name, convention = INTERNAL )
-        self.content.update( NTmolParameters )
-        self.content.saveAllXML()
-        self.content.keysformat()
+#        self.content = NTdict( name = self.name, convention = INTERNAL )
+#        self.content.update( NTmolParameters )
+#        self.content.saveAllXML()
+#        self.content.keysformat()
 
         self.project = None
         self.rmsd = None
@@ -1594,32 +1580,6 @@ class Molecule( NTtree, ResidueList ):
         return None
     #end def
 
-    def _save075( self, path = None)   :
-        """Save sequence, resonances, stereo assignments and coordinates in <=0.75 format
-
-           gwv 13 Jun 08: Return self or None on error
-        """
-        if not path:
-            path = self.name + '.NTmol'
-
-        content = NTdict( name = self.name, convention = INTERNAL )
-        content.update( NTmolParameters )
-        content.saveAllXML()
-        content.keysformat()
-        xmlfile = os.path.join( path, NTmolParameters.contentFile )
-        if (obj2XML( content, path=xmlfile ) != content):
-            nTerror('Molecule.save: writing xml file "%s" failed', xmlfile)
-            return None
-        #end if
-        self.content = content
-        self._saveSequence(   os.path.join( path, NTmolParameters.sequenceFile   ) )
-        self._saveResonances(  os.path.join( path, NTmolParameters.resonanceFile  ) )
-        self._saveStereoAssignments( os.path.join( path, NTmolParameters.stereoFile ) )
-        self._saveCoordinates( os.path.join( path, NTmolParameters.coordinateFile ) )
-#        nTdetail('==> Saved %s to "%s"', self, smlFile) # smlFile was undefined.
-        nTdetail('==> Saved %s to "%s"', self )
-        return self
-    #end def
 
     def save( self, path = None)   :
         """Create a directory with SML file
@@ -1700,79 +1660,6 @@ class Molecule( NTtree, ResidueList ):
         return mol
     #end def
 
-    @staticmethod
-    def openMol_094( path )   :
-        """Static method to restore molecule from SML file path: 0.75< version <= 0.90
-           returns Molecule instance or None on error
-        """
-        #print '*** Opening using Molecule.openMol_094'
-
-        if (not os.path.exists( path )):
-            nTerror('Molecule.open: smlFile "%s" not found\n', path)
-            return None
-        #end if
-
-        mol = Molecule.SMLhandler.fromFile(path)  # pylint: disable=E1101
-        if not mol:
-            nTerror('Molecule.open: open from "%s" failed', path)
-            return None
-        #end if
-
-        mol._check()
-        mol.updateAll()
-
-        nTdetail('%s', mol.format())
-
-        return mol
-    #end def
-
-    @staticmethod
-    def openMol_075( path )   :
-        """Static method to restore molecule from directory path
-           implements the <=0.75 storage model
-           returns Molecule instance or None on error
-        """
-        # old format
-        nTdetail('Molecule.openMol_075: opening from old format "%s"', path)
-
-        if (not os.path.exists( path )):
-            nTerror('Molecule.openMol_075: path "%s" not found\n', path)
-            return None
-        #end if
-
-        content = xML2obj( path=os.path.join( path, NTmolParameters.contentFile ) )
-        if not content:
-            nTerror('Molecule.openMol_075: error reading xml file "%s"\n',
-                     os.path.join( path, NTmolParameters.contentFile )
-                   )
-            return None
-        #end if
-        content.keysformat()
-#        nTdebug('content from xml-file: %s', content.format())
-
-        mol = Molecule( name = content.name )
-        if not mol:
-            nTerror('Molecule.openMol_075: initializing molecule\n')
-            return None
-        #end if
-
-        mol.content = content
-        if content.has_key('sequenceFile') and not mol._restoreSequence(    os.path.join( path, content.sequenceFile   ) ):
-            return None
-        if content.has_key('resonanceFile') and mol._restoreResonances(  os.path.join( path, content.resonanceFile  ), append=False ) < 0:
-            return None
-        if content.has_key('stereoFile') and mol._restoreStereoAssignments( os.path.join( path, content.stereoFile ) ) < 0:
-            return None
-        mol._restoreCoordinates( os.path.join( path, content.coordinateFile ), append=False )
-
-        mol._check()
-        mol.updateAll()
-
-#        nTdebug('%s', mol.format())
-
-        return mol
-    #end def
-
     def _check(self):
         # check for potential atoms with incomplete resonances
         # Might occur after change of database
@@ -1794,100 +1681,6 @@ class Molecule( NTtree, ResidueList ):
                 #end for
             #end if
         #end for
-    #end def
-
-    def _saveSequence( self, fileName ):
-        """Write a xml sequence file.
-        return self or None on error
-        """
-        sequence = NTlist()
-        for res in self.allResidues():
-            # append a tuple
-            sequence.append( ( res.chain.name,
-                               res.db.translate(CYANA),
-                               res.resNum,
-                               CYANA
-                             )
-                           )
-        #end for
-        if obj2XML( sequence, path=fileName ) != sequence:
-            nTerror('Molecule._saveSequence: writing xml sequence file "%s"', fileName)
-            return None
-        #end if
-        return self
-    #end def
-
-    def _restoreSequence( self, sequenceFile ):
-        """Restore sequence from sequenceFile.
-        Return self or None on error.
-        """
-        if (not os.path.exists( sequenceFile ) ):
-            nTerror('Molecule.restoreSequence: sequenceFile "%s" not found\n',
-                     sequenceFile
-                   )
-            return None
-        #end if
-        # compatibility
-        if self.content.version < 0.92:
-            fileObject = open(sequenceFile, 'r')
-            for line in fileObject:
-                exec(line)
-            #end for
-            fileObject.close()
-        else:
-            sequence = xML2obj( sequenceFile )
-            if sequence == None:
-                nTerror('Molecule._restoreSequence: error parsing xml-file "%s"', sequenceFile)
-                return None
-            for chainId, resName, resNum, convention in sequence:
-                self.addResidue( chainId, resName, resNum, convention )
-            #end for
-        #end if
-        #nTdebug('Molecule._restoreSequence: %s', sequenceFile)
-        return self
-    #end def
-
-    def _saveResonances( self, fileName ):
-        """Write a plain text file with code for saving resonances
-        """
-        fp = open( fileName, 'w' )
-#        fprintf( fp, 'self.resonanceCount = %d\n', self.resonanceCount )
-        for atm in self.allAtoms():
-            for r in atm.resonances:
-                fprintf( fp, 'self%s.addResonance( value=%s, error=%s )\n',
-                              atm.cName2( 2 ),
-                              repr(r.value), repr(r.error)
-                       )
-            #end for
-        #end for
-        fp.close()
-        #nTdebug('Molecule.saveResonances: %s', fileName)
-    #end def
-
-    def _restoreResonances( self, fileName, append = True ):
-        """Restore resonances from fileName
-           Optionally append to existing settings
-           Return resonanceCount or -1 on error
-        """
-        if not os.path.exists( fileName ):
-            nTerror('Error Molecule._restoreResonances: file "%s" not found\n', fileName )
-            return -1
-        #end if
-        if not append:
-            self.initResonances(   )
-        #end if
-
-        #execfile( fileName )
-        # 25 Sep 2007: Explicit coding, less memory, better:
-        file = open(fileName, 'r')
-        for line in file:
-            exec(line)
-        #end for
-        file.close()
-
-        resonanceCount = len(self.resonanceSources)
-        #nTdebug('Molecule.restoreResonances: %s (%d)', fileName, resonanceCount)
-        return resonanceCount
     #end def
 
     def _convertResonanceSources(self, sMLfileVersion):
@@ -2184,91 +1977,6 @@ class Molecule( NTtree, ResidueList ):
         # end if
 #        nTdebug("Ignoring multimers with 3 or more chains for now.")
         return result
-
-
-    def _saveStereoAssignments( self, stereoFileName ):
-        """
-        Save the stereo assignments to xml stereoFileName.
-        Return self of None on error
-        """
-        stereo = NTlist()
-        for atm in self.allAtoms():
-            if atm.isStereoAssigned():
-                stereo.append( atm.nameTuple(convention=CYANA) )
-            #endif
-        #end for
-        if obj2XML(stereo, path=stereoFileName) != stereo:
-            nTerror('Molecule._saveStereoAssignments: write xml-file "%s" failed', stereoFileName)
-            return None
-        #end if
-
-        #nTdebug('Molecule.saveStereoAssignments: saved %d stereo assignments to "%s', len(stereo), stereoFileName)
-        return self
-    #end def
-
-    def _restoreStereoAssignments( self, stereoFileName ):
-        """
-        Restore the stereo assignments from xml stereoFileName,
-        return count or -1 on error
-        """
-        if not os.path.exists( stereoFileName ):
-            return -1
-
-        stereo = xML2obj(stereoFileName)
-        if stereo == None:
-            nTerror('Molecule._restoreStereoAssignment: parsing xml-file "s"', stereoFileName)
-            return -1
-        #end if
-
-        count = 0
-        for nameTuple in stereo:
-            atm = self.decodeNameTuple( nameTuple )
-            if atm == None:
-                nTerror('Molecule._restoreStereoAssignment: invalid atom nameTuple (%s)', nameTuple)
-            else:
-                atm.stereoAssigned = True
-                count += 1
-            #end if
-        #end for
-
-        #nTdebug('Molecule.restoreStereoAssignments: restored %d stereo assignments from "%s\n',count, stereoFileName)
-        return count
-    #end def
-
-    def _saveCoordinates( self, fileName ):
-        """Write a plain text file with code for saving coordinates"""
-        fp = open( fileName, 'w' )
-        fprintf( fp, 'self.modelCount = %d\n', self.modelCount )
-        for atm in self.allAtoms():
-            for c in atm.coordinates:
-                fprintf( fp, 'self%s.addCoordinate( %r, %r, %r, Bfac=%r )\n',
-                              atm.cName2( 2 ), c[0], c[1], c[2], c.Bfac)
-        fp.close()
-        #nTdebug('Molecule.saveCoordinates: %s', fileName)
-
-    def _restoreCoordinates( self, fileName, append = True ):
-        """Restore coordinates from fileName
-           Optionally append to existing settings
-           Return self or None on error
-        """
-        if not os.path.exists( fileName ):
-            nTerror('Error Molecule._restoreCoordinates: file "%s" not found\n', fileName )
-            return None
-        #end if
-        if not append:
-            for atm in self.allAtoms():
-                atm.coordinates = NTlist()
-            #end for
-        #end if
-        #execfile(fileName);
-        # 25 Sep 2007: Explicit coding, less memory, better:
-        file = open(fileName, 'r')
-        for line in file:
-            exec(line)
-        #end for
-        file.close()
-        #nTdebug('Molecule.restoreCoordinates: %s (%d)', fileName, self.modelCount)
-        return self
     #end def
 
     def initCoordinates(self, resetStatusObjects = False): # JFD: should we do this by default?
@@ -3903,43 +3611,9 @@ class RmsdResult( NTdict ):
         return '\n'.join( [self.header(), msg, '' ])
     #end def
 #end class
-
-
-#class XMLMoleculeHandler( XMLhandler ):
-#    """Molecule handler class"""
-#    def __init__( self ):
-#        XMLhandler.__init__( self, name='Molecule')
-#    #end def
-#
-#    def handle( self, node ):
-#        attrs = self.handleDictElements( node )
-#        if attrs == None: return None
-#        result = Molecule( name = attrs['name'] )
-#
-#        # update the attrs values
-#        result.update( attrs )
-#
-#        # restore the tree structure
-#        for child in result._children:
-##           print '>child>', repr(child)
-#            result[child.name] = child
-#            child._parent = result
-#        return result
-#    #end def
-##end class
-#
-##register this handler
-#Molecule.XMLhandler = XMLMoleculeHandler()
-
-
 #
 #==============================================================================
 #
-
-
-
-
-
 
 # pylint: disable=R0904
 class Chain( NTtree, ResidueList ):
@@ -4407,36 +4081,8 @@ Chain class: defines chain properties and methods
             nTerror('Chain.toSML: no SMLhandler defined')
         #end if
     #end def
-
 #end class
 
-#class XMLChainHandler( XMLhandler ):
-#    """Chain handler class"""
-#    def __init__( self ):
-#        XMLhandler.__init__( self, name='Chain')
-#    #end def
-#
-#    def handle( self, node ):
-#        attrs = self.handleDictElements( node )
-#        if attrs == None: return None
-#        result = Molecule( name = attrs['name'] )
-#
-#        # update the attrs values
-#        result.update( attrs )
-#
-#        # restore the tree structure and references
-#        for res in result._children:
-##           print '>child>', repr(child)
-#            result[res.name] = res
-#            result[res.shortName] = res
-#            result[res.resNum] = res
-#            res._parent = result
-#        return result
-#    #end def
-##end class
-#
-##register this handler
-#Chain.XMLhandler = XMLChainHandler()
 
 # pylint: disable=R0904
 class Residue( NTtree, SMLhandled ):
@@ -6727,30 +6373,6 @@ coordinates: %s"""  , dots, self, dots
 #end class
 
 
-#class XMLAtomHandler( XMLhandler ):
-#    """Atom handler class"""
-#    def __init__( self ):
-#        XMLhandler.__init__( self, name='Atom')
-#    #end def
-#
-#    def handle( self, node ):
-#        attrs = self.handleDictElements( node )
-#        if attrs == None: return None
-#        result = Atom( resName = attrs['resName'], atomName = attrs['name'] )
-#
-#        # update the attrs values
-#        result.update( attrs )
-#
-#        # restore the resonance references
-#        for r in result.resonances:
-#            r.atom = result
-#
-#        return result
-#    #end def
-##end class
-##register this handler
-#Atom.XMLhandler = XMLAtomHandler()
-
 class AtomList( NTlist ):
     """
     Class based on NTlist that holds atoms.
@@ -7174,39 +6796,6 @@ def updateResonancesFromPeaks( peaks, axes = None)   :
     #end for
 #end def
 
-
-#==============================================================================
-#def saveMolecule( molecule, fileName=None)   :
-#    """save to fileName for restoring with restoreMolecule"""
-#    if not fileName:
-#        fileName = molecule.name + '.xml'
-#    #end if
-#
-#    if (molecule == None):
-#        nTerror("saveMolecule: molecule not defined")
-#        return
-#    #end if
-#
-#    obj2XML( molecule, path=fileName )
-#
-#    nTmessage( '==> saveMolecule: saved to %s', fileName )
-#    #end if
-#end def
-
-#==============================================================================
-#def restoreMolecule( fileName)   :
-#    """restore from fileName, return Molecule instance """
-#
-#    mol = xML2obj( path=fileName )
-#    if (mol == None): return None
-#
-#    mol.source = fileName
-#
-#    nTmessage( '==> restoreMolecule: restored %s', mol.format())
-#    #end if
-#
-#    return mol
-##end def
 
 def rmsd( atomList ):
     """

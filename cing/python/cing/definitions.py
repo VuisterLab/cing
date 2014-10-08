@@ -23,8 +23,8 @@ verbosityWarning  = 2 # show errors and warnings
 verbosityOutput   = 3 # and regular output DEFAULT
 verbosityDetail   = 4 # show more details
 verbosityDebug    = 9 # add debugging info (not recommended for casual user)
-
 verbosityDefault  = verbosityOutput
+###### legacy definitions Jurgen local override
 try:
     from cing.localConstants import verbosityDefault
 except:
@@ -217,7 +217,7 @@ htmlDirectories = Adict.Adict(
 
 # These files and directories are just definitions
 cingPaths = Adict.Adict(
-    project      = 'project.sml',
+    project      = 'project.json',
 #    plugins      = 'PluginCode',  # OBSOLETE: to be replaced by cingDefinitions.pluginPath
     scripts      = 'Scripts',
 #    bin          = 'bin',       # OBSOLETE: to be replaced by cingDefinitions.binPath

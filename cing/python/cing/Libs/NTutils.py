@@ -1,20 +1,31 @@
 # pylint: disable=C0302
-'''
-Nijmegen Tools utilities
-'''
+"""
+NMR Tools utilities
+"""
 import cing
 import cing.constants as constants
 import cing.definitions as cdefs
 from cing.core import pid
+import cing.Libs.xmlTools as xmlTools
+from cing.Libs.xmlTools import quote
+import cing.Libs.jsonTools as jsonTools
 
-from cing import NaNstring
-from cing import verbosityDebug
-from cing import verbosityDefault #@UnusedImport actually used by wild imports of this module (NTutils)
-from cing import verbosityDetail
-from cing import verbosityError
-from cing import verbosityNothing
-from cing import verbosityOutput
-from cing import verbosityWarning
+import cing.Libs.io as io
+from cing.Libs.io import fprintf
+from cing.Libs.io import sprintf  #unused here but for compatibility
+from cing.Libs.io import printf   #unused here but for compatibility
+from cing.Libs.io import mprintf  #unused here but for compatibility
+
+
+from cing.constants import NaNstring
+from cing.definitions import verbosityDebug
+from cing.definitions import verbosityDefault #@UnusedImport actually used by wild imports of this module (NTutils)
+from cing.definitions import verbosityDetail
+from cing.definitions import verbosityError
+from cing.definitions import verbosityNothing
+from cing.definitions import verbosityOutput
+from cing.definitions import verbosityWarning
+
 from cing.Libs.disk import mkdirs #@UnusedImport
 from cing.Libs.fpconst import NaN
 from cing.Libs.fpconst import isNaN
@@ -33,11 +44,9 @@ from os.path import exists
 from os.path import expanduser
 from os.path import normpath
 from random import random #@UnusedImport for outside this module
-from string  import find
 from subprocess import PIPE
 from subprocess import Popen
-from xml.dom import minidom, Node
-from xml.sax import saxutils
+
 import array
 import datetime
 import locale # used in nrgCingRdb @UnusedImport
@@ -46,8 +55,10 @@ import optparse
 import os
 import pydoc
 import re
+from string  import find
 import sys
 import time
+
 
 FAC = 180.0/math.pi
 SMALLEST_BMRB_ID = 3
@@ -57,6 +68,18 @@ LARGEST_BMRB_ID = 99*1000
 # Disabled in an emergency fix for this failed after upgrade Mac Ports to 2.6.7
 # Not important enough to reenable.
 #locale.setlocale(locale.LC_ALL, "")
+
+# def quote(inputString):
+#     "return a single or double quoted string"
+#     single = (find(inputString, "'") >= 0)
+#     double = (find(inputString, '"') >= 0)
+#     if single and double:
+#         nTerror("in quote: both single and double quotes in [%s]" % inputString)
+#         return None
+#     if double:
+#         return "'" + inputString + "'"
+#     return '"' + inputString + '"'
+# #end def
 
 # pylint: disable=R0902
 class NTlist(list, Lister, SMLhandled):
@@ -647,16 +670,6 @@ Sum                %s""" % (
         'gv 19 Jun 08: reintroduced functionality, but shorter'
         msg = list.__repr__(self)
         return 'NTlist(' + msg[1:-1] + ')'
-
-#        if len(self) == 0:
-#            return 'NTlist()'
-#        #end if
-#        msg = 'NTlist('
-#        for item in self:
-#            msg = msg + repr( item ) +', '
-#        #end for
-#        msg = msg[:-2]+')'
-#        return msg
     #end def
 
     def format(self, fmt = None):
@@ -721,21 +734,21 @@ Sum                %s""" % (
 #        return htmlLine
 #    #end def
 
-    def toXML(self, depth=0, stream=sys.stdout, indent='\t', lineEnd='\n'):
-        """
-        Write XML-representation of elements of self to stream
-        """
-        nTindent(depth, stream, indent)
-        fprintf(stream, "<NTlist>")
-        fprintf(stream, lineEnd)
-
-        for a in self:
-            nTtoXML(a, depth+1, stream, indent, lineEnd)
-        #end for
-        nTindent(depth, stream, indent)
-        fprintf(stream, "</NTlist>")
-        fprintf(stream, lineEnd)
-    #end def
+    # def toXML(self, depth=0, stream=sys.stdout, indent='\t', lineEnd='\n'):
+    #     """
+    #     Write XML-representation of elements of self to stream
+    #     """
+    #     nTindent(depth, stream, indent)
+    #     fprintf(stream, "<NTlist>")
+    #     fprintf(stream, lineEnd)
+    #
+    #     for a in self:
+    #         xmlTools.nTtoXML(a, depth+1, stream, indent, lineEnd)
+    #     #end for
+    #     nTindent(depth, stream, indent)
+    #     fprintf(stream, "</NTlist>")
+    #     fprintf(stream, lineEnd)
+    # #end def
 
     def toSML(self, stream=sys.stdout):
         'Write by looked-up handler if available. An implementing class needs to have one defined it in order to be allowed to be called.'
@@ -747,6 +760,7 @@ Sum                %s""" % (
         self.SMLhandler.toSML(self, stream)
     #end def
 #end class
+
 
 
 def nTfill(value, n):
@@ -1154,21 +1168,21 @@ class NTset(NTlist):
         return string
     #end def
 
-    def toXML(self, depth=0, stream=sys.stdout, indent='\t', lineEnd='\n'):
-        """
-        Write XML-representation of elements of self to stream
-        """
-        nTindent(depth, stream, indent)
-        fprintf(stream, "<NTset>")
-        fprintf(stream, lineEnd)
-
-        for a in self:
-            nTtoXML(a, depth+1, stream, indent, lineEnd)
-        #end for
-        nTindent(depth, stream, indent)
-        fprintf(stream, "</NTset>")
-        fprintf(stream, lineEnd)
-    #end def
+    # def toXML(self, depth=0, stream=sys.stdout, indent='\t', lineEnd='\n'):
+    #     """
+    #     Write XML-representation of elements of self to stream
+    #     """
+    #     nTindent(depth, stream, indent)
+    #     fprintf(stream, "<NTset>")
+    #     fprintf(stream, lineEnd)
+    #
+    #     for a in self:
+    #         xmlTools.nTtoXML(a, depth+1, stream, indent, lineEnd)
+    #     #end for
+    #     nTindent(depth, stream, indent)
+    #     fprintf(stream, "</NTset>")
+    #     fprintf(stream, lineEnd)
+    # #end def
 #end class
 
 
@@ -1957,39 +1971,39 @@ class NTdict(dict):
     #------------------------------------------------------------------
     # XML routines
     #------------------------------------------------------------------
-    def toXML(self, depth=0, stream=sys.stdout, indent='  ', lineEnd='\n'):
-        """
-        Write XML-representation of keys/attributes of self (defined by the
-        saveXML or saveAllXML methods) to stream
-        """
-        nTindent(depth, stream, indent)
-        fprintf(stream, "<%s>", self.__CLASS__)
-        fprintf(stream, lineEnd)
-#       print node
-
-        # check for what we need to write out
-        if (self.__SAVEALLXML__):
-            keys = self.keys()
-        elif (self.__SAVEXML__ != None):
-            keys = self.__SAVEXML__
-        else:
-            keys = []
-        #end if
-
-        for a in keys:
-            nTindent(depth+1, stream, indent)
-            fprintf(stream, "<Attr name=%s>", quote(a))
-            fprintf(stream, lineEnd)
-
-            nTtoXML(self[a], depth+2, stream, indent, lineEnd)
-
-            nTindent(depth+1, stream, indent)
-            fprintf(stream, "</Attr>")
-            fprintf(stream, lineEnd)
-        #end for
-        nTindent(depth, stream, indent)
-        fprintf(stream, "</%s>", self.__CLASS__)
-        fprintf(stream, lineEnd)
+#     def toXML(self, depth=0, stream=sys.stdout, indent='  ', lineEnd='\n'):
+#         """
+#         Write XML-representation of keys/attributes of self (defined by the
+#         saveXML or saveAllXML methods) to stream
+#         """
+#         nTindent(depth, stream, indent)
+#         fprintf(stream, "<%s>", self.__CLASS__)
+#         fprintf(stream, lineEnd)
+# #       print node
+#
+#         # check for what we need to write out
+#         if (self.__SAVEALLXML__):
+#             keys = self.keys()
+#         elif (self.__SAVEXML__ != None):
+#             keys = self.__SAVEXML__
+#         else:
+#             keys = []
+#         #end if
+#
+#         for a in keys:
+#             nTindent(depth+1, stream, indent)
+#             fprintf(stream, "<Attr name=%s>", quote(a))
+#             fprintf(stream, lineEnd)
+#
+#             xmlTools.nTtoXML(self[a], depth+2, stream, indent, lineEnd)
+#
+#             nTindent(depth+1, stream, indent)
+#             fprintf(stream, "</Attr>")
+#             fprintf(stream, lineEnd)
+#         #end for
+#         nTindent(depth, stream, indent)
+#         fprintf(stream, "</%s>", self.__CLASS__)
+#         fprintf(stream, lineEnd)
     #end def
 
     def saveXML(self, *attrs):
@@ -2034,6 +2048,8 @@ class NTdict(dict):
     #end def
 #end class
 
+#LEGACY
+NTstruct = NTdict
 
 class CountMap(NTdict):
     'A Hash to int map. Superclass to AssignmentCountMap'
@@ -2152,9 +2168,6 @@ class NTtree(NTdict):
         self._iter = 0 # For iteration by __iter__
         # set names
         self.name = name        # keeping name is essential for later referencing
-
-        # saving name and children will allow to save the tree as XML and reconstruct
-        self.saveXML('name', '_children')
     #end def
 
     def cName(self, depth=0):
@@ -2981,548 +2994,6 @@ def nTsq(value):
     return value*value # fastest
 #end def
 
-def nTindent(depth, stream, indent):
-    """
-    Indent stream to depth; to pretty format XML
-    """
-    for dummy in range(depth):
-        fprintf(stream, indent)
-    #end for
-#end def
-
-XMLhandlers             = {}
-
-class XMLhandler:
-    """Generic handler class
-
-       methods:
-       __init__                 : will register the handler in XMLhandlers
-       handle                   : to be implemented in specific handler
-       handleSingleElement      : for float,int,string etc)
-       handleMultipleElements   : for list, tuple
-       handleDictElements       : for dict, NTdict and the like
-
-    """
-    def __init__(self, name):
-        global XMLhandlers # pylint: disable=W0602
-        self.name = name
-        XMLhandlers[name] = self
-    #end def
-
-    def handle(self, node):
-        'A do nothing method.'
-        pass
-    #end def
-
-    def handleSingleElement(self, node):
-        """Returns single element below node from DOM tree"""
-        self.printDebugNode(node)
-        if node.nodeName != self.name:
-            nTerror('XML%sHandler: invalid XML handler for node <%s>', self.name, node.nodeName)
-            return None
-        #end if
-        if len(node.childNodes) != 1:
-            nTerror("XML%sHandler: malformed DOM tree", self.name)
-            return None
-        #end if
-        if node.childNodes[0].nodeType != Node.TEXT_NODE:
-            nTerror("XML%sHandler: malformed DOM tree, expected TEXT_NODE containing value", self.name)
-            return None
-        #end if
-        result = node.childNodes[0].nodeValue
-#        nTdebug("==>%s %s",repr(node), result)
-        return result
-    #end def
-
-    def handleMultipleElements(self, node):
-        'For each child handle XML'
-        self.printDebugNode(node)
-        if node.nodeName != self.name:
-            nTerror('XML%Handler: invalid XML handler for node <%s>\n', self.name, node.nodeName)
-            return None
-        #end if
-        result = []
-        for subNode in node.childNodes:
-            if subNode.nodeType == Node.ELEMENT_NODE:
-                result.append(nThandle(subNode))
-            #end if
-        #end for
-#        nTdebug("==>%s %s",repr(node), result)
-        return  result
-    #end def
-
-    def handleDictElements(self, node):
-        'For dictionary elements return another dictionary.'
-        self.printDebugNode(node)
-        if node.nodeName != self.name:
-            nTerror('XML%sHandler: invalid XML handler for node <%s>\n', self.name, node.nodeName)
-            return None
-        #end if
-
-        result = {}
-
-# We have two dict formats
-# original 'NT' format:
-##
-##<dict>
-##    <key name="noot">
-##        <int>2</int>
-##    </key>
-##    <key name="mies">
-##        <int>3</int>
-##    </key>
-##    <key name="aap">
-##        <int>1</int>
-##    </key>
-##</dict>
-##
-# Or Apple plist dict's
-##<dict>
-##      <key>Key</key>
-##      <string>3F344E56-C8C2-4A1C-B6C7-CD84EAA1E70A</string>
-##      <key>Title</key>
-##      <string>New on palm</string>
-##      <key>Type</key>
-##      <string>com.apple.ical.sources.naivereadwrite</string>
-##</dict>
-
-        # first collect all element nodes, skipping the 'empty' text nodes
-        subNodes = []
-        for n in node.childNodes:
-#            print '>>',n
-            if n.nodeType == Node.ELEMENT_NODE:
-                subNodes.append(n)
-        #end for
-        if len(subNodes) == 0:
-            return result
-
-        #append all keys, checking for 'format' as outlined above
-        i = 0
-        while (i < len(subNodes)):
-            #print '>>', len(subNodes), i, str(subNodes[i]), 'childnodes:', len(subNodes[i].childNodes), str(subNodes[i].childNodes[0])
-            self.printDebugNode(subNodes[i])
-
-            try:
-                keyName = subNodes[i].attributes.get('name').nodeValue
-                #test for valid childNodes; have seen cases they don't exits (!?)
-                if len(subNodes[i].childNodes) > 1:
-                    value = nThandle(subNodes[i].childNodes[1])
-                else:
-                    nTdebug('XMLhandler.handleDictElements: empty key "%s", value set to None', keyName)
-                    value = None
-                i += 1
-            except AttributeError:
-                keyName = subNodes[i].childNodes[0].nodeValue
-                value = nThandle(subNodes[i+1])
-                i += 2
-
-#            print ">>", keyName, value
-            result[keyName] = value
-        #end while
-#        nTdebug("==>%s %s",repr(node), result)
-        return result
-    #end def
-
-    def printDebugNode(self, node):
-        'Flip this method on when needing output for debugging.'
-        pass
-#        nTdebug("   %s, type %s, subnodes %d", str(node), node.nodeType, len(node.childNodes) )
-    #end def
-#end class
-
-
-class XMLNoneHandler(XMLhandler):
-    """None handler class"""
-    def __init__(self):
-        XMLhandler.__init__(self, name='None')
-    #end def
-
-    def handle(self, node):
-        return None
-    #end def
-#end class
-
-class XMLintHandler(XMLhandler):
-    """int handler class"""
-    def __init__(self):
-        XMLhandler.__init__(self, name='int')
-    #end def
-
-    def handle(self, node):
-        result = self.handleSingleElement(node)
-        if result == None:
-            return None
-        return int(result)
-    #end def
-#end class
-
-
-class XMLboolHandler(XMLhandler):
-    """bool handler class"""
-    def __init__(self):
-        XMLhandler.__init__(self, name='bool')
-    #end def
-
-    def handle(self, node):
-        result = self.handleSingleElement(node)
-        if result == None:
-            return None
-        # NB: bool('False') returns True!
-        return bool(result=='True')
-    #end def
-#end class
-
-
-class XMLfloatHandler(XMLhandler):
-    """float handler class"""
-    def __init__(self):
-        XMLhandler.__init__(self, name='float')
-    #end def
-
-    def handle(self, node):
-        result = self.handleSingleElement(node)
-        if result == None:
-            return None
-        return float(result)
-    #end def
-#end class
-
-
-class XMLstringHandler(XMLhandler):
-    """string handler class"""
-    def __init__(self):
-        XMLhandler.__init__(self, name='string')
-    #end def
-
-    def handle(self, node):
-        # strings can be empty
-        if len(node.childNodes) == 0:
-            return ''
-
-        result = self.handleSingleElement(node)
-        if result == None:
-            return None
-        return str(saxutils.unescape(result))
-    #end def
-#end class
-
-
-class XMLunicodeHandler(XMLhandler):
-    """unicode handler class"""
-    def __init__(self):
-        XMLhandler.__init__(self, name='unicode')
-    #end def
-
-    def handle(self, node):
-        # strings can be empty
-        if len(node.childNodes) == 0:
-            return unicode('')
-
-        result = self.handleSingleElement(node)
-        if result == None:
-            return None
-        return unicode(saxutils.unescape(result))
-    #end def
-#end class
-
-
-class XMLlistHandler(XMLhandler):
-    """list handler class"""
-    def __init__(self):
-        XMLhandler.__init__(self, name='list')
-    #end def
-
-    def handle(self, node):
-        result = self.handleMultipleElements(node)
-        if result == None:
-            return None
-        return result
-    #end def
-#end class
-
-
-class XMLNTlistHandler(XMLhandler):
-    """NTlist handler class"""
-    def __init__(self):
-        XMLhandler.__init__(self, name='NTlist')
-    #end def
-
-    def handle(self, node):
-        items = self.handleMultipleElements(node)
-        if items == None:
-            return None
-        result = NTlist()
-        for item in items:
-            result.append(item)
-        return result
-    #end def
-#end class
-
-
-class XMLtupleHandler(XMLhandler):
-    """tuple handler class"""
-    def __init__(self):
-        XMLhandler.__init__(self, name='tuple')
-    #end def
-
-    def handle(self, node):
-        result = self.handleMultipleElements(node)
-        if result == None:
-            return None
-        return tuple(result)
-    #end def
-#end class
-
-
-class XMLdictHandler(XMLhandler):
-    """dict handler class"""
-    def __init__(self):
-        XMLhandler.__init__(self, name='dict')
-    #end def
-
-    def handle(self, node):
-        result = self.handleDictElements(node)
-        if result == None:
-            return None
-        return result
-    #end def
-#end class
-
-
-class XMLNTdictHandler(XMLhandler):
-    """NTdict handler class"""
-    def __init__(self):
-        XMLhandler.__init__(self, name='NTdict')
-    #end def
-
-    def handle(self, node):
-        attrs = self.handleDictElements(node)
-        if attrs == None:
-            return None
-        result = NTdict()
-        result.update(attrs)
-        return result
-    #end def
-#end class
-
-
-class XMLNTtreeHandler(XMLhandler):
-    """NTtree handler class"""
-    def __init__(self):
-        XMLhandler.__init__(self, name='NTtree')
-    #end def
-
-    def handle(self, node):
-        attrs = self.handleDictElements(node)
-        if attrs == None:
-            return None
-#       print ">>attrs", attrs
-        result = NTtree(name = attrs['name'])
-
-        # update the attrs values
-        result.update(attrs)
-
-        # restore the tree structure
-        for child in result._children: # pylint: disable=W0212
-#           print '>child>', repr(child)
-            result[child.name] = child
-            child._parent = result
-        return result
-    #end def
-#end class
-
-
-class XMLNTvalueHandler(XMLhandler):
-    """NTvalue handler class"""
-    def __init__(self):
-        XMLhandler.__init__(self, name='NTvalue')
-    #end def
-
-    def handle(self, node):
-        attrs = self.handleDictElements(node)
-        if attrs == None:
-            return None
-        result = NTvalue(value = attrs['value'], error = attrs['error'], fmt = attrs['fmt'], fmt2 = attrs['fmt2'])
-        result.update(attrs)
-        return result
-    #end def
-#end class
-
-class XMLNTplistHandler(XMLhandler):
-    """NTplist handler class"""
-    def __init__(self):
-        XMLhandler.__init__(self, name='plist')
-    #end def
-
-    def handle(self, node):
-        result = NTplist()
-        for subNode in node.childNodes:
-            if (subNode.nodeType == Node.ELEMENT_NODE):
-                attrs = nThandle(subNode)
-                if attrs == None:
-                    return None
-                result.update(attrs)
-            #end if
-        #end for
-        return result
-    #end def
-#end class
-
-#define one instance of the handlers
-nonehandler     = XMLNoneHandler()
-inthandler      = XMLintHandler()
-boolhandler     = XMLboolHandler()
-floathandler    = XMLfloatHandler()
-stringhandler   = XMLstringHandler()
-unicodehandler  = XMLunicodeHandler()
-listhandler     = XMLlistHandler()
-tuplehandler    = XMLtupleHandler()
-dicthandler     = XMLdictHandler()
-
-# link handler of own classes to class def
-NTlist.XMLhandler  = XMLNTlistHandler()
-NTdict.XMLhandler  = XMLNTdictHandler()
-NTtree.XMLhandler  = XMLNTtreeHandler()
-NTvalue.XMLhandler = XMLNTvalueHandler()
-NTplist.XMLhandler = XMLNTplistHandler()
-
-
-def nThandle(node):
-    """Handle a given node, return object of None in case of Error
-    """
-    if node == None:
-        nTerror("nThandle: None node")
-        return None
-    #end if
-    if node.nodeName not in XMLhandlers:
-        nTerror('nThandle: no handler for XML <%s>', node.nodeName)
-        return None
-    #end if
-    return XMLhandlers[node.nodeName].handle(node)
-#end def
-
-def nTtoXML(obj, depth=0, stream=sys.stdout, indent='\t', lineEnd='\n'):
-    """Generate XML:
-       check for method toXML
-       or
-       standard types int, float, tuple, list, dict
-    """
-    if (obj == None):
-        nTindent(depth, stream, indent)
-        fprintf(stream, "<None/>")
-        fprintf(stream, lineEnd)
-    elif hasattr(obj, 'toXML'):
-        obj.toXML(depth, stream, indent, lineEnd)
-    elif (type(obj) == int):
-        nTindent(depth, stream, indent)
-        fprintf(stream, "<int>%s</int>", repr(obj))
-        fprintf(stream, lineEnd)
-    elif (type(obj) == bool):
-        nTindent(depth, stream, indent)
-        fprintf(stream, "<bool>%s</bool>", repr(obj))
-        fprintf(stream, lineEnd)
-    elif (type(obj) == float):
-        nTindent(depth, stream, indent)
-        fprintf(stream, "<float>%s</float>", repr(obj))
-        fprintf(stream, lineEnd)
-    elif (type(obj) == str):
-        nTindent(depth, stream, indent)
-#        fprintf( stream, "<string>%s</string>",  saxutils.escape( obj )  )
-        fprintf(stream, "<string>%s</string>", unicode(saxutils.escape(obj)))
-        fprintf(stream, lineEnd)
-    elif (type(obj) == unicode):
-        nTindent(depth, stream, indent)
-        fprintf(stream, "<unicode>%s</unicode>", unicode(saxutils.escape(obj)))
-        fprintf(stream, lineEnd)
-    elif (type(obj) == list):
-        nTindent(depth, stream, indent)
-        fprintf(stream, "<list>")
-        fprintf(stream, lineEnd)
-        for a in obj:
-            nTtoXML(a, depth+1, stream, indent, lineEnd)
-        #end for
-        nTindent(depth, stream, indent)
-        fprintf(stream, "</list>")
-        fprintf(stream, lineEnd)
-    elif (type(obj) == tuple):
-        nTindent(depth, stream, indent)
-        fprintf(stream, "<tuple>")
-        fprintf(stream, lineEnd)
-        for a in list(obj):
-            nTtoXML(a, depth+1, stream, indent, lineEnd)
-        #end for
-        nTindent(depth, stream, indent)
-        fprintf(stream, "</tuple>")
-        fprintf(stream, lineEnd)
-    elif (type(obj) == dict):
-        nTindent(depth, stream, indent)
-        fprintf(stream, "<dict>")
-        fprintf(stream, lineEnd)
-        for key, value in obj.iteritems():
-            nTindent(depth+1, stream, indent)
-            fprintf(stream, "<key name=%s>", quote(key))
-            fprintf(stream, lineEnd)
-            nTtoXML(value, depth+2, stream, indent, lineEnd)
-            nTindent(depth+1, stream, indent)
-            fprintf(stream, "</key>")
-            fprintf(stream, lineEnd)
-        #end for
-        nTindent(depth, stream, indent)
-        fprintf(stream, "</dict>")
-        fprintf(stream, lineEnd)
-    else:
-        pass
-#        nTerror('nTtoXML: undefined object "%s": cannot generate XML\n', obj) # TODO: reenable when done testing.
-    #end if
-#end def
-
-def obj2XML(obj, stream=None, path=None):
-    """Convert an object to XML
-       output to stream or path
-       gwv 13 Jun08: return object or None on error
-    """
-    if obj == None:
-        nTerror("obj2XML: no object")
-        return None
-    if stream == None and path == None:
-        nTerror("obj2XML: no output defined")
-        return None
-
-    closeFile = 0
-    if not stream:
-        stream = open(path, 'w')
-        closeFile = 1
-
-    fprintf(stream, '<?xml version="1.0" encoding="ISO-8859-1"?>\n')
-    nTtoXML(obj, depth=0, stream=stream, indent='    ')
-
-    if closeFile:
-        stream.close()
-
-    return obj
-#end def
-
-def xML2obj(path=None, string=None):
-    """Convert XML file to object
-       returns object or None on error
-    """
-    if path == None and string==None:
-        nTerror("xML2obj: no input defined")
-        return None
-
-#    nTdebug("Starting to read XML from path: " + repr(path)+ " or string: " + repr(string))
-    if path:
-        doc = minidom.parse(path)
-    else:
-        doc = minidom.parseString(string)
-#    nTdebug("Done reading XML")
-    root = doc.documentElement
-
-    result = nThandle(root)
-    doc.unlink()
-    return result
-#end def
-
 
 class Sorter:
     '''
@@ -3589,18 +3060,6 @@ class Sorter:
 #end class
 NTsort = Sorter()
 
-
-def quote(inputString):
-    "return a single or double quoted string"
-    single = (find(inputString, "'") >= 0)
-    double = (find(inputString, '"') >= 0)
-    if single and double:
-        nTerror("in quote: both single and double quotes in [%s]" % inputString)
-        return None
-    if double:
-        return "'" + inputString + "'"
-    return '"' + inputString + '"'
-#end def
 
 
 def asci2list(inputStr, onlyStartStopIdx = False):
@@ -3877,33 +3336,6 @@ class NTprogressIndicator: # pylint: disable=R0903
     #end def
 #end class
 
-def fprintf(stream, form, *args):
-    """C's fprintf routine"""
-    if args:
-        stream.write((form) % (args))
-    else:
-        stream.write(form)
-
-def mprintf(fps, fmt, *args):
-    """
-    Print to list of filepointers (fps) using format and args.
-    Use fp only if it evaluates to True.
-    """
-    for fp in fps:
-        if fp:
-            fprintf(fp, fmt, *args)
-# end def
-
-def sprintf(form, *args):
-    """return a string according to C's sprintf routine"""
-    return ((form) % (args))
-# end def
-
-def printf(form, *args):
-    """print string according to C's printf routine"""
-    # JFD: need to take out the sys.stdout dep?
-    fprintf(sys.stdout, form, *args)
-# end def
 
 class PrintWrap:
     '''
@@ -5177,13 +4609,13 @@ prefixWarning   = 'WARNING: '
 prefixDebug     = 'DEBUG: '
 
 nTnothing = PrintWrap(verbose=verbosityNothing) # JFD added but totally silly
-nTerror   = PrintWrap(verbose=verbosityError, prefix = prefixError)
-nTcodeerror=PrintWrap(verbose=verbosityError, prefix = prefixCodeError)
-nTexception=PrintWrap(verbose=verbosityError, prefix = prefixException)
-nTwarning = PrintWrap(verbose=verbosityWarning, prefix = prefixWarning)
+nTerror   = PrintWrap(verbose=verbosityError, prefix = prefixError, stream=sys.stderr)
+nTcodeerror=PrintWrap(verbose=verbosityError, prefix = prefixCodeError, stream=sys.stderr)
+nTexception=PrintWrap(verbose=verbosityError, prefix = prefixException, stream=sys.stderr)
+nTwarning = PrintWrap(verbose=verbosityWarning, prefix = prefixWarning, stream=sys.stderr)
 nTmessage = PrintWrap(verbose=verbosityOutput)
 nTdetail  = PrintWrap(verbose=verbosityDetail)
-nTdebug   = PrintWrap(verbose=verbosityDebug, prefix = prefixDebug)
+nTdebug   = PrintWrap(verbose=verbosityDebug, prefix = prefixDebug, stream=sys.stderr)
 nTmessageNoEOL = PrintWrap(verbose=verbosityOutput, noEOL=True)
 
 kwdsPrintWrap = {'useDate':True, 'useProcessId':True, 'doubleToStandardStreams': True}
@@ -5229,9 +4661,8 @@ NTcAverage         = nTcAverage
 NTcVarianceAverage = nTcVarianceAverage
 NTexit             = nTexit
 NTfill             = nTfill
-NThandle           = nThandle
 NThistogram        = nThistogram
-NTindent           = nTindent
+
 NTlimit            = nTlimit
 NTlimitSingleValue = nTlimitSingleValue
 NTmax              = nTmax
@@ -5240,7 +4671,6 @@ NTmkdir            = nTmkdir
 NTpath             = nTpath
 NTsign             = nTsign
 NTsq               = nTsq
-NTtoXML            = nTtoXML
 NTzap              = nTzap
 
 # Block the import so it stays here.

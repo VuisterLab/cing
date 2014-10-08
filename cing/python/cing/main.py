@@ -470,7 +470,7 @@ def testByName(name, excludedModuleList):
 
     try:
         exec("import %s" % (mod_name))
-        exec("suite = unittest.defaultTestLoader.loadTestsFromModule(%s)" % (mod_name))
+        exec("suite = unittest.defaultTestLoader.loadTestsFromModule(%s)" % mod_name)
         testVerbosity = 2
         unittest.TextTestRunner(verbosity=testVerbosity).run(suite) #@UndefinedVariable
         nTmessage('\n\n\n')

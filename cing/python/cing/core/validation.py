@@ -43,6 +43,10 @@ class ValidationResultsContainer(Adict.Adict):
 class ValidationResult(Adict.Adict):
     """v3:base class for validation results dict's
     """
+    def __init__(self):
+        Adict.Adict.__init__(self)
+        self.object = None
+
     def __str__(self):
         if self.object != None:
             s =  '<%s: %s>'      % (self.__class__.__name__,
