@@ -59,16 +59,17 @@ def upgradeProject2Json( name, restore  ):
 
         # change types of names list
         for listName in 'moleculeNames peakListNames distanceListNames dihedralListNames rdcListNames'.split():
+            #print 'listName>>',listName, (listName in pr)
             if listName in pr:
-                pr[listName] = list(pr[listName])
+                pr[listName] = [n for n in pr[listName]]
 
         # convert status type to Adict
         status = Adict()
         for key in pr.status.keys():
             status[key] = pr.getStatusDict(key, **pr.status[key].toDict())
         pr.status = status
-        # update the shiftx status
 
+        # update the shiftx status
         s = pr.getStatusDict(constants.SHIFTX_KEY)
         s.update(pr.shiftxStatus)
         del(pr['shiftxStatus'])

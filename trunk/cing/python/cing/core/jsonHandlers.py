@@ -2,48 +2,50 @@ import cing
 import cing.Libs.jsonTools as jsonTools
 import cing.Libs.io as io
 import cing.Libs.NTutils as ntu
+import cing.Libs.Adict as adict
 
 
-class NTdictJsonHandler(jsonTools.handlers.BaseHandler):
-    """Handler for the ntdict class
+class AdictJsonHandler(jsonTools.handlers.AnyDictHandler):
+    """Handler for the Adict class
     """
     def flatten(self, obj, data):
         data['version'] = cing.definitions.cingDefinitions.version
-        data['convention'] = cing.constants.INTERNAL
-        data['items'] = []
-        for k in obj.keys():
-            data['items'].append( (k,jsonTools.encode(obj[k])) )
-        return data
+        return self._flatten(obj, data)
 
-    def restore(self, obj):
-        #print "restore>", obj
-        a = ntu.NTdict()
-        for key,value in obj['items']:
-            a[key] = jsonTools.decode(value)
-        return a
+    def restore(self, data):
+        a = adict.Adict()
+        return self._restore(data, a)
 #end class
-jsonTools.handlers.register(ntu.NTdict,NTdictJsonHandler)
+AdictJsonHandler.handles(adict.Adict)
 
 
-class NTlistJsonHandler(jsonTools.handlers.BaseHandler):
+class NTdictJsonHandler(jsonTools.handlers.AnyDictHandler):
+    """Handler for the NTdict class
+    """
+    def flatten(self, obj, data):
+        data['version'] = cing.definitions.cingDefinitions.version
+        return self._flatten(obj, data)
+
+    def restore(self, data):
+        d = ntu.NTdict()
+        return self._restore(data, d)
+#end class
+NTdictJsonHandler.handles(ntu.NTdict)
+
+
+class NTlistJsonHandler(jsonTools.handlers.AnyListHandler):
     """Handler for the NTlist class
     """
     def flatten(self, obj, data):
         data['version'] = cing.definitions.cingDefinitions.version
-        data['convention'] = cing.constants.INTERNAL
-        data['values'] = []
-        for k in obj:
-            data['values'].append( jsonTools.encode(k) )
-        return data
+        return self._flatten(obj, data)
 
-    def restore(self, obj):
+    def restore(self, data):
         #print "restore>", obj
         a = ntu.NTlist()
-        for value in obj['values']:
-            a.append( jsonTools.decode(value) )
-        return a
+        return self._restore(data, a)
 #end class
-jsonTools.handlers.register(ntu.NTlist,NTlistJsonHandler)
+NTlistJsonHandler.handles(ntu.NTlist)
 
 
 class TimeJsonHandler(jsonTools.handlers.BaseHandler):
@@ -51,56 +53,45 @@ class TimeJsonHandler(jsonTools.handlers.BaseHandler):
     """
     def flatten(self, obj, data):
         data['version'] = cing.definitions.cingDefinitions.version
-        data['convention'] = cing.constants.INTERNAL
         data['time'] = float.__repr__(obj)
         return data
 
-    def restore(self, obj):
+    def restore(self, data):
         #print 'restore>', obj
-        return io.Time(obj['time'])
+        return io.Time(data['time'])
 #end class
-jsonTools.handlers.register(io.Time, TimeJsonHandler)
+TimeJsonHandler.handles(io.Time)
 
 
-class ProjectJsonHandler(jsonTools.handlers.BaseHandler):
+class ProjectJsonHandler(jsonTools.handlers.AnyDictHandler):
     """Json handler for the Project class
     """
-    def flatten(self, project, data):
-        # have name and version readily available for decoding later as all keys will be 'encoded' in a list
-        data['name'] = project.name
+    def flatten(self, obj, data):
+        # have name, version and convention readily available for decoding later as all keys will be 'encoded' in a list
+        data['name'] = obj.name
         data['version'] = cing.definitions.cingDefinitions.version
         data['convention'] = cing.constants.INTERNAL
-        data['items'] = [(k,jsonTools.encode(project[k])) for k in project.saveKeys ]
+        flatten = self.context.flatten
+        data['items'] = [flatten([k,obj[k]],reset=False) for k in obj.saveKeys ]
         return data
 
     def restore(self, data):
         #print 'restore>', data
-        p = cing.core.classes.Project(name=data['name'])
-        for key,value in data['items']:
-            #print '>>', key, value
-            p[key] = jsonTools.decode(value)
-        return p
+        p = cing.Project(name=data['name'])
+        #print data['items']
+        return self._restore(data, p)
 #end class
-# register this handler
-jsonTools.handlers.register(cing.core.classes.Project,ProjectJsonHandler)
+ProjectJsonHandler.handles(cing.Project)
 
-
-class HistoryJsonHandler(jsonTools.handlers.BaseHandler):
+class HistoryJsonHandler(jsonTools.handlers.AnyListHandler):
     """Handler for the History class
     """
     def flatten(self, obj, data):
         data['version'] = cing.definitions.cingDefinitions.version
-        data['convention'] = cing.constants.INTERNAL
-        data['values'] = []
-        for k in obj:
-            data['values'].append( jsonTools.encode(k) )
-        return data
+        return self._flatten(obj,data)
 
-    def restore(self, obj):
-        #print "restore>", obj
-        a = cing.core.classes.History()
-        for value in obj['values']:
-            a.append( jsonTools.decode(value) )
-        return a
+    def restore(self, data):
+        h = cing.core.classes.History()
+        return self._restore(data, h)
 #end class
-jsonTools.handlers.register(cing.core.classes.History,HistoryJsonHandler)
+HistoryJsonHandler.handles(cing.core.classes.History)
