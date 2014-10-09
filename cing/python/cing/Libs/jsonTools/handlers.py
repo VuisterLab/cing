@@ -97,6 +97,75 @@ class BaseHandler(object):
         return cls
 
 
+class AnyDictHandler(BaseHandler):
+    """
+    Base class for dict objects
+    GWV
+    """
+    def flatten(self, obj, data):
+        """
+        Needs subclassing
+        """
+        return self._flatten(obj,data)
+
+    def _flatten(self, obj, data):
+        flatten = self.context.flatten
+        data['items'] = [flatten([k,obj[k]],reset=False) for k in obj.keys()]
+        return data
+
+    def restore(self, data):
+        """
+        Needs subclassing
+        """
+        return None
+
+    def _restore(self, data, obj):
+        """
+        restores key, values from dat into object
+        """
+        if obj is None: return None
+        restore = self.context.restore
+        for item in data['items']:
+            key,value = restore(item, reset=False)
+            obj[key] = value
+        return obj
+#end class
+
+
+class AnyListHandler(BaseHandler):
+    """
+    Base class for list objects
+    GWV
+    """
+    def flatten(self, obj, data):
+        """
+        Needs subclassing
+        """
+        return self._flatten(obj,data)
+
+    def _flatten(self, obj, data):
+        flatten = self.context.flatten
+        data['values'] = [flatten(k,reset=False) for k in obj]
+        return data
+
+    def restore(self, data):
+        """
+        Needs subclassing
+        """
+        return None
+
+    def _restore(self, data, obj):
+        """
+        restores key, values from dat into object
+        """
+        if obj is None: return None
+        restore = self.context.restore
+        for value in data['values']:
+            obj.append(restore(value, reset=False))
+        return obj
+#end class
+
+
 class DatetimeHandler(BaseHandler):
 
     """Custom handler for datetime objects

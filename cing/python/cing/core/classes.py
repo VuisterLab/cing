@@ -291,13 +291,13 @@ Project: Top level Cing project class
     def rootPath(pathName):
         """Static method returning root,name,ext of project from pathName
         root will be name.cing
-        extension will be .tgz (if name had .tgz extension) or .sml or .xml
+        extension will be .tgz/.zip (if name had .tgz/.zip extension) or .json or .xml
 
         name can be:
             simple_name_string
             directory.cing
             directory.cing/
-            directory.cing/project.sml
+            directory.cing/project.json (or directory.cing/project.xml for old-style)
             name.tgz
             name.cing.tgz
             name.zip
@@ -318,7 +318,7 @@ Project: Top level Cing project class
             return root, name, ext
         # anything else
         elif len(name) > 0:
-            return Path(root.strip()) / name+'.cing', name, '.sml'
+            return Path(root.strip()) / name+'.cing', name, '.json'
         # we should not be here
         else:
             nTerror('Project.rootPath: unable to parse "%s"', pathName)
@@ -490,11 +490,13 @@ Project: Top level Cing project class
         sdict = self.status.setdefault(key, defaults)
         if sdict is None:
             io.error('Project.getStatusDict: key %s returned None, reverting to default values\n', key)
-            sdict = defaults
+            sdict = Adict()
+        else:
+            # convert to Adict
+            s = Adict()
+            s.update(sdict)
+            sdict = s
         #end if
-        # convert to Adict
-        sdict = Adict( sdict )
-        self.status[key] = sdict
         # update keys
         sdict.setdefaultKeys(defaults)
         sdict.setdefaultKeys(minimals)
@@ -504,6 +506,7 @@ Project: Top level Cing project class
             else:
                 sdict.remark = '%s not completed' % key
         #end if
+        self.status[key] = sdict
         return sdict
     #end def
 
@@ -814,6 +817,7 @@ Project: Top level Cing project class
     def _save2json(self):
         """Save project settings as json file"""
         path = self.path() / cdefs.cingPaths.project
+        self.lastSaved = io.now()
         # get key, value pairs to save
         jsonTools.set_encoder_options('json',indent=4)
         return jsonTools.obj2json( self, path )
