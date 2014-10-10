@@ -4,6 +4,8 @@
 import sys
 import os
 
+import cing
+
 def makePid( *args ):
     """
     Return Pid object from arguments
@@ -32,36 +34,39 @@ class Pid( str ):
     - Incrementation and decrementation
     
     pid = makePid('Residue','mol1','A',507)
-    -> 'Residue:mol1.A.502'
+    -> Residue:mol1.A.502   (Pid instance)
+
+    pid.type
+    -> 'Residue' (str instance)
+
+    pid.id
+    -> 'mol1.A.502' (str instance)
     
     pid[0]
-    -> Residue
+    -> Residue (Pid instance)
     
     for id in pid:
         print id
     ->
-    Residue
-    mol1
-    A
-    502
+    'Residue' (str instance)
+    'mol1' (str instance)
+    'A'  (str instance)
+    '502'  (str instance)
     
     pid2 = pid.modify(0, 'Atom') + 'N'
-    -> 'Atom:mol1.A.502.N'
+    -> Atom:mol1.A.502.N  (Pid instance)
     
     but also:
-    pid3 = pid[0:3] + 100
-    -> 'Residue:mol1.A.100'
+    pid3 = pid[0:3] + '100'
+    -> Residue:mol1.A.100  (Pid instance)
     
-    pid4 = pid[0:3] + (int(pid[3]) - 1)
-    -> 'Residue:mol1.A.501'
-    
-    which is equivalent to
     pid4 = pid.decrement(3,1)
+    -> Residue:mol1.A.501  (Pid instance)
     or
     pid4 = pid.increment(3,-1)
     
     pid5 = pid.copy()
-    -> 'Residue:mol1.A.502'
+    -> Residue:mol1.A.502  (Pid instance)
     
     pid==pid5
     -> True
@@ -74,7 +79,27 @@ class Pid( str ):
     nameMap = dict(
         MO = 'Molecule'
     )
+
+    def __init__(self, string):
+        str.__init__(self, string)
+        self.version = cing.cingDefinitions.version
+
+    @property
+    def type(self):
+        parts = self._split()
+        if len(parts) > 0:
+            return parts[0]
+        else:
+            return ''
     
+    @property
+    def id(self):
+        parts = self._split()
+        if len(parts) > 1:
+            return '.'.join(parts[1:])
+        else:
+            return ''
+
     def __add__(self, other):
         tmp = self._split() + [other]
         return makePid(*tmp)
@@ -98,7 +123,7 @@ class Pid( str ):
     
     def __iter__(self):
         for f in self._split():
-            yield makePid(f)
+            yield f
         #end for
     #end def
     
@@ -112,7 +137,7 @@ class Pid( str ):
 
     def _split(self):
         """
-        Return a splitted pid as list or empty list on eror
+        Return a splitted pid as list or empty list on error
         """
         allParts = []
         
