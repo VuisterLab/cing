@@ -1,28 +1,8 @@
 #!/usr/bin/env python
 #--------------------------------------------------------------------------------------------------------------
 
-import sys
-import os
-
 import cing
 
-def makePid( *args ):
-    """
-    Return Pid object from arguments
-    Apply str() on all arguments
-    """
-    # use str operator on all arguments
-    args = map(str, args)
-    # could implement some checking here
-    # could implement mapping here
-    if (len(args) > 0) and (args[0] in Pid.nameMap):
-        #args = list(args) # don't know why I have to use the list operator
-        args[0] = Pid.nameMap[args[0]]
-    #end if
-    return Pid( Pid._join(*args) )
-#end def
-    
-    
 class Pid( str ):
     """Pid routines, adapted from path idea in: Python Cookbook, A. Martelli and D. Ascher (eds), O'Reilly 2002, pgs 140-142
     Features:
@@ -33,7 +13,7 @@ class Pid( str ):
     - Copy a pid
     - Incrementation and decrementation
     
-    pid = makePid('Residue','mol1','A',507)
+    pid = Pid('Residue','mol1','A',507)
     -> Residue:mol1.A.502   (Pid instance)
 
     pid.type
@@ -43,7 +23,10 @@ class Pid( str ):
     -> 'mol1.A.502' (str instance)
     
     pid[0]
-    -> Residue (Pid instance)
+    -> 'Residue' (str instance)
+
+    pid[0:3]
+    -> 'Residue:mol1.A' (str instance)
     
     for id in pid:
         print id
@@ -57,8 +40,8 @@ class Pid( str ):
     -> Atom:mol1.A.502.N  (Pid instance)
     
     but also:
-    pid3 = pid[0:3] + '100'
-    -> Residue:mol1.A.100  (Pid instance)
+    pid3 = Pid('Residue') + 'mol2'
+    -> Residue:mol2  (Pid instance)
     
     pid4 = pid.decrement(3,1)
     -> Residue:mol1.A.501  (Pid instance)
@@ -81,8 +64,9 @@ class Pid( str ):
     )
 
     def __init__(self, string):
-        str.__init__(self, string)
-        self.version = cing.cingDefinitions.version
+        str.__init__(string)
+
+        self._version = 'cing:%s' % cing.cingDefinitions.version
 
     @property
     def type(self):
@@ -102,23 +86,24 @@ class Pid( str ):
 
     def __add__(self, other):
         tmp = self._split() + [other]
-        return makePid(*tmp)
+        #print 'Pid.__add__', tmp
+        return Pid.new(*tmp)
     #end def
     
     def __len__(self):
         return len(self._split())
     #end def
     
-    def __getslice__( self, start, stop ):
+    def __getslice__(self, start, stop):
         parts = self._split()[start:stop]
         if len(parts) > 0:
-            return makePid(*parts)
+            return self._join(*parts)
         else:
-            return Pid('')
+            return ''
     #end def
     
     def __getitem__(self, i):
-        return makePid(self._split()[i])
+        return self._split()[i]
     #end def
     
     def __iter__(self):
@@ -141,7 +126,8 @@ class Pid( str ):
         """
         allParts = []
         
-        # Does not work with subsitution of ":" with "." as 'Pid' object does not support item assignment
+        # Does not work with subsitution of ":" with "." as 'Pid' object does not support
+        # item assignment
         parts = self.split(':')
         if len(parts) > 0:
             allParts.append(parts[0])
@@ -152,7 +138,24 @@ class Pid( str ):
     #end def
 
     @staticmethod
-    def _join( *args ):
+    def new( *args ):
+        """
+        Return Pid object from arguments
+        Apply str() on all arguments
+        Have to use this as intermediate as str baseclass of Pid only accepts one argument
+        """
+        # use str operator on all arguments
+        args = map(str, args)
+        # could implement could implement mapping here
+        if (len(args) > 0) and (args[0] in Pid.nameMap):
+            #args = list(args) # don't know why I have to use the list operator
+            args[0] = Pid.nameMap[args[0]]
+        #end if
+        return Pid( Pid._join(*args) )
+    #end def
+
+    @staticmethod
+    def _join(*args):
         """Join args using the rules for constructing a pid
         """
         if len(args) >= 2:
@@ -171,7 +174,7 @@ class Pid( str ):
         "Return new pid with position index modified by newId"
         parts = self._split()
         parts[index] = newId
-        return makePid(*parts)
+        return Pid.new(*parts)
     #end def
 
     def increment(self, index, value):
@@ -180,7 +183,7 @@ class Pid( str ):
         """
         parts = self._split()
         parts[index] = int(parts[index]) + value
-        return makePid(*parts)
+        return Pid.new(*parts)
     #end def
 
     def decrement(self, index, value):
@@ -192,9 +195,9 @@ class Pid( str ):
     
     def copy(self):
         "Return copy of pid"
-        # Use makePid to pass it by any 'translater/checking routine'
+        # Use Pid.new to pass it by any 'translater/checking routine'
         parts = self._split()
-        return makePid(*parts)
+        return Pid.new(*parts)
     #end def
 #end class
 #--------------------------------------------------------------------------------------------------------------
