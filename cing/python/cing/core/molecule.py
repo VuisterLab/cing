@@ -1989,7 +1989,9 @@ class Molecule( NTtree, ResidueList ):
             atm.coordinates = NTlist()
         self.modelCount = 0
         if resetStatusObjects:
-            self.project.setStatusObjects(parsed = False, completed = False)
+            for sdict in self.project.status.items():
+                sdict.parsed = False
+                sdict.completed = False
         # end if
     #end def
 

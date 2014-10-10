@@ -374,6 +374,7 @@ CCPN_LOWERCASE_STR = 'ccpn'
 #----------------------------------------------------------------------
 # Talos, from reqNih
 #----------------------------------------------------------------------
+#DEPRECIATED
 TALOSPLUS_STR = "talosPlus" # key to the entities (status, atoms, residues, etc)
                             # under which the results will be stored
 #NIH_STR = "nih" # key to the plugin
@@ -386,13 +387,14 @@ TALOSPLUS_LIST_STR = "talos_plus_predicted_dihedrals"
 #----------------------------------------------------------------------
 # queeny, from reqQueeny
 #----------------------------------------------------------------------
+#DEPRECIATED
 QUEENY_STR       = "queeny" # key to the entities (atoms, residues, etc under which the results will be stored
 
 QUEENY_UNCERTAINTY1_STR = 'uncertainty1'  # Key used for residue's and atom's uncertainty after topology triangulation
 QUEENY_UNCERTAINTY2_STR = 'uncertainty2'  # Key used for residue's and atom's uncertainty after restraint triangulation
 QUEENY_INFORMATION_STR  = 'information'   # Key used for residue's and atom's information, calculated from uncertainty1 and uncertainty2
 
-# RDB requires a little bit more specific qualifier
+# RDB requires a little bit more specific qualifier; GWV?
 RDB_QUEENY_UNCERTAINTY1_STR = 'queen_uncertainty1'
 RDB_QUEENY_UNCERTAINTY2_STR = 'queen_uncertainty2'
 RDB_QUEENY_INFORMATION_STR = 'queen_information'
@@ -401,12 +403,23 @@ RDB_QUEENY_INFORMATION_STR = 'queen_information'
 #----------------------------------------------------------------------
 # v3 key definitions
 #----------------------------------------------------------------------
+
 OBJECT_KEY     = 'object' # ValidationResult key for pointing at object
 
 # keys of different ValidationResult types
-TALOSPLUS_KEY  = 'talosPlus'
-QUEENY_KEY     = 'queeny'
+CING_KEY       = 'cing'
+TALOSPLUS_KEY  = TALOSPLUS_STR
+QUEENY_KEY     = QUEENY_STR
 SHIFTX_KEY     = 'shiftx'
+WHATIF_KEY     = 'whatif'
+DSSP_KEY       = 'dssp'
+PROCHECK_KEY   = 'procheck'
+WATTOS_KEY     = 'wattos'
+VASCO_KEY      = 'vasco'
+X3DNA_KEY      = 'x3dna'
+
+VALIDATION_KEYS = [TALOSPLUS_KEY, QUEENY_KEY, SHIFTX_KEY, WHATIF_KEY, DSSP_KEY, PROCHECK_KEY,
+                   WATTOS_KEY, VASCO_KEY, X3DNA_KEY]
 
 
 

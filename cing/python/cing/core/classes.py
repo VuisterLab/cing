@@ -172,6 +172,7 @@ Project: Top level Cing project class
         self.distanceListNames = [] # list to store distancelist names names for save and restore
         self.dihedralListNames = [] # list to store dihedrallist names for save and restore
         self.rdcListNames = [] # list to store rdclist names for save and restore
+        # GWV: do not know precisely what these are!
         self.coplanarListNames = NTlist() # list to store  names for save and restore
         self.dihedralByProjectListNames = NTlist() # list to store  names for save and restore
         self.dihedralByResidue = NTtree( DIHEDRAL_BY_RESIDUE_STR ) # Used to be set in DihedralByResidueHTMLfile but that's too late.
@@ -182,15 +183,32 @@ Project: Top level Cing project class
         self.storedInCcpnFormat = False
         self.restoredFromXml = True # Project settings restored from project.xml file
 
-        self.status = Adict() # General status dict for external programs
+        # status of Plugins
+        self.status = Adict() # General status dict for external programs;
+                              # initialise for 'known' programs
+        for key in constants.VALIDATION_KEYS:
+            self.getStatusDict(key)
         #LEGACY
-        self.statusObjectNameList = 'procheckStatus dsspStatus whatifStatus wattosStatus vascoStatus x3dnaStatus'.split()
-        self.procheckStatus = NTdict(completed = False, parsed = False, ranges = None)
-        self.whatifStatus = NTdict(completed = False, parsed = False)
-        self.wattosStatus = NTdict(completed = False, parsed = False)
-        self.vascoStatus = NTdict(completed = False, parsed = False)
-        #self.shiftxStatus = NTdict(completed = False, parsed = False)
-        self.x3dnaStatus  = NTdict(completed = False, parsed = False)
+        for key, statusName in [
+            (constants.SHIFTX_KEY, 'shiftxStatus'),
+            (constants.PROCHECK_KEY,'procheckStatus'),
+            (constants.DSSP_KEY, 'dsspStatus'),
+            (constants.WHATIF_KEY, 'whatifStatus'),
+            (constants.WATTOS_KEY, 'wattosStatus'),
+            (constants.VASCO_KEY, 'vascoStatus'),
+            (constants.X3DNA_KEY, 'x3dnaStatus')
+             ]:
+            self[statusName] = self.status[key]
+        #end for
+
+        #OBSOLETE
+        #self.statusObjectNameList = 'procheckStatus dsspStatus whatifStatus wattosStatus vascoStatus x3dnaStatus'.split()
+        # self.procheckStatus = NTdict(completed = False, parsed = False, ranges = None)
+        # self.whatifStatus = NTdict(completed = False, parsed = False)
+        # self.wattosStatus = NTdict(completed = False, parsed = False)
+        # self.vascoStatus = NTdict(completed = False, parsed = False)
+        # #self.shiftxStatus = NTdict(completed = False, parsed = False)
+        # self.x3dnaStatus  = NTdict(completed = False, parsed = False)
 
 #        store a reference to the global things we might need
 #        self.gui = None # Reference to CingGui instance
@@ -265,7 +283,7 @@ Project: Top level Cing project class
                          'storedInCcpnFormat',
                          'reports',
                          'history',
-                         'procheckStatus', 'whatifStatus', 'wattosStatus', 'status'
+                         'status'
                          ]
     #end def
 
@@ -289,8 +307,8 @@ Project: Top level Cing project class
 
     @staticmethod
     def rootPath(pathName):
-        """Static method returning root,name,ext of project from pathName
-        root will be name.cing
+        """Static method returning root, projectName, extension of pathName
+        root will be Path instance amounting to x/y/projectName.cing
         extension will be .tgz/.zip (if name had .tgz/.zip extension) or .json or .xml
 
         name can be:
@@ -311,14 +329,14 @@ Project: Top level Cing project class
         # tgz file
         if (ext=='.tgz' or ext=='.zip') and len(name) > 0:
             root, name, _dummy = Project.rootPath(root / name)
-            return root, name, ext
+            return root, str(name), ext
         # full path
         elif name == 'project':
             root, name, _dummy = Project.rootPath(root)
-            return root, name, ext
+            return root, str(name), ext
         # anything else
         elif len(name) > 0:
-            return Path(root.strip()) / name+'.cing', name, '.json'
+            return Path(root.strip()) / name+'.cing', str(name), '.json'
         # we should not be here
         else:
             nTerror('Project.rootPath: unable to parse "%s"', pathName)
@@ -421,14 +439,14 @@ Project: Top level Cing project class
         thePid = pid.Pid(str(thePid))
 
         object = self
-        for p in thePid[1:]:
-            #print '>>', p, object
+        for p in thePid.id:
+            print 'getByPid>>', p, object
             if p not in object:
                 return None
             object = object[p]
         #end for
-        if thePid[0] != object.__class__.__name__:
-            io.error('Project.getByPid: type {r} does not match object {1!r}', p[0], object)
+        if thePid.type != object.__class__.__name__:
+            io.error('Project.getByPid: type {0!r} does not match object {1!r}', p[0], object)
             return None
         return object
     #end def
@@ -449,63 +467,40 @@ Project: Top level Cing project class
 #    #end def
 #    exists = staticmethod(exists)
 
-#LEGACY:
-    def setStatusObjects(self, parsed=None, completed = None):
-        """Only update the parameter that is not None (True or False)
-        """
-#             = 'procheckStatus dsspStatus whatifStatus wattosStatus vascoStatus shiftxStatus x3dnaStatus'.split()
-        for statusObjectName in self.statusObjectNameList:
-            if parsed != None:
-                setDeepByKeys(self, parsed, statusObjectName, PARSED_STR)
-            if completed != None:
-                setDeepByKeys(self, completed, statusObjectName, COMPLETED_STR)
-        # end for
-    #end def
+#OBSOLETE:
+#     def setStatusObjects(self, parsed=None, completed = None):
+#         """Only update the parameter that is not None (True or False)
+#         """
+# #             = 'procheckStatus dsspStatus whatifStatus wattosStatus vascoStatus shiftxStatus x3dnaStatus'.split()
+#         for statusObjectName in self.statusObjectNameList:
+#             if parsed != None:
+#                 setDeepByKeys(self, parsed, statusObjectName, PARSED_STR)
+#             if completed != None:
+#                 setDeepByKeys(self, completed, statusObjectName, COMPLETED_STR)
+#         # end for
+#     #end def
 
     def getStatusDict(self, key, **defaults ):
-        """Return statusDict for key, initialise with defaults if not exist
-        add keys from defaults if not exist
-        add keys from minimals if not exist
-        update type to Adict
+        """Return statusDict for key, initialise with **defaults if not exist
+        add keys from defaults if keys do not exist
+        set molecule key to pid of current molecule
         return None on error
         """
+        sdict = self.status.setdefault(key, StatusDict(key, **defaults))
+        if sdict is None:
+            io.error('Project.getStatusDict: key %s returned None, reverting to default values\n', key)
+            return None
+        #end if
+
         mpid = None
         if self.molecule is not None:
             mpid = self.molecule.asPid()
+        sdict.molecule = mpid
 
-        minimals = Adict(
-                         date         = io.Time(1360158182.7),   # Wed Feb  6 13:43:02 2013
-                         runVersion   = 0.95,               # 0.95; denotes all older versions
-                         saveVersion  = 0.95,               # 0.95; denotes all older versions
-                         directory    = None,               # directory relative to project.validationPath()
-                         smlFile      = None,               # path relative to project.path()
-                         completed    = False,              # True: Program was run successfully
-                         parsed       = False,              # True: Program output was parsed successfully; i.e parse can be called if completed == True -> implies present = True
-                         present      = False,              # True: Program data are in the cing datamodel
-                         saved        = False,              # True: Data have been saved to sml in Data/Plugins; i.e. restore can be called
-                         molecule     = mpid,               # molecule pid
-                         convention   = constants.INTERNAL, # convention; always handy to have
-                         remark       = None
-        )
-        sdict = self.status.setdefault(key, defaults)
-        if sdict is None:
-            io.error('Project.getStatusDict: key %s returned None, reverting to default values\n', key)
-            sdict = Adict()
-        else:
-            # convert to Adict
-            s = Adict()
-            s.update(sdict)
-            sdict = s
-        #end if
-        # update keys
-        sdict.setdefaultKeys(defaults)
-        sdict.setdefaultKeys(minimals)
-        if sdict.remark is None:
-            if sdict.completed:
-                sdict.remark = '%s completed' % key
-            else:
-                sdict.remark = '%s not completed' % key
-        #end if
+        # update keys; we may not have a StatusDict yet, hence explicit iteration here:
+        for k,v in defaults.items():
+            sdict.setdefault(k, v)
+
         self.status[key] = sdict
         return sdict
     #end def
@@ -526,15 +521,17 @@ Project: Top level Cing project class
 
         #print '>>', name, status
         status = status.strip()
+        name = str(name)
+
         if status == constants.PROJECT_NEW:
-            root, dummy, ext = Project.rootPath(name)
+            root, projectName, ext = Project.rootPath(name)
             if not root:
                 return None
             if root.exists():
                 root.rmdir()
             #end if
             #root.makedirs()
-            pr = Project(name)
+            pr = Project(projectName)
             pr._updateProjectPaths()
             pr.addHistory('New project')
             # Save the project settings
@@ -584,7 +581,7 @@ Project: Top level Cing project class
             pr.contentIsRestored = True
 
         elif status == constants.PROJECT_OLD:
-            root, newName, ext = Project.rootPath(name)
+            root, projectName, ext = Project.rootPath(name)
             if ext == '.tgz':
                 tarPath = Path(name)
                 if not tarPath.exists():
@@ -627,7 +624,7 @@ Project: Top level Cing project class
             #end if
 
             # 'proper' project from here on
-            name = newName
+            name = str(projectName)
             if not root:
                 io.error('Project.open: unable to open Project "{0}" because root is [{1}]\n', name, root)
                 return None
@@ -648,7 +645,7 @@ Project: Top level Cing project class
                     return None
             elif (f+'.xml').exists():
                 from cing.Legacy.Legacy100.upgrade100 import upgradeProject2Json
-                return upgradeProject2Json(root,restore)
+                return upgradeProject2Json(str(root),restore)
             else:
                 # Neither one found
                 io.error('Project.open: missing Project file "{0}"\n', pfile)
@@ -661,7 +658,7 @@ Project: Top level Cing project class
             #end if
             # This allows renaming/relative addressing at the shell level
             pr.root = root
-            pr.name = newName
+            pr.name = name
             pr._updateProjectPaths()
             # No content present
             pr.contentIsRestored = False
@@ -669,7 +666,7 @@ Project: Top level Cing project class
                 status = pr.getStatusDict(key)
                 status.present = False
             #LEGACY:
-            pr.setStatusObjects(parsed=False)
+            #pr.setStatusObjects(parsed=False)
 
             io.debug('Project.open: read {0}, software version {1:.3f}\n', pfile, pr.version)
 
@@ -902,6 +899,9 @@ Project: Top level Cing project class
             return False # Gracefully returns
 
         defs = self.getStatusDict(key)
+
+        ###TEMP
+        defs.saved = False
 
         if (not defs.saved):
             nTdebug('Project._restorePluginData: data not saved; returning')
@@ -1288,7 +1288,7 @@ Project: Top level Cing project class
     def __repr__(self): # pylint: disable=W0221
         return '<Project:%s>' % self.name
 
-    def _list2string(self, theList, firstString, maxItems):
+    def _list2string(self, firstString, theList, maxItems):
         result = firstString
         if len(theList) <= maxItems:
             result = result + str(theList)
@@ -1315,8 +1315,10 @@ Project: Top level Cing project class
                                   ('rdcs:       ', 'rdcs'),
                                   ('coplanars:  ', 'coplanars'),
                                  ]:
-            result += self._list2string(self[item], firstString, 2) + '\n'
+            result += self._list2string(firstString, self[item], 2) + '\n'
         #end for
+        remarks = [self.status[k].text for k in self.status.keys()]
+        result += self._list2string('plugins:    ', remarks, 2) + '\n'
         result += self.footer() # Project.footer defaults to NTdict
         return result
     #end def
@@ -1325,7 +1327,7 @@ Project: Top level Cing project class
         """Removes True on error. If no cing project is found on disk None (Success) will
         still be returned. Note that you should set the nosave option on the project
         before exiting."""
-        pathString, _name = self.rootPath(self.name)
+        pathString, _name, _dummy = self.rootPath(self.name)
         if not os.path.exists(pathString):
 #            nTdebug("No cing project is found at: " + pathString)
             return None
@@ -1562,6 +1564,41 @@ Project: Top level Cing project class
 # end class
 
 
+class StatusDict(Adict):
+    """
+    Class to store the plugin status data
+    """
+    def __init__(self, key, **defaults):
+        Adict.__init__(self)
+        self.key          = key                     # program key
+        self.setdefaultKeys(defaults)
+
+        # additional minimal set to have
+        self.setdefault('completed', False)         # True: Program was run successfully
+        self.setdefault('parsed', False)            # True: Program output was parsed successfully; i.e parse can be called if completed == True -> implies present = True
+        self.setdefault('date', io.now())           # date ran
+        self.setdefault('version', cdefs.cingDefinitions.version)   # 0.95 denotes all older versions
+        self.setdefault('directory', None)          # directory relative to project.validationPath()
+        self.setdefault('molecule', None)           # pid of molecule used in the analysis
+        self.setdefault('convention', constants.INTERNAL)   # convention; always handy to have
+    #end def
+
+    @property
+    def text(self):
+        """
+        Return textual description
+        """
+        if self.completed and self.parsed:
+            return '%-10s completed (on:%s) and data present' % (self.key, self.date)
+        elif self.completed and not self.parsed:
+            return '%-10s completed (on:%s) but data not present' % (self.key, self.date)
+        else:
+            return '%-10s not completed and data not present' % self.key
+        #end if
+    #end def
+#end class
+
+
 class ProjectList(NTlist):
     """Generic Project list class: the list of lists of the project; e.g. molecules, peaks, ...
        Creates classDef instance when calling the new() method
@@ -1749,7 +1786,7 @@ class ProjectList(NTlist):
 # Routines to compare different Project instances this is therefore completely different from the ProjectList
 # class where no such relation can be assumed.
 
-#GWV: to check relevance and usefullness
+#GWV:TODO to check relevance and usefullnes
 
 class ProjectTree( NTtree ): # pylint: disable=R0904
     """

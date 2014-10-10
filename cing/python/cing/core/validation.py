@@ -9,6 +9,7 @@ keys: validation   object               'userKeys'               object
 from cing import constants
 from cing.Libs import Adict
 from cing.Libs import io
+import cing.core.pid
 
 
 class ValidationResultsContainer(Adict.Adict):
@@ -46,33 +47,13 @@ class ValidationResult(Adict.Adict):
     def __init__(self):
         Adict.Adict.__init__(self)
         self.object = None
+        self._pid = '%s:%s' % (self.__class__.__name__, self.getOid())
 
     def __str__(self):
-        if self.object != None:
-            s =  '<%s: %s>'      % (self.__class__.__name__,
-                                    self.object.cName(-1)
-                                   )
-        else:
-            s =  '<%s: %s>'      % (self.__class__.__name__,
-                                    'None'
-                                   )
-        #end if
-        return s
+        return '<%s>' % self._pid
 
     def asPid(self):
-        if self.object != None:
-            #key = self.getattrOnly(constants.PARENT_KEY)
-            s =  '<%s:%s.%s.%s>' % (self.__class__.__name__,
-                                    self.object.cName(-1),
-                                    ValidationResultsContainer.KEY,
-                                    self.KEY
-                                   )
-        else:
-            s =  '<%s:%s>'       % (self.__class__.__name__,
-                                    'None'
-                                   )
-        #end if
-        return s
+        return cing.core.pid.Pid(self._pid)
     #end def
 #end class
 #If neded, should be in sml.py because circular imports otherwise
@@ -144,5 +125,13 @@ def setValidationResult(theObject, key, result):
     container[key] = result
     if result is not None:
         result[constants.OBJECT_KEY] = theObject
+        if hasattr(theObject,'asPid'):
+            result._pid = '%s:%s.%s.%s' % (result.__class__.__name__,
+                                           theObject.asPid().id,
+                                           ValidationResultsContainer.KEY,
+                                           key
+                                          )
+        #end if
+    #end if
     return False
 #end def

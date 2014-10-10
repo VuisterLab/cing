@@ -28,6 +28,7 @@ import re
 import sys
 import time
 
+import cing
 #from cing.Libs.jsonTools import util
 from cing.Libs.jsonTools.compat import unicode
 from cing.Libs.jsonTools.compat import queue
@@ -97,35 +98,51 @@ class BaseHandler(object):
         return cls
 
 
+def setVersion(data):
+    """
+    Set py/version key in data
+    """
+    version = '%s:%s' % (cing.constants.CING_KEY,
+                         cing.definitions.cingDefinitions.version
+                        )
+    data['py/version'] = version
+#end def
+
+
 class AnyDictHandler(BaseHandler):
     """
     Base class for dict objects
     GWV
     """
+    cls = dict # optionally modify in subclassing
+
     def flatten(self, obj, data):
         """
-        Needs subclassing
+        Potentially needs subclassing
         """
         return self._flatten(obj,data)
 
     def _flatten(self, obj, data):
+        setVersion(data)
         flatten = self.context.flatten
-        data['items'] = [flatten([k,obj[k]],reset=False) for k in obj.keys()]
+        data['py/items'] = [flatten([k,obj[k]],reset=False) for k in obj.keys()]
         return data
 
     def restore(self, data):
         """
-        Needs subclassing
+        Potentially needs subclassing
         """
-        return None
+        obj = self.cls()
+        print 'AnyDictHandler.restore>', type(obj)
+        return self._restore(data, obj)
 
     def _restore(self, data, obj):
         """
-        restores key, values from dat into object
+        restores key, values from data into object
         """
         if obj is None: return None
         restore = self.context.restore
-        for item in data['items']:
+        for item in data['py/items']:
             key,value = restore(item, reset=False)
             obj[key] = value
         return obj
@@ -137,33 +154,39 @@ class AnyListHandler(BaseHandler):
     Base class for list objects
     GWV
     """
+    cls = list  # redefine for other classes
+
     def flatten(self, obj, data):
         """
-        Needs subclassing
+        Potentially needs subclassing
         """
         return self._flatten(obj,data)
 
     def _flatten(self, obj, data):
+        setVersion(data)
         flatten = self.context.flatten
-        data['values'] = [flatten(k,reset=False) for k in obj]
+        data['py/values'] = [flatten(k,reset=False) for k in obj]
         return data
 
     def restore(self, data):
         """
-        Needs subclassing
+        Potentially needs subclassing
         """
-        return None
+        obj = self.cls()
+        #print 'AnyListHandler.restore>', type(obj)
+        return self._restore(data, obj)
 
     def _restore(self, data, obj):
         """
-        restores key, values from dat into object
+        restores key, values from data into object
         """
         if obj is None: return None
         restore = self.context.restore
-        for value in data['values']:
+        for value in data['py/values']:
             obj.append(restore(value, reset=False))
         return obj
 #end class
+
 
 
 class DatetimeHandler(BaseHandler):
@@ -300,4 +323,4 @@ class CloneFactory(object):
         return clone(self.exemplar)
 
     def __repr__(self):
-        return ('<CloneFactory object at 0x%x (%s)>' % (id(self), self.exemplar))
+        return '<CloneFactory object at 0x%x (%s)>' % (id(self), self.exemplar)
