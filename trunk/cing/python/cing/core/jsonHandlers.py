@@ -9,6 +9,9 @@ import cing.Libs.io as io
 import cing.Libs.NTutils as ntu
 import cing.Libs.Adict as adict
 
+# set indent=4 as default
+cing.Libs.jsonTools.set_encoder_options('json',indent=4)
+
 
 class AdictJsonHandler(cing.Libs.jsonTools.handlers.AnyDictHandler):
     """Handler for the Adict class

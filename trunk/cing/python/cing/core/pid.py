@@ -13,7 +13,7 @@ class Pid( str ):
     - Copy a pid
     - Incrementation and decrementation
     
-    pid = Pid('Residue','mol1','A',507)
+    pid = Pid('Residue','mol1','A',502)
     -> Residue:mol1.A.502   (Pid instance)
 
     pid.type
@@ -23,30 +23,29 @@ class Pid( str ):
     -> 'mol1.A.502' (str instance)
     
     pid[0]
-    -> 'Residue' (str instance)
+    -> 'mol1' (str instance)
 
     pid[0:3]
-    -> 'Residue:mol1.A' (str instance)
+    -> 'mol1.A.502' (str instance)
     
     for id in pid:
         print id
     ->
-    'Residue' (str instance)
     'mol1' (str instance)
     'A'  (str instance)
     '502'  (str instance)
     
-    pid2 = pid.modify(0, 'Atom') + 'N'
-    -> Atom:mol1.A.502.N  (Pid instance)
+    pid2 = pid.modify(1, 'B', type='Atom') + 'N'
+    -> Atom:mol1.B.502.N  (Pid instance)
     
     but also:
     pid3 = Pid('Residue') + 'mol2'
     -> Residue:mol2  (Pid instance)
     
-    pid4 = pid.decrement(3,1)
+    pid4 = pid.decrement(2,1)
     -> Residue:mol1.A.501  (Pid instance)
     or
-    pid4 = pid.increment(3,-1)
+    pid4 = pid.increment(2,-1)
     
     pid5 = pid.copy()
     -> Residue:mol1.A.502  (Pid instance)
@@ -95,19 +94,19 @@ class Pid( str ):
     #end def
     
     def __getslice__(self, start, stop):
-        parts = self._split()[start:stop]
+        parts = self._split()[start+1:stop+1]
         if len(parts) > 0:
-            return self._join(*parts)
+            return '.'.join(*parts)
         else:
             return ''
     #end def
     
     def __getitem__(self, i):
-        return self._split()[i]
+        return self._split()[i+1]
     #end def
     
     def __iter__(self):
-        for f in self._split():
+        for f in self._split()[1:]:
             yield f
         #end for
     #end def
@@ -170,10 +169,12 @@ class Pid( str ):
             return ''
     #end def
 
-    def modify(self, index, newId):
+    def modify(self, index, newId, type=None):
         "Return new pid with position index modified by newId"
         parts = self._split()
-        parts[index] = newId
+        parts[index+1] = newId
+        if type is not None:
+            parts[0] = type
         return Pid.new(*parts)
     #end def
 
@@ -182,7 +183,7 @@ class Pid( str ):
         Assumes integer valued id at position index
         """
         parts = self._split()
-        parts[index] = int(parts[index]) + value
+        parts[index+1] = int(parts[index+1]) + value
         return Pid.new(*parts)
     #end def
 

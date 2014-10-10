@@ -34,6 +34,7 @@ from cing.Libs.jsonTools.compat import unicode
 from cing.Libs.jsonTools.compat import queue
 from cing.Libs.jsonTools.util import b64decode
 from cing.Libs.jsonTools.util import b64encode
+import cing.core.pid
 
 
 class Registry(object):
@@ -114,7 +115,8 @@ class AnyDictHandler(BaseHandler):
     Base class for dict objects
     GWV
     """
-    cls = dict # optionally modify in subclassing
+    cls = dict          # to modify in subclassing
+    encodedKeys = []    # keys encoded asPids()
 
     def flatten(self, obj, data):
         """
@@ -125,7 +127,14 @@ class AnyDictHandler(BaseHandler):
     def _flatten(self, obj, data):
         setVersion(data)
         flatten = self.context.flatten
-        data['py/items'] = [flatten([k,obj[k]],reset=False) for k in obj.keys()]
+        # data['py/items'] = [flatten([k,obj[k]], reset=False) for k in obj.keys()]
+        data['py/items'] = []
+        for k in obj.keys():
+            if k in self.encodedKeys and hasattr(obj[k],'asPid'):
+                #print('AnyDictHandler._flatten>', k, obj[k])
+                data['py/items'].append(flatten([k,obj[k].asPid()], reset=False))
+            else:
+                data['py/items'].append(flatten([k,obj[k]], reset=False))
         return data
 
     def restore(self, data):
@@ -133,7 +142,7 @@ class AnyDictHandler(BaseHandler):
         Potentially needs subclassing
         """
         obj = self.cls()
-        print 'AnyDictHandler.restore>', type(obj)
+        #print('AnyDictHandler.restore>', type(obj))
         return self._restore(data, obj)
 
     def _restore(self, data, obj):
@@ -142,9 +151,16 @@ class AnyDictHandler(BaseHandler):
         """
         if obj is None: return None
         restore = self.context.restore
+        reference = self.context.referenceObject
         for item in data['py/items']:
             key,value = restore(item, reset=False)
-            obj[key] = value
+            if key in self.encodedKeys and \
+               reference is not None and hasattr(reference, 'getByPid') and \
+               isinstance(value, cing.core.pid.Pid):
+                obj[key] = reference.getByPid(value)
+            else:
+                obj[key] = value
+        #end for
         return obj
 #end class
 

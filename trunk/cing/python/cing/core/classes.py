@@ -439,8 +439,8 @@ Project: Top level Cing project class
         thePid = pid.Pid(str(thePid))
 
         object = self
-        for p in thePid.id:
-            print 'getByPid>>', p, object
+        for p in thePid:
+            #print( 'getByPid>>', p, object)
             if p not in object:
                 return None
             object = object[p]
