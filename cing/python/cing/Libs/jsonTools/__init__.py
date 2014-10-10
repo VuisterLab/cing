@@ -2,7 +2,8 @@
 #
 # - Custom handlers are stored and referenced under class name only; not including full module path
 #   -> will assure data restore across different version which may have moved the location of the handler
-# - pass on referenceObject as attribute of the handle class
+# - pass on referenceObject as attribute of the unpickle class (can be accessed through a handlers
+#   context attribute: myHandler.context.referenceObject
 # - implement json2obj and obj2json for direct storage to file.
 # - re-arrange import to allow for relocation in the cing.Libs directory
 #
@@ -63,6 +64,7 @@ added to JSON::
     assert obj.name == result['name'] == 'Awesome'
 
 """
+import cing.Libs.jsonTools
 
 from cing.Libs.jsonTools.backend import JSONBackend
 from cing.Libs.jsonTools.version import VERSION
@@ -191,4 +193,5 @@ def json2obj(path, referenceObject=None):
         obj = decode(fp.read(), referenceObject=referenceObject)
     return obj
 #end def
+
 

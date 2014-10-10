@@ -21,8 +21,8 @@ def decode(string, backend=None, context=None, keys=False, reset=True,
            safe=False, referenceObject=None):
     backend = _make_backend(backend)
     if context is None:
-        context = Unpickler(keys=keys, backend=backend, safe=safe)
-    return context.restore(backend.decode(string), reset=reset, referenceObject=referenceObject)
+        context = Unpickler(keys=keys, backend=backend, safe=safe, referenceObject=referenceObject)
+    return context.restore(backend.decode(string), reset=reset)
 
 
 def _make_backend(backend):
@@ -74,7 +74,7 @@ def _obj_setvalue(obj, idx, proxy):
 
 class Unpickler(object):
 
-    def __init__(self, backend=None, keys=False, safe=False):
+    def __init__(self, backend=None, keys=False, safe=False, referenceObject=None):
         ## The current recursion depth
         ## Maps reference names to object instances
         self.backend = _make_backend(backend)
@@ -89,6 +89,7 @@ class Unpickler(object):
         self._obj_to_idx = {}
         self._objs = []
         self._proxies = []
+        self.referenceObject = referenceObject
 
     def reset(self):
         """Resets the object's internal state.
@@ -99,7 +100,7 @@ class Unpickler(object):
         self._objs = []
         self._proxies = []
 
-    def restore(self, obj, reset=True, referenceObject=None):
+    def restore(self, obj, reset=True):
         """Restores a flattened object to its original python state.
 
         Simply returns any of the basic builtin types
@@ -112,7 +113,7 @@ class Unpickler(object):
         """
         if reset:
             self.reset()
-        value = self._restore(obj, referenceObject=referenceObject)
+        value = self._restore(obj)
         if reset:
             self._finalize()
 
@@ -123,7 +124,7 @@ class Unpickler(object):
         for (obj, attr, proxy, method) in self._proxies:
             method(obj, attr, proxy)
 
-    def _restore(self, obj, referenceObject=None):
+    def _restore(self, obj):
         if has_tag(obj, tags.ID):
             restore = self._restore_id
         elif has_tag(obj, tags.REF): # Backwards compatibility
@@ -137,7 +138,7 @@ class Unpickler(object):
         elif has_tag(obj, tags.REDUCE):
             restore = self._restore_reduce
         elif has_tag(obj, tags.OBJECT):
-            return self._restore_object(obj, referenceObject=referenceObject)
+            return self._restore_object(obj)
         elif has_tag(obj, tags.FUNCTION):
             restore = self._restore_function
         elif util.is_list(obj):
@@ -215,13 +216,12 @@ class Unpickler(object):
         obj = loadrepr(obj[tags.REPR])
         return self._mkref(obj)
 
-    def _restore_object(self, obj, referenceObject=None):
+    def _restore_object(self, obj):
         class_name = obj[tags.OBJECT]
         #print '_restore_object>', class_name
         handler = handlers.get(class_name)
         if handler is not None: # custom handler
-            handler.referenceObject = referenceObject
-            instance = handler(self).restore(obj)
+            instance = handler(context=self).restore(obj)
             return self._mkref(instance)
 
         cls = loadclass(class_name)
