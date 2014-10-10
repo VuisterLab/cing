@@ -9,7 +9,9 @@ from cing.PluginCode import queeny
 from cing.core import validation
 from cing.core import sml
 from cing.core.classes import Project
+from cing.core.classes import StatusDict
 from cing.core.molecule import Molecule
+import cing.core.pid as pid
 from cing.Libs import io
 import cing.Libs.NTutils as ntu
 from cing.Libs.NTutils import nTdebug
@@ -63,16 +65,42 @@ def upgradeProject2Json( name, restore  ):
             if listName in pr:
                 pr[listName] = [n for n in pr[listName]]
 
-        # convert status type to Adict
+        # convert status type to Adict and update
         status = Adict()
-        for key in pr.status.keys():
-            status[key] = pr.getStatusDict(key, **pr.status[key].toDict())
-        pr.status = status
+        for key in constants.VALIDATION_KEYS:
+            sdict = pr.getStatusDict(key)
+            if not isinstance(sdict, StatusDict):
+                sdict = StatusDict(key)
+            if key in pr.status:
+                for k,v in pr.status[key].items():
+                    sdict[k] = v  # not certain if we get dict or NTdict; this circumvent unwanted keys of NTdict
+            status[key] = sdict
+        #end for
 
-        # update the shiftx status
-        s = pr.getStatusDict(constants.SHIFTX_KEY)
-        s.update(pr.shiftxStatus)
-        del(pr['shiftxStatus'])
+        # update the status from old definitions;
+        for (key, statusName) in [
+                (constants.SHIFTX_KEY, 'shiftxStatus'),
+                (constants.PROCHECK_KEY,'procheckStatus'),
+                (constants.DSSP_KEY, 'dsspStatus'),
+                (constants.WHATIF_KEY, 'whatifStatus'),
+                (constants.WATTOS_KEY, 'wattosStatus'),
+                (constants.VASCO_KEY, 'vascoStatus'),
+                (constants.X3DNA_KEY, 'x3dnaStatus')
+            ]:
+            if statusName in pr:
+                status[key].update(pr[statusName])
+            #LEGACY names
+            pr[statusName] = status[key]
+        #end for
+        # update some fields if present
+        for sdict in status.values():
+            if 'molecule' in sdict and isinstance(sdict['molecule'], tuple):
+                sdict['molecule'] = pid.Pid.fromString('Molecule:' + sdict['molecule'][0])
+            if 'runVersion' in sdict:
+                sdict['version'] = sdict['runVersion']
+                sdict['date'] = io.Time(1360158182.7)  # Wed Feb  6 13:43:02 2013
+        #end for
+        pr.status = status
 
         pr._save2json()
         disk.rename(pfile, pfile + '.save')
@@ -92,11 +120,11 @@ def restoreQueeny100( project, tmp=None ):
 
     Return True on error
     """
-    if project == None:
+    if project is None:
         nTmessage("restoreQueeny100: No project defined")
         return True
 
-    if project.molecule == None:
+    if project.molecule is None:
         return False # Gracefully returns
 
     queenyDefs = project.getStatusDict(constants.QUEENY_KEY)
@@ -224,44 +252,22 @@ def restoreTalosPlus100(project):
 
     Return True on error
     """
-    if project == None:
-        nTdebug("restoreTalosPlus100: No project defined")
+    if project is None:
+        io.error("restoreTalosPlus100: No project defined\n")
         return True
 
-    if project.molecule == None:
+    if project.molecule is None:
         return True # Gracefully returns
 
     talosDefs = project.getStatusDict('talosPlus')
 
     if not talosDefs.completed:
-        nTdebug('restoreTalosPlus100: talosPlus not completed')
+        io.error('restoreTalosPlus100: talosPlus not completed\n')
         return True
 
-    # for res in project.molecule.allResidues():
-    #     res.talosPlus = None
-
-#    if not talosDefs.parsed:
-#        nDebug('restoreTalosPlus100: talosPlus not parsed')
-#        return project.parseTalosPlus()
-#
-#    path = project.validationPath( talosDefs.directory)
-#    if not path:
-#        nDebug('restoreTalosPlus100: directory "%s" with talosPlus data not found', path)
-#        return True
-#
-#    smlFile = path / talosDefs.smlFile
-#    if smlFile.exists():
-#        # Restore the data
-#        nTdebug('restoreTalosPlus100: Restoring talos+ results from %s (code version %s)', smlFile, talosDefs.saveVersion)
-#        l=sml.sml2obj( smlFile, project.molecule)
-#        if l != None:
-#            talosDefs.present = True
-#            return False
-#        #endif
-#    #end if
-#    nTdebug('restoreTalosPlus100: restoring talosPlus data from "%s" failed; reverting to parsing', smlFile)
     return project.parseTalosPlus()
 #end def
+
 
 def upgrade100(project, restore):
     """
@@ -292,8 +298,7 @@ def upgrade100(project, restore):
 
     # Now patch talos+
     if restoreTalosPlus100(project):
-        nTerror('upgrade100: restoring talosPlus data failed')
-        return None
+        io.error('upgrade100: restoring talosPlus data failed\n')
     # project.saveTalosPlus()
     #
     # # Now patch queeny
@@ -316,6 +321,6 @@ def upgrade100(project, restore):
     project.save()
 
     cing.verbosity = verbosity
-    return Project.open( project.name, 'old', restore=restore)
+    return Project.open(project.name, constants.PROJECT_OLD, restore=restore)
 #end def
 
