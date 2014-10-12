@@ -69,17 +69,6 @@ LARGEST_BMRB_ID = 99*1000
 # Not important enough to reenable.
 #locale.setlocale(locale.LC_ALL, "")
 
-# def quote(inputString):
-#     "return a single or double quoted string"
-#     single = (find(inputString, "'") >= 0)
-#     double = (find(inputString, '"') >= 0)
-#     if single and double:
-#         nTerror("in quote: both single and double quotes in [%s]" % inputString)
-#         return None
-#     if double:
-#         return "'" + inputString + "'"
-#     return '"' + inputString + '"'
-# #end def
 
 # pylint: disable=R0902
 class NTlist(list, Lister, SMLhandled):
@@ -2193,14 +2182,14 @@ class NTtree(NTdict):
         return result
 
     def __str__(self):
-        return '<%s %s>' % (self._className(), self.name)
+        return '<%s %s>' % (self.__class__.__name__, self.name)
 
     def __repr__( self ):  #pylint: disable=W0221
-        return '<%s:%s>' % (self._className(), self.cName( -1 ))
+        return '<%s:%s>' % (self.__class__.__name__, self.cName( -1 ))
     #end def
 
     def asPid(self):
-        return pid.Pid('%s:%s' % (self._className(), self.cName( -1 )))
+        return pid.Pid.new(self.__class__.__name__, self.cName( -1 ))
 
     def _decodeTreeName(self, nodeNames ):
         """
@@ -2548,11 +2537,11 @@ class NTvalue(NTdict):
     def __init__(self, value, error=NaN, fmt=None, fmt2=None, **kwds):
         kwds.setdefault('__CLASS__', 'NTvalue')
         # hack to get default values from NTvalues defs
-        if fmt == None:
+        if fmt is None:
             kwds.setdefault('fmt', NTvalue.defaultFormat)
         else:
             kwds.setdefault('fmt', fmt)
-        if fmt2 == None:
+        if fmt2 is None:
             kwds.setdefault('fmt2', NTvalue.defaultFormat2)
         else:
             kwds.setdefault('fmt2', fmt2)
