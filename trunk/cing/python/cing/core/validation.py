@@ -5,11 +5,43 @@ v1 stuff
         <obj> <-> <validationResultContainer> -> <ValidationResult> -> <obj>
 keys: validation   object               'userKeys'               object
 """
+import sys
 
 from cing import constants
 from cing.Libs import Adict
 from cing.Libs import io
-import cing.core.pid
+import cing.core.pid as pid
+import cing.Libs.jsonTools as jsonTools
+
+class ValidationData(Adict.Adict):
+    """
+    Class to store the ValidationResults container instances
+    Used for saving/restoring/writing.
+    Contains [object.asPid().str, container) key, value pairs
+    """
+    def add(self, theObject, container):
+        """
+        Add the container under the object key
+        """
+        self[theObject.asPid().str] = container
+    #end def
+
+    def save(self, toPath):
+        jsonTools.obj2json(self, toPath)
+    #end def
+
+    def restore(self, fromPath, project):
+        pass
+    #end def
+
+    def write(self, stream=sys.stdout):
+        for container in self.itervalues():
+            if len(container) > 0:
+                stream.write(container.format())
+        #end for
+    #end def
+#end class
+data = ValidationData()
 
 
 class ValidationResultsContainer(Adict.Adict):
@@ -23,14 +55,30 @@ class ValidationResultsContainer(Adict.Adict):
         self.setattrOnly(constants.OBJECT_KEY, None)
     #end def
 
+    def __len__(self):
+        """
+        Return number of non-None elements
+        """
+        count = 0
+        for k,v in self.iteritems():
+            if v is not None: count += 1
+        #end for
+        return count
+    #end def
+
     def format(self):
+        l = 80
         object = self.getattrOnly(constants.OBJECT_KEY)
-        if object == None:
-            return ''
-        result = '======== %s ========\n' % str(object)
+
+        result =  '\n# ' + '='*(l-2) + '\n'
+        result += '# %s\n' % object
+        result += '# ' + '='*(l-2) + '\n\n'
+
         for key, value in self.iteritems():
             if value is not None:
-                result += '-------- %s --------\n' % value
+                result += '# ' + '-'*(l-2) + '\n'
+                result += '# %s\n' % key
+                result += '# ' + '-'*(l-2) + '\n'
                 result += io.formatDictItems(value,
                                              '{key:20} : {value!s}\n'
                                             )
@@ -46,21 +94,16 @@ class ValidationResult(Adict.Adict):
     """
     def __init__(self):
         Adict.Adict.__init__(self)
+        self._pid = pid.Pid.new(self.__class__.__name__, self.getOid()).str
         self.object = None
-        self._pid = '%s:%s' % (self.__class__.__name__, self.getOid())
 
     def __str__(self):
         return '<%s>' % self._pid
 
     def asPid(self):
-        return cing.core.pid.Pid(self._pid)
+        return pid.Pid(self._pid)
     #end def
 #end class
-#If neded, should be in sml.py because circular imports otherwise
-#ValidationResult.SMLhandler = sml.SMLAnyDictHandler(ValidationResult,'ValidationResult',
-#                                                    encodeKeys = [constants.OBJECT_KEY],
-#                                                    decodeKeys = [constants.OBJECT_KEY]
-#                                                   )
 
 
 def hasValidationResult(theObject,key):
@@ -120,18 +163,30 @@ def setValidationResult(theObject, key, result):
         container.setattrOnly(constants.OBJECT_KEY, theObject)
     else:
         container = getattr(theObject, ValidationResultsContainer.KEY)
+    #end if
+
+    # add this container to the data
+    data.add(theObject, container)
 
     # add the result and set the object's reference
     container[key] = result
     if result is not None:
         result[constants.OBJECT_KEY] = theObject
         if hasattr(theObject,'asPid'):
-            result._pid = '%s:%s.%s.%s' % (result.__class__.__name__,
-                                           theObject.asPid().id,
-                                           ValidationResultsContainer.KEY,
-                                           key
-                                          )
+            result._pid = pid.Pid.new(result.__class__.__name__,
+                                      theObject.asPid().id,
+                                      ValidationResultsContainer.KEY,
+                                      key
+                                     )
         #end if
     #end if
     return False
 #end def
+
+# convenience
+get = getValidationResult
+set = setValidationResult
+hasResult = hasValidationResult
+save = data.save
+restore = data.restore
+write = data.write

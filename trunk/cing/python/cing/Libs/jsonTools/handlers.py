@@ -155,9 +155,9 @@ class AnyDictHandler(BaseHandler):
         for item in data['py/items']:
             key,value = restore(item, reset=False)
             if key in self.encodedKeys and \
-               reference is not None and hasattr(reference, 'getByPid') and \
+               reference is not None and \
                isinstance(value, cing.core.pid.Pid):
-                obj[key] = reference.getByPid(value)
+                obj[key] = cing.core.pid.decodePid(value)
             else:
                 obj[key] = value
         #end for

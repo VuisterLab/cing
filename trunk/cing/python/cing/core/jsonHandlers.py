@@ -37,6 +37,55 @@ class NTlistJsonHandler(cing.Libs.jsonTools.handlers.AnyListHandler):
 NTlistJsonHandler.handles(ntu.NTlist)
 
 
+class NTvalueJsonHandler(cing.Libs.jsonTools.handlers.AnyDictHandler):
+    """Handler for the NTvalue class
+    """
+    cls = ntu.NTvalue
+    def flatten(self, obj, data):
+        cing.Libs.jsonTools.handlers.setVersion(data)
+        data['value'] = obj['value']
+        return self._flatten(obj, data)
+
+    def restore(self, data):
+        a = ntu.NTvalue(value=data['value'])
+        return self._restore(data, a)
+#end class
+NTvalueJsonHandler.handles(ntu.NTvalue)
+
+
+class NTtreeJsonHandler(cing.Libs.jsonTools.handlers.AnyDictHandler):
+    """Handler for the NTvalue class
+    """
+    cls = ntu.NTtree
+    def flatten(self, obj, data):
+        cing.Libs.jsonTools.handlers.setVersion(data)
+        data['name'] = obj['name']
+        return self._flatten(obj, data)
+
+    def restore(self, data):
+        reference = self.context.referenceObject
+        tree = ntu.NTtree(name=data['name'])
+        self._restore(data, tree)
+        for child in tree._children:
+            if isinstance(child, pid.Pid) and \
+               reference is not None and \
+               isinstance(reference, classes.Project):
+                childObj = pid.decodePid(reference, child)
+            else:
+                childObj = child
+            #end if
+            if childObj is not None:
+                #establish backward and forward linkages
+                tree[child.name] = childObj
+                childObj._parent = tree
+            #end if
+        #end for
+        return tree
+    #end def
+#end class
+NTtreeJsonHandler.handles(ntu.NTtree)
+
+
 class TimeJsonHandler(cing.Libs.jsonTools.handlers.BaseHandler):
     """Json handler for the Time class
     """
@@ -122,7 +171,6 @@ class ObjectPidJsonHandler(cing.Libs.jsonTools.handlers.BaseHandler):
         return data
 
     def restore(self, data):
-        #print 'restore>', obj
         return pid.Pid(data['pid'])
 #end class
 ObjectPidJsonHandler.handles(cing.core.molecule.Molecule)

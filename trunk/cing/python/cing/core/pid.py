@@ -1,7 +1,46 @@
-#!/usr/bin/env python
-#--------------------------------------------------------------------------------------------------------------
-
+"""
+Version 2/3 Pid routines
+"""
 import cing
+import cing.Libs.io as io
+
+
+#
+# TODO Could hash decoded pid's for speed!
+#
+def decodePid(sourceObject, thePid):
+    """
+    try to decode thePid relative to sourceObject
+    return decoded pid object or None on not found or Error
+    """
+    if thePid is None:
+        return None
+
+    # assure a Pid object
+    thePid = Pid(str(thePid))
+
+    # check if thePid describes the source object
+    if hasattr(sourceObject,'asPid'):
+        sourcePid = sourceObject.asPid()
+        if sourcePid == thePid:
+            return sourceObject
+    #end if
+    # apparently not, let try to traverse down to find the elements of thePis
+    obj = sourceObject
+    for p in thePid:
+        #print( 'decodePid>>', p, object)
+        if p not in obj:
+            return None
+        obj = obj[p]
+    #end for
+    # found an object, check if it is the right kind
+    if thePid.type != obj.__class__.__name__:
+        io.error('decodePid: type "{0}" does not match object type "{1}"',
+                 thePid.type, obj.__class__.__name__)
+        return None
+    return obj
+#end def
+
 
 class Pid( str ):
     """Pid routines, adapted from path idea in: Python Cookbook, A. Martelli and D. Ascher (eds), O'Reilly 2002, pgs 140-142
@@ -82,6 +121,11 @@ class Pid( str ):
             return '.'.join(parts[1:])
         else:
             return ''
+    #end def
+
+    @property
+    def str(self):
+        return str(self)
 
     def __add__(self, other):
         tmp = self._split() + [other]
@@ -172,6 +216,8 @@ class Pid( str ):
     def modify(self, index, newId, type=None):
         "Return new pid with position index modified by newId"
         parts = self._split()
+        if index+1 >= len(parts):
+            io.error('Pid.modify: invalid index ({0})\n', index+1)
         parts[index+1] = newId
         if type is not None:
             parts[0] = type

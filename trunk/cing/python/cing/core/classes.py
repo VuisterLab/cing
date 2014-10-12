@@ -432,23 +432,14 @@ Project: Top level Cing project class
         """Decode object by pid, in anticipation of version 3
         return object or None on error
         """
-        if thePid == None:
-            return None
+        return pid.decodePid(self, thePid)
+    #end def
 
-        # assure a Pid object
-        thePid = pid.Pid(str(thePid))
-
-        object = self
-        for p in thePid:
-            #print( 'getByPid>>', p, object)
-            if p not in object:
-                return None
-            object = object[p]
-        #end for
-        if thePid.type != object.__class__.__name__:
-            io.error('Project.getByPid: type {0!r} does not match object {1!r}', p[0], object)
-            return None
-        return object
+    def asPid(self):
+        """
+        Return a Pid
+        """
+        return pid.Pid.new('Project', self.name)
     #end def
 
 #-------------------------------------------------------------------------
