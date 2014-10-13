@@ -405,8 +405,8 @@ def importable_name(cls):
     return '%s.%s' % (module, name)
 
 
-def nameSpace_name(handler, cls):
-    return '%s:%s' % (handler.nameSpace, cls.__name__)
+def namespace_name(handler, cls):
+    return '%s:%s' % (handler.namespace, cls.__name__)
 
 
 def b64encode(data):

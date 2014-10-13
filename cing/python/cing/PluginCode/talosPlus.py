@@ -1239,7 +1239,7 @@ Reference: Predicted order parameter (S2) from backbone chemical shifts for talo
 class TalosPlusResultJsonHandler(jsonTools.handlers.AnyDictHandler):
     """Handler for the TalosPlusResult class
     """
-    nameSpace = cing.constants.TALOSPLUS_KEY
+    namespace = cing.constants.TALOSPLUS_KEY
     cls = TalosPlusResult
     encodedKeys = [cing.constants.OBJECT_KEY,'residue']
 

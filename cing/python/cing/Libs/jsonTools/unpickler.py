@@ -92,7 +92,7 @@ class Unpickler(object):
 
         #GWV
         self.referenceObject = referenceObject # externally passed on
-        self.metaData = None # decoded later from first parsing
+        self.metadata = None # decoded later from first parsing
 
     def reset(self):
         """Resets the object's internal state.

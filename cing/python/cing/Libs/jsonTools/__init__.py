@@ -1,6 +1,6 @@
 # jsonTools; GWV adapted jsonpickle for CING (using 'jsonTools' name to avoid confusion):
 #
-# - Custom handlers are stored and referenced under nameSpace:class_name key
+# - Custom handlers are stored and referenced under namespace:class_name key
 #   (not including full module path as in the original implementation)
 #   -> This will assure data restore across different versions,
 #      which potentially may have moved the location of the handler
@@ -80,7 +80,7 @@ __import__('cing.Libs.jsonTools.util')
 __import__('cing.Libs.jsonTools.compat')
 # ensure built-in handlers are loaded
 __import__('cing.Libs.jsonTools.handlers')
-__import__('cing.Libs.jsonTools.metaData')
+__import__('cing.Libs.jsonTools.metadata')
 
 #__all__ = ('encode', 'decode')
 __version__ = VERSION
@@ -102,7 +102,7 @@ def encode(value,
            backend=None,
            warn=False,
            max_iter=None,
-           **metaData
+           **metadata
 ):
     """
     Return a JSON formatted representation of value, a Python object.
@@ -144,7 +144,7 @@ def encode(value,
 
     """
     from cing.Libs.jsonTools import pickler
-    from cing.Libs.jsonTools.metaData import MetaData
+    from cing.Libs.jsonTools.metadata import Metadata
 
     if backend is None:
         backend = json
@@ -153,7 +153,7 @@ def encode(value,
     # do get added as version, revision and info attributes to unpickler instance
     # i.e the context of each handler class
     # encoding in class assures it is decoded automatically
-    mdata = MetaData(
+    mdata = Metadata(
              version   = cing.definitions.cingDefinitions.version,
              revision  = cing.definitions.cingDefinitions.revision,
              copyRight = cing.definitions.cingDefinitions.copyright,
@@ -163,10 +163,10 @@ def encode(value,
                          cing.definitions.systemDefinitions.osRelease,
                          cing.definitions.systemDefinitions.osArchitecture
                         ),
-             **metaData
+             **metadata
     )
+    #GWV: encode metadata and value
     obj = [mdata, value]
-
     return pickler.encode(obj,
                           backend=backend,
                           unpicklable=unpicklable,
@@ -184,7 +184,7 @@ def decode(string, backend=None, keys=False, referenceObject=None):
     If set to True then jsonpickle will decode non-string dictionary keys
     into python objects via the jsonpickle protocol.
 
-    return (obj, metaData) tuple
+    return (obj, metadata) tuple
 
     >>> str(decode('"my string"'))
     'my string'
@@ -196,8 +196,8 @@ def decode(string, backend=None, keys=False, referenceObject=None):
     if backend is None:
         backend = json
     # unwrap the object
-    metaData,obj = unpickler.decode(string, backend=backend, keys=keys, referenceObject=referenceObject)
-    return (obj, metaData)
+    metadata,obj = unpickler.decode(string, backend=backend, keys=keys, referenceObject=referenceObject)
+    return (obj, metadata)
 
 
 def obj2json(obj, path):
