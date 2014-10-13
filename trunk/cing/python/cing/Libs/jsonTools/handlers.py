@@ -36,6 +36,7 @@ from cing.Libs.jsonTools.compat import queue
 from cing.Libs.jsonTools.util import b64decode
 from cing.Libs.jsonTools.util import b64encode
 from cing.Libs.jsonTools import tags
+from cing.Libs.jsonTools import util
 import cing.core.pid
 
 
@@ -51,9 +52,13 @@ class Registry(object):
         :param handler: The custom handler class
 
         """
-        #key = util.importable_name(cls)
-        #print 'register>', cls.__name__
-        self._handlers[cls.__name__] = handler
+        name = util.importable_name(cls)
+        self._handlers[name] = handler
+        #GWV addition:
+        # for unpickling: # also register as nameSpace:__name__
+        name = util.nameSpace_name(handler, cls)
+        print 'Registry.register>', name
+        self._handlers[name] = handler
 
     def get(self, class_name):
         return self._handlers.get(class_name)
@@ -65,6 +70,8 @@ get = registry.get
 
 
 class BaseHandler(object):
+
+    nameSpace = 'generic'
 
     def __init__(self, context):
         """

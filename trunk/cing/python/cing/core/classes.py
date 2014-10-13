@@ -817,7 +817,7 @@ Project: Top level Cing project class
         Returns True on error
         """
         io.debug('Project._restoreFromJson: restoring from {0}\n', path)
-        p = jsonTools.json2obj(path)
+        p, metadata = jsonTools.json2obj(path)
         if p is None:
             return None
         p.restoredFromXml = False

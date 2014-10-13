@@ -1,7 +1,11 @@
-# jsonTools; GWV adapted jsonpickle for CING (using different name to avoid confusion):
+# jsonTools; GWV adapted jsonpickle for CING (using 'jsonTools' name to avoid confusion):
 #
-# - Custom handlers are stored and referenced under class name only; not including full module path
-#   -> will assure data restore across different version which may have moved the location of the handler
+# - Custom handlers are stored and referenced under nameSpace:class_name key
+#   (not including full module path as in the original implementation)
+#   -> This will assure data restore across different versions,
+#      which potentially may have moved the location of the handler
+# - include metadata context in encode and obj2json (vide infra)
+#   metadata are returned upon decode
 # - pass on referenceObject as attribute of the unpickle class (can be accessed through a handlers
 #   context attribute: myHandler.context.referenceObject
 # - implement json2obj and obj2json for direct storage to file.
@@ -65,6 +69,7 @@ added to JSON::
 
 """
 import cing
+import cing.Libs.io
 
 from cing.Libs.jsonTools.backend import JSONBackend
 from cing.Libs.jsonTools.version import VERSION
@@ -179,6 +184,8 @@ def decode(string, backend=None, keys=False, referenceObject=None):
     If set to True then jsonpickle will decode non-string dictionary keys
     into python objects via the jsonpickle protocol.
 
+    return (obj, metaData) tuple
+
     >>> str(decode('"my string"'))
     'my string'
     >>> decode('36')
@@ -189,8 +196,8 @@ def decode(string, backend=None, keys=False, referenceObject=None):
     if backend is None:
         backend = json
     # unwrap the object
-    obj = unpickler.decode(string, backend=backend, keys=keys, referenceObject=referenceObject)
-    return obj[1]
+    metaData,obj = unpickler.decode(string, backend=backend, keys=keys, referenceObject=referenceObject)
+    return (obj, metaData)
 
 
 def obj2json(obj, path):
@@ -201,7 +208,7 @@ def obj2json(obj, path):
     root, file, ext = p.split3()
     root.makedirs()
     with open(p,'w') as fp:
-        fp.write(encode(obj, path=str(path)))
+        fp.write(encode(obj, path=str(path), timestamp=str(cing.Libs.io.now())))
 #end def
 
 

@@ -92,10 +92,12 @@ class ValidationResultsContainer(Adict.Adict):
 class ValidationResult(Adict.Adict):
     """v3:base class for validation results dict's
     """
+    OBJECT_KEY = constants.OBJECT_KEY
+
     def __init__(self):
         Adict.Adict.__init__(self)
         self._pid = pid.Pid.new(self.__class__.__name__, self.getOid()).str
-        self.object = None
+        self[self.OBJECT_KEY] = None
 
     def __str__(self):
         return '<%s>' % self._pid
