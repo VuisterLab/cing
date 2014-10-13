@@ -89,7 +89,10 @@ class Unpickler(object):
         self._obj_to_idx = {}
         self._objs = []
         self._proxies = []
-        self.referenceObject = referenceObject
+
+        #GWV
+        self.referenceObject = referenceObject # externally passed on
+        self.metaData = None # decoded later from first parsing
 
     def reset(self):
         """Resets the object's internal state.

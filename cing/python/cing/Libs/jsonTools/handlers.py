@@ -30,10 +30,12 @@ import time
 
 import cing
 #from cing.Libs.jsonTools import util
+import cing.Libs.jsonTools
 from cing.Libs.jsonTools.compat import unicode
 from cing.Libs.jsonTools.compat import queue
 from cing.Libs.jsonTools.util import b64decode
 from cing.Libs.jsonTools.util import b64encode
+from cing.Libs.jsonTools import tags
 import cing.core.pid
 
 
@@ -106,7 +108,7 @@ def setVersion(data):
     version = '%s:%s' % (cing.constants.CING_KEY,
                          cing.definitions.cingDefinitions.version
                         )
-    data['py/version'] = version
+    data[tags.VERSION] = version
 #end def
 
 
@@ -125,16 +127,22 @@ class AnyDictHandler(BaseHandler):
         return self._flatten(obj,data)
 
     def _flatten(self, obj, data):
-        setVersion(data)
+        """
+        Flatten the object by saving the key,value pairs as
+        list. Since this calls the keys method, if the class
+        implements an order, this is order is preserved upon
+        restore.
+        Optionally encode as Pid values for specified keys.
+        """
         flatten = self.context.flatten
         # data['py/items'] = [flatten([k,obj[k]], reset=False) for k in obj.keys()]
-        data['py/items'] = []
+        data[tags.ITEMS] = []
         for k in obj.keys():
             if k in self.encodedKeys and hasattr(obj[k],'asPid'):
                 #print('AnyDictHandler._flatten>', k, obj[k])
-                data['py/items'].append(flatten([k,obj[k].asPid()], reset=False))
+                data[tags.ITEMS].append(flatten([k,obj[k].asPid()], reset=False))
             else:
-                data['py/items'].append(flatten([k,obj[k]], reset=False))
+                data[tags.ITEMS].append(flatten([k,obj[k]], reset=False))
         return data
 
     def restore(self, data):
@@ -148,11 +156,12 @@ class AnyDictHandler(BaseHandler):
     def _restore(self, data, obj):
         """
         restores key, values from data into object
+        Optionally decode form Pid specified keys
         """
         if obj is None: return None
         restore = self.context.restore
         reference = self.context.referenceObject
-        for item in data['py/items']:
+        for item in data[tags.ITEMS]:
             key,value = restore(item, reset=False)
             if key in self.encodedKeys and \
                reference is not None and \
@@ -179,9 +188,9 @@ class AnyListHandler(BaseHandler):
         return self._flatten(obj,data)
 
     def _flatten(self, obj, data):
-        setVersion(data)
+        #setVersion(data)
         flatten = self.context.flatten
-        data['py/values'] = [flatten(k,reset=False) for k in obj]
+        data[tags.VALUES] = [flatten(k,reset=False) for k in obj]
         return data
 
     def restore(self, data):
@@ -198,11 +207,10 @@ class AnyListHandler(BaseHandler):
         """
         if obj is None: return None
         restore = self.context.restore
-        for value in data['py/values']:
+        for value in data[tags.VALUES]:
             obj.append(restore(value, reset=False))
         return obj
 #end class
-
 
 
 class DatetimeHandler(BaseHandler):
