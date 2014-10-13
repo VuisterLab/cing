@@ -102,7 +102,7 @@ def encode(value,
            backend=None,
            warn=False,
            max_iter=None,
-           **metadata
+           **keyedMetadata
 ):
     """
     Return a JSON formatted representation of value, a Python object.
@@ -163,7 +163,7 @@ def encode(value,
                          cing.definitions.systemDefinitions.osRelease,
                          cing.definitions.systemDefinitions.osArchitecture
                         ),
-             **metadata
+             **keyedMetadata
     )
     #GWV: encode metadata and value
     obj = [mdata, value]
@@ -197,15 +197,15 @@ def decode(string, backend=None, keys=False, referenceObject=None):
         backend = json
     # unwrap the object
     metadata,obj = unpickler.decode(string, backend=backend, keys=keys, referenceObject=referenceObject)
-    return (obj, metadata)
+    return obj, metadata
 
 
 def obj2json(obj, path):
-    "serialise object to json file"
+    """serialise object to json file"""
     from cing.Libs.disk import Path
 
     p = Path(str(path))  # assure path instance
-    root, file, ext = p.split3()
+    root, f, ext = p.split3()
     root.makedirs()
     with open(p,'w') as fp:
         fp.write(encode(obj, path=str(path), timestamp=str(cing.Libs.io.now())))

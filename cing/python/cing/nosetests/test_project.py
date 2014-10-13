@@ -1,26 +1,26 @@
 from nose import with_setup
 import os
 
-import cing
 from cing import definitions as cdefs
 from cing import constants
 from cing.core import classes
 from cing.core import molecule
 from cing.Libs import io
 from cing.core import validation
+from cing.core import project
 
-project = None
+theProject = None
 
 TEST = 'test'
 
 def setup_DummyProject():
-    global project
+    global theProject
     os.chdir(cdefs.cingDefinitions.tmpdir)
     print('Now in %s' % cdefs.cingDefinitions.tmpdir)
-    project = cing.openProject(TEST, constants.PROJECT_NEW)
+    theProject = project.new(TEST)
     # create a molecule
     mol = molecule.Molecule(TEST)
-    project.appendMolecule(mol)
+    theProject.appendMolecule(mol)
     c = mol.addChain('A')
     c.addResidue('ALA', 1, Nterminal = True)
     c.addResidue('VAL', 2)
@@ -54,15 +54,15 @@ def setup_DummyProject():
 
 
 def teardown_project():
-    global project
-    if project is not None:
-        project.close(save=False)
+    global theProject
+    if theProject is not None:
+        theProject.close(save=False)
 
 
 def test_projectNotPresent():
     print('Forced error:')
-    project = classes.Project.open('notPresent','old')
-    assert project is None
+    theProject = project.open('notPresent',project.PROJECT_OLD)
+    assert theProject is None
 
 
 def test_rootPath():
@@ -72,10 +72,10 @@ def test_rootPath():
     root,name,ext = classes.Project.rootPath('test.cing')
     assert root == 'test.cing'
     assert name == 'test'
-    root,name,ext = classes.Project.rootPath('test.cing/project.sml')
+    root,name,ext = classes.Project.rootPath('test.cing/project.json')
     assert root == 'test.cing'
     assert name == 'test'
-    assert ext == '.sml'
+    assert ext == '.json'
     root,name, ext = classes.Project.rootPath('test.tgz')
     assert root == 'test.cing'
     assert name == 'test'
@@ -84,10 +84,10 @@ def test_rootPath():
 
 @with_setup(setup_DummyProject,teardown_project)
 def test_openSaveProject():
-    assert project is not None
-    project.created = io.Time(10.0) # silly date
+    assert theProject is not None
+    theProject.created = io.Time(10.0) # silly date
     # this will test the save routines
-    assert project.save() == False
+    assert theProject.save() == False
     # this will test the restore routines
     p = project.open(TEST,constants.PROJECT_OLD)
     assert p is not None
@@ -96,20 +96,20 @@ def test_openSaveProject():
 
 @with_setup(setup_DummyProject,teardown_project)
 def test_pluginRoutines():
-    assert project is not None
-    pdefs = project.getStatusDict(TEST)
+    assert theProject is not None
+    pdefs = theProject.getStatusDict(TEST)
     assert pdefs is not None
 
     vobj = validation.ValidationResult()
     vobj.value = 10
-    validation.setValidationResult(project.molecule,TEST,vobj)
+    validation.setValidationResult(theProject.molecule,TEST,vobj)
     pdefs.present = True
-    result = project._savePluginData(TEST, saved=True)
+    result = theProject._savePluginData(TEST, saved=True)
     assert result == False
 
-    result = project._restorePluginData(TEST)
+    result = theProject._restorePluginData(TEST)
     assert result == False
-    vobj = validation.getValidationResult(project.molecule,TEST)
+    vobj = validation.getValidationResult(theProject.molecule,TEST)
     assert vobj is not None
     assert vobj.value == 10
 

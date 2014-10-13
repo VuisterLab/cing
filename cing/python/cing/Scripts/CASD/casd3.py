@@ -253,7 +253,7 @@ class Entry( NTdict ):
             print 'Error Entry.readProject: file %s does not exist' % path
             return None
         nTmessage( '==> reading project from %s', path )
-        self.project = cing.Project.open(path,'old')
+        self.project = cing.project.open(path,'old')
         return self.project
     #end def
         

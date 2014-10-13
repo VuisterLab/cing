@@ -1,21 +1,22 @@
 import cing
-import cing.Libs.disk
-import cing.core.classes as classes
 import cing.core.molecule
 import cing.core.pid as pid
 import cing.core.validation as validation
-import cing.Libs.jsonTools as jsonTools
-#import cing.core.jsonHandlers as jsonHandlers
+
+from cing.Libs import jsonTools
+
 import cing.Libs.io as io
 import cing.Libs.NTutils as ntu
 import cing.Libs.Adict as adict
+
 from cing.Libs import disk
+from cing.core import project
 
 # set indent=4 as default
-cing.Libs.jsonTools.set_encoder_options('json',indent=4)
+jsonTools.set_encoder_options('json',indent=4)
 
 
-class AdictJsonHandler(cing.Libs.jsonTools.handlers.AnyDictHandler):
+class AdictJsonHandler(jsonTools.handlers.AnyDictHandler):
     """Handler for the Adict class
     """
     namespace = cing.constants.CING_KEY
@@ -24,7 +25,7 @@ class AdictJsonHandler(cing.Libs.jsonTools.handlers.AnyDictHandler):
 AdictJsonHandler.handles(adict.Adict)
 
 
-class NTdictJsonHandler(cing.Libs.jsonTools.handlers.AnyDictHandler):
+class NTdictJsonHandler(jsonTools.handlers.AnyDictHandler):
     """Handler for the NTdict class
     """
     namespace = cing.constants.CING_KEY
@@ -33,7 +34,7 @@ class NTdictJsonHandler(cing.Libs.jsonTools.handlers.AnyDictHandler):
 NTdictJsonHandler.handles(ntu.NTdict)
 
 
-class NTlistJsonHandler(cing.Libs.jsonTools.handlers.AnyListHandler):
+class NTlistJsonHandler(jsonTools.handlers.AnyListHandler):
     """Handler for the NTlist class
     """
     namespace = cing.constants.CING_KEY
@@ -42,7 +43,7 @@ class NTlistJsonHandler(cing.Libs.jsonTools.handlers.AnyListHandler):
 NTlistJsonHandler.handles(ntu.NTlist)
 
 
-class NTvalueJsonHandler(cing.Libs.jsonTools.handlers.AnyDictHandler):
+class NTvalueJsonHandler(jsonTools.handlers.AnyDictHandler):
     """Handler for the NTvalue class
     """
     namespace = cing.constants.CING_KEY
@@ -59,7 +60,7 @@ class NTvalueJsonHandler(cing.Libs.jsonTools.handlers.AnyDictHandler):
 NTvalueJsonHandler.handles(ntu.NTvalue)
 
 
-class NTtreeJsonHandler(cing.Libs.jsonTools.handlers.AnyDictHandler):
+class NTtreeJsonHandler(jsonTools.handlers.AnyDictHandler):
     """Handler for the NTtree class
     """
     cls = ntu.NTtree
@@ -76,7 +77,7 @@ class NTtreeJsonHandler(cing.Libs.jsonTools.handlers.AnyDictHandler):
         for child in tree._children:
             if isinstance(child, pid.Pid) and \
                reference is not None and \
-               isinstance(reference, classes.Project):
+               isinstance(reference, project.Project):
                 childObj = pid.decodePid(reference, child)
             else:
                 childObj = child
@@ -93,13 +94,12 @@ class NTtreeJsonHandler(cing.Libs.jsonTools.handlers.AnyDictHandler):
 NTtreeJsonHandler.handles(ntu.NTtree)
 
 
-class TimeJsonHandler(cing.Libs.jsonTools.handlers.BaseHandler):
+class TimeJsonHandler(jsonTools.handlers.BaseHandler):
     """Json handler for the Time class
     """
     namespace = cing.constants.CING_KEY
 
     def flatten(self, obj, data):
-        #cing.Libs.jsonTools.handlers.setVersion(data)
         data['time'] = float.__repr__(obj)
         return data
 
@@ -110,7 +110,7 @@ class TimeJsonHandler(cing.Libs.jsonTools.handlers.BaseHandler):
 TimeJsonHandler.handles(io.Time)
 
 
-class ProjectJsonHandler(cing.Libs.jsonTools.handlers.AnyDictHandler):
+class ProjectJsonHandler(jsonTools.handlers.AnyDictHandler):
     """Json handler for the Project class
     """
     namespace = cing.constants.CING_KEY
@@ -124,22 +124,22 @@ class ProjectJsonHandler(cing.Libs.jsonTools.handlers.AnyDictHandler):
         return data
 
     def restore(self, data):
-        p = classes.Project(name=data['name'])
+        p = project.Project(name=data['name'])
         return self._restore(data, p)
 #end class
-ProjectJsonHandler.handles(classes.Project)
+ProjectJsonHandler.handles(project.Project)
 
 
-class HistoryJsonHandler(cing.Libs.jsonTools.handlers.AnyListHandler):
+class HistoryJsonHandler(jsonTools.handlers.AnyListHandler):
     """Handler for the History class
     """
     namespace = cing.constants.CING_KEY
-    cls = classes.History
+    cls = project.History
 #end class
-HistoryJsonHandler.handles(classes.History)
+HistoryJsonHandler.handles(project.History)
 
 
-class StatusDictJsonHandler(cing.Libs.jsonTools.handlers.AnyDictHandler):
+class StatusDictJsonHandler(jsonTools.handlers.AnyDictHandler):
     """Handler for the StatusDict class
     """
     namespace = cing.constants.CING_KEY
@@ -149,13 +149,13 @@ class StatusDictJsonHandler(cing.Libs.jsonTools.handlers.AnyDictHandler):
         return self._flatten(obj, data)
 
     def restore(self, data):
-        a = classes.StatusDict(data['key'])
+        a = project.StatusDict(data['key'])
         return self._restore(data, a)
 #end class
-StatusDictJsonHandler.handles(classes.StatusDict)
+StatusDictJsonHandler.handles(project.StatusDict)
 
 
-class PathJsonHandler(cing.Libs.jsonTools.handlers.BaseHandler):
+class PathJsonHandler(jsonTools.handlers.BaseHandler):
     """Json handler for the Path class
     """
     namespace = cing.constants.CING_KEY
@@ -171,7 +171,7 @@ class PathJsonHandler(cing.Libs.jsonTools.handlers.BaseHandler):
 PathJsonHandler.handles(disk.Path)
 
 
-class PidJsonHandler(cing.Libs.jsonTools.handlers.BaseHandler):
+class PidJsonHandler(jsonTools.handlers.BaseHandler):
     """Json handler for the Pid class
     """
     namespace = cing.constants.CING_KEY
@@ -184,14 +184,14 @@ class PidJsonHandler(cing.Libs.jsonTools.handlers.BaseHandler):
         p = pid.Pid(data['pid'])
         if self.context.metadata is not None and \
            'version' in (self.context.metadata):
-            print('PidJsonHandler.restore>> version=', self.context.metadata['version'])
+            #print('PidJsonHandler.restore>> version=', self.context.metadata['version'])
             p._version = self.context.metadata['version']  # restore version info used to create it
         return p
 #end class
 PidJsonHandler.handles(pid.Pid)
 
 
-class ObjectPidJsonHandler(cing.Libs.jsonTools.handlers.BaseHandler):
+class ObjectPidJsonHandler(jsonTools.handlers.BaseHandler):
     """Json handler for the Molecule, Chain, Residue, Atom classes
     """
     namespace = cing.constants.CING_KEY
@@ -208,7 +208,7 @@ ObjectPidJsonHandler.handles(cing.core.molecule.Chain)
 ObjectPidJsonHandler.handles(cing.core.molecule.Residue)
 ObjectPidJsonHandler.handles(cing.core.molecule.Atom)
 
-class ValidationResultsContainerJsonHandler(cing.Libs.jsonTools.handlers.AnyDictHandler):
+class ValidationResultsContainerJsonHandler(jsonTools.handlers.AnyDictHandler):
     """Handler for the ValidationResultsContainer class
     """
     cls = validation.ValidationResultsContainer

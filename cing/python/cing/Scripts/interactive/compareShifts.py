@@ -9,6 +9,7 @@ First used for CaM analysis JBC paper
 import cing
 from cing import constants
 from cing.core import pid
+from cing.core import project
 from cing.Libs import io
 from cing.Libs import fpconst
 import math
@@ -113,11 +114,12 @@ def mapMolecule(molA, molB):
     for objA in molA.allChains() + molA.allResidues() + molA.allAtoms():
         pidA = objA.asPid()
         # create the corresponding pid for objB
-        pidB = pidA.modify(1,molB.name)
-        if pidA[0] == 'Atom':
-            # change residue to look for matching atoms; to deal with mutations in the sequence
+        pidB = pidA.modify(0,molB.name)
+        if pidA.type == 'Atom':
+            # change residue to include matching atoms; to deal with mutations in the sequence
+            # CaM: GLU67   CaM10: GLN67; resnum's are the same
             resNum = objA._parent.resNum
-            pidB = pid.makePid('Atom', molB.name, 'A', molB.A[resNum].name, pidA[4])
+            pidB = pid.new('Atom', molB.name, 'A', molB.A[resNum].name, objA.name)
         #end if
         # see if objB exists
         objB = molB.project.getByPid(pidB)
@@ -187,7 +189,7 @@ def printShifts(project):
 
 
 def openProject(path, status):
-    p = cing.openProject(path, status)
+    p = project.open(path, status)
     if p is None:
         return None
     if p.molecule is None:

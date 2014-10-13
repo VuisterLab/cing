@@ -52,10 +52,11 @@ class Registry(object):
         :param handler: The custom handler class
 
         """
+        #GWV: this one will be used when pickling the class
         name = util.importable_name(cls)
         self._handlers[name] = handler
         #GWV addition:
-        # for unpickling: # also register as namespace:__name__
+        # this one will be used for unpickling: # also register as namespace:__name__
         name = util.namespace_name(handler, cls)
         #print 'Registry.register>', name
         self._handlers[name] = handler
