@@ -405,6 +405,10 @@ def importable_name(cls):
     return '%s.%s' % (module, name)
 
 
+def nameSpace_name(handler, cls):
+    return '%s:%s' % (handler.nameSpace, cls.__name__)
+
+
 def b64encode(data):
     payload = base64.b64encode(data)
     if PY3 and type(payload) is bytes:

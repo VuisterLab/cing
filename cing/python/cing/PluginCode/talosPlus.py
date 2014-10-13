@@ -1220,6 +1220,7 @@ Reference: Predicted order parameter (S2) from backbone chemical shifts for talo
         self.setdefault(TalosPlusResult.Q_E, NaN)
         self.setdefault(TalosPlusResult.Q_H, NaN)
         self.setdefault(TalosPlusResult.Q_L, NaN)
+        self.setdefault(TalosPlusResult.OBJECT_KEY, None)
         self.setdefault('residue', None) #LEGACY:
     #end def
 
@@ -1232,52 +1233,20 @@ Reference: Predicted order parameter (S2) from backbone chemical shifts for talo
         else:
             return fmt.format(**self)
     #end if
-
-    # @staticmethod
-    # def endHandler(tPlus, project=None):
-    #     # Restore linkage
-    #     # Needs a valid project
-    #     # Adds to validation
-    #     if project is None:
-    #         return None
-    #     if constants.OBJECT_KEY not in tPlus:
-    #         nTerror('TalosPlusResult.endHandler: object key not found ==> skipped item')
-    #         return None
-    #     theObject = project.getByPid(tPlus[constants.OBJECT_KEY])
-    #     if theObject is None:
-    #         nTerror('TalosPlusResult.endHandler: invalid residue Pid %s, ==> skipped Residue', tPlus[constants.OBJECT_KEY])
-    #         return None
-    #     #end if
-    #     #v3:
-    #     validation.setValidationResult(theObject, constants.TALOSPLUS_KEY, tPlus)
-    #     #LEGACY:
-    #     # redundant for now with 'object', added just below
-    #     tPlus.residue = theObject
-    #     theObject.talosPlus = tPlus
-    #     return tPlus
-    # #end def
 #end class
 
-#register TalosPlus SML handler
-# TalosPlusResult.SMLhandler = sml.SMLAnyDictHandler(TalosPlusResult,'TalosPlusResult',
-#                                                    encodeKeys = ['residue', constants.OBJECT_KEY],
-#                                                    endHandler = TalosPlusResult.endHandler,
-#                                                   )
 
-class TalosPlusResultJsonHandler(cing.Libs.jsonTools.handlers.AnyDictHandler):
+class TalosPlusResultJsonHandler(jsonTools.handlers.AnyDictHandler):
     """Handler for the TalosPlusResult class
     """
+    nameSpace = cing.constants.TALOSPLUS_KEY
     cls = TalosPlusResult
     encodedKeys = [cing.constants.OBJECT_KEY,'residue']
-
-#     def flatten(self, obj, data):
-# #        data['py/version'] = cing.definitions.cingDefinitions.version
-#         return self._flatten(obj, data)
 
     def restore(self, data):
         a = TalosPlusResult()
         self._restore(data, a)
-        print('TalosPlusJsonHandler.restore>', a.format(), self.context.referenceObject)
+        #print('TalosPlusJsonHandler.restore>', a.format(), self.context.referenceObject)
         return a
 #end class
 TalosPlusResultJsonHandler.handles(TalosPlusResult)

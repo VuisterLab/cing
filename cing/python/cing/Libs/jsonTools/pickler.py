@@ -238,10 +238,11 @@ class Pickler(object):
 
         # Check for a custom handler
         class_name = util.importable_name(cls)
-        handler = handlers.get(cls.__name__)
+        handler = handlers.get(class_name)
         if handler is not None:
             if self.unpicklable:
-                data[tags.OBJECT] = cls.__name__
+                #GWV change
+                data[tags.OBJECT] = util.nameSpace_name(handler, cls)
             return handler(self).flatten(obj, data)
 
         reduce_val = None
