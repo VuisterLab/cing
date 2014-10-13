@@ -52,13 +52,6 @@ Z_AXIS = 2
 A_AXIS = 3
 
 
-# Projects; used in openProject routine
-PROJECT_OLD         = 'old'
-PROJECT_NEW         = 'new'
-PROJECT_CREATE      = 'create'
-PROJECT_NEWFROMCCPN = 'newFromCcpn' #use new CCPN file to initialise data
-PROJECT_OLDFROMCCPN = 'oldFromCcpn' #use the stored CCPN data for restoring
-
 NaNstring           = "."
 
 CONSENSUS_STR = 'consensus'
@@ -132,7 +125,7 @@ RES_STR = 'res'
 CHAIN_STR = 'chain'
 MOLECULE_STR = 'molecule'
 PROJECT_STR = 'project'
-ATOMS_STR = 'atoms'
+#ATOMS_STR = 'atoms'
 COORDINATES_STR = 'coordinates'
 DIHEDRAL_STR = 'dihedral'
 DIHEDRALS_STR = 'dihedrals'
@@ -404,12 +397,19 @@ RDB_QUEENY_INFORMATION_STR = 'queen_information'
 # v3 key definitions
 #----------------------------------------------------------------------
 
+# Projects; used in Project.open routine
+PROJECT_OLD         = 'old'
+PROJECT_NEW         = 'new'
+PROJECT_CREATE      = 'create'
+PROJECT_NEWFROMCCPN = 'newFromCcpn' #use new CCPN file to initialise data
+PROJECT_OLDFROMCCPN = 'oldFromCcpn' #use the stored CCPN data for restoring
+
 OBJECT_KEY     = 'object' # ValidationResult key for pointing at object
 
 # keys of different ValidationResult types
 CING_KEY       = 'cing'
-TALOSPLUS_KEY  = TALOSPLUS_STR
-QUEENY_KEY     = QUEENY_STR
+TALOSPLUS_KEY  = 'talosPlus'
+QUEENY_KEY     = 'queeny'
 SHIFTX_KEY     = 'shiftx'
 WHATIF_KEY     = 'whatif'
 DSSP_KEY       = 'dssp'

@@ -173,22 +173,22 @@ from cing.main import getInfoMessage as gi
 from cing.Libs.io import formatDictItems as fd
 from cing.core.importPlugin import importPlugin
 
-def openProject(name, status=constants.PROJECT_CREATE):
-    """Top level convenience method to load a project
-    return Project instance or None on error
-    """
-
-    if status == constants.PROJECT_NEW or \
-       status == constants.PROJECT_OLD or \
-       status == constants.PROJECT_CREATE or \
-       status == constants.PROJECT_NEWFROMCCPN or \
-       status == constants.PROJECT_OLDFROMCCPN:
-        project = Project.open(name, status)
-        if project is None:
-            io.error('openProject: opening {0} failed\n', name)
-        return project
-    else:
-        io.error('openProject: invalid status {0}\n', status)
-    #end if
-#end def
+# def openProject(name, status=constants.PROJECT_CREATE):
+#     """Top level convenience method to load a project
+#     return Project instance or None on error
+#     """
+#
+#     if status == constants.PROJECT_NEW or \
+#        status == constants.PROJECT_OLD or \
+#        status == constants.PROJECT_CREATE or \
+#        status == constants.PROJECT_NEWFROMCCPN or \
+#        status == constants.PROJECT_OLDFROMCCPN:
+#         project = Project.open(name, status)
+#         if project is None:
+#             io.error('openProject: opening {0} failed\n', name)
+#         return project
+#     else:
+#         io.error('openProject: invalid status {0}\n', status)
+#     #end if
+# #end def
 
