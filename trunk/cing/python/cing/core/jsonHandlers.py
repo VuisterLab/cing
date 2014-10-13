@@ -1,4 +1,5 @@
 import cing
+import cing.Libs.disk
 import cing.core.classes as classes
 import cing.core.molecule
 import cing.core.pid as pid
@@ -8,6 +9,7 @@ import cing.Libs.jsonTools as jsonTools
 import cing.Libs.io as io
 import cing.Libs.NTutils as ntu
 import cing.Libs.Adict as adict
+from cing.Libs import disk
 
 # set indent=4 as default
 cing.Libs.jsonTools.set_encoder_options('json',indent=4)
@@ -42,7 +44,7 @@ class NTvalueJsonHandler(cing.Libs.jsonTools.handlers.AnyDictHandler):
     """
     cls = ntu.NTvalue
     def flatten(self, obj, data):
-        cing.Libs.jsonTools.handlers.setVersion(data)
+        #cing.Libs.jsonTools.handlers.setVersion(data)
         data['value'] = obj['value']
         return self._flatten(obj, data)
 
@@ -58,7 +60,7 @@ class NTtreeJsonHandler(cing.Libs.jsonTools.handlers.AnyDictHandler):
     """
     cls = ntu.NTtree
     def flatten(self, obj, data):
-        cing.Libs.jsonTools.handlers.setVersion(data)
+        #cing.Libs.jsonTools.handlers.setVersion(data)
         data['name'] = obj['name']
         return self._flatten(obj, data)
 
@@ -90,7 +92,7 @@ class TimeJsonHandler(cing.Libs.jsonTools.handlers.BaseHandler):
     """Json handler for the Time class
     """
     def flatten(self, obj, data):
-        cing.Libs.jsonTools.handlers.setVersion(data)
+        #cing.Libs.jsonTools.handlers.setVersion(data)
         data['time'] = float.__repr__(obj)
         return data
 
@@ -106,7 +108,7 @@ class ProjectJsonHandler(cing.Libs.jsonTools.handlers.AnyDictHandler):
     """
     def flatten(self, obj, data):
         # have name, version and convention readily available for decoding later as all keys will be 'encoded' in a list
-        cing.Libs.jsonTools.handlers.setVersion(data)
+        #cing.Libs.jsonTools.handlers.setVersion(data)
         data['name'] = obj.name
         data['convention'] = cing.constants.INTERNAL
         flatten = self.context.flatten
@@ -134,7 +136,7 @@ class StatusDictJsonHandler(cing.Libs.jsonTools.handlers.AnyDictHandler):
     """Handler for the StatusDict class
     """
     def flatten(self, obj, data):
-        cing.Libs.jsonTools.handlers.setVersion(data)
+        #cing.Libs.jsonTools.handlers.setVersion(data)
         data['key'] = obj['key']
         return self._flatten(obj, data)
 
@@ -145,18 +147,35 @@ class StatusDictJsonHandler(cing.Libs.jsonTools.handlers.AnyDictHandler):
 StatusDictJsonHandler.handles(classes.StatusDict)
 
 
+class PathJsonHandler(cing.Libs.jsonTools.handlers.BaseHandler):
+    """Json handler for the Path class
+    """
+    def flatten(self, obj, data):
+        data['path'] = str(obj)
+        return data
+
+    def restore(self, data):
+        p = disk.Path(data['path'])
+        return p
+#end class
+PathJsonHandler.handles(disk.Path)
+
+
 class PidJsonHandler(cing.Libs.jsonTools.handlers.BaseHandler):
     """Json handler for the Pid class
     """
     def flatten(self, obj, data):
-        cing.Libs.jsonTools.handlers.setVersion(data)
+        #cing.Libs.jsonTools.handlers.setVersion(data)
         data['pid'] = str(obj)
         return data
 
     def restore(self, data):
         #print 'restore>', obj
         p = pid.Pid(data['pid'])
-        p._version = data['py/version']  # restore version info used to create it
+        if self.context.metaData is not None and \
+           'version' in (self.context.metaData):
+            print('PidJsonHandler.restore>> version=', self.context.metaData['version'])
+            p._version = self.context.metaData['version']  # restore version info used to create it
         return p
 #end class
 PidJsonHandler.handles(pid.Pid)
@@ -166,7 +185,7 @@ class ObjectPidJsonHandler(cing.Libs.jsonTools.handlers.BaseHandler):
     """Json handler for the Molecule, Chain, Residue, Atom classes
     """
     def flatten(self, obj, data):
-        cing.Libs.jsonTools.handlers.setVersion(data)
+        #cing.Libs.jsonTools.handlers.setVersion(data)
         data['pid'] = str(obj.asPid())
         return data
 

@@ -25,6 +25,12 @@ SET = 'py/set'
 STATE = 'py/state'
 TUPLE = 'py/tuple'
 TYPE = 'py/type'
+# GWV
+# INFO = 'py/info'  # key used for info to be part of unpickler context
+# VERSION = 'py/version'  # key used to store version information; added to unpickler context
+# REVISION = 'py/revision'  # key used to store version information; added to unpickler context
+ITEMS = 'py/items'  # key to store items of AnyDictHandler
+VALUES = 'py/values'  # key to store values of AnyListHandler
 
 # All reserved tag names
 RESERVED = set([
@@ -43,4 +49,6 @@ RESERVED = set([
     STATE,
     TUPLE,
     TYPE,
+    ITEMS,
+    VALUES
 ])

@@ -64,16 +64,18 @@ added to JSON::
     assert obj.name == result['name'] == 'Awesome'
 
 """
-import cing.Libs.jsonTools
+import cing
 
 from cing.Libs.jsonTools.backend import JSONBackend
 from cing.Libs.jsonTools.version import VERSION
+from cing.Libs.jsonTools import tags
 
 __import__('cing.Libs.jsonTools.tags')
 __import__('cing.Libs.jsonTools.util')
 __import__('cing.Libs.jsonTools.compat')
 # ensure built-in handlers are loaded
 __import__('cing.Libs.jsonTools.handlers')
+__import__('cing.Libs.jsonTools.metaData')
 
 #__all__ = ('encode', 'decode')
 __version__ = VERSION
@@ -87,7 +89,6 @@ load_backend = json.load_backend
 remove_backend = json.remove_backend
 enable_fallthrough = json.enable_fallthrough
 
-
 def encode(value,
            unpicklable=True,
            make_refs=True,
@@ -95,7 +96,9 @@ def encode(value,
            max_depth=None,
            backend=None,
            warn=False,
-           max_iter=None):
+           max_iter=None,
+           **metaData
+):
     """
     Return a JSON formatted representation of value, a Python object.
 
@@ -136,9 +139,30 @@ def encode(value,
 
     """
     from cing.Libs.jsonTools import pickler
+    from cing.Libs.jsonTools.metaData import MetaData
+
     if backend is None:
         backend = json
-    return pickler.encode(value,
+
+    # wrap version and info for usage on decoding
+    # do get added as version, revision and info attributes to unpickler instance
+    # i.e the context of each handler class
+    # encoding in class assures it is decoded automatically
+    mdata = MetaData(
+             version   = cing.definitions.cingDefinitions.version,
+             revision  = cing.definitions.cingDefinitions.revision,
+             copyRight = cing.definitions.cingDefinitions.copyright,
+             user      = cing.definitions.systemDefinitions.user,
+             os        = '%s:%s:%s' % (
+                         cing.definitions.systemDefinitions.osType,
+                         cing.definitions.systemDefinitions.osRelease,
+                         cing.definitions.systemDefinitions.osArchitecture
+                        ),
+             **metaData
+    )
+    obj = [mdata, value]
+
+    return pickler.encode(obj,
                           backend=backend,
                           unpicklable=unpicklable,
                           make_refs=make_refs,
@@ -164,7 +188,9 @@ def decode(string, backend=None, keys=False, referenceObject=None):
 
     if backend is None:
         backend = json
-    return unpickler.decode(string, backend=backend, keys=keys, referenceObject=referenceObject)
+    # unwrap the object
+    obj = unpickler.decode(string, backend=backend, keys=keys, referenceObject=referenceObject)
+    return obj[1]
 
 
 def obj2json(obj, path):
@@ -175,7 +201,7 @@ def obj2json(obj, path):
     root, file, ext = p.split3()
     root.makedirs()
     with open(p,'w') as fp:
-        fp.write(encode(obj))
+        fp.write(encode(obj, path=str(path)))
 #end def
 
 
