@@ -242,7 +242,7 @@ class Pickler(object):
         if handler is not None:
             if self.unpicklable:
                 #GWV change
-                data[tags.OBJECT] = util.nameSpace_name(handler, cls)
+                data[tags.OBJECT] = util.namespace_name(handler, cls)
             return handler(self).flatten(obj, data)
 
         reduce_val = None

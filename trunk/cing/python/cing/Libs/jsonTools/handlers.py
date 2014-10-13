@@ -55,9 +55,9 @@ class Registry(object):
         name = util.importable_name(cls)
         self._handlers[name] = handler
         #GWV addition:
-        # for unpickling: # also register as nameSpace:__name__
-        name = util.nameSpace_name(handler, cls)
-        print 'Registry.register>', name
+        # for unpickling: # also register as namespace:__name__
+        name = util.namespace_name(handler, cls)
+        #print 'Registry.register>', name
         self._handlers[name] = handler
 
     def get(self, class_name):
@@ -71,7 +71,7 @@ get = registry.get
 
 class BaseHandler(object):
 
-    nameSpace = 'generic'
+    namespace = 'generic'
 
     def __init__(self, context):
         """
