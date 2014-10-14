@@ -1,0 +1,584 @@
+ASSI (RESI     9 AND NAME    C)
+     (RESI    10 AND NAME    N)
+     (RESI    10 AND NAME   CA)
+     (RESI    10 AND NAME    C)  1.0  -68.40   17.18 2
+ASSI (RESI    10 AND NAME    N)
+     (RESI    10 AND NAME   CA)
+     (RESI    10 AND NAME    C)
+     (RESI    11 AND NAME    N)  1.0  -43.01   14.82 2
+ASSI (RESI    10 AND NAME    C)
+     (RESI    11 AND NAME    N)
+     (RESI    11 AND NAME   CA)
+     (RESI    11 AND NAME    C)  1.0  -65.91   13.06 2
+ASSI (RESI    11 AND NAME    N)
+     (RESI    11 AND NAME   CA)
+     (RESI    11 AND NAME    C)
+     (RESI    12 AND NAME    N)  1.0  -37.49   16.16 2
+ASSI (RESI    11 AND NAME    C)
+     (RESI    12 AND NAME    N)
+     (RESI    12 AND NAME   CA)
+     (RESI    12 AND NAME    C)  1.0  -69.73   17.68 2
+ASSI (RESI    12 AND NAME    N)
+     (RESI    12 AND NAME   CA)
+     (RESI    12 AND NAME    C)
+     (RESI    13 AND NAME    N)  1.0  -39.93   12.82 2
+ASSI (RESI    12 AND NAME    C)
+     (RESI    13 AND NAME    N)
+     (RESI    13 AND NAME   CA)
+     (RESI    13 AND NAME    C)  1.0  -63.15    9.24 2
+ASSI (RESI    13 AND NAME    N)
+     (RESI    13 AND NAME   CA)
+     (RESI    13 AND NAME    C)
+     (RESI    14 AND NAME    N)  1.0  -36.06   11.44 2
+ASSI (RESI    13 AND NAME    C)
+     (RESI    14 AND NAME    N)
+     (RESI    14 AND NAME   CA)
+     (RESI    14 AND NAME    C)  1.0  -63.01   17.58 2
+ASSI (RESI    14 AND NAME    N)
+     (RESI    14 AND NAME   CA)
+     (RESI    14 AND NAME    C)
+     (RESI    15 AND NAME    N)  1.0  -38.10   12.43 2
+ASSI (RESI    14 AND NAME    C)
+     (RESI    15 AND NAME    N)
+     (RESI    15 AND NAME   CA)
+     (RESI    15 AND NAME    C)  1.0  -71.84   21.38 2
+ASSI (RESI    15 AND NAME    N)
+     (RESI    15 AND NAME   CA)
+     (RESI    15 AND NAME    C)
+     (RESI    16 AND NAME    N)  1.0  -41.39   10.78 2
+ASSI (RESI    15 AND NAME    C)
+     (RESI    16 AND NAME    N)
+     (RESI    16 AND NAME   CA)
+     (RESI    16 AND NAME    C)  1.0  -64.45   10.80 2
+ASSI (RESI    16 AND NAME    N)
+     (RESI    16 AND NAME   CA)
+     (RESI    16 AND NAME    C)
+     (RESI    17 AND NAME    N)  1.0  -43.04   14.90 2
+ASSI (RESI    16 AND NAME    C)
+     (RESI    17 AND NAME    N)
+     (RESI    17 AND NAME   CA)
+     (RESI    17 AND NAME    C)  1.0  -66.75    8.96 2
+ASSI (RESI    17 AND NAME    N)
+     (RESI    17 AND NAME   CA)
+     (RESI    17 AND NAME    C)
+     (RESI    18 AND NAME    N)  1.0  -37.55   11.44 2
+ASSI (RESI    17 AND NAME    C)
+     (RESI    18 AND NAME    N)
+     (RESI    18 AND NAME   CA)
+     (RESI    18 AND NAME    C)  1.0  -63.44   15.71 2
+ASSI (RESI    18 AND NAME    N)
+     (RESI    18 AND NAME   CA)
+     (RESI    18 AND NAME    C)
+     (RESI    19 AND NAME    N)  1.0  -41.90   12.22 2
+ASSI (RESI    18 AND NAME    C)
+     (RESI    19 AND NAME    N)
+     (RESI    19 AND NAME   CA)
+     (RESI    19 AND NAME    C)  1.0  -64.12   14.92 2
+ASSI (RESI    19 AND NAME    N)
+     (RESI    19 AND NAME   CA)
+     (RESI    19 AND NAME    C)
+     (RESI    20 AND NAME    N)  1.0  -35.73   29.42 2
+ASSI (RESI    19 AND NAME    C)
+     (RESI    20 AND NAME    N)
+     (RESI    20 AND NAME   CA)
+     (RESI    20 AND NAME    C)  1.0  -63.49   14.76 2
+ASSI (RESI    20 AND NAME    N)
+     (RESI    20 AND NAME   CA)
+     (RESI    20 AND NAME    C)
+     (RESI    21 AND NAME    N)  1.0  -29.80   25.68 2
+ASSI (RESI    20 AND NAME    C)
+     (RESI    21 AND NAME    N)
+     (RESI    21 AND NAME   CA)
+     (RESI    21 AND NAME    C)  1.0  -94.76   29.74 2
+ASSI (RESI    21 AND NAME    N)
+     (RESI    21 AND NAME   CA)
+     (RESI    21 AND NAME    C)
+     (RESI    22 AND NAME    N)  1.0  -13.80   40.70 2
+ASSI (RESI    21 AND NAME    C)
+     (RESI    22 AND NAME    N)
+     (RESI    22 AND NAME   CA)
+     (RESI    22 AND NAME    C)  1.0  -78.48   37.32 2
+ASSI (RESI    22 AND NAME    N)
+     (RESI    22 AND NAME   CA)
+     (RESI    22 AND NAME    C)
+     (RESI    23 AND NAME    N)  1.0  128.08   49.18 2
+ASSI (RESI    24 AND NAME    C)
+     (RESI    25 AND NAME    N)
+     (RESI    25 AND NAME   CA)
+     (RESI    25 AND NAME    C)  1.0  -84.56   18.93 2
+ASSI (RESI    25 AND NAME    N)
+     (RESI    25 AND NAME   CA)
+     (RESI    25 AND NAME    C)
+     (RESI    26 AND NAME    N)  1.0  126.09   27.08 2
+ASSI (RESI    27 AND NAME    C)
+     (RESI    28 AND NAME    N)
+     (RESI    28 AND NAME   CA)
+     (RESI    28 AND NAME    C)  1.0 -126.69   43.01 2
+ASSI (RESI    28 AND NAME    N)
+     (RESI    28 AND NAME   CA)
+     (RESI    28 AND NAME    C)
+     (RESI    29 AND NAME    N)  1.0  137.33   31.66 2
+ASSI (RESI    28 AND NAME    C)
+     (RESI    29 AND NAME    N)
+     (RESI    29 AND NAME   CA)
+     (RESI    29 AND NAME    C)  1.0 -131.26   33.34 2
+ASSI (RESI    29 AND NAME    N)
+     (RESI    29 AND NAME   CA)
+     (RESI    29 AND NAME    C)
+     (RESI    30 AND NAME    N)  1.0  136.59   42.80 2
+ASSI (RESI    29 AND NAME    C)
+     (RESI    30 AND NAME    N)
+     (RESI    30 AND NAME   CA)
+     (RESI    30 AND NAME    C)  1.0 -102.60   42.50 2
+ASSI (RESI    30 AND NAME    N)
+     (RESI    30 AND NAME   CA)
+     (RESI    30 AND NAME    C)
+     (RESI    31 AND NAME    N)  1.0  129.43   16.62 2
+ASSI (RESI    30 AND NAME    C)
+     (RESI    31 AND NAME    N)
+     (RESI    31 AND NAME   CA)
+     (RESI    31 AND NAME    C)  1.0 -122.67   27.73 2
+ASSI (RESI    31 AND NAME    N)
+     (RESI    31 AND NAME   CA)
+     (RESI    31 AND NAME    C)
+     (RESI    32 AND NAME    N)  1.0  143.88   39.42 2
+ASSI (RESI    31 AND NAME    C)
+     (RESI    32 AND NAME    N)
+     (RESI    32 AND NAME   CA)
+     (RESI    32 AND NAME    C)  1.0  -96.83   40.88 2
+ASSI (RESI    32 AND NAME    N)
+     (RESI    32 AND NAME   CA)
+     (RESI    32 AND NAME    C)
+     (RESI    33 AND NAME    N)  1.0  146.21   46.54 2
+ASSI (RESI    32 AND NAME    C)
+     (RESI    33 AND NAME    N)
+     (RESI    33 AND NAME   CA)
+     (RESI    33 AND NAME    C)  1.0  -68.61   16.50 2
+ASSI (RESI    33 AND NAME    N)
+     (RESI    33 AND NAME   CA)
+     (RESI    33 AND NAME    C)
+     (RESI    34 AND NAME    N)  1.0  -13.22   20.24 2
+ASSI (RESI    33 AND NAME    C)
+     (RESI    34 AND NAME    N)
+     (RESI    34 AND NAME   CA)
+     (RESI    34 AND NAME    C)  1.0  -95.00   28.50 2
+ASSI (RESI    34 AND NAME    N)
+     (RESI    34 AND NAME   CA)
+     (RESI    34 AND NAME    C)
+     (RESI    35 AND NAME    N)  1.0    4.38   26.48 2
+ASSI (RESI    35 AND NAME    C)
+     (RESI    36 AND NAME    N)
+     (RESI    36 AND NAME   CA)
+     (RESI    36 AND NAME    C)  1.0  -95.92   43.88 2
+ASSI (RESI    36 AND NAME    N)
+     (RESI    36 AND NAME   CA)
+     (RESI    36 AND NAME    C)
+     (RESI    37 AND NAME    N)  1.0  126.90   46.66 2
+ASSI (RESI    38 AND NAME    C)
+     (RESI    39 AND NAME    N)
+     (RESI    39 AND NAME   CA)
+     (RESI    39 AND NAME    C)  1.0 -134.19   58.72 2
+ASSI (RESI    39 AND NAME    N)
+     (RESI    39 AND NAME   CA)
+     (RESI    39 AND NAME    C)
+     (RESI    40 AND NAME    N)  1.0  147.28   29.82 2
+ASSI (RESI    39 AND NAME    C)
+     (RESI    40 AND NAME    N)
+     (RESI    40 AND NAME   CA)
+     (RESI    40 AND NAME    C)  1.0 -117.11   42.89 2
+ASSI (RESI    40 AND NAME    N)
+     (RESI    40 AND NAME   CA)
+     (RESI    40 AND NAME    C)
+     (RESI    41 AND NAME    N)  1.0  129.44   29.70 2
+ASSI (RESI    41 AND NAME    C)
+     (RESI    42 AND NAME    N)
+     (RESI    42 AND NAME   CA)
+     (RESI    42 AND NAME    C)  1.0 -115.64   55.05 2
+ASSI (RESI    42 AND NAME    N)
+     (RESI    42 AND NAME   CA)
+     (RESI    42 AND NAME    C)
+     (RESI    43 AND NAME    N)  1.0  153.40   34.16 2
+ASSI (RESI    43 AND NAME    C)
+     (RESI    44 AND NAME    N)
+     (RESI    44 AND NAME   CA)
+     (RESI    44 AND NAME    C)  1.0  -59.41   12.12 2
+ASSI (RESI    44 AND NAME    N)
+     (RESI    44 AND NAME   CA)
+     (RESI    44 AND NAME    C)
+     (RESI    45 AND NAME    N)  1.0  -37.54   12.12 2
+ASSI (RESI    45 AND NAME    N)
+     (RESI    45 AND NAME   CA)
+     (RESI    45 AND NAME    C)
+     (RESI    46 AND NAME    N)  1.0  -37.63   22.32 2
+ASSI (RESI    46 AND NAME    C)
+     (RESI    47 AND NAME    N)
+     (RESI    47 AND NAME   CA)
+     (RESI    47 AND NAME    C)  1.0  -67.62   11.56 2
+ASSI (RESI    47 AND NAME    N)
+     (RESI    47 AND NAME   CA)
+     (RESI    47 AND NAME    C)
+     (RESI    48 AND NAME    N)  1.0  -39.52    7.84 2
+ASSI (RESI    47 AND NAME    C)
+     (RESI    48 AND NAME    N)
+     (RESI    48 AND NAME   CA)
+     (RESI    48 AND NAME    C)  1.0  -68.80   14.72 2
+ASSI (RESI    48 AND NAME    N)
+     (RESI    48 AND NAME   CA)
+     (RESI    48 AND NAME    C)
+     (RESI    49 AND NAME    N)  1.0  -42.31    5.36 2
+ASSI (RESI    48 AND NAME    C)
+     (RESI    49 AND NAME    N)
+     (RESI    49 AND NAME   CA)
+     (RESI    49 AND NAME    C)  1.0  -61.50   15.92 2
+ASSI (RESI    49 AND NAME    N)
+     (RESI    49 AND NAME   CA)
+     (RESI    49 AND NAME    C)
+     (RESI    50 AND NAME    N)  1.0  -42.29   21.50 2
+ASSI (RESI    49 AND NAME    C)
+     (RESI    50 AND NAME    N)
+     (RESI    50 AND NAME   CA)
+     (RESI    50 AND NAME    C)  1.0  -65.59   12.34 2
+ASSI (RESI    50 AND NAME    N)
+     (RESI    50 AND NAME   CA)
+     (RESI    50 AND NAME    C)
+     (RESI    51 AND NAME    N)  1.0  -41.22   10.40 2
+ASSI (RESI    50 AND NAME    C)
+     (RESI    51 AND NAME    N)
+     (RESI    51 AND NAME   CA)
+     (RESI    51 AND NAME    C)  1.0  -66.84    9.16 2
+ASSI (RESI    51 AND NAME    N)
+     (RESI    51 AND NAME   CA)
+     (RESI    51 AND NAME    C)
+     (RESI    52 AND NAME    N)  1.0  -41.62    8.14 2
+ASSI (RESI    51 AND NAME    C)
+     (RESI    52 AND NAME    N)
+     (RESI    52 AND NAME   CA)
+     (RESI    52 AND NAME    C)  1.0  -65.02   10.44 2
+ASSI (RESI    52 AND NAME    N)
+     (RESI    52 AND NAME   CA)
+     (RESI    52 AND NAME    C)
+     (RESI    53 AND NAME    N)  1.0  -38.84   12.24 2
+ASSI (RESI    52 AND NAME    C)
+     (RESI    53 AND NAME    N)
+     (RESI    53 AND NAME   CA)
+     (RESI    53 AND NAME    C)  1.0  -70.26   19.14 2
+ASSI (RESI    53 AND NAME    N)
+     (RESI    53 AND NAME   CA)
+     (RESI    53 AND NAME    C)
+     (RESI    54 AND NAME    N)  1.0  -37.52   26.86 2
+ASSI (RESI    53 AND NAME    C)
+     (RESI    54 AND NAME    N)
+     (RESI    54 AND NAME   CA)
+     (RESI    54 AND NAME    C)  1.0  -68.95   19.02 2
+ASSI (RESI    54 AND NAME    N)
+     (RESI    54 AND NAME   CA)
+     (RESI    54 AND NAME    C)
+     (RESI    55 AND NAME    N)  1.0  -34.56   20.05 2
+ASSI (RESI    54 AND NAME    C)
+     (RESI    55 AND NAME    N)
+     (RESI    55 AND NAME   CA)
+     (RESI    55 AND NAME    C)  1.0  -68.44   14.66 2
+ASSI (RESI    55 AND NAME    N)
+     (RESI    55 AND NAME   CA)
+     (RESI    55 AND NAME    C)
+     (RESI    56 AND NAME    N)  1.0  -40.33   14.20 2
+ASSI (RESI    55 AND NAME    C)
+     (RESI    56 AND NAME    N)
+     (RESI    56 AND NAME   CA)
+     (RESI    56 AND NAME    C)  1.0  -64.51   11.60 2
+ASSI (RESI    56 AND NAME    N)
+     (RESI    56 AND NAME   CA)
+     (RESI    56 AND NAME    C)
+     (RESI    57 AND NAME    N)  1.0  -39.78    7.52 2
+ASSI (RESI    56 AND NAME    C)
+     (RESI    57 AND NAME    N)
+     (RESI    57 AND NAME   CA)
+     (RESI    57 AND NAME    C)  1.0  -67.01   11.42 2
+ASSI (RESI    57 AND NAME    N)
+     (RESI    57 AND NAME   CA)
+     (RESI    57 AND NAME    C)
+     (RESI    58 AND NAME    N)  1.0  -44.18   15.26 2
+ASSI (RESI    57 AND NAME    C)
+     (RESI    58 AND NAME    N)
+     (RESI    58 AND NAME   CA)
+     (RESI    58 AND NAME    C)  1.0  -65.52   15.30 2
+ASSI (RESI    58 AND NAME    N)
+     (RESI    58 AND NAME   CA)
+     (RESI    58 AND NAME    C)
+     (RESI    59 AND NAME    N)  1.0  -42.19   16.61 2
+ASSI (RESI    58 AND NAME    C)
+     (RESI    59 AND NAME    N)
+     (RESI    59 AND NAME   CA)
+     (RESI    59 AND NAME    C)  1.0  -63.65   15.40 2
+ASSI (RESI    59 AND NAME    N)
+     (RESI    59 AND NAME   CA)
+     (RESI    59 AND NAME    C)
+     (RESI    60 AND NAME    N)  1.0  -37.17   24.10 2
+ASSI (RESI    59 AND NAME    C)
+     (RESI    60 AND NAME    N)
+     (RESI    60 AND NAME   CA)
+     (RESI    60 AND NAME    C)  1.0  -64.04   13.82 2
+ASSI (RESI    60 AND NAME    N)
+     (RESI    60 AND NAME   CA)
+     (RESI    60 AND NAME    C)
+     (RESI    61 AND NAME    N)  1.0  -36.86    8.68 2
+ASSI (RESI    60 AND NAME    C)
+     (RESI    61 AND NAME    N)
+     (RESI    61 AND NAME   CA)
+     (RESI    61 AND NAME    C)  1.0  -66.34   11.36 2
+ASSI (RESI    61 AND NAME    N)
+     (RESI    61 AND NAME   CA)
+     (RESI    61 AND NAME    C)
+     (RESI    62 AND NAME    N)  1.0  -40.01    8.82 2
+ASSI (RESI    61 AND NAME    C)
+     (RESI    62 AND NAME    N)
+     (RESI    62 AND NAME   CA)
+     (RESI    62 AND NAME    C)  1.0  -65.48   12.79 2
+ASSI (RESI    62 AND NAME    N)
+     (RESI    62 AND NAME   CA)
+     (RESI    62 AND NAME    C)
+     (RESI    63 AND NAME    N)  1.0  -39.86   17.48 2
+ASSI (RESI    62 AND NAME    C)
+     (RESI    63 AND NAME    N)
+     (RESI    63 AND NAME   CA)
+     (RESI    63 AND NAME    C)  1.0  -67.26   14.38 2
+ASSI (RESI    63 AND NAME    N)
+     (RESI    63 AND NAME   CA)
+     (RESI    63 AND NAME    C)
+     (RESI    64 AND NAME    N)  1.0  -39.65   16.90 2
+ASSI (RESI    63 AND NAME    C)
+     (RESI    64 AND NAME    N)
+     (RESI    64 AND NAME   CA)
+     (RESI    64 AND NAME    C)  1.0  -68.78   17.56 2
+ASSI (RESI    64 AND NAME    N)
+     (RESI    64 AND NAME   CA)
+     (RESI    64 AND NAME    C)
+     (RESI    65 AND NAME    N)  1.0  -41.78    9.16 2
+ASSI (RESI    64 AND NAME    C)
+     (RESI    65 AND NAME    N)
+     (RESI    65 AND NAME   CA)
+     (RESI    65 AND NAME    C)  1.0  -64.18   18.96 2
+ASSI (RESI    65 AND NAME    N)
+     (RESI    65 AND NAME   CA)
+     (RESI    65 AND NAME    C)
+     (RESI    66 AND NAME    N)  1.0  -38.95   18.90 2
+ASSI (RESI    65 AND NAME    C)
+     (RESI    66 AND NAME    N)
+     (RESI    66 AND NAME   CA)
+     (RESI    66 AND NAME    C)  1.0  -70.58   20.50 2
+ASSI (RESI    66 AND NAME    N)
+     (RESI    66 AND NAME   CA)
+     (RESI    66 AND NAME    C)
+     (RESI    67 AND NAME    N)  1.0  -41.96   15.30 2
+ASSI (RESI    66 AND NAME    C)
+     (RESI    67 AND NAME    N)
+     (RESI    67 AND NAME   CA)
+     (RESI    67 AND NAME    C)  1.0  -67.66   14.16 2
+ASSI (RESI    67 AND NAME    N)
+     (RESI    67 AND NAME   CA)
+     (RESI    67 AND NAME    C)
+     (RESI    68 AND NAME    N)  1.0  -34.40   20.90 2
+ASSI (RESI    67 AND NAME    C)
+     (RESI    68 AND NAME    N)
+     (RESI    68 AND NAME   CA)
+     (RESI    68 AND NAME    C)  1.0  -75.41   30.89 2
+ASSI (RESI    68 AND NAME    N)
+     (RESI    68 AND NAME   CA)
+     (RESI    68 AND NAME    C)
+     (RESI    69 AND NAME    N)  1.0  -33.75   21.82 2
+ASSI (RESI    71 AND NAME    C)
+     (RESI    72 AND NAME    N)
+     (RESI    72 AND NAME   CA)
+     (RESI    72 AND NAME    C)  1.0 -108.69   56.11 2
+ASSI (RESI    72 AND NAME    N)
+     (RESI    72 AND NAME   CA)
+     (RESI    72 AND NAME    C)
+     (RESI    73 AND NAME    N)  1.0  151.12   28.90 2
+ASSI (RESI    72 AND NAME    C)
+     (RESI    73 AND NAME    N)
+     (RESI    73 AND NAME   CA)
+     (RESI    73 AND NAME    C)  1.0 -122.34   50.56 2
+ASSI (RESI    73 AND NAME    N)
+     (RESI    73 AND NAME   CA)
+     (RESI    73 AND NAME    C)
+     (RESI    74 AND NAME    N)  1.0  132.62   39.60 2
+ASSI (RESI    73 AND NAME    C)
+     (RESI    74 AND NAME    N)
+     (RESI    74 AND NAME   CA)
+     (RESI    74 AND NAME    C)  1.0  -99.22   59.38 2
+ASSI (RESI    74 AND NAME    N)
+     (RESI    74 AND NAME   CA)
+     (RESI    74 AND NAME    C)
+     (RESI    75 AND NAME    N)  1.0  112.09   25.98 2
+ASSI (RESI    75 AND NAME    C)
+     (RESI    76 AND NAME    N)
+     (RESI    76 AND NAME   CA)
+     (RESI    76 AND NAME    C)  1.0 -155.20   30.90 2
+ASSI (RESI    76 AND NAME    N)
+     (RESI    76 AND NAME   CA)
+     (RESI    76 AND NAME    C)
+     (RESI    77 AND NAME    N)  1.0  146.52   30.10 2
+ASSI (RESI    76 AND NAME    C)
+     (RESI    77 AND NAME    N)
+     (RESI    77 AND NAME   CA)
+     (RESI    77 AND NAME    C)  1.0 -129.19   37.12 2
+ASSI (RESI    77 AND NAME    N)
+     (RESI    77 AND NAME   CA)
+     (RESI    77 AND NAME    C)
+     (RESI    78 AND NAME    N)  1.0  129.35   35.14 2
+ASSI (RESI    77 AND NAME    C)
+     (RESI    78 AND NAME    N)
+     (RESI    78 AND NAME   CA)
+     (RESI    78 AND NAME    C)  1.0 -124.36   36.45 2
+ASSI (RESI    78 AND NAME    N)
+     (RESI    78 AND NAME   CA)
+     (RESI    78 AND NAME    C)
+     (RESI    79 AND NAME    N)  1.0  125.06   38.04 2
+ASSI (RESI    78 AND NAME    C)
+     (RESI    79 AND NAME    N)
+     (RESI    79 AND NAME   CA)
+     (RESI    79 AND NAME    C)  1.0 -127.20   23.10 2
+ASSI (RESI    79 AND NAME    N)
+     (RESI    79 AND NAME   CA)
+     (RESI    79 AND NAME    C)
+     (RESI    80 AND NAME    N)  1.0  136.74   33.62 2
+ASSI (RESI    79 AND NAME    C)
+     (RESI    80 AND NAME    N)
+     (RESI    80 AND NAME   CA)
+     (RESI    80 AND NAME    C)  1.0 -106.98   37.82 2
+ASSI (RESI    80 AND NAME    N)
+     (RESI    80 AND NAME   CA)
+     (RESI    80 AND NAME    C)
+     (RESI    81 AND NAME    N)  1.0  121.62   21.14 2
+ASSI (RESI    82 AND NAME    C)
+     (RESI    83 AND NAME    N)
+     (RESI    83 AND NAME   CA)
+     (RESI    83 AND NAME    C)  1.0  -91.56   29.04 2
+ASSI (RESI    83 AND NAME    N)
+     (RESI    83 AND NAME   CA)
+     (RESI    83 AND NAME    C)
+     (RESI    84 AND NAME    N)  1.0  -15.01   44.08 2
+ASSI (RESI    84 AND NAME    C)
+     (RESI    85 AND NAME    N)
+     (RESI    85 AND NAME   CA)
+     (RESI    85 AND NAME    C)  1.0 -146.10   33.70 2
+ASSI (RESI    85 AND NAME    N)
+     (RESI    85 AND NAME   CA)
+     (RESI    85 AND NAME    C)
+     (RESI    86 AND NAME    N)  1.0  143.47   24.42 2
+ASSI (RESI    85 AND NAME    C)
+     (RESI    86 AND NAME    N)
+     (RESI    86 AND NAME   CA)
+     (RESI    86 AND NAME    C)  1.0 -119.22   28.68 2
+ASSI (RESI    86 AND NAME    N)
+     (RESI    86 AND NAME   CA)
+     (RESI    86 AND NAME    C)
+     (RESI    87 AND NAME    N)  1.0  130.30   32.10 2
+ASSI (RESI    86 AND NAME    C)
+     (RESI    87 AND NAME    N)
+     (RESI    87 AND NAME   CA)
+     (RESI    87 AND NAME    C)  1.0 -119.56   21.93 2
+ASSI (RESI    87 AND NAME    N)
+     (RESI    87 AND NAME   CA)
+     (RESI    87 AND NAME    C)
+     (RESI    88 AND NAME    N)  1.0  134.53   33.38 2
+ASSI (RESI    87 AND NAME    C)
+     (RESI    88 AND NAME    N)
+     (RESI    88 AND NAME   CA)
+     (RESI    88 AND NAME    C)  1.0 -125.45   24.35 2
+ASSI (RESI    88 AND NAME    N)
+     (RESI    88 AND NAME   CA)
+     (RESI    88 AND NAME    C)
+     (RESI    89 AND NAME    N)  1.0  128.18   33.22 2
+ASSI (RESI    88 AND NAME    C)
+     (RESI    89 AND NAME    N)
+     (RESI    89 AND NAME   CA)
+     (RESI    89 AND NAME    C)  1.0 -117.62   39.77 2
+ASSI (RESI    89 AND NAME    N)
+     (RESI    89 AND NAME   CA)
+     (RESI    89 AND NAME    C)
+     (RESI    90 AND NAME    N)  1.0  140.03   24.41 2
+ASSI (RESI    90 AND NAME    N)
+     (RESI    90 AND NAME   CA)
+     (RESI    90 AND NAME    C)
+     (RESI    91 AND NAME    N)  1.0  137.38   13.94 2
+ASSI (RESI    90 AND NAME    C)
+     (RESI    91 AND NAME    N)
+     (RESI    91 AND NAME   CA)
+     (RESI    91 AND NAME    C)  1.0  -94.38   42.42 2
+ASSI (RESI    91 AND NAME    N)
+     (RESI    91 AND NAME   CA)
+     (RESI    91 AND NAME    C)
+     (RESI    92 AND NAME    N)  1.0  137.47   28.79 2
+ASSI (RESI    93 AND NAME    C)
+     (RESI    94 AND NAME    N)
+     (RESI    94 AND NAME   CA)
+     (RESI    94 AND NAME    C)  1.0 -113.38   64.33 2
+ASSI (RESI    94 AND NAME    N)
+     (RESI    94 AND NAME   CA)
+     (RESI    94 AND NAME    C)
+     (RESI    95 AND NAME    N)  1.0  147.22   35.92 2
+ASSI (RESI    94 AND NAME    C)
+     (RESI    95 AND NAME    N)
+     (RESI    95 AND NAME   CA)
+     (RESI    95 AND NAME    C)  1.0 -119.55   38.25 2
+ASSI (RESI    95 AND NAME    N)
+     (RESI    95 AND NAME   CA)
+     (RESI    95 AND NAME    C)
+     (RESI    96 AND NAME    N)  1.0  138.30   38.12 2
+ASSI (RESI    95 AND NAME    C)
+     (RESI    96 AND NAME    N)
+     (RESI    96 AND NAME   CA)
+     (RESI    96 AND NAME    C)  1.0 -112.11   40.49 2
+ASSI (RESI    96 AND NAME    N)
+     (RESI    96 AND NAME   CA)
+     (RESI    96 AND NAME    C)
+     (RESI    97 AND NAME    N)  1.0  119.44   35.84 2
+ASSI (RESI    96 AND NAME    C)
+     (RESI    97 AND NAME    N)
+     (RESI    97 AND NAME   CA)
+     (RESI    97 AND NAME    C)  1.0 -110.68   21.22 2
+ASSI (RESI    97 AND NAME    N)
+     (RESI    97 AND NAME   CA)
+     (RESI    97 AND NAME    C)
+     (RESI    98 AND NAME    N)  1.0  135.12   20.14 2
+ASSI (RESI    97 AND NAME    C)
+     (RESI    98 AND NAME    N)
+     (RESI    98 AND NAME   CA)
+     (RESI    98 AND NAME    C)  1.0 -122.56   35.03 2
+ASSI (RESI    98 AND NAME    N)
+     (RESI    98 AND NAME   CA)
+     (RESI    98 AND NAME    C)
+     (RESI    99 AND NAME    N)  1.0  134.16   17.41 2
+ASSI (RESI    98 AND NAME    C)
+     (RESI    99 AND NAME    N)
+     (RESI    99 AND NAME   CA)
+     (RESI    99 AND NAME    C)  1.0  -99.56   32.03 2
+ASSI (RESI    99 AND NAME    N)
+     (RESI    99 AND NAME   CA)
+     (RESI    99 AND NAME    C)
+     (RESI   100 AND NAME    N)  1.0  126.30   11.36 2
+ASSI (RESI    99 AND NAME    C)
+     (RESI   100 AND NAME    N)
+     (RESI   100 AND NAME   CA)
+     (RESI   100 AND NAME    C)  1.0 -132.02   33.08 2
+ASSI (RESI   100 AND NAME    N)
+     (RESI   100 AND NAME   CA)
+     (RESI   100 AND NAME    C)
+     (RESI   101 AND NAME    N)  1.0  157.34   12.50 2
+ASSI (RESI   100 AND NAME    C)
+     (RESI   101 AND NAME    N)
+     (RESI   101 AND NAME   CA)
+     (RESI   101 AND NAME    C)  1.0 -103.51   58.49 2
+ASSI (RESI   101 AND NAME    N)
+     (RESI   101 AND NAME   CA)
+     (RESI   101 AND NAME    C)
+     (RESI   102 AND NAME    N)  1.0  128.25   49.70 2
+ASSI (RESI   102 AND NAME    C)
+     (RESI   103 AND NAME    N)
+     (RESI   103 AND NAME   CA)
+     (RESI   103 AND NAME    C)  1.0  -84.44   39.76 2
+ASSI (RESI   103 AND NAME    N)
+     (RESI   103 AND NAME   CA)
+     (RESI   103 AND NAME    C)
+     (RESI   104 AND NAME    N)  1.0  126.49   35.58 2

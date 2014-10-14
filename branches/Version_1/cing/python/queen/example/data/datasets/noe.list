@@ -1,0 +1,16 @@
+NAME = Intra residual NOE restraints
+TYPE = DIST
+FILE = noe_IR
+//
+NAME = Sequential NOE restraints
+TYPE = DIST
+FILE = noe_SQ
+//
+NAME = Medium range NOE restraints
+TYPE = DIST
+FILE = noe_MR
+//
+NAME = Long range NOE restraints
+TYPE = DIST
+FILE = noe_LR
+//

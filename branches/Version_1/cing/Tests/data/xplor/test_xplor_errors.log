@@ -1,0 +1,219 @@
+		       Xplor-NIH version 2.27 
+ 
+ C.D. Schwieters, J.J.  Kuszewski,       Progr. NMR Spectr. 48, 47-62 (2006). 
+ N. Tjandra, and G.M. Clore              J. Magn. Res., 160, 66-74 (2003). 
+ http://nmr.cit.nih.gov/xplor-nih        based on X-PLOR 3.851 by A.T. Brunger 
+
+ User: jd           on: duvel.cmbi(darwin/x86    )  at: 06-May-11 14:32:21
+ X-PLOR> 
+ X-PLOR>{*==========================================================================*} 
+ X-PLOR>remarks Generation of psf-file 
+ X-PLOR>remarks modified for XPLOR-NIH 
+ X-PLOR>{*==========================================================================*} 
+ X-PLOR> 
+ X-PLOR>{*==========================================================================*} 
+ X-PLOR>{*=== READ THE PARAMETER AND TOPOLOGY FILES ================================*} 
+ X-PLOR>{*==========================================================================*} 
+ X-PLOR> 
+ X-PLOR>{* Non-bonded parameters; choice: "PROLSQ" "PARMALLH6" "PARALLHDG" "OPLSX"  *} 
+ X-PLOR>evaluate ( $par_nonbonded = "OPLSX" ) 
+ EVALUATE: symbol $PAR_NONBONDED set to "OPLSX" (string)
+ X-PLOR> 
+ X-PLOR>parameter 
+ PARRDR>  @2fwu.cing/Refine/annealed/Toppar/parallhdg5.3-merge.pro 
+ ASSFIL: file 2fwu.cing/Refine/annealed/Toppar/parallhdg5.3-merge.pro opened.
+ PARRDR>remark   file protein-allhdg-ucl.param  version UCL  date 07-JUL-01 
+ PARRDR>remark   for file protein-allhdg-ucl.top  version UCL  date 14-MAR-00 
+ PARRDR>remark   for file protein-allhdg-dih-ucl.top  version UCL  date 07-JUL-01 
+ PARRDR>remark   Geometric energy function parameters for distance geometry and 
+ PARRDR>remark   simulated annealing. 
+ PARRDR>remark   Original author: Michael Nilges, EMBL Heidelberg 
+ PARRDR>remark   Modifications: Mark A. Williams, UCL London 
+ PARRDR>remark   last modification: NBFIX for hydrogens in OPLSX nonbonded term. MN, 30-01-04 
+ PARRDR> 
+ PARRDR>set echo off message off end 
+ PARRDR>end 
+ X-PLOR> 
+ X-PLOR>parameter 
+ PARRDR>  @2fwu.cing/Refine/annealed/Toppar/par_axis_aria.pro 
+ PARRDR>remark parameter file for dipolar coupling calculations 
+ PARRDR>set message off echo off end 
+ PARRDR>end 
+ X-PLOR> 
+ X-PLOR>parameter 
+ PARRDR>  @2fwu.cing/Refine/annealed/Toppar/ion.param 
+ ASSFIL: file 2fwu.cing/Refine/annealed/Toppar/ion.param opened.
+ PARRDR>remarks file toppar/ion.param 
+ PARRDR>remarks nonbonded parameters for common ions 
+ PARRDR>remarks new parameters derived from literature for single atom species 
+ PARRDR>remarks PDA 02/09/99 
+ PARRDR> 
+ PARRDR>set echo=off end 
+ PARRDR>end 
+ X-PLOR> 
+ X-PLOR>topology 
+ RTFRDR>  @2fwu.cing/Refine/annealed/Toppar/topallhdg5.3-merge.pro 
+ ASSFIL: file 2fwu.cing/Refine/annealed/Toppar/topallhdg5.3-merge.pro opened.
+ RTFRDR>remark   file topallhdg.pro  version 5.3  date 23-Sept-02 
+ RTFRDR>remark      for file parallhdg.pro version 5.3 date 13-Feb-02 or later 
+ RTFRDR>remark   Geometric energy function parameters for distance geometry and 
+ RTFRDR>remark      simulated annealing. 
+ RTFRDR>remark   Author: Michael Nilges, EMBL Heidelberg; Institut Pasteur, Paris 
+ RTFRDR>remark   This file contains modifications from M. Williams, UCL London 
+ RTFRDR>remark   Last modification 16-Sept-02 
+ RTFRDR> 
+ RTFRDR>set echo off message off end 
+ RTFRDR>end 
+ X-PLOR>topology 
+ RTFRDR>  @2fwu.cing/Refine/annealed/Toppar/topallhdg5.3.sol 
+ RTFRDR>remarks  TOPH19.SOL 
+ RTFRDR>remarks  ========== 
+ RTFRDR>remarks  topology file for solvent molecules 
+ RTFRDR>remarks  water models available: TIP3P model 
+ RTFRDR> 
+ RTFRDR>set echo=false end 
+ RTFRDR>end 
+ X-PLOR>topology 
+ RTFRDR>  @2fwu.cing/Refine/annealed/Toppar/top_axis_aria.pro 
+ RTFRDR>remark topology file for dipolar coupling calculations 
+ RTFRDR>set message off echo off end 
+ RTFRDR>end 
+ X-PLOR>topology 
+ RTFRDR>  @2fwu.cing/Refine/annealed/Toppar/ion.top 
+ ASSFIL: file 2fwu.cing/Refine/annealed/Toppar/ion.top opened.
+ RTFRDR>remarks file toppar/ion.top 
+ RTFRDR>remarks topology and masses for common ions 
+ RTFRDR>remarks Dingle atom ion residues are given the name of the element. 
+ RTFRDR>remarks By default the atom will be uncharged (eg. the residue MG will 
+ RTFRDR>remarks contain the atom called MG with zero charge). 
+ RTFRDR>remarks To use the charged species the charge state is appended to 
+ RTFRDR>remarks the atom name (eg to use MG2+ the residue name is MG2, and the 
+ RTFRDR>remarks atom name is MG+2 and has charge +2.0). 
+ RTFRDR>remarks NOTE: not all ionic species are represented 
+ RTFRDR>remarks PDA 02/09/99 
+ RTFRDR> 
+ RTFRDR>set echo=false end 
+ RTFRDR>end 
+ X-PLOR>set message on echo on end 
+ X-PLOR> 
+ X-PLOR>segment 
+ SEGMENT>  chain 
+ CHAIN>    @2fwu.cing/Refine/annealed/Toppar/topallhdg5.3.pep 
+ ASSFIL: file 2fwu.cing/Refine/annealed/Toppar/topallhdg5.3.pep opened.
+ CHAIN>REMARKS  TOPH19.pep -MACRO for protein sequence 
+ CHAIN>SET ECHO=FALSE END 
+ CHAIN>    coord @2fwu.cing/Refine/annealed/Converted/2fwu_000.pdb 
+ SEGMNT: sequence read from coordinate file
+ ASSFIL: file 2fwu.cing/Refine/annealed/Converted/2fwu_000.pdb opened.
+ COOR>REMARK PDB file of molecule 2fwu 
+ COOR>ATOM      1  N   HIS A 501      -9.946 -15.962  -5.170  1.00  0.00 
+ %SEGMNT-ERR: No matching first patch found
+ %GENRES-ERR: residue CA80 not found in topology file
+ %PATCH-ERR: bond -C    +N    not found 
+ %PATCH-ERR: angle -CA   -C    +N    not found 
+ %PATCH-ERR: angle -O    -C    +N    not found 
+ %PATCH-ERR: angle -C    +N    +CA   not found 
+ %PATCH-ERR: angle -C    +N    +HN   not found 
+ %PATCH-ERR: dihedral -C    +N    +CA   +C    not found
+ %PATCH-ERR: dihedral -C    +N    +CA   +C    not found
+ %PATCH-ERR: dihedral -C    +N    +CA   +C    not found
+ %PATCH-ERR: dihedral -C    +N    +CA   +C    not found
+ %PATCH-ERR: dihedral -C    +N    +CA   +C    not found
+ %PATCH-ERR: dihedral -C    +N    +CA   +C    not found
+ %PATCH-ERR: dihedral -C    +N    +CA   +CB   not found
+ %PATCH-ERR: dihedral -C    +N    +CA   +CB   not found
+ %PATCH-ERR: dihedral -C    +N    +CA   +CB   not found
+ %PATCH-ERR: dihedral -C    +N    +CA   +CB   not found
+ %PATCH-ERR: dihedral -C    +N    +CA   +CB   not found
+ %PATCH-ERR: dihedral -C    +N    +CA   +CB   not found
+ %PATCH-ERR: dihedral -CB   -CA   -C    +N    not found
+ %PATCH-ERR: dihedral -CB   -CA   -C    +N    not found
+ %PATCH-ERR: dihedral -CB   -CA   -C    +N    not found
+ %PATCH-ERR: dihedral -CB   -CA   -C    +N    not found
+ %PATCH-ERR: dihedral -CB   -CA   -C    +N    not found
+ %PATCH-ERR: dihedral -CB   -CA   -C    +N    not found
+ %PATCH-ERR: improper -C    -CA   +N    -O    not found
+ %PATCH-ERR: improper +N    -C    +CA   +HN   not found
+ %PATCH-ERR: improper -CA   -C    +N    +CA   not found
+ %GENRES-ERR: residue CA85 not found in topology file
+ %PATCH-ERR: bond -C    +N    not found 
+ %PATCH-ERR: angle -CA   -C    +N    not found 
+ %PATCH-ERR: angle -O    -C    +N    not found 
+ %PATCH-ERR: angle -C    +N    +CA   not found 
+ %PATCH-ERR: angle -C    +N    +HN   not found 
+ %PATCH-ERR: dihedral -C    +N    +CA   +C    not found
+ %PATCH-ERR: dihedral -C    +N    +CA   +C    not found
+ %PATCH-ERR: dihedral -C    +N    +CA   +C    not found
+ %PATCH-ERR: dihedral -C    +N    +CA   +C    not found
+ %PATCH-ERR: dihedral -C    +N    +CA   +C    not found
+ %PATCH-ERR: dihedral -C    +N    +CA   +C    not found
+ %PATCH-ERR: dihedral -C    +N    +CA   +CB   not found
+ %PATCH-ERR: dihedral -C    +N    +CA   +CB   not found
+ %PATCH-ERR: dihedral -C    +N    +CA   +CB   not found
+ %PATCH-ERR: dihedral -C    +N    +CA   +CB   not found
+ %PATCH-ERR: dihedral -C    +N    +CA   +CB   not found
+ %PATCH-ERR: dihedral -C    +N    +CA   +CB   not found
+ %PATCH-ERR: dihedral -CB   -CA   -C    +N    not found
+ %PATCH-ERR: dihedral -CB   -CA   -C    +N    not found
+ %PATCH-ERR: dihedral -CB   -CA   -C    +N    not found
+ %PATCH-ERR: dihedral -CB   -CA   -C    +N    not found
+ %PATCH-ERR: dihedral -CB   -CA   -C    +N    not found
+ %PATCH-ERR: dihedral -CB   -CA   -C    +N    not found
+ %PATCH-ERR: dihedral -CB   -CA   -C    -O    not found
+ %PATCH-ERR: dihedral -CB   -CA   -C    -O    not found
+ %PATCH-ERR: dihedral -CB   -CA   -C    -O    not found
+ %PATCH-ERR: dihedral -CB   -CA   -C    -O    not found
+ %PATCH-ERR: dihedral -CB   -CA   -C    -O    not found
+ %PATCH-ERR: dihedral -CB   -CA   -C    -O    not found
+ %PATCH-ERR: improper -C    -CA   +N    -O    not found
+ %PATCH-ERR: improper +N    -C    +CA   +HN   not found
+ %PATCH-ERR: improper -CA   -C    +N    +CA   not found
+ %SEGMNT-ERR: no matching LAST patch found
+ CHAIN>  end 
+ SEGMENT>end 
+ SEGMNT:   159 residues were inserted into segment "    "
+ XPLOR: current counts (number in parenthesis is maximum)
+ NATOM=       2468(MAXA=        3200)  NBOND=       2487(MAXB=        3200)
+ NTHETA=      4507(MAXT=        6400)  NGRP=         157(MAXGRP=       200)
+ NPHI=        3849(MAXP=        6400)  NIMPHI=      1249(MAXIMP=      1600)  
+ NDON=         265(MAXPAD=       400)  NACC=         261(MAXPAD=       400)
+ NNB=         1044(MAXNB=       1600) 
+ X-PLOR> 
+ X-PLOR>patch HISD  reference=nil=( resid 501 ) end 
+ SELRPN:     18 atoms have been selected out of   2468
+ MAPIC: Atom numbers being modified
+ XPLOR: current counts (number in parenthesis is maximum)
+ NATOM=       2467(MAXA=        3200)  NBOND=       2486(MAXB=        3200)
+ NTHETA=      4505(MAXT=        6400)  NGRP=         157(MAXGRP=       200)
+ NPHI=        3849(MAXP=        6400)  NIMPHI=      1249(MAXIMP=      1600)  
+ NDON=         264(MAXPAD=       400)  NACC=         262(MAXPAD=       400)
+ NNB=         1044(MAXNB=       1600) 
+ X-PLOR>patch HISD  reference=nil=( resid 513 ) end 
+ SELRPN:     18 atoms have been selected out of   2467
+ MAPIC: Atom numbers being modified
+ XPLOR: current counts (number in parenthesis is maximum)
+ NATOM=       2466(MAXA=        3200)  NBOND=       2485(MAXB=        3200)
+ NTHETA=      4503(MAXT=        6400)  NGRP=         157(MAXGRP=       200)
+ NPHI=        3849(MAXP=        6400)  NIMPHI=      1249(MAXIMP=      1600)  
+ NDON=         263(MAXPAD=       400)  NACC=         263(MAXPAD=       400)
+ NNB=         1044(MAXNB=       1600) 
+ X-PLOR>patch HISD  reference=nil=( resid 639 ) end 
+ SELRPN:     18 atoms have been selected out of   2466
+ MAPIC: Atom numbers being modified
+ XPLOR: current counts (number in parenthesis is maximum)
+ NATOM=       2465(MAXA=        3200)  NBOND=       2484(MAXB=        3200)
+ NTHETA=      4501(MAXT=        6400)  NGRP=         157(MAXGRP=       200)
+ NPHI=        3849(MAXP=        6400)  NIMPHI=      1249(MAXIMP=      1600)  
+ NDON=         262(MAXPAD=       400)  NACC=         264(MAXPAD=       400)
+ NNB=         1044(MAXNB=       1600) 
+ X-PLOR> 
+ X-PLOR>write psf output=2fwu.cing/Refine/annealed/PSF/2fwu.psf end 
+ ASSFIL: file 2fwu.cing/Refine/annealed/PSF/2fwu.psf opened.
+ X-PLOR> 
+ X-PLOR>set message on echo on end 
+ X-PLOR> 
+ X-PLOR>stop 
+ HEAP:   maximum use=  4074148 current use=  3687646
+ X-PLOR: total CPU time=      0.2796 s
+ X-PLOR: entry time at 14:32:21 06-May-11
+ X-PLOR: exit time at 14:32:22 06-May-11

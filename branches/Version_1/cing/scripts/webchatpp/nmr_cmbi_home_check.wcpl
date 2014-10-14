@@ -1,0 +1,12 @@
+print "Checked NMR CMBI home\n";
+GET http://nmr.cmbi.ru.nl/
+  EXPECT OK 
+  EXPECT (! /ERROR/)
+GET http://nmr.cmbi.ru.nl/~jd
+  EXPECT OK 
+  EXPECT (! /ERROR/)
+GET http://nmr.cmbi.ru.nl/NRG-CING/HTML/index.html
+  EXPECT OK 
+  EXPECT (! /ERROR/)
+  EXPECT /UA-4413187-1/
+  EXPECT /9pcy/

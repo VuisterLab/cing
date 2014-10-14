@@ -1,0 +1,129 @@
+data_completeness_observable_info
+
+save_file_characteristics
+   _Saveframe_category   file_characteristics
+
+   _File_version         1.0
+   _Author              "Jurgen F. Doreleijers"
+
+   loop_
+      _Date
+      _Details
+
+       2004-01-30 "First creation from Aqua lib" 
+
+   stop_
+
+save_
+
+
+save_completeness_observable_info
+   _Saveframe_category   completeness_observable_info
+
+   _Details             
+;
+The listed residues/atom combination is considered observable in an NMR 
+NOESY experiment in case no individual prochiral groups could be assessed.
+;
+
+   loop_
+      _Comp_ID
+      _Atom_ID
+
+       LEU  H   
+       LEU  HA  
+       LEU  QB  
+       LEU  HG  
+       LEU  QD  
+       ALA  H   
+       ALA  HA  
+       ALA  MB  
+       ARG  H   
+       ARG  HA  
+       ARG  QB  
+       ARG  QG  
+       ARG  QD  
+       ARG  HE  
+       ASN  H   
+       ASN  HA  
+       ASN  QB  
+       ASN  QD  
+       ASP  H   
+       ASP  HA  
+       ASP  QB  
+       CYS  H   
+       CYS  HA  
+       CYS  QB  
+       GLN  H   
+       GLN  HA  
+       GLN  QB  
+       GLN  QG  
+       GLN  QE  
+       GLU  H   
+       GLU  HA  
+       GLU  QB  
+       GLU  QG  
+       GLY  H   
+       GLY  QA  
+       HIS  H   
+       HIS  HA  
+       HIS  QB  
+       HIS  HD2 
+       HIS  HE1 
+       ILE  H   
+       ILE  HA  
+       ILE  HB  
+       ILE  MG  
+       ILE  QG  
+       ILE  MD  
+       LYS  H   
+       LYS  HA  
+       LYS  QB  
+       LYS  QG  
+       LYS  QD  
+       LYS  QE  
+       MET  H   
+       MET  HA  
+       MET  QB  
+       MET  QG  
+       MET  ME  
+       PHE  H   
+       PHE  HA  
+       PHE  QB  
+       PHE  QD  
+       PHE  QE  
+       PHE  HZ  
+       SER  H   
+       SER  HA  
+       SER  QB  
+       THR  H   
+       THR  HA  
+       THR  HB  
+       THR  MG  
+       TRP  H   
+       TRP  HA  
+       TRP  QB  
+       TRP  HD1 
+       TRP  HE3 
+       TRP  HE1 
+       TRP  HZ3 
+       TRP  HZ2 
+       TRP  HH2 
+       TYR  H   
+       TYR  HA  
+       TYR  QB  
+       TYR  QD  
+       TYR  QE  
+       VAL  H   
+       VAL  HA  
+       VAL  HB  
+       VAL  QG  
+       PRO  HA  
+       PRO  QB  
+       PRO  QG  
+       PRO  QD  
+
+   stop_
+
+save_
+
