@@ -1,0 +1,113 @@
+
+./generate-mapping -o nrgcing.n3 -u pdbj -d org.postgresql.Driver \
+    jdbc:postgresql://127.0.0.1/pdbmlplus
+
+./generate-mapping -o wattos1.n3 -u wattos1 -p 4I4KMS \
+    jdbc:mysql://127.0.0.1/wattos1
+
+./d2r-server wattos1.n3
+./d2r-server nrgcing.n3
+
+
+
+
+
+Example of a config file for a mixed pdbmlplus / nrgcing
+- below
+Example query:
+
+  FILTER ( app:customDate(?date) > "2005-02-28"^^xsd:date ) .
+
+# Get the entries for with at least 1000 distance restraints
+SELECT DISTINCT ?resource ?value
+WHERE { ?resource <http://localhost:2020/vocab/resource/cingentry_distance_count> ?value
+ FILTER (?value >= 1000)
+}
+ORDER BY DESC(?value)
+
+# Get/count the entries deposited after 2010
+
+SELECT count( ?resource )
+WHERE {
+?resource <http://localhost:2020/vocab/resource/brief_summary_release_date> ?value
+FILTER (?value >= "2010-01-01"^^xsd:date)
+}
+ORDER BY DESC(?value)
+LIMIT 10
+
+# Finally a join the tables
+# triplets containing: "object predicate subject"
+PREFIX r: <http://localhost:2020/vocab/resource/>
+SELECT ?pdb1 ?date $dist
+WHERE {
+?bs r:derived_from_pdb_id ?pdb1 .
+?ce r:derived_from_pdb_id ?pdb1 .
+?ce r:cingentry_distance_count ?dist .
+?bs r:brief_summary_release_date ?date .
+FILTER (?date >= "2010-01-01"^^xsd:date)
+FILTER (?dist >= 1000)
+}
+ORDER BY DESC(?dist)
+LIMIT 10
+
+
+@prefix map: <file:/Users/jd/progs/d2r-server/nrgcing.n3#> .
+@prefix db: <> .
+@prefix vocab: <http://localhost:2020/vocab/resource/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix d2rq: <http://www.wiwiss.fu-berlin.de/suhl/bizer/D2RQ/0.1#> .
+@prefix jdbc: <http://d2rq.org/terms/jdbc/> .
+@prefix d2r: <http://sites.wiwiss.fu-berlin.de/suhl/bizer/d2r-server/config.rdf#> .
+@prefix bio2rdf: <http://bio2rdf.org/> .
+
+
+map:database a d2rq:Database;
+    d2rq:jdbcDriver "org.postgresql.Driver";
+    d2rq:jdbcDSN "jdbc:postgresql://127.0.0.1/pdbmlplus";
+    d2rq:username "pdbj";
+    d2rq:resultSizeLimit 20;
+    jdbc:autoReconnect "true";
+    jdbc:zeroDateTimeBehavior "convertToNull";
+    .
+
+
+<> a d2r:Server;
+        rdfs:label "NRG-CING ***Development*** D2R Server";
+#        d2r:baseURI <http://nmr.cmbi.umcn.nl:2020/>;
+        d2r:baseURI <http://localhost:2020/>;
+        d2r:port 2020;
+    .
+
+# Manually defined triples:
+#   d2rq:uriPattern "http://nmr.cmbi.ru.nl/NRG-CING/data/br/@@pdbj.brief_summary.pdbid@@/@@pdbj.brief_summary.pdbid@@.cing";
+
+# Table pdbj.brief_summary
+<file:/Users/jd/progs/d2r-server/nrgcing.n3#pdbj.brief_summary> a d2rq:ClassMap;
+    d2rq:dataStorage map:database;
+    d2rq:uriPattern "pdbj.brief_summary/@@pdbj.brief_summary.pdbid|urlify@@";
+    d2rq:class <http://localhost:2020/vocab/resource/pdbj.brief_summary>;
+    d2rq:classDefinitionLabel "pdbj.brief_summary";
+    .
+<file:/Users/jd/progs/d2r-server/nrgcing.n3#pdbj.brief_summary__label> a d2rq:PropertyBridge;
+    d2rq:belongsToClassMap <file:/Users/jd/progs/d2r-server/nrgcing.n3#pdbj.brief_summary>;
+    d2rq:property rdfs:label;
+    d2rq:pattern "pdbj.brief_summary #@@pdbj.brief_summary.pdbid@@";
+    .
+
+# JFD modified:
+map:brief_summary_pdbid a d2rq:PropertyBridge;
+    d2rq:belongsToClassMap <file:/Users/jd/progs/d2r-server/nrgcing.n3#pdbj.brief_summary>;
+    d2rq:property vocab:brief_summary_pdbid;
+    d2rq:propertyDefinitionLabel "brief_summary pdbid";
+#   d2rq:column "pdbj.brief_summary.pdbid";
+    d2rq:uriPattern "http://bio2rdf.org/pdb:@@pdbj.brief_summary.pdbid@@";
+    .
+map:brief_summary_deposition_date a d2rq:PropertyBridge;
+    d2rq:belongsToClassMap <file:/Users/jd/progs/d2r-server/nrgcing.n3#pdbj.brief_summary>;
+    d2rq:property vocab:brief_summary_deposition_date;
+    d2rq:propertyDefinitionLabel "brief_summary deposition_date";
+    d2rq:column "pdbj.brief_summary.deposition_date";
+    d2rq:datatype xsd:date;
+    .

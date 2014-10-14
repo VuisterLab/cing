@@ -1,0 +1,219 @@
+This is the file: $C/Documentation/psql_setup_instructions.txt
+
+Follow 00README.txt in pdbj_Mine directory from: ftp://ftp.pdbj.org/mine
+
+########### FOR LINUX ###################
+setenv PGBIN  /usr/local/pgsql/bin/
+setenv PGDATA /home/kss16/workspace/pgdata
+dpkg -l | grep post
+
+echo "SHOW config_file;" | psql -h localhost postgres lampuser
+echo "SHOW config_file;" | psql postgres lampuser
+
+
+
+
+
+#sudo su postgres
+#   initdb -D $PGDATA
+#sudo cp ~jd/postgresql.conf $PGDATA
+#sudo cp ~jd/pg_hba.conf     $PGDATA
+#sudo tail -f $PGDATA/logfile &
+#sudo SystemStarter stop PostgreSQL
+#sudo SystemStarter start PostgreSQL
+#sudo su postgres
+#  createdb pdbmlplus
+#  createlang plpgsql pdbmlplus
+#  psql
+#    create role pdbj LOGIN CREATEDB SUPERUSER;
+#    create role jd LOGIN CREATEDB SUPERUSER;
+#    create role akinjo LOGIN CREATEDB SUPERUSER;
+#    create role nrgcing1 LOGIN CREATEDB SUPERUSER;
+#    create role casdcing1 LOGIN CREATEDB SUPERUSER;
+#     after downloading from pdbj & setting options in script:
+
+# Test starting this way:
+./postgresql stop
+./postgresql start
+# ignore X11 warnings.
+# Test server as user i
+echo "SHOW config_file;" | psql postgres postgres
+./postgresql stop
+# Reboot to see if it comes up.
+echo "SHOW config_file;" | psql postgres postgres
+# Use the update-rc.d command to create symbolic links in the /etc/rc?.d
+update-rc.d script defaults
+# Configure further as postgres user: (see below etc.)
+vi $PGDATA/postgresql.conf 
+# Reset kernel.shmmax (has a different name in Linux than in OSX).
+vi /etc/sysctl.conf
+sysctl -p /etc/sysctl.conf
+sysctl -a | grep shmmax
+# Restart 
+/etc/init.d/postgresql restart
+# Check log
+tail -f $PGDATA/serverlog &
+
+# Create regular users without superuser privileges.
+createuser wim
+createuser wouter
+
+
+
+########### FOR OSX ###################
+Read: http://shifteleven.com/articles/2008/03/21/installing-postgresql-on-leopard-using-macports
+
+sudo SystemStarter stop  PostgreSQL
+sudo SystemStarter start PostgreSQL
+
+setenv PGDATA /pgdata
+# stella
+setenv PGBIN /Users/jd/opt/bin
+# nmr
+setenv PGBIN /usr/local/pgsql/bin
+
+
+Configuration at:
+$PGDATA/postgresql.conf
+Can be confirmed by sql query: SHOW config_file;
+e.g. shows default port to be 5432
+max_locks_per_transaction set to 5120 before I could drop pdbj schema; needed to restart PostgreSQL.
+max_connections = 60 # ran out of connections when doing updates with 8 processes from storeCING2db at a time.
+Log:
+sudo tail -f $PGDATA/logfile
+
+-- 1 -- Use Fix in http://shifteleven.com/articles/2008/03/21/installing-postgresql-on-leopard-using-macports
+on: "The solution to the /dev/null error:"
+
+Create a user with group:
+- First via gui in OSX and then:
+sudo dscl . -create /Users/postgres UserShell /bin/bash
+sudo dscl . -create /Users/postgres NFSHomeDirectory /Users/postgres
+# Create group
+sudo dscl . -create /Groups/postgres
+# Add user to grup
+sudo dscl . -create /Groups/postgres GroupMembership postgres
+# Give an id; making sure it's not taken...
+sudo dscl . -create /Groups/postgres gid 505
+# Read out
+dscl . read /Groups/postgres
+sudo mkdir /Users/postgres
+sudo chown postgres:postgres /Users/postgres
+
+--  2 -- Fix problem with getline. described here:
+http://www.stereoplex.com/2008/feb/select5/error-compiling-postgresql-83-on-leopard-rl_comple/
+stella:
+./configure --prefix=/Users/jd/opt --with-python --with-libxml --with-libxslt --with-libedit-preferred
+nmr:
+./configure --prefix=/usr/local/pgsql --with-python --with-libxml --with-libxslt --with-libedit-preferred
+
+To create a database instance, after install do
+ sudo mkdir -p $PGDATA
+ sudo chown postgres:postgres $PGDATA
+ sudo su postgres -c 'initdb -D $PGDATA'
+# sudo su postgres -c 'cp ~jd/postgresql.conf $PGDATA'
+
+# start the db:
+    sudo su postgres
+    pg_ctl -D $PGDATA -l logfile start
+
+Connect as postgres unix user:
+  psql
+  create role jd LOGIN CREATEDB SUPERUSER;
+  create role pdbj LOGIN CREATEDB SUPERUSER;
+  create role akinjo LOGIN CREATEDB SUPERUSER;
+  create role nrgcing1 LOGIN CREATEDB SUPERUSER;
+  create role casdcing1 LOGIN CREATEDB SUPERUSER;
+
+
+-- Getting started help:
+\? from the psql monitor
+\l list db
+\dn list schemas
+\dt list tables
+\d nrgcing.cingatom        list a table called cingatom.
+
+- add PGDATA to exclusion list of spotlight and TM.
+- To tweak your DBMS
+  + Create file /etc/sysctl.conf with .5 Gb and reboot:
+# This one is working on Stella
+kern.sysv.shmmax=524288000
+kern.sysv.shmmin=1
+kern.sysv.shmmni=64
+kern.sysv.shmseg=16
+kern.sysv.semmns=130
+kern.sysv.shmall=131072000
+kern.sysv.maxproc=2048
+kern.maxprocperuid=512
+
+For all shared memory related settings:
+sysctl -a | grep shm
+Or do on line but settings will not persist.
+jd:nmr/~/ sudo sysctl -w kern.sysv.shmmax=524288000
+
+Good resource:
+http://wiki.postgresql.org/wiki/Tuning_Your_PostgreSQL_Server
+
+- For querying e.g. performance parameters live see $CINGROOT/python/cing/NRG/sql/handy_commands.sql
+  + E.g.: select name, setting, unit  from pg_settings where category like 'Resource%';
+
+It failed to reload the weekly run with setting of 256 as suggested so increased to:
+max_locks_per_transaction = 1024
+This was running 93 Mb (675 Mb uncompressed SQL).
+Tuning is related to setting the kernel resources:
+http://www.postgresql.org/docs/8.4/static/kernel-resources.html#SYSVIPC
+There must be something wrong in my settings as the postgres program only shows 2 Mb Real memory and 30 Mb Virtual.
+Way too small to be useful.
+Ok documentation found at:
+http://www.postgresql.org/docs/current/static/runtime-config-resource.html
+Looks like it really needs to be adjusted:
+
+***** Allow access from non local clients:
+Add a line to: $PGDATA/pg_hba.conf
+# will allow access from 131.174.146.x ip's
+host    all         all         131.174.146.0/24      trust
+
+***** Set a password:
+http://www.postgresql.org/docs/8.3/interactive/libpq-pgpass.html
+
+***** For automatic start/stop follow instructions at:
+http://ripary.com/postgresql.html
+using:
+sudo cp $CINGROOT/scripts/sql/PostgreSQL /Library/StartupItems/PostgreSQL/PostgreSQL
+
+'''You can disable automatic startup at any time by editing /etc/hostconfig.'''
+
+-- Creating a backup every month is really nice so not too many updates are needed.
+
+See doc at: http://www.postgresql.org/docs/8.4/interactive/backup-dump.html (end of page)
+# for custom (binary;compressed)
+# Replace nrgcing with pdbj.
+pg_dump -U pdbj --format=c --schema=nrgcing pdbmlplus > nrgcing.dump
+# Restore
+psql pdbmlplus < nrgcing.dump
+
+
+## REPEAT AFTER ME: e.g. after nilling PGDATA and restarting.
+# Indentation to left means logout of previous shell.
+
+sudo mkdir -p $PGDATA
+sudo chown postgres:postgres $PGDATA
+sudo su postgres
+   initdb -D $PGDATA
+sudo cp ~jd/postgresql.conf $PGDATA
+sudo cp ~jd/pg_hba.conf     $PGDATA
+sudo tail -f $PGDATA/logfile &
+sudo SystemStarter stop PostgreSQL
+sudo SystemStarter start PostgreSQL
+sudo su postgres
+  createdb pdbmlplus
+  createlang plpgsql pdbmlplus
+  psql
+    create role pdbj LOGIN CREATEDB SUPERUSER;
+    create role jd LOGIN CREATEDB SUPERUSER;
+    create role akinjo LOGIN CREATEDB SUPERUSER;
+    create role nrgcing1 LOGIN CREATEDB SUPERUSER;
+    create role casdcing1 LOGIN CREATEDB SUPERUSER;
+# after downloading from pdbj & setting options in script:
+
+$CINGROOT/scripts/cing/manualUpdatePdbjMine.csh >& ~/manualUpdatePdbjMine_2.log &

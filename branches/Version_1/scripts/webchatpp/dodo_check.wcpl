@@ -1,0 +1,6 @@
+print "Checked Dodo home \n";
+GET http://ododo.nl
+  EXPECT OK
+GET http://ododo.nl/DodoBrouwerij/Dodo_Brouwerij.html
+  EXPECT OK
+  EXPECT /Dodo Brouwerij/

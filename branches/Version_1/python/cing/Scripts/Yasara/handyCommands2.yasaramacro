@@ -1,0 +1,9 @@
+#DelTab all
+#For i=1 to (LastObj)
+#  x =  Distance IUPAC HE1 res 17 obj (i), IUPAC HB2 res 22 obj (i),bound=No
+#  y =  Distance IUPAC HE2 res 17 obj (i), IUPAC HB2 res 22 obj (i),bound=No
+#  d = math.min( x, y ) 
+#  Tabulate (i)
+#  Tabulate (x)
+#  Tabulate (y)
+#SaveTab 1,/z.tab,columns=3
