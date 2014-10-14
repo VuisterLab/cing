@@ -15,7 +15,7 @@ from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.Scripts.doScriptOnEntryList import doScriptOnEntryList
 from cing.Scripts.validateEntry import ARCHIVE_TYPE_BY_ENTRY
 from cing.Scripts.validateEntry import PROJECT_TYPE_CYANA
-from cing.constants import * #@UnusedWildImport
+from cing.core.constants import * #@UnusedWildImport
 
 cing.verbosity = cing.verbosityDebug
 
@@ -30,7 +30,7 @@ entryListFileName     = os.path.join(cingDirScripts, DATA_STR, 'entryCodeListPro
 
 # parameters for validateEntry
 #inputDir              = '/Volumes/proteins/var/www/html/Education/Validation/HTML/Exercise_1/Data/'
-#inputDir              = '/Users/jd/Sites/cing/in/data/Tests/cyana'
+#inputDir              = '/Users/jd/Sites/cing/in/Tests/data/cyana'
 inputDir              = os.path.join(cingDirTestsData, "cyana" )
 outputDir             = startDir
 #pdbConvention         = PDB before using Yasara to update.

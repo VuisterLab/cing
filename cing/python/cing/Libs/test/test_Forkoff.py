@@ -2,10 +2,12 @@
 # python -u $CINGROOT/python/cing/Libs/test/test_Forkoff.py
 # In order to test killing capabilities try (replacing 9999 by pid):
 # kill -2 9999 (twice)
-import cing
 from cing import cingDirTmp
+from cing import header
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.Libs.forkoff import * #@UnusedWildImport
+from cing.main import getStartMessage
+from cing.main import getStopMessage
 from unittest import TestCase
 import unittest
 
@@ -80,10 +82,10 @@ class AllChecks(TestCase):
 
 if __name__ == "__main__":
     cing.verbosity = verbosityDebug
-    nTmessage(cing.cingDefinitions.getHeaderString())
-    nTmessage(cing.systemDefinitions.getStopMessage())
+    nTmessage(header)
+    nTmessage(getStartMessage())
     try:
         unittest.main()
     finally:
-        nTmessage(cing.systemDefinitions.getStopMessage())
+        nTmessage(getStopMessage(cing.starttime))
 

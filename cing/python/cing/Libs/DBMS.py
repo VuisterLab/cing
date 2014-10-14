@@ -142,8 +142,8 @@ class Relation():
         ncols = -1
         try:
             if containsHeaderRow:
-                row = reader.next
-                #                nTdebug("read header: %s" % row)
+                row = reader.next()
+#                nTdebug("read header: %s" % row)
                 ncols = len(row)
                 for c in range(ncols):
                     self.insertColumn(label=row[c])

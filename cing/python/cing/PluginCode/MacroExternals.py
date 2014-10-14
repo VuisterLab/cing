@@ -2,9 +2,10 @@
 Create the macros that external programs such as Yasara, Molmol, and PyMol
 can read to work on CING data.
 """
-import cing
+from cing import header
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.PluginCode.required.reqProcheck import * #@UnusedWildImport
+from cing.main import getStartMessage
 
 try:
     import yasaramodule as yasara #@UnresolvedImport
@@ -19,7 +20,7 @@ loadTestingFile = True
 
 originatingProgramDeclaration = """Created by:
 %s
-%s""" % (cing.cingDefinitions.getHeaderString(), cing.systemDefinitions.getStartMessage())
+%s""" % (header, getStartMessage())
 originatingProgramDeclaration = toPoundedComment(originatingProgramDeclaration)
 
 molmolMacroFileHeader = """# Execute by issuing command (without pound sign):
@@ -35,7 +36,7 @@ yasaraMacroFileHeader = """# Execute by issuing command  (without pound sign):
 # E.g. sequence:
 # Read the PDB file.
 # LoadPDB /home/i/2kq3/2kq3.pdb
-# Show only the backbone trace with secondary structure.
+# Show only the backbone trace with secondary structure.  
 # Style Ribbon
 # Omit all but the first model.
 # DelObj 2-20
@@ -165,7 +166,7 @@ pymol.finish_launching()
 """
     # Just for testing:
     pdbCode = '1brv'
-    scriptPdbLoad = "cmd.load('/Users/jd/workspace35/cing/data/Tests/pdb/%s/pdb%s.ent')" % (pdbCode, pdbCode)
+    scriptPdbLoad = "cmd.load('/Users/jd/workspace35/cing/Tests/data/pdb/%s/pdb%s.ent')" % (pdbCode, pdbCode)
 
     macroTxt = \
 """
@@ -204,7 +205,7 @@ pymol.finish_launching()
 def makePyMolReadPdbMacro(project, path = None):
     # Just for testing:
     pdbCode = '1brv'
-    scriptPdbLoad = "load /Users/jd/workspace35/cing/data/Tests/pdb/%s/pdb%s.ent" % (pdbCode, pdbCode)
+    scriptPdbLoad = "load /Users/jd/workspace35/cing/Tests/data/pdb/%s/pdb%s.ent" % (pdbCode, pdbCode)
     macroTxt = pyMolMacroFileHeader + '\n' + scriptPdbLoad +'\n'
 
     if path:
@@ -221,13 +222,13 @@ def makePyMolByResidueMacro(project, keys,
     """From http://pymolwiki.org/index.php/Color#Reassigning_B-Factors_and_Coloring
     http://pymolwiki.org/index.php/Command_Line_Options
     """
-#    nTdebug('makePyMolByResidueMacro: keys: %s, minValue: %s maxValue: %s reverseColorScheme: %s', keys, minValue,
+#    nTdebug('makePyMolByResidueMacro: keys: %s, minValue: %s maxValue: %s reverseColorScheme: %s', keys, minValue, 
 #maxValue, reverseColorScheme)
 
     # Just for testing:
     pdbCode = '1brv'
     if loadTestingFile:
-        scriptPdbLoad = "load /Users/jd/workspace35/cing/data/Tests/pdb/%s/pdb%s.ent" % (pdbCode, pdbCode)
+        scriptPdbLoad = "load /Users/jd/workspace35/cing/Tests/data/pdb/%s/pdb%s.ent" % (pdbCode, pdbCode)
 
     macroTxt = \
 """
@@ -288,7 +289,7 @@ def makeMolmolByResidueROGMacro(project, path = None):
 
 # Coloring residues by CING ROG scores.
 
-ReadPdb /Users/jd/workspace35/cing/data/Tests/pdb/1brv/pdb1brv.ent
+ReadPdb /Users/jd/workspace35/cing/Tests/data/pdb/1brv/pdb1brv.ent
 
 DefPropAtom 'prev_sel' 'selected'
 DefPropBond 'prev_sel' 'selected'
@@ -387,14 +388,14 @@ def makeMolmolByResidueMacro(project, keys,
                             path = None
                            ):
 
-#    nTdebug('makeMolmolByResidueMacro: keys: %s, minValue: %s maxValue: %s reverseColorScheme: %s',
+#    nTdebug('makeMolmolByResidueMacro: keys: %s, minValue: %s maxValue: %s reverseColorScheme: %s', 
 #keys, minValue, maxValue, reverseColorScheme)
     macroTxt = \
 """%s
 
 # Scaling colors to MinValue, MaxValue, ReverseColorScheme: minValue, maxValue, reverseColorScheme
 
-ReadPdb /Users/jd/workspace35/cing/data/Tests/pdb/1brv/pdb1brv.ent
+ReadPdb /Users/jd/workspace35/cing/Tests/data/pdb/1brv/pdb1brv.ent
 
 DefPropAtom 'prev_sel' 'selected'
 DefPropBond 'prev_sel' 'selected'

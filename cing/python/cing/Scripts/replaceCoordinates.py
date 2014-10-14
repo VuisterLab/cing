@@ -13,13 +13,12 @@ file:///Library/WebServer/Documents/NRG-CING/data \
 
 """
 
-import cing
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.Libs.network import * #@UnusedWildImport
 from cing.NRG import * #@UnusedWildImport
 from cing.NRG.settings import * #@UnusedWildImport
 from cing.Scripts.validateEntry import * #@UnusedWildImport
-from cing.constants import * #@UnusedWildImport
+from cing.core.constants import * #@UnusedWildImport
 
 
 def mainReplaceCoordinatesEntry(entryId, *extraArgList):
@@ -27,9 +26,9 @@ def mainReplaceCoordinatesEntry(entryId, *extraArgList):
     """
 
     fastestTest = False # DEFAULT: False
-
+    
     htmlOnly = False # DEFAULT:: False but enable it for faster runs without some actual data.
-    doWhatif = True
+    doWhatif = True 
     doProcheck = True
     doWattos = True
     doQueeny = True
@@ -46,8 +45,8 @@ def mainReplaceCoordinatesEntry(entryId, *extraArgList):
     force_retrieve_input = True
 
 
-    nTmessage(cing.cingDefinitions.getHeaderString())
-    nTmessage(cing.systemDefinitions.getStartMessage())
+    nTmessage(header)
+    nTmessage(getStartMessage())
 
     # Sync below code with nrgCing#createToposTokens
     expectedArgumentList = """
@@ -86,10 +85,10 @@ def mainReplaceCoordinatesEntry(entryId, *extraArgList):
     else:
         filterVasco = 1 # Default should be True
     singleCoreOperation = getDeepByKeysOrAttributes(extraArgList, IDX_SINGLE_CORE_OPERATION )
-    inPathTemplate = getDeepByKeysOrAttributes(extraArgList, IDX_SINGLE_CORE_OPERATION + 1 )
-    archive_id = getDeepByKeysOrAttributes(extraArgList, IDX_SINGLE_CORE_OPERATION + 2 )
-    convention = getDeepByKeysOrAttributes(extraArgList, IDX_SINGLE_CORE_OPERATION + 3 )
-
+    inPathTemplate = getDeepByKeysOrAttributes(extraArgList, IDX_SINGLE_CORE_OPERATION + 1 )    
+    archive_id = getDeepByKeysOrAttributes(extraArgList, IDX_SINGLE_CORE_OPERATION + 2 )    
+    convention = getDeepByKeysOrAttributes(extraArgList, IDX_SINGLE_CORE_OPERATION + 3 )        
+    
     if archiveType == ARCHIVE_TYPE_FLAT:
         pass # default
     elif archiveType == ARCHIVE_TYPE_BY_ENTRY:
@@ -121,11 +120,11 @@ def mainReplaceCoordinatesEntry(entryId, *extraArgList):
     nTdebug("")
     nTdebug("Using derived settings:")
     nTdebug("isRemoteOutputDir:    %s" % isRemoteOutputDir)
-
+    
     # For NMR_REDO required as most efficient.
-    if singleCoreOperation:
+    if singleCoreOperation: 
         setToSingleCoreOperation()
-
+    
     # presume the directory still needs to be created.
     cingEntryDir = entryId + ".cing"
 
@@ -201,14 +200,14 @@ def mainReplaceCoordinatesEntry(entryId, *extraArgList):
         # end if
     # end if
 
-####> MAIN UTILITY HERE
+####> MAIN UTILITY HERE    
     name = entryId + "_recoord"
-    inPath = inPathTemplate % entryId
-    if project.molecule.replaceCoordinatesByPdb( inPath, name = name, convention=convention ):
+    inPath = inPathTemplate % entryId    
+    if project.molecule.replaceCoordinatesByPdb( inPath, name = name, convention=convention ):  
         nTerror("Failed replaceCoordinatesByPdb.")
         return True
-    # end if
-
+    # end if          
+    
     if ranges != None:
         project.molecule.setRanges(ranges)
     project.molecule.superpose(ranges=ranges)
@@ -222,7 +221,7 @@ def mainReplaceCoordinatesEntry(entryId, *extraArgList):
     # end if filterVasco
 
     project.save()
-
+    
     if storeCING2db:
         try:
             if doStoreCING2db( entryId, archive_id, project=project):
@@ -232,7 +231,7 @@ def mainReplaceCoordinatesEntry(entryId, *extraArgList):
             nTerror("Failed to store CING project's data due to above traceback error.")
     # end if
 
-
+    
 # end def
 
 if __name__ == "__main__":
@@ -241,4 +240,4 @@ if __name__ == "__main__":
     try:
         status = mainReplaceCoordinatesEntry(*sys.argv[1:])
     finally:
-        nTmessage(cing.systemDefinitions.getStopMessage())
+        nTmessage(getStopMessage(cing.starttime))

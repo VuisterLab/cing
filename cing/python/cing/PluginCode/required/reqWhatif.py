@@ -1,6 +1,6 @@
 'required items for this plugin for CING setup'
 from cing.Libs.NTutils import * #@UnusedWildImport
-from cing.constants import * #@UnusedWildImport
+from cing.core.constants import * #@UnusedWildImport
 
 # Too long lines. pylint: disable=C0301
 

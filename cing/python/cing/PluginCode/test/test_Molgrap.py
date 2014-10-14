@@ -9,7 +9,7 @@ from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.Libs.disk import rmdir
 from cing.PluginCode.required.reqMolgrap import MOLGRAP_STR
 from cing.core.classes import Project
-from cing.constants import * #@UnusedWildImport
+from cing.core.constants import * #@UnusedWildImport
 from nose.plugins.skip import SkipTest
 from unittest import TestCase
 import shutil
@@ -52,7 +52,7 @@ class AllChecks(TestCase):
         self.assertFalse(project.molecule.export2gif(pathGif, project=project))
         self.assertTrue(os.path.exists(pathGif))
         pathMolGifPinup = pathGif[:-4] + '_pin.gif'
-        self.assertTrue(os.path.exists(pathMolGifPinup))
+        self.assertTrue(os.path.exists(pathMolGifPinup))                
         pathGifDefault =  os.path.join( cingPythonCingDir, 'PluginCode', DATA_STR, 'UnknownImage.gif' )
         self.assertFalse(os.path.getsize(pathGif) == os.path.getsize(pathGifDefault))
         nTmessage("Created new molecular imagery at: %s" % self.cingDirTmpTest)

@@ -1,10 +1,10 @@
 """
 Adds methods:
     Molecule.export2gif()
-
-Molmol fails to compile on Mountain Lion OSX as of 2012-08-08 on development machine.
+    
+Molmol fails to compile on Mountain Lion OSX as of 2012-08-08 on development machine.  
 Actually, this works again with XQuartz installed and symbolic links from
-/usr/X11R6 to /opt/X11R6 etc.
+/usr/X11R6 to /opt/X11R6 etc.  
 """
 from cing import cingDirMolmolScripts
 from cing import cingDirTmp
@@ -16,7 +16,7 @@ from cing.Libs.Imagery import convertImageMagick
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.Libs.TypeChecking import check_string
 from cing.Libs.TypeChecking import check_type
-from cing.constants import * #@UnusedWildImport
+from cing.core.constants import * #@UnusedWildImport
 from cing.core.molecule import Molecule
 from cing.core.parameters import cingPaths
 from cing.core.parameters import directories
@@ -289,7 +289,7 @@ def export2gif(molecule, pathMolGif, project = None):
     if convertImageMagick(pathMolGif, pathMolGifPinup, options='-geometry 114x80'):
         nTerror("convertImageMagick failed for: " + pathMolGifPinup)
     # end if
-
+    
     if failed:
         return True
     return None

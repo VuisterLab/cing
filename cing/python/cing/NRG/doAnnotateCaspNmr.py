@@ -1,11 +1,13 @@
-import cing
+from cing import header
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.Libs.forkoff import do_cmd
 from cing.NRG.CaspNmrMassageCcpnProject import baseDir
 from cing.Scripts.FC.utils import importPseudoPdb
 from cing.Scripts.FC.utils import swapCheck
 from cing.core.classes import Project
-from cing.constants import * #@UnusedWildImport
+from cing.core.constants import * #@UnusedWildImport
+from cing.main import getStartMessage
+from cing.main import getStopMessage
 from memops.general.Io import loadProject
 from memops.general.Io import saveProject
 from shutil import copytree
@@ -17,8 +19,8 @@ import tarfile
 dataDir = os.path.join(baseDir,DATA_STR)
 
 def annotateEntry(entryCodeNew, *extraArgList):
-    nTmessage(cing.cingDefinitions.getHeaderString())
-    nTmessage(cing.systemDefinitions.getStartMessage())
+    nTmessage(header)
+    nTmessage(getStartMessage())
 
     expectedArgumentList = []
     expectedNumberOfArguments = len(expectedArgumentList)
@@ -123,7 +125,7 @@ def annotateEntry(entryCodeNew, *extraArgList):
 #    print 'status: %s' % ccpnMolSystem.setCode(projectName) # impossible; reported to ccpn team.
 
     if replaceCoordinates or replaceRestraints:
-        importPseudoPdb(ccpnProject, inputAuthorDir, guiRoot, allowPopups=allowPopups,
+        importPseudoPdb(ccpnProject, inputAuthorDir, guiRoot, allowPopups=allowPopups, 
                         minimalPrompts=minimalPrompts, verbose=verbose, **presets)
 
     if doSwapCheck:
@@ -161,4 +163,4 @@ if __name__ == "__main__":
     try:
         status = annotateEntry(*sys.argv[1:])
     finally:
-        nTmessage(cing.systemDefinitions.getStopMessage())
+        nTmessage(getStopMessage(cing.starttime))

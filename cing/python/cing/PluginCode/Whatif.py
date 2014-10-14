@@ -2,7 +2,6 @@
 Whatif Module
 First version: gv June 3, 2007
 """
-#TODO: GWV fix this
 
 from cing import issueListUrl
 from cing.Libs.AwkLike import AwkLike
@@ -11,38 +10,20 @@ from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.Libs.disk import removeEmptyFiles
 from cing.PluginCode.required.reqMatplib import MATPLIB_STR
 from cing.PluginCode.required.reqWhatif import * #@UnusedWildImport
-from cing.constants import * #@UnusedWildImport
-from cing.definitions import cingPaths
-from cing import plugins
+from cing.core.constants import * #@UnusedWildImport
+from cing.core.parameters import PLEASE_ADD_EXECUTABLE_HERE
+from cing.core.parameters import cingPaths
+from cing.core.parameters import plugins
 from glob import glob
 from shutil import copy
 from string import upper
 
-whatifPluginVersion = 0.96 # 0.01 higher then implied previous versions
-scriptFileName      = "whatif_$modelNumberString.script"
+#if cingPaths.whatif == None or cingPaths.whatif == PLEASE_ADD_EXECUTABLE_HERE:
+#    nTdebug("No whatif installed.")
+#    raise ImportWarning(WHATIF_STR)
+#nTmessage('Using Whatif')
 
-def whatifDefaults():
-    return NTdict(
-                  directory  = 'Whatif',
-                  smlFile    = 'whatif.sml',
-                  molecule   = None,
-                  completed  = False,
-                  exitCode   = 0,
-                  models     = [],
-                  nonStandardResidues = [],
-                  time       = 0.0,
-                  parsed     = False,
-                  version    = whatifPluginVersion,
-                  savedAsSML = False,
-                  restored   = False
-                 )
-#end def
-
-#FIXME: revisions conflict
-#<<<<<<< .mine
-#=======
 scriptFileName = "whatif.script"
-#>>>>>>> .r1249
 
 class WhatifResult( NTdict ):
     """
@@ -328,7 +309,7 @@ end y
         return default
     #end def
 
-    def _processWhatifSummary( self, fileName ):
+    def _processWhatifSummary( self, fileName='pdbout.txt' ):
         """Parse the Whatif summary indicated by fileName.
 
            Store the overall check data according to each model as WhatifResult instances
@@ -353,7 +334,7 @@ end y
 #            nTdebug("DEBUG: read line dollar 2: [%s]" % line.dollar[2])
 
             if li.find( 'Summary report for users of a structure') > 0:
-                nTdebug('Whatif._processWhatifSummary: Found summary report and increasing model idx: %d' % modelIdx)
+#                nTdebug('Found summary report and increasing model idx: %d' % modelIdx)
                 modelIdx += 1
                 continue
 
@@ -383,7 +364,7 @@ end y
                 checkId = INOCHK_STR
 
             if not checkId:
-                nTdebug("Whatif._processWhatifSummary: Failed to find any specific check, continuing to look")
+#                nTdebug("Failed to find any specific check, continuing to look")
                 continue
 
 #            nTdebug("Processing checkId %s" % checkId)
@@ -400,14 +381,15 @@ end y
             # Happens for entry 2kqu line:
             #   Bond angles           STOP Normal end of WHAT IF.
             if len(line.dollar) < 3:
-                nTerror("Whatif._processWhatifSummary: Failed to find at least two elements after splitting the line on a colon;  ")
+                nTerror("Failed to find at least two elements after splitting the line on a colon;  ")
                 nTmessage("See also issue: %s%d" % (issueListUrl, 242))
                 return True
+
 
             valueStringList  = line.dollar[2].strip().split()
 #            nTdebug("valueStringList: %s" % valueStringList)
             if not valueStringList:
-                nTerror("Whatif._processWhatifSummary: Failed to get valueStringList for check [%s] from line: [%s]" % (checkId, line))
+                nTerror("Failed to get valueStringList for check [%s] from line: [%s]" % (checkId, line))
                 return True
 
             # Very rarely it happens that the end-message of whatif gets intermingled with the values parsed here:
@@ -417,7 +399,7 @@ end y
             try:
                 value = float(valueStringList[0])
             except:
-                nTerror("Whatif._processWhatifSummary: Failed to parse value as a float for check [%s] for line [%s] from What If string [%s]; setting value to a None"%(
+                nTerror("Failed to parse value as a float for check [%s] for line [%s] from What If string [%s]; setting value to a None"%(
                     checkId,line,valueStringList[0]))
                 nTmessage("See also issue: %s%d" % (issueListUrl, 242))
                 value = None
@@ -429,7 +411,7 @@ end y
 #                nTmessage('Failed to have increased model idx at least once for checkId %s' % checkId)
                 continue
 
-            ensembleValueList = getDeepByKeysOrAttributes( self.molecule, WHATIF_STR, checkId, VALUE_LIST_STR )
+            ensembleValueList = getDeepByKeysOrAttributes( self.molecule, WHATIF_STR, checkId, VALUE_LIST_STR )            
             ensembleValueList[modelIdx] = value
 
             ensembleQualList = getDeepByKeysOrAttributes( self.molecule, WHATIF_STR, checkId, QUAL_LIST_STR )
@@ -972,17 +954,9 @@ def runWhatif( project, ranges=None, parseOnly=False ):
     """
 
     if cingPaths.whatif == None or cingPaths.whatif == PLEASE_ADD_EXECUTABLE_HERE:
-#<<<<<<< .mine
-        if not parseOnly:
-            nTmessage("runWhatif: No whatif installed so skipping this step")
-            return
-        # end if
-    # end if
-#=======
         nTmessage("No whatif installed so skipping this step")
         return
 
-#>>>>>>> .r1249
     if not project.molecule:
         nTerror("runWhatif: no molecule defined")
         return True
@@ -998,7 +972,7 @@ def runWhatif( project, ranges=None, parseOnly=False ):
 
     #Specific Whatif requirement : no spaces in path because it will crash
     absPath = os.path.abspath(path)
-    if len(absPath.split()) > 1 and not parseOnly:
+    if len(absPath.split()) > 1:
         nTerror('runWhatif: absolute path "%s" contains spaces. This will crash Whatif.', absPath)
         return True
 
@@ -1015,30 +989,24 @@ def runWhatif( project, ranges=None, parseOnly=False ):
     if useRanges:
         residueList = mol.ranges2list(whatif.ranges)
         if residueList == None:
-            nTerror("runWhatif: Failed ranges2list in Whatif")
+            nTerror("Failed ranges2list in Whatif")
             return True
         if not residueList:
-            nTerror("runWhatif: Empty list of residues in Whatif")
+            nTerror("Empty list of residues in Whatif")
             return True
         whatif.ranges = mol.rangesToExpandedRanges(whatif.ranges)
         if mol.rangesIsAll(whatif.ranges):
-            nTerror("runWhatif: Non fatal code error but ranges can't be all if they are to be 'used'; don't worry code will still function fine.")
+            nTerror("Non fatal code error but ranges can't be all if they are to be 'used'; don't worry code will still function fine.")
 
     numberOfResidues = len(residueList)
     if numberOfResidues == 0:
-        nTerror("runWhatif: No residues to run Whatif on")
+        nTerror("No residues to run Whatif on")
         return True
 
     models = NTlist(*range( mol.modelCount ))
 
     whatifDir = project.mkdir( mol.name, project.moleculeDirectories.whatif  )
-
-    whatifStatus = whatifDefaults()
-    whatifStatus.update(project.whatifStatus)
-    project.whatifStatus = whatifStatus
-    project.whatifStatus.keysformat()
-    project.whatifStatus.restored = False
-    project.whatifStatus.parsed = False
+    whatifStatus = project.whatifStatus
 
     if not parseOnly:
 
@@ -1095,27 +1063,9 @@ def runWhatif( project, ranges=None, parseOnly=False ):
               numberOfResidues, mol.modelCount, Whatif.NUMBER_RESIDUES_PER_SECONDS)
         msg += ' %s hours, %s minutes and %s seconds; please wait' % timeRunEstimatedList
         nTmessage(msg)
+#        if totalNumberOfResidues < 100:
+#            nTmessage("It takes much longer per residue for a small molecule/ensemble")
 
-#<<<<<<< .mine
-        # Run a separate WHAT IF instance for each model
-        for model in models:
-            whatifProgram = ExecuteProgram( whatifExecutable, rootPath = whatifDir,
-                                            redirectOutput = True, redirectInputFromDummy = True )
-            # The last argument becomes a necessary redirection into fouling What If into
-            # thinking it's running interactively.
-            now = time.time()
-            modelNumberString = sprintf('%03d', model)
-            scriptModelFileName = scriptFileName.replace("$modelNumberString", modelNumberString)
-            whatifExitCode = whatifProgram("script", scriptModelFileName )
-    #        nTdebug("Took number of seconds: " + sprintf("%8.1f", time.time() - now))
-            whatifStatus.exitCode  = whatifExitCode
-            whatifStatus.time      = sprintf("%.1f", time.time() - now)
-    #        nTdebug('runWhatif: exitCode %s,  time: %s', whatifStatus.exitCode, whatifStatus.time)
-
-            if whatifExitCode:
-                nTerror("runWhatif: Failed whatif checks with exit code: " + repr(whatifExitCode))
-                return True
-#=======
         scriptFullFileName =  os.path.join( whatifDir, scriptFileName )
         open(scriptFullFileName,"w").write(scriptComplete)
         whatifProgram = ExecuteProgram( whatifExecutable, rootPath = whatifDir,
@@ -1133,26 +1083,9 @@ def runWhatif( project, ranges=None, parseOnly=False ):
         if whatifExitCode:
             nTerror("runWhatif: Failed whatif checks with exit code: " + repr(whatifExitCode))
             return True
-#>>>>>>> .r1249
-        #end for
-
-        # Concatenate all pdbout.txt files to a file that can be processed
-        # GV todo: should be done differently, working directly from the original files
-        pathPdbOut = os.path.join(path, 'pdbout.txt' )
-        pdboutFiles = list()
-        for model in models:
-            modelNumberString = sprintf('%03d', model)
-            pdboutName = os.path.join(path, "pdbout_$modelNumberString.txt".replace("$modelNumberString", modelNumberString))
-            pdboutFiles.append(pdboutName)
-
-        for model in models:
-            with open(pathPdbOut, 'w') as fout:
-                for line in fileinput.input(pdboutFiles):
-                    fout.write(line)
 
         whatifStatus.completed = True
-        # Clean up junk.
-        removeTempFiles( whatifDir )
+#        nTdebug("Setting what if status completed to %s" % whatifStatus.completed)
     else:
 #        nTdebug("Skipping actual whatif execution")
         whatifExitCode = 0
@@ -1174,6 +1107,8 @@ def runWhatif( project, ranges=None, parseOnly=False ):
         if atm.has_key(WHATIF_STR):
             del(atm[WHATIF_STR])
 
+    whatifStatus.parsed = False
+#    for model in NTprogressIndicator(models):
     for model in models:
         modelNumberString = sprintf('%03d', model)
 #        fullname =  os.path.join( whatifDir, sprintf('model_%03d.pdb', model) )
@@ -1191,18 +1126,9 @@ def runWhatif( project, ranges=None, parseOnly=False ):
     if whatif._processCheckdb():
         nTerror("runWhatif: Failed to process check db")
         return True
-#<<<<<<< .mine
 
-    if whatifStatus.version < whatifPluginVersion:
-        #old output files
-        pathPdbOut = os.path.join(path, 'DO_WHATIF.out0' )
-    else:
-        pathPdbOut = os.path.join(path, 'pdbout.txt' )
-
-#=======
 #    pathPdbOut = os.path.join(path, 'pdbout.txt' ) has only one model!
     pathPdbOut = os.path.join(path, 'DO_WHATIF.out0' )
-#>>>>>>> .r1249
     if not os.path.exists(pathPdbOut): # Happened for 1ao2 on production machine; not on development...
         nTerror("Path does not exist: %s" % (pathPdbOut))
         return True
@@ -1213,7 +1139,7 @@ def runWhatif( project, ranges=None, parseOnly=False ):
             return True
     except:
         nTtracebackError()
-        nTerror("runWhatif: Skipping restore of whatif summary.")
+        nTerror("Skipping restore of whatif summary.") 
         return True
     whatif._makeSummary()
 
@@ -1234,6 +1160,16 @@ def runWhatif( project, ranges=None, parseOnly=False ):
                 cingId = cingCheckId( checkId )
                 if cingId != checkId:
                     res[WHATIF_STR][cingId] = item
+#            for key1, key2 in [('RAMCHK', 'ramanchandran'),
+#                               ('BBCCHK', 'backbone'),
+#                               ('CHICHK', 'chi1'),
+#                               ('C12CHK', 'janin')
+#                              ]:
+#                if res[WHATIF_STR].has_key(key1):
+#                    res[WHATIF_STR][key2] = res[WHATIF_STR][key1]
+#                else:
+#                    res[WHATIF_STR][key2] = NoneObject
+            #end for
             res[WHATIF_STR].keysformat()
         #end if
 
@@ -1247,6 +1183,11 @@ def runWhatif( project, ranges=None, parseOnly=False ):
     whatif.keysformat()
 
     whatifStatus.parsed = True
+    whatifStatus.keysformat()
+
+    # Clean up junk.
+    if 1: # DEFAULT 1
+        removeTempFiles( whatifDir )
 #end def
 
 
@@ -1255,20 +1196,10 @@ def removeTempFiles( whatifDir ):
 #    whatifDir        = project.mkdir( mol.name, molDirectories.whatif  )
 #    nTdebug("Removing temporary files generated by What If")
     try:
-#<<<<<<< .mine
-        # Retain pdbout.txt and the pdbout files for each model
-        # Now DO_WHATIF.out0 is no longer parsed, it may be removed I guess unless we want it again for fixing an issue
-#=======
         # do NOT remove pdbout.txt.
         # Now pdbout.txt is no longer parsed, it may be removed I guess unless we want it again for fixing an issue
-#>>>>>>> .r1249
         # on this but then we need all not just the last model.
-#<<<<<<< .mine
-#        removeListLocal = ["DO_WHATIF.out0", "DSSPOUT", "TOPOLOGY.FIL", "PDBFILE.PDB", "PDBFILE", "pdbout.tex", 'fort.79', 'DONE']
-        removeListLocal = ["DSSPOUT", "TOPOLOGY.FIL", "PDBFILE.PDB", "PDBFILE", "pdbout.tex", 'fort.79', 'DONE']
-#=======
         removeListLocal = [scriptFileName, "DSSPOUT", "TOPOLOGY.FIL", "PDBFILE.PDB", "PDBFILE", "pdbout.tex", 'fort.79', 'DONE']
-#>>>>>>> .r1249
         removeList = []
         for fn in removeListLocal:
             removeList.append( os.path.join(whatifDir, fn) )
@@ -1292,28 +1223,9 @@ def restoreWhatif( project, tmp=None ):
     """
     Optionally restore whatif results
     """
-#<<<<<<< .mine
-    #update the old status records with a version  and a savedAsSML key
-    if not project.whatifStatus.has_key('version'):
-       project.whatifStatus.version = project.version
-   #end if
-
-    whatifStatus = whatifDefaults()
-    whatifStatus.update(project.whatifStatus)
-    project.whatifStatus = whatifStatus
-    project.whatifStatus.keysformat()
-    project.whatifStatus.restored = False
-
-    if project.whatifStatus.completed:
-        nTmessage('==> Restoring whatif results')
-        project.runWhatif(parseOnly=True, ranges='all')
-        project.whatifStatus.restored = True
-    #end if
-#=======
     if project.whatifStatus.completed:
         nTmessage('==> Restoring whatif results')
         project.runWhatif(parseOnly=True)
-#>>>>>>> .r1249
 #end def
 
 

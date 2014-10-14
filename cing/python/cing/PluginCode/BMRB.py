@@ -5,7 +5,7 @@ Methods:
 """
 from cing.Libs.AwkLike import AwkLike
 from cing.Libs.NTutils import * #@UnusedWildImport
-from cing.constants import * #@UnusedWildImport
+from cing.core.constants import * #@UnusedWildImport
 from cing.core.molecule import Chain
 from cing.core.molecule import Molecule
 

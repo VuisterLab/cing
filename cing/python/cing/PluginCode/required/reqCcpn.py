@@ -1,5 +1,4 @@
-#DEPRECIATED:
-'required items for this plugin for CING setup: Depreciated'
+'required items for this plugin for CING setup'
 
 CCPN_STR = "Ccpn"
 CCPN_LOWERCASE_STR = 'ccpn'

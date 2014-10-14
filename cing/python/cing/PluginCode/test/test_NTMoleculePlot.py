@@ -10,7 +10,7 @@ from cing.Libs.html import image2Ddihedralheight
 from cing.PluginCode.matplib import * #@UnusedWildImport
 from cing.PluginCode.required.reqWhatif import * #@UnusedWildImport
 from cing.core.classes import Project
-from cing.constants import * #@UnusedWildImport
+from cing.core.constants import * #@UnusedWildImport
 from nose.plugins.skip import SkipTest
 from unittest import TestCase
 import unittest

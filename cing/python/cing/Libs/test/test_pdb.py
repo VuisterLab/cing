@@ -7,7 +7,7 @@ from cing import cingDirTmp
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.Scripts.utils import printSequenceFromPdbFile
 from cing.core.classes import Project
-from cing.constants import * #@UnusedWildImport
+from cing.core.constants import * #@UnusedWildImport
 from unittest import TestCase
 import unittest
 

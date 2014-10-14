@@ -15,10 +15,10 @@ from cing.PluginCode.procheck import SECSTRUCT_STR
 from cing.Scripts.getPhiPsiWrapper import Janin
 from cing.Scripts.getPhiPsiWrapper import Ramachandran
 from cing.Scripts.getPhiPsiWrapper import d1d2
-from cing.Scripts.getPhiPsiWrapper import dihedralComboTodo
+from cing.Scripts.getPhiPsiWrapper import dihedralComboTodo 
 from cing.Scripts.getPhiPsiWrapper import subdir
 from cing.core.classes import Project
-from cing.constants import * #@UnusedWildImport
+from cing.core.constants import * #@UnusedWildImport
 from cing.core.molecule import Chain
 from cing.core.molecule import commonAAList
 import yasara #@UnresolvedImport

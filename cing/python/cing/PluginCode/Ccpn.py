@@ -1,5 +1,5 @@
 '''
-Collaborative Computing Project for NMR
+Collaborative Computing Project for NMR 
 '''
 from cing import issueListUrl
 from cing.Libs.NTutils import * #@UnusedWildImport
@@ -11,7 +11,7 @@ from cing.core.classes import Peak
 from cing.core.classes import Project
 from cing.core.classes import RDCRestraint
 from cing.core.classes2 import ResonanceList
-from cing.constants import * #@UnusedWildImport
+from cing.core.constants import * #@UnusedWildImport
 from cing.core.database import NTdb
 from cing.core.molecule import Molecule
 from cing.core.molecule import unmatchedAtomByResDictToString
@@ -22,8 +22,8 @@ import string
 import tarfile
 
 if True: # for easy blocking of data, preventing the code to be resorted with imports above.
-    #from cing.PluginCode.required.reqCcpn import * #@UnusedWildImport
-    #switchOutput(False)
+    from cing.PluginCode.required.reqCcpn import * #@UnusedWildImport
+    switchOutput(False)
     try:
         import ccpnmr #@UnusedImport
         from ccp.general.Util import createMoleculeTorsionDict
@@ -36,23 +36,23 @@ if True: # for easy blocking of data, preventing the code to be resorted with im
         from memops.api.Implementation import AppDataString
         from memops.general import Io as memopsIo
     except:
-        #switchOutput(True)
+        switchOutput(True)
         raise ImportWarning(CCPN_STR)
-#        raise SkipTest(CCPN_STR)
-    #finally: # finally fails in python below 2.5
-        #switchOutput(True)
+#        raise SkipTest(CCPN_STR)        
+    finally: # finally fails in python below 2.5
+        switchOutput(True)
 #    nTmessage('Using Ccpn')
 
 class Ccpn:
     """
         Adds initialize from CCPN project files
         Class to accommodate a ccpn project and import it into a CING project instance
-
+    
         Steps:
         - Parse the ccpn file using the CCPN api
         - Import the coordinates.
         - Import the experimental data.
-
+    
         The allowNonStandardResidue determines if the non-standard residues and atoms are read. If so they will be shown as
         a regular message. Otherwise they will be shown as a warning. Just like MolMol does; the unknown atoms per residue.
     """
@@ -101,7 +101,7 @@ class Ccpn:
     CCPN_RUN_STRUCTURE = 'StructureEnsembleData'
     CCPN_RUN_RESIDUE = 'MolResidueData'
     CCPN_RUN_PEAK = 'PeakListData'
-
+    
     CCPN_CLASSNAME_STR = 'className'
 
     CCPN_CLASS_RESTRAINT = { RESTRAINT_IDX_DISTANCE: CCPN_DISTANCE_CONSTRAINT,
@@ -263,8 +263,8 @@ class Ccpn:
         if ccpnCalc: # Fails for NRG-CING but a nice feature for use from within Analysis etc.
             # Mol System is the one associated with chosen structure
             structureData = ccpnCalc.findFirstData(className = self.CCPN_RUN_STRUCTURE, ioRole = 'input')
-            if structureData:
-#              ccpnMolSystem = structureData.structureEnsemble.molSystem
+            if structureData:            
+#              ccpnMolSystem = structureData.structureEnsemble.molSystem 
 # Fails for Ulrich Schwartz's project that has no attribute molSystem
                 ccpnMolSystem = getDeepByKeysOrAttributes(structureData, 'structureEnsemble', 'molSystem')
                 if not ccpnMolSystem:
@@ -328,7 +328,7 @@ class Ccpn:
 
         nTmessage('==> Importing data from Ccpn project "%s"', self.ccpnProject.name)
 
-        if not self.importFromCcpnMolecule(modelCount=modelCount,
+        if not self.importFromCcpnMolecule(modelCount=modelCount, 
                                            nmrCalcName=nmrCalcName):
             nTerror("Failed to importFromCcpnMolecule")
             return None
@@ -368,6 +368,7 @@ class Ccpn:
         nTmessage('==> Ccpn project imported')
 
         self.project.addHistory(sprintf('Imported CCPN project'))
+        self.project.updateProject()
         return True # To distinguish success from failure.
     # end def importFromCcpn
 
@@ -389,7 +390,7 @@ class Ccpn:
            nmrCalcName is used to select the NmrCalcStore to search for runs.
            Output: True or None on error.
         '''
-#        nTmessage('==> %s selecting NmrCalcStore %s from: %s' % (hasattr(self.ccpnProject, self.CCPN_CING_RUN), nmrCalcName,
+#        nTmessage('==> %s selecting NmrCalcStore %s from: %s' % (hasattr(self.ccpnProject, self.CCPN_CING_RUN), nmrCalcName, 
 #                                                                 self.ccpnProject.sortedNmrCalcStores()))
 
         if hasattr(self.ccpnProject, self.CCPN_CING_RUN): # Fails for NRG-CING but a nice feature for use from within Analysis etc.
@@ -473,6 +474,7 @@ class Ccpn:
             self.project.molecule.updateAll()
             nTmessage("==> Ccpn molecule '%s' imported", moleculeName)
         # end for
+        self.project.updateProject()
 
         return True
     # end def importFromCcpnMolecule
@@ -544,7 +546,7 @@ class Ccpn:
                 # In example from Wim there is a chain without a chain ID so disabling the above error message.
                 # This isn't a problem if CCPN uses the same chain id's i.e. no spaces or special chars.
                 # From CCPN doc:
-    #            One letter chain identifier. Will be used by PDB (and programs that use similar conventions).
+    #            One letter chain identifier. Will be used by PDB (and programs that use similar conventions). 
 #    WARNING: having same oneLetterCode for different chains is legal but may cause serious confusion.
                 # Looking at the complex case of 1ai0 which in the PDB formatted PDB file it has spaces for the chain id
                 # the NRG derived CCPN file has beautiful unique simple chain ids A thru U.
@@ -609,7 +611,7 @@ class Ccpn:
                 # end if
             # end for
             for ccpnResidue in ccpnChain.sortedResidues():
-                ccpnMolType = ccpnResidue.molType
+                ccpnMolType = ccpnResidue.molType 
                 # Can not be taken outside loop because within a chain multiple molTypes might occur in CCPN.
                 resNumber = ccpnResidue.seqCode
                 chemCompVar = ccpnResidue.chemCompVar
@@ -654,7 +656,7 @@ class Ccpn:
 #                            nTdebug("Residue '%s' will be a new residue in convention %s." % (ccpnResName3Letter, matchingConvention))
                             pass
                         else:
-                            nTmessage("Residue '%s' will be skipped as it is non-standard in convention: %s." % (ccpnResName3Letter,
+                            nTmessage("Residue '%s' will be skipped as it is non-standard in convention: %s." % (ccpnResName3Letter, 
                                                                                                                  matchingConvention))
                             addResidue = False
                             addingNonStandardResidue = True
@@ -680,7 +682,7 @@ class Ccpn:
                 if not resNameCing:
                     nTcodeerror("Failed to get a resNameCing for ccpnResidue: [" + ccpnResidue + ']')
                     continue
-                residue = chain.addResidue(resNameCing, resNumber, convention = matchingConvention, Nterminal = Nterminal, Cterminal =
+                residue = chain.addResidue(resNameCing, resNumber, convention = matchingConvention, Nterminal = Nterminal, Cterminal = 
                                            Cterminal)
                 if not residue:
                     nTwarning("Failed to add residue: [" + resNameCing + ']')
@@ -754,14 +756,14 @@ class Ccpn:
                                 ccpnCoord = ccpnCoordAtom.findFirstCoord(model = ccpnModel)
                                 if not ccpnCoord: # as in entry 1agg GLU1.H2 and 3.
                                     nTwarning("Skipping coordinate for CING failed to find coordinate for model %d for atom %s" % (
-                                              i, atom))
+                                              i, atom)) 
 # happens for 2xfm  <Atom A.VAL280.HG11> and many others.
                                     continue
                                 atom.addCoordinate(ccpnCoord.x, ccpnCoord.y, ccpnCoord.z, ccpnCoord.bFactor, ocuppancy=ccpnCoord.occupancy)
                             # end for
                         else:
                             nTwarning("No coordinates for atom %s" % (atom))
-
+                            
                         # end if
                     # end for
                 # end for
@@ -779,7 +781,7 @@ class Ccpn:
                 nTmessage(msg)
             else:
                 nTerror(msg)
-
+        
         return self.molecule
     # end def _match2Cing
 
@@ -938,7 +940,7 @@ class Ccpn:
             # end try
         # end for.over shifts.
 
-#        nTdebug("==> CCPN ShiftList '%s' imported from CCPN Nmr project '%s' with %s items",
+#        nTdebug("==> CCPN ShiftList '%s' imported from CCPN Nmr project '%s' with %s items", 
 #ccpnShiftList.name, ccpnShiftList.parent.name, len(resonanceList))
 #        nTmessage("==> Count of (pseudo-)atom with resonances updated %s" % len(atomsTouched.keys()))
 #        nTdebug(  "==> Count of resonances in list added %s (should be the same)" % len(resonanceList))
@@ -1159,7 +1161,7 @@ class Ccpn:
                     peakLists.append(peakList)
         # No ccpnCalc or ccpnCalc is empty
         #if not peakLists:
-
+        
         # NBNB Rasmus 19 May 2013. Change: If ccpnCalc is present it MUST be followed.
         else:
 #            nTdebug("In %s no peakLists yet" % getCallerName())
@@ -1463,7 +1465,7 @@ class Ccpn:
 #            nTdebug("Ignoring meta data because no self.ccpnNmrConstraintStore.findAllApplicationData")
             return
 
-        appDataList = self.ccpnNmrConstraintStore.findAllApplicationData(application='FormatConverter',
+        appDataList = self.ccpnNmrConstraintStore.findAllApplicationData(application='FormatConverter', 
                                                                          keyword='stereoAssignmentCorrectionsFile')
         if len(appDataList) == 0:
 #            nTdebug("No FC meta data on SSA")
@@ -1640,7 +1642,7 @@ class Ccpn:
             # Here, resonanceList should always have 2 resonances.
 
             resonanceListLength = len(resonanceList)
-            assert(resonanceListLength == 2)
+            assert(resonanceListLength == 2) 
             # During a regular run (not with -O option given to python interpreter) this might cause a exception being thrown.
             if resonanceListLength != 2:
                 nTcodeerror("expected a pair but found number: %d for ccpnConstraint %s" % (resonanceListLength, ccpnConstraint))
@@ -1650,7 +1652,7 @@ class Ccpn:
                 resonanceSet = resonance.resonanceSet
                 if resonanceSet:
                     for atomSet in resonanceSet.sortedAtomSets():
-                        # atom set is a group of atoms that are in fast exchange and therefore are not assigned to individually
+                        # atom set is a group of atoms that are in fast exchange and therefore are not assigned to individually 
 #                        (e.g. methyl group).
                         for atom in atomSet.sortedAtoms():
                             resAtomList.append('%d.%s' % (
@@ -2044,7 +2046,7 @@ Note that this doesn't happen with other pseudos. Perhaps CCPN does not have the
 
                 ccpnResDescriptorOrg = ccpnResDescriptorList[i]
                 ccpnResDescriptor = modResDescriptorForTerminii( ccpnResDescriptorOrg, i, seqLength, molType)
-#                nTdebug("Looking at CING residue [%s] with ccpnResDescriptor, ccpnResidue.linking [%s] [%s]" % (r,
+#                nTdebug("Looking at CING residue [%s] with ccpnResDescriptor, ccpnResidue.linking [%s] [%s]" % (r, 
 #ccpnResDescriptor, ccpnResidue.linking))
 
                 chemCompVarNew = None
@@ -2080,7 +2082,7 @@ Note that this doesn't happen with other pseudos. Perhaps CCPN does not have the
 #                            if ccpnResidue is ccpnResidueOrg:
 #                                nTerror("ccpnResidue is ccpnResidueOrg after it should have been replaced")
     #                        nTdebug("Replacing ccpnMolResidue %s with %s" % (ccpnMolResidueOrg, ccpnMolResidue))
-#                            nTdebug("Confirming ccpnResidue.chemCompVar %s TODO: this line reports bad ccv but it's done correctly." %
+#                            nTdebug("Confirming ccpnResidue.chemCompVar %s TODO: this line reports bad ccv but it's done correctly." % 
 #ccpnResidue.getChemCompVar())
                         else:
 #                            nTdebug("chemCompVar is same as chemCompVarNew")
@@ -2090,7 +2092,7 @@ Note that this doesn't happen with other pseudos. Perhaps CCPN does not have the
                                     " [%s] with descriptor [%s] and linking [%s].") % (
                                chemComp, chemCompVar, ccpnResDescriptor, ccpnResidue.linking))
 #                        for ccv in chemComp.chemCompVars:
-#                            nTdebug("Available molType, ccpCode, linking, descriptor,default: %s %s %s %s %s" % (
+#                            nTdebug("Available molType, ccpCode, linking, descriptor,default: %s %s %s %s %s" % ( 
 #chemComp.molType, chemComp.ccpCode, ccv.linking, ccv.descriptor, ccv.isDefaultVar))
                     # end if chemCompVarNew
                 # end if patch needed.
@@ -2437,7 +2439,7 @@ def getRestraintBoundList(constraint, restraintTypeIdx, msgHoL):
     if isDistanceOrHBondType(restraintTypeIdx):
         if (lower != None) and (upper != None):
             if lower > upper:
-                msgHoL.appendError("Lower bound is above upper bound: [%s,%s]" % (lower, upper))
+                msgHoL.appendError("Lower bound is above upper bound: [%s,%s]" % (lower, upper))                
                 msgHoL.appendError("CING prefers upper bound and thus unsetting lower bound as if unexisting; please check your data.")
                 lower = None
         if (lower != None) and (lower < 0):
@@ -2488,9 +2490,9 @@ def saveCcpn(project, ccpnFolder, ccpnTgzFile = None):
     '''
     if project.has_key('ccpn'):
         ccpnProject = project.ccpn
-        nTmessage('==> saveCcpn: Saving any changes to %s', ccpnFolder)
+        nTmessage('saveCcpn: Saving any changes to original CCPN project')
     else:
-        nTmessage('==> saveCcpn: Creating new CCPN project %s', ccpnFolder)
+        nTmessage('saveCcpn: Creating new CCPN project')
         # work horse class.
         ccpn = Ccpn(project = project, ccpnFolder = ccpnFolder)
         if not ccpn.createCcpn():
@@ -2502,16 +2504,13 @@ def saveCcpn(project, ccpnFolder, ccpnTgzFile = None):
     switchOutput(False)
     #status = ccpnProject.saveModified() # DONE: can't change from original ccpnFolder
     # Fixed problem Rasmus May 2013
-    try:
-        status = memopsIo.saveProject(ccpnProject, ccpnFolder, removeExisting=True)
-    except:
-        pass
+    status = memopsIo.saveProject(ccpnProject, ccpnFolder, removeExisting=True)
     switchOutput(True)
     if not status:
         nTerror("Failed memopsIo.saveProject in " + getCallerName())
         return None
 
-    nTdetail("==> Saved ccpn project to folder: %s" % ccpnFolder)
+    nTmessage("Saved ccpn project to folder: %s" % ccpnFolder)
 
     if ccpnTgzFile:
         cmd = "tar -czf %s %s" % (ccpnTgzFile, ccpnFolder)

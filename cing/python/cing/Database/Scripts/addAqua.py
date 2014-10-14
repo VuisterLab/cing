@@ -2,7 +2,7 @@
 Copy BMRB to Aqua with mods.
 """
 from cing import NTdb
-from cing.constants import * #@UnusedWildImport
+from cing.core.constants import * #@UnusedWildImport
 
 nuclList = ('GUA', 'CYT', 'ADE', 'THY', 'URA',
             'RGUA', 'RCYT', 'RADE', 'RTHY', 'RURA',

@@ -7,32 +7,13 @@ Residues obtain attribute 'information' with information value that is averaged 
 
 """
 
-import cing
-from cing import constants
-from cing import definitions as cdefs
-from cing.core import validation
-from cing.core import sml
-from cing.Libs import io
-
-from cing.Libs.Adict import Adict
 from cing.Libs.NTutils import * #@UnusedWildImport
-try:
-    import pyximport
-    pyximport.install()
-    import cing.Libs.cython.superpose as superpose
-# GWV 20140501: changed calls
-#    from cing.Libs.cython.superpose import NTcMatrix
-#    from cing.Libs.cython.superpose import NTcVector
-#    from cing.Libs.cython.superpose import calculateRMSD
-#    from cing.Libs.cython.superpose import superposeVectors
-#    from cing.Libs.cython.superpose import Rm6dist #@UnresolvedImport
-except ImportError:
-    pass
+from cing.Libs.cython.superpose import Rm6dist
+from cing.PluginCode.required.reqQueeny import * #@UnusedWildImport
+from cing.core.sml import sML2obj
+from cing.core.sml import obj2SML
 
-# versions < 0.95 not logged with version number
-# cing versions >1.0 first ones to include this
-__version__ = cdefs.cingDefinitions.version
-
+storedPropList = [QUEENY_UNCERTAINTY1_STR, QUEENY_UNCERTAINTY2_STR, QUEENY_INFORMATION_STR ]
 
 class DmElement():
     "Distance Matrix element for Queeny"
@@ -75,7 +56,6 @@ class DmElement():
     #end def
 #end class
 
-
 class Queeny( Odict ):
     """
     Class to run a queen-like analysis
@@ -102,7 +82,7 @@ class Queeny( Odict ):
         return Odict.__getitem__(self, key)
     #end def
 
-    # W0222 Signature differs from overridden method
+    # W0222 Signature differs from overridden method 
     # pylint: disable=W0222
     def setdefault(self, key, defaultValue):
         if key[0] > key[1]:
@@ -125,13 +105,13 @@ class Queeny( Odict ):
         # do the topology
         self.initTopology()
         self.triangulateAll( cutoff=cutoff, maxDepth = 4 )
-        self.setUncertainty(constants.QUEENY_UNCERTAINTY1_STR)
+        self.setUncertainty(QUEENY_UNCERTAINTY1_STR)
         # do the restraints
         self.initRestraints()
         self.triangulateAll( cutoff=cutoff, maxDepth = 3 )
-        self.setUncertainty(constants.QUEENY_UNCERTAINTY2_STR)
+        self.setUncertainty(QUEENY_UNCERTAINTY2_STR)
         # calculate the information content for each atom, residue
-        self.setInformation(constants.QUEENY_UNCERTAINTY1_STR, constants.QUEENY_UNCERTAINTY2_STR, constants.QUEENY_INFORMATION_STR)
+        self.setInformation(QUEENY_UNCERTAINTY1_STR, QUEENY_UNCERTAINTY2_STR, QUEENY_INFORMATION_STR)
     #end def
 
     def initDmElement(self, atm1, atm2, lower=None, upper=None):
@@ -314,7 +294,7 @@ class Queeny( Odict ):
                     #end if
 
                     for i in models:
-                        rm6distances[pair] += superpose.Rm6dist(a1.coordinates[i].e, a2.coordinates[i].e)
+                        rm6distances[pair] += Rm6dist(a1.coordinates[i].e, a2.coordinates[i].e)
                     #end for models
                 #end for a2
             #end for a1
@@ -588,14 +568,12 @@ class Queeny( Odict ):
 #end class
 
 def queenyDefaults():
-    d = Adict( directory  = 'Queeny',
+    d = NTdict( directory  = 'Queeny',
                 smlFile    = 'queeny.sml',
                 molecule   = None,
                 completed  = False,
-                parsed     = False,
-                present    = False,
-                saved      = False,
               )
+    d.keysformat()
     return d
 #end def
 
@@ -627,8 +605,10 @@ def _runQueeny( project, tmp=None ):
         nTmessage("==> runQueeny: No distance restraints defined.")
         return True
 
-    queenyDefs = project.getStatusDict(constants.QUEENY_KEY, **queenyDefaults())
-    queenyDefs.molecule = project.molecule.asPid()
+    project.status.queeny = queenyDefaults()
+    queenyDefs = project.status.queeny # temp variable for shorter typing
+    queenyDefs.molecule = project.molecule.nameTuple()
+
 
     path = project.validationPath( queenyDefs.directory )
     if not path:
@@ -637,103 +617,119 @@ def _runQueeny( project, tmp=None ):
 
     q = Queeny( project )
     q.execute()
-    queenyDefs.date = io.now()
+    project.saveQueeny()
+
     queenyDefs.completed = True
-    queenyDefs.present = True
-    queenyDefs.saved = False
-    queenyDefs.runVersion = __version__
 
     del(q)
 
     return False
 #end def
 
-class QueenyResult(validation.ValidationResult):
-    """Class to store queeny results
-    """
-    KEY = constants.QUEENY_KEY
-    UNCERTAINTY1 = constants.QUEENY_UNCERTAINTY1_STR
-    UNCERTAINTY2 = constants.QUEENY_UNCERTAINTY2_STR
-    INFORMATION  = constants.QUEENY_INFORMATION_STR
 
-    def __init__(self, **kwds):
-        validation.ValidationResult.__init__( self, **kwds)
-        self.setdefault(QueenyResult.UNCERTAINTY1, 0.0)
-        self.setdefault(QueenyResult.UNCERTAINTY2, 0.0)
-        self.setdefault(QueenyResult.INFORMATION, 0.0)
-    #end def
-
-    @staticmethod
-    def endHandler(qDict, project=None):
-        # Restore linkage
-        # Needs a valid project
-        # Needs a valid object key
-        # Adds to validation
-        if project is None:
-            return None
-        if constants.OBJECT_KEY not in qDict:
-            nTerror('QueenyResult.endHandler: object key not found ==> skipped item')
-            return None
-        theObject = project.getByPid(qDict[constants.OBJECT_KEY])
-        if theObject is None:
-            nTerror('QueenyResult.endHandler: invalid residue Pid %s, ==> skipped', qDict[constants.OBJECT_KEY])
-            return None
-        #end if
-        #v3:
-        validation.setValidationResult(theObject, constants.QUEENY_KEY, qDict)
-        #LEGACY:
-        for storedProp in [QueenyResult.UNCERTAINTY1, QueenyResult.UNCERTAINTY2, QueenyResult.INFORMATION]:
-            theObject[storedProp] = qDict[storedProp]
-        return qDict
-    #end def
-#end class
-
-#register QueenyResult SML handler
-QueenyResult.SMLhandler = sml.SMLAnyDictHandler(QueenyResult,'QueenyResult',
-                                                encodeKeys = [constants.OBJECT_KEY],
-                                                endHandler = QueenyResult.endHandler,
-                                               )
-
-
-def saveQueeny(project, tmp=None):
+def saveQueeny( project, tmp=None ):
     """
     Save queeny results to sml file
     Returns True on error.
     Returns False on success.
     """
-    if project is None:
+    if project == None:
         nTmessage("saveQueeny: No project defined")
         return True
 
-    if project.molecule is None:
+    if QUEENY_STR not in project.status:
+#        nTdebug("saveQueeny: No talos+ was run")
+        return False # just no data, not an error
+
+    queenyDefs = project.status.queeny
+
+    path = project.validationPath( queenyDefs.directory )
+    if not path:
+        nTerror('saveQueeny: directory "%s" with talosPlus data not found', path)
+        return True
+
+    if project.molecule == None:
         nTmessage("saveQueeny: No molecule defined")
         return True
-    # save the data
-    return project._savePluginData(constants.QUEENY_KEY, saved=True, saveVersion=__version__)
+
+    myList = NTlist()
+    for res in project.molecule.allResidues():
+        for storedProp in storedPropList:
+            if res.has_key(storedProp):
+                myList.append( (res.nameTuple(), storedProp, res[storedProp]))
+            for atm in res:
+                if atm.has_key(storedProp):
+                    myList.append( (atm.nameTuple(), storedProp, atm[storedProp]))
+        #end for
+    #end for
+    smlFile = os.path.join(path, queenyDefs.smlFile )
+    obj2SML( myList, smlFile)
+#    nTdebug('==> Saved queeny results to "%s"', smlFile)
+    return False
 #end def
 
 
-def restoreQueeny(project, tmp=None):
+def restoreQueeny( project, tmp=None ):
     """
     Restore queeny results from sml file.
+
     Return True on error
     """
-    if project is None:
+    if project == None:
         nTmessage("restoreQueeny: No project defined")
         return True
 
-    if project.molecule is None:
+    if project.molecule == None:
         return False # Gracefully returns
+    for storedProp in storedPropList:
+        for res in project.molecule.allResidues():
+            res[storedProp] = 0.0
+        for atm in project.molecule.allAtoms():
+            atm[storedProp] = 0.0
 
-    # Reset the data
-    for obj in project.molecule.allResidues() + project.molecule.allAtoms():
-        validation.setValidationResult(obj, constants.QUEENY_KEY, None)
-        #LEGACY:
-        for storedProp in [constants.QUEENY_UNCERTAINTY1_STR, constants.QUEENY_UNCERTAINTY2_STR, constants.QUEENY_INFORMATION_STR ]:
-           obj[storedProp] = 0.0
-    #end for
-    #restore the data
-    return project._restorePluginData(constants.QUEENY_KEY, present=True)
+    project.status.setdefault(QUEENY_STR,queenyDefaults())
+    project.status.keysformat()
+
+    if not project.status.queeny.completed:
+        return # Return gracefully
+
+    queenyDefs = project.status.queeny # short cur for less typing
+    path = project.validationPath( queenyDefs.directory)
+    if not path:
+        nTerror('restoreQueeny: directory "%s" with queeny data not found', path)
+        return True
+
+    smlFile = os.path.join(path, queenyDefs.smlFile )
+    if not os.path.exists(smlFile):
+        nTerror('restoreQueeny: file "%s" with queeny data not found', path)
+        return True
+
+    # Restore the data
+    nTmessage('==> Restoring queeny results')
+    myList=sML2obj( smlFile, project.molecule)
+    if myList==None:
+        return True
+
+    try:
+        for tupleInfo in myList:
+            if len(tupleInfo) == 3: # Version with multiple data items
+                nameTuple,storedProp,info = tupleInfo
+            else: # Old version with multiple data items
+                nameTuple,info = tupleInfo
+                storedProp = QUEENY_INFORMATION_STR
+            obj = project.molecule.decodeNameTuple(nameTuple)
+            if not obj:
+                atomName = nameTuple[3]
+                if not (atomName in ATOM_LIST_TO_IGNORE_REPORTING):
+                    nTerror('restoreQueeny: error decoding "%s"', nameTuple) 
+                    # Was reporting terminal atoms eg. in "('1buq', 'A', 39, 'H2', None, None, 'INTERNAL_1')"
+            else:
+                obj[storedProp] = info
+    except:
+        nTtracebackError()
+        nTerror("Failed to restore Queeny results.")
+        return True
+    return False
 #end def
 #-----------------------------------------------------------------------------
 

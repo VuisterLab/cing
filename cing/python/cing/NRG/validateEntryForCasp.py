@@ -1,4 +1,4 @@
-import cing
+from cing import header
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.Libs.disk import rmdir
 from cing.Libs.forkoff import do_cmd
@@ -6,7 +6,9 @@ from cing.NRG import ARCHIVE_CASP_ID
 from cing.NRG.storeCING2db import doStoreCING2db
 from cing.Scripts.validateEntry import retrieveTgzFromUrl
 from cing.core.classes import Project
-from cing.constants import * #@UnusedWildImport
+from cing.core.constants import * #@UnusedWildImport
+from cing.main import getStartMessage
+from cing.main import getStopMessage
 from shutil import rmtree
 import shutil
 #from cing.NRG.CasdNmrMassageCcpnProject import getRangesForTarget
@@ -56,8 +58,8 @@ def main(entryId, *extraArgList):
     force_retrieve_input = True
 
 
-    nTmessage(cing.cingDefinitions.getHeaderString())
-    nTmessage(cing.systemDefinitions.getStartMessage())
+    nTmessage(header)
+    nTmessage(getStartMessage())
 
     expectedArgumentList = [ 'inputDir', 'outputDir', 'pdbConvention', 'restraintsConvention', 'archiveType','projectType','storeCING2db']
     expectedNumberOfArguments = len(expectedArgumentList)
@@ -208,6 +210,7 @@ def main(entryId, *extraArgList):
 #    if True: # Default is False for this is specific to CASD-NMR
 #        nTmessage("Renaming molecule name to entry id: %s" % entryId)
 #        project.molecule.name = entryId # insufficient since all data is already initialized to disk.
+#        project.updateProject()
 #        project.molecule.rename( entryId )
 
 #    project.save()
@@ -253,4 +256,4 @@ if __name__ == "__main__":
     try:
         status = main(*sys.argv[1:])
     finally:
-        nTmessage(cing.systemDefinitions.getStopMessage())
+        nTmessage(getStopMessage(cing.starttime))

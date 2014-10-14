@@ -1,13 +1,11 @@
 # CING makefile
 # gv  June 10, 2008
 # jfd 2011-06-17
-# gv 2014-05-01
 #
 
 #all:	clean install cython sloccount pylint nose test
-#all:	install cython sloccount pylint nose test
-all:	install sloccount pylint nose test
-
+all:	install cython sloccount pylint nose test
+		
 clean:
 	@echo "Cleaning up CING installation"
 	-/bin/rm -f cing.csh
@@ -17,11 +15,11 @@ install:
 	-/bin/rm -f cing.csh
 	python python/cing/setupCing.py -tcsh
 
-#cython:
-#	@echo "==> Building CING cython dependencies ..."
-#	-/bin/rm -f python/cing/Libs/cython/superpose.so
-#	-/bin/rm -f python/cing/Libs/cython/superpose.c
-#	cd python/cing/Libs/cython; python setup.py build_ext --inplace
+cython:
+	@echo "==> Building CING cython dependencies ..."
+	-/bin/rm -f python/cing/Libs/cython/superpose.so
+	-/bin/rm -f python/cing/Libs/cython/superpose.c
+	cd python/cing/Libs/cython; python compile.py build_ext --inplace
 
 # Using nose instead.
 #test:

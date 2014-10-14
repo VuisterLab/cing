@@ -26,35 +26,14 @@ Atom:
     validateAssignment: NTlist instance with potential warnings/errors concerning the assignment of this atom
 
     shiftx, shiftx.av, shiftx.sd: NTlist instance with shiftx predictions, average and sd
-
-v3:
-object have ValidationResults container (key VALIDATION_KEY) with "Program"Results objects
-stored under "PROGRAM"_KEY
 """
 
 import time
 
-import cing
-from cing import definitions as cdefs
-from cing import constants
-from cing.Libs import Adict
-from cing.Libs import io
-
 from cing.Libs.Geometry import violationAngle
 from cing.Libs.NTplot import ssIdxToType
 from cing.Libs.NTutils import * #@UnusedWildImport
-try:
-    import pyximport
-    pyximport.install()
-    import cing.Libs.cython.superpose as superpose
-# GWV 20140501: changed calls
-#    from cing.Libs.cython.superpose import NTcMatrix
-#    from cing.Libs.cython.superpose import NTcVector
-#    from cing.Libs.cython.superpose import calculateRMSD
-#    from cing.Libs.cython.superpose import superposeVectors
-#    from cing.Libs.cython.superpose import Rm6dist #@UnresolvedImport
-except ImportError:
-    pass
+from cing.Libs.cython.superpose import NTcVector #@UnresolvedImport
 from cing.Libs.html import addPreTagLines
 from cing.Libs.html import hPlot
 from cing.Libs.html import removePreTagLines
@@ -63,6 +42,7 @@ from cing.Libs.numpyInterpolation import interpn_linear
 from cing.Libs.peirceTest import peirceTest
 from cing.PluginCode.required.reqDssp import DSSP_STR
 from cing.PluginCode.required.reqDssp import getDsspSecStructConsensus
+from cing.PluginCode.required.reqNih import NIH_STR
 from cing.PluginCode.required.reqProcheck import PROCHECK_STR
 from cing.PluginCode.required.reqShiftx import SHIFTX_STR
 from cing.PluginCode.required.reqVasco import VASCO_STR
@@ -71,14 +51,13 @@ from cing.PluginCode.required.reqWattos import WATTOS_SUMMARY_STR
 from cing.PluginCode.required.reqWhatif import WHATIF_STR
 from cing.core.ROGscore import CingResult
 from cing.core.classes2 import RestraintList
-from cing.constants import * #@UnusedWildImport
+from cing.core.constants import * #@UnusedWildImport
 from cing.core.molecule import Atom
 from cing.core.molecule import Chain
 from cing.core.molecule import Molecule
 from cing.core.molecule import Residue
 from cing.core.parameters import plotParameters
-from cing.definitions import validationDirectories
-from cing import plugins
+from cing.core.parameters import plugins
 from numpy.lib.index_tricks import ogrid
 from numpy.lib.twodim_base import histogram2d
 
@@ -86,6 +65,7 @@ CUTOFF_SALTBRIDGE_BY_Calpha = 20.0 # DEFAULT: 20
 TRANS_OMEGA_VALUE           = 179.6
 CIS_OMEGA_VALUE             = 0.0
 OMEGA_SD                    = 4.7  # Know from literature of hi-res X-ray structures.
+
 
 
 def runCingChecks( project, toFile=True, ranges=None ):
@@ -138,7 +118,7 @@ def validate( project, ranges=None, parseOnly=False, htmlOnly=False,
             doShiftx = False
     if validateFastest or validateImageLess:
         htmlOnly = True
-
+    
     t0 = tx = time.time()
 #    nTdebug('Starting validate#validate with toFile True')
     if doShiftx and getDeepByKeysOrAttributes(plugins, SHIFTX_STR, IS_INSTALLED_STR):
@@ -171,7 +151,7 @@ def validate( project, ranges=None, parseOnly=False, htmlOnly=False,
 #    tt = time.time()
 #    nTmessage('Time for runQueeny %s' % (tt -tx))
 #    tx = tt
-    if doTalos and getDeepByKeysOrAttributes(plugins, TALOSPLUS_STR, IS_INSTALLED_STR):
+    if doTalos and getDeepByKeysOrAttributes(plugins, NIH_STR, IS_INSTALLED_STR):
         project.runTalosPlus(parseOnly=parseOnly)
 #    tt = time.time()
 #    nTmessage('Time for runTalosPlus %s' % (tt -tx))
@@ -234,7 +214,7 @@ def criticizePeaks( project, toFile=True ):
         return
     #end if
 
-    for atm in project.molecule.allAtoms():
+    for atm in project.molecule.allAtoms(): 
         atm.peakPositions = NTlist()
 
     # criticize peak based on deviation of assigned value
@@ -396,7 +376,7 @@ def _criticizeResidue( residue, valSets ):
         #end for
     #end if
 
-    #OMEGA refs from: Wilson et al. Who checks the checkers? Four validation tools applied to eight atomic resolution structures.
+    #OMEGA refs from: Wilson et al. Who checks the checkers? Four validation tools applied to eight atomic resolution structures. 
     #J Mol Biol (1998) vol. 276 pp. 417-436
     for key in ['OMEGA']:
         if residue.hasProperties('protein') and key in residue and residue[key]:
@@ -407,7 +387,7 @@ def _criticizeResidue( residue, valSets ):
                 v = violationAngle(value=value, lowerBound=TRANS_OMEGA_VALUE, upperBound=TRANS_OMEGA_VALUE)
                 if v > 90.: # Check a cis
                     v = violationAngle(value=value, lowerBound=CIS_OMEGA_VALUE, upperBound=CIS_OMEGA_VALUE)
-#                nTdebug('found residue %s model %d omega to violate from square trans/cis: %8.3f (omega: %8.3f)' % (
+#                nTdebug('found residue %s model %d omega to violate from square trans/cis: %8.3f (omega: %8.3f)' % ( 
 #                            residue, modelId, v, value) )
                 vList.append(v)
             #end for
@@ -489,7 +469,7 @@ Residue.criticize = _criticizeResidue
 def criticize(project, toFile=True):
     """
     initialize
-
+    
     GV: Criticize restraints, peaks etc first
     Restraint red ROGs get carried as orange to residue ROGs
     """
@@ -502,7 +482,7 @@ def criticize(project, toFile=True):
     for drl in project.allRestraintLists():
         drl.criticize(project, toFile=toFile)
     # end for
-
+    
     #Peaks
     criticizePeaks( project, toFile=toFile )
 
@@ -533,15 +513,15 @@ def criticize(project, toFile=True):
             elif len(project.molecule[COLOR_ORANGE]) > 0:
                 color = COLOR_ORANGE
             # end if
-        # end if
+        # end if        
         if color == None:
             nTerror("Failed to determine the entry rog score color")
-        else:
+        else:                
             # TODO: NB if the rog was more severe before it will not be reset here.
-#            nTdebug("If worse, setting molecule rog color to: %s" % color)
+#            nTdebug("If worse, setting molecule rog color to: %s" % color) 
             project.molecule.rogScore.setMaxColor(color, 'Inferred from residue ROG scores')
         # end if
-
+                
         if toFile:
             path = project.moleculePath('analysis', 'ROG.txt')
             f = file(path,'w')
@@ -619,7 +599,6 @@ def summaryForProject( project, toFile = True, ranges=None ):
     mol = project.molecule
     if ranges == None:
         ranges = mol.ranges
-    nTdebug('validate#summaryForProject: ranges=%s type:%s', ranges, type(ranges) )
 
     msg = ''
 #    msg += sprintf( '%s\n', mol.format() )
@@ -692,14 +671,12 @@ def summaryForProject( project, toFile = True, ranges=None ):
     # don't mark nucleic acid only entries at all.
     if mol.hasAminoAcid():
 #        shiftx = getDeepByKeys(mol, SHIFTX_STR) # modded by GWV in revision 624.
-#       modded by GWV again in revision 15xx
-        shifxDefs = project.getStatusDict(constants.SHIFTX_KEY)
-        shiftx = shifxDefs.completed
+        shiftx = project.shiftxStatus.completed
         if not shiftx:
 #            nTmessage('runShiftx: not a single amino acid in the molecule so skipping this step.')
             incompleteItems.append( SHIFTX_STR )
     topMsg = sprintf( '%s CING SUMMARY project %s %s', dots, project.name, dots )
-
+    
     # Block from storeCING2db keep synced.
     p_assignmentCountMap = project.molecule.getAssignmentCountMap()
     p_cs_count = p_assignmentCountMap.overallCount()
@@ -707,7 +684,7 @@ def summaryForProject( project, toFile = True, ranges=None ):
     p_distance_count = project.distances.lenRecursive(max_depth = 1)
     p_dihedral_count = 0
     for dihList in project.dihedrals:
-        if dihList.isFromTalos():
+        if dihList.isFromTalos(): 
             continue
         # end if
         p_dihedral_count += len(dihList)
@@ -716,24 +693,24 @@ def summaryForProject( project, toFile = True, ranges=None ):
     hasExperimentalData = p_distance_count or p_dihedral_count or p_rdc_count or p_peak_count or p_cs_count
     bestMsg = '\nAll applicable programs/checks were performed.'
     if not hasExperimentalData:
-        bestMsg = '\nBecause there were no experimental data, this project was not fully validated. %s' % (
+        bestMsg = '\nBecause there were no experimental data, this project was not fully validated. %s' % (  
                    '\nAll applicable programs/checks for the coordinate data were performed.' )
     else:
         if False: # DEFAULT: False
             debugMsg = """
-                p_distance_count =  %(p_distance_count)5d
-                p_dihedral_count =  %(p_dihedral_count)5d
-                p_rdc_count      =  %(p_rdc_count)5d
-                p_peak_count     =  %(p_peak_count)5d
-                p_cs_count       =  %(p_cs_count)5d
-            """ % dict(
+                p_distance_count =  %(p_distance_count)5d 
+                p_dihedral_count =  %(p_dihedral_count)5d 
+                p_rdc_count      =  %(p_rdc_count)5d      
+                p_peak_count     =  %(p_peak_count)5d     
+                p_cs_count       =  %(p_cs_count)5d       
+            """ % dict( 
                            p_distance_count= p_distance_count,
                            p_dihedral_count= p_dihedral_count,
                            p_rdc_count     = p_rdc_count,
                            p_peak_count    = p_peak_count,
-                           p_cs_count      = p_cs_count
+                           p_cs_count      = p_cs_count            
                         )
-            nTdebug(debugMsg)
+            nTdebug(debugMsg)        
         # end if
     # end if
     if not incompleteItems:
@@ -750,7 +727,7 @@ def summaryForProject( project, toFile = True, ranges=None ):
     msg = topMsg + '\n' + msg
 
     if toFile:
-        fname = project.path(mol.name, validationDirectories.analysis,'summary.txt')
+        fname = project.path(mol.name, project.moleculeDirectories.analysis,'summary.txt')
         fp = open( fname, 'w' )
         nTmessage( '==> summary, output to %s', fname)
 #        nTdebug(" msg: " + msg)
@@ -785,7 +762,6 @@ def partitionRestraints( project ):
                 if not (atm1 and atm2): # Not observed yet.
                     nTerror("Found distance restraint without atom1 or 2. For restraint: %s" % restraint)
                     continue
-                #print '>>', atm1, atm2
                 atm1.residue.distanceRestraints.add( restraint ) #AWSS
                 atm2.residue.distanceRestraints.add( restraint ) #AWSS
             #end for
@@ -796,8 +772,8 @@ def partitionRestraints( project ):
     for drl in project.dihedrals:
         for restraint in drl:
             atom = restraint.atoms[2]
-            if not atom:
-                # Failed for entry 8psh but in fact this shouldn't occur because the atoms should not exist then.
+            if not atom: 
+                # Failed for entry 8psh but in fact this shouldn't occur because the atoms should not exist then. 
                 #NB this only happens after restoring.
                 nTerror("Found restraint without an atom at index 2. For restraint: %s" % restraint)
                 continue
@@ -833,7 +809,7 @@ def validateRestraints( project, toFile = True):
 #    fps = []
 #    fps.append( sys.stdout )
 
-    if not project.molecule:
+    if not project.molecule: 
         return
 
     msg = ""
@@ -879,7 +855,7 @@ def validateRestraints( project, toFile = True):
         rL.addList(drl)
     #end for
     getStatsRestraintNTlist(rL)
-
+    
     # Process the per residue restraints data
     msg += sprintf( '%s Per residue scores %s\n', dots, dots )
     for restraintListAtribute in ( 'distanceRestraints', 'dihedralRestraints'):
@@ -890,7 +866,7 @@ def validateRestraints( project, toFile = True):
 
             # print every 10 lines
             if not count % 30:
-                msg += sprintf('%-18s %15s  %15s   %s\n', '--- RESIDUE ---', '--- PHI ---', '--- PSI ---',
+                msg += sprintf('%-18s %15s  %15s   %s\n', '--- RESIDUE ---', '--- PHI ---', '--- PSI ---', 
                                '-- dist 0.1A 0.3A 0.5A   rmsd   violAv violMaxAll --')
             #end if
             if res.has_key('PHI'):
@@ -923,7 +899,7 @@ def validateRestraints( project, toFile = True):
 #    nTdebug(msg)
     if toFile:
         #project.mkdir(project.directories.analysis, project.molecule.name)
-        fname = project.path(project.molecule.name, validationDirectories.analysis,'restraints.txt')
+        fname = project.path(project.molecule.name, project.moleculeDirectories.analysis,'restraints.txt')
         fp = open( fname, 'w' )
         nTmessage( '==> validateRestraints, output to %s', fname)
         fprintf(fp, msg)
@@ -941,7 +917,6 @@ def checkForSaltbridges( project, cutoff = 0.5, toFile=False)   :
     Returns a NTlist with saltbridge summaries.
 
     Optionally print output to file in analysis directory of project.
-
     """
 
 #    nTdebug("Starting checkForSaltbridges with toFile:%s" % toFile)
@@ -959,7 +934,7 @@ def checkForSaltbridges( project, cutoff = 0.5, toFile=False)   :
 
     if toFile: # This output could easily be cached before write at once.
         #project.mkdir(project.directories.analysis, project.molecule.name)
-        fname = project.path(project.molecule.name, validationDirectories.analysis,'saltbridges.txt')
+        fname = project.path(project.molecule.name, project.moleculeDirectories.analysis,'saltbridges.txt')
         fp = open( fname, 'w' )
         nTmessage( '==> checkSaltbridges, output to %s', fname)
     else:
@@ -1143,7 +1118,7 @@ Arbitrarily set the criteria for ion-pair (r,theta) to be within
     # get the vectors c1, c1a, c2, c2a for each model and compute the result
     for model in range( modelCount ):
         #c1 is geometric mean of centroid atms
-        c1 = superpose.NTcVector(0,0,0)
+        c1 = NTcVector(0,0,0)
         for atmName in centroids[residue1.db.shortName]:
             atm = residue1[atmName]
             c1 += atm.coordinates[model].e
@@ -1158,7 +1133,7 @@ Arbitrarily set the criteria for ion-pair (r,theta) to be within
             break
 
         #c2 is geometric mean of centroid atms
-        c2 = superpose.NTcVector(0,0,0)
+        c2 = NTcVector(0,0,0)
         for atmName in centroids[residue2.db.shortName]:
             atm = residue2[atmName]
             c2 += atm.coordinates[model].e
@@ -1304,9 +1279,9 @@ def checkHbond( donorH, acceptor,
         #end if
         result.modelCount += 1
     #end for
-    if len(distances) > 0:
+    if len(distances) > 0: 
         result.distance, result.distanceSD, _n = distances.average()
-    if len(angles) > 0:
+    if len(angles) > 0: 
         result.angle, result.angleCV, _n = angles.cAverage()
     result.accepted = ((float(len( result.acceptedModels)) / float(len( result.data ))) >= fraction)
     del distances
@@ -1463,10 +1438,10 @@ def moleculeValidateAssignments( molecule  ):
                     msg = sprintf('%.1f*sd from (%.2f,%.2f)', delta, av, sd )
 #                    debug_msg = sprintf('    shift %.2f, ' % shift)
 #                    nTdebug(debug_msg)
-                    if delta > 3.0:
+                    if delta > 3.0:                        
                         result.append( atm )
                         atm.validateAssignment.append(msg)
-#                        nTdebug("Found situation 2: " + msg)
+#                        nTdebug("Found situation 2: " + msg)                        
                     else:
                         pass
 #                        nTdebug("Found situation 3: " + msg)
@@ -1785,7 +1760,7 @@ def validateDihedralCombinations(project):
 #                    nTdebug( 'Skipping residue without triplet %s' % residue)
                     continue
                 # Note that this was a major bug before June 3, 2010.
-#                resTypeList = [getDeepByKeys(triplet[i].db.nameDict, IUPAC) for i in tripletIdxList]
+#                resTypeList = [getDeepByKeys(triplet[i].db.nameDict, IUPAC) for i in tripletIdxList]  
                 resTypeList = [getDeepByKeys(triplet[i].db.nameDict, IUPAC) for i in range(3)]
             else:
                 nTcodeerror("validateDihedralCombinations called for non Rama/Janin/d1d2")
@@ -1907,7 +1882,7 @@ def validateDihedralCombinations(project):
                     ensembleValueList[modelIdx] = max(ensembleValueLoL[modelIdx])
 #                    if modelIdx == 0:
                     if False:
-                        nTdebug("For modelIdx %s found: %s and selected max: %s" % (modelIdx, str(ensembleValueLoL[modelIdx]),
+                        nTdebug("For modelIdx %s found: %s and selected max: %s" % (modelIdx, str(ensembleValueLoL[modelIdx]), 
                                                                                     ensembleValueList[modelIdx] ))
         # end for checkIdx
     # end for residue
@@ -1925,7 +1900,7 @@ def validateModels( self)   :
         return True
     if not self.molecule.modelCount:
         nTwarning("validateModels: no model for molecule %s defined", self.molecule)
-        return True
+        return None
 
     backbone = ['PHI','PSI','OMEGA']
 

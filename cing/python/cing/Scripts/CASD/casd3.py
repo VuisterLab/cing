@@ -11,11 +11,6 @@ from cing.Libs.AwkLike import AwkLikeS
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.Libs.disk import NTpath
 from cing.core.classes import ProjectTree
-from cing.Libs.xmlTools import nTtoXML
-from cing.Libs.xmlTools import xML2obj
-from cing.Libs.xmlTools import XMLhandler
-from cing.Libs.xmlTools import obj2XML
-
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -253,7 +248,7 @@ class Entry( NTdict ):
             print 'Error Entry.readProject: file %s does not exist' % path
             return None
         nTmessage( '==> reading project from %s', path )
-        self.project = cing.project.open(path,'old')
+        self.project = cing.Project.open(path,'old')
         return self.project
     #end def
         

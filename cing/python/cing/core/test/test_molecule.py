@@ -6,6 +6,7 @@ from cing import cingDirTmp
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.core.classes import Project
 from cing.core.molecule import * #@UnusedWildImport
+from cing.main import format
 from unittest import TestCase
 import profile
 import pstats
@@ -53,7 +54,7 @@ class AllChecks(TestCase):
         self.assertTrue( ccFound == ccExpected )
 
     # end def
-
+    
     def test_EnsureValidChainId(self):
         self.assertEquals( ensureValidChainId('A'), 'A')
         self.assertEquals( ensureValidChainId('a'), 'a')
@@ -81,7 +82,7 @@ class AllChecks(TestCase):
         for _c in range(n):
             chainId = molecule.getNextAvailableChainId()
             self.assertTrue( molecule.addChain(chainId))
-        nTdebug("Added %d chains to: %s" % (n, molecule.format()))
+        nTdebug("Added %d chains to: %s" % (n, format(molecule)))
         self.assertEqual( len(molecule.allChains()), n)
 
     def test_AddResidue_Standard(self):
@@ -121,7 +122,7 @@ class AllChecks(TestCase):
         project = Project.open(entryId, status='new')
 
         mol = Molecule('test')
-        project.appendMolecule(mol)
+        project.appendMolecule(mol)        
         c = mol.addChain('A')
         c.addResidue('ALA', 1, Nterminal = True)
         c.addResidue('VAL', 2)
@@ -134,9 +135,9 @@ class AllChecks(TestCase):
         c.addResidue('DT', 3)
         c.addResidue('DC', 4, Cterminal = True)
         c = mol.addChain('C')
-
+        
         c.addResidue('RGUA', 1, convention=INTERNAL_0, Nterminal = True)
-        c.addResidue('RADE', 2, convention=INTERNAL_0, )
+        c.addResidue('RADE', 2, convention=INTERNAL_0, ) 
         c.addResidue('URA', 3, convention=INTERNAL_0, ) # not RTHY normally of course.
         c.addResidue('RTHY', 4, convention=INTERNAL_0, )
         c.addResidue('RCYT',  5, convention=INTERNAL_0, Cterminal = True)
@@ -157,9 +158,9 @@ class AllChecks(TestCase):
             nTmessage( c.format() )
             nTmessage( "idxMolType: %s" % (c.getIdxMolType()))
         # end for
-
+        
         nTmessage("Count the molecule types")
-        molTypeCountList = mol.getMolTypeCountList()
+        molTypeCountList = mol.getMolTypeCountList()    
         p_protein_count = molTypeCountList[ mapMoltypeToInt[PROTEIN_STR] ]
         p_dna_count     = molTypeCountList[ mapMoltypeToInt[DNA_STR] ]
         p_rna_count     = molTypeCountList[ mapMoltypeToInt[RNA_STR] ]
@@ -170,9 +171,9 @@ class AllChecks(TestCase):
         self.assertEqual(1, p_rna_count  )
         self.assertEqual(1, p_water_count)
         self.assertEqual(2, p_other_count)
-
+        
         nTmessage("Count the residue types")
-        molTypeResidueCountList = mol.getMolTypeResidueCountList()
+        molTypeResidueCountList = mol.getMolTypeResidueCountList()    
         p_res_protein_count = molTypeResidueCountList[ mapMoltypeToInt[PROTEIN_STR] ]
         p_res_dna_count     = molTypeResidueCountList[ mapMoltypeToInt[DNA_STR] ]
         p_res_rna_count     = molTypeResidueCountList[ mapMoltypeToInt[RNA_STR] ]
@@ -183,7 +184,7 @@ class AllChecks(TestCase):
         self.assertEqual(5, p_res_rna_count  )
         self.assertEqual(10, p_res_water_count)
         self.assertEqual(2, p_res_other_count)
-
+        
         nTmessage("Select a list of residues.")
         inputResList = (('A', 5),('B', 2),('A', 6),('X', 1)) # The last 2 are non-existing residues
         # should give two warnings for a non-existing residue
@@ -334,14 +335,14 @@ class AllChecks(TestCase):
         nTdebug("atomList: %s" % str(atomList))
         self.assertEquals( len(atomList[0]), 5)
     # end def
-
+    
     def test_RangeSelectionStatic(self):
         inputList = """
             A.1
             A.1-3
             A.-2--1
             A.-2-1
-            A.-3
+            A.-3        
             A.3-52,B.3-52
             2-40,41
             1-96,102-177
@@ -357,7 +358,7 @@ class AllChecks(TestCase):
             [ ['A', 1, 96],     ['A', 102, 177]]
         ]
         cing.verbosity = verbosityDebug
-
+        
         for i, ranges in enumerate(inputList):
             nTdebug("\ntest_RangeSelectionStatic: %d %s" % (i, ranges))
             startStopList = Molecule.ranges2StartStopLoLStatic(ranges)

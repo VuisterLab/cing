@@ -3,18 +3,15 @@ Created on Aug 30, 2010
 
 Simple class that doesn't import NTutils or sml in order to avoid cyclic behaviour.
 '''
-from cing.constants import * #@UnusedWildImport
+from cing.core.constants import * #@UnusedWildImport
 #from cing.core.sml import SMLhandler
-
-DEFAULT_SML_HANDLER_STRING = 'Default handler from SMLhandled'
-
 
 #class GumboObject(): # pylint: disable=R0903
 class SMLhandled(): # pylint: disable=R0903
     '''
     Place holder for any attributes that were dynamically added.
-    Gumbo stands for soup and soup stands for any 3D object like an atom
-    or collections thereof.
+    Gumbo stands for soup and soup stands for any 3D object like an atom 
+    or collections thereof.     
     '''
     def __init__(self):
         # pylint: disable=C0103
@@ -35,10 +32,10 @@ class Formatted(): # pylint: disable=R0903
 class Lister(Formatted): # pylint: disable=R0903
     """Example from 'Learning Python from O'Reilly publisher'"""
     MAX_LINE_SIZE_VALUE = 80 # who wants to see long lines of gibberish
-
+    
     def __init__(self):
         Formatted.__init__(self)
-
+            
     def __repr__(self):
         return ("<Instance of %s, address %s:\n%s>" %
            (self.__class__.__name__, id(self), self.attrnames()))

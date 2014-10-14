@@ -23,8 +23,9 @@ from cing.Libs.AwkLike import AwkLikeS
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.Libs.disk import copy
 from cing.PluginCode.required.reqProcheck import * #@UnusedWildImport
-from cing.constants import * #@UnusedWildImport
-from cing.definitions import cingPaths
+from cing.core.constants import * #@UnusedWildImport
+from cing.core.parameters import PLEASE_ADD_EXECUTABLE_HERE
+from cing.core.parameters import cingPaths
 from glob import glob
 
 
@@ -36,8 +37,8 @@ if True: # block
     elif not cingPaths.procheck_nmr:
 #        nTdebug("Missing procheck_nmr which is a dep for procheck")
         useModule = False
-#    if not useModule:
-#        raise ImportWarning('procheck')
+    if not useModule:
+        raise ImportWarning('procheck')
 #    nTmessage('Using procheck')
 
 #Trying to accommodate at least
@@ -338,7 +339,7 @@ B   7 U   999.900 999.900 999.900 999.900 999.900 999.900   0.000   1.932 999.90
         if resCountTotal >= MAX_PROCHECK_TOTAL_RESIDUES:
             max_models_org = max_models
             max_models =  MAX_PROCHECK_TOTAL_RESIDUES / resCount
-            nTdebug("Reducing number of models from %s to %s to limit residue count to less than %s" % (max_models_org, max_models,
+            nTdebug("Reducing number of models from %s to %s to limit residue count to less than %s" % (max_models_org, max_models, 
                 MAX_PROCHECK_TOTAL_RESIDUES))
         if max_models < 1:
             nTerror("Molecule is to large for procheck to even run on a single model")
@@ -612,13 +613,13 @@ B   7 U   999.900 999.900 999.900 999.900 999.900 999.900   0.000   1.932 999.90
                     continue
                 # end if
                 # Truncate for those rare instances ( < 10 for > 9,000 entries )
-#pc gf phipsi can be extremely high:
+#pc gf phipsi can be extremely high: 
 # 1b64 SER      82        34.36      this might be an installation bug as it's value in PDBe is normal.
                 if value and (field in gf_LIST_STR):
                     if value > PCgFactorMaxErrorValue:
                         nTwarning("A pc g-factor for %s of %s will be truncated to %s" % ( field, value, PCgFactorMaxErrorValue))
                         value = PCgFactorMaxErrorValue
-                    # end if
+                    # end if 
                 # end if
                 residue.procheck[field] = value
             #end for
@@ -690,6 +691,9 @@ def runProcheck(project, ranges=None, createPlots=True, runAqua=True, parseOnly 
     Adds <Procheck> instance to molecule. Run procheck and parse result.
     Return True on error.
     """
+    if cingPaths.procheck_nmr == None or cingPaths.procheck_nmr == PLEASE_ADD_EXECUTABLE_HERE:
+        nTmessage("No procheck_nmr installed so skipping this step")
+        return
 
     if not project.molecule:
         nTerror('runProcheck: no molecule defined')
@@ -719,9 +723,6 @@ def runProcheck(project, ranges=None, createPlots=True, runAqua=True, parseOnly 
     project.molecule[PROCHECK_STR] = pcheck
 
     if not parseOnly:
-        if cingPaths.procheck_nmr == None or cingPaths.procheck_nmr == PLEASE_ADD_EXECUTABLE_HERE:
-            nTmessage("No procheck_nmr installed so skipping this step")
-            return
         if not pcheck.run(ranges=ranges,createPlots=createPlots, runAqua=runAqua):
             nTerror("runProcheck: Failed to run procheck_nmr")
             return True

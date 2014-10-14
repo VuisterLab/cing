@@ -4,7 +4,7 @@ Execute like:
 python -u $CINGROOT/python/cing/NRG/doAnnotateNrgCing.py $x $y
 '''
 
-import cing
+from cing import header
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.Libs.forkoff import do_cmd
 from cing.NRG.PDBEntryLists import getBmrbLinks
@@ -14,7 +14,9 @@ from cing.NRG.shiftPresetDict import presetDict
 from cing.Scripts.FC.convertStar2Ccpn import importStarChemicalShifts
 from cing.Scripts.FC.utils import swapCheck
 from cing.core.classes import Project
-from cing.constants import * #@UnusedWildImport
+from cing.core.constants import * #@UnusedWildImport
+from cing.main import getStartMessage
+from cing.main import getStopMessage
 from memops.general.Io import loadProject
 from memops.general.Io import saveProject
 from shutil import rmtree
@@ -32,8 +34,8 @@ nrgPlusDir = os.path.join(results_dir, 'nrgPlus')
 
 def annotateEntry(entry_code, bmrb_id, *extraArgList):
     'Return True on error'
-    nTmessage(cing.cingDefinitions.getHeaderString())
-    nTmessage(cing.systemDefinitions.getStartMessage())
+    nTmessage(header)
+    nTmessage(getStartMessage())
 
     expectedArgumentList = []
     expectedNumberOfArguments = len(expectedArgumentList)
@@ -140,7 +142,7 @@ def annotateEntry(entry_code, bmrb_id, *extraArgList):
 #            nTmessage('found ccpnMolSystem: %s' % ccpnMolSystem)
 #    print 'status: %s' % ccpnMolSystem.setCode(projectName) # impossible; reported to ccpn team.
 
-    importStarChemicalShifts(ccpnProject, inputStarDir, guiRoot, allowPopups=allowPopups, minimalPrompts=minimalPrompts,
+    importStarChemicalShifts(ccpnProject, inputStarDir, guiRoot, allowPopups=allowPopups, minimalPrompts=minimalPrompts, 
                              verbose=verbose, **presets)
 
     if doSwapCheck:
@@ -180,7 +182,7 @@ def runAbunch():
 #Good: 1brv 1cjg 1d3z 1ieh
 # OK (only 1 chain done) 1cjg 1hue 2jmx 1iv6 2kib
 
-# cp $CINGROOT/data/Tests/ccpn/$x.tgz .
+# cp $CINGROOT/Tests/data/ccpn/$x.tgz .
 # scp    -r nmr:/Library/WebServer/Documents/NRG-CING/recoordSync/$x $D/NRG-CING/recoordSync
 
 # scp -r nmr:/Users/jd/wattosTestingPlatform/bmrb/ftp.bmrb.wisc.edu/pub/bmrb/entry_directories/bmr$y .
@@ -213,7 +215,7 @@ def runAbunch():
             nTtracebackError()
             status = True
         finally:
-            nTmessage(cing.systemDefinitions.getStopMessage())
+            nTmessage(getStopMessage(cing.starttime))
             if status:
                 nTerror("Failed to annotateEntry for arguments: %s" % str( sys.argv))
 
@@ -226,7 +228,7 @@ if __name__ == "__main__":
 #        nTtracebackError()
 #        status = True
 #    finally:
-#        nTmessage(cing.systemDefinitions.getStopMessage())
+#        nTmessage(getStopMessage(cing.starttime))
 #        if status:
 #            nTerror("Failed to annotateEntry for arguments: %s" % str( sys.argv))
 #            sys.exit(1)

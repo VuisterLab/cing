@@ -11,8 +11,6 @@ import sys
 import time
 import urllib2
 
-import cing.Libs.Adict as Adict
-
 #-----------------------------------------------------------------------------------
 # Synchronize block with cing.Libs.helper.py
 #-----------------------------------------------------------------------------------
@@ -47,11 +45,11 @@ def _nTmessage(msg):
 # end def
 #-----------------------------------------------------------------------------------
 
-def getSvnRevision( path ):
-    """Return the revision number (int) or -1 if the revision isn't known.
-    It depends on (proper) svn being available on the system."""
+def getSvnRevision( envRootDir = 'CINGROOT'):
+    """Return the revision number (int) or None if the revision isn't known. It depends on svn being available on the system."""
+#    return None
     try:
-        cingSvnInfo, err = _nTgetoutput('svn info %s' % path)
+        cingSvnInfo, err = _nTgetoutput('svn info %s' % os.getenv(envRootDir))
         #_nTmessage("cingSvnInfo: " + cingSvnInfo)
         #_nTmessage("err: " + err)
         if not err:
@@ -67,12 +65,11 @@ def getSvnRevision( path ):
     except:
         pass
 #        _nTwarning("Failed to getSvnRevision()" )
-    return -1
 # end def
 
 def getIpythonVersionTuple(reportAsIs = False):
     """
-    Return a tuple of iPython version ids such as
+    Return a tuple of iPython version ids such as 
     (0, 10, 1) older or
     (0, 12) current.
     Returns None on error.
@@ -84,7 +81,7 @@ def getIpythonVersionTuple(reportAsIs = False):
         # end if
         iPythonVersionStr = IPython.__version__.split('.')
         iPythonVersion = [ int(x) for x in iPythonVersionStr]
-    except:
+    except:        
         _nTwarning("Failed to getIpythonVersion()" )
     # end try
     return iPythonVersion
@@ -93,7 +90,7 @@ def getIpythonVersionTuple(reportAsIs = False):
 
 def getIpythonVersionType():
     """
-    Return IPYTHON_VERSION_XXXX
+    Return IPYTHON_VERSION_XXXX 
 
     Make sure they match the defs in constants.py
     IPYTHON_VERSION_A = 'iPythonVersion_A'
@@ -106,7 +103,7 @@ def getIpythonVersionType():
         _nTerror("Failed to getIpythonVersionTuple")
         return None
     # end if
-
+    
     c = compareVersionTuple(iPythonVersionTuple, (0,11))
     if c == None:
         _nTerror("Failed to compareVersionTuple")
@@ -139,12 +136,12 @@ def compareVersionTuple( t1, t2):
     if t2 == None:
         _nTerror("Input 2 of compareIpythonVersionTuple is None" )
         return None
-    # end if
+    # end if    
     lt1 = len(t1)
     lt2 = len(t2)
     for i in range(max(lt1,lt2)):
         if lt1 <= i:
-            if lt2 <= i:
+            if lt2 <= i:                
                 return 0
             else:
                 return -1
@@ -156,16 +153,16 @@ def compareVersionTuple( t1, t2):
         v1 = t1[i]
         v2 = t2[i]
         if v1 == v2:
-            continue
+            continue 
         # end if
         if v1 > v2:
-            return 1
+            return 1 
         # end if
         return -1
     # end for
     return 0
 # end def
-
+    
 def isInternetConnected():
     """Retrieves about 6 kbytes from google; takes 0.2 seconds on fast network."""
     url = 'http://www.google.com'
@@ -240,3 +237,46 @@ def getOsRelease():
     return unameList[2]
 # end def
 
+
+
+def getStartMessage(ncpus=None):
+    """
+    Copy catted from xplor
+    user = "jd"
+    on   = "Stella.local (darwin/32bit/2cores/2.6.6)
+    at   = "(3676) 29-Oct-08 15:36:22
+
+    ncpus will be detected if not presented. Derive it from cing.ncpus and pass it in here is normal operation.
+    """
+    user = os.getenv("USER", "Unknown user")
+    machine = os.getenv("HOST", "Unknown host") #only works with (t)csh shell
+    if not ncpus:
+        ncpus = detectCPUs()
+#    ostype = os.getenv("OSTYPE", "Unknown os") #only works with (t)csh shell
+    osType = getOsType()
+    osRelease = getOsRelease()
+    on = "%s (%s%s/%s/%scores/py%s)" % (machine, osType, osRelease, platform.architecture()[0], ncpus, sys.version.split()[0])
+    at = time.asctime()
+    pid = os.getpid()
+    at = '(%d) ' %  pid + at
+#    atForFileName = "%s" % at
+#    atForFileName = re.sub('[ :]', '_', atForFileName)
+    return "User: %-10s on: %-42s at: %32s" % (user, on, at)
+    #(3737) Thu Oct 21 11:19:30 2010
+    #Stella.local (darwin/32bit/2cores/2.6.6)
+# end def
+
+def getStopMessage(starttime):
+    """From Wattos
+#    Wattos started at: October 29, 2008 4:04:44 PM CET
+#    Wattos stopped at: October 29, 2008 4:04:49 PM CET
+#    Wattos took (#ms): 4915"""
+    at = time.asctime(time.localtime(starttime))
+    now = time.asctime()
+
+#    memory TODO print "in use and allocated"
+    msg = "CING started at : %s\n" % at
+    msg += "CING stopped at : %s\n" % now
+    msg += "CING took       : %-.3f s\n\n" % (time.time() - starttime)
+    return msg
+# end def

@@ -2,38 +2,21 @@
 Implementation of the CING API's main classes.
 Split into 3 for better performance.
 """
-import cing
-import cing.constants as constants
-import cing.definitions as cdefs
-from cing.core import pid
-#from cing.Libs import io
-import cing.Libs.io as io
-#import cing.Libs.jsonTools as jsonTools
-#import cing.Libs.xmlTools as xmlTools
 
 from ConfigParser import ConfigParser
 from cing import cingPythonCingDir
 from cing import cingRoot
 from cing import cingVersion
+from cing import header
 from cing import issueListUrl
-from cing import plugins
-from cing.Libs.Adict import Adict
 from cing.Libs.Geometry import violationAngle
 from cing.Libs.NTutils import * #@UnusedWildImport
-try:
-    import pyximport
-    pyximport.install()
-    import cing.Libs.cython.superpose as superpose
-    from cing.Libs.cython.superpose import NTcVector #@UnresolvedImport @UnusedImport
-    from cing.Libs.cython.superpose import Rm6dist #@UnresolvedImport
-except ImportError:
-    pass
-
-
+from cing.Libs.cython.superpose import NTcVector #@UnresolvedImport @UnusedImport
+from cing.Libs.cython.superpose import Rm6dist #@UnresolvedImport
 from cing.Libs.disk import copydir
-from cing.Libs.disk import Path
 from cing.Libs.disk import remove
-from cing.Libs.disk import modtime
+from cing.Libs.helper import getStartMessage
+from cing.Libs.helper import getStopMessage
 from cing.Libs.html import DihedralByProjectList
 from cing.Libs.html import addPreTagLines
 from cing.Libs.html import generateHtml
@@ -42,22 +25,23 @@ from cing.Libs.html import setupHtml
 from cing.Libs.pdb import export2PDB
 from cing.Libs.pdb import importPDB
 from cing.Libs.pdb import initPDB
-from cing.constants import TALOSPLUS_LIST_STR
+from cing.PluginCode.required.reqNih import TALOSPLUS_LIST_STR
 from cing.PluginCode.required.reqWhatif import summaryCheckIdList
 from cing.STAR.File import File
 from cing.core.CingSummary import CingSummary
 from cing.core.classes2 import * #@UnusedWildImport
-from cing.constants import * #@UnusedWildImport
+from cing.core.constants import * #@UnusedWildImport
 from cing.core.molecule import Atom
 from cing.core.molecule import Ensemble
 from cing.core.molecule import Molecule
 from cing.core.molecule import nTdihedralOpt
 from cing.core.molecule import nTdistanceOpt #@UnusedImport
-from cing.definitions import cingPaths
-from cing.definitions import directories
-from cing.definitions import validationDirectories
+from cing.core.parameters import cingPaths
+from cing.core.parameters import directories
 from cing.core.parameters import moleculeDirectories
 from cing.core.parameters import plotParameters
+from cing.core.parameters import plugins
+from cing.core.parameters import validationSubDirectories
 from cing.core.validate import checkForSaltbridges
 from cing.core.validate import criticize
 from cing.core.validate import criticizePeaks
@@ -71,23 +55,20 @@ from cing.core.validate import validateDihedralCombinations
 from cing.core.validate import validateDihedrals
 from cing.core.validate import validateModels
 from cing.core.validate import validateRestraints
-from cing.core import validation
-
-
 from glob import glob
 from glob import glob1
 from shutil import rmtree
 import tarfile
-import zipfile
-
-__version__   = cdefs.__version__
-__date__      = cdefs.__date__
-__author__    = cdefs.__author__
-__copyright__ = cdefs.__copyright__
-__credits__   = cdefs.__credits__
+__version__ = cing.__version__
+__date__ = cing.__date__
+__author__ = cing.__author__
+__copyright__ = cing.__copyright__
+__credits__ = cing.__credits__
 
 projects = NTlist()
 
+#: CRV stands for CRiteria Value CRS stands for CRiteria String
+CRV_NONE = "-999.9"
 
 #-----------------------------------------------------------------------------
 # Cing classes and routines
@@ -111,6 +92,7 @@ Project: Top level Cing project class
            -> directories
            -> cingPaths
            -> plotParameters
+           -> plugins
   _____________________________________________________________________________
 
     Methods:
@@ -154,25 +136,21 @@ Project: Top level Cing project class
 
     def __init__(self, name):
 
-        root, name, ext = Project.rootPath(name)
+        root, name = Project.rootPath(name)
 
         NTdict.__init__(self, __CLASS__ = 'Project')
 
-        self.version = cingVersion
+        self.version = cingVersion       
         self.root = root
         self.name = name.strip()
-        self.created = io.now()
-        self.lastSaved = io.now()
-        self.convention = constants.INTERNAL
-
+        self.created = time.asctime()      
         self.molecule = None # Current Molecule instance
 
-        self.moleculeNames = [] # list to store molecule names for save and restore
-        self.peakListNames = [] # list to store peaklist names for save and restore
-        self.distanceListNames = [] # list to store distancelist names names for save and restore
-        self.dihedralListNames = [] # list to store dihedrallist names for save and restore
-        self.rdcListNames = [] # list to store rdclist names for save and restore
-        # GWV: do not know precisely what these are!
+        self.moleculeNames = NTlist() # list to store molecule names for save and restore
+        self.peakListNames = NTlist() # list to store peaklist names for save and restore
+        self.distanceListNames = NTlist() # list to store distancelist names names for save and restore
+        self.dihedralListNames = NTlist() # list to store dihedrallist names for save and restore
+        self.rdcListNames = NTlist() # list to store rdclist names for save and restore
         self.coplanarListNames = NTlist() # list to store  names for save and restore
         self.dihedralByProjectListNames = NTlist() # list to store  names for save and restore
         self.dihedralByResidue = NTtree( DIHEDRAL_BY_RESIDUE_STR ) # Used to be set in DihedralByResidueHTMLfile but that's too late.
@@ -181,47 +159,26 @@ Project: Top level Cing project class
         self.history = History()
         self.contentIsRestored = False # True if Project.restore() has been called
         self.storedInCcpnFormat = False
-        self.restoredFromXml = True # Project settings restored from project.xml file
 
-        # status of Plugins
-        self.status = Adict() # General status dict for external programs;
-                              # initialise for 'known' programs
-        for key in constants.VALIDATION_KEYS:
-            self.getStatusDict(key)
-        #LEGACY
-        for key, statusName in [
-            (constants.SHIFTX_KEY, 'shiftxStatus'),
-            (constants.PROCHECK_KEY,'procheckStatus'),
-            (constants.DSSP_KEY, 'dsspStatus'),
-            (constants.WHATIF_KEY, 'whatifStatus'),
-            (constants.WATTOS_KEY, 'wattosStatus'),
-            (constants.VASCO_KEY, 'vascoStatus'),
-            (constants.X3DNA_KEY, 'x3dnaStatus')
-             ]:
-            self[statusName] = self.status[key]
-        #end for
+        self.procheckStatus = NTdict(completed = False, parsed = False, ranges = None)
 
-        #OBSOLETE
-        #self.statusObjectNameList = 'procheckStatus dsspStatus whatifStatus wattosStatus vascoStatus x3dnaStatus'.split()
-        # self.procheckStatus = NTdict(completed = False, parsed = False, ranges = None)
-        # self.whatifStatus = NTdict(completed = False, parsed = False)
-        # self.wattosStatus = NTdict(completed = False, parsed = False)
-        # self.vascoStatus = NTdict(completed = False, parsed = False)
-        # #self.shiftxStatus = NTdict(completed = False, parsed = False)
-        # self.x3dnaStatus  = NTdict(completed = False, parsed = False)
+        self.whatifStatus = NTdict(completed = False, parsed = False)
+        self.wattosStatus = NTdict(completed = False, parsed = False)
+        self.vascoStatus = NTdict(completed = False, parsed = False)
+        self.shiftxStatus = NTdict(completed = False, parsed = False)
+        self.x3dnaStatus  = NTdict(completed = False, parsed = False)
+        self.status = NTdict() # General status dict for external programs
 
 #        store a reference to the global things we might need
-#        self.gui = None # Reference to CingGui instance
-        #LEGACY: GWV: 20140202 bad idea mixing code with data
+        self.gui = None # Reference to CingGui instance
         self.directories = directories
         self.moleculeDirectories = moleculeDirectories
-        self.validationDirectories = validationDirectories
+        self.validationSubDirectories = validationSubDirectories
         self.cingPaths = cingPaths
         self.plotParameters = plotParameters
-        self.valSets = cdefs.validationSettings
-#OBSOLETE:
-#        self.plugins = plugins
+        self.plugins = plugins
 
+        self.statusObjectNameList = 'procheckStatus dsspStatus whatifStatus wattosStatus vascoStatus shiftxStatus x3dnaStatus'.split()
         # These Project lists are dynamic and will be filled  on restoring a project
         # They also maintain some internal settings
         # new( name ), append( instance), save(), restore() and path( name ) and names() comprise core functionality
@@ -267,24 +224,90 @@ Project: Top level Cing project class
 #        self.dihedralByResidue = None # done above.
 
 
-        # Path's related stuff
+        # store reference to self
+        #self[name] = self
         self.objectPath = self.path(cingPaths.project)
+#        self.makeObjectPaths() # generates the objectPaths dict from the nameLists
 
         self.rogScore = ROGscore()
         self.summaryDict = CingSummary()
 
+        self.valSets = NTdict()
+        self.readValidationSettings(fn = None)
         self.nosave = False
-        self.saveKeys = [
-                         'version',
-                         'name', 'created','lastSaved','convention',
-                         'moleculeNames',
-                         'peakListNames', 'distanceListNames', 'dihedralListNames', 'rdcListNames',
-                         'coplanarListNames', 'dihedralByProjectListNames', 'dihedralByResidue',
-                         'storedInCcpnFormat',
-                         'reports',
-                         'history',
-                         'status'
-                         ]
+
+        self.saveXML('version',
+                      'name', 'created',
+                      'moleculeNames',
+                      'peakListNames', 'distanceListNames', 'dihedralListNames', 'rdcListNames', 
+                      'coplanarListNames', 'dihedralByProjectListNames', 'dihedralByResidue',
+                      'storedInCcpnFormat',
+                      'reports',
+                      'history',
+                      'procheckStatus', 'whatifStatus', 'wattosStatus', 'shiftxStatus', 'status'
+                    )
+    #end def
+
+
+    def readValidationSettings(self, fn = None):
+        """Reads the validation settings from installation first and then overwrite any if a filename is given.
+        This ensures that all settings needed are present but can be overwritten. It decouples development from
+        production.
+        """
+
+        validationConfigurationFile = os.path.join(cingPythonCingDir, VAL_SETS_CFG_DEFAULT_FILENAME)
+#        nTdebug("Using system validation configuration file: " + validationConfigurationFile)
+        self._readValidationSettingsFromfile(validationConfigurationFile)
+        validationConfigurationFile = None
+
+        if fn:
+            validationConfigurationFile = fn
+#            nTdebug("Using validation configuration file: " + validationConfigurationFile)
+        elif os.path.exists(VAL_SETS_CFG_DEFAULT_FILENAME):
+            validationConfigurationFile = VAL_SETS_CFG_DEFAULT_FILENAME
+#            nTdebug("Using local validation configuration file: " + validationConfigurationFile)
+        if validationConfigurationFile:
+            self._readValidationSettingsFromfile(validationConfigurationFile)
+
+    #end def
+
+    def _readValidationSettingsFromfile(self, fn):
+        """Return True on error.   """
+        if not fn:
+            nTcodeerror("No input filename given at: _readValidationSettingsFromfile")
+            return True
+
+        if not os.path.exists(fn):
+            nTcodeerror("Input file does not exist at: " + fn)
+            return True
+
+#        nTdebug("Reading validation file: " + fn)
+        config = ConfigParser()
+        config.readfp(open(fn))
+        for item in config.items('DEFAULT'):
+            key = item[0].upper()  # upper only.
+            try:
+                if item[1] == CRV_NONE:
+                    value = None
+                else:
+                    value = float(item[1])
+            except ValueError:
+                try:
+                    value = bool(item[1])
+                except:
+                    value = item[1]
+            valueStr = repr(value)
+            if self.valSets.has_key(key):
+                valueFromStr = repr(self.valSets[key])
+                if valueStr == valueFromStr:
+                    continue  # no print
+#                nTdebug("Replacing value for key " + key + " from " + valueFromStr + " with " + valueStr)
+            else:
+#                nTdebug("Adding              key " + key + " with value: " + valueStr)
+                pass
+            self.valSets[key] = value # name value pairs.
+        #end for
+        self.valSets.keysformat()
     #end def
 
     def getCingSummaryDict(self):
@@ -295,65 +318,52 @@ Project: Top level Cing project class
         return self.summaryDict
     #end def
 
-#-------------------------------------------------------------------------
-# Path stuff
-#-------------------------------------------------------------------------
+    #-------------------------------------------------------------------------
+    # Path stuff
+    #-------------------------------------------------------------------------
 
     def path(self, *args):
         """Return joined args as path relative to root of project
         """
-        return Path(os.path.normpath(os.path.join(self.root, *args)))
+        return os.path.normpath(os.path.join(self.root, *args))
     #end def
 
-    @staticmethod
     def rootPath(pathName):
-        """Static method returning root, projectName, extension of pathName
-        root will be Path instance amounting to x/y/projectName.cing
-        extension will be .tgz/.zip (if name had .tgz/.zip extension) or .json or .xml
+        """Static method returning Root,name of project from pathName
 
         name can be:
             simple_name_string
             directory.cing
             directory.cing/
-            directory.cing/project.json (or directory.cing/project.xml for old-style)
-            name.tgz
-            name.cing.tgz
-            name.zip
-            name.cing.zip
+            directory.cing/project.xml
 
         GWV  6 Dec 2007: to allow for relative paths.
         JFD 17 Apr 2008: fixed bugs caused by returning 2 values.
-        GWV 17 Feb 2014: also allow for .tgz and .zip extension
         """
-        root, name, ext = Path(pathName).split3()
-        # tgz file
-        if (ext=='.tgz' or ext=='.zip') and len(name) > 0:
-            root, name, _dummy = Project.rootPath(root / name)
-            return root, str(name), ext
-        # full path
-        elif name == 'project':
-            root, name, _dummy = Project.rootPath(root)
-            return root, str(name), ext
-        # anything else
-        elif len(name) > 0:
-            return Path(root.strip()) / name+'.cing', str(name), '.json'
-        # we should not be here
-        else:
-            nTerror('Project.rootPath: unable to parse "%s"', pathName)
+        root, name, ext = nTpath(pathName)
+        if name == '' or name == 'project': # indicate we had a full path
+            root, name, ext = nTpath(root)
+        #end if
+        if (len(ext) > 0 and ext != '.cing'):
+            nTerror('FATAL: unable to parse "%s"; invalid extention "%s"\n', pathName, ext)
 #            exit(1) # no more hard exits for we might call this from GUI or so wrappers
-            return None, None, None
-    #end def
+            return None, None
 
-#DEPRECIATED: use project.path() with Path methods instead
+        rootp = os.path.join(root, name + '.cing')
+#        nTdebug("rootp, name: [%s] [%s]" % (rootp, name))
+        return rootp, name
+    #end def
+    rootPath = staticmethod(rootPath)
+
     def mkdir(self, *args):
         """Make a directory relative to to root of project from joined args.
            Check for presence.
            Return the result
         """
         d = self.path(*args)
-        if not d.exists():
+        if not os.path.exists(d):
 #            nTdebug( "project.mkdir: %s" % d )
-            d.makedirs()
+            os.makedirs(d)
         return d
     #end def
 
@@ -391,27 +401,6 @@ Project: Top level Cing project class
         return self.moleculePath('html', *args)
     #end def
 
-    def _updateProjectPaths(self):
-        """Check for (and make if needed) all project related directory paths
-        """
-        if not self.root.exists():
-            self.root.makedirs()
-        # Check the subdirectories
-        # 'global' cing directory
-        tmpdir = self.path(directories.tmp)
-        if tmpdir.exists():
-            tmpdir.rmdir()
-        tmpdir.makedirs()
-        # project related directories
-        for d in directories.values():
-            dir = self.path() / d
-            if not dir.exists():
-                dir.makedirs()
-        #end for
-    #end def
-#-------------------------------------------------------------------------
-
-#DEPRECIATED: should start using Pid's instead
     def decodeNameTuple(self, nameTuple):
         """Decode the 7-element nameTuple:
 
@@ -420,87 +409,44 @@ Project: Top level Cing project class
     Return Object or None on error.
 
     @TODO Now works for Molecule; Also implement for other project list object like PeakList, DistanceRestraintList, etc
-
+        
         Also see function in this object: decodeResidueList
         """
         if nameTuple == None or not self.has_key(nameTuple[0]):
             return None
         return self[nameTuple[0]].decodeNameTuple(nameTuple)
-    #end def
 
-    def getByPid(self, thePid):
-        """Decode object by pid, in anticipation of version 3
-        return object or None on error
+    #-------------------------------------------------------------------------
+    # actions exists/open/restore/save/close/export/updateProject
+    #-------------------------------------------------------------------------
+
+    def exists(name):
+        """Static method exists check for presence of Project directory derived from name
+            returns True or False
         """
-        return pid.decodePid(self, thePid)
+        rootp, _n = Project.rootPath(name)
+        if os.path.exists(rootp):
+            return True
+        return False
     #end def
+    exists = staticmethod(exists)
 
-    def asPid(self):
-        """
-        Return a Pid
-        """
-        return pid.Pid.new('Project', self.name)
-    #end def
+    def setStatusObjects(self, parsed=None, completed = None):
+        'Only update the parameter that is not None (True or False)'
+#             = 'procheckStatus dsspStatus whatifStatus wattosStatus vascoStatus shiftxStatus x3dnaStatus'.split()
+        for statusObjectName in self.statusObjectNameList:
+            if parsed != None:
+                setDeepByKeys(self, parsed, statusObjectName, PARSED_STR)
+            if completed != None:
+                setDeepByKeys(self, completed, statusObjectName, COMPLETED_STR)
+        # end for
+    # end def
 
-#-------------------------------------------------------------------------
-# actions exists/open/restore/save/close/export/updateProject
-#-------------------------------------------------------------------------
-
-#OBSOLETE: uses exists() on all path objects
-#    def exists(name):
-#        """Static method exists check for presence of Project directory derived from name
-#            returns True or False
-#        """
-#        rootp, _n = Project.rootPath(name)
-#        if os.path.exists(rootp):
-#            return True
-#        return False
-#    #end def
-#    exists = staticmethod(exists)
-
-#OBSOLETE:
-#     def setStatusObjects(self, parsed=None, completed = None):
-#         """Only update the parameter that is not None (True or False)
-#         """
-# #             = 'procheckStatus dsspStatus whatifStatus wattosStatus vascoStatus shiftxStatus x3dnaStatus'.split()
-#         for statusObjectName in self.statusObjectNameList:
-#             if parsed != None:
-#                 setDeepByKeys(self, parsed, statusObjectName, PARSED_STR)
-#             if completed != None:
-#                 setDeepByKeys(self, completed, statusObjectName, COMPLETED_STR)
-#         # end for
-#     #end def
-
-    def getStatusDict(self, key, **defaults ):
-        """Return statusDict for key, initialise with **defaults if not exist
-        add keys from defaults if keys do not exist
-        set molecule key to pid of current molecule
-        return None on error
-        """
-        sdict = self.status.setdefault(key, StatusDict(key, **defaults))
-        if sdict is None:
-            io.error('Project.getStatusDict: key %s returned None, reverting to default values\n', key)
-            return None
-        #end if
-
-        mpid = None
-        if self.molecule is not None:
-            mpid = self.molecule.asPid()
-        sdict.molecule = mpid
-
-        # update keys; we may not have a StatusDict yet, hence explicit iteration here:
-        for k,v in defaults.items():
-            sdict.setdefault(k, v)
-
-        self.status[key] = sdict
-        return sdict
-    #end def
-
-    @staticmethod
-    def open(name, status = constants.PROJECT_CREATE, restore = True):
+        
+    def open(name, status = 'create', restore = True):
         """Static method open returns a new/existing Project instance depending on status.
 
-           status == 'new': open a new project 'name', overwrite when exists
+           status == 'new': open a new project 'name'
            status == 'old: open existing project 'name'
                       project data is restored when restore == True.
            status == 'create': if project name if exists open as old, open as new otherwise.
@@ -511,183 +457,168 @@ Project: Top level Cing project class
         global projects
 
         #print '>>', name, status
-        status = status.strip()
-        name = str(name)
 
-        if status == constants.PROJECT_NEW:
-            root, projectName, ext = Project.rootPath(name)
-            if not root:
-                return None
-            if root.exists():
-                root.rmdir()
-            #end if
-            #root.makedirs()
-            pr = Project(projectName)
-            pr._updateProjectPaths()
-            pr.addHistory('New project')
-            # Save the project settings
-            pr._save2json()
-
-        elif status == constants.PROJECT_CREATE:
-            root, dummy, ext = Project.rootPath(name)
+        if (status == 'new'):
+            root, dummy = Project.rootPath(name)
             if not root:
                 return None
             if os.path.exists(root):
-                return Project.open(name, constants.PROJECT_OLD, restore = restore)
+                removedir(root)
+            #end if
+            os.mkdir(root)
+            pr = Project(name)
+            pr.addHistory('New project')
+            # Save the project data
+            obj2XML(pr, path = pr.objectPath)
+#            nTdebug('New project %s', pr)
+
+        elif (status == 'create'):
+            root, dummy = Project.rootPath(name)
+            if not root:
+                return None
+            if os.path.exists(root):
+                return Project.open(name, 'old', restore = restore)
             else:
-                return Project.open(name, constants.PROJECT_NEW, restore = restore)
+                return Project.open(name, 'new', restore = restore)
             #end if
 
-        elif status == constants.PROJECT_NEWFROMCCPN:
-            pr = Project.open(name, constants.PROJECT_NEW)
-            if pr is None:
-                return None
-            p = pr.initCcpn(ccpnFolder=name)
-            if p is None:
-                return None
-            ccpnPath = pr.path() / cdefs.directories.ccpn
-            ccpnPath.makedirs()
-            p = pr.saveCcpn(ccpnFolder=ccpnPath)
-            if p is None:
-                return None
-            pr.storedInCcpnFormat = True
-            pr.save()
-            pr._callPluginRestores()
-            pr.runCingChecks(toFile=False)
-            pr.contentIsRestored = True
-
-        elif status == constants.PROJECT_OLDFROMCCPN:
-            pr = Project.open(name, constants.PROJECT_OLD, restore=False)
-            if pr is None:
-                return None
-            if not pr.storedInCcpnFormat:
-                io.error('Project.open: restoring from ccpn: data are not available\n')
-                return None
-            ccpnPath = pr.path() / cdefs.directories.ccpn
-            p = pr.initCcpn(ccpnFolder=ccpnPath)
-            if p is None:
-                return None
-            pr._callPluginRestores()
-            pr.runCingChecks(toFile=False)
-            pr.contentIsRestored = True
-
-        elif status == constants.PROJECT_OLD:
-            root, projectName, ext = Project.rootPath(name)
-            if ext == '.tgz':
-                tarPath = Path(name)
-                if not tarPath.exists():
-                    io.error('Project.open: tarfile "{0}" does not exist\n', tarPath)
-                    return None
-                if root.exists():
-                    root.rmdir()
-                #root.makedirs()
-
-                io.debug('Project.open: unpacking {0}\n', tarPath)
-                tar = tarfile.open(tarPath, "r:gz")
+        elif status == 'old':
+            possibleTgz = name + ".cing.tgz"
+            possibleProjectDir = name + '.cing'
+            if os.path.exists(possibleTgz) and not os.path.exists(possibleProjectDir):
+#                nTdebug("Unpacking possibleTgz: " + possibleTgz)
+                tar = tarfile.open(possibleTgz, "r:gz")
                 for itar in tar:
                     tar.extract(itar.name, '.') # itar is a TarInfo object
 #                    nTdebug("extracted: " + itar.name)
                 tar.close()
-                if not root.exists():
-                    io.error('Project.open: Failed to find project in .tgz file. Unable to open Project "{0}"\n', name)
+                if not os.path.exists(possibleProjectDir):
+                    nTerror('Project.open: Failed to find project in .tgz file. Unable to open Project "%s"', name)
                     return None
-                return Project.open(root, status=status, restore=restore)
-            elif ext == '.zip':
-                zipPath = Path(name)
-                if not zipPath.exists():
-                    io.error('Project.open: zipfile "{0}" does not exist\n', zipPath)
-                    return None
-                if root.exists():
-                    root.rmdir()
-                #root.makedirs()
+#            else:
+#                if not os.path.exists(possibleTgz):
+#                    nTdebug("No " + possibleTgz + " found.")
+#                    nTdebug("Skipping .tgz because there's already a .cing")
+#                else:
 
-                io.debug('Project.open: unpacking {0}\n', zipPath)
-                with zipfile.ZipFile(zipPath,'r') as z:
-                    for f in z.namelist():
-                        if not f.startswith('__MACOSX'):
-                            z.extract(f)
-                    #end for
-                #end with
-                if not root.exists():
-                    io.error('Project.open: Failed to find project in .zip file. Unable to open Project "{0}"\n', name)
-                    return None
-                return Project.open(root, status=status, restore=restore)
-            #end if
-
-            # 'proper' project from here on
-            name = str(projectName)
+            root, newName = Project.rootPath(name)
             if not root:
-                io.error('Project.open: unable to open Project "{0}" because root is [{1}]\n', name, root)
+                nTerror('Project.open: unable to open Project "%s" because root is [%s].', name, root)
                 return None
-            if not root.exists():
-                io.error('Project.open: unable to open Project "{0}" because root [{1}] was not found\n', name, root)
-                return None
-            #end if
-
-            # Restore Project info from xml/json-file
-            from cing.Libs.jsonTools import json2obj
-            pfile = root / cingPaths.project
-            # Check if we find an json or xml file
-            f,e = pfile.splitext()
-            if (f+'.json').exists():
-                pr = Project._restoreFromJson(f+'.json')
-                if pr is None:
-                    io.error('Project.open: error restoring project data\n')
-                    return None
-            elif (f+'.xml').exists():
-                from cing.Legacy.Legacy100.upgrade100 import upgradeProject2Json
-                return upgradeProject2Json(str(root),restore)
-            else:
-                # Neither one found
-                io.error('Project.open: missing Project file "{0}"\n', pfile)
+            if not os.path.exists(root):
+                nTerror('Project.open: unable to open Project "%s" because root [%s] was not found.', name, root)
                 return None
             #end if
 
+            # Restore Project info from xml-file
+            pfile = os.path.join(root, cingPaths.project)
+            if not os.path.exists(pfile):
+                nTerror('Project.open: missing Project file "%s"', pfile)
+                return None
+            #end if
+            pr = xML2obj(pfile)
             if pr == None:
-                io.error('Project.open: error parsing Project file "{0}"\n', pfile)
+                nTerror('Project.open: error parsing Project file "%s"', pfile)
                 return None
             #end if
             # This allows renaming/relative addressing at the shell level
             pr.root = root
-            pr.name = name
-            pr._updateProjectPaths()
-            # No content present
+            pr.name = newName
+            pr.objectPath = pfile
+
             pr.contentIsRestored = False
-            for key in pr.status.keys():
-                status = pr.getStatusDict(key)
-                status.present = False
-            #LEGACY:
-            #pr.setStatusObjects(parsed=False)
 
-            io.debug('Project.open: read {0}, software version {1:.3f}\n', pfile, pr.version)
+            pr.setStatusObjects(parsed=False)
 
-            #LEGACY:
+            try:
+                # <= 0.75 version have string
+                pr.version = float(pr.version.strip('abcdefghijklmnopqrtsuvw ()!@#$%^&*').split()[0])
+            except:
+                pass
+
             if pr.version <= 0.75:
-                from cing.Legacy.Legacy075.upgrade075 import upgrade075
-                return upgrade075(pr, restore=restore)
+                nTmessage('Project.Open: converting from CING version %s', pr.version)
+#                nTdebug('Project.open: conversion: old project settings\n%s', pr.format())
+
+                # 0.75 version had moleculeNames stored in molecules attribute
+                # >=0.76 version molecules is a ProjectList instance
+                pr.moleculeNames = pr.molecules
+                if 'molecules' in pr.__SAVEXML__:
+                    pr.__SAVEXML__.remove('molecules')
+                pr.saveXML('moleculeNames')
+
+                # store the xmlFile and reopen to have correct settings
+                if obj2XML(pr, path = pfile) != pr:
+                    nTerror('Project.Open: conversion from version %s failed on write', pr.version)
+                    return None
+                pr = xML2obj(pfile)
+                if pr == None:
+                    nTerror('Project.Open: conversion from version %s failed on read', pr.version)
+                    return None
+
+                for molName in pr.moleculeNames:
+                    pathName = pr.path(directories.molecules, molName) # old reference, versions 0.48-0.75
+                    if pr.version <= 0.48:
+                        pathName = pr.path('Molecules', molName) # old reference
+                    # end if
+#                    nTdebug('Project.open: trying molecule conversion from %s', pathName)
+                    if not os.path.exists(pathName):
+                        nTerror('Project.open: old molecule pathName "%s" does not exist.', pathName)
+                        return None
+                    mol = Molecule.openMol_075(pathName)
+                    if not mol:
+                        nTerror('Project.Open: conversion from version %s failed on molecule %s', pr.version, molName)
+                        return None
+                    removedir(pathName)
+                    # Save molecule to new format
+                    mol.save(pr.molecules.path(molName))
+                #end for
+
+                # restore
+                pr.restore()
+                # Save to consolidate
+                pr.save()
+
             # changed for allowing to store special database entries.
             elif round(pr.version*1000) < 950: # i.e. versions 0.94 and lower
-                from cing.Legacy.Legacy095.upgrade095 import upgrade095
-                return upgrade095(pr,restore=restore)
-            # version <= 1.00
-            elif pr.version <= 1.00:
-                from cing.Legacy.Legacy100.upgrade100 import upgrade100
-                return upgrade100(pr,restore=restore)
+                for molName in pr.moleculeNames:
+                    pathName = pr.molecules.path(molName)
+                    mol = Molecule.openMol_094(pathName+'.molecule')
+                    mol.save(pathName)
+                    remove(pathName+'.molecule')
+                #end for
+                # restore
+                pr.restore()
+                # Save to consolidate
+                pr.save()
             #end if
 
             # Optionally restore the content
             if restore and not pr.contentIsRestored:
                 pr.restore()
             #end if
-            #nTmessage('Finished restoring project %s', pr)
+            nTmessage('Finished restoring project %s', pr)
         else:
             nTerror('ERROR Project.open: invalid status option "%s"', status)
             return None
         #end if
+
+        # Check the subdirectories
+        tmpdir = pr.path(directories.tmp)
+        # have to use cing.verbosity to work?
+        if os.path.exists(tmpdir) and cing.verbosity != cing.verbosityDebug:
+            removedir(tmpdir)
+        for d in directories.values():            
+#            nTdebug('dir: %r' % d)
+            pr.mkdir(d)
+        #end for
+
         pr.addLog()
+
         projects.append(pr)
         return pr
     #end def
+    open = staticmethod(open)
 
     def close(self, save = True):
         """
@@ -735,99 +666,15 @@ Project: Top level Cing project class
 
         self.molecule.superpose(ranges = ranges, backboneOnly = backboneOnly,
                                    includeProtons = includeProtons, iterations = iterations
-                               )
+                                  )
         return self.molecule.rmsd
-    #end def
-
-    def _savePluginData(self, key, **kwds):
-        """
-        Save Plugin data to sml file.
-        Uses getStatusDict method for settings
-        Update statusDict with kwds before saving
-
-        Return True on error
-        """
-
-        defs = self.getStatusDict(key)
-        if not defs.present:
-            defs.saved = False
-            nTdebug('Project._savePluginData: data not present; returning')
-            return False # Return gracefully
-
-        if self.molecule is None:
-            nTmessage("Project._savePluginData: No molecule defined; returning")
-            defs.saved = False
-            return True
-
-        # set values before doing anything or they get lost
-        defs.update(kwds)
-        defs.convention = constants.INTERNAL # asPid routines will return values
-                                             # in INTERNAL convention
-
-        smlFile = self.path() / cdefs.directories.plugins / defs.smlFile
-        # Assemble elements to be saved
-        myList = NTlist()
-        # first element of list is the settings
-        myList.append( defs )
-        # next elements are ResultDefs instances
-        for obj in [self.molecule] + \
-                    self.molecule.allChains() + \
-                    self.molecule.allResidues() + \
-                    self.molecule.allAtoms():
-            vDict = validation.getValidationResult(obj, key)
-            if vDict is not None:
-                myList.append(vDict)
-            #end for
-        #end for
-
-        # Import her to prevent circular  imports
-        from cing.core import sml
-        obj = sml.obj2sml( myList, smlFile)
-        if obj is None:
-            nTerror('Project._savePluginData: error saving %s results to "%s"', key, smlFile)
-            defs.saved = False
-            return True
-
-        nTdetail('==> Saved %s results to "%s"', key, smlFile)
-        return False
-    #end def
-
-    # def _save2sml(self):
-    #     """Save project settings as SML file"""
-    #     from cing.core import sml
-    #     path = self.path() / cdefs.cingPaths.project
-    #     # get key, value pairs to save
-    #     p = Adict([(k,self[k]) for k in self.saveKeys ])
-    #     return sml.obj2sml( p, path )
-    # #end def
-
-
-    def _save2json(self):
-        """Save project settings as json file"""
-        path = self.path() / cdefs.cingPaths.project
-        self.lastSaved = io.now()
-        # get key, value pairs to save
-        jsonTools.set_encoder_options('json',indent=4)
-        return jsonTools.obj2json( self, path )
-    #end def
-
-    @staticmethod
-    def _restoreFromJson(path):
-        """Restore project settings from json project file
-        Returns True on error
-        """
-        io.debug('Project._restoreFromJson: restoring from {0}\n', path)
-        p, metadata = jsonTools.json2obj(path)
-        if p is None:
-            return None
-        p.restoredFromXml = False
-        return p
     #end def
 
     def save(self):
         """
         Save project data;
-        Return True on error.
+
+        Return True on success.
         """
         nTmessage('' + dots * 5 + '')
         nTmessage('==> Saving %s', self)
@@ -836,106 +683,36 @@ Project: Top level Cing project class
         for mol in self.molecules:
             mol.save(mol.objectPath)
         self.moleculeNames = self.molecules.names()
-        #OBSOLETE:
-        #self.saveXML('moleculeNames')
+        self.saveXML('moleculeNames')
 
         # Save the molecules and lists
         for pl in [self.peaks, self.distances, self.dihedrals, self.rdcs, self.coplanars]:
             self[pl.nameListKey] = pl.save() # Save returns a list of name; store these in project
             # Patch for XML bug
-            #OBSOLETE:
-            #self.saveXML(pl.nameListKey)
+            self.saveXML(pl.nameListKey)
         #end for
 
         # Call Plugin registered functions
-        for p in cing.plugins.values():
+        for p in self.plugins.values():
             if (not p) or (not hasattr(p, 'saves')) or (not p.saves):
                 pass
 #                nTdebug("Skipping save for disabled plugin: %s" % p)
             else:
                 for f, obj in p.saves:
-                    nTdebug("Project.save: Saving with %s( %s, %s )" % (f,self,obj))
 #                    nTdebug("Save for plugin: %s with %s on object %s" % (p,f,obj))
                     f(self, obj)
             #end for
         #end for
 
-        # Update version number and convention since it is now saved with this cingVersion
+        # Update version number since it is now saved with this cingVersion
         self.version = cingVersion
-        self.convention = constants.INTERNAL
-        # Save the project data
-        #OBSOLETE:
-        #if obj2XML(self, path = self.objectPath) != self:
-        #    nTerror('Project.save: writing Project file "%s" failed', self.objectPath)
-        ##end if
-        if self._save2json():
-            return True
+        # Save the project data to xml file
+        if obj2XML(self, path = self.objectPath) != self:
+            nTerror('Project.save: writing Project file "%s" failed', self.objectPath)
+        #end if
 
         self.addHistory('Saved project')
-        return False
-    #end def
-
-    def _restorePluginData( self, key, **kwds ):
-        """
-        Restore Plugin data from sml file.
-        Uses getStatusDict method for settings
-        Restore statusDict value with those in the file
-        Update statusDict with **kwds
-
-        Return True on error
-        """
-
-        if self.molecule is None:
-            nTdebug('Project._restorePluginData: no molecule; returning')
-            return False # Gracefully returns
-
-        defs = self.getStatusDict(key)
-
-        ###TEMP
-        defs.saved = False
-
-        if (not defs.saved):
-            nTdebug('Project._restorePluginData: data not saved; returning')
-            return False # Return gracefully
-
-        smlFile = self.path() / cdefs.directories.plugins / defs.smlFile
-        if not smlFile.exists():
-            nTerror('Project._restorePluginData: file "%s" with %s data not found', smlFile, key)
-            return True
-        # end if
-
-        # Restore the data
-        # Import here to prevent circular imports
-        from cing.core import sml
-
-        myList = sml.sml2obj( smlFile, self )
-        if myList is None:
-            nTerror('Project._restorePluginData: Restoring %s results from %s (code version %s)', key, smlFile, defs.saveVersion)
-            defs.present = False
-            return True
-        # first element is stored definitions
-        defs.update(myList[0])
-        defs.update(kwds)
-
-        nTmessage('==> Restored %s results from %s (code version %s)', key, smlFile, defs.saveVersion)
-        return False
-    #end def
-
-    def _callPluginRestores(self):
-        """Call plugin restores to restore data
-        """
-        # Plugin registered functions
-        for p in cing.plugins.values():
-            if p.isInstalled:
-                #nTdebug("Project.restore: %s" % p.module)
-                for f, obj in p.restores:
-                    nTdebug("Project._restorePlugins: Restoring with %s( %s, %s )",
-                             f, self,obj
-                           )
-                    f(self, obj)
-                #end for
-            #end if
-        #end for
+        return True
     #end def
 
     def restore(self):
@@ -971,10 +748,18 @@ Project: Top level Cing project class
 #            l.criticize(self) now in criticize of validate plugin
 
         # Plugin registered functions
-        nTdebug('Project.restore: calling plugins')
-        self._callPluginRestores()
+        for p in self.plugins.values():
+            if p.isInstalled:
+                for f, obj in p.restores:
+#                    nTdebug("Restoring object [%s] with function [%s]" % (f,o))
+                    f(self, obj)
+                #end for
+            #end if
+        #end for
+        #nTdebug("In classes#restore() doing runCingChecks without output generation.")
         self.runCingChecks(toFile=False)
         self.contentIsRestored = True
+        self.updateProject()
     #end def
 
     def removeCcpnReferences(self):
@@ -1035,20 +820,19 @@ Project: Top level Cing project class
         nTmessage('' + dots * 5 + '')
         nTmessage('==> Exporting %s', self)
 
-        for p in cing.plugins.values():
+        for p in self.plugins.values():
             for f, obj in p.exports:
                 f(self, obj)
             #end for
         #end for
     #end def
 
-    #OBSOLETE:
-    # def updateProject(self):
-    #     """Do all administrative things after actions
-    #     """
-    #     if self.molecule:
-    #         self[self.molecule.name] = self.molecule
-    # #end def
+    def updateProject(self):
+        """Do all administrative things after actions
+        """
+        if self.molecule:
+            self[self.molecule.name] = self.molecule
+    #end def
 
     #-------------------------------------------------------------------------
     # actions Molecule
@@ -1057,23 +841,20 @@ Project: Top level Cing project class
         """Append molecule to project.molecules; generate required internal directories.
         Return molecule or None on error.
         """
-        if not molecule:
+        if not molecule: 
             return None
 
-        #nTdebug('Project.appendMolecule: appending %s', molecule)
         # Store names and references and append
         self.molecule = molecule
-        #self[molecule.name] = molecule #this should not be done because
-        # the line below takes care of this
         self.molecules.append(molecule)
-        self.createValidationDirectories(molecule)
+        self.createMoleculeDirectories(molecule)
         return self.molecule
     #end def
 
-    def createValidationDirectories(self, molecule):
+    def createMoleculeDirectories(self, molecule):
         """generate the required directories for export and HTML data."""
         # generate the required directories for export and HTML data
-        for d in validationDirectories.values():
+        for d in moleculeDirectories.values():
             self.mkdir(molecule.name, d)
         #end for
     #end def
@@ -1104,11 +885,11 @@ Project: Top level Cing project class
         pathName = self.molecules.path(name)
         mol = Molecule.open(pathName)
 
-        if mol is None:
-            return None
-
-        mol.status = 'keep'
-        self.appendMolecule(mol)
+        if mol:
+            mol.status = 'keep'
+            self.appendMolecule(mol)
+        #end if
+        self.molecule = mol
         return mol
     #end def
 
@@ -1169,8 +950,8 @@ Project: Top level Cing project class
         stream2 = open(logFilePath, 'w')
 #        nTdebug("Opening %s" % logFilePath )
         addStreamnTmessageList(stream2)
-        fprintf(stream2,cing.cingDefinitions.getHeaderString()+'\n')
-        fprintf(stream2,cing.systemDefinitions.getStartMessage()+'\n')
+        fprintf(stream2,header+'\n')
+        fprintf(stream2,getStartMessage()+'\n')
 #        nTdebug("Opened %s (should now show up in log too)" % logFilePath )
     #end def
 
@@ -1180,7 +961,7 @@ Project: Top level Cing project class
             nTdebug("Strange in project.removeLog stream2 was already closed.")
             return
         stream2 = nTdebug.stream2
-        fprintf(stream2, cing.systemDefinitions.getStopMessage()+'\n')
+        fprintf(stream2, getStopMessage(cing.starttime)+'\n')
         removeStreamnTmessageList()
 #        nTdebug("Closed stream2 (should now NOT show up in log too)" )
     #end def
@@ -1277,9 +1058,9 @@ Project: Top level Cing project class
     #end def
 
     def __repr__(self): # pylint: disable=W0221
-        return '<Project:%s>' % self.name
+        return str(self)
 
-    def _list2string(self, firstString, theList, maxItems):
+    def _list2string(self, theList, firstString, maxItems):
         result = firstString
         if len(theList) <= maxItems:
             result = result + str(theList)
@@ -1296,21 +1077,18 @@ Project: Top level Cing project class
 
     def format(self): # pylint: disable=W0221
         result = self.header() + '\n' + \
-                                  'created:    %(created)s\n' \
-                                  'last saved: %(lastSaved)s\n'
+                            'created:    %(created)s\n'
         result = result % self
         for firstString, item in [('molecules:  ', 'molecules'),
-                                  ('peaks:      ', 'peaks'),
-                                  ('distances:  ', 'distances'),
-                                  ('dihedrals:  ', 'dihedrals'),
-                                  ('rdcs:       ', 'rdcs'),
-                                  ('coplanars:  ', 'coplanars'),
-                                 ]:
-            result += self._list2string(firstString, self[item], 2) + '\n'
+                                 ('peaks:      ', 'peaks'),
+                                 ('distances:  ', 'distances'),
+                                 ('dihedrals:  ', 'dihedrals'),
+                                 ('rdcs:       ', 'rdcs'),
+                                 ('coplanars:  ', 'coplanars'),
+                                ]:
+            result += self._list2string(self[item], firstString, 2) + '\n'
         #end for
-        remarks = [self.status[k].text for k in self.status.keys()]
-        result += self._list2string('plugins:    ', remarks, 2) + '\n'
-        result += self.footer() # Project.footer defaults to NTdict
+        result += self.footer() # Project.footer defaults to NTdict 
         return result
     #end def
 
@@ -1318,7 +1096,7 @@ Project: Top level Cing project class
         """Removes True on error. If no cing project is found on disk None (Success) will
         still be returned. Note that you should set the nosave option on the project
         before exiting."""
-        pathString, _name, _dummy = self.rootPath(self.name)
+        pathString, _name = self.rootPath(self.name)
         if not os.path.exists(pathString):
 #            nTdebug("No cing project is found at: " + pathString)
             return None
@@ -1330,7 +1108,7 @@ Project: Top level Cing project class
     # Convenience methods calls to validate.py.
     def initPDB(self, pdbFile, convention = IUPAC, name = None, nmodels = None, update = True, allowNonStandardResidue = True):
         """Initializes from a pdb file."""
-        return initPDB(self, pdbFile, convention = convention, name = name, nmodels = nmodels, update = update,
+        return initPDB(self, pdbFile, convention = convention, name = name, nmodels = nmodels, update = update, 
                        allowNonStandardResidue = allowNonStandardResidue)
 
     def importPDB(self, pdbFile, convention = IUPAC, nmodels = None):
@@ -1367,32 +1145,32 @@ Project: Top level Cing project class
 
     def criticize(self, toFile = True):
         return criticize(self, toFile = toFile)
-
+    
     def decriticize(self):
         """
         Reset all Rog score objects in this project.
-
+        
         Return True on error and None on success.
         """
-
+    
 #        nTdebug("Now in project#decriticize")
-
+        
         self.rogScore.reset()
         # Project lists of lists
         projectLoL = []
-        projectLoL += self.allRestraintLists() # distances, etc.
-        projectLoL += self.peaks
+        projectLoL += self.allRestraintLists() # distances, etc.        
+        projectLoL += self.peaks     
         for projectList in projectLoL:
             if projectList.decriticize():
                 nTerror("Failed to decriticize %s in project#decriticize" % str(projectList))
                 return True
             #end if
         # end for
-
+            
         if self.molecule:
             if self.molecule.decriticize():
                 nTerror("Failed to decriticize %s in project#decriticize" % str(self.molecule))
-                return True
+                return True                
             #end if
         #end if
     #end def
@@ -1430,9 +1208,9 @@ Project: Top level Cing project class
         Remove the largest violating distance restraints that meet a certain cutoff.
         Violation are not averaged over models for this purpose.
         Writes the removed restraints to a file.
-
+    
         Return False on error.
-
+    
         restraintLoL   Defaults to p.distances
         cutoff         Tolerance above which to delete.
         maxRemov       Maximum number of violations to remove. Largest violations will be removed.
@@ -1520,7 +1298,7 @@ Project: Top level Cing project class
 
         txt = restraintList.format(showAll=True)
         if toFile:
-            fileName = self.path(self.molecule.name, validationDirectories.analysis, fileName)
+            fileName = self.path(self.molecule.name, self.moleculeDirectories.analysis, fileName)
             nTmessage( '==> %s, removed %s restraints and written to %s' % ( getCallerName(), len(restraintList), fileName))
             writeTextToFile(fileName, txt)
         else:
@@ -1529,7 +1307,7 @@ Project: Top level Cing project class
 #        nTmessage("Finished filterHighDistanceViol")
         return True # success
     # end def
-
+    
     def decodeResidueList(self, resLot):
         '''
         Decode LoL to list of residues.
@@ -1549,46 +1327,33 @@ Project: Top level Cing project class
                 continue
             # end if
             resList.append(res)
-        # end for
+        # end for        
         return resList
-    # end def
+    # end def    
 # end class
 
 
-class StatusDict(Adict):
-    """
-    Class to store the plugin status data
-    """
-    def __init__(self, key, **defaults):
-        Adict.__init__(self)
-        self.key          = key                     # program key
-        self.setdefaultKeys(defaults)
-
-        # additional minimal set to have
-        self.setdefault('completed', False)         # True: Program was run successfully
-        self.setdefault('parsed', False)            # True: Program output was parsed successfully; i.e parse can be called if completed == True -> implies present = True
-        self.setdefault('date', io.now())           # date ran
-        self.setdefault('version', cdefs.cingDefinitions.version)   # 0.95 denotes all older versions
-        self.setdefault('directory', None)          # directory relative to project.validationPath()
-        self.setdefault('molecule', None)           # pid of molecule used in the analysis
-        self.setdefault('convention', constants.INTERNAL)   # convention; always handy to have
+class XMLProjectHandler(XMLhandler):
+    """Project handler class"""
+    def __init__(self):
+        XMLhandler.__init__(self, name = 'Project')
     #end def
 
-    @property
-    def text(self):
-        """
-        Return textual description
-        """
-        if self.completed and self.parsed:
-            return '%-10s completed (on:%s) and data present' % (self.key, self.date)
-        elif self.completed and not self.parsed:
-            return '%-10s completed (on:%s) but data not present' % (self.key, self.date)
-        else:
-            return '%-10s not completed and data not present' % self.key
-        #end if
+    def handle(self, node):
+        attrs = self.handleDictElements(node)
+        if attrs == None: 
+            return None
+        result = Project(name = attrs['name'])
+
+        # update the attrs values
+        result.update(attrs)
+
+        return result
     #end def
 #end class
 
+#register this handler
+projecthandler = XMLProjectHandler()
 
 class ProjectList(NTlist):
     """Generic Project list class: the list of lists of the project; e.g. molecules, peaks, ...
@@ -1776,8 +1541,6 @@ class ProjectList(NTlist):
 
 # Routines to compare different Project instances this is therefore completely different from the ProjectList
 # class where no such relation can be assumed.
-
-#GWV:TODO to check relevance and usefullnes
 
 class ProjectTree( NTtree ): # pylint: disable=R0904
     """
@@ -2136,7 +1899,7 @@ ranges:  %s
 
     def printScore( self, name, rogScore ):
         clist = rogScore.colorCommentList.zap(1)
-        if len(clist) == 0:
+        if len(clist) == 0: 
             clist.append('---')
         printf('%-20s%-10s %s\n', name, rogScore, clist[0])
         for c in clist[1:]:
@@ -2153,7 +1916,7 @@ ranges:  %s
         for p in self:
             p.cingSummary = p.getCingSummaryDict()
         # end for
-
+        
         self.printTitle('Overall scores target '+self.name, 20*(n+1), stream)
     #    line = dots20*(n+1)
     #   fprintf( stream, '%s\n    Overall scores %s\n%s\n\n', line, self.name, line )
@@ -2506,10 +2269,10 @@ ranges:  %s
                 psi.cAverage()
 
                 use1 = 0
-                if (2.0 - res.PHI.cv - res.PSI.cv > cutoff):
+                if (2.0 - res.PHI.cv - res.PSI.cv > cutoff): 
                     use1 = 1
                 use2 = 0
-                if (2.0 - phi.cv - psi.cv > cutoff):
+                if (2.0 - phi.cv - psi.cv > cutoff): 
                     use2 = 1
                 #printf('%-35s %-35s  %6.2f  %1d     %6.2f %6.2f   %6.2f  %1d     %2d\n',
                 #      res.PHI, res.PSI, 2.0 - res.PHI.cv - res.PSI.cv, use1,
@@ -2694,13 +2457,13 @@ class Peak(NTdict, Lister):
     #end def
 
     def isAssigned(self, axis):
-        if axis >= self.dimension:
+        if axis >= self.dimension: 
             return False
-        if axis >= len(self.resonances):
+        if axis >= len(self.resonances): 
             return False
-        if self.resonances[axis] == None:
+        if self.resonances[axis] == None: 
             return False
-        if self.resonances[axis].atom == None:
+        if self.resonances[axis].atom == None: 
             return False
         return True
     #end def
@@ -2726,7 +2489,7 @@ class Peak(NTdict, Lister):
                          self.peakIndex, self.dimension,
                          self.positions.format('%8.2f'),
                          self.height, self.volume,
-                         self.resonances.zap('atom')
+                         self.resonances.zap('atom').format('%-20s')
                        )
     #end def
 
@@ -2807,7 +2570,7 @@ class PeakList(NTlist, ProjectListMember):
         Create a SML file
         Return self or None on error
         """
-        if not path:
+        if not path: 
             path = self.objectPath
         if self.SMLhandler.toFile(self, path) != self:
             nTerror('PeakList.save: failed creating "%s"', path)
@@ -2857,12 +2620,12 @@ class Restraint(NTdict):
     def __str__(self):
         return '<%s %d>' % (self.__CLASS__, self.id)
     #end def
-
+    
     def decriticize(self):
 #        nTdebug("Now in Restraint#%s" % getCallerName())
         self.rogScore.reset()
     #end def
-
+    
     def getModelCount(self):
         """Iterate over the atoms until an atom is found that returns not a None for getModelCount.
         Return 0 if it doesn't have any models or None on error.
@@ -2926,7 +2689,7 @@ class DistanceRestraint(Restraint):
     STATUS_REMOVED_DUPLICATE = 'removed duplicate'
     STATUS_NOT_REMOVED_DUPLICATE = 'not removed duplicate'
     # The maximum number of atom pairs expected before it will be treated normally.
-    # This is to prevent HADDOCK AIR restraints to slow CING to a crawl as per issue 324.
+    # This is to prevent HADDOCK AIR restraints to slow CING to a crawl as per issue 324. 
     MAX_ATOM_PAIRS_EXPECTED = 1000
 
 #    def __init__( self, atomPairs=[], lower=0.0, upper=0.0, **kwds ):
@@ -2942,7 +2705,7 @@ class DistanceRestraint(Restraint):
         self.violCountLower = 0    # Lower-bound violations
         self.violUpperMax = 0.0    # Max violation over upper bound
         self.violLowerMax = 0.0    # Max violation over lower bound
-
+        
         self.duplicates = NTlist() # NTlist instance with DistanceRestraint instances considered duplicates; TODO: check this code
         self.error = False    # Indicates if an error was encountered when analyzing restraint
 
@@ -3041,13 +2804,13 @@ class DistanceRestraint(Restraint):
 
         Routine is iterative itself because both sides may contain ambis to collapse and remove.
         """
-        atomPairCount = len(self.atomPairs)
+        atomPairCount = len(self.atomPairs)        
         if atomPairCount > DistanceRestraint.MAX_ATOM_PAIRS_EXPECTED: # Happens for entry 2bgf as per issue 324.
 #            nTdebug('In %s; skipping restraint %s with %s atom pairs which is more than the maximum expected: %s' % (
 #                getCallerName(), self, atomPairCount, DistanceRestraint.MAX_ATOM_PAIRS_EXPECTED))
             return self.STATUS_NOT_SIMPLIFIED
         # end if
-
+        
         statusOverall = self.STATUS_NOT_SIMPLIFIED
         status = self.STATUS_SIMPLIFIED
         while status == self.STATUS_SIMPLIFIED:
@@ -3493,7 +3256,7 @@ class DistanceRestraint(Restraint):
                         i = 0
                         if len(a2.coordinates) == modelCount:
                             for i in models:
-                                self.distances[i] += superpose.Rm6dist(a1.coordinates[i].e, a2.coordinates[i].e)
+                                self.distances[i] += Rm6dist(a1.coordinates[i].e, a2.coordinates[i].e)
                             #end for
                         else:
 #                            self.distances[0] = 0.0
@@ -3601,7 +3364,7 @@ class DistanceRestraint(Restraint):
     #end def
 #end class
 
-# Too many ancestors (8/7) pylint: disable=R0901
+# Too many ancestors (8/7) pylint: disable=R0901 
 class DistanceRestraintList(RestraintList):
     """
     Class based on NTlist that holds distanceRestraints.
@@ -3612,7 +3375,7 @@ class DistanceRestraintList(RestraintList):
     def __init__(self, name, status = 'keep'):
         RestraintList.__init__(self, name, status = status)
         self.__CLASS__ = DRL_LEVEL
-        self.hBond = False       # hBond: fix to keep information about hBond restraints from CCPN
+        self.hBond = False       # hBond: fix to keep information about hBond restraints from CCPN 
         self.violCountLower = 0   # Total lower-bound violations over 0.1 A
         self.violCount1 = 0
         self.violCount3 = 0
@@ -3738,7 +3501,7 @@ class DistanceRestraintList(RestraintList):
             elif c == 3:
                 self.longRange.append(dr)
             #end if
-            if dr.isAmbiguous():
+            if dr.isAmbiguous(): 
                 self.ambiguous.append(dr)
         #end for
 
@@ -3768,7 +3531,7 @@ class DistanceRestraintList(RestraintList):
         TODO: check code with unit check.
         Checked by hand for entry 1cjg on 2012-04-23
         """
-        pairs = {} # Hashed by a sorted tuple of atom pairs. The value is a list of drs.
+        pairs = {} # Hashed by a sorted tuple of atom pairs. The value is a list of drs.        
         for dr in self:
             dr.atomPairs.sort() # improves matching for ambiguous restraints
             t = tuple(dr.atomPairs)
@@ -3815,7 +3578,7 @@ classes
 counts
   total all:          %4d (A)        All DRs
   singly defined      %4d (B)        DRs for which no other DR has the same set of atom pairs.
-  multiple atom pairs:%4d (F=A-B)
+  multiple atom pairs:%4d (F=A-B)    
   multiple defined    %4d (E=C-B)
   total unique:       %4d (C=A-D)    Count of the set of unique atom pairs.
   duplicates:         %4d (D=A-C)
@@ -4084,11 +3847,11 @@ class DihedralRestraint(Restraint):
 #                nTdebug("self.violations %s" % self.violations)
 
                 fv = math.fabs(vList[jSelected])
-                if fv > 1.0:
+                if fv > 1.0: 
                     self.violCount1 += 1
-                if fv > 3.0:
+                if fv > 3.0: 
                     self.violCount3 += 1
-                if fv > 5.0:
+                if fv > 5.0: 
                     self.violCount5 += 1
                 if fv > self.violMax:
                     self.violMax = fv
@@ -4168,15 +3931,15 @@ class DihedralRestraint(Restraint):
     #end def
 #end class
 
-# Too many ancestors (8/7) pylint: disable=R0901
+# Too many ancestors (8/7) pylint: disable=R0901 
 class DihedralRestraintList(RestraintList):
     'List of dihedral angle restraints.'
 #    export2cyana = exportDihedralRestraint2cyana
-
+    
     def __init__(self, name, status = 'keep'):
         RestraintList.__init__(self, name, status = status)
         self.__CLASS__ = ACL_LEVEL
-    #end def
+    #end def    
 
     def criticize(self, project, toFile = True):
         """
@@ -4393,7 +4156,7 @@ class RDCRestraint(DistanceRestraint):
     #end def
 #end class
 
-# Too many ancestors (8/7) pylint: disable=R0901
+# Too many ancestors (8/7) pylint: disable=R0901 
 class RDCRestraintList(RestraintList):
     """List of RDCRestraint"""
 
@@ -4425,7 +4188,7 @@ class RDCRestraintList(RestraintList):
                 modelCount = self[0].atomPairs[0][0].residue.chain.molecule.modelCount
         #end if
 
-        if not modelCount: # JFD notes eg reading $CINGROOT/data/Tests/ccpn/2hgh.tgz
+        if not modelCount: # JFD notes eg reading $CINGROOT/Tests/data/ccpn/2hgh.tgz
             nTerror('RDCRestraintList.analyze: "%s" modelCount 0', self.name)
             return (None, None, None, None, None)
         #end if
@@ -4565,10 +4328,43 @@ class History(NTlist):
     #end def
 
     format = __str__
+
+    def toXML(self, depth = 0, stream = sys.stdout, indent = '\t', lineEnd = '\n'):
+        nTindent(depth, stream, indent)
+        fprintf(stream, "<History>")
+        fprintf(stream, lineEnd)
+
+        for a in self:
+            nTtoXML(a, depth + 1, stream, indent, lineEnd)
+        #end for
+        nTindent(depth, stream, indent)
+        fprintf(stream, "</History>")
+        fprintf(stream, lineEnd)
+    #end def
 #end class
 
 
-#DEPRECIATED:
+class XMLHistoryHandler(XMLhandler):
+    """History handler class"""
+    def __init__(self):
+        XMLhandler.__init__(self, name = 'History')
+    #end def
+
+    def handle(self, node):
+        items = self.handleMultipleElements(node)
+        if items == None: 
+            return None
+        result = History()
+        for item in items:
+            result.append(item)
+        return result
+    #end def
+#end class
+
+#register this handler
+historyhandler = XMLHistoryHandler()
+
+
 def path(*args):
     """
     Return a path from arguments relative to cing root

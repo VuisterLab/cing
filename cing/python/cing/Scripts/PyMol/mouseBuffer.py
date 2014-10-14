@@ -7,7 +7,7 @@ from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.Libs.pdb import initPDB
 from cing.Scripts.PyMol.createProtein import reportsDir
 from cing.core.classes import Project
-from cing.constants import * #@UnusedWildImport
+from cing.core.constants import * #@UnusedWildImport
 import glob
 
 cing.verbosity = cing.verbosityDebug

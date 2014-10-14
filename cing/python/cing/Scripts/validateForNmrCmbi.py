@@ -4,7 +4,7 @@ from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.Scripts.doScriptOnEntryList import doScriptOnEntryList
 from cing.Scripts.validateEntry import ARCHIVE_TYPE_BY_ENTRY
 from cing.Scripts.validateEntry import PROJECT_TYPE_CYANA
-from cing.constants import * #@UnusedWildImport
+from cing.core.constants import * #@UnusedWildImport
 
 cing.verbosity = cing.verbosityDebug
 

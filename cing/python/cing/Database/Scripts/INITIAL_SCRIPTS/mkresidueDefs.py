@@ -1352,7 +1352,7 @@ for r in AwkLikeS( cyanaLib ):
             # temporarily store data from the dihedrals lines
             tmp2 = {}
             for i in range(0, ndihed):
-                r.next
+                r.next()
                 tmp2[r.dollar[2]] = [r.int(6), r.int(7), r.int(8), r.int(9)]
 
             # print '>>>', tmp2
@@ -1360,7 +1360,7 @@ for r in AwkLikeS( cyanaLib ):
             # temporarily store data from the atom lines
             tmp = {}
             for i in range(0, natom):
-                r.next
+                r.next()
                 idx = r.int(1)
                 aname = r.dollar[2]
                 tmp[idx] = (idx, aname, r.dollar[3], [r.int(9), r.int(10), r.int(11),r.int(12)], r.int(13) )

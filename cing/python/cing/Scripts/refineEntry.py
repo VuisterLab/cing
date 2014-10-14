@@ -3,7 +3,7 @@
 """
 Regular use: from nmr_redo.
 
-    verbosity
+    verbosity         
     inputDir             outputDir
     pdbConvention     restraintsConvention archiveType         projectType
     storeCING2db      ranges               filterTopViolations filterVasco
@@ -18,24 +18,23 @@ mkdir -p $D/NMR_REDO/data/$ch23/$x
 cd !$
 $C/python/cing/Scripts/refineEntry.py $x 9 file://$D/NRG-CING/data $D/NMR_REDO . . BY_CH23_BY_ENTRY CING 0 auto 0 0 0 >& $x"_ref".log &
 
-or as remote slave. NB the
+or as remote slave. NB the 
     input directory name will be postfixed with  (          entryCodeChar2and3, entryId)
     output directory name will be postfixed with (DATA_STR, entryCodeChar2and3, entryId)
 
-cd /home/i/tmp/cingTmp
+cd /home/i/tmp/cingTmp 
 $C/python/cing/Scripts/refineEntry.py $x 9 \
     http://nmr.cmbi.ru.nl/NRG-CING/data i@nmr.cmbi.ru.nl:/mnt/data/D/NMR_REDO \
     . . BY_CH23_BY_ENTRY CING 0 auto 0 0 1 >& $x"_ref".log &
 
 """
 
-import cing
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.Libs.network import * #@UnusedWildImport
 from cing.NRG import * #@UnusedWildImport
 from cing.NRG.settings import * #@UnusedWildImport
 from cing.Scripts.validateEntry import * #@UnusedWildImport
-from cing.constants import * #@UnusedWildImport
+from cing.core.constants import * #@UnusedWildImport
 
 
 def mainRefineEntry(entryId, *extraArgList):
@@ -43,7 +42,7 @@ def mainRefineEntry(entryId, *extraArgList):
     """
 
     fastestTest = 0 # DEFAULT: False
-    modelCountAnneal, bestAnneal, best = 200, 50, 25
+    modelCountAnneal, bestAnneal, best = 200, 50, 25    
     htmlOnly = False # default: False but enable it for faster runs without some actual data.
     doWhatif = True # disables whatif actual run
     doProcheck = True
@@ -56,7 +55,7 @@ def mainRefineEntry(entryId, *extraArgList):
 #    ranges = None
 
     if fastestTest:
-        modelCountAnneal, bestAnneal, best = 4, 3, 2
+        modelCountAnneal, bestAnneal, best = 4, 3, 2        
 #        modelCount = 2 # if this is more and there is only one model present it leads to an error message.
         htmlOnly = True
         doWhatif = False
@@ -68,8 +67,8 @@ def mainRefineEntry(entryId, *extraArgList):
     force_retrieve_input = True
 
 
-    nTmessage(cing.cingDefinitions.getHeaderString())
-    nTmessage(cing.systemDefinitions.getStartMessage())
+    nTmessage(header)
+    nTmessage(getStartMessage())
 
     # Sync below code with nrgCing#createToposTokens
     expectedArgumentList = """
@@ -147,9 +146,9 @@ def mainRefineEntry(entryId, *extraArgList):
     nTdebug("bestAnneal:           %s" % bestAnneal)
     nTdebug("best:                 %s" % best)
     nTdebug("isRemoteOutputDir:    %s" % isRemoteOutputDir)
-
+    
     # For NMR_REDO required as most efficient.
-    if singleCoreOperation:
+    if singleCoreOperation: 
         setToSingleCoreOperation()
     # end if
     ip = get_local_ip_address()
@@ -233,30 +232,30 @@ def mainRefineEntry(entryId, *extraArgList):
         return True
         # end if
     # end if
-
+    
     # Mutate LYSx to LYS and ARGx to ARG residues
     if len(project.molecule.residuesWithProperties('LYSx')) > 0:
         nTdebug("%d LYSx residues will be mutated to LYS",len(project.molecule.residuesWithProperties('LYSx')))
         for res in project.molecule.residuesWithProperties('LYSx'):
             res.mutate('LYS')
         # end for
-    # end if
+    # end if    
     if len(project.molecule.residuesWithProperties('ARGx')) > 0:
         nTdebug("%d ARGx residues will be mutated to ARG",len(project.molecule.residuesWithProperties('ARGx')))
         for res in project.molecule.residuesWithProperties('ARGx'):
             res.mutate('ARG')
         # end for
-    # end if
+    # end if   
     project.save()
 
 
 
 ####> MAIN UTILITY HERE
-    if project.fullRedo(modelCountAnneal = modelCountAnneal, bestAnneal = bestAnneal, best = best):
+    if project.fullRedo(modelCountAnneal = modelCountAnneal, bestAnneal = bestAnneal, best = best):  
         nTerror("Failed fullAnnealAndRefine.")
-
+        
         # Store the unfinished results
-        # We don't need a time stamp because we are interested
+        # We don't need a time stamp because we are interested 
         # in the most recent unfinished (failed) run
         directoryNameCing = entryId + ".cing"
         startFileNameCing = directoryNameCing + ".tgz"
@@ -269,8 +268,8 @@ def mainRefineEntry(entryId, *extraArgList):
             pass
         # end if/else
         return True
-
-
+          
+    
     if ranges != None:
         project.molecule.setRanges(ranges)
     project.molecule.superpose(ranges=ranges)
@@ -282,9 +281,9 @@ def mainRefineEntry(entryId, *extraArgList):
         nTerror("Failed to validate project read")
         return True
     # end if filterVasco
-
-    # Write a single PDB file containing all models
-    # according to IUPAC conventions
+    
+    # Write a single PDB file containing all models 
+    # according to IUPAC conventions 
     project.export2PDB()
 
     project.save()
@@ -352,4 +351,4 @@ if __name__ == "__main__":
     try:
         status = mainRefineEntry(*sys.argv[1:])
     finally:
-        nTmessage(cing.systemDefinitions.getStopMessage())
+        nTmessage(getStopMessage(cing.starttime))

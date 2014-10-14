@@ -8,7 +8,7 @@ from cing import cingDirTmp
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.PluginCode.required.reqYasara import YASARA_STR
 from cing.core.classes import Project
-from cing.constants import * #@UnusedWildImport
+from cing.core.constants import * #@UnusedWildImport
 from nose.plugins.skip import SkipTest
 from unittest import TestCase
 import unittest

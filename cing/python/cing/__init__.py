@@ -14,113 +14,127 @@ Talos                   Contains the Talos data.
 Files:
 
 CONTENTS.txt            File with directory and file description.
-constants.py            File with constants definitions
-definitions.py          File with cing and system definitions
-localConstants.py       Settings that can be imported from python/cing/definitions.py
+localConstants.py       Settings that can be imported from python/cing/__init__.py
                         NB this file is absent from svn. An example can be adapted
+                        from: scripts/cing/localSettingsExample.py
 main.py                 The CING program.
 setupCing.py            Run to set up environment variables and check installation.
 valSets.cfg             Validation settings. Might be moved around.
 
 """
-#-----------------------------------------------------------------------------
-# Imports
-#-----------------------------------------------------------------------------
-
-#import os
 #import sys
+#print sys.path
 
-#import cing.Libs.helper as helper
-#import cing.Libs.disk as disk
-from cing import constants
-import cing.definitions as cdefs
+#try:
+#    import nose
+#except:
+#    print "No nose: that's strange, everyone has to semll something"
 
-#-----------------------------------------------------------------------------
-# pydoc settings
-#-----------------------------------------------------------------------------
-__version__         = cdefs.__version__
-__revision__        = '$Revision$'
-__date__            = '$Date$'
-__copyright_years__ = cdefs.__copyright_years__
-__author__          = '$Author$'
-__copyright__       = cdefs.__copyright__
-__credits__         = cdefs.__credits__
 
-#-----------------------------------------------------------------------------
-# Verbosity
-#-----------------------------------------------------------------------------
-verbosityNothing    = cdefs.verbosityNothing # Even errors will be suppressed
-verbosityError      = cdefs.verbosityError   # show only errors
-verbosityWarning    = cdefs.verbosityWarning # show errors and warnings
-verbosityOutput     = cdefs.verbosityOutput  # and regular output DEFAULT
-verbosityDetail     = cdefs.verbosityDetail  # show more details
-verbosityDebug      = cdefs.verbosityDebug   # add debugging info (not recommended for casual user)
-verbosityDefault    = cdefs.verbosityDefault
-from cing.definitions import verbosity
+from cing.Libs.helper import *
 
-#-----------------------------------------------------------------------------
-# System and cing definitions
-#-----------------------------------------------------------------------------
-from cing.definitions import systemDefinitions
-from cing.definitions import cingDefinitions
-from cing.definitions import cingPaths
-from cing.definitions import directories
+programName     = 'CING'
+# Version number is a float. Watch out, version 0.100 will be older than 0.99; nope, version 0.100 is long behind us !! (GWV)
+cingVersion     = 0.95
+cingRevision    = getSvnRevision()
 
-#-----------------------------------------------------------------------------
-# create tmp directory
-#-----------------------------------------------------------------------------
-#
-if cingDefinitions.tmpdir.exists():
-    if cingDefinitions.tmpdir.isdir():
-        cingDefinitions.tmpdir.rmdir()
-    else:
-        cingDefinitions.tmpdir.remove()
-#end if
-try:
-    cingDefinitions.tmpdir.makedirs()
-except:
-    print("ERROR: Failed to create a temporary directory for %s at: %s" % (cingDefinitions.programName,cingDefinitions.tmpdir) )
-    sys.exit(1)
 
-#-----------------------------------------------------------------------------
-###### legacy definitions
-#-----------------------------------------------------------------------------
-#starttime              = systemDefinitions.startTime
-#osType                 = systemDefinitions.osType
-ncpus                  = systemDefinitions.nCPU # use all if not specified by -c flag to main cing program.
-internetConnected      = systemDefinitions.internetConnected # Can be reset later when internet is up again
 
-programName            = cingDefinitions.programName
-cingVersion            = cingDefinitions.version
-versionStr             = cingDefinitions.getVersionString()
-cingRevision           = cingDefinitions.revision
-cingRevisionUrl        = cingDefinitions.revisionUrl
-issueListUrl           = cingDefinitions.issueUrl
-authorList             = cingDefinitions.authors
+__version__     = cingVersion # for pydoc
+#__date__        = '31 January 2011' # TODO: make this live.
+__date__        = '1 February 2013'
+__copyright_years__ = '2004-' + __date__.split()[-1] # Never have to update this again...
 
+authorList      = [  ('Geerten W. Vuister',          'g.vuister@science.ru.nl'),
+                     ('Jurgen F. Doreleijers',       'jurgend@cmbi.ru.nl'),
+                     ('Alan Wilter Sousa da Silva',  'alanwilter@gmail.com'),
+                  ]
+__author__      = '' # for pydoc
+for _a in authorList:
+    __author__ = __author__ + _a[0] + ' (' + _a[1] + ')    '
+__copyright__  = "Copyright (c) %s Protein Biophysics (IMM)/CMBI, Radboud University Nijmegen, The Netherlands"
+__credits__    = """More info at http://nmr.cmbi.ru.nl/CING
+
+""" + __copyright__ # TODO: misusing credits for pydoc
+
+versionStr = "%s" % cingVersion
+cingRevisionUrl = "http://code.google.com/p/cing/source/detail?r="
+if cingRevision:
+    versionStr += " (r%d)" % cingRevision
+
+header = \
+"======================================================================================================\n" +\
+"| CING: Common Interface for NMR structure Generation version %-17s AW,JFD,GWV %s |\n" % (versionStr, __copyright_years__) +\
+"======================================================================================================"
+
+issueListUrl = 'http://code.google.com/p/cing/issues/detail?id='
+
+# Verbosity settings: How much text is printed to stdout/stderr streams
+# Follows exact same int codes as Wattos.
+# Reference to it as cing.verbosity if you want to see non-default behavior
+verbosityNothing  = 0 # Even errors will be suppressed
+verbosityError    = 1 # show only errors
+verbosityWarning  = 2 # show errors and warnings
+verbosityOutput   = 3 # and regular output DEFAULT
+verbosityDetail   = 4 # show more details
+verbosityDebug    = 9 # add debugging info (not recommended for casual user)
+
+verbosityDefault  = verbosityOutput
+verbosity         = verbosityDefault
+#verbosity         = verbosityDebug # disable when done debugging e.g. importPlugin.py
+
+#- configure local settings:
+#    Create a file localConstants parallel to the setupCing.py file and add definitions that
+#    get imported from the parallel __init__.py code. Just one setting at the moment.
+NaNstring = "." # default if not set in localConstants. @UnusedVariable
+# When specified differently it should also be reflected in some dictionaries
+# so better not.
+
+
+osType = getOsType()
+ncpus = detectCPUs() # use all if not specified by -c flag to main cing program.
+
+# Can be reset later when internet is up again
+internetConnected = isInternetConnected()
+#if verbosity >= verbosityOutput:
+#  sys.stdout.write(header)
+
+######################################################################################################
 # This code is repeated in __init__.py and setupCing.py please keep it sync-ed
-cingPythonCingDir      = cingDefinitions.codePath  # os.path.split(__file__)[0]
+cingPythonCingDir = os.path.split(__file__)[0]
 # The path to add to your PYTHONPATH thru the settings script generated by cing.core.setupCing.py
-cingPythonDir          = cingDefinitions.codePath[:-1]  # os.path.split(cingPythonCingDir)[0]
+cingPythonDir = os.path.split(cingPythonCingDir)[0]
 # Now a very important variable used through out the code. Even though the
 # environment variable CINGROOT is defined the same this is the preferred
-# source for the info within the CING python code.
-cingRoot               = cingDefinitions.rootPath # os.path.split(cingPythonDir)[0]
+# source for the info within the CING python code. GWV does not understand why. JFD: because it is
+# nice to have a cached version instead of having to query the os.
+cingRoot = os.path.split(cingPythonDir)[0]
+#nTdebug("cingRoot        : " + cingRoot)
+######################################################################################################
+cingDirTests           = os.path.join(cingRoot,         "Tests")
+cingDirMolmolScripts   = os.path.join(cingRoot,         "scripts", "molmol")
+cingDirTestsData       = os.path.join(cingDirTests,     "data")
+cingDirScripts         = os.path.join(cingPythonCingDir,"Scripts")
+cingDirLibs            = os.path.join(cingPythonCingDir,"Libs")
+cingDirData            = os.path.join(cingRoot,         "data")
+cingDirTmp             = os.path.join("/tmp" , "cing")
 
-cingDirTests           = cingRoot / "Tests"
-cingDirMolmolScripts   = cingRoot / "scripts"  / "molmol"
-cingDirTestsData       = cingRoot / "data" / "Tests"
-cingDirScripts         = cingPythonCingDir / "Scripts"
-cingDirLibs            = cingPythonCingDir / "Libs"
-cingDirData            = cingRoot / "data"
-cingDirTmp             = cingDefinitions.tmpdir
+# The TMPDIR environment variable will override the default above but not the one that
+# might be defined in localConstants.py.
+try:
+    from cing.localConstants import cingDirTmp #@UnresolvedImport # pylint: disable=E0611
+except:
+    if os.environ.has_key("TMPDIR"):
+        cingDirTmp = os.path.join(os.environ["TMPDIR"] , "cing")
+# end if
 
-NaNstring              = constants.NaNstring
+if not os.path.exists(cingDirTmp):
+#    print("DEBUG: Creating a temporary dir for cing: [%s]" % cingDirTmp)
+    if os.mkdir(cingDirTmp):
+        print("ERROR: Failed to create a temporary dir for cing at: " + cingDirTmp)
+        sys.exit(1)
 
-#-----------------------------------------------------------------------------
-###### end legacy definitions
-#-----------------------------------------------------------------------------
-
+starttime = time.time()
 
 #---------------------------------------------------------------------------------------------
 # Define toplevel CING api
@@ -129,12 +143,10 @@ NaNstring              = constants.NaNstring
 # track imports well if not correct.
 #---------------------------------------------------------------------------------------------
 
-from cing.Libs.NTutils      import *               #TODO: ugly, need to be explicit
+from cing.Libs.NTutils      import *
 from cing.Libs.AwkLike      import AwkLike
-from cing.Libs.Adict        import Adict
-from cing.Libs              import io
 
-plugins = Adict() # Filled  later-on
+from cing.core.constants    import *
 
 from cing.core.classes      import Project
 from cing.core.classes      import Peak,              PeakList
@@ -146,49 +158,25 @@ from cing.core.classes      import RDCRestraint,      RDCRestraintList
 # functional imports: Order matters!
 #---------------------------------------------------------------------------------------------
 
-# Molecule
-from cing.core.molecule     import *             #TODO: ugly, need to be explicit
+# Try a Yasara import
+# GV: We could change this by defining yasaradir in the CING setup
+try:
+    from yasara import yasaradir #@UnresolvedImport # JFD: why not add the functionality from the plugin ?
+    if os.path.exists(yasaradir):
+        sys.path.append(os.path.join(yasaradir,'pym'))
+        sys.path.append(os.path.join(yasaradir,'plg'))
+    else:
+        nTcodeerror('Yasara directory "%s" as defined in yasara.py module not found', yasaradir)
+        exit(1)
+except:
+    yasaradir = None
+#end try
 
-# Plugins
-from cing.core.importPlugin import importPlugins
-importPlugins()                                  # This imports all plugins
+from cing.core.molecule     import *
+from cing.core.importPlugin import importPlugin # This imports all plugins
+from cing.core.sml          import obj2SML      # This also initializes the SMLhandler methods
+from cing.core.sml          import sML2obj      # This also initializes the SMLhandler methods
 
-# SML
-from cing.core.sml          import obj2sml       # This also initializes the SMLhandler methods
-from cing.core.sml          import sml2obj       # This also initializes the SMLhandler methods
 
-# database
 from cing.core.database     import NTdb #@Reimport
 NTdb._restoreFromSML()                          # This initializes the database
-
-# json handlers
-__import__('cing.core.jsonHandlers')
-# xml handlers
-__import__('cing.core.xmlHandlers')
-
-#---------------------------------------------------------------------------------------------
-# convenience
-#---------------------------------------------------------------------------------------------
-from cing.main import getInfoMessage as gi
-from cing.Libs.io import formatDictItems as fd
-from cing.core.importPlugin import importPlugin
-
-# def openProject(name, status=constants.PROJECT_CREATE):
-#     """Top level convenience method to load a project
-#     return Project instance or None on error
-#     """
-#
-#     if status == constants.PROJECT_NEW or \
-#        status == constants.PROJECT_OLD or \
-#        status == constants.PROJECT_CREATE or \
-#        status == constants.PROJECT_NEWFROMCCPN or \
-#        status == constants.PROJECT_OLDFROMCCPN:
-#         project = Project.open(name, status)
-#         if project is None:
-#             io.error('openProject: opening {0} failed\n', name)
-#         return project
-#     else:
-#         io.error('openProject: invalid status {0}\n', status)
-#     #end if
-# #end def
-

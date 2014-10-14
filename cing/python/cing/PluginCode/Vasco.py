@@ -3,7 +3,7 @@ from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.PluginCode.required.reqCcpn import CCPN_STR
 from cing.PluginCode.required.reqVasco import * #@UnusedWildImport
 from cing.core.molecule import getAssignmentCountMapForResList
-from cing import plugins
+from cing.core.parameters import plugins
 from glob import glob
 
 
@@ -109,7 +109,7 @@ class Vasco(NTdict):
         vascoReferenceCheck.checkAllShiftLists()
 
         #vascoReferenceCheck.ccpnProject.saveModified()
-    # end def
+    # end def    
 # end class
 
 

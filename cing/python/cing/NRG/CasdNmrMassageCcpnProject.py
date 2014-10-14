@@ -16,7 +16,7 @@ from cing.Libs.disk import copy
 from cing.Libs.disk import globMultiplePatterns
 from cing.NRG import CASD_NMR_BASE_NAME
 from cing.NRG.PDBEntryLists import writeEntryListToFile
-from cing.constants import * #@UnusedWildImport
+from cing.core.constants import * #@UnusedWildImport
 from glob import glob1
 import tarfile, json
 

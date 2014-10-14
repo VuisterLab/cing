@@ -121,33 +121,33 @@ project.mergeResonances( status='reduce'  )
 == Generating a peak file from shifts ==
 project.listPredefinedExperiments() # list all predefined experiments
 peaks = project.generatePeaks('hncaha','HN:HA:N')
+format(peaks)
 
 == Print list of parameters:
     formatall( project.molecule.A.residues[0].procheck ) # Adjust for your mols
     formatall( project.molecule.A.VAL171.C )
 """
 #==============================================================================
-import cing
-import cing.constants as constants
-import cing.definitions as cdefs
-#from cing import __author__ #@UnusedImport
-#from cing import __copyright__ #@UnusedImport
-#from cing import __credits__ #@UnusedImport
-#from cing import __date__ #@UnusedImport
-#from cing import __version__ #@UnusedImport
+from cing import __author__ #@UnusedImport
+from cing import __copyright__ #@UnusedImport
+from cing import __credits__ #@UnusedImport
+from cing import __date__ #@UnusedImport
+from cing import __version__ #@UnusedImport
 from cing import cingDirTmp
 from cing import cingPythonCingDir
 from cing import cingPythonDir
 from cing import cingVersion
-from cing.Libs import io
+from cing import header
+from cing import starttime
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.Libs.disk import rmdir
 from cing.Libs.forkoff import ForkOff
 from cing.Libs.helper import * #@UnusedWildImport
 from cing.core.classes import Project
 from cing.core.molecule import Molecule
-from cing.definitions import cingPaths
-from cing import plugins
+from cing.core.parameters import cingPaths
+from cing.core.parameters import osType
+from cing.core.parameters import plugins
 from cing.core.sml import SMLversion
 from nose.plugins.skip import SkipTest # Dependency on nose can be removed in python 2.7 or later when UnitTest has similar functionality.
 import commands
@@ -158,9 +158,13 @@ import webbrowser
 # Support routines
 #------------------------------------------------------------------------------------
 
-#DEPRECIATED: use python format strings instead
 def pformat( obj ):
     'Convenience method.'
+#$%^%^&&*(()
+#
+# JURGEN: do NOT touch this routine! Only for interactive usage
+#
+#%%^$&*$($()
 #    print '>>', obj
     if hasattr(obj,'format'):
         print obj.format()
@@ -169,9 +173,13 @@ def pformat( obj ):
     #end if
 #end def
 
-#DEPRECIATED: use python format strings instead
 def pformatall( obj, *args, **kwds ):
     'Convenience method.'
+#$%^%^&&*(()
+#
+# JURGEN: do NOT touch this routine! Only for interactive usage
+#
+#%%^$&*$($()
 #    print '>>', obj
     if hasattr(obj,'formatAll'):
         print obj.formatAll(*args, **kwds)
@@ -180,17 +188,34 @@ def pformatall( obj, *args, **kwds ):
     #end if
 #end def
 
-#OBSOLETE: conflict with python format functions
-#def format(obj): # pylint: disable=W0622
-#    """Returns the formatted object representation"""
-##    print '>>', obj
-#    if hasattr(obj, 'format'):
-#        return obj.format()
-#    return  "%s" % obj
-##end def
+def format(obj): # pylint: disable=W0622
+    """Returns the formatted object representation"""
+#    print '>>', obj
+    if hasattr(obj, 'format'):
+        return obj.format()
+    return  "%s" % obj
+#end def
 
-def pfd( object ):
-    print io.formatDictItems( object )
+def getInfoMessage():
+    'Returns information about CING internals. Depreciated: use start message instead.'
+    return sprintf(
+"""
+Version:           %.3f
+Revision:          %s (%s)
+Date:              %s
+Database:          %s
+SML:               %.3f
+
+CING root:         %s
+CING tmp:          %s
+
+Default verbosity: %d
+""",
+     cing.cingVersion, cing.cingRevision, cing.cingRevisionUrl+str(cing.cingRevision),
+     cing.__date__, cing.INTERNAL,  SMLversion,
+     cing.cingRoot, cing.cingDirTmp,
+     cing.verbosityDefault
+    )
 
 def verbosity(value):
     """Set CING verbosity
@@ -202,7 +227,6 @@ def verbosity(value):
 #end def
 
 
-#DEPRECIATED: use python format strings instead
 def formatall(obj):
     """Returns the formatted obj representation"""
     result = ""
@@ -222,26 +246,6 @@ def formatall(obj):
         return result
     return format(obj)
 #end def
-
-def getInfoMessage():
-    """Get all the info there is to get
-    """
-    l = max(map(len, cdefs.cingDefinitions.keys()+cdefs.systemDefinitions.keys()+cing.plugins.keys()))
-    fmt = '{key:%s} : {value}\n' % l
-    fmt2 = '{key:%s} : {value.module}\n' % l
-    #print '>>', fmt, fmt2
-
-    result = '-'*100 +'\n'
-    result += '--- cingDefinitions ---\n'
-    result += cdefs.cingDefinitions.formatItems(fmt)
-    result += '--- systemDefinitions ---\n'
-    result += cdefs.systemDefinitions.formatItems(fmt)
-    result += '--- Plugins ---\n'
-    result += cing.plugins.formatItems(fmt2)
-    result += '-'*100
-    return result
-#end def
-
 
 args = []
 kwds = {}
@@ -285,7 +289,7 @@ def testQuiet():
     fn = 'cingTest.log'
     nTmessage("\nStarting quiet test in %s logged to %s\n" % (cingDirTmp, fn))
     os.chdir(cingDirTmp)
-    resultStatus = False
+    resultStatus = False 
     cmdCingTest = 'python -u $CINGROOT/python/cing/main.py --test -c %d -v 0 > %s 2>&1' % ( cing.ncpus, fn )
 #    nTmessage("In cing.main doing [%s]" % cmdCingTest)
     status, content = commands.getstatusoutput(cmdCingTest)
@@ -295,7 +299,7 @@ def testQuiet():
     else:
         nTmessage("Finished CING test\n")
     # end if
-    if content:
+    if content:        
         nTerror("Unexpected output: [%s]" % content)
         resultStatus = True
     # end if
@@ -335,20 +339,20 @@ def doPylintOverallSummary(pylintFileName='pylint.txt'):
         if line.count("GtkWarning") or line.count("_gtk.Warning"):
             nTdebug("Ignoring warnings from Gtk that have to do with running headless:\n%s" % line)
             continue
-        # Match the message id with a starting bracket
+        # Match the message id with a starting bracket 
         # an alpha
-        # a 4 digit number
+        # a 4 digit number 
         match_msg_id = re.search(r'\[([EWICRF][0-9]{4})', line, 0)
         if not match_msg_id:
             nTwarning( "Failed to find message id from line: %s" % line )
             continue
         msg_id = match_msg_id.group(1)
         pylintMsgCountMap.increaseCount(msg_id, 1)
-    # end for
+    # end for        
     nTmessage("pylint message types counts:\n%s" % (pylintMsgCountMap.toString()))
 #    nTmessage('pylint message types overall count: %s' % len(pylintMsgHash.keys()))
 #end def
-
+    
 def doPylintOverall(pylintFileName='pylint.txt'):
     "Add the ones you don't want to pylint (perhaps you know they don't work yet)"
     namepattern = "*.py"
@@ -359,7 +363,7 @@ def doPylintOverall(pylintFileName='pylint.txt'):
     mkdirs( pylintDir )
     if os.path.exists( pylintFileName ):
         os.unlink(pylintFileName)
-    excludedModuleList = [
+    excludedModuleList = [ 
                             # enable exclusions for quick testing.
 #                           cingPythonDir + "/cing/core*",
 #                           cingPythonDir + "/cing/Database*",
@@ -388,7 +392,7 @@ def doPylintOverall(pylintFileName='pylint.txt'):
     f = ForkOff(
             processes_max=cing.ncpus,
             max_time_to_wait=600, # on a very slow setup
-            verbosity=2
+            verbosity=2            
             )
     job_list = []
     for name in nameList:
@@ -401,7 +405,7 @@ def doPylintOverall(pylintFileName='pylint.txt'):
         if mod_name in excludedModuleList:
             print "Skipping module:  " + mod_name
             return
-        pylintOutputFileName = os.path.join( pylintDir, mod_name + '.log')
+        pylintOutputFileName = os.path.join( pylintDir, mod_name + '.log')        
         if not os.path.exists( pylintDir ):
             nTerror("Failed to find pylint output: " + pylintOutputFileName)
             continue
@@ -417,7 +421,7 @@ def testOverall(namepattern):
     'Use silent testing from top level.'
 #    cing.verbosity = verbosityError
     # Add the ones you don't want to test (perhaps you know they don't work yet)
-    excludedModuleList = [
+    excludedModuleList = [ 
 #                           cingPythonDir + "/Cython*",
                            cingPythonDir + "/cyana2cing*",
 #                           cingPythonDir + "/cing.PluginCode",
@@ -470,14 +474,14 @@ def testByName(name, excludedModuleList):
 
     try:
         exec("import %s" % (mod_name))
-        exec("suite = unittest.defaultTestLoader.loadTestsFromModule(%s)" % mod_name)
+        exec("suite = unittest.defaultTestLoader.loadTestsFromModule(%s)" % (mod_name))
         testVerbosity = 2
         unittest.TextTestRunner(verbosity=testVerbosity).run(suite) #@UndefinedVariable
         nTmessage('\n\n\n')
     except ImportWarning, extraInfo:
         nTmessage("Skipping test report of an optional compound (please recode to use SkipTest): %s" % extraInfo)
     except SkipTest, extraInfo:
-        nTmessage("Skipping test report of an optional compound: %s" % extraInfo)
+        nTmessage("Skipping test report of an optional compound: %s" % extraInfo)    
     except ImportError, extraInfo:
         nTmessage("Skipping test report of an optional module: %s" % mod_name)
 
@@ -512,11 +516,11 @@ def doPylintByName(name, excludedModuleList):
         nTmessage("Pylint found some flaws or crashed for " + mod_name)
     else:
 #        nTdebug("pylint was flawless for " + mod_name)
-        pass
+        pass 
     if not os.path.exists(pylintOutputFileName):
         # Will be created even if pylint found messages or crashed.
         nTerror("Failed to find pylint result file: " + pylintOutputFileName)
-        return True
+        return True        
 # end def
 
 
@@ -565,6 +569,11 @@ def getParser():
                       help="NAME of the project (required)",
                       metavar="PROJECTNAME"
                      )
+#    parser.add_option("--gui",
+#                      action="store_true",
+#                      dest="gui",
+#                      help="Start graphical user interface"
+#                     )
     parser.add_option("--new",
                       action="store_true",
                       dest="new",
@@ -635,12 +644,12 @@ def getParser():
                       metavar="SCRIPTFILE"
                      )
     parser.add_option("--doPylint",
-                      dest="doPylint", default=None,
+                      dest="doPylint", default=None,                      
                       help="Do code analysis using pylint on those matching *.py excluding some.",
                       metavar="PYLINTFILE"
                      )
     parser.add_option("--doPylintsum",
-                      dest="doPylintsum", default=None,
+                      dest="doPylintsum", default=None,                      
                       help="Do summary code analysis on previous pylint run.",
                       metavar="PYLINTSUMFILE"
                      )
@@ -744,7 +753,7 @@ def startIpythonShell(
     elif iPythonVersionType == IPYTHON_VERSION_A:
         # The next import is missing in one OSX installation but is on all others.
         # The new way of doing this would be the below but that still fails on all OSX installs but the one above.
-        # from IPython.frontend.terminal.embed import InteractiveShellEmbed
+        # from IPython.frontend.terminal.embed import InteractiveShellEmbed 
         # The next method started to fail in 2012 see issue 329
         # pylint: disable=W0404
         # pylint: disable=E0611
@@ -752,26 +761,29 @@ def startIpythonShell(
         ipshell = IPShellEmbed(
                                ['-prompt_in1',in_template], # Fails to be set correctly on ipython version 0.11.
                                 banner=banner, exit_msg=exit_msg
-                              )
+                              )        
         ipshell()
     elif iPythonVersionType == IPYTHON_VERSION_B:
         # pylint: disable=W0404
         # pylint: disable=E0611
         from IPython.config.loader import Config  #@UnresolvedImport
         cfg = Config()
-        cfg.PromptManager.in_template =  in_template
+        cfg.PromptManager.in_template =  in_template 
         cfg.PromptManager.in2_template = in2_template
-        cfg.PromptManager.out_template = out_template
+        cfg.PromptManager.out_template = out_template                
         IPython.embed(config=cfg, banner1 =banner, exit_msg=exit_msg) #@UnresolvedImport # pylint: disable=E1101
     else:
         nTerror("Got unexpected value %s from getIpythonVersionType" % str(iPythonVersionType))
-    # end if
+    # end if 
 #end def
 
-
+  
 def main():
     'Main entry point for all CING functionality. Use --help for a list of all options.'
-    if not ( cing.systemDefinitions.osType == constants.OS_TYPE_MAC or cing.systemDefinitions.osType == constants.OS_TYPE_LINUX ):
+    #import sys
+    #print sys.path
+    if not ( osType == OS_TYPE_MAC or
+             osType == OS_TYPE_LINUX ):
         nTerror("CING only runs on mac or linux.")
         sys.exit(1)
 
@@ -793,21 +805,19 @@ def main():
 
     if options.ncpus > 0:
         cing.ncpus = options.ncpus
-        cing.systemDefinitions.nCPU = int(options.ncpus)
         nTdebug("Set the number of threads for cing to: %d" % cing.ncpus)
 
-    nTmessage(cing.cingDefinitions.getHeaderString())
-    nTmessage(cing.systemDefinitions.getStartMessage())
+    nTmessage(header)
+    nTmessage(getStartMessage(ncpus=cing.ncpus))
 
     nTdebug(getInfoMessage())
 
-#    _tmp = NTdict()
-#    _tmp2 = eval(str(options)) # options is not a dict, prints like a dict??
-#    _tmp.update(_tmp2)
-#    _tmp.keysformat()
-#    nTdebug('\noptions: %s', _tmp.format())
-#    nTdebug('args: %s\n', _args)
+    nTdebug('options: %s', options)
+    nTdebug('args: %s', _args)
 
+    # The weird location of this import is because we want it to be verbose.
+#    from cing.core.importPlugin import importPlugin # This imports all plugins    @UnusedImport
+    # JFD: already present in __init__.py.
 
     if options.test:
         if testOverall(namepattern="test_*.py"):
@@ -828,20 +838,20 @@ def main():
         # end if
         sys.exit(0)
     # end if
-
+    
     # Bug in pylint requires mention of: Unable to consider inline option %r pylint: disable=I0010
     if options.doPylint:
         if doPylintOverall(options.doPylint):
             sys.exit(1)
         sys.exit(0)
     # end if
-
+        
     if options.doPylintsum:
         if doPylintOverallSummary(options.doPylintsum):
             sys.exit(1)
         sys.exit(0)
     # end if
-
+        
     #------------------------------------------------------------------------------------
     # Extended documentation
     #------------------------------------------------------------------------------------
@@ -872,20 +882,16 @@ def main():
         parser.print_help(file=sys.stdout)
         print __doc__
 
-        print '-------------------------------------------------------------------------------'
-        print Molecule.__doc__
-
         print Project.__doc__
         for p in plugins.values():
-            if p.isInstalled and p.module != None:
-                nTmessage('-------------------------------------------------------------------------------\n' +
-                          'Plugin %s\n' +
-                          '-------------------------------------------------------------------------------\n%s\n',
-                          p.module.__file__, p.module.__doc__
-                          )
+            nTmessage('-------------------------------------------------------------------------------' +
+                       'Plugin %s\n' +
+                       '-------------------------------------------------------------------------------\n%s\n',
+                        p.module.__file__, p.module.__doc__
+                     )
         #end for
 
-        print '=============================================================================='
+        print Molecule.__doc__
         sys.exit(0)
     #end if
 
@@ -893,7 +899,6 @@ def main():
     # START
     #------------------------------------------------------------------------------------
 
-#OBSOLETE:
     # GUI
 #    if options.gui:
 #        import Tkinter
@@ -986,7 +991,7 @@ def main():
 
         # shortcuts
         p = project
-        mol = project.molecule #@UnusedVariable # pylint: disable=W0612
+        mol = project.molecule #@UnusedVariable # pylint: disable=W0612        
         m = project.molecule #@UnusedVariable # pylint: disable=W0612
 
 #        nTdebug("p.molecule.ranges: %s" % p.molecule.ranges)
@@ -1055,7 +1060,7 @@ def main():
         # Validate
         #------------------------------------------------------------------------------------
         if options.validate or options.validateFastest or options.validateCingOnly or options.validateImageLess:
-            project.validate(validateFastest = options.validateFastest, validateCingOnly = options.validateCingOnly,
+            project.validate(validateFastest = options.validateFastest, validateCingOnly = options.validateCingOnly, 
                              validateImageLess = options.validateImageLess)
         #end if
     # end if noProject
@@ -1081,7 +1086,6 @@ def main():
     if project and  options.export:
         project.export()
     #end if
-
     if project:
         project.close(save=not options.nosave)
     #end if
@@ -1091,4 +1095,4 @@ if __name__ == '__main__':
     try:
         main()
     finally:
-        nTmessage(cing.systemDefinitions.getStopMessage())
+        nTmessage(getStopMessage(starttime))

@@ -34,7 +34,7 @@ from cing.core.classes import DihedralRestraint
 from cing.core.classes import DihedralRestraintList
 from cing.core.classes import DistanceRestraint
 from cing.core.classes import DistanceRestraintList
-from cing.constants import * #@UnusedWildImport
+from cing.core.constants import * #@UnusedWildImport
 from cing.core.molecule import translateTopology
 from glob import glob
 from shutil import move
@@ -179,7 +179,7 @@ def exportDistanceRestraint2cyana( dr, upper=True, convention=CYANA2 ):
     if val == 0.0: # this will interfere with Cyana's def for ambiguous restraints
         val = 0.01
     #end if
-
+    
 
     for atm1,atm2 in dr.atomPairs:
         res1 = atm1.residue
@@ -247,9 +247,9 @@ def importUpl( project, uplFile, convention, lower = 0.0 ):
     Read Cyana upl file
     return a DistanceRestraintList or None on error
     """
-
+    
     #print 'Convention: ' + convention
-
+    
     maxErrorCount = 50
     errorCount = 0
 
@@ -374,7 +374,7 @@ atom stereo "HA1  HA2   519"   # GLY
                     count += 1
                     #print atm.nameTuple()
                     # Val, Ile methyls: Carbon implicit in CYANA defs
-                    if atm.residue.db.name in ['VAL', 'LEU'] and atm.isMethylProton():
+                    if atm.residue.db.name in ['VAL', 'LEU'] and atm.isMethylProton():        
                         heavy = atm.heavyAtom()
                         heavy.stereoAssigned = True
                         count += 1
@@ -418,18 +418,18 @@ def autoDetectCyanaConvention(pdbFile):
     'Returns None on error or CYANA or CYANA2'
 #    tmpProjectName = getRandomKey(size=10)
 #    switchOutput(False) # disable standard out.
-    countMap = CountMap()
+    countMap = CountMap()    
     countMap['HN'] = 0 # CYANA 1
     countMap['H'] = 0
     pdbRecords = PyMMLib.PDBFile(pdbFile)
     for _i,record in enumerate(pdbRecords):
         recordName = record._name.strip()
         if recordName != "ATOM":
-            continue
+            continue            
         # end if
         atmName = record.name.strip()
         if not (atmName == 'HN' or atmName == 'H'):
-            continue
+            continue 
         # end if
         countMap.increaseCount(atmName, 1)
     # end for
@@ -465,9 +465,9 @@ def cyana2cing( project, cyanaDirectory, convention=CYANA2, copy2sources=True, u
     Read the data from the cyanaDirectory and store in project.
     If useAllInDirectory is set than only but all the files in the directory will matched
     based on filename extension.
-    If autoDetectFormat is set and no convention is specified then the PDB file will be queried for
-    distinguishing CYANA from CYANA2.
-
+    If autoDetectFormat is set and no convention is specified then the PDB file will be queried for 
+    distinguishing CYANA from CYANA2.    
+     
     Return list of sources or None on error.
     """
 #    nTdebug("In %s found convention %s" % ( getCallerName(), convention))
@@ -490,20 +490,20 @@ def cyana2cing( project, cyanaDirectory, convention=CYANA2, copy2sources=True, u
             kwds[f] = kwds[f].split(',')
 #    nTdebug( '>>'+ repr(kwds) )
         #end if
-    #end for
+    #end for    
     mapExtension2KwdTuple = { # Nice to have an overview of the different types here.
         'pdb':   (0, 'pdbFile'),
         'seq':   (0, 'seqFile'),
         'prot':  (0, 'protFile'),
-        'stereo':(0, 'stereoFile'),
+        'stereo':(0, 'stereoFile'),        
         'peaks': (1, 'peakFiles'),
         'upl':   (1, 'uplFiles'),
-        'aco':   (1, 'acoFiles'),
+        'aco':   (1, 'acoFiles'),                        
     }
     if useAllInDirectory:
 #        nTdebug("Determining the input from filename extensions.")
         for extension in mapExtension2KwdTuple.keys():
-            pluralityIdx, keyWord = mapExtension2KwdTuple[extension]
+            pluralityIdx, keyWord = mapExtension2KwdTuple[extension]        
 #            nTdebug("Match found for keyword %s and extension %s." % (keyWord, extension))
             globPattern = cyanaDirectory + '/*.' + extension
             fileList = glob(globPattern)
@@ -525,15 +525,15 @@ def cyana2cing( project, cyanaDirectory, convention=CYANA2, copy2sources=True, u
                 kwds[keyWord] = fnBaseName
                 continue
             # end if
-            kwds[keyWord] = []
+            kwds[keyWord] = []        
             for fn in fileList:
                 fnBaseName = os.path.basename(fn).split('.')[0]
 #                nTdebug("Appending potentially plural %s to keyWord: %s" % (fnBaseName, keyWord))
                 kwds[keyWord].append(fnBaseName)
-            # end for
+            # end for        
         # end for
     # end if
-
+        
 #    nTdebug("In %s found convention %s" % ( getCallerName(), convention))
     if not convention:
         convention = CYANA2
@@ -553,7 +553,7 @@ def cyana2cing( project, cyanaDirectory, convention=CYANA2, copy2sources=True, u
     if not coordinateConvention:
         coordinateConvention = convention
     # end if
-
+   
     # look for pdb, initiate new Molecule instance.
     # This goes first so that peaks, upls and acos refer to this molecule
     if kwds['pdbFile']:
@@ -644,7 +644,7 @@ def initCyana(project, cyanaFolder, modelCount = None, convention=None, coordina
     if not os.path.exists( cyanaFolder ):
         nTerror('initCyana: cyanaFolder "%s" does not exist', cyanaFolder)
         return None
-    # end if
+    # end if    
     if os.path.isfile(cyanaFolder) and ( cyanaFolder.endswith(".tgz") or cyanaFolder.endswith(".tar.gz")):
         try: # If present the target will be removed so it doesn't need to be overwritten.
             rmtree(project.name)
@@ -670,11 +670,11 @@ def initCyana(project, cyanaFolder, modelCount = None, convention=None, coordina
                     cyanaRootDirectory = itar.name.replace("/", '')
                     if not cyanaRootDirectory:
                         nTerror("Skipping potential cyanaRootDirectory")
-                    # end if
-                # end if
-            # end if
+                    # end if            
+                # end if            
+            # end if            
         # end for
-        tar.close()
+        tar.close()        
         if not cyanaRootDirectory:
             # in python 2.6 tarfile class doesn't append '/' in root dir anymore
             # sorting by length and taking the shortest, likely the root dir.
@@ -685,7 +685,7 @@ def initCyana(project, cyanaFolder, modelCount = None, convention=None, coordina
                 nTerror("First listed directory after sorting: %s" % cyanaRootDirectory)
                 return None
             # end if
-        # end if
+        # end if                
         if cyanaRootDirectory != project.name:
             nTmessage("Moving Cyana directory from [%s] to [%s]" % (cyanaRootDirectory, project.name))
             move(cyanaRootDirectory, project.name)
@@ -700,9 +700,9 @@ def initCyana(project, cyanaFolder, modelCount = None, convention=None, coordina
         nTerror("cyanaFolder '%s' not not a directory", cyanaFolder)
         return None
     # end if
-    sourceList = cyana2cing( project, cyanaFolder,
-                             convention=convention, coordinateConvention=coordinateConvention,
-                             useAllInDirectory=True, autoDetectFormat=autoDetectFormat)
+    sourceList = cyana2cing( project, cyanaFolder, 
+                             convention=convention, coordinateConvention=coordinateConvention, 
+                             useAllInDirectory=True, autoDetectFormat=autoDetectFormat)    
     return sourceList
 # end def
 #-----------------------------------------------------------------------------

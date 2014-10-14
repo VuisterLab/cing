@@ -88,10 +88,7 @@ ________________________________________________________________________________
 from cing import cingPythonCingDir
 from cing.Libs.AwkLike import AwkLike
 from cing.Libs.NTutils import * #@UnusedWildImport
-from cing.constants import * #@UnusedWildImport
-
-import cing.Libs.xmlTools as xmlTools
-import cing.Libs.disk as disk
+from cing.core.constants import * #@UnusedWildImport
 
 
 DEFAULT_PSEUDO_ATOM_ID_UNDEFINED             = 0 # Not mandatory in dbTable.
@@ -231,7 +228,7 @@ class MolDef( NTtree ):
         """
         result = NTlist()
 
-        if len(properties) == 0:
+        if len(properties) == 0: 
             return result
         for res in self.residues:
             if res.hasProperties(*properties):
@@ -247,7 +244,7 @@ class MolDef( NTtree ):
         """
         result = NTlist()
 
-        if len(properties) == 0:
+        if len(properties) == 0: 
             return result
         for atm in self.allAtomDefs():
             if atm.hasProperties(*properties):
@@ -383,11 +380,11 @@ class ResidueDef( NTtree ):
                            shortName   = '_',
                            canBeModified = True,      # ResidueDef can be modified; i.e. AtomDefs added;
                                                       # set to False on import for  non-protein and non-nucleic CING definitions
-                           shouldBeSaved = True,
+                           shouldBeSaved = True,      
                            # ResidueDef requires saving with project; set to False on import for default CING definitions
                            comment     = None,
                            nameDict    = {INTERNAL_0:name, INTERNAL_1:name},
-                           atomDict    = {},
+                           atomDict    = {},          
                            # contains definition of atoms, sorted by convention, dynamically created on initialization
                            dihedrals   = NTlist(),
                            properties  = []           # list of properties for residue
@@ -525,7 +522,7 @@ class ResidueDef( NTtree ):
         if newName:
             return newName
 
-        nTwarning('ResidueDef.translate: Failed to find translation to "%s" for residue: %s; Using CING name "%s" instead.',
+        nTwarning('ResidueDef.translate: Failed to find translation to "%s" for residue: %s; Using CING name "%s" instead.', 
                   convention, self, self.name )
         return self.name
     #end def
@@ -582,7 +579,7 @@ class ResidueDef( NTtree ):
         # Set the entry residueDict of molDef to self
         residueDict = self.molDef.residueDict
         residueDict.setdefault( LOOSE, {} )
-        for n in [self.shortName, self.name, self.name.capitalize(), self.name.lower(), self.commonName, self.commonName.capitalize(),
+        for n in [self.shortName, self.name, self.name.capitalize(), self.name.lower(), self.commonName, self.commonName.capitalize(), 
                   self.commonName.lower()]:
             residueDict[LOOSE][n] = self
         #end for
@@ -686,7 +683,7 @@ def isAromatic( atmDef ):
         nTdebug("%s called without atom/residue definition." % getCallerName())
         return 0
 
-    if not atmDef.residueDef.hasProperties('aromatic'):
+    if not atmDef.residueDef.hasProperties('aromatic'): 
         return False
 
     if (isCarbon(atmDef) and atmDef.shift != None and atmDef.shift.average > 100.0):
@@ -694,7 +691,7 @@ def isAromatic( atmDef ):
     if (isNitrogen(atmDef) and atmDef.shift != None and atmDef.shift.average > 130.0):
         return True
     elif (isProton(atmDef)):
-        if len(atmDef.topology) == 0:
+        if len(atmDef.topology) == 0: 
             return False #bloody CYANA pseudo atomsof some residues like CA2P do not have a topology
         heavy = atmDef.residueDef[atmDef.topology[0][1]]
         return isAromatic( heavy )
@@ -747,7 +744,7 @@ def isMethyl( atmDef ):
         return (count == 3) # Methyls have three protons!
     elif isProton(atmDef):
         # should be attached to a heavy atom
-        if len(atmDef.topology) == 0:
+        if len(atmDef.topology) == 0: 
             return False #bloody CYANA pseudo atomsof some residues like CA2P do not have a topology
         heavy = atmDef.residueDef[atmDef.topology[0][1]]
         return isMethyl( heavy )
@@ -781,7 +778,7 @@ def isMethylene( atmDef ):
         return (count == 2) # Methylene's have two protons!
     elif isProton(atmDef):
         # should be attached to a heavy atom
-        if len(atmDef.topology) == 0:
+        if len(atmDef.topology) == 0: 
             return False #bloody CYANA pseudo atomsof some residues like CA2P do not have a topology
         heavy = atmDef.residueDef[atmDef.topology[0][1]]
         return isMethylene( heavy )
@@ -824,7 +821,7 @@ def isHeavy( atmDef ):
     """
     Return True for any atom that is not a proton or a pseudo.
     I.e. a pseudo of carbons (Leu QD) is not a 'heavy'.
-    Note the same code is in molecule.py
+    Note the same code is in molecule.py        
     """
     if isProton(atmDef):
         return False
@@ -896,7 +893,7 @@ class AtomDef( NTtree ):
 
                            hetatm      = False     # PDB HETATM type
                          )
-        self.properties = []       # List with properties
+        self.properties = []       # List with properties  
         self.update( kwds )
 
         self.__FORMAT__ = '=== %(name)s (%(convention)r) ===\n' +\
@@ -941,7 +938,7 @@ class AtomDef( NTtree ):
         newName = self.translate( convention )
         if newName:
             return newName
-        nTwarning('AtomDef.translateWithDefault: Failed to find translation to "%s" for atom: %s; Using CING name "%s" instead.',
+        nTwarning('AtomDef.translateWithDefault: Failed to find translation to "%s" for atom: %s; Using CING name "%s" instead.', 
                   convention, self, self.name )
         return self.name
     #end def
@@ -956,7 +953,7 @@ class AtomDef( NTtree ):
         """
         result = NTlist()
 
-        if len(properties) == 0:
+        if len(properties) == 0: 
             return result
         if self.hasProperties(*properties):
             result.append(self)
@@ -968,7 +965,7 @@ class AtomDef( NTtree ):
         """
         Returns True if AtomDef has properties, False otherwise
         """
-        if len(properties) == 0:
+        if len(properties) == 0: 
             return False
 
         for p in properties:
@@ -982,7 +979,7 @@ class AtomDef( NTtree ):
     def patchProperties(self):
         """Patch the properties list
         """
-        props = NTlist( self.name, self.residueDef.name, self.residueDef.commonName, self.residueDef.shortName,
+        props = NTlist( self.name, self.residueDef.name, self.residueDef.commonName, self.residueDef.shortName, 
                         self.spinType, *self.properties)
 
         # Append these defs so we will always have them. If they were already present, they will be removed again below.
@@ -1303,27 +1300,33 @@ def saveToSML( rDefList, rootPath, convention=INTERNAL ):
     Save ResidueDefs of rDefList as SML files in rootPath; optionally translate to convention
     """
     #print '>>', rootPath
+    fileList = NTlist()
     for rdef in rDefList:
         fname = rdef.translate(convention) +'.sml'
+        fileList.append(fname)
         path = os.path.join(rootPath, fname)
 #        nTdebug('saveToSML: saving %s to"%s"', rdef, path)
         #obj2SML( rdef, path, convention=convention) cannot use, because it will generate circular imports!
         rdef.SMLhandler.toFile( rdef, path, convention=convention )
     #end for
+    # save a content file
+    obj2XML( fileList,path=os.path.join(rootPath, 'content.xml') )
 #end def
 
 def restoreFromSML( rootPath, mDef, convention=INTERNAL ):
     """
     restore ResidueDefs from SML files in rootPath to a MolDef instance mDef
     """
-    path = disk.Path(str(rootPath))
-    if not path.exists():
-        nTerror('restoreFromSML: path "%s" not found', path)
+    path = os.path.join(rootPath, 'content.xml')
+    fileList = xML2obj( path=path )
+    if fileList == None:
+        nTerror('restoreFromSML: unable to open "%s"', path)
         return None
     #end if
-    for rfile in path.glob('*.sml'):
-#        nTdebug('restoreSML: restoring from "%s"', rfile)
-        mDef.appendResidueDefFromSMLfile(rfile)
+    for rfile in fileList:
+        path = os.path.join(rootPath, rfile)
+#        nTdebug('restoreSML: restoring from "%s"', path)
+        mDef.appendResidueDefFromSMLfile( path)
     #end for
 #end def
 
