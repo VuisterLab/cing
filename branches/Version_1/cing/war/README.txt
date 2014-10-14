@@ -1,1 +1,0 @@
-The redirection from index.html doesn't seem to stick well.
