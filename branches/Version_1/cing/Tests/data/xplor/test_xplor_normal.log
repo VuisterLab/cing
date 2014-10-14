@@ -1,0 +1,1166 @@
+		       Xplor-NIH version 2.27 
+ 
+ C.D. Schwieters, J.J.  Kuszewski,       Progr. NMR Spectr. 48, 47-62 (2006). 
+ N. Tjandra, and G.M. Clore              J. Magn. Res., 160, 66-74 (2003). 
+ http://nmr.cit.nih.gov/xplor-nih        based on X-PLOR 3.851 by A.T. Brunger 
+
+ User: jd           on: duvel.cmbi(darwin/x86    )  at: 06-May-11 14:32:22
+ X-PLOR> 
+ X-PLOR>{*==========================================================================*} 
+ X-PLOR>remarks  file  nmr/generate_template.inp 
+ X-PLOR>remarks  Generates a "template" coordinate set.  This produces 
+ X-PLOR>remarks  an arbitrary extended conformation with ideal geometry. 
+ X-PLOR>remarks  Author: Axel T. Brunger 
+ X-PLOR>{*==========================================================================*} 
+ X-PLOR> 
+ X-PLOR> 
+ X-PLOR>{*==========================================================================*} 
+ X-PLOR>{*=== READ THE PARAMETER AND TOPOLOGY FILES ================================*} 
+ X-PLOR>{*==========================================================================*} 
+ X-PLOR> 
+ X-PLOR>{* Non-bonded parameters; choice: "PROLSQ" "PARMALLH6" "PARALLHDG" "OPLSX"  *} 
+ X-PLOR>evaluate ( $par_nonbonded = "OPLSX" ) 
+ EVALUATE: symbol $PAR_NONBONDED set to "OPLSX" (string)
+ X-PLOR> 
+ X-PLOR>parameter 
+ PARRDR>  @2fwu.cing/Refine/annealed/Toppar/parallhdg5.3-merge.pro 
+ ASSFIL: file 2fwu.cing/Refine/annealed/Toppar/parallhdg5.3-merge.pro opened.
+ PARRDR>remark   file protein-allhdg-ucl.param  version UCL  date 07-JUL-01 
+ PARRDR>remark   for file protein-allhdg-ucl.top  version UCL  date 14-MAR-00 
+ PARRDR>remark   for file protein-allhdg-dih-ucl.top  version UCL  date 07-JUL-01 
+ PARRDR>remark   Geometric energy function parameters for distance geometry and 
+ PARRDR>remark   simulated annealing. 
+ PARRDR>remark   Original author: Michael Nilges, EMBL Heidelberg 
+ PARRDR>remark   Modifications: Mark A. Williams, UCL London 
+ PARRDR>remark   last modification: NBFIX for hydrogens in OPLSX nonbonded term. MN, 30-01-04 
+ PARRDR> 
+ PARRDR>set echo off message off end 
+ PARRDR>end 
+ X-PLOR> 
+ X-PLOR>parameter 
+ PARRDR>  @2fwu.cing/Refine/annealed/Toppar/par_axis_aria.pro 
+ PARRDR>remark parameter file for dipolar coupling calculations 
+ PARRDR>set message off echo off end 
+ PARRDR>end 
+ X-PLOR> 
+ X-PLOR>parameter 
+ PARRDR>  @2fwu.cing/Refine/annealed/Toppar/ion.param 
+ ASSFIL: file 2fwu.cing/Refine/annealed/Toppar/ion.param opened.
+ PARRDR>remarks file toppar/ion.param 
+ PARRDR>remarks nonbonded parameters for common ions 
+ PARRDR>remarks new parameters derived from literature for single atom species 
+ PARRDR>remarks PDA 02/09/99 
+ PARRDR> 
+ PARRDR>set echo=off end 
+ PARRDR>end 
+ X-PLOR> 
+ X-PLOR>topology 
+ RTFRDR>  @2fwu.cing/Refine/annealed/Toppar/topallhdg5.3-merge.pro 
+ ASSFIL: file 2fwu.cing/Refine/annealed/Toppar/topallhdg5.3-merge.pro opened.
+ RTFRDR>remark   file topallhdg.pro  version 5.3  date 23-Sept-02 
+ RTFRDR>remark      for file parallhdg.pro version 5.3 date 13-Feb-02 or later 
+ RTFRDR>remark   Geometric energy function parameters for distance geometry and 
+ RTFRDR>remark      simulated annealing. 
+ RTFRDR>remark   Author: Michael Nilges, EMBL Heidelberg; Institut Pasteur, Paris 
+ RTFRDR>remark   This file contains modifications from M. Williams, UCL London 
+ RTFRDR>remark   Last modification 16-Sept-02 
+ RTFRDR> 
+ RTFRDR>set echo off message off end 
+ RTFRDR>end 
+ X-PLOR>topology 
+ RTFRDR>  @2fwu.cing/Refine/annealed/Toppar/topallhdg5.3.sol 
+ RTFRDR>remarks  TOPH19.SOL 
+ RTFRDR>remarks  ========== 
+ RTFRDR>remarks  topology file for solvent molecules 
+ RTFRDR>remarks  water models available: TIP3P model 
+ RTFRDR> 
+ RTFRDR>set echo=false end 
+ RTFRDR>end 
+ X-PLOR>topology 
+ RTFRDR>  @2fwu.cing/Refine/annealed/Toppar/top_axis_aria.pro 
+ RTFRDR>remark topology file for dipolar coupling calculations 
+ RTFRDR>set message off echo off end 
+ RTFRDR>end 
+ X-PLOR>topology 
+ RTFRDR>  @2fwu.cing/Refine/annealed/Toppar/ion.top 
+ ASSFIL: file 2fwu.cing/Refine/annealed/Toppar/ion.top opened.
+ RTFRDR>remarks file toppar/ion.top 
+ RTFRDR>remarks topology and masses for common ions 
+ RTFRDR>remarks Dingle atom ion residues are given the name of the element. 
+ RTFRDR>remarks By default the atom will be uncharged (eg. the residue MG will 
+ RTFRDR>remarks contain the atom called MG with zero charge). 
+ RTFRDR>remarks To use the charged species the charge state is appended to 
+ RTFRDR>remarks the atom name (eg to use MG2+ the residue name is MG2, and the 
+ RTFRDR>remarks atom name is MG+2 and has charge +2.0). 
+ RTFRDR>remarks NOTE: not all ionic species are represented 
+ RTFRDR>remarks PDA 02/09/99 
+ RTFRDR> 
+ RTFRDR>set echo=false end 
+ RTFRDR>end 
+ X-PLOR> 
+ X-PLOR>structure @2fwu.cing/Refine/annealed/PSF/2fwu.psf end 
+ ASSFIL: file 2fwu.cing/Refine/annealed/PSF/2fwu.psf opened.
+ STRUcture>PSF 
+ REMARKS FILENAME="2fwu.cing/Refine/annealed/PSF/2fwu.psf"
+ REMARKS PDB file of molecule 2fwu
+ REMARKS DATE:06-May-11  14:32:22       created by user: jd
+ XPLOR: current counts (number in parenthesis is maximum)
+ NATOM=       2465(MAXA=        3200)  NBOND=       2484(MAXB=        3200)
+ NTHETA=      4501(MAXT=        6400)  NGRP=         157(MAXGRP=       200)
+ NPHI=        3849(MAXP=        6400)  NIMPHI=      1249(MAXIMP=      1600)  
+ NDON=         262(MAXPAD=       400)  NACC=         264(MAXPAD=       400)
+ NNB=         1044(MAXNB=       1600) 
+ STRUcture> end 
+ X-PLOR> 
+ X-PLOR> 
+ X-PLOR> 
+ X-PLOR>set seed 479917 end 
+ X-PLOR> 
+ X-PLOR>vector ident (x) ( all ) 
+ SELRPN:   2465 atoms have been selected out of   2465
+ X-PLOR>vector do (x=x/10.) ( all ) 
+ SELRPN:   2465 atoms have been selected out of   2465
+ X-PLOR>vector do (y=random(0.5) ) ( all ) 
+ SELRPN:   2465 atoms have been selected out of   2465
+ X-PLOR>vector do (z=random(0.5) ) ( all ) 
+ SELRPN:   2465 atoms have been selected out of   2465
+ X-PLOR> 
+ X-PLOR>vector do (fbeta=50) (all)                 {*Friction coefficient, in 1/ps.*} 
+ SELRPN:   2465 atoms have been selected out of   2465
+ X-PLOR>vector do (mass=100) (all)                         {*Heavy masses, in amus.*} 
+ SELRPN:   2465 atoms have been selected out of   2465
+ X-PLOR> 
+ X-PLOR>{* JFD note the above parameters are reset here *} 
+ X-PLOR>parameter 
+ PARRDR>   nbonds 
+ NBDSET>      cutnb=5.5 rcon=20. nbxmod=-2 repel=0.9  wmin=0.1 tolerance=1. 
+ NBDSET>      rexp=2 irexp=2 inhibit=0.25 
+ NBDSET>   end 
+ PARRDR>end 
+ X-PLOR> 
+ X-PLOR>{* Nill the scaling factor on the force applied to disulfide            *} 
+ X-PLOR>{* bonds and angles from 1000.0 to 100.0 in order to reduce computation instability *} 
+ X-PLOR>{* and keep the chain extended. *} 
+ X-PLOR>parameter 
+ PARRDR>      bonds ( name SG ) ( name SG ) 0. TOKEN 
+ SELRPN:      1 atoms have been selected out of   2465
+ SELRPN:      1 atoms have been selected out of   2465
+ PARRDR>      angle ( name CB ) ( name SG ) ( name SG ) 0. TOKEN 
+ SELRPN:    143 atoms have been selected out of   2465
+ SELRPN:      1 atoms have been selected out of   2465
+ SELRPN:      1 atoms have been selected out of   2465
+ PARRDR>end 
+ X-PLOR> 
+ X-PLOR>flags exclude * include bond angle vdw end 
+ X-PLOR> 
+ X-PLOR>minimize powell nstep=50  nprint=10 end 
+ POWELL: number of degrees of freedom=  7395
+ MAKINB: mode  -2 found   2484 exclusions,       0 interactions(1-4) and   2484 GB exclusions
+ %atoms "    -527 -ARG -HH12" and "    -528 -THR -CB  " only  0.08 A apart
+ %atoms "    -572 -SER -HN  " and "    -572 -SER -HB1 " only  0.03 A apart
+ %atoms "    -633 -ARG -HN  " and "    -633 -ARG -HB1 " only  0.09 A apart
+ %atoms "    -541 -THR -HA  " and "    -542 -ILE -N   " only  0.07 A apart
+ --------------- cycle=    10 ------ stepsize=    0.0001 -----------------------
+ | Etotal =0.13E+08   grad(E)=1956.251   E(BOND)=0.48E+07   E(ANGL)=0.14E+07   |
+ | E(VDW )=0.71E+07                                                            |
+ -------------------------------------------------------------------------------
+ %atoms "    -629 -ALA -HA  " and "    -630 -GLU -HN  " only  0.04 A apart
+ --------------- cycle=    20 ------ stepsize=    0.0002 -----------------------
+ | Etotal =0.45E+07   grad(E)=1005.991   E(BOND)=0.17E+07   E(ANGL)=690597.704 |
+ | E(VDW )=0.21E+07                                                            |
+ -------------------------------------------------------------------------------
+ --------------- cycle=    30 ------ stepsize=    0.0002 -----------------------
+ | Etotal =0.24E+07   grad(E)=518.586    E(BOND)=0.12E+07   E(ANGL)=370640.253 |
+ | E(VDW )=892216.091                                                          |
+ -------------------------------------------------------------------------------
+ --------------- cycle=    40 ------ stepsize=    0.0002 -----------------------
+ | Etotal =0.16E+07   grad(E)=397.355    E(BOND)=768969.765 E(ANGL)=253426.512 |
+ | E(VDW )=572685.612                                                          |
+ -------------------------------------------------------------------------------
+ --------------- cycle=    50 ------ stepsize=    0.0002 -----------------------
+ | Etotal =0.12E+07   grad(E)=293.713    E(BOND)=606242.882 E(ANGL)=192496.231 |
+ | E(VDW )=395596.032                                                          |
+ -------------------------------------------------------------------------------
+ POWELL: STEP number limit. Normal termination
+ POWELL: Current coordinates set to last minimum
+ X-PLOR> 
+ X-PLOR>flags include impr end 
+ X-PLOR> 
+ X-PLOR>minimize powell nstep=50 nprint=10 end 
+ POWELL: number of degrees of freedom=  7395
+ --------------- cycle=    10 ------ stepsize=    0.0000 -----------------------
+ | Etotal =0.19E+07   grad(E)=389.765    E(BOND)=623068.561 E(ANGL)=249380.843 |
+ | E(IMPR)=581067.162 E(VDW )=434841.180                                       |
+ -------------------------------------------------------------------------------
+ --------------- cycle=    20 ------ stepsize=    0.0000 -----------------------
+ | Etotal =0.16E+07   grad(E)=345.897    E(BOND)=557863.719 E(ANGL)=240921.995 |
+ | E(IMPR)=415684.600 E(VDW )=379755.715                                       |
+ -------------------------------------------------------------------------------
+ --------------- cycle=    30 ------ stepsize=    0.0001 -----------------------
+ | Etotal =0.14E+07   grad(E)=292.095    E(BOND)=524782.077 E(ANGL)=216543.465 |
+ | E(IMPR)=335868.970 E(VDW )=322606.435                                       |
+ -------------------------------------------------------------------------------
+ --------------- cycle=    40 ------ stepsize=    0.0000 -----------------------
+ | Etotal =0.13E+07   grad(E)=534.115    E(BOND)=478830.572 E(ANGL)=202221.506 |
+ | E(IMPR)=296135.983 E(VDW )=299874.580                                       |
+ -------------------------------------------------------------------------------
+ --------------- cycle=    50 ------ stepsize=    0.0001 -----------------------
+ | Etotal =0.12E+07   grad(E)=345.934    E(BOND)=448706.051 E(ANGL)=180696.587 |
+ | E(IMPR)=262531.690 E(VDW )=278816.581                                       |
+ -------------------------------------------------------------------------------
+ POWELL: STEP number limit. Normal termination
+ POWELL: Current coordinates set to last minimum
+ X-PLOR> 
+ X-PLOR>dynamics  verlet 
+ DYNAmics>   nstep=50  timestep=0.001 iasvel=maxwell  firsttemp= 300. 
+ DYNAmics>   tcoupling = true  tbath = 300.   nprint=50  iprfrq=0 
+ DYNAmics>end 
+ DYNAMC: number of degrees of freedom=    7395
+ ASSVEL: velocities assigned at    300.0000 K, SEED= 0.185493600E+10
+ ASSVEL: maxwell distribution
+ CENMAS: Information about center of free masses
+         position [A]          :    123.30000      0.49856      0.49613
+         velocity [A/ps]       :     -0.04384     -0.09740      0.04062
+         ang. mom. [amu A/ps]  :  42332.53106-372580.71893-175911.03326
+         kin. ener. [Kcal/mol] :      3.84653
+ ROTSTP: CM translation and rotation removed.
+ CENMAS: Information about center of free masses
+         position [A]          :    123.30000      0.49856      0.49613
+         velocity [A/ps]       :      0.00000      0.00000     -0.00000
+         ang. mom. [amu A/ps]  :     -0.00000      0.00000     -0.00000
+         kin. ener. [Kcal/mol] :      0.00000
+ --------------- 2-step Verlet initialization ----------------------------------
+ | E(kin)+E(total)=0.12E+07        E(kin)=2222.087      temperature=302.422    |
+ | Etotal =0.12E+07   grad(E)=345.934    E(BOND)=448706.051 E(ANGL)=180696.587 |
+ | E(IMPR)=262531.690 E(VDW )=278816.581                                       |
+ -------------------------------------------------------------------------------
+ --------------- step=    50 at      0.05000 ps --------------------------------
+ | E(kin)+E(total)=0.11E+07        E(kin)=34050.273     temperature=4634.179   |
+ | Etotal =0.10E+07   grad(E)=150.693    E(BOND)=415458.973 E(ANGL)=152051.769 |
+ | E(IMPR)=219461.276 E(VDW )=236472.619                                       |
+ -------------------------------------------------------------------------------
+ CENMAS: Information about center of free masses
+         position [A]          :    123.30000      0.49856      0.49613
+         velocity [A/ps]       :     -0.00000     -0.00000     -0.00000
+         ang. mom. [amu A/ps]  :     -0.00000      0.00000      0.00000
+         kin. ener. [Kcal/mol] :      0.00000
+ DCNTRL: current coordinates in X, Y, Z
+ DCNTRL: current velocities in VX, VY, VZ
+ X-PLOR> 
+ X-PLOR>parameter 
+ PARRDR>   nbonds 
+ NBDSET>      rcon=2. nbxmod=-3 repel=0.75 
+ NBDSET>   end 
+ PARRDR>end 
+ X-PLOR> 
+ X-PLOR>minimize powell nstep=100 nprint=25 end 
+ POWELL: number of degrees of freedom=  7395
+ MAKINB: mode  -3 found   6985 exclusions,       0 interactions(1-4) and   6985 GB exclusions
+ --------------- cycle=    25 ------ stepsize=   -0.0000 -----------------------
+ | Etotal =257856.949 grad(E)=223.281    E(BOND)=43110.615  E(ANGL)=116882.539 |
+ | E(IMPR)=86307.583  E(VDW )=11556.212                                        |
+ -------------------------------------------------------------------------------
+ --------------- cycle=    50 ------ stepsize=   -0.0000 -----------------------
+ | Etotal =98428.535  grad(E)=107.797    E(BOND)=11588.442  E(ANGL)=47885.706  |
+ | E(IMPR)=28381.875  E(VDW )=10572.511                                        |
+ -------------------------------------------------------------------------------
+ --------------- cycle=    75 ------ stepsize=    0.0001 -----------------------
+ | Etotal =55574.363  grad(E)=55.360     E(BOND)=5235.546   E(ANGL)=25344.301  |
+ | E(IMPR)=17285.800  E(VDW )=7708.717                                         |
+ -------------------------------------------------------------------------------
+ --------------- cycle=   100 ------ stepsize=    0.0000 -----------------------
+ | Etotal =37776.350  grad(E)=45.121     E(BOND)=2563.999   E(ANGL)=17253.569  |
+ | E(IMPR)=11057.621  E(VDW )=6901.161                                         |
+ -------------------------------------------------------------------------------
+ POWELL: STEP number limit. Normal termination
+ POWELL: Current coordinates set to last minimum
+ X-PLOR> 
+ X-PLOR>dynamics  verlet 
+ DYNAmics>   nstep=500  timestep=0.005 iasvel=maxwell  firsttemp= 300. 
+ DYNAmics>   tcoupling = true  tbath = 300.   nprint=100  iprfrq=0 
+ DYNAmics>end 
+ DYNAMC: number of degrees of freedom=    7395
+ ASSVEL: velocities assigned at    300.0000 K, SEED= 0.127068182E+10
+ ASSVEL: maxwell distribution
+ CENMAS: Information about center of free masses
+         position [A]          :    123.30000      0.49856      0.49613
+         velocity [A/ps]       :      0.01565     -0.01611     -0.02811
+         ang. mom. [amu A/ps]  : -12473.49343-274635.54529 295473.54917
+         kin. ener. [Kcal/mol] :      0.38142
+ ROTSTP: CM translation and rotation removed.
+ CENMAS: Information about center of free masses
+         position [A]          :    123.30000      0.49856      0.49613
+         velocity [A/ps]       :      0.00000     -0.00000     -0.00000
+         ang. mom. [amu A/ps]  :     -0.00000     -0.00000      0.00000
+         kin. ener. [Kcal/mol] :      0.00000
+ --------------- 2-step Verlet initialization ----------------------------------
+ | E(kin)+E(total)=40013.516       E(kin)=2237.166      temperature=304.474    |
+ | Etotal =37776.350  grad(E)=45.121     E(BOND)=2563.999   E(ANGL)=17253.569  |
+ | E(IMPR)=11057.621  E(VDW )=6901.161                                         |
+ -------------------------------------------------------------------------------
+ --------------- step=   100 at      0.50000 ps --------------------------------
+ | E(kin)+E(total)=10511.171       E(kin)=2555.025      temperature=347.734    |
+ | Etotal =7956.146   grad(E)=20.749     E(BOND)=672.631    E(ANGL)=3483.057   |
+ | E(IMPR)=910.488    E(VDW )=2889.969                                         |
+ -------------------------------------------------------------------------------
+ --------------- step=   200 at      1.00000 ps --------------------------------
+ | E(kin)+E(total)=5365.778        E(kin)=2223.818      temperature=302.657    |
+ | Etotal =3141.960   grad(E)=14.251     E(BOND)=351.428    E(ANGL)=1144.503   |
+ | E(IMPR)=242.414    E(VDW )=1403.616                                         |
+ -------------------------------------------------------------------------------
+ --------------- step=   300 at      1.50000 ps --------------------------------
+ | E(kin)+E(total)=4562.042        E(kin)=2224.643      temperature=302.770    |
+ | Etotal =2337.399   grad(E)=12.417     E(BOND)=297.759    E(ANGL)=822.338    |
+ | E(IMPR)=172.432    E(VDW )=1044.869                                         |
+ -------------------------------------------------------------------------------
+ --------------- step=   400 at      2.00000 ps --------------------------------
+ | E(kin)+E(total)=4452.191        E(kin)=2200.014      temperature=299.418    |
+ | Etotal =2252.177   grad(E)=13.052     E(BOND)=311.019    E(ANGL)=751.672    |
+ | E(IMPR)=156.831    E(VDW )=1032.655                                         |
+ -------------------------------------------------------------------------------
+ --------------- step=   500 at      2.50000 ps --------------------------------
+ | E(kin)+E(total)=4390.303        E(kin)=2218.425      temperature=301.923    |
+ | Etotal =2171.879   grad(E)=12.586     E(BOND)=294.697    E(ANGL)=756.741    |
+ | E(IMPR)=152.291    E(VDW )=968.150                                          |
+ -------------------------------------------------------------------------------
+ CENMAS: Information about center of free masses
+         position [A]          :    123.30000      0.49856      0.49613
+         velocity [A/ps]       :      0.00000      0.00000      0.00000
+         ang. mom. [amu A/ps]  :     -0.00000     -0.00000      0.00000
+         kin. ener. [Kcal/mol] :      0.00000
+ DCNTRL: current coordinates in X, Y, Z
+ DCNTRL: current velocities in VX, VY, VZ
+ X-PLOR> 
+ X-PLOR>flags exclude vdw elec end 
+ X-PLOR>vector do (mass=1.) ( name h* ) 
+ SELRPN:   1215 atoms have been selected out of   2465
+ X-PLOR>hbuild selection=( name h* ) phistep=360 end 
+ SELRPN:   1215 atoms have been selected out of   2465
+ HBUILD: dihedral PHI STePs for spin =  360.0000
+ HBUILD: cutoff during water acceptor search =    7.5000
+ HBUILD: HA  ,    ,     placed for donor      501  HIS  CA  .
+ HBUILD: HB1 ,HB2 ,     placed for donor      501  HIS  CB  .
+ HBUILD: HD1 ,    ,     placed for donor      501  HIS  ND1 .
+ HBUILD: HD2 ,    ,     placed for donor      501  HIS  CD2 .
+ HBUILD: HE1 ,    ,     placed for donor      501  HIS  CE1 .
+ HBUILD: HN  ,    ,     placed for donor      502  ALA  N   .
+ HBUILD: HA  ,    ,     placed for donor      502  ALA  CA  .
+ HBUILD: HN  ,    ,     placed for donor      503  GLY  N   .
+ HBUILD: HA1 ,HA2 ,     placed for donor      503  GLY  CA  .
+ HBUILD: HN  ,    ,     placed for donor      504  ILE  N   .
+ HBUILD: HA  ,    ,     placed for donor      504  ILE  CA  .
+ HBUILD: HB  ,    ,     placed for donor      504  ILE  CB  .
+ HBUILD: HG11,HG12,     placed for donor      504  ILE  CG1 .
+ HBUILD: HN  ,    ,     placed for donor      505  PHE  N   .
+ HBUILD: HA  ,    ,     placed for donor      505  PHE  CA  .
+ HBUILD: HB1 ,HB2 ,     placed for donor      505  PHE  CB  .
+ HBUILD: HD1 ,    ,     placed for donor      505  PHE  CD1 .
+ HBUILD: HD2 ,    ,     placed for donor      505  PHE  CD2 .
+ HBUILD: HE1 ,    ,     placed for donor      505  PHE  CE1 .
+ HBUILD: HE2 ,    ,     placed for donor      505  PHE  CE2 .
+ HBUILD: HZ  ,    ,     placed for donor      505  PHE  CZ  .
+ HBUILD: HN  ,    ,     placed for donor      506  THR  N   .
+ HBUILD: HA  ,    ,     placed for donor      506  THR  CA  .
+ HBUILD: HB  ,    ,     placed for donor      506  THR  CB  .
+ HBUILD: HN  ,    ,     placed for donor      507  PHE  N   .
+ HBUILD: HA  ,    ,     placed for donor      507  PHE  CA  .
+ HBUILD: HB1 ,HB2 ,     placed for donor      507  PHE  CB  .
+ HBUILD: HD1 ,    ,     placed for donor      507  PHE  CD1 .
+ HBUILD: HD2 ,    ,     placed for donor      507  PHE  CD2 .
+ HBUILD: HE1 ,    ,     placed for donor      507  PHE  CE1 .
+ HBUILD: HE2 ,    ,     placed for donor      507  PHE  CE2 .
+ HBUILD: HZ  ,    ,     placed for donor      507  PHE  CZ  .
+ HBUILD: HN  ,    ,     placed for donor      508  GLU  N   .
+ HBUILD: HA  ,    ,     placed for donor      508  GLU  CA  .
+ HBUILD: HB1 ,HB2 ,     placed for donor      508  GLU  CB  .
+ HBUILD: HG1 ,HG2 ,     placed for donor      508  GLU  CG  .
+ HBUILD: HN  ,    ,     placed for donor      509  GLU  N   .
+ HBUILD: HA  ,    ,     placed for donor      509  GLU  CA  .
+ HBUILD: HB1 ,HB2 ,     placed for donor      509  GLU  CB  .
+ HBUILD: HG1 ,HG2 ,     placed for donor      509  GLU  CG  .
+ HBUILD: HA  ,    ,     placed for donor      510  PRO  CA  .
+ HBUILD: HB1 ,HB2 ,     placed for donor      510  PRO  CB  .
+ HBUILD: HG1 ,HG2 ,     placed for donor      510  PRO  CG  .
+ HBUILD: HD1 ,HD2 ,     placed for donor      510  PRO  CD  .
+ HBUILD: HN  ,    ,     placed for donor      511  VAL  N   .
+ HBUILD: HA  ,    ,     placed for donor      511  VAL  CA  .
+ HBUILD: HB  ,    ,     placed for donor      511  VAL  CB  .
+ HBUILD: HN  ,    ,     placed for donor      512  THR  N   .
+ HBUILD: HA  ,    ,     placed for donor      512  THR  CA  .
+ HBUILD: HB  ,    ,     placed for donor      512  THR  CB  .
+ HBUILD: HN  ,    ,     placed for donor      513  HIS  N   .
+ HBUILD: HA  ,    ,     placed for donor      513  HIS  CA  .
+ HBUILD: HB1 ,HB2 ,     placed for donor      513  HIS  CB  .
+ HBUILD: HD1 ,    ,     placed for donor      513  HIS  ND1 .
+ HBUILD: HD2 ,    ,     placed for donor      513  HIS  CD2 .
+ HBUILD: HE1 ,    ,     placed for donor      513  HIS  CE1 .
+ HBUILD: HN  ,    ,     placed for donor      514  VAL  N   .
+ HBUILD: HA  ,    ,     placed for donor      514  VAL  CA  .
+ HBUILD: HB  ,    ,     placed for donor      514  VAL  CB  .
+ HBUILD: HN  ,    ,     placed for donor      515  SER  N   .
+ HBUILD: HA  ,    ,     placed for donor      515  SER  CA  .
+ HBUILD: HB1 ,HB2 ,     placed for donor      515  SER  CB  .
+ HBUILD: HN  ,    ,     placed for donor      516  GLU  N   .
+ HBUILD: HA  ,    ,     placed for donor      516  GLU  CA  .
+ HBUILD: HB1 ,HB2 ,     placed for donor      516  GLU  CB  .
+ HBUILD: HG1 ,HG2 ,     placed for donor      516  GLU  CG  .
+ HBUILD: HN  ,    ,     placed for donor      517  SER  N   .
+ HBUILD: HA  ,    ,     placed for donor      517  SER  CA  .
+ HBUILD: HB1 ,HB2 ,     placed for donor      517  SER  CB  .
+ HBUILD: HN  ,    ,     placed for donor      518  ILE  N   .
+ HBUILD: HA  ,    ,     placed for donor      518  ILE  CA  .
+ HBUILD: HB  ,    ,     placed for donor      518  ILE  CB  .
+ HBUILD: HG11,HG12,     placed for donor      518  ILE  CG1 .
+ HBUILD: HN  ,    ,     placed for donor      519  GLY  N   .
+ HBUILD: HA1 ,HA2 ,     placed for donor      519  GLY  CA  .
+ HBUILD: HN  ,    ,     placed for donor      520  ILE  N   .
+ HBUILD: HA  ,    ,     placed for donor      520  ILE  CA  .
+ HBUILD: HB  ,    ,     placed for donor      520  ILE  CB  .
+ HBUILD: HG11,HG12,     placed for donor      520  ILE  CG1 .
+ HBUILD: HN  ,    ,     placed for donor      521  MET  N   .
+ HBUILD: HA  ,    ,     placed for donor      521  MET  CA  .
+ HBUILD: HB1 ,HB2 ,     placed for donor      521  MET  CB  .
+ HBUILD: HG1 ,HG2 ,     placed for donor      521  MET  CG  .
+ HBUILD: HN  ,    ,     placed for donor      522  GLU  N   .
+ HBUILD: HA  ,    ,     placed for donor      522  GLU  CA  .
+ HBUILD: HB1 ,HB2 ,     placed for donor      522  GLU  CB  .
+ HBUILD: HG1 ,HG2 ,     placed for donor      522  GLU  CG  .
+ HBUILD: HN  ,    ,     placed for donor      523  VAL  N   .
+ HBUILD: HA  ,    ,     placed for donor      523  VAL  CA  .
+ HBUILD: HB  ,    ,     placed for donor      523  VAL  CB  .
+ HBUILD: HN  ,    ,     placed for donor      524  LYS  N   .
+ HBUILD: HA  ,    ,     placed for donor      524  LYS  CA  .
+ HBUILD: HB1 ,HB2 ,     placed for donor      524  LYS  CB  .
+ HBUILD: HG1 ,HG2 ,     placed for donor      524  LYS  CG  .
+ HBUILD: HD1 ,HD2 ,     placed for donor      524  LYS  CD  .
+ HBUILD: HE1 ,HE2 ,     placed for donor      524  LYS  CE  .
+ HBUILD: HN  ,    ,     placed for donor      525  VAL  N   .
+ HBUILD: HA  ,    ,     placed for donor      525  VAL  CA  .
+ HBUILD: HB  ,    ,     placed for donor      525  VAL  CB  .
+ HBUILD: HN  ,    ,     placed for donor      526  LEU  N   .
+ HBUILD: HA  ,    ,     placed for donor      526  LEU  CA  .
+ HBUILD: HB1 ,HB2 ,     placed for donor      526  LEU  CB  .
+ HBUILD: HG  ,    ,     placed for donor      526  LEU  CG  .
+ HBUILD: HN  ,    ,     placed for donor      527  ARG  N   .
+ HBUILD: HA  ,    ,     placed for donor      527  ARG  CA  .
+ HBUILD: HB1 ,HB2 ,     placed for donor      527  ARG  CB  .
+ HBUILD: HG1 ,HG2 ,     placed for donor      527  ARG  CG  .
+ HBUILD: HD1 ,HD2 ,     placed for donor      527  ARG  CD  .
+ HBUILD: HE  ,    ,     placed for donor      527  ARG  NE  .
+ HBUILD: HN  ,    ,     placed for donor      528  THR  N   .
+ HBUILD: HA  ,    ,     placed for donor      528  THR  CA  .
+ HBUILD: HB  ,    ,     placed for donor      528  THR  CB  .
+ HBUILD: HN  ,    ,     placed for donor      529  SER  N   .
+ HBUILD: HA  ,    ,     placed for donor      529  SER  CA  .
+ HBUILD: HB1 ,HB2 ,     placed for donor      529  SER  CB  .
+ HBUILD: HN  ,    ,     placed for donor      530  GLY  N   .
+ HBUILD: HA1 ,HA2 ,     placed for donor      530  GLY  CA  .
+ HBUILD: HN  ,    ,     placed for donor      531  ALA  N   .
+ HBUILD: HA  ,    ,     placed for donor      531  ALA  CA  .
+ HBUILD: HN  ,    ,     placed for donor      532  ARG  N   .
+ HBUILD: HA  ,    ,     placed for donor      532  ARG  CA  .
+ HBUILD: HB1 ,HB2 ,     placed for donor      532  ARG  CB  .
+ HBUILD: HG1 ,HG2 ,     placed for donor      532  ARG  CG  .
+ HBUILD: HD1 ,HD2 ,     placed for donor      532  ARG  CD  .
+ HBUILD: HE  ,    ,     placed for donor      532  ARG  NE  .
+ HBUILD: HN  ,    ,     placed for donor      533  GLY  N   .
+ HBUILD: HA1 ,HA2 ,     placed for donor      533  GLY  CA  .
+ HBUILD: HN  ,    ,     placed for donor      534  ASN  N   .
+ HBUILD: HA  ,    ,     placed for donor      534  ASN  CA  .
+ HBUILD: HB1 ,HB2 ,     placed for donor      534  ASN  CB  .
+ HBUILD: HN  ,    ,     placed for donor      535  VAL  N   .
+ HBUILD: HA  ,    ,     placed for donor      535  VAL  CA  .
+ HBUILD: HB  ,    ,     placed for donor      535  VAL  CB  .
+ HBUILD: HN  ,    ,     placed for donor      536  ILE  N   .
+ HBUILD: HA  ,    ,     placed for donor      536  ILE  CA  .
+ HBUILD: HB  ,    ,     placed for donor      536  ILE  CB  .
+ HBUILD: HG11,HG12,     placed for donor      536  ILE  CG1 .
+ HBUILD: HN  ,    ,     placed for donor      537  VAL  N   .
+ HBUILD: HA  ,    ,     placed for donor      537  VAL  CA  .
+ HBUILD: HB  ,    ,     placed for donor      537  VAL  CB  .
+ HBUILD: HA  ,    ,     placed for donor      538  PRO  CA  .
+ HBUILD: HB1 ,HB2 ,     placed for donor      538  PRO  CB  .
+ HBUILD: HG1 ,HG2 ,     placed for donor      538  PRO  CG  .
+ HBUILD: HD1 ,HD2 ,     placed for donor      538  PRO  CD  .
+ HBUILD: HN  ,    ,     placed for donor      539  TYR  N   .
+ HBUILD: HA  ,    ,     placed for donor      539  TYR  CA  .
+ HBUILD: HB1 ,HB2 ,     placed for donor      539  TYR  CB  .
+ HBUILD: HD1 ,    ,     placed for donor      539  TYR  CD1 .
+ HBUILD: HD2 ,    ,     placed for donor      539  TYR  CD2 .
+ HBUILD: HE1 ,    ,     placed for donor      539  TYR  CE1 .
+ HBUILD: HE2 ,    ,     placed for donor      539  TYR  CE2 .
+ HBUILD: HN  ,    ,     placed for donor      540  LYS  N   .
+ HBUILD: HA  ,    ,     placed for donor      540  LYS  CA  .
+ HBUILD: HB1 ,HB2 ,     placed for donor      540  LYS  CB  .
+ HBUILD: HG1 ,HG2 ,     placed for donor      540  LYS  CG  .
+ HBUILD: HD1 ,HD2 ,     placed for donor      540  LYS  CD  .
+ HBUILD: HE1 ,HE2 ,     placed for donor      540  LYS  CE  .
+ HBUILD: HN  ,    ,     placed for donor      541  THR  N   .
+ HBUILD: HA  ,    ,     placed for donor      541  THR  CA  .
+ HBUILD: HB  ,    ,     placed for donor      541  THR  CB  .
+ HBUILD: HN  ,    ,     placed for donor      542  ILE  N   .
+ HBUILD: HA  ,    ,     placed for donor      542  ILE  CA  .
+ HBUILD: HB  ,    ,     placed for donor      542  ILE  CB  .
+ HBUILD: HG11,HG12,     placed for donor      542  ILE  CG1 .
+ HBUILD: HN  ,    ,     placed for donor      543  GLU  N   .
+ HBUILD: HA  ,    ,     placed for donor      543  GLU  CA  .
+ HBUILD: HB1 ,HB2 ,     placed for donor      543  GLU  CB  .
+ HBUILD: HG1 ,HG2 ,     placed for donor      543  GLU  CG  .
+ HBUILD: HN  ,    ,     placed for donor      544  GLY  N   .
+ HBUILD: HA1 ,HA2 ,     placed for donor      544  GLY  CA  .
+ HBUILD: HN  ,    ,     placed for donor      545  THR  N   .
+ HBUILD: HA  ,    ,     placed for donor      545  THR  CA  .
+ HBUILD: HB  ,    ,     placed for donor      545  THR  CB  .
+ HBUILD: HN  ,    ,     placed for donor      546  ALA  N   .
+ HBUILD: HA  ,    ,     placed for donor      546  ALA  CA  .
+ HBUILD: HN  ,    ,     placed for donor      547  ARG  N   .
+ HBUILD: HA  ,    ,     placed for donor      547  ARG  CA  .
+ HBUILD: HB1 ,HB2 ,     placed for donor      547  ARG  CB  .
+ HBUILD: HG1 ,HG2 ,     placed for donor      547  ARG  CG  .
+ HBUILD: HD1 ,HD2 ,     placed for donor      547  ARG  CD  .
+ HBUILD: HE  ,    ,     placed for donor      547  ARG  NE  .
+ HBUILD: HN  ,    ,     placed for donor      548  GLY  N   .
+ HBUILD: HA1 ,HA2 ,     placed for donor      548  GLY  CA  .
+ HBUILD: HN  ,    ,     placed for donor      549  GLY  N   .
+ HBUILD: HA1 ,HA2 ,     placed for donor      549  GLY  CA  .
+ HBUILD: HN  ,    ,     placed for donor      550  GLY  N   .
+ HBUILD: HA1 ,HA2 ,     placed for donor      550  GLY  CA  .
+ HBUILD: HN  ,    ,     placed for donor      551  GLU  N   .
+ HBUILD: HA  ,    ,     placed for donor      551  GLU  CA  .
+ HBUILD: HB1 ,HB2 ,     placed for donor      551  GLU  CB  .
+ HBUILD: HG1 ,HG2 ,     placed for donor      551  GLU  CG  .
+ HBUILD: HN  ,    ,     placed for donor      552  ASP  N   .
+ HBUILD: HA  ,    ,     placed for donor      552  ASP  CA  .
+ HBUILD: HB1 ,HB2 ,     placed for donor      552  ASP  CB  .
+ HBUILD: HN  ,    ,     placed for donor      553  PHE  N   .
+ HBUILD: HA  ,    ,     placed for donor      553  PHE  CA  .
+ HBUILD: HB1 ,HB2 ,     placed for donor      553  PHE  CB  .
+ HBUILD: HD1 ,    ,     placed for donor      553  PHE  CD1 .
+ HBUILD: HD2 ,    ,     placed for donor      553  PHE  CD2 .
+ HBUILD: HE1 ,    ,     placed for donor      553  PHE  CE1 .
+ HBUILD: HE2 ,    ,     placed for donor      553  PHE  CE2 .
+ HBUILD: HZ  ,    ,     placed for donor      553  PHE  CZ  .
+ HBUILD: HN  ,    ,     placed for donor      554  GLU  N   .
+ HBUILD: HA  ,    ,     placed for donor      554  GLU  CA  .
+ HBUILD: HB1 ,HB2 ,     placed for donor      554  GLU  CB  .
+ HBUILD: HG1 ,HG2 ,     placed for donor      554  GLU  CG  .
+ HBUILD: HN  ,    ,     placed for donor      555  ASP  N   .
+ HBUILD: HA  ,    ,     placed for donor      555  ASP  CA  .
+ HBUILD: HB1 ,HB2 ,     placed for donor      555  ASP  CB  .
+ HBUILD: HN  ,    ,     placed for donor      556  THR  N   .
+ HBUILD: HA  ,    ,     placed for donor      556  THR  CA  .
+ HBUILD: HB  ,    ,     placed for donor      556  THR  CB  .
+ HBUILD: HN  ,    ,     placed for donor      557  CYS  N   .
+ HBUILD: HA  ,    ,     placed for donor      557  CYS  CA  .
+ HBUILD: HB1 ,HB2 ,     placed for donor      557  CYS  CB  .
+ HBUILD: HN  ,    ,     placed for donor      558  GLY  N   .
+ HBUILD: HA1 ,HA2 ,     placed for donor      558  GLY  CA  .
+ HBUILD: HN  ,    ,     placed for donor      559  GLU  N   .
+ HBUILD: HA  ,    ,     placed for donor      559  GLU  CA  .
+ HBUILD: HB1 ,HB2 ,     placed for donor      559  GLU  CB  .
+ HBUILD: HG1 ,HG2 ,     placed for donor      559  GLU  CG  .
+ HBUILD: HN  ,    ,     placed for donor      560  LEU  N   .
+ HBUILD: HA  ,    ,     placed for donor      560  LEU  CA  .
+ HBUILD: HB1 ,HB2 ,     placed for donor      560  LEU  CB  .
+ HBUILD: HG  ,    ,     placed for donor      560  LEU  CG  .
+ HBUILD: HN  ,    ,     placed for donor      561  GLU  N   .
+ HBUILD: HA  ,    ,     placed for donor      561  GLU  CA  .
+ HBUILD: HB1 ,HB2 ,     placed for donor      561  GLU  CB  .
+ HBUILD: HG1 ,HG2 ,     placed for donor      561  GLU  CG  .
+ HBUILD: HN  ,    ,     placed for donor      562  PHE  N   .
+ HBUILD: HA  ,    ,     placed for donor      562  PHE  CA  .
+ HBUILD: HB1 ,HB2 ,     placed for donor      562  PHE  CB  .
+ HBUILD: HD1 ,    ,     placed for donor      562  PHE  CD1 .
+ HBUILD: HD2 ,    ,     placed for donor      562  PHE  CD2 .
+ HBUILD: HE1 ,    ,     placed for donor      562  PHE  CE1 .
+ HBUILD: HE2 ,    ,     placed for donor      562  PHE  CE2 .
+ HBUILD: HZ  ,    ,     placed for donor      562  PHE  CZ  .
+ HBUILD: HN  ,    ,     placed for donor      563  GLN  N   .
+ HBUILD: HA  ,    ,     placed for donor      563  GLN  CA  .
+ HBUILD: HB1 ,HB2 ,     placed for donor      563  GLN  CB  .
+ HBUILD: HG1 ,HG2 ,     placed for donor      563  GLN  CG  .
+ HBUILD: HN  ,    ,     placed for donor      564  ASN  N   .
+ HBUILD: HA  ,    ,     placed for donor      564  ASN  CA  .
+ HBUILD: HB1 ,HB2 ,     placed for donor      564  ASN  CB  .
+ HBUILD: HN  ,    ,     placed for donor      565  ASP  N   .
+ HBUILD: HA  ,    ,     placed for donor      565  ASP  CA  .
+ HBUILD: HB1 ,HB2 ,     placed for donor      565  ASP  CB  .
+ HBUILD: HN  ,    ,     placed for donor      566  GLU  N   .
+ HBUILD: HA  ,    ,     placed for donor      566  GLU  CA  .
+ HBUILD: HB1 ,HB2 ,     placed for donor      566  GLU  CB  .
+ HBUILD: HG1 ,HG2 ,     placed for donor      566  GLU  CG  .
+ HBUILD: HN  ,    ,     placed for donor      567  ILE  N   .
+ HBUILD: HA  ,    ,     placed for donor      567  ILE  CA  .
+ HBUILD: HB  ,    ,     placed for donor      567  ILE  CB  .
+ HBUILD: HG11,HG12,     placed for donor      567  ILE  CG1 .
+ HBUILD: HN  ,    ,     placed for donor      568  VAL  N   .
+ HBUILD: HA  ,    ,     placed for donor      568  VAL  CA  .
+ HBUILD: HB  ,    ,     placed for donor      568  VAL  CB  .
+ HBUILD: HN  ,    ,     placed for donor      569  LYS  N   .
+ HBUILD: HA  ,    ,     placed for donor      569  LYS  CA  .
+ HBUILD: HB1 ,HB2 ,     placed for donor      569  LYS  CB  .
+ HBUILD: HG1 ,HG2 ,     placed for donor      569  LYS  CG  .
+ HBUILD: HD1 ,HD2 ,     placed for donor      569  LYS  CD  .
+ HBUILD: HE1 ,HE2 ,     placed for donor      569  LYS  CE  .
+ HBUILD: HN  ,    ,     placed for donor      570  THR  N   .
+ HBUILD: HA  ,    ,     placed for donor      570  THR  CA  .
+ HBUILD: HB  ,    ,     placed for donor      570  THR  CB  .
+ HBUILD: HN  ,    ,     placed for donor      571  ILE  N   .
+ HBUILD: HA  ,    ,     placed for donor      571  ILE  CA  .
+ HBUILD: HB  ,    ,     placed for donor      571  ILE  CB  .
+ HBUILD: HG11,HG12,     placed for donor      571  ILE  CG1 .
+ HBUILD: HN  ,    ,     placed for donor      572  SER  N   .
+ HBUILD: HA  ,    ,     placed for donor      572  SER  CA  .
+ HBUILD: HB1 ,HB2 ,     placed for donor      572  SER  CB  .
+ HBUILD: HN  ,    ,     placed for donor      573  VAL  N   .
+ HBUILD: HA  ,    ,     placed for donor      573  VAL  CA  .
+ HBUILD: HB  ,    ,     placed for donor      573  VAL  CB  .
+ HBUILD: HN  ,    ,     placed for donor      574  LYS  N   .
+ HBUILD: HA  ,    ,     placed for donor      574  LYS  CA  .
+ HBUILD: HB1 ,HB2 ,     placed for donor      574  LYS  CB  .
+ HBUILD: HG1 ,HG2 ,     placed for donor      574  LYS  CG  .
+ HBUILD: HD1 ,HD2 ,     placed for donor      574  LYS  CD  .
+ HBUILD: HE1 ,HE2 ,     placed for donor      574  LYS  CE  .
+ HBUILD: HN  ,    ,     placed for donor      575  VAL  N   .
+ HBUILD: HA  ,    ,     placed for donor      575  VAL  CA  .
+ HBUILD: HB  ,    ,     placed for donor      575  VAL  CB  .
+ HBUILD: HN  ,    ,     placed for donor      576  ILE  N   .
+ HBUILD: HA  ,    ,     placed for donor      576  ILE  CA  .
+ HBUILD: HB  ,    ,     placed for donor      576  ILE  CB  .
+ HBUILD: HG11,HG12,     placed for donor      576  ILE  CG1 .
+ HBUILD: HN  ,    ,     placed for donor      577  ASP  N   .
+ HBUILD: HA  ,    ,     placed for donor      577  ASP  CA  .
+ HBUILD: HB1 ,HB2 ,     placed for donor      577  ASP  CB  .
+ HBUILD: HN  ,    ,     placed for donor      578  ASP  N   .
+ HBUILD: HA  ,    ,     placed for donor      578  ASP  CA  .
+ HBUILD: HB1 ,HB2 ,     placed for donor      578  ASP  CB  .
+ HBUILD: HN  ,    ,     placed for donor      579  GLU  N   .
+ HBUILD: HA  ,    ,     placed for donor      579  GLU  CA  .
+ HBUILD: HB1 ,HB2 ,     placed for donor      579  GLU  CB  .
+ HBUILD: HG1 ,HG2 ,     placed for donor      579  GLU  CG  .
+ HBUILD: HN  ,    ,     placed for donor      580  GLU  N   .
+ HBUILD: HA  ,    ,     placed for donor      580  GLU  CA  .
+ HBUILD: HB1 ,HB2 ,     placed for donor      580  GLU  CB  .
+ HBUILD: HG1 ,HG2 ,     placed for donor      580  GLU  CG  .
+ HBUILD: HN  ,    ,     placed for donor      581  TYR  N   .
+ HBUILD: HA  ,    ,     placed for donor      581  TYR  CA  .
+ HBUILD: HB1 ,HB2 ,     placed for donor      581  TYR  CB  .
+ HBUILD: HD1 ,    ,     placed for donor      581  TYR  CD1 .
+ HBUILD: HD2 ,    ,     placed for donor      581  TYR  CD2 .
+ HBUILD: HE1 ,    ,     placed for donor      581  TYR  CE1 .
+ HBUILD: HE2 ,    ,     placed for donor      581  TYR  CE2 .
+ HBUILD: HN  ,    ,     placed for donor      582  GLU  N   .
+ HBUILD: HA  ,    ,     placed for donor      582  GLU  CA  .
+ HBUILD: HB1 ,HB2 ,     placed for donor      582  GLU  CB  .
+ HBUILD: HG1 ,HG2 ,     placed for donor      582  GLU  CG  .
+ HBUILD: HN  ,    ,     placed for donor      583  LYS  N   .
+ HBUILD: HA  ,    ,     placed for donor      583  LYS  CA  .
+ HBUILD: HB1 ,HB2 ,     placed for donor      583  LYS  CB  .
+ HBUILD: HG1 ,HG2 ,     placed for donor      583  LYS  CG  .
+ HBUILD: HD1 ,HD2 ,     placed for donor      583  LYS  CD  .
+ HBUILD: HE1 ,HE2 ,     placed for donor      583  LYS  CE  .
+ HBUILD: HN  ,    ,     placed for donor      584  ASN  N   .
+ HBUILD: HA  ,    ,     placed for donor      584  ASN  CA  .
+ HBUILD: HB1 ,HB2 ,     placed for donor      584  ASN  CB  .
+ HBUILD: HN  ,    ,     placed for donor      585  LYS  N   .
+ HBUILD: HA  ,    ,     placed for donor      585  LYS  CA  .
+ HBUILD: HB1 ,HB2 ,     placed for donor      585  LYS  CB  .
+ HBUILD: HG1 ,HG2 ,     placed for donor      585  LYS  CG  .
+ HBUILD: HD1 ,HD2 ,     placed for donor      585  LYS  CD  .
+ HBUILD: HE1 ,HE2 ,     placed for donor      585  LYS  CE  .
+ HBUILD: HN  ,    ,     placed for donor      586  THR  N   .
+ HBUILD: HA  ,    ,     placed for donor      586  THR  CA  .
+ HBUILD: HB  ,    ,     placed for donor      586  THR  CB  .
+ HBUILD: HN  ,    ,     placed for donor      587  PHE  N   .
+ HBUILD: HA  ,    ,     placed for donor      587  PHE  CA  .
+ HBUILD: HB1 ,HB2 ,     placed for donor      587  PHE  CB  .
+ HBUILD: HD1 ,    ,     placed for donor      587  PHE  CD1 .
+ HBUILD: HD2 ,    ,     placed for donor      587  PHE  CD2 .
+ HBUILD: HE1 ,    ,     placed for donor      587  PHE  CE1 .
+ HBUILD: HE2 ,    ,     placed for donor      587  PHE  CE2 .
+ HBUILD: HZ  ,    ,     placed for donor      587  PHE  CZ  .
+ HBUILD: HN  ,    ,     placed for donor      588  PHE  N   .
+ HBUILD: HA  ,    ,     placed for donor      588  PHE  CA  .
+ HBUILD: HB1 ,HB2 ,     placed for donor      588  PHE  CB  .
+ HBUILD: HD1 ,    ,     placed for donor      588  PHE  CD1 .
+ HBUILD: HD2 ,    ,     placed for donor      588  PHE  CD2 .
+ HBUILD: HE1 ,    ,     placed for donor      588  PHE  CE1 .
+ HBUILD: HE2 ,    ,     placed for donor      588  PHE  CE2 .
+ HBUILD: HZ  ,    ,     placed for donor      588  PHE  CZ  .
+ HBUILD: HN  ,    ,     placed for donor      589  LEU  N   .
+ HBUILD: HA  ,    ,     placed for donor      589  LEU  CA  .
+ HBUILD: HB1 ,HB2 ,     placed for donor      589  LEU  CB  .
+ HBUILD: HG  ,    ,     placed for donor      589  LEU  CG  .
+ HBUILD: HN  ,    ,     placed for donor      590  GLU  N   .
+ HBUILD: HA  ,    ,     placed for donor      590  GLU  CA  .
+ HBUILD: HB1 ,HB2 ,     placed for donor      590  GLU  CB  .
+ HBUILD: HG1 ,HG2 ,     placed for donor      590  GLU  CG  .
+ HBUILD: HN  ,    ,     placed for donor      591  ILE  N   .
+ HBUILD: HA  ,    ,     placed for donor      591  ILE  CA  .
+ HBUILD: HB  ,    ,     placed for donor      591  ILE  CB  .
+ HBUILD: HG11,HG12,     placed for donor      591  ILE  CG1 .
+ HBUILD: HN  ,    ,     placed for donor      592  GLY  N   .
+ HBUILD: HA1 ,HA2 ,     placed for donor      592  GLY  CA  .
+ HBUILD: HN  ,    ,     placed for donor      593  GLU  N   .
+ HBUILD: HA  ,    ,     placed for donor      593  GLU  CA  .
+ HBUILD: HB1 ,HB2 ,     placed for donor      593  GLU  CB  .
+ HBUILD: HG1 ,HG2 ,     placed for donor      593  GLU  CG  .
+ HBUILD: HA  ,    ,     placed for donor      594  PRO  CA  .
+ HBUILD: HB1 ,HB2 ,     placed for donor      594  PRO  CB  .
+ HBUILD: HG1 ,HG2 ,     placed for donor      594  PRO  CG  .
+ HBUILD: HD1 ,HD2 ,     placed for donor      594  PRO  CD  .
+ HBUILD: HN  ,    ,     placed for donor      595  ARG  N   .
+ HBUILD: HA  ,    ,     placed for donor      595  ARG  CA  .
+ HBUILD: HB1 ,HB2 ,     placed for donor      595  ARG  CB  .
+ HBUILD: HG1 ,HG2 ,     placed for donor      595  ARG  CG  .
+ HBUILD: HD1 ,HD2 ,     placed for donor      595  ARG  CD  .
+ HBUILD: HE  ,    ,     placed for donor      595  ARG  NE  .
+ HBUILD: HN  ,    ,     placed for donor      596  LEU  N   .
+ HBUILD: HA  ,    ,     placed for donor      596  LEU  CA  .
+ HBUILD: HB1 ,HB2 ,     placed for donor      596  LEU  CB  .
+ HBUILD: HG  ,    ,     placed for donor      596  LEU  CG  .
+ HBUILD: HN  ,    ,     placed for donor      597  VAL  N   .
+ HBUILD: HA  ,    ,     placed for donor      597  VAL  CA  .
+ HBUILD: HB  ,    ,     placed for donor      597  VAL  CB  .
+ HBUILD: HN  ,    ,     placed for donor      598  GLU  N   .
+ HBUILD: HA  ,    ,     placed for donor      598  GLU  CA  .
+ HBUILD: HB1 ,HB2 ,     placed for donor      598  GLU  CB  .
+ HBUILD: HG1 ,HG2 ,     placed for donor      598  GLU  CG  .
+ HBUILD: HN  ,    ,     placed for donor      599  MET  N   .
+ HBUILD: HA  ,    ,     placed for donor      599  MET  CA  .
+ HBUILD: HB1 ,HB2 ,     placed for donor      599  MET  CB  .
+ HBUILD: HG1 ,HG2 ,     placed for donor      599  MET  CG  .
+ HBUILD: HN  ,    ,     placed for donor      600  SER  N   .
+ HBUILD: HA  ,    ,     placed for donor      600  SER  CA  .
+ HBUILD: HB1 ,HB2 ,     placed for donor      600  SER  CB  .
+ HBUILD: HN  ,    ,     placed for donor      601  GLU  N   .
+ HBUILD: HA  ,    ,     placed for donor      601  GLU  CA  .
+ HBUILD: HB1 ,HB2 ,     placed for donor      601  GLU  CB  .
+ HBUILD: HG1 ,HG2 ,     placed for donor      601  GLU  CG  .
+ HBUILD: HN  ,    ,     placed for donor      602  LYS  N   .
+ HBUILD: HA  ,    ,     placed for donor      602  LYS  CA  .
+ HBUILD: HB1 ,HB2 ,     placed for donor      602  LYS  CB  .
+ HBUILD: HG1 ,HG2 ,     placed for donor      602  LYS  CG  .
+ HBUILD: HD1 ,HD2 ,     placed for donor      602  LYS  CD  .
+ HBUILD: HE1 ,HE2 ,     placed for donor      602  LYS  CE  .
+ HBUILD: HN  ,    ,     placed for donor      603  LYS  N   .
+ HBUILD: HA  ,    ,     placed for donor      603  LYS  CA  .
+ HBUILD: HB1 ,HB2 ,     placed for donor      603  LYS  CB  .
+ HBUILD: HG1 ,HG2 ,     placed for donor      603  LYS  CG  .
+ HBUILD: HD1 ,HD2 ,     placed for donor      603  LYS  CD  .
+ HBUILD: HE1 ,HE2 ,     placed for donor      603  LYS  CE  .
+ HBUILD: HN  ,    ,     placed for donor      604  GLY  N   .
+ HBUILD: HA1 ,HA2 ,     placed for donor      604  GLY  CA  .
+ HBUILD: HN  ,    ,     placed for donor      605  GLY  N   .
+ HBUILD: HA1 ,HA2 ,     placed for donor      605  GLY  CA  .
+ HBUILD: HN  ,    ,     placed for donor      606  PHE  N   .
+ HBUILD: HA  ,    ,     placed for donor      606  PHE  CA  .
+ HBUILD: HB1 ,HB2 ,     placed for donor      606  PHE  CB  .
+ HBUILD: HD1 ,    ,     placed for donor      606  PHE  CD1 .
+ HBUILD: HD2 ,    ,     placed for donor      606  PHE  CD2 .
+ HBUILD: HE1 ,    ,     placed for donor      606  PHE  CE1 .
+ HBUILD: HE2 ,    ,     placed for donor      606  PHE  CE2 .
+ HBUILD: HZ  ,    ,     placed for donor      606  PHE  CZ  .
+ HBUILD: HN  ,    ,     placed for donor      607  THR  N   .
+ HBUILD: HA  ,    ,     placed for donor      607  THR  CA  .
+ HBUILD: HB  ,    ,     placed for donor      607  THR  CB  .
+ HBUILD: HN  ,    ,     placed for donor      608  ILE  N   .
+ HBUILD: HA  ,    ,     placed for donor      608  ILE  CA  .
+ HBUILD: HB  ,    ,     placed for donor      608  ILE  CB  .
+ HBUILD: HG11,HG12,     placed for donor      608  ILE  CG1 .
+ HBUILD: HN  ,    ,     placed for donor      609  THR  N   .
+ HBUILD: HA  ,    ,     placed for donor      609  THR  CA  .
+ HBUILD: HB  ,    ,     placed for donor      609  THR  CB  .
+ HBUILD: HN  ,    ,     placed for donor      610  GLU  N   .
+ HBUILD: HA  ,    ,     placed for donor      610  GLU  CA  .
+ HBUILD: HB1 ,HB2 ,     placed for donor      610  GLU  CB  .
+ HBUILD: HG1 ,HG2 ,     placed for donor      610  GLU  CG  .
+ HBUILD: HN  ,    ,     placed for donor      611  GLU  N   .
+ HBUILD: HA  ,    ,     placed for donor      611  GLU  CA  .
+ HBUILD: HB1 ,HB2 ,     placed for donor      611  GLU  CB  .
+ HBUILD: HG1 ,HG2 ,     placed for donor      611  GLU  CG  .
+ HBUILD: HN  ,    ,     placed for donor      612  TYR  N   .
+ HBUILD: HA  ,    ,     placed for donor      612  TYR  CA  .
+ HBUILD: HB1 ,HB2 ,     placed for donor      612  TYR  CB  .
+ HBUILD: HD1 ,    ,     placed for donor      612  TYR  CD1 .
+ HBUILD: HD2 ,    ,     placed for donor      612  TYR  CD2 .
+ HBUILD: HE1 ,    ,     placed for donor      612  TYR  CE1 .
+ HBUILD: HE2 ,    ,     placed for donor      612  TYR  CE2 .
+ HBUILD: HN  ,    ,     placed for donor      613  ASP  N   .
+ HBUILD: HA  ,    ,     placed for donor      613  ASP  CA  .
+ HBUILD: HB1 ,HB2 ,     placed for donor      613  ASP  CB  .
+ HBUILD: HN  ,    ,     placed for donor      614  ASP  N   .
+ HBUILD: HA  ,    ,     placed for donor      614  ASP  CA  .
+ HBUILD: HB1 ,HB2 ,     placed for donor      614  ASP  CB  .
+ HBUILD: HN  ,    ,     placed for donor      615  LYS  N   .
+ HBUILD: HA  ,    ,     placed for donor      615  LYS  CA  .
+ HBUILD: HB1 ,HB2 ,     placed for donor      615  LYS  CB  .
+ HBUILD: HG1 ,HG2 ,     placed for donor      615  LYS  CG  .
+ HBUILD: HD1 ,HD2 ,     placed for donor      615  LYS  CD  .
+ HBUILD: HE1 ,HE2 ,     placed for donor      615  LYS  CE  .
+ HBUILD: HN  ,    ,     placed for donor      616  GLN  N   .
+ HBUILD: HA  ,    ,     placed for donor      616  GLN  CA  .
+ HBUILD: HB1 ,HB2 ,     placed for donor      616  GLN  CB  .
+ HBUILD: HG1 ,HG2 ,     placed for donor      616  GLN  CG  .
+ HBUILD: HA  ,    ,     placed for donor      617  PRO  CA  .
+ HBUILD: HB1 ,HB2 ,     placed for donor      617  PRO  CB  .
+ HBUILD: HG1 ,HG2 ,     placed for donor      617  PRO  CG  .
+ HBUILD: HD1 ,HD2 ,     placed for donor      617  PRO  CD  .
+ HBUILD: HN  ,    ,     placed for donor      618  LEU  N   .
+ HBUILD: HA  ,    ,     placed for donor      618  LEU  CA  .
+ HBUILD: HB1 ,HB2 ,     placed for donor      618  LEU  CB  .
+ HBUILD: HG  ,    ,     placed for donor      618  LEU  CG  .
+ HBUILD: HN  ,    ,     placed for donor      619  THR  N   .
+ HBUILD: HA  ,    ,     placed for donor      619  THR  CA  .
+ HBUILD: HB  ,    ,     placed for donor      619  THR  CB  .
+ HBUILD: HN  ,    ,     placed for donor      620  SER  N   .
+ HBUILD: HA  ,    ,     placed for donor      620  SER  CA  .
+ HBUILD: HB1 ,HB2 ,     placed for donor      620  SER  CB  .
+ HBUILD: HN  ,    ,     placed for donor      621  LYS  N   .
+ HBUILD: HA  ,    ,     placed for donor      621  LYS  CA  .
+ HBUILD: HB1 ,HB2 ,     placed for donor      621  LYS  CB  .
+ HBUILD: HG1 ,HG2 ,     placed for donor      621  LYS  CG  .
+ HBUILD: HD1 ,HD2 ,     placed for donor      621  LYS  CD  .
+ HBUILD: HE1 ,HE2 ,     placed for donor      621  LYS  CE  .
+ HBUILD: HN  ,    ,     placed for donor      622  GLU  N   .
+ HBUILD: HA  ,    ,     placed for donor      622  GLU  CA  .
+ HBUILD: HB1 ,HB2 ,     placed for donor      622  GLU  CB  .
+ HBUILD: HG1 ,HG2 ,     placed for donor      622  GLU  CG  .
+ HBUILD: HN  ,    ,     placed for donor      623  GLU  N   .
+ HBUILD: HA  ,    ,     placed for donor      623  GLU  CA  .
+ HBUILD: HB1 ,HB2 ,     placed for donor      623  GLU  CB  .
+ HBUILD: HG1 ,HG2 ,     placed for donor      623  GLU  CG  .
+ HBUILD: HN  ,    ,     placed for donor      624  GLU  N   .
+ HBUILD: HA  ,    ,     placed for donor      624  GLU  CA  .
+ HBUILD: HB1 ,HB2 ,     placed for donor      624  GLU  CB  .
+ HBUILD: HG1 ,HG2 ,     placed for donor      624  GLU  CG  .
+ HBUILD: HN  ,    ,     placed for donor      625  GLU  N   .
+ HBUILD: HA  ,    ,     placed for donor      625  GLU  CA  .
+ HBUILD: HB1 ,HB2 ,     placed for donor      625  GLU  CB  .
+ HBUILD: HG1 ,HG2 ,     placed for donor      625  GLU  CG  .
+ HBUILD: HN  ,    ,     placed for donor      626  ARG  N   .
+ HBUILD: HA  ,    ,     placed for donor      626  ARG  CA  .
+ HBUILD: HB1 ,HB2 ,     placed for donor      626  ARG  CB  .
+ HBUILD: HG1 ,HG2 ,     placed for donor      626  ARG  CG  .
+ HBUILD: HD1 ,HD2 ,     placed for donor      626  ARG  CD  .
+ HBUILD: HE  ,    ,     placed for donor      626  ARG  NE  .
+ HBUILD: HN  ,    ,     placed for donor      627  ARG  N   .
+ HBUILD: HA  ,    ,     placed for donor      627  ARG  CA  .
+ HBUILD: HB1 ,HB2 ,     placed for donor      627  ARG  CB  .
+ HBUILD: HG1 ,HG2 ,     placed for donor      627  ARG  CG  .
+ HBUILD: HD1 ,HD2 ,     placed for donor      627  ARG  CD  .
+ HBUILD: HE  ,    ,     placed for donor      627  ARG  NE  .
+ HBUILD: HN  ,    ,     placed for donor      628  ILE  N   .
+ HBUILD: HA  ,    ,     placed for donor      628  ILE  CA  .
+ HBUILD: HB  ,    ,     placed for donor      628  ILE  CB  .
+ HBUILD: HG11,HG12,     placed for donor      628  ILE  CG1 .
+ HBUILD: HN  ,    ,     placed for donor      629  ALA  N   .
+ HBUILD: HA  ,    ,     placed for donor      629  ALA  CA  .
+ HBUILD: HN  ,    ,     placed for donor      630  GLU  N   .
+ HBUILD: HA  ,    ,     placed for donor      630  GLU  CA  .
+ HBUILD: HB1 ,HB2 ,     placed for donor      630  GLU  CB  .
+ HBUILD: HG1 ,HG2 ,     placed for donor      630  GLU  CG  .
+ HBUILD: HN  ,    ,     placed for donor      631  MET  N   .
+ HBUILD: HA  ,    ,     placed for donor      631  MET  CA  .
+ HBUILD: HB1 ,HB2 ,     placed for donor      631  MET  CB  .
+ HBUILD: HG1 ,HG2 ,     placed for donor      631  MET  CG  .
+ HBUILD: HN  ,    ,     placed for donor      632  GLY  N   .
+ HBUILD: HA1 ,HA2 ,     placed for donor      632  GLY  CA  .
+ HBUILD: HN  ,    ,     placed for donor      633  ARG  N   .
+ HBUILD: HA  ,    ,     placed for donor      633  ARG  CA  .
+ HBUILD: HB1 ,HB2 ,     placed for donor      633  ARG  CB  .
+ HBUILD: HG1 ,HG2 ,     placed for donor      633  ARG  CG  .
+ HBUILD: HD1 ,HD2 ,     placed for donor      633  ARG  CD  .
+ HBUILD: HE  ,    ,     placed for donor      633  ARG  NE  .
+ HBUILD: HA  ,    ,     placed for donor      634  PRO  CA  .
+ HBUILD: HB1 ,HB2 ,     placed for donor      634  PRO  CB  .
+ HBUILD: HG1 ,HG2 ,     placed for donor      634  PRO  CG  .
+ HBUILD: HD1 ,HD2 ,     placed for donor      634  PRO  CD  .
+ HBUILD: HN  ,    ,     placed for donor      635  ILE  N   .
+ HBUILD: HA  ,    ,     placed for donor      635  ILE  CA  .
+ HBUILD: HB  ,    ,     placed for donor      635  ILE  CB  .
+ HBUILD: HG11,HG12,     placed for donor      635  ILE  CG1 .
+ HBUILD: HN  ,    ,     placed for donor      636  LEU  N   .
+ HBUILD: HA  ,    ,     placed for donor      636  LEU  CA  .
+ HBUILD: HB1 ,HB2 ,     placed for donor      636  LEU  CB  .
+ HBUILD: HG  ,    ,     placed for donor      636  LEU  CG  .
+ HBUILD: HN  ,    ,     placed for donor      637  GLY  N   .
+ HBUILD: HA1 ,HA2 ,     placed for donor      637  GLY  CA  .
+ HBUILD: HN  ,    ,     placed for donor      638  GLU  N   .
+ HBUILD: HA  ,    ,     placed for donor      638  GLU  CA  .
+ HBUILD: HB1 ,HB2 ,     placed for donor      638  GLU  CB  .
+ HBUILD: HG1 ,HG2 ,     placed for donor      638  GLU  CG  .
+ HBUILD: HN  ,    ,     placed for donor      639  HIS  N   .
+ HBUILD: HA  ,    ,     placed for donor      639  HIS  CA  .
+ HBUILD: HB1 ,HB2 ,     placed for donor      639  HIS  CB  .
+ HBUILD: HD1 ,    ,     placed for donor      639  HIS  ND1 .
+ HBUILD: HD2 ,    ,     placed for donor      639  HIS  CD2 .
+ HBUILD: HE1 ,    ,     placed for donor      639  HIS  CE1 .
+ HBUILD: HN  ,    ,     placed for donor      640  THR  N   .
+ HBUILD: HA  ,    ,     placed for donor      640  THR  CA  .
+ HBUILD: HB  ,    ,     placed for donor      640  THR  CB  .
+ HBUILD: HN  ,    ,     placed for donor      641  LYS  N   .
+ HBUILD: HA  ,    ,     placed for donor      641  LYS  CA  .
+ HBUILD: HB1 ,HB2 ,     placed for donor      641  LYS  CB  .
+ HBUILD: HG1 ,HG2 ,     placed for donor      641  LYS  CG  .
+ HBUILD: HD1 ,HD2 ,     placed for donor      641  LYS  CD  .
+ HBUILD: HE1 ,HE2 ,     placed for donor      641  LYS  CE  .
+ HBUILD: HN  ,    ,     placed for donor      642  LEU  N   .
+ HBUILD: HA  ,    ,     placed for donor      642  LEU  CA  .
+ HBUILD: HB1 ,HB2 ,     placed for donor      642  LEU  CB  .
+ HBUILD: HG  ,    ,     placed for donor      642  LEU  CG  .
+ HBUILD: HN  ,    ,     placed for donor      643  GLU  N   .
+ HBUILD: HA  ,    ,     placed for donor      643  GLU  CA  .
+ HBUILD: HB1 ,HB2 ,     placed for donor      643  GLU  CB  .
+ HBUILD: HG1 ,HG2 ,     placed for donor      643  GLU  CG  .
+ HBUILD: HN  ,    ,     placed for donor      644  VAL  N   .
+ HBUILD: HA  ,    ,     placed for donor      644  VAL  CA  .
+ HBUILD: HB  ,    ,     placed for donor      644  VAL  CB  .
+ HBUILD: HN  ,    ,     placed for donor      645  ILE  N   .
+ HBUILD: HA  ,    ,     placed for donor      645  ILE  CA  .
+ HBUILD: HB  ,    ,     placed for donor      645  ILE  CB  .
+ HBUILD: HG11,HG12,     placed for donor      645  ILE  CG1 .
+ HBUILD: HN  ,    ,     placed for donor      646  ILE  N   .
+ HBUILD: HA  ,    ,     placed for donor      646  ILE  CA  .
+ HBUILD: HB  ,    ,     placed for donor      646  ILE  CB  .
+ HBUILD: HG11,HG12,     placed for donor      646  ILE  CG1 .
+ HBUILD: HN  ,    ,     placed for donor      647  GLU  N   .
+ HBUILD: HA  ,    ,     placed for donor      647  GLU  CA  .
+ HBUILD: HB1 ,HB2 ,     placed for donor      647  GLU  CB  .
+ HBUILD: HG1 ,HG2 ,     placed for donor      647  GLU  CG  .
+ HBUILD: HN  ,    ,     placed for donor      648  GLU  N   .
+ HBUILD: HA  ,    ,     placed for donor      648  GLU  CA  .
+ HBUILD: HB1 ,HB2 ,     placed for donor      648  GLU  CB  .
+ HBUILD: HG1 ,HG2 ,     placed for donor      648  GLU  CG  .
+ HBUILD: HN  ,    ,     placed for donor      649  SER  N   .
+ HBUILD: HA  ,    ,     placed for donor      649  SER  CA  .
+ HBUILD: HB1 ,HB2 ,     placed for donor      649  SER  CB  .
+ HBUILD: HN  ,    ,     placed for donor      650  TYR  N   .
+ HBUILD: HA  ,    ,     placed for donor      650  TYR  CA  .
+ HBUILD: HB1 ,HB2 ,     placed for donor      650  TYR  CB  .
+ HBUILD: HD1 ,    ,     placed for donor      650  TYR  CD1 .
+ HBUILD: HD2 ,    ,     placed for donor      650  TYR  CD2 .
+ HBUILD: HE1 ,    ,     placed for donor      650  TYR  CE1 .
+ HBUILD: HE2 ,    ,     placed for donor      650  TYR  CE2 .
+ HBUILD: HN  ,    ,     placed for donor      651  GLU  N   .
+ HBUILD: HA  ,    ,     placed for donor      651  GLU  CA  .
+ HBUILD: HB1 ,HB2 ,     placed for donor      651  GLU  CB  .
+ HBUILD: HG1 ,HG2 ,     placed for donor      651  GLU  CG  .
+ HBUILD: HN  ,    ,     placed for donor      652  PHE  N   .
+ HBUILD: HA  ,    ,     placed for donor      652  PHE  CA  .
+ HBUILD: HB1 ,HB2 ,     placed for donor      652  PHE  CB  .
+ HBUILD: HD1 ,    ,     placed for donor      652  PHE  CD1 .
+ HBUILD: HD2 ,    ,     placed for donor      652  PHE  CD2 .
+ HBUILD: HE1 ,    ,     placed for donor      652  PHE  CE1 .
+ HBUILD: HE2 ,    ,     placed for donor      652  PHE  CE2 .
+ HBUILD: HZ  ,    ,     placed for donor      652  PHE  CZ  .
+ HBUILD: HN  ,    ,     placed for donor      653  LYS  N   .
+ HBUILD: HA  ,    ,     placed for donor      653  LYS  CA  .
+ HBUILD: HB1 ,HB2 ,     placed for donor      653  LYS  CB  .
+ HBUILD: HG1 ,HG2 ,     placed for donor      653  LYS  CG  .
+ HBUILD: HD1 ,HD2 ,     placed for donor      653  LYS  CD  .
+ HBUILD: HE1 ,HE2 ,     placed for donor      653  LYS  CE  .
+ HBUILD: HN  ,    ,     placed for donor      654  SER  N   .
+ HBUILD: HA  ,    ,     placed for donor      654  SER  CA  .
+ HBUILD: HB1 ,HB2 ,     placed for donor      654  SER  CB  .
+ HBUILD: HN  ,    ,     placed for donor      655  THR  N   .
+ HBUILD: HA  ,    ,     placed for donor      655  THR  CA  .
+ HBUILD: HB  ,    ,     placed for donor      655  THR  CB  .
+ HBUILD: HN  ,    ,     placed for donor      656  VAL  N   .
+ HBUILD: HA  ,    ,     placed for donor      656  VAL  CA  .
+ HBUILD: HB  ,    ,     placed for donor      656  VAL  CB  .
+ HBUILD: HN  ,    ,     placed for donor      657  ASP  N   .
+ HBUILD: HA  ,    ,     placed for donor      657  ASP  CA  .
+ HBUILD: HB1 ,HB2 ,     placed for donor      657  ASP  CB  .
+ HBUILD: HN  ,    ,    , constructed (spin) for donor      501  HIS  N   .
+ HBUILD: HB1 ,HB2 ,HB3 , constructed (spin) for donor      502  ALA  CB  .
+ HBUILD: HG21,HG22,HG23, constructed (spin) for donor      504  ILE  CG2 .
+ HBUILD: HD11,HD12,HD13, constructed (spin) for donor      504  ILE  CD1 .
+ HBUILD: HG1 ,    ,    , constructed (spin) for donor      506  THR  OG1 .
+ HBUILD: HG21,HG22,HG23, constructed (spin) for donor      506  THR  CG2 .
+ HBUILD: HG11,HG12,HG13, constructed (spin) for donor      511  VAL  CG1 .
+ HBUILD: HG21,HG22,HG23, constructed (spin) for donor      511  VAL  CG2 .
+ HBUILD: HG1 ,    ,    , constructed (spin) for donor      512  THR  OG1 .
+ HBUILD: HG21,HG22,HG23, constructed (spin) for donor      512  THR  CG2 .
+ HBUILD: HG11,HG12,HG13, constructed (spin) for donor      514  VAL  CG1 .
+ HBUILD: HG21,HG22,HG23, constructed (spin) for donor      514  VAL  CG2 .
+ HBUILD: HG  ,    ,    , constructed (spin) for donor      515  SER  OG  .
+ HBUILD: HG  ,    ,    , constructed (spin) for donor      517  SER  OG  .
+ HBUILD: HG21,HG22,HG23, constructed (spin) for donor      518  ILE  CG2 .
+ HBUILD: HD11,HD12,HD13, constructed (spin) for donor      518  ILE  CD1 .
+ HBUILD: HG21,HG22,HG23, constructed (spin) for donor      520  ILE  CG2 .
+ HBUILD: HD11,HD12,HD13, constructed (spin) for donor      520  ILE  CD1 .
+ HBUILD: HE1 ,HE2 ,HE3 , constructed (spin) for donor      521  MET  CE  .
+ HBUILD: HG11,HG12,HG13, constructed (spin) for donor      523  VAL  CG1 .
+ HBUILD: HG21,HG22,HG23, constructed (spin) for donor      523  VAL  CG2 .
+ HBUILD: HZ1 ,HZ2 ,HZ3 , constructed (spin) for donor      524  LYS  NZ  .
+ HBUILD: HG11,HG12,HG13, constructed (spin) for donor      525  VAL  CG1 .
+ HBUILD: HG21,HG22,HG23, constructed (spin) for donor      525  VAL  CG2 .
+ HBUILD: HD11,HD12,HD13, constructed (spin) for donor      526  LEU  CD1 .
+ HBUILD: HD21,HD22,HD23, constructed (spin) for donor      526  LEU  CD2 .
+ HBUILD: HH11,HH12,    , constructed (spin) for donor      527  ARG  NH1 .
+ HBUILD: HH21,HH22,    , constructed (spin) for donor      527  ARG  NH2 .
+ HBUILD: HG1 ,    ,    , constructed (spin) for donor      528  THR  OG1 .
+ HBUILD: HG21,HG22,HG23, constructed (spin) for donor      528  THR  CG2 .
+ HBUILD: HG  ,    ,    , constructed (spin) for donor      529  SER  OG  .
+ HBUILD: HB1 ,HB2 ,HB3 , constructed (spin) for donor      531  ALA  CB  .
+ HBUILD: HH11,HH12,    , constructed (spin) for donor      532  ARG  NH1 .
+ HBUILD: HH21,HH22,    , constructed (spin) for donor      532  ARG  NH2 .
+ HBUILD: HD21,HD22,    , constructed (spin) for donor      534  ASN  ND2 .
+ HBUILD: HG11,HG12,HG13, constructed (spin) for donor      535  VAL  CG1 .
+ HBUILD: HG21,HG22,HG23, constructed (spin) for donor      535  VAL  CG2 .
+ HBUILD: HG21,HG22,HG23, constructed (spin) for donor      536  ILE  CG2 .
+ HBUILD: HD11,HD12,HD13, constructed (spin) for donor      536  ILE  CD1 .
+ HBUILD: HG11,HG12,HG13, constructed (spin) for donor      537  VAL  CG1 .
+ HBUILD: HG21,HG22,HG23, constructed (spin) for donor      537  VAL  CG2 .
+ HBUILD: HH  ,    ,    , constructed (spin) for donor      539  TYR  OH  .
+ HBUILD: HZ1 ,HZ2 ,HZ3 , constructed (spin) for donor      540  LYS  NZ  .
+ HBUILD: HG1 ,    ,    , constructed (spin) for donor      541  THR  OG1 .
+ HBUILD: HG21,HG22,HG23, constructed (spin) for donor      541  THR  CG2 .
+ HBUILD: HG21,HG22,HG23, constructed (spin) for donor      542  ILE  CG2 .
+ HBUILD: HD11,HD12,HD13, constructed (spin) for donor      542  ILE  CD1 .
+ HBUILD: HG1 ,    ,    , constructed (spin) for donor      545  THR  OG1 .
+ HBUILD: HG21,HG22,HG23, constructed (spin) for donor      545  THR  CG2 .
+ HBUILD: HB1 ,HB2 ,HB3 , constructed (spin) for donor      546  ALA  CB  .
+ HBUILD: HH11,HH12,    , constructed (spin) for donor      547  ARG  NH1 .
+ HBUILD: HH21,HH22,    , constructed (spin) for donor      547  ARG  NH2 .
+ HBUILD: HG1 ,    ,    , constructed (spin) for donor      556  THR  OG1 .
+ HBUILD: HG21,HG22,HG23, constructed (spin) for donor      556  THR  CG2 .
+ HBUILD: HG  ,    ,    , constructed (spin) for donor      557  CYS  SG  .
+ HBUILD: HD11,HD12,HD13, constructed (spin) for donor      560  LEU  CD1 .
+ HBUILD: HD21,HD22,HD23, constructed (spin) for donor      560  LEU  CD2 .
+ HBUILD: HE21,HE22,    , constructed (spin) for donor      563  GLN  NE2 .
+ HBUILD: HD21,HD22,    , constructed (spin) for donor      564  ASN  ND2 .
+ HBUILD: HG21,HG22,HG23, constructed (spin) for donor      567  ILE  CG2 .
+ HBUILD: HD11,HD12,HD13, constructed (spin) for donor      567  ILE  CD1 .
+ HBUILD: HG11,HG12,HG13, constructed (spin) for donor      568  VAL  CG1 .
+ HBUILD: HG21,HG22,HG23, constructed (spin) for donor      568  VAL  CG2 .
+ HBUILD: HZ1 ,HZ2 ,HZ3 , constructed (spin) for donor      569  LYS  NZ  .
+ HBUILD: HG1 ,    ,    , constructed (spin) for donor      570  THR  OG1 .
+ HBUILD: HG21,HG22,HG23, constructed (spin) for donor      570  THR  CG2 .
+ HBUILD: HG21,HG22,HG23, constructed (spin) for donor      571  ILE  CG2 .
+ HBUILD: HD11,HD12,HD13, constructed (spin) for donor      571  ILE  CD1 .
+ HBUILD: HG  ,    ,    , constructed (spin) for donor      572  SER  OG  .
+ HBUILD: HG11,HG12,HG13, constructed (spin) for donor      573  VAL  CG1 .
+ HBUILD: HG21,HG22,HG23, constructed (spin) for donor      573  VAL  CG2 .
+ HBUILD: HZ1 ,HZ2 ,HZ3 , constructed (spin) for donor      574  LYS  NZ  .
+ HBUILD: HG11,HG12,HG13, constructed (spin) for donor      575  VAL  CG1 .
+ HBUILD: HG21,HG22,HG23, constructed (spin) for donor      575  VAL  CG2 .
+ HBUILD: HG21,HG22,HG23, constructed (spin) for donor      576  ILE  CG2 .
+ HBUILD: HD11,HD12,HD13, constructed (spin) for donor      576  ILE  CD1 .
+ HBUILD: HH  ,    ,    , constructed (spin) for donor      581  TYR  OH  .
+ HBUILD: HZ1 ,HZ2 ,HZ3 , constructed (spin) for donor      583  LYS  NZ  .
+ HBUILD: HD21,HD22,    , constructed (spin) for donor      584  ASN  ND2 .
+ HBUILD: HZ1 ,HZ2 ,HZ3 , constructed (spin) for donor      585  LYS  NZ  .
+ HBUILD: HG1 ,    ,    , constructed (spin) for donor      586  THR  OG1 .
+ HBUILD: HG21,HG22,HG23, constructed (spin) for donor      586  THR  CG2 .
+ HBUILD: HD11,HD12,HD13, constructed (spin) for donor      589  LEU  CD1 .
+ HBUILD: HD21,HD22,HD23, constructed (spin) for donor      589  LEU  CD2 .
+ HBUILD: HG21,HG22,HG23, constructed (spin) for donor      591  ILE  CG2 .
+ HBUILD: HD11,HD12,HD13, constructed (spin) for donor      591  ILE  CD1 .
+ HBUILD: HH11,HH12,    , constructed (spin) for donor      595  ARG  NH1 .
+ HBUILD: HH21,HH22,    , constructed (spin) for donor      595  ARG  NH2 .
+ HBUILD: HD11,HD12,HD13, constructed (spin) for donor      596  LEU  CD1 .
+ HBUILD: HD21,HD22,HD23, constructed (spin) for donor      596  LEU  CD2 .
+ HBUILD: HG11,HG12,HG13, constructed (spin) for donor      597  VAL  CG1 .
+ HBUILD: HG21,HG22,HG23, constructed (spin) for donor      597  VAL  CG2 .
+ HBUILD: HE1 ,HE2 ,HE3 , constructed (spin) for donor      599  MET  CE  .
+ HBUILD: HG  ,    ,    , constructed (spin) for donor      600  SER  OG  .
+ HBUILD: HZ1 ,HZ2 ,HZ3 , constructed (spin) for donor      602  LYS  NZ  .
+ HBUILD: HZ1 ,HZ2 ,HZ3 , constructed (spin) for donor      603  LYS  NZ  .
+ HBUILD: HG1 ,    ,    , constructed (spin) for donor      607  THR  OG1 .
+ HBUILD: HG21,HG22,HG23, constructed (spin) for donor      607  THR  CG2 .
+ HBUILD: HG21,HG22,HG23, constructed (spin) for donor      608  ILE  CG2 .
+ HBUILD: HD11,HD12,HD13, constructed (spin) for donor      608  ILE  CD1 .
+ HBUILD: HG1 ,    ,    , constructed (spin) for donor      609  THR  OG1 .
+ HBUILD: HG21,HG22,HG23, constructed (spin) for donor      609  THR  CG2 .
+ HBUILD: HH  ,    ,    , constructed (spin) for donor      612  TYR  OH  .
+ HBUILD: HZ1 ,HZ2 ,HZ3 , constructed (spin) for donor      615  LYS  NZ  .
+ HBUILD: HE21,HE22,    , constructed (spin) for donor      616  GLN  NE2 .
+ HBUILD: HD11,HD12,HD13, constructed (spin) for donor      618  LEU  CD1 .
+ HBUILD: HD21,HD22,HD23, constructed (spin) for donor      618  LEU  CD2 .
+ HBUILD: HG1 ,    ,    , constructed (spin) for donor      619  THR  OG1 .
+ HBUILD: HG21,HG22,HG23, constructed (spin) for donor      619  THR  CG2 .
+ HBUILD: HG  ,    ,    , constructed (spin) for donor      620  SER  OG  .
+ HBUILD: HZ1 ,HZ2 ,HZ3 , constructed (spin) for donor      621  LYS  NZ  .
+ HBUILD: HH11,HH12,    , constructed (spin) for donor      626  ARG  NH1 .
+ HBUILD: HH21,HH22,    , constructed (spin) for donor      626  ARG  NH2 .
+ HBUILD: HH11,HH12,    , constructed (spin) for donor      627  ARG  NH1 .
+ HBUILD: HH21,HH22,    , constructed (spin) for donor      627  ARG  NH2 .
+ HBUILD: HG21,HG22,HG23, constructed (spin) for donor      628  ILE  CG2 .
+ HBUILD: HD11,HD12,HD13, constructed (spin) for donor      628  ILE  CD1 .
+ HBUILD: HB1 ,HB2 ,HB3 , constructed (spin) for donor      629  ALA  CB  .
+ HBUILD: HE1 ,HE2 ,HE3 , constructed (spin) for donor      631  MET  CE  .
+ HBUILD: HH11,HH12,    , constructed (spin) for donor      633  ARG  NH1 .
+ HBUILD: HH21,HH22,    , constructed (spin) for donor      633  ARG  NH2 .
+ HBUILD: HG21,HG22,HG23, constructed (spin) for donor      635  ILE  CG2 .
+ HBUILD: HD11,HD12,HD13, constructed (spin) for donor      635  ILE  CD1 .
+ HBUILD: HD11,HD12,HD13, constructed (spin) for donor      636  LEU  CD1 .
+ HBUILD: HD21,HD22,HD23, constructed (spin) for donor      636  LEU  CD2 .
+ HBUILD: HG1 ,    ,    , constructed (spin) for donor      640  THR  OG1 .
+ HBUILD: HG21,HG22,HG23, constructed (spin) for donor      640  THR  CG2 .
+ HBUILD: HZ1 ,HZ2 ,HZ3 , constructed (spin) for donor      641  LYS  NZ  .
+ HBUILD: HD11,HD12,HD13, constructed (spin) for donor      642  LEU  CD1 .
+ HBUILD: HD21,HD22,HD23, constructed (spin) for donor      642  LEU  CD2 .
+ HBUILD: HG11,HG12,HG13, constructed (spin) for donor      644  VAL  CG1 .
+ HBUILD: HG21,HG22,HG23, constructed (spin) for donor      644  VAL  CG2 .
+ HBUILD: HG21,HG22,HG23, constructed (spin) for donor      645  ILE  CG2 .
+ HBUILD: HD11,HD12,HD13, constructed (spin) for donor      645  ILE  CD1 .
+ HBUILD: HG21,HG22,HG23, constructed (spin) for donor      646  ILE  CG2 .
+ HBUILD: HD11,HD12,HD13, constructed (spin) for donor      646  ILE  CD1 .
+ HBUILD: HG  ,    ,    , constructed (spin) for donor      649  SER  OG  .
+ HBUILD: HH  ,    ,    , constructed (spin) for donor      650  TYR  OH  .
+ HBUILD: HZ1 ,HZ2 ,HZ3 , constructed (spin) for donor      653  LYS  NZ  .
+ HBUILD: HG  ,    ,    , constructed (spin) for donor      654  SER  OG  .
+ HBUILD: HG1 ,    ,    , constructed (spin) for donor      655  THR  OG1 .
+ HBUILD: HG21,HG22,HG23, constructed (spin) for donor      655  THR  CG2 .
+ HBUILD: HG11,HG12,HG13, constructed (spin) for donor      656  VAL  CG1 .
+ HBUILD: HG21,HG22,HG23, constructed (spin) for donor      656  VAL  CG2 .
+ X-PLOR>flags include vdw elec end 
+ X-PLOR> 
+ X-PLOR>minimize powell nstep=200 nprint=50 end 
+ POWELL: number of degrees of freedom=  7395
+ MAKINB: mode  -3 found   6985 exclusions,       0 interactions(1-4) and   6985 GB exclusions
+ --------------- cycle=    50 ------ stepsize=    0.0002 -----------------------
+ | Etotal =2100.704   grad(E)=14.192     E(BOND)=235.481    E(ANGL)=661.887    |
+ | E(IMPR)=218.627    E(VDW )=984.709    E(ELEC)=0.000                         |
+ -------------------------------------------------------------------------------
+ --------------- cycle=   100 ------ stepsize=    0.0002 -----------------------
+ | Etotal =1588.479   grad(E)=4.793      E(BOND)=170.812    E(ANGL)=441.779    |
+ | E(IMPR)=60.125     E(VDW )=915.763    E(ELEC)=0.000                         |
+ -------------------------------------------------------------------------------
+ --------------- cycle=   150 ------ stepsize=    0.0001 -----------------------
+ | Etotal =1401.715   grad(E)=2.149      E(BOND)=150.948    E(ANGL)=362.376    |
+ | E(IMPR)=41.355     E(VDW )=847.036    E(ELEC)=0.000                         |
+ -------------------------------------------------------------------------------
+ --------------- cycle=   200 ------ stepsize=    0.0001 -----------------------
+ | Etotal =1283.989   grad(E)=2.428      E(BOND)=142.740    E(ANGL)=314.641    |
+ | E(IMPR)=29.400     E(VDW )=797.208    E(ELEC)=0.000                         |
+ -------------------------------------------------------------------------------
+ POWELL: STEP number limit. Normal termination
+ POWELL: Current coordinates set to last minimum
+ X-PLOR> 
+ X-PLOR>{*Write coordinates.*} 
+ X-PLOR> 
+ X-PLOR>remarks produced by Refine.NTxplor.GenerateTemplate 
+ X-PLOR> 
+ X-PLOR> 
+ X-PLOR>{*==========================================================================*} 
+ X-PLOR>{*=== WRITE MOLECULAR FILES ================================================*} 
+ X-PLOR>{*==========================================================================*} 
+ X-PLOR> 
+ X-PLOR>write coordinates 
+ WRITE-COOR>  sele=(all) 
+ SELRPN:   2465 atoms have been selected out of   2465
+ WRITE-COOR>  output=2fwu.cing/Refine/annealed/Template/template.pdb 
+ WRITE-COOR>end 
+ ASSFIL: file 2fwu.cing/Refine/annealed/Template/template.pdb opened.
+ X-PLOR> 
+ X-PLOR> 
+ X-PLOR>set message on echo on end 
+ X-PLOR> 
+ X-PLOR>stop 
+ HEAP:   maximum use=  3490060 current use=  3114206
+ X-PLOR: total CPU time=      3.3409 s
+ X-PLOR: entry time at 14:32:22 06-May-11
+ X-PLOR: exit time at 14:32:25 06-May-11

@@ -1,0 +1,77 @@
+data_completeness_observable_info
+
+save_file_characteristics
+   _Saveframe_category   file_characteristics
+
+   _File_version         1.0
+   _Author              "Jurgen F. Doreleijers"
+
+   loop_
+      _Date
+      _Details
+
+       2004-01-30 "First creation from Aqua lib" 
+
+   stop_
+
+save_
+
+
+save_completeness_observable_info
+   _Saveframe_category   completeness_observable_info
+
+   _Details             
+;
+The listed residues/atom combination only considers observable 
+amide and alpha protons.
+;
+
+   loop_
+      _Comp_ID
+      _Atom_ID
+
+       ALA  H   
+       ALA  HA  
+       ARG  H   
+       ARG  HA  
+       ASN  H   
+       ASN  HA  
+       ASP  H   
+       ASP  HA  
+       CYS  H   
+       CYS  HA  
+       GLN  H   
+       GLN  HA  
+       GLU  H   
+       GLU  HA  
+       GLY  H   
+       GLY  HA2 
+       GLY  HA3 
+       HIS  H   
+       HIS  HA  
+       ILE  H   
+       ILE  HA  
+       LEU  H   
+       LEU  HA  
+       LYS  H   
+       LYS  HA  
+       MET  H   
+       MET  HA  
+       PHE  H   
+       PHE  HA  
+       PRO  HA  
+       SER  H   
+       SER  HA  
+       THR  H   
+       THR  HA  
+       TRP  H   
+       TRP  HA  
+       TYR  H   
+       TYR  HA  
+       VAL  H   
+       VAL  HA  
+
+   stop_
+
+save_
+

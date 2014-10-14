@@ -1,0 +1,42 @@
+6,500 lines of java.
+
+jd:stella/cing/ find client -name "*.java" | xargs wc
+      54     155    1886 client/About.java
+     216     512    8259 client/CingLogView.java
+     104     433    4285 client/Classification.java
+     716    1931   33273 client/Criteria.java
+     433    1188   17030 client/FileView.java
+     169     467    5706 client/FormHandlerFile.java
+     151     574    5217 client/FormHandlerMain.java
+      45     137    1722 client/FormHandlerSpecific.java
+     473    1978   13617 client/GenClient.java
+      12      28     324 client/GreetingService.java
+      10      22     250 client/GreetingServiceAsync.java
+     741    2158   21932 client/iCing.java
+    1232    2899   26803 client/iCingConstants.java
+      57     195    2158 client/iCingQuery.java
+      65     192    1626 client/iCingView.java
+      67     150    2257 client/Login.java
+      73     175    2623 client/LogView.java
+      28      50     781 client/Maintenance.java
+     177     452    6302 client/Options.java
+      61     149    2093 client/Preferences.java
+     193     641    6755 client/Report.java
+      75     171    3006 client/RestraintCriteria.java
+     153     391    5956 client/RunView.java
+     116     834    6794 client/Settings.java
+     144     582    4887 client/StyleSheetLoader.java
+     284    1002    8074 client/Utils.java
+      49     180    1292 client/UtilsJS.java
+      41      88    1474 client/Welcome.java
+    5939   17734  196382 total
+
+jd:stella/cing/ find server -name "*.java" | xargs wc
+      19      62     624 server/GreetingServiceImpl.java
+     692    2520   28403 server/iCingServlet.java
+      23      97     838 server/Tgz.java
+      14      28     287 server/TgzTest.java
+     114     386    3403 server/Ut.java
+      33      89     894 server/UtilsTest.java
+      21      53     683 server/UtTest.java
+     916    3235   35132 total

@@ -1,0 +1,174 @@
+data_completeness_observable_info
+
+save_file_characteristics
+   _Saveframe_category   file_characteristics
+
+   _File_version         1.0
+   _Author              "Jurgen F. Doreleijers"
+
+   loop_
+      _Date
+      _Details
+
+       2004-01-30 "First creation from Aqua lib" 
+
+   stop_
+
+save_
+
+
+save_completeness_observable_info
+   _Saveframe_category   completeness_observable_info
+
+   _Details             
+;
+The listed residues/atom combination includes all theoretically possible
+with NMR. Due to technical limitations the protons of QD and QE of
+Phenylalanine and Tyrosine and QH1 and QH2 of Arginine can only be
+represented by their pseudoatoms. This set is the same as the standard set with
+all prochiral groups individually observable plus 9 exchangable protons
+;
+
+   loop_
+      _Comp_ID
+      _Atom_ID
+
+       ALA  H    
+       ALA  HA   
+       ALA  MB   
+       ARG  H    
+       ARG  HA   
+       ARG  HB2  
+       ARG  HB3  
+       ARG  HG2  
+       ARG  HG3  
+       ARG  HD2  
+       ARG  HD3  
+       ARG  HE   
+       ARG  QH1  
+       ARG  QH2  
+       ASN  H    
+       ASN  HA   
+       ASN  HB2  
+       ASN  HB3  
+       ASN  HD21 
+       ASN  HD22 
+       ASP  H    
+       ASP  HA   
+       ASP  HB2  
+       ASP  HB3  
+       ASP  HD2  
+       CYS  H    
+       CYS  HA   
+       CYS  HB2  
+       CYS  HB3  
+       CYS  HG   
+       GLN  H    
+       GLN  HA   
+       GLN  HB2  
+       GLN  HB3  
+       GLN  HG2  
+       GLN  HG3  
+       GLN  HE21 
+       GLN  HE22 
+       GLU  H    
+       GLU  HA   
+       GLU  HB2  
+       GLU  HB3  
+       GLU  HG2  
+       GLU  HG3  
+       GLU  HE2  
+       GLY  H    
+       GLY  HA2  
+       GLY  HA3  
+       HIS  H    
+       HIS  HA   
+       HIS  HB2  
+       HIS  HB3  
+       HIS  HD1  
+       HIS  HD2  
+       HIS  HE1  
+       HIS  HE2  
+       ILE  H    
+       ILE  HA   
+       ILE  HB   
+       ILE  MG   
+       ILE  HG12 
+       ILE  HG13 
+       ILE  MD   
+       LEU  H    
+       LEU  HA   
+       LEU  HB2  
+       LEU  HB3  
+       LEU  HG   
+       LEU  MD1  
+       LEU  MD2  
+       LYS  H    
+       LYS  HA   
+       LYS  HB2  
+       LYS  HB3  
+       LYS  HG2  
+       LYS  HG3  
+       LYS  HD2  
+       LYS  HD3  
+       LYS  HE2  
+       LYS  HE3  
+       LYS  QZ   
+       MET  H    
+       MET  HA   
+       MET  HB2  
+       MET  HB3  
+       MET  HG2  
+       MET  HG3  
+       MET  ME   
+       PHE  H    
+       PHE  HA   
+       PHE  HB2  
+       PHE  HB3  
+       PHE  QD   
+       PHE  HZ   
+       PHE  QE   
+       PRO  HA   
+       PRO  HB2  
+       PRO  HB3  
+       PRO  HG2  
+       PRO  HG3  
+       PRO  HD2  
+       PRO  HD3  
+       SER  H    
+       SER  HA   
+       SER  HB2  
+       SER  HB3  
+       SER  HG   
+       THR  H    
+       THR  HA   
+       THR  HB   
+       THR  MG   
+       THR  HG1  
+       TRP  H    
+       TRP  HA   
+       TRP  HB2  
+       TRP  HB3  
+       TRP  HD1  
+       TRP  HE3  
+       TRP  HE1  
+       TRP  HZ3  
+       TRP  HZ2  
+       TRP  HH2  
+       TYR  H    
+       TYR  HA   
+       TYR  HB2  
+       TYR  HB3  
+       TYR  QD   
+       TYR  QE   
+       TYR  HH   
+       VAL  H    
+       VAL  HA   
+       VAL  HB   
+       VAL  MG1  
+       VAL  MG2  
+
+   stop_
+
+save_
+

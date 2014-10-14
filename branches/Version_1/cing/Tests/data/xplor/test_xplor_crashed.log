@@ -1,0 +1,2077 @@
+		       Xplor-NIH version 2.27 
+ 
+ C.D. Schwieters, J.J.  Kuszewski,       Progr. NMR Spectr. 48, 47-62 (2006). 
+ N. Tjandra, and G.M. Clore              J. Magn. Res., 160, 66-74 (2003). 
+ http://nmr.cit.nih.gov/xplor-nih        based on X-PLOR 3.851 by A.T. Brunger 
+
+ User: jd           on: duvel.cmbi(darwin/x86    )  at: 06-May-11 14:40:46
+ X-PLOR>blow it up 
+ %X-PLOR-ERR: unrecognized command:
+ blow 
+ ^^^^
+ %X-PLOR-ERR: unrecognized command:
+ blow it 
+      ^^
+ %X-PLOR-ERR: unrecognized command:
+ blow it up 
+         ^^
+ X-PLOR>blow it up 
+ %X-PLOR-ERR: unrecognized command:
+ blow 
+ ^^^^
+ %X-PLOR-ERR: unrecognized command:
+ blow it 
+      ^^
+ %X-PLOR-ERR: unrecognized command:
+ blow it up 
+         ^^
+ X-PLOR>blow it up 
+ %X-PLOR-ERR: unrecognized command:
+ blow 
+ ^^^^
+ %X-PLOR-ERR: unrecognized command:
+ blow it 
+      ^^
+ %X-PLOR-ERR: unrecognized command:
+ blow it up 
+         ^^
+ X-PLOR>blow it up 
+ %X-PLOR-ERR: unrecognized command:
+ blow 
+ ^^^^
+ %X-PLOR-ERR: unrecognized command:
+ blow it 
+      ^^
+ %X-PLOR-ERR: unrecognized command:
+ blow it up 
+         ^^
+ X-PLOR>blow it up 
+ %X-PLOR-ERR: unrecognized command:
+ blow 
+ ^^^^
+ %X-PLOR-ERR: unrecognized command:
+ blow it 
+      ^^
+ %X-PLOR-ERR: unrecognized command:
+ blow it up 
+         ^^
+ X-PLOR>blow it up 
+ %X-PLOR-ERR: unrecognized command:
+ blow 
+ ^^^^
+ %X-PLOR-ERR: unrecognized command:
+ blow it 
+      ^^
+ %X-PLOR-ERR: unrecognized command:
+ blow it up 
+         ^^
+ X-PLOR>blow it up 
+ %X-PLOR-ERR: unrecognized command:
+ blow 
+ ^^^^
+ %X-PLOR-ERR: unrecognized command:
+ blow it 
+      ^^
+ %X-PLOR-ERR: unrecognized command:
+ blow it up 
+         ^^
+ X-PLOR>blow it up 
+ %X-PLOR-ERR: unrecognized command:
+ blow 
+ ^^^^
+ %X-PLOR-ERR: unrecognized command:
+ blow it 
+      ^^
+ %X-PLOR-ERR: unrecognized command:
+ blow it up 
+         ^^
+ X-PLOR>{*==========================================================================*} 
+ X-PLOR>remarks Anneal protocol adapted from tutorial/nmr/sa_new.inp 
+ X-PLOR>remarks in XPLOR-NIH (Charles D. Schwieters) 
+ X-PLOR>remarks by Jurgen F. Doreleijers 2011-04-30 
+ X-PLOR>{*==========================================================================*} 
+ X-PLOR> 
+ X-PLOR> 
+ X-PLOR>{*==========================================================================*} 
+ X-PLOR>{*=== READ THE PARAMETER AND TOPOLOGY FILES ================================*} 
+ X-PLOR>{*==========================================================================*} 
+ X-PLOR> 
+ X-PLOR>{* Non-bonded parameters; choice: "PROLSQ" "PARMALLH6" "PARALLHDG" "OPLSX"  *} 
+ X-PLOR>evaluate ( $par_nonbonded = "OPLSX" ) 
+ EVALUATE: symbol $PAR_NONBONDED set to "OPLSX" (string)
+ X-PLOR> 
+ X-PLOR>parameter 
+ PARRDR>  @2fwu.cing/Refine/annealed/Toppar/parallhdg5.3-merge.pro 
+ ASSFIL: file 2fwu.cing/Refine/annealed/Toppar/parallhdg5.3-merge.pro opened.
+ PARRDR>remark   file protein-allhdg-ucl.param  version UCL  date 07-JUL-01 
+ PARRDR>remark   for file protein-allhdg-ucl.top  version UCL  date 14-MAR-00 
+ PARRDR>remark   for file protein-allhdg-dih-ucl.top  version UCL  date 07-JUL-01 
+ PARRDR>remark   Geometric energy function parameters for distance geometry and 
+ PARRDR>remark   simulated annealing. 
+ PARRDR>remark   Original author: Michael Nilges, EMBL Heidelberg 
+ PARRDR>remark   Modifications: Mark A. Williams, UCL London 
+ PARRDR>remark   last modification: NBFIX for hydrogens in OPLSX nonbonded term. MN, 30-01-04 
+ PARRDR> 
+ PARRDR>set echo off message off end 
+ PARRDR>end 
+ X-PLOR> 
+ X-PLOR>parameter 
+ PARRDR>  @2fwu.cing/Refine/annealed/Toppar/par_axis_aria.pro 
+ PARRDR>remark parameter file for dipolar coupling calculations 
+ PARRDR>set message off echo off end 
+ PARRDR>end 
+ X-PLOR> 
+ X-PLOR>parameter 
+ PARRDR>  @2fwu.cing/Refine/annealed/Toppar/ion.param 
+ ASSFIL: file 2fwu.cing/Refine/annealed/Toppar/ion.param opened.
+ PARRDR>remarks file toppar/ion.param 
+ PARRDR>remarks nonbonded parameters for common ions 
+ PARRDR>remarks new parameters derived from literature for single atom species 
+ PARRDR>remarks PDA 02/09/99 
+ PARRDR> 
+ PARRDR>set echo=off end 
+ PARRDR>end 
+ X-PLOR> 
+ X-PLOR>topology 
+ RTFRDR>  @2fwu.cing/Refine/annealed/Toppar/topallhdg5.3-merge.pro 
+ ASSFIL: file 2fwu.cing/Refine/annealed/Toppar/topallhdg5.3-merge.pro opened.
+ RTFRDR>remark   file topallhdg.pro  version 5.3  date 23-Sept-02 
+ RTFRDR>remark      for file parallhdg.pro version 5.3 date 13-Feb-02 or later 
+ RTFRDR>remark   Geometric energy function parameters for distance geometry and 
+ RTFRDR>remark      simulated annealing. 
+ RTFRDR>remark   Author: Michael Nilges, EMBL Heidelberg; Institut Pasteur, Paris 
+ RTFRDR>remark   This file contains modifications from M. Williams, UCL London 
+ RTFRDR>remark   Last modification 16-Sept-02 
+ RTFRDR> 
+ RTFRDR>set echo off message off end 
+ RTFRDR>end 
+ X-PLOR>topology 
+ RTFRDR>  @2fwu.cing/Refine/annealed/Toppar/topallhdg5.3.sol 
+ RTFRDR>remarks  TOPH19.SOL 
+ RTFRDR>remarks  ========== 
+ RTFRDR>remarks  topology file for solvent molecules 
+ RTFRDR>remarks  water models available: TIP3P model 
+ RTFRDR> 
+ RTFRDR>set echo=false end 
+ RTFRDR>end 
+ X-PLOR>topology 
+ RTFRDR>  @2fwu.cing/Refine/annealed/Toppar/top_axis_aria.pro 
+ RTFRDR>remark topology file for dipolar coupling calculations 
+ RTFRDR>set message off echo off end 
+ RTFRDR>end 
+ X-PLOR>topology 
+ RTFRDR>  @2fwu.cing/Refine/annealed/Toppar/ion.top 
+ ASSFIL: file 2fwu.cing/Refine/annealed/Toppar/ion.top opened.
+ RTFRDR>remarks file toppar/ion.top 
+ RTFRDR>remarks topology and masses for common ions 
+ RTFRDR>remarks Dingle atom ion residues are given the name of the element. 
+ RTFRDR>remarks By default the atom will be uncharged (eg. the residue MG will 
+ RTFRDR>remarks contain the atom called MG with zero charge). 
+ RTFRDR>remarks To use the charged species the charge state is appended to 
+ RTFRDR>remarks the atom name (eg to use MG2+ the residue name is MG2, and the 
+ RTFRDR>remarks atom name is MG+2 and has charge +2.0). 
+ RTFRDR>remarks NOTE: not all ionic species are represented 
+ RTFRDR>remarks PDA 02/09/99 
+ RTFRDR> 
+ RTFRDR>set echo=false end 
+ RTFRDR>end 
+ X-PLOR>{*==========================================================================*} 
+ X-PLOR>{*=== READ MOLECULAR FILES =================================================*} 
+ X-PLOR>{*==========================================================================*} 
+ X-PLOR>structure @2fwu.cing/Refine/annealed/PSF/2fwu.psf end 
+ ASSFIL: file 2fwu.cing/Refine/annealed/PSF/2fwu.psf opened.
+ STRUcture>PSF 
+ REMARKS FILENAME="2fwu.cing/Refine/annealed/PSF/2fwu.psf"
+ REMARKS PDB file of molecule 2fwu
+ REMARKS DATE:06-May-11  14:32:22       created by user: jd
+ XPLOR: current counts (number in parenthesis is maximum)
+ NATOM=       2465(MAXA=        3200)  NBOND=       2484(MAXB=        3200)
+ NTHETA=      4501(MAXT=        6400)  NGRP=         157(MAXGRP=       200)
+ NPHI=        3849(MAXP=        6400)  NIMPHI=      1249(MAXIMP=      1600)  
+ NDON=         262(MAXPAD=       400)  NACC=         264(MAXPAD=       400)
+ NNB=         1044(MAXNB=       1600) 
+ STRUcture> end 
+ X-PLOR>coordinates @2fwu.cing/Refine/annealed/Template/template.pdb 
+ ASSFIL: file 2fwu.cing/Refine/annealed/Template/template.pdb opened.
+ COOR>REMARK FILENAME="2fwu.cing/Refine/annealed/Template/template.pdb" 
+ COOR>REMARK produced by Refine.NTxplor.GenerateTemplate 
+ COOR>REMARK DATE:06-May-11  14:32:25       created by user: jd 
+ COOR>ATOM      1  N   HIS   501      -7.998   3.465   0.756  1.00  0.00 
+ COOR>ATOM      2  HN  HIS   501      -8.164   4.184   1.400  1.00  0.00 
+ X-PLOR> 
+ X-PLOR>set message on echo on end 
+ X-PLOR> 
+ X-PLOR>remarks file  nmr/sa.inp 
+ X-PLOR>remarks  Simulated annealing protocol for NMR structure determination. 
+ X-PLOR>remarks  The starting structure for this protocol can be any structure with 
+ X-PLOR>remarks  a reasonable geometry, such as randomly assigned torsion angles or 
+ X-PLOR>remarks  extended strands. 
+ X-PLOR>remarks  Author: Michael Nilges 
+ X-PLOR> 
+ X-PLOR>{====>} 
+ X-PLOR>evaluate ($init_t = 1000 )       {*Initial simulated annealing temperature.*} 
+ EVALUATE: symbol $INIT_T set to    1000.00     (real)
+ X-PLOR>{====>} 
+ X-PLOR>evaluate ($high_steps= 24000 )         {*Total number of steps at high temp.*} 
+ EVALUATE: symbol $HIGH_STEPS set to    24000.0     (real)
+ X-PLOR>{====>} 
+ X-PLOR>evaluate ($cool_steps = 3000 )      {*Total number of steps during cooling.*} 
+ EVALUATE: symbol $COOL_STEPS set to    3000.00     (real)
+ X-PLOR> 
+ X-PLOR> 
+ X-PLOR>{*==========================================================================*} 
+ X-PLOR>{*========================= READ THE EXPERIMENTAL DATA =====================*} 
+ X-PLOR>{*==========================================================================*} 
+ X-PLOR>set message off echo off end 
+ NOE: allocating space for   30000 restraints.
+ %CSTRAN: allocating space for   10000 assignments.
+ POWELL: number of degrees of freedom=  7395
+ --------------- cycle=    25 ------ stepsize=    0.0001 -----------------------
+ | Etotal =470389.256 grad(E)=40.519     E(BOND)=1719.473   E(ANGL)=5737.731   |
+ | E(IMPR)=2686.657   E(VDW )=205.408    E(CDIH)=10659.015  E(NOE )=449380.972 |
+ -------------------------------------------------------------------------------
+ --------------- cycle=    50 ------ stepsize=    0.0001 -----------------------
+ | Etotal =461261.417 grad(E)=25.589     E(BOND)=1525.720   E(ANGL)=3759.308   |
+ | E(IMPR)=1210.867   E(VDW )=225.611    E(CDIH)=8416.682   E(NOE )=446123.229 |
+ -------------------------------------------------------------------------------
+ POWELL: STEP number limit. Normal termination
+ POWELL: Current coordinates set to last minimum
+ DYNAMC: number of degrees of freedom=    7395
+ ASSVEL: velocities assigned at   1000.0000 K, SEED=  906205932.    
+ ASSVEL: maxwell distribution
+ CENMAS: Information about center of free masses
+         position [A]          :    123.30112      0.49835      0.50067
+         velocity [A/ps]       :      0.02980      0.02802      0.01110
+         ang. mom. [amu A/ps]  :  80873.18204 687694.487021045313.49511
+         kin. ener. [Kcal/mol] :      0.52907
+ ROTSTP: CM translation and rotation removed.
+ CENMAS: Information about center of free masses
+         position [A]          :    123.30112      0.49835      0.50067
+         velocity [A/ps]       :     -0.00000      0.00000      0.00000
+         ang. mom. [amu A/ps]  :     -0.00000      0.00000      0.00000
+         kin. ener. [Kcal/mol] :      0.00000
+ --------------- 2-step Verlet initialization ----------------------------------
+ | E(kin)+E(total)=465266.308      E(kin)=7350.256      temperature=1000.356   |
+ | Etotal =457916.052 grad(E)=39.202     E(BOND)=1525.720   E(ANGL)=1503.723   |
+ | E(IMPR)=121.087    E(VDW )=225.611    E(CDIH)=8416.682   E(NOE )=446123.229 |
+ -------------------------------------------------------------------------------
+ %ATMCHK-ERR: unknown coordinates for atom "    -501 -HIS -N   :"-30354.630 20545.923 -4647.666
+ %ATMCHK-ERR: unknown coordinates for atom "    -501 -HIS -CA  :"104452.113-41283.139-31078.575
+ %ATMCHK-ERR: unknown coordinates for atom "    -501 -HIS -HA  :"-26145.026 11712.204 -2563.256
+ %ATMCHK-ERR: unknown coordinates for atom "    -501 -HIS -CB  :" 26588.280  7231.474 72848.044
+ %ATMCHK-ERR: unknown coordinates for atom "    -501 -HIS -CG  :"-21633.226 19374.483 -5377.994
+ %ATMCHK-ERR: unknown coordinates for atom "    -501 -HIS -HD1 :" -3407.249 16567.666 10762.939
+ %ATMCHK-ERR: unknown coordinates for atom "    -501 -HIS -CD2 :" 52513.124 22009.551-28165.224
+ %ATMCHK-ERR: unknown coordinates for atom "    -501 -HIS -HD2 :"-47022.945-25418.692 10888.149
+ %ATMCHK-ERR: unknown coordinates for atom "    -501 -HIS -CE1 :"  8456.171 28413.153 10873.304
+ %ATMCHK-ERR: unknown coordinates for atom "    -501 -HIS -NE2 :" -6462.534 -6015.178 15969.443
+ %ATMCHK-ERR: unknown coordinates for atom "    -501 -HIS -C   :"-79027.055-36805.745 16876.012
+ %ATMCHK-ERR: unknown coordinates for atom "    -501 -HIS -O   :" 13595.370  7019.194  6795.985
+ %ATMCHK-ERR: unknown coordinates for atom "    -502 -ALA -N   :" 80732.380 71052.937-60286.594
+ %ATMCHK-ERR: unknown coordinates for atom "    -502 -ALA -HN  :"-20829.986-18356.644 16791.068
+ %ATMCHK-ERR: unknown coordinates for atom "    -502 -ALA -CA  :"-80743.261-60637.014 79008.713
+ %ATMCHK-ERR: unknown coordinates for atom "    -502 -ALA -HA  :" 20988.124  8527.945 -9333.105
+ %ATMCHK-ERR: unknown coordinates for atom "    -502 -ALA -HB1 :" 22582.329 16936.790 16204.038
+ %ATMCHK-ERR: unknown coordinates for atom "    -502 -ALA -HB2 :" 31068.904 17727.900 11867.566
+ %ATMCHK-ERR: unknown coordinates for atom "    -502 -ALA -HB3 :" 20917.121 10315.223 14813.950
+ %ATMCHK-ERR: unknown coordinates for atom "    -502 -ALA -C   :" 10570.213 72676.605 14164.298
+ %ATMCHK-ERR: unknown coordinates for atom "    -503 -GLY -HN  :"-13415.277  9436.788 15377.827
+ %ATMCHK-ERR: unknown coordinates for atom "    -503 -GLY -CA  :"291542.453********************
+ %ATMCHK-ERR: unknown coordinates for atom "    -503 -GLY -HA1 :"-58924.042 37272.620 66283.377
+ %ATMCHK-ERR: unknown coordinates for atom "    -503 -GLY -HA2 :"**********-27989.495 23555.723
+ %ATMCHK-ERR: unknown coordinates for atom "    -503 -GLY -C   :"**********427892.088231172.871
+ %ATMCHK-ERR: unknown coordinates for atom "    -503 -GLY -O   :" 52394.624-89561.924-56528.801
+ %ATMCHK-ERR: unknown coordinates for atom "    -504 -ILE -N   :"494882.217**********-76160.155
+ %ATMCHK-ERR: unknown coordinates for atom "    -504 -ILE -HN  :"**********115076.574 13522.817
+ %ATMCHK-ERR: unknown coordinates for atom "    -504 -ILE -CA  :"**********672783.231-39508.043
+ %ATMCHK-ERR: unknown coordinates for atom "    -504 -ILE -HA  :" 68917.628-64520.050 34927.581
+ %ATMCHK-ERR: unknown coordinates for atom "    -504 -ILE -CB  :" 22483.594**********-59292.454
+ %ATMCHK-ERR: unknown coordinates for atom "    -504 -ILE -HB  :" 14899.118170261.361-14589.039
+ %ATMCHK-ERR: unknown coordinates for atom "    -504 -ILE -CG1 :" 17501.008103200.349-36618.085
+ %ATMCHK-ERR: unknown coordinates for atom "    -504 -ILE -HG11:"  4475.708  7654.527 18244.882
+ %ATMCHK-ERR: unknown coordinates for atom "    -504 -ILE -HG12:" -7639.679  6049.422 15000.008
+ %ATMCHK-ERR: unknown coordinates for atom "    -504 -ILE -CG2 :"154299.864142111.243397740.595
+ %ATMCHK-ERR: unknown coordinates for atom "    -504 -ILE -CD1 :"-11900.801-93171.755 19049.120
+ %ATMCHK-ERR: unknown coordinates for atom "    -504 -ILE -HD11:"  1453.579 22773.514 -8121.012
+ %ATMCHK-ERR: unknown coordinates for atom "    -504 -ILE -HD12:"  7860.385 40818.004 -6545.339
+ %ATMCHK-ERR: unknown coordinates for atom "    -504 -ILE -HD13:"  -509.949 20534.421 -1255.482
+ %ATMCHK-ERR: unknown coordinates for atom "    -504 -ILE -O   :" 19595.416130508.763 60265.752
+ %ATMCHK-ERR: unknown coordinates for atom "    -505 -PHE -N   :"172361.329601097.834138488.824
+ %ATMCHK-ERR: unknown coordinates for atom "    -505 -PHE -HA  :" 31730.234-10091.537 28152.027
+ %ATMCHK-ERR: unknown coordinates for atom "    -505 -PHE -CB  :"181690.171-23680.293-63061.684
+ %ATMCHK-ERR: unknown coordinates for atom "    -505 -PHE -HB1 :"-45572.785 -6719.927 15424.171
+ %ATMCHK-ERR: unknown coordinates for atom "    -505 -PHE -HB2 :"-71739.571-11933.995 16177.453
+ %ATMCHK-ERR: unknown coordinates for atom "    -505 -PHE -CG  :"  5210.597103785.232 93086.671
+ %ATMCHK-ERR: unknown coordinates for atom "    -505 -PHE -HD1 :" 18405.853  -362.786 18946.852
+ %ATMCHK-ERR: unknown coordinates for atom "    -505 -PHE -CD2 :" 17620.456 -6831.734-74764.318
+ %ATMCHK-ERR: unknown coordinates for atom "    -505 -PHE -HD2 :" -3645.496-10044.874 23058.993
+ %ATMCHK-ERR: unknown coordinates for atom "    -505 -PHE -CE1 :"125469.497-11122.179 90076.620
+ %ATMCHK-ERR: unknown coordinates for atom "    -505 -PHE -CE2 :" -8920.796-41858.589 58692.407
+ %ATMCHK-ERR: unknown coordinates for atom "    -505 -PHE -HE2 :"  5631.647 19499.629 -4651.159
+ %ATMCHK-ERR: unknown coordinates for atom "    -505 -PHE -HZ  :" -3344.790 26293.870 38756.064
+ %ATMCHK-ERR: unknown coordinates for atom "    -505 -PHE -C   :"278464.458 42625.361192373.405
+ %ATMCHK-ERR: unknown coordinates for atom "    -506 -THR -N   :"**********425494.779**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -506 -THR -HN  :"196000.352-83379.113125643.799
+ %ATMCHK-ERR: unknown coordinates for atom "    -506 -THR -CA  :"******************************
+ %ATMCHK-ERR: unknown coordinates for atom "    -506 -THR -HA  :"**********233139.275**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -506 -THR -CB  :"**********581976.170**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -506 -THR -HB  :" 22477.392-83340.478 -2583.144
+ %ATMCHK-ERR: unknown coordinates for atom "    -506 -THR -HG1 :" 28231.493 19104.386  -305.411
+ %ATMCHK-ERR: unknown coordinates for atom "    -506 -THR -CG2 :" 65844.127**********-41202.905
+ %ATMCHK-ERR: unknown coordinates for atom "    -506 -THR -HG21:" -5254.738 11100.091  8573.678
+ %ATMCHK-ERR: unknown coordinates for atom "    -506 -THR -HG22:"-15828.907 12654.722 16889.619
+ %ATMCHK-ERR: unknown coordinates for atom "    -506 -THR -HG23:" -9189.411 18683.949 11237.983
+ %ATMCHK-ERR: unknown coordinates for atom "    -506 -THR -C   :"**********312941.596**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -506 -THR -O   :" 37735.084**********231077.404
+ %ATMCHK-ERR: unknown coordinates for atom "    -507 -PHE -N   :"**********784229.256218220.098
+ %ATMCHK-ERR: unknown coordinates for atom "    -507 -PHE -HN  :" 66930.643**********  9277.394
+ %ATMCHK-ERR: unknown coordinates for atom "    -507 -PHE -CA  :"584665.000********************
+ %ATMCHK-ERR: unknown coordinates for atom "    -507 -PHE -HA  :"**********318127.867 36421.257
+ %ATMCHK-ERR: unknown coordinates for atom "    -507 -PHE -CB  :"**********216476.721338741.635
+ %ATMCHK-ERR: unknown coordinates for atom "    -507 -PHE -HB1 :"  7082.074 28047.777-74239.853
+ %ATMCHK-ERR: unknown coordinates for atom "    -507 -PHE -HB2 :" 22523.456 14526.870-80165.161
+ %ATMCHK-ERR: unknown coordinates for atom "    -507 -PHE -CG  :" 55818.386-19989.515-84409.347
+ %ATMCHK-ERR: unknown coordinates for atom "    -507 -PHE -CD1 :" 75121.014 15933.007-16627.183
+ %ATMCHK-ERR: unknown coordinates for atom "    -507 -PHE -CD2 :"-52897.409 88336.893 21505.217
+ %ATMCHK-ERR: unknown coordinates for atom "    -507 -PHE -HD2 :" 14036.982-12779.685-14500.800
+ %ATMCHK-ERR: unknown coordinates for atom "    -507 -PHE -CE1 :"   119.075-17524.711 38833.949
+ %ATMCHK-ERR: unknown coordinates for atom "    -507 -PHE -CE2 :"-17782.163-73686.928 32344.673
+ %ATMCHK-ERR: unknown coordinates for atom "    -507 -PHE -HE2 :" -7382.020 15317.246 -8104.366
+ %ATMCHK-ERR: unknown coordinates for atom "    -507 -PHE -CZ  :" 51688.893 -1177.898-48176.191
+ %ATMCHK-ERR: unknown coordinates for atom "    -507 -PHE -HZ  :"-24591.162 10959.108  9733.441
+ %ATMCHK-ERR: unknown coordinates for atom "    -507 -PHE -C   :"**********409091.002**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -507 -PHE -O   :" 16194.158-73666.811-15800.673
+ %ATMCHK-ERR: unknown coordinates for atom "    -508 -GLU -N   :"-88971.439488793.981699625.278
+ %ATMCHK-ERR: unknown coordinates for atom "    -508 -GLU -HN  :" 38530.304********************
+ %ATMCHK-ERR: unknown coordinates for atom "    -508 -GLU -CA  :" 37860.178********************
+ %ATMCHK-ERR: unknown coordinates for atom "    -508 -GLU -HA  :"-17710.061 65359.853228799.855
+ %ATMCHK-ERR: unknown coordinates for atom "    -508 -GLU -CB  :" 28378.455-18786.248314301.782
+ %ATMCHK-ERR: unknown coordinates for atom "    -508 -GLU -HB1 :"-10852.006 17398.738-21376.770
+ %ATMCHK-ERR: unknown coordinates for atom "    -508 -GLU -HB2 :" -2777.762 14420.812-11160.842
+ %ATMCHK-ERR: unknown coordinates for atom "    -508 -GLU -CG  :"-43513.933112300.063-62640.636
+ %ATMCHK-ERR: unknown coordinates for atom "    -508 -GLU -HG2 :"  1605.892-26785.569 18599.284
+ %ATMCHK-ERR: unknown coordinates for atom "    -508 -GLU -OE2 :"   269.280  -912.907 12994.102
+ %ATMCHK-ERR: unknown coordinates for atom "    -508 -GLU -C   :"163394.757149283.768348236.171
+ %ATMCHK-ERR: unknown coordinates for atom "    -509 -GLU -N   :"********************210456.050
+ %ATMCHK-ERR: unknown coordinates for atom "    -509 -GLU -HN  :" 89032.038  5403.202-62800.112
+ %ATMCHK-ERR: unknown coordinates for atom "    -509 -GLU -CA  :"149139.231274015.024**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -509 -GLU -HA  :"-25358.651-49420.322 69096.738
+ %ATMCHK-ERR: unknown coordinates for atom "    -509 -GLU -CB  :" 56032.782**********138043.282
+ %ATMCHK-ERR: unknown coordinates for atom "    -509 -GLU -HB1 :"-11290.470 18928.540 -7121.749
+ %ATMCHK-ERR: unknown coordinates for atom "    -509 -GLU -HB2 :"-16045.940 23454.759-19659.496
+ %ATMCHK-ERR: unknown coordinates for atom "    -509 -GLU -CG  :"-96410.660103651.058 24944.439
+ %ATMCHK-ERR: unknown coordinates for atom "    -509 -GLU -HG1 :" 25964.156-13672.935-22673.212
+ %ATMCHK-ERR: unknown coordinates for atom "    -509 -GLU -CD  :" 23329.331-40124.065  3402.440
+ %ATMCHK-ERR: unknown coordinates for atom "    -509 -GLU -C   :" 31758.219**********225092.456
+ %ATMCHK-ERR: unknown coordinates for atom "    -509 -GLU -O   :"-26315.606 41940.963-40979.805
+ %ATMCHK-ERR: unknown coordinates for atom "    -510 -PRO -N   :" 69911.734 89125.491-92693.956
+ %ATMCHK-ERR: unknown coordinates for atom "    -510 -PRO -CA  :"********** 91876.414**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -510 -PRO -HA  :" 44943.135-27041.364 43082.275
+ %ATMCHK-ERR: unknown coordinates for atom "    -510 -PRO -CB  :"163900.333********** 23734.403
+ %ATMCHK-ERR: unknown coordinates for atom "    -510 -PRO -HB1 :"-34888.476 26582.761 19049.734
+ %ATMCHK-ERR: unknown coordinates for atom "    -510 -PRO -HB2 :"-33918.326 14618.092  5617.407
+ %ATMCHK-ERR: unknown coordinates for atom "    -510 -PRO -HG1 :"  3094.889  1214.810 24256.456
+ %ATMCHK-ERR: unknown coordinates for atom "    -510 -PRO -HG2 :"   262.536  6786.736 28144.839
+ %ATMCHK-ERR: unknown coordinates for atom "    -510 -PRO -CD  :"-13444.684-37308.785 73950.119
+ %ATMCHK-ERR: unknown coordinates for atom "    -510 -PRO -C   :" 74718.794 18831.604135834.105
+ %ATMCHK-ERR: unknown coordinates for atom "    -511 -VAL -N   :"143081.848  5094.812-18214.928
+ %ATMCHK-ERR: unknown coordinates for atom "    -511 -VAL -HN  :"-67701.389 24085.994-20216.162
+ %ATMCHK-ERR: unknown coordinates for atom "    -511 -VAL -CA  :"-81470.905**********132845.223
+ %ATMCHK-ERR: unknown coordinates for atom "    -511 -VAL -HA  :"-20753.306152077.079**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -511 -VAL -CB  :" 38325.351 40856.687-24852.532
+ %ATMCHK-ERR: unknown coordinates for atom "    -511 -VAL -HB  :"-10295.805 17896.675-11433.135
+ %ATMCHK-ERR: unknown coordinates for atom "    -511 -VAL -CG1 :"-22611.751 57825.882 25334.656
+ %ATMCHK-ERR: unknown coordinates for atom "    -511 -VAL -HG11:" 14985.638 -8225.565 -3399.067
+ %ATMCHK-ERR: unknown coordinates for atom "    -511 -VAL -CG2 :" 73553.588 46126.625 -9281.189
+ %ATMCHK-ERR: unknown coordinates for atom "    -511 -VAL -C   :"-59829.699534615.891428427.518
+ %ATMCHK-ERR: unknown coordinates for atom "    -512 -THR -N   :"758387.792********************
+ %ATMCHK-ERR: unknown coordinates for atom "    -512 -THR -HN  :"********** 26661.693204784.381
+ %ATMCHK-ERR: unknown coordinates for atom "    -512 -THR -CA  :"**********670450.974**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -512 -THR -HA  :"446128.437********************
+ %ATMCHK-ERR: unknown coordinates for atom "    -512 -THR -CB  :"421611.059********************
+ %ATMCHK-ERR: unknown coordinates for atom "    -512 -THR -HB  :" 17032.453 64776.532 78883.407
+ %ATMCHK-ERR: unknown coordinates for atom "    -512 -THR -OG1 :"-46266.968153430.203-33900.698
+ %ATMCHK-ERR: unknown coordinates for atom "    -512 -THR -HG1 :" 15757.697-39091.321 66138.938
+ %ATMCHK-ERR: unknown coordinates for atom "    -512 -THR -CG2 :"**********138143.784111343.458
+ %ATMCHK-ERR: unknown coordinates for atom "    -512 -THR -HG21:" 32068.999-26077.246  2881.598
+ %ATMCHK-ERR: unknown coordinates for atom "    -512 -THR -HG22:" 37935.533 -2299.880-27741.602
+ %ATMCHK-ERR: unknown coordinates for atom "    -512 -THR -HG23:" 33501.663-27806.888 -1805.849
+ %ATMCHK-ERR: unknown coordinates for atom "    -512 -THR -C   :"371184.414********************
+ %ATMCHK-ERR: unknown coordinates for atom "    -512 -THR -O   :"-60878.343 88861.850 65564.113
+ %ATMCHK-ERR: unknown coordinates for atom "    -513 -HIS -N   :"568304.879**********274135.903
+ %ATMCHK-ERR: unknown coordinates for atom "    -513 -HIS -HN  :"********** 68861.683-59407.144
+ %ATMCHK-ERR: unknown coordinates for atom "    -513 -HIS -CA  :"**********533901.461**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -513 -HIS -HA  :"132519.833**********111300.036
+ %ATMCHK-ERR: unknown coordinates for atom "    -513 -HIS -CB  :"108385.630105890.238**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -513 -HIS -HB1 :" 10508.927-48881.823102737.838
+ %ATMCHK-ERR: unknown coordinates for atom "    -513 -HIS -HB2 :" -3262.527-40479.189 76880.616
+ %ATMCHK-ERR: unknown coordinates for atom "    -513 -HIS -CG  :"-49963.296********** 74404.438
+ %ATMCHK-ERR: unknown coordinates for atom "    -513 -HIS -ND1 :"-19061.425-52461.845 18398.094
+ %ATMCHK-ERR: unknown coordinates for atom "    -513 -HIS -HD1 :"  8363.064 29678.956-10682.550
+ %ATMCHK-ERR: unknown coordinates for atom "    -513 -HIS -CD2 :"140177.963 49496.920 77647.289
+ %ATMCHK-ERR: unknown coordinates for atom "    -513 -HIS -CE1 :" 58455.877 76026.965   789.759
+ %ATMCHK-ERR: unknown coordinates for atom "    -513 -HIS -C   :" 76191.104**********250938.896
+ %ATMCHK-ERR: unknown coordinates for atom "    -513 -HIS -O   :" 50895.296 76377.320-38329.675
+ %ATMCHK-ERR: unknown coordinates for atom "    -514 -VAL -HN  :" 52521.298 38451.512 75191.674
+ %ATMCHK-ERR: unknown coordinates for atom "    -514 -VAL -CA  :"888507.807836704.795453396.593
+ %ATMCHK-ERR: unknown coordinates for atom "    -514 -VAL -HB  :" 23549.829115033.854 17868.525
+ %ATMCHK-ERR: unknown coordinates for atom "    -514 -VAL -CG1 :"-99687.914162929.040 87800.964
+ %ATMCHK-ERR: unknown coordinates for atom "    -514 -VAL -HG11:" 32588.829-14595.509-10613.246
+ %ATMCHK-ERR: unknown coordinates for atom "    -514 -VAL -HG12:" 37443.071-42112.688-22685.626
+ %ATMCHK-ERR: unknown coordinates for atom "    -514 -VAL -HG13:" 21375.799-12046.670-15244.102
+ %ATMCHK-ERR: unknown coordinates for atom "    -514 -VAL -CG2 :" 64784.401 96492.869366899.874
+ %ATMCHK-ERR: unknown coordinates for atom "    -514 -VAL -O   :"190026.092135276.549 74714.457
+ %ATMCHK-ERR: unknown coordinates for atom "    -515 -SER -N   :"443758.915367661.627**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -515 -SER -CA  :"********** 29024.305**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -515 -SER -HA  :" 72402.743-17581.194360736.857
+ %ATMCHK-ERR: unknown coordinates for atom "    -515 -SER -CB  :"-94965.992285181.932749846.100
+ %ATMCHK-ERR: unknown coordinates for atom "    -515 -SER -HB1 :" 47050.103********************
+ %ATMCHK-ERR: unknown coordinates for atom "    -515 -SER -HB2 :" 47449.288-83672.818-97064.244
+ %ATMCHK-ERR: unknown coordinates for atom "    -515 -SER -OG  :" 53071.392-73839.993-19419.924
+ %ATMCHK-ERR: unknown coordinates for atom "    -515 -SER -C   :" 78813.623**********667221.635
+ %ATMCHK-ERR: unknown coordinates for atom "    -515 -SER -O   :"  8882.924 32356.730**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -516 -GLU -N   :" 38440.548141765.019159102.873
+ %ATMCHK-ERR: unknown coordinates for atom "    -516 -GLU -CA  :"303893.190********************
+ %ATMCHK-ERR: unknown coordinates for atom "    -516 -GLU -HA  :"-61794.055 53543.635123881.664
+ %ATMCHK-ERR: unknown coordinates for atom "    -516 -GLU -CB  :"********************426659.355
+ %ATMCHK-ERR: unknown coordinates for atom "    -516 -GLU -HB1 :" 46957.694 74331.744-73842.894
+ %ATMCHK-ERR: unknown coordinates for atom "    -516 -GLU -HB2 :" 51521.086 65307.137-58562.763
+ %ATMCHK-ERR: unknown coordinates for atom "    -516 -GLU -CG  :"126461.013 99237.730**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -516 -GLU -HG2 :"-28047.496-11730.462 18027.636
+ %ATMCHK-ERR: unknown coordinates for atom "    -516 -GLU -CD  :" 58053.331-24710.354 53230.011
+ %ATMCHK-ERR: unknown coordinates for atom "    -516 -GLU -C   :"**********331001.353-34739.148
+ %ATMCHK-ERR: unknown coordinates for atom "    -516 -GLU -O   :"107422.703**********114246.385
+ %ATMCHK-ERR: unknown coordinates for atom "    -517 -SER -N   :"240748.740********************
+ %ATMCHK-ERR: unknown coordinates for atom "    -517 -SER -HN  :"-22373.580 65155.256 67745.887
+ %ATMCHK-ERR: unknown coordinates for atom "    -517 -SER -CA  :"**********258091.529240575.933
+ %ATMCHK-ERR: unknown coordinates for atom "    -517 -SER -HA  :" 17309.650-79898.249-25114.929
+ %ATMCHK-ERR: unknown coordinates for atom "    -517 -SER -CB  :"242051.105157697.794**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -517 -SER -HB1 :"-57712.940-39369.066 16779.522
+ %ATMCHK-ERR: unknown coordinates for atom "    -517 -SER -HB2 :"-61470.311-64614.714 10692.265
+ %ATMCHK-ERR: unknown coordinates for atom "    -517 -SER -OG  :"-28010.294-64826.533 60795.468
+ %ATMCHK-ERR: unknown coordinates for atom "    -517 -SER -HG  :"-13874.439 10692.508-25528.036
+ %ATMCHK-ERR: unknown coordinates for atom "    -517 -SER -O   :" 28656.105133607.700-41324.449
+ %ATMCHK-ERR: unknown coordinates for atom "    -518 -ILE -N   :"181732.907356069.028378846.137
+ %ATMCHK-ERR: unknown coordinates for atom "    -518 -ILE -CA  :"**********156453.966**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -518 -ILE -HA  :" 14656.579-52630.639105080.811
+ %ATMCHK-ERR: unknown coordinates for atom "    -518 -ILE -CB  :"143720.267**********-16791.260
+ %ATMCHK-ERR: unknown coordinates for atom "    -518 -ILE -HB  :"-24345.038 51026.126 13015.943
+ %ATMCHK-ERR: unknown coordinates for atom "    -518 -ILE -CG1 :"********** 45797.872 13277.533
+ %ATMCHK-ERR: unknown coordinates for atom "    -518 -ILE -HG11:" 31153.806  7535.962 36010.034
+ %ATMCHK-ERR: unknown coordinates for atom "    -518 -ILE -HG12:" 34478.016 21604.555  -683.566
+ %ATMCHK-ERR: unknown coordinates for atom "    -518 -ILE -CG2 :" 95034.774260532.322186358.085
+ %ATMCHK-ERR: unknown coordinates for atom "    -518 -ILE -CD1 :"189152.501********************
+ %ATMCHK-ERR: unknown coordinates for atom "    -518 -ILE -HD11:"-26005.591 47827.365 58492.758
+ %ATMCHK-ERR: unknown coordinates for atom "    -518 -ILE -HD12:"-41495.185 45915.396 60210.221
+ %ATMCHK-ERR: unknown coordinates for atom "    -518 -ILE -HD13:"-41417.848 39974.123 26010.428
+ %ATMCHK-ERR: unknown coordinates for atom "    -518 -ILE -C   :"279569.799-54345.331643268.175
+ %ATMCHK-ERR: unknown coordinates for atom "    -518 -ILE -O   :"-41715.912 14320.696**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -519 -GLY -HN  :" 91481.156 33929.112119545.008
+ %ATMCHK-ERR: unknown coordinates for atom "    -519 -GLY -CA  :"197389.213294063.846 50206.245
+ %ATMCHK-ERR: unknown coordinates for atom "    -519 -GLY -HA1 :"-19061.911-56573.550 52312.778
+ %ATMCHK-ERR: unknown coordinates for atom "    -519 -GLY -HA2 :"-12332.262-63605.694 28330.627
+ %ATMCHK-ERR: unknown coordinates for atom "    -519 -GLY -O   :" 32979.468  5996.349 38547.395
+ %ATMCHK-ERR: unknown coordinates for atom "    -520 -ILE -N   :"366668.046142827.993198049.110
+ %ATMCHK-ERR: unknown coordinates for atom "    -520 -ILE -HA  :" 61629.578 81412.339195898.745
+ %ATMCHK-ERR: unknown coordinates for atom "    -520 -ILE -CB  :"**********474356.945621800.499
+ %ATMCHK-ERR: unknown coordinates for atom "    -520 -ILE -HB  :" 76151.933**********-82095.847
+ %ATMCHK-ERR: unknown coordinates for atom "    -520 -ILE -CG1 :"584833.234********************
+ %ATMCHK-ERR: unknown coordinates for atom "    -520 -ILE -HG11:"********** 26960.731 71281.855
+ %ATMCHK-ERR: unknown coordinates for atom "    -520 -ILE -HG12:"**********  9544.362 89328.019
+ %ATMCHK-ERR: unknown coordinates for atom "    -520 -ILE -CG2 :" 82916.190148200.585**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -520 -ILE -HG21:" -3764.139-94894.245 57350.954
+ %ATMCHK-ERR: unknown coordinates for atom "    -520 -ILE -HG22:"-24664.686-37109.344 67798.851
+ %ATMCHK-ERR: unknown coordinates for atom "    -520 -ILE -HG23:"-12414.607-74348.005 76780.771
+ %ATMCHK-ERR: unknown coordinates for atom "    -520 -ILE -CD1 :"**********295284.223505793.001
+ %ATMCHK-ERR: unknown coordinates for atom "    -520 -ILE -HD11:" 81240.447-95451.787**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -520 -ILE -HD12:" 70873.267-62454.263-82261.314
+ %ATMCHK-ERR: unknown coordinates for atom "    -520 -ILE -HD13:" 73893.053-57416.850**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -520 -ILE -C   :"587642.826121893.727813686.251
+ %ATMCHK-ERR: unknown coordinates for atom "    -521 -MET -N   :"********** 63324.173**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -521 -MET -HN  :" 56733.521 18911.836141971.432
+ %ATMCHK-ERR: unknown coordinates for atom "    -521 -MET -CA  :"380268.209**********593843.538
+ %ATMCHK-ERR: unknown coordinates for atom "    -521 -MET -HA  :"-60909.640 74891.407**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -521 -MET -CB  :"-43725.172219134.888 63787.172
+ %ATMCHK-ERR: unknown coordinates for atom "    -521 -MET -CG  :" 54218.473243225.393-54920.446
+ %ATMCHK-ERR: unknown coordinates for atom "    -521 -MET -HG2 :"-34546.111-65607.204 17567.141
+ %ATMCHK-ERR: unknown coordinates for atom "    -521 -MET -SD  :"-18481.343**********108008.813
+ %ATMCHK-ERR: unknown coordinates for atom "    -521 -MET -CE  :" 11618.751 59071.107-88337.598
+ %ATMCHK-ERR: unknown coordinates for atom "    -521 -MET -HE2 :" -8170.606-10249.280 17170.785
+ %ATMCHK-ERR: unknown coordinates for atom "    -521 -MET -C   :"**********431972.275 20815.010
+ %ATMCHK-ERR: unknown coordinates for atom "    -521 -MET -O   :" 83370.568-82560.184  4433.750
+ %ATMCHK-ERR: unknown coordinates for atom "    -522 -GLU -N   :"373552.595********************
+ %ATMCHK-ERR: unknown coordinates for atom "    -522 -GLU -HN  :"-28752.921120437.598151147.658
+ %ATMCHK-ERR: unknown coordinates for atom "    -522 -GLU -CA  :"**********465677.259793646.320
+ %ATMCHK-ERR: unknown coordinates for atom "    -522 -GLU -HA  :"229924.523-85738.859**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -522 -GLU -CB  :" 48733.211-64549.690**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -522 -GLU -HB1 :" 17514.405 15041.862  8970.024
+ %ATMCHK-ERR: unknown coordinates for atom "    -522 -GLU -HB2 :" 29648.292 -9725.939 10633.749
+ %ATMCHK-ERR: unknown coordinates for atom "    -522 -GLU -CG  :"132266.771 38917.836177942.277
+ %ATMCHK-ERR: unknown coordinates for atom "    -522 -GLU -OE1 :"  9261.603 43516.730 94310.244
+ %ATMCHK-ERR: unknown coordinates for atom "    -522 -GLU -OE2 :" -4756.463 25974.705 71378.011
+ %ATMCHK-ERR: unknown coordinates for atom "    -522 -GLU -C   :"143642.304********************
+ %ATMCHK-ERR: unknown coordinates for atom "    -522 -GLU -O   :"-12848.976 80897.488133680.927
+ %ATMCHK-ERR: unknown coordinates for atom "    -523 -VAL -N   :"162569.604436993.047425220.588
+ %ATMCHK-ERR: unknown coordinates for atom "    -523 -VAL -HA  :" 48936.991158467.519 94573.322
+ %ATMCHK-ERR: unknown coordinates for atom "    -523 -VAL -CB  :"**********239084.724-54237.012
+ %ATMCHK-ERR: unknown coordinates for atom "    -523 -VAL -HB  :" 29081.071-43752.113 29278.604
+ %ATMCHK-ERR: unknown coordinates for atom "    -523 -VAL -CG1 :" 90635.201-35434.137 23292.503
+ %ATMCHK-ERR: unknown coordinates for atom "    -523 -VAL -CG2 :" 15462.629-63316.395-29695.073
+ %ATMCHK-ERR: unknown coordinates for atom "    -523 -VAL -HG21:"  -373.843  6205.177 15017.068
+ %ATMCHK-ERR: unknown coordinates for atom "    -523 -VAL -HG23:" 21238.230 11209.994 19849.250
+ %ATMCHK-ERR: unknown coordinates for atom "    -523 -VAL -C   :"314238.375331111.371450087.282
+ %ATMCHK-ERR: unknown coordinates for atom "    -524 -LYS -HN  :" 99588.387 33563.205128961.926
+ %ATMCHK-ERR: unknown coordinates for atom "    -524 -LYS -CA  :"245303.940594659.382299815.580
+ %ATMCHK-ERR: unknown coordinates for atom "    -524 -LYS -CB  :"158899.464-47255.602 84634.398
+ %ATMCHK-ERR: unknown coordinates for atom "    -524 -LYS -HB2 :"-66378.382 11036.874-34679.951
+ %ATMCHK-ERR: unknown coordinates for atom "    -524 -LYS -CG  :"**********-70679.537157451.654
+ %ATMCHK-ERR: unknown coordinates for atom "    -524 -LYS -HG1 :" 50333.356  4215.499-58100.594
+ %ATMCHK-ERR: unknown coordinates for atom "    -524 -LYS -HG2 :" 28568.790-21596.685-58322.891
+ %ATMCHK-ERR: unknown coordinates for atom "    -524 -LYS -CD  :"-90894.675103110.481**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -524 -LYS -HD1 :" 26050.486 -5354.978 44031.384
+ %ATMCHK-ERR: unknown coordinates for atom "    -524 -LYS -HD2 :" 18593.064-12497.197 53393.184
+ %ATMCHK-ERR: unknown coordinates for atom "    -524 -LYS -CE  :"230292.885-87398.288  -249.909
+ %ATMCHK-ERR: unknown coordinates for atom "    -524 -LYS -HE1 :"-61153.889 28963.721  4891.171
+ %ATMCHK-ERR: unknown coordinates for atom "    -524 -LYS -HE2 :"-66473.616 25168.376 19105.713
+ %ATMCHK-ERR: unknown coordinates for atom "    -524 -LYS -HZ1 :"-11108.870 23054.891  4767.310
+ %ATMCHK-ERR: unknown coordinates for atom "    -524 -LYS -HZ2 :"  4806.011 32151.934  5817.906
+ %ATMCHK-ERR: unknown coordinates for atom "    -524 -LYS -HZ3 :" -2875.309 23017.839  4044.031
+ %ATMCHK-ERR: unknown coordinates for atom "    -524 -LYS -C   :" 16543.691********************
+ %ATMCHK-ERR: unknown coordinates for atom "    -524 -LYS -O   :"-27301.119200181.084 19216.004
+ %ATMCHK-ERR: unknown coordinates for atom "    -525 -VAL -N   :" 59772.198737085.541116921.127
+ %ATMCHK-ERR: unknown coordinates for atom "    -525 -VAL -CA  :"******************** 71511.773
+ %ATMCHK-ERR: unknown coordinates for atom "    -525 -VAL -HA  :" 66334.798136750.488 -3946.307
+ %ATMCHK-ERR: unknown coordinates for atom "    -525 -VAL -CB  :" 45493.043213924.546 36418.566
+ %ATMCHK-ERR: unknown coordinates for atom "    -525 -VAL -HB  :" 20425.468-12979.778 -7828.375
+ %ATMCHK-ERR: unknown coordinates for atom "    -525 -VAL -HG11:" 32387.082  1261.993 24216.104
+ %ATMCHK-ERR: unknown coordinates for atom "    -525 -VAL -HG12:" 44452.739  2597.143 15128.045
+ %ATMCHK-ERR: unknown coordinates for atom "    -525 -VAL -HG13:" 35856.865-11484.287 16985.273
+ %ATMCHK-ERR: unknown coordinates for atom "    -525 -VAL -HG21:" 37487.524 21329.171 26122.703
+ %ATMCHK-ERR: unknown coordinates for atom "    -525 -VAL -HG22:" 19747.562 28754.125 18242.717
+ %ATMCHK-ERR: unknown coordinates for atom "    -525 -VAL -HG23:" 22070.850 22560.569 13988.243
+ %ATMCHK-ERR: unknown coordinates for atom "    -525 -VAL -C   :" 20768.615318797.092**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -525 -VAL -O   :" -4940.510-61306.966 97951.731
+ %ATMCHK-ERR: unknown coordinates for atom "    -526 -LEU -N   :" 99355.422**********215799.117
+ %ATMCHK-ERR: unknown coordinates for atom "    -526 -LEU -CA  :"**********-46795.649 46594.807
+ %ATMCHK-ERR: unknown coordinates for atom "    -526 -LEU -HA  :" 40443.608  1531.498 32958.938
+ %ATMCHK-ERR: unknown coordinates for atom "    -526 -LEU -CB  :" 37825.548-61201.278 89415.827
+ %ATMCHK-ERR: unknown coordinates for atom "    -526 -LEU -HB1 :" -6658.614 23907.978 -5238.198
+ %ATMCHK-ERR: unknown coordinates for atom "    -526 -LEU -CG  :"180747.222 -1972.639**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -526 -LEU -HG  :"-30456.246 12362.454 50108.492
+ %ATMCHK-ERR: unknown coordinates for atom "    -526 -LEU -CD1 :"********** 57254.627159914.453
+ %ATMCHK-ERR: unknown coordinates for atom "    -526 -LEU -HD11:" 46647.347 -9632.912-31540.159
+ %ATMCHK-ERR: unknown coordinates for atom "    -526 -LEU -HD12:" 35473.555-22263.271-32885.073
+ %ATMCHK-ERR: unknown coordinates for atom "    -526 -LEU -HD13:" 42994.560-17509.656-22797.263
+ %ATMCHK-ERR: unknown coordinates for atom "    -526 -LEU -CD2 :"-46025.611-20785.103 33763.134
+ %ATMCHK-ERR: unknown coordinates for atom "    -526 -LEU -C   :"397390.025135170.316**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -526 -LEU -O   :"**********-63813.452168510.456
+ %ATMCHK-ERR: unknown coordinates for atom "    -527 -ARG -N   :"307862.027503433.810**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -527 -ARG -HN  :"-34248.309-76218.516 93197.655
+ %ATMCHK-ERR: unknown coordinates for atom "    -527 -ARG -CA  :"********************581275.803
+ %ATMCHK-ERR: unknown coordinates for atom "    -527 -ARG -HA  :"391781.535319816.179**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -527 -ARG -CB  :"282051.594230069.446**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -527 -ARG -HB1 :" 10809.925 16071.483 31979.976
+ %ATMCHK-ERR: unknown coordinates for atom "    -527 -ARG -HB2 :" 31444.358 19050.477 22228.514
+ %ATMCHK-ERR: unknown coordinates for atom "    -527 -ARG -CG  :"154179.329 10792.561 64420.706
+ %ATMCHK-ERR: unknown coordinates for atom "    -527 -ARG -CD  :"********** 33971.420130962.430
+ %ATMCHK-ERR: unknown coordinates for atom "    -527 -ARG -HD1 :" 20149.092-13393.965-26768.950
+ %ATMCHK-ERR: unknown coordinates for atom "    -527 -ARG -HD2 :" 33275.835 -7043.083-33224.252
+ %ATMCHK-ERR: unknown coordinates for atom "    -527 -ARG -NE  :"122453.701 12086.269**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -527 -ARG -HE  :"-31260.301 -9123.094 44989.873
+ %ATMCHK-ERR: unknown coordinates for atom "    -527 -ARG -CZ  :"-41865.550-10697.465266425.548
+ %ATMCHK-ERR: unknown coordinates for atom "    -527 -ARG -NH1 :"-16062.947 54345.438**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -527 -ARG -HH11:"  8328.722-16843.597 49015.771
+ %ATMCHK-ERR: unknown coordinates for atom "    -527 -ARG -HH12:"  5820.512-21931.205 43241.383
+ %ATMCHK-ERR: unknown coordinates for atom "    -527 -ARG -NH2 :" 45972.516-44419.250**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -527 -ARG -HH21:"-18489.991 21037.700 43548.662
+ %ATMCHK-ERR: unknown coordinates for atom "    -527 -ARG -HH22:"-14601.772 12954.818 35469.903
+ %ATMCHK-ERR: unknown coordinates for atom "    -527 -ARG -C   :"696543.866623679.786716961.321
+ %ATMCHK-ERR: unknown coordinates for atom "    -528 -THR -N   :"**********517670.982**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -528 -THR -HN  :"**********-94843.230184484.552
+ %ATMCHK-ERR: unknown coordinates for atom "    -528 -THR -CA  :"******************************
+ %ATMCHK-ERR: unknown coordinates for atom "    -528 -THR -HA  :"525647.900403562.815**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -528 -THR -CB  :"471864.581744026.458**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -528 -THR -HB  :" 17585.348-95732.351-10124.775
+ %ATMCHK-ERR: unknown coordinates for atom "    -528 -THR -HG1 :" 56167.449 10096.870-18581.990
+ %ATMCHK-ERR: unknown coordinates for atom "    -528 -THR -CG2 :"144953.815********************
+ %ATMCHK-ERR: unknown coordinates for atom "    -528 -THR -HG21:"-43093.833  3309.177 33582.926
+ %ATMCHK-ERR: unknown coordinates for atom "    -528 -THR -HG22:"-31412.946 18779.275 19109.433
+ %ATMCHK-ERR: unknown coordinates for atom "    -528 -THR -HG23:"-29949.501 23284.815 28888.873
+ %ATMCHK-ERR: unknown coordinates for atom "    -528 -THR -C   :"******************************
+ %ATMCHK-ERR: unknown coordinates for atom "    -528 -THR -O   :"********************115752.031
+ %ATMCHK-ERR: unknown coordinates for atom "    -529 -SER -HN  :" 34315.433-76444.979142998.763
+ %ATMCHK-ERR: unknown coordinates for atom "    -529 -SER -CA  :"********************349290.283
+ %ATMCHK-ERR: unknown coordinates for atom "    -529 -SER -HA  :" 53202.987 79388.824-54746.622
+ %ATMCHK-ERR: unknown coordinates for atom "    -529 -SER -CB  :" 82454.212-48448.039**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -529 -SER -HB1 :"-10297.616 27349.062 41636.245
+ %ATMCHK-ERR: unknown coordinates for atom "    -529 -SER -HB2 :"-14949.803 18589.387 48098.240
+ %ATMCHK-ERR: unknown coordinates for atom "    -529 -SER -OG  :"-19333.103 55132.672 15942.177
+ %ATMCHK-ERR: unknown coordinates for atom "    -529 -SER -C   :"119193.547 58387.291-21852.007
+ %ATMCHK-ERR: unknown coordinates for atom "    -530 -GLY -N   :"-55612.742104813.707-73964.404
+ %ATMCHK-ERR: unknown coordinates for atom "    -530 -GLY -HN  :" 12971.520-20067.273 13151.773
+ %ATMCHK-ERR: unknown coordinates for atom "    -530 -GLY -CA  :"  -605.530**********224116.513
+ %ATMCHK-ERR: unknown coordinates for atom "    -530 -GLY -HA1 :"   817.078 20503.288-13126.238
+ %ATMCHK-ERR: unknown coordinates for atom "    -530 -GLY -HA2 :" -5736.303 38480.933-37064.912
+ %ATMCHK-ERR: unknown coordinates for atom "    -530 -GLY -C   :"  1878.128 57994.652**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -530 -GLY -O   :" 14125.664-18304.820 99657.637
+ %ATMCHK-ERR: unknown coordinates for atom "    -531 -ALA -N   :"-26609.860110331.072**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -531 -ALA -HN  :" -1632.200-69720.510 66705.637
+ %ATMCHK-ERR: unknown coordinates for atom "    -531 -ALA -CA  :" 61341.381105566.539365903.641
+ %ATMCHK-ERR: unknown coordinates for atom "    -531 -ALA -CB  :"182318.605 -8428.886 63546.175
+ %ATMCHK-ERR: unknown coordinates for atom "    -531 -ALA -O   :" 46183.772 92286.179150748.662
+ %ATMCHK-ERR: unknown coordinates for atom "    -532 -ARG -N   :"-36601.132455330.179453992.401
+ %ATMCHK-ERR: unknown coordinates for atom "    -532 -ARG -HN  :" 43580.410-99128.247**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -532 -ARG -HA  :" 54349.760116423.607-14333.188
+ %ATMCHK-ERR: unknown coordinates for atom "    -532 -ARG -CB  :"220214.134514856.212**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -532 -ARG -HB1 :"-48391.736-86363.912 62950.838
+ %ATMCHK-ERR: unknown coordinates for atom "    -532 -ARG -HB2 :"-52187.930-84571.676 63096.177
+ %ATMCHK-ERR: unknown coordinates for atom "    -532 -ARG -CG  :"-33121.815**********328378.680
+ %ATMCHK-ERR: unknown coordinates for atom "    -532 -ARG -HG1 :"-11899.847 88019.932-89580.696
+ %ATMCHK-ERR: unknown coordinates for atom "    -532 -ARG -HG2 :" 16128.767 84705.584-83669.311
+ %ATMCHK-ERR: unknown coordinates for atom "    -532 -ARG -CD  :"-19589.359-28904.262 54439.746
+ %ATMCHK-ERR: unknown coordinates for atom "    -532 -ARG -HD1 :"   191.187 25079.982-25661.892
+ %ATMCHK-ERR: unknown coordinates for atom "    -532 -ARG -HD2 :"  4565.811 12546.521-27187.086
+ %ATMCHK-ERR: unknown coordinates for atom "    -532 -ARG -NE  :" 25711.913 43644.002-45158.947
+ %ATMCHK-ERR: unknown coordinates for atom "    -532 -ARG -CZ  :"-50112.945-38014.221 13934.280
+ %ATMCHK-ERR: unknown coordinates for atom "    -532 -ARG -NH1 :" 29591.016 20589.734  5962.148
+ %ATMCHK-ERR: unknown coordinates for atom "    -532 -ARG -NH2 :" 24825.803 23069.805 -7546.766
+ %ATMCHK-ERR: unknown coordinates for atom "    -532 -ARG -C   :"-12672.072294277.312192378.459
+ %ATMCHK-ERR: unknown coordinates for atom "    -532 -ARG -O   :" 30246.655-83723.025-89868.091
+ %ATMCHK-ERR: unknown coordinates for atom "    -533 -GLY -N   :" 64586.007-25515.437-12898.926
+ %ATMCHK-ERR: unknown coordinates for atom "    -533 -GLY -CA  :"-36081.794 94587.249 89903.511
+ %ATMCHK-ERR: unknown coordinates for atom "    -533 -GLY -HA1 :" 17089.717-45868.363-41492.097
+ %ATMCHK-ERR: unknown coordinates for atom "    -533 -GLY -C   :"**********-36731.696 30805.888
+ %ATMCHK-ERR: unknown coordinates for atom "    -533 -GLY -O   :" 26850.699 -3939.375  5270.535
+ %ATMCHK-ERR: unknown coordinates for atom "    -534 -ASN -N   :"289236.657182966.178-97535.018
+ %ATMCHK-ERR: unknown coordinates for atom "    -534 -ASN -CA  :"******************** 31599.612
+ %ATMCHK-ERR: unknown coordinates for atom "    -534 -ASN -HA  :" 68207.600149239.922 30078.475
+ %ATMCHK-ERR: unknown coordinates for atom "    -534 -ASN -CB  :"266154.099253004.235 81968.081
+ %ATMCHK-ERR: unknown coordinates for atom "    -534 -ASN -OD1 :"  2057.094   797.557 18260.668
+ %ATMCHK-ERR: unknown coordinates for atom "    -534 -ASN -ND2 :" 60721.520 67863.096 23417.333
+ %ATMCHK-ERR: unknown coordinates for atom "    -534 -ASN -HD22:"-49515.014-22495.946 14864.238
+ %ATMCHK-ERR: unknown coordinates for atom "    -534 -ASN -C   :"-80830.365432934.126**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -534 -ASN -O   :" 49687.523-56503.303 34305.185
+ %ATMCHK-ERR: unknown coordinates for atom "    -535 -VAL -N   :"-41169.153**********312645.218
+ %ATMCHK-ERR: unknown coordinates for atom "    -535 -VAL -HN  :"-26124.887199889.705-79534.863
+ %ATMCHK-ERR: unknown coordinates for atom "    -535 -VAL -CA  :"727738.837849156.980**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -535 -VAL -HA  :"******************** 60367.359
+ %ATMCHK-ERR: unknown coordinates for atom "    -535 -VAL -CB  :"-97418.782********** 40035.600
+ %ATMCHK-ERR: unknown coordinates for atom "    -535 -VAL -CG1 :"-10755.530 96864.799-55552.560
+ %ATMCHK-ERR: unknown coordinates for atom "    -535 -VAL -HG11:"  -223.690-19422.449 26540.028
+ %ATMCHK-ERR: unknown coordinates for atom "    -535 -VAL -HG12:" -7253.438-19304.138 20132.271
+ %ATMCHK-ERR: unknown coordinates for atom "    -535 -VAL -HG13:"   208.832-13017.403 13972.465
+ %ATMCHK-ERR: unknown coordinates for atom "    -535 -VAL -CG2 :"-26869.406175598.159-86544.689
+ %ATMCHK-ERR: unknown coordinates for atom "    -535 -VAL -HG21:"   109.194-50646.757 26331.379
+ %ATMCHK-ERR: unknown coordinates for atom "    -535 -VAL -HG22:" -2855.174-42935.575 27574.327
+ %ATMCHK-ERR: unknown coordinates for atom "    -535 -VAL -HG23:"  7885.617-23754.642 30661.488
+ %ATMCHK-ERR: unknown coordinates for atom "    -535 -VAL -C   :"********************233888.410
+ %ATMCHK-ERR: unknown coordinates for atom "    -535 -VAL -O   :"109987.370 97782.102-41441.492
+ %ATMCHK-ERR: unknown coordinates for atom "    -536 -ILE -N   :"781626.540334516.116**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -536 -ILE -HN  :"**********-27083.412 26354.144
+ %ATMCHK-ERR: unknown coordinates for atom "    -536 -ILE -CA  :"********************205472.708
+ %ATMCHK-ERR: unknown coordinates for atom "    -536 -ILE -HA  :"289671.712 40993.717-73512.275
+ %ATMCHK-ERR: unknown coordinates for atom "    -536 -ILE -CB  :"662684.611 49367.637 40604.897
+ %ATMCHK-ERR: unknown coordinates for atom "    -536 -ILE -HB  :"-89692.815 17587.322-19713.820
+ %ATMCHK-ERR: unknown coordinates for atom "    -536 -ILE -HG11:" 30380.152  9085.639 12266.119
+ %ATMCHK-ERR: unknown coordinates for atom "    -536 -ILE -HG12:" 19758.150 12605.613 13574.407
+ %ATMCHK-ERR: unknown coordinates for atom "    -536 -ILE -HG21:" 31897.617 32730.094 26663.723
+ %ATMCHK-ERR: unknown coordinates for atom "    -536 -ILE -HG22:" 14199.408 47002.552 21159.487
+ %ATMCHK-ERR: unknown coordinates for atom "    -536 -ILE -HG23:" 32051.308 29701.001 35416.753
+ %ATMCHK-ERR: unknown coordinates for atom "    -536 -ILE -CD1 :"136258.395-45034.216 79994.462
+ %ATMCHK-ERR: unknown coordinates for atom "    -536 -ILE -HD11:"-28236.614 12498.216-13603.520
+ %ATMCHK-ERR: unknown coordinates for atom "    -536 -ILE -HD12:"-25856.426 18424.528-31876.657
+ %ATMCHK-ERR: unknown coordinates for atom "    -536 -ILE -HD13:"-38566.400 14969.319 -7748.691
+ %ATMCHK-ERR: unknown coordinates for atom "    -536 -ILE -C   :"772657.417263914.321285779.292
+ %ATMCHK-ERR: unknown coordinates for atom "    -537 -VAL -HN  :" 41721.917-17072.898152913.300
+ %ATMCHK-ERR: unknown coordinates for atom "    -537 -VAL -CA  :"404904.496-88121.416517743.885
+ %ATMCHK-ERR: unknown coordinates for atom "    -537 -VAL -HA  :"-69202.944 29608.029-93221.281
+ %ATMCHK-ERR: unknown coordinates for atom "    -537 -VAL -HB  :"-18946.705 64143.092-12931.668
+ %ATMCHK-ERR: unknown coordinates for atom "    -537 -VAL -CG1 :"  4725.360110218.281 28963.995
+ %ATMCHK-ERR: unknown coordinates for atom "    -537 -VAL -CG2 :" 50928.369 65454.852 60905.436
+ %ATMCHK-ERR: unknown coordinates for atom "    -537 -VAL -C   :"**********315626.485**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -537 -VAL -O   :" 95886.194-84786.172 61277.501
+ %ATMCHK-ERR: unknown coordinates for atom "    -538 -PRO -N   :"141663.885**********211539.855
+ %ATMCHK-ERR: unknown coordinates for atom "    -538 -PRO -CA  :"**********119243.565**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -538 -PRO -HA  :" 78684.327  4123.904 79777.209
+ %ATMCHK-ERR: unknown coordinates for atom "    -538 -PRO -CB  :" 39884.677**********228230.131
+ %ATMCHK-ERR: unknown coordinates for atom "    -538 -PRO -HB1 :" 12039.122 28832.448-37201.778
+ %ATMCHK-ERR: unknown coordinates for atom "    -538 -PRO -HB2 :" -1779.552 24864.758-39647.093
+ %ATMCHK-ERR: unknown coordinates for atom "    -538 -PRO -CG  :"-24627.260121302.013**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -538 -PRO -HG1 :" -3974.922-13140.631 27515.315
+ %ATMCHK-ERR: unknown coordinates for atom "    -538 -PRO -HG2 :" 10114.511 -6301.039 22638.035
+ %ATMCHK-ERR: unknown coordinates for atom "    -538 -PRO -CD  :"110548.938**********-82514.888
+ %ATMCHK-ERR: unknown coordinates for atom "    -538 -PRO -HD1 :"-37592.721 66004.761 42781.252
+ %ATMCHK-ERR: unknown coordinates for atom "    -538 -PRO -HD2 :"-32327.505 61138.074 17898.520
+ %ATMCHK-ERR: unknown coordinates for atom "    -538 -PRO -C   :"403928.708-74076.496 49654.733
+ %ATMCHK-ERR: unknown coordinates for atom "    -538 -PRO -O   :"********** 38371.772  2522.957
+ %ATMCHK-ERR: unknown coordinates for atom "    -539 -TYR -N   :"********************224667.279
+ %ATMCHK-ERR: unknown coordinates for atom "    -539 -TYR -HN  :" 29181.376 54449.672-76392.851
+ %ATMCHK-ERR: unknown coordinates for atom "    -539 -TYR -CA  :"197318.227470089.056**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -539 -TYR -HA  :"-36901.903-64205.591 76937.745
+ %ATMCHK-ERR: unknown coordinates for atom "    -539 -TYR -CB  :"********** 79491.898173111.559
+ %ATMCHK-ERR: unknown coordinates for atom "    -539 -TYR -HB2 :" 44714.721-23380.968-41312.264
+ %ATMCHK-ERR: unknown coordinates for atom "    -539 -TYR -CG  :" 27926.056-66232.461   753.715
+ %ATMCHK-ERR: unknown coordinates for atom "    -539 -TYR -CD1 :" 10243.212 -9732.238-82189.820
+ %ATMCHK-ERR: unknown coordinates for atom "    -539 -TYR -HD1 :"-13985.934  1093.756 44745.340
+ %ATMCHK-ERR: unknown coordinates for atom "    -539 -TYR -CD2 :" 54593.975-65604.442 19106.934
+ %ATMCHK-ERR: unknown coordinates for atom "    -539 -TYR -HD2 :"-38587.756 32758.848 -1894.872
+ %ATMCHK-ERR: unknown coordinates for atom "    -539 -TYR -CE1 :" 32856.934 60558.440 12312.050
+ %ATMCHK-ERR: unknown coordinates for atom "    -539 -TYR -CE2 :" 64829.972 15075.879-70338.596
+ %ATMCHK-ERR: unknown coordinates for atom "    -539 -TYR -HE2 :"-29049.512 -5697.971 20601.898
+ %ATMCHK-ERR: unknown coordinates for atom "    -539 -TYR -CZ  :"********** 56170.464 30094.927
+ %ATMCHK-ERR: unknown coordinates for atom "    -539 -TYR -OH  :" 56337.397-37921.030  9490.424
+ %ATMCHK-ERR: unknown coordinates for atom "    -539 -TYR -C   :"-24043.959**********764615.624
+ %ATMCHK-ERR: unknown coordinates for atom "    -539 -TYR -O   :" 23692.654200502.882**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -540 -LYS -N   :"**********515880.072**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -540 -LYS -HN  :" 14110.355-68936.069132178.780
+ %ATMCHK-ERR: unknown coordinates for atom "    -540 -LYS -CA  :"277508.334**********350030.620
+ %ATMCHK-ERR: unknown coordinates for atom "    -540 -LYS -HA  :"-96342.586189566.820-11918.632
+ %ATMCHK-ERR: unknown coordinates for atom "    -540 -LYS -CB  :"**********236372.006**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -540 -LYS -HB1 :"  3061.209-34973.312 85171.349
+ %ATMCHK-ERR: unknown coordinates for atom "    -540 -LYS -HB2 :"-30516.674-40185.042 82337.618
+ %ATMCHK-ERR: unknown coordinates for atom "    -540 -LYS -CG  :"440512.051 56661.659391894.946
+ %ATMCHK-ERR: unknown coordinates for atom "    -540 -LYS -CD  :"**********226736.277**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -540 -LYS -HD1 :"113927.495-72460.019 70304.041
+ %ATMCHK-ERR: unknown coordinates for atom "    -540 -LYS -HD2 :" 89843.540-59492.669 57848.673
+ %ATMCHK-ERR: unknown coordinates for atom "    -540 -LYS -HE1 :" 37535.172  9490.882  -644.068
+ %ATMCHK-ERR: unknown coordinates for atom "    -540 -LYS -HE2 :" 28108.165 35384.354 13462.859
+ %ATMCHK-ERR: unknown coordinates for atom "    -540 -LYS -NZ  :"178806.008-55590.395253422.145
+ %ATMCHK-ERR: unknown coordinates for atom "    -540 -LYS -HZ1 :"-33794.788 20873.989-67929.655
+ %ATMCHK-ERR: unknown coordinates for atom "    -540 -LYS -HZ2 :"-45881.401 24417.747-71352.459
+ %ATMCHK-ERR: unknown coordinates for atom "    -540 -LYS -HZ3 :"-31295.155 19883.068-71443.610
+ %ATMCHK-ERR: unknown coordinates for atom "    -540 -LYS -C   :" 13152.791524183.370 68067.655
+ %ATMCHK-ERR: unknown coordinates for atom "    -541 -THR -N   :" 47632.807-43694.959**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -541 -THR -CA  :"125625.011**********669958.127
+ %ATMCHK-ERR: unknown coordinates for atom "    -541 -THR -HA  :"-91171.591 87222.700**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -541 -THR -CB  :"**********153320.973-36217.409
+ %ATMCHK-ERR: unknown coordinates for atom "    -541 -THR -HB  :" 83712.550-31878.306-17828.801
+ %ATMCHK-ERR: unknown coordinates for atom "    -541 -THR -OG1 :"-17785.695-86262.985 21422.195
+ %ATMCHK-ERR: unknown coordinates for atom "    -541 -THR -HG1 :" 34941.052 43469.842-27566.127
+ %ATMCHK-ERR: unknown coordinates for atom "    -541 -THR -HG21:" 16602.135 11551.341 36007.244
+ %ATMCHK-ERR: unknown coordinates for atom "    -541 -THR -HG22:" 13369.574  1657.080 39155.223
+ %ATMCHK-ERR: unknown coordinates for atom "    -541 -THR -HG23:"  3060.951  7176.888 36924.220
+ %ATMCHK-ERR: unknown coordinates for atom "    -541 -THR -C   :"101041.844-33439.408**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -541 -THR -O   :"-45341.163 30200.961 57754.564
+ %ATMCHK-ERR: unknown coordinates for atom "    -542 -ILE -N   :"171016.614151029.231**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -542 -ILE -HN  :"-31076.057 21145.927152209.849
+ %ATMCHK-ERR: unknown coordinates for atom "    -542 -ILE -CA  :"******************************
+ %ATMCHK-ERR: unknown coordinates for atom "    -542 -ILE -HA  :"114609.933110039.788**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -542 -ILE -CB  :"563827.239-12019.849**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -542 -ILE -HB  :"********** 17154.869 29906.134
+ %ATMCHK-ERR: unknown coordinates for atom "    -542 -ILE -CG1 :"**********340692.159312421.579
+ %ATMCHK-ERR: unknown coordinates for atom "    -542 -ILE -CG2 :"-38348.660**********163435.261
+ %ATMCHK-ERR: unknown coordinates for atom "    -542 -ILE -HG21:"-23356.970 40076.502-34327.574
+ %ATMCHK-ERR: unknown coordinates for atom "    -542 -ILE -HG22:"-17093.693 46486.762-35712.502
+ %ATMCHK-ERR: unknown coordinates for atom "    -542 -ILE -HG23:"-17751.519 57827.719-27785.235
+ %ATMCHK-ERR: unknown coordinates for atom "    -542 -ILE -CD1 :" 50720.756********************
+ %ATMCHK-ERR: unknown coordinates for atom "    -542 -ILE -HD11:"-30297.317  2652.191 24648.051
+ %ATMCHK-ERR: unknown coordinates for atom "    -542 -ILE -HD12:" -6463.065  5959.514 32045.361
+ %ATMCHK-ERR: unknown coordinates for atom "    -542 -ILE -HD13:"  5809.979 20140.229 52972.827
+ %ATMCHK-ERR: unknown coordinates for atom "    -542 -ILE -C   :"297722.202312585.204**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -542 -ILE -O   :"-64543.951-55289.736181410.167
+ %ATMCHK-ERR: unknown coordinates for atom "    -543 -GLU -N   :" 54015.149********************
+ %ATMCHK-ERR: unknown coordinates for atom "    -543 -GLU -HN  :" -7977.777 88738.284140898.928
+ %ATMCHK-ERR: unknown coordinates for atom "    -543 -GLU -CA  :"******************************
+ %ATMCHK-ERR: unknown coordinates for atom "    -543 -GLU -HA  :" 55247.744  3841.281**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -543 -GLU -CB  :" 59950.036 26898.775**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -543 -GLU -HB1 :" 10662.685-10086.335 31539.626
+ %ATMCHK-ERR: unknown coordinates for atom "    -543 -GLU -HB2 :" 16564.353 17653.429 20076.800
+ %ATMCHK-ERR: unknown coordinates for atom "    -543 -GLU -HG1 :" 10710.335  -168.475  7987.493
+ %ATMCHK-ERR: unknown coordinates for atom "    -543 -GLU -C   :"-16153.074251957.924**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -543 -GLU -O   :" 34506.363-79898.548107086.924
+ %ATMCHK-ERR: unknown coordinates for atom "    -544 -GLY -N   :" 55986.535 60718.944 86889.732
+ %ATMCHK-ERR: unknown coordinates for atom "    -544 -GLY -CA  :"  -265.828**********130834.449
+ %ATMCHK-ERR: unknown coordinates for atom "    -544 -GLY -HA1 :" 10522.116 44417.625-37066.242
+ %ATMCHK-ERR: unknown coordinates for atom "    -544 -GLY -HA2 :"  5185.989 46063.246-22245.866
+ %ATMCHK-ERR: unknown coordinates for atom "    -544 -GLY -C   :"-91960.876117938.459-56202.608
+ %ATMCHK-ERR: unknown coordinates for atom "    -544 -GLY -O   :" 12169.466-18224.188  9835.860
+ %ATMCHK-ERR: unknown coordinates for atom "    -545 -THR -N   :"146677.951********** 62617.336
+ %ATMCHK-ERR: unknown coordinates for atom "    -545 -THR -HN  :"-34148.905 15883.686  1938.915
+ %ATMCHK-ERR: unknown coordinates for atom "    -545 -THR -CA  :"**********272073.169**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -545 -THR -HA  :" 37023.921-56163.984 64815.749
+ %ATMCHK-ERR: unknown coordinates for atom "    -545 -THR -CB  :"  2467.489**********157151.564
+ %ATMCHK-ERR: unknown coordinates for atom "    -545 -THR -OG1 :" -3032.979 24768.233-42009.601
+ %ATMCHK-ERR: unknown coordinates for atom "    -545 -THR -HG1 :"  4634.989 -6285.952 15331.466
+ %ATMCHK-ERR: unknown coordinates for atom "    -545 -THR -CG2 :" 94627.559 53810.514  1170.146
+ %ATMCHK-ERR: unknown coordinates for atom "    -545 -THR -C   :"241327.802**********229429.165
+ %ATMCHK-ERR: unknown coordinates for atom "    -545 -THR -O   :"-50115.426 23994.110-32372.101
+ %ATMCHK-ERR: unknown coordinates for atom "    -546 -ALA -HN  :" 83564.941  -171.704 81311.626
+ %ATMCHK-ERR: unknown coordinates for atom "    -546 -ALA -CA  :"462623.261-95076.736579008.447
+ %ATMCHK-ERR: unknown coordinates for atom "    -546 -ALA -CB  :"-52976.014429954.839-86752.823
+ %ATMCHK-ERR: unknown coordinates for atom "    -546 -ALA -C   :" 32377.358187599.190**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -546 -ALA -O   :"-23078.876-17468.193198465.553
+ %ATMCHK-ERR: unknown coordinates for atom "    -547 -ARG -N   :"********************664617.644
+ %ATMCHK-ERR: unknown coordinates for atom "    -547 -ARG -HN  :" 54071.475 79803.847**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -547 -ARG -CA  :"******************************
+ %ATMCHK-ERR: unknown coordinates for atom "    -547 -ARG -HA  :" 92741.687********** 95663.260
+ %ATMCHK-ERR: unknown coordinates for atom "    -547 -ARG -CB  :"630272.484**********274123.314
+ %ATMCHK-ERR: unknown coordinates for atom "    -547 -ARG -HB1 :"********** 62774.219-43747.318
+ %ATMCHK-ERR: unknown coordinates for atom "    -547 -ARG -HB2 :"********** 88565.181-30926.525
+ %ATMCHK-ERR: unknown coordinates for atom "    -547 -ARG -CG  :"********** 94820.021**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -547 -ARG -HG1 :" 65961.336 31692.339 27631.421
+ %ATMCHK-ERR: unknown coordinates for atom "    -547 -ARG -HG2 :" 95652.421-11307.066 49840.236
+ %ATMCHK-ERR: unknown coordinates for atom "    -547 -ARG -CD  :"108210.813**********450134.182
+ %ATMCHK-ERR: unknown coordinates for atom "    -547 -ARG -HD1 :"  7534.096 59977.281**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -547 -ARG -HD2 :"-11156.562 43616.102-87940.408
+ %ATMCHK-ERR: unknown coordinates for atom "    -547 -ARG -NE  :"-41656.216 54765.434**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -547 -ARG -HE  :"  2288.048-20389.205 14149.920
+ %ATMCHK-ERR: unknown coordinates for atom "    -547 -ARG -CZ  :"112805.360159100.840-40993.431
+ %ATMCHK-ERR: unknown coordinates for atom "    -547 -ARG -NH1 :"-66589.485********** 56825.964
+ %ATMCHK-ERR: unknown coordinates for atom "    -547 -ARG -HH11:" 12312.391 63000.708-12252.194
+ %ATMCHK-ERR: unknown coordinates for atom "    -547 -ARG -HH12:" 10539.398 56904.159-21877.050
+ %ATMCHK-ERR: unknown coordinates for atom "    -547 -ARG -NH2 :"-50302.978********** 18614.827
+ %ATMCHK-ERR: unknown coordinates for atom "    -547 -ARG -HH21:"  1401.705 35539.226     7.738
+ %ATMCHK-ERR: unknown coordinates for atom "    -547 -ARG -HH22:" 14358.636 35095.307 -1854.651
+ %ATMCHK-ERR: unknown coordinates for atom "    -547 -ARG -C   :"121470.476********** 55514.431
+ %ATMCHK-ERR: unknown coordinates for atom "    -547 -ARG -O   :"  8137.251119611.260 24360.360
+ %ATMCHK-ERR: unknown coordinates for atom "    -548 -GLY -N   :"********** 10923.852-95582.562
+ %ATMCHK-ERR: unknown coordinates for atom "    -548 -GLY -HN  :" 33780.701  3162.908 36214.323
+ %ATMCHK-ERR: unknown coordinates for atom "    -548 -GLY -CA  :"-73177.176239427.043281713.932
+ %ATMCHK-ERR: unknown coordinates for atom "    -548 -GLY -HA1 :" 44864.853-51094.936-74468.877
+ %ATMCHK-ERR: unknown coordinates for atom "    -548 -GLY -HA2 :" 37419.088-45595.156-64747.768
+ %ATMCHK-ERR: unknown coordinates for atom "    -548 -GLY -C   :" 52140.066********************
+ %ATMCHK-ERR: unknown coordinates for atom "    -548 -GLY -O   :"  1271.930 15542.979 14951.957
+ %ATMCHK-ERR: unknown coordinates for atom "    -549 -GLY -N   :"********** 43026.308258179.656
+ %ATMCHK-ERR: unknown coordinates for atom "    -549 -GLY -HN  :" 44890.390-13470.175-55792.025
+ %ATMCHK-ERR: unknown coordinates for atom "    -549 -GLY -CA  :"132672.428144463.399**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -549 -GLY -HA1 :"-45152.368-40276.255 63505.521
+ %ATMCHK-ERR: unknown coordinates for atom "    -549 -GLY -HA2 :"-22931.028-41013.897 71398.537
+ %ATMCHK-ERR: unknown coordinates for atom "    -549 -GLY -C   :" 74120.790-92034.195115481.337
+ %ATMCHK-ERR: unknown coordinates for atom "    -549 -GLY -O   :"-38428.800 27549.304-29432.048
+ %ATMCHK-ERR: unknown coordinates for atom "    -550 -GLY -N   :"-65754.605 34457.936 16420.672
+ %ATMCHK-ERR: unknown coordinates for atom "    -550 -GLY -HN  :" 29379.943 13349.375 22883.984
+ %ATMCHK-ERR: unknown coordinates for atom "    -550 -GLY -HA1 :" -9677.114 51859.505 52952.892
+ %ATMCHK-ERR: unknown coordinates for atom "    -550 -GLY -HA2 :" 21346.334 88302.183 68305.461
+ %ATMCHK-ERR: unknown coordinates for atom "    -550 -GLY -C   :" 62215.300 61356.526**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -551 -GLU -N   :" 40098.095158300.578952601.118
+ %ATMCHK-ERR: unknown coordinates for atom "    -551 -GLU -CA  :"  2569.888417328.699**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -551 -GLU -HA  :"-25984.903-88043.685255491.009
+ %ATMCHK-ERR: unknown coordinates for atom "    -551 -GLU -HB1 :"-20532.995117325.932 97577.342
+ %ATMCHK-ERR: unknown coordinates for atom "    -551 -GLU -HB2 :"-12200.573160075.078 96806.681
+ %ATMCHK-ERR: unknown coordinates for atom "    -551 -GLU -CG  :"385146.334 85130.534191315.369
+ %ATMCHK-ERR: unknown coordinates for atom "    -551 -GLU -HG2 :"********** 27721.789 29108.159
+ %ATMCHK-ERR: unknown coordinates for atom "    -551 -GLU -CD  :"-98591.490100060.093**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -551 -GLU -OE1 :" -2525.189-43034.062 50720.828
+ %ATMCHK-ERR: unknown coordinates for atom "    -551 -GLU -OE2 :"  6950.869-36549.344 42353.269
+ %ATMCHK-ERR: unknown coordinates for atom "    -551 -GLU -C   :"**********104671.381155210.280
+ %ATMCHK-ERR: unknown coordinates for atom "    -551 -GLU -O   :" 82539.786 57515.871  9247.330
+ %ATMCHK-ERR: unknown coordinates for atom "    -552 -ASP -N   :"-42365.718**********445642.245
+ %ATMCHK-ERR: unknown coordinates for atom "    -552 -ASP -HN  :"-25138.628324093.786**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -552 -ASP -CA  :"684730.662**********613962.622
+ %ATMCHK-ERR: unknown coordinates for atom "    -552 -ASP -HB1 :" 89524.549 81225.977 15879.735
+ %ATMCHK-ERR: unknown coordinates for atom "    -552 -ASP -HB2 :" 72601.932 96600.461-21927.983
+ %ATMCHK-ERR: unknown coordinates for atom "    -552 -ASP -CG  :" 68297.007 65018.142 37060.870
+ %ATMCHK-ERR: unknown coordinates for atom "    -552 -ASP -O   :"211569.643272176.881234444.265
+ %ATMCHK-ERR: unknown coordinates for atom "    -553 -PHE -N   :"678974.461323405.709248952.021
+ %ATMCHK-ERR: unknown coordinates for atom "    -553 -PHE -CA  :"**********312804.971148830.984
+ %ATMCHK-ERR: unknown coordinates for atom "    -553 -PHE -HA  :"102374.424-58947.303-55017.267
+ %ATMCHK-ERR: unknown coordinates for atom "    -553 -PHE -CB  :"507459.696**********222841.452
+ %ATMCHK-ERR: unknown coordinates for atom "    -553 -PHE -HB1 :"-89922.826 37454.074-52536.534
+ %ATMCHK-ERR: unknown coordinates for atom "    -553 -PHE -HB2 :"-92475.446 47681.035-58929.133
+ %ATMCHK-ERR: unknown coordinates for atom "    -553 -PHE -CG  :"**********325109.128**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -553 -PHE -HD1 :"  6852.999 76153.626 90121.116
+ %ATMCHK-ERR: unknown coordinates for atom "    -553 -PHE -CD2 :"143155.935**********224396.684
+ %ATMCHK-ERR: unknown coordinates for atom "    -553 -PHE -CE1 :"-11101.465222772.081 94554.693
+ %ATMCHK-ERR: unknown coordinates for atom "    -553 -PHE -CE2 :"**********345078.406**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -553 -PHE -HE2 :" 18421.819********** 99783.324
+ %ATMCHK-ERR: unknown coordinates for atom "    -553 -PHE -CZ  :" 92850.858**********-98910.309
+ %ATMCHK-ERR: unknown coordinates for atom "    -553 -PHE -HZ  :"-18762.506 71295.013 64934.608
+ %ATMCHK-ERR: unknown coordinates for atom "    -553 -PHE -C   :" 96047.489********** 21807.819
+ %ATMCHK-ERR: unknown coordinates for atom "    -553 -PHE -O   :" 22335.039123149.290-18858.331
+ %ATMCHK-ERR: unknown coordinates for atom "    -554 -GLU -N   :"  8023.296195513.235**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -554 -GLU -HN  :"  5677.920 -1284.021 33692.768
+ %ATMCHK-ERR: unknown coordinates for atom "    -554 -GLU -CA  :"********************319143.416
+ %ATMCHK-ERR: unknown coordinates for atom "    -554 -GLU -HA  :" 52886.829 44249.927-74018.146
+ %ATMCHK-ERR: unknown coordinates for atom "    -554 -GLU -CB  :"113313.368197930.370147373.966
+ %ATMCHK-ERR: unknown coordinates for atom "    -554 -GLU -CG  :"********** 26455.014**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -554 -GLU -HG1 :" 23523.577-23052.539 42225.471
+ %ATMCHK-ERR: unknown coordinates for atom "    -554 -GLU -HG2 :" 30366.292-17181.880 33400.764
+ %ATMCHK-ERR: unknown coordinates for atom "    -554 -GLU -CD  :" 71400.107 -1057.585 23338.934
+ %ATMCHK-ERR: unknown coordinates for atom "    -554 -GLU -OE1 :"-14805.793 -3369.151 10332.840
+ %ATMCHK-ERR: unknown coordinates for atom "    -554 -GLU -C   :"245924.020190999.321**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -554 -GLU -O   :"-62315.497-64243.971 62555.926
+ %ATMCHK-ERR: unknown coordinates for atom "    -555 -ASP -N   :"**********129256.687 26181.323
+ %ATMCHK-ERR: unknown coordinates for atom "    -555 -ASP -HN  :" 28090.275********** -9817.109
+ %ATMCHK-ERR: unknown coordinates for atom "    -555 -ASP -CA  :"-84881.896 20021.060202220.080
+ %ATMCHK-ERR: unknown coordinates for atom "    -555 -ASP -HA  :" 45158.679 -8169.148**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -555 -ASP -CB  :"**********101307.811 16153.264
+ %ATMCHK-ERR: unknown coordinates for atom "    -555 -ASP -HB1 :" 46221.041-28072.086 -4597.815
+ %ATMCHK-ERR: unknown coordinates for atom "    -555 -ASP -HB2 :" 44903.489-31052.791-13946.751
+ %ATMCHK-ERR: unknown coordinates for atom "    -555 -ASP -CG  :" 56173.606-62345.905-49195.851
+ %ATMCHK-ERR: unknown coordinates for atom "    -555 -ASP -OD1 :" -2832.001 17503.834 23840.016
+ %ATMCHK-ERR: unknown coordinates for atom "    -555 -ASP -OD2 :"-16590.322 15515.213 10340.413
+ %ATMCHK-ERR: unknown coordinates for atom "    -555 -ASP -C   :" 39736.276**********-49149.370
+ %ATMCHK-ERR: unknown coordinates for atom "    -555 -ASP -O   :"-40449.477 47776.324 -2477.127
+ %ATMCHK-ERR: unknown coordinates for atom "    -556 -THR -N   :"246425.512 16257.511 77206.031
+ %ATMCHK-ERR: unknown coordinates for atom "    -556 -THR -CA  :"**********215360.171**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -556 -THR -HA  :" 40232.051-44083.710 45302.013
+ %ATMCHK-ERR: unknown coordinates for atom "    -556 -THR -HB  :" 69203.435 28940.245 23278.279
+ %ATMCHK-ERR: unknown coordinates for atom "    -556 -THR -OG1 :" 36277.428 47797.062 57936.013
+ %ATMCHK-ERR: unknown coordinates for atom "    -556 -THR -CG2 :"317931.713 82478.680130501.325
+ %ATMCHK-ERR: unknown coordinates for atom "    -556 -THR -C   :"**********  3539.419523849.988
+ %ATMCHK-ERR: unknown coordinates for atom "    -556 -THR -O   :" 33840.046-15935.210**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -557 -CYS -N   :"234338.026-23441.946**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -557 -CYS -HN  :"-55931.471 -4170.610110984.895
+ %ATMCHK-ERR: unknown coordinates for atom "    -557 -CYS -CA  :"********** -1893.779246150.639
+ %ATMCHK-ERR: unknown coordinates for atom "    -557 -CYS -HA  :"109140.397 15041.916-26703.381
+ %ATMCHK-ERR: unknown coordinates for atom "    -557 -CYS -CB  :"265811.027-10336.948-67881.930
+ %ATMCHK-ERR: unknown coordinates for atom "    -557 -CYS -HB1 :"-33498.579  4559.717 12577.762
+ %ATMCHK-ERR: unknown coordinates for atom "    -557 -CYS -HB2 :"-76452.416  3031.664 32017.866
+ %ATMCHK-ERR: unknown coordinates for atom "    -557 -CYS -HG  :"-10632.945 24379.520 43457.949
+ %ATMCHK-ERR: unknown coordinates for atom "    -557 -CYS -C   :" 81319.447-46364.773**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -557 -CYS -O   :"-11103.820 47838.971105144.223
+ %ATMCHK-ERR: unknown coordinates for atom "    -558 -GLY -N   :"  4143.795-92930.029 78078.441
+ %ATMCHK-ERR: unknown coordinates for atom "    -558 -GLY -HN  :"   822.881 23173.541 16122.878
+ %ATMCHK-ERR: unknown coordinates for atom "    -558 -GLY -CA  :" 75035.095205329.603-69927.205
+ %ATMCHK-ERR: unknown coordinates for atom "    -558 -GLY -HA1 :"-20935.045-44362.819 14112.231
+ %ATMCHK-ERR: unknown coordinates for atom "    -558 -GLY -HA2 :"-48709.227-51112.819 29397.449
+ %ATMCHK-ERR: unknown coordinates for atom "    -558 -GLY -O   :" -8779.524  3956.321 13042.932
+ %ATMCHK-ERR: unknown coordinates for atom "    -559 -GLU -N   :"212212.683392392.608 47277.304
+ %ATMCHK-ERR: unknown coordinates for atom "    -559 -GLU -CA  :"******************** 17666.367
+ %ATMCHK-ERR: unknown coordinates for atom "    -559 -GLU -HA  :"166979.561224285.446-29402.657
+ %ATMCHK-ERR: unknown coordinates for atom "    -559 -GLU -CB  :"259505.699198304.813 25363.762
+ %ATMCHK-ERR: unknown coordinates for atom "    -559 -GLU -CG  :" 47469.583 53763.539 33882.959
+ %ATMCHK-ERR: unknown coordinates for atom "    -559 -GLU -OE1 :" 34211.322 16097.033 46082.993
+ %ATMCHK-ERR: unknown coordinates for atom "    -559 -GLU -OE2 :" 52777.319  6339.860 42455.745
+ %ATMCHK-ERR: unknown coordinates for atom "    -559 -GLU -C   :"627436.530581127.154-45919.082
+ %ATMCHK-ERR: unknown coordinates for atom "    -560 -LEU -N   :"********************185721.711
+ %ATMCHK-ERR: unknown coordinates for atom "    -560 -LEU -HN  :"113383.767 65585.192-26326.938
+ %ATMCHK-ERR: unknown coordinates for atom "    -560 -LEU -CA  :"399866.186249168.097**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -560 -LEU -HA  :"-55184.252-45479.787 73963.576
+ %ATMCHK-ERR: unknown coordinates for atom "    -560 -LEU -CB  :"-26773.412 -7874.089321365.656
+ %ATMCHK-ERR: unknown coordinates for atom "    -560 -LEU -HB2 :" 13747.289-29646.070-54790.486
+ %ATMCHK-ERR: unknown coordinates for atom "    -560 -LEU -CG  :"**********140355.799-54128.778
+ %ATMCHK-ERR: unknown coordinates for atom "    -560 -LEU -HG  :" 39971.509-16658.255 12110.978
+ %ATMCHK-ERR: unknown coordinates for atom "    -560 -LEU -HD11:" 19753.135 22742.922 15594.840
+ %ATMCHK-ERR: unknown coordinates for atom "    -560 -LEU -HD12:" 12355.360 33378.372 12568.829
+ %ATMCHK-ERR: unknown coordinates for atom "    -560 -LEU -HD13:" 12242.715 19455.032 14805.305
+ %ATMCHK-ERR: unknown coordinates for atom "    -560 -LEU -CD2 :" 90662.077**********-57422.414
+ %ATMCHK-ERR: unknown coordinates for atom "    -560 -LEU -HD21:"-21889.738 53245.322 11841.033
+ %ATMCHK-ERR: unknown coordinates for atom "    -560 -LEU -HD22:"-15927.118 44871.402 11518.166
+ %ATMCHK-ERR: unknown coordinates for atom "    -560 -LEU -HD23:" -2870.340 49238.644 23982.423
+ %ATMCHK-ERR: unknown coordinates for atom "    -560 -LEU -C   :"**********182256.707370043.309
+ %ATMCHK-ERR: unknown coordinates for atom "    -560 -LEU -O   :"117096.482-39261.997-61697.884
+ %ATMCHK-ERR: unknown coordinates for atom "    -561 -GLU -N   :"298086.309********************
+ %ATMCHK-ERR: unknown coordinates for atom "    -561 -GLU -HN  :"-79530.498108607.556105759.615
+ %ATMCHK-ERR: unknown coordinates for atom "    -561 -GLU -CA  :"-25490.658159332.827145986.838
+ %ATMCHK-ERR: unknown coordinates for atom "    -561 -GLU -HA  :" 28749.200-90893.075 16783.977
+ %ATMCHK-ERR: unknown coordinates for atom "    -561 -GLU -CB  :"********** 32257.799**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -561 -GLU -HB1 :" 33408.414-10553.459106756.639
+ %ATMCHK-ERR: unknown coordinates for atom "    -561 -GLU -HB2 :" 23499.053-25568.276 84665.202
+ %ATMCHK-ERR: unknown coordinates for atom "    -561 -GLU -CG  :"140985.626-34069.149303304.530
+ %ATMCHK-ERR: unknown coordinates for atom "    -561 -GLU -HG1 :"-14715.100 13070.518-44629.509
+ %ATMCHK-ERR: unknown coordinates for atom "    -561 -GLU -CD  :"-92852.911 14296.609**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -561 -GLU -OE1 :" 18670.240 -6080.747 31228.101
+ %ATMCHK-ERR: unknown coordinates for atom "    -561 -GLU -OE2 :" 25193.876   761.527 41182.839
+ %ATMCHK-ERR: unknown coordinates for atom "    -561 -GLU -C   :" 46527.405441984.113**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -561 -GLU -O   :"  3144.305********** 44896.826
+ %ATMCHK-ERR: unknown coordinates for atom "    -562 -PHE -N   :"********************418322.493
+ %ATMCHK-ERR: unknown coordinates for atom "    -562 -PHE -HN  :" 65726.372123383.641**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -562 -PHE -CA  :"136876.860-72217.549**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -562 -PHE -HA  :" -6110.313 92484.991 35391.442
+ %ATMCHK-ERR: unknown coordinates for atom "    -562 -PHE -HB1 :" -8061.933 17950.576 62828.908
+ %ATMCHK-ERR: unknown coordinates for atom "    -562 -PHE -HB2 :" 15853.351 27317.644 68829.031
+ %ATMCHK-ERR: unknown coordinates for atom "    -562 -PHE -CG  :"-19469.587168144.260 88790.783
+ %ATMCHK-ERR: unknown coordinates for atom "    -562 -PHE -CD1 :"151612.649-53202.047**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -562 -PHE -HD1 :"-48934.435  5564.103 32891.108
+ %ATMCHK-ERR: unknown coordinates for atom "    -562 -PHE -CD2 :"-68262.932-78481.806 34962.283
+ %ATMCHK-ERR: unknown coordinates for atom "    -562 -PHE -HD2 :" 10205.247 38017.932 -8581.891
+ %ATMCHK-ERR: unknown coordinates for atom "    -562 -PHE -CE1 :"********** -3387.156216089.213
+ %ATMCHK-ERR: unknown coordinates for atom "    -562 -PHE -HE1 :" 38559.056 -4180.182-48677.539
+ %ATMCHK-ERR: unknown coordinates for atom "    -562 -PHE -CE2 :" 94741.794-31485.440 -9458.123
+ %ATMCHK-ERR: unknown coordinates for atom "    -562 -PHE -HE2 :"-33961.069 13510.695 14894.414
+ %ATMCHK-ERR: unknown coordinates for atom "    -562 -PHE -CZ  :"-21227.114 27674.226**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -562 -PHE -HZ  :" 11179.352 -8559.289 60223.348
+ %ATMCHK-ERR: unknown coordinates for atom "    -562 -PHE -C   :"-99258.286-18634.340 15798.223
+ %ATMCHK-ERR: unknown coordinates for atom "    -562 -PHE -O   :" 28856.697 49377.553-51784.729
+ %ATMCHK-ERR: unknown coordinates for atom "    -563 -GLN -N   :"342709.949**********708976.875
+ %ATMCHK-ERR: unknown coordinates for atom "    -563 -GLN -HN  :"********** 73682.397**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -563 -GLN -CA  :"********** 32921.977**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -563 -GLN -HA  :"103955.950  9510.601164105.951
+ %ATMCHK-ERR: unknown coordinates for atom "    -563 -GLN -CB  :"661927.218298671.523-93607.927
+ %ATMCHK-ERR: unknown coordinates for atom "    -563 -GLN -HB1 :"**********-69981.411 24955.005
+ %ATMCHK-ERR: unknown coordinates for atom "    -563 -GLN -HB2 :"**********-58745.104 78254.596
+ %ATMCHK-ERR: unknown coordinates for atom "    -563 -GLN -CG  :"********************414792.177
+ %ATMCHK-ERR: unknown coordinates for atom "    -563 -GLN -HG1 :"166757.971 77177.171-72019.355
+ %ATMCHK-ERR: unknown coordinates for atom "    -563 -GLN -HG2 :"112123.362 97514.464-98352.248
+ %ATMCHK-ERR: unknown coordinates for atom "    -563 -GLN -CD  :"214070.221107348.796**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -563 -GLN -OE1 :"-26521.270-14854.347 20981.576
+ %ATMCHK-ERR: unknown coordinates for atom "    -563 -GLN -NE2 :"-51931.830**********116898.130
+ %ATMCHK-ERR: unknown coordinates for atom "    -563 -GLN -HE21:"-12757.729 42881.647-13103.919
+ %ATMCHK-ERR: unknown coordinates for atom "    -563 -GLN -HE22:" 20837.788 35846.947-30183.850
+ %ATMCHK-ERR: unknown coordinates for atom "    -563 -GLN -C   :"-16411.894**********179950.793
+ %ATMCHK-ERR: unknown coordinates for atom "    -563 -GLN -O   :" 21332.535  8083.580-79954.751
+ %ATMCHK-ERR: unknown coordinates for atom "    -564 -ASN -N   :"416433.011762605.199790637.463
+ %ATMCHK-ERR: unknown coordinates for atom "    -564 -ASN -HA  :"189458.837160210.288341686.317
+ %ATMCHK-ERR: unknown coordinates for atom "    -564 -ASN -CB  :"197988.483192567.958145557.213
+ %ATMCHK-ERR: unknown coordinates for atom "    -564 -ASN -HB1 :"  2507.532-29953.358 38806.117
+ %ATMCHK-ERR: unknown coordinates for atom "    -564 -ASN -HB2 :" 10576.888 -7806.554 20530.282
+ %ATMCHK-ERR: unknown coordinates for atom "    -564 -ASN -CG  :"-17909.983 57960.915 60504.861
+ %ATMCHK-ERR: unknown coordinates for atom "    -564 -ASN -HD21:"  3592.412 -3354.762 15800.786
+ %ATMCHK-ERR: unknown coordinates for atom "    -564 -ASN -HD22:"   -66.469   777.214 34207.999
+ %ATMCHK-ERR: unknown coordinates for atom "    -564 -ASN -C   :"383242.189146847.678 12102.697
+ %ATMCHK-ERR: unknown coordinates for atom "    -564 -ASN -O   :"-20119.101-29785.710 40409.201
+ %ATMCHK-ERR: unknown coordinates for atom "    -565 -ASP -N   :"**********279404.206535611.218
+ %ATMCHK-ERR: unknown coordinates for atom "    -565 -ASP -CA  :"579865.590 27281.143**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -565 -ASP -HA  :"**********-56920.717 69801.797
+ %ATMCHK-ERR: unknown coordinates for atom "    -565 -ASP -HB1 :" 67581.876 26574.019 30127.844
+ %ATMCHK-ERR: unknown coordinates for atom "    -565 -ASP -HB2 :" 65960.536 23020.351 51709.320
+ %ATMCHK-ERR: unknown coordinates for atom "    -565 -ASP -CG  :"105806.112-39482.046100835.438
+ %ATMCHK-ERR: unknown coordinates for atom "    -565 -ASP -OD1 :"-17240.412 32124.374-15560.944
+ %ATMCHK-ERR: unknown coordinates for atom "    -565 -ASP -OD2 :"-10488.997 13947.653-16695.489
+ %ATMCHK-ERR: unknown coordinates for atom "    -565 -ASP -C   :"********** 10769.258-73188.527
+ %ATMCHK-ERR: unknown coordinates for atom "    -566 -GLU -N   :"102598.352-74613.580191593.284
+ %ATMCHK-ERR: unknown coordinates for atom "    -566 -GLU -HN  :"-51713.414 16066.231-63260.562
+ %ATMCHK-ERR: unknown coordinates for atom "    -566 -GLU -CA  :" 39882.026173281.814 -6977.655
+ %ATMCHK-ERR: unknown coordinates for atom "    -566 -GLU -HB1 :" 23641.082 29973.190  -239.606
+ %ATMCHK-ERR: unknown coordinates for atom "    -566 -GLU -HB2 :" 62869.909 30486.601-14190.850
+ %ATMCHK-ERR: unknown coordinates for atom "    -566 -GLU -CG  :"-43587.619223713.844 22626.896
+ %ATMCHK-ERR: unknown coordinates for atom "    -566 -GLU -HG1 :" 22839.723-60237.492-32540.282
+ %ATMCHK-ERR: unknown coordinates for atom "    -566 -GLU -CD  :" 78178.274-96339.092 73328.699
+ %ATMCHK-ERR: unknown coordinates for atom "    -566 -GLU -OE1 :"-27372.915 29070.057-22622.101
+ %ATMCHK-ERR: unknown coordinates for atom "    -566 -GLU -OE2 :"-21423.342 13842.558-29399.174
+ %ATMCHK-ERR: unknown coordinates for atom "    -566 -GLU -O   :" 26300.294 24340.854 12696.608
+ %ATMCHK-ERR: unknown coordinates for atom "    -567 -ILE -N   :"123272.320184440.427 42778.891
+ %ATMCHK-ERR: unknown coordinates for atom "    -567 -ILE -HN  :"-37865.125********** 20762.020
+ %ATMCHK-ERR: unknown coordinates for atom "    -567 -ILE -CA  :"-43645.438186104.631**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -567 -ILE -HA  :" -1258.055-46816.254 94211.115
+ %ATMCHK-ERR: unknown coordinates for atom "    -567 -ILE -CB  :"********************150806.144
+ %ATMCHK-ERR: unknown coordinates for atom "    -567 -ILE -HB  :" 56154.575  5661.926-24894.042
+ %ATMCHK-ERR: unknown coordinates for atom "    -567 -ILE -CG1 :" 57059.134214468.073-81941.733
+ %ATMCHK-ERR: unknown coordinates for atom "    -567 -ILE -HG11:"  9584.779-57302.066 17770.721
+ %ATMCHK-ERR: unknown coordinates for atom "    -567 -ILE -CG2 :"-46394.394 37418.304 18731.122
+ %ATMCHK-ERR: unknown coordinates for atom "    -567 -ILE -HG21:" 19842.769   351.021 -7754.460
+ %ATMCHK-ERR: unknown coordinates for atom "    -567 -ILE -HG22:" 22154.920  4080.938-10903.718
+ %ATMCHK-ERR: unknown coordinates for atom "    -567 -ILE -HG23:" 11994.430  1044.488 -7402.402
+ %ATMCHK-ERR: unknown coordinates for atom "    -567 -ILE -CD1 :"-58344.243 37883.013 71459.537
+ %ATMCHK-ERR: unknown coordinates for atom "    -567 -ILE -HD11:" 18082.042-25661.191-15094.324
+ %ATMCHK-ERR: unknown coordinates for atom "    -567 -ILE -HD12:" 11240.439-16270.061-11622.176
+ %ATMCHK-ERR: unknown coordinates for atom "    -567 -ILE -C   :"116311.740-62262.167454097.049
+ %ATMCHK-ERR: unknown coordinates for atom "    -568 -VAL -HN  :"  3364.313 15879.742 68131.460
+ %ATMCHK-ERR: unknown coordinates for atom "    -568 -VAL -CA  :"********** 22958.132519131.849
+ %ATMCHK-ERR: unknown coordinates for atom "    -568 -VAL -HA  :" 93127.367  -780.115**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -568 -VAL -CB  :"456170.848227975.336**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -568 -VAL -HB  :"**********-56277.293 86725.096
+ %ATMCHK-ERR: unknown coordinates for atom "    -568 -VAL -CG1 :"-49850.035 91561.043 94901.619
+ %ATMCHK-ERR: unknown coordinates for atom "    -568 -VAL -CG2 :"-97505.416 34387.460-68528.196
+ %ATMCHK-ERR: unknown coordinates for atom "    -568 -VAL -HG21:"  1170.885-22114.316 33631.085
+ %ATMCHK-ERR: unknown coordinates for atom "    -568 -VAL -HG22:" -1649.671-35378.974 30167.470
+ %ATMCHK-ERR: unknown coordinates for atom "    -568 -VAL -HG23:" 16601.214-34134.425 21704.037
+ %ATMCHK-ERR: unknown coordinates for atom "    -568 -VAL -O   :" 19243.874 86592.183 -8504.363
+ %ATMCHK-ERR: unknown coordinates for atom "    -569 -LYS -N   :"291834.912331381.555**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -569 -LYS -HN  :"-45844.777-73877.345 88266.526
+ %ATMCHK-ERR: unknown coordinates for atom "    -569 -LYS -CA  :"********************823176.293
+ %ATMCHK-ERR: unknown coordinates for atom "    -569 -LYS -HA  :" 83195.064 49620.743**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -569 -LYS -CB  :"362006.754********************
+ %ATMCHK-ERR: unknown coordinates for atom "    -569 -LYS -HB1 :"-39807.891104351.370130933.175
+ %ATMCHK-ERR: unknown coordinates for atom "    -569 -LYS -HB2 :"-37766.390118958.063113869.068
+ %ATMCHK-ERR: unknown coordinates for atom "    -569 -LYS -CG  :"**********499509.169611651.881
+ %ATMCHK-ERR: unknown coordinates for atom "    -569 -LYS -HG1 :"150678.569-97249.651-96823.956
+ %ATMCHK-ERR: unknown coordinates for atom "    -569 -LYS -HG2 :"135941.824********************
+ %ATMCHK-ERR: unknown coordinates for atom "    -569 -LYS -CD  :"498058.132********************
+ %ATMCHK-ERR: unknown coordinates for atom "    -569 -LYS -HD1 :"-79781.787-10381.341134456.409
+ %ATMCHK-ERR: unknown coordinates for atom "    -569 -LYS -HD2 :"-97441.472-31966.929158253.892
+ %ATMCHK-ERR: unknown coordinates for atom "    -569 -LYS -CE  :"-91835.584255757.500 72020.447
+ %ATMCHK-ERR: unknown coordinates for atom "    -569 -LYS -HE1 :" -2509.711-82715.903 12366.156
+ %ATMCHK-ERR: unknown coordinates for atom "    -569 -LYS -HE2 :" 14198.157-46308.339 -2820.711
+ %ATMCHK-ERR: unknown coordinates for atom "    -569 -LYS -NZ  :"-51991.620**********109538.651
+ %ATMCHK-ERR: unknown coordinates for atom "    -569 -LYS -HZ1 :"  9557.741 25228.156-27373.662
+ %ATMCHK-ERR: unknown coordinates for atom "    -569 -LYS -HZ2 :" 11612.920 24132.968-30806.781
+ %ATMCHK-ERR: unknown coordinates for atom "    -569 -LYS -HZ3 :" 17559.225 23959.250-32948.320
+ %ATMCHK-ERR: unknown coordinates for atom "    -569 -LYS -C   :"358164.521558502.322**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -569 -LYS -O   :"-72217.842********** 67956.771
+ %ATMCHK-ERR: unknown coordinates for atom "    -570 -THR -N   :"-27098.487-13408.099469698.466
+ %ATMCHK-ERR: unknown coordinates for atom "    -570 -THR -HN  :" 60818.471 50083.525**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -570 -THR -HA  :"175045.068248156.245-16619.342
+ %ATMCHK-ERR: unknown coordinates for atom "    -570 -THR -CB  :"175719.803 65536.141**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -570 -THR -HB  :" 10083.510 76054.184 50959.408
+ %ATMCHK-ERR: unknown coordinates for atom "    -570 -THR -OG1 :"-13787.824-18224.350245630.176
+ %ATMCHK-ERR: unknown coordinates for atom "    -570 -THR -HG1 :" 19359.334 40232.912**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -570 -THR -CG2 :"-62149.942 30900.554 12243.825
+ %ATMCHK-ERR: unknown coordinates for atom "    -570 -THR -HG21:" 10342.459 -2217.498  5402.709
+ %ATMCHK-ERR: unknown coordinates for atom "    -570 -THR -HG22:" 15818.138  6039.174  -267.450
+ %ATMCHK-ERR: unknown coordinates for atom "    -570 -THR -HG23:" 28433.153-13121.936  8032.806
+ %ATMCHK-ERR: unknown coordinates for atom "    -570 -THR -C   :"613130.814431583.152380491.309
+ %ATMCHK-ERR: unknown coordinates for atom "    -571 -ILE -N   :"-52311.904122203.568**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -571 -ILE -HN  :"  6862.988 13478.323297598.088
+ %ATMCHK-ERR: unknown coordinates for atom "    -571 -ILE -CA  :"******************************
+ %ATMCHK-ERR: unknown coordinates for atom "    -571 -ILE -HA  :" 36423.038147153.096**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -571 -ILE -CB  :"421480.856172830.262**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -571 -ILE -HB  :"-48922.945 25691.538123718.238
+ %ATMCHK-ERR: unknown coordinates for atom "    -571 -ILE -CG1 :"**********177822.862241440.660
+ %ATMCHK-ERR: unknown coordinates for atom "    -571 -ILE -HG11:" 32765.943-37475.952-44690.635
+ %ATMCHK-ERR: unknown coordinates for atom "    -571 -ILE -HG12:" 23246.718-42465.497-48477.544
+ %ATMCHK-ERR: unknown coordinates for atom "    -571 -ILE -HG21:" 63249.668111400.428 61686.568
+ %ATMCHK-ERR: unknown coordinates for atom "    -571 -ILE -HG22:" 31283.045 81151.789 38982.516
+ %ATMCHK-ERR: unknown coordinates for atom "    -571 -ILE -HG23:" 45751.813 96024.364 62324.639
+ %ATMCHK-ERR: unknown coordinates for atom "    -571 -ILE -CD1 :" 72741.825********** 34247.566
+ %ATMCHK-ERR: unknown coordinates for atom "    -571 -ILE -HD11:"-18257.407 66210.322-13248.004
+ %ATMCHK-ERR: unknown coordinates for atom "    -571 -ILE -HD12:"   -62.377 48848.915-13847.438
+ %ATMCHK-ERR: unknown coordinates for atom "    -571 -ILE -HD13:" -4878.569 50810.363-26465.802
+ %ATMCHK-ERR: unknown coordinates for atom "    -571 -ILE -C   :"379653.571547470.342**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -571 -ILE -O   :"-55788.623**********149852.644
+ %ATMCHK-ERR: unknown coordinates for atom "    -572 -SER -N   :"********************540079.535
+ %ATMCHK-ERR: unknown coordinates for atom "    -572 -SER -HN  :"161878.184 18160.120**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -572 -SER -CA  :"**********552270.999**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -572 -SER -HA  :"******************** 87504.239
+ %ATMCHK-ERR: unknown coordinates for atom "    -572 -SER -CB  :"**********-22720.707412943.865
+ %ATMCHK-ERR: unknown coordinates for atom "    -572 -SER -HB1 :"119265.557-41876.486-74959.069
+ %ATMCHK-ERR: unknown coordinates for atom "    -572 -SER -HB2 :"126288.820 -9366.165-83098.572
+ %ATMCHK-ERR: unknown coordinates for atom "    -572 -SER -OG  :"203191.412-34907.397-51742.567
+ %ATMCHK-ERR: unknown coordinates for atom "    -572 -SER -HG  :"-44134.956 13315.467 -3083.137
+ %ATMCHK-ERR: unknown coordinates for atom "    -572 -SER -C   :"********************680642.600
+ %ATMCHK-ERR: unknown coordinates for atom "    -572 -SER -O   :"  7700.594 48501.833**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -573 -VAL -HN  :" 83186.535 85862.805181537.495
+ %ATMCHK-ERR: unknown coordinates for atom "    -573 -VAL -CA  :"**********907000.484**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -573 -VAL -HA  :" 96580.919********************
+ %ATMCHK-ERR: unknown coordinates for atom "    -573 -VAL -CB  :"111119.884-31965.049**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -573 -VAL -HB  :" 20511.739-49308.284 36335.510
+ %ATMCHK-ERR: unknown coordinates for atom "    -573 -VAL -CG1 :" 31854.768********** -6195.362
+ %ATMCHK-ERR: unknown coordinates for atom "    -573 -VAL -HG11:"   164.550 34082.176 18359.019
+ %ATMCHK-ERR: unknown coordinates for atom "    -573 -VAL -HG12:"-19076.952 61172.254  8006.003
+ %ATMCHK-ERR: unknown coordinates for atom "    -573 -VAL -HG13:" -9812.743 23705.688  7785.404
+ %ATMCHK-ERR: unknown coordinates for atom "    -573 -VAL -CG2 :"-73683.535 10509.478 63089.321
+ %ATMCHK-ERR: unknown coordinates for atom "    -573 -VAL -HG21:" 23719.704-11305.334-21640.912
+ %ATMCHK-ERR: unknown coordinates for atom "    -573 -VAL -HG22:" 29225.459  -238.643  1416.059
+ %ATMCHK-ERR: unknown coordinates for atom "    -573 -VAL -C   :"165276.776********************
+ %ATMCHK-ERR: unknown coordinates for atom "    -573 -VAL -O   :"-56044.587190595.244118041.789
+ %ATMCHK-ERR: unknown coordinates for atom "    -574 -LYS -N   :"277845.405479159.320**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -574 -LYS -HN  :"**********-82237.867183381.553
+ %ATMCHK-ERR: unknown coordinates for atom "    -574 -LYS -CA  :"-79610.408**********231770.764
+ %ATMCHK-ERR: unknown coordinates for atom "    -574 -LYS -HA  :" -2088.255 15513.457 12085.236
+ %ATMCHK-ERR: unknown coordinates for atom "    -574 -LYS -CB  :"**********178424.115-79192.150
+ %ATMCHK-ERR: unknown coordinates for atom "    -574 -LYS -HB1 :" 37052.702-71442.761  5066.156
+ %ATMCHK-ERR: unknown coordinates for atom "    -574 -LYS -HB2 :" 20845.265-26727.437  2508.897
+ %ATMCHK-ERR: unknown coordinates for atom "    -574 -LYS -CG  :"136767.681106352.016145299.938
+ %ATMCHK-ERR: unknown coordinates for atom "    -574 -LYS -HD1 :" 39076.419 12249.311  3583.439
+ %ATMCHK-ERR: unknown coordinates for atom "    -574 -LYS -HD2 :" 32276.857 13040.391 -1343.369
+ %ATMCHK-ERR: unknown coordinates for atom "    -574 -LYS -CE  :"117026.440 99740.581**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -574 -LYS -HE1 :"-10544.110-15931.472 24503.114
+ %ATMCHK-ERR: unknown coordinates for atom "    -574 -LYS -HE2 :"-20330.360-27337.152 29501.642
+ %ATMCHK-ERR: unknown coordinates for atom "    -574 -LYS -NZ  :"**********-22254.554 65455.933
+ %ATMCHK-ERR: unknown coordinates for atom "    -574 -LYS -HZ1 :" 26446.332  3128.379-11230.629
+ %ATMCHK-ERR: unknown coordinates for atom "    -574 -LYS -HZ2 :" 23216.659 -3172.368-10539.226
+ %ATMCHK-ERR: unknown coordinates for atom "    -574 -LYS -HZ3 :" 27165.731  4485.974-13966.012
+ %ATMCHK-ERR: unknown coordinates for atom "    -574 -LYS -C   :"**********264089.763   897.885
+ %ATMCHK-ERR: unknown coordinates for atom "    -574 -LYS -O   :" 26003.686-74134.986 -7414.035
+ %ATMCHK-ERR: unknown coordinates for atom "    -575 -VAL -N   :"283668.885**********-21693.539
+ %ATMCHK-ERR: unknown coordinates for atom "    -575 -VAL -HN  :"-87502.606 27320.133 20167.172
+ %ATMCHK-ERR: unknown coordinates for atom "    -575 -VAL -CA  :"**********108932.658**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -575 -VAL -HA  :" 78834.448-13955.381 29146.703
+ %ATMCHK-ERR: unknown coordinates for atom "    -575 -VAL -CB  :"-83301.341-52223.197141601.981
+ %ATMCHK-ERR: unknown coordinates for atom "    -575 -VAL -HB  :" 43243.433 27731.437-55860.472
+ %ATMCHK-ERR: unknown coordinates for atom "    -575 -VAL -CG1 :" 49939.872 18853.347-39082.892
+ %ATMCHK-ERR: unknown coordinates for atom "    -575 -VAL -CG2 :" 42289.351  9156.308-40505.793
+ %ATMCHK-ERR: unknown coordinates for atom "    -575 -VAL -HG23:"   639.304  3336.827 15310.481
+ %ATMCHK-ERR: unknown coordinates for atom "    -575 -VAL -C   :"205332.252**********151323.890
+ %ATMCHK-ERR: unknown coordinates for atom "    -575 -VAL -O   :"-43104.129 32189.961-34128.517
+ %ATMCHK-ERR: unknown coordinates for atom "    -576 -ILE -N   :"**********160364.809**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -576 -ILE -HN  :" 31487.955-23938.341 42659.014
+ %ATMCHK-ERR: unknown coordinates for atom "    -576 -ILE -CA  :" 12186.960**********144320.983
+ %ATMCHK-ERR: unknown coordinates for atom "    -576 -ILE -HA  :"  1682.495 19711.787-39466.487
+ %ATMCHK-ERR: unknown coordinates for atom "    -576 -ILE -CB  :"262628.456-35619.051112247.186
+ %ATMCHK-ERR: unknown coordinates for atom "    -576 -ILE -CG1 :"********** 63451.966**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -576 -ILE -HG11:" 86579.653-21403.043 76522.279
+ %ATMCHK-ERR: unknown coordinates for atom "    -576 -ILE -HG12:" 43081.567-32607.525 62435.146
+ %ATMCHK-ERR: unknown coordinates for atom "    -576 -ILE -CG2 :"-81788.939 95398.766-50851.935
+ %ATMCHK-ERR: unknown coordinates for atom "    -576 -ILE -HG21:"  8745.868-23687.092 10983.218
+ %ATMCHK-ERR: unknown coordinates for atom "    -576 -ILE -HG22:" 12373.925-27781.218  8258.580
+ %ATMCHK-ERR: unknown coordinates for atom "    -576 -ILE -HG23:" 10082.810-21453.551  3624.332
+ %ATMCHK-ERR: unknown coordinates for atom "    -576 -ILE -CD1 :"311141.117 66442.009130666.831
+ %ATMCHK-ERR: unknown coordinates for atom "    -576 -ILE -C   :"-85358.399531056.661 52375.895
+ %ATMCHK-ERR: unknown coordinates for atom "    -576 -ILE -O   :" 52114.619********** -7450.363
+ %ATMCHK-ERR: unknown coordinates for atom "    -577 -ASP -HN  :" 33743.567192490.423 45193.414
+ %ATMCHK-ERR: unknown coordinates for atom "    -577 -ASP -CA  :" -5075.099472202.939530009.073
+ %ATMCHK-ERR: unknown coordinates for atom "    -577 -ASP -CB  :"-46477.234-13217.564 38629.828
+ %ATMCHK-ERR: unknown coordinates for atom "    -577 -ASP -HB2 :" 12407.890-20306.788-32205.177
+ %ATMCHK-ERR: unknown coordinates for atom "    -577 -ASP -CG  :" 77990.081  9975.159**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -577 -ASP -OD1 :"-30904.882 -9954.695 47852.057
+ %ATMCHK-ERR: unknown coordinates for atom "    -577 -ASP -OD2 :"-19272.425-11372.863 28930.888
+ %ATMCHK-ERR: unknown coordinates for atom "    -577 -ASP -C   :" 58733.797********************
+ %ATMCHK-ERR: unknown coordinates for atom "    -577 -ASP -O   :"-11552.349 22008.519 37996.090
+ %ATMCHK-ERR: unknown coordinates for atom "    -578 -ASP -N   :" 30892.831  4351.995-17426.000
+ %ATMCHK-ERR: unknown coordinates for atom "    -578 -ASP -HN  :"-16581.471 30766.257  7464.990
+ %ATMCHK-ERR: unknown coordinates for atom "    -578 -ASP -CA  :"-80243.504**********143405.409
+ %ATMCHK-ERR: unknown coordinates for atom "    -578 -ASP -HA  :" 32546.324103974.974-43251.018
+ %ATMCHK-ERR: unknown coordinates for atom "    -578 -ASP -CB  :"-57474.339148088.962-78332.335
+ %ATMCHK-ERR: unknown coordinates for atom "    -578 -ASP -HB1 :" 13956.705-26777.809  4432.322
+ %ATMCHK-ERR: unknown coordinates for atom "    -578 -ASP -HB2 :" 20600.240-18648.842 17221.336
+ %ATMCHK-ERR: unknown coordinates for atom "    -578 -ASP -CG  :" 41976.402-13197.775 45927.157
+ %ATMCHK-ERR: unknown coordinates for atom "    -578 -ASP -C   :" 57968.839242671.119  8512.142
+ %ATMCHK-ERR: unknown coordinates for atom "    -579 -GLU -CA  :" 85540.707-69530.304114666.776
+ %ATMCHK-ERR: unknown coordinates for atom "    -579 -GLU -HA  :" -7643.644 17060.095-28124.976
+ %ATMCHK-ERR: unknown coordinates for atom "    -579 -GLU -CB  :"-67258.120 45785.709 38059.580
+ %ATMCHK-ERR: unknown coordinates for atom "    -579 -GLU -HB1 :" 11907.823-25295.993-17669.278
+ %ATMCHK-ERR: unknown coordinates for atom "    -579 -GLU -CG  :" 26615.605131010.662-22760.282
+ %ATMCHK-ERR: unknown coordinates for atom "    -579 -GLU -HG2 :" -2902.942-29909.103 12094.138
+ %ATMCHK-ERR: unknown coordinates for atom "    -579 -GLU -OE1 :"  -926.644 26611.205  6225.366
+ %ATMCHK-ERR: unknown coordinates for atom "    -579 -GLU -OE2 :"  2078.828 29345.277  4202.985
+ %ATMCHK-ERR: unknown coordinates for atom "    -579 -GLU -C   :"  4759.694124523.765-46739.566
+ %ATMCHK-ERR: unknown coordinates for atom "    -579 -GLU -O   :"-18217.729-51416.395 26694.515
+ %ATMCHK-ERR: unknown coordinates for atom "    -580 -GLU -N   :"270106.333 82241.432**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -580 -GLU -HN  :"-71034.974  7992.933 41071.744
+ %ATMCHK-ERR: unknown coordinates for atom "    -580 -GLU -CA  :"********************104591.482
+ %ATMCHK-ERR: unknown coordinates for atom "    -580 -GLU -HA  :"137523.344 96013.082-12738.676
+ %ATMCHK-ERR: unknown coordinates for atom "    -580 -GLU -CB  :"245445.658**********215836.020
+ %ATMCHK-ERR: unknown coordinates for atom "    -580 -GLU -HB1 :"-37350.989 38603.690-47297.687
+ %ATMCHK-ERR: unknown coordinates for atom "    -580 -GLU -HB2 :"-36811.756 71073.450-73776.047
+ %ATMCHK-ERR: unknown coordinates for atom "    -580 -GLU -CG  :"-49081.358281208.206**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -580 -GLU -HG1 :" 10321.017-75606.471 31785.204
+ %ATMCHK-ERR: unknown coordinates for atom "    -580 -GLU -CD  :" 58502.856-42328.281 37544.595
+ %ATMCHK-ERR: unknown coordinates for atom "    -580 -GLU -C   :"453571.753434891.991-67352.788
+ %ATMCHK-ERR: unknown coordinates for atom "    -580 -GLU -O   :"******************** 64577.267
+ %ATMCHK-ERR: unknown coordinates for atom "    -581 -TYR -N   :"177666.414 90175.661**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -581 -TYR -HN  :"  3383.000-26078.906134947.740
+ %ATMCHK-ERR: unknown coordinates for atom "    -581 -TYR -CA  :"******************************
+ %ATMCHK-ERR: unknown coordinates for atom "    -581 -TYR -HA  :"257441.751195835.870**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -581 -TYR -CB  :"536133.721378186.967**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -581 -TYR -HB1 :"-53438.588-56863.883 48399.335
+ %ATMCHK-ERR: unknown coordinates for atom "    -581 -TYR -HB2 :"-56313.441-63716.170 25950.075
+ %ATMCHK-ERR: unknown coordinates for atom "    -581 -TYR -CG  :"**********-31796.237 59851.208
+ %ATMCHK-ERR: unknown coordinates for atom "    -581 -TYR -CD1 :" 22653.015**********223761.669
+ %ATMCHK-ERR: unknown coordinates for atom "    -581 -TYR -HD1 :"-68998.707 83403.388**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -581 -TYR -CD2 :" 38892.176-22676.638   217.156
+ %ATMCHK-ERR: unknown coordinates for atom "    -581 -TYR -CE1 :"147525.050 38024.413**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -581 -TYR -HE1 :"**********  5572.981 48192.743
+ %ATMCHK-ERR: unknown coordinates for atom "    -581 -TYR -CE2 :" 13644.260  2624.704-77555.952
+ %ATMCHK-ERR: unknown coordinates for atom "    -581 -TYR -CZ  :"-17076.395 63717.251156053.132
+ %ATMCHK-ERR: unknown coordinates for atom "    -581 -TYR -OH  :" 39863.175-46350.935-50626.545
+ %ATMCHK-ERR: unknown coordinates for atom "    -581 -TYR -HH  :"-27666.869 15478.064 13091.025
+ %ATMCHK-ERR: unknown coordinates for atom "    -581 -TYR -C   :"907545.195 -4969.021**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -581 -TYR -O   :"**********-26044.714 90992.980
+ %ATMCHK-ERR: unknown coordinates for atom "    -582 -GLU -N   :"**********862554.669424716.901
+ %ATMCHK-ERR: unknown coordinates for atom "    -582 -GLU -HA  :" 50364.941200721.316174528.592
+ %ATMCHK-ERR: unknown coordinates for atom "    -582 -GLU -CB  :" 50136.099 61314.085164595.905
+ %ATMCHK-ERR: unknown coordinates for atom "    -582 -GLU -HB1 :" 11814.965 24283.843  9162.805
+ %ATMCHK-ERR: unknown coordinates for atom "    -582 -GLU -HB2 :"  -229.192 26455.791 11317.770
+ %ATMCHK-ERR: unknown coordinates for atom "    -582 -GLU -CG  :"-47576.294169732.490**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -582 -GLU -HG1 :" 10812.570-43021.267 47490.750
+ %ATMCHK-ERR: unknown coordinates for atom "    -582 -GLU -HG2 :" 10106.437-34910.742 37293.273
+ %ATMCHK-ERR: unknown coordinates for atom "    -582 -GLU -CD  :" 30468.956-28980.813107288.018
+ %ATMCHK-ERR: unknown coordinates for atom "    -582 -GLU -C   :"589477.670447200.226262217.189
+ %ATMCHK-ERR: unknown coordinates for atom "    -583 -LYS -HN  :"163453.781 39197.624   604.596
+ %ATMCHK-ERR: unknown coordinates for atom "    -583 -LYS -CA  :" 39732.988 89531.594410905.044
+ %ATMCHK-ERR: unknown coordinates for atom "    -583 -LYS -HA  :" 43892.194-19623.745**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -583 -LYS -CB  :"330760.786-15189.385**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -583 -LYS -HB1 :"-78927.330 -4010.676 55563.829
+ %ATMCHK-ERR: unknown coordinates for atom "    -583 -LYS -HB2 :"-80796.632 -8336.631 34548.705
+ %ATMCHK-ERR: unknown coordinates for atom "    -583 -LYS -CG  :"**********121902.732 16774.226
+ %ATMCHK-ERR: unknown coordinates for atom "    -583 -LYS -HG1 :" 20448.527-47812.062 17305.492
+ %ATMCHK-ERR: unknown coordinates for atom "    -583 -LYS -HG2 :" 25036.846-23596.160  3988.243
+ %ATMCHK-ERR: unknown coordinates for atom "    -583 -LYS -CD  :" 59986.392-51867.708-64437.531
+ %ATMCHK-ERR: unknown coordinates for atom "    -583 -LYS -HD1 :" -9763.786 12878.031  8238.665
+ %ATMCHK-ERR: unknown coordinates for atom "    -583 -LYS -HD2 :"-20272.051 -4682.728 39602.152
+ %ATMCHK-ERR: unknown coordinates for atom "    -583 -LYS -CE  :" 10020.281 27578.339  7568.499
+ %ATMCHK-ERR: unknown coordinates for atom "    -583 -LYS -HZ1 :"  3757.937 12024.285  7213.907
+ %ATMCHK-ERR: unknown coordinates for atom "    -583 -LYS -HZ2 :" -6419.066 15284.078  6800.434
+ %ATMCHK-ERR: unknown coordinates for atom "    -583 -LYS -HZ3 :" -3221.295 10750.803  4776.718
+ %ATMCHK-ERR: unknown coordinates for atom "    -583 -LYS -C   :"175010.680  4341.562**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -584 -ASN -N   :"**********-14148.832 88059.062
+ %ATMCHK-ERR: unknown coordinates for atom "    -584 -ASN -HN  :" 57771.732 13840.228-51299.271
+ %ATMCHK-ERR: unknown coordinates for atom "    -584 -ASN -CA  :"146982.331-41552.274-72059.688
+ %ATMCHK-ERR: unknown coordinates for atom "    -584 -ASN -HA  :"-17312.749 26019.670 21792.090
+ %ATMCHK-ERR: unknown coordinates for atom "    -584 -ASN -CB  :" 91643.330-39398.233-84601.923
+ %ATMCHK-ERR: unknown coordinates for atom "    -584 -ASN -HB1 :"-48091.570  -323.670 28324.247
+ %ATMCHK-ERR: unknown coordinates for atom "    -584 -ASN -HB2 :"-37329.588 13489.054 29034.693
+ %ATMCHK-ERR: unknown coordinates for atom "    -584 -ASN -CG  :" 43984.543 81408.161  4918.348
+ %ATMCHK-ERR: unknown coordinates for atom "    -584 -ASN -ND2 :"-56480.225-82078.159 60594.643
+ %ATMCHK-ERR: unknown coordinates for atom "    -584 -ASN -HD21:" 12967.650 29483.958-24489.601
+ %ATMCHK-ERR: unknown coordinates for atom "    -584 -ASN -HD22:" 12134.602 17651.125-14371.712
+ %ATMCHK-ERR: unknown coordinates for atom "    -585 -LYS -N   :"********** -9845.370648554.960
+ %ATMCHK-ERR: unknown coordinates for atom "    -585 -LYS -HN  :" 82778.294 -2073.567**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -585 -LYS -CA  :"285405.758360793.794**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -585 -LYS -HA  :"-52797.093**********222832.666
+ %ATMCHK-ERR: unknown coordinates for atom "    -585 -LYS -CB  :"********** -4336.220376975.473
+ %ATMCHK-ERR: unknown coordinates for atom "    -585 -LYS -HB1 :" 29647.484 -9576.526-29320.385
+ %ATMCHK-ERR: unknown coordinates for atom "    -585 -LYS -HB2 :" 40293.537-17141.841-36305.242
+ %ATMCHK-ERR: unknown coordinates for atom "    -585 -LYS -HG1 :" 31988.731 28411.914 58003.495
+ %ATMCHK-ERR: unknown coordinates for atom "    -585 -LYS -HG2 :" 26339.694 32584.717 55119.114
+ %ATMCHK-ERR: unknown coordinates for atom "    -585 -LYS -CD  :" 98797.819147482.155573546.229
+ %ATMCHK-ERR: unknown coordinates for atom "    -585 -LYS -CE  :" 24174.171-91467.963-44474.661
+ %ATMCHK-ERR: unknown coordinates for atom "    -585 -LYS -HE1 :"-11198.226 18612.025-10907.876
+ %ATMCHK-ERR: unknown coordinates for atom "    -585 -LYS -NZ  :"-29449.784 88362.007**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -585 -LYS -HZ1 :"  1497.051-19522.329 29029.290
+ %ATMCHK-ERR: unknown coordinates for atom "    -585 -LYS -HZ2 :"  7445.088-17137.234 41507.447
+ %ATMCHK-ERR: unknown coordinates for atom "    -585 -LYS -HZ3 :"  9434.621-24397.153 24454.151
+ %ATMCHK-ERR: unknown coordinates for atom "    -585 -LYS -C   :"********** 57115.072633849.579
+ %ATMCHK-ERR: unknown coordinates for atom "    -585 -LYS -O   :"100367.415 14473.602**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -586 -THR -N   :"256029.769********************
+ %ATMCHK-ERR: unknown coordinates for atom "    -586 -THR -HN  :"-50814.905158581.328105237.159
+ %ATMCHK-ERR: unknown coordinates for atom "    -586 -THR -CA  :"**********363440.612708937.869
+ %ATMCHK-ERR: unknown coordinates for atom "    -586 -THR -HA  :" 39151.901-62598.455**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -586 -THR -CB  :"157933.492********************
+ %ATMCHK-ERR: unknown coordinates for atom "    -586 -THR -HB  :"-24303.657 12988.895  7032.733
+ %ATMCHK-ERR: unknown coordinates for atom "    -586 -THR -OG1 :" -4491.297 31165.107 15229.681
+ %ATMCHK-ERR: unknown coordinates for atom "    -586 -THR -CG2 :"**********274532.578-80976.874
+ %ATMCHK-ERR: unknown coordinates for atom "    -586 -THR -HG21:" 31638.522-79060.890 25989.095
+ %ATMCHK-ERR: unknown coordinates for atom "    -586 -THR -HG22:" 16487.418-76626.547 15038.462
+ %ATMCHK-ERR: unknown coordinates for atom "    -586 -THR -HG23:" 29725.097-69542.059 23759.181
+ %ATMCHK-ERR: unknown coordinates for atom "    -586 -THR -C   :"113352.940-99642.497**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -586 -THR -O   :"-28338.188-51708.497123263.646
+ %ATMCHK-ERR: unknown coordinates for atom "    -587 -PHE -N   :" -1014.826671045.756**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -587 -PHE -HN  :"-47853.165**********348568.070
+ %ATMCHK-ERR: unknown coordinates for atom "    -587 -PHE -CA  :"267321.694********************
+ %ATMCHK-ERR: unknown coordinates for atom "    -587 -PHE -HA  :"-90393.008208295.072**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -587 -PHE -CB  :"**********188828.085**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -587 -PHE -HB1 :" 19645.977 18457.056 84045.428
+ %ATMCHK-ERR: unknown coordinates for atom "    -587 -PHE -HB2 :" 11806.323  3956.454113636.644
+ %ATMCHK-ERR: unknown coordinates for atom "    -587 -PHE -CG  :"130105.647-46712.471243204.004
+ %ATMCHK-ERR: unknown coordinates for atom "    -587 -PHE -CD1 :"********** 24573.011-88061.934
+ %ATMCHK-ERR: unknown coordinates for atom "    -587 -PHE -HD1 :" 27433.337 -5283.533 11902.480
+ %ATMCHK-ERR: unknown coordinates for atom "    -587 -PHE -CD2 :"********** 54872.693**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -587 -PHE -HD2 :" 72396.468-17192.680 10812.467
+ %ATMCHK-ERR: unknown coordinates for atom "    -587 -PHE -CE1 :" 94449.152-10951.915 32971.414
+ %ATMCHK-ERR: unknown coordinates for atom "    -587 -PHE -HE1 :"-42927.452 12203.230 -5545.410
+ %ATMCHK-ERR: unknown coordinates for atom "    -587 -PHE -CE2 :"   298.033  5322.092 71530.585
+ %ATMCHK-ERR: unknown coordinates for atom "    -587 -PHE -HE2 :" 13352.314 -2051.217-29683.650
+ %ATMCHK-ERR: unknown coordinates for atom "    -587 -PHE -HZ  :"-10292.416 10762.720 -1663.812
+ %ATMCHK-ERR: unknown coordinates for atom "    -587 -PHE -C   :"177890.188348078.244**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -587 -PHE -O   :"-10828.715-70689.556238563.810
+ %ATMCHK-ERR: unknown coordinates for atom "    -588 -PHE -N   :"**********628004.479**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -588 -PHE -HN  :"227596.030**********147378.958
+ %ATMCHK-ERR: unknown coordinates for atom "    -588 -PHE -CA  :"******************************
+ %ATMCHK-ERR: unknown coordinates for atom "    -588 -PHE -HA  :"**********308971.227**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -588 -PHE -CB  :"**********284819.149  6414.021
+ %ATMCHK-ERR: unknown coordinates for atom "    -588 -PHE -HB1 :" -4355.470 10417.255-64127.711
+ %ATMCHK-ERR: unknown coordinates for atom "    -588 -PHE -CG  :" 56762.420-16532.933**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -588 -PHE -CD1 :" 26803.782 27442.130145693.880
+ %ATMCHK-ERR: unknown coordinates for atom "    -588 -PHE -CD2 :"-62009.581-18342.806103919.860
+ %ATMCHK-ERR: unknown coordinates for atom "    -588 -PHE -HE1 :"  6698.388 34411.663 22713.093
+ %ATMCHK-ERR: unknown coordinates for atom "    -588 -PHE -CE2 :" 18773.977-10680.432**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -588 -PHE -HE2 :"-13865.913  5482.418 34186.098
+ %ATMCHK-ERR: unknown coordinates for atom "    -588 -PHE -CZ  :" 34465.855 34027.019107568.273
+ %ATMCHK-ERR: unknown coordinates for atom "    -588 -PHE -C   :"-61116.856787832.883**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -588 -PHE -O   :"-26462.710********** 31578.505
+ %ATMCHK-ERR: unknown coordinates for atom "    -589 -LEU -N   :"**********304203.956226661.026
+ %ATMCHK-ERR: unknown coordinates for atom "    -589 -LEU -HN  :" 47556.342**********-24015.861
+ %ATMCHK-ERR: unknown coordinates for atom "    -589 -LEU -HA  :" 98781.607166093.886 77639.663
+ %ATMCHK-ERR: unknown coordinates for atom "    -589 -LEU -CB  :"133875.264-19993.478-43384.661
+ %ATMCHK-ERR: unknown coordinates for atom "    -589 -LEU -HB1 :"-16641.651 46405.931 30225.643
+ %ATMCHK-ERR: unknown coordinates for atom "    -589 -LEU -HB2 :" -2818.329 45633.005 23247.291
+ %ATMCHK-ERR: unknown coordinates for atom "    -589 -LEU -CG  :"-94837.988 11093.892197966.974
+ %ATMCHK-ERR: unknown coordinates for atom "    -589 -LEU -HG  :" 16727.440  2687.724-38539.269
+ %ATMCHK-ERR: unknown coordinates for atom "    -589 -LEU -CD1 :" 33780.459 65660.706-96804.522
+ %ATMCHK-ERR: unknown coordinates for atom "    -589 -LEU -HD11:" -1992.836-12671.682 19647.193
+ %ATMCHK-ERR: unknown coordinates for atom "    -589 -LEU -HD13:" -8568.067-23130.322 20436.953
+ %ATMCHK-ERR: unknown coordinates for atom "    -589 -LEU -CD2 :"100585.251122148.037**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -589 -LEU -HD21:"-22948.499-37198.774 24871.969
+ %ATMCHK-ERR: unknown coordinates for atom "    -589 -LEU -HD22:"-21700.449-27253.383 20825.964
+ %ATMCHK-ERR: unknown coordinates for atom "    -589 -LEU -HD23:"-23299.196-35541.777 12337.263
+ %ATMCHK-ERR: unknown coordinates for atom "    -589 -LEU -C   :"434343.095636200.477280825.298
+ %ATMCHK-ERR: unknown coordinates for atom "    -590 -GLU -N   :" 16386.595369163.954581670.258
+ %ATMCHK-ERR: unknown coordinates for atom "    -590 -GLU -HN  :" 39776.030-95686.553**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -590 -GLU -HA  :"182662.311249997.889413679.552
+ %ATMCHK-ERR: unknown coordinates for atom "    -590 -GLU -CB  :"339263.639 33369.442530207.765
+ %ATMCHK-ERR: unknown coordinates for atom "    -590 -GLU -HB1 :"-30266.201 40526.545-27881.654
+ %ATMCHK-ERR: unknown coordinates for atom "    -590 -GLU -HB2 :"-53155.279 60357.067-40265.579
+ %ATMCHK-ERR: unknown coordinates for atom "    -590 -GLU -CG  :"-77786.797 92635.436**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -590 -GLU -HG1 :" 10911.527-23047.888 10325.685
+ %ATMCHK-ERR: unknown coordinates for atom "    -590 -GLU -HG2 :"  6679.771  -435.352 21162.468
+ %ATMCHK-ERR: unknown coordinates for atom "    -590 -GLU -CD  :" 33997.015-14389.378 11793.525
+ %ATMCHK-ERR: unknown coordinates for atom "    -590 -GLU -C   :"317688.446614193.725467642.603
+ %ATMCHK-ERR: unknown coordinates for atom "    -591 -ILE -N   :"337535.182283577.691753000.469
+ %ATMCHK-ERR: unknown coordinates for atom "    -591 -ILE -HA  :"203867.055 14989.415120147.811
+ %ATMCHK-ERR: unknown coordinates for atom "    -591 -ILE -CB  :"109561.699218163.993  5815.262
+ %ATMCHK-ERR: unknown coordinates for atom "    -591 -ILE -HB  :" 37244.861-19384.248 36280.329
+ %ATMCHK-ERR: unknown coordinates for atom "    -591 -ILE -CG1 :" 38440.883**********-88719.273
+ %ATMCHK-ERR: unknown coordinates for atom "    -591 -ILE -HG11:"  -228.725 42535.214 33549.900
+ %ATMCHK-ERR: unknown coordinates for atom "    -591 -ILE -HG12:" -7736.795 53315.024 41207.328
+ %ATMCHK-ERR: unknown coordinates for atom "    -591 -ILE -CG2 :"-61953.913********** 99505.680
+ %ATMCHK-ERR: unknown coordinates for atom "    -591 -ILE -HG21:" 29389.473 54145.291-28088.917
+ %ATMCHK-ERR: unknown coordinates for atom "    -591 -ILE -HG22:" 12257.131 47798.897 -2589.924
+ %ATMCHK-ERR: unknown coordinates for atom "    -591 -ILE -HG23:" 25410.360 47728.218-24478.454
+ %ATMCHK-ERR: unknown coordinates for atom "    -591 -ILE -CD1 :" -9606.358119407.576 12582.163
+ %ATMCHK-ERR: unknown coordinates for atom "    -591 -ILE -C   :"564456.562237541.651**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -591 -ILE -O   :"**********-32458.398 33711.970
+ %ATMCHK-ERR: unknown coordinates for atom "    -592 -GLY -N   :"********************339007.928
+ %ATMCHK-ERR: unknown coordinates for atom "    -592 -GLY -HN  :" 46674.260123200.340**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -592 -GLY -CA  :"**********156416.344 15666.138
+ %ATMCHK-ERR: unknown coordinates for atom "    -592 -GLY -HA1 :" 22759.708 -7024.681-23378.666
+ %ATMCHK-ERR: unknown coordinates for atom "    -592 -GLY -HA2 :" 48494.414  6411.752-33989.291
+ %ATMCHK-ERR: unknown coordinates for atom "    -592 -GLY -C   :"188387.165 20451.438-51894.125
+ %ATMCHK-ERR: unknown coordinates for atom "    -593 -GLU -N   :"**********-29716.894 51864.997
+ %ATMCHK-ERR: unknown coordinates for atom "    -593 -GLU -HN  :" 52055.163 18593.316  4421.948
+ %ATMCHK-ERR: unknown coordinates for atom "    -593 -GLU -CA  :"279283.404********************
+ %ATMCHK-ERR: unknown coordinates for atom "    -593 -GLU -HA  :"-56019.487 54016.080 38681.710
+ %ATMCHK-ERR: unknown coordinates for atom "    -593 -GLU -CB  :"-92238.082-10907.861176894.748
+ %ATMCHK-ERR: unknown coordinates for atom "    -593 -GLU -HB1 :"  8291.671 12010.739-34002.652
+ %ATMCHK-ERR: unknown coordinates for atom "    -593 -GLU -HB2 :" 19217.740 13010.404-42169.262
+ %ATMCHK-ERR: unknown coordinates for atom "    -593 -GLU -CG  :" -6700.683 17244.516-36892.041
+ %ATMCHK-ERR: unknown coordinates for atom "    -593 -GLU -CD  :"   -26.035 -9927.729 12873.367
+ %ATMCHK-ERR: unknown coordinates for atom "    -593 -GLU -C   :"**********144691.833 25246.413
+ %ATMCHK-ERR: unknown coordinates for atom "    -593 -GLU -O   :" 14140.700-40936.755 -1625.936
+ %ATMCHK-ERR: unknown coordinates for atom "    -594 -PRO -N   :"169443.359-67159.873 86324.697
+ %ATMCHK-ERR: unknown coordinates for atom "    -594 -PRO -CA  :"********** 64912.654-87856.225
+ %ATMCHK-ERR: unknown coordinates for atom "    -594 -PRO -HA  :" 47629.106-20649.844 19825.266
+ %ATMCHK-ERR: unknown coordinates for atom "    -594 -PRO -HB1 :" 16744.207 -7513.053   452.783
+ %ATMCHK-ERR: unknown coordinates for atom "    -594 -PRO -CG  :" 78068.394  6828.023 16746.667
+ %ATMCHK-ERR: unknown coordinates for atom "    -594 -PRO -CD  :"********** 22418.379**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -594 -PRO -HD1 :" 21118.843 -2040.703 21443.388
+ %ATMCHK-ERR: unknown coordinates for atom "    -594 -PRO -HD2 :"  9732.724-11856.972 33024.034
+ %ATMCHK-ERR: unknown coordinates for atom "    -594 -PRO -C   :"136127.593-25364.473 36434.012
+ %ATMCHK-ERR: unknown coordinates for atom "    -595 -ARG -HN  :" 73823.967 -1382.654 10460.470
+ %ATMCHK-ERR: unknown coordinates for atom "    -595 -ARG -CA  :" 45320.781 31036.774-29372.164
+ %ATMCHK-ERR: unknown coordinates for atom "    -595 -ARG -HA  :" 17777.792-29493.594 16979.187
+ %ATMCHK-ERR: unknown coordinates for atom "    -595 -ARG -CB  :"-71218.545 16804.111 25812.729
+ %ATMCHK-ERR: unknown coordinates for atom "    -595 -ARG -HB1 :" 16392.392 -4773.311 -3311.048
+ %ATMCHK-ERR: unknown coordinates for atom "    -595 -ARG -HB2 :" 15270.608 -5367.947   570.812
+ %ATMCHK-ERR: unknown coordinates for atom "    -595 -ARG -CG  :" 87528.768-44551.691-74129.942
+ %ATMCHK-ERR: unknown coordinates for atom "    -595 -ARG -HG1 :"-16126.506  7258.979 18785.782
+ %ATMCHK-ERR: unknown coordinates for atom "    -595 -ARG -HG2 :"-14485.983 11815.935 19929.155
+ %ATMCHK-ERR: unknown coordinates for atom "    -595 -ARG -CD  :"********** 33019.518 31084.043
+ %ATMCHK-ERR: unknown coordinates for atom "    -595 -ARG -HD1 :" 22516.392 -4509.697 -3220.158
+ %ATMCHK-ERR: unknown coordinates for atom "    -595 -ARG -HD2 :" 18057.986 -4361.013 -4627.975
+ %ATMCHK-ERR: unknown coordinates for atom "    -595 -ARG -NE  :"213485.036-56066.125 30706.611
+ %ATMCHK-ERR: unknown coordinates for atom "    -595 -ARG -CZ  :"**********155760.205-73592.696
+ %ATMCHK-ERR: unknown coordinates for atom "    -595 -ARG -NH1 :"164008.579********** -1051.980
+ %ATMCHK-ERR: unknown coordinates for atom "    -595 -ARG -HH11:"-41334.789 31144.262  6169.964
+ %ATMCHK-ERR: unknown coordinates for atom "    -595 -ARG -HH12:"-34518.157 21984.292 14121.763
+ %ATMCHK-ERR: unknown coordinates for atom "    -595 -ARG -NH2 :"142793.474********** 26331.511
+ %ATMCHK-ERR: unknown coordinates for atom "    -595 -ARG -HH21:"-35771.570 40291.396 -7394.402
+ %ATMCHK-ERR: unknown coordinates for atom "    -595 -ARG -HH22:"-25242.187 32168.478  3714.182
+ %ATMCHK-ERR: unknown coordinates for atom "    -595 -ARG -C   :"-60262.670121324.821 27864.684
+ %ATMCHK-ERR: unknown coordinates for atom "    -595 -ARG -O   :" 11270.400-28608.273-10679.293
+ %ATMCHK-ERR: unknown coordinates for atom "    -596 -LEU -N   :"183728.590**********-34832.366
+ %ATMCHK-ERR: unknown coordinates for atom "    -596 -LEU -HN  :"-49979.722 69229.341 17365.573
+ %ATMCHK-ERR: unknown coordinates for atom "    -596 -LEU -CA  :"**********462329.298 91763.714
+ %ATMCHK-ERR: unknown coordinates for atom "    -596 -LEU -HA  :" 47673.176-78926.326-37892.799
+ %ATMCHK-ERR: unknown coordinates for atom "    -596 -LEU -CB  :"143464.049********** 60956.122
+ %ATMCHK-ERR: unknown coordinates for atom "    -596 -LEU -HB1 :"-46837.764 21846.223-31700.004
+ %ATMCHK-ERR: unknown coordinates for atom "    -596 -LEU -CG  :"-89603.678336593.891-11377.814
+ %ATMCHK-ERR: unknown coordinates for atom "    -596 -LEU -CD1 :" 33088.423********************
+ %ATMCHK-ERR: unknown coordinates for atom "    -596 -LEU -HD11:"  5173.650 39048.460 36891.972
+ %ATMCHK-ERR: unknown coordinates for atom "    -596 -LEU -HD12:"  -840.185 38593.573 23431.134
+ %ATMCHK-ERR: unknown coordinates for atom "    -596 -LEU -HD13:"-13404.956 46521.984 33403.216
+ %ATMCHK-ERR: unknown coordinates for atom "    -596 -LEU -CD2 :" 90377.165********** 48373.423
+ %ATMCHK-ERR: unknown coordinates for atom "    -596 -LEU -HD21:"-16006.971 25974.689-13592.523
+ %ATMCHK-ERR: unknown coordinates for atom "    -596 -LEU -HD22:"-27281.465 40174.681 -3873.186
+ %ATMCHK-ERR: unknown coordinates for atom "    -596 -LEU -HD23:"-16096.856 26594.250-16056.547
+ %ATMCHK-ERR: unknown coordinates for atom "    -596 -LEU -C   :"418659.582********************
+ %ATMCHK-ERR: unknown coordinates for atom "    -596 -LEU -O   :"-91151.022123046.879 54438.970
+ %ATMCHK-ERR: unknown coordinates for atom "    -597 -VAL -N   :"**********359566.488 56590.457
+ %ATMCHK-ERR: unknown coordinates for atom "    -597 -VAL -HN  :" 90901.920**********-13717.632
+ %ATMCHK-ERR: unknown coordinates for atom "    -597 -VAL -CA  :"**********-83024.525113137.109
+ %ATMCHK-ERR: unknown coordinates for atom "    -597 -VAL -HA  :" 98848.444 15784.724-26865.113
+ %ATMCHK-ERR: unknown coordinates for atom "    -597 -VAL -CB  :" 82659.419********************
+ %ATMCHK-ERR: unknown coordinates for atom "    -597 -VAL -HB  :" 12223.113 56815.535 63807.058
+ %ATMCHK-ERR: unknown coordinates for atom "    -597 -VAL -CG1 :"-29222.270  7366.909 39870.358
+ %ATMCHK-ERR: unknown coordinates for atom "    -597 -VAL -HG13:"  8096.186 11124.381-10179.344
+ %ATMCHK-ERR: unknown coordinates for atom "    -597 -VAL -HG21:"  6164.993 14703.975 16187.355
+ %ATMCHK-ERR: unknown coordinates for atom "    -597 -VAL -HG22:"  7886.718 12464.407  6074.515
+ %ATMCHK-ERR: unknown coordinates for atom "    -597 -VAL -HG23:" 13811.591  3229.262  4119.571
+ %ATMCHK-ERR: unknown coordinates for atom "    -597 -VAL -C   :"152298.680-15600.913**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -597 -VAL -O   :"-10161.038 -9552.312 19037.605
+ %ATMCHK-ERR: unknown coordinates for atom "    -598 -GLU -N   :"**********192890.049128010.796
+ %ATMCHK-ERR: unknown coordinates for atom "    -598 -GLU -HN  :" 77296.610-90418.614-26704.285
+ %ATMCHK-ERR: unknown coordinates for atom "    -598 -GLU -HA  :" 16778.330  4817.447  6367.202
+ %ATMCHK-ERR: unknown coordinates for atom "    -598 -GLU -CB  :" 25189.742 22189.519-45524.063
+ %ATMCHK-ERR: unknown coordinates for atom "    -598 -GLU -CG  :"-23445.330-45219.190 62225.012
+ %ATMCHK-ERR: unknown coordinates for atom "    -598 -GLU -HG2 :"  8028.083 12336.285-11920.476
+ %ATMCHK-ERR: unknown coordinates for atom "    -598 -GLU -CD  :" 12119.841 17460.179-14206.337
+ %ATMCHK-ERR: unknown coordinates for atom "    -598 -GLU -C   :" 41591.860 19410.518  1589.514
+ %ATMCHK-ERR: unknown coordinates for atom "    -599 -MET -N   :"  5637.575 -4643.594 17856.636
+ %ATMCHK-ERR: unknown coordinates for atom "    -599 -MET -HA  :"  7095.918 24716.277 21081.988
+ %ATMCHK-ERR: unknown coordinates for atom "    -599 -MET -CB  :" 26487.599 53343.178 25160.417
+ %ATMCHK-ERR: unknown coordinates for atom "    -599 -MET -SD  :"  5642.859 -9870.685 15575.403
+ %ATMCHK-ERR: unknown coordinates for atom "    -599 -MET -CE  :"  9666.363 38936.834-42156.420
+ %ATMCHK-ERR: unknown coordinates for atom "    -599 -MET -HE1 :" -6064.115 -7979.393 18717.283
+ %ATMCHK-ERR: unknown coordinates for atom "    -599 -MET -HE2 :"    96.820-13044.159 12221.965
+ %ATMCHK-ERR: unknown coordinates for atom "    -599 -MET -C   :"   363.749 68492.042 67417.144
+ %ATMCHK-ERR: unknown coordinates for atom "    -600 -SER -HN  :" 11703.123  2376.605 38887.515
+ %ATMCHK-ERR: unknown coordinates for atom "    -600 -SER -CA  :"**********-35038.853250006.268
+ %ATMCHK-ERR: unknown coordinates for atom "    -600 -SER -HA  :" 27825.825  -927.574-45883.031
+ %ATMCHK-ERR: unknown coordinates for atom "    -600 -SER -CB  :" 69223.075 71908.404-77529.201
+ %ATMCHK-ERR: unknown coordinates for atom "    -600 -SER -HB2 :" -8828.075-10934.357 17180.413
+ %ATMCHK-ERR: unknown coordinates for atom "    -600 -SER -C   :" 91680.701    36.644-86728.042
+ %ATMCHK-ERR: unknown coordinates for atom "    -600 -SER -O   :"-18468.716  4320.028 14141.771
+ %ATMCHK-ERR: unknown coordinates for atom "    -601 -GLU -N   :"-55805.768 17148.212 41725.827
+ %ATMCHK-ERR: unknown coordinates for atom "    -601 -GLU -CA  :" 48827.234-31625.290-67406.859
+ %ATMCHK-ERR: unknown coordinates for atom "    -601 -GLU -HA  :"-12291.354  2035.034 12710.865
+ %ATMCHK-ERR: unknown coordinates for atom "    -601 -GLU -CB  :"-32613.280-10360.734 38426.992
+ %ATMCHK-ERR: unknown coordinates for atom "    -601 -GLU -CG  :" 13451.190 12250.804  5045.536
+ %ATMCHK-ERR: unknown coordinates for atom "    -601 -GLU -C   :" 10907.647 55961.983 15992.691
+ %ATMCHK-ERR: unknown coordinates for atom "    -602 -LYS -HN  :"  5353.741 14572.497  1625.817
+ %ATMCHK-ERR: unknown coordinates for atom "    -602 -LYS -CA  :" -4820.363 46071.654 -4413.075
+ %ATMCHK-ERR: unknown coordinates for atom "    -602 -LYS -CB  :" 14591.388-21193.638 19755.393
+ %ATMCHK-ERR: unknown coordinates for atom "    -602 -LYS -CE  :"   -89.338 11768.203  6408.087
+ %ATMCHK-ERR: unknown coordinates for atom "    -602 -LYS -O   :" -3370.118 12461.027 -1446.561
+ %ATMCHK-ERR: unknown coordinates for atom "    -603 -LYS -N   :"  2247.499 15019.883-16013.880
+ %ATMCHK-ERR: unknown coordinates for atom "    -603 -LYS -CG  :" 19350.803 -1944.270 -2445.638
+ %ATMCHK-ERR: unknown coordinates for atom "    -603 -LYS -CE  :" -9827.605 13149.830  -813.999
+ %ATMCHK-ERR: unknown coordinates for atom "    -603 -LYS -C   :"  2079.300 17266.862  6954.924
+ %ATMCHK-ERR: unknown coordinates for atom "    -604 -GLY -C   :" -2619.486  7791.179 10766.116
+ %ATMCHK-ERR: unknown coordinates for atom "    -605 -GLY -CA  :"-12463.203 20236.610-13872.675
+ %ATMCHK-ERR: unknown coordinates for atom "    -606 -PHE -N   :" 28831.108 16562.885  2695.549
+ %ATMCHK-ERR: unknown coordinates for atom "    -606 -PHE -CA  :"-32904.118 22772.833  2048.363
+ %ATMCHK-ERR: unknown coordinates for atom "    -606 -PHE -HB1 :"  4326.780 12605.543  4405.588
+ %ATMCHK-ERR: unknown coordinates for atom "    -606 -PHE -CG  :" 28089.554 46850.671-36438.745
+ %ATMCHK-ERR: unknown coordinates for atom "    -606 -PHE -CD1 :" -5977.008-15556.657 18183.039
+ %ATMCHK-ERR: unknown coordinates for atom "    -606 -PHE -CD2 :"-14863.383-11027.513 15224.843
+ %ATMCHK-ERR: unknown coordinates for atom "    -606 -PHE -CE1 :" 36382.321 15667.683 18258.096
+ %ATMCHK-ERR: unknown coordinates for atom "    -606 -PHE -CE2 :" -8589.684 14049.886-35686.993
+ %ATMCHK-ERR: unknown coordinates for atom "    -606 -PHE -HE2 :"  6808.491 -2495.061 10755.033
+ %ATMCHK-ERR: unknown coordinates for atom "    -606 -PHE -CZ  :"-25104.901-47982.392 26159.215
+ %ATMCHK-ERR: unknown coordinates for atom "    -606 -PHE -HZ  :"  6890.875 16884.817 -8485.339
+ %ATMCHK-ERR: unknown coordinates for atom "    -607 -THR -N   :" 66833.449 22180.318  2760.104
+ %ATMCHK-ERR: unknown coordinates for atom "    -607 -THR -CA  :"********** 64025.696 36636.051
+ %ATMCHK-ERR: unknown coordinates for atom "    -607 -THR -HA  :" 43095.550 -1406.138-12363.566
+ %ATMCHK-ERR: unknown coordinates for atom "    -607 -THR -HB  :" 10894.135 45708.353 10144.924
+ %ATMCHK-ERR: unknown coordinates for atom "    -607 -THR -OG1 :" 14771.148 47703.627 11383.882
+ %ATMCHK-ERR: unknown coordinates for atom "    -607 -THR -CG2 :"121327.294212948.888-33082.388
+ %ATMCHK-ERR: unknown coordinates for atom "    -607 -THR -HG21:"-39255.465-47124.104 14583.959
+ %ATMCHK-ERR: unknown coordinates for atom "    -607 -THR -HG22:"-19109.035-36966.406 13419.500
+ %ATMCHK-ERR: unknown coordinates for atom "    -607 -THR -C   :"-43218.715 45153.472**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -607 -THR -O   :" -7627.054-45376.603 17293.750
+ %ATMCHK-ERR: unknown coordinates for atom "    -608 -ILE -N   :"369713.644 41162.265236894.669
+ %ATMCHK-ERR: unknown coordinates for atom "    -608 -ILE -CA  :"********** 36342.142128538.103
+ %ATMCHK-ERR: unknown coordinates for atom "    -608 -ILE -HA  :" 70592.300-24546.354-29275.393
+ %ATMCHK-ERR: unknown coordinates for atom "    -608 -ILE -CB  :"412159.022-60197.167**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -608 -ILE -HB  :"-66756.698 20758.769 87834.165
+ %ATMCHK-ERR: unknown coordinates for atom "    -608 -ILE -HG11:"110200.797  1856.240 28011.014
+ %ATMCHK-ERR: unknown coordinates for atom "    -608 -ILE -HG12:"108032.220 16660.410 40877.715
+ %ATMCHK-ERR: unknown coordinates for atom "    -608 -ILE -CG2 :"-60891.026 37515.894 11905.874
+ %ATMCHK-ERR: unknown coordinates for atom "    -608 -ILE -HG21:" -2298.980 -1775.903 14311.126
+ %ATMCHK-ERR: unknown coordinates for atom "    -608 -ILE -HG22:" 12039.571 -6473.513  3967.943
+ %ATMCHK-ERR: unknown coordinates for atom "    -608 -ILE -HG23:" -7640.914 -8957.079 12876.055
+ %ATMCHK-ERR: unknown coordinates for atom "    -608 -ILE -CD1 :"108858.681 16165.157 60720.900
+ %ATMCHK-ERR: unknown coordinates for atom "    -608 -ILE -HD11:"-12802.371 11332.728-16371.910
+ %ATMCHK-ERR: unknown coordinates for atom "    -608 -ILE -C   :"102125.545139019.675-45442.413
+ %ATMCHK-ERR: unknown coordinates for atom "    -609 -THR -N   :" -5252.461********** 30115.316
+ %ATMCHK-ERR: unknown coordinates for atom "    -609 -THR -HN  :" 20066.821 30636.327-16983.130
+ %ATMCHK-ERR: unknown coordinates for atom "    -609 -THR -CA  :"********** 26222.946-75812.368
+ %ATMCHK-ERR: unknown coordinates for atom "    -609 -THR -HA  :" 35182.381-14077.126 26816.900
+ %ATMCHK-ERR: unknown coordinates for atom "    -609 -THR -CB  :"342115.883235088.159 25456.493
+ %ATMCHK-ERR: unknown coordinates for atom "    -609 -THR -HG21:"  2142.517 18788.635  4766.033
+ %ATMCHK-ERR: unknown coordinates for atom "    -609 -THR -HG22:" -5785.756 19289.249  9546.331
+ %ATMCHK-ERR: unknown coordinates for atom "    -609 -THR -HG23:"  3199.059 15606.146  6158.264
+ %ATMCHK-ERR: unknown coordinates for atom "    -609 -THR -C   :" 41929.653-85935.219 61529.752
+ %ATMCHK-ERR: unknown coordinates for atom "    -609 -THR -O   :"  1512.126 29933.059 -9888.560
+ %ATMCHK-ERR: unknown coordinates for atom "    -610 -GLU -N   :" 15786.177 37784.819-38499.168
+ %ATMCHK-ERR: unknown coordinates for atom "    -610 -GLU -CA  :"-61466.949 20902.365-31225.554
+ %ATMCHK-ERR: unknown coordinates for atom "    -610 -GLU -HA  :" 10666.598 -2100.427  4516.479
+ %ATMCHK-ERR: unknown coordinates for atom "    -610 -GLU -CB  :" 61619.306-65249.013 36071.522
+ %ATMCHK-ERR: unknown coordinates for atom "    -610 -GLU -HB1 :" -9955.327 10736.174  2977.280
+ %ATMCHK-ERR: unknown coordinates for atom "    -610 -GLU -HB2 :" -7500.765 12348.608-12861.421
+ %ATMCHK-ERR: unknown coordinates for atom "    -610 -GLU -CG  :"-31954.109 55489.401  2252.654
+ %ATMCHK-ERR: unknown coordinates for atom "    -610 -GLU -C   :"-44885.547 -6855.554 23073.426
+ %ATMCHK-ERR: unknown coordinates for atom "    -611 -GLU -N   :" 74086.607 -6503.651 24813.316
+ %ATMCHK-ERR: unknown coordinates for atom "    -611 -GLU -CA  :" 58157.347 -2818.726 60388.327
+ %ATMCHK-ERR: unknown coordinates for atom "    -611 -GLU -CB  :"********** 53382.930-29270.832
+ %ATMCHK-ERR: unknown coordinates for atom "    -611 -GLU -HB1 :" 40310.344-10436.187 13530.467
+ %ATMCHK-ERR: unknown coordinates for atom "    -611 -GLU -HB2 :" 61301.415-10149.111  6710.544
+ %ATMCHK-ERR: unknown coordinates for atom "    -611 -GLU -CG  :" 67422.097-22539.692-76035.591
+ %ATMCHK-ERR: unknown coordinates for atom "    -611 -GLU -HG1 :" -4936.231 11077.309 26061.573
+ %ATMCHK-ERR: unknown coordinates for atom "    -611 -GLU -HG2 :" -7918.668 -2487.404 17688.344
+ %ATMCHK-ERR: unknown coordinates for atom "    -611 -GLU -O   :"  3670.932 25152.119  4558.649
+ %ATMCHK-ERR: unknown coordinates for atom "    -612 -TYR -N   :" 21891.447 59008.204 33628.127
+ %ATMCHK-ERR: unknown coordinates for atom "    -612 -TYR -HA  :" -2786.614-18890.115 39584.598
+ %ATMCHK-ERR: unknown coordinates for atom "    -612 -TYR -CB  :" 33831.963   215.334 67228.558
+ %ATMCHK-ERR: unknown coordinates for atom "    -612 -TYR -CG  :" 14944.587 49838.423 26814.860
+ %ATMCHK-ERR: unknown coordinates for atom "    -612 -TYR -HD1 :" 17757.803  2971.268  7841.063
+ %ATMCHK-ERR: unknown coordinates for atom "    -612 -TYR -HD2 :"  2359.266 14994.156 21952.518
+ %ATMCHK-ERR: unknown coordinates for atom "    -612 -TYR -CE1 :" 15406.123 12990.186 47027.953
+ %ATMCHK-ERR: unknown coordinates for atom "    -612 -TYR -CE2 :" 30715.090 29054.984 36123.303
+ %ATMCHK-ERR: unknown coordinates for atom "    -612 -TYR -OH  :" 14217.731  2886.684 16133.995
+ %ATMCHK-ERR: unknown coordinates for atom "    -612 -TYR -C   :"-24945.386   604.451 38803.088
+ %ATMCHK-ERR: unknown coordinates for atom "    -613 -ASP -CA  :" 24845.264 -6406.042 11618.001
+ %ATMCHK-ERR: unknown coordinates for atom "    -613 -ASP -CG  :" -9775.304  2960.282 16627.395
+ %ATMCHK-ERR: unknown coordinates for atom "    -613 -ASP -C   :"-20623.722 39753.812-13070.114
+ %ATMCHK-ERR: unknown coordinates for atom "    -613 -ASP -O   :" 10595.150 -9660.220    70.308
+ %ATMCHK-ERR: unknown coordinates for atom "    -614 -ASP -HN  :" 10981.560 11090.086 -4133.886
+ %ATMCHK-ERR: unknown coordinates for atom "    -614 -ASP -CA  :"-14094.695 93744.198 20195.226
+ %ATMCHK-ERR: unknown coordinates for atom "    -614 -ASP -CB  :"   -30.031-62876.936 44263.631
+ %ATMCHK-ERR: unknown coordinates for atom "    -614 -ASP -HB1 :" 13464.823 11467.033-13637.356
+ %ATMCHK-ERR: unknown coordinates for atom "    -614 -ASP -HB2 :" -8138.617 16110.728-17822.917
+ %ATMCHK-ERR: unknown coordinates for atom "    -614 -ASP -CG  :"  4083.997 10101.693-20958.772
+ %ATMCHK-ERR: unknown coordinates for atom "    -615 -LYS -N   :"138520.762 43278.288 51276.409
+ %ATMCHK-ERR: unknown coordinates for atom "    -615 -LYS -HA  :" 30657.498 -4271.720 19560.707
+ %ATMCHK-ERR: unknown coordinates for atom "    -615 -LYS -CB  :"159437.299-13444.461 74127.209
+ %ATMCHK-ERR: unknown coordinates for atom "    -615 -LYS -HG1 :" 32473.791 13602.382  9399.572
+ %ATMCHK-ERR: unknown coordinates for atom "    -615 -LYS -HG2 :" 27473.245 -1442.482  2268.119
+ %ATMCHK-ERR: unknown coordinates for atom "    -615 -LYS -CD  :"  8049.709 -2315.213 22902.320
+ %ATMCHK-ERR: unknown coordinates for atom "    -615 -LYS -CE  :" 12559.890 -7805.568  9476.138
+ %ATMCHK-ERR: unknown coordinates for atom "    -615 -LYS -C   :" 37316.707-20389.404 59099.160
+ %ATMCHK-ERR: unknown coordinates for atom "    -616 -GLN -N   :" 46219.870 54657.227-83898.486
+ %ATMCHK-ERR: unknown coordinates for atom "    -616 -GLN -HN  :"  2504.868-13184.060 31679.066
+ %ATMCHK-ERR: unknown coordinates for atom "    -616 -GLN -CA  :"**********-67670.321 54576.413
+ %ATMCHK-ERR: unknown coordinates for atom "    -616 -GLN -HA  :" 36031.551 14240.315 -4164.002
+ %ATMCHK-ERR: unknown coordinates for atom "    -616 -GLN -CB  :" 55790.129 18367.901-26793.478
+ %ATMCHK-ERR: unknown coordinates for atom "    -616 -GLN -CD  :" -1638.133 18302.083  2111.613
+ %ATMCHK-ERR: unknown coordinates for atom "    -616 -GLN -NE2 :" 12463.627-12739.583 -5848.901
+ %ATMCHK-ERR: unknown coordinates for atom "    -616 -GLN -C   :" 57986.292-22011.996-42846.587
+ %ATMCHK-ERR: unknown coordinates for atom "    -617 -PRO -N   :" 11983.712109132.064 33062.386
+ %ATMCHK-ERR: unknown coordinates for atom "    -617 -PRO -CA  :"********************262904.584
+ %ATMCHK-ERR: unknown coordinates for atom "    -617 -PRO -HA  :" 12148.593 31880.192-43166.624
+ %ATMCHK-ERR: unknown coordinates for atom "    -617 -PRO -CB  :"258625.514-69895.066**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -617 -PRO -HB1 :"-69462.392 25639.306 49690.695
+ %ATMCHK-ERR: unknown coordinates for atom "    -617 -PRO -HB2 :"-56877.523 26698.936 41791.880
+ %ATMCHK-ERR: unknown coordinates for atom "    -617 -PRO -CG  :"********** 22050.458 68251.592
+ %ATMCHK-ERR: unknown coordinates for atom "    -617 -PRO -HG1 :" 16667.997  2563.931 -3303.576
+ %ATMCHK-ERR: unknown coordinates for atom "    -617 -PRO -HG2 :" 12227.508  7391.595-10392.063
+ %ATMCHK-ERR: unknown coordinates for atom "    -617 -PRO -CD  :" 28860.370-81074.621-53027.865
+ %ATMCHK-ERR: unknown coordinates for atom "    -617 -PRO -HD1 :" -8335.458 13227.251 13408.878
+ %ATMCHK-ERR: unknown coordinates for atom "    -617 -PRO -HD2 :"  5717.747 15780.175   413.431
+ %ATMCHK-ERR: unknown coordinates for atom "    -617 -PRO -C   :"215634.002178736.131**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -617 -PRO -O   :"-60508.050-66378.409 90241.712
+ %ATMCHK-ERR: unknown coordinates for atom "    -618 -LEU -N   :"**********-77899.639122894.148
+ %ATMCHK-ERR: unknown coordinates for atom "    -618 -LEU -HN  :" 68358.367 50487.855-41948.178
+ %ATMCHK-ERR: unknown coordinates for atom "    -618 -LEU -CA  :" 63267.285**********-87037.193
+ %ATMCHK-ERR: unknown coordinates for atom "    -618 -LEU -HA  :"-12489.915 34997.336 17238.483
+ %ATMCHK-ERR: unknown coordinates for atom "    -618 -LEU -CB  :"236778.348193840.501272927.155
+ %ATMCHK-ERR: unknown coordinates for atom "    -618 -LEU -HG  :" 23264.196 -5917.509 29771.318
+ %ATMCHK-ERR: unknown coordinates for atom "    -618 -LEU -CD1 :"107159.133 36671.222**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -618 -LEU -HD11:"-23265.519-19397.621 41217.635
+ %ATMCHK-ERR: unknown coordinates for atom "    -618 -LEU -HD12:"-23667.721 -7747.123 32199.081
+ %ATMCHK-ERR: unknown coordinates for atom "    -618 -LEU -HD13:"-16785.714  6188.859 41601.004
+ %ATMCHK-ERR: unknown coordinates for atom "    -618 -LEU -CD2 :" -6577.529 78210.215129208.400
+ %ATMCHK-ERR: unknown coordinates for atom "    -618 -LEU -HD22:" 15231.623-16443.815-21661.342
+ %ATMCHK-ERR: unknown coordinates for atom "    -618 -LEU -C   :"********** 88823.669**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -618 -LEU -O   :" 45245.404-11267.577 23597.439
+ %ATMCHK-ERR: unknown coordinates for atom "    -619 -THR -N   :" 50684.072**********214780.167
+ %ATMCHK-ERR: unknown coordinates for atom "    -619 -THR -HN  :" 14784.041 53475.992-80729.297
+ %ATMCHK-ERR: unknown coordinates for atom "    -619 -THR -CA  :"-44105.467 65435.463**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -619 -THR -HA  :" 15335.356 -6000.659  9925.248
+ %ATMCHK-ERR: unknown coordinates for atom "    -619 -THR -CB  :"  -101.376-31415.989 11341.723
+ %ATMCHK-ERR: unknown coordinates for atom "    -619 -THR -OG1 :" 15630.645 13278.338 23498.778
+ %ATMCHK-ERR: unknown coordinates for atom "    -619 -THR -CG2 :"  2888.294 39237.283-10922.836
+ %ATMCHK-ERR: unknown coordinates for atom "    -619 -THR -C   :" 29446.092 16985.741 21125.642
+ %ATMCHK-ERR: unknown coordinates for atom "    -620 -SER -HN  :"  2630.429 10954.858 -3743.060
+ %ATMCHK-ERR: unknown coordinates for atom "    -620 -SER -CA  :" 78433.714 34296.683 80022.746
+ %ATMCHK-ERR: unknown coordinates for atom "    -620 -SER -CB  :" 54432.834-52504.323-64971.406
+ %ATMCHK-ERR: unknown coordinates for atom "    -620 -SER -HB1 :"-26334.578  6013.604 16325.366
+ %ATMCHK-ERR: unknown coordinates for atom "    -620 -SER -HB2 :"-15879.514 10104.102 15433.335
+ %ATMCHK-ERR: unknown coordinates for atom "    -620 -SER -OG  :"-18928.100 29574.379  6154.470
+ %ATMCHK-ERR: unknown coordinates for atom "    -620 -SER -O   :"   847.196  3219.168 16179.989
+ %ATMCHK-ERR: unknown coordinates for atom "    -621 -LYS -N   :"  -940.254 32789.172 68309.894
+ %ATMCHK-ERR: unknown coordinates for atom "    -621 -LYS -CG  :" 19629.495 -3503.441-12196.988
+ %ATMCHK-ERR: unknown coordinates for atom "    -621 -LYS -HG2 :" -4531.393   700.161 10136.162
+ %ATMCHK-ERR: unknown coordinates for atom "    -621 -LYS -CD  :"-12926.102 32916.410-17628.333
+ %ATMCHK-ERR: unknown coordinates for atom "    -621 -LYS -CE  :" -5223.822 -8927.181 11030.100
+ %ATMCHK-ERR: unknown coordinates for atom "    -621 -LYS -HZ2 :"  4638.928 13478.297  1620.244
+ %ATMCHK-ERR: unknown coordinates for atom "    -621 -LYS -C   :"-10067.337 43262.601  4513.822
+ %ATMCHK-ERR: unknown coordinates for atom "    -622 -GLU -HN  :" 15557.543  -409.012  9637.241
+ %ATMCHK-ERR: unknown coordinates for atom "    -622 -GLU -CA  :" 14128.357-30027.888  -454.249
+ %ATMCHK-ERR: unknown coordinates for atom "    -622 -GLU -HA  :"  2408.818 13105.315  5694.191
+ %ATMCHK-ERR: unknown coordinates for atom "    -622 -GLU -CB  :"-42769.355-23703.722 20927.293
+ %ATMCHK-ERR: unknown coordinates for atom "    -622 -GLU -HB1 :"  6075.559 12376.361 -6123.785
+ %ATMCHK-ERR: unknown coordinates for atom "    -622 -GLU -CG  :" 61055.619-35435.423 -5344.388
+ %ATMCHK-ERR: unknown coordinates for atom "    -622 -GLU -HG1 :"-14258.824 11720.639   785.598
+ %ATMCHK-ERR: unknown coordinates for atom "    -622 -GLU -HG2 :" -9874.320 15975.714  -417.142
+ %ATMCHK-ERR: unknown coordinates for atom "    -622 -GLU -C   :" 16127.388 43844.818  -252.371
+ %ATMCHK-ERR: unknown coordinates for atom "    -623 -GLU -HN  :"  3766.497 16682.536 -2639.866
+ %ATMCHK-ERR: unknown coordinates for atom "    -623 -GLU -CA  :"-73917.464-68499.900 21624.861
+ %ATMCHK-ERR: unknown coordinates for atom "    -623 -GLU -HA  :"  7572.001 22719.733 -4389.225
+ %ATMCHK-ERR: unknown coordinates for atom "    -623 -GLU -CB  :" 45592.962 23038.851  7547.183
+ %ATMCHK-ERR: unknown coordinates for atom "    -623 -GLU -CD  :" 22975.006 21794.432 -2283.272
+ %ATMCHK-ERR: unknown coordinates for atom "    -623 -GLU -C   :"174006.927 83424.706-54023.576
+ %ATMCHK-ERR: unknown coordinates for atom "    -624 -GLU -N   :"********** 12833.814131923.392
+ %ATMCHK-ERR: unknown coordinates for atom "    -624 -GLU -HN  :" 73921.926  1716.663-51581.138
+ %ATMCHK-ERR: unknown coordinates for atom "    -624 -GLU -HA  :" 40348.252 27176.780   948.703
+ %ATMCHK-ERR: unknown coordinates for atom "    -624 -GLU -CB  :" 85627.718 20961.753 37018.307
+ %ATMCHK-ERR: unknown coordinates for atom "    -624 -GLU -HG1 :"  -785.903 11889.688 22887.228
+ %ATMCHK-ERR: unknown coordinates for atom "    -624 -GLU -HG2 :" -2904.237  4508.575 30976.598
+ %ATMCHK-ERR: unknown coordinates for atom "    -624 -GLU -CD  :"-42854.428  6991.400 46070.048
+ %ATMCHK-ERR: unknown coordinates for atom "    -624 -GLU -OE1 :" 15555.946   165.730 -9749.204
+ %ATMCHK-ERR: unknown coordinates for atom "    -624 -GLU -OE2 :" 11396.714  -244.417 -7364.325
+ %ATMCHK-ERR: unknown coordinates for atom "    -624 -GLU -C   :" -3505.193141857.042167659.689
+ %ATMCHK-ERR: unknown coordinates for atom "    -625 -GLU -N   :"956526.986********************
+ %ATMCHK-ERR: unknown coordinates for atom "    -625 -GLU -HN  :"********** 31078.799 89693.971
+ %ATMCHK-ERR: unknown coordinates for atom "    -625 -GLU -CA  :"**********833253.972814876.157
+ %ATMCHK-ERR: unknown coordinates for atom "    -625 -GLU -HA  :"382242.077********************
+ %ATMCHK-ERR: unknown coordinates for atom "    -625 -GLU -CB  :"315844.096********************
+ %ATMCHK-ERR: unknown coordinates for atom "    -625 -GLU -HB1 :" 18961.966 -1756.851 80185.280
+ %ATMCHK-ERR: unknown coordinates for atom "    -625 -GLU -HB2 :" 26069.170 12310.216 82035.756
+ %ATMCHK-ERR: unknown coordinates for atom "    -625 -GLU -CG  :"  7135.127-25430.143120919.973
+ %ATMCHK-ERR: unknown coordinates for atom "    -625 -GLU -HG1 :"  9100.284 15134.503-15405.009
+ %ATMCHK-ERR: unknown coordinates for atom "    -625 -GLU -CD  :"-11482.291 15896.971 35179.994
+ %ATMCHK-ERR: unknown coordinates for atom "    -625 -GLU -C   :"******************************
+ %ATMCHK-ERR: unknown coordinates for atom "    -625 -GLU -O   :"********** 60337.902100083.475
+ %ATMCHK-ERR: unknown coordinates for atom "    -626 -ARG -N   :"******************** 91157.559
+ %ATMCHK-ERR: unknown coordinates for atom "    -626 -ARG -HN  :" -2424.481182080.721-18468.864
+ %ATMCHK-ERR: unknown coordinates for atom "    -626 -ARG -CA  :"********************277095.841
+ %ATMCHK-ERR: unknown coordinates for atom "    -626 -ARG -HA  :"140268.934**********-70817.316
+ %ATMCHK-ERR: unknown coordinates for atom "    -626 -ARG -CB  :" 44812.678 92677.972-60833.725
+ %ATMCHK-ERR: unknown coordinates for atom "    -626 -ARG -HB1 :" 24949.531-90999.232  1419.050
+ %ATMCHK-ERR: unknown coordinates for atom "    -626 -ARG -HB2 :" 30128.742-72676.670  2841.466
+ %ATMCHK-ERR: unknown coordinates for atom "    -626 -ARG -HG1 :" 19635.845  9610.094 30453.223
+ %ATMCHK-ERR: unknown coordinates for atom "    -626 -ARG -HG2 :" 23201.939 14359.392 29161.534
+ %ATMCHK-ERR: unknown coordinates for atom "    -626 -ARG -CD  :" 17524.341 -7138.854-25805.259
+ %ATMCHK-ERR: unknown coordinates for atom "    -626 -ARG -HD2 :"  1359.260 13268.553 12054.474
+ %ATMCHK-ERR: unknown coordinates for atom "    -626 -ARG -NE  :" 49528.279-58446.289 21113.816
+ %ATMCHK-ERR: unknown coordinates for atom "    -626 -ARG -HE  :" -5287.468 20585.220 -3413.559
+ %ATMCHK-ERR: unknown coordinates for atom "    -626 -ARG -CZ  :"********** 53633.529-15795.093
+ %ATMCHK-ERR: unknown coordinates for atom "    -626 -ARG -NH1 :" 65688.891-40168.486 23765.533
+ %ATMCHK-ERR: unknown coordinates for atom "    -626 -ARG -HH11:"-14692.188 13296.778 -8841.864
+ %ATMCHK-ERR: unknown coordinates for atom "    -626 -ARG -NH2 :" 55097.323-36348.066  3004.986
+ %ATMCHK-ERR: unknown coordinates for atom "    -626 -ARG -HH21:" -5700.348 12204.609   930.035
+ %ATMCHK-ERR: unknown coordinates for atom "    -626 -ARG -HH22:"-14935.590 10246.575  2913.453
+ %ATMCHK-ERR: unknown coordinates for atom "    -626 -ARG -C   :"244359.344**********-69818.911
+ %ATMCHK-ERR: unknown coordinates for atom "    -626 -ARG -O   :" -2274.440 95414.060-75191.013
+ %ATMCHK-ERR: unknown coordinates for atom "    -627 -ARG -N   :"********************191140.356
+ %ATMCHK-ERR: unknown coordinates for atom "    -627 -ARG -HN  :" 14285.020100971.191-37226.470
+ %ATMCHK-ERR: unknown coordinates for atom "    -627 -ARG -CA  :"153973.396404569.073  3439.566
+ %ATMCHK-ERR: unknown coordinates for atom "    -627 -ARG -HA  :"-18167.074 18600.357-58093.661
+ %ATMCHK-ERR: unknown coordinates for atom "    -627 -ARG -HB1 :" 33779.861 17000.530 28167.614
+ %ATMCHK-ERR: unknown coordinates for atom "    -627 -ARG -HB2 :"-18265.210 73179.415 54402.696
+ %ATMCHK-ERR: unknown coordinates for atom "    -627 -ARG -CG  :"137299.962 26535.097**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -627 -ARG -HG1 :" -4062.901 30447.268 38946.796
+ %ATMCHK-ERR: unknown coordinates for atom "    -627 -ARG -HG2 :" -9402.682 -6283.503 44192.347
+ %ATMCHK-ERR: unknown coordinates for atom "    -627 -ARG -CD  :"**********-76327.664218245.013
+ %ATMCHK-ERR: unknown coordinates for atom "    -627 -ARG -HD1 :" 69290.436 25735.856-23729.941
+ %ATMCHK-ERR: unknown coordinates for atom "    -627 -ARG -HD2 :" 58242.583 24091.046-57004.854
+ %ATMCHK-ERR: unknown coordinates for atom "    -627 -ARG -NE  :"152316.441 16793.140**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -627 -ARG -HE  :"-49000.210  4059.843 61745.484
+ %ATMCHK-ERR: unknown coordinates for atom "    -627 -ARG -CZ  :" 37139.700-37703.226 72542.960
+ %ATMCHK-ERR: unknown coordinates for atom "    -627 -ARG -NH1 :"-83284.011 42253.395 20281.936
+ %ATMCHK-ERR: unknown coordinates for atom "    -627 -ARG -HH11:" 29003.656 -9657.731-14270.948
+ %ATMCHK-ERR: unknown coordinates for atom "    -627 -ARG -HH12:" 26851.972-14577.304-11546.145
+ %ATMCHK-ERR: unknown coordinates for atom "    -627 -ARG -NH2 :"-81461.803 10465.472  6177.394
+ %ATMCHK-ERR: unknown coordinates for atom "    -627 -ARG -HH21:" 25470.336  1853.375 -9811.325
+ %ATMCHK-ERR: unknown coordinates for atom "    -627 -ARG -HH22:" 27891.615 -2798.281 -3901.206
+ %ATMCHK-ERR: unknown coordinates for atom "    -627 -ARG -O   :" 22766.728 -4054.296 45678.210
+ %ATMCHK-ERR: unknown coordinates for atom "    -628 -ILE -N   :"233056.547416906.372**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -628 -ILE -HN  :"-86474.336  2343.523 65331.874
+ %ATMCHK-ERR: unknown coordinates for atom "    -628 -ILE -HA  :" 93877.328350653.122  1851.713
+ %ATMCHK-ERR: unknown coordinates for atom "    -628 -ILE -CB  :"155843.066170353.315438277.732
+ %ATMCHK-ERR: unknown coordinates for atom "    -628 -ILE -HB  :"  5825.324 34727.507**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -628 -ILE -CG1 :"-78097.118474797.927**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -628 -ILE -HG11:" 47508.259********** 14211.081
+ %ATMCHK-ERR: unknown coordinates for atom "    -628 -ILE -HG12:" 15810.579********** 32986.846
+ %ATMCHK-ERR: unknown coordinates for atom "    -628 -ILE -CG2 :"**********310036.353123087.708
+ %ATMCHK-ERR: unknown coordinates for atom "    -628 -ILE -HG21:" 12355.780-67511.717-82803.074
+ %ATMCHK-ERR: unknown coordinates for atom "    -628 -ILE -HG22:" 38794.010-88283.831-19119.297
+ %ATMCHK-ERR: unknown coordinates for atom "    -628 -ILE -HG23:" 60688.015-91276.402-69322.332
+ %ATMCHK-ERR: unknown coordinates for atom "    -628 -ILE -CD1 :" 78181.172**********  9803.482
+ %ATMCHK-ERR: unknown coordinates for atom "    -628 -ILE -HD11:"-34047.389 39386.314 14508.681
+ %ATMCHK-ERR: unknown coordinates for atom "    -628 -ILE -HD12:"-25048.246 27531.787 -3669.017
+ %ATMCHK-ERR: unknown coordinates for atom "    -628 -ILE -HD13:" -2263.378 27813.940 24005.672
+ %ATMCHK-ERR: unknown coordinates for atom "    -628 -ILE -C   :"**********553827.041410094.261
+ %ATMCHK-ERR: unknown coordinates for atom "    -628 -ILE -O   :" 48137.385-91672.761**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -629 -ALA -N   :"525316.195467570.862**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -629 -ALA -HN  :"********************178412.914
+ %ATMCHK-ERR: unknown coordinates for atom "    -629 -ALA -CA  :" 64874.701********************
+ %ATMCHK-ERR: unknown coordinates for atom "    -629 -ALA -HA  :" 42056.864176639.588 43148.359
+ %ATMCHK-ERR: unknown coordinates for atom "    -629 -ALA -CB  :"**********172658.139255812.015
+ %ATMCHK-ERR: unknown coordinates for atom "    -629 -ALA -HB1 :" 56341.260  2557.583-65484.486
+ %ATMCHK-ERR: unknown coordinates for atom "    -629 -ALA -HB2 :" 78756.211 -8067.597-40007.327
+ %ATMCHK-ERR: unknown coordinates for atom "    -629 -ALA -HB3 :" 43461.007 -1917.132-54141.296
+ %ATMCHK-ERR: unknown coordinates for atom "    -629 -ALA -C   :"**********239783.378365978.415
+ %ATMCHK-ERR: unknown coordinates for atom "    -629 -ALA -O   :"174714.118-26078.825-84139.325
+ %ATMCHK-ERR: unknown coordinates for atom "    -630 -GLU -N   :" 98527.748112708.299**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -630 -GLU -HN  :"-21533.255-18813.192 48767.989
+ %ATMCHK-ERR: unknown coordinates for atom "    -630 -GLU -CA  :"747360.740********** 77313.966
+ %ATMCHK-ERR: unknown coordinates for atom "    -630 -GLU -HA  :"********** 59606.052-23009.588
+ %ATMCHK-ERR: unknown coordinates for atom "    -630 -GLU -CB  :"**********201321.250 87838.994
+ %ATMCHK-ERR: unknown coordinates for atom "    -630 -GLU -HB1 :" 12917.452-25988.416-25577.056
+ %ATMCHK-ERR: unknown coordinates for atom "    -630 -GLU -HB2 :" 40685.033-40271.151-21295.374
+ %ATMCHK-ERR: unknown coordinates for atom "    -630 -GLU -CG  :"200962.107********************
+ %ATMCHK-ERR: unknown coordinates for atom "    -630 -GLU -HG1 :"-43949.707 41696.660 25409.439
+ %ATMCHK-ERR: unknown coordinates for atom "    -630 -GLU -HG2 :"-51984.426 41915.634 27365.114
+ %ATMCHK-ERR: unknown coordinates for atom "    -630 -GLU -CD  :"-47633.027 31165.963 -9737.548
+ %ATMCHK-ERR: unknown coordinates for atom "    -630 -GLU -OE1 :"  8005.757  2850.404 13969.651
+ %ATMCHK-ERR: unknown coordinates for atom "    -630 -GLU -C   :"**********250064.785191713.683
+ %ATMCHK-ERR: unknown coordinates for atom "    -630 -GLU -O   :"152802.485-27490.273-34051.354
+ %ATMCHK-ERR: unknown coordinates for atom "    -631 -MET -N   :"247082.417********************
+ %ATMCHK-ERR: unknown coordinates for atom "    -631 -MET -HN  :"-64471.609117211.537129051.302
+ %ATMCHK-ERR: unknown coordinates for atom "    -631 -MET -CA  :"115675.217**********959572.943
+ %ATMCHK-ERR: unknown coordinates for atom "    -631 -MET -HB1 :"  8626.656 25649.911 65572.451
+ %ATMCHK-ERR: unknown coordinates for atom "    -631 -MET -HB2 :" 12466.377  4250.288 56705.492
+ %ATMCHK-ERR: unknown coordinates for atom "    -631 -MET -CG  :" 71637.377 14889.664119938.182
+ %ATMCHK-ERR: unknown coordinates for atom "    -631 -MET -CE  :" 16929.685 36784.414 -6923.168
+ %ATMCHK-ERR: unknown coordinates for atom "    -631 -MET -O   :"  1216.395117989.755 85518.443
+ %ATMCHK-ERR: unknown coordinates for atom "    -632 -GLY -N   :"********** 59567.970103121.587
+ %ATMCHK-ERR: unknown coordinates for atom "    -632 -GLY -HN  :" 31398.910 31756.844 17270.922
+ %ATMCHK-ERR: unknown coordinates for atom "    -632 -GLY -CA  :" 54592.978-33918.733**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -632 -GLY -HA1 :"-20999.484  8612.972 41675.068
+ %ATMCHK-ERR: unknown coordinates for atom "    -632 -GLY -HA2 :"-16290.906 15249.624 51911.980
+ %ATMCHK-ERR: unknown coordinates for atom "    -632 -GLY -C   :"167043.744 26280.623-50191.705
+ %ATMCHK-ERR: unknown coordinates for atom "    -632 -GLY -O   :"-40596.882 -5483.297 14660.237
+ %ATMCHK-ERR: unknown coordinates for atom "    -633 -ARG -N   :"**********-15512.229154066.015
+ %ATMCHK-ERR: unknown coordinates for atom "    -633 -ARG -HN  :" 63581.377 10148.084-31787.200
+ %ATMCHK-ERR: unknown coordinates for atom "    -633 -ARG -CA  :"166114.680-36753.751**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -633 -ARG -HA  :"-22306.287  4385.922 18865.614
+ %ATMCHK-ERR: unknown coordinates for atom "    -633 -ARG -CB  :" -6633.148 38472.101 37411.267
+ %ATMCHK-ERR: unknown coordinates for atom "    -633 -ARG -HG1 :" 12573.748  6231.567 -5798.956
+ %ATMCHK-ERR: unknown coordinates for atom "    -633 -ARG -HG2 :" 14278.534  7579.168  -331.271
+ %ATMCHK-ERR: unknown coordinates for atom "    -633 -ARG -CD  :"-83268.063 33691.031 95599.537
+ %ATMCHK-ERR: unknown coordinates for atom "    -633 -ARG -HD1 :" 28308.051 -9380.775-27831.669
+ %ATMCHK-ERR: unknown coordinates for atom "    -633 -ARG -HD2 :" 27858.192 -8907.791-21098.624
+ %ATMCHK-ERR: unknown coordinates for atom "    -633 -ARG -NE  :" 39358.656-12959.157-32639.698
+ %ATMCHK-ERR: unknown coordinates for atom "    -633 -ARG -NH1 :" 13784.368-14076.673 40185.344
+ %ATMCHK-ERR: unknown coordinates for atom "    -633 -ARG -HH21:"  4785.748   293.922 10847.580
+ %ATMCHK-ERR: unknown coordinates for atom "    -633 -ARG -HH22:"  1338.692 -3690.223 14269.339
+ %ATMCHK-ERR: unknown coordinates for atom "    -633 -ARG -C   :"********** 40398.238 75327.315
+ %ATMCHK-ERR: unknown coordinates for atom "    -633 -ARG -O   :" 19044.467 -9885.862 -9345.412
+ %ATMCHK-ERR: unknown coordinates for atom "    -634 -PRO -N   :" 20742.977 22324.044**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -634 -PRO -CA  :"159465.560**********271599.036
+ %ATMCHK-ERR: unknown coordinates for atom "    -634 -PRO -HA  :"-73175.791 77261.971-47305.119
+ %ATMCHK-ERR: unknown coordinates for atom "    -634 -PRO -CB  :" 39785.576 69207.233-51771.504
+ %ATMCHK-ERR: unknown coordinates for atom "    -634 -PRO -HB1 :"-19507.545 -9117.672 12200.095
+ %ATMCHK-ERR: unknown coordinates for atom "    -634 -PRO -HG1 :" 18650.689 11605.038 13412.584
+ %ATMCHK-ERR: unknown coordinates for atom "    -634 -PRO -HG2 :"  9551.487 29372.558 19735.492
+ %ATMCHK-ERR: unknown coordinates for atom "    -634 -PRO -CD  :"-12813.457 74206.693 82051.170
+ %ATMCHK-ERR: unknown coordinates for atom "    -634 -PRO -C   :"********** 10563.305**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -634 -PRO -O   :"  5802.198 24114.605 84009.175
+ %ATMCHK-ERR: unknown coordinates for atom "    -635 -ILE -N   :"466057.194 64833.590412072.711
+ %ATMCHK-ERR: unknown coordinates for atom "    -635 -ILE -HA  :"203750.604 88867.046 94896.088
+ %ATMCHK-ERR: unknown coordinates for atom "    -635 -ILE -CB  :"579645.881332972.598299097.205
+ %ATMCHK-ERR: unknown coordinates for atom "    -635 -ILE -HG11:" 48930.471-32562.508 84159.648
+ %ATMCHK-ERR: unknown coordinates for atom "    -635 -ILE -HG12:" 70462.543-15007.972 82634.958
+ %ATMCHK-ERR: unknown coordinates for atom "    -635 -ILE -HG22:" 11331.630  3320.299 -2259.327
+ %ATMCHK-ERR: unknown coordinates for atom "    -635 -ILE -CD1 :" 93950.634 -6881.585  9131.761
+ %ATMCHK-ERR: unknown coordinates for atom "    -635 -ILE -HD11:" -9379.344  7125.139 27960.239
+ %ATMCHK-ERR: unknown coordinates for atom "    -635 -ILE -C   :"406906.000316857.817222304.633
+ %ATMCHK-ERR: unknown coordinates for atom "    -636 -LEU -HN  :" 67025.850 19369.873 -5457.127
+ %ATMCHK-ERR: unknown coordinates for atom "    -636 -LEU -CA  :"170407.514172475.957246634.594
+ %ATMCHK-ERR: unknown coordinates for atom "    -636 -LEU -CB  :"-19689.239********** 29766.570
+ %ATMCHK-ERR: unknown coordinates for atom "    -636 -LEU -HB1 :"  1860.093 25671.795-18083.658
+ %ATMCHK-ERR: unknown coordinates for atom "    -636 -LEU -HB2 :" -3720.579 12990.986-26062.480
+ %ATMCHK-ERR: unknown coordinates for atom "    -636 -LEU -CG  :"-13673.702 83678.072-54379.009
+ %ATMCHK-ERR: unknown coordinates for atom "    -636 -LEU -HG  :"  5467.891-21956.138 10772.210
+ %ATMCHK-ERR: unknown coordinates for atom "    -636 -LEU -CD1 :"-30811.639 13478.677 16317.039
+ %ATMCHK-ERR: unknown coordinates for atom "    -636 -LEU -HD12:" 11979.863 -7594.951  -531.796
+ %ATMCHK-ERR: unknown coordinates for atom "    -636 -LEU -HD13:" 10207.247-10612.578  -192.724
+ %ATMCHK-ERR: unknown coordinates for atom "    -636 -LEU -CD2 :" 32460.353-18109.397-14485.339
+ %ATMCHK-ERR: unknown coordinates for atom "    -636 -LEU -HD23:" -5601.738  -178.097 13178.195
+ %ATMCHK-ERR: unknown coordinates for atom "    -636 -LEU -O   :" 21241.743 21230.610 33551.415
+ %ATMCHK-ERR: unknown coordinates for atom "    -637 -GLY -N   :" 42126.383-28008.979 48785.744
+ %ATMCHK-ERR: unknown coordinates for atom "    -637 -GLY -HN  :"  1106.119 13809.681 -5714.324
+ %ATMCHK-ERR: unknown coordinates for atom "    -637 -GLY -CA  :"-80067.391 93268.166-31940.493
+ %ATMCHK-ERR: unknown coordinates for atom "    -637 -GLY -HA1 :" 27703.864-23566.867 10661.813
+ %ATMCHK-ERR: unknown coordinates for atom "    -637 -GLY -HA2 :" 15533.279-29706.027 -5856.750
+ %ATMCHK-ERR: unknown coordinates for atom "    -637 -GLY -C   :" 13522.883-30133.823117013.788
+ %ATMCHK-ERR: unknown coordinates for atom "    -638 -GLU -N   :" 32992.979-14121.393**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -638 -GLU -HN  :"   903.803   169.125 30930.722
+ %ATMCHK-ERR: unknown coordinates for atom "    -638 -GLU -CA  :"**********126801.852171324.077
+ %ATMCHK-ERR: unknown coordinates for atom "    -638 -GLU -HA  :" 53453.502-27727.641-20041.923
+ %ATMCHK-ERR: unknown coordinates for atom "    -638 -GLU -CB  :"179500.232********************
+ %ATMCHK-ERR: unknown coordinates for atom "    -638 -GLU -HB1 :"-18328.964 43786.684 28642.269
+ %ATMCHK-ERR: unknown coordinates for atom "    -638 -GLU -HB2 :"-64789.599 40530.085 40748.022
+ %ATMCHK-ERR: unknown coordinates for atom "    -638 -GLU -CG  :" 53872.456 53142.154-82214.671
+ %ATMCHK-ERR: unknown coordinates for atom "    -638 -GLU -HG1 :"-23467.766 -4833.657 26859.780
+ %ATMCHK-ERR: unknown coordinates for atom "    -638 -GLU -HG2 :"-12153.386-12349.486 37327.687
+ %ATMCHK-ERR: unknown coordinates for atom "    -638 -GLU -OE1 :" 22101.238 16202.468  3961.428
+ %ATMCHK-ERR: unknown coordinates for atom "    -638 -GLU -OE2 :" 27861.186 14537.405  3621.489
+ %ATMCHK-ERR: unknown coordinates for atom "    -638 -GLU -C   :" 67134.227-64034.772**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -638 -GLU -O   :"-23402.897 28477.404 36664.012
+ %ATMCHK-ERR: unknown coordinates for atom "    -639 -HIS -N   :"184776.590-12040.606-15170.777
+ %ATMCHK-ERR: unknown coordinates for atom "    -639 -HIS -HN  :"-36498.455 37069.508 -9523.056
+ %ATMCHK-ERR: unknown coordinates for atom "    -639 -HIS -CA  :"********************265954.856
+ %ATMCHK-ERR: unknown coordinates for atom "    -639 -HIS -HA  :"103378.754103652.997-26579.088
+ %ATMCHK-ERR: unknown coordinates for atom "    -639 -HIS -HB1 :" 14659.180 15244.404  9110.877
+ %ATMCHK-ERR: unknown coordinates for atom "    -639 -HIS -HB2 :" 29375.344 22629.041-15231.602
+ %ATMCHK-ERR: unknown coordinates for atom "    -639 -HIS -CG  :" 70355.464 98167.799-12924.797
+ %ATMCHK-ERR: unknown coordinates for atom "    -639 -HIS -ND1 :"-78512.167  7394.680 47455.740
+ %ATMCHK-ERR: unknown coordinates for atom "    -639 -HIS -HD1 :" 27448.230-16804.309-20546.754
+ %ATMCHK-ERR: unknown coordinates for atom "    -639 -HIS -CD2 :" 28062.543********** 49225.636
+ %ATMCHK-ERR: unknown coordinates for atom "    -639 -HIS -HD2 :"-17496.786 56679.911-63991.323
+ %ATMCHK-ERR: unknown coordinates for atom "    -639 -HIS -CE1 :" 30969.427 11554.917-15667.925
+ %ATMCHK-ERR: unknown coordinates for atom "    -639 -HIS -C   :"179746.644291358.307**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -639 -HIS -O   :"-21230.427-37560.569 48575.521
+ %ATMCHK-ERR: unknown coordinates for atom "    -640 -THR -N   :"********************133664.658
+ %ATMCHK-ERR: unknown coordinates for atom "    -640 -THR -HN  :" -9863.162 86757.207-18829.112
+ %ATMCHK-ERR: unknown coordinates for atom "    -640 -THR -CA  :"458017.047985515.401 36631.166
+ %ATMCHK-ERR: unknown coordinates for atom "    -640 -THR -HA  :"-86078.596********** 14220.016
+ %ATMCHK-ERR: unknown coordinates for atom "    -640 -THR -CB  :"******************** 68080.011
+ %ATMCHK-ERR: unknown coordinates for atom "    -640 -THR -HB  :" 25570.084 58494.263-18938.273
+ %ATMCHK-ERR: unknown coordinates for atom "    -640 -THR -OG1 :" 43617.687135932.578-76692.826
+ %ATMCHK-ERR: unknown coordinates for atom "    -640 -THR -HG1 :"-10674.204-36396.118 27296.668
+ %ATMCHK-ERR: unknown coordinates for atom "    -640 -THR -CG2 :" -2845.575156820.201 31101.804
+ %ATMCHK-ERR: unknown coordinates for atom "    -640 -THR -HG21:" 24553.826-36182.003-21947.813
+ %ATMCHK-ERR: unknown coordinates for atom "    -640 -THR -O   :" 70376.927117611.925 43463.561
+ %ATMCHK-ERR: unknown coordinates for atom "    -641 -LYS -N   :"**********913435.950290507.427
+ %ATMCHK-ERR: unknown coordinates for atom "    -641 -LYS -HN  :" 88641.898**********-83024.325
+ %ATMCHK-ERR: unknown coordinates for atom "    -641 -LYS -HA  :" 81157.946179212.109 44581.739
+ %ATMCHK-ERR: unknown coordinates for atom "    -641 -LYS -CB  :"-51372.202177408.593-41893.774
+ %ATMCHK-ERR: unknown coordinates for atom "    -641 -LYS -HB1 :"-18698.674-28286.368 61976.330
+ %ATMCHK-ERR: unknown coordinates for atom "    -641 -LYS -HB2 :" 33677.425 15465.098 12096.046
+ %ATMCHK-ERR: unknown coordinates for atom "    -641 -LYS -CG  :"173209.881-43742.667-13551.757
+ %ATMCHK-ERR: unknown coordinates for atom "    -641 -LYS -CD  :"**********282057.166182149.005
+ %ATMCHK-ERR: unknown coordinates for atom "    -641 -LYS -HD1 :" 33705.257-89006.762-29130.988
+ %ATMCHK-ERR: unknown coordinates for atom "    -641 -LYS -HD2 :" 28810.383-88697.806-44700.186
+ %ATMCHK-ERR: unknown coordinates for atom "    -641 -LYS -CE  :" 58737.814 97835.656**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -641 -LYS -HE1 :"  9027.407-26856.743 33362.888
+ %ATMCHK-ERR: unknown coordinates for atom "    -641 -LYS -HE2 :"  5922.138-29837.483 50562.019
+ %ATMCHK-ERR: unknown coordinates for atom "    -641 -LYS -HZ1 :" 28487.058 60574.324 16943.767
+ %ATMCHK-ERR: unknown coordinates for atom "    -641 -LYS -HZ2 :" 28151.977 64636.474 22228.944
+ %ATMCHK-ERR: unknown coordinates for atom "    -641 -LYS -HZ3 :" 31338.106 69349.721 21105.150
+ %ATMCHK-ERR: unknown coordinates for atom "    -641 -LYS -C   :"283576.714330002.224251967.299
+ %ATMCHK-ERR: unknown coordinates for atom "    -642 -LEU -N   :"**********409720.532**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -642 -LEU -HN  :"108759.543********** 26126.588
+ %ATMCHK-ERR: unknown coordinates for atom "    -642 -LEU -CA  :"534057.714**********408356.975
+ %ATMCHK-ERR: unknown coordinates for atom "    -642 -LEU -HA  :"-69152.974107120.300-78822.175
+ %ATMCHK-ERR: unknown coordinates for atom "    -642 -LEU -CB  :"**********284862.199**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -642 -LEU -HB1 :" 78313.154-34552.268 29562.802
+ %ATMCHK-ERR: unknown coordinates for atom "    -642 -LEU -HB2 :" 83593.103-23500.076 22822.585
+ %ATMCHK-ERR: unknown coordinates for atom "    -642 -LEU -CG  :" 10889.841**********136634.825
+ %ATMCHK-ERR: unknown coordinates for atom "    -642 -LEU -HG  :"  3364.140 37525.833-19824.158
+ %ATMCHK-ERR: unknown coordinates for atom "    -642 -LEU -CD1 :" 38312.060142224.200-35937.990
+ %ATMCHK-ERR: unknown coordinates for atom "    -642 -LEU -HD12:"-20229.531-34795.585 10616.161
+ %ATMCHK-ERR: unknown coordinates for atom "    -642 -LEU -HD13:"  4986.043-23507.504 13405.475
+ %ATMCHK-ERR: unknown coordinates for atom "    -642 -LEU -CD2 :" 46783.084225578.084**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -642 -LEU -HD21:" -2580.605-45318.017 45671.216
+ %ATMCHK-ERR: unknown coordinates for atom "    -642 -LEU -HD22:" -2712.450-38207.614 41938.461
+ %ATMCHK-ERR: unknown coordinates for atom "    -642 -LEU -HD23:"-24659.236-51620.759 36656.273
+ %ATMCHK-ERR: unknown coordinates for atom "    -642 -LEU -C   :"**********276766.262**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -642 -LEU -O   :" 20448.851-30404.655 20182.516
+ %ATMCHK-ERR: unknown coordinates for atom "    -643 -GLU -N   :"351396.674********** 27601.456
+ %ATMCHK-ERR: unknown coordinates for atom "    -643 -GLU -HN  :"-87655.976 55151.708 -4948.920
+ %ATMCHK-ERR: unknown coordinates for atom "    -643 -GLU -CA  :"**********468493.829 46397.171
+ %ATMCHK-ERR: unknown coordinates for atom "    -643 -GLU -HA  :" 66400.882-99931.473-22792.740
+ %ATMCHK-ERR: unknown coordinates for atom "    -643 -GLU -CB  :" 69871.224**********-44934.290
+ %ATMCHK-ERR: unknown coordinates for atom "    -643 -GLU -HB1 :" -4066.709 37009.112  4372.601
+ %ATMCHK-ERR: unknown coordinates for atom "    -643 -GLU -HB2 :"   784.073 33946.606  8070.104
+ %ATMCHK-ERR: unknown coordinates for atom "    -643 -GLU -CG  :" 52713.721104681.809 90178.662
+ %ATMCHK-ERR: unknown coordinates for atom "    -643 -GLU -CD  :"-49587.811-12713.177 32085.610
+ %ATMCHK-ERR: unknown coordinates for atom "    -643 -GLU -OE1 :" 15482.705  -302.491-23302.546
+ %ATMCHK-ERR: unknown coordinates for atom "    -643 -GLU -OE2 :" 10413.120 -4362.601-11846.052
+ %ATMCHK-ERR: unknown coordinates for atom "    -643 -GLU -C   :"258143.136**********-33572.788
+ %ATMCHK-ERR: unknown coordinates for atom "    -643 -GLU -O   :"-71101.514 56796.126 24827.116
+ %ATMCHK-ERR: unknown coordinates for atom "    -644 -VAL -N   :" 24714.037352572.812**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -644 -VAL -HN  :"  9358.518-91674.797 12229.860
+ %ATMCHK-ERR: unknown coordinates for atom "    -644 -VAL -CA  :"********************632837.750
+ %ATMCHK-ERR: unknown coordinates for atom "    -644 -VAL -HA  :"109572.168 49856.447**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -644 -VAL -CB  :"502702.178307074.868  4093.689
+ %ATMCHK-ERR: unknown coordinates for atom "    -644 -VAL -HG12:" 11272.331-13685.345  6343.237
+ %ATMCHK-ERR: unknown coordinates for atom "    -644 -VAL -HG13:" -4433.631 -6441.836 18765.869
+ %ATMCHK-ERR: unknown coordinates for atom "    -644 -VAL -HG21:" 61709.140122066.507 47256.282
+ %ATMCHK-ERR: unknown coordinates for atom "    -644 -VAL -HG22:" 99773.931144501.788 47609.520
+ %ATMCHK-ERR: unknown coordinates for atom "    -644 -VAL -HG23:" 77458.462100637.111 48052.035
+ %ATMCHK-ERR: unknown coordinates for atom "    -644 -VAL -C   :"327234.060418845.951**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -644 -VAL -O   :"-65143.408-79998.867149542.187
+ %ATMCHK-ERR: unknown coordinates for atom "    -645 -ILE -N   :"********************495637.201
+ %ATMCHK-ERR: unknown coordinates for atom "    -645 -ILE -HN  :" 62791.298163031.662**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -645 -ILE -CA  :"**********245507.639**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -645 -ILE -HA  :" 10656.707 12294.378 76061.425
+ %ATMCHK-ERR: unknown coordinates for atom "    -645 -ILE -CB  :"263614.549 -1766.172125670.635
+ %ATMCHK-ERR: unknown coordinates for atom "    -645 -ILE -CG1 :"********** 39640.630**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -645 -ILE -HG11:" 24068.648   895.634 38115.938
+ %ATMCHK-ERR: unknown coordinates for atom "    -645 -ILE -HG12:" 44655.334 -6706.503 69421.725
+ %ATMCHK-ERR: unknown coordinates for atom "    -645 -ILE -CG2 :"-78477.707    16.169194262.631
+ %ATMCHK-ERR: unknown coordinates for atom "    -645 -ILE -HG22:" 15029.135   803.993-53745.148
+ %ATMCHK-ERR: unknown coordinates for atom "    -645 -ILE -HG23:"  1586.544 16551.872-58986.106
+ %ATMCHK-ERR: unknown coordinates for atom "    -645 -ILE -CD1 :"118955.267********** 82543.424
+ %ATMCHK-ERR: unknown coordinates for atom "    -645 -ILE -HD11:"-37652.463 32229.412 10813.352
+ %ATMCHK-ERR: unknown coordinates for atom "    -645 -ILE -HD12:"-18860.018 28249.269-11700.801
+ %ATMCHK-ERR: unknown coordinates for atom "    -645 -ILE -HD13:"-10800.557 34562.310-21650.151
+ %ATMCHK-ERR: unknown coordinates for atom "    -645 -ILE -C   :" 21494.255**********136465.118
+ %ATMCHK-ERR: unknown coordinates for atom "    -645 -ILE -O   :" -1896.810148863.333-63341.285
+ %ATMCHK-ERR: unknown coordinates for atom "    -646 -ILE -N   :"169184.055575448.995171286.151
+ %ATMCHK-ERR: unknown coordinates for atom "    -646 -ILE -HA  :"135401.059112895.957 63581.982
+ %ATMCHK-ERR: unknown coordinates for atom "    -646 -ILE -CB  :"560560.055394181.627-18357.750
+ %ATMCHK-ERR: unknown coordinates for atom "    -646 -ILE -CG1 :"**********-57549.035242762.839
+ %ATMCHK-ERR: unknown coordinates for atom "    -646 -ILE -HG11:"109245.763-11653.225-69780.094
+ %ATMCHK-ERR: unknown coordinates for atom "    -646 -ILE -HG12:"106710.753 -3791.559-68348.196
+ %ATMCHK-ERR: unknown coordinates for atom "    -646 -ILE -CG2 :"**********-82969.127 19053.469
+ %ATMCHK-ERR: unknown coordinates for atom "    -646 -ILE -HG22:" 25756.892 10743.408 -3820.511
+ %ATMCHK-ERR: unknown coordinates for atom "    -646 -ILE -CD1 :"114254.892 89975.225-57449.531
+ %ATMCHK-ERR: unknown coordinates for atom "    -646 -ILE -HD11:" -4595.124-37642.099 12176.082
+ %ATMCHK-ERR: unknown coordinates for atom "    -646 -ILE -C   :"445510.293240710.130 29312.678
+ %ATMCHK-ERR: unknown coordinates for atom "    -646 -ILE -O   :"-79995.773-37722.633 11014.194
+ %ATMCHK-ERR: unknown coordinates for atom "    -647 -GLU -N   :"******************** 18941.757
+ %ATMCHK-ERR: unknown coordinates for atom "    -647 -GLU -HN  :"112485.571 12589.897 -7181.022
+ %ATMCHK-ERR: unknown coordinates for atom "    -647 -GLU -CA  :"-69394.294224942.364103636.503
+ %ATMCHK-ERR: unknown coordinates for atom "    -647 -GLU -HA  :" 34391.205-34508.766-35267.647
+ %ATMCHK-ERR: unknown coordinates for atom "    -647 -GLU -CB  :" 48105.423-97069.372**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -647 -GLU -HB1 :" -3074.164 10303.084 36309.097
+ %ATMCHK-ERR: unknown coordinates for atom "    -647 -GLU -HB2 :"   760.094 11628.015 32347.797
+ %ATMCHK-ERR: unknown coordinates for atom "    -647 -GLU -CG  :"-30633.802-53686.754122752.969
+ %ATMCHK-ERR: unknown coordinates for atom "    -647 -GLU -HG1 :" 12233.223 25422.561-25310.210
+ %ATMCHK-ERR: unknown coordinates for atom "    -647 -GLU -HG2 :"  6895.304 31031.549-36016.501
+ %ATMCHK-ERR: unknown coordinates for atom "    -647 -GLU -CD  :" 25516.190 27774.515-18856.555
+ %ATMCHK-ERR: unknown coordinates for atom "    -647 -GLU -C   :" 77023.370********** 45206.578
+ %ATMCHK-ERR: unknown coordinates for atom "    -647 -GLU -O   :"  6334.841 61601.788-21491.772
+ %ATMCHK-ERR: unknown coordinates for atom "    -648 -GLU -N   :"**********140288.822-40004.331
+ %ATMCHK-ERR: unknown coordinates for atom "    -648 -GLU -HN  :" 52415.775-25140.517  5112.304
+ %ATMCHK-ERR: unknown coordinates for atom "    -648 -GLU -CA  :"193794.045-67207.946-29656.633
+ %ATMCHK-ERR: unknown coordinates for atom "    -648 -GLU -HA  :"-33721.986 12473.869  4444.091
+ %ATMCHK-ERR: unknown coordinates for atom "    -648 -GLU -CB  :"-96036.214 39439.597  4356.337
+ %ATMCHK-ERR: unknown coordinates for atom "    -648 -GLU -HB1 :" 27008.249 -6867.410 -3903.722
+ %ATMCHK-ERR: unknown coordinates for atom "    -648 -GLU -HB2 :" 16537.610 -8828.996   181.721
+ %ATMCHK-ERR: unknown coordinates for atom "    -648 -GLU -HG2 :" 14082.010  9226.808  7326.020
+ %ATMCHK-ERR: unknown coordinates for atom "    -648 -GLU -CD  :"  2580.585 17943.707-19015.396
+ %ATMCHK-ERR: unknown coordinates for atom "    -648 -GLU -OE2 :" -1075.766 -7813.604 10364.870
+ %ATMCHK-ERR: unknown coordinates for atom "    -648 -GLU -C   :"-29565.040  1866.719 93598.482
+ %ATMCHK-ERR: unknown coordinates for atom "    -649 -SER -N   :"-13630.792 11260.887-87347.874
+ %ATMCHK-ERR: unknown coordinates for atom "    -649 -SER -HN  :" -1609.064 -6370.149 17964.194
+ %ATMCHK-ERR: unknown coordinates for atom "    -649 -SER -CA  :" 83892.799  8911.505 55525.301
+ %ATMCHK-ERR: unknown coordinates for atom "    -649 -SER -C   :"  -252.295 11250.310-28987.701
+ %ATMCHK-ERR: unknown coordinates for atom "    -650 -TYR -N   :"-44291.734  9896.456 11053.576
+ %ATMCHK-ERR: unknown coordinates for atom "    -650 -TYR -HN  :" 11985.249  2834.444 -2906.079
+ %ATMCHK-ERR: unknown coordinates for atom "    -650 -TYR -HA  :"  4839.178 13804.746 -4344.645
+ %ATMCHK-ERR: unknown coordinates for atom "    -650 -TYR -CB  :"-19734.422 39210.993 96134.358
+ %ATMCHK-ERR: unknown coordinates for atom "    -650 -TYR -CG  :" 45271.190-28170.241-42781.931
+ %ATMCHK-ERR: unknown coordinates for atom "    -650 -TYR -CD2 :"-39245.064-15955.732 43032.008
+ %ATMCHK-ERR: unknown coordinates for atom "    -650 -TYR -CE1 :"-20260.383  8399.253 11997.557
+ %ATMCHK-ERR: unknown coordinates for atom "    -650 -TYR -CE2 :" 40185.449 44047.964-33391.014
+ %ATMCHK-ERR: unknown coordinates for atom "    -650 -TYR -CZ  :" 27485.345 17766.664 -5111.362
+ %ATMCHK-ERR: unknown coordinates for atom "    -650 -TYR -C   :" 80710.576 19206.153-66651.950
+ %ATMCHK-ERR: unknown coordinates for atom "    -650 -TYR -O   :" -9717.503 -2126.217 22874.821
+ %ATMCHK-ERR: unknown coordinates for atom "    -651 -GLU -N   :"********** 23387.503 29150.519
+ %ATMCHK-ERR: unknown coordinates for atom "    -651 -GLU -HN  :" 55575.769  2289.039 -9873.884
+ %ATMCHK-ERR: unknown coordinates for atom "    -651 -GLU -CA  :"298542.961********** 45058.744
+ %ATMCHK-ERR: unknown coordinates for atom "    -651 -GLU -HA  :"-56388.210 48205.788-37268.340
+ %ATMCHK-ERR: unknown coordinates for atom "    -651 -GLU -CB  :"-53329.885 11170.932 26806.638
+ %ATMCHK-ERR: unknown coordinates for atom "    -651 -GLU -CD  :"  7201.767 14716.412 20749.180
+ %ATMCHK-ERR: unknown coordinates for atom "    -651 -GLU -C   :"**********100348.547111518.636
+ %ATMCHK-ERR: unknown coordinates for atom "    -651 -GLU -O   :" 51656.619-29219.351-47833.105
+ %ATMCHK-ERR: unknown coordinates for atom "    -652 -PHE -N   :"161600.977-14519.157-70532.026
+ %ATMCHK-ERR: unknown coordinates for atom "    -652 -PHE -HN  :"-22623.334 27676.181 -7397.764
+ %ATMCHK-ERR: unknown coordinates for atom "    -652 -PHE -CA  :"********************162745.788
+ %ATMCHK-ERR: unknown coordinates for atom "    -652 -PHE -HA  :" 89515.550 26122.062-43189.146
+ %ATMCHK-ERR: unknown coordinates for atom "    -652 -PHE -CB  :" 33946.533 -1133.800**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -652 -PHE -HB1 :" 15214.429  6975.702 18841.865
+ %ATMCHK-ERR: unknown coordinates for atom "    -652 -PHE -HB2 :" -2502.218  7018.329 39659.365
+ %ATMCHK-ERR: unknown coordinates for atom "    -652 -PHE -CG  :"-14715.616 52890.170  9718.843
+ %ATMCHK-ERR: unknown coordinates for atom "    -652 -PHE -CD2 :" 38474.381**********-13012.997
+ %ATMCHK-ERR: unknown coordinates for atom "    -652 -PHE -HD2 :" -4779.662 10549.428  4158.296
+ %ATMCHK-ERR: unknown coordinates for atom "    -652 -PHE -CE1 :"  1339.231 16442.425  8239.499
+ %ATMCHK-ERR: unknown coordinates for atom "    -652 -PHE -CE2 :" -8533.312131675.754 18660.324
+ %ATMCHK-ERR: unknown coordinates for atom "    -652 -PHE -CZ  :" 13729.077-18105.197 -7086.499
+ %ATMCHK-ERR: unknown coordinates for atom "    -652 -PHE -C   :" 46439.125 -1219.724-66833.697
+ %ATMCHK-ERR: unknown coordinates for atom "    -652 -PHE -O   :"   364.663  8765.012 22089.200
+ %ATMCHK-ERR: unknown coordinates for atom "    -653 -LYS -N   :"-18915.507-20113.792 20722.613
+ %ATMCHK-ERR: unknown coordinates for atom "    -653 -LYS -CA  :" 76608.950135996.573-33507.921
+ %ATMCHK-ERR: unknown coordinates for atom "    -653 -LYS -CB  :"-86626.298-70971.626 63564.794
+ %ATMCHK-ERR: unknown coordinates for atom "    -653 -LYS -HB2 :" 15046.907  -990.524 -8970.452
+ %ATMCHK-ERR: unknown coordinates for atom "    -653 -LYS -CG  :" 62489.017154096.960**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -653 -LYS -HG1 :" -5286.205-29205.650 11435.313
+ %ATMCHK-ERR: unknown coordinates for atom "    -653 -LYS -HG2 :"  9498.516-44809.922 48153.913
+ %ATMCHK-ERR: unknown coordinates for atom "    -653 -LYS -HD1 :" 13845.502 -1479.198   926.110
+ %ATMCHK-ERR: unknown coordinates for atom "    -653 -LYS -CE  :"  8060.343-22582.478 15520.220
+ %ATMCHK-ERR: unknown coordinates for atom "    -653 -LYS -NZ  :" 21367.329 26729.186 13302.810
+ %ATMCHK-ERR: unknown coordinates for atom "    -654 -SER -N   :"-29087.131-12131.378 10072.691
+ %ATMCHK-ERR: unknown coordinates for atom "    -654 -SER -CA  :" 24901.352  6305.226  4820.798
+ %ATMCHK-ERR: unknown coordinates for atom "    -654 -SER -CB  :" 11303.553-15588.610   360.803
+ %ATMCHK-ERR: unknown coordinates for atom "    -654 -SER -OG  :"-11201.528 10874.156  6517.945
+ %ATMCHK-ERR: unknown coordinates for atom "    -654 -SER -C   :" 13494.570 25625.661 -8989.097
+ %ATMCHK-ERR: unknown coordinates for atom "    -655 -THR -CA  :"-21141.455 -5825.987 63568.142
+ %ATMCHK-ERR: unknown coordinates for atom "    -655 -THR -CB  :"-37594.623 -1259.691 32593.735
+ %ATMCHK-ERR: unknown coordinates for atom "    -655 -THR -HB  :" 13894.004  4240.499-14564.973
+ %ATMCHK-ERR: unknown coordinates for atom "    -655 -THR -OG1 :" 25205.019 -2043.412 -6199.098
+ %ATMCHK-ERR: unknown coordinates for atom "    -655 -THR -HG22:" 12103.633  1931.307  7342.192
+ %ATMCHK-ERR: unknown coordinates for atom "    -655 -THR -HG23:" 17469.147  5874.744 10834.723
+ %ATMCHK-ERR: unknown coordinates for atom "    -655 -THR -C   :" 59405.687-62856.326-15798.790
+ %ATMCHK-ERR: unknown coordinates for atom "    -656 -VAL -N   :" 16112.600168406.741 21671.763
+ %ATMCHK-ERR: unknown coordinates for atom "    -656 -VAL -HA  :" 11523.077 34490.520 29743.620
+ %ATMCHK-ERR: unknown coordinates for atom "    -656 -VAL -CB  :"216964.643114069.756182129.256
+ %ATMCHK-ERR: unknown coordinates for atom "    -656 -VAL -HG21:"-14321.016  8573.659 19292.471
+ %ATMCHK-ERR: unknown coordinates for atom "    -656 -VAL -HG22:" -8249.518  3721.328 11173.150
+ %ATMCHK-ERR: unknown coordinates for atom "    -656 -VAL -HG23:" -7907.459  3165.190 19212.408
+ %ATMCHK-ERR: unknown coordinates for atom "    -656 -VAL -C   :"144197.586 90490.234 85371.886
+ %ATMCHK-ERR: unknown coordinates for atom "    -657 -ASP -HN  :" 92740.510 38589.939 52263.107
+ %ATMCHK-ERR: unknown coordinates for atom "    -657 -ASP -CA  :"-31038.802216115.705284463.973
+ %ATMCHK-ERR: unknown coordinates for atom "    -657 -ASP -HA  :" 11886.633-32687.087-49708.076
+ %ATMCHK-ERR: unknown coordinates for atom "    -657 -ASP -CB  :"-24337.371**********137447.041
+ %ATMCHK-ERR: unknown coordinates for atom "    -657 -ASP -HB1 :" 21238.723 12248.916-51790.359
+ %ATMCHK-ERR: unknown coordinates for atom "    -657 -ASP -HB2 :"  -702.022 49843.837-38858.771
+ %ATMCHK-ERR: unknown coordinates for atom "    -657 -ASP -CG  :" 64932.697-14687.395**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -657 -ASP -OD1 :"-20685.003 13112.724 39485.757
+ %ATMCHK-ERR: unknown coordinates for atom "    -657 -ASP -OD2 :"-27530.998  7454.316 14755.612
+ %ATMCHK-ERR: unknown coordinates for atom "    -657 -ASP -C   :" 57715.787-69191.291**********
+ %ATMCHK-ERR: unknown coordinates for atom "    -657 -ASP -O   :"-17939.712 31371.069 86418.426
+ %ATMCHK-ERR: Unknown coordinates
+ %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+ BOMLEV=    0 reached.  Program execution will be terminated.
+ %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+ Subroutine DIE called . Terminating

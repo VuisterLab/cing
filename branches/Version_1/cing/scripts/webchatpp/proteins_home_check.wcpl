@@ -1,0 +1,4 @@
+print "Checked Proteins Nijmegen home\n";
+GET http://proteins.dyndns.org/RWP/index.html
+  EXPECT OK 
+  EXPECT (! /ERROR/)

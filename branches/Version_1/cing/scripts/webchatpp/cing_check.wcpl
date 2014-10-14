@@ -1,0 +1,5 @@
+print "Checked CING home \n";
+GET http://nmr.cmbi.ru.nl/cing/Home.html
+  EXPECT OK
+  EXPECT /Common Interface/
+  EXPECT /UA-4413187-1/
