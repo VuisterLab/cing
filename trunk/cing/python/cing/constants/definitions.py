@@ -2,40 +2,24 @@ import os
 import sys
 import platform
 import time
-
 from ConfigParser import ConfigParser
-
-from cing      import constants
+#
+import cing
 from cing.Libs import Adict
 from cing.Libs import disk
 from cing.Libs import helper
 from cing.Libs import io
 
-
 #-----------------------------------------------------------------------------
-# Verbosity settings: How much text is printed to stdout/stderr streams
-# Follows exact same int codes as Wattos.
-# Reference to it as cing.verbosity if you want to see non-default behavior
+# pydoc settings
 #-----------------------------------------------------------------------------
-verbosityNothing  = 0 # Even errors will be suppressed
-verbosityError    = 1 # show only errors
-verbosityWarning  = 2 # show errors and warnings
-verbosityOutput   = 3 # and regular output DEFAULT
-verbosityDetail   = 4 # show more details
-verbosityDebug    = 9 # add debugging info (not recommended for casual user)
-verbosityDefault  = verbosityOutput
-###### legacy definitions Jurgen local override
-try:
-    from cing.localConstants import verbosityDefault
-except:
-    pass
-#end try
-verbosity =  verbosityDefault
-try:
-    from cing.localConstants import verbosity
-except:
-    pass
-#end try
+__version__         = cing.__version__
+__date__            = cing.__date__
+__revision__        = cing.__revision__
+__author__          = cing.__author__
+__copyright__       = cing.__copyright__
+__copyright_years__ = cing.__copyright_years__
+__credits__         = cing.__credits__
 
 #-----------------------------------------------------------------------------
 # System definitions
@@ -59,12 +43,6 @@ class SystemDefinitions(Adict.Adict):
     def elapsedTime(self):
         return time.time() - self.startTime
 
-#    def ascTime(self, timePoint=None):
-#        if timePoint:
-#            return time.asctime(time.localtime(timePoint))
-#        else:
-#            return time.asctime(time.localtime(self.startTime))
-
     def getStartMessage(self):
         on = "%s (%s%s/%s/%scores/py%s)" % (self.host, self.osType, self.osRelease, self.osArchitecture, self.nCPU, sys.version.split()[0])
         at = '(pid:%d) %s' %  (self.pid, self.startTime)
@@ -86,16 +64,16 @@ systemDefinitions = SystemDefinitions()
 class CingDefinitions(Adict.Adict):
     def __init__(self):
         Adict.Adict.__init__(self)
-        self.programName     = constants.CING
+        self.programName     = 'CING'
         self.longProgramName = 'CING: Common Interface for NMR structure Generation version'
         self.version         = 1.01
-        self.date            = '30 Jan 2014'
+        self.date            = '15 Oct 2014'
 
-        self.codePath        = disk.Path(__file__)[:-1] # all relative from this path, also assures a Path object
+        self.codePath        = disk.Path(__file__)[:-2] # all relative from this path, also assures a Path object
         self.rootPath        = self.codePath[:-2]
         self.libPath         = self.codePath / 'Libs'
         self.pluginPath      = self.codePath / 'PluginCode'
-        self.pluginCode      = 'cing.PluginCode' # used in importPluging
+        self.pluginCode      = 'cing.PluginCode' # used in importPlugin
 
         self.binPath         = self.rootPath / 'bin'
         self.htmlPath        = self.rootPath / 'HTML'
@@ -112,7 +90,7 @@ class CingDefinitions(Adict.Adict):
             #end if
         #end try
 
-        self.revision        = helper.getSvnRevision(self.rootPath)
+        self.revision        = cing.__revision__.split()[1]
         self.revisionUrl     = 'http://code.google.com/p/cing/source/detail?r=%s' % self.revision
         self.issueUrl        = 'http://code.google.com/p/cing/issues/detail?id='
 
@@ -121,10 +99,10 @@ class CingDefinitions(Adict.Adict):
                                   ('Alan Wilter Sousa da Silva',  'alanwilter@gmail.com'),
                                ]
 
-        self.copyright       = 'Copyright (c) 2004-2014: Department of Biochemistry, University of Leicester, UK'
-        self.credits         = 'More info at http://nmr.le.ac.uk'
-
-        self.verbosity       = verbosity
+        # self.copyright       = 'Copyright (c) 2004-2014: Department of Biochemistry, University of Leicester, UK'
+        # self.credits         = 'More info at http://nmr.le.ac.uk'
+        self.copyright       = cing.__copyright__
+        self.credits         = cing.__credits__
     #end def
 
     def getVersionString(self):
@@ -246,7 +224,7 @@ class ValidationSettings(Adict.Adict):
     #: CRV stands for CRiteria Value CRS stands for CRiteria String
     CRV_NONE = "-999.9"
 
-    def __init__(self, configurationFile = cingDefinitions.codePath / 'valSets.cfg'):
+    def __init__(self, configurationFile = cingDefinitions.codePath / 'constants' / 'valSets.cfg'):
         Adict.Adict.__init__(self )
         self.configurationFile = disk.Path(configurationFile)
     #end def
@@ -295,47 +273,3 @@ class ValidationSettings(Adict.Adict):
 validationSettings = ValidationSettings().readFromFile()
 #-----------------------------------------------------------------------------
 
-#-----------------------------------------------------------------------------
-# pydoc settings
-#-----------------------------------------------------------------------------
-__version__            = cingDefinitions.version
-__date__               = cingDefinitions.date
-__copyright_years__    = '2004-' + cingDefinitions.date.split()[-1] # Never have to update this again...
-__author__             = cingDefinitions.getAuthorsString()
-__copyright__          = cingDefinitions.copyright
-__credits__            = cingDefinitions.credits + '  ' + __copyright__
-
-#-----------------------------------------------------------------------------
-# Adaptations. TODO: cleanup
-#-----------------------------------------------------------------------------
-for key in cingPaths.keys():
-    if cingPaths[ key ] == constants.PLEASE_ADD_EXECUTABLE_HERE:
-        cingPaths[ key ] = None
-
-if cingPaths.convert:
-    cingPaths[ 'montage' ] = cingPaths.convert.replace('convert','montage')
-
-# shiftx
-if systemDefinitions.osType == constants.OS_TYPE_LINUX and systemDefinitions.osArchitecture == '64bit':
-    cingPaths.shiftx = cingDefinitions.binPath / 'shiftx_linux64'
-elif systemDefinitions.osType == constants.OS_TYPE_LINUX and systemDefinitions.osArchitecture == '32bit':
-    cingPaths.shiftx = cingDefinitions.binPath / 'shiftx_linux'
-elif systemDefinitions.osType == constants.OS_TYPE_MAC:
-    cingPaths.shiftx = cingDefinitions.binPath / 'shiftx'
-else:
-    cingPaths.shiftx = None
-
-# x3dna
-if systemDefinitions.osType == constants.OS_TYPE_MAC:
-    cingPaths.x3dna = cingDefinitions.binPath / 'x3dna'
-else:
-    cingPaths.x3dna = None
-
-# molprobity
-if systemDefinitions.osType == constants.OS_TYPE_MAC:
-    cingPaths.MolProbity = cingDefinitions.binPath / 'molprobity'
-else:
-    cingPaths.MolProbity = None
-
-if cingPaths.classpath:
-    cingPaths.classpath = cingPaths.classpath.split(':')

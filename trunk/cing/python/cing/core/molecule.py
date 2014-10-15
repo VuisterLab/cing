@@ -1,16 +1,37 @@
 'Gumbo stuff. Its what is in the soup today'
 # pylint: disable=C0302
+
 from cing import issueListUrl
 from cing.Libs import disk
+
+#from cing.constants import * #@UnusedWildImport
+from cing import constants
+from cing.constants import TALOSPLUS_STR
+from cing.PluginCode.required.reqVasco import * #@UnusedWildImport
+
+#from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.Libs import NTutils as ntu
+from cing.Libs.NTutils import nTerror
+from cing.Libs.NTutils import nTcodeerror
+from cing.Libs.NTutils import nTwarning
+from cing.Libs.NTutils import nTmessage
+from cing.Libs.NTutils import nTdebug
+from cing.Libs.NTutils import getEnsembleAverageAndSigmaHis
+
+
+from cing.Libs.NTutils2 import MsgHoL
+
+
 from cing.Libs import PyMMLib
 from cing.Libs.AwkLike import AwkLikeS
 from cing.Libs.Geometry import to_0_360
 from cing.Libs.NTplot import ssIdxToType
-from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.Libs.PyMMLib import ATOM
 from cing.Libs.PyMMLib import HETATM
 from cing.Libs.PyMMLib import PDBFile
+
+from cing.core.classes2 import ResonanceList
+from cing.core.classes2 import RestraintList
 try:
     import pyximport
     pyximport.install()
@@ -28,13 +49,14 @@ from cing.Libs.html import addPreTagLines
 from cing.Libs.html import hPlot
 from cing.NRG import archiveIdPdbBased
 from cing.PluginCode.required.reqDssp import * #@UnusedWildImport
-from cing.constants import TALOSPLUS_STR
-from cing.PluginCode.required.reqVasco import * #@UnusedWildImport
+
 from cing.core import database
-from cing.core.classes2 import * #@UnusedWildImport
-from cing.constants import * #@UnusedWildImport
+#from cing.core.classes2 import * #@UnusedWildImport
 #from cing.core.database import AtomDef
+
 from cing.core.parameters import plotParameters
+from cing.core.ROGscore import ROGscore
+
 from numpy import convolve
 from numpy import linalg as LA
 from numpy import mat
@@ -139,8 +161,8 @@ def getAssignedAtomListForResList(resList, isAssigned = True, resonanceListIdx=R
     assignmentCountMap = AssignmentCountMap() # Just for checking against its keys.
 #    nTdebug("Now in getAssignedAtomListForResList starting with assignmentCountMap: %s" % assignmentCountMap.__str__(showEmptyElements=1))
 
-    atmList = NTlist()
-    resultAtmList = NTlist()
+    atmList = ntu.NTlist()
+    resultAtmList = ntu.NTlist()
     for res in resList:
         atmList.addList( res.allAtoms() )
     for atm in atmList:
@@ -224,8 +246,8 @@ def getAssignmentCountMapForResList(resList, isAssigned = True, resonanceListIdx
 
 
 def allResiduesWithCoordinates(resList):
-    """Returns NTlist with a subset of residues that have at least one atom with at least one coordinate"""
-    result = NTlist()
+    """Returns ntu.NTlist with a subset of residues that have at least one atom with at least one coordinate"""
+    result = ntu.NTlist()
     for res in resList:
         hasCoor = res.hasCoordinates()
 #        nTdebug("Res %s has coordinates: %s" % ( res, hasCoor ))
@@ -234,7 +256,7 @@ def allResiduesWithCoordinates(resList):
     return result
 
 def allCommonAaResidues(resList):
-    result = NTlist()
+    result = ntu.NTlist()
     for r in resList:
         resTypeSimple = getDeepByKeys(r.db.nameDict, IUPAC)
         if resTypeSimple in commonAAList:
@@ -244,7 +266,7 @@ def allCommonAaResidues(resList):
 def selectFitAtoms( fitResidues, backboneOnly=True, includeProtons = False ):
     """
     Select the atoms to be fitted from a list of fitResidues
-    return NTlist instance or NoneObject on error
+    return ntu.NTlist instance or NoneObject on error
 
     No longer changes self.ranges
     """
@@ -329,7 +351,7 @@ class ResidueList(SMLhandled):
 
 
 # pylint: disable=R0904
-class Molecule( NTtree, ResidueList ):
+class Molecule( ntu.NTtree, ResidueList ):
     """
     Molecule class: defines the holder for molecule items.
 
@@ -371,7 +393,7 @@ class Molecule( NTtree, ResidueList ):
   """
 
     def __init__( self, name, **kwds ):
-        NTtree.__init__(self, name, __CLASS__='Molecule', **kwds )
+        ntu.NTtree.__init__(self, name, __CLASS__='Molecule', **kwds )
         ResidueList.__init__(self)
 
         self.chains       = self._children
@@ -383,7 +405,7 @@ class Molecule( NTtree, ResidueList ):
 
         # These will be maintained by the appropriate routines
 #        self.resonanceCount   = 0
-        self.resonanceSources = NTlist() #  resonanceCount = len(self.resonanceSources) # match RESONANCE_SOURCES_STR
+        self.resonanceSources = ntu.NTlist() #  resonanceCount = len(self.resonanceSources) # match RESONANCE_SOURCES_STR
         # Used to contain NTlist of strings, now NTlist of ResonanceList's.
         self.modelCount       = 0
 
@@ -396,8 +418,8 @@ class Molecule( NTtree, ResidueList ):
         self.rogScore         = ROGscore()
         self.ranges           = None         # ranges used for superposition/rmsd calculations. None means all. 'auto' will be converted.
         self.archive_id       = None         # See doc in setArchiveId
-        self.bmrbEntryList    = NTlist()     # List of BMRB entries whose data occurs in this object.
-        self.pdbEntryList     = NTlist()     # List of PDB entries whose data occurs in this object.
+        self.bmrbEntryList    = ntu.NTlist()     # List of BMRB entries whose data occurs in this object.
+        self.pdbEntryList     = ntu.NTlist()     # List of PDB entries whose data occurs in this object.
 
 #        self.saveXML('chainCount','residueCount','atomCount')
 
@@ -416,10 +438,10 @@ class Molecule( NTtree, ResidueList ):
 
         self.selectedResidues = None # this is a python array
 #        for color in [COLOR_GREEN,COLOR_ORANGE,COLOR_RED]:
-#            self[color] = NTlist()
-        self.green = NTlist()
-        self.orange = NTlist()
-        self.red = NTlist()
+#            self[color] = ntu.NTlist()
+        self.green = ntu.NTlist()
+        self.orange = ntu.NTlist()
+        self.red = ntu.NTlist()
     #end def
 
     def format(self): # pylint: disable=W0221
@@ -862,9 +884,9 @@ class Molecule( NTtree, ResidueList ):
         Return list of list instance with chain number and residue number in order.
         For decoding usage with Wattos routines
         """
-        result = NTlist()
+        result = ntu.NTlist()
         for ch in self.allChains():
-            chList = NTlist()
+            chList = ntu.NTlist()
             result.append(chList)
             for res in ch.allResidues():
                 chList.append(res)
@@ -981,7 +1003,7 @@ class Molecule( NTtree, ResidueList ):
         Doesn't set self attribute.
         """
 #        nTdebug("Now in %s" % getCallerName())
-        bmrbEntryList = NTlist()
+        bmrbEntryList = ntu.NTlist()
         for i, resonanceSource in enumerate(self.resonanceSources):
             nTdebug("Looking at resonanceSource %s" % resonanceSource)
             if not isinstance( resonanceSource, ResonanceList):
@@ -1012,7 +1034,7 @@ class Molecule( NTtree, ResidueList ):
         Denotes which archive if any this molecule is part of.
         E.g. archive_id can be NRG-CING or NMR_REDO.
         It will also set the related entry ids.
-        E.g. for bmrbEntryList = NTlist( [4020, 4060 ] )
+        E.g. for bmrbEntryList = ntu.NTlist( [4020, 4060 ] )
         """
         self.archive_id = archive_id
         if pdbEntryList:
@@ -1021,7 +1043,7 @@ class Molecule( NTtree, ResidueList ):
             if is_pdb_code( self.name ):
                 pdb_id = self.name
                 nTmessage("Autodetected PDB entry ID: %s" % pdb_id)
-                self.pdbEntryList = NTlist()
+                self.pdbEntryList = ntu.NTlist()
                 self.pdbEntryList.append( pdb_id )
             else:
                 nTdebug("Failed to derive PDB entry ID from molecule name: %s" % self.name)
@@ -1032,7 +1054,7 @@ class Molecule( NTtree, ResidueList ):
         else:
             bmrbEntryList = self.getInvolvedBmrbIdList()
             if bmrbEntryList:
-                self.bmrbEntryList = NTlist()
+                self.bmrbEntryList = ntu.NTlist()
                 for bmrb_id in bmrbEntryList:
                     if is_bmrb_code( bmrb_id ):
 #                        nTdebug("Autodetected BMRB entry ID: %s" % bmrb_id)
@@ -1121,7 +1143,7 @@ class Molecule( NTtree, ResidueList ):
         elif ranges == ALL_RANGES_STR:
             selectedResidues = self.allResidues()
         elif ranges == EMPTY_RANGES_STR:
-            selectedResidues = NTlist()
+            selectedResidues = ntu.NTlist()
         elif ranges == None:
             selectedResidues = self.allResidues()
         else:
@@ -1371,7 +1393,7 @@ class Molecule( NTtree, ResidueList ):
         if ranges == CV_RANGES_STR:
             ranges = self.rangesByCv()
         if ranges == EMPTY_RANGES_STR:
-            return NTlist()
+            return ntu.NTlist()
         if ranges == ALL_RANGES_STR:
             return self.allResidues()
         if ranges == AUTO_RANGES_STR:
@@ -1386,7 +1408,7 @@ class Molecule( NTtree, ResidueList ):
 
         rangesCollapsed = ranges.replace(' ', '')
         rangeStrList = rangesCollapsed.split(',')
-        result = NTlist()
+        result = ntu.NTlist()
 
         # hashes by keys to use
         resNumDict = NTdict()
@@ -1474,7 +1496,7 @@ class Molecule( NTtree, ResidueList ):
 
         if isinstance( ranges, list ):
             resnumDict = dict(zip(self.allResidues().zap('resNum'), self.allResidues()))
-            result = NTlist()
+            result = ntu.NTlist()
             for item in ranges:
                 if isinstance( item, int ):
                     if resnumDict.has_key(item):
@@ -1497,7 +1519,7 @@ class Molecule( NTtree, ResidueList ):
         return None
 
     def getFixedRangeList( self, max_length_range = 50, ranges=None ):
-        """Return a list of NTlist instance with residue objects.
+        """Return a list of ntu.NTlist instance with residue objects.
         The NTlist contains only residues in the given ranges and is at most
         max_length_range long.
         """
@@ -1510,12 +1532,12 @@ class Molecule( NTtree, ResidueList ):
         else:
             selectedResidues = self.allResidues()
         # end if
-        r = NTlist() # list of residues selected in
+        r = ntu.NTlist() # list of residues selected in
         result = [] # list of ranges
         for res in selectedResidues:
             if len(r) == max_length_range:
                 result.append( r )
-                r = NTlist()
+                r = ntu.NTlist()
             r.append(res)
         if r:
             result.append(r)
@@ -1536,15 +1558,15 @@ class Molecule( NTtree, ResidueList ):
             Note that model number start at zero .
         """
         if models == None:
-            return NTlist( *range(self.modelCount))
+            return ntu.NTlist( *range(self.modelCount))
 
         if self.modelCount == 0:
-            return NTlist()
+            return ntu.NTlist()
 
         if type(models) == str:
             models = asci2list(models)
             models.sort()
-            result = NTlist()
+            result = ntu.NTlist()
             for model in models:
                 if model < 0:
                     nTerror('Molecule.models2list: invalid model number %d ( < 0 )', model )
@@ -1561,7 +1583,7 @@ class Molecule( NTtree, ResidueList ):
 
         if isinstance( models, list ):
             models.sort()
-            result = NTlist()
+            result = ntu.NTlist()
             for model in models:
                 if not isinstance( model, int):
                     nTerror('Error Molecule.models2list: invalid model "%s" in models list\n', model )
@@ -1604,7 +1626,7 @@ class Molecule( NTtree, ResidueList ):
         # save special db entries
         dbpath = path / 'Database'
         dbpath.makedirs()
-        dblist = NTlist()
+        dblist = ntu.NTlist()
         for res in self.allResidues():
             if res.db.shouldBeSaved and res.db not in dblist:
                 dblist.append(res.db)
@@ -1690,7 +1712,7 @@ class Molecule( NTtree, ResidueList ):
         """
         msg = "In %s with sMLfileVersion %s" % ( getCallerName(), sMLfileVersion )
 #        nTdebug(msg)
-        if not isinstance( self.resonanceSources, NTlist):
+        if not isinstance( self.resonanceSources, ntu.NTlist):
             nTerror( msg + " expected to have already restored an NTlist" )
             return True
         if len( self.resonanceSources ) == 0:
@@ -1726,10 +1748,10 @@ class Molecule( NTtree, ResidueList ):
         """ Initialize resonances for all the atoms
         """
         for atom in self.allAtoms():
-            atom.resonances = NTlist()
+            atom.resonances = ntu.NTlist()
         #end for
 #        self.resonanceCount = 0
-        self.resonanceSources = NTlist()
+        self.resonanceSources = ntu.NTlist()
         #nTmessage("==> Initialized resonances")
         #end if
     #end def
@@ -1773,7 +1795,7 @@ class Molecule( NTtree, ResidueList ):
 
             # Optionally reduce the list
             if not append:
-                atom.resonances = NTlist( atom.resonances() )
+                atom.resonances = ntu.NTlist( atom.resonances() )
         #end for
 
     def setVascoCsCorrections(self, rerefInfo, resonanceList ):
@@ -1835,7 +1857,7 @@ class Molecule( NTtree, ResidueList ):
             if not atomListAll:
                 nTerror("Failed to find any assigned atom in a common amino acid but Vasco did produce results for them.")
                 return True
-            atomListDone = NTlist() # watch out for double corrections.
+            atomListDone = ntu.NTlist() # watch out for double corrections.
             for atomKey in vascoAtomIdLoL:
                 atomId = "_".join([atomKey[0], str(atomKey[1])])
                 rerefNTvalue = getDeepByKeysOrAttributes(resonanceList.vascoResults, atomId)
@@ -1986,7 +2008,7 @@ class Molecule( NTtree, ResidueList ):
         Resets all the project status objects to not parsed or even completed if resetStatusObjects is set.
         """
         for atm in self.allAtoms():
-            atm.coordinates = NTlist()
+            atm.coordinates = ntu.NTlist()
         self.modelCount = 0
         if resetStatusObjects:
             for sdict in self.project.status.items():
@@ -2087,7 +2109,7 @@ class Molecule( NTtree, ResidueList ):
 #        nTdebug('Defining topology')
         for residue in self.allResidues():
             for atm in residue:
-                atm._topology = NTlist()
+                atm._topology = ntu.NTlist()
                 if atm.db:
                     topDef = atm.db.topology
                     # manage N- and C-terminal exceptions
@@ -2135,8 +2157,8 @@ class Molecule( NTtree, ResidueList ):
         if not isinstance(residueList, list):
             nTcodeerror("In updateDihedrals the residueList is not of a class list")
             return True
-        if not isinstance(residueList, NTlist):
-            residueList = NTlist( *residueList )
+        if not isinstance(residueList, ntu.NTlist):
+            residueList = ntu.NTlist( *residueList )
 
         for cvType in [ CV_BACKBONE_STR, CV_SIDECHAIN_STR ]:
             cvList = residueList.zap(cvType)
@@ -2511,7 +2533,7 @@ Return an Molecule instance or None on error
         """
         Return a NTlist instance with Residues that have properties
         """
-        result = NTlist()
+        result = ntu.NTlist()
 
         if not len(properties):
             return result
@@ -2527,7 +2549,7 @@ Return an Molecule instance or None on error
         """
         Return a NTlist instance with Atoms that have properties
         """
-        result = NTlist()
+        result = ntu.NTlist()
 
         if len(properties) == 0:
             return result
@@ -2628,7 +2650,7 @@ Return an Molecule instance or None on error
             #end if
 
             # Pass two
-            r = NTlist()
+            r = ntu.NTlist()
             for res in self.allResidues():
                 if res._tmp == 1:
                     r.append(res)
@@ -2691,7 +2713,7 @@ Return an Molecule instance or None on error
             return ALL_RANGES_STR
         # end if
 
-        residueList = NTlist()
+        residueList = ntu.NTlist()
         max_cv = 0.0
         cvWindowSize = 2
 #        coefficients = [ 0.25, 0.50, 0.25 ] # part of sample Savitzky-Golay coefficients from Numerical Recipes p 651.
@@ -2708,7 +2730,7 @@ Return an Molecule instance or None on error
             if not n:
                 continue
             # endif
-            cvList = NTlist()
+            cvList = ntu.NTlist()
             for r in resList:
                 cv = r.getDeepByKeys(CV_BACKBONE_STR)
                 if cv == None:
@@ -2867,7 +2889,7 @@ Return an Molecule instance or None on error
             nTdebug("In %s got: %s" % ( getCallerName(), str(residueList)))
         # end if
         # Exclude water and absent residues
-        residueList2 = NTlist()
+        residueList2 = ntu.NTlist()
         for residue in residueList:
             if residue.isWater():
                 if debugRoutine:
@@ -2967,9 +2989,9 @@ Return an Molecule instance or None on error
         comment = 'Ranges %s' % ranges
         self.rmsd = RmsdResult( selectedModels, selectedResiduesWithCoord, comment=comment )
         for res in self.allResidues():
-            res.rmsd = RmsdResult( selectedModels,  NTlist( res ), comment = res.name )
-            res.rmsd.bbtemp = NTlist() # list of included bb-atms
-            res.rmsd.hvtemp = NTlist() # list of included heavy-atms
+            res.rmsd = RmsdResult( selectedModels,  ntu.NTlist( res ), comment = res.name )
+            res.rmsd.bbtemp = ntu.NTlist() # list of included bb-atms
+            res.rmsd.hvtemp = ntu.NTlist() # list of included heavy-atms
 
             for atm in res.allAtoms():
                 if not atm.isProton() and len(atm.coordinates)>0:
@@ -3097,7 +3119,7 @@ Return an Molecule instance or None on error
             return None
 
         if model==None:
-            models = NTlist(*range( self.modelCount ))
+            models = ntu.NTlist(*range( self.modelCount ))
         else:
             if model<0:
                 nTerror("model number is below zero in Molecule instance: %r and model number: %s" % (self,  model))
@@ -3105,7 +3127,7 @@ Return an Molecule instance or None on error
             if model >= self.modelCount:
                 nTerror("model number is larger than modelCount in Molecule instance: %r" % self)
                 return None
-            models = NTlist(model)
+            models = ntu.NTlist(model)
 
         if max_models:
             if len(models) > max_models:
@@ -3267,19 +3289,19 @@ Return an Molecule instance or None on error
 
         w, v = LA.eig(a)
         print w,v
-        return NTlist(*map(math.sqrt, w))
+        return ntu.NTlist(*map(math.sqrt, w))
     #end def
 #end class
 
 
-class Ensemble( NTlist ):
+class Ensemble( ntu.NTlist ):
     """
     Ensemble class hold is a list of Models instances.
     Initialization is done from a Molecule instance, thus the class represents
     a different arrangement of the coordinate instances of a molecule.
     """
     def __init__( self, molecule=None ):
-        NTlist.__init__( self )
+        ntu.NTlist.__init__( self )
         self.averageModel       = None
         #self.closestToMeanModel = None # not yet used
         self.molecule           = molecule
@@ -3317,7 +3339,7 @@ class Ensemble( NTlist ):
         for atm in self.molecule.allAtoms():
             atm.calculateMeanCoordinate()
         #end for
-        self.rmsd = NTlist()
+        self.rmsd = ntu.NTlist()
         for m in self:
             self.rmsd.append( m.calculateRMSD( self.averageModel ) )
         #end for
@@ -3330,9 +3352,9 @@ class Ensemble( NTlist ):
         Initialize the fitCoordinates lists of models of self from fitAtoms
         """
         for model in self:
-            model.fitCoordinates = NTlist()
+            model.fitCoordinates = ntu.NTlist()
         #end for
-        self.averageModel.fitCoordinates = NTlist()
+        self.averageModel.fitCoordinates = ntu.NTlist()
 
         for atm in fitAtoms:
             for i in range(0, len(self) ):
@@ -3415,8 +3437,8 @@ class Model( superpose.NTcMatrix ):
         NTcMatrix.__init__( self )
         self.name              = name
         self.index             = index
-        self.coordinates       = NTlist()  # All coordinate instances of Model
-        self.fitCoordinates    = NTlist()  # Coordinates used for fitting
+        self.coordinates       = ntu.NTlist()  # All coordinate instances of Model
+        self.fitCoordinates    = ntu.NTlist()  # Coordinates used for fitting
         self.rmsd              = 0.0
     #end def
 
@@ -3618,7 +3640,7 @@ class RmsdResult( NTdict ):
 #
 
 # pylint: disable=R0904
-class Chain( NTtree, ResidueList ):
+class Chain( ntu.NTtree, ResidueList ):
     """
 -------------------------------------------------------------------------------
 Chain class: defines chain properties and methods
@@ -3663,7 +3685,7 @@ Chain class: defines chain properties and methods
     # like in: Scripts/getPhiPsiWrapper.py
 
     def __init__( self, name, **kwds ):
-        NTtree.__init__( self, name=name, __CLASS__='Chain', **kwds )
+        ntu.NTtree.__init__( self, name=name, __CLASS__='Chain', **kwds )
         ResidueList.__init__( self )
         self.__FORMAT__ =  self.header() + '\n' +\
                           'residues (%(residueCount)d): %(residues)s\n' +\
@@ -3762,7 +3784,7 @@ Chain class: defines chain properties and methods
             nTerror("Code only able to do first model right now but found request for model: %s" % modelIdx)
             return None
         ensemble = Ensemble()
-        fittedL = NTlist()
+        fittedL = ntu.NTlist()
         chainList = [self, other]
         for idx, chain in enumerate(chainList):
             fitAtoms = chain.selectFitAtoms( chain.allResidues(), backboneOnly=backboneOnly, includeProtons = includeProtons )
@@ -3951,7 +3973,7 @@ Chain class: defines chain properties and methods
         """
         Return a NTlist instance with Residues that have properties
         """
-        result = NTlist()
+        result = ntu.NTlist()
 
         if len(properties) == 0:
             return result
@@ -4032,7 +4054,7 @@ Chain class: defines chain properties and methods
         """
         Return a NTlist instance with Atoms that have properties
         """
-        result = NTlist()
+        result = ntu.NTlist()
 
         if len(properties) == 0:
             return result
@@ -4087,7 +4109,7 @@ Chain class: defines chain properties and methods
 
 
 # pylint: disable=R0904
-class Residue( NTtree, SMLhandled ):
+class Residue( ntu.NTtree, SMLhandled ):
     """
 -------------------------------------------------------------------------------
 Residue class: Defines residue properties
@@ -4108,7 +4130,7 @@ Residue class: Defines residue properties
 #        resNum is the author supplied number. This is called the seqCode in CCPN. It's key in CING.
 #        seqId in CCPN is 'Identifier corresponding to the molResidue identifier (self.molResidue.serial)' It's key in CCPN.
         #print '>',resName, resNum
-        NTtree.__init__(self, __CLASS__ = 'Residue',
+        ntu.NTtree.__init__(self, __CLASS__ = 'Residue',
                               name=resName + str(resNum),    # Only a temporarily name, will be formalised after
                                                              # this init
                               Nterminal = Nterminal,         # defines the residue to be N-terminus
@@ -4122,7 +4144,7 @@ Residue class: Defines residue properties
         self.atomCount = 0
         self.chain     = self._parent
 
-        self.dihedrals = NTlist()
+        self.dihedrals = ntu.NTlist()
 
         # restraints associated with this residue; filled in partition restraints
         self.distanceRestraints = RestraintList('distanceRestraints')
@@ -4392,7 +4414,7 @@ Residue class: Defines residue properties
             return
 
         if self.db:
-            self.dihedrals = NTlist()
+            self.dihedrals = ntu.NTlist()
             for d in self.db.dihedrals:
 
                 dihed = Dihedral( self, d.name )
@@ -4514,10 +4536,10 @@ Residue class: Defines residue properties
            translate from convention if needed
         """
         if atomNames == None:
-            return NTlist()
+            return ntu.NTlist()
         #end if
 
-        result = NTlist()
+        result = ntu.NTlist()
         for name in atomNames:
             a = self.getAtom( name, convention=convention )
             if (a != None):
@@ -4566,7 +4588,7 @@ Residue class: Defines residue properties
         """
         if not len(properties):
             return True
-        props = NTlist( self.db.name, self.db.shortName, *self.db.properties)
+        props = ntu.NTlist( self.db.name, self.db.shortName, *self.db.properties)
         for p in properties:
             if not p in props:
                 return False
@@ -4592,7 +4614,7 @@ Residue class: Defines residue properties
         Return a NTlist instance with self if it has properties.
         NB (ode copied from Molecule and Chain; could be shorter.
         """
-        result = NTlist()
+        result = ntu.NTlist()
 
         if len(properties) == 0:
             return result
@@ -4608,7 +4630,7 @@ Residue class: Defines residue properties
         """
         Return a NTlist instance with Atoms that have properties
         """
-        result = NTlist()
+        result = ntu.NTlist()
 
         if len(properties) == 0:
             return result
@@ -4655,7 +4677,7 @@ Residue class: Defines residue properties
         if not self.hasProperties('protein'):
             return
 #        TODO: change to HA3 when CING switches to IUPAC
-        doublet = NTlist()
+        doublet = ntu.NTlist()
         for i in [-1,0]:
             doublet.append( self.sibling(i) )
 
@@ -4753,7 +4775,7 @@ Residue class: Defines residue properties
         """
 
         if True: # just a checking block.
-            triplet = NTlist()
+            triplet = ntu.NTlist()
             tripletIdxList = [0,-1,1] # Note that this was a major bug before today June 3, 2010. Matches the one in
             # cing.core.validate#validateDihedralCombinations
 
@@ -5022,14 +5044,14 @@ Residue class: Defines residue properties
         'The NTlist over all possible models. May be empty list or None on error.'
         ensemble = self.toEnsemble()
         resultList = [model.radius() for model in ensemble]
-        return NTlist(*resultList)
+        return ntu.NTlist(*resultList)
     # end def
 
     def center(self):
         'The NTlist over all possible models. May be empty list or None on error.'
         ensemble = self.toEnsemble()
         resultList = [model.center() for model in ensemble]
-        return NTlist(*resultList)
+        return ntu.NTlist(*resultList)
     # end def
 
     def distance(self, other):
@@ -5037,17 +5059,17 @@ Residue class: Defines residue properties
         ensemble = self.toEnsemble()
         otherEnsemble = other.toEnsemble()
         resultList = [model.distance(otherEnsemble[i]) for i,model in enumerate(ensemble)]
-        return NTlist(*resultList)
+        return ntu.NTlist(*resultList)
     # end def
 #end class
 
-class Dihedral( NTlist ):
+class Dihedral( ntu.NTlist ):
     """
     Class to represent a dihedral angle
     """
 
     def __init__(self, residue, dihedralName, range=None ):
-        NTlist.__init__(self)
+        ntu.NTlist.__init__(self)
 
         self.residue = residue
         self.name = dihedralName
@@ -5086,7 +5108,7 @@ class Dihedral( NTlist ):
             if isNaN(self.cav):
                 return None
 
-        tmp = NTlist(self.cav).limit(lower,lower+360.0) # Rescale cav to the range lower, lower+360.0
+        tmp = ntu.NTlist(self.cav).limit(lower,lower+360.0) # Rescale cav to the range lower, lower+360.0
         if tmp[0] >= lower and tmp[0] <= upper:
             return True
         return False
@@ -5133,7 +5155,7 @@ class Dihedral( NTlist ):
                        'range:    %s\n' +\
                        'atoms:    %s',
                         dots, dname, dots,
-                        NTlist.__str__(self),
+                        ntu.NTlist.__str__(self),
                         self.cav, self.cv, self.range,
                         self.atoms
                        )
@@ -5339,7 +5361,7 @@ e.g.
 
 
 # pylint: disable=R0904
-class Atom( NTtree ):
+class Atom( ntu.NTtree ):
     """
 -------------------------------------------------------------------------------
 Atom class: Defines object for storing atom properties
@@ -5364,12 +5386,12 @@ Atom class: Defines object for storing atom properties
                  )
     def __init__( self, resName, atomName, convention=INTERNAL, **kwds ):
 
-        NTtree.__init__(self, name=atomName, __CLASS__='Atom', **kwds )
+        ntu.NTtree.__init__(self, name=atomName, __CLASS__='Atom', **kwds )
 
         self.setdefault( 'stereoAssigned', False )
 
-        self.resonances  = NTlist()
-        self.coordinates = NTlist()
+        self.resonances  = ntu.NTlist()
+        self.coordinates = ntu.NTlist()
         self.rogScore    = ROGscore()
         self.stereoAssigned = None # WARNING: only set when asked for.
         self[CHK_STR] = NTdict()
@@ -5571,7 +5593,7 @@ coordinates: %s"""  , dots, self, dots
 #            nTdebug("In Atom.distance: No coordinates for other %s" % other)
             return None
         #end if
-        self.distances = NTlist()
+        self.distances = ntu.NTlist()
         modelToDoList = range(0, lenSelf)
         if modelIdx != None:
             modelToDoList = [ modelIdx ]
@@ -5678,7 +5700,7 @@ coordinates: %s"""  , dots, self, dots
         if (lenSelf != len( other2.coordinates ) ):
             return None
         #end if
-        self.angles = NTlist()
+        self.angles = ntu.NTlist()
         for i in range(0, lenSelf):
             self.angles.append( nTangleOpt(other1.coordinates[i], self.coordinates[i], other2.coordinates[i], radians=radians ) )
         #end for
@@ -6061,7 +6083,7 @@ coordinates: %s"""  , dots, self, dots
         if len(properties) == 0:
             return False
 
-        props = NTlist(*self.db.properties)
+        props = ntu.NTlist(*self.db.properties)
 
         if self.isAssigned(resonanceListIdx=RESONANCE_LIST_IDX_ANY):
             props.append('isAssigned','assigned')
@@ -6088,7 +6110,7 @@ coordinates: %s"""  , dots, self, dots
         Return a NTlist instance with self if it has properties.
         NB. Code could be shorter but is copied from Molecule,Chain,Residue
         """
-        result = NTlist()
+        result = ntu.NTlist()
 
         if len(properties) == 0:
             return result
@@ -6166,7 +6188,7 @@ coordinates: %s"""  , dots, self, dots
         if self.isPseudoAtom():
             return self.residue.getAtoms( self.db.real )
         else:
-            return NTlist( self )
+            return ntu.NTlist( self )
     #end def
 
     def getRepresentativePseudoAtom( self, atomList ):
@@ -6229,7 +6251,7 @@ coordinates: %s"""  , dots, self, dots
         voor protons or pseudoatoms (spinType = '1H')
         Optionally include pseudoatom
         """
-        result = NTlist()
+        result = ntu.NTlist()
         if (self.db.spinType == '1H'):
             return result
         #endif
@@ -6256,7 +6278,7 @@ coordinates: %s"""  , dots, self, dots
         result = self.attachedProtons( includePseudo = False )
         # Methyl
         if (len(result) == 3):
-            result = NTlist( result[0].pseudoAtom() )
+            result = ntu.NTlist( result[0].pseudoAtom() )
         elif (includePseudo and len(result) > 0):
             if result[0].hasPseudoAtom():
                 result.append( result[0].pseudoAtom() )
@@ -6375,7 +6397,7 @@ coordinates: %s"""  , dots, self, dots
 #end class
 
 
-class AtomList( NTlist ):
+class AtomList( ntu.NTlist ):
     """
     Class based on NTlist that holds atoms.
     Also manages the "id's". GV wants to know why as atoms have an id???
@@ -6387,7 +6409,7 @@ class AtomList( NTlist ):
     JFD: why not skip this intermediate object and hang functionality straight off Atom and AtomsHTMLfile classes?
     """
     def __init__( self, molecule ):
-        NTlist.__init__( self )
+        ntu.NTlist.__init__( self )
         self.name       = molecule.name + '.atoms'
 #        self.status     = status      # Status of the list; 'keep' indicates storage required
         self.currentId  = 0           # Id for each element of list
@@ -6404,7 +6426,7 @@ class AtomList( NTlist ):
 
     def append( self, obj ): # pylint: disable=W0221
         obj.id = self.currentId
-        NTlist.append( self, obj )
+        ntu.NTlist.append( self, obj )
         self.currentId += 1
 
     def appendFromMolecule( self, molecule ):
@@ -6686,7 +6708,7 @@ def translateTopology( residue, topDefList ):
        tuples to Atom instances
        return NTlist instance or None on error
     """
-    result = NTlist()
+    result = ntu.NTlist()
 
     for resdiffIndex,atomName in topDefList:
         # optimized
@@ -6866,7 +6888,7 @@ def disulfideScore( cys1, cys2 ):
                 nTdebug("Skipping disulfideScore between %s and %s for there are no coordinates for atom: %s" % (cys1, cys2, atom))
                 return None # The white space on this line was screwed up with Eclipse svn finding a diff. It has been in for over a year.
 
-    score = NTlist(0., 0., 0., 0.)
+    score = ntu.NTlist(0., 0., 0., 0.)
     for m in range( mc ):
         da = nTdistance( cys1.CA.coordinates[m], cys2.CA.coordinates[m] )
         if da >= 3.72 and da <= 6.77:

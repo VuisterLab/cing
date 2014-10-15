@@ -1,17 +1,59 @@
 """
-==================================================================================================================
-USE THE CLASS IN cing.core.classes.ProjectTree INSTEAD OF THIS ONE!!!
-==================================================================================================================
-
 TOBE REMOVED
 Routines to compare different Project instances
 """
-from cing import Project
-from cing.Libs.NTutils import * #@UnusedWildImport
+import sys
+import os
+import math
+
+from cing.Libs.io import sprintf
+from cing.Libs.io import fprintf
+from cing.Libs.io import printf
+
+from cing.core.classes import Project
+#from cing.Libs.NTutils import * #@UnusedWildImport
+from cing.Libs.NTutils import NTdict
+from cing.Libs.NTutils import NTtree
+from cing.Libs.NTutils import NTlist
+from cing.Libs.NTutils import NTvalue
+from cing.Libs.NTutils import NTvector
+from cing.Libs.NTutils import NTlistOfLists
+from cing.Libs.NTutils import NTvalue
+
+from cing.Libs.NTutils import nTerror
+from cing.Libs.NTutils import NTsort
+from cing.Libs.NTutils import nTcodeerror
+from cing.Libs.NTutils import nTwarning
+from cing.Libs.NTutils import nTmessage
+from cing.Libs.NTutils import nTdebug
+from cing.Libs.NTutils import nTerror
+from cing.Libs.NTutils import nTfill
+from cing.Libs.NTutils import nTdetail
+from cing.Libs.NTutils import nTlimit
+from cing.Libs.NTutils import getDeepByKeys
+from cing.Libs.NTutils import getDeepByKeysOrAttributes
+from cing.Libs.NTutils import getDeepByKeysOrDefault
+from cing.Libs.NTutils import appendDeepByKeys
+from cing.Libs.NTutils import setDeepByKeys
+from cing.Libs.NTutils import val2Str
+from cing.Libs.NTutils import formatList
+from cing.Libs.NTutils import getEnsembleAverageAndSigmaHis
+from cing.Libs.NTutils import amin
+from cing.Libs.NTutils import amax
+from cing.Libs.NTutils import deepcopy
+from cing.Libs.NTutils import lenNonZero
+from cing.Libs.NTutils import list2asci
+
+from cing.Libs.fpconst import NaN
+from cing.Libs.fpconst import isNaN
+
 from cing.Libs.disk import copydir
-from cing.constants import * #@UnusedWildImport
+#from cing.constants import * #@UnusedWildImport
+from cing import constants
+
 from cing.core.molecule import Ensemble
 from numpy import linalg as LA
+
 import numpy as np
 
 class Projects( NTtree ): # pylint: disable=R0904
@@ -436,7 +478,7 @@ def printOverallScores( projects, stream = sys.stdout ):
         return
 
     printTitle('Overall scores target '+projects.name, 20*(n+1), stream)
-#    line = dots20*(n+1)
+#    line = constants.dots20*(n+1)
 #   fprintf( stream, '%s\n    Overall scores %s\n%s\n\n', line, projects.name, line )
     fprintf( stream, '%-20s%s\n\n', 'Parameter', projects.entries.zap('group').format('%-20s'))
 
@@ -477,9 +519,9 @@ def printRestraintScores( projects, stream=sys.stdout ):
     if n == 0:
         return
 
-#    print dots20*(n+1)
+#    print constants.dots20*(n+1)
 #    print ' Restraints target', projects[0].target
-#    print dots20*(n+1)
+#    print constants.dots20*(n+1)
 #    print
 
     hlen=40
@@ -540,9 +582,9 @@ def printResidueScores( projects ):
 
     n = len(projects)
 
-    print dots20*(n+1)
+    print constants.dots20*(n+1)
     print '    Residues'
-    print dots20*(n+1)
+    print constants.dots20*(n+1)
     p0 = projects[0]
     for res in p0.molecule.allResidues():
         printf('%s %s %s\n',  '-'*5, res, '-'*5 )
@@ -550,7 +592,7 @@ def printResidueScores( projects ):
         printScore( p0.name, res.rogScore )
         # find the corresponding residues
         for p in projects[1:]:
-            nameTuple = (p.molecule.name, res.chain.name, res.resNum, None, None, None, INTERNAL)
+            nameTuple = (p.molecule.name, res.chain.name, res.resNum, None, None, None, constants.INTERNAL)
             res2 = p.decodeNameTuple( nameTuple )
             if res2:
                 #printf('%-20s%-10s %s\n', p.name, res2.rogScore, res2.rogScore.colorCommentList.zap(1).format())

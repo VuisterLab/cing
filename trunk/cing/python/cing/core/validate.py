@@ -33,16 +33,49 @@ stored under "PROGRAM"_KEY
 """
 
 import time
+import math
 
 import cing
-from cing import definitions as cdefs
+from cing.constants import definitions as cdefs
 from cing import constants
 from cing.Libs import Adict
 from cing.Libs import io
 
 from cing.Libs.Geometry import violationAngle
 from cing.Libs.NTplot import ssIdxToType
-from cing.Libs.NTutils import * #@UnusedWildImport
+#from cing.Libs.NTutils import * #@UnusedWildImport
+from cing.Libs.NTutils import NTdict
+from cing.Libs.NTutils import NTtree
+from cing.Libs.NTutils import NTlist
+from cing.Libs.NTutils import NTvalue
+
+from cing.Libs.NTutils import nTerror
+from cing.Libs.NTutils import NTsort
+from cing.Libs.NTutils import nTcodeerror
+from cing.Libs.NTutils import nTwarning
+from cing.Libs.NTutils import nTmessage
+from cing.Libs.NTutils import nTdebug
+from cing.Libs.NTutils import nTfill
+from cing.Libs.NTutils import nTdetail
+from cing.Libs.NTutils import nTlimit
+from cing.Libs.NTutils import getDeepByKeys
+from cing.Libs.NTutils import getDeepByKeysOrAttributes
+from cing.Libs.NTutils import getDeepByKeysOrDefault
+from cing.Libs.NTutils import appendDeepByKeys
+from cing.Libs.NTutils import setDeepByKeys
+from cing.Libs.NTutils import val2Str
+from cing.Libs.NTutils import formatList
+from cing.Libs.NTutils import getEnsembleAverageAndSigmaHis
+from cing.Libs.NTutils import amin
+from cing.Libs.NTutils import amax
+from cing.Libs.NTutils import deepcopy
+from cing.Libs.NTutils import lenNonZero
+
+from cing.Libs.NTutils2 import getCallerName
+from cing.Libs.NTutils2 import MsgHoL
+
+from cing.Libs.fpconst import NaN
+
 try:
     import pyximport
     pyximport.install()
@@ -71,13 +104,17 @@ from cing.PluginCode.required.reqWattos import WATTOS_SUMMARY_STR
 from cing.PluginCode.required.reqWhatif import WHATIF_STR
 from cing.core.ROGscore import CingResult
 from cing.core.classes2 import RestraintList
-from cing.constants import * #@UnusedWildImport
+
+#from cing.constants import * #@UnusedWildImport
+from cing import constants
+
+
 from cing.core.molecule import Atom
 from cing.core.molecule import Chain
 from cing.core.molecule import Molecule
 from cing.core.molecule import Residue
 from cing.core.parameters import plotParameters
-from cing.definitions import validationDirectories
+from cing.constants.definitions import validationDirectories
 from cing import plugins
 from numpy.lib.index_tricks import ogrid
 from numpy.lib.twodim_base import histogram2d
@@ -141,27 +178,27 @@ def validate( project, ranges=None, parseOnly=False, htmlOnly=False,
 
     t0 = tx = time.time()
 #    nTdebug('Starting validate#validate with toFile True')
-    if doShiftx and getDeepByKeysOrAttributes(plugins, SHIFTX_STR, IS_INSTALLED_STR):
+    if doShiftx and getDeepByKeysOrAttributes(plugins, constants.SHIFTX_STR, constants.IS_INSTALLED_STR):
         project.runShiftx(parseOnly=parseOnly)
 #    tt = time.time()
 #    nTmessage('Time for runShiftx %s' % (tt -tx))
 #    tx = tt
-    if getDeepByKeysOrAttributes(plugins, DSSP_STR, IS_INSTALLED_STR):
+    if getDeepByKeysOrAttributes(plugins, constants.DSSP_STR, constants.IS_INSTALLED_STR):
         project.runDssp(parseOnly=parseOnly)
 #    tt = time.time()
 #    nTmessage('Time for runDssp %s' % (tt -tx))
 #    tx = tt
-    if doWhatif and getDeepByKeysOrAttributes(plugins, WHATIF_STR, IS_INSTALLED_STR):
+    if doWhatif and getDeepByKeysOrAttributes(plugins, constants.WHATIF_STR, constants.IS_INSTALLED_STR):
         project.runWhatif(ranges=ranges, parseOnly=parseOnly)
 #    tt = time.time()
 #    nTmessage('Time for runWhatif %s' % (tt -tx))
 #    tx = tt
-    if doProcheck and getDeepByKeysOrAttributes(plugins, PROCHECK_STR, IS_INSTALLED_STR):
+    if doProcheck and getDeepByKeysOrAttributes(plugins, constants.PROCHECK_STR, constants.IS_INSTALLED_STR):
         project.runProcheck(ranges=ranges, parseOnly=parseOnly)
 #    tt = time.time()
 #    nTmessage('Time for runProcheck %s' % (tt -tx))
 #    tx = tt
-    if doWattos and getDeepByKeysOrAttributes(plugins, WATTOS_STR, IS_INSTALLED_STR):
+    if doWattos and getDeepByKeysOrAttributes(plugins, constants.WATTOS_STR, constants.IS_INSTALLED_STR):
         project.runWattos(parseOnly=parseOnly)
 #    tt = time.time()
 #    nTmessage('Time for runWattos %s' % (tt -tx))
@@ -171,7 +208,7 @@ def validate( project, ranges=None, parseOnly=False, htmlOnly=False,
 #    tt = time.time()
 #    nTmessage('Time for runQueeny %s' % (tt -tx))
 #    tx = tt
-    if doTalos and getDeepByKeysOrAttributes(plugins, TALOSPLUS_STR, IS_INSTALLED_STR):
+    if doTalos and getDeepByKeysOrAttributes(plugins, constants.TALOSPLUS_STR, constants.IS_INSTALLED_STR):
         project.runTalosPlus(parseOnly=parseOnly)
 #    tt = time.time()
 #    nTmessage('Time for runTalosPlus %s' % (tt -tx))
@@ -183,8 +220,8 @@ def validate( project, ranges=None, parseOnly=False, htmlOnly=False,
 #    tx = tt
 
     if filterVasco:
-        if not getDeepByKeysOrAttributes(plugins, VASCO_STR, IS_INSTALLED_STR):
-            nTdebug("Missing required plugin %s or not installed." % VASCO_STR)
+        if not getDeepByKeysOrAttributes(plugins, constants.VASCO_STR, constants.IS_INSTALLED_STR):
+            nTdebug("Missing required plugin %s or not installed." % constants.VASCO_STR)
             return True
         if project.molecule.hasVascoApplied():
             nTmessage("==> Keeping Vasco rereferencing done before.")
@@ -249,25 +286,25 @@ def criticizePeaks( project, toFile=True ):
             peak.rogScore.reset()
             for i in range(peak.dimension):
                 resonance = peak.resonances[i]
-                if resonance and resonance.atom != None and resonance.value != NOSHIFT:
+                if resonance and resonance.atom != None and resonance.value != constants.NOSHIFT:
                     resonance.atom.peakPositions.append(peak.positions[i])
-                    if not resonance.atom.isAssigned(resonanceListIdx=RESONANCE_LIST_IDX_ANY):
-                        peak.rogScore.setMaxColor( COLOR_ORANGE,
-                                                    sprintf('%s unassigned', resonance.atom)
+                    if not resonance.atom.isAssigned(resonanceListIdx=constants.RESONANCE_LIST_IDX_ANY):
+                        peak.rogScore.setMaxColor( constants.COLOR_ORANGE,
+                                                    io.sprintf('%s unassigned', resonance.atom)
                                                   )
                     else:
                         if resonance.atom.db.spinType in errorMargins:
                             shift = resonance.atom.shift()
                             errM = errorMargins[resonance.atom.db.spinType]
                             if math.fabs(resonance.value-shift)> 2.0*errM:
-                                peak.rogScore.setMaxColor( COLOR_RED,
-                                    sprintf('dimension %d: position (%.2f) - shift Atom %s (%.2f) > 2.0*(%.2f)',
+                                peak.rogScore.setMaxColor( constants.COLOR_RED,
+                                    io.sprintf('dimension %d: position (%.2f) - shift Atom %s (%.2f) > 2.0*(%.2f)',
                                              i, resonance.value, resonance.atom, shift, errM)
                                 )
 
                             elif math.fabs(resonance.value-shift)> 1.0*errM:
-                                peak.rogScore.setMaxColor( COLOR_ORANGE,
-                                    sprintf('dimension %d: position (%.2f) - shift Atom %s (%.2f) > 1.0*(%.2f)',
+                                peak.rogScore.setMaxColor( constants.COLOR_ORANGE,
+                                    io.sprintf('dimension %d: position (%.2f) - shift Atom %s (%.2f) > 1.0*(%.2f)',
                                              i, resonance.value, resonance.atom, shift, errM)
                                 )
                             #end if
@@ -290,7 +327,7 @@ def criticizePeaks( project, toFile=True ):
             path = project.moleculePath('analysis',pl.name+'.txt')
             f = file(path, 'w')
             for peak in pl:
-                fprintf(f, '%s  %s\n', peak, peak.rogScore.format())
+                io.fprintf(f, '%s  %s\n', peak, peak.rogScore.format())
             #end for
             f.close()
             nTdetail('==> Analyzing %s, output to: %s', pl, path)
@@ -302,7 +339,7 @@ def _criticizeChain( chain, valSets ):
     """
     Convenience method
     """
-    for color in [COLOR_GREEN,COLOR_ORANGE,COLOR_RED]:
+    for color in [constants.COLOR_GREEN,constants.COLOR_ORANGE,constants.COLOR_RED]:
         chain[color] = NTlist()
 
     chain.rogScore.reset()
@@ -336,7 +373,7 @@ def _criticizeResidue( residue, valSets ):
 #                nTdebug("Skipping What If " + key + " critique")
                 continue
 
-            actualValue        = getDeepByKeys(residue, WHATIF_STR, key, VALUE_LIST_STR) #TODO remove this valueList stuff
+            actualValue        = getDeepByKeys(residue, constants.WHATIF_STR, key, constants.VALUE_LIST_STR) #TODO remove this valueList stuff
             if actualValue == None:
                 #print '>>', residue,key
                 continue
@@ -350,11 +387,11 @@ def _criticizeResidue( residue, valSets ):
             if actualValue < thresholdValueBad: # assuming Z score
                 comment = 'whatif %s value %s <%8.3f' % (key, actualValueStr, thresholdValueBad)
 #                nTdebug(comment)
-                residue.rogScore.setMaxColor( COLOR_RED, comment)
+                residue.rogScore.setMaxColor( constants.COLOR_RED, comment)
             elif actualValue < thresholdValuePoor:
                 comment = 'whatif %s value %s <%8.3f' % (key, actualValueStr, thresholdValuePoor)
 #                nTdebug(comment)
-                residue.rogScore.setMaxColor( COLOR_ORANGE, comment)
+                residue.rogScore.setMaxColor( constants.COLOR_ORANGE, comment)
             #endif
             residue.rogScore[key] = actualValue
         #end for
@@ -386,11 +423,11 @@ def _criticizeResidue( residue, valSets ):
             if actualValue < thresholdValueBad: # assuming Z score
                 comment = 'Procheck %s value %s <%8.3f' % (key, actualValueStr, thresholdValueBad)
 #                nTdebug(comment)
-                residue.rogScore.setMaxColor( COLOR_RED, comment)
+                residue.rogScore.setMaxColor( constants.COLOR_RED, comment)
             elif actualValue < thresholdValuePoor:
                 comment = 'Procheck %s value %s <%8.3f' % (key, actualValueStr, thresholdValuePoor)
 #                nTdebug(comment)
-                residue.rogScore.setMaxColor( COLOR_ORANGE, comment)
+                residue.rogScore.setMaxColor( constants.COLOR_ORANGE, comment)
             #endif
             residue.rogScore[key] = actualValue
         #end for
@@ -427,19 +464,19 @@ def _criticizeResidue( residue, valSets ):
             postFixStr = '(%s times known s.d. of %.1f degrees)' % (val2Str(timesKnownSd, fmt='%.1f'), OMEGA_SD)
             if (valSets.OMEGA_MAXALL_BAD != None) and (avViol >= valSets.OMEGA_MAXALL_BAD):
                 comment = '%s value %s >%8.3f %s' % (key, actualValueStr, valSets.OMEGA_MAXALL_BAD, postFixStr)
-                residue.rogScore.setMaxColor( COLOR_RED, comment )
+                residue.rogScore.setMaxColor( constants.COLOR_RED, comment )
 #                nTdebug('Set to red')
             elif (valSets.OMEGA_MAXALL_POOR != None) and (avViol >= valSets.OMEGA_MAXALL_POOR):
                 comment = '%s value %s >%8.3f %s' % (key, actualValueStr, valSets.OMEGA_MAXALL_POOR, postFixStr)
-                residue.rogScore.setMaxColor(COLOR_ORANGE, comment)
+                residue.rogScore.setMaxColor(constants.COLOR_ORANGE, comment)
 #                nTdebug('Set to orange (perhaps)')
             residue.rogScore[key] = avViol
         #end if
     # end for
 
-    if residue.has_key(CHK_STR) and residue.hasProperties('protein'):
+    if residue.has_key(constants.CHK_STR) and residue.hasProperties('protein'):
 #        print '>', residue, residue.rogScore
-        for key in [RAMACHANDRAN_CHK_STR, CHI1CHI2_CHK_STR, D1D2_CHK_STR]: # TODO: disable those not needed.
+        for key in [constants.RAMACHANDRAN_CHK_STR, constants.CHI1CHI2_CHK_STR, constants.D1D2_CHK_STR]: # TODO: disable those not needed.
 #        for key in [D1D2_CHK_STR]: # TODO: disable those not needed.
 #            nTdebug('Now criticizing %s, whatif key %s', residue, key )
 
@@ -449,7 +486,7 @@ def _criticizeResidue( residue, valSets ):
 #                nTdebug("Skipping CING " + key + " critique")
                 continue
 
-            actualValue        = getDeepByKeys(residue, CHK_STR, key, VALUE_LIST_STR) #TODO remove this valueList stuff
+            actualValue        = getDeepByKeys(residue, constants.CHK_STR, key, constants.VALUE_LIST_STR) #TODO remove this valueList stuff
             if actualValue == None:
 #                nTdebug("None available for >> %s,%s" % ( residue,key))
                 continue
@@ -463,11 +500,11 @@ def _criticizeResidue( residue, valSets ):
             if actualValue < thresholdValueBad: # assuming Z score
                 comment = 'CING %s value %s <%8.3f' % (key, actualValueStr, thresholdValueBad)
 #                nTdebug(comment)
-                residue.rogScore.setMaxColor( COLOR_RED, comment)
+                residue.rogScore.setMaxColor( constants.COLOR_RED, comment)
             elif actualValue < thresholdValuePoor:
                 comment = 'CING %s value %s <%8.3f' % (key, actualValueStr, thresholdValuePoor)
 #                nTdebug(comment)
-                residue.rogScore.setMaxColor( COLOR_ORANGE, comment)
+                residue.rogScore.setMaxColor( constants.COLOR_ORANGE, comment)
             #endif
             residue.rogScore[key] = actualValue
         #end for
@@ -511,7 +548,7 @@ def criticize(project, toFile=True):
 
     if project.molecule:
         project.molecule.rogScore.reset()
-        for color in [COLOR_GREEN,COLOR_ORANGE,COLOR_RED]:
+        for color in [constants.COLOR_GREEN,constants.COLOR_ORANGE,constants.COLOR_RED]:
             project.molecule[color].clear() # is a NTlist
         #end for
 
@@ -528,10 +565,10 @@ def criticize(project, toFile=True):
         useOldMethod = 0
         color = project.molecule.getRogColor()
         if useOldMethod:
-            if len(project.molecule[COLOR_RED]) > 0:
-                color = COLOR_RED
-            elif len(project.molecule[COLOR_ORANGE]) > 0:
-                color = COLOR_ORANGE
+            if len(project.molecule[constants.COLOR_RED]) > 0:
+                color = constants.COLOR_RED
+            elif len(project.molecule[constants.COLOR_ORANGE]) > 0:
+                color = constants.COLOR_ORANGE
             # end if
         # end if
         if color == None:
@@ -546,16 +583,16 @@ def criticize(project, toFile=True):
             path = project.moleculePath('analysis', 'ROG.txt')
             f = file(path,'w')
             for residue in project.molecule.allResidues():
-                fprintf(f, '%-15s %4d %-6s  ', residue.cName(-1), residue.resNum, residue.rogScore.colorLabel)
+                io.fprintf(f, '%-15s %4d %-6s  ', residue.cName(-1), residue.resNum, residue.rogScore.colorLabel)
                 keys = residue.rogScore.keys()
                 for key in ['BBCCHK', 'C12CHK', 'RAMCHK', 'gf', 'OMEGA']:
                     if key in keys:
-                        fprintf(f,'%-6s %-8s   ', key, val2Str( residue.rogScore[key], fmt='%8.3f', count=8 ))
+                        io.fprintf(f,'%-6s %-8s   ', key, val2Str( residue.rogScore[key], fmt='%8.3f', count=8 ))
                     else:
-                        fprintf(f,'%-6s %8s   ', key, '.   ')
+                        io.fprintf(f,'%-6s %8s   ', key, '.   ')
                     #end if
                 #end for
-                fprintf(f,'%s\n', residue.rogScore.colorCommentList.zap(1))
+                io.fprintf(f,'%s\n', residue.rogScore.colorCommentList.zap(1))
             #end for
             f.close()
             nTdetail('==> Criticizing project: output to "%s"', path)
@@ -622,26 +659,26 @@ def summaryForProject( project, toFile = True, ranges=None ):
     nTdebug('validate#summaryForProject: ranges=%s type:%s', ranges, type(ranges) )
 
     msg = ''
-#    msg += sprintf( '%s\n', mol.format() )
+#    msg += io.sprintf( '%s\n', mol.format() )
 
     skippedRmsd = False # keep logic simple.
-    if mol.has_key( RMSD_STR ) and mol.rmsd:
+    if mol.has_key( constants.RMSD_STR ) and mol.rmsd:
         # Next msg isn't returning when no models are present in CING.
         msgNext = mol.rmsd.format(allowHtml=True)
         if msgNext:
             msg += msgNext
-#        msg += sprintf( '\n%s\n', mol.rmsd.format() )
+#        msg += io.sprintf( '\n%s\n', mol.rmsd.format() )
         if not mol.modelCount:
             # empty molecule can't have meaningfull rmsds and this might be an important factor to note here.
             skippedRmsd = True
     else:
         skippedRmsd = True
     if skippedRmsd:
-        incompleteItems.append( RMSD_STR )
+        incompleteItems.append( constants.RMSD_STR )
 
     for drl in project.distances + project.dihedrals + project.rdcs:
         msg += drl.format(allowHtml=True) + '\n'
-#        msg += sprintf( '\n%s\n', drl.format() )
+#        msg += io.sprintf( '\n%s\n', drl.format() )
     allResidues = mol.allResidues()
     allResiduesWithCoord = mol.allResiduesWithCoordinates()
     rangesStrAll = mol.residueList2Ranges(allResidues)
@@ -650,7 +687,7 @@ def summaryForProject( project, toFile = True, ranges=None ):
     msgRanges = "all residues"
     if rangesStrAll != rangesStrAllWithCoord:
         msgRanges += " with coordinates: " + rangesStrAllWithCoord
-    msg += "\n%s CING ROG analysis (%s) %s\n%s\n" % (dots, msgRanges, dots, _ROGsummary(allResiduesWithCoord,allowHtml=True))
+    msg += "\n%s CING ROG analysis (%s) %s\n%s\n" % (constants.dots, msgRanges, constants.dots, _ROGsummary(allResiduesWithCoord,allowHtml=True))
 
     useRanges = mol.useRanges(ranges)
     if useRanges:
@@ -659,19 +696,19 @@ def summaryForProject( project, toFile = True, ranges=None ):
         rangesStrRangeWithCoord = mol.residueList2Ranges(rangeResidueListWithCoord)
 #        nTdebug("rangesStrAll, rangesStrRangeWithCoord: %s %s" % ( rangesStrAll, rangesStrRangeWithCoord))
         msg += "\n%s CING ROG analysis (%s) %s\n%s\n" % \
-               (dots, rangesStrRangeWithCoord, dots, _ROGsummary(rangeResidueListWithCoord, allowHtml=True))
+               (constants.dots, rangesStrRangeWithCoord, constants.dots, _ROGsummary(rangeResidueListWithCoord, allowHtml=True))
 
-    wiSummary = getDeepByKeys(mol, WHATIF_STR, 'summary')
+    wiSummary = getDeepByKeys(mol, constants.WHATIF_STR, 'summary')
     if wiSummary:
-        msg += "\n%s WHAT IF Summary %s\n" % (dots, dots )
+        msg += "\n%s WHAT IF Summary %s\n" % (constants.dots, constants.dots )
         msg += addPreTagLines(wiSummary)
     else:
-        incompleteItems.append( WHATIF_STR )
+        incompleteItems.append( constants.WHATIF_STR )
 
-    pc = getDeepByKeys(mol, PROCHECK_STR)
+    pc = getDeepByKeys(mol, constants.PROCHECK_STR)
     if pc:
-        if hasattr(pc, SUMMARY_STR):
-            msg += "\n%s Procheck Summary %s\n" % (dots, dots )
+        if hasattr(pc, constants.SUMMARY_STR):
+            msg += "\n%s Procheck Summary %s\n" % (constants.dots, constants.dots )
             if mol.useRanges(pc.ranges):
                 msg += '     (ranges %s)\n' % pc.ranges
             msg += '\n' + addPreTagLines(pc.summary.format())
@@ -683,7 +720,7 @@ def summaryForProject( project, toFile = True, ranges=None ):
     # TODO: change this like shiftx setup with wattosStatus.
     wattosSummary = getDeepByKeys(mol, WATTOS_SUMMARY_STR)
     if wattosSummary:
-        msg += "\n%s Wattos Summary %s\n" % (dots, dots )
+        msg += "\n%s Wattos Summary %s\n" % (constants.dots, constants.dots )
         msg += '\n' + addPreTagLines(wattosSummary)
 #    else:
 #        incompleteItems.append( WATTOS_STR )
@@ -697,8 +734,8 @@ def summaryForProject( project, toFile = True, ranges=None ):
         shiftx = shifxDefs.completed
         if not shiftx:
 #            nTmessage('runShiftx: not a single amino acid in the molecule so skipping this step.')
-            incompleteItems.append( SHIFTX_STR )
-    topMsg = sprintf( '%s CING SUMMARY project %s %s', dots, project.name, dots )
+            incompleteItems.append( constants.SHIFTX_STR )
+    topMsg = io.sprintf( '%s CING SUMMARY project %s %s', constants.dots, project.name, constants.dots )
 
     # Block from storeCING2db keep synced.
     p_assignmentCountMap = project.molecule.getAssignmentCountMap()
@@ -756,7 +793,7 @@ def summaryForProject( project, toFile = True, ranges=None ):
 #        nTdebug(" msg: " + msg)
         msgClean = removePreTagLines( msg )
 #        nTdebug(" msgClean: " + msgClean)
-        fprintf( fp, msgClean )
+        io.fprintf( fp, msgClean )
         fp.close()
     #end if
 
@@ -837,7 +874,7 @@ def validateRestraints( project, toFile = True):
         return
 
     msg = ""
-    msg += sprintf('%s\n', project.format() )
+    msg += io.sprintf('%s\n', project.format() )
 
 #    # distances and dihedrals
 #    for res in project.molecule.allResidues():
@@ -849,17 +886,17 @@ def validateRestraints( project, toFile = True):
     rL = project.distanceRestraintNTlist = RestraintList('distanceRestraintNTlist') # used for DB as a list of all restraints combined.
     for drl in project.distances:
 #        drl.analyze()
-        msg += sprintf( '%s\n', drl.format())
+        msg += io.sprintf( '%s\n', drl.format())
         drl.sort('violMax').reverse()
-        msg += sprintf( '%s Sorted on Maximum Violations %s\n', dots, dots)
-        msg += sprintf( '%s\n', formatList( drl[0:min(len(drl),30)] ) )
+        msg += io.sprintf( '%s Sorted on Maximum Violations %s\n', constants.dots, constants.dots)
+        msg += io.sprintf( '%s\n', formatList( drl[0:min(len(drl),30)] ) )
 
         drl.sort('violCount3').reverse()
         # omit restraints that have a violation less than cut off.  NEW FEATURE REQUEST
-        msg += sprintf( '%s Sorted on Violations > 0.3 A %s\n', dots, dots)
+        msg += io.sprintf( '%s Sorted on Violations > 0.3 A %s\n', constants.dots, constants.dots)
         theList = drl[0:min(len(drl),30)]
 #        nTdebug("Found list: " + repr(theList))
-        msg += sprintf( '%s\n', formatList( theList ) )
+        msg += io.sprintf( '%s\n', formatList( theList ) )
         rL.addList(drl)
     #end for
     getStatsRestraintNTlist(rL)
@@ -868,20 +905,20 @@ def validateRestraints( project, toFile = True):
     rL = project.dihedralRestraintNTlist = RestraintList('dihedralRestraintNTlist')
     for drl in project.dihedrals:
 #        drl.analyze()
-        msg += sprintf( '%s\n', drl.format())
+        msg += io.sprintf( '%s\n', drl.format())
         drl.sort('violMax').reverse()
-        msg += sprintf( '%s Sorted on Maximum Violations %s\n', dots, dots)
-        msg += sprintf( '%s\n', formatList( drl[0:min(len(drl),30)] ) )
+        msg += io.sprintf( '%s Sorted on Maximum Violations %s\n', constants.dots, constants.dots)
+        msg += io.sprintf( '%s\n', formatList( drl[0:min(len(drl),30)] ) )
 
         drl.sort('violCount3').reverse()
-        msg += sprintf( '%s Sorted on Violations > 3 degree %s\n', dots, dots)
-        msg += sprintf( '%s\n', formatList( drl[0:min(len(drl),30)] ) )
+        msg += io.sprintf( '%s Sorted on Violations > 3 degree %s\n', constants.dots, constants.dots)
+        msg += io.sprintf( '%s\n', formatList( drl[0:min(len(drl),30)] ) )
         rL.addList(drl)
     #end for
     getStatsRestraintNTlist(rL)
 
     # Process the per residue restraints data
-    msg += sprintf( '%s Per residue scores %s\n', dots, dots )
+    msg += io.sprintf( '%s Per residue scores %s\n', constants.dots, constants.dots )
     for restraintListAtribute in ( 'distanceRestraints', 'dihedralRestraints'):
         count = 0
         for res in project.molecule.allResidues():
@@ -890,7 +927,7 @@ def validateRestraints( project, toFile = True):
 
             # print every 10 lines
             if not count % 30:
-                msg += sprintf('%-18s %15s  %15s   %s\n', '--- RESIDUE ---', '--- PHI ---', '--- PSI ---',
+                msg += io.sprintf('%-18s %15s  %15s   %s\n', '--- RESIDUE ---', '--- PHI ---', '--- PSI ---',
                                '-- dist 0.1A 0.3A 0.5A   rmsd   violAv violMaxAll --')
             #end if
             if res.has_key('PHI'):
@@ -904,7 +941,7 @@ def validateRestraints( project, toFile = True):
                 psi = NTvalue( '-', '-', fmt='%7s %7s', fmt2='%7s' )
             #end if
             try:
-                msg += sprintf( '%-18s %-15s  %-15s      %3d %4d %4d %4d  %6.3f %6.3f %6.3f\n',
+                msg += io.sprintf( '%-18s %-15s  %-15s      %3d %4d %4d %4d  %6.3f %6.3f %6.3f\n',
                      res, phi, psi,
                          len(rL),
                          rL.violCount1,
@@ -926,7 +963,7 @@ def validateRestraints( project, toFile = True):
         fname = project.path(project.molecule.name, validationDirectories.analysis,'restraints.txt')
         fp = open( fname, 'w' )
         nTmessage( '==> validateRestraints, output to %s', fname)
-        fprintf(fp, msg)
+        io.fprintf(fp, msg)
     #end if
 #end def
 
@@ -968,7 +1005,7 @@ def checkForSaltbridges( project, cutoff = 0.5, toFile=False)   :
     #end if
 
     if toFile:
-        fprintf( fp, '%s\n', project.molecule.format() )
+        io.fprintf( fp, '%s\n', project.molecule.format() )
 #    nTmessage(     '%s', project.molecule.format() )
 
     residues1 = project.molecule.residuesWithProperties('E') + \
@@ -1009,7 +1046,7 @@ def checkForSaltbridges( project, cutoff = 0.5, toFile=False)   :
                 pairCountBelowCutoff += 1
                 continue
             if toFile:
-                fprintf(fp, '%s\n', s.format() )
+                io.fprintf(fp, '%s\n', s.format() )
 #            nTdebug(    '%s\n', s.format() )
             res1.saltbridges.append( s )
             res2.saltbridges.append( s )
@@ -1027,8 +1064,8 @@ def checkForSaltbridges( project, cutoff = 0.5, toFile=False)   :
         nTcodeerror("Failed sum check in checkForSaltbridges")
     nTmessage(msg)
     if s and toFile:
-        fprintf( fp, '%s\n', msg )
-        fprintf( fp, '%s\n', s.comment )
+        io.fprintf( fp, '%s\n', msg )
+        io.fprintf( fp, '%s\n', s.comment )
         #nTdebug(     '%s\n', s.comment )
     #end if
 
@@ -1323,7 +1360,7 @@ def _fixStereoAssignments( project  ):
             # check stereo methyl protons
             if atm.isMethylProton():
                 heavy = atm.heavyAtom()
-                if heavy and heavy.isAssigned(resonanceListIdx=RESONANCE_LIST_IDX_ANY) and not heavy.isStereoAssigned():
+                if heavy and heavy.isAssigned(resonanceListIdx=constants.RESONANCE_LIST_IDX_ANY) and not heavy.isStereoAssigned():
                     heavy.stereoAssigned = True
                     nTmessage('==> fixed stereo assignment %s', heavy)
                 #end if
@@ -1331,13 +1368,13 @@ def _fixStereoAssignments( project  ):
             # check stereo methyl carbon
             elif atm.isMethyl() and atm.isCarbon():
                 pseudo = atm.attachedProtons(includePseudo=True).last()
-                if pseudo and pseudo.isAssigned(resonanceListIdx=RESONANCE_LIST_IDX_ANY) and not pseudo.isStereoAssigned():
+                if pseudo and pseudo.isAssigned(resonanceListIdx=constants.RESONANCE_LIST_IDX_ANY) and not pseudo.isStereoAssigned():
                     pseudo.stereoAssigned = True
                     nTmessage('==> fixed stereo assignment %s', pseudo)
                 #end if
             #end if
             partner = atm.proChiralPartner()
-            if partner and partner.isAssigned(resonanceListIdx=RESONANCE_LIST_IDX_ANY) and not partner.isStereoAssigned():
+            if partner and partner.isAssigned(resonanceListIdx=constants.RESONANCE_LIST_IDX_ANY) and not partner.isStereoAssigned():
                 partner.stereoAssigned = True
                 nTmessage('==> fixed stereo assignment %s', partner)
             #end if
@@ -1437,9 +1474,9 @@ def moleculeValidateAssignments( molecule  ):
                 nTerror("Failed to validateChemicalShiftLeu for %s" % res)
 
         for atm in res.allAtoms():
-            if atm.isAssigned(resonanceListIdx=RESONANCE_LIST_IDX_ANY):
+            if atm.isAssigned(resonanceListIdx=constants.RESONANCE_LIST_IDX_ANY):
 #                nTdebug('Assigned atom: %s' % atm)
-                shift = atm.shift(resonanceListIdx=RESONANCE_LIST_IDX_ANY)
+                shift = atm.shift(resonanceListIdx=constants.RESONANCE_LIST_IDX_ANY)
                 pseudo = atm.pseudoAtom()
 
                 # Check the shift against the database
@@ -1460,8 +1497,8 @@ def moleculeValidateAssignments( molecule  ):
                     if sd < 0.0:
                         nTerror("Found negative sd. Skipping critiqueing.")
                         continue
-                    msg = sprintf('%.1f*sd from (%.2f,%.2f)', delta, av, sd )
-#                    debug_msg = sprintf('    shift %.2f, ' % shift)
+                    msg = io.sprintf('%.1f*sd from (%.2f,%.2f)', delta, av, sd )
+#                    debug_msg = io.sprintf('    shift %.2f, ' % shift)
 #                    nTdebug(debug_msg)
                     if delta > 3.0:
                         result.append( atm )
@@ -1474,8 +1511,8 @@ def moleculeValidateAssignments( molecule  ):
                 #end if
 
                 # Check if not both realAtom and pseudoAtom are assigned
-                if atm.hasPseudoAtom() and atm.pseudoAtom().isAssigned(resonanceListIdx=RESONANCE_LIST_IDX_ANY):
-                    msg = sprintf('%s: and %s', MULTIPLE_ASSIGNMENT, atm.pseudoAtom() )
+                if atm.hasPseudoAtom() and atm.pseudoAtom().isAssigned(resonanceListIdx=constants.RESONANCE_LIST_IDX_ANY):
+                    msg = io.sprintf('%s: and %s', MULTIPLE_ASSIGNMENT, atm.pseudoAtom() )
     #                nTmessage('%-20s %s', atm, msg)
                     result.append( atm )
                     atm.validateAssignment.append(msg)
@@ -1484,8 +1521,8 @@ def moleculeValidateAssignments( molecule  ):
                 # Check if not pseudoAtom and realAtom are assigned
                 if atm.isPseudoAtom():
                     for a in atm.realAtoms():
-                        if a.isAssigned(resonanceListIdx=RESONANCE_LIST_IDX_ANY):
-                            msg = sprintf('%s: and %s', MULTIPLE_ASSIGNMENT, a )
+                        if a.isAssigned(resonanceListIdx=constants.RESONANCE_LIST_IDX_ANY):
+                            msg = io.sprintf('%s: and %s', constants.MULTIPLE_ASSIGNMENT, a )
     #                        nTmessage('%-20s %s', atm, msg)
                             result.append( atm )
                             atm.validateAssignment.append(msg)
@@ -1498,8 +1535,8 @@ def moleculeValidateAssignments( molecule  ):
                     for a in atm.pseudoAtom().realAtoms():
                         if a.isMethylProtonButNotPseudo():
                             continue
-                        if not a.isAssigned(resonanceListIdx=RESONANCE_LIST_IDX_ANY):
-                            msg = sprintf('%s: expected %s', MISSING_ASSIGNMENT, a )
+                        if not a.isAssigned(resonanceListIdx=constants.RESONANCE_LIST_IDX_ANY):
+                            msg = io.sprintf('%s: expected %s', constants.MISSING_ASSIGNMENT, a )
     #                        nTmessage('%-20s %s', atm, msg )
                             result.append( atm )
                             atm.validateAssignment.append(msg)
@@ -1513,12 +1550,12 @@ def moleculeValidateAssignments( molecule  ):
                     if heavyAtm == None: # Happens for all non-standard residues protons.
                         nTwarning("Failed to get heavy for atm: %s" % atm)
                     # end if
-                    elif not heavyAtm.isAssigned(resonanceListIdx=RESONANCE_LIST_IDX_ANY):
+                    elif not heavyAtm.isAssigned(resonanceListIdx=constants.RESONANCE_LIST_IDX_ANY):
                         spinType = getDeepByKeys(heavyAtm, 'db', 'spinType')
                         if spinType:
                             # Only complain if type has at least one assignment.
                             if getDeepByKeys( hasAssignment, spinType):
-                                msg = sprintf('%s: %s', EXPECTED_ASSIGNMENT, heavyAtm )
+                                msg = io.sprintf('%s: %s', constants.EXPECTED_ASSIGNMENT, heavyAtm )
             #                    nTmessage('%-20s %s', atm, msg )
                                 result.append( atm )
                                 atm.validateAssignment.append(msg)
@@ -1528,20 +1565,20 @@ def moleculeValidateAssignments( molecule  ):
                 # stereo assignments checks
                 if atm.isStereoAssigned():
                     if not atm.isProChiral():
-                        msg = sprintf('%s: %s', INVALID_STEREO_ASSIGNMENT, atm )
+                        msg = io.sprintf('%s: %s', INVALID_STEREO_ASSIGNMENT, atm )
                         result.append( atm )
                         atm.validateAssignment.append(msg)
                     else:
                         # Check prochiral partner assignments
                         partner = atm.proChiralPartner()
                         if partner:
-                            if not partner.isAssigned(resonanceListIdx=RESONANCE_LIST_IDX_ANY):
-                                msg = sprintf('%s: %s unassigned', INVALID_STEREO_ASSIGNMENT, partner )
+                            if not partner.isAssigned(resonanceListIdx=constants.RESONANCE_LIST_IDX_ANY):
+                                msg = io.sprintf('%s: %s unassigned', constants.INVALID_STEREO_ASSIGNMENT, partner )
                                 result.append( atm )
                                 atm.validateAssignment.append(msg)
                             else:
                                 if not partner.isStereoAssigned():
-                                    msg = sprintf('%s: %s not stereo assigned', INVALID_STEREO_ASSIGNMENT, partner )
+                                    msg = io.sprintf('%s: %s not stereo assigned', INVALID_STEREO_ASSIGNMENT, partner )
                                     result.append( atm )
                                     atm.validateAssignment.append(msg)
                                 #end if
@@ -1556,12 +1593,12 @@ def moleculeValidateAssignments( molecule  ):
                     if atm.name.endswith('1'): # JFD: don't do both.
                         if heavy and heavy.isAssigned():
                             if atm.isStereoAssigned() and not heavy.isStereoAssigned():
-                                msg = sprintf('%s: %s not stereo assigned', INVALID_STEREO_ASSIGNMENT, heavy )
+                                msg = io.sprintf('%s: %s not stereo assigned', INVALID_STEREO_ASSIGNMENT, heavy )
                                 result.append( atm )
                                 atm.validateAssignment.append(msg)
                             #end if
                             if not atm.isStereoAssigned() and heavy.isStereoAssigned():
-                                msg = sprintf('%s: %s is stereo assigned', INVALID_STEREO_ASSIGNMENT, heavy )
+                                msg = io.sprintf('%s: %s is stereo assigned', INVALID_STEREO_ASSIGNMENT, heavy )
                                 result.append( atm )
                                 atm.validateAssignment.append(msg)
                             #end if
@@ -1573,14 +1610,14 @@ def moleculeValidateAssignments( molecule  ):
                     # check stereo methyl carbon
                     if atm.isMethyl() and atm.isCarbon():
                         pseudo = atm.attachedProtons(includePseudo=True).last()
-                        if pseudo and pseudo.isAssigned(resonanceListIdx=RESONANCE_LIST_IDX_ANY):
+                        if pseudo and pseudo.isAssigned(resonanceListIdx=constants.RESONANCE_LIST_IDX_ANY):
                             if atm.isStereoAssigned() and not pseudo.isStereoAssigned():
-                                msg = sprintf('%s: %s not stereo assigned', INVALID_STEREO_ASSIGNMENT, pseudo )
+                                msg = io.sprintf('%s: %s not stereo assigned', INVALID_STEREO_ASSIGNMENT, pseudo )
                                 result.append( atm )
                                 atm.validateAssignment.append(msg)
                             #end if
                             if not atm.isStereoAssigned() and pseudo.isStereoAssigned():
-                                msg = sprintf('%s: %s is stereo assigned', INVALID_STEREO_ASSIGNMENT, pseudo )
+                                msg = io.sprintf('%s: %s is stereo assigned', constants.INVALID_STEREO_ASSIGNMENT, pseudo )
                                 result.append( atm )
                                 atm.validateAssignment.append(msg)
                             #end if
@@ -1592,24 +1629,24 @@ def moleculeValidateAssignments( molecule  ):
 #                nTdebug('Unassigned atom: %s' % atm)
                 # Atm is not assigned but stereo assignment is set
                 if atm.isStereoAssigned():
-                    msg = sprintf('%s: not assigned but stereo-assignment %s set', INVALID_STEREO_ASSIGNMENT, atm )
+                    msg = io.sprintf('%s: not assigned but stereo-assignment %s set', constants.INVALID_STEREO_ASSIGNMENT, atm )
                     result.append( atm )
                     atm.validateAssignment.append(msg)
                 #end if
 
                 if atm.isProChiral():
                     partner = atm.proChiralPartner()
-                    if partner and partner.isAssigned(resonanceListIdx=RESONANCE_LIST_IDX_ANY) and partner.isStereoAssigned():
-                        msg = sprintf('%s: prochiral partner %s is stereo assigned', INVALID_STEREO_ASSIGNMENT, partner )
+                    if partner and partner.isAssigned(resonanceListIdx=constants.RESONANCE_LIST_IDX_ANY) and partner.isStereoAssigned():
+                        msg = io.sprintf('%s: prochiral partner %s is stereo assigned', INVALID_STEREO_ASSIGNMENT, partner )
                         result.append( atm )
                         atm.validateAssignment.append(msg)
                 #end if
             #end if atm.isAssigned():
 
             if atm.validateAssignment:
-                atm.rogScore.setMaxColor( COLOR_ORANGE, atm.validateAssignment )
+                atm.rogScore.setMaxColor( constants.COLOR_ORANGE, atm.validateAssignment )
                 if hasattr(molecule, 'atomList'):
-                    molecule.atomList.rogScore.setMaxColor( COLOR_ORANGE, 'Inferred from atoms')
+                    molecule.atomList.rogScore.setMaxColor( constants.COLOR_ORANGE, 'Inferred from atoms')
             #end if
         #end for atoms
     #end for residues
@@ -1728,9 +1765,9 @@ def validateDihedralCombinations(project):
     # 2: angle 2 name
     # 3: Angle combination name
     plotDihedral2dLoL = [ # truncate if needed.
-        [RAMACHANDRAN_CHK_STR, PHI_STR,  PSI_STR,  'Ramachandran'],
-        [CHI1CHI2_CHK_STR, CHI1_STR, CHI2_STR, 'Janin'],
-        [D1D2_CHK_STR, DIHEDRAL_NAME_Cb4N, DIHEDRAL_NAME_Cb4C, 'D1D2']
+        [constants.RAMACHANDRAN_CHK_STR, constants.PHI_STR,  constants.PSI_STR,  'Ramachandran'],
+        [constants.CHI1CHI2_CHK_STR, constants.CHI1_STR, constants.CHI2_STR, 'Janin'],
+        [constants.D1D2_CHK_STR, constants.DIHEDRAL_NAME_Cb4N, constants.DIHEDRAL_NAME_Cb4C, 'D1D2']
        ]
 
     msgHol = MsgHoL()
@@ -1743,7 +1780,7 @@ def validateDihedralCombinations(project):
 #                residue))
             continue
         # The assumption is that the derived residues can be represented by the regular.
-        resName = getDeepByKeysOrDefault(residue, residue.resName, 'nameDict', PDB)
+        resName = getDeepByKeysOrDefault(residue, residue.resName, 'nameDict', constants.PDB)
         if len( resName ) > 3: # The above line doesn't work. Manual correction works 95% of the time.
             resName = resName[:3]  # .pdb files have a max of 3 chars in their residue name.
         for checkIdx in range(len(plotDihedral2dLoL)):
@@ -1753,22 +1790,22 @@ def validateDihedralCombinations(project):
             dihedralName1 = plotDihedral2dLoL[checkIdx][1]
             dihedralName2 = plotDihedral2dLoL[checkIdx][2]
 
-            residue[CHK_STR][checkId] = CingResult( checkId, level=RES_LEVEL, modelCount = modelCount)
-            ensembleValueList = getDeepByKeysOrAttributes( residue, CHK_STR, checkId, VALUE_LIST_STR )
+            residue[constants.CHK_STR][checkId] = CingResult( checkId, level=constants.RES_LEVEL, modelCount = modelCount)
+            ensembleValueList = getDeepByKeysOrAttributes( residue, constants.CHK_STR, checkId, constants.VALUE_LIST_STR )
             ensembleValueLoL = []
 
             doingNewD1D2plot = False
             bins = bins360P # most common. (chis & ds)
             resTypeList = None # used for lookup of C tuple
             normalizeBeforeCombining = False
-            if dihedralName1==PHI_STR and dihedralName2==PSI_STR:
+            if dihedralName1==constants.PHI_STR and dihedralName2==constants.PSI_STR:
                 histBySsAndResType         = hPlot.histRamaBySsAndResType
                 histCtupleBySsAndResType   = hPlot.histRamaCtupleBySsAndResType
                 bins = bins180P
-            elif dihedralName1==CHI1_STR and dihedralName2==CHI2_STR:
+            elif dihedralName1==constants.CHI1_STR and dihedralName2==constants.CHI2_STR:
                 histBySsAndResType         = hPlot.histJaninBySsAndResType
                 histCtupleBySsAndResType   = hPlot.histJaninCtupleBySsAndResType
-            elif dihedralName1==DIHEDRAL_NAME_Cb4N and dihedralName2==DIHEDRAL_NAME_Cb4C:
+            elif dihedralName1==constants.DIHEDRAL_NAME_Cb4N and dihedralName2==constants.DIHEDRAL_NAME_Cb4C:
 #                histBySsAndResType         = hPlot.histd1BySsAndResTypes
                 histBySsAndResType         = None
                 histCtupleBySsAndResType   = hPlot.histd1CtupleBySsAndResTypes
@@ -1786,7 +1823,7 @@ def validateDihedralCombinations(project):
                     continue
                 # Note that this was a major bug before June 3, 2010.
 #                resTypeList = [getDeepByKeys(triplet[i].db.nameDict, IUPAC) for i in tripletIdxList]
-                resTypeList = [getDeepByKeys(triplet[i].db.nameDict, IUPAC) for i in range(3)]
+                resTypeList = [getDeepByKeys(triplet[i].db.nameDict, constants.IUPAC) for i in range(3)]
             else:
                 nTcodeerror("validateDihedralCombinations called for non Rama/Janin/d1d2")
                 return None
@@ -1963,7 +2000,7 @@ binCount  = 360/binSize
 #binCountJ = (binCount + 0)* 1j # used for numpy's 'gridding'.but fails anyway.
 # Used for linear interpolation
 # 0-360 is the most common range for the dihedrals; e.g. chis & ds
-plotparams360 = plotParameters.getdefault(CHI1_STR,'dihedralDefault')
+plotparams360 = plotParameters.getdefault(constants.CHI1_STR,'dihedralDefault')
 plotparams360P = deepcopy(plotparams360)
 plotparams360P.min -= binSize
 plotparams360P.max += binSize
@@ -1973,7 +2010,7 @@ bins360 = (xGrid360,yGrid360)
 xGrid360P,yGrid360P = ogrid[ plotparams360P.min:plotparams360P.max:binSize, plotparams360P.min:plotparams360P.max:binSize ]
 bins360P = (xGrid360P,yGrid360P)
 
-plotparams180 = plotParameters.getdefault(PHI_STR,'dihedralDefault')
+plotparams180 = plotParameters.getdefault(constants.PHI_STR,'dihedralDefault')
 plotparams180P = deepcopy(plotparams180)
 plotparams180P.min -= binSize
 plotparams180P.max += binSize

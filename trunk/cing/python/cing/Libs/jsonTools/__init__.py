@@ -154,14 +154,14 @@ def encode(value,
     # i.e the context of each handler class
     # encoding in class assures it is decoded automatically
     mdata = Metadata(
-             version   = cing.definitions.cingDefinitions.version,
-             revision  = cing.definitions.cingDefinitions.revision,
-             copyRight = cing.definitions.cingDefinitions.copyright,
-             user      = cing.definitions.systemDefinitions.user,
+             version   = cing.constants.definitions.cingDefinitions.version,
+             revision  = cing.constants.definitions.cingDefinitions.revision,
+             copyRight = cing.constants.definitions.cingDefinitions.copyright,
+             user      = cing.constants.definitions.systemDefinitions.user,
              os        = '%s:%s:%s' % (
-                         cing.definitions.systemDefinitions.osType,
-                         cing.definitions.systemDefinitions.osRelease,
-                         cing.definitions.systemDefinitions.osArchitecture
+                         cing.constants.definitions.systemDefinitions.osType,
+                         cing.constants.definitions.systemDefinitions.osRelease,
+                         cing.constants.definitions.systemDefinitions.osArchitecture
                         ),
              **keyedMetadata
     )

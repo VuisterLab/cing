@@ -2,7 +2,7 @@ from nose import with_setup
 import os
 
 import cing
-from cing import definitions as cdefs
+from cing.constants import definitions as cdefs
 from cing import constants
 from cing.core import classes
 from cing.core import molecule
@@ -144,11 +144,11 @@ def teardown_project():
 
 #@with_setup(setup_EmptyProject,teardown_project)
 def openCcpn(target, path):
-    io.debug('\nopenCcpn: doing {0} from {1}\n', target, path)
-    project = classes.Project.open(target, constants.PROJECT_NEW)
+    io.debug('openCcpn: doing {0} from {1}\n', target, path)
+    project = classes.Project.open(target, constants.PROJECT_NEWFROMCCPN)
     assert project is not None
-    p = project.initCcpn(path)
-    assert p is not None
+#    p = project.initCcpn(path)
+#    assert p is not None
     io.debug('{0}\n',project.format())
     chains, residues, atoms, models = targets[target].molecule
     assert chains == len(project.molecule.allChains())
@@ -167,11 +167,12 @@ def openCcpn(target, path):
 
 def test_openCcpnProjects():
     os.chdir(cdefs.cingDefinitions.tmpdir)
-    dataPath = cdefs.cingDefinitions.rootPath / 'Tests' / 'data' / 'ccpn'
+    dataPath = cdefs.cingDefinitions.rootPath  / 'data' / 'Tests' / 'ccpn'
 #    for target in '1a4d 1a24 1afp 1ai0 1b4y 1brv 1bus 1cjg 1d3z 1hkt 1hue 1ieh 1iv6 1jwe 1kr8 2hgh 2k0e'.split():
 #    for target in '1brv'.split():
     for target in targets.keys():
         path = dataPath / target+'.tgz'
+        io.debug('==> Now trying {0}\n', path)
         if path.exists():
             openCcpn(target, path)
 

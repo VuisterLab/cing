@@ -3,7 +3,7 @@ Code to upgrade all project <= 1.0
 """
 import cing
 from cing import constants
-from cing import definitions as cdefs
+from cing.constants import definitions as cdefs
 from cing.PluginCode import queeny
 
 from cing.core import validation

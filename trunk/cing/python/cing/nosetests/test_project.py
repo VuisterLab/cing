@@ -1,13 +1,13 @@
 from nose import with_setup
 import os
 
-from cing import definitions as cdefs
+from cing.constants import definitions as cdefs
 from cing import constants
 from cing.core import classes
 from cing.core import molecule
 from cing.Libs import io
 from cing.core import validation
-from cing.core import project
+from cing.core import Project
 
 theProject = None
 
@@ -17,7 +17,7 @@ def setup_DummyProject():
     global theProject
     os.chdir(cdefs.cingDefinitions.tmpdir)
     print('Now in %s' % cdefs.cingDefinitions.tmpdir)
-    theProject = project.new(TEST)
+    theProject = Project.new(TEST)
     # create a molecule
     mol = molecule.Molecule(TEST)
     theProject.appendMolecule(mol)
@@ -61,7 +61,7 @@ def teardown_project():
 
 def test_projectNotPresent():
     print('Forced error:')
-    theProject = project.open('notPresent',project.PROJECT_OLD)
+    theProject = Project.open('notPresent',Project.PROJECT_OLD)
     assert theProject is None
 
 
@@ -89,7 +89,7 @@ def test_openSaveProject():
     # this will test the save routines
     assert theProject.save() == False
     # this will test the restore routines
-    p = project.open(TEST,constants.PROJECT_OLD)
+    p = Project.open(TEST,constants.PROJECT_OLD)
     assert p is not None
     assert p.created == 10.0
 

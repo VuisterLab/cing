@@ -15,9 +15,9 @@ from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.core.classes import DihedralRestraint
 from cing.core.classes import jsonTools as jsonTools
 from cing.constants import * #@UnusedWildImport
-from cing.definitions import cingPaths
-from cing.definitions import cingDefinitions
-from cing.definitions import directories
+from cing.constants.definitions import cingPaths
+from cing.constants.definitions import cingDefinitions
+from cing.constants.definitions import directories
 
 # versions < 0.95 not logged with version number
 # cing versions >1.0 first ones to include this

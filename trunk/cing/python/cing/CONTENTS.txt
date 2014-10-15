@@ -11,8 +11,6 @@ Talos                   Contains the Talos data.
 Files:
 
 CONTENTS.txt            This file.
-constants.py            File with constants definitions
-definitions.py          File with cing and system definitions
 localConstants.py       Settings that can be imported from python/cing/__init__.py
                         NB this file is absent from svn. An example can be adapted
                         from: scripts/cing/localSettingsExample.py

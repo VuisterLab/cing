@@ -122,14 +122,11 @@ project.mergeResonances( status='reduce'  )
 project.listPredefinedExperiments() # list all predefined experiments
 peaks = project.generatePeaks('hncaha','HN:HA:N')
 
-== Print list of parameters:
-    formatall( project.molecule.A.residues[0].procheck ) # Adjust for your mols
-    formatall( project.molecule.A.VAL171.C )
 """
 #==============================================================================
 import cing
 import cing.constants as constants
-import cing.definitions as cdefs
+import cing.constants.definitions as cdefs
 #from cing import __author__ #@UnusedImport
 #from cing import __copyright__ #@UnusedImport
 #from cing import __credits__ #@UnusedImport
@@ -146,7 +143,7 @@ from cing.Libs.forkoff import ForkOff
 from cing.Libs.helper import * #@UnusedWildImport
 from cing.core.classes import Project
 from cing.core.molecule import Molecule
-from cing.definitions import cingPaths
+from cing.constants.definitions import cingPaths
 from cing import plugins
 from cing.core.sml import SMLversion
 from nose.plugins.skip import SkipTest # Dependency on nose can be removed in python 2.7 or later when UnitTest has similar functionality.
@@ -281,7 +278,7 @@ def script(scriptFile, *a, **k):
 
 def testQuiet():
     'Return True on error'
-    cing.verbosity = cing.verbosityOutput
+    cing.verbosity = cing.verbosity.output
     fn = 'cingTest.log'
     nTmessage("\nStarting quiet test in %s logged to %s\n" % (cingDirTmp, fn))
     os.chdir(cingDirTmp)
@@ -455,8 +452,8 @@ def testOverall(namepattern):
     nTmessage("Finished ids: %s", done_list)
 
     # Exit with timer info anywho. After this CING should exit so the tweak shouldn't break anything.
-    if cing.verbosity <= cing.verbosityError:
-        cing.verbosity = cing.verbosityOutput
+    if cing.verbosity <= cing.verbosity.error:
+        cing.verbosity = cing.verbosity.output
 # end def
 
 def testByName(name, excludedModuleList):
@@ -482,8 +479,8 @@ def testByName(name, excludedModuleList):
         nTmessage("Skipping test report of an optional module: %s" % mod_name)
 
     # Exit with timer info anywho. After this CING should exit so the tweak shouldn't break anything.
-    if cing.verbosity <= cing.verbosityError:
-        cing.verbosity = cing.verbosityOutput
+    if cing.verbosity <= cing.verbosity.error:
+        cing.verbosity = cing.verbosity.output
 # end def
 
 def pathToModuleName( name ):

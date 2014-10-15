@@ -12,7 +12,7 @@ from cing.Libs.disk import removeEmptyFiles
 from cing.PluginCode.required.reqMatplib import MATPLIB_STR
 from cing.PluginCode.required.reqWhatif import * #@UnusedWildImport
 from cing.constants import * #@UnusedWildImport
-from cing.definitions import cingPaths
+from cing.constants.definitions import cingPaths
 from cing import plugins
 from glob import glob
 from shutil import copy

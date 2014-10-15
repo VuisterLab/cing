@@ -79,11 +79,11 @@ class AllChecks(TestCase):
 
 
 if __name__ == "__main__":
-    cing.verbosity = verbosityDebug
-    nTmessage(cing.cingDefinitions.getHeaderString())
-    nTmessage(cing.systemDefinitions.getStopMessage())
+    cing.verbosity = cing.constants.verbosity.debug
+    nTmessage(cing.constants.definitions.cingDefinitions.getHeaderString())
+    nTmessage(cing.constants.definitions.systemDefinitions.getStopMessage())
     try:
         unittest.main()
     finally:
-        nTmessage(cing.systemDefinitions.getStopMessage())
+        nTmessage(cing.constants.definitions.systemDefinitions.getStopMessage())
 

@@ -3,12 +3,16 @@
 NMR Tools utilities
 """
 import cing
+from cing import verbosity
+
+
 import cing.constants as constants
-import cing.definitions as cdefs
+import cing.constants.definitions as cdefs
 from cing.core import pid
 import cing.Libs.xmlTools as xmlTools
 from cing.Libs.xmlTools import quote
 import cing.Libs.jsonTools as jsonTools
+
 
 import cing.Libs.io as io
 from cing.Libs.io import fprintf
@@ -18,20 +22,21 @@ from cing.Libs.io import mprintf  #unused here but for compatibility
 
 
 from cing.constants import NaNstring
-from cing.definitions import verbosityDebug
-from cing.definitions import verbosityDefault #@UnusedImport actually used by wild imports of this module (NTutils)
-from cing.definitions import verbosityDetail
-from cing.definitions import verbosityError
-from cing.definitions import verbosityNothing
-from cing.definitions import verbosityOutput
-from cing.definitions import verbosityWarning
+# from cing.definitions import verbosityDebug
+# from cing.definitions import verbosityDefault #@UnusedImport actually used by wild imports of this module (NTutils)
+# from cing.definitions import verbosityDetail
+# from cing.definitions import verbosityError
+# from cing.definitions import verbosityNothing
+# from cing.definitions import verbosityOutput
+# from cing.definitions import verbosityWarning
 
 from cing.Libs.disk import mkdirs #@UnusedImport
 from cing.Libs.fpconst import NaN
 from cing.Libs.fpconst import isNaN
 from cing.core.classes3 import Lister
 from cing.core.classes3 import SMLhandled
-from cing.constants import * #@UnusedWildImport
+#from cing.constants import * #@UnusedWildImport
+
 from copy import deepcopy
 from fnmatch import fnmatch
 from gzip import GzipFile
@@ -58,6 +63,7 @@ import re
 from string  import find
 import sys
 import time
+
 
 
 FAC = 180.0/math.pi
@@ -1549,7 +1555,7 @@ class NTdict(dict):
         return result
     #end def
 
-    def keysformat(self, mdots=dots20):
+    def keysformat(self, mdots=constants.dots20):
         """set __FORMAT__ to list all keys
         """
         fmt = self.header(mdots) + '\n'
@@ -1579,13 +1585,13 @@ class NTdict(dict):
         return msg
     #end def
 
-    def header(self, mdots = dots20):
+    def header(self, mdots = constants.dots20):
         """Generate a header using __CLASS__ and dots.
         """
         return sprintf('%s %s %s', mdots, self.__CLASS__, mdots)
     #end def
 
-    def footer(self, mdots = dots20):
+    def footer(self, mdots = constants.dots20):
         """Generate a footer using dots of the same length as header.
         """
         header = self.header(mdots = mdots)
@@ -2393,7 +2399,7 @@ class NTtree(NTdict):
         return result
     # end def
 
-    def header(self, mdots = dots):
+    def header(self, mdots = constants.dots):
         """Subclass header to generate using __CLASS__, name and dots.
         """
         return sprintf('%s %s: %s %s', mdots, self.__CLASS__, self.name, mdots)
@@ -3327,12 +3333,12 @@ class NTprogressIndicator: # pylint: disable=R0903
 
 
 class PrintWrap:
-    '''
+    """
     Base class for all messaging for example nTmessage()
-    '''
+    """
     def __init__(self, stream = None,
                        autoFlush = True,
-                       verbose=verbosityOutput,
+                       verbose=constants.verbosity.output,
                        noEOL=False,
                        useDate=False,
                        useProcessId=False,
@@ -3347,7 +3353,7 @@ class PrintWrap:
         self.doubleToStandardStreams = doubleToStandardStreams
         self.stream2   = None
 
-        if self.verbose > verbosityError:
+        if self.verbose > constants.verbosity.error:
             self.stream = sys.stdout
         else:
             self.stream = sys.stderr
@@ -3357,6 +3363,7 @@ class PrintWrap:
     # end def
 
     def __call__(self, form, *args):
+        #print('PrintWrap> verbosity,self.verbose: ', cing.verbosity, self.verbose)
         if self.verbose > cing.verbosity: # keep my mouth shut per request.
             return
         if self.prefix:
@@ -4597,26 +4604,26 @@ prefixException = 'EXCEPTION CAUGHT: '
 prefixWarning   = 'WARNING: '
 prefixDebug     = 'DEBUG: '
 
-nTnothing = PrintWrap(verbose=verbosityNothing) # JFD added but totally silly
-nTerror   = PrintWrap(verbose=verbosityError, prefix = prefixError, stream=sys.stderr)
-nTcodeerror=PrintWrap(verbose=verbosityError, prefix = prefixCodeError, stream=sys.stderr)
-nTexception=PrintWrap(verbose=verbosityError, prefix = prefixException, stream=sys.stderr)
-nTwarning = PrintWrap(verbose=verbosityWarning, prefix = prefixWarning, stream=sys.stderr)
-nTmessage = PrintWrap(verbose=verbosityOutput)
-nTdetail  = PrintWrap(verbose=verbosityDetail)
-nTdebug   = PrintWrap(verbose=verbosityDebug, prefix = prefixDebug, stream=sys.stderr)
-nTmessageNoEOL = PrintWrap(verbose=verbosityOutput, noEOL=True)
+nTnothing = PrintWrap(verbose=constants.verbosity.nothing) # JFD added but totally silly
+nTerror   = PrintWrap(verbose=constants.verbosity.error, prefix = prefixError, stream=sys.stderr)
+nTcodeerror=PrintWrap(verbose=constants.verbosity.error, prefix = prefixCodeError, stream=sys.stderr)
+nTexception=PrintWrap(verbose=constants.verbosity.error, prefix = prefixException, stream=sys.stderr)
+nTwarning = PrintWrap(verbose=constants.verbosity.warning, prefix = prefixWarning, stream=sys.stderr)
+nTmessage = PrintWrap(verbose=constants.verbosity.output)
+nTdetail  = PrintWrap(verbose=constants.verbosity.detail)
+nTdebug   = PrintWrap(verbose=constants.verbosity.debug, prefix = prefixDebug, stream=sys.stderr)
+nTmessageNoEOL = PrintWrap(verbose=constants.verbosity.output, noEOL=True)
 
 kwdsPrintWrap = {'useDate':True, 'useProcessId':True, 'doubleToStandardStreams': True}
-nTnothingT              = PrintWrap(verbose=verbosityNothing                            , **kwdsPrintWrap)
-nTerrorT                = PrintWrap(verbose=verbosityError, prefix = prefixError        , **kwdsPrintWrap)
-nTcodeerrorT            = PrintWrap(verbose=verbosityError, prefix = prefixCodeError    , **kwdsPrintWrap)
-nTexceptionT            = PrintWrap(verbose=verbosityError, prefix = prefixException    , **kwdsPrintWrap)
-nTwarningT              = PrintWrap(verbose=verbosityWarning, prefix = prefixWarning    , **kwdsPrintWrap)
-nTmessageT              = PrintWrap(verbose=verbosityOutput                             , **kwdsPrintWrap)
-nTdetailT               = PrintWrap(verbose=verbosityDetail                             , **kwdsPrintWrap)
-nTdebugT                = PrintWrap(verbose=verbosityDebug, prefix = prefixDebug        , **kwdsPrintWrap)
-nTmessageNoEOLT         = PrintWrap(verbose=verbosityOutput, noEOL=True                 , **kwdsPrintWrap)
+nTnothingT              = PrintWrap(verbose=constants.verbosity.nothing                            , **kwdsPrintWrap)
+nTerrorT                = PrintWrap(verbose=constants.verbosity.error, prefix = prefixError        , **kwdsPrintWrap)
+nTcodeerrorT            = PrintWrap(verbose=constants.verbosity.error, prefix = prefixCodeError    , **kwdsPrintWrap)
+nTexceptionT            = PrintWrap(verbose=constants.verbosity.error, prefix = prefixException    , **kwdsPrintWrap)
+nTwarningT              = PrintWrap(verbose=constants.verbosity.warning, prefix = prefixWarning    , **kwdsPrintWrap)
+nTmessageT              = PrintWrap(verbose=constants.verbosity.output                             , **kwdsPrintWrap)
+nTdetailT               = PrintWrap(verbose=constants.verbosity.detail                             , **kwdsPrintWrap)
+nTdebugT                = PrintWrap(verbose=constants.verbosity.debug, prefix = prefixDebug        , **kwdsPrintWrap)
+nTmessageNoEOLT         = PrintWrap(verbose=constants.verbosity.output, noEOL=True                 , **kwdsPrintWrap)
 
 nTmessageList = ( #@UnusedVariable used in NTutils2
   nTnothing,  nTerror ,  nTcodeerror ,  nTexception ,  nTwarning ,  nTmessage ,  nTdetail ,  nTdebug,  nTmessageNoEOL,

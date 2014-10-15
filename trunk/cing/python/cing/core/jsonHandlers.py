@@ -10,7 +10,7 @@ import cing.Libs.NTutils as ntu
 import cing.Libs.Adict as adict
 
 from cing.Libs import disk
-from cing.core import project
+from cing.core import Project
 
 # set indent=4 as default
 jsonTools.set_encoder_options('json',indent=4)
@@ -77,7 +77,7 @@ class NTtreeJsonHandler(jsonTools.handlers.AnyDictHandler):
         for child in tree._children:
             if isinstance(child, pid.Pid) and \
                reference is not None and \
-               isinstance(reference, project.Project):
+               isinstance(reference, Project.Project):
                 childObj = pid.decodePid(reference, child)
             else:
                 childObj = child
@@ -124,19 +124,19 @@ class ProjectJsonHandler(jsonTools.handlers.AnyDictHandler):
         return data
 
     def restore(self, data):
-        p = project.Project(name=data['name'])
+        p = Project.Project(name=data['name'])
         return self._restore(data, p)
 #end class
-ProjectJsonHandler.handles(project.Project)
+ProjectJsonHandler.handles(Project.Project)
 
 
 class HistoryJsonHandler(jsonTools.handlers.AnyListHandler):
     """Handler for the History class
     """
     namespace = cing.constants.CING_KEY
-    cls = project.History
+    cls = Project.History
 #end class
-HistoryJsonHandler.handles(project.History)
+HistoryJsonHandler.handles(Project.History)
 
 
 class StatusDictJsonHandler(jsonTools.handlers.AnyDictHandler):
@@ -149,10 +149,10 @@ class StatusDictJsonHandler(jsonTools.handlers.AnyDictHandler):
         return self._flatten(obj, data)
 
     def restore(self, data):
-        a = project.StatusDict(data['key'])
+        a = Project.StatusDict(data['key'])
         return self._restore(data, a)
 #end class
-StatusDictJsonHandler.handles(project.StatusDict)
+StatusDictJsonHandler.handles(Project.StatusDict)
 
 
 class PathJsonHandler(jsonTools.handlers.BaseHandler):

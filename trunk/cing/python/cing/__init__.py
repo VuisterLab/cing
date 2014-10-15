@@ -3,68 +3,66 @@ CING: Common Interface for NMR structure Generation
 
 Directories:
 
+constants               CING constants, defenitions, parameters etc
 core                    CING API basics
 Database                Nomenclature database files
+Legacy                  CING to maintain backward compatibility
 Libs                    Library functionality including fast c code for cython.
+nosetest                Directory with nose testing routines
 PluginCode              Application specific code for e.g. validation programs.
 Scripts                 Loose pieces of python CING code.
 STAR                    Python API to STAR.
-Talos                   Contains the Talos data.
+
 
 Files:
 
 CONTENTS.txt            File with directory and file description.
-constants.py            File with constants definitions
-definitions.py          File with cing and system definitions
-localConstants.py       Settings that can be imported from python/cing/definitions.py
+localConstants.py       Settings that can be imported from python/cing/constants/definitions.py
                         NB this file is absent from svn. An example can be adapted
 main.py                 The CING program.
 setupCing.py            Run to set up environment variables and check installation.
-valSets.cfg             Validation settings. Might be moved around.
 
 """
-#-----------------------------------------------------------------------------
-# Imports
-#-----------------------------------------------------------------------------
 
-#import os
-#import sys
-
-#import cing.Libs.helper as helper
-#import cing.Libs.disk as disk
-from cing import constants
-import cing.definitions as cdefs
+import time
+import sys
 
 #-----------------------------------------------------------------------------
-# pydoc settings
+# pydoc settings; also used by the program
 #-----------------------------------------------------------------------------
-__version__         = cdefs.__version__
+__version__         =  '2.0.0'
 __revision__        = '$Revision$'
 __date__            = '$Date$'
-__copyright_years__ = cdefs.__copyright_years__
-__author__          = '$Author$'
-__copyright__       = cdefs.__copyright__
-__credits__         = cdefs.__credits__
+__author__          = 'Geerten Vuister'
+__copyright__       = 'Copyright (c) 2004-2014: Department of Biochemistry, University of Leicester, UK'
+__copyright_years__ = '2004-' + time.asctime().split()[-1] # never have to update this again
+__credits__         = 'More info at http://nmr.le.ac.uk'
+
+#-----------------------------------------------------------------------------
+# Cing Imports
+#-----------------------------------------------------------------------------
+
+from cing import constants
 
 #-----------------------------------------------------------------------------
 # Verbosity
 #-----------------------------------------------------------------------------
-verbosityNothing    = cdefs.verbosityNothing # Even errors will be suppressed
-verbosityError      = cdefs.verbosityError   # show only errors
-verbosityWarning    = cdefs.verbosityWarning # show errors and warnings
-verbosityOutput     = cdefs.verbosityOutput  # and regular output DEFAULT
-verbosityDetail     = cdefs.verbosityDetail  # show more details
-verbosityDebug      = cdefs.verbosityDebug   # add debugging info (not recommended for casual user)
-verbosityDefault    = cdefs.verbosityDefault
-from cing.definitions import verbosity
+# set verbosity to default
+verbosity = constants.verbosity.default
+###### legacy definitions Jurgen local override
+try:
+    from cing.localConstants import verbosity
+except:
+    pass
+#end try
 
 #-----------------------------------------------------------------------------
 # System and cing definitions
 #-----------------------------------------------------------------------------
-from cing.definitions import systemDefinitions
-from cing.definitions import cingDefinitions
-from cing.definitions import cingPaths
-from cing.definitions import directories
+from cing.constants.definitions import systemDefinitions
+from cing.constants.definitions import cingDefinitions
+from cing.constants.definitions import cingPaths
+from cing.constants.definitions import directories
 
 #-----------------------------------------------------------------------------
 # create tmp directory
@@ -87,8 +85,16 @@ except:
 #-----------------------------------------------------------------------------
 #starttime              = systemDefinitions.startTime
 #osType                 = systemDefinitions.osType
-ncpus                  = systemDefinitions.nCPU # use all if not specified by -c flag to main cing program.
-internetConnected      = systemDefinitions.internetConnected # Can be reset later when internet is up again
+verbosityNothing       = constants.verbosity.nothing # Even errors will be suppressed
+verbosityError         = constants.verbosity.error   # show only errors
+verbosityWarning       = constants.verbosity.warning # show errors and warnings
+verbosityOutput        = constants.verbosity.output  # and regular output DEFAULT
+verbosityDetail        = constants.verbosity.detail  # show more details
+verbosityDebug         = constants.verbosity.debug   # add debugging info (not recommended for casual user)
+verbosityDefault       = constants.verbosity.default
+
+ncpus                  = constants.system.nCPU # use all if not specified by -c flag to main cing program.
+internetConnected      = constants.system.internetConnected # Can be reset later when internet is up again
 
 programName            = cingDefinitions.programName
 cingVersion            = cingDefinitions.version
@@ -121,6 +127,40 @@ NaNstring              = constants.NaNstring
 ###### end legacy definitions
 #-----------------------------------------------------------------------------
 
+#-----------------------------------------------------------------------------
+# Adaptations. TODO: cleanup
+#-----------------------------------------------------------------------------
+for key in cingPaths.keys():
+    if cingPaths[ key ] == constants.PLEASE_ADD_EXECUTABLE_HERE:
+        cingPaths[ key ] = None
+
+if cingPaths.convert:
+    cingPaths[ 'montage' ] = cingPaths.convert.replace('convert','montage')
+
+# shiftx
+if systemDefinitions.osType == constants.OS_TYPE_LINUX and systemDefinitions.osArchitecture == '64bit':
+    cingPaths.shiftx = cingDefinitions.binPath / 'shiftx_linux64'
+elif systemDefinitions.osType == constants.OS_TYPE_LINUX and systemDefinitions.osArchitecture == '32bit':
+    cingPaths.shiftx = cingDefinitions.binPath / 'shiftx_linux'
+elif systemDefinitions.osType == constants.OS_TYPE_MAC:
+    cingPaths.shiftx = cingDefinitions.binPath / 'shiftx'
+else:
+    cingPaths.shiftx = None
+
+# x3dna
+if systemDefinitions.osType == constants.OS_TYPE_MAC:
+    cingPaths.x3dna = cingDefinitions.binPath / 'x3dna'
+else:
+    cingPaths.x3dna = None
+
+# molprobity
+if systemDefinitions.osType == constants.OS_TYPE_MAC:
+    cingPaths.MolProbity = cingDefinitions.binPath / 'molprobity'
+else:
+    cingPaths.MolProbity = None
+
+if cingPaths.classpath:
+    cingPaths.classpath = cingPaths.classpath.split(':')
 
 #---------------------------------------------------------------------------------------------
 # Define toplevel CING api
@@ -129,36 +169,22 @@ NaNstring              = constants.NaNstring
 # track imports well if not correct.
 #---------------------------------------------------------------------------------------------
 
-from cing.Libs.NTutils      import *               #TODO: ugly, need to be explicit
-from cing.Libs.AwkLike      import AwkLike
-from cing.Libs.Adict        import Adict
-from cing.Libs              import io
-
-plugins = Adict() # Filled  later-on
-
-from cing.core.classes      import Project
-from cing.core.classes      import Peak,              PeakList
-from cing.core.classes      import DistanceRestraint, DistanceRestraintList
-from cing.core.classes      import DihedralRestraint, DihedralRestraintList
-from cing.core.classes      import RDCRestraint,      RDCRestraintList
-
 #---------------------------------------------------------------------------------------------
 # functional imports: Order matters!
 #---------------------------------------------------------------------------------------------
 
-# Molecule
-from cing.core.molecule     import *             #TODO: ugly, need to be explicit
+from cing.Libs import Adict
 
 # Plugins
+plugins = Adict.Adict() # Filled  later-on
 from cing.core.importPlugin import importPlugins
 importPlugins()                                  # This imports all plugins
 
-# SML
-from cing.core.sml          import obj2sml       # This also initializes the SMLhandler methods
-from cing.core.sml          import sml2obj       # This also initializes the SMLhandler methods
+# initialize the SMLhandler methods
+__import__('cing.core.sml')
 
 # database
-from cing.core.database     import NTdb #@Reimport
+from cing.core.database     import NTdb
 NTdb._restoreFromSML()                          # This initializes the database
 
 # json handlers
@@ -173,22 +199,4 @@ from cing.main import getInfoMessage as gi
 from cing.Libs.io import formatDictItems as fd
 from cing.core.importPlugin import importPlugin
 
-# def openProject(name, status=constants.PROJECT_CREATE):
-#     """Top level convenience method to load a project
-#     return Project instance or None on error
-#     """
-#
-#     if status == constants.PROJECT_NEW or \
-#        status == constants.PROJECT_OLD or \
-#        status == constants.PROJECT_CREATE or \
-#        status == constants.PROJECT_NEWFROMCCPN or \
-#        status == constants.PROJECT_OLDFROMCCPN:
-#         project = Project.open(name, status)
-#         if project is None:
-#             io.error('openProject: opening {0} failed\n', name)
-#         return project
-#     else:
-#         io.error('openProject: invalid status {0}\n', status)
-#     #end if
-# #end def
 

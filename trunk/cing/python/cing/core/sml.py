@@ -1,12 +1,72 @@
+"""
+#DEPRECIATED
+SML routines and handlers for the different classes
+"""
+
+import os
+import sys
+
 from cing.Libs.Adict import Adict
 from cing.Libs.io import Time
-from cing.Libs.NTutils import * #@UnusedWildImport
+
+from cing.Libs import io
+
+#from cing.constants import * #@UnusedWildImport
+from cing import constants
+
+#from cing.Libs.NTutils import * #@UnusedWildImport
+from cing.Libs.NTutils import NTdict
+from cing.Libs.NTutils import NTtree
+from cing.Libs.NTutils import NTlist
+from cing.Libs.NTutils import NTvalue
+
+from cing.Libs.NTutils import nTerror
+from cing.Libs.NTutils import NTsort
+from cing.Libs.NTutils import nTcodeerror
+from cing.Libs.NTutils import nTwarning
+from cing.Libs.NTutils import nTmessage
+from cing.Libs.NTutils import nTdebug
+from cing.Libs.NTutils import nTfill
+from cing.Libs.NTutils import nTdetail
+from cing.Libs.NTutils import getDeepByKeys
+from cing.Libs.NTutils import getDeepByKeysOrAttributes
+from cing.Libs.NTutils import getDeepByKeysOrDefault
+from cing.Libs.NTutils2 import getCallerName
+
+from cing.Libs.fpconst import NaN
 from cing.Libs.fpconst import NaN as nan #@UnresolvedImport @UnusedImport ? need for restoring the project ?
 from cing.PluginCode.required.reqVasco import * #@UnusedWildImport
-from cing.core.classes import * #@UnusedWildImport
-from cing.constants import * #@UnusedWildImport
-from cing.core.database import * #@UnusedWildImport
-from cing.core.molecule import * #@UnusedWildImport
+
+#from cing.core.classes import * #@UnusedWildImport
+from cing.core.classes import History
+from cing.core.classes import Project
+from cing.core.classes import Peak
+from cing.core.classes import PeakList
+from cing.core.classes import DistanceRestraint
+from cing.core.classes import DistanceRestraintList
+from cing.core.classes import DihedralRestraint
+from cing.core.classes import DihedralRestraintList
+from cing.core.classes import RDCRestraint
+from cing.core.classes import RDCRestraintList
+
+#from cing.core.database import * #@UnusedWildImport
+from cing.core.database import MolDef
+from cing.core.database import ResidueDef
+from cing.core.database import AtomDef
+from cing.core.database import DihedralDef
+
+from cing.core.database import isNterminalAtom
+from cing.core.database import isCterminalAtom
+
+#from cing.core.molecule import * #@UnusedWildImport
+from cing.core.molecule import Molecule
+from cing.core.molecule import Chain
+from cing.core.molecule import Residue
+from cing.core.molecule import Atom
+from cing.core.molecule import Resonance
+from cing.core.molecule import ResonanceList
+from cing.core.molecule import Coordinate   # used for restoring
+
 
 SMLstarthandlers = {}
 SMLendhandlers   = {}
@@ -20,7 +80,7 @@ SMLversion       = 0.25
 #  0.23: Molecule saves Nterminal, Cterminal in _sequence list
 #  0.24: ResidueDef initial string changes
 
-SMLsaveFormat  = 'INTERNAL_0'
+SMLsaveFormat  = constants.INTERNAL_0
 SMLfileVersion = None
 
 class SmlFile(file):
@@ -82,8 +142,8 @@ Example file:
     debug = False
 
     def __init__(self, name):
-        self.startTag = sprintf('<%s>', name)
-        self.endTag   = sprintf('</%s>', name)
+        self.startTag = io.sprintf('<%s>', name)
+        self.endTag   = io.sprintf('</%s>', name)
         self.name     = name
 
         SMLstarthandlers[self.startTag] = self
@@ -92,7 +152,7 @@ Example file:
 #        print self._className()
 
     def __str__(self):
-        return sprintf('<SMLhandler %s>', self.name )
+        return io.sprintf('<SMLhandler %s>', self.name )
 
 #    def _className(self):
 #        return str(self.__class__)[7:-2].split('.')[-1:][0]
@@ -241,9 +301,9 @@ Example file:
         This method should be subclassed to fit specific needs in the actual class.
         Should return obj or None on error
         """
-        fprintf( fp, '%s\n', self.startTag )
+        io.fprintf( fp, '%s\n', self.startTag )
         # code should be here
-        fprintf( fp, '%s\n', self.endTag )
+        io.fprintf( fp, '%s\n', self.endTag )
         return obj
     #end def
 
@@ -252,11 +312,11 @@ Example file:
         Write element of theList to fp for restoring later with fromFile method
         Returns theList or None on error.
         """
-        fprintf( fp, '%s %s %s\n', self.startTag, theList.name, theList.status )
+        io.fprintf( fp, '%s %s %s\n', self.startTag, theList.name, theList.status )
         for item in theList:
             item.SMLhandler.toSML( item, fp )
         #end for
-        fprintf( fp, '%s\n', self.endTag )
+        io.fprintf( fp, '%s\n', self.endTag )
         return theList
     #end def
 
@@ -273,8 +333,8 @@ Example file:
         #print '>', result, '<'
         # Much quicker then previous NTlist stuff!
         if SMLhandler.debug:
-#            s = sprintf('%s l:%d> %s\n', SMLfileVersion, fp.NR, [line]+line.split())
-            s = sprintf('%s l:%d> %s', SMLfileVersion, fp.NR, line)
+#            s = io.sprintf('%s l:%d> %s\n', SMLfileVersion, fp.NR, [line]+line.split())
+            s = io.sprintf('%s l:%d> %s', SMLfileVersion, fp.NR, line)
             nTmessage(s)
         return [line]+line.split()
     #end def
@@ -316,7 +376,7 @@ Example file:
             nTerror('SMLhandle.toFile: opening "%s"\n', fileName)
             return None
         #end if
-        fprintf( fp, '%s %s\n', smlhandler.startTag, SMLversion )
+        io.fprintf( fp, '%s %s\n', smlhandler.startTag, SMLversion )
 
         if not hasattr(object,'SMLhandler'):
             nTerror('SMLHandler.toFile: object "%s" without SMLhandler method', object)
@@ -324,7 +384,7 @@ Example file:
             return None
 
         object.SMLhandler.toSML( object, fp, **kwds )
-        fprintf( fp, '%s\n', smlhandler.endTag )
+        io.fprintf( fp, '%s\n', smlhandler.endTag )
 
 #        nTdebug('saved %s to "%s"', object, fileName ) # JFD adds; it's a duplicate of the nTdetail message.
         #end if
@@ -387,10 +447,10 @@ class SMLAnyDictHandler( SMLhandler ):
         Returns theDict or None on error.
         """
 #        nTdebug("Now in SMLAnyDictHandler#toSML" )
-        fprintf( stream, '%s\n', self.startTag )
+        io.fprintf( stream, '%s\n', self.startTag )
         for key,value in dictObj.iteritems():
             #print '>>', key, value
-            fprintf( stream, '%s = ', key )
+            io.fprintf( stream, '%s = ', key )
             if key in self._encodeKeys:
                 if value != None and hasattr(value,'asPid') and value.asPid != None:
                     val = value.asPid()
@@ -398,14 +458,14 @@ class SMLAnyDictHandler( SMLhandler ):
                     nTerror('SMLAnyDictHandler.toSML: cannot encode value "%s" of key "%s"', value, key)
                     val = value
                 #end if
-                fprintf( stream, '%r\n', val )
+                io.fprintf( stream, '%r\n', val )
             elif hasattr(value,'SMLhandler') and value.SMLhandler != None:
                 value.SMLhandler.toSML( value, stream, *args, **kwds )
             else:
-                fprintf( stream, '%r\n', value )
+                io.fprintf( stream, '%r\n', value )
             #end if
         #end for
-        fprintf( stream, '%s\n', self.endTag )
+        io.fprintf( stream, '%s\n', self.endTag )
         return dictObj
     #end def
 #end class
@@ -427,15 +487,15 @@ class SMLNTlistHandler( SMLhandler ):
         Write element of theList to stream for restoring later with fromFile method
         Returns theList or None on error.
         """
-        fprintf( stream, '%s\n', self.startTag )
+        io.fprintf( stream, '%s\n', self.startTag )
         for item in theList:
             if hasattr(item,'SMLhandler') and item.SMLhandler != None:
                 item.SMLhandler.toSML( item, stream, *args, **kwds )
             else:
-                fprintf( stream, '%r\n', item )
+                io.fprintf( stream, '%r\n', item )
             #end if
         #end for
-        fprintf( stream, '%s\n', self.endTag )
+        io.fprintf( stream, '%s\n', self.endTag )
         return theList
     #end def
 #end class
@@ -460,16 +520,16 @@ class SMLNTdictHandler( SMLhandler ):
         Returns theDict or None on error.
         """
 #        nTdebug("Now in SMLAdictHandler#toSML" )
-        fprintf( stream, '%s\n', self.startTag )
+        io.fprintf( stream, '%s\n', self.startTag )
         for key,value in theDict.iteritems():
-            fprintf( stream, '%s = ', key )
+            io.fprintf( stream, '%s = ', key )
             if hasattr(value,'SMLhandler') and value.SMLhandler != None:
                 value.SMLhandler.toSML( value, stream, *args, **kwds )
             else:
-                fprintf( stream, '%r\n', value )
+                io.fprintf( stream, '%r\n', value )
             #end if
         #end for
-        fprintf( stream, '%s\n', self.endTag )
+        io.fprintf( stream, '%s\n', self.endTag )
         return theDict
     #end def
 #end class
@@ -494,16 +554,16 @@ class SMLAdictHandler( SMLhandler ):
         Returns theDict or None on error.
         """
 #        nTdebug("Now in SMLAdictHandler#toSML" )
-        fprintf( stream, '%s\n', self.startTag )
+        io.fprintf( stream, '%s\n', self.startTag )
         for key,value in theDict.iteritems():
-            fprintf( stream, '%s = ', key )
+            io.fprintf( stream, '%s = ', key )
             if hasattr(value,'SMLhandler') and value.SMLhandler != None:
                 value.SMLhandler.toSML( value, stream, *args, **kwds )
             else:
-                fprintf( stream, '%r\n', value )
+                io.fprintf( stream, '%r\n', value )
             #end if
         #end for
-        fprintf( stream, '%s\n', self.endTag )
+        io.fprintf( stream, '%s\n', self.endTag )
         return theDict
     #end def
 #end class
@@ -518,7 +578,7 @@ class SMLNTvalueHandler( SMLhandler ):
     #end def
 
     def handle(self, line, fp, obj=None):
-        nTdebug("Now in %s#handle at line: %s" % (getCallerName(), str(line)))
+        #nTdebug("Now in %s#handle at line: %s" % (getCallerName(), str(line)))
         dictObj = NTvalue(NaN)
         return self.dictHandler(dictObj, fp, obj)
     #end def
@@ -528,17 +588,17 @@ class SMLNTvalueHandler( SMLhandler ):
         Write key value pairs of theDict to stream for restoring later with fromFile method
         Returns theDict or None on error.
         """
-#        fprintf( stream, '%s\n', self.startTag )
+#        io.fprintf( stream, '%s\n', self.startTag )
 #        for key,value in theDict.iteritems():
-#            fprintf( stream, '%s = ', key )
+#            io.fprintf( stream, '%s = ', key )
 #            if hasattr(value,'SMLhandler') and value.SMLhandler != None:
 #                value.SMLhandler.toSML( value, stream, *args, **kwds )
 #            else:
-#                fprintf( stream, '%r\n', value )
+#                io.fprintf( stream, '%r\n', value )
 #            #end if
 #        #end for
-#        fprintf( stream, '%s\n', self.endTag )
-        fprintf( stream, '%r\n', theDict )
+#        io.fprintf( stream, '%s\n', self.endTag )
+        io.fprintf( stream, '%r\n', theDict )
         return theDict
     #end def
 #end class
@@ -560,10 +620,10 @@ class SMLHistoryHandler( SMLhandler ):
     #end def
 
     def toSML(self, h, fp):
-        fprintf( fp, '%s\n', self.startTag )
+        io.fprintf( fp, '%s\n', self.startTag )
         for item in h:
-            fprintf( fp, '%r\n', item )
-        fprintf( fp, '%s\n', self.endTag )
+            io.fprintf( fp, '%r\n', item )
+        io.fprintf( fp, '%s\n', self.endTag )
     #end def
 #end class
 History.SMLhandler = SMLHistoryHandler()
@@ -653,7 +713,7 @@ class SMLMoleculeHandler( SMLhandler ):
                                     res.Nterminal,
                                     res.Cterminal,
                                     SMLsaveFormat ) )
-        fprintf( stream, "%s  %r\n", self.startTag, mol.nameTuple(SMLsaveFormat) )
+        io.fprintf( stream, "%s  %r\n", self.startTag, mol.nameTuple(SMLsaveFormat) )
 #       Can add attributes here; update endHandler if needed
         exportAttributeList = 'modelCount ranges archive_id'.split()
         for a in exportAttributeList:
@@ -661,16 +721,16 @@ class SMLMoleculeHandler( SMLhandler ):
                 nTcodeerror('In %s' % getCallerName())
                 continue
             # end if
-            fprintf( stream, '%s = %r\n', a, mol[a] )
+            io.fprintf( stream, '%s = %r\n', a, mol[a] )
         #end for
         exportAttributeList = '_sequence chains resonanceSources bmrbEntryList pdbEntryList'.split()
         for exportAttribute in exportAttributeList:
 #            nTdebug("Exporting molecule's %s" % exportAttribute)
-            fprintf( stream, '%s = ' % exportAttribute)
+            io.fprintf( stream, '%s = ' % exportAttribute)
             exportObject = mol[ exportAttribute ]
             exportObject.toSML( stream )
         # end for
-        fprintf( stream, "%s\n", self.endTag )
+        io.fprintf( stream, "%s\n", self.endTag )
     #end def
 #end class
 #register this handler
@@ -713,16 +773,16 @@ class SMLChainHandler( SMLhandler ):
         Write SML code for chain to stream
         """
         # print value, error, model ontag line to speed up parsing and initialization
-        fprintf( stream, "%s  %r\n", self.startTag, chain.nameTuple(SMLsaveFormat) )
+        io.fprintf( stream, "%s  %r\n", self.startTag, chain.nameTuple(SMLsaveFormat) )
 #       Can add attributes here; update endHandler if needed
         for a in []:
-            fprintf( stream, '%s = %r\n', a, chain[a] )
+            io.fprintf( stream, '%s = %r\n', a, chain[a] )
         #end for
 
-        fprintf( stream, 'residues = ')
+        io.fprintf( stream, 'residues = ')
         chain.residues.toSML( stream )
 
-        fprintf( stream, "%s\n", self.endTag )
+        io.fprintf( stream, "%s\n", self.endTag )
     #end def
 #end class
 #register this handler
@@ -761,16 +821,16 @@ class SMLResidueHandler( SMLhandler ):
         """
         Write SML code for residue to stream
         """
-        fprintf( stream, "%s  %r\n", self.startTag, res.nameTuple(SMLsaveFormat) )
+        io.fprintf( stream, "%s  %r\n", self.startTag, res.nameTuple(SMLsaveFormat) )
 #       Can add attributes here; update endHandler if needed
         for a in []:
-            fprintf( stream, '%s = %r\n', a, res[a] )
+            io.fprintf( stream, '%s = %r\n', a, res[a] )
         #end for
 
-        fprintf( stream, 'atoms = ')
+        io.fprintf( stream, 'atoms = ')
         res.atoms.toSML( stream )
 
-        fprintf( stream, "%s\n", self.endTag )
+        io.fprintf( stream, "%s\n", self.endTag )
     #end def
 #end class
 #register this handler
@@ -809,7 +869,7 @@ class SMLAtomHandler( SMLhandler ):
             aDef = res.db.getAtomDefByName(nameTuple[3], convention=nameTuple[6])
             if aDef:
                 if (   (not res.Nterminal and isNterminalAtom(aDef))
-                    or (res.Nterminal and aDef.translate(INTERNAL_0) == 'HN')
+                    or (res.Nterminal and aDef.translate(constants.INTERNAL_0) == 'HN')
                     or (not res.Cterminal and isCterminalAtom(aDef))
                    ):
 #                    nTdebug('SMLAtomHandler.handle: line %d, skipping terminal atom: %s', fp.NR, str(nameTuple))
@@ -844,29 +904,29 @@ class SMLAtomHandler( SMLhandler ):
         """
         Write SML code for atom to stream
         """
-        fprintf( stream, "%s  %r\n", self.startTag, atm.nameTuple(SMLsaveFormat) )
+        io.fprintf( stream, "%s  %r\n", self.startTag, atm.nameTuple(SMLsaveFormat) )
 #       Can add attributes here; update endHandler if needed
 #version >=1.01: diabled as shiftx data are now in separate sml file
 #        for a in ['shiftx']:
 #            if atm.has_key(a):
-#                fprintf( stream, '%s = %r\n', a, atm[a] )
+#                io.fprintf( stream, '%s = %r\n', a, atm[a] )
 #        #end for
 
         # coordinates; only write when present
         if len(atm.coordinates) > 0:
-            fprintf(stream,"coordinates = ")
+            io.fprintf(stream,"coordinates = ")
             atm.coordinates.toSML( stream )
         # resonances; only write when present
         if len(atm.resonances) > 0:
-            fprintf(stream,"resonances = ")
+            io.fprintf(stream,"resonances = ")
             atm.resonances.toSML( stream )
 
         # Minimize the number of lines by not outputting the default values
         if atm.stereoAssigned:
-            fprintf( stream, 'stereoAssigned = True\n' )
+            io.fprintf( stream, 'stereoAssigned = True\n' )
         #end if
 
-        fprintf( stream, "%s\n", self.endTag )
+        io.fprintf( stream, "%s\n", self.endTag )
     #end def
 #end class
 #register this handler
@@ -913,25 +973,25 @@ Atom.SMLhandler = SMLAtomHandler()
 #        """
 #            For coordinate
 #        """
-##        fprintf( stream, "%s\n", self.startTag)
+##        io.fprintf( stream, "%s\n", self.startTag)
 ##        for a in ['x','y','z','Bfac','occupancy','model']:
-##            fprintf( stream, '%s = %s\n', a, repr(c[a]) )
+##            io.fprintf( stream, '%s = %s\n', a, repr(c[a]) )
 ##        #end for
 #
 #        # print x,y,z,Bfac,occupancy, model ontag line to speed up parsing and initialization
-#        fprintf( stream, "%s %.3f %.3f %.3f %.3f %.3f %d\n",
+#        io.fprintf( stream, "%s %.3f %.3f %.3f %.3f %.3f %d\n",
 #                         self.startTag,
 #                         c.e[0], c.e[1], c.e[2],
 #                         c.Bfac, c.occupancy,
 #                         c.model
 #               )
-#        fprintf( stream, '%s\n', repr( c.atom.nameTuple(SMLsaveFormat) ) )
+#        io.fprintf( stream, '%s\n', repr( c.atom.nameTuple(SMLsaveFormat) ) )
 ##        Can add attributes here; update handle
 ##        for a in ['model']:
-##            fprintf( stream, '%s = %s\n', a, repr(c[a]) )
+##            io.fprintf( stream, '%s = %s\n', a, repr(c[a]) )
 #        #end for
 #
-#        fprintf( stream, "%s\n", self.endTag )
+#        io.fprintf( stream, "%s\n", self.endTag )
 #    #end def
 ##end class
 #Coordinate.SMLhandler = SMLCoordinateHandler()
@@ -1004,20 +1064,20 @@ class SMLPeakHandler( SMLhandler ):
         """
         Version 0.22: Use the encode for resonances
         """
-        fprintf( fp, '%s  %d  %d\n', self.startTag, peak.dimension, peak.peakIndex )
+        io.fprintf( fp, '%s  %d  %d\n', self.startTag, peak.dimension, peak.peakIndex )
         for a in ['positions']:
-            fprintf( fp, '    %-15s = %r\n', a, peak[a] )
+            io.fprintf( fp, '    %-15s = %r\n', a, peak[a] )
         #end for
 
         # special cases
         for a in ['height','volume']:
-            fprintf( fp, '    %-15s = %r\n', a, peak[a].toTuple() )
+            io.fprintf( fp, '    %-15s = %r\n', a, peak[a].toTuple() )
         #end for
         if peak.has_key('xeasyIndex'):
-            fprintf( fp, '    %-15s = %r\n', 'xeasyIndex', peak['xeasyIndex'] )
+            io.fprintf( fp, '    %-15s = %r\n', 'xeasyIndex', peak['xeasyIndex'] )
         # Resonances
-        fprintf( fp, '    %-15s = %r\n', 'resonances', encode( peak.resonances ))
-        fprintf( fp, '%s\n', self.endTag )
+        io.fprintf( fp, '    %-15s = %r\n', 'resonances', encode( peak.resonances ))
+        io.fprintf( fp, '%s\n', self.endTag )
     #end def
 
 #end class
@@ -1046,7 +1106,7 @@ PeakList.SMLhandler = SMLPeakListHandler()
 class SMLDistanceRestraintHandler( SMLhandler ):
 
     def __init__(self):
-        SMLhandler.__init__( self, name = DR_LEVEL )
+        SMLhandler.__init__( self, name = constants.DR_LEVEL )
     #end def
 
     def handle(self, line, fp, project=None):
@@ -1082,17 +1142,17 @@ class SMLDistanceRestraintHandler( SMLhandler ):
         """
             For DistanceRestraint
         """
-        fprintf( stream, "%s\n", self.startTag )
+        io.fprintf( stream, "%s\n", self.startTag )
         for a in ['lower','upper' ]:
-            fprintf( stream, '    %-15s = %s\n', a, repr(dr[a]) )
+            io.fprintf( stream, '    %-15s = %s\n', a, repr(dr[a]) )
         #end for
 
         rl = []
         for r in dr.atomPairs:
             rl.append((r[0].nameTuple(SMLsaveFormat),r[1].nameTuple(SMLsaveFormat)))
         #end for
-        fprintf( stream, '    %-15s = %s\n', 'atomPairs', repr( rl ) )
-        fprintf( stream, "%s\n", self.endTag )
+        io.fprintf( stream, '    %-15s = %s\n', 'atomPairs', repr( rl ) )
+        io.fprintf( stream, "%s\n", self.endTag )
     #end def
 #end class
 DistanceRestraint.SMLhandler = SMLDistanceRestraintHandler()
@@ -1122,7 +1182,7 @@ DistanceRestraintList.SMLhandler = SMLDistanceRestraintListHandler()
 class SMLDihedralRestraintHandler( SMLhandler ):
 
     def __init__(self):
-        SMLhandler.__init__( self, name = AC_LEVEL )
+        SMLhandler.__init__( self, name = constants.AC_LEVEL )
     #end def
 
     def handle(self, line, fp, project=None):
@@ -1144,13 +1204,13 @@ class SMLDihedralRestraintHandler( SMLhandler ):
     def toSML(self, dr, stream ):
         """
         """
-        fprintf( stream, "%s\n", self.startTag )
+        io.fprintf( stream, "%s\n", self.startTag )
         for a in ['lower','upper' ]:
-            fprintf( stream, '    %-15s = %s\n', a, repr(dr[a]) )
+            io.fprintf( stream, '    %-15s = %s\n', a, repr(dr[a]) )
         #end for
-        fprintf( stream, '    %-15s = %s\n', 'atoms', repr(encode(dr.atoms)) )
+        io.fprintf( stream, '    %-15s = %s\n', 'atoms', repr(encode(dr.atoms)) )
 
-        fprintf( stream, "%s\n", self.endTag )
+        io.fprintf( stream, "%s\n", self.endTag )
     #end def
 #end class
 DihedralRestraint.SMLhandler = SMLDihedralRestraintHandler()
@@ -1179,7 +1239,7 @@ DihedralRestraintList.SMLhandler = SMLDihedralRestraintListHandler()
 class SMLRDCRestraintHandler( SMLhandler ):
 
     def __init__(self):
-        SMLhandler.__init__( self, name = RDC_LEVEL )
+        SMLhandler.__init__( self, name = constants.RDC_LEVEL )
     #end def
 
     def handle(self, line, fp, project=None):
@@ -1215,17 +1275,17 @@ class SMLRDCRestraintHandler( SMLhandler ):
         """
             For RDCRestraint (based on DistanceRestraint)
         """
-        fprintf( stream, "%s\n", self.startTag )
+        io.fprintf( stream, "%s\n", self.startTag )
         for a in ['lower','upper' ]:
-            fprintf( stream, '    %-15s = %s\n', a, repr(dr[a]) )
+            io.fprintf( stream, '    %-15s = %s\n', a, repr(dr[a]) )
         #end for
 
         rl = []
         for r in dr.atomPairs:
             rl.append((r[0].nameTuple(SMLsaveFormat),r[1].nameTuple(SMLsaveFormat)))
         #end for
-        fprintf( stream, '    %-15s = %s\n', 'atomPairs', repr( rl ) )
-        fprintf( stream, "%s\n", self.endTag )
+        io.fprintf( stream, '    %-15s = %s\n', 'atomPairs', repr( rl ) )
+        io.fprintf( stream, "%s\n", self.endTag )
     #end def
 #end class
 RDCRestraint.SMLhandler = SMLRDCRestraintHandler()
@@ -1269,11 +1329,11 @@ RDCRestraintList.SMLhandler = SMLRDCRestraintListHandler()
 #            For Resonance (based on DistanceRestraint)
 #        """
 ##        pass
-#        fprintf( stream, "%s\n", self.startTag )
+#        io.fprintf( stream, "%s\n", self.startTag )
 #        for a in ['value' ]:
-#            fprintf( stream, '    %-15s = %s\n', a, repr(r[a]) )
+#            io.fprintf( stream, '    %-15s = %s\n', a, repr(r[a]) )
 #        #end for
-#        fprintf( stream, "%s\n", self.endTag )
+#        io.fprintf( stream, "%s\n", self.endTag )
 #    #end def
 ##end class
 #Resonance.SMLhandler = SMLResonanceHandler()
@@ -1318,7 +1378,7 @@ class SMLNTListWithAttrHandler( SMLhandler ):
 
     def toSML(self, rl, fp):
         'This list will be encapsulated in a dictionary so the additional attributes can be saved.'
-        fprintf( fp, '%s\n', self.startTag )
+        io.fprintf( fp, '%s\n', self.startTag )
 
         # Build customary dictionary as top object to save.
         theDict = NTdict()
@@ -1332,14 +1392,14 @@ class SMLNTListWithAttrHandler( SMLhandler ):
 
         # save it regardless of content.
         for key,value in theDict.iteritems():
-            fprintf( fp, '%s = ', key )
+            io.fprintf( fp, '%s = ', key )
             if hasattr(value,'SMLhandler') and value.SMLhandler != None:
                 value.SMLhandler.toSML( value, fp )
             else:
-                fprintf( fp, '%r\n', value )
+                io.fprintf( fp, '%r\n', value )
             #end if
         #end for
-        fprintf( fp, '%s\n', self.endTag )
+        io.fprintf( fp, '%s\n', self.endTag )
         return rl
     #end def
 #end class
@@ -1352,7 +1412,7 @@ ResonanceList.SMLhandler.SML_SAVE_ATTRIBUTE_LIST = ResonanceList.SML_SAVE_ATTRIB
 class SMLCoplanarHandler( SMLhandler ):
 
     def __init__(self):
-        SMLhandler.__init__( self, name = COPLANAR_LEVEL )
+        SMLhandler.__init__( self, name = constants.COPLANAR_LEVEL )
     #end def
 
     def handle(self, line, fp, project=None):
@@ -1419,9 +1479,9 @@ class SMLResidueDefHandler( SMLhandler ):
                 self.jumpToEndTag(fp)
                 return None
             #end if
-#            if line[4] != INTERNAL:
+#            if line[4] != constants.INTERNAL:
 #                nTerror('SMLResidueDefHandler.handle: file "%s" line %d, convention "%s" differs from current (%s)',
-#                        fp.name, fp.NR, line[4], INTERNAL)
+#                        fp.name, fp.NR, line[4], constants.INTERNAL)
 #                self.jumpToEndTag(fp)
 #                return None
 #            #end if
@@ -1451,17 +1511,17 @@ class SMLResidueDefHandler( SMLhandler ):
     # W0221 Arguments number differs from overridden method
     # W0222 Signature differs from overridden method
     # pylint: disable=W0221,W0222
-    def toSML(self, resDef, stream = sys.stdout, convention = INTERNAL  ):
+    def toSML(self, resDef, stream = sys.stdout, convention = constants.INTERNAL  ):
         """Store resDef in SML format
         """
-        fprintf( stream, '\n#=======================================================================\n')
-        fprintf( stream,   '#%s \t%-8s %-8s\n', ' '*len(self.startTag), 'name', 'convention')
-        fprintf( stream,   '%s  \t%-8s %-8s\n', self.startTag, resDef.translate(convention), convention)
-        fprintf( stream,   '#=======================================================================\n')
+        io.fprintf( stream, '\n#=======================================================================\n')
+        io.fprintf( stream,   '#%s \t%-8s %-8s\n', ' '*len(self.startTag), 'name', 'convention')
+        io.fprintf( stream,   '%s  \t%-8s %-8s\n', self.startTag, resDef.translate(convention), convention)
+        io.fprintf( stream,   '#=======================================================================\n')
 
         # saving different residue attributes
         for attr in ['commonName','shortName','comment','nameDict']:
-            fprintf( stream, "\t%-10s = %r\n", attr, resDef[attr] )
+            io.fprintf( stream, "\t%-10s = %r\n", attr, resDef[attr] )
         #end for
 
         # clean the properties list
@@ -1472,20 +1532,20 @@ class SMLResidueDefHandler( SMLhandler ):
                 props.append(prop)
             #end if
         #end for
-        fprintf( stream, "\t%-10s = %r\n", 'properties', props )
+        io.fprintf( stream, "\t%-10s = %r\n", 'properties', props )
 
-        fprintf( stream, "\n\t%-10s = %s\n", 'dihedrals', '<NTlist>') # for readability (tabs), write it explicitly
+        io.fprintf( stream, "\n\t%-10s = %s\n", 'dihedrals', '<NTlist>') # for readability (tabs), write it explicitly
         for d in resDef.dihedrals:
             d.SMLhandler.toSML( d, stream, convention=convention )
-        fprintf( stream, "\t%s\n", '</NTlist>')
+        io.fprintf( stream, "\t%s\n", '</NTlist>')
 
-        fprintf( stream, "\n\t%-10s = %s\n", 'atoms', '<NTlist>') # for readability (tabs), write it explicitly
+        io.fprintf( stream, "\n\t%-10s = %s\n", 'atoms', '<NTlist>') # for readability (tabs), write it explicitly
         for a in resDef.atoms:
             a.SMLhandler.toSML( a, stream, convention=convention )
-        fprintf( stream, "\t%s\n", '</NTlist>')
+        io.fprintf( stream, "\t%s\n", '</NTlist>')
 
-        fprintf( stream,   '%s\n', self.endTag)
-        fprintf( stream,   '#=======================================================================\n')
+        io.fprintf( stream,   '%s\n', self.endTag)
+        io.fprintf( stream,   '#=======================================================================\n')
     #end def
 #end class
 ResidueDef.SMLhandler = SMLResidueDefHandler()
@@ -1519,15 +1579,15 @@ class SMLDihedralDefHandler( SMLhandler ):
     # W0221 Arguments number differs from overridden method
     # W0222 Signature differs from overridden method
     # pylint: disable=W0221,W0222
-    def toSML(self, dihedDef, stream = sys.stdout, convention = INTERNAL  ):
+    def toSML(self, dihedDef, stream = sys.stdout, convention = constants.INTERNAL  ):
         """Store dihedDef in SML format
         """
         #print '>', convention
-        fprintf( stream, '\t#---------------------------------------------------------------\n')
-        fprintf( stream, '\t%s %-8s\n', self.startTag, dihedDef.name)
-        fprintf( stream, '\t#---------------------------------------------------------------\n')
+        io.fprintf( stream, '\t#---------------------------------------------------------------\n')
+        io.fprintf( stream, '\t%s %-8s\n', self.startTag, dihedDef.name)
+        io.fprintf( stream, '\t#---------------------------------------------------------------\n')
 
-        if convention == INTERNAL:
+        if convention == constants.INTERNAL:
             atms = dihedDef.atoms
         else:
             # convert atoms
@@ -1546,13 +1606,13 @@ class SMLDihedralDefHandler( SMLhandler ):
             #end for
             #print 'atms', atms
         #end if
-        fprintf( stream, "\t\t%-8s = %r\n", 'atoms', atms )
+        io.fprintf( stream, "\t\t%-8s = %r\n", 'atoms', atms )
 
         for attr in ['karplus']:
-            fprintf( stream, "\t\t%-8s = %r\n", attr, dihedDef[attr] )
+            io.fprintf( stream, "\t\t%-8s = %r\n", attr, dihedDef[attr] )
         #end for
 
-        fprintf( stream, '\t%s\n', self.endTag)
+        io.fprintf( stream, '\t%s\n', self.endTag)
     #end def
 #end class
 DihedralDef.SMLhandler = SMLDihedralDefHandler()
@@ -1586,16 +1646,16 @@ class SMLAtomDefHandler( SMLhandler ):
     # W0221 Arguments number differs from overridden method
     # W0222 Signature differs from overridden method
     # pylint: disable=W0221,W0222
-    def toSML(self, atmDef, stream = sys.stdout, convention = INTERNAL  ):
+    def toSML(self, atmDef, stream = sys.stdout, convention = constants.INTERNAL  ):
         """Store dihedDef in SML format
         """
         #print '>', convention
-        fprintf( stream, '\t#---------------------------------------------------------------\n')
-        fprintf( stream, '\t%s %-8s\n', self.startTag, atmDef.translate(convention) )
-        fprintf( stream, '\t#---------------------------------------------------------------\n')
+        io.fprintf( stream, '\t#---------------------------------------------------------------\n')
+        io.fprintf( stream, '\t%s %-8s\n', self.startTag, atmDef.translate(convention) )
+        io.fprintf( stream, '\t#---------------------------------------------------------------\n')
 
         # Topology; optionally convert
-        if convention == INTERNAL:
+        if convention == constants.INTERNAL:
             top2 = atmDef.topology
         else:
             # convert topology
@@ -1614,10 +1674,10 @@ class SMLAtomDefHandler( SMLhandler ):
             #end for
             #print 'top2', top2
         #end if
-        fprintf( stream, "\t\t%-10s = %r\n", 'topology', top2 )
+        io.fprintf( stream, "\t\t%-10s = %r\n", 'topology', top2 )
 
         # real; optionally convert
-        if convention == INTERNAL or len(atmDef.real) == 0:
+        if convention == constants.INTERNAL or len(atmDef.real) == 0:
             real2 = atmDef.real
         else:
             real2 = []
@@ -1630,10 +1690,10 @@ class SMLAtomDefHandler( SMLhandler ):
                 #end if
             #end for
         #end if
-        fprintf( stream, "\t\t%-10s = %r\n", 'real', real2 )
+        io.fprintf( stream, "\t\t%-10s = %r\n", 'real', real2 )
 
         # pseudo; optionally convert
-        if convention == INTERNAL or atmDef.pseudo == None:
+        if convention == constants.INTERNAL or atmDef.pseudo == None:
             pseudo2 = atmDef.pseudo
         else:
             pseudo2 = None
@@ -1644,12 +1704,12 @@ class SMLAtomDefHandler( SMLhandler ):
                 pseudo2 = adef.translate( convention )
             #end for
         #end if
-        fprintf( stream, "\t\t%-10s = %r\n", 'pseudo', pseudo2 )
+        io.fprintf( stream, "\t\t%-10s = %r\n", 'pseudo', pseudo2 )
 
         # Others
         for attr in ['nameDict','aliases','type','spinType','shift','hetatm']:
             if atmDef.has_key(attr):
-                fprintf( stream, "\t\t%-10s = %r\n", attr, atmDef[attr] )
+                io.fprintf( stream, "\t\t%-10s = %r\n", attr, atmDef[attr] )
         #end for
 
         # clean the properties list
@@ -1660,9 +1720,9 @@ class SMLAtomDefHandler( SMLhandler ):
                 props.append(prop)
             #end if
         #end for
-        fprintf( stream, "\t\t%-10s = %r\n", 'properties', props )
+        io.fprintf( stream, "\t\t%-10s = %r\n", 'properties', props )
 
-        fprintf( stream, '\t%s\n', self.endTag)
+        io.fprintf( stream, '\t%s\n', self.endTag)
     #end def
 #end class
 AtomDef.SMLhandler = SMLAtomDefHandler()

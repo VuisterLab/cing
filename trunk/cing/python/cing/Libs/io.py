@@ -42,7 +42,7 @@ def message(fmt, *args, **kwds):
      """Output to stdout depending on verbosity level
        (defined as in cing)
      """
-     if cing.verbosity >= cing.verbosityOutput:
+     if cing.verbosity >= cing.constants.verbosity.output:
          sys.stdout.write(fmt.format(*args, **kwds))
 #end def
 
@@ -51,7 +51,7 @@ def warning(fmt, *args, **kwds):
      """Output stderr depending on verbosity level
        (defined as in cing)
      """
-     if cing.verbosity >= cing.verbosityWarning:
+     if cing.verbosity >= cing.constants.verbosity.warning:
          sys.stdout.write('WARNING: ' + fmt.format(*args, **kwds))
 #end def
 
@@ -60,7 +60,7 @@ def error(fmt, *args, **kwds):
      """Output stderr depending on verbosity level
        (defined as in cing)
      """
-     if cing.verbosity >= cing.verbosityError:
+     if cing.verbosity >= cing.constants.verbosity.error:
          sys.stderr.write('ERROR: ' + fmt.format(*args, **kwds))
 #end def
 
@@ -69,7 +69,7 @@ def debug(fmt, *args, **kwds):
      """Output stderr depending on verbosity level
        (defined as in cing)
      """
-     if cing.verbosity >= cing.verbosityDebug:
+     if cing.verbosity >= cing.constants.verbosity.debug:
          sys.stderr.write('DEBUG: ' + fmt.format(*args, **kwds))
 #end def
 
