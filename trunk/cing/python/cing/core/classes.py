@@ -2,41 +2,104 @@
 Implementation of the CING API's main classes.
 Split into 3 for better performance.
 """
+import os
+import sys
+import math
+import time
+
+from glob import glob
+from glob import glob1
+from shutil import rmtree
+import tarfile
+import zipfile
+
 import cing
+
 import cing.constants as constants
 import cing.constants.definitions as cdefs
-from cing.core import pid
-#from cing.Libs import io
-import cing.Libs.io as io
-#import cing.Libs.jsonTools as jsonTools
-#import cing.Libs.xmlTools as xmlTools
+import cing.core.pid as pid
+from   cing.core import validation
+from   cing.Libs import io
+import cing.Libs.jsonTools as jsonTools
+from   cing.Libs import utils
 
-from ConfigParser import ConfigParser
-from cing import cingPythonCingDir
-from cing import cingRoot
-from cing import cingVersion
-from cing import issueListUrl
-from cing import plugins
+
+# from ConfigParser import ConfigParser
+# from cing import cingPythonCingDir
+# from cing import cingRoot
+# from cing import cingVersion
+# from cing import issueListUrl
+# from cing import plugins
 from cing.Libs.Adict import Adict
 from cing.Libs.Geometry import violationAngle
 
-from cing.Libs.NTutils import * #@UnusedWildImport
+from cing.Libs.fpconst import NaN
+from cing.Libs.fpconst import isNaN
+
+from cing.Libs.io import sprintf
+from cing.Libs.io import fprintf
+from cing.Libs.io import printf
+
+#from cing.Libs.NTutils import * #@UnusedWildImport
+from cing.Libs.NTutils import getCallerName
+from cing.Libs.NTutils import NTdict
+from cing.Libs.NTutils import NTtree
+from cing.Libs.NTutils import NTlist
+from cing.Libs.NTutils import NTlistOfLists
+from cing.Libs.NTutils import NTvalue
+
+from cing.Libs.NTutils import nTaverage
+from cing.Libs.NTutils import nTaverage2
+from cing.Libs.NTutils import nTerror
+from cing.Libs.NTutils import NTsort
+from cing.Libs.NTutils import nTcodeerror
+from cing.Libs.NTutils import nTwarning
+from cing.Libs.NTutils import nTmessage
+from cing.Libs.NTutils import nTdebug
+from cing.Libs.NTutils import nTfill
+from cing.Libs.NTutils import nTdetail
+from cing.Libs.NTutils import nTlimit
+from cing.Libs.NTutils import NTvalue
+from cing.Libs.NTutils import NTvector
+from cing.Libs.NTutils import getDeepByKeys
+from cing.Libs.NTutils import getDeepByKeysOrAttributes
+from cing.Libs.NTutils import getDeepByKeysOrDefault
+from cing.Libs.NTutils import appendDeepByKeys
+from cing.Libs.NTutils import setDeepByKeys
+from cing.Libs.NTutils import val2Str
+from cing.Libs.NTutils import list2asci
+from cing.Libs.NTutils import formatList
+from cing.Libs.NTutils import getEnsembleAverageAndSigmaHis
+from cing.Libs.NTutils import amin
+from cing.Libs.NTutils import amax
+from cing.Libs.NTutils import deepcopy
+from cing.Libs.NTutils import lenNonZero
+from cing.Libs.NTutils import getDateTimeStampForFileName
+from cing.Libs.NTutils import addStreamnTmessageList
+from cing.Libs.NTutils import removeStreamnTmessageList
+from cing.Libs.NTutils import getRandomKey
+from cing.Libs.NTutils import writeTextToFile
+from cing.Libs.NTutils import matchString
+
 from cing.Libs.NTutils2 import MsgHoL
+
 
 try:
     import pyximport
     pyximport.install()
     import cing.Libs.cython.superpose as superpose
-    from cing.Libs.cython.superpose import NTcVector #@UnresolvedImport @UnusedImport
-    from cing.Libs.cython.superpose import Rm6dist #@UnresolvedImport
+
+#    from cing.Libs.cython.superpose import NTcVector #@UnresolvedImport @UnusedImport
+#    from cing.Libs.cython.superpose import Rm6dist #@UnresolvedImport
 except ImportError:
     pass
 
 
 from cing.Libs.disk import copydir
 from cing.Libs.disk import Path
-from cing.Libs.disk import remove
-from cing.Libs.disk import modtime
+from cing.Libs.disk import rmdir
+#from cing.Libs.disk import modtime
+
 from cing.Libs.html import DihedralByProjectList
 from cing.Libs.html import addPreTagLines
 from cing.Libs.html import generateHtml
@@ -45,22 +108,35 @@ from cing.Libs.html import setupHtml
 from cing.Libs.pdb import export2PDB
 from cing.Libs.pdb import importPDB
 from cing.Libs.pdb import initPDB
-from cing.constants import TALOSPLUS_LIST_STR
+
 from cing.PluginCode.required.reqWhatif import summaryCheckIdList
 from cing.STAR.File import File
 from cing.core.CingSummary import CingSummary
-from cing.core.classes2 import * #@UnusedWildImport
+
+#from cing.core.classes2 import * #@UnusedWildImport
+from cing.core.classes2 import RestraintList
+from cing.core.classes2 import ProjectListMember
+
+from cing.core.classes3 import Lister
+from cing.core.classes3 import SMLhandled
+
 #from cing.constants import * #@UnusedWildImport
+
 from cing.core.molecule import Atom
 from cing.core.molecule import Ensemble
 from cing.core.molecule import Molecule
 from cing.core.molecule import nTdihedralOpt
-from cing.core.molecule import nTdistanceOpt #@UnusedImport
-from cing.constants.definitions import cingPaths
-from cing.constants.definitions import directories
-from cing.constants.definitions import validationDirectories
-from cing.core.parameters import moleculeDirectories
+
+#from cing.core.molecule import nTdistanceOpt #@UnusedImport
+
+# from cing.constants.definitions import cingPaths
+# from cing.constants.definitions import directories
+# from cing.constants.definitions import validationDirectories
+# from cing.core.parameters import moleculeDirectories
 from cing.core.parameters import plotParameters
+from cing.core.ROGscore import ROGscore
+
+
 from cing.core.validate import checkForSaltbridges
 from cing.core.validate import criticize
 from cing.core.validate import criticizePeaks
@@ -74,20 +150,18 @@ from cing.core.validate import validateDihedralCombinations
 from cing.core.validate import validateDihedrals
 from cing.core.validate import validateModels
 from cing.core.validate import validateRestraints
-from cing.core import validation
 
 
-from glob import glob
-from glob import glob1
-from shutil import rmtree
-import tarfile
-import zipfile
-
-__version__   = cdefs.__version__
-__date__      = cdefs.__date__
-__author__    = cdefs.__author__
-__copyright__ = cdefs.__copyright__
-__credits__   = cdefs.__credits__
+#-----------------------------------------------------------------------------
+# pydoc settings
+#-----------------------------------------------------------------------------
+__version__         = cing.__version__
+__revision__        = cing.__revision__
+__date__            = cing.__date__
+__author__          = cing.__author__
+__copyright__       = cing.__copyright__
+__copyright_years__ = cing.__copyright_years__
+__credits__         = cing.__credits__
 
 projects = NTlist()
 
@@ -111,9 +185,6 @@ Project: Top level Cing project class
           <-> dihedrals[<DihedralRestraintList[<DihedralRestraint>, ...]>]   # Project DihedralRestraint lists
           <-> rdcs[<RDCRestraintList[<RDCRestraint>, ...]>]                  # Project RDCRestraint lists
 
-           -> directories
-           -> cingPaths
-           -> plotParameters
   _____________________________________________________________________________
 
     Methods:
@@ -154,31 +225,48 @@ Project: Top level Cing project class
     Likewise for list of other restraint types (dihedrals, RDCs).
 
     """
+#-------------------------------------------------------------------------
+# class definitions
+#-------------------------------------------------------------------------
+    # keys to be saved in project json file
+    saveKeys = [
+                 'version',
+                 'name', 'created','lastSaved','convention',
+                 'moleculeNames',
+                 'peakListNames', 'distanceListNames', 'dihedralListNames', 'rdcListNames',
+                 'coplanarListNames', 'dihedralByProjectListNames', 'dihedralByResidue',
+                 'storedInCcpnFormat',
+                 'reports',
+                 'history',
+                 'status'
+    ]
 
+
+#-------------------------------------------------------------------------
     def __init__(self, name):
 
         root, name, ext = Project.rootPath(name)
 
         NTdict.__init__(self, __CLASS__ = 'Project')
 
-        self.version = cingVersion
+        self.version = cdefs.cingDefinitions.version
         self.root = root
         self.name = name.strip()
         self.created = io.now()
         self.lastSaved = io.now()
         self.convention = constants.INTERNAL
 
-        self.molecule = None # Current Molecule instance
+        self.molecule = None        # Current Molecule instance
 
-        self.moleculeNames = [] # list to store molecule names for save and restore
-        self.peakListNames = [] # list to store peaklist names for save and restore
+        self.moleculeNames = []     # list to store molecule names for save and restore
+        self.peakListNames = []     # list to store peaklist names for save and restore
         self.distanceListNames = [] # list to store distancelist names names for save and restore
         self.dihedralListNames = [] # list to store dihedrallist names for save and restore
-        self.rdcListNames = [] # list to store rdclist names for save and restore
-        # GWV: do not know precisely what these are!
+        self.rdcListNames = []      # list to store rdclist names for save and restore
+        # GWV: does not know precisely what these are!
         self.coplanarListNames = NTlist() # list to store  names for save and restore
         self.dihedralByProjectListNames = NTlist() # list to store  names for save and restore
-        self.dihedralByResidue = NTtree( DIHEDRAL_BY_RESIDUE_STR ) # Used to be set in DihedralByResidueHTMLfile but that's too late.
+        self.dihedralByResidue = NTtree( constants.DIHEDRAL_BY_RESIDUE_STR ) # Used to be set in DihedralByResidueHTMLfile but that's too late.
         self.reports = NTlist() # list with validation reports names
 
         self.history = History()
@@ -186,9 +274,9 @@ Project: Top level Cing project class
         self.storedInCcpnFormat = False
         self.restoredFromXml = True # Project settings restored from project.xml file
 
-        # status of Plugins
-        self.status = Adict() # General status dict for external programs;
-                              # initialise for 'known' programs
+        # General status dict for storing state of external programs;
+        self.status = Adict()
+        # initialise for 'known' programs
         for key in constants.VALIDATION_KEYS:
             self.getStatusDict(key)
         #LEGACY
@@ -214,12 +302,11 @@ Project: Top level Cing project class
         # self.x3dnaStatus  = NTdict(completed = False, parsed = False)
 
 #        store a reference to the global things we might need
-#        self.gui = None # Reference to CingGui instance
         #LEGACY: GWV: 20140202 bad idea mixing code with data
-        self.directories = directories
-        self.moleculeDirectories = moleculeDirectories
-        self.validationDirectories = validationDirectories
-        self.cingPaths = cingPaths
+        self.directories = cdefs.directories
+        self.moleculeDirectories = cdefs.validationDirectories
+        self.validationDirectories = cdefs.validationDirectories
+        self.cingPaths = cdefs.cingPaths
         self.plotParameters = plotParameters
         self.valSets = cdefs.validationSettings
 #OBSOLETE:
@@ -231,63 +318,52 @@ Project: Top level Cing project class
         self.molecules = ProjectList(project = self,
                                          classDef = Molecule,
                                          nameListKey = 'moleculeNames',
-                                         basePath = directories.molecules + '/%s'
+                                         basePath = cdefs.directories.molecules + '/%s'
                                        )
         self.peaks = ProjectList(project = self,
                                          classDef = PeakList,
                                          nameListKey = 'peakListNames',
-                                         basePath = directories.peaklists + '/%s.peaks'
+                                         basePath = cdefs.directories.peaklists + '/%s.peaks'
                                        )
         self.distances = ProjectList(project = self,
                                          classDef = DistanceRestraintList,
                                          nameListKey = 'distanceListNames',
-                                         basePath = directories.restraints + '/%s.distances'
+                                         basePath = cdefs.directories.restraints + '/%s.distances'
                                        )
         self.distanceRestraintNTlist = RestraintList('distanceRestraintNTlist') # used for DB populated by validateRestraints
 
         self.dihedrals = ProjectList(project = self,
                                          classDef = DihedralRestraintList,
                                          nameListKey = 'dihedralListNames',
-                                         basePath = directories.restraints + '/%s.dihedrals'
+                                         basePath = cdefs.directories.restraints + '/%s.dihedrals'
                                        )
         self.dihedralRestraintNTlist = RestraintList('dihedralRestraintNTlist')
         self.rdcs = ProjectList(project = self,
                                          classDef = RDCRestraintList,
                                          nameListKey = 'rdcListNames',
-                                         basePath = directories.restraints + '/%s.rdcs'
+                                         basePath = cdefs.directories.restraints + '/%s.rdcs'
                                        )
         self.coplanars = ProjectList(project = self,
                                          classDef = CoplanarList,
                                          nameListKey = 'coplanarListNames',
-                                         basePath = directories.restraints + '/%s.coPlanars'
+                                         basePath = cdefs.directories.restraints + '/%s.coPlanars'
                                        )
         self.dihedralByProjectList = ProjectList(project = self,
                                          classDef = DihedralByProjectList,
                                          nameListKey = 'dihedralByProjectListNames',
-                                         basePath = directories.molecules + '/%s.dihedralsByProjectList'# Will never need to be saved.
+                                         basePath = cdefs.directories.molecules + '/%s.dihedralsByProjectList'# Will never need to be saved.
                                        )
 
 #        self.dihedralByResidue = None # done above.
 
 
         # Path's related stuff
-        self.objectPath = self.path(cingPaths.project)
+        self.objectPath = self.path(cdefs.cingPaths.project)
 
         self.rogScore = ROGscore()
         self.summaryDict = CingSummary()
 
         self.nosave = False
-        self.saveKeys = [
-                         'version',
-                         'name', 'created','lastSaved','convention',
-                         'moleculeNames',
-                         'peakListNames', 'distanceListNames', 'dihedralListNames', 'rdcListNames',
-                         'coplanarListNames', 'dihedralByProjectListNames', 'dihedralByResidue',
-                         'storedInCcpnFormat',
-                         'reports',
-                         'history',
-                         'status'
-                         ]
     #end def
 
     def getCingSummaryDict(self):
@@ -360,6 +436,7 @@ Project: Top level Cing project class
         return d
     #end def
 
+#DEPRECIATED: use validation.path() instead
     def moleculePath(self, subdir = None, *args):
         """ Path relative to molecule.
         Return path or None in case of error.
@@ -368,8 +445,7 @@ Project: Top level Cing project class
             return None
         if subdir == None:
             return self.path(self.molecule.name)
-#        nTdebug("moleculePath: subdir, moleculeDirectories[subdir] %s %s" % (subdir, moleculeDirectories[subdir]))
-        return self.path(self.molecule.name, moleculeDirectories[subdir], *args)
+        return self.path(self.molecule.name, cdefs.validationDirectories[subdir], *args)
     #end def
 
     def validationPath(self, *args):
@@ -401,15 +477,15 @@ Project: Top level Cing project class
             self.root.makedirs()
         # Check the subdirectories
         # 'global' cing directory
-        tmpdir = self.path(directories.tmp)
+        tmpdir = self.path(cdefs.directories.tmp)
         if tmpdir.exists():
             tmpdir.rmdir()
         tmpdir.makedirs()
         # project related directories
-        for d in directories.values():
-            dir = self.path() / d
-            if not dir.exists():
-                dir.makedirs()
+        for d in cdefs.directories.values():
+            mdir = self.path() / d
+            if not mdir.exists():
+                mdir.makedirs()
         #end for
     #end def
 #-------------------------------------------------------------------------
@@ -503,10 +579,10 @@ Project: Top level Cing project class
     def open(name, status = constants.PROJECT_CREATE, restore = True):
         """Static method open returns a new/existing Project instance depending on status.
 
-           status == 'new': open a new project 'name', overwrite when exists
-           status == 'old: open existing project 'name'
+           status == PROJECT_NEW: open a new project 'name', overwrite when exists
+           status == PROJECT_OLD: open existing project 'name'
                       project data is restored when restore == True.
-           status == 'create': if project name if exists open as old, open as new otherwise.
+           status == PROJECT_CREATE: if project name if exists open as old, open as new otherwise.
 
            Returns Project instance or None on error.
         """
@@ -629,7 +705,7 @@ Project: Top level Cing project class
 
             # Restore Project info from xml/json-file
             from cing.Libs.jsonTools import json2obj
-            pfile = root / cingPaths.project
+            pfile = root / cdefs.cingPaths.project
             # Check if we find an json or xml file
             f,e = pfile.splitext()
             if (f+'.json').exists():
@@ -656,24 +732,26 @@ Project: Top level Cing project class
             pr._updateProjectPaths()
             # No content present
             pr.contentIsRestored = False
-            for key in pr.status.keys():
-                status = pr.getStatusDict(key)
-                status.present = False
+
+            #LEGACY
+            # for key in pr.status.keys():
+            #     status = pr.getStatusDict(key)
+            #     status.present = False
             #LEGACY:
             #pr.setStatusObjects(parsed=False)
 
-            io.debug('Project.open: read {0}, software version {1:.3f}\n', pfile, pr.version)
+            io.debug('Project.open: read {0}, stored with software version {1}\n', pfile, pr.version)
 
             #LEGACY:
-            if pr.version <= 0.75:
+            if utils.compareVersions(pr.version, 0.76) == -1:
                 from cing.Legacy.Legacy075.upgrade075 import upgrade075
                 return upgrade075(pr, restore=restore)
             # changed for allowing to store special database entries.
-            elif round(pr.version*1000) < 950: # i.e. versions 0.94 and lower
+            elif utils.compareVersions(pr.version, 0.95) == -1: # i.e. versions 0.94 and lower
                 from cing.Legacy.Legacy095.upgrade095 import upgrade095
                 return upgrade095(pr,restore=restore)
             # version <= 1.00
-            elif pr.version <= 1.00:
+            elif utils.compareVersions(pr.version, 1.00) == -1:
                 from cing.Legacy.Legacy100.upgrade100 import upgrade100
                 return upgrade100(pr,restore=restore)
             #end if
@@ -704,11 +782,11 @@ Project: Top level Cing project class
         if save and not self.nosave:
             self.save()
         # remove the tmpdir
-        tmpdir = self.path(directories.tmp)
+        tmpdir = self.path(cdefs.directories.tmp)
         # have to use cing.verbosity to work?
         #print '>>', cing.verbosity, cing.verbosityDebug
         if os.path.exists(tmpdir) and cing.verbosity != cing.verbosityDebug:
-            removedir(tmpdir)
+            rmdir(tmpdir)
 
         self.closeLog()
 
@@ -751,59 +829,52 @@ Project: Top level Cing project class
         Return True on error
         """
 
-        defs = self.getStatusDict(key)
-        if not defs.present:
-            defs.saved = False
-            nTdebug('Project._savePluginData: data not present; returning')
-            return False # Return gracefully
-
-        if self.molecule is None:
-            nTmessage("Project._savePluginData: No molecule defined; returning")
-            defs.saved = False
-            return True
-
-        # set values before doing anything or they get lost
-        defs.update(kwds)
-        defs.convention = constants.INTERNAL # asPid routines will return values
-                                             # in INTERNAL convention
-
-        smlFile = self.path() / cdefs.directories.plugins / defs.smlFile
-        # Assemble elements to be saved
-        myList = NTlist()
-        # first element of list is the settings
-        myList.append( defs )
-        # next elements are ResultDefs instances
-        for obj in [self.molecule] + \
-                    self.molecule.allChains() + \
-                    self.molecule.allResidues() + \
-                    self.molecule.allAtoms():
-            vDict = validation.getValidationResult(obj, key)
-            if vDict is not None:
-                myList.append(vDict)
-            #end for
-        #end for
-
-        # Import her to prevent circular  imports
-        from cing.core import sml
-        obj = sml.obj2sml( myList, smlFile)
-        if obj is None:
-            nTerror('Project._savePluginData: error saving %s results to "%s"', key, smlFile)
-            defs.saved = False
-            return True
-
-        nTdetail('==> Saved %s results to "%s"', key, smlFile)
-        return False
+        nTwarning('Project._savePluginData: no-longer in use for saving %s', key)
+        return True
+        #
+        # defs = self.getStatusDict(key)
+        # if not defs.present:
+        #     defs.saved = False
+        #     nTdebug('Project._savePluginData: data not present; returning')
+        #     return False # Return gracefully
+        #
+        # if self.molecule is None:
+        #     nTmessage("Project._savePluginData: No molecule defined; returning")
+        #     defs.saved = False
+        #     return True
+        #
+        # # set values before doing anything or they get lost
+        # defs.update(kwds)
+        # defs.convention = constants.INTERNAL # asPid routines will return values
+        #                                      # in INTERNAL convention
+        #
+        # smlFile = self.path() / cdefs.directories.plugins / defs.smlFile
+        # # Assemble elements to be saved
+        # myList = NTlist()
+        # # first element of list is the settings
+        # myList.append( defs )
+        # # next elements are ResultDefs instances
+        # for obj in [self.molecule] + \
+        #             self.molecule.allChains() + \
+        #             self.molecule.allResidues() + \
+        #             self.molecule.allAtoms():
+        #     vDict = validation.getValidationResult(obj, key)
+        #     if vDict is not None:
+        #         myList.append(vDict)
+        #     #end for
+        # #end for
+        #
+        # # Import her to prevent circular  imports
+        # from cing.core import sml
+        # obj = sml.obj2sml( myList, smlFile)
+        # if obj is None:
+        #     nTerror('Project._savePluginData: error saving %s results to "%s"', key, smlFile)
+        #     defs.saved = False
+        #     return True
+        #
+        # nTdetail('==> Saved %s results to "%s"', key, smlFile)
+        # return False
     #end def
-
-    # def _save2sml(self):
-    #     """Save project settings as SML file"""
-    #     from cing.core import sml
-    #     path = self.path() / cdefs.cingPaths.project
-    #     # get key, value pairs to save
-    #     p = Adict([(k,self[k]) for k in self.saveKeys ])
-    #     return sml.obj2sml( p, path )
-    # #end def
-
 
     def _save2json(self):
         """Save project settings as json file"""
@@ -832,7 +903,7 @@ Project: Top level Cing project class
         Save project data;
         Return True on error.
         """
-        nTmessage('' + dots * 5 + '')
+        nTmessage('' + constants.dots * 5 + '')
         nTmessage('==> Saving %s', self)
 
         # Save the molecules
@@ -850,6 +921,10 @@ Project: Top level Cing project class
             #self.saveXML(pl.nameListKey)
         #end for
 
+        # save validation containers
+        path = self.path() / cdefs.directories.plugins / cdefs.cingPaths.validation
+        if validation.save(path): return True
+
         # Call Plugin registered functions
         for p in cing.plugins.values():
             if (not p) or (not hasattr(p, 'saves')) or (not p.saves):
@@ -863,10 +938,10 @@ Project: Top level Cing project class
             #end for
         #end for
 
-        # Update version number and convention since it is now saved with this cingVersion
-        self.version = cingVersion
+        # Update version number and convention since it is now saved with this version
+        self.version = cdefs.cingDefinitions.version
         self.convention = constants.INTERNAL
-        # Save the project data
+        # Save the project file
         #OBSOLETE:
         #if obj2XML(self, path = self.objectPath) != self:
         #    nTerror('Project.save: writing Project file "%s" failed', self.objectPath)
@@ -874,7 +949,7 @@ Project: Top level Cing project class
         if self._save2json():
             return True
 
-        self.addHistory('Saved project')
+        self.addHistory('Saved project on %s' % io.now())
         return False
     #end def
 
@@ -888,40 +963,43 @@ Project: Top level Cing project class
         Return True on error
         """
 
-        if self.molecule is None:
-            nTdebug('Project._restorePluginData: no molecule; returning')
-            return False # Gracefully returns
+        nTwarning('Project._restorePluginData: no-longer in use for saving %s', key)
+        return True
 
-        defs = self.getStatusDict(key)
-
-        ###TEMP
-        defs.saved = False
-
-        if (not defs.saved):
-            nTdebug('Project._restorePluginData: data not saved; returning')
-            return False # Return gracefully
-
-        smlFile = self.path() / cdefs.directories.plugins / defs.smlFile
-        if not smlFile.exists():
-            nTerror('Project._restorePluginData: file "%s" with %s data not found', smlFile, key)
-            return True
-        # end if
-
-        # Restore the data
-        # Import here to prevent circular imports
-        from cing.core import sml
-
-        myList = sml.sml2obj( smlFile, self )
-        if myList is None:
-            nTerror('Project._restorePluginData: Restoring %s results from %s (code version %s)', key, smlFile, defs.saveVersion)
-            defs.present = False
-            return True
-        # first element is stored definitions
-        defs.update(myList[0])
-        defs.update(kwds)
-
-        nTmessage('==> Restored %s results from %s (code version %s)', key, smlFile, defs.saveVersion)
-        return False
+        # if self.molecule is None:
+        #     nTdebug('Project._restorePluginData: no molecule; returning')
+        #     return False # Gracefully returns
+        #
+        # defs = self.getStatusDict(key)
+        #
+        # ###TEMP
+        # defs.saved = False
+        #
+        # if (not defs.saved):
+        #     nTdebug('Project._restorePluginData: data not saved; returning')
+        #     return False # Return gracefully
+        #
+        # smlFile = self.path() / cdefs.directories.plugins / defs.smlFile
+        # if not smlFile.exists():
+        #     nTerror('Project._restorePluginData: file "%s" with %s data not found', smlFile, key)
+        #     return True
+        # # end if
+        #
+        # # Restore the data
+        # # Import here to prevent circular imports
+        # from cing.core import sml
+        #
+        # myList = sml.sml2obj( smlFile, self )
+        # if myList is None:
+        #     nTerror('Project._restorePluginData: Restoring %s results from %s (code version %s)', key, smlFile, defs.saveVersion)
+        #     defs.present = False
+        #     return True
+        # # first element is stored definitions
+        # defs.update(myList[0])
+        # defs.update(kwds)
+        #
+        # nTmessage('==> Restored %s results from %s (code version %s)', key, smlFile, defs.saveVersion)
+        # return False
     #end def
 
     def _callPluginRestores(self):
@@ -996,7 +1074,7 @@ Project: Top level Cing project class
         if not len(self.distances):
 #            nTdebug("self.project.distances is empty.")
             return
-        star_text = getDeepByKeysOrAttributes( self.distances, STEREO_ASSIGNMENT_CORRECTIONS_STAR_STR)
+        star_text = getDeepByKeysOrAttributes( self.distances, constants.STEREO_ASSIGNMENT_CORRECTIONS_STAR_STR)
         if not star_text:
 #            nTdebug("No SSA info embedded.")
             return
@@ -1035,7 +1113,7 @@ Project: Top level Cing project class
     def export(self):
         """Call export routines from the plugins to export the project
         """
-        nTmessage('' + dots * 5 + '')
+        nTmessage('' + constants.dots * 5 + '')
         nTmessage('==> Exporting %s', self)
 
         for p in cing.plugins.values():
@@ -1075,14 +1153,13 @@ Project: Top level Cing project class
 
     def createValidationDirectories(self, molecule):
         """generate the required directories for export and HTML data."""
-        # generate the required directories for export and HTML data
-        for d in validationDirectories.values():
+        for d in cdefs.validationDirectories.values():
             self.mkdir(molecule.name, d)
         #end for
     #end def
 
 
-    def newMolecule(self, name, sequenceFile, convention = LOOSE):
+    def newMolecule(self, name, sequenceFile, convention = constants.LOOSE):
         """Return Molecule instance or None on error
         """
         uname = self.uniqueKey(name)
@@ -1152,7 +1229,7 @@ Project: Top level Cing project class
         Remove all but last; because we're still writting to it.
         Match code to html#_generateLogsHtml
         """
-        logsPattern = self.path(directories.logs, '*.txt')
+        logsPattern = self.path(cdefs.directories.logs, '*.txt')
         logFileList = glob(logsPattern)
         if not logFileList:
             nTmessage("No log files found")
@@ -1168,7 +1245,7 @@ Project: Top level Cing project class
         # 2jsx.cing/2jsx/Cing/Logs/2jsx_2011-02-10_20-09-31.html
         date_stamp = getDateTimeStampForFileName()
         fn = "%s_%s.txt" % (self.name, date_stamp )
-        logFilePath = self.path(directories.logs, fn)
+        logFilePath = self.path(cdefs.directories.logs, fn)
         stream2 = open(logFilePath, 'w')
 #        nTdebug("Opening %s" % logFilePath )
         addStreamnTmessageList(stream2)
@@ -1193,7 +1270,7 @@ Project: Top level Cing project class
         Returns a list of project log files sorted chronologically with latest first.
         NB the latest includes the current log.
         """
-        logsDir = self.path(directories.logs)
+        logsDir = self.path(cdefs.directories.logs)
         logFileList = glob1(logsDir, '*.txt')
         if logFileList:
             logFileList.sort()
@@ -1250,11 +1327,11 @@ Project: Top level Cing project class
             return None
         restraintList = restraintLoL[0]
         randomKey = getRandomKey()
-        if restraintList.__CLASS__ == DRL_LEVEL:
+        if restraintList.__CLASS__ == constants.DRL_LEVEL:
             result = DistanceRestraintList('allRestraints_with_random_key_'+randomKey)
-        elif restraintList.__CLASS__ == ACL_LEVEL:
+        elif restraintList.__CLASS__ == constants.ACL_LEVEL:
             result = DihedralRestraintList('allRestraints_with_random_key_'+randomKey)
-        elif restraintList.__CLASS__ == RDCL_LEVEL:
+        elif restraintList.__CLASS__ == constants.RDCL_LEVEL:
             result = RDCRestraintList('allRestraints_with_random_key_'+randomKey)
 
         for rL in restraintLoL:
@@ -1269,10 +1346,10 @@ Project: Top level Cing project class
                 return True
         return False
 
-    def header(self, mdots=dots):
+    def header(self, mdots=constants.dots):
         """Subclass header to generate using __CLASS__, name and dots.
         """
-        return sprintf('%s %s: %s %s', dots, self.__CLASS__, self.name, mdots)
+        return sprintf('%s %s: %s %s', mdots, self.__CLASS__, self.name, mdots)
     #end def
 
     def __str__(self):
@@ -1331,12 +1408,12 @@ Project: Top level Cing project class
             return True
 
     # Convenience methods calls to validate.py.
-    def initPDB(self, pdbFile, convention = IUPAC, name = None, nmodels = None, update = True, allowNonStandardResidue = True):
+    def initPDB(self, pdbFile, convention = constants.IUPAC, name = None, nmodels = None, update = True, allowNonStandardResidue = True):
         """Initializes from a pdb file."""
         return initPDB(self, pdbFile, convention = convention, name = name, nmodels = nmodels, update = update,
                        allowNonStandardResidue = allowNonStandardResidue)
 
-    def importPDB(self, pdbFile, convention = IUPAC, nmodels = None):
+    def importPDB(self, pdbFile, convention = constants.IUPAC, nmodels = None):
         """Initializes from a pdb file."""
         return importPDB(self, pdbFile, convention = convention, nmodels = nmodels)
 
@@ -1428,7 +1505,7 @@ Project: Top level Cing project class
         return generateHtml(self, htmlOnly = htmlOnly)
 
     def filterHighRestraintViol(self, restraintLoL = None, cutoff=2.0, maxRemove=3, toFile=True,
-                                fileName = DISTANCE_RESTRAINT_LIST_HIGH_VIOLATIONS_FILTERED_STR):
+                                fileName = constants.DISTANCE_RESTRAINT_LIST_HIGH_VIOLATIONS_FILTERED_STR):
         """
         Remove the largest violating distance restraints that meet a certain cutoff.
         Violation are not averaged over models for this purpose.
@@ -1523,7 +1600,7 @@ Project: Top level Cing project class
 
         txt = restraintList.format(showAll=True)
         if toFile:
-            fileName = self.path(self.molecule.name, validationDirectories.analysis, fileName)
+            fileName = self.path(self.molecule.name, cdefs.validationDirectories.analysis, fileName)
             nTmessage( '==> %s, removed %s restraints and written to %s' % ( getCallerName(), len(restraintList), fileName))
             writeTextToFile(fileName, txt)
         else:
@@ -1544,7 +1621,7 @@ Project: Top level Cing project class
         for resTuple in resLot:
 #            nTdebug("nameTuple: %s" % str(resTuple))
             chainName, resNum = resTuple
-            nameTuple = (mol.name, chainName, resNum, None, None, None, INTERNAL)
+            nameTuple = (mol.name, chainName, resNum, None, None, None, constants.INTERNAL)
 #            nTdebug("nameTuple: %s" % str(nameTuple))
             res = self.decodeNameTuple( nameTuple )
             if not res:
@@ -1688,7 +1765,7 @@ class ProjectList(NTlist):
     #end def
 
     def names(self, *patterns):
-        "Return a list of names of self, optionally screen using pattern"
+        """Return a list of names of self, optionally screen using pattern"""
         names = NTlist()
         for myList in self:
             if len(patterns) == 0:
@@ -1843,7 +1920,7 @@ for i,g in enumerate(groups):
 
         for group in self.groups:
             entryId = self.name + group
-            path = os.path.join(DATA_STR, entryId[1:3],  entryId, entryId + '.cing')
+            path = os.path.join(constants.DATA_STR, entryId[1:3],  entryId, entryId + '.cing')
             nTdebug('opening %s', path)
             p = self.openProject( path )
             if not p:
@@ -2158,7 +2235,7 @@ ranges:  %s
         # end for
 
         self.printTitle('Overall scores target '+self.name, 20*(n+1), stream)
-    #    line = dots20*(n+1)
+    #    line = constants.dots20*(n+1)
     #   fprintf( stream, '%s\n    Overall scores %s\n%s\n\n', line, self.name, line )
         fprintf( stream, '%-20s%s\n\n', 'Parameter', self.entries.zap('group').format('%-20s'))
 
@@ -2201,9 +2278,9 @@ ranges:  %s
         if n == 0:
             return
 
-    #    print dots20*(n+1)
+    #    print constants.dots20*(n+1)
     #    print ' Restraints target', self[0].target
-    #    print dots20*(n+1)
+    #    print constants.dots20*(n+1)
     #    print
 
         hlen=40
@@ -2255,9 +2332,9 @@ ranges:  %s
 
         n = len(self)
 
-        nTmessage( dots20*(n+1) )
+        nTmessage( constants.dots20*(n+1) )
         nTmessage( '    Residues' )
-        nTmessage( dots20*(n+1) )
+        nTmessage( constants.dots20*(n+1) )
         p0 = self[0]
         for res in p0.molecule.allResidues():
             printf('%s %s %s\n',  '-'*5, res, '-'*5 )
@@ -2265,7 +2342,7 @@ ranges:  %s
             self.printScore( p0.name, res.rogScore )
             # find the corresponding residues
             for p in self[1:]:
-                nameTuple = (p.molecule.name, res.chain.name, res.resNum, None, None, None, INTERNAL)
+                nameTuple = (p.molecule.name, res.chain.name, res.resNum, None, None, None, constants.INTERNAL)
                 res2 = p.decodeNameTuple( nameTuple )
                 if res2:
                     #printf('%-20s%-10s %s\n', p.name, res2.rogScore, res2.rogScore.colorCommentList.zap(1).format())
@@ -2443,9 +2520,9 @@ ranges:  %s
 
     def qShiftMacro( self ):
         self.mkYasaraByResidueMacro( ['Qshift', 'backbone'],
-                               minValue = QshiftMinValue,
-                               maxValue = QshiftMaxValue,
-                               reverseColorScheme = QshiftReverseColorScheme,
+                               minValue = constants.QshiftMinValue,
+                               maxValue = constants.QshiftMaxValue,
+                               reverseColorScheme = constants.QshiftReverseColorScheme,
                                path = self.path('Qshift.mcr') )
 
     def copyFiles2Project( self ):
@@ -2733,7 +2810,7 @@ class Peak(NTdict, Lister):
                        )
     #end def
 
-    def header(self, mdots = dots):
+    def header(self, mdots = constants.dots):
         """Subclass header to generate using __CLASS__, peakIndex and dots.
         """
         return sprintf('%s %s: %d %s', mdots, self.__CLASS__, self.peakIndex, mdots)
@@ -2798,7 +2875,7 @@ class PeakList(NTlist, ProjectListMember):
     #end def
 
     def format(self):  # pylint: disable=W0221
-        s = sprintf('%s PeakList "%s" (%s,%d,%s) %s\n', dots, self.name, self.status, len(self), self.rogScore, dots)
+        s = sprintf('%s PeakList "%s" (%s,%d,%s) %s\n', constants.dots, self.name, self.status, len(self), self.rogScore, constants.dots)
         for peak in self:
             s = s + str(peak) + '\n'
         #end for
@@ -2872,7 +2949,7 @@ class Restraint(NTdict):
         """
         modelCount = None
 
-        if self.__CLASS__ == DR_LEVEL or self.__CLASS__ == RDC_LEVEL:
+        if self.__CLASS__ == constants.DR_LEVEL or self.__CLASS__ == constants.RDC_LEVEL:
 #            lAtom  = len(self.atomPairs)
             for atompair in self.atomPairs:
                 for atom in atompair:
@@ -2935,7 +3012,7 @@ class DistanceRestraint(Restraint):
 #    def __init__( self, atomPairs=[], lower=0.0, upper=0.0, **kwds ):
     def __init__(self, atomPairs = NTlist(), lower = None, upper = None, **kwds):
         Restraint.__init__(self, lower = lower, upper = upper, **kwds)
-        self.__CLASS__ = DR_LEVEL
+        self.__CLASS__ = constants.DR_LEVEL
         self.atomPairs = NTlist()
         self.distances = None     # list with distances for each model; None: not yet defined
         self.av = None      # Average distance
@@ -2991,31 +3068,31 @@ class DistanceRestraint(Restraint):
         if (project.valSets.DR_MAXALL_BAD != None) and (self.violMax >= project.valSets.DR_MAXALL_BAD):
             comment = 'violMax: %7.2f' % self.violMax
 #            nTdebug(comment)
-            self.rogScore.setMaxColor(COLOR_RED, comment)
+            self.rogScore.setMaxColor(constants.COLOR_RED, comment)
         elif (project.valSets.DR_MAXALL_POOR != None) and (self.violMax >= project.valSets.DR_MAXALL_POOR):
             comment = 'violMax: %7.2f' % self.violMax
 #            nTdebug(comment)
-            self.rogScore.setMaxColor(COLOR_ORANGE, comment)
+            self.rogScore.setMaxColor(constants.COLOR_ORANGE, comment)
         if (project.valSets.DR_THRESHOLD_OVER_POOR != None) and (project.valSets.DR_THRESHOLD_FRAC_POOR != None):
             fractionAbove = getFractionAbove(self.violations, project.valSets.DR_THRESHOLD_OVER_POOR)
             if fractionAbove >= project.valSets.DR_THRESHOLD_FRAC_POOR:
                 comment = 'fractionAbove: %7.2f' % fractionAbove
     #            nTdebug(comment)
-                self.rogScore.setMaxColor(COLOR_ORANGE, comment)
+                self.rogScore.setMaxColor(constants.COLOR_ORANGE, comment)
         if (project.valSets.DR_THRESHOLD_OVER_BAD != None) and (project.valSets.DR_THRESHOLD_FRAC_BAD != None):
             fractionAbove = getFractionAbove(self.violations, project.valSets.DR_THRESHOLD_OVER_BAD)
             if fractionAbove >= project.valSets.DR_THRESHOLD_FRAC_BAD:
                 comment = 'fractionAbove: %7.2f' % fractionAbove
     #            nTdebug(comment)
-                self.rogScore.setMaxColor(COLOR_RED, comment)
+                self.rogScore.setMaxColor(constants.COLOR_RED, comment)
         if (project.valSets.DR_RMSALL_BAD != None) and (self.violSd >= project.valSets.DR_RMSALL_BAD):
             comment = 'violSd: %7.2f' % self.violSd
 #            nTdebug(comment)
-            self.rogScore.setMaxColor(COLOR_RED, comment)
+            self.rogScore.setMaxColor(constants.COLOR_RED, comment)
         elif (project.valSets.DR_RMSALL_POOR != None) and (self.violSd >= project.valSets.DR_RMSALL_POOR):
             comment = 'violSd: %7.2f' % self.violSd
 #            nTdebug(comment)
-            self.rogScore.setMaxColor(COLOR_ORANGE, comment)
+            self.rogScore.setMaxColor(constants.COLOR_ORANGE, comment)
 
 
 
@@ -3031,7 +3108,7 @@ class DistanceRestraint(Restraint):
                     #if len(a.coordinates) < modelCount:
                         msg = "Missing coordinates (%s)" % a.toString()
 #                        nTdebug(msg)
-                        self.rogScore.setMaxColor(COLOR_RED, msg)
+                        self.rogScore.setMaxColor(constants.COLOR_RED, msg)
                     #end if
                 #end for
             #end for
@@ -3516,7 +3593,7 @@ class DistanceRestraint(Restraint):
         if self.error:
             msg = "AtomPair (%s,%s) model %d without coordinates" % (atm1.toString(), atm2.toString(), i)
 #            nTdebug(msg)
-            self.rogScore.setMaxColor(COLOR_RED, msg)
+            self.rogScore.setMaxColor(constants.COLOR_RED, msg)
             return (None, None, None, None)
         #end if
 
@@ -3614,7 +3691,7 @@ class DistanceRestraintList(RestraintList):
     # use the same spelling through out.
     def __init__(self, name, status = 'keep'):
         RestraintList.__init__(self, name, status = status)
-        self.__CLASS__ = DRL_LEVEL
+        self.__CLASS__ = constants.DRL_LEVEL
         self.hBond = False       # hBond: fix to keep information about hBond restraints from CCPN
         self.violCountLower = 0   # Total lower-bound violations over 0.1 A
         self.violCount1 = 0
@@ -3849,7 +3926,7 @@ ROG score:         %7s
         if allowHtml:
             msg = addPreTagLines(msg)
         header = '%s DistanceRestraintList "%s" (%s,%d) %s\n' % (
-            dots, self.name, self.status, len(self), dots)
+            constants.dots, self.name, self.status, len(self), constants.dots)
         msg = header + msg
         msg += RestraintList.format(self, showAll = False)
         return msg
@@ -3888,7 +3965,7 @@ class DihedralRestraint(Restraint):
         self.cv = None      # cv on dihedral
 
         self.setdefault('discontinuous', False)
-        self.__CLASS__ = AC_LEVEL
+        self.__CLASS__ = constants.AC_LEVEL
         self.atoms = NTlist(*atoms)
         if None in self.atoms:
             self.isValid = False
@@ -3920,34 +3997,34 @@ class DihedralRestraint(Restraint):
         if (project.valSets.AC_MAXALL_BAD != None) and (self.violMax >= project.valSets.AC_MAXALL_BAD):
             comment = 'violMax: %7.2f' % self.violMax
 #            nTdebug(comment)
-            self.rogScore.setMaxColor(COLOR_RED, comment)
+            self.rogScore.setMaxColor(constants.COLOR_RED, comment)
         elif (project.valSets.AC_MAXALL_POOR != None) and (self.violMax >= project.valSets.AC_MAXALL_POOR):
             comment = 'violMax: %7.2f' % self.violMax
 #            nTdebug(comment)
-            self.rogScore.setMaxColor(COLOR_ORANGE, comment)
+            self.rogScore.setMaxColor(constants.COLOR_ORANGE, comment)
 
         if (project.valSets.AC_THRESHOLD_OVER_POOR != None) and (project.valSets.AC_THRESHOLD_FRAC_POOR != None):
             fractionAbove = getFractionAbove(self.violations, project.valSets.AC_THRESHOLD_OVER_POOR)
             if fractionAbove >= project.valSets.AC_THRESHOLD_FRAC_POOR:
                 comment = 'fractionAbove: %7.2f' % fractionAbove
     #            nTdebug(comment)
-                self.rogScore.setMaxColor(COLOR_ORANGE, comment)
+                self.rogScore.setMaxColor(constants.COLOR_ORANGE, comment)
 
         if (project.valSets.AC_THRESHOLD_OVER_BAD != None) and (project.valSets.AC_THRESHOLD_FRAC_BAD != None):
             fractionAbove = getFractionAbove(self.violations, project.valSets.AC_THRESHOLD_OVER_BAD)
             if fractionAbove >= project.valSets.AC_THRESHOLD_FRAC_BAD:
                 comment = 'fractionAbove: %7.2f' % fractionAbove
     #            nTdebug(comment)
-                self.rogScore.setMaxColor(COLOR_RED, comment)
+                self.rogScore.setMaxColor(constants.COLOR_RED, comment)
 
         if (project.valSets.AC_RMSALL_BAD != None) and (self.violSd >= project.valSets.AC_RMSALL_BAD):
             comment = 'violSd: %7.2f' % self.violSd
 #            nTdebug(comment)
-            self.rogScore.setMaxColor(COLOR_RED, comment)
+            self.rogScore.setMaxColor(constants.COLOR_RED, comment)
         elif (project.valSets.AC_RMSALL_POOR != None) and (self.violSd >= project.valSets.AC_RMSALL_POOR):
             comment = 'violSd: %7.2f' % self.violSd
 #            nTdebug(comment)
-            self.rogScore.setMaxColor(COLOR_ORANGE, comment)
+            self.rogScore.setMaxColor(constants.COLOR_ORANGE, comment)
 
         if project.valSets.FLAG_MISSING_COOR:
             #modelCount = self.getModelCount()
@@ -3962,7 +4039,7 @@ class DihedralRestraint(Restraint):
                     # incompleteness
                     msg = "Missing coordinates in dihedral (%s)" % a.toString()
 #                    nTdebug(msg)
-                    self.rogScore.setMaxColor(COLOR_RED, msg)
+                    self.rogScore.setMaxColor(constants.COLOR_RED, msg)
     #end def
 
     def isChi2TyrOrPhe(self):
@@ -4178,7 +4255,7 @@ class DihedralRestraintList(RestraintList):
 
     def __init__(self, name, status = 'keep'):
         RestraintList.__init__(self, name, status = status)
-        self.__CLASS__ = ACL_LEVEL
+        self.__CLASS__ = constants.ACL_LEVEL
     #end def
 
     def criticize(self, project, toFile = True):
@@ -4276,7 +4353,7 @@ ROG score:            %s
         if allowHtml:
             msg = addPreTagLines(msg)
         header = '%s DihedralRestraintList "%s" (%s,%d) %s\n' % (
-            dots, self.name, self.status, len(self), dots)
+            constants.dots, self.name, self.status, len(self), constants.dots)
         msg = header + msg
         return msg
     #end def
@@ -4307,7 +4384,7 @@ ROG score:            %s
     #end def
 
     def isFromTalos(self):
-        return self.name.startswith(TALOSPLUS_LIST_STR)
+        return self.name.startswith(constants.TALOSPLUS_LIST_STR)
 #end class
 
 
@@ -4323,7 +4400,7 @@ class RDCRestraint(DistanceRestraint):
                               upper = upper,
                               **kwds
                        )
-        self.__CLASS__ = RDC_LEVEL
+        self.__CLASS__ = constants.RDC_LEVEL
         self.rdcs = None     # list with backcalculated rdc values for each model, None indicates no analysis done
         # copied from dihedral; to be implemented
         self.cav = None     # Average dihedral value
@@ -4402,7 +4479,7 @@ class RDCRestraintList(RestraintList):
 
     def __init__(self, name, status = 'keep'):
         RestraintList.__init__(self, name, status = status)
-        self.__CLASS__ = RDCL_LEVEL
+        self.__CLASS__ = constants.RDCL_LEVEL
     #end def
 
     def analyze(self, calculateFirst = True):
@@ -4422,7 +4499,7 @@ class RDCRestraintList(RestraintList):
         firstRestraint = self[0]
         if not hasattr(firstRestraint, "atoms"):
             nTwarning("Failed to get the model count for no atoms are available in the first RDC restraint.")
-            nTwarning("See also issue: %s%d" % (issueListUrl, 133))
+            nTwarning("See also issue: %s%d" % (cdefs.cingDefinitions.issueUrl, 133))
         else:
             if len(self[0].atomPairs):
                 modelCount = self[0].atomPairs[0][0].residue.chain.molecule.modelCount
@@ -4491,7 +4568,7 @@ class RDCRestraintList(RestraintList):
         if allowHtml:
             msg = addPreTagLines(msg)
         header = '%s RDCRestraintList "%s" (%s,%d) %s\n' % (
-            dots, self.name, self.status, len(self), dots)
+            constants.dots, self.name, self.status, len(self), constants.dots)
         msg = header + msg
         return msg
     #end def
@@ -4556,7 +4633,7 @@ class History(NTlist):
     #end def
 
     def __str__(self):
-        s = sprintf('%s History %s\n', dots, dots)
+        s = sprintf('%s History %s\n', constants.dots, constants.dots)
         for timeStamp, line in self:
             if timeStamp:
                 s = s + sprintf('%s: %s\n', timeStamp, line)
@@ -4572,12 +4649,12 @@ class History(NTlist):
 
 
 #DEPRECIATED:
-def path(*args):
-    """
-    Return a path from arguments relative to cing root
-    """
-    return os.path.join(cingRoot, *args)
-#end def
+# def path(*args):
+#     """
+#     Return a path from arguments relative to cing root
+#     """
+#     return os.path.join(cingRoot, *args)
+# #end def
 
 def shift(atm):
     return atm.shift()
@@ -4605,7 +4682,7 @@ class Coplanar(NTdict):
     """
     def __init__(self, name, resList = []):
         NTdict.__init__(self,
-                         __CLASS__ = COPLANAR_LEVEL,
+                         __CLASS__ = constants.COPLANAR_LEVEL,
                          resList = resList)
         self.__FORMAT__ = self.header() + '\n' + \
                           'residues:  %(resList)s\n'
@@ -4618,7 +4695,7 @@ class CoplanarList(NTlist):
     """
     def __init__(self, name, status = 'skip'): # reset status to keep when SML handler finished with GWV's help.
         NTlist.__init__(self)
-        self.__CLASS__ = COPLANARL_LEVEL
+        self.__CLASS__ = constants.COPLANARL_LEVEL
         self.name = name
         self.status = status
         self.currentId = 0       # Id for each element of list

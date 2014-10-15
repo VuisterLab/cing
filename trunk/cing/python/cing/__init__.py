@@ -31,8 +31,8 @@ import sys
 # pydoc settings; also used by the program
 #-----------------------------------------------------------------------------
 __version__         =  '2.0.0'
-__revision__        = '$Revision$'
-__date__            = '$Date$'
+__revision__        = '$Revision$'.split()[1]
+__date__            = '$Date$'.split()[1]
 __author__          = 'Geerten Vuister'
 __copyright__       = 'Copyright (c) 2004-2014: Department of Biochemistry, University of Leicester, UK'
 __copyright_years__ = '2004-' + time.asctime().split()[-1] # never have to update this again

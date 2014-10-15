@@ -4,6 +4,15 @@ v1 stuff
 
         <obj> <-> <validationResultContainer> -> <ValidationResult> -> <obj>
 keys: validation   object               'userKeys'               object
+
+
+validation.getResult, validation.setResult and validation.hasResult are convenience methods
+
+validation.data is a ValidationData instance that contains all the containers.
+validation.save is a convenience method to save validation.data
+validation.restore is a convenience method to restore validation.data
+
+
 """
 import sys
 
@@ -27,10 +36,18 @@ class ValidationData(Adict.Adict):
     #end def
 
     def save(self, toPath):
+        """
+        Save validation toPath using json encoder
+        return True on error
+        """
         jsonTools.obj2json(self, toPath)
+        return False
     #end def
 
-    def restore(self, fromPath, project):
+    def restore(self, fromPath, project=None):
+        """
+        restore validation data fromPath; establish linkage to project if project is not None
+        """
         pass
     #end def
 
@@ -68,10 +85,10 @@ class ValidationResultsContainer(Adict.Adict):
 
     def format(self):
         l = 80
-        object = self.getattrOnly(constants.OBJECT_KEY)
+        obj = self.getattrOnly(constants.OBJECT_KEY)
 
         result =  '\n# ' + '='*(l-2) + '\n'
-        result += '# %s\n' % object
+        result += '# %s\n' % obj
         result += '# ' + '='*(l-2) + '\n\n'
 
         for key, value in self.iteritems():
@@ -109,7 +126,7 @@ class ValidationResult(Adict.Adict):
 
 
 def hasValidationResult(theObject,key):
-    return (getValidationResult(theObject, key) != None)
+    return getValidationResult(theObject, key) is not None
 
 
 def getValidationResult(theObject, key, default=None):
@@ -186,9 +203,10 @@ def setValidationResult(theObject, key, result):
 #end def
 
 # convenience
-get = getValidationResult
-set = setValidationResult
+getResult = getValidationResult
+setResult = setValidationResult
 hasResult = hasValidationResult
+
 save = data.save
 restore = data.restore
 write = data.write
