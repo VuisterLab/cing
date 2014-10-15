@@ -14,8 +14,8 @@ from cing.Libs import io
 # pydoc settings
 #-----------------------------------------------------------------------------
 __version__         = cing.__version__
-__date__            = cing.__date__
 __revision__        = cing.__revision__
+__date__            = cing.__date__
 __author__          = cing.__author__
 __copyright__       = cing.__copyright__
 __copyright_years__ = cing.__copyright_years__
@@ -66,7 +66,7 @@ class CingDefinitions(Adict.Adict):
         Adict.Adict.__init__(self)
         self.programName     = 'CING'
         self.longProgramName = 'CING: Common Interface for NMR structure Generation version'
-        self.version         = 1.01
+        self.version         = cing.__version__
         self.date            = '15 Oct 2014'
 
         self.codePath        = disk.Path(__file__)[:-2] # all relative from this path, also assures a Path object
@@ -90,7 +90,7 @@ class CingDefinitions(Adict.Adict):
             #end if
         #end try
 
-        self.revision        = cing.__revision__.split()[1]
+        self.revision        = cing.__revision__
         self.revisionUrl     = 'http://code.google.com/p/cing/source/detail?r=%s' % self.revision
         self.issueUrl        = 'http://code.google.com/p/cing/issues/detail?id='
 
@@ -196,9 +196,8 @@ htmlDirectories = Adict.Adict(
 # These files and directories are just definitions
 cingPaths = Adict.Adict(
     project      = 'project.json',
-#    plugins      = 'PluginCode',  # OBSOLETE: to be replaced by cingDefinitions.pluginPath
+    validation   = 'validation.json',
     scripts      = 'Scripts',
-#    bin          = 'bin',       # OBSOLETE: to be replaced by cingDefinitions.binPath
     html         = 'HTML',
     css          = 'cing.css',
     xplor        = os.getenv('xplorPath'),
