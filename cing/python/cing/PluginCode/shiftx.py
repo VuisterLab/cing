@@ -14,7 +14,7 @@ from cing.Libs.AwkLike import AwkLike
 from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.constants import * #@UnusedWildImport
 from cing.core.parameters import cingPaths
-from cing.definitions import validationDirectories
+from cing.constants.definitions import validationDirectories
 from glob import glob
 from math import sqrt
 

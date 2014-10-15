@@ -7,7 +7,7 @@ from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.PluginCode.required.reqDssp import DSSP_STR
 from cing.PluginCode.required.reqProcheck import SECSTRUCT_STR
 from cing.constants import * #@UnusedWildImport
-from cing.definitions import cingPaths
+from cing.constants.definitions import cingPaths
 from glob import glob
 
 if True: # block

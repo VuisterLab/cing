@@ -1,5 +1,23 @@
-from cing.Libs.NTutils import * #@UnusedWildImport
-from cing.constants import * #@UnusedWildImport
+"""
+ROG score class
+"""
+from cing.Libs import io
+#from cing.Libs.NTutils import * #@UnusedWildImport
+from cing.Libs.NTutils import NTdict
+from cing.Libs.NTutils import nTfill
+from cing.Libs.NTutils import NTlist
+from cing.Libs.NTutils import nTerror
+from cing.Libs.NTutils import NTsort
+from cing.Libs.NTutils import nTaverage2
+from cing.Libs.NTutils import nTcodeerror
+from cing.Libs.NTutils import nTwarning
+from cing.Libs.NTutils import nTmessage
+from cing.Libs.NTutils import nTdebug
+from cing.Libs.NTutils import nTdetail
+
+#from cing.constants import * #@UnusedWildImport
+from cing import constants
+
 import cing.Libs.xmlTools as xmlTools
 
 #Attribute name in e.g. residue object.
@@ -14,8 +32,8 @@ class ROGscore(NTdict):
 
     MAX_TO_REPORT_IN_POPUP = 5
 
-    mapColorString2Int = {COLOR_GREEN: 0, COLOR_ORANGE : 1, COLOR_RED : 2}
-    mapColorInt2String2 = {0:COLOR_GREEN, 1:COLOR_ORANGE, 2: COLOR_RED}
+    mapColorString2Int = {constants.COLOR_GREEN: 0, constants.COLOR_ORANGE : 1, constants.COLOR_RED : 2}
+    mapColorInt2String2 = {0:constants.COLOR_GREEN, 1:constants.COLOR_ORANGE, 2: constants.COLOR_RED}
 
     def __init__(self):
         NTdict.__init__(self,
@@ -23,7 +41,7 @@ class ROGscore(NTdict):
                          __FORMAT__ = "ROGscore '%(colorLabel)s' %(colorCommentList)s"
                        )
         # Explicitly showing instance attributes here in init.
-        self.colorLabel = COLOR_GREEN
+        self.colorLabel = constants.COLOR_GREEN
 #        Elements in this list are tuples of (color, comment).
         self.colorCommentList = NTlist()
 
@@ -33,11 +51,11 @@ class ROGscore(NTdict):
         return self.colorLabel
 
     def reset(self):
-        self.colorLabel = COLOR_GREEN
+        self.colorLabel = constants.COLOR_GREEN
         self.colorCommentList = NTlist()
 
     def isCritiqued(self):
-        if self.colorLabel != COLOR_GREEN:
+        if self.colorLabel != constants.COLOR_GREEN:
             return True
         else:
             return False
@@ -52,9 +70,9 @@ class ROGscore(NTdict):
 
 
     def isRed(self):
-        return self.colorLabel == COLOR_RED
+        return self.colorLabel == constants.COLOR_RED
     def isOrange(self):
-        return self.colorLabel == COLOR_ORANGE
+        return self.colorLabel == constants.COLOR_ORANGE
 
 
     # Thanks to a tip from http://morecavalier.com/index.php?whom=Articles%2FMultiline+TITLES+for+Firefox
@@ -102,9 +120,9 @@ class ROGscore(NTdict):
         """
         kw = {'style': 'font-style: italic'}
         if self.isCritiqued():
-            color = COLOR_ORANGE
+            color = constants.COLOR_ORANGE
             if self.isRed():
-                color = COLOR_RED
+                color = constants.COLOR_RED
             kw['color'] = color
         dst('font' , str, **kw)
 
@@ -120,11 +138,11 @@ class ROGscore(NTdict):
     #    if not hasattr(o,'colorLabel'):
     #        o.colorLabel = COLOR_GREEN
 
-        if colorLabel == COLOR_GREEN:
+        if colorLabel == constants.COLOR_GREEN:
             return
 
         # certain to stay at or upgrade to given color.
-        if colorLabel == COLOR_RED or (colorLabel == COLOR_ORANGE and self.colorLabel != COLOR_RED):
+        if colorLabel == constants.COLOR_RED or (colorLabel == constants.COLOR_ORANGE and self.colorLabel != constants.COLOR_RED):
             self.colorLabel = colorLabel
 
         if not comment:
@@ -161,7 +179,7 @@ class XMLROGscoreHandler( xmlTools.XMLhandler ):
         attrs = self.handleDictElements(node)
         if attrs == None:
             return None
-        result = cing.core.ROGscore()
+        result = ROGscore()
         result.update(attrs)
         return result
     #end def
@@ -186,7 +204,7 @@ class CingResult( NTdict ):
 #        if Whatif.cingNameDict.has_key(checkID):
 #            self.alternate = Whatif.cingNameDict[checkID]
 #        for c  in  [ VALUE_LIST_STR, QUAL_LIST_STR]:
-        for c  in  [ VALUE_LIST_STR ]:
+        for c  in  [ constants.VALUE_LIST_STR ]:
             self[c] = nTfill( None, modelCount)
 
         #self.keysformat()
@@ -195,7 +213,7 @@ class CingResult( NTdict ):
     def average(self, fmt='%5.2f +/- %4.2f'):
         """Return average of valueList as NTvalue object
         """
-        theList = self[VALUE_LIST_STR]
+        theList = self[constants.VALUE_LIST_STR]
         return nTaverage2(theList, fmt=fmt)
 
     def __str__(self):
@@ -203,12 +221,12 @@ class CingResult( NTdict ):
     #end def
 
     def format(self): # pylint: disable=W0221
-        return sprintf(
+        return io.sprintf(
 """%s CingResult %s (%s) %s
 comment   = %s
 alternate = %s
 valueList = %s
-""",                   dots, self.checkID, self.level, dots,
+""",                   constants.dots, self.checkID, self.level, constants.dots,
                        self.comment, self.alternate, self.valueList
                       )
 #end class

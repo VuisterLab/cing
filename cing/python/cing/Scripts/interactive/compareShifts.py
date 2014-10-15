@@ -9,7 +9,7 @@ First used for CaM analysis JBC paper
 import cing
 from cing import constants
 from cing.core import pid
-from cing.core import project
+from cing.core import Project
 from cing.Libs import io
 from cing.Libs import fpconst
 import math
@@ -189,7 +189,7 @@ def printShifts(project):
 
 
 def openProject(path, status):
-    p = project.open(path, status)
+    p = Project.open(path, status)
     if p is None:
         return None
     if p.molecule is None:
@@ -286,6 +286,5 @@ if True:
     #CaM1 V5/V6
     compare(cam10v5,cam10v6)
     printShifts(cam10v5)
-
 #end if
 

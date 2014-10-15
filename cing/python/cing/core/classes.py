@@ -4,7 +4,7 @@ Split into 3 for better performance.
 """
 import cing
 import cing.constants as constants
-import cing.definitions as cdefs
+import cing.constants.definitions as cdefs
 from cing.core import pid
 #from cing.Libs import io
 import cing.Libs.io as io
@@ -19,7 +19,10 @@ from cing import issueListUrl
 from cing import plugins
 from cing.Libs.Adict import Adict
 from cing.Libs.Geometry import violationAngle
+
 from cing.Libs.NTutils import * #@UnusedWildImport
+from cing.Libs.NTutils2 import MsgHoL
+
 try:
     import pyximport
     pyximport.install()
@@ -47,15 +50,15 @@ from cing.PluginCode.required.reqWhatif import summaryCheckIdList
 from cing.STAR.File import File
 from cing.core.CingSummary import CingSummary
 from cing.core.classes2 import * #@UnusedWildImport
-from cing.constants import * #@UnusedWildImport
+#from cing.constants import * #@UnusedWildImport
 from cing.core.molecule import Atom
 from cing.core.molecule import Ensemble
 from cing.core.molecule import Molecule
 from cing.core.molecule import nTdihedralOpt
 from cing.core.molecule import nTdistanceOpt #@UnusedImport
-from cing.definitions import cingPaths
-from cing.definitions import directories
-from cing.definitions import validationDirectories
+from cing.constants.definitions import cingPaths
+from cing.constants.definitions import directories
+from cing.constants.definitions import validationDirectories
 from cing.core.parameters import moleculeDirectories
 from cing.core.parameters import plotParameters
 from cing.core.validate import checkForSaltbridges
@@ -1169,8 +1172,8 @@ Project: Top level Cing project class
         stream2 = open(logFilePath, 'w')
 #        nTdebug("Opening %s" % logFilePath )
         addStreamnTmessageList(stream2)
-        fprintf(stream2,cing.cingDefinitions.getHeaderString()+'\n')
-        fprintf(stream2,cing.systemDefinitions.getStartMessage()+'\n')
+        fprintf(stream2,cing.constants.definitions.cingDefinitions.getHeaderString()+'\n')
+        fprintf(stream2,cing.constants.definitions.systemDefinitions.getStartMessage()+'\n')
 #        nTdebug("Opened %s (should now show up in log too)" % logFilePath )
     #end def
 
@@ -1180,7 +1183,7 @@ Project: Top level Cing project class
             nTdebug("Strange in project.removeLog stream2 was already closed.")
             return
         stream2 = nTdebug.stream2
-        fprintf(stream2, cing.systemDefinitions.getStopMessage()+'\n')
+        fprintf(stream2, cing.constants.definitions.systemDefinitions.getStopMessage()+'\n')
         removeStreamnTmessageList()
 #        nTdebug("Closed stream2 (should now NOT show up in log too)" )
     #end def
@@ -2631,7 +2634,7 @@ class Peak(NTdict, Lister):
        Peaks point to resonances
        Resonances point to atoms
        by GV 2007 07 23: added hasHeight, hasVolume attributes to the class
-          GV 2007 28 09: Moved from molecule.py to project.py
+          GV 2007 28 09: Moved from molecule.py to Project.py
           GV 19 Jun 08: PeakIndex starts at 0
           GV 19 Jun 08: change height, volume to NTvalue classes
           GV 19 Jun 08: changed hasHeight and hasVolume to methods

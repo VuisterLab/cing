@@ -3,8 +3,30 @@ Created on Aug 30, 2010
 
 @author: jd
 '''
+import math
+import re
 
-from cing.Libs.NTutils import * #@UnusedWildImport
+from cing import constants
+
+#from cing.Libs.NTutils import * #@UnusedWildImport
+from cing.Libs.NTutils import NTdict
+from cing.Libs.NTutils import NTtree
+from cing.Libs.NTutils import NTlist
+from cing.Libs.NTutils import nTerror
+from cing.Libs.NTutils import NTsort
+from cing.Libs.NTutils import nTcodeerror
+from cing.Libs.NTutils import nTwarning
+from cing.Libs.NTutils import nTmessage
+from cing.Libs.NTutils import nTdebug
+from cing.Libs.NTutils import nTdetail
+from cing.Libs.NTutils import getDeepByKeys
+from cing.Libs.NTutils import getDeepByKeysOrAttributes
+from cing.Libs.NTutils import getDeepByKeysOrDefault
+from cing.Libs.NTutils import is_bmrb_code
+from cing.Libs.NTutils import isNoneorNaN
+
+from cing.Libs import io
+
 from cing.PluginCode.required.reqVasco import * #@UnusedWildImport
 from cing.core.ROGscore import ROGscore
 
@@ -66,7 +88,7 @@ class RestraintList(NTlist, ProjectListMember):
     #end def
     
     def __str__(self):
-        return sprintf('<%s "%s" (%s,%d)>' % (self.__CLASS__, self.name, self.status, len(self)))
+        return io.sprintf('<%s "%s" (%s,%d)>' % (self.__CLASS__, self.name, self.status, len(self)))
     #end def
     def __repr__(self):
         return self.__str__()
@@ -77,18 +99,18 @@ class RestraintList(NTlist, ProjectListMember):
     #end def
     
     def renameToXplorCompatible(self):
-        'rename to Xplor Compatible'
+        """rename to Xplor Compatible"""
         n = len(self.name)
-        if n < MAX_SIZE_XPLOR_RESTRAINT_LIST_NAME:
+        if n < constants.MAX_SIZE_XPLOR_RESTRAINT_LIST_NAME:
 #             nTdebug("Kept the original xplor compatible drl name: %s" % self.name)
             return
         prefix = 'pl'
-        if self.__CLASS__ == DRL_LEVEL:
-            prefix = DRL_STR
-        elif self.__CLASS__ == ACL_LEVEL:
-            prefix = ACL_STR
-        elif self.__CLASS__ == RDCL_LEVEL:
-            prefix = RDCL_STR
+        if self.__CLASS__ == constants.DRL_LEVEL:
+            prefix = constants.DRL_STR
+        elif self.__CLASS__ == constants.ACL_LEVEL:
+            prefix = constants.ACL_STR
+        elif self.__CLASS__ == constants.RDCL_LEVEL:
+            prefix = constants.RDCL_STR
         prefix += '_'
         newName = self.projectList.getNextValidName(prefix = prefix)
         if newName == None:
@@ -217,12 +239,12 @@ class ResonanceList(NTlist, ProjectListMember):
     #end def
 
     def hasVascoCorrectionsApplied(self):
-        'A little bit more sophisticated routine to report no corrections of zero.'
+        """A little bit more sophisticated routine to report no corrections of zero."""
         return self.vascoApplied and self.hasVascoCorrectionsApplicable()
     #end def
 
     def hasVascoCorrectionsApplicable(self):
-        'A little bit more sophisticated routine to report no corrections of zero.'
+        """A little bit more sophisticated routine to report no corrections of zero."""
         for atomId in self.vascoResults.keys():
             ntvalue =  self.vascoResults[ atomId ]
             rerefValue = ntvalue.value
@@ -236,7 +258,7 @@ class ResonanceList(NTlist, ProjectListMember):
     #end def
 
     def __str__(self):
-        return sprintf('<%s "%s">' % (self.__CLASS__, self.name))
+        return io.sprintf('<%s "%s">' % (self.__CLASS__, self.name))
 #        return self.toVascoHtmlList() # modify when needed.
 
     def toVascoHtmlList(self, showHeader = False):

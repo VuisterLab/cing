@@ -11,7 +11,7 @@ import sys
 import time
 import urllib2
 
-import cing.Libs.Adict as Adict
+#import cing.Libs.Adict as Adict
 
 #-----------------------------------------------------------------------------------
 # Synchronize block with cing.Libs.helper.py
@@ -47,28 +47,29 @@ def _nTmessage(msg):
 # end def
 #-----------------------------------------------------------------------------------
 
-def getSvnRevision( path ):
-    """Return the revision number (int) or -1 if the revision isn't known.
-    It depends on (proper) svn being available on the system."""
-    try:
-        cingSvnInfo, err = _nTgetoutput('svn info %s' % path)
-        #_nTmessage("cingSvnInfo: " + cingSvnInfo)
-        #_nTmessage("err: " + err)
-        if not err:
-            cingSvnInfoList = cingSvnInfo.split('\n')
-            for cingSvnInfo in cingSvnInfoList:
-                if  cingSvnInfo.startswith('Revision:'):
-                    cingRevisionStr = cingSvnInfo.split()[ - 1]
-                    cingRevision = int(cingRevisionStr)
-                    return cingRevision
-                # end if
-            # end for
-        # end if
-    except:
-        pass
-#        _nTwarning("Failed to getSvnRevision()" )
-    return -1
-# end def
+#OBSOLETE
+# def getSvnRevision( path ):
+#     """Return the revision number (int) or -1 if the revision isn't known.
+#     It depends on (proper) svn being available on the system."""
+#     try:
+#         cingSvnInfo, err = _nTgetoutput('svn info %s' % path)
+#         #_nTmessage("cingSvnInfo: " + cingSvnInfo)
+#         #_nTmessage("err: " + err)
+#         if not err:
+#             cingSvnInfoList = cingSvnInfo.split('\n')
+#             for cingSvnInfo in cingSvnInfoList:
+#                 if  cingSvnInfo.startswith('Revision:'):
+#                     cingRevisionStr = cingSvnInfo.split()[ - 1]
+#                     cingRevision = int(cingRevisionStr)
+#                     return cingRevision
+#                 # end if
+#             # end for
+#         # end if
+#     except:
+#         pass
+# #        _nTwarning("Failed to getSvnRevision()" )
+#     return -1
+# # end def
 
 def getIpythonVersionTuple(reportAsIs = False):
     """

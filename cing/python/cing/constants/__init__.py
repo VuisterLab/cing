@@ -2,15 +2,12 @@
 Constants definitions
 """
 
+#__author__ = 'geerten'
+__author__ = 'jurgen'
+
+
 CING       = 'CING'
 CING_STR   = CING
-
-
-# OS related
-OS_TYPE_MAC = 'darwin'
-OS_TYPE_LINUX = 'linux'
-OS_TYPE_WINDOWS = 'windows' # unsupported.
-OS_TYPE_UNKNOWN = 'unknown'
 
 
 # 0.11+ is iPython version 2.
@@ -226,7 +223,7 @@ BAD_PROP  = 'BAD'
 
 CHARS_PER_LINE_OF_PROGRESS = 100
 
-PROTEIN_STR = 'protein'
+#PROTEIN_STR = 'protein' # duplicate
 PHI_STR = 'PHI'
 PSI_STR = 'PSI'
 CHI1_STR = 'CHI1'
@@ -254,7 +251,7 @@ CHI1CHI2_CHK_STR = 'CHI1CHI2_CHK'
 D1D2_CHK_STR = 'D1D2_CHK'
 
 AUTO_STR = 'auto'
-RMSD_STR = 'rmsd'
+#RMSD_STR = 'rmsd' #duplicate
 RANGES_STR = 'ranges'
 RESNUM_STR = 'resNum'
 VALUE_STR = "value"
@@ -392,6 +389,17 @@ RDB_QUEENY_UNCERTAINTY1_STR = 'queen_uncertainty1'
 RDB_QUEENY_UNCERTAINTY2_STR = 'queen_uncertainty2'
 RDB_QUEENY_INFORMATION_STR = 'queen_information'
 
+#----------------------------------------------------------------------
+# Whatif, from reqWhatif
+#----------------------------------------------------------------------
+#DEPRECIATED
+WHATIF_STR       = "Whatif" # key to the entities (atoms, residues, etc under which the results will be stored
+
+#----------------------------------------------------------------------
+# Procheck, from reqProcheck
+#----------------------------------------------------------------------
+#DEPRECIATED
+PROCHECK_STR       = "procheck" # key to the entities (atoms, residues, etc under which the results will be stored
 
 #----------------------------------------------------------------------
 # v3 key definitions
@@ -404,22 +412,41 @@ PROJECT_CREATE      = 'create'
 PROJECT_NEWFROMCCPN = 'newFromCcpn' #use new CCPN file to initialise data
 PROJECT_OLDFROMCCPN = 'oldFromCcpn' #use the stored CCPN data for restoring
 
-OBJECT_KEY     = 'object' # ValidationResult key for pointing at object
 
 # keys of different ValidationResult types
-CING_KEY       = 'cing'
-TALOSPLUS_KEY  = 'talosPlus'
-QUEENY_KEY     = 'queeny'
-SHIFTX_KEY     = 'shiftx'
-WHATIF_KEY     = 'whatif'
-DSSP_KEY       = 'dssp'
-PROCHECK_KEY   = 'procheck'
-WATTOS_KEY     = 'wattos'
-VASCO_KEY      = 'vasco'
-X3DNA_KEY      = 'x3dna'
+OBJECT_KEY          = 'object' # ValidationResult key for pointing at object
+CING_KEY            = 'cing'
+TALOSPLUS_KEY       = 'talosPlus'
+QUEENY_KEY          = 'queeny'
+SHIFTX_KEY          = 'shiftx'
+WHATIF_KEY          = 'whatif'
+DSSP_KEY            = 'dssp'
+PROCHECK_KEY        = 'procheck'
+WATTOS_KEY          = 'wattos'
+VASCO_KEY           = 'vasco'
+X3DNA_KEY           = 'x3dna'
 
 VALIDATION_KEYS = [TALOSPLUS_KEY, QUEENY_KEY, SHIFTX_KEY, WHATIF_KEY, DSSP_KEY, PROCHECK_KEY,
                    WATTOS_KEY, VASCO_KEY, X3DNA_KEY]
+# OS related
+OS_TYPE_MAC         = 'darwin'
+OS_TYPE_LINUX       = 'linux'
+OS_TYPE_WINDOWS     = 'windows' # unsupported.
+OS_TYPE_UNKNOWN     = 'unknown'
+
+#----------------------------------------------------------------------
+# convenience imports
+#----------------------------------------------------------------------
+# verbosity
+from cing.constants import verbosity
+# system related
+from cing.constants.definitions import systemDefinitions as system
+# code related
+from cing.constants.definitions import cingDefinitions as code
+# path related
+from cing.constants.definitions import cingPaths as paths
+# validation related
+from cing.constants.definitions import validationSettings
 
 
 

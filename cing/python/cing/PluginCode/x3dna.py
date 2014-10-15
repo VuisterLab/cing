@@ -10,11 +10,10 @@ from cing.core.classes import Coplanar
 from cing.core.classes import CoplanarList
 from cing.core.parameters import cingPaths
 from cing import plugins
-from cing.definitions import validationDirectories
+from cing.constants.definitions import validationDirectories
 
 useModule = True
-if cing.systemDefinitions.osType == OS_TYPE_MAC: # only installed for mac os currently.
-    if not os.path.exists(cingPaths.x3dna): # cingPaths.x3dna gets set in __init__ for MAC.
+if cingPaths.x3dna is None or not os.path.exists(cingPaths.x3dna): # cingPaths.x3dna gets set in __init__ for MAC.
         nTdebug("Missing x3dna directory which is a dep for x3dna; currently only tested for mac and disabled for other os")
         useModule = False
 else:

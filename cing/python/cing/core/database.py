@@ -84,13 +84,28 @@ Implemented new methods for MolDef class
 Completed the SML implementation
 __________________________________________________________________________________________________________
 """
+import sys
+import os
 
 from cing import cingPythonCingDir
 from cing.Libs.AwkLike import AwkLike
-from cing.Libs.NTutils import * #@UnusedWildImport
-from cing.constants import * #@UnusedWildImport
 
-import cing.Libs.xmlTools as xmlTools
+#from cing.Libs.NTutils import * #@UnusedWildImport
+from cing.Libs.NTutils import NTdict
+from cing.Libs.NTutils import NTtree
+from cing.Libs.NTutils import NTlist
+from cing.Libs.NTutils import nTerror
+from cing.Libs.NTutils import nTcodeerror
+from cing.Libs.NTutils import nTwarning
+from cing.Libs.NTutils import nTmessage
+from cing.Libs.NTutils import nTdebug
+
+from cing.Libs import io
+
+#from cing.constants import * #@UnusedWildImport
+from cing import constants
+
+#import cing.Libs.xmlTools as xmlTools
 import cing.Libs.disk as disk
 
 
@@ -146,7 +161,7 @@ class MolDef( NTtree ):
     def __init__( self, name, *args, **kwds ):
         NTtree.__init__( self,
                          __CLASS__   = 'MolDef',
-                         convention  = INTERNAL,
+                         convention  = constants.INTERNAL,
                          name        = name,
                          residueDict = {},    # contains definitions of residues, sorted by convention
                        )
@@ -184,7 +199,7 @@ class MolDef( NTtree ):
         return resDef
     #end def
 
-    def _restoreFromSML( self, convention=INTERNAL ):
+    def _restoreFromSML( self, convention=constants.INTERNAL ):
         """
             Restore the MolDef instance from CING ResidueDef SML files
         """
@@ -198,7 +213,7 @@ class MolDef( NTtree ):
         return NTdb
     #end def
 
-    def _saveToSML( self, convention=INTERNAL ):
+    def _saveToSML( self, convention=constants.INTERNAL ):
         """
             Save the MolDef instance to CING ResidueDef SML files; optionally convert to convention
         """
@@ -257,7 +272,7 @@ class MolDef( NTtree ):
         return result
     #end def
 
-    def isValidResidueName( self, resName, convention = INTERNAL ):
+    def isValidResidueName( self, resName, convention = constants.INTERNAL ):
         """return True if resName is a valid for convention, False otherwise
         """
         if not resName:
@@ -268,10 +283,10 @@ class MolDef( NTtree ):
 #            nTdebug('MolDef.isValidResidueName: convention %s not defined within CING', convention)
             return False
         #end if
-        return (self.getResidueDefByName( resName, convention=convention) != None)
+        return self.getResidueDefByName( resName, convention=convention) is not None
     #end def
 
-    def getResidueDefByName( self, resName, convention = INTERNAL ):
+    def getResidueDefByName( self, resName, convention = constants.INTERNAL ):
         """return ResidueDef instance for resName if resName is a valid for convention
            or None otherwise
         """
@@ -291,7 +306,7 @@ class MolDef( NTtree ):
         return None
     #end def
 
-    def isValidAtomName( self, resName, atmName, convention = INTERNAL ):
+    def isValidAtomName( self, resName, atmName, convention = constants.INTERNAL ):
         """return True if resName, atmName is a valid for convention, False otherwise"""
     #  print '>>', resName, atomName
 
@@ -307,10 +322,10 @@ class MolDef( NTtree ):
 #            nTdebug('MolDef.isValidAtomName: convention %s not defined within CING', convention)
             return False
         #end if
-        return (self.getAtomDefByName( resName, atmName, convention=convention) != None)
+        return self.getAtomDefByName( resName, atmName, convention=convention) is not None
     #end def
 
-    def getAtomDefByName( self, resName, atmName, convention = INTERNAL ):
+    def getAtomDefByName( self, resName, atmName, convention = constants.INTERNAL ):
         """return AtomDef instance for resName, atmName if resName, atmName is a valid for convention
            or None otherwise
         """
@@ -364,9 +379,9 @@ class MolDef( NTtree ):
         #end for
     #end def
 
-    def exportDef( self, stream = sys.stdout, convention=INTERNAL ):
-        "export name definitions to stream"
-        fprintf(stream,'convention = %r\n', convention)
+    def exportDef( self, stream = sys.stdout, convention=constants.INTERNAL ):
+        """export name definitions to stream"""
+        io.fprintf(stream,'convention = %r\n', convention)
         for res in self:
             res.exportDef( stream=stream, convention=convention )
         #end for
@@ -377,23 +392,23 @@ class ResidueDef( NTtree ):
     def __init__( self, name, **kwds ):
         NTtree.__init__(   self,
                            __CLASS__   = 'ResidueDef',
-                           convention  = INTERNAL,
+                           convention  = constants.INTERNAL,
                            name        = name,        # used to refer to this residueDef: should be unique
-                           commonName  = name,        # used to name residue; default later changed to IUPAC if exists
+                           commonName  = name,        # used to name residue; default later changed to constants.IUPAC if exists
                            shortName   = '_',
                            canBeModified = True,      # ResidueDef can be modified; i.e. AtomDefs added;
                                                       # set to False on import for  non-protein and non-nucleic CING definitions
                            shouldBeSaved = True,
                            # ResidueDef requires saving with project; set to False on import for default CING definitions
                            comment     = None,
-                           nameDict    = {INTERNAL_0:name, INTERNAL_1:name},
+                           nameDict    = {constants.INTERNAL_0:name, constants.INTERNAL_1:name},
                            atomDict    = {},
                            # contains definition of atoms, sorted by convention, dynamically created on initialization
                            dihedrals   = NTlist(),
                            properties  = []           # list of properties for residue
                        )
-        if self.nameDict.has_key(IUPAC):
-            self.commonName = self.nameDict[IUPAC]
+        if self.nameDict.has_key(constants.IUPAC):
+            self.commonName = self.nameDict[constants.IUPAC]
         # update the defaults with any arguments to the initialization
         self.update( kwds )
         self.properties = []
@@ -442,8 +457,9 @@ class ResidueDef( NTtree ):
 
     def appendAtomListDef( self, nameList=[], **kwds ):
         """Not used yet; to be used in CCPN reader..."""
-        for atomName in nameList:
-            _atm = self.appendAtomDef(atomName,**kwds)
+        pass
+        # for atomName in nameList:
+        #     _atm = self.appendAtomDef(atomName,**kwds)
 #            nTdebug("Added to residue: %s atom %s" % (self, atm))
     #end def
 
@@ -530,7 +546,7 @@ class ResidueDef( NTtree ):
         return self.name
     #end def
 
-    def isValidAtomName( self, atmName, convention = INTERNAL ):
+    def isValidAtomName( self, atmName, convention = constants.INTERNAL ):
         """return True if resName, atmName is a valid for convention, False otherwise"""
     #  print '>>', resName, atomName
 
@@ -538,10 +554,10 @@ class ResidueDef( NTtree ):
             nTerror('ResidueDef.isValidAtomName: convention %s not defined within CING', convention)
             return False
         #end if
-        return (self.getAtomDefByName( atmName, convention=convention) != None)
+        return self.getAtomDefByName( atmName, convention=convention) is not None
     #end def
 
-    def getAtomDefByName( self, atmName, convention = INTERNAL ):
+    def getAtomDefByName( self, atmName, convention = constants.INTERNAL ):
         """return AtomDef instance for atmName if atmName is a valid for convention
            or None otherwise.
 
@@ -581,15 +597,15 @@ class ResidueDef( NTtree ):
 
         # Set the entry residueDict of molDef to self
         residueDict = self.molDef.residueDict
-        residueDict.setdefault( LOOSE, {} )
+        residueDict.setdefault( constants.LOOSE, {} )
         for n in [self.shortName, self.name, self.name.capitalize(), self.name.lower(), self.commonName, self.commonName.capitalize(),
                   self.commonName.lower()]:
-            residueDict[LOOSE][n] = self
+            residueDict[constants.LOOSE][n] = self
         #end for
         #different convention definitions
         for convR, nameR in self.nameDict.iteritems():
             residueDict.setdefault( convR, {} )
-            if (nameR != None):
+            if nameR is not None:
                 residueDict[convR][nameR] = self
             #end if
         #end for
@@ -599,16 +615,16 @@ class ResidueDef( NTtree ):
         #end for
     #end def
 
-    def exportDef( self, stream = sys.stdout, convention = INTERNAL ):
-        "export definitions to stream"
-        fprintf( stream, '\n#=======================================================================\n')
-        fprintf( stream,   '#\t%-8s %-8s\n','internal', 'short')
-        fprintf( stream,   'RESIDUE\t%-8s %-8s\n', self.translate(convention), self.shortName )
-        fprintf( stream,   '#=======================================================================\n')
+    def exportDef( self, stream = sys.stdout, convention = constants.INTERNAL ):
+        """export definitions to stream"""
+        io.fprintf( stream, '\n#=======================================================================\n')
+        io.fprintf( stream,   '#\t%-8s %-8s\n','internal', 'short')
+        io.fprintf( stream,   'RESIDUE\t%-8s %-8s\n', self.translate(convention), self.shortName )
+        io.fprintf( stream,   '#=======================================================================\n')
 
         # saving different residue attributes
         for attr in ['nameDict', 'comment']:
-            fprintf( stream, "\t%s = %s\n", attr, repr(self[attr]) )
+            io.fprintf( stream, "\t%s = %s\n", attr, repr(self[attr]) )
         #end for
 
         # clean the properties list
@@ -619,7 +635,7 @@ class ResidueDef( NTtree ):
                 props.append(prop)
             #end if
         #end for
-        fprintf( stream, "\t%s = %s\n", 'properties', repr(props) )
+        io.fprintf( stream, "\t%s = %s\n", 'properties', repr(props) )
 
         for dh in self.dihedrals:
             dh.exportDef( stream=stream, convention=convention )
@@ -629,8 +645,8 @@ class ResidueDef( NTtree ):
             atm.exportDef( stream=stream, convention=convention )
         #end for
 
-        fprintf( stream,   'END_RESIDUE\n')
-        fprintf( stream,   '#=======================================================================\n')
+        io.fprintf( stream,   'END_RESIDUE\n')
+        io.fprintf( stream,   '#=======================================================================\n')
     #end def
 #end class
 
@@ -650,8 +666,8 @@ def isNterminalAtom( atmDef ):
     Return True if atom belongs to N-terminal category.
     Needs to be called by valid atmDef or 0 will be returned.
     """
-    if atmDef == None or atmDef.residueDef == None: # Fixes 2ksi
-        nTdebug("%s called without atom/residue definition." % getCallerName())
+    if atmDef is None or atmDef.residueDef is None: # Fixes 2ksi
+        #nTdebug("%s called without atom/residue definition." % getCallerName())
         return 0
     if atmDef.residueDef.hasProperties('protein'):
         d = NterminalProteinAtomDict
@@ -666,11 +682,11 @@ CterminalAtomDict = NTdict()
 CterminalAtomDict.appendFromList( "OXT".split())
 
 def isCterminalAtom( atmDef ):
-    "Return True if atom belongs to C-terminal category"
+    """Return True if atom belongs to C-terminal category"""
     return CterminalAtomDict.has_key(atmDef.name)
 
 def isTerminal( atmDef ):
-    if atmDef == None or atmDef.residueDef == None:
+    if atmDef is None or atmDef.residueDef is None:
 #        nTdebug("%s called without atom/residue definition." % getCallerName())
         return 0
 
@@ -682,18 +698,18 @@ def isAromatic( atmDef ):
     """Return true if it is an atom belonging to an aromatic ring
        Patched for now, have to store it in database
     """
-    if atmDef == None or atmDef.residueDef == None:
-        nTdebug("%s called without atom/residue definition." % getCallerName())
+    if atmDef is None or atmDef.residueDef is None:
+        #nTdebug("%s called without atom/residue definition." % getCallerName())
         return 0
 
     if not atmDef.residueDef.hasProperties('aromatic'):
         return False
 
-    if (isCarbon(atmDef) and atmDef.shift != None and atmDef.shift.average > 100.0):
+    if isCarbon(atmDef) and atmDef.shift is not None and atmDef.shift.average > 100.0:
         return True
-    if (isNitrogen(atmDef) and atmDef.shift != None and atmDef.shift.average > 130.0):
+    if isNitrogen(atmDef) and atmDef.shift is not None and atmDef.shift.average > 130.0:
         return True
-    elif (isProton(atmDef)):
+    elif isProton(atmDef):
         if len(atmDef.topology) == 0:
             return False #bloody CYANA pseudo atomsof some residues like CA2P do not have a topology
         heavy = atmDef.residueDef[atmDef.topology[0][1]]
@@ -706,7 +722,7 @@ def isBackbone( atmDef ):
     """
     Return True if it is not a sidechain atom, False otherwise
     """
-    if atmDef == None or atmDef.residueDef == None: # Fixes 2ksi
+    if atmDef is None or atmDef.residueDef is None: # Fixes 2ksi
 #        nTdebug("%s called without atom/residue definition." % getCallerName())
         return 0
     if atmDef.residueDef.hasProperties('protein'):
@@ -723,7 +739,7 @@ def isSidechain( atmDef ):
     Return True if it is not a backbone atom,
     i.e. not isBackbone, but is protein or nucleic acid; e.g. HOH is not sidechain!
     """
-    if atmDef == None or atmDef.residueDef == None:
+    if atmDef is None or atmDef.residueDef is None:
 #        nTdebug("%s called without atom/residue definition." % getCallerName())
         return 0
 
@@ -734,7 +750,7 @@ def isMethyl( atmDef ):
     """
     Return True atm is a methyl (either carbon or proton)
     """
-    if atmDef == None or atmDef.residueDef == None:
+    if atmDef is None or atmDef.residueDef is None:
 #        nTdebug("%s called without atom/residue definition." % getCallerName())
         return 0
     if isCarbon(atmDef):
@@ -744,7 +760,7 @@ def isMethyl( atmDef ):
                 count += 1
             #end if
         #end for
-        return (count == 3) # Methyls have three protons!
+        return count == 3 # Methyls have three protons!
     elif isProton(atmDef):
         # should be attached to a heavy atom
         if len(atmDef.topology) == 0:
@@ -767,8 +783,8 @@ def isMethylene( atmDef ):
     """
     Return True atm is a methylene (either carbon or proton)
     """
-    if atmDef == None or atmDef.residueDef == None:
-        nTdebug("%s called without atom/residue definition." % getCallerName())
+    if atmDef is None or atmDef.residueDef is None:
+        #nTdebug("%s called without atom/residue definition." % getCallerName())
         return 0
 
     if isCarbon(atmDef):
@@ -778,7 +794,7 @@ def isMethylene( atmDef ):
                 count += 1
             #end if
         #end for
-        return (count == 2) # Methylene's have two protons!
+        return count == 2 # Methylene's have two protons!
     elif isProton(atmDef):
         # should be attached to a heavy atom
         if len(atmDef.topology) == 0:
@@ -817,7 +833,7 @@ def isMethylProtonButNotPseudo( atmDef ):
 def isProton( atmDef ):
     """Return Tue if atm is 1H
     """
-    return (atmDef.spinType == '1H')
+    return atmDef.spinType == '1H'
 #end def
 
 def isHeavy( atmDef ):
@@ -836,35 +852,35 @@ def isHeavy( atmDef ):
 def isCarbon( atmDef ):
     """Return Tue if atm is 13C
     """
-    return (atmDef.spinType == '13C')
+    return atmDef.spinType == '13C'
 #end def
 
 def isNitrogen( atmDef ):
     """Return Tue if atm is 15N
     """
-    return (atmDef.spinType == '15N')
+    return atmDef.spinType == '15N'
 #end def
 
 def isOxygen( atmDef ):
     """Return Tue if atm is 16O
     """
-    return (atmDef.spinType == '16O')
+    return atmDef.spinType == '16O'
 #end def
 
 def isSulfur( atmDef ):
     """Return Tue if atm is 32S
     """
-    return (atmDef.spinType == '32S')
+    return atmDef.spinType == '32S'
 #end def
 
 def isPseudoAtom( atmDef ):
     """Return True if atom is pseudoAtom"""
-    return ( len(atmDef.real) > 0 or atmDef.hasProperties('isPseudoAtom') ) # additional check: eq. CYANA Pseudoatoms of Calcium
+    return len(atmDef.real) > 0 or atmDef.hasProperties('isPseudoAtom')  # additional check: eq. CYANA Pseudoatoms of Calcium
 #end def
 
 def hasPseudoAtom( atmDef ):
     """Return True if atom has a correponding pseudoAtom"""
-    return ( atmDef.pseudo != None )
+    return atmDef.pseudo is not None
 #end def
 
 class AtomDef( NTtree ):
@@ -872,9 +888,9 @@ class AtomDef( NTtree ):
         #print '>>', args, kwds
         NTtree.__init__( self,
                            __CLASS__   = 'AtomDef' ,
-                           convention  = INTERNAL,
+                           convention  = constants.INTERNAL,
                            name        = name,     # Internal name
-                           nameDict    = {INTERNAL_0:name, INTERNAL_1:name}, # default initialization, to be
+                           nameDict    = {constants.INTERNAL_0:name, constants.INTERNAL_1:name}, # default initialization, to be
                                                                              # updated later.
                            aliases     = [],       # list of aliases,
                            canBeModified = True,
@@ -927,7 +943,7 @@ class AtomDef( NTtree ):
         if self.nameDict.has_key(convention):
             # XPLOR definitions potentially have multiple
             # entries, separated by ','. Take the first.
-            if self.nameDict[convention] != None:
+            if self.nameDict[convention] is not None:
                 return self.nameDict[convention].split(',')[0]
             #end if
         #end if
@@ -1065,7 +1081,7 @@ class AtomDef( NTtree ):
         atomDict = self.residueDef.atomDict
         for convA, nameA in self.nameDict.iteritems():
             atomDict.setdefault( convA, {} )
-            if (nameA != None):
+            if nameA is not None:
                 # XPLOR definitions have possibly multiple entries
                 # separated by ','
                 for n in nameA.split(','):
@@ -1077,18 +1093,18 @@ class AtomDef( NTtree ):
         #Add aliases
         for aname in self.aliases:
             self.residueDef[aname] = self
-            atomDict[INTERNAL][aname] = self
+            atomDict[constants.INTERNAL][aname] = self
         #end for
     #end def
 
-    def exportDef( self, stream = sys.stdout, convention=INTERNAL ):
-        "export definitions to stream"
-        fprintf( stream, '\t#---------------------------------------------------------------\n')
-        fprintf( stream, '\tATOM %-8s\n',self.translate(convention))
-        fprintf( stream, '\t#---------------------------------------------------------------\n')
+    def exportDef( self, stream = sys.stdout, convention=constants.INTERNAL ):
+        """export definitions to stream"""
+        io.fprintf( stream, '\t#---------------------------------------------------------------\n')
+        io.fprintf( stream, '\tATOM %-8s\n',self.translate(convention))
+        io.fprintf( stream, '\t#---------------------------------------------------------------\n')
 
         # Topology; optionally convert
-        if convention == INTERNAL:
+        if convention == constants.INTERNAL:
             top2 = self.topology
         else:
             # convert topology
@@ -1107,7 +1123,7 @@ class AtomDef( NTtree ):
             #end for
             #print 'top2', top2
         #end if
-        fprintf( stream, "\t\t%s = %s\n", 'topology', repr(top2) )
+        io.fprintf( stream, "\t\t%s = %s\n", 'topology', repr(top2) )
 
         # clean the properties list
         props = []
@@ -1117,16 +1133,16 @@ class AtomDef( NTtree ):
                 props.append(prop)
             #end if
         #end for
-        fprintf( stream, "\t\t%s = %s\n", 'properties', repr(props) )
+        io.fprintf( stream, "\t\t%s = %s\n", 'properties', repr(props) )
 
         # Others
         for attr in ['nameDict','aliases','pseudo','real','type','spinType','shift','hetatm']:
             if self.has_key(attr):
-                fprintf( stream, "\t\t%s = %s\n", attr, repr(self[attr]) )
+                io.fprintf( stream, "\t\t%s = %s\n", attr, repr(self[attr]) )
         #end for
 
-        fprintf( stream, '\tEND_ATOM\n')
-#        fprintf( stream, '\t#---------------------------------------------------------------\n')
+        io.fprintf( stream, '\tEND_ATOM\n')
+#        io.fprintf( stream, '\t#---------------------------------------------------------------\n')
     #end def
 
 #end class
@@ -1135,7 +1151,7 @@ class DihedralDef( NTtree ):
     def __init__( self, name, **kwds ):
         NTtree.__init__(   self,
                            __CLASS__   = 'DihedralDef',
-                           convention  = INTERNAL,
+                           convention  = constants.INTERNAL,
                            name        = name,
                            aliases     = [],
                            residueDef  = None,
@@ -1157,13 +1173,13 @@ class DihedralDef( NTtree ):
     def __str__(self):
         return '<DihedralDef %s.%s>' % (self.residueDef.name, self.name)
 
-    def exportDef( self, stream = sys.stdout, convention=INTERNAL ):
-        "export definitions to stream"
-        fprintf( stream, '\t#---------------------------------------------------------------\n')
-        fprintf( stream, '\tDIHEDRAL %-8s\n',self.name)
-        fprintf( stream, '\t#---------------------------------------------------------------\n')
+    def exportDef( self, stream = sys.stdout, convention=constants.INTERNAL ):
+        """export definitions to stream"""
+        io.fprintf( stream, '\t#---------------------------------------------------------------\n')
+        io.fprintf( stream, '\tDIHEDRAL %-8s\n',self.name)
+        io.fprintf( stream, '\t#---------------------------------------------------------------\n')
 
-        if convention == INTERNAL:
+        if convention == constants.INTERNAL:
             atms = self.atoms
         else:
             # convert atoms
@@ -1182,14 +1198,14 @@ class DihedralDef( NTtree ):
             #end for
             #print 'atms', atms
         #end if
-        fprintf( stream, "\t\t%s = %s\n", 'atoms', repr(atms) )
+        io.fprintf( stream, "\t\t%s = %s\n", 'atoms', repr(atms) )
 
         for attr in ['karplus']:
-            fprintf( stream, "\t\t%s = %s\n", attr, repr(self[attr]) )
+            io.fprintf( stream, "\t\t%s = %s\n", attr, repr(self[attr]) )
         #end for
 
-        fprintf( stream, '\tEND_DIHEDRAL\n')
-#        fprintf( stream, '\t#---------------------------------------------------------------\n')
+        io.fprintf( stream, '\tEND_DIHEDRAL\n')
+#        io.fprintf( stream, '\t#---------------------------------------------------------------\n')
     #end for
 
     def postProcess(self):
@@ -1204,7 +1220,7 @@ class DihedralDef( NTtree ):
 
 
 def importNameDefs( tableFile, name)   :
-    "Import residue and atoms name defs from tableFile"
+    """Import residue and atoms name defs from tableFile"""
 
 #    nTdebug('==> Importing database file '+ tableFile )
 
@@ -1258,9 +1274,9 @@ def importNameDefs( tableFile, name)   :
     #end for
     mol.name=name
 
-    if mol.convention != INTERNAL:
+    if mol.convention != constants.INTERNAL:
         nTerror('Reading databse: current convention setting (%s) does not match database file "%s" (%s)',
-                INTERNAL, tableFile, mol.convention
+                constants.INTERNAL, tableFile, mol.convention
                )
         sys.exit(1)
 
@@ -1275,30 +1291,30 @@ def importNameDefs( tableFile, name)   :
 #end def
 
 
-def translateResidueName( convention, resName, newConvention=INTERNAL ):
+def translateResidueName( convention, resName, newConvention=constants.INTERNAL ):
     """ Translate resName from convention to newConvention
         return None on error/no-translation
     """
     res =  NTdb.getResidueDefByName( resName, convention=convention )
-    if res != None:
+    if res is not None:
         return res.translate( newConvention )
     #endif
     return None
 #end def
 
 
-def translateAtomName( convention, resName, atmName, newConvention=INTERNAL ):
+def translateAtomName( convention, resName, atmName, newConvention=constants.INTERNAL ):
     """ Translate resName,atomName from convention to newConvention
         return None on error/no-translation
     """
     atm =  NTdb.getAtomDefByName( resName, atmName, convention=convention )
-    if atm != None:
+    if atm is not None:
         return atm.translate( newConvention )
     #endif
     return None
 #end def
 
-def saveToSML( rDefList, rootPath, convention=INTERNAL ):
+def saveToSML( rDefList, rootPath, convention=constants.INTERNAL ):
     """
     Save ResidueDefs of rDefList as SML files in rootPath; optionally translate to convention
     """
@@ -1312,7 +1328,7 @@ def saveToSML( rDefList, rootPath, convention=INTERNAL ):
     #end for
 #end def
 
-def restoreFromSML( rootPath, mDef, convention=INTERNAL ):
+def restoreFromSML( rootPath, mDef, convention=constants.INTERNAL ):
     """
     restore ResidueDefs from SML files in rootPath to a MolDef instance mDef
     """
@@ -1328,7 +1344,7 @@ def restoreFromSML( rootPath, mDef, convention=INTERNAL ):
 #end def
 
 
-#NTdb = importNameDefs( os.path.realpath(cingPythonCingDir + '/Database/dbTable.' + INTERNAL), name='NTdb')
+#NTdb = importNameDefs( os.path.realpath(cingPythonCingDir + '/Database/dbTable.' + constants.INTERNAL), name='NTdb')
 NTdb = MolDef( name = 'NTdb') # Database instance; to be filled later,otherwise we get circular imports
 
 patch=False
@@ -1345,11 +1361,11 @@ if patch:
             #print hn
 
             for hName in ['H1','H2','H3']:
-                ad = res.appendAtomDef( hName, nameDict={'INTERNAL_0':hName,
-                                                         'INTERNAL_1':hName,
-                                                          IUPAC:hName,
-                                                          CCPN:hName,
-                                                          XPLOR:hName,
+                ad = res.appendAtomDef( hName, nameDict={ constants.INTERNAL_0:hName,
+                                                          constants.INTERNAL_1:hName,
+                                                          constants.IUPAC:hName,
+                                                          constants.CCPN:hName,
+                                                          constants.XPLOR:hName,
                                                         },
                                              aliases=[],
                                              pseudo = None,
@@ -1367,11 +1383,11 @@ if patch:
         else: # proline (cis and trans)
 
             for hName in ['H2','H3']:
-                ad = res.appendAtomDef( hName, nameDict={'INTERNAL_0':hName,
-                                                         'INTERNAL_1':hName,
-                                                          IUPAC:hName,
-                                                          CCPN:hName,
-                                                          XPLOR:hName,
+                ad = res.appendAtomDef( hName, nameDict={constants.INTERNAL_0:hName,
+                                                          constants.INTERNAL_1:hName,
+                                                          constants.IUPAC:hName,
+                                                          constants.CCPN:hName,
+                                                          constants.XPLOR:hName,
                                                         },
                                              aliases=[],
                                              pseudo = None,
@@ -1392,11 +1408,11 @@ if patch:
         res.O.postProcess()
 
         # add C-terminal OXT
-        ad = res.appendAtomDef( 'OXT', nameDict={'INTERNAL_0':'OXT',
-                                                 'INTERNAL_1':'OXT',
-                                                   IUPAC:"OXT,O''",
-                                                   CCPN:"O''",
-                                                   XPLOR:'OXT',
+        ad = res.appendAtomDef( 'OXT', nameDict={ constants.INTERNAL_0:'OXT',
+                                                  constants.INTERNAL_1:'OXT',
+                                                  constants.IUPAC:"OXT,O''",
+                                                  constants.CCPN:"O''",
+                                                  constants.XPLOR:'OXT',
                                                  },
                                          aliases=["OXT","O''"],
                                          pseudo = None,

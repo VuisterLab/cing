@@ -114,7 +114,7 @@ def setVersion(data):
     Set py/version key in data
     """
     version = '%s:%s' % (cing.constants.CING_KEY,
-                         cing.definitions.cingDefinitions.version
+                         cing.constants.definitions.cingDefinitions.version
                         )
     data[tags.VERSION] = version
 #end def

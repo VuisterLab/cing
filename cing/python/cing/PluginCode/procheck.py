@@ -24,7 +24,7 @@ from cing.Libs.NTutils import * #@UnusedWildImport
 from cing.Libs.disk import copy
 from cing.PluginCode.required.reqProcheck import * #@UnusedWildImport
 from cing.constants import * #@UnusedWildImport
-from cing.definitions import cingPaths
+from cing.constants.definitions import cingPaths
 from glob import glob
 
 

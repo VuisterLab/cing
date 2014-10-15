@@ -1,5 +1,5 @@
 from cing import plugins
-from cing import definitions as cdefs
+from cing.constants import definitions as cdefs
 from cing.Libs import Adict
 from cing.Libs import NTutils as ntu
 

@@ -3,7 +3,7 @@ Created on Aug 30, 2010
 
 Simple class that doesn't import NTutils or sml in order to avoid cyclic behaviour.
 '''
-from cing.constants import * #@UnusedWildImport
+#from cing.constants import * #@UnusedWildImport
 #from cing.core.sml import SMLhandler
 
 DEFAULT_SML_HANDLER_STRING = 'Default handler from SMLhandled'

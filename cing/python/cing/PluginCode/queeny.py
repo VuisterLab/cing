@@ -9,7 +9,7 @@ Residues obtain attribute 'information' with information value that is averaged 
 
 import cing
 from cing import constants
-from cing import definitions as cdefs
+from cing.constants import definitions as cdefs
 from cing.core import validation
 from cing.core import sml
 from cing.Libs import io

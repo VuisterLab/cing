@@ -3,7 +3,7 @@
 CING Package Contents:
 -------------------------------------------------------------------------------
 classes        Project, Restraints, Lists and auxiliary classes.
-constants      CING constants.
+constants      CING constants, definitions and parameters.
 database       CING database implementation.
 importPlugin   CING plugin implementation
 molecule       Molecule, Chain, Residue, Atom, Coordinate, Ensemble and Model
@@ -66,11 +66,13 @@ A Zinc ion will usually be part of the same chain in CING whereas it will be
 in a different assembly entity in NMR-STAR. This has consequences for numbering.
 -------------------------------------------------------------------------------
 """
-import cing.definitions as cdefs
+import cing
 
-__version__         = cdefs.__version__
-__date__            = cdefs.__date__
-__copyright_years__ = cdefs.__copyright_years__
-__author__          = cdefs.__author__
-__copyright__       = cdefs.__copyright__
-__credits__         = cdefs.__credits__
+__version__         = cing.__version__
+__revision__        = cing.__revision__
+__date__            = cing.__date__
+__author__          = cing.__author__
+__copyright__       = cing.__copyright__
+__copyright_years__ = cing.__copyright_years__
+__credits__         = cing.__credits__
+

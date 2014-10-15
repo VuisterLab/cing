@@ -3,7 +3,7 @@ Adds html generation methods
 """
 import cing
 import cing.constants as constants
-import cing.definitions as cdefs
+import cing.constants.definitions as cdefs
 from cing.constants import *
 from cing import authorList
 from cing import cingDirData
