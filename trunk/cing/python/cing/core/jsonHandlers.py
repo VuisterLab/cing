@@ -143,8 +143,10 @@ class StatusDictJsonHandler(jsonTools.handlers.AnyDictHandler):
     """Handler for the StatusDict class
     """
     namespace = cing.constants.CING_KEY
+    encodedKeys = [Project.StatusDict.MOLECULE]
 
     def flatten(self, obj, data):
+        #print 'StatusDictJasonHandler.flatten>\n', obj.formatItems()
         data['key'] = obj['key']
         return self._flatten(obj, data)
 
@@ -223,3 +225,20 @@ class ValidationResultsContainerJsonHandler(jsonTools.handlers.AnyDictHandler):
     #     return self._restore(data, a)
 #end class
 ValidationResultsContainerJsonHandler.handles(validation.ValidationResultsContainer)
+
+class ValidationDataJsonHandler(jsonTools.handlers.AnyDictHandler):
+    """Handler for the ValidationData class
+    """
+    cls = validation.ValidationData
+    namespace = cing.constants.CING_KEY
+    encodedKeys = [validation.ValidationData.PROJECT]
+
+    # def flatten(self, obj, data):
+    #     data['py/version'] = cing.definitions.cingDefinitions.version
+    #     return self._flatten(obj, data)
+    #
+    # def restore(self, data):
+    #     a = validation.ValidationResultsContainer()
+    #     return self._restore(data, a)
+#end class
+ValidationDataJsonHandler.handles(validation.ValidationData)

@@ -23,13 +23,7 @@ from   cing.Libs import io
 import cing.Libs.jsonTools as jsonTools
 from   cing.Libs import utils
 
-
-# from ConfigParser import ConfigParser
-# from cing import cingPythonCingDir
-# from cing import cingRoot
-# from cing import cingVersion
-# from cing import issueListUrl
-# from cing import plugins
+# v1 imports
 from cing.Libs.Adict import Adict
 from cing.Libs.Geometry import violationAngle
 
@@ -118,24 +112,14 @@ from cing.core.classes2 import RestraintList
 from cing.core.classes2 import ProjectListMember
 
 from cing.core.classes3 import Lister
-from cing.core.classes3 import SMLhandled
-
-#from cing.constants import * #@UnusedWildImport
 
 from cing.core.molecule import Atom
 from cing.core.molecule import Ensemble
 from cing.core.molecule import Molecule
 from cing.core.molecule import nTdihedralOpt
 
-#from cing.core.molecule import nTdistanceOpt #@UnusedImport
-
-# from cing.constants.definitions import cingPaths
-# from cing.constants.definitions import directories
-# from cing.constants.definitions import validationDirectories
-# from cing.core.parameters import moleculeDirectories
 from cing.core.parameters import plotParameters
 from cing.core.ROGscore import ROGscore
-
 
 from cing.core.validate import checkForSaltbridges
 from cing.core.validate import criticize
@@ -162,8 +146,6 @@ __author__          = cing.__author__
 __copyright__       = cing.__copyright__
 __copyright_years__ = cing.__copyright_years__
 __credits__         = cing.__credits__
-
-projects = NTlist()
 
 
 #-----------------------------------------------------------------------------
@@ -237,8 +219,8 @@ Project: Top level Cing project class
                  'coplanarListNames', 'dihedralByProjectListNames', 'dihedralByResidue',
                  'storedInCcpnFormat',
                  'reports',
-                 'history',
-                 'status'
+                 'status',
+                 'history'
     ]
 
 
@@ -274,6 +256,8 @@ Project: Top level Cing project class
         self.storedInCcpnFormat = False
         self.restoredFromXml = True # Project settings restored from project.xml file
 
+        # validation data instance
+        self.validationData = validation.ValidationData(self)
         # General status dict for storing state of external programs;
         self.status = Adict()
         # initialise for 'known' programs
@@ -281,16 +265,17 @@ Project: Top level Cing project class
             self.getStatusDict(key)
         #LEGACY
         for key, statusName in [
-            (constants.SHIFTX_KEY, 'shiftxStatus'),
-            (constants.PROCHECK_KEY,'procheckStatus'),
-            (constants.DSSP_KEY, 'dsspStatus'),
-            (constants.WHATIF_KEY, 'whatifStatus'),
-            (constants.WATTOS_KEY, 'wattosStatus'),
-            (constants.VASCO_KEY, 'vascoStatus'),
-            (constants.X3DNA_KEY, 'x3dnaStatus')
+            (constants.SHIFTX_KEY,   'shiftxStatus'),
+            (constants.PROCHECK_KEY, 'procheckStatus'),
+            (constants.DSSP_KEY,     'dsspStatus'),
+            (constants.WHATIF_KEY,   'whatifStatus'),
+            (constants.WATTOS_KEY,   'wattosStatus'),
+            (constants.VASCO_KEY,    'vascoStatus'),
+            (constants.X3DNA_KEY,    'x3dnaStatus')
              ]:
             self[statusName] = self.status[key]
         #end for
+
 
         #OBSOLETE
         #self.statusObjectNameList = 'procheckStatus dsspStatus whatifStatus wattosStatus vascoStatus x3dnaStatus'.split()
@@ -587,11 +572,10 @@ Project: Top level Cing project class
            Returns Project instance or None on error.
         """
         # Using the global statement without assignment pylint: disable=W0602
-        global projects
 
         #print '>>', name, status
         status = status.strip()
-        name = str(name)
+        name = str(name.strip())
 
         if status == constants.PROJECT_NEW:
             root, projectName, ext = Project.rootPath(name)
@@ -652,6 +636,7 @@ Project: Top level Cing project class
 
         elif status == constants.PROJECT_OLD:
             root, projectName, ext = Project.rootPath(name)
+
             if ext == '.tgz':
                 tarPath = Path(name)
                 if not tarPath.exists():
@@ -671,6 +656,7 @@ Project: Top level Cing project class
                     io.error('Project.open: Failed to find project in .tgz file. Unable to open Project "{0}"\n', name)
                     return None
                 return Project.open(root, status=status, restore=restore)
+
             elif ext == '.zip':
                 zipPath = Path(name)
                 if not zipPath.exists():
@@ -766,7 +752,7 @@ Project: Top level Cing project class
             return None
         #end if
         pr.addLog()
-        projects.append(pr)
+        cing.projects[pr.name] = pr
         return pr
     #end def
 
@@ -776,7 +762,6 @@ Project: Top level Cing project class
         TODO: Call destructor on self and its elements
         """
         # Using the global statement without assignment pylint: disable=W0602
-        global projects
         #self.export()
 
         if save and not self.nosave:
@@ -790,7 +775,7 @@ Project: Top level Cing project class
 
         self.closeLog()
 
-        projects.remove(self)
+        del(cing.projects[self.name])
         return None
     #end def
 
@@ -922,8 +907,7 @@ Project: Top level Cing project class
         #end for
 
         # save validation containers
-        path = self.path() / cdefs.directories.plugins / cdefs.cingPaths.validation
-        if validation.save(path): return True
+        if self.validationData.save(): return True
 
         # Call Plugin registered functions
         for p in cing.plugins.values():
@@ -1639,6 +1623,11 @@ class StatusDict(Adict):
     """
     Class to store the plugin status data
     """
+
+    MOLECULE = 'molecule'
+    COMPLETED = 'completed'
+    PARSED = 'parsed'
+
     def __init__(self, key, **defaults):
         Adict.__init__(self)
         self.key          = key                     # program key
@@ -2377,7 +2366,7 @@ ranges:  %s
 
 
     def test2(self):
-        'Untested by JFD'
+        """Untested by JFD"""
         ensemble = Ensemble()
         for p in self:
             closest = p.molecule.rmsd.closestToMean
@@ -2391,9 +2380,9 @@ ranges:  %s
         selectedResidues = self[0].molecule.setResiduesFromRanges('all')
         for res in selectedResidues:
             prev = res.sibling(-1)
-            next = res.sibling(1)
-            if prev and next:
-                res.runngRmsds = self.calcRmsds( [prev,res,next])
+            nextt = res.sibling(1) # use nextt to remove conflict with next method
+            if prev and nextt:
+                res.runngRmsds = self.calcRmsds( [prev,res,nextt])
         #end for
     #end def
 

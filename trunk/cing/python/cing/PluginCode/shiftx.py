@@ -3,20 +3,32 @@ Adds shiftx method to predict chemical shifts. The shiftx program is included as
 Linux in the bin directory.
 
 """
+import os
+import math
+
 import cing
 from cing import constants
+import cing.constants.definitions as cdefs
 from cing.core import validation
-from cing.core import sml
 from cing.Libs import Adict
 from cing.Libs import io
+import cing.Libs.jsonTools as jsonTools
 
 from cing.Libs.AwkLike import AwkLike
-from cing.Libs.NTutils import * #@UnusedWildImport
-from cing.constants import * #@UnusedWildImport
-from cing.core.parameters import cingPaths
-from cing.constants.definitions import validationDirectories
-from glob import glob
-from math import sqrt
+
+#from cing.Libs.NTutils import * #@UnusedWildImport
+from cing.Libs.NTutils import NTdict
+from cing.Libs.NTutils import NTlist
+
+from cing.Libs.NTutils import nTerror
+from cing.Libs.NTutils import nTwarning
+from cing.Libs.NTutils import nTmessage
+from cing.Libs.NTutils import nTdebug
+from cing.Libs.NTutils import nTaverage
+from cing.Libs.NTutils import nTdetail
+from cing.Libs.NTutils import ExecuteProgram
+
+from cing.Libs.fpconst import NaN
 
 __version__ = cing.__version__
 
@@ -30,94 +42,125 @@ __version__ = cing.__version__
 #         raise ImportWarning('shiftx')
 # #    nTmessage('Using shiftx')
 
-# def shiftxPath(project, *args):
-#     """
-#     Return shiftx path from active molecule of project
-#     Creates directory if does not exist
-#     """
-#     return project.validationPath(validationDirectories['shiftx'], *args)
-#end def
 
-def shifxDefaults():
-    """Return shiftx default dict
+def shiftxStatus():
+    """Return shiftx default status dict
     """
     defs = Adict.Adict()
     defs.completed    = False
     defs.parsed       = False
-    defs.present      = False
-    defs.saved        = False
-    defs.saveVersion  = __version__
-    defs.runVersion   = __version__
+    defs.version      = __version__
     defs.models       = []
     defs.baseName     = 'model_%03d'
     defs.directory    = constants.SHIFTX_KEY
-    defs.smlFile      = constants.SHIFTX_KEY + '.sml'
-    defs.chains       = NTlist()    # list of (chainNames, outputFile) tuples to be parsed
-
+    defs.chains       = []    # list of (chainNames, outputFile) tuples to be parsed
     return defs
 #end def
 
 
 class ShiftxResult(validation.ValidationResult):
-    """Class to store shiftx results
+    """Class to store shiftx results; all related to atoms
     """
     KEY     = constants.SHIFTX_KEY
     DATA    = 'data'
     AVERAGE = 'average'
     SD      = 'sd'
 
-    def __init__(self, **kwds):
-        validation.ValidationResult.__init__( self, **kwds)
-        self.setdefault(ShiftxResult.DATA, NTlist())
+    def __init__(self):
+        validation.ValidationResult.__init__(self)
+        self.setdefault(ShiftxResult.DATA, [])
         self.setdefault(ShiftxResult.AVERAGE, NaN)
         self.setdefault(ShiftxResult.SD, NaN)
     #end def
+#end class
 
-    @staticmethod
-    def endHandler(qDict, project=None):
-        # Restore linkage
-        # Needs a valid project
-        # Needs a valid object key
-        # Adds to validation
-        if project is None:
-            return None
-        if constants.OBJECT_KEY not in qDict:
-            nTerror('ShiftxResult.endHandler: object key not found ==> skipped item')
-            return None
-        theObject = project.getByPid(qDict[constants.OBJECT_KEY])
-        if theObject is None:
-            nTerror('ShiftxResult.endHandler: invalid object Pid %s, ==> skipped', qDict[constants.OBJECT_KEY])
-            return None
 
-        #end if
-        #v3:
-        validation.setValidationResult(theObject, constants.SHIFTX_KEY, qDict)
-        #LEGACY:
-        theObject['shiftx'] = qDict[ShiftxResult.DATA]
-        return qDict
+class ShiftxResultJsonHandler(jsonTools.handlers.AnyDictHandler):
+    """Handler for the ShiftxsResult class
+    """
+    namespace = cing.constants.SHIFTX_KEY
+    cls = ShiftxResult
+    encodedKeys = [cing.constants.OBJECT_KEY]
+#end class
+ShiftxResultJsonHandler.handles(ShiftxResult)
+
+
+class QshiftxResult(validation.ValidationResult):
+    """Class to store residue Q-factor shiftx results
+    """
+    KEY         = constants.SHIFTX_KEY
+    ALL_ATOMS   = 'allAtoms'
+    BACKBONE    = 'backbone'
+    HEAVY_ATOMS = 'heavyAtoms'
+    PROTONS     = 'protons'
+
+    def __init__(self):
+        validation.ValidationResult.__init__(self)
+        self.setdefault(ShiftxResult.ALL_ATOMS, NaN)
+        self.setdefault(ShiftxResult.BACKBONE, NaN)
+        self.setdefault(ShiftxResult.HEAVY_ATOMS, NaN)
+        self.setdefault(ShiftxResult.PROTONS, NaN)
     #end def
 #end class
 
-#register ShiftxResult SML handler
-ShiftxResult.SMLhandler = sml.SMLAnyDictHandler(ShiftxResult,'ShiftxResult',
-                                                encodeKeys = [constants.OBJECT_KEY],
-                                                endHandler = ShiftxResult.endHandler,
-                                               )
 
-
-def _resetShiftx(defs, molecule):
-    """Reset the shiftx references in the data
+#LEGACY
+def legacyQshiftDict():
     """
-    for atm in molecule.allAtoms():
-        #LEGACY:
-        atm.shiftx = NTlist()
-        validation.setValidationResult(atm, constants.SHIFTX_KEY, None)
-    #end for
-    defs.present = False
+    return a legacy dict used to store the shiftx Qfactor results
+    """
+    return  NTdict(allAtoms = None, backbone=None, heavyAtoms=None, protons=None, residue = None,
+                   __FORMAT__ = \
+    constants.dots + ' shiftx Qfactor %(residue)s ' + constants.dots + """
+    allAtoms:   %(allAtoms)6.3f
+    backbone:   %(backbone)6.3f
+    heavyAtoms: %(heavyAtoms)6.3f
+    protons:    %(protons)6.3f"""
+    )
 #end def
 
 
-def _parseShiftxOutput( fileName, molecule, chainId ):
+class QshiftxResultJsonHandler(jsonTools.handlers.AnyDictHandler):
+    """Handler for the QshiftxResult class
+    """
+    namespace = cing.constants.SHIFTX_KEY
+    cls = QshiftxResult
+    encodedKeys = [cing.constants.OBJECT_KEY]
+
+    def restore(self, data):
+        result = QshiftxResult()
+        self._restore(data, result)
+        #restore LEGACY
+        if result[constants.OBJECT_KEY] is not None and \
+           isinstance(result[constants.OBJECT_KEY], cing.core.classes.Project):
+            qshiftDict = legacyQshiftDict()
+            for k in [QshiftxResult.ALL_ATOMS, QshiftxResult.BACKBONE,
+                      QshiftxResult.HEAVY_ATOMS, QshiftxResult.PROTONS]:
+                qshiftDict[k] = result[k]
+            qshiftDict['residue'] = result[constants.OBJECT_KEY]
+            result[constants.OBJECT_KEY].Qshift = qshiftDict
+        #end if
+    #end def
+#end class
+QshiftxResultJsonHandler.handles(QshiftxResult)
+
+
+def _resetShiftx(project):
+    """Reset the shiftx references
+    """
+    for res in project.molecule.allResidues():
+        project.validationData.setResult(res, constants.SHIFTX_KEY, None)
+        #LEGACY:
+
+    for atm in project.molecule.allAtoms():
+        project.validationData.setResult(atm, constants.SHIFTX_KEY, None)
+        #LEGACY:
+        atm.shiftx = NTlist()
+    #end for
+#end def
+
+
+def _parseShiftxOutput( fileName, project, chainId ):
     """
     Parse shiftx generated output (gv_version!).
     Store result in shiftx attribute (which is a NTlist type) of each atom
@@ -144,21 +187,27 @@ format file:
         nTerror("_parseShiftxOutput: Failed to find %s" % fileName)
         return True
 
+    if project is None:
+        nTerror("_parseShiftxOutput: no project defined")
+        return True
+
+    molecule = project.molecule
+
     nTdebug('_parseShiftxOutput: parsing %s', fileName)
 
-    atomDict = molecule.getAtomDict(IUPAC, chainId)
+    atomDict = molecule.getAtomDict(constants.IUPAC, chainId)
 
     for line in AwkLike(fileName, commentString = '#', minNF = 4):
         shift = line.float(4)
         if shift != -666.000:
             lineCol1 = int(line.dollar[1].strip('*'))
             atmName = line.dollar[3]
-            if chainId != None:
-                atm = molecule.decodeNameTuple( (IUPAC, chainId, lineCol1, atmName) )
+            if chainId is not None:
+                atm = molecule.decodeNameTuple( (constants.IUPAC, chainId, lineCol1, atmName) )
                 #happens for all N-terminal H because the Nterminal residue has H1/2/3
                 #fix:
                 if atm is None and atmName == 'H':
-                    atm = molecule.decodeNameTuple( (IUPAC, chainId, lineCol1, 'H1') )
+                    atm = molecule.decodeNameTuple( (constants.IUPAC, chainId, lineCol1, 'H1') )
             else:
                 atm = None
                 if atomDict.has_key((lineCol1, atmName)):
@@ -170,14 +219,14 @@ format file:
                 nTdebug('parseShiftxOutput: chainId [%s] line %d (%s)', chainId, line.NR, line.dollar[0] )
                 # happens for all LYS without HZ3.
             else:
-                result = validation.getValidationResult(atm, constants.SHIFTX_KEY)
+                result = project.validationData.getResult(atm, constants.SHIFTX_KEY, ShiftxResult())
                 if result is None:
-                    result = ShiftxResult()
-                    validation.setValidationResult(atm, constants.SHIFTX_KEY, result)
+                    io.error('_parseShiftxOutput: retrieving ShiftxResult for atom {0}\n', atm)
+                else:
+                    result.DATA.append(shift)
+                    #LEGACY:
+                    atm.shiftx.append(shift)
                 #end if
-                result[ShiftxResult.DATA].append(shift)
-                #LEGACY:
-                atm.shiftx.append(shift)
             #end if
         #end if
     #end for
@@ -196,7 +245,7 @@ def parseShiftx(project, tmp=None):
         nTmessage("parseShiftx: No molecule defined")
         return True
 
-    defs = project.getStatusDict(constants.SHIFTX_KEY, **shifxDefaults())
+    defs = project.getStatusDict(constants.SHIFTX_KEY, **shiftxStatus())
 
     if not defs.completed:
         nTmessage("parseShiftx: No shiftx was run")
@@ -207,15 +256,15 @@ def parseShiftx(project, tmp=None):
         nTerror('parseShiftx: directory "%s" with shiftx data not found', path)
         return True
 
-    _resetShiftx(defs, project.molecule)
+    _resetShiftx(project)
     #print '>>', defs, len(defs.chains)
     for chainId, fname in defs.chains:
-        if _parseShiftxOutput(path / fname, project.molecule, chainId):
+        if _parseShiftxOutput(path / fname, project, chainId):
             return True
     #end for
-    defs.present = True
-    _calculatePseudoAtomShifts(project.molecule, len(defs.models))
-    _averageShiftx(project.molecule)
+    defs.parsed = True
+    _calculatePseudoAtomShifts(project, len(defs.models))
+    _averageShiftx(project)
     calcQshift(project)
     return False
 #end def
@@ -246,7 +295,7 @@ def runShiftx(project, parseOnly=False, model=None):
         nTmessage('runShiftx: no shiftx executable, skipping')
         return False # Gracefully return
 
-    if project.molecule == None:
+    if project.molecule is None:
         nTerror('runShiftx: no molecule defined')
         return True
 
@@ -254,7 +303,7 @@ def runShiftx(project, parseOnly=False, model=None):
         nTwarning('runShiftx: no models for "%s"', project.molecule)
         return True
 
-    if model != None and model >= project.molecule.modelCount:
+    if model is not None and model >= project.molecule.modelCount:
         nTerror('runShiftx: invalid model (%d) for "%s"', model, project.molecule)
         return True
 
@@ -288,18 +337,18 @@ def runShiftx(project, parseOnly=False, model=None):
     if skippedResidues:
         nTmessage('==> runShiftx: %s non-protein residues will be skipped.' %  len(skippedResidues))
 
-    defs = project.getStatusDict(constants.SHIFTX_KEY, **shifxDefaults())
-    if model!=None:
+    defs = project.getStatusDict(constants.SHIFTX_KEY, **shiftxStatus())
+    if model is not None:
         defs.models = NTlist(model)
     else:
         defs.models = NTlist(*range(project.molecule.modelCount))
     defs.baseName  = 'model_%03d'
     defs.completed = False
     defs.parsed    = False
-    defs.chains    = NTlist()
+    defs.chains    = []
 
     # initialize the shiftx attributes
-    _resetShiftx(defs, project.molecule)
+    _resetShiftx(project)
 
     path = project.validationPath(defs.directory)
     if not path:
@@ -309,7 +358,7 @@ def runShiftx(project, parseOnly=False, model=None):
         path.rmdir()
     path.makedirs()
 
-    doShiftx = ExecuteProgram(pathToProgram=cingPaths.shiftx,
+    doShiftx = ExecuteProgram(pathToProgram=cdefs.cingPaths.shiftx,
                               rootPath=path, redirectOutput=False)
     startTime = io.now()
 
@@ -319,12 +368,12 @@ def runShiftx(project, parseOnly=False, model=None):
         nTdebug('runShiftx: doing model %s, path %s, rootname %s', model, path, rootname)
 
         # generate a pdbfile
-        pdbFile = project.molecule.toPDB(model=model, convention = IUPAC)
+        pdbFile = project.molecule.toPDB(model=model, convention = constants.IUPAC)
         if not pdbFile:
             nTerror("runShiftx: Failed to generate a pdb file for model: %s", model)
             return True
         pdbFile.save(path / rootname+'.pdb')
-        del(pdbFile)
+        del pdbFile
 
         for chain in project.molecule.allChains():
             if chain not in skippedChains:
@@ -354,7 +403,7 @@ def runShiftx(project, parseOnly=False, model=None):
         return True
 
     defs.date = io.now()
-    defs.runVersion = __version__
+    defs.version = __version__
     defs.molecule = project.molecule.asPid()
     defs.remark = 'Shiftx on %s completed in %.1f seconds on %s; data in %s' % \
                   (project.molecule, defs.date-startTime, defs.date, path)
@@ -363,59 +412,13 @@ def runShiftx(project, parseOnly=False, model=None):
     return False
 #end def
 
-#OBSOLETE: superseded by _calculatePseudoAtomShifts
-# def _averageMethylAndMethylene( project, models ):
-#     """
-#     Routine to average the methyl proton shifts and b-methylene, before calculating average per atom
-#     """
-#     nmodels = len(models)
-# #    nTdebug('shiftx: doing _averageMethylAndMethylene')
-#     for atm in project.molecule.allAtoms():
-#         if atm.isCarbon():
-#
-#             protons = atm.attachedProtons(includePseudo=False)
-#             if len(protons) >= 2:
-#                 skip = False
-#                 for p in protons:
-#                     if len(p.shiftx) == 0:  # No prediction for this proton
-#                                             # Do not average
-#                         skip = True
-#                         #print p, p.shiftx
-#                         break
-#                     #end if
-#                 #end for
-#
-#                 if not skip:
-#                     shiftsComplete = True # fails for issue 201 with entry 2e5r For atom [<Atom MET57.CE>] proton [<Atom MET57.HE2>]
-#                     shifts  = nTfill(0.0,nmodels)
-#                     for i in range(nmodels):
-#                         for p in protons:
-#                             if len(p.shiftx) > i:
-#                                 shifts[i] += p.shiftx[i]
-#                             else:
-#                                 nTerror("For atom [%s] proton [%s] no shiftx found; skipping _averageMethylAndMethylene" % (atm, p) )
-#                                 shiftsComplete = False
-#                             # end if
-#                         #end for
-#                         shifts[i] /= len(protons)
-#                     #end for
-#                     ps = protons[0].pseudoAtom()
-#                     if shiftsComplete:
-#                         ps.shiftx = shifts
-#                     else:
-#                         ps.shiftx = NTlist() # just an empty list.
-#                     #end if
-#                 #end if
-#             #end if
-#         #end if
-#     #end for
-# #end def
 
-def _calculatePseudoAtomShifts(molecule, nmodels):
+def _calculatePseudoAtomShifts(project, nmodels):
     """
     Calculate the shift of the methylene and methyl pseudoAtom protons
     Replaces _averageMethylAndMethylene
     """
+    molecule = project.molecule
     for atm in molecule.atomsWithProperties('isMethyl','isCarbon') + \
                molecule.atomsWithProperties('isMethylene','isCarbon'):
         protons = atm.attachedProtons(includePseudo=False)
@@ -423,10 +426,10 @@ def _calculatePseudoAtomShifts(molecule, nmodels):
         if pseudo is None:
             continue
         # check if the data are there
-        shiftxProtons = [validation.getValidationResult(p, constants.SHIFTX_KEY) for p in protons]
+        shiftxProtons = [project.validationData.getResult(p, constants.SHIFTX_KEY) for p in protons]
         if None in shiftxProtons:
             continue
-        shiftxPseudo = validation.getValidationResult(pseudo, constants.SHIFTX_KEY, ShiftxResult())
+        shiftxPseudo = project.validationData.getResult(pseudo, constants.SHIFTX_KEY, ShiftxResult())
 
         # average the data:
         for i in range(nmodels):
@@ -438,11 +441,13 @@ def _calculatePseudoAtomShifts(molecule, nmodels):
     #end for
 #end def
 
-def _averageShiftx(molecule):
+
+def _averageShiftx(project):
     """Average shiftx data array for each atom
     return True on error
     """
 #    nTdebug('shiftx: doing averageShiftx')
+    molecule = project.molecule
     if molecule is None:
         nTerror('_averageShiftx: no molecule defined')
         return True
@@ -450,10 +455,10 @@ def _averageShiftx(molecule):
 
     for atm in molecule.allAtoms():
         # Set averages
-        shiftx = validation.getValidationResult(atm, constants.SHIFTX_KEY)
+        shiftx = project.validationData.getResult(atm, constants.SHIFTX_KEY)
         if shiftx is not None:
-            av,sd,n = NTaverage(shiftx.data)
-            if av == None:
+            av,sd,n = nTaverage(shiftx.data)
+            if av is None:
                 shiftx[ShiftxResult.AVERAGE] = NaN
                 shiftx[ShiftxResult.SD] = NaN
                 #LEGACY:
@@ -471,92 +476,42 @@ def _averageShiftx(molecule):
 #end def
 
 
-def saveShiftx(project, tmp=None):
-    """
-    Save shiftx results to sml file
-    Returns True on error.
-    Returns None on success.
-    """
-    if project is None:
-        nTmessage("saveShiftx: No project defined")
-        return True
-
-    if project.molecule is None:
-        nTmessage("saveShiftx: No molecule defined")
-        return True
-    # save the data
-    return project._savePluginData(constants.SHIFTX_KEY,
-                                   smlFile=constants.SHIFTX_KEY+'.sml',
-                                   saved=True,
-                                   saveVersion=__version__)
-#end def
-
-# pylint: disable=C0102
-def restoreShiftx(project, tmp=None):
-    """
-    Restore shiftx results from sml file.
-    Return True on error
-    """
-    if project == None:
-        nTmessage("restoreShiftx: No project defined")
-        return True
-
-    if project.molecule == None:
-        return False # Gracefully returns
-
-    # Reset the data
-    defs = project.getStatusDict(constants.SHIFTX_KEY, **shifxDefaults())
-    _resetShiftx(defs, project.molecule)
-    #restore the data
-    if project._restorePluginData(constants.SHIFTX_KEY, present=True):
-        return True
-    _calculatePseudoAtomShifts(project.molecule, len(defs.models))
-    _averageShiftx(project.molecule)
-    calcQshift(project)
-    return False
-#end def
-
-
-def _calcQshift( atmList ):
+def _calcQshift(project, atmList):
     """
     Calculate Qshift value for list of atoms
     """
-    # for each model + av + heavyatom + proton + bb
     sumDeltaSq    = 0.0
     sumMeasuredSq = 0.0
     for atm in atmList:
-        if atm.has_key('shiftx') and len(atm.shiftx)>0 and atm.isAssigned(resonanceListIdx=RESONANCE_LIST_IDX_ANY):
-            atm.shiftx.average()
+        shiftxResult = project.validationData.getResult(atm, constants.SHIFTX_KEY)
+        if shiftxResult is not None and \
+           len(shiftxResult.DATA)>0 and \
+            atm.isAssigned(resonanceListIdx=constants.RESONANCE_LIST_IDX_ANY):
             measured = atm.shift()
             sumMeasuredSq += measured**2
             # delta with shiftx average
-            sumDeltaSq = (measured-atm.shiftx.av)**2
+            sumDeltaSq = (measured-shiftxResult.AVERAGE)**2
             #print atm, measured, av
-#            sumDeltaSq[project.molecule.modelCount] += (av-measured)**2
-#            if not atm.isProton():
-#                sumDeltaSq[project.molecule.modelCount+1] += (av-measured)**2
-#            if atm.isProton():
-#                #print atm, measured, av
-#                sumDeltaSq[project.molecule.modelCount+2] += (av-measured)**2
-#            if not atm.isBackbone():
-#                sumDeltaSq[project.molecule.modelCount+3] += (av-measured)**2
         #end if
     #end for
 
     if sumMeasuredSq >0.0:
-        qshift=sqrt(sumDeltaSq/sumMeasuredSq)
+        qshift=math.sqrt(sumDeltaSq/sumMeasuredSq)
     else:
         qshift=NaN
     # end if
-
     return qshift
 #end def
 
 
-#TODO: check this code
-def calcQshift( project, tmp=None ):
+def calcQshift(project):
     """Calculate per residue Q factors between assignment and shiftx results
     """
+    if project is None:
+        nTmessage('calcQshift: no project defined')
+        return None
+    #end if
+
     if not project.molecule:
         nTmessage('calcQshift: no molecule defined')
         return None
@@ -567,16 +522,6 @@ def calcQshift( project, tmp=None ):
         bb = NTlist()
         heavy = NTlist()
         protons = NTlist()
-        res.Qshift  = NTdict(allAtoms = None, backbone=None, heavyAtoms=None, protons=None,
-                             residue = res,
-                             __FORMAT__ = \
-dots + ' shiftx Qfactor %(residue)s ' + dots + """
-allAtoms:   %(allAtoms)6.3f
-backbone:   %(backbone)6.3f
-heavyAtoms: %(heavyAtoms)6.3f
-protons:    %(protons)6.3f"""
-
-                        )
 
         for a in atms:
             if a.isBackbone():
@@ -587,44 +532,30 @@ protons:    %(protons)6.3f"""
                 heavy.append(a)
         #end for
 
-        res.Qshift.allAtoms   = _calcQshift( atms )
-        res.Qshift.backbone   = _calcQshift( bb )
-        res.Qshift.heavyAtoms = _calcQshift( heavy )
-        res.Qshift.protons    = _calcQshift( protons )
+        result = project.validationData.getResult(res, constants.SHIFTX_KEY, QshiftxResult())
+        if result is None:
+            nTmessage('calcQshift: error setting QshiftResult for residue %s', res)
+            return None
+        #end if
+        result[QshiftxResult.ALL_ATOMS]   = _calcQshift(project, atms)
+        result[QshiftxResult.BACKBONE]    = _calcQshift(project, bb)
+        result[QshiftxResult.HEAVY_ATOMS] = _calcQshift(project, heavy)
+        result[QshiftxResult.PROTONS]     = _calcQshift(project, protons)
+
+        #LEGACY
+        qshiftDict = legacyQshiftDict()
+        for k in [QshiftxResult.ALL_ATOMS, QshiftxResult.BACKBONE,
+                  QshiftxResult.HEAVY_ATOMS, QshiftxResult.PROTONS]:
+            qshiftDict[k] = result[k]
+        qshiftDict['residue'] = res
+        res.Qshift = qshiftDict
     #end for
 #end def
 
-#OBSOLETE:
-# def removeTempFiles( todoDir ):
-# #    whatifDir        = project.mkdir( project.molecule.name, project.moleculeDirectories.whatif  )
-#     nTdebug("Removing temporary files generated by shiftx")
-#     try:
-# #        removeListLocal = ["prodata", "ps.number", "aqua.cmm", "resdefs.dat", "mplot.in", '.log' ]
-#         removeList = []
-# #        for fn in removeListLocal:
-# #            removeList.append( os.path.join(todoDir, fn) )
-#
-#         for extension in [ "*.pdb" ]:
-#             for fn in glob(os.path.join(todoDir,extension)):
-#                 removeList.append(fn)
-#         for fn in removeList:
-#             if not os.path.exists(fn):
-#                 nTdebug("shiftx.removeTempFiles: Expected to find a file to be removed but it doesn't exist: " + fn )
-#                 continue
-# #            nTdebug("Removing: " + fn)
-#             os.unlink(fn)
-#     except:
-#         nTdebug("shiftx.removeTempFiles: Failed to remove all temporary files that were expected")
-# #end def
-
 # register the functions
 methods  = [(runShiftx,None),
-            (calcQshift,None),
             (parseShiftx,None),
            ]
-saves    = [(saveShiftx, None),
-           ]
-restores = [
-            (restoreShiftx, None),
-           ]
+#saves    = []
+#restores = []
 #exports  = []

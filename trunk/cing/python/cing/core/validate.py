@@ -97,7 +97,6 @@ from cing.Libs.peirceTest import peirceTest
 from cing.PluginCode.required.reqDssp import DSSP_STR
 from cing.PluginCode.required.reqDssp import getDsspSecStructConsensus
 from cing.PluginCode.required.reqProcheck import PROCHECK_STR
-from cing.PluginCode.required.reqShiftx import SHIFTX_STR
 from cing.PluginCode.required.reqVasco import VASCO_STR
 from cing.PluginCode.required.reqWattos import WATTOS_STR
 from cing.PluginCode.required.reqWattos import WATTOS_SUMMARY_STR
@@ -728,7 +727,7 @@ def summaryForProject( project, toFile = True, ranges=None ):
 #    skippedShiftx = False
     # don't mark nucleic acid only entries at all.
     if mol.hasAminoAcid():
-#        shiftx = getDeepByKeys(mol, SHIFTX_STR) # modded by GWV in revision 624.
+#        shiftx = getDeepByKeys(mol, constants.SHIFTX_STR) # modded by GWV in revision 624.
 #       modded by GWV again in revision 15xx
         shifxDefs = project.getStatusDict(constants.SHIFTX_KEY)
         shiftx = shifxDefs.completed

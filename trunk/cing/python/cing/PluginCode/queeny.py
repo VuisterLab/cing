@@ -584,8 +584,8 @@ class Queeny( Odict ):
         a.reverse()
         self._keys = nTzap(a,0)
     #end def
-
 #end class
+
 
 def queenyDefaults():
     d = Adict( directory  = 'Queeny',
@@ -695,49 +695,49 @@ QueenyResult.SMLhandler = sml.SMLAnyDictHandler(QueenyResult,'QueenyResult',
                                                )
 
 
-def saveQueeny(project, tmp=None):
-    """
-    Save queeny results to sml file
-    Returns True on error.
-    Returns False on success.
-    """
-    if project is None:
-        nTmessage("saveQueeny: No project defined")
-        return True
-
-    if project.molecule is None:
-        nTmessage("saveQueeny: No molecule defined")
-        return True
-    # save the data
-    return project._savePluginData(constants.QUEENY_KEY, saved=True, saveVersion=__version__)
-#end def
-
-
-def restoreQueeny(project, tmp=None):
-    """
-    Restore queeny results from sml file.
-    Return True on error
-    """
-    if project is None:
-        nTmessage("restoreQueeny: No project defined")
-        return True
-
-    if project.molecule is None:
-        return False # Gracefully returns
-
-    # Reset the data
-    for obj in project.molecule.allResidues() + project.molecule.allAtoms():
-        validation.setValidationResult(obj, constants.QUEENY_KEY, None)
-        #LEGACY:
-        for storedProp in [constants.QUEENY_UNCERTAINTY1_STR, constants.QUEENY_UNCERTAINTY2_STR, constants.QUEENY_INFORMATION_STR ]:
-           obj[storedProp] = 0.0
-    #end for
-    #restore the data
-    return project._restorePluginData(constants.QUEENY_KEY, present=True)
-#end def
+# def saveQueeny(project, tmp=None):
+#     """
+#     Save queeny results to sml file
+#     Returns True on error.
+#     Returns False on success.
+#     """
+#     if project is None:
+#         nTmessage("saveQueeny: No project defined")
+#         return True
+#
+#     if project.molecule is None:
+#         nTmessage("saveQueeny: No molecule defined")
+#         return True
+#     # save the data
+#     return project._savePluginData(constants.QUEENY_KEY, saved=True, saveVersion=__version__)
+# #end def
+#
+#
+# def restoreQueeny(project, tmp=None):
+#     """
+#     Restore queeny results from sml file.
+#     Return True on error
+#     """
+#     if project is None:
+#         nTmessage("restoreQueeny: No project defined")
+#         return True
+#
+#     if project.molecule is None:
+#         return False # Gracefully returns
+#
+#     # Reset the data
+#     for obj in project.molecule.allResidues() + project.molecule.allAtoms():
+#         validation.setValidationResult(obj, constants.QUEENY_KEY, None)
+#         #LEGACY:
+#         for storedProp in [constants.QUEENY_UNCERTAINTY1_STR, constants.QUEENY_UNCERTAINTY2_STR, constants.QUEENY_INFORMATION_STR ]:
+#            obj[storedProp] = 0.0
+#     #end for
+#     #restore the data
+#     return project._restorePluginData(constants.QUEENY_KEY, present=True)
+# #end def
 #-----------------------------------------------------------------------------
 
 # register the functions
 methods  = [(runQueeny,None)]
-saves    = [(saveQueeny, None)]
-restores = [(restoreQueeny, None)]
+saves    = []
+restores = []
