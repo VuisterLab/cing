@@ -356,6 +356,12 @@ mapMoltypeToInt = {PROTEIN_STR: 0, DNA_STR : 1, RNA_STR : 2, WATER_STR : 3, OTHE
 WATER_ATOM_COUNT = 4 # Including QH.
 
 #----------------------------------------------------------------------
+#required items for reqShiftx plugin
+#----------------------------------------------------------------------
+#'required items for this plugin for CING setup'
+SHIFTX_STR       = "shiftx"
+
+#----------------------------------------------------------------------
 #required items for CCPN plugin
 #----------------------------------------------------------------------
 CCPN_STR = "Ccpn"

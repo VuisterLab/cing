@@ -22,7 +22,7 @@
 
 """Python library for serializing any arbitrary object graph into JSON.
 
-jsonTools; GWV adapted jsonpickle for CING: replace josonpickle with jsonTools
+jsonTools; GWV adapted jsonpickle for CING: replace jsonpickle name with jsonTools to avoid confusion
 
 jsonpickle can take almost any Python object and turn the object into JSON.
 Additionally, it can reconstitute the object back into Python.
@@ -154,6 +154,7 @@ def encode(value,
     # i.e the context of each handler class
     # encoding in class assures it is decoded automatically
     mdata = Metadata(
+             program   = cing.constants.definitions.cingDefinitions.programName,
              version   = cing.constants.definitions.cingDefinitions.version,
              revision  = cing.constants.definitions.cingDefinitions.revision,
              copyRight = cing.constants.definitions.cingDefinitions.copyright,
@@ -184,6 +185,10 @@ def decode(string, backend=None, keys=False, referenceObject=None):
     If set to True then jsonpickle will decode non-string dictionary keys
     into python objects via the jsonpickle protocol.
 
+    referenceObject is passed as attribute to to the unpickler instance (available as 'context'
+    attribute in custom handlers that are derived from the Basehandler class).
+
+    GWV changed to return a tuple
     return (obj, metadata) tuple
 
     >>> str(decode('"my string"'))
@@ -195,11 +200,12 @@ def decode(string, backend=None, keys=False, referenceObject=None):
 
     if backend is None:
         backend = json
-    # unwrap the object
+    #GWV:  unwrap the object
     metadata,obj = unpickler.decode(string, backend=backend, keys=keys, referenceObject=referenceObject)
     return obj, metadata
 
 
+#GWV
 def obj2json(obj, path):
     """serialise object to json file"""
     from cing.Libs.disk import Path
@@ -212,6 +218,7 @@ def obj2json(obj, path):
 #end def
 
 
+#GWV
 def json2obj(path, referenceObject=None):
     """return object from serialised representation in json file
     or None on error

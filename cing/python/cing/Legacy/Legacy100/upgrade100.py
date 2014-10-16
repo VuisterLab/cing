@@ -1,6 +1,8 @@
 """
 Code to upgrade all project <= 1.0
 """
+import sys
+
 import cing
 from cing import constants
 from cing.constants import definitions as cdefs
@@ -65,18 +67,24 @@ def upgradeProject2Json( name, restore  ):
             if listName in pr:
                 pr[listName] = [n for n in pr[listName]]
 
-        # convert status type to Adict and update
+        # update from old status type
         status = Adict()
         for key in constants.VALIDATION_KEYS:
-            sdict = pr.getStatusDict(key)
-            if not isinstance(sdict, StatusDict):
-                sdict = StatusDict(key)
-            if key in pr.status:
-                for k,v in pr.status[key].items():
-                    sdict[k] = v  # not certain if we get dict or NTdict; this circumvent unwanted keys of NTdict
+            sdict = StatusDict(key)
             status[key] = sdict
+            # if not isinstance(sdict, StatusDict):
+            #     sdict = StatusDict(key)
+            if key in pr.status:
+                # print 'upgrade2json> key=', key
+                # not certain if we get dict or NTdict; this circumvent unwanted keys of NTdict
+                for k,v in pr.status[key].items():
+                    #print 'upgrade2json>> k,v', k,v
+                    sdict[k] = v
+                #print '>>>\n', sdict.formatItems()
+            #end if
         #end for
 
+        #end for
         # update the status from old definitions;
         for (key, statusName) in [
                 (constants.SHIFTX_KEY, 'shiftxStatus'),
@@ -87,20 +95,38 @@ def upgradeProject2Json( name, restore  ):
                 (constants.VASCO_KEY, 'vascoStatus'),
                 (constants.X3DNA_KEY, 'x3dnaStatus')
             ]:
+            sdict = status[key]
             if statusName in pr:
-                status[key].update(pr[statusName])
+
+                #print 'upgrade2json> statusName=', statusName
+
+                # not certain if we get dict or NTdict; this circumvent unwanted keys of NTdict
+                for k,v in pr[statusName].items():
+                    #print 'upgrade2json>> k,v=', k,v
+                    sdict[k] = v
+                #print '>>>\n', sdict.formatItems()
+            #end if
             #LEGACY names
-            pr[statusName] = status[key]
+            pr[statusName] = sdict
         #end for
         # update some fields if present
         for sdict in status.values():
             if 'molecule' in sdict and isinstance(sdict['molecule'], tuple):
-                sdict['molecule'] = pid.Pid.fromString('Molecule:' + sdict['molecule'][0])
+                sdict['molecule'] = pid.Pid.new('Molecule:' + sdict['molecule'][0])
+            if 'moleculeName' in sdict and isinstance(sdict['molecule'], tuple):
+                sdict['molecule'] = pid.Pid.new('Molecule:' + sdict['moleculeName'][0])
+                del sdict['moleculeName']
             if 'runVersion' in sdict:
                 sdict['version'] = sdict['runVersion']
-                sdict['date'] = io.Time(1360158182.7)  # Wed Feb  6 13:43:02 2013
+                del sdict['runVersion']
+#            sdict['date'] = io.Time(1360158182.7)  # Wed Feb  6 13:43:02 2013
+            sdict['date'] = io.Time(pr.lastSaved) # make a copy because otherwise the json handler breaks
+            sdict['version'] = 0.95  # old version
         #end for
+        # make this the new status dict
         pr.status = status
+
+        #print '>>>>>\n', pr.status.queeny.formatItems()
 
         pr._save2json()
         disk.rename(pfile, pfile + '.save')

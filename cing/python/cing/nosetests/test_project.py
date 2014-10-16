@@ -97,19 +97,22 @@ def test_openSaveProject():
 @with_setup(setup_DummyProject,teardown_project)
 def test_pluginRoutines():
     assert theProject is not None
-    pdefs = theProject.getStatusDict(TEST)
-    assert pdefs is not None
+    status = theProject.getStatusDict(TEST)
+    assert status is not None
 
     vobj = validation.ValidationResult()
     vobj.value = 10
-    validation.setValidationResult(theProject.molecule,TEST,vobj)
-    pdefs.present = True
-    result = theProject._savePluginData(TEST, saved=True)
+    theProject.validationData.setResult(theProject.molecule,TEST,vobj)
+    result = theProject.validationData.save('test.json')
     assert result == False
 
-    result = theProject._restorePluginData(TEST)
+    theProject.validationData.clear()
+    vobj = validation.getResult(theProject.molecule,TEST)
+    assert vobj is None
+
+    result = theProject.validationData.restore('test.json')
     assert result == False
-    vobj = validation.getValidationResult(theProject.molecule,TEST)
+    vobj = theProject.validationData.getResult(theProject.molecule,TEST)
     assert vobj is not None
     assert vobj.value == 10
 
