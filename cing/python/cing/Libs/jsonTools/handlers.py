@@ -148,7 +148,7 @@ class AnyDictHandler(BaseHandler):
         for k in obj.keys():
             if k in self.encodedKeys and hasattr(obj[k],'asPid'):
                 #print('AnyDictHandler._flatten>', k, obj[k])
-                data[tags.ITEMS].append(flatten([k,obj[k].asPid()], reset=False))
+                data[tags.ITEMS].append(flatten([k,str(obj[k].asPid())], reset=False))
             else:
                 data[tags.ITEMS].append(flatten([k,obj[k]], reset=False))
         return data
@@ -178,6 +178,47 @@ class AnyDictHandler(BaseHandler):
             else:
                 obj[key] = value
         #end for
+        return obj
+#end class
+
+class SimpleDictHandler(BaseHandler):
+    """
+    Base class for 'simple' dict objects: i.e. dicts that do not require
+    further encoding of key,value pairs
+    GWV
+    """
+    cls = dict          # to modify in subclassing
+
+    def flatten(self, obj, data):
+        """
+        Potentially needs subclassing
+        """
+        return self._flatten(obj,data)
+
+    def _flatten(self, obj, data):
+        """
+        Flatten the object by saving the key,value pairs in data
+        """
+        # cannot use data.update(obj) as some CING classes are NTdict derived
+        # for which update brings along unwanted keys
+        for k in obj.keys():
+            data[k] = obj[k]
+        return data
+
+    def restore(self, data):
+        """
+        Potentially needs subclassing
+        """
+        obj = self.cls()
+        return self._restore(data, obj)
+
+    def _restore(self, data, obj):
+        """
+        restores key, values from data into object
+        """
+        if obj is None: return None
+        data.pop(tags.OBJECT)
+        obj.update(data)
         return obj
 #end class
 

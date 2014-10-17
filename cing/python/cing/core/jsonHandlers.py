@@ -43,7 +43,7 @@ class NTlistJsonHandler(jsonTools.handlers.AnyListHandler):
 NTlistJsonHandler.handles(ntu.NTlist)
 
 
-class NTvalueJsonHandler(jsonTools.handlers.AnyDictHandler):
+class NTvalueJsonHandler(jsonTools.handlers.SimpleDictHandler):
     """Handler for the NTvalue class
     """
     namespace = cing.constants.CING_KEY
@@ -210,6 +210,7 @@ ObjectPidJsonHandler.handles(cing.core.molecule.Chain)
 ObjectPidJsonHandler.handles(cing.core.molecule.Residue)
 ObjectPidJsonHandler.handles(cing.core.molecule.Atom)
 
+
 class ValidationResultsContainerJsonHandler(jsonTools.handlers.AnyDictHandler):
     """Handler for the ValidationResultsContainer class
     """
@@ -225,6 +226,7 @@ class ValidationResultsContainerJsonHandler(jsonTools.handlers.AnyDictHandler):
     #     return self._restore(data, a)
 #end class
 ValidationResultsContainerJsonHandler.handles(validation.ValidationResultsContainer)
+
 
 class ValidationDataJsonHandler(jsonTools.handlers.AnyDictHandler):
     """Handler for the ValidationData class

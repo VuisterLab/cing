@@ -48,9 +48,9 @@ from cing.Libs.NTutils import NTdict
 from cing.Libs.NTutils import NTtree
 from cing.Libs.NTutils import NTlist
 from cing.Libs.NTutils import NTvalue
+from cing.Libs.NTutils import NTsort
 
 from cing.Libs.NTutils import nTerror
-from cing.Libs.NTutils import NTsort
 from cing.Libs.NTutils import nTcodeerror
 from cing.Libs.NTutils import nTwarning
 from cing.Libs.NTutils import nTmessage
@@ -103,9 +103,6 @@ from cing.PluginCode.required.reqWattos import WATTOS_SUMMARY_STR
 from cing.PluginCode.required.reqWhatif import WHATIF_STR
 from cing.core.ROGscore import CingResult
 from cing.core.classes2 import RestraintList
-
-#from cing.constants import * #@UnusedWildImport
-from cing import constants
 
 
 from cing.core.molecule import Atom
@@ -1521,7 +1518,7 @@ def moleculeValidateAssignments( molecule  ):
                 if atm.isPseudoAtom():
                     for a in atm.realAtoms():
                         if a.isAssigned(resonanceListIdx=constants.RESONANCE_LIST_IDX_ANY):
-                            msg = io.sprintf('%s: and %s', constants.MULTIPLE_ASSIGNMENT, a )
+                            msg = io.sprintf('%s: and %s', MULTIPLE_ASSIGNMENT, a )
     #                        nTmessage('%-20s %s', atm, msg)
                             result.append( atm )
                             atm.validateAssignment.append(msg)
@@ -1535,7 +1532,7 @@ def moleculeValidateAssignments( molecule  ):
                         if a.isMethylProtonButNotPseudo():
                             continue
                         if not a.isAssigned(resonanceListIdx=constants.RESONANCE_LIST_IDX_ANY):
-                            msg = io.sprintf('%s: expected %s', constants.MISSING_ASSIGNMENT, a )
+                            msg = io.sprintf('%s: expected %s', MISSING_ASSIGNMENT, a )
     #                        nTmessage('%-20s %s', atm, msg )
                             result.append( atm )
                             atm.validateAssignment.append(msg)
@@ -1554,7 +1551,7 @@ def moleculeValidateAssignments( molecule  ):
                         if spinType:
                             # Only complain if type has at least one assignment.
                             if getDeepByKeys( hasAssignment, spinType):
-                                msg = io.sprintf('%s: %s', constants.EXPECTED_ASSIGNMENT, heavyAtm )
+                                msg = io.sprintf('%s: %s', EXPECTED_ASSIGNMENT, heavyAtm )
             #                    nTmessage('%-20s %s', atm, msg )
                                 result.append( atm )
                                 atm.validateAssignment.append(msg)
@@ -1572,7 +1569,7 @@ def moleculeValidateAssignments( molecule  ):
                         partner = atm.proChiralPartner()
                         if partner:
                             if not partner.isAssigned(resonanceListIdx=constants.RESONANCE_LIST_IDX_ANY):
-                                msg = io.sprintf('%s: %s unassigned', constants.INVALID_STEREO_ASSIGNMENT, partner )
+                                msg = io.sprintf('%s: %s unassigned', INVALID_STEREO_ASSIGNMENT, partner )
                                 result.append( atm )
                                 atm.validateAssignment.append(msg)
                             else:
@@ -1616,7 +1613,7 @@ def moleculeValidateAssignments( molecule  ):
                                 atm.validateAssignment.append(msg)
                             #end if
                             if not atm.isStereoAssigned() and pseudo.isStereoAssigned():
-                                msg = io.sprintf('%s: %s is stereo assigned', constants.INVALID_STEREO_ASSIGNMENT, pseudo )
+                                msg = io.sprintf('%s: %s is stereo assigned', INVALID_STEREO_ASSIGNMENT, pseudo )
                                 result.append( atm )
                                 atm.validateAssignment.append(msg)
                             #end if
@@ -1628,7 +1625,7 @@ def moleculeValidateAssignments( molecule  ):
 #                nTdebug('Unassigned atom: %s' % atm)
                 # Atm is not assigned but stereo assignment is set
                 if atm.isStereoAssigned():
-                    msg = io.sprintf('%s: not assigned but stereo-assignment %s set', constants.INVALID_STEREO_ASSIGNMENT, atm )
+                    msg = io.sprintf('%s: not assigned but stereo-assignment %s set', INVALID_STEREO_ASSIGNMENT, atm )
                     result.append( atm )
                     atm.validateAssignment.append(msg)
                 #end if
@@ -1830,7 +1827,7 @@ def validateDihedralCombinations(project):
             if doingNewD1D2plot:
                 # depending on doOnlyOverall it will actually return an array of myHist.
                 myHistList = residue.getTripletHistogramList( doOnlyOverall = False, ssTypeRequested = ssType, doNormalize=doNormalize  )
-                if myHistList == None:
+                if myHistList is None:
 #                    nTdebug("Failed to get the D1D2 hist for %s; skipping. Perhaps a non-protein residue was a neighbor?" % residue)
                     continue
                 if len(myHistList) != 3:
@@ -1840,7 +1837,7 @@ def validateDihedralCombinations(project):
 #                myHist = myHistList[0]
             else:
                 myHist = getDeepByKeysOrAttributes(histBySsAndResType,ssType,resName)
-                if myHist == None:
+                if myHist is None:
 #                    nTdebug("No hist for ssType %s and resName %s of residue %s" % (ssType,resName,residue))
                     continue
                 myHistList = [ myHist ]

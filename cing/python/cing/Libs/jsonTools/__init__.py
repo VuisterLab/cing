@@ -69,7 +69,7 @@ added to JSON::
 
 """
 import cing
-import cing.Libs.io
+import cing.Libs.io as io
 
 from cing.Libs.jsonTools.backend import JSONBackend
 from cing.Libs.jsonTools.version import VERSION
@@ -200,13 +200,17 @@ def decode(string, backend=None, keys=False, referenceObject=None):
 
     if backend is None:
         backend = json
-    #GWV:  unwrap the object
+    #GWV:  unwrap the metadata and the object
     metadata,obj = unpickler.decode(string, backend=backend, keys=keys, referenceObject=referenceObject)
+    if metadata is None:
+        io.error('jsonTools.decode: failed to decode metadata\n')
+    if obj is None:
+        io.error('jsonTools.decode: failed to decode object\n')
     return obj, metadata
 
 
 #GWV
-def obj2json(obj, path):
+def obj2json(obj, path, **metadata):
     """serialise object to json file"""
     from cing.Libs.disk import Path
 
@@ -214,7 +218,7 @@ def obj2json(obj, path):
     root, f, ext = p.split3()
     root.makedirs()
     with open(p,'w') as fp:
-        fp.write(encode(obj, path=str(path), timestamp=str(cing.Libs.io.now())))
+        fp.write(encode(obj, path=str(path), timestamp=str(io.now()), **metadata))
 #end def
 
 
@@ -227,11 +231,12 @@ def json2obj(path, referenceObject=None):
 
     p = Path(str(path))  # assure path instance
     if not p.exists():
-        return None
+        io.error('json2obj: path "{0}" does not exist\n', path)
+        return None, None
 
     with open(p,'r') as fp:
-        obj = decode(fp.read(), referenceObject=referenceObject)
-    return obj
+        obj, keyedMetadata = decode(fp.read(), referenceObject=referenceObject)
+    return obj, keyedMetadata
 #end def
 
 

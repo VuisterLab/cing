@@ -119,6 +119,8 @@ def upgradeProject2Json( name, restore  ):
             if 'runVersion' in sdict:
                 sdict['version'] = sdict['runVersion']
                 del sdict['runVersion']
+            if 'smlFile' in sdict:
+                del sdict['smlFile']
 #            sdict['date'] = io.Time(1360158182.7)  # Wed Feb  6 13:43:02 2013
             sdict['date'] = io.Time(pr.lastSaved) # make a copy because otherwise the json handler breaks
             sdict['version'] = 0.95  # old version
@@ -255,14 +257,16 @@ def restoreShiftx100(project):
     #end if
 
     #update some of the settings
-    del(defs['moleculeName'])
-    defs.directory = disk.Path(defs.path)[-1:]
-    del(defs['path'])
-    defs.smlFile = constants.SHIFTX_KEY + '.sml'
-    defs.saveVersion = defs.version
-    defs.runVersion = defs.version
-    del(defs['version'])
-    del(defs['contentFile'])
+    if 'moleculeName' in defs:
+        del defs['moleculeName']
+
+    if 'path' in defs:
+        defs.directory = disk.Path(defs.path)[-1:]
+        del defs['path']
+    else:
+        defs.directory = constants.SHIFTX_KEY
+    if 'contenFile' in defs:
+        del defs['contentFile']
 
     if not defs.completed:
         nTdebug('restoreShiftx100: shiftx not completed')
