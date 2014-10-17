@@ -29,6 +29,14 @@ from subprocess import Popen
 import os
 import sys
 
+try:
+    import cython
+    # Hack to compile superpose.  Should be moved to proper setup.py file
+    import pyximport; pyximport.install()
+    import cing.Libs.cython.superpose
+except ImportError:
+    pass
+
 #-----------------------------------------------------------------------------------
 # Synchronize block with cing.Libs.helper.py
 #-----------------------------------------------------------------------------------
@@ -107,6 +115,7 @@ CING_SHELL_TEMPLATE = \
 %(export)s  molmolPath%(equals)s%(molmolPath)s
 %(export)s  povrayPath%(equals)s%(povrayPath)s
 %(export)s  talosPath%(equals)s%(talosPath)s
+%(export)s  JAVA_HOME%(equals)s%(java_home)s #32-bit v1.6
 #############################################
 # No changes needed below this line.
 #############################################
@@ -127,11 +136,21 @@ else
 %(close_if)s
 
 # Use -u to ensure messaging streams for stdout/stderr don't mingle (too much).
-alias cing%(equals)s'python -u $CINGROOT/python/cing/main.py'
-alias queen%(equals)s'python -u $CINGROOT/python/queen/main.py'
-alias cyana2cing%(equals)s'python -u $CINGROOT/python/cyana2cing/cyana2cing.py'
-alias refine%(equals)s'python -u $CINGROOT/python/Refine/refine.py'
+alias cing%(equals)s'(python_location) -u $CINGROOT/python/cing/main.py'
+alias queen%(equals)s'(python_location) -u $CINGROOT/python/queen/main.py'
+alias cyana2cing%(equals)s'(python_location) -u $CINGROOT/python/cyana2cing/cyana2cing.py'
+alias refine%(equals)s'(python_location) -u $CINGROOT/python/Refine/refine.py'
 alias cython%(equals)s'$CYTHON/bin/cython'
+
+#WATTOS
+
+setenv W /local/workspace/wattos
+setenv WATTOSHOME /local/workspace/tmp
+
+alias wsetup        'setenv WATTOSROOT $W; source $W/scripts/wsetup'
+if ( -e $W/scripts/wsetup ) then
+    wsetup
+endif
 
 '''
 # make the addition conditional to presence like for tcsh.
@@ -344,6 +363,7 @@ def check_cython():
 
 def _writeCingShellFile(isTcsh): # pylint: disable=W0621
     '''Generate the Cing Shell file for csh or bash'''
+    parametersDict['python_location'] = sys.executable
     if isTcsh:
         parametersDict['export'] = 'setenv'
         parametersDict['equals'] = ' '
@@ -379,13 +399,13 @@ def _writeCingShellFile(isTcsh): # pylint: disable=W0621
     print '    %s %s' % ( sourceCommand, cname)
     print ''
     print ''
-    print '==> Note by JFD'
-    print ' There is another dependency; cython. Please install it and run:'
-    print ' cd $CINGROOT/python/cing/Libs/cython; python compile.py build_ext --inplace'
-    print ' After installing cython; rerun setupCing.py or manually update the settings file.'
-    print ' We have included the Cython distribution needed so add to your PYTHONPATH for now:'
-    print ' $CINGROOT/dist/Cython (later it will be added by the cing.[c]sh created.'
-
+    if 'cython' not in sys.modules:
+        print '==> Note by JFD'
+        print ' There is another dependency; cython. Please install it and run:'
+        print ' cd $CINGROOT/python/cing/Libs/cython; python compile.py build_ext --inplace'
+        print ' After installing cython; rerun setupCing.py or manually update the settings file.'
+        print ' We have included the Cython distribution needed so add to your PYTHONPATH for now:'
+        print ' $CINGROOT/dist/Cython (later it will be added by the cing.[c]sh created.'
 #end def
 #------------------------------------------------------------------------------------
 
@@ -577,6 +597,17 @@ if __name__ == '__main__':
         talosPath = strip(talosPath)
         _nTmessage("........ Found 'talos+'        %-10s %s" % ('', talosPath))        
         parametersDict['talosPath'] = talosPath
+    # end if
+
+    # TODO: check java version (1.6) and architecture (32-bit)
+    java_home, err  = _NTgetoutput('which java')
+    if not java_home:
+        _nTmessage("Could not find 'java'        (optional)")
+        parametersDict['java_home']  = PLEASE_ADD_EXECUTABLE_HERE
+    else:
+        java_home = strip(java_home)
+        _nTmessage("........ Found 'java'        %-10s %s" % ('', java_home))
+        parametersDict['java_home'] = java_home
     # end if
 
     # TODO: enable real location finder. This just works for some cases but we shouldn't bother

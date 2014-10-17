@@ -35,17 +35,18 @@ from cing.Libs.helper import *
 
 programName     = 'CING'
 # Version number is a float. Watch out, version 0.100 will be older than 0.99; nope, version 0.100 is long behind us !! (GWV)
-cingVersion     = 0.95
+cingVersion     = 0.96
 cingRevision    = getSvnRevision()
 
 
 
 __version__     = cingVersion # for pydoc
 #__date__        = '31 January 2011' # TODO: make this live.
-__date__        = '1 February 2013'
+__date__        = '17 October 2014'
 __copyright_years__ = '2004-' + __date__.split()[-1] # Never have to update this again...
 
-authorList      = [  ('Geerten W. Vuister',          'g.vuister@science.ru.nl'),
+authorList      = [  ('Geerten W. Vuister',          'gv29@le.ac.uk'),
+                     ('T. J. Ragan',                 'tjr22@le.ac.uk'),
                      ('Jurgen F. Doreleijers',       'jurgend@cmbi.ru.nl'),
                      ('Alan Wilter Sousa da Silva',  'alanwilter@gmail.com'),
                   ]
@@ -53,7 +54,8 @@ __author__      = '' # for pydoc
 for _a in authorList:
     __author__ = __author__ + _a[0] + ' (' + _a[1] + ')    '
 __copyright__  = "Copyright (c) %s Protein Biophysics (IMM)/CMBI, Radboud University Nijmegen, The Netherlands"
-__credits__    = """More info at http://nmr.cmbi.ru.nl/CING
+__copyright__  = "Copyright (c) %s Department of Biochemistry, University of Leicester, UK"
+__credits__    = """More info at http://nmr.le.ac.uk/
 
 """ + __copyright__ # TODO: misusing credits for pydoc
 
@@ -64,7 +66,7 @@ if cingRevision:
 
 header = \
 "======================================================================================================\n" +\
-"| CING: Common Interface for NMR structure Generation version %-17s AW,JFD,GWV %s |\n" % (versionStr, __copyright_years__) +\
+"| CING: Common Interface for NMR structure Generation version %-13s AW,JFD,GWV,TJR %s |\n" % (versionStr, __copyright_years__) +\
 "======================================================================================================"
 
 issueListUrl = 'http://code.google.com/p/cing/issues/detail?id='

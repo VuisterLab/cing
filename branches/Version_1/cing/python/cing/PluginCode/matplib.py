@@ -21,6 +21,10 @@ except ImportError:
 #end try
 
 try:
+    # Change matplotlib backend to 'Agg' for headless use
+    import matplotlib
+    matplotlib.use('Agg')
+
     from matplotlib.pylab import * #@UnusedWildImport for such functions as amax, arange, multiply, mat, etc...
     from matplotlib import pyplot
     from matplotlib.cm import LUTSIZE

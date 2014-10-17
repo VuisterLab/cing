@@ -15,6 +15,7 @@ XPLOR        XPLOR nomenclature
 Axes descriptors:
 X_AXIS, Y_AXIS, Z_AXIS, A_AXIS
 """
+import os
 import cing
 __version__    = cing.__version__
 __date__       = cing.__date__
@@ -342,9 +343,10 @@ JVM_MAX_MEM     = '1499m' # passed to Java using the -Xmx option. For now this i
 JVM_TYPE        = '-d32'
 JVM_HEADNESS    = '-Djava.awt.headless=true'
 #JVM_CMD_STD     = '/local/tmp/jdk1.6.0_41/bin/java -Xmx%s %s %s' % ( JVM_MAX_MEM, JVM_TYPE, JVM_HEADNESS )
-JVM_CMD_STD     = '/usr/bin/java -Xmx%s %s %s' % ( JVM_MAX_MEM, JVM_TYPE, JVM_HEADNESS )
+#JVM_CMD_STD     = '/usr/bin/java -Xmx%s %s %s' % ( JVM_MAX_MEM, JVM_TYPE, JVM_HEADNESS )
 #JVM_CMD_STD     = 'echo helloJvm; which java; ' + JVM_CMD_STD # DEFAULT OFF
-    
+JVM_CMD_STD     = '%s/bin/java -Xmx%s %s %s' % (os.environ['JAVA_HOME'], JVM_MAX_MEM, JVM_TYPE, JVM_HEADNESS)
+
 DEFAULT_SML_HANDLER_STRING = 'Default handler from SMLhandled'
 
 #: Don't report on the next atoms
