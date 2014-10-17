@@ -404,7 +404,7 @@ def runShiftx(project, parseOnly=False, model=None):
 
     defs.date = io.now()
     defs.version = __version__
-    defs.molecule = project.molecule.asPid()
+    defs.molecule = project.molecule.asPid
     defs.remark = 'Shiftx on %s completed in %.1f seconds on %s; data in %s' % \
                   (project.molecule, defs.date-startTime, defs.date, path)
     project.history(defs.remark)

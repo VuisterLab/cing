@@ -2,6 +2,7 @@ from collections import OrderedDict
 #import sys
 
 from cing.Libs import io
+from cing.core import pid
 
 
 class Adict(OrderedDict):
@@ -12,6 +13,7 @@ class Adict(OrderedDict):
     # Object id
     nextOid = 0
     OID_STRING = '_oid'
+    PID_KEY = '_pid'
 
     def __init__(self, *args, **kwds):
         """
@@ -21,8 +23,8 @@ class Adict(OrderedDict):
         """
         OrderedDict.__init__(self, *args, **kwds)
         self.setattrOnly(Adict.OID_STRING, Adict.nextOid)
+        self.setPid(Adict.nextOid)
         Adict.nextOid += 1
-    #end def
     #------------------------------------------------------------------
     # Basic functionality
     #------------------------------------------------------------------
@@ -91,6 +93,17 @@ class Adict(OrderedDict):
     def getOid(self):
         "Return object id"
         return self.getattrOnly(Adict.OID_STRING)
+
+    def setPid(self, *id):
+        # set pif to class_name:id
+        _pid = pid.Pid.new(self.__class__.__name__, *id)
+        self.setattrOnly(self.PID_KEY, _pid)
+
+    @property
+    def asPid(self):
+        _pid = self.getattrOnly(self.PID_KEY)
+        return pid.Pid(_pid)
+    #end def
 
     def setdefaultKeys(self, fromDict):
         """Set keys of fromDict not present in self to values fromDict"""

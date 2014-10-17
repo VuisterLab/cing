@@ -112,7 +112,7 @@ def mapMolecule(molA, molB):
         objB.map = None
 
     for objA in molA.allChains() + molA.allResidues() + molA.allAtoms():
-        pidA = objA.asPid()
+        pidA = objA.asPid
         # create the corresponding pid for objB
         pidB = pidA.modify(0,molB.name)
         if pidA.type == 'Atom':

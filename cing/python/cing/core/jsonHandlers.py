@@ -199,7 +199,7 @@ class ObjectPidJsonHandler(jsonTools.handlers.BaseHandler):
     namespace = cing.constants.CING_KEY
 
     def flatten(self, obj, data):
-        data['pid'] = str(obj.asPid())
+        data['pid'] = str(obj.asPid)
         return data
 
     def restore(self, data):

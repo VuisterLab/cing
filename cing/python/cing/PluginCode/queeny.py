@@ -628,7 +628,7 @@ def _runQueeny( project, tmp=None ):
         return True
 
     queenyDefs = project.getStatusDict(constants.QUEENY_KEY, **queenyDefaults())
-    queenyDefs.molecule = project.molecule.asPid()
+    queenyDefs.molecule = project.molecule.asPid
 
     path = project.validationPath( queenyDefs.directory )
     if not path:
