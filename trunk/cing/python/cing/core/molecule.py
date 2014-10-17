@@ -4174,11 +4174,6 @@ Residue class: Defines residue properties
         return sprintf('<Residue %s>', self.toString())
     #end def
 
-#    def asPid(self):
-#        thePid = ntu.NTtree.asPid(self)
-#        return thePid.modify(3, str(self.resNum))
-#    #end def
-
     def toString(self, showChainId=True, showResidueType=True):
         """A unique compact string identifier.e.g B.LYS282"""
         if showChainId:
@@ -5445,11 +5440,6 @@ Atom class: Defines object for storing atom properties
 #        return self.cName( 1 )
         return '<%s %s>' % ( self._className(), self.cName(2) ) # Include chain id as well as residue id.
     #end def
-
-#    def asPid(self):
-#        thePid = ntu.NTtree.asPid(self)
-#        return thePid.modify(3, str(self._parent.resNum))
-#    #end def
 
     def format(self): # pylint: disable=W0221
         return sprintf("""%s %s %s

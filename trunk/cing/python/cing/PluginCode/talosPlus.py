@@ -779,7 +779,7 @@ def runTalosPlus(project, tmp=None, parseOnly=False):
 
     talosDefs = project.getStatusDict(constants.TALOSPLUS_KEY, **talosDefaults)
 
-    talosDefs.molecule = project.molecule.asPid()
+    talosDefs.molecule = project.molecule.asPid
     talosDefs.directory = constants.TALOSPLUS_KEY
 
     path = project.validationPath( talosDefs.directory )
@@ -814,7 +814,7 @@ def runTalosPlus(project, tmp=None, parseOnly=False):
     talosDefs.date = io.now()
     talosDefs.completed=True
     talosDefs.version = __version__
-    talosDefs.molecule = project.molecule.asPid()
+    talosDefs.molecule = project.molecule.asPid
     talosDefs.remark = 'TalosPlus on %s completed in %.1f seconds on %s; data in %s' % \
                        (project.molecule, talosDefs.date-startTime, talosDefs.date, path)
 

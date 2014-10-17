@@ -126,7 +126,7 @@ class AnyDictHandler(BaseHandler):
     GWV
     """
     cls = dict          # to modify in subclassing
-    encodedKeys = []    # keys encoded asPids()
+    encodedKeys = []    # keys encoded asPids
 
     def flatten(self, obj, data):
         """
@@ -148,7 +148,7 @@ class AnyDictHandler(BaseHandler):
         for k in obj.keys():
             if k in self.encodedKeys and hasattr(obj[k],'asPid'):
                 #print('AnyDictHandler._flatten>', k, obj[k])
-                data[tags.ITEMS].append(flatten([k,str(obj[k].asPid())], reset=False))
+                data[tags.ITEMS].append(flatten([k,str(obj[k].asPid)], reset=False))
             else:
                 data[tags.ITEMS].append(flatten([k,obj[k]], reset=False))
         return data

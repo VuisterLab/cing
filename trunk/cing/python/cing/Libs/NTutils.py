@@ -2187,6 +2187,7 @@ class NTtree(NTdict):
         return '<%s:%s>' % (self.__class__.__name__, self.cName( -1 ))
     #end def
 
+    @property
     def asPid(self):
         return pid.Pid.new(self.__class__.__name__, self.cName( -1 ))
 

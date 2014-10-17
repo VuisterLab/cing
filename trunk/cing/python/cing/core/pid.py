@@ -1,7 +1,7 @@
 """
 Version 2/3 Pid routines
 """
-import cing
+from cing import __version__
 import cing.Libs.io as io
 
 
@@ -16,7 +16,7 @@ def decodePid(sourceObject, thePid):
     # assure a Pid object
     if not isinstance(thePid, Pid):
         if hasattr(thePid, 'asPid'):
-            thePid = thePid.asPid()
+            thePid = thePid.asPid
         else:
             # just try
             thePid = Pid(str(thePid))
@@ -30,7 +30,7 @@ def decodePid(sourceObject, thePid):
 
     # check if thePid describes the source object
     if hasattr(sourceObject,'asPid'):
-        sourcePid = sourceObject.asPid()
+        sourcePid = sourceObject.asPid
         if sourcePid == thePid:
             return sourceObject
     #end if
@@ -57,11 +57,18 @@ class Pid( str ):
     - newpid = pid1 + id1 
     - slicing to address elements of pid
     - loop over elements of pid
-    - Modify an element
-    - Copy a pid
-    - Incrementation and decrementation
+    - modify an element
+    - copy a pid
+    - incrementation and decrementation
+    - check validity
+    - return as string (convenience)
     
-    pid = Pid('Residue','mol1','A',502)
+    pid = Pid.new('Residue','mol1','A', 502) # elements need not be strings; but will be converted
+    -> Residue:mol1.A.502   (Pid instance)
+
+    which is equivalent to:
+
+    pid = Pid('Residue:mol1.A.502')
     -> Residue:mol1.A.502   (Pid instance)
 
     pid.type
@@ -69,12 +76,15 @@ class Pid( str ):
 
     pid.id
     -> 'mol1.A.502' (str instance)
-    
+
+    len(pid)
+    -> 3
+
     pid[0]
     -> 'mol1' (str instance)
 
-    pid[0:3]
-    -> 'mol1.A.502' (str instance)
+    pid[0:2]
+    -> 'mol1.A' (str instance)
     
     for id in pid:
         print id
@@ -113,10 +123,13 @@ class Pid( str ):
     def __init__(self, string):
         str.__init__(string)
 
-        self._version = 'cing:%s' % cing.cingDefinitions.version
+        self._version = 'cing:%s' % __version__
 
     @property
     def type(self):
+        """
+        return type part of pid
+        """
         parts = self._split()
         if len(parts) > 0:
             return parts[0]
@@ -125,6 +138,9 @@ class Pid( str ):
     
     @property
     def id(self):
+        """
+        return id part of pid
+        """
         parts = self._split()
         if len(parts) > 1:
             return '.'.join(parts[1:])
@@ -145,6 +161,9 @@ class Pid( str ):
 
     @property
     def str(self):
+        """
+        return as string rather than object
+        """
         return str(self)
 
     def __add__(self, other):
@@ -154,7 +173,9 @@ class Pid( str ):
     #end def
     
     def __len__(self):
-        return len(self._split())
+        l = len(self._split())-1
+        if l < 0: l=0
+        return l
     #end def
     
     def __getslice__(self, start, stop):

@@ -399,7 +399,7 @@ smlhandler = SMLhandler(name='SML')
 class SMLAnyDictHandler( SMLhandler ):
     """General dict encoding class
     startAttributes: list of attribute names to be used for initiation
-    encodeKeys: keys to encode with asPid( value ) method
+    encodeKeys: keys to encode with asPid method
     decodeKeys: keys do decode with getByPid( value ) method
     endHandler: function called with (dictObj, extraObject) arguments
     """
@@ -452,9 +452,10 @@ class SMLAnyDictHandler( SMLhandler ):
             #print '>>', key, value
             io.fprintf( stream, '%s = ', key )
             if key in self._encodeKeys:
-                if value != None and hasattr(value,'asPid') and value.asPid != None:
-                    val = value.asPid()
-                else:
+                val = None
+                if value is not None and hasattr(value,'asPid'):
+                    val = value.asPid
+                if val is None:
                     nTerror('SMLAnyDictHandler.toSML: cannot encode value "%s" of key "%s"', value, key)
                     val = value
                 #end if

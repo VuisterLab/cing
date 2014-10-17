@@ -22,7 +22,7 @@ class ValidationData(Adict.Adict):
     """
     Class to store the ValidationResults container instances
     Used for saving/restoring/writing.
-    Contains [object.asPid().str, container) key, value pairs
+    Contains [object.asPid.str, container) key, value pairs
     """
     PROJECT = 'project'
     #STATUS  = 'status'
@@ -40,7 +40,7 @@ class ValidationData(Adict.Adict):
         """
         setattr(theObject, ValidationResultsContainer.KEY, container)
         container.setattrOnly(constants.OBJECT_KEY, theObject)
-        self.data[theObject.asPid().str] = container
+        self.data[theObject.asPid.str] = container
     #end def
 
     def save(self, toPath=None):
@@ -143,12 +143,10 @@ class ValidationData(Adict.Adict):
         if result is not None:
             result[constants.OBJECT_KEY] = theObject
             if hasattr(theObject,'asPid'):
-                _pid = pid.Pid.new(result.__class__.__name__,
-                                   theObject.asPid().id,
-                                   ValidationResultsContainer.KEY,
-                                   key
-                                  )
-                result.setattrOnly(ValidationResult.PID_KEY, _pid)
+                result.setPid(theObject.asPid.id,
+                              ValidationResultsContainer.KEY,
+                              key
+                             )
             #end if
         #end if
         return False
@@ -200,7 +198,8 @@ class ValidationResultsContainer(Adict.Adict):
     def __init__(self, *args, **kwds):
         Adict.Adict.__init__(self, *args, **kwds)
         self.setattrOnly(constants.OBJECT_KEY, None)
-    #end def
+        # _pid = pid.Pid.new(self.__class__.__name__, self.getOid()).str
+        # self.setattrOnly(ValidationResult.PID_KEY, _pid)    #end def
 
     def __len__(self):
         """
@@ -248,16 +247,18 @@ class ValidationResult(Adict.Adict):
 
     def __init__(self):
         Adict.Adict.__init__(self)
-        _pid = pid.Pid.new(self.__class__.__name__, self.getOid()).str
-        self.setattrOnly(ValidationResult.PID_KEY, _pid)
+        # done in Adict now
+#        _pid = pid.Pid.new(self.__class__.__name__, self.getOid()).str
+#        self.setattrOnly(ValidationResult.PID_KEY, _pid)
         self[self.OBJECT_KEY] = None
 
     def __str__(self):
         _pid = self.getattrOnly(ValidationResult.PID_KEY)
         return '<%s>' % _pid
 
-    def asPid(self):
-        _pid = self.getattrOnly(ValidationResult.PID_KEY)
-        return pid.Pid(_pid)
-    #end def
+    # @property
+    # def asPid(self):
+    #     _pid = self.getattrOnly(ValidationResult.PID_KEY)
+    #     return pid.Pid(_pid)
+    # #end def
 #end class

@@ -499,6 +499,7 @@ Project: Top level Cing project class
         return pid.decodePid(self, thePid)
     #end def
 
+    @property
     def asPid(self):
         """
         Return a Pid
@@ -549,7 +550,7 @@ Project: Top level Cing project class
 
         mpid = None
         if self.molecule is not None:
-            mpid = self.molecule.asPid()
+            mpid = self.molecule.asPid
         sdict.molecule = mpid
 
         # update keys; we may not have a StatusDict yet, hence explicit iteration here:
@@ -816,49 +817,6 @@ Project: Top level Cing project class
 
         nTwarning('Project._savePluginData: no-longer in use for saving %s', key)
         return True
-        #
-        # defs = self.getStatusDict(key)
-        # if not defs.present:
-        #     defs.saved = False
-        #     nTdebug('Project._savePluginData: data not present; returning')
-        #     return False # Return gracefully
-        #
-        # if self.molecule is None:
-        #     nTmessage("Project._savePluginData: No molecule defined; returning")
-        #     defs.saved = False
-        #     return True
-        #
-        # # set values before doing anything or they get lost
-        # defs.update(kwds)
-        # defs.convention = constants.INTERNAL # asPid routines will return values
-        #                                      # in INTERNAL convention
-        #
-        # smlFile = self.path() / cdefs.directories.plugins / defs.smlFile
-        # # Assemble elements to be saved
-        # myList = NTlist()
-        # # first element of list is the settings
-        # myList.append( defs )
-        # # next elements are ResultDefs instances
-        # for obj in [self.molecule] + \
-        #             self.molecule.allChains() + \
-        #             self.molecule.allResidues() + \
-        #             self.molecule.allAtoms():
-        #     vDict = validation.getValidationResult(obj, key)
-        #     if vDict is not None:
-        #         myList.append(vDict)
-        #     #end for
-        # #end for
-        #
-        # # Import her to prevent circular  imports
-        # from cing.core import sml
-        # obj = sml.obj2sml( myList, smlFile)
-        # if obj is None:
-        #     nTerror('Project._savePluginData: error saving %s results to "%s"', key, smlFile)
-        #     defs.saved = False
-        #     return True
-        #
-        # nTdetail('==> Saved %s results to "%s"', key, smlFile)
-        # return False
     #end def
 
     def _save2json(self):
@@ -949,41 +907,6 @@ Project: Top level Cing project class
 
         nTwarning('Project._restorePluginData: no-longer in use for saving %s', key)
         return True
-
-        # if self.molecule is None:
-        #     nTdebug('Project._restorePluginData: no molecule; returning')
-        #     return False # Gracefully returns
-        #
-        # defs = self.getStatusDict(key)
-        #
-        # ###TEMP
-        # defs.saved = False
-        #
-        # if (not defs.saved):
-        #     nTdebug('Project._restorePluginData: data not saved; returning')
-        #     return False # Return gracefully
-        #
-        # smlFile = self.path() / cdefs.directories.plugins / defs.smlFile
-        # if not smlFile.exists():
-        #     nTerror('Project._restorePluginData: file "%s" with %s data not found', smlFile, key)
-        #     return True
-        # # end if
-        #
-        # # Restore the data
-        # # Import here to prevent circular imports
-        # from cing.core import sml
-        #
-        # myList = sml.sml2obj( smlFile, self )
-        # if myList is None:
-        #     nTerror('Project._restorePluginData: Restoring %s results from %s (code version %s)', key, smlFile, defs.saveVersion)
-        #     defs.present = False
-        #     return True
-        # # first element is stored definitions
-        # defs.update(myList[0])
-        # defs.update(kwds)
-        #
-        # nTmessage('==> Restored %s results from %s (code version %s)', key, smlFile, defs.saveVersion)
-        # return False
     #end def
 
     def _callPluginRestores(self):
