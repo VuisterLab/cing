@@ -34,10 +34,12 @@ class ValidationData(Adict.Adict):
         self.data    = {}
     #end def
 
-    def add(self, theObject, container):
+    def addContainer(self, theObject, container):
         """
         Add the container under the object key
         """
+        setattr(theObject, ValidationResultsContainer.KEY, container)
+        container.setattrOnly(constants.OBJECT_KEY, theObject)
         self.data[theObject.asPid().str] = container
     #end def
 
@@ -47,7 +49,7 @@ class ValidationData(Adict.Adict):
         return True on error
         """
         if toPath is None:
-            toPath = self.project.path() / cdefs.directories.plugins / cdefs.cingPaths.validation
+            toPath = self.project.path() / cdefs.directories.validation / cdefs.cingPaths.validation
 
         jsonTools.obj2json(self.data, toPath)
         return False
@@ -61,7 +63,7 @@ class ValidationData(Adict.Adict):
         return True on error
         """
         if fromPath is None:
-            fromPath = self.project.path() / cdefs.directories.plugins / cdefs.cingPaths.validation
+            fromPath = self.project.path() / cdefs.directories.validation / cdefs.cingPaths.validation
         if restoreLinkages:
             vdata, metadeta = jsonTools.json2obj(fromPath, self.project)
         else:
@@ -71,12 +73,20 @@ class ValidationData(Adict.Adict):
 
         # update the data containers
         for pid, container in vdata.iteritems():
-            if pid in self:
+            if pid in self.data:
                 # we already have a container for this object => update the container elements
-                self[pid].update(container)
+                self.data[pid].update(container)
             else:
                 # we don't have it yet, just add
-                self[pid] = container
+                self.data[pid] = container
+                if restoreLinkages:
+                    obj = self.project.getByPid(pid)
+                    if obj is None:
+                        io.error('ValidationData.restore: unable to decode "{0}\n', pid)
+                    else:
+                        self.addContainer(obj, container)
+                    #end if
+                #end if
             #end if
         #end for
     #end def
@@ -119,25 +129,26 @@ class ValidationData(Adict.Adict):
         # check if theObject has a validation container, create one if needed
         if not hasattr(theObject, ValidationResultsContainer.KEY):
             container = ValidationResultsContainer()
-            setattr(theObject, ValidationResultsContainer.KEY, container)
-            container.setattrOnly(constants.OBJECT_KEY, theObject)
+            # add this container
+            self.addContainer(theObject, container)
+            # setattr(theObject, ValidationResultsContainer.KEY, container)
+            # container.setattrOnly(constants.OBJECT_KEY, theObject)
         else:
             container = getattr(theObject, ValidationResultsContainer.KEY)
         #end if
 
-        # add this container to self
-        self.add(theObject, container)
-
         # add the result and set the object's reference
+        # conditionally adjust the the pid of result instance
         container[key] = result
         if result is not None:
             result[constants.OBJECT_KEY] = theObject
             if hasattr(theObject,'asPid'):
-                result._pid = pid.Pid.new(result.__class__.__name__,
-                                          theObject.asPid().id,
-                                          ValidationResultsContainer.KEY,
-                                          key
-                                         )
+                _pid = pid.Pid.new(result.__class__.__name__,
+                                   theObject.asPid().id,
+                                   ValidationResultsContainer.KEY,
+                                   key
+                                  )
+                result.setattrOnly(ValidationResult.PID_KEY, _pid)
             #end if
         #end if
         return False
@@ -202,19 +213,23 @@ class ValidationResultsContainer(Adict.Adict):
         return count
     #end def
 
+    def __str__(self):
+        obj = self.getattrOnly(constants.OBJECT_KEY)
+        return '<ValidationResultsContainer: %s, keys: %s>' % (obj, self.keys())
+
     def format(self):
         l = 80
         obj = self.getattrOnly(constants.OBJECT_KEY)
 
-        result =  '\n# ' + '='*(l-2) + '\n'
+        result =  '\n#' + '='*(l-2) + '\n'
         result += '# %s\n' % obj
-        result += '# ' + '='*(l-2) + '\n\n'
+        result += '#' + '='*(l-2) + '\n\n'
 
         for key, value in self.iteritems():
             if value is not None:
-                result += '# ' + '-'*(l-2) + '\n'
+                result += '#' + '-'*(l-2) + '\n'
                 result += '# %s\n' % key
-                result += '# ' + '-'*(l-2) + '\n'
+                result += '#' + '-'*(l-2) + '\n'
                 result += io.formatDictItems(value,
                                              '{key:20} : {value!s}\n'
                                             )
@@ -229,16 +244,20 @@ class ValidationResult(Adict.Adict):
     """v3:base class for validation results dict's
     """
     OBJECT_KEY = constants.OBJECT_KEY
+    PID_KEY = '_pid'
 
     def __init__(self):
         Adict.Adict.__init__(self)
-        self._pid = pid.Pid.new(self.__class__.__name__, self.getOid()).str
+        _pid = pid.Pid.new(self.__class__.__name__, self.getOid()).str
+        self.setattrOnly(ValidationResult.PID_KEY, _pid)
         self[self.OBJECT_KEY] = None
 
     def __str__(self):
-        return '<%s>' % self._pid
+        _pid = self.getattrOnly(ValidationResult.PID_KEY)
+        return '<%s>' % _pid
 
     def asPid(self):
-        return pid.Pid(self._pid)
+        _pid = self.getattrOnly(ValidationResult.PID_KEY)
+        return pid.Pid(_pid)
     #end def
 #end class

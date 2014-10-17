@@ -22,20 +22,13 @@ from cing.Libs.io import mprintf  #unused here but for compatibility
 
 
 from cing.constants import NaNstring
-# from cing.definitions import verbosityDebug
-# from cing.definitions import verbosityDefault #@UnusedImport actually used by wild imports of this module (NTutils)
-# from cing.definitions import verbosityDetail
-# from cing.definitions import verbosityError
-# from cing.definitions import verbosityNothing
-# from cing.definitions import verbosityOutput
-# from cing.definitions import verbosityWarning
 
 from cing.Libs.disk import mkdirs #@UnusedImport
 from cing.Libs.fpconst import NaN
 from cing.Libs.fpconst import isNaN
 from cing.core.classes3 import Lister
 from cing.core.classes3 import SMLhandled
-#from cing.constants import * #@UnusedWildImport
+
 
 from copy import deepcopy
 from fnmatch import fnmatch
@@ -2556,12 +2549,20 @@ class NTvalue(NTdict):
         self.value = value
         self.error = error
 #        NTdict.__init__(self, value=value, error=error, fmt=fmt, fmt2=fmt2, **kwds)
-        # always map av and sd as alternatives for value and error, set default n
-        self.av = self.value
-        self.sd = self.error
+#        self.av = self.value
+#        self.sd = self.error
         self.setdefault('n',1)
         self.saveXML('value', 'error', 'n','fmt', 'fmt2')
     #end def
+
+    # always map av and sd as alternatives for value and error, set default n
+    @property
+    def av(self):
+        return self.value
+
+    @property
+    def sd(self):
+        return self.error
 
     def __call__(self):
         return self.value

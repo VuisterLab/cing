@@ -412,11 +412,11 @@ PROCHECK_STR       = "procheck" # key to the entities (atoms, residues, etc unde
 #----------------------------------------------------------------------
 
 # Projects; used in Project.open routine
-PROJECT_OLD         = 'old'
-PROJECT_NEW         = 'new'
-PROJECT_CREATE      = 'create'
-PROJECT_NEWFROMCCPN = 'newFromCcpn' #use new CCPN file to initialise data
-PROJECT_OLDFROMCCPN = 'oldFromCcpn' #use the stored CCPN data for restoring
+PROJECT_OLD         = 'old'             # open existing cing project
+PROJECT_NEW         = 'new'             # create new cing project; overwrite any existing one
+PROJECT_CREATE      = 'create'          # open old project if it exists, new project otherwise
+PROJECT_NEWFROMCCPN = 'newFromCcpn'     # use new CCPN file to initialise data
+PROJECT_OLDFROMCCPN = 'oldFromCcpn'     # use the stored CCPN data for restoring
 
 
 # keys of different ValidationResult types

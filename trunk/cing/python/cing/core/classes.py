@@ -41,6 +41,7 @@ from cing.Libs.NTutils import NTtree
 from cing.Libs.NTutils import NTlist
 from cing.Libs.NTutils import NTlistOfLists
 from cing.Libs.NTutils import NTvalue
+from cing.Libs.NTutils import NTvector
 
 from cing.Libs.NTutils import nTaverage
 from cing.Libs.NTutils import nTaverage2
@@ -53,8 +54,6 @@ from cing.Libs.NTutils import nTdebug
 from cing.Libs.NTutils import nTfill
 from cing.Libs.NTutils import nTdetail
 from cing.Libs.NTutils import nTlimit
-from cing.Libs.NTutils import NTvalue
-from cing.Libs.NTutils import NTvector
 from cing.Libs.NTutils import getDeepByKeys
 from cing.Libs.NTutils import getDeepByKeysOrAttributes
 from cing.Libs.NTutils import getDeepByKeysOrDefault
@@ -496,6 +495,7 @@ Project: Top level Cing project class
         """Decode object by pid, in anticipation of version 3
         return object or None on error
         """
+        # TODO Could hash decoded pid's for speed!
         return pid.decodePid(self, thePid)
     #end def
 
@@ -1028,6 +1028,9 @@ Project: Top level Cing project class
             pl.restore()
         #end for
 
+        # restore the validation data
+        self.validationData.restore()
+
         # this is also done in runCingChecks, but should be here to assure restraint
         # partitioning and analysis for the external routines.
         # JFD TODO: why? the above is unclear to me now.
@@ -1106,14 +1109,6 @@ Project: Top level Cing project class
             #end for
         #end for
     #end def
-
-    #OBSOLETE:
-    # def updateProject(self):
-    #     """Do all administrative things after actions
-    #     """
-    #     if self.molecule:
-    #         self[self.molecule.name] = self.molecule
-    # #end def
 
     #-------------------------------------------------------------------------
     # actions Molecule

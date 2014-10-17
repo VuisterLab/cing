@@ -5759,7 +5759,7 @@ coordinates: %s"""  , dots, self, dots
         else:
             resonance = getDeepByKeysOrAttributes( self.resonances, resonanceListIdx )
             if resonance == None:
-                nTcodeerror("Failed to find resonance for idx: %s" % resonanceListIdx)
+                nTcodeerror('Atom.isAssigned: Failed to find resonance for %s at idx "%s"' % (self,resonanceListIdx))
                 return False
         if resonance == None:
             return False

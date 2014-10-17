@@ -143,13 +143,14 @@ cingDefinitions = CingDefinitions()
 # via myProject.path() / directories.xyz syntax of the Path class.
 directories = Adict.Adict(
     data       = 'Data',
-    molecules  = 'Data/Molecules',
-    peaklists  = 'Data/Peaklists',
-    restraints = 'Data/Restraints',
-    ccpn       = 'Data/Ccpn',
-    sources    = 'Data/Sources',
+    molecules  = 'Data/Molecules',      # molecule data
+    peaklists  = 'Data/Peaklists',      # peak lists data
+    restraints = 'Data/Restraints',     # restraint data
+    ccpn       = 'Data/Ccpn',           # ccpn data
+    sources    = 'Data/Sources',        # source data
 #    database   = 'Data/Database',
-    plugins    = 'Data/Plugins',
+    plugins    = 'Data/Plugins',        # plugin data (only in V3)
+    validation = 'Data/Validation',     # validation data
     logs       = 'Logs',
     export     = 'Export',
     xeasy      = 'Export/Xeasy',
@@ -164,6 +165,7 @@ directories = Adict.Adict(
     tmp        = 'Temp'
 )
 
+#DEPRECIATED: in V3 these data will be under Data/Plugins
 # These directories get created upon opening/appending a molecule to project
 validationDirectories = Adict.Adict(
     # Directories generated

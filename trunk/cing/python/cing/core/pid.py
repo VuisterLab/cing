@@ -5,9 +5,6 @@ import cing
 import cing.Libs.io as io
 
 
-#
-# TODO Could hash decoded pid's for speed!
-#
 def decodePid(sourceObject, thePid):
     """
     try to decode thePid relative to sourceObject
@@ -17,7 +14,19 @@ def decodePid(sourceObject, thePid):
         return None
 
     # assure a Pid object
-    thePid = Pid(str(thePid))
+    if not isinstance(thePid, Pid):
+        if hasattr(thePid, 'asPid'):
+            thePid = thePid.asPid()
+        else:
+            # just try
+            thePid = Pid(str(thePid))
+        #end if
+    #end if
+
+    if not thePid.isValid:
+        io.error('decodePid: pid "{0}" is invalid', thePid)
+        return None
+    #end if
 
     # check if thePid describes the source object
     if hasattr(sourceObject,'asPid'):
@@ -25,7 +34,7 @@ def decodePid(sourceObject, thePid):
         if sourcePid == thePid:
             return sourceObject
     #end if
-    # apparently not, let try to traverse down to find the elements of thePis
+    # apparently not, let try to traverse down to find the elements of thePid
     obj = sourceObject
     for p in thePid:
         #print( 'decodePid>>', p, object)
@@ -122,6 +131,17 @@ class Pid( str ):
         else:
             return ''
     #end def
+
+    @property
+    def isValid(self):
+        # tests here
+        if self.find(':') < 0:
+            return False
+        parts = self._split()
+        if len(parts) < 2:
+            return False
+        # passed all test; return True
+        return True
 
     @property
     def str(self):
