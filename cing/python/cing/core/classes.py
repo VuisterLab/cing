@@ -511,31 +511,6 @@ Project: Top level Cing project class
 # actions exists/open/restore/save/close/export/updateProject
 #-------------------------------------------------------------------------
 
-#OBSOLETE: uses exists() on all path objects
-#    def exists(name):
-#        """Static method exists check for presence of Project directory derived from name
-#            returns True or False
-#        """
-#        rootp, _n = Project.rootPath(name)
-#        if os.path.exists(rootp):
-#            return True
-#        return False
-#    #end def
-#    exists = staticmethod(exists)
-
-#OBSOLETE:
-#     def setStatusObjects(self, parsed=None, completed = None):
-#         """Only update the parameter that is not None (True or False)
-#         """
-# #             = 'procheckStatus dsspStatus whatifStatus wattosStatus vascoStatus shiftxStatus x3dnaStatus'.split()
-#         for statusObjectName in self.statusObjectNameList:
-#             if parsed != None:
-#                 setDeepByKeys(self, parsed, statusObjectName, PARSED_STR)
-#             if completed != None:
-#                 setDeepByKeys(self, completed, statusObjectName, COMPLETED_STR)
-#         # end for
-#     #end def
-
     def getStatusDict(self, key, **defaults ):
         """Return statusDict for key, initialise with **defaults if not exist
         add keys from defaults if keys do not exist
@@ -544,7 +519,7 @@ Project: Top level Cing project class
         """
         sdict = self.status.setdefault(key, StatusDict(key, **defaults))
         if sdict is None:
-            io.error('Project.getStatusDict: key %s returned None, reverting to default values\n', key)
+            io.error('Project.getStatusDict: key %s returned None!\n', key)
             return None
         #end if
 
@@ -553,7 +528,7 @@ Project: Top level Cing project class
             mpid = self.molecule.asPid
         sdict.molecule = mpid
 
-        # update keys; we may not have a StatusDict yet, hence explicit iteration here:
+        # update keys; we may not have a StatusDict instance yet, hence explicit iteration here:
         for k,v in defaults.items():
             sdict.setdefault(k, v)
 

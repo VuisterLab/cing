@@ -2,6 +2,7 @@
 Code to upgrade all project <= 1.0
 """
 import sys
+import os
 
 import cing
 from cing import constants
@@ -131,7 +132,9 @@ def upgradeProject2Json( name, restore  ):
         #print '>>>>>\n', pr.status.queeny.formatItems()
 
         pr._save2json()
-        disk.rename(pfile, pfile + '.save')
+        # have to make the directory because we have not yet fully initialised all directories at this stage
+        pr._updateProjectPaths()
+        disk.rename(pfile, pr.path() / cdefs.directories.version1 / 'project.xml' )
         #now we should be able to open it again
         return Project.open( name, status = constants.PROJECT_OLD, restore = restore )
 
@@ -161,59 +164,16 @@ def restoreQueeny100( project, tmp=None ):
         nTdebug('restoreQueeny100: no queeny completed')
         return False # Return gracefully
 
-    path = project.validationPath( queenyDefs.directory)
-    if not path:
-        nTerror('restoreQueeny100: directory "%s" with queeny data not found', path)
-        return True
-
-    smlFile = path / queenyDefs.smlFile
-    if not smlFile.exists():
-        nTerror('restoreQueeny100: file "%s" with queeny data not found', path)
-        return True
-
-    # Restore the data
-    for storedProp in [constants.QUEENY_UNCERTAINTY1_STR, constants.QUEENY_UNCERTAINTY2_STR, constants.QUEENY_INFORMATION_STR ]:
-        for res in project.molecule.allResidues():
-            res[storedProp] = 0.0
-        for atm in project.molecule.allAtoms():
-            atm[storedProp] = 0.0
-    #end for
-
-    myList=sml.sml2obj( smlFile, project.molecule)
-    if myList==None:
-        nTerror('restoreQueeny100: Failed restoring Queeny results from %s (code version %s)', smlFile, queenyDefs.saveVersion)
-        return True
-
-    try:
-        for tupleInfo in myList:
-            if len(tupleInfo) == 3: # Version with multiple data items
-                nameTuple,storedProp,info = tupleInfo
-            else: # Old version with multiple data items
-                nameTuple,info = tupleInfo
-                storedProp = constants.QUEENY_INFORMATION_STR
-            obj = project.molecule.decodeNameTuple(nameTuple)
-            if not obj:
-                atomName = nameTuple[3]
-                if not (atomName in constants.ATOM_LIST_TO_IGNORE_REPORTING):
-                    nTerror('restoreQueeny100: error decoding "%s"', nameTuple)
-                    # Was reporting terminal atoms eg. in "('1buq', 'A', 39, 'H2', None, None, 'INTERNAL_1')"
-                return True
-            #end if
-            obj[storedProp] = info
-    except:
-        ntu.nTtracebackError()
-        nTerror("restoreQueeny100: Failed to restore Queeny results.")
-        return True
-    #success
-    # Store as new data structure
-    for obj in project.molecule.allResidues() + project.molecule.allAtoms():
-        qDict = queeny.QueenyResult()
-        for storedProp in [constants.QUEENY_UNCERTAINTY1_STR, constants.QUEENY_UNCERTAINTY2_STR, constants.QUEENY_INFORMATION_STR ]:
-            qDict[storedProp] = obj[storedProp]
-        validation.setValidationResult(obj, constants.QUEENY_KEY, qDict)
-    #end for
-    queenyDefs.present = True
-    nTmessage('restoreQueeny100: Restored Queeny results from %s (code version %s)', smlFile, queenyDefs.saveVersion)
+    path = project.validationPath( 'Queeny')
+    if not path.exists():
+        ntu.nTwarning('restoreQueeny100: directory "%s" with prior queeny data not found', path)
+    else:
+        # delete the data and run again
+        os.rename(path, project.path() / cdefs.directories.version1 / 'Queeny')
+    #end if
+    # regenerate the data
+    project.runQueeny()
+    nTmessage('restoreQueeny100: Re-generated Queeny results')
     return False
 #end def
 
@@ -327,14 +287,14 @@ def upgrade100(project, restore):
     #end for
 
     # Now patch talos+
+    nTmessage('==> upgrade100: talosPlus')
     if restoreTalosPlus100(project):
         io.error('upgrade100: restoring talosPlus data failed\n')
-    # project.saveTalosPlus()
-    #
-    # # Now patch queeny
+
+    # Now patch queeny
+    # nTmessage('==> upgrade100: queeny')
     # if restoreQueeny100(project):
     #     nTerror('upgrade100: restoring queeny data failed')
-    #     return None
     # project.saveQueeny()
     #
     # # Now patch shiftx

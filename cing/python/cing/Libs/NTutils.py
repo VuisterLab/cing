@@ -1248,10 +1248,10 @@ class Odict(dict):
         return (key, val)
     # end def
 
-    def setdefault(self, key, failobj = None):
+    def setdefault(self, key, defaultValue):
         if key not in self._keys:
             self._keys.append(key)
-        return dict.setdefault(self, key, failobj)
+        return dict.setdefault(self, key, defaultValue)
     # end def
 
     def update(self, myDict):

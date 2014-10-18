@@ -148,8 +148,9 @@ directories = Adict.Adict(
     restraints = 'Data/Restraints',     # restraint data
     ccpn       = 'Data/Ccpn',           # ccpn data
     sources    = 'Data/Sources',        # source data
+    version1   = 'Data/Version1',       # legacy version 1 files
 #    database   = 'Data/Database',
-    plugins    = 'Data/Plugins',        # plugin data (only in V3)
+#    plugins    = 'Data/Plugins',        # plugin data (only in V3)
     validation = 'Data/Validation',     # validation data
     logs       = 'Logs',
     export     = 'Export',
@@ -165,8 +166,10 @@ directories = Adict.Adict(
     tmp        = 'Temp'
 )
 
-#DEPRECIATED: in V3 these data will be under Data/Plugins
-# These directories get created upon opening/appending a molecule to project
+#DEPRECIATED:
+# in V3 these data will be under Data/Plugins and are to be created by the
+# plugin code itself
+# V1 These directories get created upon opening/appending a molecule to project
 validationDirectories = Adict.Adict(
     # Directories generated
     procheck   = 'Procheck',

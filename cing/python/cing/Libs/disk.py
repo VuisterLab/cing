@@ -871,6 +871,8 @@ class Path( str ):
     #end def
     def makedirs(self):
         mkdirs(str(self))
+    def mkdirs(self):
+        mkdirs(str(self))
     def rmdir(self):
         rmdir(str(self))
     def remove(self):

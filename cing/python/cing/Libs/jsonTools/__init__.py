@@ -235,7 +235,11 @@ def json2obj(path, referenceObject=None):
         return None, None
 
     with open(p,'r') as fp:
-        obj, keyedMetadata = decode(fp.read(), referenceObject=referenceObject)
+        try:
+            obj, keyedMetadata = decode(fp.read(), referenceObject=referenceObject)
+        except ValueError:
+            io.error('json2obj: trying to decode object from "{0}" failed\n', path)
+            return None, None
     return obj, keyedMetadata
 #end def
 

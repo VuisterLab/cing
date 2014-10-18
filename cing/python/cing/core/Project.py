@@ -1,5 +1,8 @@
 """
 V3 Code to put Project related classes
+Filename starts with capital P in order to preserve 'project' for actual Project instances
+in many routines application code.
+
 Just a stub for now
 """
 
@@ -15,7 +18,6 @@ from cing.constants import PROJECT_CREATE
 from cing.constants import PROJECT_NEW
 from cing.constants import PROJECT_NEWFROMCCPN
 from cing.constants import PROJECT_OLDFROMCCPN
-
 
 # convenience methods
 open = Project.open
