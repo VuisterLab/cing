@@ -13,6 +13,7 @@ import sys
 from cing import constants
 from cing.Libs import Adict
 from cing.Libs import io
+from cing.Libs import disk
 import cing.constants.definitions as cdefs
 import cing.Libs.jsonTools as jsonTools
 
@@ -21,7 +22,7 @@ class ValidationData(Adict.Adict):
     """
     Class to store the ValidationResults container instances
     Used for saving/restoring/writing.
-    Contains [object.asPid.str, container) key, value pairs
+    Contains self.data is a dict of (object.asPid.str, container) key, value pairs
     """
     PROJECT = 'project'
     #STATUS  = 'status'
@@ -48,10 +49,82 @@ class ValidationData(Adict.Adict):
         return True on error
         """
         if toPath is None:
-            toPath = self.project.path() / cdefs.directories.validation / cdefs.cingPaths.validation
+            toPath = self.project.path() / cdefs.directories.validation
+        else:
+            toPath = disk.Path(toPath)
+        toPath.makedirs()
 
-        jsonTools.obj2json(self.data, toPath)
+        # sort by key:
+        keyedResults = {}
+        for container in self.data.itervalues():
+            for key, result in container.iteritems():
+                # only add result items with data
+                if result is not None:
+                    theList = keyedResults.setdefault(key, [])
+                    theList.append(result)
+                #end if
+            #end for
+        #end for
+        for key, theList in keyedResults.iteritems():
+            io.debug('ValidationData.save: key {0}, list of {1} items, saving to "{3}"\n',
+                      key, len(theList), theList, toPath / key + '.json'
+                    )
+            jsonTools.obj2json(theList, toPath / key + '.json')
+        #end for
+        del keyedResults  # allow garbage collection??
         return False
+    #end def
+
+    def _restoreWithLinkages(self, vfile):
+        """
+        restore validation results in vfile, reestablish linkages to project objects
+        """
+        vdata, metadeta = jsonTools.json2obj(vfile, self.project)
+
+        if vdata is None:
+            io.error('ValidationData._restoreWithLinkages: unable to restore objects from "{0}"\n',
+                     vfile)
+            return True
+        #end if
+        for result in vdata:
+            #print 'ValidationData.restore> ', result
+            obj = self.project.getByPid(result[constants.OBJECT_KEY])
+            if obj is None:
+                io.error('ValidationData._restoreWithLinkages: unable to decode pid "{0} (file {1})"\n',
+                         result[constants.OBJECT_KEY], vfile
+                        )
+                return True
+            #end if
+            self.project.validationData.setResult(obj, result.KEY, result)
+        #end for
+        return False
+    #end def
+
+
+    def _restoreWithoutLinkages(self, vfile):
+        """
+        restore validation results in vfile, do not decode pid's into linkages
+        Add containers to self.data when needed
+        """
+        # everything is maintained as pid's
+        vdata, metadeta = jsonTools.json2obj(vfile)
+
+        if vdata is None:
+            io.error('ValidationData._restoreWithoutLinkages: unable to restore objects from "{0}"\n',
+                     vfile)
+            return True
+
+        for result in vdata:
+            # check for the presence of appropriate container
+            objPid = result[constants.OBJECT_KEY]
+            if objPid in self.data:
+                container = self.data[objPid]
+            else:
+                container = ValidationResultsContainer()
+                self.data[objPid] = container
+            #end if
+            container[result.KEY] = result
+        #end for
     #end def
 
     def restore(self, fromPath=None, restoreLinkages=True):
@@ -62,34 +135,25 @@ class ValidationData(Adict.Adict):
         return True on error
         """
         if fromPath is None:
-            fromPath = self.project.path() / cdefs.directories.validation / cdefs.cingPaths.validation
-        if restoreLinkages:
-            vdata, metadeta = jsonTools.json2obj(fromPath, self.project)
+            fromPath = self.project.path() / cdefs.directories.validation
         else:
-            vdata, metadeta = jsonTools.json2obj(fromPath)
+            fromPath = disk.Path(fromPath)
+        if not fromPath.exists():
+            io.error('ValidationData.restore: path "{0}" does not exist\n', fromPath)
 
-        if vdata is None:
-            io.error('ValidationData.restore: unable to restore\n')
-            return True
+        error = False  # used to track if decoding of any of the json files generated an error
+        for vfile in fromPath.glob('*.json'):
 
-        # update the data containers
-        for pid, container in vdata.iteritems():
-            if pid in self.data:
-                # we already have a container for this object => update the container elements
-                self.data[pid].update(container)
+            io.debug('ValidationData.restore: restoring {0}, restoreLinkages = \n',
+                     vfile, restoreLinkages)
+
+            if restoreLinkages:
+                if self._restoreWithLinkages(vfile): error = True
             else:
-                # we don't have it yet, just add
-                self.data[pid] = container
-                if restoreLinkages:
-                    obj = self.project.getByPid(pid)
-                    if obj is None:
-                        io.error('ValidationData.restore: unable to decode "{0}\n', pid)
-                    else:
-                        self.addContainer(obj, container)
-                    #end if
-                #end if
+                if self._restoreWithoutLinkages(vfile): error = True
             #end if
         #end for
+        return error
     #end def
 
     def clear(self, project=None):

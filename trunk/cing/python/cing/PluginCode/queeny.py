@@ -11,6 +11,7 @@ import math
 import cing
 from cing import constants
 from cing.core import validation
+from cing.core import molecule
 #from cing. import sml
 from cing.Libs import io
 from cing.Libs import jsonTools
@@ -89,11 +90,12 @@ class QueenyResultJsonHandler(jsonTools.handlers.SimpleDictHandler):
         result = QueenyResult()
         self._restore(data, result)
         #LEGACY:
-        if isinstance(result.object, cing.core.classes.molecule.Residue) or \
-           isinstance(result.object, cing.core.classes.molecule.Atom):
+        if isinstance(result.object, molecule.Residue) or \
+           isinstance(result.object, molecule.Atom):
             for storedProp in [QueenyResult.UNCERTAINTY1, QueenyResult.UNCERTAINTY2, QueenyResult.INFORMATION]:
                 result.object[storedProp] = result[storedProp]
         #end if
+        return result
     #end def
 #end class
 QueenyResultJsonHandler.handles(QueenyResult)
