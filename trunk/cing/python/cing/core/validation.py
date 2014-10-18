@@ -14,7 +14,6 @@ from cing import constants
 from cing.Libs import Adict
 from cing.Libs import io
 import cing.constants.definitions as cdefs
-import cing.core.pid as pid
 import cing.Libs.jsonTools as jsonTools
 
 
@@ -69,7 +68,9 @@ class ValidationData(Adict.Adict):
         else:
             vdata, metadeta = jsonTools.json2obj(fromPath)
 
-        if vdata is None: return True
+        if vdata is None:
+            io.error('ValidationData.restore: unable to restore\n')
+            return True
 
         # update the data containers
         for pid, container in vdata.iteritems():
@@ -243,7 +244,6 @@ class ValidationResult(Adict.Adict):
     """v3:base class for validation results dict's
     """
     OBJECT_KEY = constants.OBJECT_KEY
-    PID_KEY = '_pid'
 
     def __init__(self):
         Adict.Adict.__init__(self)
@@ -253,12 +253,6 @@ class ValidationResult(Adict.Adict):
         self[self.OBJECT_KEY] = None
 
     def __str__(self):
-        _pid = self.getattrOnly(ValidationResult.PID_KEY)
+        _pid = self.getattrOnly(self.PID_KEY)
         return '<%s>' % _pid
-
-    # @property
-    # def asPid(self):
-    #     _pid = self.getattrOnly(ValidationResult.PID_KEY)
-    #     return pid.Pid(_pid)
-    # #end def
 #end class

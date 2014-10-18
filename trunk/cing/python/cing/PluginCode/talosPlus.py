@@ -37,9 +37,6 @@ from cing.Libs.io import fprintf
 
 from cing.core.classes import DihedralRestraint
 
-from cing.constants.definitions import cingDefinitions
-from cing.constants.definitions import directories
-
 # versions < 0.95 not logged with version number
 # cing versions >1.0 first ones to include this
 __version__ = cing.__version__
@@ -109,9 +106,9 @@ class TalosPlusResult( validation.ValidationResult ):
 class TalosPlusResultJsonHandler(jsonTools.handlers.AnyDictHandler):
     """Handler for the TalosPlusResult class
     """
-    namespace = cing.constants.TALOSPLUS_KEY
+    namespace = constants.TALOSPLUS_KEY
     cls = TalosPlusResult
-    encodedKeys = [cing.constants.OBJECT_KEY,'residue']
+    encodedKeys = [constants.OBJECT_KEY,'residue']
 #end class
 TalosPlusResultJsonHandler.handles(TalosPlusResult)
 
@@ -648,7 +645,6 @@ def _importTalosPlus( project, predFile, ssFile=None ):
 
         #print '>', row, row.residue
         talosPlus = TalosPlusResult()
-        talosPlus.residue = row.residue
         talosPlus.phi = NTvalue( row.PHI, row.DPHI, '%6.1f +- %4.1f')
         talosPlus.psi = NTvalue( row.PSI, row.DPSI, '%6.1f +- %4.1f')
         talosPlus.S2  = row.S2
@@ -667,6 +663,7 @@ def _importTalosPlus( project, predFile, ssFile=None ):
 
         project.validationData.setResult(row.residue, constants.TALOSPLUS_KEY, talosPlus)
         #LEGACY:
+        talosPlus.residue = row.residue
         row.residue.talosPlus = talosPlus
     #end for
 

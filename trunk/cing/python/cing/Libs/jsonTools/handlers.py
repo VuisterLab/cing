@@ -37,7 +37,7 @@ from cing.Libs.jsonTools.util import b64decode
 from cing.Libs.jsonTools.util import b64encode
 from cing.Libs.jsonTools import tags
 from cing.Libs.jsonTools import util
-import cing.core.pid
+from cing.core import pid
 
 
 class Registry(object):
@@ -109,15 +109,15 @@ class BaseHandler(object):
         return cls
 
 
-def setVersion(data):
-    """
-    Set py/version key in data
-    """
-    version = '%s:%s' % (cing.constants.CING_KEY,
-                         cing.constants.definitions.cingDefinitions.version
-                        )
-    data[tags.VERSION] = version
-#end def
+# def setVersion(data):
+#     """
+#     Set py/version key in data
+#     """
+#     version = '%s:%s' % (cing.constants.CING_KEY,
+#                          cing.constants.definitions.cingDefinitions.version
+#                         )
+#     data[tags.VERSION] = version
+# #end def
 
 
 class AnyDictHandler(BaseHandler):
@@ -172,9 +172,8 @@ class AnyDictHandler(BaseHandler):
         for item in data[tags.ITEMS]:
             key,value = restore(item, reset=False)
             if key in self.encodedKeys and \
-               reference is not None and \
-               isinstance(value, cing.core.pid.Pid):
-                obj[key] = cing.core.pid.decodePid(value)
+               reference is not None:
+                obj[key] = pid.decodePid(reference, value)
             else:
                 obj[key] = value
         #end for

@@ -3,19 +3,31 @@ Basic QUEEN implementation for restraint information calculation
 
 project.runQueeny() executes the queeny routine.
 Atoms obtain attribute 'information' (defined in QUEENY_INFORMATION_STR) with information value.
-Residues obtain attribute 'information' with information value that is averaged over a three residue window
+Residues obtain attribute 'information' with information value that is averaged over all atoms
 
 """
+import math
 
 import cing
 from cing import constants
-from cing.constants import definitions as cdefs
 from cing.core import validation
-from cing.core import sml
+#from cing. import sml
 from cing.Libs import io
+from cing.Libs import jsonTools
 
 from cing.Libs.Adict import Adict
-from cing.Libs.NTutils import * #@UnusedWildImport
+from cing.Libs.NTutils import NTsort
+from cing.Libs.NTutils import nTerror
+from cing.Libs.NTutils import nTtracebackError
+from cing.Libs.NTutils import nTwarning
+from cing.Libs.NTutils import nTmessage
+from cing.Libs.NTutils import nTdebug
+from cing.Libs.NTutils import nTfill
+from cing.Libs.NTutils import nTzap
+from cing.Libs.NTutils import Odict
+
+from cing.Libs.io import sprintf
+
 try:
     import pyximport
     pyximport.install()
@@ -27,15 +39,68 @@ try:
 #    from cing.Libs.cython.superpose import superposeVectors
 #    from cing.Libs.cython.superpose import Rm6dist #@UnresolvedImport
 except ImportError:
-    pass
+    io.error('Importing cython routines  for queeny\n')
+    raise ImportError
+
 
 # versions < 0.95 not logged with version number
 # cing versions >1.0 first ones to include this
-__version__ = cdefs.cingDefinitions.version
+__version__ = cing.__version__
+
+
+# defaults for the talosPlus status dict
+def queenyDefaults():
+    d = Adict(
+               completed  = False,
+               parsed     = False,
+               version    = __version__,
+               directory  = constants.QUEENY_KEY,
+               molecule   = None,
+              )
+    return d
+#end def
+
+
+class QueenyResult(validation.ValidationResult):
+    """Class to store queeny results
+    """
+    KEY = constants.QUEENY_KEY
+    UNCERTAINTY1 = constants.QUEENY_UNCERTAINTY1_STR
+    UNCERTAINTY2 = constants.QUEENY_UNCERTAINTY2_STR
+    INFORMATION  = constants.QUEENY_INFORMATION_STR
+
+    def __init__(self):
+        validation.ValidationResult.__init__(self)
+        self.setdefault(QueenyResult.UNCERTAINTY1, 0.0)
+        self.setdefault(QueenyResult.UNCERTAINTY2, 0.0)
+        self.setdefault(QueenyResult.INFORMATION, 0.0)
+    #end def
+#end class
+
+
+class QueenyResultJsonHandler(jsonTools.handlers.SimpleDictHandler):
+    """Handler for the QueenyResult class
+    """
+    namespace = constants.QUEENY_KEY
+    cls = QueenyResult
+    encodedKeys = [constants.OBJECT_KEY]
+
+    def restore(self, data):
+        result = QueenyResult()
+        self._restore(data, result)
+        #LEGACY:
+        if isinstance(result.object, cing.core.classes.molecule.Residue) or \
+           isinstance(result.object, cing.core.classes.molecule.Atom):
+            for storedProp in [QueenyResult.UNCERTAINTY1, QueenyResult.UNCERTAINTY2, QueenyResult.INFORMATION]:
+                result.object[storedProp] = result[storedProp]
+        #end if
+    #end def
+#end class
+QueenyResultJsonHandler.handles(QueenyResult)
 
 
 class DmElement():
-    "Distance Matrix element for Queeny"
+    """Distance Matrix element for Queeny"""
     upperDefault = 256.0
     lowerDefault =   0.0
     uncertaintyDefault  =  5.545177 # log(256.0-0.0)
@@ -122,6 +187,14 @@ class Queeny( Odict ):
     def execute(self, cutoff = 0.1):
         """Do the steps for a full analysis
         """
+        if self.project is None:
+            io.error('Queeny.execute: undefined project')
+            return True
+        if self.molecule is None:
+            io.error('Queeny.execute: undefined molecule')
+            return True
+        self.reset()
+
         # do the topology
         self.initTopology()
         self.triangulateAll( cutoff=cutoff, maxDepth = 4 )
@@ -132,7 +205,22 @@ class Queeny( Odict ):
         self.setUncertainty(constants.QUEENY_UNCERTAINTY2_STR)
         # calculate the information content for each atom, residue
         self.setInformation(constants.QUEENY_UNCERTAINTY1_STR, constants.QUEENY_UNCERTAINTY2_STR, constants.QUEENY_INFORMATION_STR)
+        return False
     #end def
+
+    def reset(self):
+        """
+        Reset all Queeny values and and results dicts
+        """
+        for obj in self.molecule.allResidues() + self.molecule.allAtoms():
+            self.project.validationData.setResult(obj, constants.QUEENY_KEY, None)
+            #LEGACY
+            for storedProp in [QueenyResult.UNCERTAINTY1, QueenyResult.UNCERTAINTY2, QueenyResult.INFORMATION]:
+                obj[storedProp] = 0.0
+            #end for
+        #end for
+    #end def
+
 
     def initDmElement(self, atm1, atm2, lower=None, upper=None):
         """Initialize a DmElement entry for atm1, atm2
@@ -145,7 +233,7 @@ class Queeny( Odict ):
         else:
             dme = self[(atm1.atomIndex,atm2.atomIndex)]
         #end if
-        if lower != None and upper != None:
+        if lower is not None and upper is not None:
             dme.setLU(lower, upper)
         #end if
         return dme
@@ -179,7 +267,7 @@ class Queeny( Odict ):
         for atm in self.molecule.atomsWithProperties('isMethyl','isCarbon'):
             #patch methyls
             protons = atm.attachedProtons()
-            if protons == None or len(protons) == 0: # fixes 2ca7
+            if protons is None or len(protons) == 0: # fixes 2ca7
                 continue
             pseudo = protons[0].pseudoAtom()
             self.initDmElement(protons[0],protons[1], 0.0, 1.764)
@@ -192,7 +280,7 @@ class Queeny( Odict ):
         for atm in self.molecule.atomsWithProperties('isMethylene','isCarbon'):
             #patch methylenes
             protons = atm.attachedProtons()
-            if protons == None or len(protons) == 0: # fixes ??
+            if protons is None or len(protons) == 0: # fixes ??
                 continue
             pseudo = protons[0].pseudoAtom()
             self.initDmElement(protons[0],protons[1], 0.0, 1.764)
@@ -201,12 +289,12 @@ class Queeny( Odict ):
         #end if
 
         for res in self.molecule.residuesWithProperties('TYR'):
-            HD1 = res.getAtom('HD1',INTERNAL_0) # pylint: disable=C0103
-            HD2 = res.getAtom('HD2',INTERNAL_0) # pylint: disable=C0103
-            QD  = res.getAtom('QD',INTERNAL_0)  # pylint: disable=C0103
-            HE1 = res.getAtom('HE1',INTERNAL_0) # pylint: disable=C0103
-            HE2 = res.getAtom('HE2',INTERNAL_0) # pylint: disable=C0103
-            QE  = res.getAtom('QE',INTERNAL_0)  # pylint: disable=C0103
+            HD1 = res.getAtom('HD1',constants.INTERNAL_0) # pylint: disable=C0103
+            HD2 = res.getAtom('HD2',constants.INTERNAL_0) # pylint: disable=C0103
+            QD  = res.getAtom('QD',constants.INTERNAL_0)  # pylint: disable=C0103
+            HE1 = res.getAtom('HE1',constants.INTERNAL_0) # pylint: disable=C0103
+            HE2 = res.getAtom('HE2',constants.INTERNAL_0) # pylint: disable=C0103
+            QE  = res.getAtom('QE',constants.INTERNAL_0)  # pylint: disable=C0103
 
             if None in [ HD1, HD2, QD, HE1, HE2, QE]:
                 continue
@@ -222,13 +310,13 @@ class Queeny( Odict ):
         #end if
 
         for res in self.molecule.residuesWithProperties('PHE'):
-            HD1 = res.getAtom('HD1',INTERNAL_0)   # pylint: disable=C0103
-            HD2 = res.getAtom('HD2',INTERNAL_0)   # pylint: disable=C0103
-            QD  = res.getAtom('QD',INTERNAL_0)    # pylint: disable=C0103
-            HE1 = res.getAtom('HE1',INTERNAL_0)   # pylint: disable=C0103
-            HE2 = res.getAtom('HE2',INTERNAL_0)   # pylint: disable=C0103
-            QE  = res.getAtom('QE',INTERNAL_0)    # pylint: disable=C0103
-            HZ  = res.getAtom('HZ',INTERNAL_0)    # pylint: disable=C0103
+            HD1 = res.getAtom('HD1',constants.INTERNAL_0)   # pylint: disable=C0103
+            HD2 = res.getAtom('HD2',constants.INTERNAL_0)   # pylint: disable=C0103
+            QD  = res.getAtom('QD',constants.INTERNAL_0)    # pylint: disable=C0103
+            HE1 = res.getAtom('HE1',constants.INTERNAL_0)   # pylint: disable=C0103
+            HE2 = res.getAtom('HE2',constants.INTERNAL_0)   # pylint: disable=C0103
+            QE  = res.getAtom('QE',constants.INTERNAL_0)    # pylint: disable=C0103
+            HZ  = res.getAtom('HZ',constants.INTERNAL_0)    # pylint: disable=C0103
 
             if None in [ HD1, HD2, QD, HE1, HE2, QE, HZ]:
                 continue
@@ -262,8 +350,6 @@ class Queeny( Odict ):
 
         returns None on error or list with relative contributions for each pair on success.
         """
-
-
 #        nTdebug('Queeny._calculateAverage: %s')
 #        error = False    # Indicates if an error was encountered when analyzing restraint @UnusedVariable
 
@@ -289,15 +375,15 @@ class Queeny( Odict ):
             # skip trivial cases
             if atm1 == atm2:
                 continue
-            if atm1 == None or atm2 == None:
+            if atm1 is None or atm2 is None:
                 continue
             #expand pseudoatoms
             atms1 = atm1.realAtoms()
-            if atms1 == None:
+            if atms1 is None:
                 #nTdebug('DistanceRestraint.calculateAverage: %s.realAtoms() None (%s)', atm1, self)
                 continue
             atms2 = atm2.realAtoms()
-            if atms2 == None:
+            if atms2 is None:
                 #nTdebug('DistanceRestraint.calculateAverage: %s.realAtoms() None (%s)', atm2, self)
                 continue
             for a1 in atms1:
@@ -353,25 +439,25 @@ class Queeny( Odict ):
                 if len(dr.atomPairs) == 1:
                     atm1,atm2 = dr.atomPairs[0]
                     upper = dr.upper
-                    if dr.upper == None: # sometimes happens; i.e. entry 1but
+                    if dr.upper is None: # sometimes happens; i.e. entry 1but
                         upper = DmElement.upperDefault
                     lower = dr.lower
-                    if dr.lower == None: # lower values sometimes set to None
+                    if dr.lower is None: # lower values sometimes set to None
                         lower = DmElement.lowerDefault
                     self.initDmElement(atm1, atm2, lower, upper)
                 else:
                     # ambiguous restraints
                     rm6distances = self._calculateAverage( dr )
-                    if rm6distances == None:
+                    if rm6distances is None:
                         nTwarning('Queeny.initRestraints: failure to analyze %s', dr)
                         break
                     #endif
 
                     upper = dr.upper
-                    if dr.upper == None: # sometimes happens; i.e. entry 1but
+                    if dr.upper is None: # sometimes happens; i.e. entry 1but
                         upper = DmElement.upperDefault
                     lower = dr.lower
-                    if dr.lower == None: # lower values sometimes set to None
+                    if dr.lower is None: # lower values sometimes set to None
                         lower = DmElement.lowerDefault
 
                     # hr: total uncertainty change associated with this restraint
@@ -420,9 +506,9 @@ class Queeny( Odict ):
             dme13 = DmElement(atm1, atm3)
             self[(atm1.atomIndex,atm3.atomIndex)] = dme13
 
-        if dme12 == None:
+        if dme12 is None:
             dme12 = self[(atm1.atomIndex,atm2.atomIndex)]
-        if dme23 == None:
+        if dme23 is None:
             dme23 = self[(atm2.atomIndex,atm3.atomIndex)]
 
         upper12 = dme12.upper
@@ -534,6 +620,7 @@ class Queeny( Odict ):
         fls = float(n-1)
         for atm in atms:
             atm[key] /= fls
+        #end for
 
         # residues
         for res in self.molecule.allResidues():
@@ -544,11 +631,12 @@ class Queeny( Odict ):
             resAtomCount = len(res.atoms)
             if resAtomCount:
                 res[key] /= resAtomCount
-
+            #end if
+        #end for
     #end def
 
     def setInformation(self, key1, key2, informationKey):
-        """set the information for:
+        """set the information and QueenyResult dicts for:
         - each atom of molecule
         - each residue of molecule
         using key1 and key2
@@ -559,12 +647,25 @@ class Queeny( Odict ):
                 atm[informationKey] = atm[key1]-atm[key2]
             else:
                 atm[informationKey] = 0.0
+            #end for
+            qresult = QueenyResult()
+            qresult[key1] = atm[key1]
+            qresult[key2] = atm[key2]
+            qresult[informationKey] = atm[informationKey]
+            qresult[constants.OBJECT_KEY] = atm
+            self.project.validationData.setResult(atm, constants.QUEENY_KEY, qresult)
         #end for
         for res in self.molecule.allResidues():
             if res.has_key(key1) and res.has_key(key2):
                 res[informationKey] = res[key1]-res[key2]
             else:
                 res[informationKey] = 0.0
+            #end for
+            qresult = QueenyResult()
+            qresult[key1] = res[key1]
+            qresult[key2] = res[key2]
+            qresult[informationKey] = res[informationKey]
+            self.project.validationData.setResult(res, constants.QUEENY_KEY, qresult)
         #end for
 #        # average
 #        for chain in self.molecule.allChains():
@@ -578,26 +679,13 @@ class Queeny( Odict ):
         return nTzap(self.values(), byItem)
 
     def sortKeys(self):
-        'Sorts the dme list by upperChange'
+        """Sorts the dme list by upperChange"""
         a = zip(self._keys,nTzap(self.values(),'upperChange'))
         NTsort(a, 1, inplace=True)
         a.reverse()
         self._keys = nTzap(a,0)
     #end def
 #end class
-
-
-def queenyDefaults():
-    d = Adict( directory  = 'Queeny',
-                smlFile    = 'queeny.sml',
-                molecule   = None,
-                completed  = False,
-                parsed     = False,
-                present    = False,
-                saved      = False,
-              )
-    return d
-#end def
 
 
 def runQueeny( project, tmp=None ):
@@ -615,11 +703,11 @@ def _runQueeny( project, tmp=None ):
     Returns False when all is fine.
     """
     nTmessage("==> Calculating restraint information by Queeny")
-    if project == None:
+    if project is None:
         nTerror("runQueeny: No project defined")
         return True
 
-    if project.molecule == None:
+    if project.molecule is None:
         nTerror("runQueeny: No molecule defined")
         return True
 
@@ -639,105 +727,17 @@ def _runQueeny( project, tmp=None ):
     q.execute()
     queenyDefs.date = io.now()
     queenyDefs.completed = True
-    queenyDefs.present = True
-    queenyDefs.saved = False
-    queenyDefs.runVersion = __version__
+    queenyDefs.parsed = True
+    queenyDefs.version = __version__
 
     del(q)
 
     return False
 #end def
 
-class QueenyResult(validation.ValidationResult):
-    """Class to store queeny results
-    """
-    KEY = constants.QUEENY_KEY
-    UNCERTAINTY1 = constants.QUEENY_UNCERTAINTY1_STR
-    UNCERTAINTY2 = constants.QUEENY_UNCERTAINTY2_STR
-    INFORMATION  = constants.QUEENY_INFORMATION_STR
-
-    def __init__(self, **kwds):
-        validation.ValidationResult.__init__( self, **kwds)
-        self.setdefault(QueenyResult.UNCERTAINTY1, 0.0)
-        self.setdefault(QueenyResult.UNCERTAINTY2, 0.0)
-        self.setdefault(QueenyResult.INFORMATION, 0.0)
-    #end def
-
-    @staticmethod
-    def endHandler(qDict, project=None):
-        # Restore linkage
-        # Needs a valid project
-        # Needs a valid object key
-        # Adds to validation
-        if project is None:
-            return None
-        if constants.OBJECT_KEY not in qDict:
-            nTerror('QueenyResult.endHandler: object key not found ==> skipped item')
-            return None
-        theObject = project.getByPid(qDict[constants.OBJECT_KEY])
-        if theObject is None:
-            nTerror('QueenyResult.endHandler: invalid residue Pid %s, ==> skipped', qDict[constants.OBJECT_KEY])
-            return None
-        #end if
-        #v3:
-        validation.setValidationResult(theObject, constants.QUEENY_KEY, qDict)
-        #LEGACY:
-        for storedProp in [QueenyResult.UNCERTAINTY1, QueenyResult.UNCERTAINTY2, QueenyResult.INFORMATION]:
-            theObject[storedProp] = qDict[storedProp]
-        return qDict
-    #end def
-#end class
-
-#register QueenyResult SML handler
-QueenyResult.SMLhandler = sml.SMLAnyDictHandler(QueenyResult,'QueenyResult',
-                                                encodeKeys = [constants.OBJECT_KEY],
-                                                endHandler = QueenyResult.endHandler,
-                                               )
-
-
-# def saveQueeny(project, tmp=None):
-#     """
-#     Save queeny results to sml file
-#     Returns True on error.
-#     Returns False on success.
-#     """
-#     if project is None:
-#         nTmessage("saveQueeny: No project defined")
-#         return True
-#
-#     if project.molecule is None:
-#         nTmessage("saveQueeny: No molecule defined")
-#         return True
-#     # save the data
-#     return project._savePluginData(constants.QUEENY_KEY, saved=True, saveVersion=__version__)
-# #end def
-#
-#
-# def restoreQueeny(project, tmp=None):
-#     """
-#     Restore queeny results from sml file.
-#     Return True on error
-#     """
-#     if project is None:
-#         nTmessage("restoreQueeny: No project defined")
-#         return True
-#
-#     if project.molecule is None:
-#         return False # Gracefully returns
-#
-#     # Reset the data
-#     for obj in project.molecule.allResidues() + project.molecule.allAtoms():
-#         validation.setValidationResult(obj, constants.QUEENY_KEY, None)
-#         #LEGACY:
-#         for storedProp in [constants.QUEENY_UNCERTAINTY1_STR, constants.QUEENY_UNCERTAINTY2_STR, constants.QUEENY_INFORMATION_STR ]:
-#            obj[storedProp] = 0.0
-#     #end for
-#     #restore the data
-#     return project._restorePluginData(constants.QUEENY_KEY, present=True)
-# #end def
 #-----------------------------------------------------------------------------
 
 # register the functions
 methods  = [(runQueeny,None)]
-saves    = []
-restores = []
+#saves    = []
+#restores = []
