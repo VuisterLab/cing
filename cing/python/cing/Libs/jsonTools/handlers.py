@@ -187,6 +187,7 @@ class SimpleDictHandler(BaseHandler):
     GWV
     """
     cls = dict          # to modify in subclassing
+    encodedKeys = []
 
     def flatten(self, obj, data):
         """
@@ -199,9 +200,14 @@ class SimpleDictHandler(BaseHandler):
         Flatten the object by saving the key,value pairs in data
         """
         # cannot use data.update(obj) as some CING classes are NTdict derived
-        # for which update brings along unwanted keys
+        # for which update brings along unwanted keys.
+        # Moreover, we want to encode the encodedKeys!
         for k in obj.keys():
-            data[k] = obj[k]
+            if k in self.encodedKeys and hasattr(obj[k],'asPid'):
+                #print('AnyDictHandler._flatten>', k, obj[k])
+                data[k] = str(obj[k].asPid)
+            else:
+                data[k] = obj[k]
         return data
 
     def restore(self, data):

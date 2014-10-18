@@ -70,13 +70,14 @@ class TalosPlusResult( validation.ValidationResult ):
     S2             = 'S2'
     SS_CLASS       = 'ss_class'
     SS_CONFIDENCE  = 'ss_confidence'
-    Q_H            = 'Q_H'
-    Q_E            = 'Q_E'
-    Q_L            = 'Q_L'
+    Q_H            = 'Q_H'              # helix
+    Q_E            = 'Q_E'              # extended
+    Q_L            = 'Q_L'              # loop
 
     def __init__(self):
 
         validation.ValidationResult.__init__(self)
+        self.setdefault(TalosPlusResult.OBJECT_KEY, None)
         self.setdefault(TalosPlusResult.PHI, None)
         self.setdefault(TalosPlusResult.PSI, None)
         self.setdefault(TalosPlusResult.COUNT, 0)
@@ -87,9 +88,12 @@ class TalosPlusResult( validation.ValidationResult ):
         self.setdefault(TalosPlusResult.Q_E, NaN)
         self.setdefault(TalosPlusResult.Q_H, NaN)
         self.setdefault(TalosPlusResult.Q_L, NaN)
-        self.setdefault(TalosPlusResult.OBJECT_KEY, None)
-        self.setdefault('residue', None) #LEGACY:
     #end def
+
+    #LEGACY implementation
+    @property
+    def residue(self):
+        return self[TalosPlusResult.OBJECT_KEY]
 
     def format(self, fmt=None):
         if fmt is None:
@@ -651,7 +655,7 @@ def _importTalosPlus( project, predFile, ssFile=None ):
         talosPlus.count = row.COUNT
         talosPlus.classification = row.CLASS
 
-        if talosPlus.classification == 'None' or \
+        if talosPlus.classification is 'None' or \
            talosPlus.phi.value == 9999.00 or \
            talosPlus.psi.value == 9999.00:
             talosPlus.phi.value = NaN
@@ -663,7 +667,7 @@ def _importTalosPlus( project, predFile, ssFile=None ):
 
         project.validationData.setResult(row.residue, constants.TALOSPLUS_KEY, talosPlus)
         #LEGACY:
-        talosPlus.residue = row.residue
+        #talosPlus.residue = row.residue: implemented through "property"
         row.residue.talosPlus = talosPlus
     #end for
 
