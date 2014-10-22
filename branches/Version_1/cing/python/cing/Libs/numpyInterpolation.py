@@ -139,7 +139,7 @@ def circularlizeMatrix(p):
     See unit test case
     """
 
-    if p == None:
+    if p is None:
         nTerror("Got None for hist in circularlizeMatrix")
         return
 

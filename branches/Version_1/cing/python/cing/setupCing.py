@@ -29,14 +29,6 @@ from subprocess import Popen
 import os
 import sys
 
-try:
-    import cython
-    # Hack to compile superpose.  Should be moved to proper setup.py file
-    import pyximport; pyximport.install()
-    import cing.Libs.cython.superpose
-except ImportError:
-    pass
-
 #-----------------------------------------------------------------------------------
 # Synchronize block with cing.Libs.helper.py
 #-----------------------------------------------------------------------------------
