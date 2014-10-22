@@ -24,7 +24,7 @@ def convert(projectName, inputDir, outputFile, excludeSaveFrames = ('general_dis
 
     # Try to find the CING setup info in the project.
     cingCalcStore = ccpnProject.findFirstNmrCalcStore(name='CING')
-    if cingCalcStore != None:
+    if cingCalcStore is not None:
         nmrProject = cingCalcStore.nmrProject
 
         run = cingCalcStore.findFirstRun(status='pending')

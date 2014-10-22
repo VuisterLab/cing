@@ -11,6 +11,13 @@ from cing import header
 from cing import issueListUrl
 from cing.Libs.Geometry import violationAngle
 from cing.Libs.NTutils import * #@UnusedWildImport
+try:
+    from cing.Libs.cython.superpose import NTcVector #@UnresolvedImport @UnusedImport
+except ImportError:
+    # import cython
+    # Hack to compile superpose.  Should be moved to proper setup.py file
+    import pyximport; pyximport.install()
+    import cing.Libs.cython.superpose
 from cing.Libs.cython.superpose import NTcVector #@UnresolvedImport @UnusedImport
 from cing.Libs.cython.superpose import Rm6dist #@UnresolvedImport
 from cing.Libs.disk import copydir
