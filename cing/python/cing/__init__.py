@@ -35,7 +35,7 @@ from cing.Libs.helper import *
 
 programName     = 'CING'
 # Version number is a float. Watch out, version 0.100 will be older than 0.99; nope, version 0.100 is long behind us !! (GWV)
-cingVersion     = 0.96.1
+cingVersion     = 0.962
 cingRevision    = getSvnRevision()
 
 

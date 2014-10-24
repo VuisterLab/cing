@@ -32,6 +32,10 @@ Scps to                 :     jd@localhost:/tmp/data/br/1brv/1brv.cing.tgz
 For topos replace the first command by validateEntryNrg:
 validateEntryNrg 1brv http://nmr.cmbi.umcn.nl/NRG-CING/input \
     jd@nmr.cmbi.umcn.nl:/Library/WebServer/Documents/NRG-CING . . BY_CH23_BY_ENTRY CCPN
+
+Usage:
+python validateEntry.py entryId verbosityLevel dataSource outputLocation pdbConvention(unused) restraintsConvention(unused)\
+                        FLAT | BY_ENTRY | BY_CH23 | BY_CH23_BY_ENTRY CING | CCPN
 """
 from cing import cingDirTmp
 from cing import header
@@ -277,7 +281,7 @@ def main(entryId, *extraArgList):
             nTdebug("Removing tmp: %s" % pdbFilePath)
             os.unlink(pdbFilePath)
     # end if
-    if ranges != None:
+    if ranges is not None:
         project.molecule.setRanges(ranges)
     # end if
     if archive_id:
@@ -411,7 +415,10 @@ if __name__ == "__main__":
     cing.verbosity = verbosityDebug
 #        sys.exit(1) # can't be used in forkoff api
     try:
-        _status = main(*sys.argv[1:])
+        parsed_sys_argv = [None if x == 'None' else x for x in sys.argv[1:]]
+        parsed_sys_argv = [False if x == 'False' else x for x in parsed_sys_argv]
+        parsed_sys_argv = [True if x == 'True' else x for x in parsed_sys_argv]
+        _status = main(*parsed_sys_argv)
     finally:
         nTmessage(getStopMessage(cing.starttime))
 

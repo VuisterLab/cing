@@ -422,7 +422,7 @@ def makeDihedralPlot( project, residueList, dihedralName1, dihedralName2,
             else:
                 myHist = getDeepByKeys(histBySsAndCombinedResType,ssType)
             # end if
-            if myHist == None:
+            if myHist is None:
 #                nTdebug("Failed to get the non-d1d2 hist for %s" % residue) # happens for 1bus cPro
                 return None
             # end if            
