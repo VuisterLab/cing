@@ -19,7 +19,7 @@ class NmrStar():
     def toNmrStarFile(self, fileName):
         """Return None on error"""
 
-#        nTdebug("starting toNmrStarFile")
+        nTdebug("starting toNmrStarFile")
 
         if not hasattr(self.project, CCPN_LOWERCASE_STR):
             nTdebug("Failed to find ccpn attribute project. Happens when no CCPN project was read first.")
@@ -33,11 +33,13 @@ class NmrStar():
             return
 
         self.ccpnProject = self.project[ CCPN_LOWERCASE_STR ]
+        nTdebug("   using ccpnProject {}".format(self.ccpnProject))
         if not self.ccpnProject:
             nTmessage("Failed to find ccpn project. This is normal if CING project didn't contain one previously generated.")
             return
 
         ccpnFolder = self.project.ccpnFolder
+        nTdebug("   using ccpnFolder {}".format(ccpnFolder))
         if ccpnFolder.endswith(".tgz") or ccpnFolder.endswith(".tar.gz"):
             head, tail = os.path.split(ccpnFolder)
             print head, tail
