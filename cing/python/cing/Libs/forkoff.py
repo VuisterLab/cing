@@ -16,9 +16,9 @@ import signal
 import types
 from datetime import datetime
 
-__author__    = "$Author$"
-___revision__ = "$Revision$"
-___date__     = "$Date$"
+__author__    = "$Author: WGTouw@gmail.com $"
+___revision__ = "$Revision: 1201 $"
+___date__     = "$Date: 2012-12-21 10:52:43 +0000 (Fri, 21 Dec 2012) $"
 
 
 def do_cmd( cmd, bufferedOutput = True ):
