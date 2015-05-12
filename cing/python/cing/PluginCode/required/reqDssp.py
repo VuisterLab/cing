@@ -1,6 +1,7 @@
 'required items for this plugin for CING setup'
-from cing.Libs.NTutils import * #@UnusedWildImport
-from cing.PluginCode.required.reqProcheck import * #@UnusedWildImport
+from cing.Libs.NTutils import NTlist
+from cing.Libs.NTutils import nTwarning
+from cing.PluginCode.required.reqProcheck import SECSTRUCT_STR
 
 DSSP_STR = "dssp" # key to the entities (atoms, residues, etc under which the results will be stored
 DSSP_ID_STR = 'dssp_id'
@@ -11,6 +12,7 @@ DSSP_C = ' '
 DSSP_ID_H = 0
 DSSP_ID_S = 1
 DSSP_ID_C = 2
+DSSP_ACC_STR = 'acc'
 
 mapDssp2Int = {DSSP_H: DSSP_ID_H, DSSP_S : DSSP_ID_S, DSSP_C : DSSP_ID_C, None: None}
 
@@ -53,6 +55,13 @@ def getDsspSecStructConsensus( res ):
 def getDsspSecStructConsensusId( res ):
     return mapDssp2Int[getDsspSecStructConsensus(res)]
 # end def
+
+def getDspAvgStdAcc (res):
+    acc = res.getDeepByKeys(DSSP_STR, DSSP_ACC_STR)
+    try:
+        return acc.average()[0], acc.average()[1]
+    except:
+        return None, None # Remember that in databases, 'None' means 'I don't know'
 
 
 def getDsspPercentList( res ):

@@ -234,7 +234,8 @@ CREATE TABLE casdcing.cingresidue
     dssp_id                        INT DEFAULT NULL, 
     dssp_h_percent                 FLOAT DEFAULT NULL, 
     dssp_s_percent                 FLOAT DEFAULT NULL, 
-    dssp_c_percent                 FLOAT DEFAULT NULL,     
+    dssp_c_percent                 FLOAT DEFAULT NULL,
+    dssp_acc                       FLOAT DEFAULT NULL,
 --   procheck_nmr
     pc_gf                           FLOAT DEFAULT NULL,
     pc_gf_phipsi                    FLOAT DEFAULT NULL,
