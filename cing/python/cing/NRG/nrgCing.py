@@ -346,13 +346,11 @@ class NrgCing(Lister):
         self.htmlFooter = startText + ' resource last updated on %s by CING (%s)' % ( time.asctime(), cingRevisionUrlStr )             
 
         os.chdir(self.results_dir)                 
-        if False: # DEFAULT: False
-            nTdebug("In updateDerivedResourceSettings (re-)setting:")        
-            nTdebug("results_dir:             %s" % self.results_dir)        
-            nTdebug("data_dir:                %s" % self.data_dir)        
-            nTdebug("schema_id:               %s" % self.schema_id)        
-            nTdebug("log_dir:                 %s" % self.log_dir)
-        # end if        
+        nTdebug("In updateDerivedResourceSettings (re-)setting:")
+        nTdebug("results_dir:             %s" % self.results_dir)
+        nTdebug("data_dir:                %s" % self.data_dir)
+        nTdebug("schema_id:               %s" % self.schema_id)
+        nTdebug("log_dir:                 %s" % self.log_dir)
     # end def
     
     def setup(self):

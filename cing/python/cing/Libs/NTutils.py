@@ -4093,7 +4093,7 @@ def removedir(path):
         try:
             os.rmdir(path)
         except:
-            nTerror('Directory "%s" could not be removed, most likely an NFS problem. Try again later.', path)
+            nTwarning('Directory "%s" could not be removed, most likely an NFS problem. Try again later.', path)
 #            continue # disabled because was leading to a infinite loop
         break
     #end while

@@ -34,6 +34,9 @@ if project.molecule == None:
     exit(1)
 #end if
 
+nTdebug("Using options:")
+nTdebug(str(options))
+
 project.validate( ranges=options.ranges, parseOnly=parseOnly,  htmlOnly=htmlOnly,
                   doProcheck = doProcheck, doWhatif=doWhatif, doWattos=doWattos, doTalos=doTalos)
 

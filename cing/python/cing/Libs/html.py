@@ -2613,14 +2613,14 @@ class ResidueHTMLfile( HTMLfile ):
 #            nTdebug("Residue %s: generating dihedral plots", self.residue )
 
         if not getDeepByKeysOrAttributes(plugins, MATPLIB_STR, IS_INSTALLED_STR):
-#            nTdebug('Skipping actual plots in html#generateHtml() because no matplib installed.')
+            nTdebug('Skipping actual plots in html#generateHtml() because no matplib installed.')
             pass
         else:
             from cing.PluginCode.matplib import NTplotSet #@UnresolvedImport
             from cing.PluginCode.matplib import makeDihedralHistogramPlot #@UnresolvedImport
 
             for plotDihedralName1,plotDihedralName2,plotDihedralComboName,_keyLoL in plotDihedral2dList:
-    #                nTdebug("Residue %s: generating %s plot", self.residue, plotDihedralComboName)
+                nTdebug("Residue %s: generating %s plot", self.residue, plotDihedralComboName)
                 ps = makeDihedralPlot( project, [residue], plotDihedralName1, plotDihedralName2, htmlOnly=htmlOnly)
                 if ps: # Can be None for error, True for success (will create on next pass if not htmlOnly)
                     plottedList.append(plotDihedralComboName)
@@ -2633,7 +2633,7 @@ class ResidueHTMLfile( HTMLfile ):
             for dihed in residue.db.dihedrals.zap('name'):
                 if dihed in residue and residue[dihed]:
                     d = residue[dihed] # List of values with outliers etc attached.
-    #                    nTdebug("Residue %s: generating dihedral %s plot", self.residue, dihed )
+                    nTdebug("Residue %s: generating dihedral %s plot", self.residue, dihed )
                     ps = makeDihedralHistogramPlot( project, residue, dihed, htmlOnly=htmlOnly )
                     tmpPath = os.path.join(resdir,dihed + '.' + graphicsFormatExtension)
                     if ps:
