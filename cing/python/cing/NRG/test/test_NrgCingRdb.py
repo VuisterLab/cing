@@ -22,14 +22,14 @@ class AllChecks(TestCase):
             "Failed to change to test directory for files: " + cingDirTmpTest)
         host = 'localhost'
         if 1: # DEFAULT False
-            host = 'nmr.cmbi.umcn.nl'
+            host = '143.210.218.192'
         schema=RECOORD_DB_SCHEMA #@UnusedVariable
         schema=NRG_DB_NAME
-        m = NrgCingRdb(host=host,schema=schema)
+        m = NrgCingRdb(host=host, schema=schema)
 
 #        self.assertFalse( m.showCounts())
 #        self.assertFalse( m.createScatterPlots())
-        self.assertFalse( m.createPlotsCompareBetweenDb(other_schema=NMR_REDO_DB_SCHEMA))
+        self.assertFalse(m.createPlotsCompareBetweenDb(other_schema=NMR_REDO_DB_SCHEMA))
         
         if False:
             a = m.getPdbIdList()

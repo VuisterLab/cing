@@ -680,7 +680,7 @@ class PdbCing(Lister):
 
         pythonScriptFileName = os.path.join(cingDirScripts, 'validateEntry.py')
 #        inputDir = 'file://' + self.results_dir + '/recoordSync'
-        inputDir = 'file:///Users/jd/wattosTestingPlatform/pdb/data/structures/divided/pdb'
+        inputDir = 'http://www.bmrb.wisc.edu/ftp/pub/bmrb/nmr_pdb_integrated_data/coordinates_restraints_chemshifts/all/ccpn/'
         outputDir = self.results_dir
         extraArgList = (inputDir, outputDir, '.', '.', ARCHIVE_TYPE_BY_CH23, PROJECT_TYPE_PDB)
 

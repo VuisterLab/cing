@@ -173,7 +173,7 @@ def main(entryId, *extraArgList):
         isRemoteOutputDir = True
     # end if
 #    vc = vCing('.') # argument is a fake master_ssh_url not needed here.
-    archive_id = getArchiveIdFromDirectoryName( inputDir )
+    archive_id = getArchiveIdFromDirectoryName( outputDir )
     
     nTdebug("Using program arguments:")
     nTdebug("inputDir:             %s" % inputDir)
@@ -415,10 +415,10 @@ if __name__ == "__main__":
     cing.verbosity = verbosityDebug
 #        sys.exit(1) # can't be used in forkoff api
     try:
-       parsed_sys_argv = [None if x == 'None' else x for x in sys.argv[1:]]
-       parsed_sys_argv = [False if x == 'False' else x for x in parsed_sys_argv]
-       parsed_sys_argv = [True if x == 'True' else x for x in parsed_sys_argv]
-       _status = main(*parsed_sys_argv)
+        parsed_sys_argv = [None if x == 'None' else x for x in sys.argv[1:]]
+        parsed_sys_argv = [False if x == 'False' else x for x in parsed_sys_argv]
+        parsed_sys_argv = [True if x == 'True' else x for x in parsed_sys_argv]
+        _status = main(*parsed_sys_argv)
     finally:
         nTmessage(getStopMessage(cing.starttime))
 

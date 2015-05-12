@@ -22,9 +22,9 @@ isProduction        = 1 # DEFAULT: 1  @UnusedVariable
 #: when assumed all are done. Disables some messaging in case not all are done.
 assumeAllAreDone    = 1 # DEFAULT: 1  @UnusedVariable
 
-UJ                  = '/Users/wim'
+UJ                  = '/Users/i'
 WS                  = os.path.join(UJ,'workspace')
-dDir                = '/Library/WebServer/Documents'            # Web dir.
+dDir                = '/mnt/data/D'            # Web dir.
 VCsecret            = 'a/b/c' # Overriden locally. @UnusedVariable Only used in publishVC.py
 
 try:
