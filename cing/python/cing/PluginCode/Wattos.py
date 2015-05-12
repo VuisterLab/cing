@@ -390,7 +390,6 @@ def _runWattos(project, ranges=None, tmp = None, parseOnly=False):
         # Let's ask the user to be nice and not kill us
         # estimate to do **0.5 residues per minutes as with entry 1bus on dual core intel Mac.
         timeRunEstimatedInSeconds = 0.025 * mol.modelCount * len(mol.allResidues())
-        timeRunEstimatedInSeconds *= 60
         timeRunEstimatedList = timedelta2Hms(timeRunEstimatedInSeconds)
         msg = '==> Running Wattos for an estimated (5,000 atoms/s): %s hours, %s minutes and %s seconds; please wait' % timeRunEstimatedList
         nTmessage(msg)
