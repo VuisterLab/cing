@@ -7382,10 +7382,10 @@ def getTripletHistogramList(resTypeListBySequenceOrder, doOnlyOverall = False, s
     histList = []
     for histTuple in histListTuple:
         hist1, hist2 = histTuple
-        if hist1 == None:
+        if hist1 is None:
 #                    nTdebug('skipping for hist1 is empty for [%s] [%s] [%s]' % (ssType, resTypePrev, resType))
             continue
-        if hist2 == None:
+        if hist2 is None:
 #                    nTdebug('skipping for hist2 is empty for [%s] [%s] [%s]' % (ssType, resType, resTypeNext))
             continue
         m1 = mat(hist1,dtype='float')

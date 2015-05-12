@@ -277,7 +277,7 @@ def main(entryId, *extraArgList):
             nTdebug("Removing tmp: %s" % pdbFilePath)
             os.unlink(pdbFilePath)
     # end if
-    if ranges != None:
+    if ranges is not None:
         project.molecule.setRanges(ranges)
     # end if
     if archive_id:

@@ -1779,7 +1779,7 @@ def validateDihedralCombinations(project):
 #                myHist = myHistList[0]
             else:
                 myHist = getDeepByKeysOrAttributes(histBySsAndResType,ssType,resName)
-                if myHist == None:
+                if myHist is None:
 #                    nTdebug("No hist for ssType %s and resName %s of residue %s" % (ssType,resName,residue))
                     continue
                 myHistList = [ myHist ]
@@ -1827,7 +1827,7 @@ def validateDihedralCombinations(project):
                         nTerror("Got keyListStr != keyListQueryStr: %s and %s" % (keyListStr, keyListQueryStr))
                         continue
 
-                if myHist == None:
+                if myHist is None:
                     nTerror("Got None for hist for %s" % residue)
                     continue
                 if True: # costly checks to be disabled later.
