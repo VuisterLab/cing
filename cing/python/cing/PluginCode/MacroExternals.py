@@ -164,7 +164,8 @@ __main__.pymol_argv = [ 'pymol', '-Gi' ]
 pymol.finish_launching()
 
 """
-    # Just for testing:
+    scriptPdbLoad = ""
+   # Just for testing:
    # pdbCode = '1brv'
    # scriptPdbLoad = "cmd.load('/Users/jd/workspace35/cing/Tests/data/pdb/%s/pdb%s.ent')" % (pdbCode, pdbCode)
 
