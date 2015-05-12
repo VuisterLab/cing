@@ -94,7 +94,8 @@ def runCingChecks( project, toFile=True, ranges=None ):
 
     project.criticize(toFile)
     project.summaryForProject(toFile)
-    project.mkMacros()
+    if toFile:
+        project.mkMacros()
     project.getCingSummaryDict()
 #end def
 

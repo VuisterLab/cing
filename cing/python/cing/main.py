@@ -962,7 +962,7 @@ def main():
     #        project = Project.open(options.name, status='create', restore=False)
     #        project.initCcpn(ccpnFolder=options.loadCcpn)
         else:
-            project = Project.open(options.name, status='create')
+            project = Project.open(options.name, status='create', nosave=options.nosave)
 
         if not project:
             nTdebug("No project, doing a hard system exit")

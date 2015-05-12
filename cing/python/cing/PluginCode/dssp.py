@@ -11,6 +11,8 @@ from cing.core.parameters import PLEASE_ADD_EXECUTABLE_HERE
 from cing.core.parameters import cingPaths
 from glob import glob
 
+useModule = True
+
 if True: # block
     useModule = True
 #    if not cingPaths.dssp:
@@ -209,7 +211,7 @@ def dsspDefault():
                  )
 #end def
 
-def runDssp(project, parseOnly=False)   :
+def runDssp(project, parseOnly=False):
     """
     Adds <Dssp> instance to molecule. Run dssp and parse result.
     (ParseOnly is only for backward compatibility)
@@ -329,10 +331,16 @@ def removeTempFiles( todoDir ):
         nTdebug("dssp.removeTempFiles: Failed to remove all temporary what if files that were expected")
 #end def
 
-
 # register the functions
-methods = [(runDssp, None)
-           ]
+# if not cingPaths.dssp:
+if cingPaths.dssp == None or cingPaths.dssp == PLEASE_ADD_EXECUTABLE_HERE:
+    nTdebug("Missing dssp which is an optional dep")
+    useModule = False
+if useModule:
+    methods = [(runDssp, None)
+               ]
+#    raise ImportWarning('dssp')
+#    nTmessage('Using dssp')
 #saves    = []
 restores = [(restoreDssp, None)]
 #exports  = []

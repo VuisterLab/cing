@@ -450,7 +450,7 @@ Project: Top level Cing project class
     # end def
 
         
-    def open(name, status = 'create', restore = True):
+    def open(name, status='create', restore=True, nosave=False):
         """Static method open returns a new/existing Project instance depending on status.
 
            status == 'new': open a new project 'name'
@@ -477,16 +477,16 @@ Project: Top level Cing project class
             pr.addHistory('New project')
             # Save the project data
             obj2XML(pr, path = pr.objectPath)
-#            nTdebug('New project %s', pr)
+            nTdebug('New project %s', pr)
 
         elif (status == 'create'):
             root, dummy = Project.rootPath(name)
             if not root:
                 return None
             if os.path.exists(root):
-                return Project.open(name, 'old', restore = restore)
+                return Project.open(name, 'old', restore = restore, nosave=nosave)
             else:
-                return Project.open(name, 'new', restore = restore)
+                return Project.open(name, 'new', restore = restore, nosave=nosave)
             #end if
 
         elif status == 'old':
@@ -602,7 +602,7 @@ Project: Top level Cing project class
 
             # Optionally restore the content
             if restore and not pr.contentIsRestored:
-                pr.restore()
+                pr.restore(nosave=nosave)
             #end if
             nTmessage('Finished restoring project %s', pr)
         else:
@@ -620,7 +620,8 @@ Project: Top level Cing project class
             pr.mkdir(d)
         #end for
 
-        pr.addLog()
+        if nosave is False:
+            pr.addLog()
 
         projects.append(pr)
         return pr
@@ -722,7 +723,7 @@ Project: Top level Cing project class
         return True
     #end def
 
-    def restore(self):
+    def restore(self, nosave=False):
         """
         Restore the project: molecules and lists
         """
