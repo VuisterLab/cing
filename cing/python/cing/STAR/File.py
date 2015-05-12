@@ -16,9 +16,9 @@ from cing.STAR.Text import pattern_tagtable_loop
 from cing.STAR.Text import pattern_tagtable_loop_nws
 from cing.STAR.Text import semicolon_block_collapse
 
-__author__    = "$Author$"
-___revision__ = "$Revision$"
-___date__     = "$Date$"
+__author__    = "$Author: jurgenfd$"
+___revision__ = "$Revision: 1084 $"
+___date__     = "$Date 2011-10-10 11:07:39 +0100 (Mon, 10 Oct 2011) $"
 
 
 class File (Lister):

@@ -4,9 +4,10 @@ Classes for dealing with STAR syntax
 from cing import verbosity
 import re
 
-__author__    = "$Author$"
-___revision__ = "$Revision$"
-___date__     = "$Date$"
+__author__    = "$Author: jurgenfd$"
+___revision__ = "$Revision: 1050 $"
+___date__     = "$Date 2011-08-11 10:57:27 +0100 (Thu, 11 Aug 2011) $"
+
 
 
 #Some handy patterns and functions for dealing with text in the STAR syntax.
