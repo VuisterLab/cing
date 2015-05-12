@@ -56,7 +56,7 @@ def getDsspSecStructConsensusId( res ):
     return mapDssp2Int[getDsspSecStructConsensus(res)]
 # end def
 
-def getDspAvgStdAcc (res):
+def getDsspAvgStdAcc (res):
     acc = res.getDeepByKeys(DSSP_STR, DSSP_ACC_STR)
     try:
         return acc.average()[0], acc.average()[1]

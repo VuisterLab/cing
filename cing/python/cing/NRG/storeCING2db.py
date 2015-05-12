@@ -582,7 +582,7 @@ def doStoreCING2db( entry_code, archive_id, project = None):
             is_present_R = residue.hasCoordinates()
             dssp_id = getDsspSecStructConsensusId(residue)
             dssp_percent_list = getDsspPercentList(residue)
-            dssp_acc_avg, dssp_acc_std = getDspAvgStdAcc(residue)
+            dssp_acc_avg, dssp_acc_std = getDsspAvgStdAcc(residue)
 
 #            r_distance_count = residue.distanceRestraints.lenRecursive(max_depth = 1) # filled in partition restraints
 #            r_dihedral_count = residue.dihedralRestraints.lenRecursive(max_depth = 1)
