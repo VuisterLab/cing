@@ -953,10 +953,6 @@ def runWhatif( project, ranges=None, parseOnly=False ):
         returns True on error.
     """
 
-    if cingPaths.whatif == None or cingPaths.whatif == PLEASE_ADD_EXECUTABLE_HERE:
-        nTmessage("No whatif installed so skipping this step")
-        return
-
     if not project.molecule:
         nTerror("runWhatif: no molecule defined")
         return True
@@ -1009,6 +1005,10 @@ def runWhatif( project, ranges=None, parseOnly=False ):
     whatifStatus = project.whatifStatus
 
     if not parseOnly:
+
+        if cingPaths.whatif == None or cingPaths.whatif == PLEASE_ADD_EXECUTABLE_HERE:
+            nTmessage("No whatif installed so skipping this step")
+            return
 
         whatifPath       = os.path.dirname(cingPaths.whatif)
         whatifTopology   = os.path.join(whatifPath, "dbdata","TOPOLOGY.H")
