@@ -11,7 +11,7 @@ import sys
 #from msd.nmrStar.IO import NmrStarExport # valid for use with python from Analysis
 #from ccpnmr.eci import NmrStarExport
 
-__author__ = "Wim Vranken <wim@ebi.ac.uk> Jurgen Doreleijers <jurgenfd@gmail.com>"
+__author__ = "Wim Vranken <wim@ebi.ac.uk> Jurgen Doreleijers <jurgenfd@gmail.com> TJ Ragan <tjr22@le.ac.uk>"
 
 def convert(projectName, inputDir, outputFile, excludeSaveFrames = ('general_distance_constraints',) ):
 
@@ -28,11 +28,12 @@ def convert(projectName, inputDir, outputFile, excludeSaveFrames = ('general_dis
         nmrProject = cingCalcStore.nmrProject
 
         run = cingCalcStore.findFirstRun(status='pending')
-        molSystem = (run.findFirstData(className='MolSystemData').molSystem or
-                          run.findFirstData(className='MolResidueData').findFirstChain().molSystem)
         nmrConstraintStore = run.findFirstData(className='ConstraintStoreData').nmrConstraintStore
+        molSystem = (run.findFirstData(className='MolSystemData') or
+                     run.findFirstData(className='StructureEnsembleData').structureEnsemble or
+                     run.findFirstData(className='MolResidueData').findFirstChain()).molSystem
         nmrEntryStore = (ccpnProject.findFirstNmrEntryStore(name='newNmrEntryStoreName') or
-                              ccpnProject.newNmrEntryStore(name='newNmrEntryStoreName'))
+                               ccpnProject.newNmrEntryStore(name='newNmrEntryStoreName'))
 
         nmrEntry = nmrEntryStore.newEntry(molSystem=molSystem, name='newNmrEntryName')
         structureGeneration = nmrProject.newStructureGeneration(name='newNmrStructureGeneration',

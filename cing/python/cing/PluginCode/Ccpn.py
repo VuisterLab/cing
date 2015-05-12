@@ -32,6 +32,7 @@ if True: # for easy blocking of data, preventing the code to be resorted with im
         from ccp.util.Molecule import setMolResidueChemCompVar
         from ccp.util.Validation import getEnsembleValidationStore
         from ccp.util.Validation import getResidueValidation
+        from ccp.util.Nef import mapAllAssignments
         from memops.api.Implementation import MemopsRoot
         from memops.api.Implementation import AppDataString
         from memops.general import Io as memopsIo
@@ -1379,6 +1380,37 @@ class Ccpn:
         return None # Just to be explicit on this.
     # end def _setPeak
 
+    def setAssignmentMap(self):
+        # Set map pf resonance/fixedResonance: (chainId, sequenceCode, residueType, atomName)
+        #
+        #
+        assignmentMap = mapAllAssignments(self.ccpnNmrProject, molSystem=self.molecule.ccpn)
+        constraintStores = set(x.nmrConstraintStore for x in self.ccpnConstraintLists)
+        for constraintStore in constraintStores:
+            assignmentMap.update(mapAllAssignments(constraintStore, molSystem=self.molecule.ccpn))
+
+        cingAssignmentMap = {}
+        for resonance,assignment in assignmentMap.items():
+            cingAssignmentMap[resonance] = self.assignment2CingAtom(assignment)
+
+        self.cingAssignmentMap = cingAssignmentMap
+
+
+    def assignment2CingAtom(self, assignment):
+        """"Find correct Cing atom (or None) from four-string assignment
+        (chainId, sequenceCode, residueType, atomName)
+
+        NB chainId = ccpnChain.code
+        sequenceCode = str(residue.seqCode) + residue.seqInsertCode
+        residueType = chemComp.code3Letter
+        atomName is:
+        1) the correct atom name if stereospecifically assigned
+        2) can contain a '#' for a pseudoatom (instead of '*')
+        3) can contain an X or Y instead of teh '#', for non-stereospecific assignment
+            X means 'alphabeticallly first', 'Y' means 'alphabetically second'
+        4) None of the above (only for resonances, not fixedResonances) means not assigned
+        """
+        pass
 
 
     def importFromCcpnDistanceRestraint(self):
@@ -1703,7 +1735,7 @@ Note that this doesn't happen with other pseudos. Perhaps CCPN does not have the
         # for speed reasons put this debug info in block.
 #        if cing.verbosity >= cing.verbosityDebug:
 #        # Example code from Wim is a nice demonstration.
-        if 0:
+        if True:
             for constItem in ccpnConstraint.sortedItems():
                 nTdebug( 'ccpn restraint: %s' % self.ccpnDistanceRestraintToString(ccpnConstraint))
 #            nTdebug('')
@@ -2474,6 +2506,7 @@ def initCcpn(project, ccpnFolder, modelCount=None, nmrCalcName='CING'):
     '''
     # work horse class.
     if not os.path.exists( ccpnFolder ):
+        nTerror('initCcpn: in directory "%s"', os.getcwd())
         nTerror('initCcpn: ccpnFolder "%s" does not exist', ccpnFolder)
         return None
     ccpn = Ccpn(project = project, ccpnFolder = ccpnFolder )
@@ -2858,7 +2891,7 @@ def saveCcpnMetaData(project, tmp = None):
 #end def
 
 # register the function
-methods = [ (initCcpn, None),
+methods = [(initCcpn, None),
            (removeCcpnReferences, None),
            (exportValidation2ccpn, None),
            (saveCcpn, None),
