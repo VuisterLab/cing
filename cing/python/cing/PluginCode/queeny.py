@@ -262,7 +262,7 @@ class Queeny( Odict ):
         rm6distances = nTfill(0.0, len(dr.atomPairs))
 
         for atm1, atm2 in dr.atomPairs:
-
+            # atm1.printAddr()
             # GV says: Check are done to prevent crashes upon rereading
             # datasets with floating/adhoc residues/atoms
 
@@ -274,14 +274,14 @@ class Queeny( Odict ):
             #expand pseudoatoms
             atms1 = atm1.realAtoms()
             if atms1 == None:
-                #nTdebug('DistanceRestraint.calculateAverage: %s.realAtoms() None (%s)', atm1, self)
+                # nTdebug('DistanceRestraint.calculateAverage: %s.realAtoms() None (%s)', atm1, self)
                 continue
             atms2 = atm2.realAtoms()
             if atms2 == None:
-                #nTdebug('DistanceRestraint.calculateAverage: %s.realAtoms() None (%s)', atm2, self)
+                # nTdebug('DistanceRestraint.calculateAverage: %s.realAtoms() None (%s)', atm2, self)
                 continue
             for a1 in atms1:
-                #print '>>>', a1.format()
+                # print '>>>', a1.format()
 
                 if len(a1.coordinates) != modelCount:
                     return None
@@ -306,6 +306,8 @@ class Queeny( Odict ):
 #        #end if
 
         psum = sum(rm6distances)
+        if psum == 0.0:
+            return None
         for i,value in enumerate(rm6distances):
             rm6distances[i] = value/psum
         #end for
@@ -333,16 +335,16 @@ class Queeny( Odict ):
                 if len(dr.atomPairs) == 1:
                     atm1,atm2 = dr.atomPairs[0]
                     upper = dr.upper
-                    if dr.upper == None: # sometimes happens; i.e. entry 1but
+                    if dr.upper is None: # sometimes happens; i.e. entry 1but
                         upper = DmElement.upperDefault
                     lower = dr.lower
-                    if dr.lower == None: # lower values sometimes set to None
+                    if dr.lower is None: # lower values sometimes set to None
                         lower = DmElement.lowerDefault
                     self.initDmElement(atm1, atm2, lower, upper)
                 else:
                     # ambiguous restraints
                     rm6distances = self._calculateAverage( dr )
-                    if rm6distances == None:
+                    if rm6distances is None:
                         nTwarning('Queeny.initRestraints: failure to analyze %s', dr)
                         break
                     #endif
