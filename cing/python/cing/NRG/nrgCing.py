@@ -79,6 +79,7 @@ from cing.Scripts.vCing.vCing import REFINE_ENTRY_STR, VALIDATE_ENTRY_NRG_STR
 from cing.Scripts.vCing.vCing import TEST_CING_STR
 from cing.Scripts.vCing.vCing import Vcing
 from cing.Scripts.validateEntry import ARCHIVE_TYPE_BY_CH23
+from cing.Scripts.validateEntry import ARCHIVE_TYPE_BY_ENTRY
 from cing.Scripts.validateEntry import ARCHIVE_TYPE_BY_CH23_BY_ENTRY
 from cing.Scripts.validateEntry import PROJECT_TYPE_CCPN
 from cing.Scripts.validateEntry import PROJECT_TYPE_CING
@@ -93,7 +94,7 @@ PHASE_R = 'R'   # restraints
 PHASE_S = 'S'   # Chemical shifts
 PHASE_F = 'F'   # SSA swap/deassign
 
-phaseIdList = [PHASE_C, PHASE_R, PHASE_S, PHASE_F ]
+phaseIdList = [PHASE_C, PHASE_R, PHASE_S, PHASE_F]
 #        self.phaseDataList = [
 #                     [ 'Coordinate',    PHASE_C],
 #                     [ 'Restraint',     PHASE_R],
@@ -148,6 +149,10 @@ class NrgCing(Lister):
 
         self.results_base = results_base                
         self.D = dDir # pylint: disable=C0103
+
+        # TODO: HACK! set cgiDir, because I can't figure out where it should come from.
+        cgiDir = '/mnt/data/D/NRG-CING/tj_test/'
+
         self.cgi_dir = cgiDir
         
         self.results_dir = None
@@ -174,8 +179,8 @@ class NrgCing(Lister):
         ## Dictionary with matches pdb to bmrb
         # will be overwritten except when testing
 #        self.matches_many2one = {
-#'1b4y': 4400 ,
-#'1brv': 4020 ,
+#                                 '1b4y': 4400 ,
+#                                 '1brv': 4020 ,
 # }
         # Retrieve the linkages between BMRB and PDB entries.
         self.matches_many2one = getBmrbLinks()
@@ -2245,6 +2250,7 @@ class NrgCing(Lister):
 
         pythonScriptFileName = os.path.join(cingDirScripts, 'validateEntry.py')
         inputDir = 'file://' + self.results_dir + '/' + INPUT_STR
+        inputDir = 'http://www.bmrb.wisc.edu/ftp/pub/bmrb/nmr_pdb_integrated_data/coordinates_restraints_chemshifts/all/ccpn/'
         outputDir = self.results_dir
         storeCING2db = "1"          # DEFAULT: '1' All arguments need to be strings.
         filterTopViolations = '1'   # DEFAULT: '1'
@@ -2256,16 +2262,16 @@ class NrgCing(Lister):
 #            storeCING2db      ranges               filterTopViolations filterVasco
 #            singleCoreOperation
         extraArgList = ( str(cing.verbosity), inputDir, outputDir,
-                         '.', '.', ARCHIVE_TYPE_BY_CH23, PROJECT_TYPE_CCPN,
+                         '.', '.', ARCHIVE_TYPE_BY_ENTRY, PROJECT_TYPE_CCPN,
                          storeCING2db, CV_RANGES_STR, filterTopViolations, filterVasco, singleCoreOperation)
 
         if doScriptOnEntryList(pythonScriptFileName,
-                            entryListFileName,
-                            self.results_dir,
-                            processes_max=self.processes_max,
-                            max_time_to_wait=self.max_time_to_wait,
-                            max_entries_todo=self.max_entries_todo,
-                            extraArgList=extraArgList):
+                               entryListFileName,
+                               self.results_dir,
+                               processes_max=self.processes_max,
+                               max_time_to_wait=self.max_time_to_wait,
+                               max_entries_todo=self.max_entries_todo,
+                               extraArgList=extraArgList):
             nTerror("Failed to doScriptOnEntryList")
             return True
         # end if
