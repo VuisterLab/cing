@@ -1017,8 +1017,8 @@ class Molecule( NTtree, ResidueList ):
         E.g. for bmrbEntryList = NTlist( [4020, 4060 ] )
         """
         nTdebug("in setArchiveID, archive_id={}".format(archive_id))
-        1020 nTdebug("in setArchiveID, pdbEntryList={}".format(archive_id))
-        1021 nTdebug("in setArchiveID, bmrbEntryList={}".format(bmrbEntryList))
+        nTdebug("in setArchiveID, pdbEntryList={}".format(archive_id))
+        nTdebug("in setArchiveID, bmrbEntryList={}".format(bmrbEntryList))
         self.archive_id = archive_id
         if pdbEntryList:
             self.pdbEntryList = pdbEntryList
