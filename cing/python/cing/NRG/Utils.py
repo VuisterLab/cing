@@ -28,9 +28,9 @@ def getArchiveIdFromDirectoryName(dirName):
             baseName = baseTry
             break
         # end if
-    # end def    
+    # end def
+    nTdebug("Returning %s as archiveID" % mapBase2Archive[baseName])
     if not baseName in mapBase2Archive.keys():
-        nTdebug("Returning %s as archiveID" % mapBase2Archive[baseName])
         nTwarning("Failed to map dirName [%s] with baseName [%s] because baseName is an unenumerated baseName." % (dirName, baseName))
         return None
     # end if
