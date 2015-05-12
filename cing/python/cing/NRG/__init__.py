@@ -3,6 +3,7 @@
 from cing.NRG.settings import results_base
 from cing.NRG.settings import results_base_recoord
 from cing.NRG.settings import results_base_redo
+from cing.NRG.settings import results_base_casd
 
 ARCHIVE_NRG_ID      =  'ARCHIVE_NRG'
 ARCHIVE_DEV_NRG_ID  =  'ARCHIVE_DEV_NRG'
@@ -16,6 +17,7 @@ ARCHIVE_RECOORDA_ID =  'ARCHIVE_RECOORDA'
 
 CASD_DB_USER_NAME = 'casdcing1'
 CASD_DB_NAME = 'casdcing'
+CASD_DB_SCHEMA = CASD_DB_NAME
 
 CASP_DB_USER_NAME = 'caspcing1'
 CASP_DB_NAME = 'caspcing'
@@ -74,11 +76,14 @@ mapBase2Archive = {}
 mapBase2Archive[ results_base ]         = ARCHIVE_NRG_ID
 mapBase2Archive[ results_base_recoord ] = ARCHIVE_RECOORD_ID
 mapBase2Archive[ results_base_redo ]    = ARCHIVE_NMR_REDO_ID
+mapBase2Archive[ results_base_casd ]    = ARCHIVE_CASD_ID
 mapArchive2Base = {}
 mapArchive2Base[ ARCHIVE_NRG_ID         ] = results_base
 mapArchive2Base[ ARCHIVE_RECOORD_ID     ] = results_base_recoord
 mapArchive2Base[ ARCHIVE_NMR_REDO_ID    ] = results_base_redo
+mapArchive2Base[ ARCHIVE_CASD_ID        ] = results_base_casd
 mapSchema2Base = {}
 mapSchema2Base[ NRG_DB_SCHEMA         ] = results_base
 mapSchema2Base[ RECOORD_DB_SCHEMA     ] = results_base_recoord
 mapSchema2Base[ NMR_REDO_DB_SCHEMA    ] = results_base_redo
+mapSchema2Base[ CASD_DB_SCHEMA    ] = results_base_casd

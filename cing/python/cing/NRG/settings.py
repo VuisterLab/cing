@@ -53,7 +53,8 @@ PDBNMR2         = os.path.join(divDir,'nmr_restraints')
 results_base         = 'NRG-CING'
 results_base_redo    = 'NMR_REDO'
 results_base_recoord = 'RECOORD'
-results_baseList = [ results_base, results_base_redo, results_base_recoord ]
+results_base_casd    = 'CASD-NMR-CING'
+results_baseList = [ results_base, results_base_redo, results_base_recoord, results_base_casd ]
 
 #if not isProduction:
 #    results_base    = 'dev' + results_base
