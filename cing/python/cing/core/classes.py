@@ -3300,16 +3300,23 @@ class DistanceRestraint(Restraint):
         self.max = max(self.distances)
 
         # calculate violations
-        for d in self.distances:
-            if d < self.lower:
-                self.violations.append(d - self.lower)
-            elif (d > self.upper):
-                if self.upper == None: # Happens for entry 1but
-                    self.violations.append(0.0)
+        same = True
+        for atm1, atm2 in self.atomPairs:
+            if atm1 != atm2:
+                same = False
+        if same:
+            self.violations= nTfill(0.0, modelCount)
+        else:
+            for d in self.distances:
+                if d < self.lower:
+                    self.violations.append(d - self.lower)
+                elif (d > self.upper):
+                    if self.upper == None: # Happens for entry 1but
+                        self.violations.append(0.0)
+                    else:
+                        self.violations.append(d - self.upper)
                 else:
-                    self.violations.append(d - self.upper)
-            else:
-                self.violations.append(0.0)
+                    self.violations.append(0.0)
             #end if
         #end for
 
