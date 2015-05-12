@@ -4187,7 +4187,7 @@ class RDCRestraintList(RestraintList):
 
         modelCount = 0
         firstRestraint = self[0]
-        if not hasattr(firstRestraint, "atoms"):
+        if not hasattr(firstRestraint, "atomPairs"):
             nTwarning("Failed to get the model count for no atoms are available in the first RDC restraint.")
             nTwarning("See also issue: %s%d" % (issueListUrl, 133))
         else:
