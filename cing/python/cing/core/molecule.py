@@ -518,7 +518,7 @@ class Molecule( NTtree, ResidueList ):
     def getRogColor(self):
         """
         Use the image in:
-        http://code.google.com/p/cing/issues/detail?id=297
+        https://github.com/VuisterLab/cing/issues/297
         which is parameterized as:
         orange: y = 20 + x
            red: y = x  - 20

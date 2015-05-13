@@ -58,7 +58,7 @@ __credits__    = """More info at http://nmr.le.ac.uk/CING
 """ + __copyright__ # TODO: misusing credits for pydoc
 
 versionStr = "%s" % cingVersion
-cingRevisionUrl = "http://code.google.com/p/cing/source/detail?r="
+cingRevisionUrl = "https://github.com/VuisterLab/cing"
 if cingRevision:
     versionStr += " (r%d)" % cingRevision
 
@@ -67,7 +67,7 @@ header = \
 "| CING: Common Interface for NMR structure Generation version %-13s AW,JFD,GWV,TJR %s |\n" % (versionStr, __copyright_years__) +\
 "======================================================================================================"
 
-issueListUrl = 'http://code.google.com/p/cing/issues/detail?id='
+issueListUrl = 'https://github.com/VuisterLab/cing/issues/'
 
 # Verbosity settings: How much text is printed to stdout/stderr streams
 # Follows exact same int codes as Wattos.

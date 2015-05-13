@@ -32,7 +32,7 @@ class AllChecks(TestCase):
     # end def
 
     def _testRestraintsValuesRegular(self):
-        _alsoSee = """See http://code.google.com/p/cing/issues/detail?id=121"""
+        _alsoSee = "https://github.com/VuisterLab/cing/issues/121"
 
         msgHoL = MsgHoL()
 #        lower, upper, targetValue, error

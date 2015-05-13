@@ -76,7 +76,7 @@ class pdbParser:
 
     The allowNonStandardResidue determines if the non-standard residues and atoms are read. If so they will be shown as
     a regular message. Otherwise they will be shown as a warning. Just like MolMol does; the unknown atoms per residue.
-    See the image at: http://code.google.com/p/cing/issues/detail?id=126#c4
+    See the image at: https://github.com/VuisterLab/cing/issues/126 comment #4
 
                              atom<->residue->chain<->molecule<-self
                               |

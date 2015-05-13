@@ -131,7 +131,7 @@ def main():
     #        hist2d = zscaleHist( hist2d, Cav, Csd )
             setDeepByKeys(histJaninBySsAndCombinedResType, hist2d, ssType)
 
-    # Throws a verbose error message on python 2.6.3 as per issue http://code.google.com/p/cing/issues/detail?id=211
+    # Throws a verbose error message on python 2.6.3 as per issue https://github.com/VuisterLab/cing/issues/211
     # Using Pickle instead
 #    dbase = shelve.open( dbase_file_abs_name )
 #    dbase.close()

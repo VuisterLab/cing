@@ -103,7 +103,7 @@ public class Ut {
     }
 
     public String getProjectNameFromCcpnProjectFile(File pathProject) {
-        /** See discussion http://code.google.com/p/cing/issues/detail?id=143
+        /** See discussion https://github.com/VuisterLab/cing/issues/143
          * Looking for \<directory\>/memops/Implementation/\<projectName\>.xml
          */
         return null;
