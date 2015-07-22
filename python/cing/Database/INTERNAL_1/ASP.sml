@@ -7,7 +7,7 @@
 	commonName = 'ASP'
 	shortName  = 'D'
 	comment    = 'De-protonated (negative) ASP (common)'
-	nameDict   = {'CCPN': 'protein Asp deprot:HD2', 'INTERNAL_0': 'ASP', 'CYANA': 'ASP-', 'CYANA2': 'ASP', 'INTERNAL_1': 'ASP', 'IUPAC': 'ASP', 'AQUA': 'ASP', 'BMRBd': 'ASP', 'XPLOR': 'ASP', 'PDB': 'ASP'}
+	nameDict   = {'STAP': 'ASP', 'IUPAC': 'ASP', 'CYANA': 'ASP-', 'PDB': 'ASP', 'XPLOR': 'ASP', 'CCPN': 'protein Asp deprot:HD2', 'BMRBd': 'ASP', 'AQUA': 'ASP', 'INTERNAL_0': 'ASP', 'INTERNAL_1': 'ASP', 'CYANA2': 'ASP'}
 	properties = ['protein', 'aliphatic', 'charged', 'isAsparticAcid']
 
 	dihedrals  = <NTlist>
@@ -50,7 +50,7 @@
 		topology   = [(-1, 'C'), (0, 'H'), (0, 'CA')]
 		real       = []
 		pseudo     = None
-		nameDict   = {'CCPN': 'N', 'INTERNAL_0': 'N', 'CYANA': 'N', 'CYANA2': 'N', 'INTERNAL_1': 'N', 'IUPAC': 'N', 'AQUA': 'N', 'BMRBd': 'N', 'XPLOR': 'N', 'PDB': 'N'}
+		nameDict   = {'STAP': 'N', 'IUPAC': 'N', 'CYANA': 'N', 'PDB': 'N', 'XPLOR': 'N', 'CCPN': 'N', 'BMRBd': 'N', 'AQUA': 'N', 'INTERNAL_0': 'N', 'INTERNAL_1': 'N', 'CYANA2': 'N'}
 		aliases    = []
 		type       = 'N_AMI'
 		spinType   = '15N'
@@ -64,11 +64,11 @@
 		topology   = [(0, 'N')]
 		real       = []
 		pseudo     = None
-		nameDict   = {'CCPN': 'H', 'INTERNAL_0': 'HN', 'CYANA': 'HN', 'CYANA2': 'H', 'INTERNAL_1': 'H', 'IUPAC': 'H', 'AQUA': 'H', 'BMRBd': 'H', 'XPLOR': 'HN', 'PDB': 'H'}
+		nameDict   = {'STAP': 'HN', 'IUPAC': 'H', 'CYANA': 'HN', 'PDB': 'H', 'XPLOR': 'HN', 'CCPN': 'H', 'BMRBd': 'H', 'AQUA': 'H', 'INTERNAL_0': 'HN', 'INTERNAL_1': 'H', 'CYANA2': 'H'}
 		aliases    = ['HN', 'H']
 		type       = 'H_AMI'
 		spinType   = '1H'
-		shift      = NTdict( average = 8.3300000000000001, sd = 0.59999999999999998 )
+		shift      = NTdict( average = 8.33, sd = 0.6 )
 		hetatm     = False
 		properties = ['isProton', 'proton', 'isNotCarbon', 'notcarbon', 'isNotNitrogen', 'notnitrogen', 'isNotSulfur', 'isNotSulphur', 'notsulfur', 'notsulphur', 'isBackbone', 'backbone', 'isNotAromatic', 'notaromatic', 'isNotMethyl', 'notmethyl', 'isNotMethylProton', 'notmethylproton', 'isNotPseudoAtom', 'notpseudoatom', 'hasNoPseudoAtom', 'hasnopseudoatom', 'isNotMethylene', 'notmethylene', 'isNotMethyleneProton', 'notmethyleneproton']
 	</AtomDef>
@@ -78,11 +78,11 @@
 		topology   = [(0, 'N'), (0, 'HA'), (0, 'CB'), (0, 'C')]
 		real       = []
 		pseudo     = None
-		nameDict   = {'CCPN': 'CA', 'INTERNAL_0': 'CA', 'CYANA': 'CA', 'CYANA2': 'CA', 'INTERNAL_1': 'CA', 'IUPAC': 'CA', 'AQUA': 'CA', 'BMRBd': 'CA', 'XPLOR': 'CA', 'PDB': 'CA'}
+		nameDict   = {'STAP': 'CA', 'IUPAC': 'CA', 'CYANA': 'CA', 'PDB': 'CA', 'XPLOR': 'CA', 'CCPN': 'CA', 'BMRBd': 'CA', 'AQUA': 'CA', 'INTERNAL_0': 'CA', 'INTERNAL_1': 'CA', 'CYANA2': 'CA'}
 		aliases    = []
 		type       = 'C_ALI'
 		spinType   = '13C'
-		shift      = NTdict( average = 54.659999999999997, sd = 2.1299999999999999 )
+		shift      = NTdict( average = 54.66, sd = 2.13 )
 		hetatm     = False
 		properties = ['isNotProton', 'notproton', 'isCarbon', 'carbon', 'isNotNitrogen', 'notnitrogen', 'isNotSulfur', 'isNotSulphur', 'notsulfur', 'notsulphur', 'isBackbone', 'backbone', 'isNotAromatic', 'notaromatic', 'isNotMethyl', 'notmethyl', 'isNotMethylProton', 'notmethylproton', 'isNotPseudoAtom', 'notpseudoatom', 'hasNoPseudoAtom', 'hasnopseudoatom', 'isNotMethylene', 'notmethylene', 'isNotMethyleneProton', 'notmethyleneproton']
 	</AtomDef>
@@ -92,11 +92,11 @@
 		topology   = [(0, 'CA')]
 		real       = []
 		pseudo     = None
-		nameDict   = {'CCPN': 'HA', 'INTERNAL_0': 'HA', 'CYANA': 'HA', 'CYANA2': 'HA', 'INTERNAL_1': 'HA', 'IUPAC': 'HA', 'AQUA': 'HA', 'BMRBd': 'HA', 'XPLOR': 'HA', 'PDB': 'HA'}
+		nameDict   = {'STAP': 'HA', 'IUPAC': 'HA', 'CYANA': 'HA', 'PDB': 'HA', 'XPLOR': 'HA', 'CCPN': 'HA', 'BMRBd': 'HA', 'AQUA': 'HA', 'INTERNAL_0': 'HA', 'INTERNAL_1': 'HA', 'CYANA2': 'HA'}
 		aliases    = []
 		type       = 'H_ALI'
 		spinType   = '1H'
-		shift      = NTdict( average = 4.6100000000000003, sd = 0.34000000000000002 )
+		shift      = NTdict( average = 4.61, sd = 0.34 )
 		hetatm     = False
 		properties = ['isProton', 'proton', 'isNotCarbon', 'notcarbon', 'isNotNitrogen', 'notnitrogen', 'isNotSulfur', 'isNotSulphur', 'notsulfur', 'notsulphur', 'isBackbone', 'backbone', 'isNotAromatic', 'notaromatic', 'isNotMethyl', 'notmethyl', 'isNotMethylProton', 'notmethylproton', 'isNotPseudoAtom', 'notpseudoatom', 'hasNoPseudoAtom', 'hasnopseudoatom', 'isNotMethylene', 'notmethylene', 'isNotMethyleneProton', 'notmethyleneproton']
 	</AtomDef>
@@ -106,11 +106,11 @@
 		topology   = [(0, 'CA'), (0, 'HB2'), (0, 'HB3'), (0, 'CG')]
 		real       = []
 		pseudo     = None
-		nameDict   = {'CCPN': 'CB', 'INTERNAL_0': 'CB', 'CYANA': 'CB', 'CYANA2': 'CB', 'INTERNAL_1': 'CB', 'IUPAC': 'CB', 'AQUA': 'CB', 'BMRBd': 'CB', 'XPLOR': 'CB', 'PDB': 'CB'}
+		nameDict   = {'STAP': 'CB', 'IUPAC': 'CB', 'CYANA': 'CB', 'PDB': 'CB', 'XPLOR': 'CB', 'CCPN': 'CB', 'BMRBd': 'CB', 'AQUA': 'CB', 'INTERNAL_0': 'CB', 'INTERNAL_1': 'CB', 'CYANA2': 'CB'}
 		aliases    = []
 		type       = 'C_ALI'
 		spinType   = '13C'
-		shift      = NTdict( average = 40.880000000000003, sd = 2.5699999999999998 )
+		shift      = NTdict( average = 40.88, sd = 2.57 )
 		hetatm     = False
 		properties = ['isNotProton', 'notproton', 'isCarbon', 'carbon', 'isNotNitrogen', 'notnitrogen', 'isNotSulfur', 'isNotSulphur', 'notsulfur', 'notsulphur', 'isSidechain', 'sidechain', 'isNotAromatic', 'notaromatic', 'isNotMethyl', 'notmethyl', 'isNotMethylProton', 'notmethylproton', 'isNotPseudoAtom', 'notpseudoatom', 'hasNoPseudoAtom', 'hasnopseudoatom', 'isMethylene', 'methylene', 'isNotMethyleneProton', 'notmethyleneproton']
 	</AtomDef>
@@ -120,7 +120,7 @@
 		topology   = [(0, 'CB')]
 		real       = []
 		pseudo     = 'QB'
-		nameDict   = {'CCPN': 'HB2', 'INTERNAL_0': 'HB2', 'CYANA': 'HB2', 'CYANA2': 'HB2', 'INTERNAL_1': 'HB2', 'IUPAC': 'HB2', 'AQUA': 'HB2', 'BMRBd': 'HB2', 'XPLOR': 'HB2', 'PDB': '1HB'}
+		nameDict   = {'STAP': 'HB2', 'IUPAC': 'HB2', 'CYANA': 'HB2', 'PDB': '1HB', 'XPLOR': 'HB2', 'CCPN': 'HB2', 'BMRBd': 'HB2', 'AQUA': 'HB2', 'INTERNAL_0': 'HB2', 'INTERNAL_1': 'HB2', 'CYANA2': 'HB2'}
 		aliases    = []
 		type       = 'H_ALI'
 		spinType   = '1H'
@@ -134,7 +134,7 @@
 		topology   = [(0, 'CB')]
 		real       = []
 		pseudo     = 'QB'
-		nameDict   = {'CCPN': 'HB3', 'INTERNAL_0': 'HB3', 'CYANA': 'HB3', 'CYANA2': 'HB3', 'INTERNAL_1': 'HB3', 'IUPAC': 'HB3', 'AQUA': 'HB3', 'BMRBd': 'HB3', 'XPLOR': 'HB1', 'PDB': '2HB'}
+		nameDict   = {'STAP': 'HB1', 'IUPAC': 'HB3', 'CYANA': 'HB3', 'PDB': '2HB', 'XPLOR': 'HB1', 'CCPN': 'HB3', 'BMRBd': 'HB3', 'AQUA': 'HB3', 'INTERNAL_0': 'HB3', 'INTERNAL_1': 'HB3', 'CYANA2': 'HB3'}
 		aliases    = []
 		type       = 'H_ALI'
 		spinType   = '1H'
@@ -148,11 +148,11 @@
 		topology   = [(0, 'CB')]
 		real       = ['HB2', 'HB3']
 		pseudo     = None
-		nameDict   = {'CCPN': 'HB*', 'INTERNAL_0': 'QB', 'CYANA': 'QB', 'CYANA2': 'QB', 'INTERNAL_1': 'QB', 'IUPAC': 'QB', 'AQUA': 'QB', 'BMRBd': None, 'XPLOR': 'HB*,HB#,HB%,HB+', 'PDB': None}
+		nameDict   = {'STAP': None, 'IUPAC': 'QB', 'CYANA': 'QB', 'PDB': None, 'XPLOR': 'HB*,HB#,HB%,HB+', 'CCPN': 'HB*', 'BMRBd': None, 'AQUA': 'QB', 'INTERNAL_0': 'QB', 'INTERNAL_1': 'QB', 'CYANA2': 'QB'}
 		aliases    = []
 		type       = 'PSEUD'
 		spinType   = '1H'
-		shift      = NTdict( average = 2.7400000000000002, sd = 1.0449999999999999 )
+		shift      = NTdict( average = 2.74, sd = 1.045 )
 		hetatm     = False
 		properties = ['isProton', 'proton', 'isNotCarbon', 'notcarbon', 'isNotNitrogen', 'notnitrogen', 'isNotSulfur', 'isNotSulphur', 'notsulfur', 'notsulphur', 'isSidechain', 'sidechain', 'isNotAromatic', 'notaromatic', 'isNotMethyl', 'notmethyl', 'isNotMethylProton', 'notmethylproton', 'isPseudoAtom', 'pseudoatom', 'hasNoPseudoAtom', 'hasnopseudoatom', 'isMethylene', 'methylene', 'isMethyleneProton', 'methyleneproton']
 	</AtomDef>
@@ -162,11 +162,11 @@
 		topology   = [(0, 'CB'), (0, 'OD1'), (0, 'OD2')]
 		real       = []
 		pseudo     = None
-		nameDict   = {'CCPN': 'CG', 'INTERNAL_0': 'CG', 'CYANA': 'CG', 'CYANA2': 'CG', 'INTERNAL_1': 'CG', 'IUPAC': 'CG', 'AQUA': 'CG', 'BMRBd': 'CG', 'XPLOR': 'CG', 'PDB': 'CG'}
+		nameDict   = {'STAP': 'CG', 'IUPAC': 'CG', 'CYANA': 'CG', 'PDB': 'CG', 'XPLOR': 'CG', 'CCPN': 'CG', 'BMRBd': 'CG', 'AQUA': 'CG', 'INTERNAL_0': 'CG', 'INTERNAL_1': 'CG', 'CYANA2': 'CG'}
 		aliases    = []
 		type       = 'C_BYL'
 		spinType   = '13C'
-		shift      = NTdict( average = 179.34, sd = 1.4399999999999999 )
+		shift      = NTdict( average = 179.34, sd = 1.44 )
 		hetatm     = False
 		properties = ['isNotProton', 'notproton', 'isCarbon', 'carbon', 'isNotNitrogen', 'notnitrogen', 'isNotSulfur', 'isNotSulphur', 'notsulfur', 'notsulphur', 'isSidechain', 'sidechain', 'isNotAromatic', 'notaromatic', 'isNotMethyl', 'notmethyl', 'isNotMethylProton', 'notmethylproton', 'isNotPseudoAtom', 'notpseudoatom', 'hasNoPseudoAtom', 'hasnopseudoatom', 'isNotMethylene', 'notmethylene', 'isNotMethyleneProton', 'notmethyleneproton']
 	</AtomDef>
@@ -176,7 +176,7 @@
 		topology   = [(0, 'CG')]
 		real       = []
 		pseudo     = None
-		nameDict   = {'CCPN': 'OD1', 'INTERNAL_0': 'OD1', 'CYANA': 'OD1', 'CYANA2': 'OD1', 'INTERNAL_1': 'OD1', 'IUPAC': 'OD1', 'AQUA': 'OD1', 'BMRBd': 'OD1', 'XPLOR': 'OD1', 'PDB': 'OD1'}
+		nameDict   = {'STAP': 'OD1', 'IUPAC': 'OD1', 'CYANA': 'OD1', 'PDB': 'OD1', 'XPLOR': 'OD1', 'CCPN': 'OD1', 'BMRBd': 'OD1', 'AQUA': 'OD1', 'INTERNAL_0': 'OD1', 'INTERNAL_1': 'OD1', 'CYANA2': 'OD1'}
 		aliases    = []
 		type       = 'O_BYL'
 		spinType   = '16O'
@@ -190,7 +190,7 @@
 		topology   = [(0, 'CG')]
 		real       = []
 		pseudo     = None
-		nameDict   = {'CCPN': 'OD2', 'INTERNAL_0': 'OD2', 'CYANA': 'OD2', 'CYANA2': 'OD2', 'INTERNAL_1': 'OD2', 'IUPAC': 'OD2', 'AQUA': 'OD2', 'BMRBd': 'OD2', 'XPLOR': 'OD2', 'PDB': 'OD2'}
+		nameDict   = {'STAP': 'OD2', 'IUPAC': 'OD2', 'CYANA': 'OD2', 'PDB': 'OD2', 'XPLOR': 'OD2', 'CCPN': 'OD2', 'BMRBd': 'OD2', 'AQUA': 'OD2', 'INTERNAL_0': 'OD2', 'INTERNAL_1': 'OD2', 'CYANA2': 'OD2'}
 		aliases    = []
 		type       = 'O_BYL'
 		spinType   = '16O'
@@ -204,11 +204,11 @@
 		topology   = [(0, 'CA'), (0, 'O'), (1, 'N')]
 		real       = []
 		pseudo     = None
-		nameDict   = {'CCPN': 'C', 'INTERNAL_0': 'C', 'CYANA': 'C', 'CYANA2': 'C', 'INTERNAL_1': 'C', 'IUPAC': 'C', 'AQUA': 'C', 'BMRBd': 'C', 'XPLOR': 'C', 'PDB': 'C'}
+		nameDict   = {'STAP': 'C', 'IUPAC': 'C', 'CYANA': 'C', 'PDB': 'C', 'XPLOR': 'C', 'CCPN': 'C', 'BMRBd': 'C', 'AQUA': 'C', 'INTERNAL_0': 'C', 'INTERNAL_1': 'C', 'CYANA2': 'C'}
 		aliases    = ['C', 'CO']
 		type       = 'C_BYL'
 		spinType   = '13C'
-		shift      = NTdict( average = 176.47999999999999, sd = 1.76 )
+		shift      = NTdict( average = 176.48, sd = 1.76 )
 		hetatm     = False
 		properties = ['isNotProton', 'notproton', 'isCarbon', 'carbon', 'isNotNitrogen', 'notnitrogen', 'isNotSulfur', 'isNotSulphur', 'notsulfur', 'notsulphur', 'isBackbone', 'backbone', 'isNotAromatic', 'notaromatic', 'isNotMethyl', 'notmethyl', 'isNotMethylProton', 'notmethylproton', 'isNotPseudoAtom', 'notpseudoatom', 'hasNoPseudoAtom', 'hasnopseudoatom', 'isNotMethylene', 'notmethylene', 'isNotMethyleneProton', 'notmethyleneproton']
 	</AtomDef>
@@ -218,7 +218,7 @@
 		topology   = [(0, 'C')]
 		real       = []
 		pseudo     = None
-		nameDict   = {'CCPN': 'O', 'INTERNAL_0': 'O', 'CYANA': 'O', 'CYANA2': 'O', 'INTERNAL_1': 'O', 'IUPAC': 'O', 'AQUA': 'O', 'BMRBd': 'O', 'XPLOR': 'O,OT1', 'PDB': 'O'}
+		nameDict   = {'STAP': 'O,OT1', 'IUPAC': 'O', 'CYANA': 'O', 'PDB': 'O', 'XPLOR': 'O,OT1', 'CCPN': 'O', 'BMRBd': 'O', 'AQUA': 'O', 'INTERNAL_0': 'O', 'INTERNAL_1': 'O', 'CYANA2': 'O'}
 		aliases    = ['O', "O'"]
 		type       = 'O_BYL'
 		spinType   = '16O'
@@ -232,11 +232,11 @@
 		topology   = [(0, 'N')]
 		real       = []
 		pseudo     = None
-		nameDict   = {'INTERNAL_0': 'H1', 'INTERNAL_1': 'H1', 'IUPAC': 'H1', 'CCPN': 'H1', 'XPLOR': 'HT1'}
+		nameDict   = {'CCPN': 'H1', 'STAP': 'H1,HT1', 'IUPAC': 'H1', 'INTERNAL_0': 'H1', 'INTERNAL_1': 'H1', 'XPLOR': 'HT1'}
 		aliases    = []
 		type       = 'H_AMI'
 		spinType   = '1H'
-		shift      = NTdict( average = 8.3300000000000001, sd = 0.59999999999999998 )
+		shift      = NTdict( average = 8.33, sd = 0.6 )
 		hetatm     = False
 		properties = ['isProton', 'proton', 'isNotCarbon', 'notcarbon', 'isNotNitrogen', 'notnitrogen', 'isNotSulfur', 'isNotSulphur', 'notsulfur', 'notsulphur', 'isBackbone', 'backbone', 'isNotAromatic', 'notaromatic', 'isNotMethyl', 'notmethyl', 'isNotMethylProton', 'notmethylproton', 'isNotPseudoAtom', 'notpseudoatom', 'hasNoPseudoAtom', 'hasnopseudoatom', 'isNotMethylene', 'notmethylene', 'isNotMethyleneProton', 'notmethyleneproton']
 	</AtomDef>
@@ -246,11 +246,11 @@
 		topology   = [(0, 'N')]
 		real       = []
 		pseudo     = None
-		nameDict   = {'INTERNAL_0': 'H2', 'INTERNAL_1': 'H2', 'IUPAC': 'H2', 'CCPN': 'H2', 'XPLOR': 'HT2'}
+		nameDict   = {'CCPN': 'H2', 'STAP': 'H2,HT2', 'IUPAC': 'H2', 'INTERNAL_0': 'H2', 'INTERNAL_1': 'H2', 'XPLOR': 'HT2'}
 		aliases    = []
 		type       = 'H_AMI'
 		spinType   = '1H'
-		shift      = NTdict( average = 8.3300000000000001, sd = 0.59999999999999998 )
+		shift      = NTdict( average = 8.33, sd = 0.6 )
 		hetatm     = False
 		properties = ['isProton', 'proton', 'isNotCarbon', 'notcarbon', 'isNotNitrogen', 'notnitrogen', 'isNotSulfur', 'isNotSulphur', 'notsulfur', 'notsulphur', 'isBackbone', 'backbone', 'isNotAromatic', 'notaromatic', 'isNotMethyl', 'notmethyl', 'isNotMethylProton', 'notmethylproton', 'isNotPseudoAtom', 'notpseudoatom', 'hasNoPseudoAtom', 'hasnopseudoatom', 'isNotMethylene', 'notmethylene', 'isNotMethyleneProton', 'notmethyleneproton']
 	</AtomDef>
@@ -260,11 +260,11 @@
 		topology   = [(0, 'N')]
 		real       = []
 		pseudo     = None
-		nameDict   = {'INTERNAL_0': 'H3', 'INTERNAL_1': 'H3', 'IUPAC': 'H3', 'CCPN': 'H3', 'XPLOR': 'HT3'}
+		nameDict   = {'CCPN': 'H3', 'STAP': 'H3,HT3', 'IUPAC': 'H3', 'INTERNAL_0': 'H3', 'INTERNAL_1': 'H3', 'XPLOR': 'HT3'}
 		aliases    = []
 		type       = 'H_AMI'
 		spinType   = '1H'
-		shift      = NTdict( average = 8.3300000000000001, sd = 0.59999999999999998 )
+		shift      = NTdict( average = 8.33, sd = 0.6 )
 		hetatm     = False
 		properties = ['isProton', 'proton', 'isNotCarbon', 'notcarbon', 'isNotNitrogen', 'notnitrogen', 'isNotSulfur', 'isNotSulphur', 'notsulfur', 'notsulphur', 'isBackbone', 'backbone', 'isNotAromatic', 'notaromatic', 'isNotMethyl', 'notmethyl', 'isNotMethylProton', 'notmethylproton', 'isNotPseudoAtom', 'notpseudoatom', 'hasNoPseudoAtom', 'hasnopseudoatom', 'isNotMethylene', 'notmethylene', 'isNotMethyleneProton', 'notmethyleneproton']
 	</AtomDef>
@@ -274,7 +274,7 @@
 		topology   = [(0, 'C')]
 		real       = []
 		pseudo     = None
-		nameDict   = {'INTERNAL_0': 'OXT', 'INTERNAL_1': 'OXT', 'IUPAC': "OXT,O''", 'CCPN': "O''", 'XPLOR': 'OT2'}
+		nameDict   = {'CCPN': "O''", 'STAP': 'OXT,OT2', 'IUPAC': "OXT,O''", 'INTERNAL_0': 'OXT', 'INTERNAL_1': 'OXT', 'XPLOR': 'OT2'}
 		aliases    = ['OXT', "O''"]
 		type       = 'O_BYL'
 		spinType   = '16O'
