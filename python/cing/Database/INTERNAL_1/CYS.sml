@@ -8,7 +8,7 @@
 	shortName  = 'C'
 	comment    = 'Regular Cys residue'
 	nameDict   = {'STAP': 'CYS', 'IUPAC': 'CYS', 'CYANA': 'CYS', 'PDB': 'CYS', 'XPLOR': 'CYS', 'CCPN': 'protein Cys prot:HG', 'BMRBd': 'CYS', 'AQUA': 'CYS', 'INTERNAL_0': 'CYS', 'INTERNAL_1': 'CYS', 'CYANA2': 'CYS'}
-	properties = ['protein', 'aliphatic', 'polar', 'isCystine']
+	properties = ['protein', 'aliphatic', 'polar']
 
 	dihedrals  = <NTlist>
 	#---------------------------------------------------------------
