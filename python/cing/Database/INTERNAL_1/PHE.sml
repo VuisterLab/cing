@@ -6,7 +6,7 @@
 #=======================================================================
 	commonName = 'PHE'
 	shortName  = 'F'
-	comment    = 'Regular Asn residue'
+	comment    = 'Regular Phe residue'
 	nameDict   = {'STAP': 'PHE', 'IUPAC': 'PHE', 'CYANA': 'PHE', 'PDB': 'PHE', 'XPLOR': 'PHE', 'CCPN': 'protein Phe neutral', 'BMRBd': 'PHE', 'AQUA': 'PHE', 'INTERNAL_0': 'PHE', 'INTERNAL_1': 'PHE', 'CYANA2': 'PHE'}
 	properties = ['protein', 'aromatic', 'large', 'neutral']
 
