@@ -7,7 +7,7 @@
 	commonName = 'SS'
 	shortName  = 's'
 	comment    = 'generic residue used by xeasy'
-	nameDict   = {'INTERNAL_0': 'SS', 'BMRBd': None, 'CYANA': 'SS', 'CYANA2': 'SS', 'INTERNAL_1': 'SS', 'IUPAC': None, 'AQUA': None, 'PDB': None, 'XPLOR': None}
+	nameDict   = {'INTERNAL_0': 'SS', 'BMRBd': None, 'CYANA': 'SS', 'STAP': None, 'CYANA2': 'SS', 'INTERNAL_1': 'SS', 'IUPAC': None, 'AQUA': None, 'PDB': None, 'XPLOR': None}
 	properties = ['protein']
 
 	dihedrals  = <NTlist>
@@ -38,7 +38,7 @@
 		topology   = [(-1, 'C'), (0, 'H'), (0, 'CA')]
 		real       = []
 		pseudo     = None
-		nameDict   = {'INTERNAL_0': 'N', 'BMRBd': 'N', 'CYANA': 'N', 'CYANA2': 'N', 'INTERNAL_1': 'N', 'IUPAC': 'N', 'AQUA': 'N', 'PDB': 'N', 'XPLOR': 'N'}
+		nameDict   = {'INTERNAL_0': 'N', 'BMRBd': 'N', 'CYANA': 'N', 'STAP': 'N', 'CYANA2': 'N', 'INTERNAL_1': 'N', 'IUPAC': 'N', 'AQUA': 'N', 'PDB': 'N', 'XPLOR': 'N'}
 		aliases    = []
 		type       = 'N_AMI'
 		spinType   = '15N'
@@ -52,7 +52,7 @@
 		topology   = [(0, 'N')]
 		real       = []
 		pseudo     = None
-		nameDict   = {'INTERNAL_0': 'HN', 'BMRBd': 'H', 'CYANA': 'HN', 'CYANA2': 'H', 'INTERNAL_1': 'H', 'IUPAC': 'H', 'AQUA': 'H', 'PDB': 'H', 'XPLOR': 'HN'}
+		nameDict   = {'INTERNAL_0': 'HN', 'BMRBd': 'H', 'CYANA': 'HN', 'STAP': 'HN', 'CYANA2': 'H', 'INTERNAL_1': 'H', 'IUPAC': 'H', 'AQUA': 'H', 'PDB': 'H', 'XPLOR': 'HN'}
 		aliases    = ['HN', 'H']
 		type       = 'H_AMI'
 		spinType   = '1H'
@@ -66,7 +66,7 @@
 		topology   = [(0, 'N'), (0, 'HA'), (0, 'CB'), (0, 'C')]
 		real       = []
 		pseudo     = None
-		nameDict   = {'INTERNAL_0': 'CA', 'BMRBd': 'CA', 'CYANA': 'CA', 'CYANA2': 'CA', 'INTERNAL_1': 'CA', 'IUPAC': 'CA', 'AQUA': 'CA', 'PDB': 'CA', 'XPLOR': 'CA'}
+		nameDict   = {'INTERNAL_0': 'CA', 'BMRBd': 'CA', 'CYANA': 'CA', 'STAP': 'CA', 'CYANA2': 'CA', 'INTERNAL_1': 'CA', 'IUPAC': 'CA', 'AQUA': 'CA', 'PDB': 'CA', 'XPLOR': 'CA'}
 		aliases    = []
 		type       = 'C_ALI'
 		spinType   = '13C'
@@ -80,7 +80,7 @@
 		topology   = [(0, 'CA')]
 		real       = []
 		pseudo     = None
-		nameDict   = {'INTERNAL_0': 'HA', 'BMRBd': 'HA', 'CYANA': 'HA', 'CYANA2': 'HA', 'INTERNAL_1': 'HA', 'IUPAC': 'HA', 'AQUA': 'HA', 'PDB': 'HA', 'XPLOR': 'HA'}
+		nameDict   = {'INTERNAL_0': 'HA', 'BMRBd': 'HA', 'CYANA': 'HA', 'STAP': 'HA', 'CYANA2': 'HA', 'INTERNAL_1': 'HA', 'IUPAC': 'HA', 'AQUA': 'HA', 'PDB': 'HA', 'XPLOR': 'HA'}
 		aliases    = []
 		type       = 'H_ALI'
 		spinType   = '1H'
@@ -94,7 +94,7 @@
 		topology   = [(0, 'CA'), (0, 'HB2'), (0, 'HB3')]
 		real       = []
 		pseudo     = None
-		nameDict   = {'INTERNAL_0': 'CB', 'BMRBd': 'CB', 'CYANA': 'CB', 'CYANA2': 'CB', 'INTERNAL_1': 'CB', 'IUPAC': 'CB', 'AQUA': 'CB', 'PDB': 'CB', 'XPLOR': 'CB'}
+		nameDict   = {'INTERNAL_0': 'CB', 'BMRBd': 'CB', 'CYANA': 'CB', 'STAP': 'CB', 'CYANA2': 'CB', 'INTERNAL_1': 'CB', 'IUPAC': 'CB', 'AQUA': 'CB', 'PDB': 'CB', 'XPLOR': 'CB'}
 		aliases    = []
 		type       = 'C_ALI'
 		spinType   = '13C'
@@ -108,7 +108,7 @@
 		topology   = [(0, 'CB')]
 		real       = []
 		pseudo     = 'QB'
-		nameDict   = {'INTERNAL_0': 'HB2', 'BMRBd': 'HB2', 'CYANA': 'HB2', 'CYANA2': 'HB2', 'INTERNAL_1': 'HB2', 'IUPAC': 'HB2', 'AQUA': 'HB2', 'PDB': '1HB', 'XPLOR': 'HB2'}
+		nameDict   = {'INTERNAL_0': 'HB2', 'BMRBd': 'HB2', 'CYANA': 'HB2', 'STAP': 'HB2', 'CYANA2': 'HB2', 'INTERNAL_1': 'HB2', 'IUPAC': 'HB2', 'AQUA': 'HB2', 'PDB': '1HB', 'XPLOR': 'HB2'}
 		aliases    = []
 		type       = 'H_ALI'
 		spinType   = '1H'
@@ -122,7 +122,7 @@
 		topology   = [(0, 'CB')]
 		real       = []
 		pseudo     = 'QB'
-		nameDict   = {'INTERNAL_0': 'HB3', 'BMRBd': 'HB3', 'CYANA': 'HB3', 'CYANA2': 'HB3', 'INTERNAL_1': 'HB3', 'IUPAC': 'HB3', 'AQUA': 'HB3', 'PDB': '2HB', 'XPLOR': 'HB1'}
+		nameDict   = {'INTERNAL_0': 'HB3', 'BMRBd': 'HB3', 'CYANA': 'HB3', 'STAP': 'HB1', 'CYANA2': 'HB3', 'INTERNAL_1': 'HB3', 'IUPAC': 'HB3', 'AQUA': 'HB3', 'PDB': '2HB', 'XPLOR': 'HB1'}
 		aliases    = []
 		type       = 'H_ALI'
 		spinType   = '1H'
@@ -136,7 +136,7 @@
 		topology   = [(0, 'CB')]
 		real       = ['HB2', 'HB3']
 		pseudo     = None
-		nameDict   = {'INTERNAL_0': 'QB', 'BMRBd': None, 'CYANA': 'QB', 'CYANA2': 'QB', 'INTERNAL_1': 'QB', 'IUPAC': 'QB', 'AQUA': 'QB', 'PDB': None, 'XPLOR': 'HB*,HB#,HB%,HB+'}
+		nameDict   = {'INTERNAL_0': 'QB', 'BMRBd': None, 'CYANA': 'QB', 'STAP': None, 'CYANA2': 'QB', 'INTERNAL_1': 'QB', 'IUPAC': 'QB', 'AQUA': 'QB', 'PDB': None, 'XPLOR': 'HB*,HB#,HB%,HB+'}
 		aliases    = []
 		type       = 'PSEUD'
 		spinType   = '1H'
@@ -150,7 +150,7 @@
 		topology   = [(0, 'CA'), (0, 'O'), (1, 'N')]
 		real       = []
 		pseudo     = None
-		nameDict   = {'INTERNAL_0': 'C', 'BMRBd': 'C', 'CYANA': 'C', 'CYANA2': 'C', 'INTERNAL_1': 'C', 'IUPAC': 'C', 'AQUA': 'C', 'PDB': 'C', 'XPLOR': 'C'}
+		nameDict   = {'INTERNAL_0': 'C', 'BMRBd': 'C', 'CYANA': 'C', 'STAP': 'C', 'CYANA2': 'C', 'INTERNAL_1': 'C', 'IUPAC': 'C', 'AQUA': 'C', 'PDB': 'C', 'XPLOR': 'C'}
 		aliases    = ['C', 'CO']
 		type       = 'C_BYL'
 		spinType   = '13C'
@@ -164,7 +164,7 @@
 		topology   = [(0, 'C')]
 		real       = []
 		pseudo     = None
-		nameDict   = {'INTERNAL_0': 'O', 'BMRBd': 'O', 'CYANA': 'O', 'CYANA2': 'O', 'INTERNAL_1': 'O', 'IUPAC': 'O', 'AQUA': 'O', 'PDB': 'O', 'XPLOR': 'O,OT1'}
+		nameDict   = {'INTERNAL_0': 'O', 'BMRBd': 'O', 'CYANA': 'O', 'STAP': 'O,OT1', 'CYANA2': 'O', 'INTERNAL_1': 'O', 'IUPAC': 'O', 'AQUA': 'O', 'PDB': 'O', 'XPLOR': 'O,OT1'}
 		aliases    = []
 		type       = 'O_BYL'
 		spinType   = '16O'
