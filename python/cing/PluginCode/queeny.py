@@ -31,25 +31,23 @@ from cing.Libs.io import sprintf
 
 try:
     import pyximport
-    pyximport.install()
-    import cing.Libs.cython.superpose as superpose
-# GWV 20140501: changed calls
-#    from cing.Libs.cython.superpose import NTcMatrix
-#    from cing.Libs.cython.superpose import NTcVector
-#    from cing.Libs.cython.superpose import calculateRMSD
-#    from cing.Libs.cython.superpose import superposeVectors
-#    from cing.Libs.cython.superpose import Rm6dist #@UnresolvedImport
 except ImportError:
-    io.error('Importing cython routines  for queeny\n')
+    io.error('Importing pyximport routines for queeny\n')
     raise ImportError
+pyximport.install()
 
+try:
+    import cing.Libs.cython.superpose as superpose
+except ImportError:
+    io.error('Importing cython routines for queeny\n')
+    raise ImportError
 
 # versions < 0.95 not logged with version number
 # cing versions >1.0 first ones to include this
 __version__ = cing.__version__
 
 
-# defaults for the talosPlus status dict
+# defaults for the queeny status dict
 def queenyDefaults():
     d = Adict(
                completed  = False,
@@ -90,7 +88,9 @@ class QueenyResultJsonHandler(jsonTools.handlers.SimpleDictHandler):
         result = QueenyResult()
         self._restore(data, result)
         #LEGACY:
-        if isinstance(result.object, molecule.Residue) or \
+        reference = self.context.referenceObject
+        if reference is not None and \
+           isinstance(result.object, molecule.Residue) or \
            isinstance(result.object, molecule.Atom):
             for storedProp in [QueenyResult.UNCERTAINTY1, QueenyResult.UNCERTAINTY2, QueenyResult.INFORMATION]:
                 result.object[storedProp] = result[storedProp]
@@ -143,14 +143,14 @@ class DmElement():
 #end class
 
 
-class Queeny( Odict ):
+class Queeny(Odict):
     """
     Class to run a queen-like analysis
 
     """
 
     def __init__(self, project ):
-        Odict.__init__( self )
+        Odict.__init__(self)
         self.project  = project
         self.molecule = project.molecule
         for atm in self.molecule.allAtoms():
@@ -174,13 +174,13 @@ class Queeny( Odict ):
     def setdefault(self, key, defaultValue):
         if key[0] > key[1]:
             key = (key[1],key[0])
-        return Odict.setdefault( self, key, defaultValue)
+        return Odict.setdefault(self, key, defaultValue)
     #end def
 
     def has_key(self, key):
         if key[0] > key[1]:
             key = (key[1],key[0])
-        return dict.has_key( self, key)
+        return dict.has_key(self, key)
     #end def
 
     def __call__(self, index):
@@ -692,7 +692,7 @@ class Queeny( Odict ):
 
 def runQueeny( project, tmp=None ):
     try: # Fixes 2l4g
-        return _runQueeny( project, tmp=tmp )
+        return _runQueeny(project, tmp=tmp)
     except:
         nTerror("Queeny failed as per below.")
         nTtracebackError()

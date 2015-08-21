@@ -97,8 +97,8 @@ from cing.Libs.NTutils import NTlist
 from cing.Libs.NTutils import nTerror
 from cing.Libs.NTutils import nTcodeerror
 from cing.Libs.NTutils import nTwarning
-from cing.Libs.NTutils import nTmessage
-from cing.Libs.NTutils import nTdebug
+#from cing.Libs.NTutils import nTmessage
+#from cing.Libs.NTutils import nTdebug
 
 from cing.Libs import io
 
@@ -109,7 +109,7 @@ from cing import constants
 import cing.Libs.disk as disk
 
 
-DEFAULT_PSEUDO_ATOM_ID_UNDEFINED             = 0 # Not mandatory in dbTable.
+DEFAULT_PSEUDO_ATOM_ID_UNDEFINED             = 0  # Not mandatory in dbTable.
 DEFAULT_PSEUDO_ATOM_ID_CH2_OR_NH2            = 1
 DEFAULT_PSEUDO_ATOM_ID_METHYL                = 2
 DEFAULT_PSEUDO_ATOM_ID_TWO_NH2_OR_CH2        = 3
@@ -133,7 +133,7 @@ PSEUDO_ATOM_TYPES = [
 
 
 # Too many public methods pylint: disable=R0904
-class MolDef( NTtree ):
+class MolDef(NTtree):
     """
     Root class for the NTdb database
 
@@ -248,9 +248,9 @@ class MolDef( NTtree ):
 
         if len(properties) == 0:
             return result
-        for res in self.residues:
-            if res.hasProperties(*properties):
-                result.append(res)
+        for residue in self.residues:
+            if residue.hasProperties(*properties):
+                result.append(residue)
             #end if
         #end for
         return result
@@ -379,14 +379,15 @@ class MolDef( NTtree ):
         #end for
     #end def
 
-    def exportDef( self, stream = sys.stdout, convention=constants.INTERNAL ):
+    def exportDef(self, stream = sys.stdout, convention=constants.INTERNAL):
         """export name definitions to stream"""
         io.fprintf(stream,'convention = %r\n', convention)
-        for res in self:
-            res.exportDef( stream=stream, convention=convention )
+        for residue in self:
+            residue.exportDef(stream=stream, convention=convention)
         #end for
     #end def
 #end class
+
 
 class ResidueDef( NTtree ):
     def __init__( self, name, **kwds ):
@@ -455,7 +456,7 @@ class ResidueDef( NTtree ):
         return atmDef
     #end def
 
-    def appendAtomListDef( self, nameList=[], **kwds ):
+    def appendAtomListDef(self, nameList=[], **kwds):
         """Not used yet; to be used in CCPN reader..."""
         pass
         # for atomName in nameList:
@@ -617,14 +618,14 @@ class ResidueDef( NTtree ):
 
     def exportDef( self, stream = sys.stdout, convention = constants.INTERNAL ):
         """export definitions to stream"""
-        io.fprintf( stream, '\n#=======================================================================\n')
-        io.fprintf( stream,   '#\t%-8s %-8s\n','internal', 'short')
-        io.fprintf( stream,   'RESIDUE\t%-8s %-8s\n', self.translate(convention), self.shortName )
-        io.fprintf( stream,   '#=======================================================================\n')
+        io.printf(stream, '\n#=======================================================================\n')
+        io.printf(stream,   '#\t%-8s %-8s\n','internal', 'short')
+        io.printf(stream,   'RESIDUE\t%-8s %-8s\n', self.translate(convention), self.shortName )
+        io.printf(stream,   '#=======================================================================\n')
 
         # saving different residue attributes
         for attr in ['nameDict', 'comment']:
-            io.fprintf( stream, "\t%s = %s\n", attr, repr(self[attr]) )
+            io.printf(stream, "\t%s = %s\n", attr, repr(self[attr]) )
         #end for
 
         # clean the properties list
@@ -635,7 +636,7 @@ class ResidueDef( NTtree ):
                 props.append(prop)
             #end if
         #end for
-        io.fprintf( stream, "\t%s = %s\n", 'properties', repr(props) )
+        io.printf(stream, "\t%s = %s\n", 'properties', repr(props) )
 
         for dh in self.dihedrals:
             dh.exportDef( stream=stream, convention=convention )
@@ -645,10 +646,11 @@ class ResidueDef( NTtree ):
             atm.exportDef( stream=stream, convention=convention )
         #end for
 
-        io.fprintf( stream,   'END_RESIDUE\n')
-        io.fprintf( stream,   '#=======================================================================\n')
+        io.printf(stream,   'END_RESIDUE\n')
+        io.printf(stream,   '#=======================================================================\n')
     #end def
 #end class
+
 
 # Use dictionaries for quick lookup.
 # Note it does not include the carbonyl anymore. Just like molmol doesn't.
@@ -660,6 +662,7 @@ NterminalProteinAtomDict.appendFromList( "H1 H2 H3 H' H''".split()) # watch out;
 
 NterminalNucleicAtomDict = NTdict()
 NterminalNucleicAtomDict.appendFromList( "HOP2 HOP3".split())
+
 
 def isNterminalAtom( atmDef ):
     """
@@ -681,9 +684,11 @@ def isNterminalAtom( atmDef ):
 CterminalAtomDict = NTdict()
 CterminalAtomDict.appendFromList( "OXT".split())
 
+
 def isCterminalAtom( atmDef ):
     """Return True if atom belongs to C-terminal category"""
     return CterminalAtomDict.has_key(atmDef.name)
+
 
 def isTerminal( atmDef ):
     if atmDef is None or atmDef.residueDef is None:
@@ -693,6 +698,7 @@ def isTerminal( atmDef ):
     if isNterminalAtom( atmDef ):
         return True
     return isCterminalAtom( atmDef )
+
 
 def isAromatic( atmDef ):
     """Return true if it is an atom belonging to an aromatic ring
@@ -718,6 +724,7 @@ def isAromatic( atmDef ):
     return False
 #end def
 
+
 def isBackbone( atmDef ):
     """
     Return True if it is not a sidechain atom, False otherwise
@@ -734,6 +741,7 @@ def isBackbone( atmDef ):
     return d.has_key( atmDef.name )
 #end def
 
+
 def isSidechain( atmDef ):
     """
     Return True if it is not a backbone atom,
@@ -745,6 +753,7 @@ def isSidechain( atmDef ):
 
     return not isBackbone( atmDef )
 #end def
+
 
 def isMethyl( atmDef ):
     """
@@ -772,12 +781,14 @@ def isMethyl( atmDef ):
     #end if
 #end def
 
+
 def isMethylProton( atmDef ):
     """
     Return True if atm is a methyl proton
     """
     return isProton(atmDef) and isMethyl(atmDef)
 #end def
+
 
 def isMethylene( atmDef ):
     """
@@ -806,6 +817,7 @@ def isMethylene( atmDef ):
     #end if
 #end def
 
+
 def isIsopropylOrGuanidinium( atmDef ):
     """Return True if atom is a Leu or Val isopropyl or Arg guanidinium pseudo"""
     n = len(atmDef.real)
@@ -814,12 +826,14 @@ def isIsopropylOrGuanidinium( atmDef ):
     return False
 #end def
 
+
 def isMethyleneProton( atmDef ):
     """
     Return True if atm is a methylene proton
     """
     return isProton(atmDef) and isMethylene(atmDef)
 #end def
+
 
 def isMethylProtonButNotPseudo( atmDef ):
     """
@@ -830,11 +844,13 @@ def isMethylProtonButNotPseudo( atmDef ):
     return not isPseudoAtom(atmDef)
 #end def
 
+
 def isProton( atmDef ):
     """Return Tue if atm is 1H
     """
     return atmDef.spinType == '1H'
 #end def
+
 
 def isHeavy( atmDef ):
     """
@@ -849,11 +865,13 @@ def isHeavy( atmDef ):
     return True
 #end def
 
+
 def isCarbon( atmDef ):
     """Return Tue if atm is 13C
     """
     return atmDef.spinType == '13C'
 #end def
+
 
 def isNitrogen( atmDef ):
     """Return Tue if atm is 15N
@@ -861,11 +879,13 @@ def isNitrogen( atmDef ):
     return atmDef.spinType == '15N'
 #end def
 
+
 def isOxygen( atmDef ):
     """Return Tue if atm is 16O
     """
     return atmDef.spinType == '16O'
 #end def
+
 
 def isSulfur( atmDef ):
     """Return Tue if atm is 32S
@@ -873,15 +893,18 @@ def isSulfur( atmDef ):
     return atmDef.spinType == '32S'
 #end def
 
+
 def isPseudoAtom( atmDef ):
     """Return True if atom is pseudoAtom"""
     return len(atmDef.real) > 0 or atmDef.hasProperties('isPseudoAtom')  # additional check: eq. CYANA Pseudoatoms of Calcium
 #end def
 
+
 def hasPseudoAtom( atmDef ):
     """Return True if atom has a correponding pseudoAtom"""
     return atmDef.pseudo is not None
 #end def
+
 
 class AtomDef( NTtree ):
     def __init__( self, name, **kwds ):
@@ -922,12 +945,6 @@ class AtomDef( NTtree ):
                           'spinType:   %(spinType)s\n' +\
                           'hetatm:     %(hetatm)s\n' +\
                           'properties: %(properties)s'
-
-#        self.saveXML('name', 'nameDict'
-#                     'topology','pseudo','real',
-#                     'type','spinType','shift', 'hetatm','properties'
-#                    )
-#        nTdebug("XXXXXXXX Adding %r" % self)
 
     def __str__(self):
         if self.residueDef:
@@ -1099,9 +1116,9 @@ class AtomDef( NTtree ):
 
     def exportDef( self, stream = sys.stdout, convention=constants.INTERNAL ):
         """export definitions to stream"""
-        io.fprintf( stream, '\t#---------------------------------------------------------------\n')
-        io.fprintf( stream, '\tATOM %-8s\n',self.translate(convention))
-        io.fprintf( stream, '\t#---------------------------------------------------------------\n')
+        io.printf(stream, '\t#---------------------------------------------------------------\n')
+        io.printf(stream, '\tATOM %-8s\n',self.translate(convention))
+        io.printf(stream, '\t#---------------------------------------------------------------\n')
 
         # Topology; optionally convert
         if convention == constants.INTERNAL:
@@ -1123,7 +1140,7 @@ class AtomDef( NTtree ):
             #end for
             #print 'top2', top2
         #end if
-        io.fprintf( stream, "\t\t%s = %s\n", 'topology', repr(top2) )
+        io.printf(stream, "\t\t%s = %s\n", 'topology', repr(top2) )
 
         # clean the properties list
         props = []
@@ -1133,19 +1150,19 @@ class AtomDef( NTtree ):
                 props.append(prop)
             #end if
         #end for
-        io.fprintf( stream, "\t\t%s = %s\n", 'properties', repr(props) )
+        io.printf(stream, "\t\t%s = %s\n", 'properties', repr(props) )
 
         # Others
         for attr in ['nameDict','aliases','pseudo','real','type','spinType','shift','hetatm']:
             if self.has_key(attr):
-                io.fprintf( stream, "\t\t%s = %s\n", attr, repr(self[attr]) )
+                io.printf(stream, "\t\t%s = %s\n", attr, repr(self[attr]) )
         #end for
 
-        io.fprintf( stream, '\tEND_ATOM\n')
-#        io.fprintf( stream, '\t#---------------------------------------------------------------\n')
+        io.printf(stream, '\tEND_ATOM\n')
+#        io.printf(stream, '\t#---------------------------------------------------------------\n')
     #end def
-
 #end class
+
 
 class DihedralDef( NTtree ):
     def __init__( self, name, **kwds ):
@@ -1175,9 +1192,9 @@ class DihedralDef( NTtree ):
 
     def exportDef( self, stream = sys.stdout, convention=constants.INTERNAL ):
         """export definitions to stream"""
-        io.fprintf( stream, '\t#---------------------------------------------------------------\n')
-        io.fprintf( stream, '\tDIHEDRAL %-8s\n',self.name)
-        io.fprintf( stream, '\t#---------------------------------------------------------------\n')
+        io.printf(stream, '\t#---------------------------------------------------------------\n')
+        io.printf(stream, '\tDIHEDRAL %-8s\n',self.name)
+        io.printf(stream, '\t#---------------------------------------------------------------\n')
 
         if convention == constants.INTERNAL:
             atms = self.atoms
@@ -1198,14 +1215,14 @@ class DihedralDef( NTtree ):
             #end for
             #print 'atms', atms
         #end if
-        io.fprintf( stream, "\t\t%s = %s\n", 'atoms', repr(atms) )
+        io.printf(stream, "\t\t%s = %s\n", 'atoms', repr(atms) )
 
         for attr in ['karplus']:
-            io.fprintf( stream, "\t\t%s = %s\n", attr, repr(self[attr]) )
+            io.printf(stream, "\t\t%s = %s\n", attr, repr(self[attr]) )
         #end for
 
-        io.fprintf( stream, '\tEND_DIHEDRAL\n')
-#        io.fprintf( stream, '\t#---------------------------------------------------------------\n')
+        io.printf(stream, '\tEND_DIHEDRAL\n')
+#        io.printf(stream, '\t#---------------------------------------------------------------\n')
     #end for
 
     def postProcess(self):
@@ -1219,7 +1236,7 @@ class DihedralDef( NTtree ):
 #end class
 
 
-def importNameDefs( tableFile, name)   :
+def importNameDefs(tableFile, name)   :
     """Import residue and atoms name defs from tableFile"""
 
 #    nTdebug('==> Importing database file '+ tableFile )
@@ -1281,17 +1298,13 @@ def importNameDefs( tableFile, name)   :
         sys.exit(1)
 
     #Post-processing
-#    for res in mol.allResidueDefs():
-#        res.postProcess()
-#    for atm in mol.allAtomDefs():
-#        atm.postProcess()
     mol.postProcess()
 
     return mol
 #end def
 
 
-def translateResidueName( convention, resName, newConvention=constants.INTERNAL ):
+def translateResidueName(convention, resName, newConvention=constants.INTERNAL):
     """ Translate resName from convention to newConvention
         return None on error/no-translation
     """
@@ -1314,6 +1327,7 @@ def translateAtomName( convention, resName, atmName, newConvention=constants.INT
     return None
 #end def
 
+
 def saveToSML( rDefList, rootPath, convention=constants.INTERNAL ):
     """
     Save ResidueDefs of rDefList as SML files in rootPath; optionally translate to convention
@@ -1327,6 +1341,7 @@ def saveToSML( rDefList, rootPath, convention=constants.INTERNAL ):
         rdef.SMLhandler.toFile( rdef, path, convention=convention )
     #end for
 #end def
+
 
 def restoreFromSML( rootPath, mDef, convention=constants.INTERNAL ):
     """
@@ -1344,8 +1359,8 @@ def restoreFromSML( rootPath, mDef, convention=constants.INTERNAL ):
 #end def
 
 
-#NTdb = importNameDefs( os.path.realpath(cingPythonCingDir + '/Database/dbTable.' + constants.INTERNAL), name='NTdb')
-NTdb = MolDef( name = 'NTdb') # Database instance; to be filled later,otherwise we get circular imports
+# Database instance; to be filled later, otherwise we get circular imports
+NTdb = MolDef(name = 'NTdb')
 
 patch=False
 if patch:
@@ -1424,7 +1439,6 @@ if patch:
                                  )
         ad.postProcess()
         res.C.CterminalTopology = [(0,'CA'),(0,'O'),(0,'OXT')]
-
     #end for
 #end if
 
