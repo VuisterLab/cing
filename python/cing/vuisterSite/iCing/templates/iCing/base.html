@@ -1,0 +1,36 @@
+{% load staticfiles %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="{% static 'iCing/iCing.css' %}" />
+    {% block css %}{% endblock css %}
+    {% block scripts %}{% endblock scripts %}
+
+    <title>iCing: a web interface to CING</title>
+</head>
+<body>
+<header>
+    <img id="headerPic" src={% static "iCing/images/cing.png" %} />
+    <div class="headerText">
+        iCing
+        <div class="headerSmallText">
+            Validation of NMR structures
+        </div>
+    </div>
+</header>
+
+<div id="nav">
+    <a href="home.html" class="navOption" title="iCing">iCing</a>
+    <a href="upload.html" class="navOption" title="Upload">Upload</a>
+    <a href="edit.html" class="navOption" title="Edit">Edit</a>
+    <a href="run.html" class="navOption" title="Run">Run</a>
+    <a href="view.html" class="navOption" title="View">View</a>
+    <a href="help.html" class="navOption navHelp" title="Help">Help</a>
+</div>
+
+{% block body_block %}{% endblock %}
+
+</body>
+</html>

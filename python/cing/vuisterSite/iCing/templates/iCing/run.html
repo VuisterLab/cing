@@ -1,0 +1,25 @@
+{% extends 'iCing/base.html' %}
+{% load staticfiles %}
+
+{% block css %}
+    <link rel="stylesheet" type="text/css" href="{% static 'iCing/run.css' %}" />
+{% endblock css %}
+
+{% block body_block %}
+<div id="body">
+    <div class="bodyHeader">Run Log</div>
+    Submission:  <b>{{ submission_code }}</b>
+    <div id="runBox", class="shadow">
+        {{ cing_log }}
+    </div>
+<form action="{% url "run" submission_code %}" method="POST">
+    {% csrf_token %}
+    {% if run_finished %}
+        <input type="submit" value="View CING Report" name="report">
+    {% else %}
+        <input type="submit" value="Refresh" name="refresh">
+    {% endif %}
+</form>
+</div>
+
+{% endblock %}

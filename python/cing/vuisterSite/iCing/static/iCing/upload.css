@@ -1,0 +1,32 @@
+#uploadBox{
+    font-family: Arial, sans-serif;
+	font-size: 15px;
+    color: black;
+    height:150px;
+    width:80%;
+    border: #e3e8f3 solid thick;
+    border-radius: 5px;
+    padding: 5px;
+    overflow:hidden;
+}
+
+#uploadFirstRow {
+    position: relative;
+    font-weight: normal;
+    height: 20%;
+}
+
+#uploadSecondRow {
+    position: relative;
+    font-weight: normal;
+    height: 60%;
+}
+
+#uploadButton {
+    position: relative;
+    font-weight: normal;
+    margin-left: 50px;
+    height: 20px;
+    width: 100px;
+}
+

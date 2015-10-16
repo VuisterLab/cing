@@ -1,0 +1,85 @@
+{% extends 'iCing/base.html' %}
+{% load staticfiles %}
+
+{% block css %}
+    <link rel="stylesheet" type="text/css" href="{% static 'iCing/upload.css' %}" />
+{% endblock css %}
+
+{#{% block scripts %}#}
+{#    <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js"></script>#}
+{##}
+{#    <script language="javascript" type="text/javascript">#}
+{#    $(document).ready(function(){#}
+{##}
+{#        var ccpn = [#}
+{#            {display: "Project", value: "project" }];#}
+{##}
+{#        var cing = [#}
+{#            {display: "Project", value: "project" },#}
+{#            {display: "Validation Settings", value: "val-settings" }];#}
+{##}
+{#        $("#project_type").change(function() {#}
+{#                var parent = $(this).val();#}
+{##}
+{#                switch(parent){#}
+{#                      case 'ccpn':#}
+{#                        list(ccpn);#}
+{#                        break;#}
+{#                      case 'cing':#}
+{#                        list(cing);#}
+{#                        break;#}
+{##}
+{#                    default:#}
+{#                        $("#project_options").html('');#}
+{#                        break;#}
+{#                   }#}
+{#        });#}
+{##}
+{#        function list(array_list)#}
+{#        {#}
+{#            $("#project_options").html("");#}
+{#            $(array_list).each(function (i) {#}
+{#                $("#project_options").append("<option value=\""+array_list[i].value+"\">"+array_list[i].display+"</option>");#}
+{#            });#}
+{#        }#}
+{##}
+{#        });#}
+{#    </script>#}
+{##}
+{#{% endblock scripts %}#}
+
+{% block body_block %}
+<div id="body">
+    <div class="bodyHeader">Upload</div>
+    <p>Or visit <a href="http://nmr.le.ac.uk">NRG-CING</a> for a CING validation report of an existing PDB NMR entry.</p>
+    <div id="uploadBox">
+
+        <div id="uploadFirstRow">
+        </div>
+
+        <div id="uploadSecondRow">
+            <form action="{% url "upload" %}" method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                {{ form.non_field_errors }}
+                <div id="file-upload" style="display: inline-block;">
+                    {{ form.user_file }}
+                </div>
+                <div id="file-options" style="display: inline-block;float:right;">
+                    {{ form.format }}
+                </div>
+                <p><input type='submit' name='upload_button' value='upload'></p>
+            </form>
+        </div>
+        <div>
+            Or download an example
+            <a href={% static "iCing/examples/1brv.tgz" %}>CCPN Project</a>,
+{#            <a href={% static "iCing/examples/1brv.cing.tgz" %}>CING Project</a>,#}
+            <a href={% static "iCing/examples/CopZ-in.cyana.tgz" %}>CYANA Project</a>
+            or <a href={% static "iCing/examples/1brv.pdb" %}>PDB File</a>.
+        </div>
+    </div>
+    <div id="forwardBackRow">
+    </div>
+</div>
+
+{% endblock %}
