@@ -1,0 +1,17 @@
+#runBox{
+    font-family: Courier, sans-serif;
+	font-size: 15px;
+    color: black;
+    height:150px;
+    width:90%;
+    border: #e3e8f3 solid thick;
+    border-radius: 5px;
+    padding: 2px;
+    overflow:hidden;
+}
+
+.shadow {
+   -moz-box-shadow:    inset 0 0 5px #000000;
+   -webkit-box-shadow: inset 0 0 5px #000000;
+   box-shadow:         inset 0 0 5px #000000;
+}

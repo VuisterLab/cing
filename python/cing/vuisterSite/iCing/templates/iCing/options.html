@@ -1,0 +1,44 @@
+{% extends 'iCing/base.html' %}
+{% load staticfiles %}
+
+{% block css %}
+    <link rel="stylesheet" type="text/css" href="{% static 'iCing/options.css' %}" />
+{% endblock css %}
+
+{% block body_block %}
+<div id="body">
+    <div class="bodyHeader">Options</div>
+
+    Submission:  <b>{{ submission_code }}</b>,
+    Type:  <b>{{ submission_type }}</b>
+    <form action="{% url "options" submission_code %}" method="POST">
+        {% csrf_token %}
+        <div id="options">
+            <div id="cingOptionsBox1">
+                {{ form.non_field_errors }}
+                <p>
+                    {{ form.ranges.errors }}
+                    {{ form.ranges.label_tag }}
+                    {{ form.ranges }}
+                    {{ ranges }}
+                    (E.g. 175,177-189)
+                </p>
+                <p>
+                    {{ form.ensemble.errors }}
+                    {{ form.ensemble.label_tag }}
+                    {{ form.ensemble }}
+                    {{ ensemble }}
+                    (E.g. 0,3-8)
+                </p>
+                <p>
+                    {{ form.verbosity.errors }}
+                    {{ form.verbosity.label_tag }}
+                    {{ form.verbosity }}
+                </p>
+                <input type="submit" value="Run CING" style="float:right">
+            </div >
+        </div>
+    </form>
+</div>
+
+{% endblock %}

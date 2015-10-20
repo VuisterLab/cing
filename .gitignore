@@ -64,3 +64,24 @@ coverage.xml
 # Sphinx documentation
 docs/_build/
 
+# rope
+.ropeproject/
+
+# Vim
+*.sw[a-z]
+*.un~
+Session.vim
+.netrwhist
+*~
+
+# CING
+cing.csh
+cing.sh
+python/cing/Libs/cython/superpose.c
+
+# pylint
+pylint.txt
+
+# sloccount
+sloccount.sc
+

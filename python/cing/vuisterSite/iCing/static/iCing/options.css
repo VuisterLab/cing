@@ -1,0 +1,27 @@
+#options{
+    font-family: Arial, sans-serif;
+    font-size: 15px;
+    color: black;
+    width:80%;
+    overflow:hidden;
+}
+
+#cingOptionsBox1{
+    height:150px;
+    border: #e3e8f3 solid thick;
+    border-radius: 5px;
+    padding: 5px;
+    overflow:hidden;
+    margin-bottom: 10px;
+    width:60%;
+
+}
+
+#cingOptionsBox2{
+    height:250px;
+    border: #e3e8f3 solid thick;
+    border-radius: 5px;
+    padding: 5px;
+    overflow:hidden;
+    margin-bottom: 10px;
+}

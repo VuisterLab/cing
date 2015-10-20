@@ -7,7 +7,7 @@
 	commonName = 'LGLY'
 	shortName  = 'LGLY'
 	comment    = 'L-glycine'
-	nameDict   = {'INTERNAL_0': 'LGLY', 'BMRBd': None, 'CYANA': 'LGLY', 'CYANA2': 'LGLY', 'INTERNAL_1': 'LGLY', 'IUPAC': None, 'AQUA': None, 'PDB': None, 'XPLOR': None}
+	nameDict   = {'INTERNAL_0': 'LGLY', 'BMRBd': None, 'CYANA': 'LGLY', 'STAP': None, 'CYANA2': 'LGLY', 'INTERNAL_1': 'LGLY', 'IUPAC': None, 'AQUA': None, 'PDB': None, 'XPLOR': None}
 	properties = ['protein']
 
 	dihedrals  = <NTlist>
@@ -38,7 +38,7 @@
 		topology   = []
 		real       = []
 		pseudo     = None
-		nameDict   = {'INTERNAL_0': 'N', 'BMRBd': None, 'CYANA': 'N', 'CYANA2': 'N', 'INTERNAL_1': 'N', 'IUPAC': None, 'AQUA': None, 'PDB': None, 'XPLOR': None}
+		nameDict   = {'INTERNAL_0': 'N', 'BMRBd': None, 'CYANA': 'N', 'STAP': None, 'CYANA2': 'N', 'INTERNAL_1': 'N', 'IUPAC': None, 'AQUA': None, 'PDB': None, 'XPLOR': None}
 		aliases    = []
 		type       = 'PSEUD'
 		spinType   = '15N'
@@ -52,7 +52,7 @@
 		topology   = []
 		real       = []
 		pseudo     = None
-		nameDict   = {'INTERNAL_0': 'Q1', 'BMRBd': None, 'CYANA': 'Q1', 'CYANA2': 'Q1', 'INTERNAL_1': 'Q1', 'IUPAC': None, 'AQUA': None, 'PDB': None, 'XPLOR': None}
+		nameDict   = {'INTERNAL_0': 'Q1', 'BMRBd': None, 'CYANA': 'Q1', 'STAP': None, 'CYANA2': 'Q1', 'INTERNAL_1': 'Q1', 'IUPAC': None, 'AQUA': None, 'PDB': None, 'XPLOR': None}
 		aliases    = []
 		type       = 'PSEUD'
 		spinType   = '1H'
@@ -66,7 +66,7 @@
 		topology   = []
 		real       = []
 		pseudo     = None
-		nameDict   = {'INTERNAL_0': 'Q2', 'BMRBd': None, 'CYANA': 'Q2', 'CYANA2': 'Q2', 'INTERNAL_1': 'Q2', 'IUPAC': None, 'AQUA': None, 'PDB': None, 'XPLOR': None}
+		nameDict   = {'INTERNAL_0': 'Q2', 'BMRBd': None, 'CYANA': 'Q2', 'STAP': None, 'CYANA2': 'Q2', 'INTERNAL_1': 'Q2', 'IUPAC': None, 'AQUA': None, 'PDB': None, 'XPLOR': None}
 		aliases    = []
 		type       = 'PSEUD'
 		spinType   = '1H'
@@ -80,7 +80,7 @@
 		topology   = []
 		real       = []
 		pseudo     = None
-		nameDict   = {'INTERNAL_0': 'Q21', 'BMRBd': None, 'CYANA': 'Q21', 'CYANA2': 'Q21', 'INTERNAL_1': 'Q21', 'IUPAC': None, 'AQUA': None, 'PDB': None, 'XPLOR': None}
+		nameDict   = {'INTERNAL_0': 'Q21', 'BMRBd': None, 'CYANA': 'Q21', 'STAP': None, 'CYANA2': 'Q21', 'INTERNAL_1': 'Q21', 'IUPAC': None, 'AQUA': None, 'PDB': None, 'XPLOR': None}
 		aliases    = []
 		type       = 'PSEUD'
 		spinType   = '1H'
@@ -94,7 +94,7 @@
 		topology   = []
 		real       = []
 		pseudo     = None
-		nameDict   = {'INTERNAL_0': 'Q22', 'BMRBd': None, 'CYANA': 'Q22', 'CYANA2': 'Q22', 'INTERNAL_1': 'Q22', 'IUPAC': None, 'AQUA': None, 'PDB': None, 'XPLOR': None}
+		nameDict   = {'INTERNAL_0': 'Q22', 'BMRBd': None, 'CYANA': 'Q22', 'STAP': None, 'CYANA2': 'Q22', 'INTERNAL_1': 'Q22', 'IUPAC': None, 'AQUA': None, 'PDB': None, 'XPLOR': None}
 		aliases    = []
 		type       = 'PSEUD'
 		spinType   = '1H'
@@ -108,7 +108,7 @@
 		topology   = []
 		real       = []
 		pseudo     = None
-		nameDict   = {'INTERNAL_0': 'Q3', 'BMRBd': None, 'CYANA': 'Q3', 'CYANA2': 'Q3', 'INTERNAL_1': 'Q3', 'IUPAC': None, 'AQUA': None, 'PDB': None, 'XPLOR': None}
+		nameDict   = {'INTERNAL_0': 'Q3', 'BMRBd': None, 'CYANA': 'Q3', 'STAP': None, 'CYANA2': 'Q3', 'INTERNAL_1': 'Q3', 'IUPAC': None, 'AQUA': None, 'PDB': None, 'XPLOR': None}
 		aliases    = []
 		type       = 'PSEUD'
 		spinType   = '1H'
@@ -122,7 +122,7 @@
 		topology   = []
 		real       = []
 		pseudo     = None
-		nameDict   = {'INTERNAL_0': 'C', 'BMRBd': None, 'CYANA': 'C', 'CYANA2': 'C', 'INTERNAL_1': 'C', 'IUPAC': None, 'AQUA': None, 'PDB': None, 'XPLOR': None}
+		nameDict   = {'INTERNAL_0': 'C', 'BMRBd': None, 'CYANA': 'C', 'STAP': None, 'CYANA2': 'C', 'INTERNAL_1': 'C', 'IUPAC': None, 'AQUA': None, 'PDB': None, 'XPLOR': None}
 		aliases    = ['C', 'CO']
 		type       = 'PSEUD'
 		spinType   = '13C'
@@ -136,7 +136,7 @@
 		topology   = []
 		real       = []
 		pseudo     = None
-		nameDict   = {'INTERNAL_0': 'O', 'BMRBd': None, 'CYANA': 'O', 'CYANA2': 'O', 'INTERNAL_1': 'O', 'IUPAC': None, 'AQUA': None, 'PDB': None, 'XPLOR': 'O,OT1'}
+		nameDict   = {'INTERNAL_0': 'O', 'BMRBd': None, 'CYANA': 'O', 'STAP': 'O,OT1', 'CYANA2': 'O', 'INTERNAL_1': 'O', 'IUPAC': None, 'AQUA': None, 'PDB': None, 'XPLOR': 'O,OT1'}
 		aliases    = ['O', "O'"]
 		type       = 'PSEUD'
 		spinType   = '16O'
@@ -150,11 +150,11 @@
 		topology   = [(0, 'N')]
 		real       = []
 		pseudo     = None
-		nameDict   = {'INTERNAL_0': 'H2', 'INTERNAL_1': 'H2', 'IUPAC': 'H2', 'CCPN': 'H2', 'XPLOR': 'HT2'}
+		nameDict   = {'CCPN': 'H2', 'STAP': 'H2,HT2', 'IUPAC': 'H2', 'INTERNAL_0': 'H2', 'INTERNAL_1': 'H2', 'XPLOR': 'HT2'}
 		aliases    = []
 		type       = 'H_AMI'
 		spinType   = '1H'
-		shift      = NTdict( average = 8.3000000000000007, sd = 0.5 )
+		shift      = NTdict( average = 8.3, sd = 0.5 )
 		hetatm     = False
 		properties = ['VAL', 'V', 'isProton', 'proton', 'isNotCarbon', 'notcarbon', 'isNotNitrogen', 'notnitrogen', 'isNotSulfur', 'isNotSulphur', 'notsulfur', 'notsulphur', 'isBackbone', 'backbone', 'isNotAromatic', 'notaromatic', 'isNotMethyl', 'notmethyl', 'isNotMethylProton', 'notmethylproton', 'isNotPseudoAtom', 'notpseudoatom', 'hasNoPseudoAtom', 'hasnopseudoatom', 'isNotMethylene', 'notmethylene', 'isNotMethyleneProton', 'notmethyleneproton']
 	</AtomDef>
@@ -164,11 +164,11 @@
 		topology   = [(0, 'N')]
 		real       = []
 		pseudo     = None
-		nameDict   = {'INTERNAL_0': 'H3', 'INTERNAL_1': 'H3', 'IUPAC': 'H3', 'CCPN': 'H3', 'XPLOR': 'HT3'}
+		nameDict   = {'CCPN': 'H3', 'STAP': 'H3,HT3', 'IUPAC': 'H3', 'INTERNAL_0': 'H3', 'INTERNAL_1': 'H3', 'XPLOR': 'HT3'}
 		aliases    = []
 		type       = 'H_AMI'
 		spinType   = '1H'
-		shift      = NTdict( average = 8.3000000000000007, sd = 0.5 )
+		shift      = NTdict( average = 8.3, sd = 0.5 )
 		hetatm     = False
 		properties = ['VAL', 'V', 'isProton', 'proton', 'isNotCarbon', 'notcarbon', 'isNotNitrogen', 'notnitrogen', 'isNotSulfur', 'isNotSulphur', 'notsulfur', 'notsulphur', 'isBackbone', 'backbone', 'isNotAromatic', 'notaromatic', 'isNotMethyl', 'notmethyl', 'isNotMethylProton', 'notmethylproton', 'isNotPseudoAtom', 'notpseudoatom', 'hasNoPseudoAtom', 'hasnopseudoatom', 'isNotMethylene', 'notmethylene', 'isNotMethyleneProton', 'notmethyleneproton']
 	</AtomDef>
@@ -178,7 +178,7 @@
 		topology   = [(0, 'C')]
 		real       = []
 		pseudo     = None
-		nameDict   = {'INTERNAL_0': 'OXT', 'INTERNAL_1': 'OXT', 'IUPAC': "OXT,O''", 'CCPN': "O''", 'XPLOR': 'OT2'}
+		nameDict   = {'CCPN': "O''", 'STAP': 'OXT,OT2', 'IUPAC': "OXT,O''", 'INTERNAL_0': 'OXT', 'INTERNAL_1': 'OXT', 'XPLOR': 'OT2'}
 		aliases    = ['OXT', "O''"]
 		type       = 'O_BYL'
 		spinType   = '16O'

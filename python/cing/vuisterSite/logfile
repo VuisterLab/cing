@@ -1,0 +1,7 @@
+[2015-Oct-09 09:46:00] INFO [iCing.webUtils:104] Starting: ppi9u2 from 127.0.0.1
+[2015-Oct-09 09:46:00] DEBUG [iCing.webUtils:105] Calling: cing --name 1brv --script doValidateiCing.py --initPDB 1brv.pdb --verbosity 3
+[2015-Oct-09 09:49:22] INFO [iCing.webUtils:104] Starting: 7auy21 from 127.0.0.1
+[2015-Oct-09 10:00:44] INFO [iCing.webUtils:104] Starting: lyvpq5 from 127.0.0.1
+[2015-Oct-09 10:58:06] INFO [iCing.ccpnUtils:126] Starting: NtGyAH from CCPN:127.0.0.1
+[2015-Oct-09 11:00:39] INFO [iCing.ccpnUtils:128] Starting: ZRK55v from CCPN:127.0.0.1
+[2015-Oct-09 11:01:21] INFO [iCing.ccpnUtils:128] Starting: qrElVq from CCPN:127.0.0.1

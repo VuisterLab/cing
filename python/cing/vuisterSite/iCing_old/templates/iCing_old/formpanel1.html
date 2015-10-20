@@ -1,0 +1,196 @@
+{% load staticfiles %}
+
+<td align="left" style="vertical-align: top;">
+    <table cellspacing="11" cellpadding="0">
+        <tbody>
+            <tr>
+                <td align="left" style="vertical-align: top;">
+                    <div class="h1">Upload</div>
+                </td>
+            </tr>
+            <tr>
+                <td align="left" style="vertical-align: top;">
+                    <div class="gwtsolutions-Message" style="display: none;">invisible empty msg</div>
+                </td>
+            </tr>
+            <tr>
+                <td align="left" style="vertical-align: top;">
+                    <div class="gwt-HTML">
+                        <p>Or visit <a href="http://nmr.cmbi.ru.nl/NRG-CING">NRG-CING</a> for a CING validation report of an existing PDB NMR entry.</p>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td align="left" style="vertical-align: top;">
+                    <table cellspacing="0" cellpadding="0" class="gwt-DecoratorPanel">
+                        <tbody>
+                            <tr class="top">
+                                <td class="topLeft">
+                                    <div class="topLeftInner"></div>
+                                </td>
+                                <td class="topCenter">
+                                    <div class="topCenterInner"></div>
+                                </td>
+                                <td class="topRight">
+                                    <div class="topRightInner"></div>
+                                </td>
+                            </tr>
+                            <tr class="middle">
+                                <td class="middleLeft">
+                                    <div class="middleLeftInner"></div>
+                                </td>
+                                <td class="middleCenter">
+                                    <div class="middleCenterInner">
+                                        <table cellspacing="11" cellpadding="0">
+                                            <tbody>
+                                                <tr>
+                                                    <td align="left" style="vertical-align: top;">
+                                                        <img class="gwt-Image" src={% static "iCing/images/paperclip.png" %} style="width: 24px; height: 24px;">
+                                                    </td>
+                                                    <td align="left" style="vertical-align: top;">
+                                                        <table>
+                                                            <colgroup>
+                                                                <col>
+                                                            </colgroup>
+                                                            <tbody>
+                                                                <tr>
+                                                                    <td>
+                                                                        <button type="button" tabindex="0" class="gwt-Button" title="Select file(s) to upload." style="display: none;">Upload file</button>
+                                                                    </td>
+                                                                    <td></td>
+                                                                    <td>
+                                                                        <div class="gwt-Label">Program</div>
+                                                                    </td>
+                                                                    <td>
+                                                                        <div class="gwt-Label">Type</div>
+                                                                    </td>
+                                                                    <td>
+                                                                        <div class="gwt-Label">Subtype</div>
+                                                                    </td>
+                                                                    <td>
+                                                                        <div class="gwt-Label">Other</div>
+                                                                    </td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td>
+                                                                        <span class="gwt-CheckBox">
+                                                                            <input type="checkbox" id="gwt-uid-16" tabindex="0" checked="">
+                                                                            <label for="gwt-uid-16"></label>
+                                                                        </span>
+                                                                    </td>
+                                                                    <td>
+                                                                        <form target="FormPanel_1" enctype="multipart/form-data" method="post" action="https://nmr.le.ac.uk/icing/icing/serv/iCingServlet">
+                                                                            <table cellspacing="0" cellpadding="0">
+                                                                                <tbody>
+                                                                                    <tr>
+                                                                                        <td align="left" style="vertical-align: top;">
+                                                                                            <input type="hidden" name="Action" value="Save">
+                                                                                        </td>
+                                                                                    </tr>
+                                                                                    <tr>
+                                                                                        <td align="left" style="vertical-align: top;">
+                                                                                            <input type="hidden" name="AccessKey" value="RCnMtR">
+                                                                                        </td>
+                                                                                    </tr>
+                                                                                    <tr>
+                                                                                        <td align="left" style="vertical-align: top;">
+                                                                                            <input type="hidden" name="UserId" value="ano">
+                                                                                        </td>
+                                                                                    </tr>
+                                                                                    <tr>
+                                                                                        <td align="left" style="vertical-align: top;">
+                                                                                            <input type="file" class="gwt-FileUpload" name="UploadFile">
+                                                                                        </td>
+                                                                                    </tr>
+                                                                                    <tr>
+                                                                                        <td align="left" style="vertical-align: top;">
+                                                                                            <div class="gwt-Label" style="display: none;">This message should not show up.</div>
+                                                                                        </td>
+                                                                                    </tr>
+                                                                                </tbody>
+                                                                            </table>
+                                                                        </form>
+                                                                    </td>
+                                                                    <td>
+                                                                        <select tabindex="0" class="gwt-ListBox" size="1">
+                                                                            <option value="CCPN">CCPN</option>
+                                                                            <option value="CING">CING</option>
+                                                                            <option value="CYANA">CYANA</option>
+                                                                            <option value="PDB">PDB</option>
+                                                                        </select>
+                                                                    </td>
+                                                                    <td>
+                                                                        <select tabindex="0" class="gwt-ListBox" size="1" disabled="">
+                                                                            <option value="project">project</option>
+                                                                        </select>
+                                                                    </td>
+                                                                    <td>
+                                                                        <select tabindex="0" class="gwt-ListBox" size="1" disabled="">
+                                                                            <option value="n/a">n/a</option>
+                                                                        </select>
+                                                                    </td>
+                                                                    <td>
+                                                                        <select tabindex="0" class="gwt-ListBox" size="1" disabled="">
+                                                                            <option value="n/a">n/a</option>
+                                                                        </select>
+                                                                    </td>
+                                                                    <td></td>
+                                                                    <td>
+                                                                        <button type="button" tabindex="0" class="gwt-Button" style="display: none;">Upload</button>
+                                                                    </td>
+                                                                    <td>
+                                                                        <div class="gwt-HTML">E.g. <a href={% static "iCing/1brv.tgz" %}>1brv.tgz</a></div>
+                                                                    </td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td></td>
+                                                                    <td>
+                                                                        <button type="button" tabindex="0" class="gwt-Button" title="Add another upload.">Upload another file</button>
+                                                                    </td>
+                                                                </tr>
+                                                            </tbody>
+                                                        </table>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </td>
+                                <td class="middleRight">
+                                    <div class="middleRightInner"></div>
+                                </td>
+                            </tr>
+                            <tr class="bottom">
+                                <td class="bottomLeft">
+                                    <div class="bottomLeftInner"></div>
+                                </td>
+                                <td class="bottomCenter">
+                                    <div class="bottomCenterInner"></div>
+                                </td>
+                                <td class="bottomRight">
+                                    <div class="bottomRightInner"></div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </td>
+            </tr>
+            <tr>
+                <td align="left" style="vertical-align: top;">
+                    <table cellspacing="11" cellpadding="0">
+                        <tbody>
+                            <tr>
+                                <td align="left" style="vertical-align: top;">
+                                    <button type="button" tabindex="0" class="gwt-Button">Back</button>
+                                </td>
+                                <td align="left" style="vertical-align: top;">
+                                    <button type="button" tabindex="0" class="gwt-Button" title="Set the criteria.">Forward</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</td>
