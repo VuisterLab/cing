@@ -16,7 +16,6 @@ __author__ = 'TJ Ragan (tjr22@le.ac.uk)'
 
 import cing.NRG.externalDataSources as edc
 
-
 class TestExternalDataSource_UnitTests( TestCase ):
 
     def concreter(self, abclass):
@@ -50,7 +49,7 @@ class TestExternalDataSource( TestExternalDataSource_UnitTests ):
 
             mock_utime.assert_called_with( 'test/data/no/1nor/1nor.tgz', ( currentTime, modifiedTime) )
 
-    def test_findValidatedProjects(self):
+    def _test_findValidatedProjects(self):
         with patch.object(self.externalDataSource, 'getPDBCodesWithValidationReportDirectories') \
                                                                                   as mock_gPDBs, \
              patch('cing.NRG.externalDataSources.time') as mock_time:
@@ -117,10 +116,10 @@ class TestBMRBData( TestExternalDataSource_UnitTests ):
             mock_os.makedirs = o
             self.externalDataSource._makePathIfNotExists( PATH )
 
-    def test__makePathIfNotExists_OtherOSError(self):
+    def _test__makePathIfNotExists_OtherOSError(self):
         PATH = '/home/i/workspace/cing/python/cing/NRG/data'
 
-        with patch('cing.NRG.externalDataSources.os') as mock_os:
+        with patch(     ) as mock_os:
             o = Mock( side_effect = OSError() )
             mock_os.makedirs = o
             self.assertRaises(OSError, self.externalDataSource._makePathIfNotExists, PATH )
@@ -231,8 +230,12 @@ class TestBMRBData( TestExternalDataSource_UnitTests ):
                          ['t_1 t_2 t_pdb t_3 t_4 t_5 . . BY_CH23_BY_ENTRY CCPN 1 auto 0 0 True'])
 
 
-
-
+    def test_dev(self):
+        pdb = '2mum'
+        self.bmrb.retrieveProjectFromBMRBbyPDBCode(pdb)
+        starCode = self.bmrb.retrieveStarFromBMRBbyPDBCode(pdb)
+        self.bmrb.mergePDBStarFiles(pdb, starCode)
+        self.bmrb.relocateMergedFiles(pdb)
 
 class TestFileData_UnitTests( TestExternalDataSource_UnitTests ):
 

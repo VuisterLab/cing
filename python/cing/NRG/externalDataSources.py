@@ -4,21 +4,22 @@ import os
 import errno
 from urllib2 import urlopen
 import re
-import time
-import datetime
 import abc
 import urllib
-import subprocess
 import time
 
+import requests
 from pandas import DataFrame
 from pandas import to_datetime
 from pandas import notnull
+
+from cing.Scripts.FC.mergeNrgBmrbShifts import MergeNrgBmrbShifts
 
 __author__ = 'TJ Ragan (tjr22@le.ac.uk)'
 
 
 VALIDATION_REPORT_LOCATION = '/mnt/data/D/NRG-CING'
+# VALIDATION_REPORT_LOCATION = '/Users/tjr22/Desktop/testing'
 CING_HOME = '~/workspace/cing/python/cing/'
 PYTHON_EXECUTABLE = 'python'
 VALIDATION_SCRIPT_LOCATION = os.path.join(CING_HOME, 'Scripts', 'validateEntry.py')
@@ -221,8 +222,13 @@ class ExternalDataSource( object ):
 
 
 class BMRBData( ExternalDataSource ):
+    NRG_PDB_BMRB_XREF_BASE = 'http://www.bmrb.wisc.edu/search/simplesearch.php'
+    NRG_PDB_BMRB_XREF_REGEX_STRING = 'bmrbId=([0-9]+)'
+
+    STAR_DATA_URL_BASE = 'http://rest.bmrb.wisc.edu/bmrb/NMR-STAR2/'
+
     DATA_URL_BASE = 'http://www.bmrb.wisc.edu/ftp/pub/bmrb/nmr_pdb_integrated_data/coordinates_restraints_chemshifts/all/ccpn/'
-    CODES_DATES_REGEX_STRING = '([0-9][a-z0-9]{3}).+([0-3][0-9]-[A-Z][a-z]{2}-[0-9]{4} [0-9]{2}:[0-9]{2})'
+    CCPN_CODES_DATES_REGEX_STRING = r'([0-9][a-z0-9]{3}).+([0-3][0-9]-[A-Z][a-z]{2}-[0-9]{4} [0-9]{2}:[0-9]{2})'
     CODE_STORAGE_FILE_NAME = 'bmrbEntryList.csv'
 
     def __init__( self, *arg, **kwargs ):
@@ -240,7 +246,7 @@ class BMRBData( ExternalDataSource ):
         return response.read()
 
     def _extractCodesDatesFromFTPListing( self, ftpListingText ):
-        return re.findall( self.CODES_DATES_REGEX_STRING, ftpListingText )
+        return re.findall( self.CCPN_CODES_DATES_REGEX_STRING, ftpListingText )
 
 
     def prepareEntriesInQueue( self , force=False):
@@ -259,6 +265,15 @@ class BMRBData( ExternalDataSource ):
             if force or shouldDownload:
                 print('    Downloading {} from BMRB... '.format( entry ))
                 self.retrieveProjectFromBMRBbyPDBCode( entry )
+                try:
+                    print('    Trying to retrieve Star file for chemical shifts...')
+                    starCode = self.retrieveStarFromBMRBbyPDBCode( entry )
+                    self.mergePDBStarFiles( entry, starCode )
+                    self.relocateMergedFiles( entry )
+                    print('    Star file integrated.')
+                except:
+                    print('    Failed.')
+                    self.relocateOriginalFile( entry )
                 ts = self.entryCodes[self.entryCodes['pdb'] == entry]['date'].tolist()[0]
                 ExternalDataSource.setDataTimestamp( entry, ts )
                 print('    done.  {} remaining.'.format( qll ))
@@ -268,11 +283,51 @@ class BMRBData( ExternalDataSource ):
     @classmethod
     def retrieveProjectFromBMRBbyPDBCode( cls, pdbCode ):
         projectLocation = cls.DATA_URL_BASE + pdbCode + '/' + pdbCode + '.tgz'
-        downloadLocation = os.path.join( VALIDATION_REPORT_LOCATION, 'data', pdbCode[1:3],
-                                         pdbCode , pdbCode + '.tgz')
+        downloadLocation = os.path.join( VALIDATION_REPORT_LOCATION, 'data', 'origCcpnProjects', pdbCode)
         cls.makeEntryValidationReportLocation( pdbCode )
-        urllib.urlretrieve(projectLocation, downloadLocation)
+        if not os.path.exists( downloadLocation ):
+            os.makedirs( downloadLocation )
+        urllib.urlretrieve(projectLocation, os.path.join(downloadLocation, 'linkNmrStarData.zip'))
 
+    @classmethod
+    def retrieveStarFromBMRBbyPDBCode( cls, pdbCode ):
+        starCode = cls.getStarCodeFromPDBCode( pdbCode )
+
+        projectLocation = cls.STAR_DATA_URL_BASE + starCode
+        downloadLocation = os.path.join( VALIDATION_REPORT_LOCATION, 'data', 'bmrb', 'bmr'+starCode)
+        cls.makeEntryValidationReportLocation( downloadLocation )
+        urllib.urlretrieve(projectLocation, os.path.join(downloadLocation, starCode+'_2.1.str.txt'))
+        return starCode
+
+    @classmethod
+    def getStarCodeFromPDBCode( cls, pdbCode ):
+        r = requests.get( cls.NRG_PDB_BMRB_XREF_BASE, params={ 'pdbid': pdbCode,
+                                                               'show_bmrbid': 'on',
+                                                               'output': 'html'
+                                                             }
+                        )
+        bmrb_id = re.search( cls.NRG_PDB_BMRB_XREF_REGEX_STRING, r.text )
+        starCode = bmrb_id.groups( )[ 0 ]
+        return starCode
+
+    @classmethod
+    def mergePDBStarFiles( cls, pdbCode, starCode):
+        mergeOutputLocation = os.path.join( VALIDATION_REPORT_LOCATION, 'data', 'jointCcpnProjects')
+        if not os.path.exists( mergeOutputLocation ):
+            os.makedirs( mergeOutputLocation )
+        MergeNrgBmrbShifts(['', pdbCode, '-bmrbCodes', 'bmr'+starCode, '-force', '-raise', '-noGui'])
+
+    @classmethod
+    def relocateMergedFiles( cls, pdbCode ):
+        mergeOutputFile = os.path.join( VALIDATION_REPORT_LOCATION, 'data', 'jointCcpnProjects', pdbCode+'.tgz')
+        cingInputFile = os.path.join( VALIDATION_REPORT_LOCATION, 'data', pdbCode[1:3], pdbCode, pdbCode+'.tgz')
+        os.rename(mergeOutputFile, cingInputFile)
+
+    @classmethod
+    def relocateOriginalFile( cls, pdbCode ):
+        downloadFile = os.path.join( VALIDATION_REPORT_LOCATION, 'data', 'origCcpnProjects', pdbCode, 'linkNmrStarData.zip')
+        cingInputFile = os.path.join( VALIDATION_REPORT_LOCATION, 'data', pdbCode[1:3], pdbCode, pdbCode+'.tgz')
+        os.rename(downloadFile, cingInputFile)
 
 
 class CASDData( ExternalDataSource ):

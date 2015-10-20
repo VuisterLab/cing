@@ -2,6 +2,7 @@
 from __future__ import division, print_function, absolute_import, unicode_literals
 __author__ = 'TJ Ragan (tjr22@le.ac.uk)'
 
+import warnings
 import begin
 
 try:
@@ -71,13 +72,13 @@ def queueAll():
 
 
 @begin.subcommand
-def queue(pdb_code):
+def queueSingle(pdb_code):
     dataSource.loadEntryCodes()
     availableEntries = dataSource.entryCodes.pdb.tolist()
     if pdb_code in availableEntries:
         dataSource.queuedEntryCodes.append(pdb_code)
         print('Preparing {}...'.format( pdb_code ))
-        dataSource.prepareEntriesInQueue()
+        dataSource.prepareEntriesInQueue( force=True )
         print('Queueing entry.')
         runValidateEntryCommands(dataSource.make_validateEntryPy_Commands())
     else:
@@ -85,6 +86,16 @@ def queue(pdb_code):
             pdb_code,
             dataSource.DATA_URL_BASE
         ))
+
+
+@begin.subcommand
+def queue(pdb_code):
+    for pdb_code in pdb_codes.split(','):
+        try:
+            queue(pdb_code)
+        except ValueError as e:
+            warnings.warn(str(e))
+
 
 
 @begin.start
