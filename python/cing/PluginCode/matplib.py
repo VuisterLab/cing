@@ -1013,7 +1013,7 @@ class NTplotSet( NTdict ):
                   'figure.dpi':       dpi,
                   'figure.figsize':   fig_size,
                   'savefig.dpi':      dpi,
-                  'savefig.figsize':  fig_size,
+                  # 'savefig.figsize':  fig_size,
                    }
         rcParams.update(params)
         figure = gcf()
