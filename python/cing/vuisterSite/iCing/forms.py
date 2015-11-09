@@ -8,7 +8,7 @@ class UploadFileForm(forms.ModelForm):
 
     class Meta:
         model = Submission
-        fields = ['format']
+        fields = ['submission_type']
 
 
 class RunSetupForm(forms.ModelForm):

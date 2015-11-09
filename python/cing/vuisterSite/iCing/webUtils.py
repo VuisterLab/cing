@@ -99,25 +99,32 @@ class CingCommand(object):
         self.ensemble = ensemble
 
     @property
+    def submission_code(self):
+        return self._submission_code
+
+    @submission_code.setter
     def submission_code(self, submission_code):
-        print('Setting up by submission code.')
-        submission_code = self.submission_code
+        self._submission_code = submission_code
         submission = Submission.objects.get(code=submission_code)
         self.username = submission.username
         self.submissionName = submission.name
         self.submissionFile = submission.filename
-        self.submission_type = submission.format
+        self.submission_type = submission.submission_type
         self.verbosity = submission.verbosity
         self.ranges = submission.ranges
         self.ensemble = submission.ensemble
 
     @property
+    def verbosity(self):
+        return self._verbosity
+
+    @verbosity.setter
     def verbosity(self, verbosity):
         verbMap = {'low': 3,
                    'medium': 6,
                    'high': 9}
         if verbosity in verbMap:
-            self.verbosity = verbMap[verbosity]
+            self._verbosity = verbMap[verbosity]
 
 
     def getRunDirectory(self):

@@ -29,14 +29,14 @@ class UploadView(generic.FormView):
         submission.filename = self.request.FILES['user_file'].name
         submission.name = submission.filename.split('.')[0]
         submission.ip = self.request.META['REMOTE_ADDR']
-        requestedSubmissionType = self.request.POST['format']
+        requestedSubmissionType = self.request.POST['submission_type']
         if requestedSubmissionType != u'auto':
             if determinedSubmissionType != 'unknown':
                 assert requestedSubmissionType == determinedSubmissionType
-            submission.format = requestedSubmissionType
+            submission.submission_type = requestedSubmissionType
 
         else:
-            submission.format = determinedSubmissionType
+            submission.submission_type = determinedSubmissionType
 
         submission.save()
         return redirect('options', submission.code)
@@ -67,7 +67,7 @@ class OptionsView(generic.FormView):
         context = super(OptionsView, self).get_context_data(**kwargs)
         submission = Submission.objects.get(code=self.kwargs['submission_code'])
         context['submission_code'] = submission.code
-        context['submission_type'] = submission.format
+        context['submission_type'] = submission.submission_type
         return context
 
 
@@ -87,16 +87,16 @@ class OptionsView(generic.FormView):
 
 
 def run(request, submission_code):
-    ccg = CingCommand(submission_code)
+    cc = CingCommand(submission_code)
 
     cing_log = str(os.environ)
-    cing_log = ccg.getRunCommand()
-    cing_log = ccg.getRunDirectory()
+    cing_log = cc.getRunCommand()
+    cing_log = cc.getRunDirectory()
 
     try:
-        logDirFiles = os.listdir(ccg.getLogPath())
+        logDirFiles = os.listdir(cc.getLogPath())
         logFile = [f for f in logDirFiles if f.endswith('.txt')][0]
-        with open(os.path.join(ccg.getLogPath(), logFile)) as f:
+        with open(os.path.join(cc.getLogPath(), logFile)) as f:
             logText = f.read()
     except OSError:
         logText = 'iCING run starting, please refresh soon,...'
@@ -106,7 +106,7 @@ def run(request, submission_code):
             return redirect('report', submission_code)
     return render(request, 'iCing/run.html', {'cing_log':logText,
                                               'submission_code': submission_code,
-                                              'run_finished': run_finished(ccg.getReportDirectory())
+                                              'run_finished': run_finished(cc.getReportDirectory())
                                               })
 
 def report(request, submission_code):
@@ -129,6 +129,4 @@ def ccpnSubmit(request):
 
 
 def run_finished(directory):
-    print(os.path.join(directory, 'project.xml'))
-    print(os.path.isfile(os.path.join(directory, 'project.xml')))
     return os.path.isfile(os.path.join(directory, 'project.xml'))

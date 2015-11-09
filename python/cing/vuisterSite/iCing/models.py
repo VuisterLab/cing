@@ -23,16 +23,16 @@ class Submission(models.Model):
     filename = models.CharField(verbose_name='Filename',
                                 max_length=6, null=False)
 
-    format = models.CharField(verbose_name='Submission Type',
-                              max_length=5,
-                              choices=(('auto','Auto'),
-                                       ('CCPN', 'CCPN'),
-                                       # ('nef', 'NEF'),
-                                       # ('cing', 'CING'),
-                                       ('CYANA', 'CYANA'),
-                                       ('PDB', 'PDB')),
-                              default='auto',
-                              null=False)
+    submission_type = models.CharField(verbose_name='Submission Type',
+                                       max_length=5,
+                                       choices=(('auto','Auto'),
+                                                ('CCPN', 'CCPN'),
+                                                # ('nef', 'NEF'),
+                                                # ('cing', 'CING'),
+                                                ('CYANA', 'CYANA'),
+                                                ('PDB', 'PDB')),
+                                       default='auto',
+                                       null=False)
 
     ranges = models.CharField(verbose_name='CING residue specifier',
                               max_length=255, default='', blank=True)
