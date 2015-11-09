@@ -101,7 +101,7 @@ def runRequest( request ):
 
         submissionName = submission.name
         submissionFile = submission.filename
-        submission_type = submission.format
+        submission_type = submission.submission_type
         verbosity = submission.verbosity
         ranges = submission.ranges
         ensemble = submission.ensemble

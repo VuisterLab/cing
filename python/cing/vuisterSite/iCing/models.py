@@ -51,7 +51,7 @@ class Submission(models.Model):
                                     null=False)
 
     def __str__(self):
-       return str((self.code, self.filename, self.format))
+       return str((self.code, self.filename, self.submission_type))
 
     def was_submitted_recently(self):
        now = timezone.now()

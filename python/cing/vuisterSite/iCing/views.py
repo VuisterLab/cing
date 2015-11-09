@@ -81,7 +81,7 @@ class OptionsView(generic.FormView):
         submission.date = timezone.now()
         submission.save()
 
-        startCingRun(submission)
+        startCingRun(submission.code)
         return redirect('run', submission.code)
 
 

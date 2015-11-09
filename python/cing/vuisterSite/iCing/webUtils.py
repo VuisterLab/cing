@@ -19,7 +19,7 @@ def handleUploadedFile(request):
         dirname = makeRandomString(6)
         full_filename = os.path.join(save_location, 'anonymous', dirname, f.name)
         if dirname not in os.listdir(save_location):
-            os.mkdir(os.path.join(save_location, 'anonymous', dirname))
+            os.mkdirs(os.path.join(save_location, 'anonymous', dirname))
             break
     with open(full_filename, 'wb+') as destination:
         logger.debug('Saving: {}'.format(full_filename))
@@ -81,13 +81,14 @@ def determineSubmissionType(submission_code):
 class CingCommand(object):
     def __init__(self,
                  submission_code=None,
-                 username='Anonymous',
+                 username='anonymous',
                  submissionName=None,
                  submissionFile=None,
                  submission_type=None,
                  verbosity=3,
                  ranges='',
                  ensemble=''):
+
         if submission_code is not None:
             self.submission_code = submission_code
         self.username = username
@@ -103,9 +104,9 @@ class CingCommand(object):
         return self._submission_code
 
     @submission_code.setter
-    def submission_code(self, submission_code):
-        self._submission_code = submission_code
-        submission = Submission.objects.get(code=submission_code)
+    def submission_code(self, sc):
+        self._submission_code = sc
+        submission = Submission.objects.get(code=sc)
         self.username = submission.username
         self.submissionName = submission.name
         self.submissionFile = submission.filename
