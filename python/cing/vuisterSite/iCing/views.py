@@ -27,7 +27,7 @@ class UploadView(generic.FormView):
 
         determinedSubmissionType = determineSubmissionType(submission.code)
         submission.filename = self.request.FILES['user_file'].name
-        submission.name = submission.filename.split('.')[0]
+        submission.name = self.request.FILES['user_file'].name.split('.')[0]
         submission.ip = self.request.META['REMOTE_ADDR']
         requestedSubmissionType = self.request.POST['submission_type']
         if requestedSubmissionType != u'auto':
@@ -104,7 +104,7 @@ def run(request, submission_code):
     if request.method == 'POST':
         if 'report' in request.POST:
             return redirect('report', submission_code)
-    return render(request, 'iCing/run.html', {'cing_log':logText,
+    return render(request, 'iCing/run.html', {'cing_log': logText,
                                               'submission_code': submission_code,
                                               'run_finished': run_finished(cc.getReportDirectory())
                                               })

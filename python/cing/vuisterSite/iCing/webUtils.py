@@ -19,7 +19,7 @@ def handleUploadedFile(request):
         dirname = makeRandomString(6)
         full_filename = os.path.join(save_location, 'anonymous', dirname, f.name)
         if dirname not in os.listdir(save_location):
-            os.mkdirs(os.path.join(save_location, 'anonymous', dirname))
+            os.makedirs(os.path.join(save_location, 'anonymous', dirname))
             break
     with open(full_filename, 'wb+') as destination:
         logger.debug('Saving: {}'.format(full_filename))
@@ -89,8 +89,6 @@ class CingCommand(object):
                  ranges='',
                  ensemble=''):
 
-        if submission_code is not None:
-            self.submission_code = submission_code
         self.username = username
         self.submissionName = submissionName
         self.submissionFile = submissionFile
@@ -98,6 +96,8 @@ class CingCommand(object):
         self.verbosity = verbosity
         self.ranges = ranges
         self.ensemble = ensemble
+        if submission_code is not None:
+            self.submission_code = submission_code
 
     @property
     def submission_code(self):
@@ -126,17 +126,20 @@ class CingCommand(object):
                    'high': 9}
         if verbosity in verbMap:
             self._verbosity = verbMap[verbosity]
+        else:
+            self._verbosity = verbosity
 
 
     def getRunDirectory(self):
-        return os.path.join(save_location, self.username, self.submission_code, self.submissionName)
+        return os.path.join(os.environ['ICING_DATA_DIRECTORY'], self.username, self.submission_code,
+                            self.submissionName)
 
     def getReportDirectory(self):
-        return os.path.join(save_location, self.username, self.submission_code,
+        return os.path.join(os.environ['ICING_DATA_DIRECTORY'], self.username, self.submission_code,
                             self.submissionName + '.cing')
 
     def getLogPath(self):
-        return os.path.join(save_location, self.username, self.submission_code,
+        return os.path.join(os.environ['ICING_DATA_DIRECTORY'], self.username, self.submission_code,
                             self.submissionName + '.cing', 'Logs')
 
 
@@ -175,7 +178,7 @@ def startCingRun(submission_code):
 
     logger.info('Starting: {} from {}'.format(submission_code, submission.ip))
     logger.debug('Creating directory: {}'.format(cc.getRunDirectory()))
-    os.mkdirs(cc.getRunDirectory(), mode=0777)
+    os.makedirs(cc.getRunDirectory(), mode=0777)
     logger.debug('Calling: {}'.format(cc.getRunCommand()))
 
     # subprocess.Popen(cc.getRunCommand(), cwd=cc.getRunDirectory(), env=env)
