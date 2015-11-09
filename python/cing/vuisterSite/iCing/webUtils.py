@@ -6,19 +6,21 @@ import os
 import logging
 # import json
 # import sys
-# import subprocess
+import subprocess
+from .models import Submission
+
 
 logger = logging.getLogger(__name__)
-save_location = '/Users/tjr22/Desktop/icingdevtemp/'
+save_location = os.environ['ICING_DATA_DIRECTORY']
 
 def handleUploadedFile(request):
     f = request.FILES['user_file']
     while True:
         dirname = makeRandomString(6)
+        full_filename = os.path.join(save_location, 'anonymous', dirname, f.name)
         if dirname not in os.listdir(save_location):
-            os.mkdir(os.path.join(save_location, dirname))
+            os.mkdir(os.path.join(save_location, 'anonymous', dirname))
             break
-        full_filename = os.path.join(save_location,'anonymous', dirname, f.name)
     with open(full_filename, 'wb+') as destination:
         logger.debug('Saving: {}'.format(full_filename))
         for chunk in f.chunks():
@@ -42,7 +44,7 @@ def decompressFile(fileLocation):
 
 
 def determineSubmissionType(submission_code):
-    submittedLocation = os.path.join(save_location, submission_code)
+    submittedLocation = os.path.join(save_location, 'anonymous', submission_code)
     submittedDirectory = os.listdir(submittedLocation)
 
     for i in submittedDirectory:
@@ -76,31 +78,96 @@ def determineSubmissionType(submission_code):
     return 'unknown'
 
 
-def startCingRun(submission):
-    submissionName = submission.name
-    submissionFile = submission.filename
-    submission_type = submission.format
-    verbosity = submission.verbosity
-    ranges = submission.ranges
-    ensemble = submission.ensemble
+class CingCommand(object):
+    def __init__(self,
+                 submission_code=None,
+                 username='Anonymous',
+                 submissionName=None,
+                 submissionFile=None,
+                 submission_type=None,
+                 verbosity=3,
+                 ranges='',
+                 ensemble=''):
+        if submission_code is not None:
+            self.submission_code = submission_code
+        self.username = username
+        self.submissionName = submissionName
+        self.submissionFile = submissionFile
+        self.submission_type = submission_type
+        self.verbosity = verbosity
+        self.ranges = ranges
+        self.ensemble = ensemble
 
-    if submission_type == 'CCPN':
-        init_type = '--initCcpn'
-    elif submission_type == 'CYANA':
-        init_type = '--initCyana'
-    elif submission_type == 'PDB':
-        init_type = '--initPDB'
+    @property
+    def submission_code(self, submission_code):
+        print('Setting up by submission code.')
+        submission_code = self.submission_code
+        submission = Submission.objects.get(code=submission_code)
+        self.username = submission.username
+        self.submissionName = submission.name
+        self.submissionFile = submission.filename
+        self.submission_type = submission.format
+        self.verbosity = submission.verbosity
+        self.ranges = submission.ranges
+        self.ensemble = submission.ensemble
 
-    validateEntryPyCallString = ' '.join(('cing',
-                                          '--name', submissionName,
-                                          '--script doValidateiCing.py',
-                                          init_type, submissionFile,
-                                          '--verbosity', str(verbosity))
-                                         )
-    if ranges != '':
-        validateEntryPyCallString += ' --ranges ' + ranges
-    if ensemble != '':
-        validateEntryPyCallString += ' --ensemble ' + ensemble
+    @property
+    def verbosity(self, verbosity):
+        verbMap = {'low': 3,
+                   'medium': 6,
+                   'high': 9}
+        if verbosity in verbMap:
+            self.verbosity = verbMap[verbosity]
 
-    logger.info('Starting: {} from {}'.format(submission.code, submission.ip))
-    logger.debug('Calling: {}'.format(validateEntryPyCallString))
+
+    def getRunDirectory(self):
+        return os.path.join(save_location, self.username, self.submission_code, self.submissionName)
+
+    def getReportDirectory(self):
+        return os.path.join(save_location, self.username, self.submission_code,
+                            self.submissionName + '.cing')
+
+    def getLogPath(self):
+        return os.path.join(save_location, self.username, self.submission_code,
+                            self.submissionName + '.cing', 'Logs')
+
+
+    def getRunCommand(self):
+
+        if self.submission_type == 'CCPN':
+            init_type = '--initCcpn'
+        elif self.submission_type == 'CYANA':
+            init_type = '--initCyana'
+        elif self.submission_type == 'PDB':
+            init_type = '--initPDB'
+
+        validateEntryPyCallString = ' '.join(('cing',
+                                              '--name', self.submissionName,
+                                              '--script doValidateiCing.py',
+                                              init_type, self.submissionFile,
+                                              '--verbosity', str(self.verbosity))
+                                             )
+        if self.ranges != '':
+            validateEntryPyCallString += ' --ranges ' + self.ranges
+        if self.ensemble != '':
+            validateEntryPyCallString += ' --ensemble ' + self.ensemble
+
+
+        return validateEntryPyCallString
+
+
+
+def startCingRun(submission_code):
+    submission = Submission.objects.get(code=submission_code)
+    cc = CingCommand(submission_code)
+
+    env = dict(os.environ)
+    cingEnv = dict()
+    env.update(cingEnv)
+
+    logger.info('Starting: {} from {}'.format(submission_code, submission.ip))
+    logger.debug('Creating directory: {}'.format(cc.getRunDirectory()))
+    os.mkdirs(cc.getRunDirectory(), mode=0777)
+    logger.debug('Calling: {}'.format(cc.getRunCommand()))
+
+    # subprocess.Popen(cc.getRunCommand(), cwd=cc.getRunDirectory(), env=env)

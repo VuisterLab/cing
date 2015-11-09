@@ -10,7 +10,7 @@ from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
 
 from .forms import UploadFileForm, RunSetupForm, CcpnSubmissionForm
-from .webUtils import handleUploadedFile, determineSubmissionType, startCingRun
+from .webUtils import handleUploadedFile, determineSubmissionType, startCingRun, CingCommand
 from .ccpnUtils import processCcpnPost
 from .models import Submission
 
@@ -87,13 +87,26 @@ class OptionsView(generic.FormView):
 
 
 def run(request, submission_code):
+    ccg = CingCommand(submission_code)
+
     cing_log = str(os.environ)
+    cing_log = ccg.getRunCommand()
+    cing_log = ccg.getRunDirectory()
+
+    try:
+        logDirFiles = os.listdir(ccg.getLogPath())
+        logFile = [f for f in logDirFiles if f.endswith('.txt')][0]
+        with open(os.path.join(ccg.getLogPath(), logFile)) as f:
+            logText = f.read()
+    except OSError:
+        logText = 'iCING run starting, please refresh soon,...'
+
     if request.method == 'POST':
         if 'report' in request.POST:
             return redirect('report', submission_code)
-    return render(request, 'iCing/run.html', {'cing_log':cing_log,
-                                               'submission_code': submission_code,
-                                               'run_finished': True
+    return render(request, 'iCing/run.html', {'cing_log':logText,
+                                              'submission_code': submission_code,
+                                              'run_finished': run_finished(ccg.getReportDirectory())
                                               })
 
 def report(request, submission_code):
@@ -115,4 +128,7 @@ def ccpnSubmit(request):
         logger.debug('CCPN GET request:{}'.format(request.POST))
 
 
-
+def run_finished(directory):
+    print(os.path.join(directory, 'project.xml'))
+    print(os.path.isfile(os.path.join(directory, 'project.xml')))
+    return os.path.isfile(os.path.join(directory, 'project.xml'))

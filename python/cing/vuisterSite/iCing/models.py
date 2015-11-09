@@ -7,7 +7,7 @@ from django.utils import timezone
 
 class Submission(models.Model):
     username = models.CharField(verbose_name='Username',
-                                max_length=255, default='Anonymous')
+                                max_length=255, default='anonymous')
 
     code = models.CharField(verbose_name='Submission Code',
                             max_length=6, primary_key=True)
