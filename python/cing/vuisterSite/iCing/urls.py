@@ -10,7 +10,7 @@ urlpatterns = [
     url(r'^upload$', views.UploadView.as_view(), name='upload'),
     url(r'^options/(?P<submission_code>\w{6})/$', views.OptionsView.as_view(), name='options'),
     url(r'^run/(?P<submission_code>\w{6})$', views.run, name='run'),
-    url(r'^report/(?P<submission_code>\w{6})$', views.report, name='report'),
+    url(r'^view/(?P<submission_code>\w{6})$', views.view, name='view'),
 
     url(r'^icing/serv/iCingServlet', views.ccpnSubmit, name='ccpnSubmit'),
 ]

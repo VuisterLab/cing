@@ -1,13 +1,14 @@
 #runBox{
     font-family: Courier, sans-serif;
-	font-size: 15px;
+	font-size: 14px;
     color: black;
-    height:150px;
+    height:250px;
     width:90%;
     border: #e3e8f3 solid thick;
     border-radius: 5px;
     padding: 2px;
-    overflow:hidden;
+    overflow: auto;
+    white-space: pre;
 }
 
 .shadow {

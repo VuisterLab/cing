@@ -12,13 +12,15 @@
     <div id="runBox", class="shadow">
         {{ cing_log }}
     </div>
-<form action="{% url "run" submission_code %}" method="POST">
+{% if run_finished %}
+    <form action="{% url "view" submission_code %}" method="POST">
     {% csrf_token %}
-    {% if run_finished %}
         <input type="submit" value="View CING Report" name="report">
-    {% else %}
+{% else %}
+    <form action="{% url "run" submission_code %}" method="POST">
+    {% csrf_token %}
         <input type="submit" value="Refresh" name="refresh">
-    {% endif %}
+{% endif %}
 </form>
 </div>
 

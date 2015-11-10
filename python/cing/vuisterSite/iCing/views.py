@@ -102,15 +102,21 @@ def run(request, submission_code):
         logText = 'iCING run starting, please refresh soon,...'
 
     if request.method == 'POST':
-        if 'report' in request.POST:
-            return redirect('report', submission_code)
+        if 'view' in request.POST:
+            return redirect('view', submission_code)
     return render(request, 'iCing/run.html', {'cing_log': logText,
                                               'submission_code': submission_code,
                                               'run_finished': run_finished(cc.getReportDirectory())
-                                              })
+                                             })
 
-def report(request, submission_code):
-    pass
+def view(request, submission_code):
+    """
+    :param request: Request object
+    :param submission_code: str
+    :return: HTTPRedirect
+    """
+    submission = Submission.objects.get(code=submission_code)
+    return redirect('../data/{0.username}/{0.code}/{0.name}.cing'.format(submission))
 
 @csrf_exempt
 def ccpnSubmit(request):
