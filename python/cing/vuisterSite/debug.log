@@ -1,0 +1,85 @@
+[2015-Nov-03 15:08:00] DEBUG [iCing.webUtils:23] Saving: /Users/tjr22/Desktop/iCingData/anonymous/inpdjb/1brv.tgz
+[2015-Nov-03 15:08:00] DEBUG [iCing.webUtils:26] Saved: /Users/tjr22/Desktop/iCingData/anonymous/inpdjb/1brv.tgz
+[2015-Nov-03 15:10:47] DEBUG [iCing.webUtils:23] Saving: /Users/tjr22/Desktop/iCingData/anonymous/6dqwdf/1brv.tgz
+[2015-Nov-03 15:10:47] DEBUG [iCing.webUtils:26] Saved: /Users/tjr22/Desktop/iCingData/anonymous/6dqwdf/1brv.tgz
+[2015-Nov-03 15:11:20] INFO [iCing.webUtils:105] Starting: 6dqwdf from 127.0.0.1
+[2015-Nov-03 15:11:20] DEBUG [iCing.webUtils:106] Calling: cing --name 1brv --script doValidateiCing.py --initCcpn 1brv.tgz --verbosity 3
+[2015-Nov-03 15:27:18] INFO [iCing.webUtils:105] Starting: 6dqwdf from 127.0.0.1
+[2015-Nov-03 15:27:18] DEBUG [iCing.webUtils:106] Calling: cing --name 1brv --script doValidateiCing.py --initCcpn 1brv.tgz --verbosity 3
+[2015-Nov-03 15:35:55] INFO [iCing.webUtils:142] Starting: 6dqwdf from 127.0.0.1
+[2015-Nov-03 15:35:55] DEBUG [iCing.webUtils:143] Calling: cing --name 1brv --script doValidateiCing.py --initCcpn 1brv.tgz --verbosity 3
+[2015-Nov-03 15:39:44] DEBUG [iCing.webUtils:25] Saving: /Users/tjr22/Desktop/iCingData/anonymous/gv4yxq/1brv (1).pdb
+[2015-Nov-03 15:39:44] DEBUG [iCing.webUtils:28] Saved: /Users/tjr22/Desktop/iCingData/anonymous/gv4yxq/1brv (1).pdb
+[2015-Nov-03 15:39:48] INFO [iCing.webUtils:142] Starting: gv4yxq from 127.0.0.1
+[2015-Nov-03 15:39:48] DEBUG [iCing.webUtils:143] Calling: cing --name 1brv (1) --script doValidateiCing.py --initPDB 1brv (1).pdb --verbosity 3
+[2015-Nov-03 15:42:18] INFO [iCing.webUtils:146] Starting: gv4yxq from 127.0.0.1
+[2015-Nov-03 15:42:18] DEBUG [iCing.webUtils:147] Calling: cing --name 1brv (1) --script doValidateiCing.py --initPDB 1brv (1).pdb --verbosity 3
+[2015-Nov-03 15:44:42] INFO [iCing.webUtils:148] Starting: gv4yxq from 127.0.0.1
+[2015-Nov-03 15:44:42] DEBUG [iCing.webUtils:149] Calling: cing --name 1brv (1) --script doValidateiCing.py --initPDB 1brv (1).pdb --verbosity 3
+[2015-Nov-03 15:44:57] DEBUG [iCing.webUtils:25] Saving: /Users/tjr22/Desktop/iCingData/anonymous/768qo8/1brv.tgz
+[2015-Nov-03 15:44:57] DEBUG [iCing.webUtils:28] Saved: /Users/tjr22/Desktop/iCingData/anonymous/768qo8/1brv.tgz
+[2015-Nov-03 15:45:04] DEBUG [iCing.webUtils:25] Saving: /Users/tjr22/Desktop/iCingData/anonymous/b66i7b/1brv.tgz
+[2015-Nov-03 15:45:04] DEBUG [iCing.webUtils:28] Saved: /Users/tjr22/Desktop/iCingData/anonymous/b66i7b/1brv.tgz
+[2015-Nov-03 15:45:13] DEBUG [iCing.webUtils:25] Saving: /Users/tjr22/Desktop/iCingData/anonymous/l0ltug/1brv.pdb
+[2015-Nov-03 15:45:13] DEBUG [iCing.webUtils:28] Saved: /Users/tjr22/Desktop/iCingData/anonymous/l0ltug/1brv.pdb
+[2015-Nov-03 15:45:16] INFO [iCing.webUtils:148] Starting: l0ltug from 127.0.0.1
+[2015-Nov-03 15:45:16] DEBUG [iCing.webUtils:149] Calling: cing --name 1brv --script doValidateiCing.py --initPDB 1brv.pdb --verbosity 3
+[2015-Nov-03 15:48:52] INFO [iCing.webUtils:148] Starting: l0ltug from 127.0.0.1
+[2015-Nov-03 15:48:52] DEBUG [iCing.webUtils:149] Calling: cing --name 1brv --script doValidateiCing.py --initPDB 1brv.pdb --verbosity 3
+[2015-Nov-03 15:52:34] INFO [iCing.webUtils:151] Starting: l0ltug from 127.0.0.1
+[2015-Nov-03 15:52:34] DEBUG [iCing.webUtils:152] Calling: cing --name 1brv --script doValidateiCing.py --initPDB 1brv.pdb --verbosity 3
+[2015-Nov-09 12:00:56] DEBUG [iCing.webUtils:25] Saving: /Users/tjr22/Desktop/iCingData/anonymous/4hombg/1brv.pdb
+[2015-Nov-09 12:00:56] DEBUG [iCing.webUtils:28] Saved: /Users/tjr22/Desktop/iCingData/anonymous/4hombg/1brv.pdb
+[2015-Nov-09 12:01:56] DEBUG [iCing.webUtils:25] Saving: /Users/tjr22/Desktop/iCingData/anonymous/n9bpcy/1brv.pdb
+[2015-Nov-09 12:01:56] DEBUG [iCing.webUtils:28] Saved: /Users/tjr22/Desktop/iCingData/anonymous/n9bpcy/1brv.pdb
+[2015-Nov-09 12:01:58] INFO [iCing.webUtils:176] Starting: n9bpcy from 127.0.0.1
+[2015-Nov-09 12:05:15] DEBUG [iCing.webUtils:25] Saving: /Users/tjr22/Desktop/iCingData/anonymous/aarp6u/1brv.pdb
+[2015-Nov-09 12:05:15] DEBUG [iCing.webUtils:28] Saved: /Users/tjr22/Desktop/iCingData/anonymous/aarp6u/1brv.pdb
+[2015-Nov-09 12:05:17] INFO [iCing.webUtils:177] Starting: aarp6u from 127.0.0.1
+[2015-Nov-09 12:05:55] INFO [iCing.webUtils:179] Starting: aarp6u from 127.0.0.1
+[2015-Nov-09 12:06:29] INFO [iCing.webUtils:178] Starting: aarp6u from 127.0.0.1
+[2015-Nov-09 12:07:56] DEBUG [iCing.webUtils:25] Saving: /Users/tjr22/Desktop/iCingData/anonymous/ol6t9x/1brv.pdb
+[2015-Nov-09 12:07:56] DEBUG [iCing.webUtils:28] Saved: /Users/tjr22/Desktop/iCingData/anonymous/ol6t9x/1brv.pdb
+[2015-Nov-09 12:07:58] INFO [iCing.webUtils:178] Starting: ol6t9x from 127.0.0.1
+[2015-Nov-09 12:08:58] DEBUG [iCing.webUtils:25] Saving: /Users/tjr22/Desktop/iCingData/anonymous/dc2uy4/1brv.pdb
+[2015-Nov-09 12:08:58] DEBUG [iCing.webUtils:28] Saved: /Users/tjr22/Desktop/iCingData/anonymous/dc2uy4/1brv.pdb
+[2015-Nov-09 12:09:07] INFO [iCing.webUtils:178] Starting: dc2uy4 from 127.0.0.1
+[2015-Nov-09 12:09:43] DEBUG [iCing.webUtils:25] Saving: /Users/tjr22/Desktop/iCingData/anonymous/ot3lx2/1brv.pdb
+[2015-Nov-09 12:09:43] DEBUG [iCing.webUtils:28] Saved: /Users/tjr22/Desktop/iCingData/anonymous/ot3lx2/1brv.pdb
+[2015-Nov-09 12:09:48] INFO [iCing.webUtils:178] Starting: ot3lx2 from 127.0.0.1
+[2015-Nov-09 12:10:59] INFO [iCing.webUtils:178] Starting: ot3lx2 from 127.0.0.1
+[2015-Nov-09 12:10:59] DEBUG [iCing.webUtils:179] Creating directory: /Users/tjr22/Desktop/iCingData/anonymous/ot3lx2/1brv
+[2015-Nov-09 12:12:01] INFO [iCing.webUtils:180] Starting: ot3lx2 from 127.0.0.1
+[2015-Nov-09 12:12:01] DEBUG [iCing.webUtils:181] Creating directory: /Users/tjr22/Desktop/iCingData/anonymous/ot3lx2/1brv
+[2015-Nov-09 12:12:10] DEBUG [iCing.webUtils:25] Saving: /Users/tjr22/Desktop/iCingData/anonymous/b0py4c/1brv.pdb
+[2015-Nov-09 12:12:10] DEBUG [iCing.webUtils:28] Saved: /Users/tjr22/Desktop/iCingData/anonymous/b0py4c/1brv.pdb
+[2015-Nov-09 12:12:13] INFO [iCing.webUtils:180] Starting: b0py4c from 127.0.0.1
+[2015-Nov-09 12:12:13] DEBUG [iCing.webUtils:181] Creating directory: /Users/tjr22/Desktop/iCingData/anonymous/b0py4c/1brv
+[2015-Nov-09 12:12:13] DEBUG [iCing.webUtils:183] Calling: cing --name 1brv --script doValidateiCing.py --initPDB 1brv.pdb --verbosity 3
+[2015-Nov-09 15:43:47] DEBUG [iCing.webUtils:25] Saving: /Users/tjr22/Desktop/iCingData/anonymous/5djctv/1brv.pdb
+[2015-Nov-09 15:43:47] DEBUG [iCing.webUtils:28] Saved: /Users/tjr22/Desktop/iCingData/anonymous/5djctv/1brv.pdb
+[2015-Nov-09 15:59:13] DEBUG [iCing.webUtils:25] Saving: /Users/tjr22/Desktop/iCingData/anonymous/6w0xpy/1brv.pdb
+[2015-Nov-09 15:59:13] DEBUG [iCing.webUtils:28] Saved: /Users/tjr22/Desktop/iCingData/anonymous/6w0xpy/1brv.pdb
+[2015-Nov-09 15:59:21] INFO [iCing.webUtils:179] Starting: 6w0xpy from 127.0.0.1
+[2015-Nov-09 15:59:21] DEBUG [iCing.webUtils:180] Creating directory: /Users/tjr22/Desktop/iCingData/anonymous/6w0xpy/1brv
+[2015-Nov-09 15:59:21] DEBUG [iCing.webUtils:182] Calling: cing --name 1brv --script doValidateiCing.py --initPDB 1brv.pdb --verbosity 3
+[2015-Nov-10 10:02:39] DEBUG [iCing.webUtils:25] Saving: /Users/tjr22/Desktop/iCingData/anonymous/rmzesv/1brv.pdb
+[2015-Nov-10 10:02:39] DEBUG [iCing.webUtils:28] Saved: /Users/tjr22/Desktop/iCingData/anonymous/rmzesv/1brv.pdb
+[2015-Nov-10 10:02:41] INFO [iCing.webUtils:179] Starting: rmzesv from 127.0.0.1
+[2015-Nov-10 10:02:41] DEBUG [iCing.webUtils:180] Creating directory: /Users/tjr22/Desktop/iCingData/anonymous/rmzesv/1brv
+[2015-Nov-10 10:02:41] DEBUG [iCing.webUtils:182] Calling: cing --name 1brv --script doValidateiCing.py --initPDB 1brv.pdb --verbosity 3
+[2015-Nov-10 17:07:38] DEBUG [iCing.views:124] CCPN POST request:<QueryDict: {u'Action': [u'Save'], u'AccessKey': [u'ExuCO0'], u'UserId': [u'ccpnAp']}>
+[2015-Nov-10 17:07:38] DEBUG [iCing.views:125] CCPN POST file:<MultiValueDict: {u'UploadFile': [<TemporaryUploadedFile: __CcpnCourse3e_innit.tgz (application/octet-stream)>]}>
+[2015-Nov-10 17:07:38] DEBUG [iCing.views:129] Returning :{"Action":"Save","Result":"0.0 MB","ExitCode":"Success"}
+[2015-Nov-10 17:07:38] DEBUG [iCing.views:124] CCPN POST request:<QueryDict: {u'Action': [u'ProjectName'], u'AccessKey': [u'ExuCO0'], u'UserId': [u'ccpnAp']}>
+[2015-Nov-10 17:07:38] DEBUG [iCing.views:125] CCPN POST file:<MultiValueDict: {}>
+[2015-Nov-10 17:07:38] DEBUG [iCing.views:129] Returning :{"Action":"ProjectName","Result":"__CcpnCourse3e_innit","ExitCode":"Success"}
+[2015-Nov-10 17:07:39] DEBUG [iCing.views:124] CCPN POST request:<QueryDict: {u'Action': [u'Run'], u'AccessKey': [u'ExuCO0'], u'UserId': [u'ccpnAp']}>
+[2015-Nov-10 17:07:39] DEBUG [iCing.views:125] CCPN POST file:<MultiValueDict: {}>
+[2015-Nov-10 17:07:39] DEBUG [iCing.ccpnUtils:120] Calling: cing --name __CcpnCourse3e_innit --script doValidateiCing.py --initCcpn __CcpnCourse3e_innit.tgz --verbosity 3
+[2015-Nov-10 17:07:39] INFO [iCing.ccpnUtils:121] Starting: ExuCO0 from CCPN:127.0.0.1
+[2015-Nov-10 17:07:39] DEBUG [iCing.views:129] Returning :{"Action":"Run","Result":"Started","ExitCode":"Success"}
+[2015-Nov-11 11:53:28] DEBUG [iCing.webUtils:25] Saving: /Users/tjr22/Desktop/iCingData/anonymous/6hx8ov/1brv.pdb
+[2015-Nov-11 11:53:28] DEBUG [iCing.webUtils:28] Saved: /Users/tjr22/Desktop/iCingData/anonymous/6hx8ov/1brv.pdb
+[2015-Nov-11 11:53:30] INFO [iCing.webUtils:216] Starting: 6hx8ov from 127.0.0.1
+[2015-Nov-11 11:53:30] DEBUG [iCing.webUtils:221] Calling: /local/bin/anaconda/bin/python -u /local/cing/python/cing/main.py --name 1brv --script doValidateiCing.py --initPDB 1brv.pdb --verbosity 3 in /Users/tjr22/Desktop/iCingData/anonymous/6hx8ov

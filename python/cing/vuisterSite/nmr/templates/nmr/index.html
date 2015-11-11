@@ -1,0 +1,63 @@
+{% load staticfiles %}
+<!DOCTYPE HTML>
+<html>
+<head>
+<meta charset="utf-8">
+<title>NMR Resources</title>
+    <link rel="icon" type="image/png" href="http://le.ac.uk/Assets/Favicons/favicon-196x196.png" sizes="196x196" />
+    <link rel="icon" type="image/png" href="http://le.ac.uk/Assets/Favicons/favicon-96x96.png" sizes="96x96" />
+    <link rel="icon" type="image/png" href="http://le.ac.uk/Assets/Favicons/favicon-32x32.png" sizes="32x32" />
+    <link rel="icon" type="image/png" href="http://le.ac.uk/Assets/Favicons/favicon-16x16.png" sizes="16x16" />
+    <link rel="icon" type="image/png" href="http://le.ac.uk/Assets/Favicons/favicon-128.png" sizes="128x128" />
+
+</head>
+<body>
+<a href="http://le.ac.uk"> <img src="https://le.ac.uk/~/media/images/ul-site-images/uollogo.ashx?h=60&w=181&la=en&hash=70953D1FD97AE7FAE3580FC0D673ED162EA46AA5"></a>
+
+<font size="4"><Center><B> NMR Resources </B></Center></font><P>
+<CENTER><B> NOTE: Currently, NRG-CING and CING are being moved from Nijmegen to Leicester. There will be a disruption to normal services.<BR>
+You can use a local copy of icing using the link below.</B></CENTER>
+
+
+
+-->
+<table width="100%" height="588" border="0">
+  <tr>
+  <td width="2%">&nbsp;</td>
+    <td width="51%"><p align="center"><a href={% url 'upload' %}><img src={% static "nmr/images/iCing.png" %} width="384" height="218"></a></p>
+    <p align="center"><a href={% url 'upload' %}>iCing</a></p></td>
+    <td width="47%"><div align="center">
+      <p><a href={% url 'nrg_home' %} title="NRG-CING"><img src={% static "nmr/images/NRG-CING.png" %} width="384" height="218"></a></p>
+{#      <p><a href="http://143.210.185.204/NRG-CING/HTML/index.html">NRG-CING</a></p>#}
+      <p><a href="88.119.17.144">NRG-CING</a></p>
+    </div></td>
+  </tr>
+  <tr>
+    <td>&nbsp;</td>
+    <td><div align="center">
+      <p><a href="https://github.com/VuisterLab/cing"><img id="github-pic" src={% static "nmr/images/Google-Code.gif" %} width="384" height="218"/></a></p>
+      <p><a href="https://github.com/VuisterLab/cing">Cing Github Repository</a></p>
+    </div></td>
+    <td><div align="center"><img src={% static "nmr/images/Help.png" %} width="334" height="216"><p>Help and other Resources</p></div></td>
+  </tr>
+
+    <td>&nbsp;</td>
+    <td><div align="center">
+     <BR><BR><BR> <p><a href="http://www.ccpn.ac.uk"><img src={% static "nmr/images/ccpn.jpg" %} width="150" height="75"></a></p>
+     <BR> <p><a href="http://www.ccpn.ac.uk">CCPN</a></p>
+    </div></td>
+
+    <td width="47%"><div align="center">
+      <p><a href="/web/service_down.html"><img src={% static "nmr/images/Other_Software.jpg" %} width="384" height="160"></a></p>
+      <p><a href="/web/service_down.html">Other Software</a></p>
+    </div></td>
+  </tr>
+
+
+
+</table>
+<p align="center"><strong>Please Cite:</strong></p>
+<font size="2">Doreleijers, J. F., Vranken, W. F., Schulte, C., Markley, J. L., Ulrich, E. L., Vriend, G., & Vuister, G. W. (2012) “NRG-CING: integrated validation reports of remediated experimental biomolecular NMR data and coordinates in wwPDB.” Nucl. Acids Res. 40, D519–D524.<BR><P>
+Doreleijers, J.F., Sousa da Silva, A.W., Krieger, E., Nabuurs, S.B., Spronk, C.A.E.M., Stevens, T.J., Vranken, W.F., Vriend, G., and Vuister, G.W. (2012). CING: an integrated residue-based structure validation program suite. J Biomol NMR 54, 267–283.</font> 
+</body>
+</html>

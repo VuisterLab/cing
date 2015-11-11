@@ -1,9 +1,10 @@
 #runBox{
     font-family: Courier, sans-serif;
-	font-size: 14px;
+	font-size: 12px;
     color: black;
-    height:250px;
-    width:90%;
+    min-height: 100px;
+    max-height: 400px;
+    width: 90%;
     border: #e3e8f3 solid thick;
     border-radius: 5px;
     padding: 2px;

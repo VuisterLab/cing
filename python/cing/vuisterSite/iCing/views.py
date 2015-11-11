@@ -2,6 +2,8 @@ from __future__ import unicode_literals, print_function, absolute_import, divisi
 
 import os
 import logging
+import subprocess
+import time
 
 from django.http import HttpResponse
 from django.shortcuts import redirect, render
@@ -15,12 +17,18 @@ from .ccpnUtils import processCcpnPost
 from .models import Submission
 
 logger = logging.getLogger(__name__)
-
+cing_version = subprocess.check_output(["git", "describe"], cwd=os.environ['CINGROOT'])
+cing_update = time.ctime(os.path.getmtime(os.path.join(os.environ['CINGROOT'],'.git', 'FETCH_HEAD')))
 
 class UploadView(generic.FormView):
     template_name = 'iCing/upload.html'
     form_class = UploadFileForm
 
+    def get_context_data(self, **kwargs):
+        context = super(UploadView, self).get_context_data(**kwargs)
+        context['cing_version'] = cing_version
+        context['cing_update'] = cing_update
+        return context
 
     def form_valid(self, form):
         submission = Submission(code = handleUploadedFile(self.request))
@@ -48,15 +56,15 @@ class OptionsView(generic.FormView):
     form_class = RunSetupForm
 
 
-    def __init__(self, *args, **kwargs):
-        super(OptionsView, self).__init__(*args, **kwargs)
+    # def __init__(self, *args, **kwargs):
+    #     super(OptionsView, self).__init__(*args, **kwargs)
 
 
     def get(self, request, *args, **kwargs):
         form = self.get_form()
         context = self.get_context_data(form=form)
 
-        submission = Submission.objects.get(code=self.kwargs['submission_code'])
+        # submission = Submission.objects.get(code=self.kwargs['submission_code'])
         context['ranges'] = ''
         context['ensemble'] = ''
 
@@ -66,6 +74,8 @@ class OptionsView(generic.FormView):
     def get_context_data(self, **kwargs):
         context = super(OptionsView, self).get_context_data(**kwargs)
         submission = Submission.objects.get(code=self.kwargs['submission_code'])
+        context['cing_version'] = cing_version
+        context['cing_update'] = cing_update
         context['submission_code'] = submission.code
         context['submission_type'] = submission.submission_type
         return context
@@ -106,15 +116,12 @@ def run(request, submission_code):
             return redirect('view', submission_code)
     return render(request, 'iCing/run.html', {'cing_log': logText,
                                               'submission_code': submission_code,
-                                              'run_finished': run_finished(cc.getReportDirectory())
+                                              'run_finished': run_finished(cc.getReportDirectory()),
+                                              'cing_version': cing_version,
+                                              'cing_update': cing_update
                                              })
 
 def view(request, submission_code):
-    """
-    :param request: Request object
-    :param submission_code: str
-    :return: HTTPRedirect
-    """
     submission = Submission.objects.get(code=submission_code)
     return redirect('../data/{0.username}/{0.code}/{0.name}.cing'.format(submission))
 
@@ -135,4 +142,6 @@ def ccpnSubmit(request):
 
 
 def run_finished(directory):
-    return os.path.isfile(os.path.join(directory, 'project.xml'))
+    if os.path.isfile(os.path.join(directory, 'index.html')):
+        return not os.path.exists(os.path.join(directory, 'Temp'))
+    return False

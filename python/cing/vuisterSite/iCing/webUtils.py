@@ -131,19 +131,21 @@ class CingCommand(object):
 
 
     def getRunDirectory(self):
-        return os.path.join(os.environ['ICING_DATA_DIRECTORY'], self.username, self.submission_code,
-                            self.submissionName)
+        return os.path.join(os.environ['ICING_DATA_DIRECTORY'], self.username, self.submission_code)
 
     def getReportDirectory(self):
         return os.path.join(os.environ['ICING_DATA_DIRECTORY'], self.username, self.submission_code,
                             self.submissionName + '.cing')
 
     def getLogPath(self):
-        return os.path.join(os.environ['ICING_DATA_DIRECTORY'], self.username, self.submission_code,
-                            self.submissionName + '.cing', 'Logs')
+        return os.path.join(self.getReportDirectory(), 'Logs')
 
 
     def getRunCommand(self):
+        # py = os.environ['CING_PYTHON']
+
+        py = os.path.join('/local', 'bin', 'anaconda', 'bin', 'python')
+        cing = os.path.join('/local', 'cing', 'python', 'cing','main.py')
 
         if self.submission_type == 'CCPN':
             init_type = '--initCcpn'
@@ -152,16 +154,16 @@ class CingCommand(object):
         elif self.submission_type == 'PDB':
             init_type = '--initPDB'
 
-        validateEntryPyCallString = ' '.join(('cing',
+        validateEntryPyCallString = [py, '-u', cing,
                                               '--name', self.submissionName,
-                                              '--script doValidateiCing.py',
+                                              '--script', 'doValidateiCing.py',
                                               init_type, self.submissionFile,
-                                              '--verbosity', str(self.verbosity))
-                                             )
+                                              '--verbosity', str(self.verbosity)
+                                            ]
         if self.ranges != '':
-            validateEntryPyCallString += ' --ranges ' + self.ranges
+            validateEntryPyCallString += ['--ranges', self.ranges]
         if self.ensemble != '':
-            validateEntryPyCallString += ' --ensemble ' + self.ensemble
+            validateEntryPyCallString += ['--ensemble', self.ensemble]
 
 
         return validateEntryPyCallString
@@ -173,12 +175,10 @@ def startCingRun(submission_code):
     cc = CingCommand(submission_code)
 
     env = dict(os.environ)
-    cingEnv = dict()
-    env.update(cingEnv)
 
     logger.info('Starting: {} from {}'.format(submission_code, submission.ip))
-    logger.debug('Creating directory: {}'.format(cc.getRunDirectory()))
-    os.makedirs(cc.getRunDirectory(), mode=0777)
-    logger.debug('Calling: {}'.format(cc.getRunCommand()))
+    rd = cc.getRunDirectory()
+    rc = cc.getRunCommand()
+    logger.debug('Calling: {} in {}'.format(rc, rd))
 
-    # subprocess.Popen(cc.getRunCommand(), cwd=cc.getRunDirectory(), env=env)
+    subprocess.Popen(cc.getRunCommand(), cwd=rd, env=env)
