@@ -99,27 +99,33 @@ class OptionsView(generic.FormView):
 def run(request, submission_code):
     cc = CingCommand(submission_code)
 
-    cing_log = str(os.environ)
-    cing_log = cc.getRunCommand()
-    cing_log = cc.getRunDirectory()
+    if request.method == 'POST':
+        if 'view' in request.POST:
+            return redirect('view', submission_code)
+    return render(request, 'iCing/run.html', {'submission_code': submission_code,
+                                              'run_finished': run_finished(cc.getReportDirectory()),
+                                              'cing_version': cing_version,
+                                              'cing_update': cing_update
+                                             })
+
+def logTextView(request, submission_code):
+    cc = CingCommand(submission_code)
 
     try:
         logDirFiles = os.listdir(cc.getLogPath())
         logFile = [f for f in logDirFiles if f.endswith('.txt')][0]
         with open(os.path.join(cc.getLogPath(), logFile)) as f:
             logText = f.read()
-    except OSError:
-        logText = 'iCING run starting, please refresh soon,...'
+    except (OSError, IndexError):
+        logText = 'iCING run starting, please wait,...'
 
-    if request.method == 'POST':
-        if 'view' in request.POST:
-            return redirect('view', submission_code)
-    return render(request, 'iCing/run.html', {'cing_log': logText,
-                                              'submission_code': submission_code,
-                                              'run_finished': run_finished(cc.getReportDirectory()),
-                                              'cing_version': cing_version,
-                                              'cing_update': cing_update
-                                             })
+    return HttpResponse(logText, content_type='text/plain')
+
+
+def runFinishedView(request, submission_code):
+    cc = CingCommand(submission_code)
+    return HttpResponse(run_finished(cc.getReportDirectory()), content_type='text/plain')
+
 
 def view(request, submission_code):
     submission = Submission.objects.get(code=submission_code)

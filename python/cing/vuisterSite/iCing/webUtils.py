@@ -142,10 +142,13 @@ class CingCommand(object):
 
 
     def getRunCommand(self):
-        # py = os.environ['CING_PYTHON']
+        print(os.environ['CINGROOT'])
 
-        py = os.path.join('/local', 'bin', 'anaconda', 'bin', 'python')
-        cing = os.path.join('/local', 'cing', 'python', 'cing','main.py')
+        if 'CING_PYTHON' in os.environ:
+            py = os.environ['CING_PYTHON']
+        else:
+            py = 'python'
+        cing = os.path.join(os.environ['CINGROOT'], 'python', 'cing','main.py')
 
         if self.submission_type == 'CCPN':
             init_type = '--initCcpn'
@@ -179,6 +182,7 @@ def startCingRun(submission_code):
     logger.info('Starting: {} from {}'.format(submission_code, submission.ip))
     rd = cc.getRunDirectory()
     rc = cc.getRunCommand()
+    print(rd, rc)
     logger.debug('Calling: {} in {}'.format(rc, rd))
 
     subprocess.Popen(cc.getRunCommand(), cwd=rd, env=env)

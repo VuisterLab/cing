@@ -1,6 +1,34 @@
 {% extends 'iCing/base.html' %}
 {% load staticfiles %}
 
+{% block scripts %}
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            setInterval("ajaxd()", 5000);
+        });
+
+        function ajaxd(){
+            $.ajax({
+                url: '{% url "logTextView" submission_code %}',
+                success: function(data) {
+                    $('#runBox').text(data);
+                }
+            });
+
+            $.ajax({
+                url: '{% url "runFinishedView" submission_code %}',
+                success: function(data) {
+                    if (data == "True") {
+                        $('input[name="Report"]').prop('disabled', false);
+                    }
+                }
+            });
+
+        }
+    </script>
+{% endblock scripts %}
+
 {% block css %}
     <link rel="stylesheet" type="text/css" href="{% static 'iCing/css/run.css' %}" />
 {% endblock css %}
@@ -10,18 +38,11 @@
     <div class="bodyHeader">Run Log</div>
     Submission:  <b>{{ submission_code }}</b>
     <div id="runBox", class="shadow">
-        {{ cing_log }}
     </div>
-{% if run_finished %}
     <form action="{% url "view" submission_code %}" method="POST">
     {% csrf_token %}
-        <input type="submit" value="View CING Report" name="report">
-{% else %}
-    <form action="{% url "run" submission_code %}" method="POST">
-    {% csrf_token %}
-        <input type="submit" value="Refresh" name="refresh">
-{% endif %}
-</form>
+        <input type="submit" value="View CING Report" name="Report" disabled=True>
+    </form>
 </div>
 
 {% endblock %}

@@ -12,6 +12,9 @@ urlpatterns = [
     url(r'^run/(?P<submission_code>\w{6})$', views.run, name='run'),
     url(r'^view/(?P<submission_code>\w{6})$', views.view, name='view'),
 
+    url(r'^logTextView/(?P<submission_code>\w{6})$', views.logTextView, name='logTextView'),
+    url(r'^runFinishedView/(?P<submission_code>\w{6})$', views.runFinishedView, name='runFinishedView'),
+
     url(r'^icing/serv/iCingServlet', views.ccpnSubmit, name='ccpnSubmit'),
 ]
 
