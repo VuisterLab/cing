@@ -21,7 +21,7 @@ class Submission(models.Model):
                             max_length=255, null=False)
 
     filename = models.CharField(verbose_name='Filename',
-                                max_length=6, null=False)
+                                max_length=255, null=False)
 
     submission_type = models.CharField(verbose_name='Submission Type',
                                        max_length=5,

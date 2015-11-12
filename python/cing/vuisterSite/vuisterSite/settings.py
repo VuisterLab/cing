@@ -85,6 +85,18 @@ DATABASES = {
     }
 }
 
+if 'DJANGO_CONFIGURATION' in os.environ:
+    if (os.environ['DJANGO_CONFIGURATION'] == 'Deploy' or
+        os.environ['DJANGO_CONFIGURATION'] == 'Development-postgres'):
+        DATABASES = {
+                'default': {
+                    'ENGINE': 'django.db.backends.postgresql_psycopg2',
+                    'NAME': 'icing',
+                    'USER': 'icing',
+                }
+            }
+
+
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.8/topics/i18n/
