@@ -3,6 +3,8 @@ from __future__ import unicode_literals, print_function, absolute_import, divisi
 from django.conf.urls import url
 from django.views.generic.base import TemplateView
 
+from . import views
+
 urlpatterns = [
     url(r'^$|(?i)index\.html{0,1}', TemplateView.as_view(template_name='nrg/index.html'),
     name='nrg_home'),
@@ -20,5 +22,7 @@ urlpatterns = [
     name='nrg_glossary'),
     url(r'^(?i)tutorials', TemplateView.as_view(template_name='nrg/tutorials.html'),
     name='nrg_tutorials'),
+
+    url(r'^fdts$', views.fakeDataTableServer, name='fdts'),
 ]
 

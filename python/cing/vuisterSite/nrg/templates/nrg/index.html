@@ -56,7 +56,8 @@ data.
 </td>
 <td align="right">
             <div style="width: 25em">
-            <FORM method="GET" action="{% static 'nrg/cgi-bin/DataTablesServer.py' %}" class="display">
+{#            <FORM method="GET" action="{% static 'nrg/cgi-bin/DataTablesServer.py' %}" class="display">#}
+            <FORM method="GET" action="{% url 'fdts' %}" class="display">%}
             Search by PDB ID (e.g. 9pcy):
             <INPUT type="hidden" name="database" value="pdb" align="left">
             <INPUT type="text" size="4" name="id" value="" title="Please provide the PDB identifier to obtain the validation report">
