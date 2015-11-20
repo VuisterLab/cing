@@ -83,3 +83,16 @@
 [2015-Nov-11 11:53:28] DEBUG [iCing.webUtils:28] Saved: /Users/tjr22/Desktop/iCingData/anonymous/6hx8ov/1brv.pdb
 [2015-Nov-11 11:53:30] INFO [iCing.webUtils:216] Starting: 6hx8ov from 127.0.0.1
 [2015-Nov-11 11:53:30] DEBUG [iCing.webUtils:221] Calling: /local/bin/anaconda/bin/python -u /local/cing/python/cing/main.py --name 1brv --script doValidateiCing.py --initPDB 1brv.pdb --verbosity 3 in /Users/tjr22/Desktop/iCingData/anonymous/6hx8ov
+[2015-Nov-12 12:24:24] DEBUG [iCing.webUtils:25] Saving: /Users/tjr22/Desktop/iCingData/anonymous/84qjoh/1brv.pdb
+[2015-Nov-12 12:24:24] DEBUG [iCing.webUtils:28] Saved: /Users/tjr22/Desktop/iCingData/anonymous/84qjoh/1brv.pdb
+[2015-Nov-12 12:24:27] INFO [iCing.webUtils:179] Starting: 84qjoh from 127.0.0.1
+[2015-Nov-12 12:24:27] DEBUG [iCing.webUtils:182] Calling: [u'/local/bin/anaconda/bin/python', u'-u', u'/local/cing/python/cing/main.py', u'--name', u'1brv', u'--script', u'doValidateiCing.py', u'--initPDB', u'1brv.pdb', u'--verbosity', '3'] in /Users/tjr22/Desktop/iCingData/anonymous/84qjoh
+[2015-Nov-12 12:26:23] INFO [iCing.webUtils:179] Starting: 84qjoh from 127.0.0.1
+[2015-Nov-12 12:26:23] DEBUG [iCing.webUtils:183] Calling: [u'/local/bin/anaconda/bin/python', u'-u', u'/local/cing/python/cing/main.py', u'--name', u'1brv', u'--script', u'doValidateiCing.py', u'--initPDB', u'1brv.pdb', u'--verbosity', '3'] in /Users/tjr22/Desktop/iCingData/anonymous/84qjoh
+[2015-Nov-12 12:30:00] INFO [iCing.webUtils:180] Starting: 84qjoh from 127.0.0.1
+[2015-Nov-12 12:30:18] INFO [iCing.webUtils:180] Starting: 84qjoh from 127.0.0.1
+[2015-Nov-12 12:30:18] DEBUG [iCing.webUtils:184] Calling: [u'/local/bin/anaconda/bin/python', u'-u', u'/local/cing/python/cing/main.py', u'--name', u'1brv', u'--script', u'doValidateiCing.py', u'--initPDB', u'1brv.pdb', u'--verbosity', '3'] in /Users/tjr22/Desktop/iCingData/anonymous/84qjoh
+[2015-Nov-12 12:32:16] INFO [iCing.webUtils:182] Starting: 84qjoh from 127.0.0.1
+[2015-Nov-12 12:32:16] DEBUG [iCing.webUtils:186] Calling: [u'python', u'-u', u'/Users/tjr22/Documents/CING/cing/python/cing/main.py', u'--name', u'1brv', u'--script', u'doValidateiCing.py', u'--initPDB', u'1brv.pdb', u'--verbosity', '3'] in /Users/tjr22/Desktop/iCingData/anonymous/84qjoh
+[2015-Nov-12 12:34:02] INFO [iCing.webUtils:182] Starting: 84qjoh from 127.0.0.1
+[2015-Nov-12 12:34:02] DEBUG [iCing.webUtils:186] Calling: [u'python', u'-u', u'/Users/tjr22/Documents/CING/cing/python/cing/main.py', u'--name', u'1brv', u'--script', u'doValidateiCing.py', u'--initPDB', u'1brv.pdb', u'--verbosity', '3'] in /Users/tjr22/Desktop/iCingData/anonymous/84qjoh

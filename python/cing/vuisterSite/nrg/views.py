@@ -2,6 +2,7 @@ from __future__ import unicode_literals, print_function, absolute_import, divisi
 
 from collections import OrderedDict
 import csv
+import os
 
 from django.shortcuts import render, redirect
 from django.http import JsonResponse, HttpResponse
@@ -10,7 +11,9 @@ from django.views.decorators.csrf import csrf_exempt
 
 import psycopg2 as pg
 
-CONN_STRING = "host='88.119.17.144' dbname='pdbmlplus' user='nrgcing1' password='4I4KMS'"
+db_location = os.environ['DATABASELOCATION']
+
+CONN_STRING = "host='{}' dbname='pdbmlplus' user='nrgcing1' password='4I4KMS'".format(db_location)
 _COLUMNS = 'is_solid name pdb_id bmrb_id rog_str distance_count cs_count chothia_class_str chain_count res_count'.split()
 _sTable = "nrgcing.cingentry"
 

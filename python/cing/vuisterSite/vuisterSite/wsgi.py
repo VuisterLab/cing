@@ -13,8 +13,10 @@ import subprocess
 
 from django.core.wsgi import get_wsgi_application
 
-from vuisterSite import localsettings
-
+try:
+    from vuisterSite import localsettings
+except ImportError:
+    pass
 
 def shell_source(script):
     pipe = subprocess.Popen('env'.format(script), stdout=subprocess.PIPE, shell=True, executable='/bin/bash')
