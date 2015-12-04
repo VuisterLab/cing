@@ -23,7 +23,7 @@ logger = logging.getLogger(__name__)
 class CingVersionMixin(object):
 
     def cing_version(self):
-        version = subprocess.check_output(["git", "describe"]),
+        version = subprocess.check_output(["git", "describe"], cwd=os.environ['CINGROOT']),
         return version[0][:-1]
 
     def cing_update(self):

@@ -16,13 +16,11 @@ STATIC_ROOT = '/local/www/vuisterSite/static'
 DATABASES = {
                 'default': {
                     'ENGINE': 'django.db.backends.postgresql_psycopg2',
-                    'HOST': '88.119.17.144',
                     'NAME': 'icing',
                     'USER': 'icing',
                 },
                 'nrg': {
                     'ENGINE': 'django.db.backends.postgresql_psycopg2',
-                    'HOST': '88.119.17.144',
                     'NAME': 'pdbmlplus',
                     'USER': 'nrgcing1',
                     'PASSWORD': '4I4KMS'
