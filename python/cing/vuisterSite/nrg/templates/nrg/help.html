@@ -10,8 +10,8 @@
 <H3>Tutorials</H3>
 <P>
 Please consider doing one of the
-<A HREF="{% url 'nrg_tutorials' %}" title="goto Youtube screencasts page">Tutorials</A> with
-<A HREF="{% url 'nrg_tutorials' %}" title="goto Youtube screencasts page"><img src="{% static 'nrg/images/icon_youtube.jpeg' %}" border="0" width="32" height="14"></A> screencasts.
+<A HREF="{% url 'nrg:tutorials' %}" title="goto Youtube screencasts page">Tutorials</A> with
+<A HREF="{% url 'nrg:tutorials' %}" title="goto Youtube screencasts page"><img src="{% static 'nrg/images/icon_youtube.jpeg' %}" border="0" width="32" height="14"></A> screencasts.
 </P>
 
 <h3>General</h3>
@@ -68,7 +68,7 @@ pressing the SHIF modifier key while clicking.</li>
 
 <h1>Help CING</h1>
 <p>
-The CING reports themselves are documented <A HREF="{% url 'cing_help' %}" title="goto CING help page">here</A>.
+The CING reports themselves are documented <A HREF="{% url 'nrg:cing_help' %}" title="goto CING help page">here</A>.
 </p>
 
 {% endblock body_block %}

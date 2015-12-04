@@ -9,9 +9,9 @@
 <div id="body">
     <div class="bodyHeader">Options</div>
 
-    Submission:  <b>{{ submission_code }}</b>,
-    Type:  <b>{{ submission_type }}</b>
-    <form action="{% url "options" submission_code %}" method="POST">
+    Submission:  <b>{{ view.object.code }}</b>,
+    Type:  <b>{{ view.object.submission_type }}</b>
+    <form action="{% url "icing:options" view.object.code %}" method="POST">
         {% csrf_token %}
         <div id="options">
             <div id="cingOptionsBox1">
@@ -20,14 +20,12 @@
                     {{ form.ranges.errors }}
                     {{ form.ranges.label_tag }}
                     {{ form.ranges }}
-                    {{ ranges }}
                     (E.g. 175,177-189)
                 </p>
                 <p>
                     {{ form.ensemble.errors }}
                     {{ form.ensemble.label_tag }}
                     {{ form.ensemble }}
-                    {{ ensemble }}
                     (E.g. 0,3-8)
                 </p>
                 <p>

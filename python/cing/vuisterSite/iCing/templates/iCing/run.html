@@ -5,19 +5,20 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
     <script>
         $(document).ready(function() {
+            ajaxd()
             interval = setInterval("ajaxd()", 5000);
         });
 
         function ajaxd(){
             $.ajax({
-                url: '{% url "logTextView" submission_code %}',
+                url: '{% url "icing:logTextView" pk %}',
                 success: function(data) {
                     $('#runBox').text(data);
                 }
             });
 
             $.ajax({
-                url: '{% url "runFinishedView" submission_code %}',
+                url: '{% url "icing:runFinishedView" pk %}',
                 success: function(data) {
                     if (data == "True") {
                         clearInterval(interval)
@@ -25,7 +26,6 @@
                     }
                 }
             });
-
         }
     </script>
 {% endblock scripts %}
@@ -37,10 +37,10 @@
 {% block body_block %}
 <div id="body">
     <div class="bodyHeader">Run Log</div>
-    Submission:  <b>{{ submission_code }}</b>
+    Submission:  <b>{{ pk }}</b>
     <div id="runBox", class="shadow">
     </div>
-    <form action="{% url "view" submission_code %}" method="POST">
+    <form action="{% url "icing:view" pk %}" method="POST">
     {% csrf_token %}
         <input type="submit" value="View CING Report" name="Report" disabled=True>
     </form>

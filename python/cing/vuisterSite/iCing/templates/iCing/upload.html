@@ -58,7 +58,7 @@
         </div>
 
         <div id="uploadSecondRow">
-            <form action="{% url "upload" %}" method="POST" enctype="multipart/form-data">
+            <form action="{% url "icing:upload" %}" method="POST" enctype="multipart/form-data">
                 {% csrf_token %}
                 {{ form.non_field_errors }}
                 <div id="file-upload" style="display: inline-block;">

@@ -11,14 +11,6 @@ class UploadFileForm(forms.ModelForm):
         fields = ['submission_type']
 
 
-class RunSetupForm(forms.ModelForm):
-    class Meta:
-        model = Submission
-        fields = ['ranges',
-                  'ensemble',
-                  'verbosity']
-
-
 class CcpnSubmissionForm(forms.Form):
     Action = forms.ChoiceField(choices=(('Save', 'Save'),
                                         ('ProjectName', 'ProjectName'),

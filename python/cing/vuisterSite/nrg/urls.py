@@ -3,26 +3,26 @@ from __future__ import unicode_literals, print_function, absolute_import, divisi
 from django.conf.urls import url
 from django.views.generic.base import TemplateView
 
-from . import views
+from .views import RevisionedTemplateView, fakeDataTableServer
 
 urlpatterns = [
-    url(r'^$|(?i)index\.html{0,1}', TemplateView.as_view(template_name='nrg/index.html'),
-    name='nrg_home'),
+    url(r'^$|(?i)index\.html{0,1}', RevisionedTemplateView.as_view(template_name='nrg/index.html'),
+    name='home'),
     url(r'^(?i)about', TemplateView.as_view(template_name='nrg/about.html'),
-    name='nrg_about'),
+    name='about'),
     url(r'^(?i)credits', TemplateView.as_view(template_name='nrg/credits.html'),
-    name='nrg_credits'),
+    name='credits'),
     url(r'^(?i)download', TemplateView.as_view(template_name='nrg/download.html'),
-    name='nrg_download'),
+    name='download'),
     url(r'^(?i)help', TemplateView.as_view(template_name='nrg/help.html'),
-    name='nrg_help'),
+    name='help'),
     url(r'^(?i)cinghelp', TemplateView.as_view(template_name='nrg/cingHelp.html'),
     name='cing_help'),
     url(r'^(?i)glossary', TemplateView.as_view(template_name='nrg/glossary.html'),
-    name='nrg_glossary'),
+    name='glossary'),
     url(r'^(?i)tutorials', TemplateView.as_view(template_name='nrg/tutorials.html'),
-    name='nrg_tutorials'),
+    name='tutorials'),
 
-    url(r'^fdts$', views.fakeDataTableServer, name='fdts'),
+    url(r'^fdts$', fakeDataTableServer, name='fdts'),
 ]
 

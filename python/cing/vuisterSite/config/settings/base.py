@@ -13,26 +13,22 @@ https://docs.djangoproject.com/en/1.8/ref/settings/
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
 
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+from django.core.exceptions import ImproperlyConfigured
 
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/1.8/howto/deployment/checklist/
+config_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+BASE_DIR = os.path.split(config_dir)[0]
+
+def get_env_var(var):
+    try:
+        return os.environ[var]
+    except KeyError:
+        error_message = "Set the {} environment variable.".format(var)
+        raise ImproperlyConfigured(error_message)
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ['DJANGO_SECRET_KEY']
-
-# SECURITY WARNING: don't run with debug turned on in production!
-if os.environ['DJANGO_CONFIGURATION'].lower().startswith('dev'):
-    DEBUG = TEMPLATE_DEBUG = True
-else:
-    DEBUG = TEMPLATE_DEBUG = False
-
-
-ALLOWED_HOSTS = ['www.icing.org.uk',
-                 'icing.org.uk',
-                 'www.nrgcing.org.uk',
-                 'nrgcing.org.uk']
+# Using Apache2 on OpenSUSE it's stored in /etc/sysconfig/apache2
+SECRET_KEY = get_env_var('DJANGO_SECRET_KEY')
 
 
 # Application definition
@@ -60,12 +56,12 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.security.SecurityMiddleware',
 )
 
-ROOT_URLCONF = 'vuisterSite.urls'
+ROOT_URLCONF = 'config.urls'
 
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join( BASE_DIR, 'templates')]
+        'DIRS': [os.path.join(BASE_DIR, 'templates')]
         ,
         'APP_DIRS': True,
         'OPTIONS': {
@@ -79,50 +75,23 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'vuisterSite.wsgi.application'
-
-
-# Database
-# https://docs.djangoproject.com/en/1.8/ref/settings/#databases
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-    }
-}
-
-if 'DJANGO_CONFIGURATION' in os.environ:
-    if (os.environ['DJANGO_CONFIGURATION'] == 'Deploy' or
-        os.environ['DJANGO_CONFIGURATION'] == 'Development-postgres'):
-        DATABASES = {
-                'default': {
-                    'ENGINE': 'django.db.backends.postgresql_psycopg2',
-                    'NAME': 'icing',
-                    'USER': 'icing',
-                }
-            }
-
+WSGI_APPLICATION = 'config.wsgi.application'
 
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.8/topics/i18n/
-
 LANGUAGE_CODE = 'en-us'
-
 TIME_ZONE = 'UTC'
-
 USE_I18N = True
-
 USE_L10N = True
-
 USE_TZ = True
 
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.8/howto/static-files/
-
+STATICFILES_DIRS = (os.path.join(BASE_DIR, 'static'),)
 STATIC_URL = '/static/'
+
 
 LOGGING = {
     'version': 1,

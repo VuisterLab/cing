@@ -2,18 +2,23 @@ from __future__ import unicode_literals, print_function, absolute_import, divisi
 
 from collections import OrderedDict
 import csv
+import time
+import subprocess
 import os
 
-from django.shortcuts import render, redirect
+from django.shortcuts import redirect
 from django.http import JsonResponse, HttpResponse
+from django.views.generic.base import TemplateView
 from django.views.decorators.csrf import csrf_exempt
-# Create your views here.
+from django.conf import settings
 
 import psycopg2 as pg
 
-db_location = os.environ['DATABASELOCATION']
 
-CONN_STRING = "host='{}' dbname='pdbmlplus' user='nrgcing1' password='4I4KMS'".format(db_location)
+nrg_file_location = 'http://143.210.185.204/NRG-CING/data'
+
+nrg_settings = settings.DATABASES['nrg']
+CONN_STRING = "host='{HOST}' dbname={NAME} user={USER} password={PASSWORD}".format(**nrg_settings)
 _COLUMNS = 'is_solid name pdb_id bmrb_id rog_str distance_count cs_count chothia_class_str chain_count res_count'.split()
 _sTable = "nrgcing.cingentry"
 
@@ -22,8 +27,7 @@ def fakeDataTableServer(request):
 
     if ('database' in request.GET):
         name = request.GET['id']
-        return redirect('http://143.210.185.204/NRG-CING/data/{0}/{1}/{1}.cing'
-                        .format(name[1:3], name))
+        return redirect('{0}/{1}/{2}/{2}.cing'.format(nrg_file_location, name[1:3], name))
 
     else:
         conn = pg.connect(CONN_STRING)
@@ -65,8 +69,8 @@ def fakeDataTableServer(request):
                 name = result[1]
                 pdb = result[2]
                 bmrb = result[3]
-                formattedResult.append("<a href='http://143.210.185.204/NRG-CING/data/{0}/{1}/{1}.cing.tgz'><img src='icon_download.gif' width=34 height=34 border=0></a>".format(name[1:3], name))
-                formattedResult.append("<a href='http://143.210.185.204/NRG-CING/data/{0}/{1}/{1}.cing'><img src='http://143.210.185.204/NRG-CING/data/{0}/{1}/{1}.cing/{1}/HTML/mol_pin.gif' width=57 height=40 border=0></a>".format(name[1:3], name))
+                formattedResult.append("<a href='{0}/{1}/{2}/{2}.cing.tgz'><img src='/static/nrg/dataTableMedia/images/icon_download.gif' width=34 height=34 border=0></a>".format(nrg_file_location, name[1:3], name))
+                formattedResult.append("<a href='{0}/{1}/{2}/{2}.cing'><img src='{0}/{1}/{2}/{2}.cing/{2}/HTML/mol_pin.gif' width=57 height=40 border=0></a>".format(nrg_file_location, name[1:3], name))
                 formattedResult.append("<a href='http://www.rcsb.org/pdb/explore/explore.do?structureId={}'>{}</a>".format(name, pdb))
 
                 if result[3] is not None:
@@ -101,3 +105,14 @@ def fakeDataTableServer(request):
                 writer.writerow(result[2:10])
 
             return response
+
+
+class RevisionedTemplateView(TemplateView):
+
+    def cing_version(self):
+        version = subprocess.check_output(["git", "describe"], cwd=os.environ['CINGROOT']),
+        return version[0][:-1]
+
+    def cing_update(self):
+        return time.ctime(os.path.getmtime(os.path.join(os.environ['CINGROOT'],'.git', 'FETCH_HEAD')))
+

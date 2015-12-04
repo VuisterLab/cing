@@ -18,26 +18,26 @@
 <div id="container">
 <div id="header">
     <H1>NRG-CING</H1>
-    <a href="{% url 'nrg_home' %}" title="goto home page">Home</a>
-    <A HREF="{% url 'nrg_about' %}" title="goto page with help about this front page">About</A>
-    <A HREF="{% url 'nrg_credits' %}" title="goto page with credits">Credits</A>
-    <A HREF="{% url 'nrg_download' %}" title="goto page with more resources to download">Download</A>
-    <A HREF="{% url 'nrg_help' %}" title="goto page with help">NRG Help</A>
-    <A HREF="{% url 'cing_help' %}" title="goto CING help page">CING Help</A>
-    <A HREF="{% url 'nrg_glossary' %}" title="goto glossary page">Glossary</A>
-    <A HREF="{% url 'nrg_tutorials' %}" title="goto Youtube screencasts page">Tutorials</A>
+    <a href="{% url 'nrg:home' %}" title="goto home page">Home</a>
+    <A HREF="{% url 'nrg:about' %}" title="goto page with help about this front page">About</A>
+    <A HREF="{% url 'nrg:credits' %}" title="goto page with credits">Credits</A>
+    <A HREF="{% url 'nrg:download' %}" title="goto page with more resources to download">Download</A>
+    <A HREF="{% url 'nrg:help' %}" title="goto page with help">NRG Help</A>
+    <A HREF="{% url 'nrg:cing_help' %}" title="goto CING help page">CING Help</A>
+    <A HREF="{% url 'nrg:glossary' %}" title="goto glossary page">Glossary</A>
+    <A HREF="{% url 'nrg:tutorials' %}" title="goto Youtube screencasts page">Tutorials</A>
     <br/>
     <br/>
 {% block body_block %}{% endblock body_block %}
 
 <p>
 Feel free to contact:
-T.J. Ragan            <a href="mailto:tjr22@le.ac.uk">      <img src="{%  static 'nrg/images/icon_email.gif' %}" border="0/"></a>,
-Gert Vriend           <a href="mailto:vriend@cmbi.ru.nl">      <img src="{%  static 'nrg/images/icon_email.gif' %}" border="0/"></a>, or
-Geerten W. Vuister    <a href="mailto:gv29@leicester.ac.uk"><img src="{%  static 'nrg/images/icon_email.gif' %}" border="0/"></a>
+T.J. Ragan            <a href="mailto:tjr22@le.ac.uk">      <img src="{%  static 'images/icon_email.gif' %}" border="0/"></a>,
+Gert Vriend           <a href="mailto:vriend@cmbi.ru.nl">      <img src="{%  static 'images/icon_email.gif' %}" border="0/"></a>, or
+Geerten W. Vuister    <a href="mailto:gv29@leicester.ac.uk"><img src="{%  static 'images/icon_email.gif' %}" border="0/"></a>
 about the NRG-CING project.
 </p>
-<a href='http://nmr.cmbi.ru.nl/NRG-CING'>NRG-CING</A> resource last updated on Fri Apr 18 01:02:21 2014 by CING (<a href="http://code.google.com/p/cing/source/detail?r=1213">r1213</a>)</p><!-- end footer --></div>
+<a href='http://nmr.cmbi.ru.nl/NRG-CING'>iCing</A> resource last updated on {{ view.cing_update }} (<a href="http://code.google.com/p/cing/source/detail?r=1213">{{ view.cing_version }}</a>)</p><!-- end footer --></div>
 <!-- end container --></div>
 
 <!-- The script below will anonymously report usage data to Google Analytics by any javascript enabled browser. -->

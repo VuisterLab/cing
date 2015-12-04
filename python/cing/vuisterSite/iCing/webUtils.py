@@ -55,10 +55,6 @@ def determineSubmissionType(submission_code):
         else:
             if i.endswith('.pdb') or i.endswith('.ent'):
                 return 'PDB'
-            # elif i.endswith('.cyana.tgz') or i.endswith('.cyana.tar.gz'):
-            #     return 'CYANA'
-            # elif i.endswith('.ccpn.tgz') or i.endswith('.ccpn.tar.gz'):
-            #     return 'CCPN'
             elif i.endswith('tgz') or i.endswith('tar.gz'):
                 import tarfile
                 with tarfile.open(os.path.join(submittedLocation, i)) as tfile:
@@ -71,8 +67,7 @@ def determineSubmissionType(submission_code):
                     pdb = any(['.pdb' in f for f in tfileFileNames])
                     upl = any(['.upl' in f for f in tfileFileNames])
                     aco = any(['.aco' in f for f in tfileFileNames])
-                    lol = any(['.lol' in f for f in tfileFileNames])
-                    if all((pdb, upl, aco, lol)):
+                    if all((pdb, upl, aco)):
                             return 'CYANA'
     logger.warn('Failed to determine project type for {}'.format(submission_code))
     return 'unknown'
