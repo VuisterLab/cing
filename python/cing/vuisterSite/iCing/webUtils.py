@@ -6,7 +6,11 @@ import os
 import logging
 # import json
 # import sys
+import tarfile
 import subprocess
+
+from django.core.exceptions import SuspiciousFileOperation
+
 from .models import Submission
 
 
@@ -56,9 +60,13 @@ def determineSubmissionType(submission_code):
             if i.endswith('.pdb') or i.endswith('.ent'):
                 return 'PDB'
             elif i.endswith('tgz') or i.endswith('tar.gz'):
-                import tarfile
                 with tarfile.open(os.path.join(submittedLocation, i)) as tfile:
                     tfileFileNames = tfile.getnames()
+
+                    for name in tfileFileNames:
+                        if (name.startswith('/') or '..' in name):
+                            raise SuspiciousFileOperation('non-relative file name {} in tar file'
+                                                          .format(name))
 
                     memopsImplementatonPath = os.path.join('memops', 'Implementation')
                     if any([memopsImplementatonPath in f for f in tfileFileNames]):
@@ -177,7 +185,7 @@ def startCingRun(submission_code):
     logger.info('Starting: {} from {}'.format(submission_code, submission.ip))
     rd = cc.getRunDirectory()
     rc = cc.getRunCommand()
-    print(rd, rc)
+    logger.debug('ICING_DATA_DIRECTORY: {}'.format(os.environ['ICING_DATA_DIRECTORY']))
     logger.debug('Calling: {} in {}'.format(rc, rd))
 
     subprocess.Popen(cc.getRunCommand(), cwd=rd, env=env)

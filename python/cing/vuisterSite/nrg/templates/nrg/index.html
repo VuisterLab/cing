@@ -55,20 +55,21 @@ data.
 </p>
 </td>
 <td align="right">
-            <div style="width: 25em">
-{#            <FORM method="GET" action="{% static 'nrg/cgi-bin/DataTablesServer.py' %}" class="display">#}
-            <FORM method="GET" action="{% url 'nrg:fdts' %}" class="display">%}
-            Search by PDB ID (e.g. 9pcy):
-            <INPUT type="hidden" name="database" value="pdb" align="left">
-            <INPUT type="text" size="4" name="id" value="" title="Please provide the PDB identifier to obtain the validation report">
-            <INPUT type="submit" name="button" value="Go">                        
-            </FORM>
-            </div>
-        </td>
+</td>
 </tr>
 </table>
 <!-- <h3>    Query </h3> -->
-<div  id="summaryArchiveDiv">
+<div style="width: 25em; padding-left: 1em">
+{#            <FORM method="GET" action="{% static 'nrg/cgi-bin/DataTablesServer.py' %}" class="display">#}
+    <FORM method="GET" action="{% url 'nrg:fdts' %}" class="display">
+        Search by PDB ID (e.g. 9pcy):
+        <INPUT type="hidden" name="database" value="pdb" align="left">
+        <INPUT type="text" size="4" name="id" value="" title="Please provide the PDB identifier to obtain the validation report">
+        <INPUT type="submit" name="button" value="Go">
+    </FORM>
+</div>
+
+    <div  id="summaryArchiveDiv">
 
             <table id="dataTables-summaryArchive" class="display" cellspacing="0" cellpadding="0" border="0"> 
             <thead>

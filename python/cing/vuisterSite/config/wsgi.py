@@ -13,10 +13,6 @@ import subprocess
 
 from django.core.wsgi import get_wsgi_application
 
-try:
-    from vuisterSite import localsettings
-except ImportError:
-    pass
 
 def shell_source(script):
     pipe = subprocess.Popen('env'.format(script), stdout=subprocess.PIPE, shell=True, executable='/bin/bash')
@@ -40,9 +36,5 @@ if cing_env is not None:
     for k,v in cing_env.items():
         os.environ.setdefault(k,v)
 
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "vuisterSite.settings")
-os.environ.setdefault('DJANGO_CONFIGURATION',  'Develop')
-os.environ.setdefault('DJANGO_SECRET_KEY', '@0+9fi5b-(flog@1yadt-xb#k=xhonbv#&+3a7+ez-zj$=5jao')
-os.environ.setdefault('ICING_DATA_DIRECTORY', '.')
 
 application = get_wsgi_application()

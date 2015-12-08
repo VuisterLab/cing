@@ -1,0 +1,99 @@
+This readme covers both the Django website, and how to set it up on an Apache2 server...
+
+##################
+# Apache2 Server #
+##################
+
+Apache serves the django project via mod_WSGI, and so these two lines get added to the bottom
+of the httpd.conf file:
+-------------------------
+WSGIDaemonProcess cing.co.uk processes=2 threads=15 python-path=/local/cing/python/cing/vuisterSite:/usr/local/lib/python2.7/site-packages
+WSGIProcessGroup cing.co.uk
+-------------------------
+
+Also, we actually symlink into the /local directory, so these lines must be added as well:
+-------------------------
+<Directory /local>
+Options +FollowSymLinks
+</Directory>:q!
+-------------------------
+
+and the sites themselves are served with virtual hosts, setup as follows:
+
+Static files are served by Apache2 from /local/www (this must be set in both the virtual hosts
+and in the Django STATIC_URL variable)
+With the vhosts.conf files listed below, users can serve their own static sites from their
+public_html folders.
+
+vhost.conf:
+-------------------------
+<VirtualHost *:80>
+
+ServerName www.icing.org.uk
+ServerAlias icing.org.uk
+
+WSGIScriptAliasMatch "^/(?!~)" /local/cing/python/cing/vuisterSite/config/wsgi.py
+
+RedirectMatch ^/$ /iCing/
+
+<Directory /local/cing/python/cing/vuisterSite/config/>
+<Files wsgi.py>
+Require all granted
+</Files>
+</Directory>
+
+Alias /static/ /local/www/vuisterSite/static/
+<Directory /local/www/vuisterSite/static/>
+Require all granted
+</Directory>
+
+Alias /iCing/data/ /local/iCingData/
+<Directory /local/iCingData>
+Require all granted
+</Directory>
+
+<Directory /local/iCingData/*/*>
+Options +Indexes
+</Directory>
+
+Alias /temp/cing/ /home/iCing/Data/
+
+</VirtualHost>
+-------------------------
+
+There are currently two virtual hosts: icing, which redirects to /iCing/; and nrgcing, which
+redirects to /nrg/.
+
+
+##########
+# Django #
+##########
+
+The Django project uses shell environment variables (not to be confused with Apache environment
+variables,) to store two key settings:
+1. The secret key, used for CSRF protection (essential,) and cryptography (currently not used).
+2. The location of the settings file that contains all the site-specific settings.
+These variables are set at the bottom of /etc/sysconfig/apache2 (in Apache on openSUSE)
+-------------------------
+DJANGO_SETTINGS_MODULE="config.settings.production"
+DJANGO_SECRET_KEY=
+-------------------------
+Note:  You MUST set the DJANGO_SECRET_KEY environment variable or the site won't load.  If you don't
+     set the DJANGO_SETTINGS_MODULE variable, you have to launch the server like:
+     python manage.py runserver --settings=config.settings.production
+
+The static files (images, css, javascript, etc,... are stored in the `static` directory
+
+There are currently three sites (apps,) hopefully soon two:
+1. nrg -  This is mostly a staic site, but it has an interactive dataTablesServer component.  This
+        component makes request to a backend that queries the postgreSQL database and returns some
+        results.  Previously this involved a separate (and possibly custom) server.  The web side is
+        now handled by Django and the backend is still based on SQL queries via psycopg2.
+
+2. iCing -  This is a complete re-write of the icing site from java to python.
+
+3. nmr -  This is the landing page that should go static...
+
+Note:  If you actually want iCing to run jobs, you need to setup the cing environment in a script
+     called `$CINGHOME\python\cing\setupCingEnv.bash` or whatever you set in the CING_ENV_SETUP_SCRIPT
+     environment variable.

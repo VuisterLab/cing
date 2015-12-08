@@ -29,6 +29,11 @@ px    em  styles using them
 Note that many sites quote a default of 16 px as the standard.
 */
 
+
+/** {*/
+    /*border: 1px dashed #0000FF;*/
+/*}*/
+
 body {
     background: #ede8e2;
     margin: 0.0em 0.0em 0.0em 0.0em;
