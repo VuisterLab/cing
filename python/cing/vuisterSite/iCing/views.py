@@ -21,6 +21,11 @@ logger = logging.getLogger(__name__)
 
 
 class CingVersionMixin(object):
+    """
+    Mixin to inject cing version and update timestamp into views
+
+    Views that use the {{ view.cing_XXX }} template tag will get the return value of these functions
+    """
 
     def cing_version(self):
         version = subprocess.check_output(["git", "describe"], cwd=os.environ['CINGROOT']),
@@ -31,11 +36,14 @@ class CingVersionMixin(object):
 
 
 class UploadView(CingVersionMixin, FormView):
+    """
+    Display the upload page if requested with a GET, and process the uploaded file from a POST.
+    """
     template_name = 'iCing/upload.html'
     form_class = UploadFileForm
 
     def form_valid(self, form):
-        submission = Submission(code = handleUploadedFile(self.request))
+        submission = Submission(code=handleUploadedFile(self.request))
 
         determinedSubmissionType = determineSubmissionType(submission.code)
         submission.filename = self.request.FILES['user_file'].name
@@ -94,8 +102,14 @@ def logTextView(request, pk):
 
 def runFinishedView(request, pk):
     cc = CingCommand(pk)
-    return HttpResponse(is_run_finished(cc.getReportDirectory()), content_type='text/plain')
-
+    reportDirectory = cc.getReportDirectory()
+    runFinished = is_run_finished(reportDirectory)
+    if runFinished:
+        import subprocess
+        cwd, reportName = os.path.split(reportDirectory)
+        tgzName = reportName + '.tgz'
+        subprocess.Popen(['/bin/tar', '-czf', tgzName, reportName], cwd=cwd)
+    return HttpResponse(runFinished, content_type='text/plain')
 
 def view(request, pk):
     submission = Submission.objects.get(code=pk)
