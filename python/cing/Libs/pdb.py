@@ -21,9 +21,23 @@ Methods:
 
 Speed check: 103.609s for pdbParser.importCoordinates: <Molecule "pdb2k0e" (C:1,R:152,A:2647,M:160)>
 """
+import os
+import cing
 from cing.Libs import PyMMLib
-from cing.Libs.NTutils import * #@UnusedWildImport
-from cing.constants import * #@UnusedWildImport
+#from cing.Libs.NTutils import * #@UnusedWildImport
+#from cing.constants import * #@UnusedWildImport
+from cing import constants
+from cing.Libs.NTutils import nTmessage
+from cing.Libs.NTutils import nTerror
+from cing.Libs.NTutils import nTcodeerror
+from cing.Libs.NTutils import nTdetail
+from cing.Libs.NTutils import nTpath
+from cing.Libs.NTutils import NTtree
+from cing.Libs.NTutils import nTwarning
+from cing.Libs.NTutils import sprintf
+
+from cing.Libs.NTutils2 import MsgHoL
+
 from cing.core.database import NTdb
 from cing.core.molecule import Molecule
 from cing.core.molecule import getNextAvailableChainId
@@ -35,7 +49,7 @@ defaultPrintChainCode = '.'
 #==============================================================================
 # PDB stuff
 #==============================================================================
-def importFromPDB(molecule, pdbFile, convention = IUPAC, nmodels = None, allowNonStandardResidue = True, verbosity = None):
+def importFromPDB(molecule, pdbFile, convention = constants.IUPAC, nmodels = None, allowNonStandardResidue = True, verbosity = None):
     """Import coordinates from pdbFile (optionally: first nmodels)
        convention e.g. PDB, CYANA, CYANA2, XPLOR, IUPAC
 
@@ -85,7 +99,7 @@ class pdbParser:
                ResidueDef<->AtomDef
 
     """
-    def __init__(self, pdbFile, convention = IUPAC, patchAtomNames = True, skipWaters = False, allowNonStandardResidue = True):
+    def __init__(self, pdbFile, convention = constants.IUPAC, patchAtomNames = True, skipWaters = False, allowNonStandardResidue = True):
 
         self.pdbFile = pdbFile
         self.convention = convention
@@ -97,7 +111,6 @@ class pdbParser:
 
         if not os.path.exists(pdbFile):
             nTerror('pdbParser: missing PDB-file "%s"', pdbFile)
-            return None
 
         nTmessage('==> Parsing pdbFile "%s" ... ', pdbFile)
 
@@ -307,15 +320,15 @@ class pdbParser:
 #                        nTdebug( '>> %s' % atm )
                         continue
                     #t = (IUPAC, chn.name, res.resNum, atm.db.name)
-                    # GV the atm.db.name is BY DEFINITION in INTERNAL format!
+                    # GV the atm.db.name is BY DEFINITION in constants.INTERNAL format!
                     # IUPAC and other mapping has already been done before and should not be
                     # repeated here. It also will cause a potential swap of atoms
-                    t = (INTERNAL, chn.name, res.resNum, atm.db.name)
+                    t = (constants.INTERNAL, chn.name, res.resNum, atm.db.name)
                     atm.atom = molecule.decodeNameTuple(t)
 #                    if res.resNum==83:
 #                        nTdebug(  '>> %s %s %s', atm.name, t, atm.atom )
 #                    if not atm.atom: # for the non-standard residues and atoms.
-#                        t = (INTERNAL, chn.name, res.resNum, atm.db.name)
+#                        t = (constants.INTERNAL, chn.name, res.resNum, atm.db.name)
 #                        atm.atom = molecule.decodeNameTuple(t)
                     if not atm.atom:
                         # JFD: Report all together now.
@@ -413,7 +426,7 @@ class pdbParser:
 #end class
 
 class MatchGame:
-    def __init__(self, convention = IUPAC, patchAtomNames = True, skipWaters = False, allowNonStandardResidue = True):
+    def __init__(self, convention = constants.IUPAC, patchAtomNames = True, skipWaters = False, allowNonStandardResidue = True):
         self.convention = convention
         self.patchAtomNames = patchAtomNames
         self.skipWaters = skipWaters
@@ -423,7 +436,7 @@ class MatchGame:
         """
         Match res to CING database using previously defined convention;
         Account for 'ill-defined' residues by examining crucial atom names.
-        Use CYANA (==DIANA) Naming for conversion to INTERNAL (i.e. These names will not likely change)
+        Use CYANA (==DIANA) Naming for conversion to constants.INTERNAL (i.e. These names will not likely change)
 
         Return NTdb resDef object None on Error
 
@@ -442,54 +455,54 @@ class MatchGame:
         # Residue names that are ambiguously defined by different PDB file formats
         if res.resName[0:3] == 'ARG':
             if 'HH1' in res:
-                res.db = NTdb.getResidueDefByName('ARG', convention = CYANA)
+                res.db = NTdb.getResidueDefByName('ARG', convention = constants.CYANA)
             elif '1HH' in res: # Second set for CYANA 1.x, AMBER
-                res.db = NTdb.getResidueDefByName('ARG', convention = CYANA)
+                res.db = NTdb.getResidueDefByName('ARG', convention = constants.CYANA)
             else:
                 # Default protonated; this also assures most common for X-ray without protons
-                res.db = NTdb.getResidueDefByName('ARG+', convention = CYANA)
+                res.db = NTdb.getResidueDefByName('ARG+', convention = constants.CYANA)
             #end if
         #end if
         elif res.resName[0:3] == 'ASP':
             if 'HD2' in res:
                 #print 'ASPH'
-                res.db = NTdb.getResidueDefByName('ASP', convention = CYANA)
+                res.db = NTdb.getResidueDefByName('ASP', convention = constants.CYANA)
             else:
                 # Default deprot; this also assures most common for X-ray without protons
                 #print 'ASP'
-                res.db = NTdb.getResidueDefByName('ASP-', convention = CYANA)
+                res.db = NTdb.getResidueDefByName('ASP-', convention = constants.CYANA)
             #end if
         elif res.resName[0:3] == 'GLU':
             if 'HE2' in res:
                 #print 'GLUH'
-                res.db = NTdb.getResidueDefByName('GLU', convention = CYANA)
+                res.db = NTdb.getResidueDefByName('GLU', convention = constants.CYANA)
             else:
                 # Default deprot; this also assures most common for X-ray without protons
                 #print 'GLU'
-                res.db = NTdb.getResidueDefByName('GLU-', convention = CYANA)
+                res.db = NTdb.getResidueDefByName('GLU-', convention = constants.CYANA)
             #end if
         elif res.resName[0:3] == 'HIS':
             if 'HD1' in res and 'HE2' in res:
                 #print 'HISH'
-                res.db = NTdb.getResidueDefByName('HIS+', convention = CYANA)
+                res.db = NTdb.getResidueDefByName('HIS+', convention = constants.CYANA)
             elif not 'HD1' in res and 'HE2' in res:
                 # print HISE
-                res.db = NTdb.getResidueDefByName('HIST', convention = CYANA)
+                res.db = NTdb.getResidueDefByName('HIST', convention = constants.CYANA)
             else:
                 # Default HD1
                 #print 'HIS'
-                res.db = NTdb.getResidueDefByName('HIS', convention = CYANA)
+                res.db = NTdb.getResidueDefByName('HIS', convention = constants.CYANA)
             #end if
         elif res.resName[0:3] == 'LYS':
             if ('HZ1' in res and not 'HZ3' in res):
-                res.db = NTdb.getResidueDefByName('LYS', convention = CYANA)
+                res.db = NTdb.getResidueDefByName('LYS', convention = constants.CYANA)
             elif ('1HZ' in res and not '3HZ' in res): # Second set for CYANA 1.x
-                res.db = NTdb.getResidueDefByName('LYS', convention = CYANA)
+                res.db = NTdb.getResidueDefByName('LYS', convention = constants.CYANA)
             else:
                 # Default prot; this also assures most common for X-ray without protons
-                res.db = NTdb.getResidueDefByName('LYS+', convention = CYANA)
+                res.db = NTdb.getResidueDefByName('LYS+', convention = constants.CYANA)
             #end if
-        elif res.resName in CYANA_NON_RESIDUES:
+        elif res.resName in constants.CYANA_NON_RESIDUES:
             res.skip = True
         elif res.resName == 'HOH' and self.skipWaters:
             res.skip = True
@@ -505,7 +518,7 @@ class MatchGame:
             res.skip = True
             return res.db
 
-        # Try to match the residue using INTERNAL convention.
+        # Try to match the residue using constants.INTERNAL convention.
         res.db = NTdb.getResidueDefByName(res.resName)
         if res.db:
             return res.db
@@ -600,7 +613,7 @@ class MatchGame:
             #end if
 #            if not atm.db:
             bName = None # Don't save the variable name beyond patch attempt.
-            if atm.name == 'H': # happens for 1y4o_1model reading as cyana but in cyana we have hn for INTERNAL_0
+            if atm.name == 'H': # happens for 1y4o_1model reading as cyana but in cyana we have hn for constants.INTERNAL_0
                 bName = 'HN'
             elif atm.name == 'HN': # for future examples.
                 bName = 'H'
@@ -628,7 +641,7 @@ def moveFirstDigitToEnd(a):
     return a
 
 
-def initPDB(project, pdbFile, convention = IUPAC, name = None, nmodels = None, update = True, allowNonStandardResidue = True):
+def initPDB(project, pdbFile, convention = constants.IUPAC, name = None, nmodels = None, update = True, allowNonStandardResidue = True):
     """Initialize Molecule from pdbFile.
        convention eq. CYANA, CYANA2, XPLOR, IUPAC
 
@@ -666,7 +679,7 @@ def initPDB(project, pdbFile, convention = IUPAC, name = None, nmodels = None, u
 #end def
 
 
-def importPDB(project, pdbFile, convention = IUPAC, nmodels = None):
+def importPDB(project, pdbFile, convention = constants.IUPAC, nmodels = None):
     """Import coordinates from pdbFile
         return pdbFile or None on error
     """
@@ -691,7 +704,7 @@ def export2PDB(project, tmp = None):
         if mol.modelCount > 0:
             fname = project.path(project.directories.PDB, mol.name + '.pdb')
             nTdetail('==> Exporting to PDB file "%s"', fname)
-            pdbFile = mol.toPDB(fileName = fname, convention = IUPAC)
+            pdbFile = mol.toPDB(fileName = fname, convention = constants.IUPAC)
             pdbFile.save(fname)
             #del(pdbFile)
             return fname

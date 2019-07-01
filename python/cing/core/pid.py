@@ -224,7 +224,7 @@ class Pid(str):
         result = [parts[0]]
 
         if parts[1]:
-            result.extend('.'.split(parts[1]))
+            result.extend(parts[1].split('.'))
 
         return result
     #end def

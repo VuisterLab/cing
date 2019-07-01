@@ -6,6 +6,7 @@
 #=======================================================================
 	commonName = 'VAL'
 	shortName  = 'V'
+	cingDefinition = True
 	comment    = 'Regular Val residue'
 	nameDict   = {'CCPN': 'protein Val neutral', 'INTERNAL_0': 'VAL', 'CYANA': 'VAL', 'CYANA2': 'VAL', 'INTERNAL_1': 'VAL', 'IUPAC': 'VAL', 'AQUA': 'VAL', 'BMRBd': 'VAL', 'XPLOR': 'VAL', 'PDB': 'VAL'}
 	properties = ['protein', 'aliphatic', 'methyl_containing', 'neutral']

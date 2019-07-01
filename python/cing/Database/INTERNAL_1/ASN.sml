@@ -6,6 +6,7 @@
 #=======================================================================
 	commonName = 'ASN'
 	shortName  = 'N'
+	cingDefinition = True
 	comment    = 'Regular Asn residue'
 	nameDict   = {'CCPN': 'protein Asn neutral', 'INTERNAL_0': 'ASN', 'CYANA': 'ASN', 'CYANA2': 'ASN', 'INTERNAL_1': 'ASN', 'IUPAC': 'ASN', 'AQUA': 'ASN', 'BMRBd': 'ASN', 'XPLOR': 'ASN', 'PDB': 'ASN'}
 	properties = ['protein', 'aliphatic', 'polar']

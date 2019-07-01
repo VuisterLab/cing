@@ -631,7 +631,7 @@ class Molecule( ntu.NTtree, ResidueList ):
         except:
             nTerror("Failed keepSelectedModels; please check the input string [" + modelListStr + "]")
 
-    def addChain( self, name=None, **kwds ):
+    def addChain( self, name=None, checkForValidChainId=True, **kwds ):
         """
         Add Chain instance name
            or
@@ -645,7 +645,7 @@ class Molecule( ntu.NTtree, ResidueList ):
         if name in self:
             nTwarning( 'Molecule.addChain: chain "%s" already present' % name )
             name = None
-        if not isValidChainId( name ): # Catch ccpn ' ' etc.
+        if checkForValidChainId and not isValidChainId( name ): # Catch ccpn ' ' etc.
             name = None
 
         if name==None:
@@ -2469,46 +2469,19 @@ Return an Molecule instance or None on error
     initialize = staticmethod( initialize )
 
     # pylint: disable=C0103
-    def addResidue( self, chainId, resName, resNum, convention, Nterminal=False, Cterminal=False ):
+    def addResidue( self, chainId, resName, resNum, convention, Nterminal=False, Cterminal=False, strict=True ):
         """
         Internal routine to add a residue to molecule
         Add chain if not yet present
 
         return Residue instance or None or error
         """
-#        rn = translateResidueName( convention, resName, INTERNAL )
-#        if (rn == None):
-#            nTerror('Molecule.addResidue: chain %s, residue "%s" not valid for convention "%s"',
-#                     chainId, resName, convention
-#                   )
-#            return None
-#        else:
-#            if chainId == None:
-#                chainId = Chain.defaultChainId
-#
-#            if chainId not in self:
-#                chain = self.addChain(chainId)
-#            else:
-#                chain = self[chainId]
-#            #end if
-#            if not chain: return None
-#
-#            # Add the residue if not present
-#            if resNum in chain:
-#                return chain[resNum]
-#            #end if
-#            residue = chain.addResidue( rn, resNum, Nterminal=Nterminal, Cterminal=Cterminal )
-#            if not residue: return None
-#
-#            # Use database to add atoms
-#            residue.addAllAtoms()
-#        #end if
 
         if chainId == None:
             chainId = Chain.defaultChainId
 
         if chainId not in self:
-            chain = self.addChain(chainId)
+            chain = self.addChain(chainId, checkForValidChainId=strict)
         else:
             chain = self[chainId]
         #end if
@@ -2519,7 +2492,7 @@ Return an Molecule instance or None on error
         if resNum in chain:
             return chain[resNum]
         #end if
-        residue = chain.addResidue( resName, resNum, convention=convention, Nterminal=Nterminal, Cterminal=Cterminal )
+        residue = chain.addResidue( resName, resNum, convention=convention, Nterminal=Nterminal, Cterminal=Cterminal, strict=strict )
         if not residue:
             return None
 
@@ -3718,14 +3691,30 @@ Chain class: defines chain properties and methods
     # pylint: disable=C0103
     def addResidue( self, resName, resNum, convention=INTERNAL,
                     Nterminal=False, Cterminal=False,
-                    FiveTerminal=False, ThreeTerminal=False, **kwds ):
+                    FiveTerminal=False, ThreeTerminal=False,
+                    strict=True,
+                    **kwds ):
         if self.has_key(resNum):
             nTwarning( 'Chain.addResidue: residue number "%s" already present in %s perhaps there is a insertion code? Skipping residue',
                        resNum, self )
             nTwarning("See also issue: %s%d" % (issueListUrl, 226))
             return None
         #end if
-        res = Residue( resName=resName, resNum=resNum, convention=convention, Nterminal=Nterminal, Cterminal=Cterminal, **kwds )
+        # check if resName is known
+        if database.NTdb.getResidueDefByName(resName, convention=convention) is None:
+            if strict:
+                nTerror( 'Chain.addResidue: stict checking: residue "%s" not defined for convention %s', resName, convention )
+                return None
+            #endif
+
+            dName = '_'.join((self.molecule.name, self.name, resName))
+            #print '>>>', self.name, resName, resNum, dName
+            db = database.NTdb.appendResidueDef(dName, commonName=resName)
+            db.postProcess()
+            res = Residue( resName=dName, resNum=resNum, convention=convention, Nterminal=Nterminal, Cterminal=Cterminal, **kwds )
+        else:
+            res = Residue( resName=resName, resNum=resNum, convention=convention, Nterminal=Nterminal, Cterminal=Cterminal, **kwds )
+        #end if
         if res.name in self:
             nTwarning( 'Chain.addResidue: residue "%s" already present in %s; skipping residue', res.name, self.name )
             return None
@@ -4313,7 +4302,7 @@ Residue class: Defines residue properties
         newRes._parent[newRes.shortName] = newRes
 #        print '.>',newRes.shortName, newRes._parent
 
-        resonanceCount = len(molecule.resonanceSources)
+        #resonanceCount = len(molecule.resonanceSources)
         # Move like atoms from self, create new atoms if needed
         for atmDef in newRes.db.atoms:
             if (atmDef.name in self):
@@ -4336,8 +4325,9 @@ Residue class: Defines residue properties
                 #end for
             else:
                 atm = newRes.addAtom( atmDef.name )
-                for dummy in range(resonanceCount):
-                    atm.addResonance()
+                # 20151102: now done in addAtom method
+                # for dummy in range(resonanceCount):
+                #     atm.addResonance()
                 #end for
             #end if
         #end for
@@ -4370,6 +4360,21 @@ Residue class: Defines residue properties
         """add atomName to self as well as potential alias references
            return Atom instance
         """
+        # check if this name is a valid one for this residue
+        if self.db.getAtomDefByName(name, convention=convention) is None:
+            #print "Residue.addAtom:", self, 'Adding', name
+            if self.db.cingDefinition:
+                # We need to copy the Cing database entry of this residue to be able to add an atomDef
+                # Make the name of the copy unique to this residue
+                newResidueType = '_'.join((self.chain.molecule.name, self.chain.name, self.name))
+                db = self.db.copy(newResidueType, shouldBeSaved = True, canBeModified = True)
+                # 'reassign' residue database definition to the new one
+                self.db = db
+            #end if
+            self.db.appendAtomDef(name)
+            self.db.postProcess()
+        #end if
+
         atm = Atom( resName=self.db.translate(convention), atomName=name, convention=convention, **kwds )
         self.addChild2( atm )
         atm.residue = self
@@ -4377,6 +4382,10 @@ Residue class: Defines residue properties
         self.atomCount += 1
         for alias in atm.db.aliases:
             self[alias] = atm
+        # end for
+        for dummy in range(len(self._parent._parent.resonanceSources)):
+            atm.addResonance()
+        #end for
         return atm
     #end def
 
@@ -4394,7 +4403,7 @@ Residue class: Defines residue properties
                 elif not self.Cterminal and database.isCterminalAtom(atm):
                     pass
                 else:
-                    self.addAtom( atm.name )
+                    self.addAtom( atm.name, postProcess=False )
                 #end if
             #end for
         #end if
@@ -5406,25 +5415,11 @@ Atom class: Defines object for storing atom properties
         else:
             # see if we can add to the definition database
             patches = NTdict()
-
             patches.nameDict = {INTERNAL_0:atomName, INTERNAL_1:atomName, convention:atomName}
-
-            if atomName[0:1] in ['H','Q', 'M']:
-                patches.spinType = '1H'
-            elif atomName[0:1] == 'N':
-                patches.spinType = '15N'
-            elif atomName[0:1] == 'C':
-                patches.spinType = '13C'
-            elif atomName[0:1] == 'P':
-                patches.spinType = '31P'
-            elif atomName[0:1] == 'S':
-                patches.spinType = '32S'
-            #end if
 
             rdef = database.NTdb.getResidueDefByName( resName, convention = convention )
             db = None
             if rdef and rdef.canBeModified:
-                #print '****', rdef, atomName
 #                nTdebug("Atom.__init__: adding non-standard '%s' to database %s", atomName, rdef)
                 db=rdef.appendAtomDef( atomName, **patches )
             #end if

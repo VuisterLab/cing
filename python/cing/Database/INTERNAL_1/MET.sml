@@ -6,6 +6,7 @@
 #=======================================================================
 	commonName = 'MET'
 	shortName  = 'M'
+	cingDefinition = True
 	comment    = 'Regular Met residue'
 	nameDict   = {'CCPN': 'protein Met neutral', 'INTERNAL_0': 'MET', 'CYANA': 'MET', 'CYANA2': 'MET', 'INTERNAL_1': 'MET', 'IUPAC': 'MET', 'AQUA': 'MET', 'BMRBd': 'MET', 'XPLOR': 'MET', 'PDB': 'MET'}
 	properties = ['protein', 'aliphatic', 'methyl_containing', 'large', 'polar']

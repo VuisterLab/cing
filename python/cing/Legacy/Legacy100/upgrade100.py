@@ -52,6 +52,10 @@ def upgradeProject2Json( name, restore  ):
             io.error('upgradeToJson: parsing from project file "{0}" failed\n', pfile)
             return None
 
+        # Update root and name to account for possible moving/renaming
+        pr.root = root
+        pr.name = newName
+
         try:
             # <= 0.75 version have string
             pr.version = float(pr.version.strip('abcdefghijklmnopqrtsuvw ()!@#$%^&*').split()[0])
@@ -113,9 +117,9 @@ def upgradeProject2Json( name, restore  ):
         # update some fields if present
         for sdict in status.values():
             if 'molecule' in sdict and isinstance(sdict['molecule'], tuple):
-                sdict['molecule'] = pid.Pid.new('Molecule:' + sdict['molecule'][0])
+                sdict['molecule'] = pid.Pid.new('Molecule', sdict['molecule'][0])
             if 'moleculeName' in sdict and isinstance(sdict['molecule'], tuple):
-                sdict['molecule'] = pid.Pid.new('Molecule:' + sdict['moleculeName'][0])
+                sdict['molecule'] = pid.Pid.new('Molecule', sdict['moleculeName'][0])
                 del sdict['moleculeName']
             if 'runVersion' in sdict:
                 sdict['version'] = sdict['runVersion']
@@ -135,8 +139,10 @@ def upgradeProject2Json( name, restore  ):
         # have to make the directory because we have not yet fully initialised all directories at this stage
         pr._updateProjectPaths()
         disk.rename(pfile, pr.path() / cdefs.directories.version1 / 'project.xml' )
+
         #now we should be able to open it again
-        return Project.open( name, status = constants.PROJECT_OLD, restore = restore )
+        convertedProject = Project.open( root, status = constants.PROJECT_OLD, restore = restore )
+        return convertedProject
 
     else:
         io.error('upgradeToJson: missing Project file "{0}"\n', pfile)
@@ -311,6 +317,6 @@ def upgrade100(project, restore):
     project.save()
 
     cing.verbosity = verbosity
-    return Project.open(project.name, constants.PROJECT_OLD, restore=restore)
+    return Project.open(project.root, constants.PROJECT_OLD, restore=restore)
 #end def
 

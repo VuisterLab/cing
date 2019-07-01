@@ -6,6 +6,7 @@
 #=======================================================================
     commonName = 'CA2P'
     shortName  = 'CA2P'
+	cingDefinition = True
     comment    = 'Calcium 2plus ion'
     nameDict   = {'CCPN': 'other Ca neutral', 'INTERNAL_0': 'CA2P', 'BMRBd': None, 'CYANA': 'ION', 'CYANA2': 'ION', 'INTERNAL_1': 'CA2P', 'IUPAC': 'CA', 'AQUA': 'CA', 'PDB': 'CA', 'XPLOR': 'CA2'}
     properties = ['ion', 'metal', 'charged']

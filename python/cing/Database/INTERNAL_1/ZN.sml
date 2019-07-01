@@ -6,6 +6,7 @@
 #=======================================================================
 	commonName = 'ZN'
 	shortName  = 'ZN'
+	cingDefinition = True
 	comment    = 'Zinc 2plus ion'
 	nameDict   = {'CCPN': 'other Zn neutral', 'INTERNAL_0': 'ZN', 'BMRBd': None, 'CYANA': 'ZN', 'CYANA2': 'ZN', 'INTERNAL_1': 'ZN', 'IUPAC': 'ZN', 'AQUA': 'ZN', 'PDB': 'ZN', 'XPLOR': 'ZN2'}
 	properties = ['ion', 'metal', 'charged']

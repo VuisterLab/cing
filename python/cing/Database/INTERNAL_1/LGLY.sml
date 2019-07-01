@@ -6,9 +6,10 @@
 #=======================================================================
 	commonName = 'LGLY'
 	shortName  = 'LGLY'
+	cingDefinition = True
 	comment    = 'L-glycine'
 	nameDict   = {'INTERNAL_0': 'LGLY', 'BMRBd': None, 'CYANA': 'LGLY', 'CYANA2': 'LGLY', 'INTERNAL_1': 'LGLY', 'IUPAC': None, 'AQUA': None, 'PDB': None, 'XPLOR': None}
-	properties = ['protein']
+	properties = ['protein','aliphatic','small','neutral']
 
 	dihedrals  = <NTlist>
 	#---------------------------------------------------------------

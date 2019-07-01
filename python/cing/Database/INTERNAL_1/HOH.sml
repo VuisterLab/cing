@@ -6,6 +6,7 @@
 #=======================================================================
 	commonName = 'HOH'
 	shortName  = 'O'
+	cingDefinition = True
 	comment    = 'Regular Water residue'
 	nameDict   = {'CCPN': 'other Hoh neutral', 'INTERNAL_0': 'HOH', 'CYANA': None, 'CYANA2': None, 'INTERNAL_1': 'HOH', 'IUPAC': 'HOH', 'AQUA': 'HOH', 'BMRBd': 'HOH', 'XPLOR': 'HOH', 'PDB': 'HOH'}
 	properties = ['small', 'polar']

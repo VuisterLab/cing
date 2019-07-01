@@ -6,6 +6,7 @@
 #=======================================================================
 	commonName = 'LEU'
 	shortName  = 'L'
+	cingDefinition = True
 	comment    = 'Regular Leu residue'
 	nameDict   = {'CCPN': 'protein Leu neutral', 'INTERNAL_0': 'LEU', 'CYANA': 'LEU', 'CYANA2': 'LEU', 'INTERNAL_1': 'LEU', 'IUPAC': 'LEU', 'AQUA': 'LEU', 'BMRBd': 'LEU', 'XPLOR': 'LEU', 'PDB': 'LEU'}
 	properties = ['protein', 'aliphatic', 'methyl_containing', 'large', 'neutral']

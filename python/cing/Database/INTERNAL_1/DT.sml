@@ -6,6 +6,7 @@
 #=======================================================================
 	commonName = 'THY'
 	shortName  = 't'
+	cingDefinition = True
 	comment    = 'deoxy-thymine'
 	nameDict   = {'CCPN': 'DNA T prot:H3', 'INTERNAL_0': 'THY', 'CYANA': 'THY', 'CYANA2': 'THY', 'INTERNAL_1': 'DT', 'IUPAC': 'DT', 'AQUA': 'T', 'BMRBd': 'THY', 'XPLOR': 'THY', 'PDB': 'THY'}
 	properties = ['nucleic', 'deoxy', 'DNA']
@@ -187,7 +188,7 @@
 	#---------------------------------------------------------------
 	<AtomDef> Q5'     
 	#---------------------------------------------------------------
-		topology   = []
+		topology   = [(0, "C5'")]
 		real       = ["H5'", "H5''"]
 		pseudo     = None
 		nameDict   = {'CCPN': "H5'*", 'INTERNAL_0': "Q5'", 'CYANA': "Q5'", 'CYANA2': "Q5'", 'INTERNAL_1': "Q5'", 'IUPAC': "Q5'", 'AQUA': "Q5'", 'BMRBd': None, 'XPLOR': "Q5'", 'PDB': None}
@@ -196,7 +197,7 @@
 		spinType   = '1H'
 		shift      = None
 		hetatm     = False
-		properties = ['isProton', 'proton', 'isNotCarbon', 'notcarbon', 'isNotNitrogen', 'notnitrogen', 'isNotSulfur', 'isNotSulphur', 'notsulfur', 'notsulphur', 'isSidechain', 'sidechain', 'isNotAromatic', 'notaromatic', 'isNotMethyl', 'notmethyl', 'isNotMethylProton', 'notmethylproton', 'isPseudoAtom', 'pseudoatom', 'hasNoPseudoAtom', 'hasnopseudoatom', 'isNotMethylene', 'notmethylene', 'isNotMethyleneProton', 'notmethyleneproton']
+		properties = ['isProton', 'proton', 'isNotCarbon', 'notcarbon', 'isNotNitrogen', 'notnitrogen', 'isNotSulfur', 'isNotSulphur', 'notsulfur', 'notsulphur', 'isSidechain', 'sidechain', 'isNotAromatic', 'notaromatic', 'isNotMethyl', 'notmethyl', 'isNotMethylProton', 'notmethylproton', 'isPseudoAtom', 'pseudoatom', 'hasNoPseudoAtom', 'hasnopseudoatom', 'isMethylene', 'methylene', 'isMethyleneProton', 'methyleneproton']
 	</AtomDef>
 	#---------------------------------------------------------------
 	<AtomDef> C4'     
@@ -299,7 +300,7 @@
 	#---------------------------------------------------------------
 	<AtomDef> Q2'     
 	#---------------------------------------------------------------
-		topology   = []
+		topology   = [(0, "C2'")]
 		real       = ["H2'", "H2''"]
 		pseudo     = None
 		nameDict   = {'CCPN': "H2'*", 'INTERNAL_0': "Q2'", 'CYANA': "Q2'", 'CYANA2': "Q2'", 'INTERNAL_1': "Q2'", 'IUPAC': "Q2'", 'AQUA': "Q2'", 'BMRBd': None, 'XPLOR': "Q2'", 'PDB': None}
@@ -308,7 +309,7 @@
 		spinType   = '1H'
 		shift      = None
 		hetatm     = False
-		properties = ['isProton', 'proton', 'isNotCarbon', 'notcarbon', 'isNotNitrogen', 'notnitrogen', 'isNotSulfur', 'isNotSulphur', 'notsulfur', 'notsulphur', 'isSidechain', 'sidechain', 'isNotAromatic', 'notaromatic', 'isNotMethyl', 'notmethyl', 'isNotMethylProton', 'notmethylproton', 'isPseudoAtom', 'pseudoatom', 'hasNoPseudoAtom', 'hasnopseudoatom', 'isNotMethylene', 'notmethylene', 'isNotMethyleneProton', 'notmethyleneproton']
+		properties = ['isProton', 'proton', 'isNotCarbon', 'notcarbon', 'isNotNitrogen', 'notnitrogen', 'isNotSulfur', 'isNotSulphur', 'notsulfur', 'notsulphur', 'isSidechain', 'sidechain', 'isNotAromatic', 'notaromatic', 'isNotMethyl', 'notmethyl', 'isNotMethylProton', 'notmethylproton', 'isPseudoAtom', 'pseudoatom', 'hasNoPseudoAtom', 'hasnopseudoatom', 'isMethylene', 'methylene', 'isMethyleneProton', 'methyleneproton']
 	</AtomDef>
 	#---------------------------------------------------------------
 	<AtomDef> C1'     
@@ -532,7 +533,7 @@
 		spinType   = '1H'
 		shift      = None
 		hetatm     = False
-		properties = ['isProton', 'proton', 'isNotCarbon', 'notcarbon', 'isNotNitrogen', 'notnitrogen', 'isNotSulfur', 'isNotSulphur', 'notsulfur', 'notsulphur', 'isSidechain', 'sidechain', 'isNotAromatic', 'notaromatic', 'isNotMethyl', 'notmethyl', 'isNotMethylProton', 'notmethylproton', 'isPseudoAtom', 'pseudoatom', 'hasNoPseudoAtom', 'hasnopseudoatom', 'isNotMethylene', 'notmethylene', 'isNotMethyleneProton', 'notmethyleneproton']
+		properties = ['isProton', 'proton', 'isNotCarbon', 'notcarbon', 'isNotNitrogen', 'notnitrogen', 'isNotSulfur', 'isNotSulphur', 'notsulfur', 'notsulphur', 'isSidechain', 'sidechain', 'isNotAromatic', 'notaromatic', 'isMethyl', 'methyl', 'isMethylProton', 'methylproton', 'isPseudoAtom', 'pseudoatom', 'hasNoPseudoAtom', 'hasnopseudoatom', 'isNotMethylene', 'notmethylene', 'isNotMethyleneProton', 'notmethyleneproton']
 	</AtomDef>
 	#---------------------------------------------------------------
 	<AtomDef> C6      

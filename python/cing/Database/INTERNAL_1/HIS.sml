@@ -6,6 +6,7 @@
 #=======================================================================
 	commonName = 'HIS'
 	shortName  = 'H'
+	cingDefinition = True
 	comment    = 'Regular His residue: prot HD1; deprot HE2'
 	nameDict   = {'CCPN': 'protein His prot:HD1;deprot:HE2', 'INTERNAL_0': 'HIS', 'CYANA': 'HIS', 'CYANA2': 'HIS', 'INTERNAL_1': 'HIS', 'IUPAC': 'HIS', 'AQUA': 'HIS', 'BMRBd': 'HIS', 'XPLOR': 'HIS', 'PDB': 'HIS'}
 	properties = ['protein', 'aromatic', 'large', 'polar', 'isHistidine']

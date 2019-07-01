@@ -6,6 +6,7 @@
 #=======================================================================
 	commonName = 'GLU'
 	shortName  = 'E'
+	cingDefinition = True
 	comment    = 'De-protonated (negative) GLU (common)'
 	nameDict   = {'CCPN': 'protein Glu deprot:HE2', 'INTERNAL_0': 'GLU', 'CYANA': 'GLU-', 'CYANA2': 'GLU', 'INTERNAL_1': 'GLU', 'IUPAC': 'GLU', 'AQUA': 'GLU', 'BMRBd': 'GLU', 'XPLOR': 'GLU', 'PDB': 'GLU'}
 	properties = ['protein', 'aliphatic', 'large', 'charged', 'isGlutamicAcid']

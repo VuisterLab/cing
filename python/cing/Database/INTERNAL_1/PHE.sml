@@ -6,6 +6,7 @@
 #=======================================================================
 	commonName = 'PHE'
 	shortName  = 'F'
+	cingDefinition = True
 	comment    = 'Regular Asn residue'
 	nameDict   = {'CCPN': 'protein Phe neutral', 'INTERNAL_0': 'PHE', 'CYANA': 'PHE', 'CYANA2': 'PHE', 'INTERNAL_1': 'PHE', 'IUPAC': 'PHE', 'AQUA': 'PHE', 'BMRBd': 'PHE', 'XPLOR': 'PHE', 'PDB': 'PHE'}
 	properties = ['protein', 'aromatic', 'large', 'neutral']

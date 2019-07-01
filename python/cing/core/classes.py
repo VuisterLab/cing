@@ -553,6 +553,10 @@ Project: Top level Cing project class
         status = status.strip()
         name = str(name.strip())
 
+        if len(name.split()) > 1:
+            io.error('Project.open: path or name "%s" contains spaces\n' % name)
+            return None
+
         if status == constants.PROJECT_NEW:
             root, projectName, ext = Project.rootPath(name)
             if not root:
@@ -821,7 +825,6 @@ Project: Top level Cing project class
         Save project data;
         Return True on error.
         """
-        nTmessage('' + constants.dots * 5 + '')
         nTmessage('==> Saving %s', self)
 
         # Save the molecules
@@ -2708,6 +2711,7 @@ class PeakList(NTlist, ProjectListMember):
         self.name = name
         self.status = status
         self.listIndex = -1 # list is not appended to anything yet
+        self._idDict = {}
     #end def
 
     def minMaxDimension(self):

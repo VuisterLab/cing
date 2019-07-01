@@ -6,6 +6,7 @@
 #=======================================================================
 	commonName = 'GLUH'
 	shortName  = 'E'
+	cingDefinition = True
 	comment    = 'Protonated (neutral) GLU (uncommon)'
 	nameDict   = {'CCPN': 'protein Glu prot:HE2', 'INTERNAL_0': 'GLUH', 'CYANA': 'GLU', 'CYANA2': 'GLU', 'INTERNAL_1': 'GLUH', 'IUPAC': 'GLU', 'AQUA': 'GLU', 'BMRBd': 'GLU', 'XPLOR': 'GLU', 'PDB': 'GLU'}
 	properties = ['protein', 'aliphatic', 'large', 'charged', 'isGlutamicAcid']

@@ -1,7 +1,7 @@
-# From YASARA BioTools
-# GWV 20130528: Added path routines
-# Visit www.yasara.org for more...
-# Copyright by Elmar Krieger
+"""
+GWV 20130528:  path routines
+"""
+
 from glob import glob
 from glob import glob1
 from optparse import OptionParser
@@ -14,6 +14,234 @@ import sys
 import time
 import zipfile
 
+
+_translate = {"..": os.pardir}
+class Path( str ):
+    """Path routines, adapted from: Python Cookbook, A. Martelli and D. Ascher (eds), O'Reilly 2002, pgs 140-142
+    Powerful file and directory manipulations
+
+    Features:
+    - newpath = path1 / path2 + ext
+    - indexing and slicing to address elements of path
+    - root, base, extension properties
+    - tilde expansion
+    - islink, isfile, isdir, issamepath, issamefile
+    - several os.path methods
+    - iteration over files in self (if directory)
+    - recursive walk using os.walk (if directory)
+    - creation of directory tree contained in path
+    - split3 method: returns (directory, basename, extension) triple
+    - getsize and getmodtime functions
+
+    Assume:
+    myPath = Path('some_directory_or_file')
+
+    Some tricks:
+    # all files and directories in the same directory as myPath:
+    files = myPath[:-1].glob('*')
+
+    # all files in mySubDir of myPath:
+    if myPath.isdir(): files = (myPath / 'mySubDir').glob('*')
+
+
+    """
+
+    @property
+    def root(self):
+      d, _b, _e = self.split3()
+      d = str(d)
+      if len(d) == 0:
+          return '.'
+      return d
+
+    @property
+    def base(self):
+      _d, b, _e = self.split3()
+      return b
+
+    @property
+    def extension(self):
+      _d, _b, e = self.split3()
+      return e
+
+    def exists( self ):
+        "Return True if file exists"
+        return os.path.exists(str(self))
+
+    def isdir( self ):
+        "Return True if file is directory"
+        return os.path.isdir(str(self))
+
+    def isfile( self ):
+        "Return True if file is file"
+        return os.path.isfile(str(self))
+
+    def islink( self ):
+        "Return True if file is link"
+        return os.path.islink(str(self))
+
+    def issamepath(self, other):
+        "Return True if other is effectively the same path as self; self and other need not exist"
+        other = Path(other)
+        return str(self.abspath()) == str(other.abspath())
+
+    def issamefile(self, other):
+        "Return True if other is same file as self; both self and other need to exists"
+        other = Path(other)
+        if self.exist() and other.exists():
+          return os.path.samefile(str(self.abspath()), str(other.abspath()))
+        return False
+
+    def glob(self, pattern=None):
+        """Apply glob on self if pattern == None, or
+        append pattern to self first when self is a directory
+        return list of Path objects or empty list on error
+        """
+        if pattern is None:
+            return [Path(f) for f in glob(str(self))]
+        else:
+            if self.isdir():
+                return [Path(f) for f in glob(str(self / pattern))]
+        # No result if we are here
+        return []
+    #end def
+
+    def makedirs(self):
+        "Make the directory tree if it does not exist"
+        mkdirs(str(self))
+
+    def mkdirs(self):
+        "convenience for makedirs"
+        mkdirs(str(self))
+
+    def rmdir(self):
+        "if a directory, delete self, including all files"
+        if self.isdir():
+            rmdir(str(self))
+
+    def remove(self):
+        remove(str(self))
+
+    def abspath( self ):
+        "Call os.abspath() on self; return Path instance"
+        return Path(os.path.abspath(str(self)))
+
+    def relpath( self, start='' ):
+        "Call os.relpath() on self; return Path instance"
+        return Path(os.path.relpath(str(self),start))
+
+    def splitext( self ):
+        "Call os.splitext() on self; return Path instance"
+        f,ext = os.path.splitext(str(self))
+        return (Path(f), ext)
+
+    def split3(self):
+        "Return (directory, basename, extension) tuple so that directory / basename + extension == self"
+        if len(self) == 0:     # empty path
+            return '', '', ''
+        else:
+            b, ext = self.splitext()
+            return b[:-1], b[-1:], ext
+    #end def
+
+    def walk( self, topdown=True, onerror=None, followlinks=False ):
+        "Call os.walk() on self"
+        return os.walk(str(self), topdown, onerror, followlinks )
+
+    def listdir( self ):
+        """if self exists and is a directory: call os.listdir on self; return list of files in self or empty
+        list otherwise
+        """
+        if self.exists() and self.isdir():
+            return [self/f for f in os.listdir(str(self))]
+        return []
+    #end def
+
+    def copydir(self, destination):
+        """
+        if self is directory: Copy all the files of self to destination
+        return destination or None on error
+        """
+        if self.exists() and self.isdir():
+            destination = Path(destination)
+            destination.makedirs()
+            for f in self.listdir():
+                #print f
+                copy(f, destination/f[-1:])
+            #end for
+            return destination
+        #end if
+        return None
+    #end def
+
+    def getmodtime(self):
+      "return modifcation time of self as asctime string or None if not exists"
+      if self.exists():
+        t = os.path.getmtime(str(self))
+        return time.asctime(time.localtime(t))
+      return None
+
+    def getsize(self):
+      "return size of self or -1 if not exists "
+      if self.exists():
+        return os.path.getsize(str(self))
+      return -1
+
+    # implementation
+    def __str__( self ):
+        p = os.path.normpath(self)
+        return os.path.expanduser(p)
+        #return os.path.normpath(self)
+
+    def __div__(self, other):
+        other = _translate.get(other, other)
+        return Path(os.path.join(str(self),str(other)))
+
+    def __add__(self, other):
+        other = _translate.get(other, other)
+        return Path(str(self)+str(other))
+
+    def __len__( self ):
+        return len(splitall(str(self)))
+
+    def __getslice__( self, start, stop ):
+        parts = splitall(str(self))[start:stop]
+        if len(parts) > 0:
+            return Path(os.path.join(*parts))
+        else:
+            return Path('')
+
+    def __getitem__(self, i):
+        return Path(splitall(str(self))[i])
+
+    def __iter__(self):
+        for f in self.listdir():
+            yield f
+        #end for
+    #end def
+#end class
+
+def splitall(thePath):
+    allParts = []
+    while True:
+        parts = os.path.split(thePath)
+        if parts[0] == thePath:
+            allParts.insert(0, parts[0])
+            break
+        elif parts[1] == thePath:
+            allParts.insert(0, parts[1])
+            break
+        else:
+            thePath = parts[0]
+            allParts.insert(0, parts[1])
+        #end if
+    return allParts
+#end if
+
+#--------------------------------------------------------------------------------------------------------------
+# From YASARA BioTools
+# Visit www.yasara.org for more...
+# Copyright by Elmar Krieger
 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -799,111 +1027,4 @@ def isRootDirectory(f):
 # end def
 
 #--------------------------------------------------------------------------------------------------------------
-def splitall(thePath):
-    allParts = []
-    while True:
-        parts = os.path.split(thePath)
-        if parts[0] == thePath:
-            allParts.insert(0, parts[0])
-            break
-        elif parts[1] == thePath:
-            allParts.insert(0, parts[1])
-            break
-        else:
-            thePath = parts[0]
-            allParts.insert(0, parts[1])
-        #end if
-    return allParts
-#end if
 
-_translate = {"..": os.pardir}
-class Path( str ):
-    """Path routines, adapted from: Python Cookbook, A. Martelli and D. Ascher (eds), O'Reilly 2002, pgs 140-142
-    Features:
-    - newpath = path1 / path2 + ext
-    - slicing to address elements of path
-    - tilde expansion
-    - several os.path methods
-    - iteration over files in self (if directory)
-    - recursive walk using os.walk
-    - split3 method: returns (directory, basename, extension) triple
-    """
-    def __str__( self ):
-        p = os.path.normpath(self)
-        return os.path.expanduser(p)
-        #return os.path.normpath(self)
-    def __div__(self, other):
-        other = _translate.get(other, other)
-        return Path(os.path.join(str(self),str(other)))
-    def __add__(self, other):
-        other = _translate.get(other, other)
-        return Path(str(self)+str(other))
-    def __len__( self ):
-        return len(splitall(str(self)))
-    def __getslice__( self, start, stop ):
-        parts = splitall(str(self))[start:stop]
-        if len(parts) > 0:
-            return Path(os.path.join(*parts))
-        else:
-            return Path('')
-    def __getitem__(self, i):
-        return Path(splitall(str(self))[i])
-    def exists( self ):
-        return os.path.exists(str(self))
-    def isdir( self ):
-        return os.path.isdir(str(self))
-    def isfile( self ):
-        return os.path.isfile(str(self))
-    def islink( self ):
-        return os.path.islink(str(self))
-    def glob(self, pattern=None):
-        """Apply glob on self if pattern == None, or
-        append pattern to self first when self is a directory
-        return list of Path objects or empty list on error
-        """
-        if pattern is None:
-            return [Path(f) for f in glob(str(self))]
-        else:
-            if self.isdir():
-                return [Path(f) for f in glob(str(self / pattern))]
-        # No result if we are here
-        return []
-    #end def
-    def makedirs(self):
-        mkdirs(str(self))
-    def mkdirs(self):
-        mkdirs(str(self))
-    def rmdir(self):
-        rmdir(str(self))
-    def remove(self):
-        remove(str(self))
-    def abspath( self ):
-        return os.path.abspath(str(self))
-    def relpath( self, start='' ):
-        return Path(os.path.relpath(str(self),start))
-    def splitext( self ):
-        f,ext = os.path.splitext(str(self))
-        return (Path(f), ext)
-    def split3(self):
-        "Return directory, basename, extension triple so that directory/basename+extension == self"
-        if len(self) == 0:     # empty path
-            return '', '', ''
-        else:
-            b, ext = self.splitext()
-            return b[:-1], b[-1:], ext
-    #end def
-    def walk( self, topdown=True, onerror=None ):
-        "Call os.walk() on self"
-        return os.walk(str(self), topdown, onerror )
-    def listdir( self ):
-        if self.exists() and self.isdir():
-            return [self/f for f in os.listdir(str(self))]
-        return []
-    #end def
-    def __iter__(self):
-        for f in self.listdir():
-            yield f
-        #end for
-    #end def
-#end class
-#--------------------------------------------------------------------------------------------------------------

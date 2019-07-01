@@ -6,6 +6,7 @@
 #=======================================================================
 	commonName = 'ASP'
 	shortName  = 'D'
+	cingDefinition = True
 	comment    = 'De-protonated (negative) ASP (common)'
 	nameDict   = {'CCPN': 'protein Asp deprot:HD2', 'INTERNAL_0': 'ASP', 'CYANA': 'ASP-', 'CYANA2': 'ASP', 'INTERNAL_1': 'ASP', 'IUPAC': 'ASP', 'AQUA': 'ASP', 'BMRBd': 'ASP', 'XPLOR': 'ASP', 'PDB': 'ASP'}
 	properties = ['protein', 'aliphatic', 'charged', 'isAsparticAcid']

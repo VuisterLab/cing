@@ -6,6 +6,7 @@
 #=======================================================================
 	commonName = 'CYS'
 	shortName  = 'C'
+	cingDefinition = True
 	comment    = 'Regular Cys residue'
 	nameDict   = {'CCPN': 'protein Cys prot:HG', 'INTERNAL_0': 'CYS', 'CYANA': 'CYS', 'CYANA2': 'CYS', 'INTERNAL_1': 'CYS', 'IUPAC': 'CYS', 'AQUA': 'CYS', 'BMRBd': 'CYS', 'XPLOR': 'CYS', 'PDB': 'CYS'}
 	properties = ['protein', 'aliphatic', 'polar', 'isCystine']

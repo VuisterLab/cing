@@ -6,6 +6,7 @@
 #=======================================================================
 	commonName = 'ILE'
 	shortName  = 'I'
+	cingDefinition = True
 	comment    = 'Regular Ile residue'
 	nameDict   = {'CCPN': 'protein Ile neutral', 'INTERNAL_0': 'ILE', 'CYANA': 'ILE', 'CYANA2': 'ILE', 'INTERNAL_1': 'ILE', 'IUPAC': 'ILE', 'AQUA': 'ILE', 'BMRBd': 'ILE', 'XPLOR': 'ILE', 'PDB': 'ILE'}
 	properties = ['protein', 'aliphatic', 'methyl_containing', 'large', 'neutral']

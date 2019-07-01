@@ -166,7 +166,6 @@ def exportDistanceRestraint2cyana( dr, upper=True, convention=CYANA2 ):
         return None
     #end if
 
-    first = True
     if upper:
         val = dr.upper
     else:
@@ -181,13 +180,21 @@ def exportDistanceRestraint2cyana( dr, upper=True, convention=CYANA2 ):
     #end if
 
 
+    first = True
     for atm1,atm2 in dr.atomPairs:
         res1 = atm1.residue
         res2 = atm2.residue
         res1Name = res1.translate(convention)
         res2Name = res2.translate(convention)
-        argList = [ res1.resNum, res1Name, atm1.translate(convention),
-                    res2.resNum, res2Name, atm2.translate(convention)]
+        atm1Name = atm1.translate(convention)
+        # 20150901: GWV patch for N-termini
+        if atm1Name is None and atm1.name in ['H1','H2', 'H3']:
+            atm1Name = res1.db.H.translate(convention)
+        atm2Name = atm2.translate(convention)
+        if atm2Name is None and atm2.name in ['H1','H2', 'H3']:
+            atm2Name = res2.db.H.translate(convention)
+        argList = [ res1.resNum, res1Name, atm1Name,
+                    res2.resNum, res2Name, atm2Name]
         if first:
             argList.append(val)
             result =    '%-3d %-4s %-4s  %-3d %-4s %-4s %7.2f' % tuple( argList )
@@ -203,27 +210,27 @@ def exportDistanceRestraint2cyana( dr, upper=True, convention=CYANA2 ):
 #Add as method to DistanceRestraint class
 DistanceRestraint.export2cyana = exportDistanceRestraint2cyana
 
-def exportDistancList2cyana( drl, path, convention=CYANA2)   :
+def exportDistanceList2cyana( drl, path, convention=CYANA2)   :
     """Export a distanceRestraintList (drl) to cyana format:
        convention = CYANA or CYANA2
        generate both .upl and .lol files from path
        return drl or None on error
     """
     if convention != CYANA and convention != CYANA2:
-        nTerror('exportDistancList2cyana: invalid convention "%s"', convention)
+        nTerror('exportDistanceList2cyana: invalid convention "%s"', convention)
         return None
     #end if
 
-    root, name, _tmp = nTpath(path)
-    path = os.path.join(root,name)
+    #root, name, _tmp = nTpath(path)
+    #path = os.path.join(root,name)
     uplfile = open( path + '.upl', 'w' )
     if not uplfile:
-        nTerror('exportDihedralList2cyana: unable to open "%s"\n', path + '.upl' )
+        nTerror('exportDistanceList2cyana: unable to open "%s"\n', path + '.upl' )
         return None
     #end def
     lolfile = open( path + '.lol', 'w' )
     if not lolfile:
-        nTerror('exportDihedralList2cyana: unable to open "%s"\n', path + '.lol' )
+        nTerror('exportDistanceList2cyana: unable to open "%s"\n', path + '.lol' )
         return None
     #end def
 
@@ -239,7 +246,7 @@ def exportDistancList2cyana( drl, path, convention=CYANA2)   :
     return drl
 #end def
 # add as a method to DistanceRestraintList Class
-DistanceRestraintList.export2cyana = exportDistancList2cyana
+DistanceRestraintList.export2cyana = exportDistanceList2cyana
 
 
 def importUpl( project, uplFile, convention, lower = 0.0 ):
@@ -389,26 +396,33 @@ atom stereo "HA1  HA2   519"   # GLY
 #end def
 
 #-----------------------------------------------------------------------------
-def export2cyana( project):
+def export2cyana(project):
     """Export restraints in CYANA and CYANA2 formats
     """
+    # save seq, prot and peak files
+    project.export2Xeasy()
+
+    # save dihedrals
     for drl in project.dihedrals:
         if (drl.status == 'keep'):
             #Xeasy/Cyana 1.x format
-            drlFile = project.path( project.directories.xeasy, drl.name+'.aco' )
+            drlFile = project.path( project.directories.cyana, drl.name+'.aco' )
+            #print ">>>", drlFile
             drl.export2cyana( drlFile, convention=CYANA)
             #Cyana 2.x format
-            drlFile = project.path( project.directories.xeasy2, drl.name+'.aco' )
+            drlFile = project.path( project.directories.cyana2, drl.name+'.aco' )
             drl.export2cyana( drlFile, convention=CYANA2)
         #end if
     #end for
+
+    # save distance restraints
     for drl in project.distances:
         if (drl.status == 'keep'):
             #Xeasy/Cyana 1.x format
-            drlFile = project.path( project.directories.xeasy, drl.name ) # extensions get appended
+            drlFile = project.path( project.directories.cyana, drl.name ) # extensions get appended
             drl.export2cyana( drlFile, convention=CYANA)
             #Cyana 2.x format
-            drlFile = project.path( project.directories.xeasy2, drl.name ) # extensions get appended
+            drlFile = project.path( project.directories.cyana2, drl.name ) # extensions get appended
             drl.export2cyana( drlFile, convention=CYANA2)
         #end if
     #end for

@@ -398,13 +398,14 @@ class ResidueDef( NTtree ):
                            commonName  = name,        # used to name residue; default later changed to constants.IUPAC if exists
                            shortName   = '_',
                            canBeModified = True,      # ResidueDef can be modified; i.e. AtomDefs added;
-                                                      # set to False on import for  non-protein and non-nucleic CING definitions
-                           shouldBeSaved = True,
-                           # ResidueDef requires saving with project; set to False on import for default CING definitions
+                                                      # set to False on import for non-protein and non-nucleic CING definitions
+                           shouldBeSaved = True,      # ResidueDef requires saving with project;
+                                                      # set to False on import for default CING definitions
+                           cingDefinition = False,    # True defines a Cing residue
                            comment     = None,
                            nameDict    = {constants.INTERNAL_0:name, constants.INTERNAL_1:name},
-                           atomDict    = {},
-                           # contains definition of atoms, sorted by convention, dynamically created on initialization
+                           atomDict    = {},          # contains definition of atoms, sorted by convention,
+                                                      # dynamically created on initialization
                            dihedrals   = NTlist(),
                            properties  = []           # list of properties for residue
                        )
@@ -583,6 +584,34 @@ class ResidueDef( NTtree ):
         return None
     #end def
 
+    def copy(self, newName, **kwds):
+        """Return a shallow copy of self, with critical elements copied for uniqueness.
+        Return None on error
+        """
+        #TODO: clean this up
+        db = NTdb.appendResidueDef(name=newName)
+        if db is None:
+            return None
+        for k,v in self.items():
+            db[k] = v
+        # restore/set some essentials that should be unique
+        db.name = newName
+        db.nameDict = self.nameDict.copy()
+        db.nameDict[constants.INTERNAL_0] = newName
+        db.nameDict[constants.INTERNAL_1] = newName
+        db.atomDict = self.atomDict.copy()
+        db.comment = 'Copied from ' + str(self)
+        db.shouldBeSaved = True
+        db.canBeModified = True
+        db.cingDefinition = False
+        db._children = self._children[:]
+        db.atoms = db._children
+        db.dihedrals = self.dihedrals[:]
+        db.update(kwds)
+        db.postProcess()
+        return db
+    #end
+
     def postProcess(self):
         """
         Any post-reading actions
@@ -612,7 +641,7 @@ class ResidueDef( NTtree ):
         #end for
 
         for atmDef in self:
-            atmDef.patchProperties() #Properties can only be patch after all atoms are present
+            atmDef.patchProperties() #Properties can only be patched after all atoms are present
         #end for
     #end def
 
@@ -936,6 +965,20 @@ class AtomDef( NTtree ):
                            hetatm      = False     # PDB HETATM type
                          )
         self.properties = []       # List with properties
+
+        # try to guess spinType from name
+        if name[0:1] in ['H','Q', 'M']:
+            self.spinType = '1H'
+        elif name[0:1] == 'N':
+            self.spinType = '15N'
+        elif name[0:1] == 'C':
+            self.spinType = '13C'
+        elif name[0:1] == 'P':
+            self.spinType = '31P'
+        elif name[0:1] == 'S':
+            self.spinType = '32S'
+        #end if
+
         self.update( kwds )
 
         self.__FORMAT__ = '=== %(name)s (%(convention)r) ===\n' +\

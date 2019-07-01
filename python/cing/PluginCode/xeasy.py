@@ -21,6 +21,7 @@ from cing.core.classes import PeakList
 from cing.constants import * #@UnusedWildImport
 from cing.core.database import NTdb
 from cing.core.database import translateAtomName
+from cing.constants.definitions import directories
 
 #==============================================================================
 class Xeasy( NTdict ):
@@ -530,7 +531,8 @@ def export2Xeasy( project, tmp=None ):
     """
     for molName in project.moleculeNames:
         #Xeasy/Cyana 1.x format
-        fileName = project.path( project.directories.xeasy, project[molName].name )
+        fileName = project.path( directories.cyana, project[molName].name )
+        #print '>>>', fileName
         exportShifts2Xeasy(  project[molName],
                              seqFile=fileName+'.seq',
                              protFile=fileName+'.prot',
@@ -538,7 +540,7 @@ def export2Xeasy( project, tmp=None ):
 
                           )
         #Cyana 2.x format
-        fileName = project.path( project.directories.xeasy2, project[molName].name )
+        fileName = project.path( directories.cyana2, project[molName].name )
         exportShifts2Xeasy(  project[molName],
                              seqFile=fileName+'.seq',
                              protFile=fileName+'.prot',
@@ -561,10 +563,10 @@ def export2Xeasy( project, tmp=None ):
                 idx += 1
 
             #Xeasy/Cyana 1.x format
-            peakFile = project.path( project.directories.xeasy, pl.name+'.peaks' )
+            peakFile = project.path( directories.cyana, pl.name+'.peaks' )
             exportPeaks2Xeasy( pl, peakFile)
             #Cyana 2.x format
-            peakFile = project.path( project.directories.xeasy2, pl.name+'.peaks' )
+            peakFile = project.path( directories.cyana2, pl.name+'.peaks' )
             exportPeaks2Xeasy( pl, peakFile)
         #end if
     #end for
@@ -572,11 +574,12 @@ def export2Xeasy( project, tmp=None ):
 
 # register the functions
 methods  = [(importXeasy, None),
-            (importXeasyPeaks, None)
+            (importXeasyPeaks, None),
+            (export2Xeasy, None)
            ]
 saves    = []
 restores = []
-exports  = [(export2Xeasy, None)]
+exports  = []
 
 #print '>>at the end'
 

@@ -218,7 +218,9 @@ def obj2json(obj, path, **metadata):
     root, f, ext = p.split3()
     root.makedirs()
     with open(p,'w') as fp:
-        fp.write(encode(obj, path=str(path), timestamp=str(io.now()), **metadata))
+        jstring = encode(obj, path=str(path), timestamp=str(io.now()), **metadata)
+        fp.write(jstring)
+    fp.close()
 #end def
 
 

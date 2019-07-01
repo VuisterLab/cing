@@ -6,6 +6,7 @@
 #=======================================================================
 	commonName = 'ALA'
 	shortName  = 'A'
+	cingDefinition = True
 	comment    = 'Regular Ala residue'
 	nameDict   = {'CCPN': 'protein Ala neutral', 'INTERNAL_0': 'ALA', 'CYANA': 'ALA', 'CYANA2': 'ALA', 'INTERNAL_1': 'ALA', 'IUPAC': 'ALA', 'AQUA': 'ALA', 'BMRBd': 'ALA', 'XPLOR': 'ALA', 'PDB': 'ALA'}
 	properties = ['protein', 'aliphatic', 'methyl_containing', 'small', 'neutral']

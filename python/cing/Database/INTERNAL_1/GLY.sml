@@ -6,6 +6,7 @@
 #=======================================================================
 	commonName = 'GLY'
 	shortName  = 'G'
+	cingDefinition = True
 	comment    = 'Regular Gly residue'
 	nameDict   = {'CCPN': 'protein Gly neutral', 'INTERNAL_0': 'GLY', 'CYANA': 'GLY', 'CYANA2': 'GLY', 'INTERNAL_1': 'GLY', 'IUPAC': 'GLY', 'AQUA': 'GLY', 'BMRBd': 'GLY', 'XPLOR': 'GLY', 'PDB': 'GLY'}
 	properties = ['protein', 'aliphatic', 'small', 'neutral']

@@ -6,6 +6,7 @@
 #=======================================================================
 	commonName = 'URA'
 	shortName  = 'u'
+	cingDefinition = True
 	comment    = 'uracil'
 	nameDict   = {'CCPN': 'RNA U prot:H3', 'INTERNAL_0': 'URA', 'CYANA': 'URA', 'CYANA2': 'URA', 'INTERNAL_1': 'U', 'IUPAC': 'U', 'AQUA': 'U', 'BMRBd': 'URA', 'XPLOR': 'URA', 'PDB': 'U'}
 	properties = ['nucleic', 'RNA']
@@ -187,7 +188,7 @@
 	#---------------------------------------------------------------
 	<AtomDef> Q5'     
 	#---------------------------------------------------------------
-		topology   = []
+		topology   = [(0, "C5'")]
 		real       = ["H5'", "H5''"]
 		pseudo     = None
 		nameDict   = {'CCPN': "H5'*", 'INTERNAL_0': "Q5'", 'CYANA': "Q5'", 'CYANA2': "Q5'", 'INTERNAL_1': "Q5'", 'IUPAC': "Q5'", 'AQUA': "Q5'", 'BMRBd': None, 'XPLOR': "Q5'", 'PDB': None}
@@ -196,7 +197,7 @@
 		spinType   = '1H'
 		shift      = None
 		hetatm     = False
-		properties = ['RURA', 'isProton', 'proton', 'isNotCarbon', 'notcarbon', 'isNotNitrogen', 'notnitrogen', 'isNotSulfur', 'isNotSulphur', 'notsulfur', 'notsulphur', 'isSidechain', 'sidechain', 'isNotAromatic', 'notaromatic', 'isNotMethyl', 'notmethyl', 'isNotMethylProton', 'notmethylproton', 'isPseudoAtom', 'pseudoatom', 'hasNoPseudoAtom', 'hasnopseudoatom', 'isNotMethylene', 'notmethylene', 'isNotMethyleneProton', 'notmethyleneproton']
+		properties = ['RURA', 'isProton', 'proton', 'isNotCarbon', 'notcarbon', 'isNotNitrogen', 'notnitrogen', 'isNotSulfur', 'isNotSulphur', 'notsulfur', 'notsulphur', 'isSidechain', 'sidechain', 'isNotAromatic', 'notaromatic', 'isNotMethyl', 'notmethyl', 'isNotMethylProton', 'notmethylproton', 'isPseudoAtom', 'pseudoatom', 'hasNoPseudoAtom', 'hasnopseudoatom', 'isMethylene', 'methylene', 'isMethyleneProton', 'methyleneproton']
 	</AtomDef>
 	#---------------------------------------------------------------
 	<AtomDef> C4'     

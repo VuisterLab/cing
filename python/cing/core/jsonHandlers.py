@@ -10,7 +10,7 @@ import cing.Libs.NTutils as ntu
 import cing.Libs.Adict as adict
 
 from cing.Libs import disk
-from cing.core import Project
+from cing.core import project
 
 # set indent=4 as default
 jsonTools.set_encoder_options('json',indent=4)
@@ -77,7 +77,7 @@ class NTtreeJsonHandler(jsonTools.handlers.AnyDictHandler):
         for child in tree._children:
             if isinstance(child, pid.Pid) and \
                reference is not None and \
-               isinstance(reference, Project.Project):
+               isinstance(reference, project.Project):
                 childObj = pid.decodePid(reference, child)
             else:
                 childObj = child
@@ -124,26 +124,26 @@ class ProjectJsonHandler(jsonTools.handlers.AnyDictHandler):
         return data
 
     def restore(self, data):
-        p = Project.Project(name=data['name'])
+        p = project.Project(name=data['name'])
         return self._restore(data, p)
 #end class
-ProjectJsonHandler.handles(Project.Project)
+ProjectJsonHandler.handles(project.Project)
 
 
 class HistoryJsonHandler(jsonTools.handlers.AnyListHandler):
     """Handler for the History class
     """
     namespace = cing.constants.CING_KEY
-    cls = Project.History
+    cls = project.History
 #end class
-HistoryJsonHandler.handles(Project.History)
+HistoryJsonHandler.handles(project.History)
 
 
 class StatusDictJsonHandler(jsonTools.handlers.AnyDictHandler):
     """Handler for the StatusDict class
     """
     namespace = cing.constants.CING_KEY
-    encodedKeys = [Project.StatusDict.MOLECULE]
+    encodedKeys = [project.StatusDict.MOLECULE]
 
     def flatten(self, obj, data):
         #print 'StatusDictJasonHandler.flatten>\n', obj.formatItems()
@@ -151,10 +151,10 @@ class StatusDictJsonHandler(jsonTools.handlers.AnyDictHandler):
         return self._flatten(obj, data)
 
     def restore(self, data):
-        a = Project.StatusDict(data['key'])
+        a = project.StatusDict(data['key'])
         return self._restore(data, a)
 #end class
-StatusDictJsonHandler.handles(Project.StatusDict)
+StatusDictJsonHandler.handles(project.StatusDict)
 
 
 class PathJsonHandler(jsonTools.handlers.BaseHandler):

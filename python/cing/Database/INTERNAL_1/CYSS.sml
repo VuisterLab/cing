@@ -6,6 +6,7 @@
 #=======================================================================
 	commonName = 'CYSS'
 	shortName  = 'C'
+	cingDefinition = True
 	comment    = 'disulphide linked Cys'
 	nameDict   = {'CCPN': 'protein Cys deprot:HG', 'INTERNAL_0': 'CYSS', 'CYANA': 'CYSS', 'CYANA2': 'CYSS', 'INTERNAL_1': 'CYSS', 'IUPAC': 'CYS', 'AQUA': 'CYS', 'BMRBd': 'CYS', 'XPLOR': 'CYS', 'PDB': 'CYS'}
 	properties = ['protein', 'aliphatic', 'polar', 'isCystine']

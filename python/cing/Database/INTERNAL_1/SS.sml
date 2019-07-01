@@ -6,6 +6,7 @@
 #=======================================================================
 	commonName = 'SS'
 	shortName  = 's'
+	cingDefinition = True
 	comment    = 'generic residue used by xeasy'
 	nameDict   = {'INTERNAL_0': 'SS', 'BMRBd': None, 'CYANA': 'SS', 'CYANA2': 'SS', 'INTERNAL_1': 'SS', 'IUPAC': None, 'AQUA': None, 'PDB': None, 'XPLOR': None}
 	properties = ['protein']

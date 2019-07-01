@@ -6,6 +6,7 @@
 #=======================================================================
 	commonName = 'PRO'
 	shortName  = 'P'
+	cingDefinition = True
 	comment    = 'trans Proline (common)'
 	nameDict   = {'CCPN': 'protein Pro neutral', 'INTERNAL_0': 'PRO', 'CYANA': 'PRO', 'CYANA2': 'PRO', 'INTERNAL_1': 'PRO', 'IUPAC': 'PRO', 'AQUA': 'PRO', 'BMRBd': 'PRO', 'XPLOR': 'PRO', 'PDB': 'PRO'}
 	properties = ['protein', 'aliphatic', 'neutral', 'isProline']

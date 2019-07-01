@@ -686,7 +686,20 @@ Updated INTERNAL_1 directory using mkINTERNAL_1.py script
 Changed to INTERNAL_1 definitions
 
 - 8 Jan 2013 WGT
-Updated Xplor N-terminal and C-terminal name conventions using updateXplorConv script
+Updated Xplor N-terminal and C-terminal name conventions using update XplorConv script
 N-terminal H1/2/3 changed to HT1/2/3
 C-terminal O changed to OT1
 C-terminal OXT changed to OT2 
+
+- 29 Oct 2015
+Manually updated pseudoatom definition nucleic acid; topology was not defined and methyl/methylene
+properties description were incorrect
+[<AtomDef A.Q5'>, <AtomDef A.Q6>]
+[<AtomDef C.Q5'>, <AtomDef C.Q4>]
+[<AtomDef DA.Q5'>, <AtomDef DA.Q2'>, <AtomDef DA.Q6>]
+[<AtomDef DC.Q5'>, <AtomDef DC.Q2>, <AtomDef DC.Q4>]
+[<AtomDef DG.Q5'>, <AtomDef DG.Q2'>, <AtomDef DG.Q2>]
+[<AtomDef DT.Q5'>, <AtomDef DT.Q2'>, <AtomDef DT.M7>]
+[<AtomDef G.Q5'>, <AtomDef G.Q2>]
+[<AtomDef T.Q5'>, <AtomDef T.M7>]
+[<AtomDef U.Q5'>]

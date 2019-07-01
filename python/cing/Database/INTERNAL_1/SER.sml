@@ -6,6 +6,7 @@
 #=======================================================================
 	commonName = 'SER'
 	shortName  = 'S'
+	cingDefinition = True
 	comment    = 'Regular Ser residue'
 	nameDict   = {'CCPN': 'protein Ser prot:HG', 'INTERNAL_0': 'SER', 'CYANA': 'SER', 'CYANA2': 'SER', 'INTERNAL_1': 'SER', 'IUPAC': 'SER', 'AQUA': 'SER', 'BMRBd': 'SER', 'XPLOR': 'SER', 'PDB': 'SER'}
 	properties = ['protein', 'aliphatic', 'polar']

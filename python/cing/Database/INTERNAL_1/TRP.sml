@@ -6,6 +6,7 @@
 #=======================================================================
 	commonName = 'TRP'
 	shortName  = 'W'
+	cingDefinition = True
 	comment    = 'Regular Trp residue'
 	nameDict   = {'CCPN': 'protein Trp prot:HE1', 'INTERNAL_0': 'TRP', 'CYANA': 'TRP', 'CYANA2': 'TRP', 'INTERNAL_1': 'TRP', 'IUPAC': 'TRP', 'AQUA': 'TRP', 'BMRBd': 'TRP', 'XPLOR': 'TRP', 'PDB': 'TRP'}
 	properties = ['protein', 'aromatic', 'large', 'polar']

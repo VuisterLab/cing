@@ -6,6 +6,7 @@
 #=======================================================================
 	commonName = 'HISH'
 	shortName  = 'H'
+	cingDefinition = True
 	comment    = 'Protonated (plus) His'
 	nameDict   = {'CCPN': 'protein His prot:HD1,HE2', 'INTERNAL_0': 'HISH', 'CYANA': 'HIS+', 'CYANA2': 'HIS', 'INTERNAL_1': 'HISH', 'IUPAC': 'HIS', 'AQUA': 'HIS', 'BMRBd': 'HIS', 'XPLOR': 'HIS', 'PDB': 'HIS'}
 	properties = ['protein', 'aromatic', 'large', 'polar', 'isHistidine']

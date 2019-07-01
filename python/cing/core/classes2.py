@@ -119,14 +119,19 @@ class RestraintList(NTlist, ProjectListMember):
         self.rename(newName)
     #end def
 
-    def append(self, restraint):  # pylint: disable=W0221
-        'Add a restraint to list.'
-        restraint.id = self.currentId
+    def append(self, restraint, keepId=False):  # pylint: disable=W0221
+        """Add a restraint to list.
+        do not modify restraint.id if keepId= True
+        """
+        if not keepId:
+            restraint.id = self.currentId
+            self.currentId += 1
+        #end if
         restraint.parent = self # being able to go from restraint to restraint list is important.
         NTlist.append(self, restraint)
         self._idDict[restraint.id] = restraint
-        self.currentId += 1
     #end def
+
     def save(self, path = None):
         """
         Create a SML file

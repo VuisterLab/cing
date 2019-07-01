@@ -6,6 +6,7 @@
 #=======================================================================
 	commonName = 'THR'
 	shortName  = 'T'
+	cingDefinition = True
 	comment    = 'Regular Thr residue'
 	nameDict   = {'CCPN': 'protein Thr prot:HG1', 'INTERNAL_0': 'THR', 'CYANA': 'THR', 'CYANA2': 'THR', 'INTERNAL_1': 'THR', 'IUPAC': 'THR', 'AQUA': 'THR', 'BMRBd': 'THR', 'XPLOR': 'THR', 'PDB': 'THR'}
 	properties = ['protein', 'aliphatic', 'methyl_containing', 'polar']

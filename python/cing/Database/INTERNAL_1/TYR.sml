@@ -6,6 +6,7 @@
 #=======================================================================
 	commonName = 'TYR'
 	shortName  = 'Y'
+	cingDefinition = True
 	comment    = 'Regular Tyr residue'
 	nameDict   = {'CCPN': 'protein Tyr prot:HH', 'INTERNAL_0': 'TYR', 'CYANA': 'TYR', 'CYANA2': 'TYR', 'INTERNAL_1': 'TYR', 'IUPAC': 'TYR', 'AQUA': 'TYR', 'BMRBd': 'TYR', 'XPLOR': 'TYR', 'PDB': 'TYR'}
 	properties = ['protein', 'aromatic', 'large', 'polar']
